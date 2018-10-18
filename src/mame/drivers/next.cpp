@@ -258,19 +258,19 @@ void next_state::irq_check()
 	}
 }
 
-const char *next_state::dma_targets[0x20] = {
+char const *const next_state::dma_targets[0x20] = {
 	nullptr, "scsi", nullptr, nullptr, "soundout", "disk", nullptr, nullptr,
 	"soundin", "printer", nullptr, nullptr, "scc", "dsp", nullptr, nullptr,
 	"s-enetx", "enetx", nullptr, nullptr, "s-enetr", "enetr", nullptr, nullptr,
 	"video", nullptr, nullptr, nullptr, "r2m", "m2r", nullptr, nullptr
 };
 
-const int next_state::dma_irqs[0x20] = {
+int const next_state::dma_irqs[0x20] = {
 	-1, 26, -1, -1, 23, 25, -1, -1, 22, 24, -1, -1, 21, 20, -1, -1,
 	-1, 28, -1, -1, -1, 27, -1, -1,  5, -1, -1, -1, 18, 19, -1, -1
 };
 
-const bool next_state::dma_has_saved[0x20] = {
+bool const next_state::dma_has_saved[0x20] = {
 	false, false, false, false, false, false, false, false,
 	false, false, false, false, false, false, false, false,
 	false, true,  false, false, false, true,  false, false,
@@ -557,7 +557,7 @@ void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 	}
 }
 
-const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 };
+int const next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 };
 
 READ32_MEMBER( next_state::scsictrl_r )
 {
@@ -1055,9 +1055,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::next_fdc_base)
 	next_base(config);
-	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, next_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, next_state, fdc_drq))
+	N82077AA(config, fdc, n82077aa_device::MODE_PS2);
+	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
+	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
 
 	// software list

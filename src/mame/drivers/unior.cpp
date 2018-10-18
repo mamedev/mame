@@ -110,8 +110,7 @@ void unior_state::unior_io(address_map &map)
 	map(0x50, 0x50).w(FUNC(unior_state::scroll_w));
 	map(0x60, 0x61).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xdc, 0xdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xec, 0xec).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xed, 0xed).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xec, 0xed).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */

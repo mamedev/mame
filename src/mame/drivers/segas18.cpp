@@ -1405,35 +1405,37 @@ void segas18_state::lghost(machine_config &config)
 	m_io->out_pc_callback().set(FUNC(segas18_state::lghost_gun_recoil_w));
 }
 
-MACHINE_CONFIG_START(segas18_state::wwally_fd1094)
+void segas18_state::wwally_fd1094(machine_config &config)
+{
 	system18_fd1094(config);
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX1")
-	MCFG_UPD4701_PORTY("TRACKY1")
+	UPD4701A(config, m_upd4701[0]);
+	m_upd4701[0]->set_portx_tag("TRACKX1");
+	m_upd4701[0]->set_porty_tag("TRACKY1");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX2")
-	MCFG_UPD4701_PORTY("TRACKY2")
+	UPD4701A(config, m_upd4701[1]);
+	m_upd4701[1]->set_portx_tag("TRACKX2");
+	m_upd4701[1]->set_porty_tag("TRACKY2");
 
-	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX3")
-	MCFG_UPD4701_PORTY("TRACKY3")
-MACHINE_CONFIG_END
+	UPD4701A(config, m_upd4701[2]);
+	m_upd4701[2]->set_portx_tag("TRACKX3");
+	m_upd4701[2]->set_porty_tag("TRACKY3");
+}
 
-MACHINE_CONFIG_START(segas18_state::wwally)
+void segas18_state::wwally(machine_config &config)
+{
 	system18(config);
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX1")
-	MCFG_UPD4701_PORTY("TRACKY1")
+	UPD4701A(config, m_upd4701[0]);
+	m_upd4701[0]->set_portx_tag("TRACKX1");
+	m_upd4701[0]->set_porty_tag("TRACKY1");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX2")
-	MCFG_UPD4701_PORTY("TRACKY2")
+	UPD4701A(config, m_upd4701[1]);
+	m_upd4701[1]->set_portx_tag("TRACKX2");
+	m_upd4701[1]->set_porty_tag("TRACKY2");
 
-	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX3")
-	MCFG_UPD4701_PORTY("TRACKY3")
-MACHINE_CONFIG_END
+	UPD4701A(config, m_upd4701[2]);
+	m_upd4701[2]->set_portx_tag("TRACKX3");
+	m_upd4701[2]->set_porty_tag("TRACKY3");
+}
 
 MACHINE_CONFIG_START(segas18_state::system18_i8751)
 	system18(config);

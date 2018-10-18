@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "machine/nscsi_cd.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
@@ -37,7 +37,6 @@ MACHINE_CONFIG_END
 
 void nscsi_cdrom_device::set_block_size(u32 block_size)
 {
-	assert_always(!started(), "block size should not be set after device start");
 	assert_always(bytes_per_sector % block_size == 0, "block size must be a factor of sector size");
 
 	bytes_per_block = block_size;
@@ -58,6 +57,25 @@ uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 		}
 	}
 	return sector_buffer[(pos + extra_pos) & (bytes_per_sector - 1)];
+}
+
+void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
+{
+	if(id != 2) {
+		nscsi_full_device::scsi_put_data(id, pos, data);
+		return;
+	}
+
+	// process mode parameter header and one block descriptor
+	if(pos < sizeof(mode_data)) {
+		mode_data[pos] = data;
+
+		// is this the last byte of the mode parameter block descriptor?
+		if(pos == sizeof(mode_data) - 1)
+			// is there exactly one block descriptor?
+			if(mode_data[3] == 8)
+				set_block_size((mode_data[9] << 16) | (mode_data[10] << 8) | (mode_data[11] << 0));
+	}
 }
 
 void nscsi_cdrom_device::return_no_cd()
@@ -124,7 +142,7 @@ void nscsi_cdrom_device::scsi_command()
 		 *    peripheral qualifier set to the value required in 8.2.5.1.
 		 *
 		 * If the logic from the specification above is applied, Sun SCSI probe
-		 * code gets confused and reports multiple valid logical units are 
+		 * code gets confused and reports multiple valid logical units are
 		 * attached; proper behaviour is produced when check condition status
 		 * is returned with sense data ILLEGAL REQUEST and LOGICAL UNIT NOT
 		 * SUPPORTED.
@@ -161,6 +179,16 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 	}
+
+	case SC_MODE_SELECT_6:
+		LOG("command MODE SELECT 6 length %d\n", scsi_cmdbuf[4]);
+
+		// accept mode select parameter data
+		if(scsi_cmdbuf[4])
+			scsi_data_out(2, scsi_cmdbuf[4]);
+
+		scsi_status_complete(SS_GOOD);
+		break;
 
 	case SC_START_STOP_UNIT:
 		LOG("command %s UNIT%s\n", (scsi_cmdbuf[4] & 0x1) ? "START" : "STOP",

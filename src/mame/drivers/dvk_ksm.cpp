@@ -174,10 +174,8 @@ void ksm_state::ksm_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x5e, 0x5f).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x6e, 0x6e).rw(m_i8251kbd, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x6f, 0x6f).rw(m_i8251kbd, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x76, 0x76).rw(m_i8251line, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x77, 0x77).rw(m_i8251line, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x6e, 0x6f).rw(m_i8251kbd, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x76, 0x77).rw(m_i8251line, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x78, 0x7b).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 

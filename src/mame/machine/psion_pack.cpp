@@ -49,7 +49,7 @@ OPTION_GUIDE_START( datapack_option_guide )
 	OPTION_INT('C', "copy", "Copyable" )
 OPTION_GUIDE_END
 
-static const char *datapack_option_spec =
+static char const *const datapack_option_spec =
 	"S1/2/4/[8]/16;R0/[1];P[0]/1;W[0]/1;B[0]/1;C0/[1]";
 
 

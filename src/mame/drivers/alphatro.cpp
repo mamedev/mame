@@ -438,8 +438,7 @@ void alphatro_state::alphatro_io(address_map &map)
 	map(0x2b, 0x2b).portr("XB");
 	map(0x30, 0x30).rw(FUNC(alphatro_state::port30_r), FUNC(alphatro_state::port30_w));
 	// USART for cassette reading and writing
-	map(0x40, 0x40).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x40, 0x41).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// CRTC - HD46505 / HD6845SP
 	map(0x50, 0x50).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x51, 0x51).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -723,9 +722,9 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, alphatro_state, fdc_irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_dmac, i8257_device, dreq2_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(alphatro_state::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatro_floppies, "525dd", alphatro_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")

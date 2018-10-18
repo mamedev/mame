@@ -39,25 +39,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define BBC_TUBE_SLOT_TAG      "tube"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BBC_TUBE_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, BBC_TUBE_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(_devcb) \
-	downcast<bbc_tube_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -70,11 +51,20 @@ class bbc_tube_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	bbc_tube_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~bbc_tube_slot_device();
+	template <typename T>
+	bbc_tube_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
+		: bbc_tube_slot_device(mconfig, tag, owner)
+	{
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
+
+	bbc_tube_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ8_MEMBER( host_r );
 	DECLARE_WRITE8_MEMBER( host_w );
@@ -99,9 +89,6 @@ private:
 class device_bbc_tube_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	virtual ~device_bbc_tube_interface();
-
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(host_r) { return 0xfe; }
 	virtual DECLARE_WRITE8_MEMBER(host_w) { }
@@ -118,6 +105,7 @@ DECLARE_DEVICE_TYPE(BBC_TUBE_SLOT, bbc_tube_slot_device)
 
 void bbc_extube_devices(device_slot_interface &device);
 void bbc_intube_devices(device_slot_interface &device);
+void electron_tube_devices(device_slot_interface &device);
 //void bbc_x25tube_devices(device_slot_interface &device);
 
 

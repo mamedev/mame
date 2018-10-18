@@ -277,6 +277,8 @@ private:
 	uint32_t n_lightgun_y;
 	uint32_t n_screenwidth;
 	uint32_t n_screenheight;
+	bool m_draw_stp;
+	bool m_check_stp;
 
 	PACKET m_packet;
 

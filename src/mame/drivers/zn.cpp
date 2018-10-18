@@ -71,8 +71,7 @@ public:
 		m_rombank(*this, "rombank%u", 1),
 		m_soundbank(*this, "soundbank"),
 		m_okibank(*this, "okibank"),
-		m_znmcu_dataout(1),
-		m_znmcu_dsrout(1)
+		m_znmcu_dataout(1)
 	{
 		std::fill(std::begin(m_cat702_dataout), std::end(m_cat702_dataout), 1);
 	}
@@ -80,6 +79,7 @@ public:
 	void zn1_1mb_vram(machine_config &config);
 	void zn1_2mb_vram(machine_config &config);
 	void zn2(machine_config &config);
+	void gameboard_cat702(machine_config &config);
 	void jdredd(machine_config &config);
 	void coh1002msnd(machine_config &config);
 	void coh1002tb(machine_config &config);
@@ -110,13 +110,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702[0]->write_clock(state);  m_cat702[1]->write_clock(state); m_znmcu->write_clock(state); }
-	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702[0]->write_datain(state);  m_cat702[1]->write_datain(state); }
-	template<int Chip> DECLARE_WRITE_LINE_MEMBER(cat702_dataout){ m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(znmcu_dataout){ m_znmcu_dataout = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(znmcu_dsrout){ m_znmcu_dsrout = state; update_sio0_dsr(); }
-	void update_sio0_rxd(){ m_sio0->write_rxd(m_cat702_dataout[0] && m_cat702_dataout[1] && m_znmcu_dataout); }
-	void update_sio0_dsr(){ m_sio0->write_dsr(m_znmcu_dsrout); }
+	template<int Chip> DECLARE_WRITE_LINE_MEMBER(cat702_dataout) { m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
+	DECLARE_WRITE_LINE_MEMBER(znmcu_dataout) { m_znmcu_dataout = state; update_sio0_rxd(); }
+	void update_sio0_rxd() { m_sio0->write_rxd(m_cat702_dataout[0] && m_cat702_dataout[1] && m_znmcu_dataout); }
 	DECLARE_READ8_MEMBER(znsecsel_r);
 	DECLARE_WRITE8_MEMBER(znsecsel_w);
 	DECLARE_READ8_MEMBER(boardconfig_r);
@@ -221,7 +217,7 @@ private:
 	required_device<psxgpu_device> m_gpu;
 	required_device<screen_device> m_gpu_screen;
 	required_device<psxsio0_device> m_sio0;
-	required_device_array<cat702_device, 2> m_cat702;
+	optional_device_array<cat702_device, 2> m_cat702;
 	required_device<znmcu_device> m_znmcu;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -241,7 +237,6 @@ private:
 
 	int m_cat702_dataout[2];
 	int m_znmcu_dataout;
-	int m_znmcu_dsrout;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -262,7 +257,6 @@ void zn_state::machine_start()
 	save_item(NAME(m_n_znsecsel));
 	save_item(NAME(m_cat702_dataout));
 	save_item(NAME(m_znmcu_dataout));
-	save_item(NAME(m_znmcu_dsrout));
 }
 
 
@@ -288,8 +282,8 @@ WRITE8_MEMBER(zn_state::znsecsel_w)
 {
 	verboselog(2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
-	m_cat702[0]->write_select(BIT(data, 2));
-	m_cat702[1]->write_select(BIT(data, 3));
+	if (m_cat702[0]) m_cat702[0]->write_select(BIT(data, 2));
+	if (m_cat702[1]) m_cat702[1]->write_select(BIT(data, 3));
 	m_znmcu->write_select((data & 0x8c) != 0x8c);
 	// BIT(data,4); // read analogue controls?
 
@@ -383,27 +377,25 @@ void zn_state::zn_map(address_map &map)
 MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( m_maincpu, CXD8530CQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( zn_map)
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::zn_map);
 
-	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
-	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE(*this, zn_state, sio0_txd))
+	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
+	sio0.sck_handler().set(m_cat702[0], FUNC(cat702_device::write_clock));
+	sio0.sck_handler().append(m_znmcu, FUNC(znmcu_device::write_clock));
+	sio0.txd_handler().set(m_cat702[0], FUNC(cat702_device::write_datain));
 
-	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, zn_state, cat702_dataout<0>))
+	CAT702(config, m_cat702[0], 0);
+	m_cat702[0]->dataout_handler().set(FUNC(zn_state::cat702_dataout<0>));
 
-	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, zn_state, cat702_dataout<1>))
-
-	MCFG_DEVICE_ADD("znmcu", ZNMCU, 0)
-	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(*this, zn_state, znmcu_dataout))
-	MCFG_ZNMCU_DSR_HANDLER(WRITELINE(*this, zn_state, znmcu_dsrout))
-	MCFG_ZNMCU_DSW_HANDLER(IOPORT("DSW"))
-	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT("ANALOG1"))
-	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT("ANALOG2"))
+	ZNMCU(config, m_znmcu, 0);
+	m_znmcu->dataout_handler().set(FUNC(zn_state::znmcu_dataout));
+	m_znmcu->dsr_handler().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
+	m_znmcu->dsw_handler().set_ioport("DSW");
+	m_znmcu->analog1_handler().set_ioport("ANALOG1");
+	m_znmcu->analog2_handler().set_ioport("ANALOG2");
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
@@ -433,27 +425,25 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zn_state::zn2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( m_maincpu, CXD8661R, XTAL(100'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP( zn_map)
+	CXD8661R(config, m_maincpu, XTAL(100'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::zn_map);
 
-	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
-	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE(*this, zn_state, sio0_txd))
+	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
+	sio0.sck_handler().set(m_cat702[0], FUNC(cat702_device::write_clock));
+	sio0.sck_handler().append(m_znmcu, FUNC(znmcu_device::write_clock));
+	sio0.txd_handler().set(m_cat702[0], FUNC(cat702_device::write_datain));
 
-	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, zn_state, cat702_dataout<0>))
+	CAT702(config, m_cat702[0], 0);
+	m_cat702[0]->dataout_handler().set(FUNC(zn_state::cat702_dataout<0>));
 
-	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, zn_state, cat702_dataout<1>))
-
-	MCFG_DEVICE_ADD("znmcu", ZNMCU, 0)
-	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(*this, zn_state, znmcu_dataout))
-	MCFG_ZNMCU_DSR_HANDLER(WRITELINE(*this, zn_state, znmcu_dsrout))
-	MCFG_ZNMCU_DSW_HANDLER(IOPORT("DSW"))
-	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT("ANALOG1"))
-	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT("ANALOG2"))
+	ZNMCU(config, m_znmcu, 0);
+	m_znmcu->dataout_handler().set(FUNC(zn_state::znmcu_dataout));
+	m_znmcu->dsr_handler().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
+	m_znmcu->dsw_handler().set_ioport("DSW");
+	m_znmcu->analog1_handler().set_ioport("ANALOG1");
+	m_znmcu->analog2_handler().set_ioport("ANALOG2");
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
@@ -473,6 +463,16 @@ MACHINE_CONFIG_START(zn_state::zn2)
 
 	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 MACHINE_CONFIG_END
+
+void zn_state::gameboard_cat702(machine_config &config)
+{
+	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
+	sio0.sck_handler().append(m_cat702[1], FUNC(cat702_device::write_clock));
+	sio0.txd_handler().append(m_cat702[1], FUNC(cat702_device::write_datain));
+
+	CAT702(config, m_cat702[1], 0);
+	m_cat702[1]->dataout_handler().set(FUNC(zn_state::cat702_dataout<1>));
+}
 
 /*
 Capcom ZN1 generic PCB Layout
@@ -659,8 +659,9 @@ void zn_state::qsound_portmap(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1000c)
 	zn1_1mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1000c_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1000c_map);
 
 	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(qsound_map)
@@ -684,8 +685,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::coh1002c)
 	zn1_2mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1000c_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1000c_map);
 
 	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(qsound_map)
@@ -845,8 +847,9 @@ Notes:
 
 MACHINE_CONFIG_START(zn_state::coh3002c)
 	zn2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1000c_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1000c_map);
 
 	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(qsound_map)
@@ -1141,8 +1144,9 @@ void zn_state::fx1a_sound_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1000ta)
 	zn1_1mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1000ta_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1000ta_map);
 
 	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(16'000'000) / 4)    /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fx1a_sound_map)
@@ -1197,10 +1201,10 @@ void zn_state::init_coh1000tb()
 
 MACHINE_CONFIG_START(zn_state::coh1000tb)
 	zn1_1mb_vram(config);
+	gameboard_cat702(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1000tb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1000tb_map);
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
@@ -1221,10 +1225,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::coh1002tb)
 	zn1_2mb_vram(config);
+	gameboard_cat702(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1000tb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1000tb_map);
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
@@ -1471,8 +1475,9 @@ void zn_state::coh1000w_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1000w)
 	zn1_2mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1000w_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1000w_map);
 
 	subdevice<ram_device>("maincpu:ram")->set_default_size("8M");
 
@@ -1691,8 +1696,9 @@ void zn_state::oki_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1002e)
 	zn1_2mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1002e_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1002e_map);
 
 	MCFG_DEVICE_ADD(m_audiocpu, M68000, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(psarc_snd_map)
@@ -1707,8 +1713,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::beastrzrb)
 	zn1_2mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1002e_map)
+	gameboard_cat702(config); // TODO: hook up bootleg protection
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1002e_map);
 
 	MCFG_DEVICE_ADD(m_audiocpu, AT89C4051, XTAL(12'000'000)) // clock unverified
 	MCFG_DEVICE_PROGRAM_MAP(beastrzrb_snd_map)
@@ -1847,8 +1854,9 @@ MACHINE_RESET_MEMBER(zn_state,bam2)
 
 MACHINE_CONFIG_START(zn_state::bam2)
 	zn1_2mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bam2_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::bam2_map);
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, bam2)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, bam2)
@@ -2197,14 +2205,15 @@ void zn_state::jdredd_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1000a)
 	zn1_2mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1000a_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1000a_map);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::nbajamex)
 	coh1000a(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nbajamex_map)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::nbajamex_map);
 
 	NVRAM(config, "71256", nvram_device::DEFAULT_ALL_1);
 
@@ -2218,8 +2227,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::jdredd)
 	coh1000a(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jdredd_map)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::jdredd_map);
 
 	m_gpu_screen->screen_vblank().set(FUNC(zn_state::jdredd_vblank));
 
@@ -2385,8 +2394,9 @@ void zn_state::atlus_snd_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1001l)
 	zn1_2mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1001l_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1001l_map);
 
 	MCFG_DEVICE_ADD(m_audiocpu, M68000, XTAL(10'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(atlus_snd_map)
@@ -2441,8 +2451,9 @@ MACHINE_RESET_MEMBER(zn_state,coh1002v)
 
 MACHINE_CONFIG_START(zn_state::coh1002v)
 	zn1_2mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1002v_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1002v_map);
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002v)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002v)
@@ -2631,8 +2642,9 @@ MACHINE_RESET_MEMBER(zn_state,coh1002m)
 
 MACHINE_CONFIG_START(zn_state::coh1002m)
 	zn1_2mb_vram(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1002m_map)
+	gameboard_cat702(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1002m_map);
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002m)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m)
@@ -2688,8 +2700,7 @@ MACHINE_CONFIG_START(zn_state::coh1002msnd)
 	coh1002m(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(coh1002msnd_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &zn_state::coh1002msnd_map);
 
 	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(32'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(cbaj_z80_map)
@@ -4944,10 +4955,13 @@ ROM_START( beastrzrb ) /* bootleg board */
 /*  http://www.atmel.com/dyn/products/product_card.asp?family_id=604&family_name=8051+Architecture&part_id=1939 */
 	ROM_LOAD( "at89c4051",    0x000000, 0x001000, NO_DUMP ) /* undumped internal ROM */
 
-	ROM_REGION( 0x180000, "oki", 0 )
+	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_LOAD( "27c4096.1",    0x000000, 0x080000, CRC(217734a1) SHA1(de4f519215123c09b3b5f27509b4d74604b5e03d) )
 	ROM_LOAD( "27c4096.2",    0x080000, 0x080000, CRC(d1f2a9b2) SHA1(d1475a453ce4e3b9f2ff59abedf0f57ba3c408fe) )
-	ROM_LOAD( "27c240.3",     0x100000, 0x080000, CRC(509cdc8b) SHA1(8b92b79be09de56e7d40c2d02fcbeca92bb60226) ) /* bad dump? (only contains 8k of data) */
+
+	// TODO: hook up bootleg protection
+	ROM_REGION16_LE( 0x080000, "blprot", 0 )
+	ROM_LOAD( "27c240.3", 0x000000, 0x080000, CRC(509cdc8b) SHA1(8b92b79be09de56e7d40c2d02fcbeca92bb60226) ) // replay attack, upper & lower bytes identical
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "et02", 0x000000, 0x000008, CRC(187ce61a) SHA1(521122b0f7b3f278dd2a2b1d73c252b952b5f55d) )

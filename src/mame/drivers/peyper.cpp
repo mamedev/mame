@@ -626,10 +626,10 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 
 	/* Devices */
 	i8279_device &kbdc(I8279(config, "i8279", 2500000));
-	kbdc.out_sl_callback().set(FUNC(peyper_state::col_w));		// scan SL lines
-	kbdc.out_disp_callback().set(FUNC(peyper_state::disp_w));	// display A&B
-	kbdc.in_rl_callback().set(FUNC(peyper_state::sw_r));		// kbd RL lines
-	kbdc.in_shift_callback().set_constant(1);					// Shift key
+	kbdc.out_sl_callback().set(FUNC(peyper_state::col_w));      // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(peyper_state::disp_w));   // display A&B
+	kbdc.in_rl_callback().set(FUNC(peyper_state::sw_r));        // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                   // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
 MACHINE_CONFIG_END
 

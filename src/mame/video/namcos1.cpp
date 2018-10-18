@@ -53,44 +53,16 @@ Namco System 1 Video Hardware
 
 ***************************************************************************/
 
-inline void namcos1_state::get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram)
+template <int Offset>
+TILE_GET_INFO_MEMBER(namcos1_state::get_tile_info)
 {
 	int code;
 
 	tile_index <<= 1;
-	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
+	tile_index += Offset;
+	code = m_videoram[tile_index + 1] + ((m_videoram[tile_index] & 0x3f) << 8);
 	SET_TILE_INFO_MEMBER(0,code,0,0);
 	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
-}
-
-TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info0)
-{
-	get_tile_info(tileinfo,tile_index,&m_videoram[0x0000]);
-}
-
-TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info1)
-{
-	get_tile_info(tileinfo,tile_index,&m_videoram[0x2000]);
-}
-
-TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info2)
-{
-	get_tile_info(tileinfo,tile_index,&m_videoram[0x4000]);
-}
-
-TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info3)
-{
-	get_tile_info(tileinfo,tile_index,&m_videoram[0x6000]);
-}
-
-TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info4)
-{
-	get_tile_info(tileinfo,tile_index,&m_videoram[0x7010]);
-}
-
-TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info5)
-{
-	get_tile_info(tileinfo,tile_index,&m_videoram[0x7810]);
 }
 
 
@@ -105,15 +77,13 @@ void namcos1_state::video_start()
 {
 	int i;
 
-	m_tilemap_maskdata = (uint8_t *)memregion("gfx1")->base();
-
 	/* initialize playfields */
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info1),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info2),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
-	m_bg_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x0000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x2000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x4000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x6000>),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x7010>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+	m_bg_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x7810>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -135,10 +105,10 @@ void namcos1_state::video_start()
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0;i < 0x2000;i++)
-		m_palette->shadow_table()[i] = i;
+		m_c116->shadow_table()[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x0800;i < 0x1000;i++)
-		m_palette->shadow_table()[i] = i + 0x0800;
+		m_c116->shadow_table()[i] = i + 0x0800;
 
 	memset(m_playfield_control, 0, sizeof(m_playfield_control));
 	m_copy_sprites = 0;
@@ -292,7 +262,7 @@ uint32_t namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	flip_screen_set(m_spriteram[0x0ff6] & 1);
 
 	/* background color */
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_c116->black_pen(), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
 	i = m_c116->get_reg(0) - 1;                         // min x

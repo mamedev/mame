@@ -2747,7 +2747,7 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	std::fill(std::begin(m_end_address), std::end(m_end_address), 0);
 	std::fill(std::begin(m_masks), std::end(m_masks), 0);
 
-	offs_t ashift = m_space.addr_shift();
+	int ashift = m_space.addr_shift();
 	endianness_t endian = m_space.endianness();
 	offs_t subamask = m_space.alignment() - 1;
 	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
@@ -2939,7 +2939,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 
 	// adjust address, size & value_to_write based on mem_mask.
 	offs_t size = 0;
-	offs_t ashift = m_space.addr_shift();
+	int ashift = m_space.addr_shift();
 	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
 	u64 unit_mask = make_bitmask<u64>(unit_size);
 

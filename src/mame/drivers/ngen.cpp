@@ -320,18 +320,18 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 		break;
 	case 0x10c:
 		if(ACCESSING_BITS_0_7)
-			m_pic->write(space,0,data & 0xff);
+			m_pic->write(0,data & 0xff);
 		break;
 	case 0x10d:
 		if(ACCESSING_BITS_0_7)
-			m_pic->write(space,1,data & 0xff);
+			m_pic->write(1,data & 0xff);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
 		if(ACCESSING_BITS_0_7)
-			m_pit->write(space,offset-0x110,data & 0xff);
+			m_pit->write(offset-0x110,data & 0xff);
 		break;
 	case 0x141:
 		// bit 1 enables speaker?
@@ -346,12 +346,9 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 			m_crtc->register_w(space,0,data & 0xff);
 		break;
 	case 0x146:
-		if(ACCESSING_BITS_0_7)
-			m_viduart->data_w(space,0,data & 0xff);
-		break;
 	case 0x147:
 		if(ACCESSING_BITS_0_7)
-			m_viduart->control_w(space,0,data & 0xff);
+			m_viduart->write(offset & 1, data & 0xff);
 		break;
 	case 0x1a0:  // serial?
 		logerror("Serial(?) 0x1a0 write offset %04x data %04x mask %04x\n",offset,data,mem_mask);
@@ -395,18 +392,18 @@ READ16_MEMBER(ngen_state::peripheral_r)
 		break;
 	case 0x10c:
 		if(ACCESSING_BITS_0_7)
-			ret = m_pic->read(space,0);
+			ret = m_pic->read(0);
 		break;
 	case 0x10d:
 		if(ACCESSING_BITS_0_7)
-			ret = m_pic->read(space,1);
+			ret = m_pic->read(1);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
 		if(ACCESSING_BITS_0_7)
-			ret = m_pit->read(space,offset-0x110);
+			ret = m_pit->read(offset-0x110);
 		break;
 	case 0x141:
 		ret = m_periph141;
@@ -420,13 +417,10 @@ READ16_MEMBER(ngen_state::peripheral_r)
 			ret = m_crtc->register_r(space,0);
 		break;
 	case 0x146:
-		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->data_r(space,0);
-		break;
 	case 0x147:  // keyboard UART
-		// expects bit 0 to be set (UART transmit ready)
+		// status expects bit 0 to be set (UART transmit ready)
 		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->status_r(space,0);
+			ret = m_viduart->read(offset & 1);
 		break;
 	case 0x1a0:  // I/O control register?
 		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Bit 6 is set during a transfer?
@@ -528,7 +522,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x0a:
 		case 0x0b:
 			if(ACCESSING_BITS_0_7)
-				m_fdc_timer->write(space,offset-0x08,data & 0xff);
+				m_fdc_timer->write(offset-0x08,data & 0xff);
 			break;
 		case 0x10:
 		case 0x11:
@@ -547,7 +541,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x1a:
 		case 0x1b:
 			if(ACCESSING_BITS_0_7)
-				m_hdc_timer->write(space,offset-0x18,data & 0xff);
+				m_hdc_timer->write(offset-0x18,data & 0xff);
 			break;
 	}
 }
@@ -577,7 +571,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x0a:
 		case 0x0b:
 			if(ACCESSING_BITS_0_7)
-				ret = m_fdc_timer->read(space,offset-0x08);
+				ret = m_fdc_timer->read(offset-0x08);
 			break;
 		case 0x10:
 		case 0x11:
@@ -596,7 +590,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x1a:
 		case 0x1b:
 			if(ACCESSING_BITS_0_7)
-				ret = m_hdc_timer->read(space,offset-0x18);
+				ret = m_hdc_timer->read(offset-0x18);
 			break;
 	}
 
@@ -791,13 +785,10 @@ READ16_MEMBER( ngen_state::b38_keyboard_r )
 	switch(offset)
 	{
 	case 0:
-		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->data_r(space,0);
-		break;
 	case 1:  // keyboard UART
-		// expects bit 0 to be set (UART transmit ready)
+		// status expects bit 0 to be set (UART transmit ready)
 		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->status_r(space,0);
+			ret = m_viduart->read(offset & 1);
 		break;
 	}
 	return ret;
@@ -808,12 +799,9 @@ WRITE16_MEMBER( ngen_state::b38_keyboard_w )
 	switch(offset)
 	{
 	case 0:
-		if(ACCESSING_BITS_0_7)
-			m_viduart->data_w(space,0,data & 0xff);
-		break;
 	case 1:
 		if(ACCESSING_BITS_0_7)
-			m_viduart->control_w(space,0,data & 0xff);
+			m_viduart->write(offset & 1, data & 0xff);
 		break;
 	}
 }
@@ -829,7 +817,7 @@ READ16_MEMBER( ngen_state::b38_crtc_r )
 		break;
 	case 1:
 		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->data_r(space,0);
+			ret = m_viduart->data_r();
 		break;
 	}
 	return ret;

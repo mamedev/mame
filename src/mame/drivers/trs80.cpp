@@ -264,8 +264,7 @@ void trs80_state::radionic_mem(address_map &map)
 {
 	m1_mem(map);
 	// Optional external RS232 module with 8251
-	//map(0x3400, 0x3400).mirror(0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	//map(0x3401, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	//map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// Internal colour controls (need details)
 	//map(0x3500, 0x35ff).w(FUNC(trs80_state::colour_w));
 	// Internal interface to external slots

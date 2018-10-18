@@ -136,8 +136,7 @@ void excali64_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).r(FUNC(excali64_state::port00_r));
-	map(0x10, 0x10).mirror(0x0e).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x20, 0x23).mirror(0x0c).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));

@@ -306,12 +306,9 @@ void cit101_state::mem_map(address_map &map)
 	map(0x8000, 0xbfff).ram().share("extraram"); // only 4 bits wide?
 	map(0x8000, 0x8000).w(FUNC(cit101_state::screen_control_w));
 	map(0xc000, 0xdfff).rw(FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
-	map(0xfc00, 0xfc00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc01, 0xfc01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfc20, 0xfc20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc21, 0xfc21).rw("comuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfc40, 0xfc40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc41, 0xfc41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc00, 0xfc01).rw("auxuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfc20, 0xfc21).rw("comuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfc40, 0xfc41).rw("kbduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xfc60, 0xfc63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc80, 0xfc83).w("pit0", FUNC(pit8253_device::write));
 	map(0xfcc0, 0xfcc3).w("pit1", FUNC(pit8253_device::write));
@@ -319,12 +316,9 @@ void cit101_state::mem_map(address_map &map)
 
 void cit101_state::io_map(address_map &map)
 {
-	map(0x00, 0x00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x20, 0x20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw("comuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x40, 0x40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw("auxuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x20, 0x21).rw("comuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x40, 0x41).rw("kbduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x60, 0x63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa0).w(FUNC(cit101_state::brightness_w));
 	map(0xe0, 0xe0).rw(FUNC(cit101_state::e0_latch_r), FUNC(cit101_state::e0_latch_w));

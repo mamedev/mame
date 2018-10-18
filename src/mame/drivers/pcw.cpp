@@ -1263,8 +1263,8 @@ MACHINE_CONFIG_START(pcw_state::pcw)
 	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pcw_state, pcw_fdc_interrupt))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(pcw_state::pcw_fdc_interrupt));
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)

@@ -32,8 +32,8 @@ protected:
 	DECLARE_READ8_MEMBER(regs_r);
 	DECLARE_WRITE8_MEMBER(regs_w);
 	DECLARE_READ32_MEMBER(rom_r);
-	DECLARE_READ32_MEMBER(vram_r);
-	DECLARE_WRITE32_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -41,8 +41,9 @@ private:
 	void mem_map(address_map &map) override;
 
 	required_memory_region m_rom;
-	std::unique_ptr<uint32_t[]> m_vram;
+	std::unique_ptr<uint8_t[]> m_vram;
 	required_device<screen_device> m_screen;
+	uint32_t m_mono_lut[256][8];
 };
 
 

@@ -83,8 +83,7 @@ void sdk80_state::sdk80_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xec, 0xef).rw(m_ppi_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf4, 0xf7).rw(m_ppi_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xfa, 0xfa).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfb, 0xfb).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfa, 0xfb).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 static INPUT_PORTS_START( sdk80 )

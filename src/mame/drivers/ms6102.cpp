@@ -135,8 +135,7 @@ void ms6102_state::ms6102_mem(address_map &map)
 void ms6102_state::ms6102_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_i8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0f).rw("589wa1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));

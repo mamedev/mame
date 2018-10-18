@@ -261,7 +261,7 @@ WRITE8_MEMBER( sitcom_timer_state::update_ppi_pa )
 WRITE8_MEMBER( sitcom_timer_state::update_ppi_pb )
 {
 	if (!m_dac_cs && !BIT(data, 0))
-		update_dac(m_ppi->read_pa());
+		update_dac(m_ppi->pa_r());
 	m_dac_wr = BIT(data, 0);
 	m_dac_cs = BIT(data, 1);
 

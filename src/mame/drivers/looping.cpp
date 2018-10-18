@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(looping_state::looping)
 	m_maincpu->set_vblank_int("screen", FUNC(looping_state::looping_interrupt));
 
 	// CPU TMS9980A for audio subsystem; no line connections
-	TMS9980A(config, m_audiocpu, SOUND_CLOCK/4);
+	TMS9980A(config, m_audiocpu, SOUND_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::looping_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &looping_state::looping_sound_io_map);
 

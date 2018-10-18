@@ -2,18 +2,18 @@
 // copyright-holders:David Haywood, Phil Stroffolino
 
 /*
-	Namco System 2 Sprites - found on Namco System 2 video board (standard type)
-	
-	based on namcoic.txt this probably consists of the following
-	C106 - Generates memory output clocks to generate X-Axis Zoom for Line Buffer Writes
-	C134 - Object Memory Address Generator. Sequences the sprite memory contents to the hardware.
-	C135 - Checks is object is displayed on Current output line.
-	C146 - Steers the Decode Object Pixel data to the correct line buffer A or B
+    Namco System 2 Sprites - found on Namco System 2 video board (standard type)
 
-	Metal Hawk requires a different draw function, so might use a different chip unless the hookup is just scrambled (needs checking)
+    based on namcoic.txt this probably consists of the following
+    C106 - Generates memory output clocks to generate X-Axis Zoom for Line Buffer Writes
+    C134 - Object Memory Address Generator. Sequences the sprite memory contents to the hardware.
+    C135 - Checks is object is displayed on Current output line.
+    C146 - Steers the Decode Object Pixel data to the correct line buffer A or B
 
-	used by the following drivers
-	namcos2.cpp (all games EXCEPT Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2 which use the newer Namco NB1 style sprites, see namco_c355spr.cpp)
+    Metal Hawk requires a different draw function, so might use a different chip unless the hookup is just scrambled (needs checking)
+
+    used by the following drivers
+    namcos2.cpp (all games EXCEPT Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2 which use the newer Namco NB1 style sprites, see namco_c355spr.cpp)
 
 
 */
@@ -26,7 +26,6 @@ DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device, "namcos2_sprite", "Nam
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCOS2_SPRITE, tag, owner, clock),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, finder_base::DUMMY_TAG),
 	m_spriteram(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -50,8 +49,9 @@ void namcos2_sprite_device::zdrawgfxzoom(
 	{
 		if( gfx )
 		{
-			int shadow_offset = (m_palette->shadows_enabled())?m_palette->entries():0;
-			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			device_palette_interface &palette = m_gfxdecode->palette();
+			int shadow_offset = (palette.shadows_enabled())?palette.entries():0;
+			const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
@@ -125,31 +125,31 @@ void namcos2_sprite_device::zdrawgfxzoom(
 							/* this code was previously shared with the c355 where this was needed
 							if( m_palxor )
 							{
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != 0xff )
-									{
-										if( pri[x]<=zpos )
-										{
-											switch( c )
-											{
-											case 0:
-												dest[x] = 0x4000|(dest[x]&0x1fff);
-												break;
-											case 1:
-												dest[x] = 0x6000|(dest[x]&0x1fff);
-												break;
-											default:
-												dest[x] = pal[c];
-												break;
-											}
-											pri[x] = zpos;
-										}
-									}
-									x_index += dx;
-								}
-								y_index += dy;
+							    for( x=sx; x<ex; x++ )
+							    {
+							        int c = source[x_index>>16];
+							        if( c != 0xff )
+							        {
+							            if( pri[x]<=zpos )
+							            {
+							                switch( c )
+							                {
+							                case 0:
+							                    dest[x] = 0x4000|(dest[x]&0x1fff);
+							                    break;
+							                case 1:
+							                    dest[x] = 0x6000|(dest[x]&0x1fff);
+							                    break;
+							                default:
+							                    dest[x] = pal[c];
+							                    break;
+							                }
+							                pri[x] = zpos;
+							            }
+							        }
+							        x_index += dx;
+							    }
+							    y_index += dy;
 							}
 							else
 							*/
@@ -343,7 +343,7 @@ void namcos2_sprite_device::draw_sprites_metalhawk(screen_device &screen, bitmap
 			int scaley = (sizey<<16)/(bBigSprite?0x20:0x10);
 
 			/* swap xy */
-			int rgn = (flags&0x01) ? 3 : 0;
+			int rgn = (flags&0x01);
 
 			gfx_element *gfx = m_gfxdecode->gfx(rgn);
 

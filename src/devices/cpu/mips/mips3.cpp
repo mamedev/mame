@@ -102,6 +102,10 @@ static const uint8_t fpmode_source[4] =
 #define ROPCODE(pc)     m_lr32(pc)
 
 
+DEFINE_DEVICE_TYPE(R4000BE,   r4000be_device,   "r4000be",   "MIPS R4000 (big)")
+DEFINE_DEVICE_TYPE(R4000LE,   r4000le_device,   "r4000le",   "MIPS R4000 (little)")
+DEFINE_DEVICE_TYPE(R4400BE,   r4400be_device,   "r4400be",   "MIPS R4400 (big)")
+DEFINE_DEVICE_TYPE(R4400LE,   r4400le_device,   "r4400le",   "MIPS R4400 (little)")
 DEFINE_DEVICE_TYPE(VR4300BE,  vr4300be_device,  "vr4300be",  "NEC VR4300 (big)")
 DEFINE_DEVICE_TYPE(VR4300LE,  vr4300le_device,  "vr4300le",  "NEC VR4300 (little)")
 DEFINE_DEVICE_TYPE(VR4310BE,  vr4310be_device,  "vr4310be",  "NEC VR4310 (big)")
@@ -284,16 +288,15 @@ void mips3_device::generate_exception(int exception, int backup)
 	/* translate our fake fill exceptions into real exceptions */
 	if (exception == EXCEPTION_TLBLOAD_FILL || exception == EXCEPTION_TLBSTORE_FILL)
 	{
-		offset = 0;
+		/* don't use the tlb exception offset if within another exception */
+		if (!(SR & SR_EXL))
+			offset = 0;
 		exception = (exception - EXCEPTION_TLBLOAD_FILL) + EXCEPTION_TLBLOAD;
 	}
 	else if (exception == EXCEPTION_INTERRUPT && m_flavor == MIPS3_TYPE_R5900)
 	{
 		offset = 0x200;
 	}
-
-	/* set the exception PC */
-	m_core->cpr[0][COP0_EPC] = m_core->pc;
 
 	/* put the cause in the low 8 bits and clear the branch delay flag */
 	CAUSE = (CAUSE & ~0x800000ff) | (exception << 2);
@@ -304,31 +307,26 @@ void mips3_device::generate_exception(int exception, int backup)
 		CAUSE |= m_badcop_value << 28;
 	}
 
-	/* if we were in a branch delay slot, adjust */
-	if ((m_nextpc != ~0) || (m_delayslot))
+	/* check if exception within another exception */
+	if (!(SR & SR_EXL))
 	{
-		m_delayslot = false;
-		m_nextpc = ~0;
-		m_core->cpr[0][COP0_EPC] -= 4;
-		CAUSE |= 0x80000000;
-	}
+		/* if we were in a branch delay slot, adjust */
+		if ((m_nextpc != ~0) || (m_delayslot))
+		{
+			m_delayslot = false;
+			m_nextpc = ~0;
+			m_core->cpr[0][COP0_EPC] = m_core->pc - 4;
+			CAUSE |= 0x80000000;
+		}
+		else
+			m_core->cpr[0][COP0_EPC] = m_core->pc;
 
-	/* set the exception level */
-	SR |= SR_EXL;
+		/* set the exception level */
+		SR |= SR_EXL;
+	}
 
 	/* based on the BEV bit, we either go to ROM or RAM */
-	m_core->pc = (SR & SR_BEV) ? 0xbfc00200 : 0x80000000;
-
-	/* most exceptions go to offset 0x180, except for TLB stuff */
-	if (exception >= EXCEPTION_TLBMOD && exception <= EXCEPTION_TLBSTORE)
-	{
-		fprintf(stderr, "TLB miss @ %08X\n", (uint32_t)m_core->cpr[0][COP0_BadVAddr]);
-		machine().debug_break();
-	}
-	else
-	{
-		m_core->pc += offset;
-	}
+	m_core->pc = ((SR & SR_BEV) ? 0xbfc00200 : 0x80000000) + offset;
 
 /*
     useful for tracking interrupts

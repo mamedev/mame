@@ -1729,7 +1729,7 @@ READ8_MEMBER(model3_state::model3_sound_r)
 		case 0:
 		{
 			if (m_uart.found())
-				return m_uart->data_r(space, 0);
+				return m_uart->data_r();
 
 			break;
 		}
@@ -1737,7 +1737,7 @@ READ8_MEMBER(model3_state::model3_sound_r)
 		case 4:
 		{
 			if (m_uart.found())
-				return m_uart->status_r(space, 0);
+				return m_uart->status_r();
 
 			uint8_t res = 0;
 			res |= 1;
@@ -1757,7 +1757,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 			set_irq_line(0x40, CLEAR_LINE);
 
 			if (m_uart.found())
-				m_uart->data_w(space, 0, data);
+				m_uart->data_w(data);
 
 			// send to the sound board
 			m_scsp1->midi_in(data);
@@ -1771,7 +1771,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 
 		case 4:
 			if (m_uart.found())
-				m_uart->control_w(space, 0, data);
+				m_uart->control_w(data);
 
 			if (data == 0x27)
 			{
@@ -5109,6 +5109,71 @@ ROM_START( eca )   /* Step 2.1 Export version */
 	ROM_PARAMETER( ":315_5881:key", "2923aa91" )
 ROM_END
 
+ROM_START( ecaj )    /* Step 2.1, ROM board ID# 834-13946 ECA */
+	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
+	// CROM
+	ROM_LOAD64_WORD_SWAP( "epr-22891.17", 0x000006, 0x200000, CRC(823a251c) SHA1(d2cc4be9dffa860d9af519e1387e7b51322c5454) )
+	ROM_LOAD64_WORD_SWAP( "epr-22892.18", 0x000004, 0x200000, CRC(0ff828a8) SHA1(2a74414891ceb5989e6ccb6e9d597f7d2e31fec4) )
+	ROM_LOAD64_WORD_SWAP( "epr-22893.19", 0x000002, 0x200000, CRC(9755dd8c) SHA1(41f27a303f4af179f17520d0c2d6a0aa4467aae8) )
+	ROM_LOAD64_WORD_SWAP( "epr-22894.20", 0x000000, 0x200000, CRC(cde48c5d) SHA1(62e640110e204b682fc582a0c1aeca370e36b4cf) )
+
+	// CROM0
+	ROM_LOAD64_WORD_SWAP( "mpr-22870.1",   0x800006, 0x400000, CRC(52054043) SHA1(f07c1f95a5847393c9e640c10cd14e2a3750b3ff) )
+	ROM_LOAD64_WORD_SWAP( "mpr-22871.2",   0x800004, 0x400000, CRC(cf5bb5b5) SHA1(fd056fcf9a48854faa357014c2cb4a6ed301c3a6) )
+	ROM_LOAD64_WORD_SWAP( "mpr-22872.3",   0x800002, 0x400000, CRC(4fde63a1) SHA1(72f88e514caea28eeee9e57e55c835c490465df0) )
+	ROM_LOAD64_WORD_SWAP( "mpr-22873.4",   0x800000, 0x400000, CRC(dd406330) SHA1(e17ed1814cb84820f19922eef27bbad65be1d355) )
+
+	// CROM1
+	ROM_LOAD64_WORD_SWAP( "mpr-22874.5",  0x1800006, 0x400000, CRC(5e990497) SHA1(f0df52a19a11ef23f82e88eddbacdcb2a6357ded) )
+	ROM_LOAD64_WORD_SWAP( "mpr-22875.6",  0x1800004, 0x400000, CRC(1bb5c018) SHA1(5d0146c32f6a50613340ba0d2f5cc5430b595965) )
+	ROM_LOAD64_WORD_SWAP( "mpr-22876.7",  0x1800002, 0x400000, CRC(a7561249) SHA1(b4217cb088234831ca2e9486af849866790bf704) )
+	ROM_LOAD64_WORD_SWAP( "mpr-22877.8",  0x1800000, 0x400000, CRC(e53b8764) SHA1(03756ef0526aa0b56c2944336590918d8ff9a9b8) )
+
+	// CROM3
+	ROM_LOAD64_WORD_SWAP( "epr-22882.13", 0x3800006, 0x400000, CRC(b161416f) SHA1(753810fa4db80a2d3a333a257dc92095a112d282) )
+	ROM_LOAD64_WORD_SWAP( "epr-22883.14", 0x3800004, 0x400000, CRC(86d90148) SHA1(4336efb9e3d62cc5e8073993c44cbe49141d987f) )
+	ROM_LOAD64_WORD_SWAP( "epr-22884.15", 0x3800002, 0x400000, CRC(254c3b63) SHA1(b5cd94ecbffb6f0da70fb2cb7541d5bfc96cb67c) )
+	ROM_LOAD64_WORD_SWAP( "epr-22885.16", 0x3800000, 0x400000, CRC(3525b46d) SHA1(d7914cd5c558b50b9115303f77bef63e04316b29) )
+
+	ROM_REGION( 0x2000000, "user3", 0 )  /* Video ROMs Part 1 */
+	ROM_LOAD_VROM( "mpr-22854.26",  0x000002, 0x400000, CRC(97a23d16) SHA1(17a11a3e1b1806f7b994955ae22dd0e5333d47ea) )
+	ROM_LOAD_VROM( "mpr-22855.27",  0x000000, 0x400000, CRC(7249cdc9) SHA1(4bd07d911382cc569e09fb888858806d06809f9f) )
+	ROM_LOAD_VROM( "mpr-22856.28",  0x000006, 0x400000, CRC(9c0d1d1b) SHA1(f15c756fb262e15d784328ed3f731aea40797d98) )
+	ROM_LOAD_VROM( "mpr-22857.29",  0x000004, 0x400000, CRC(44e6ce2b) SHA1(03a33417dc96d3ddcbeb92422654f75f620ef265) )
+	ROM_LOAD_VROM( "mpr-22858.30",  0x00000a, 0x400000, CRC(0af40aae) SHA1(1af762e09af932d267b860712fa46eaf4b1500ac) )
+	ROM_LOAD_VROM( "mpr-22859.31",  0x000008, 0x400000, CRC(c64f0158) SHA1(b92dba07e52b4fdabc9bd4bbd26cc41cdab0414d) )
+	ROM_LOAD_VROM( "mpr-22860.32",  0x00000e, 0x400000, CRC(053af14b) SHA1(6d13609e52a4999d6dca3c4da695ebd973b06b7e) )
+	ROM_LOAD_VROM( "mpr-22861.33",  0x00000c, 0x400000, CRC(d26343da) SHA1(9d8c860c388cc2434cc8d753cde139096c12e79e) )
+
+	ROM_REGION( 0x2000000, "user4", 0 )  /* Video ROMs Part 2 */
+	ROM_LOAD_VROM( "mpr-22862.34",  0x000002, 0x400000, CRC(38347c14) SHA1(6222a5001d3a6ed8e8ff3010284658dbc69edee6) )
+	ROM_LOAD_VROM( "mpr-22863.35",  0x000000, 0x400000, CRC(28b558e6) SHA1(9b4849499baebbd2ea81d00663dff0d40c9db602) )
+	ROM_LOAD_VROM( "mpr-22864.36",  0x000006, 0x400000, CRC(31ed02f6) SHA1(a669aa8a42ff70562c86f348fcf4be6f14c2f650) )
+	ROM_LOAD_VROM( "mpr-22865.37",  0x000004, 0x400000, CRC(3e3a211a) SHA1(422f960914a6604de59b110b18f3e67ed9116f22) )
+	ROM_LOAD_VROM( "mpr-22866.38",  0x00000a, 0x400000, CRC(a863a3c8) SHA1(52e13b76a3698deef05df4c607d047e6362d81c0) )
+	ROM_LOAD_VROM( "mpr-22867.39",  0x000008, 0x400000, CRC(1ce6c7b2) SHA1(d5fd49f9838d3dc636366c436c507ac2b4f2596e) )
+	ROM_LOAD_VROM( "mpr-22868.40",  0x00000e, 0x400000, CRC(2db40cf8) SHA1(be1e04aeb5034c2edc5c0ad153700c385a1b773a) )
+	ROM_LOAD_VROM( "mpr-22869.41",  0x00000c, 0x400000, CRC(c6d62634) SHA1(72d493653b50fb31333f70c7ee143a8c7531106f) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "epr-22886.21", 0x000000, 0x080000, CRC(374ec1c6) SHA1(b06e678db191971f6701bd1f739815d00d4cfb3e) )
+
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )   /* SCSP samples */
+	ROM_LOAD16_WORD_SWAP( "mpr-22887.22", 0x000000, 0x400000, CRC(7d04a867) SHA1(053de98105880188b4daff183710d7932617547f) )
+	ROM_LOAD16_WORD_SWAP( "mpr-22889.24", 0x400000, 0x400000, CRC(4f9ba45d) SHA1(d60314e852637edf6510be52b9b6576a1f3e1b7e) )
+	ROM_LOAD16_WORD_SWAP( "mpr-22888.23", 0x800000, 0x400000, CRC(018fcf22) SHA1(c5133358f591d699f177617463e7dfa22edf5369) )
+	ROM_LOAD16_WORD_SWAP( "mpr-22890.25", 0xc00000, 0x400000, CRC(b638bd7c) SHA1(ed9c69175fd0ca4c6f22e542b4e68398a6e4ad07) )
+
+	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
+	ROM_FILL( 0x000000, 0x20000, 0x0000 )
+
+	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_FILL( 0x000000, 0x1000000, 0x0000 )
+
+	//             ????     317-0265-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "2923aa91" )
+ROM_END
+
 ROM_START( ecau )    /* Step 2.1, ROM board ID# 834-13946-01 ECA */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
@@ -6050,5 +6115,6 @@ GAME( 1998, spikeout,         0, model3_21_5881, model3,   model3_state, init_sp
 GAME( 1999, spikeofe,         0, model3_21_5881, model3,   model3_state, init_spikeofe, ROT0, "Sega", "Spikeout Final Edition", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, magtruck,         0, model3_21_5881, eca,      model3_state, init_magtruck, ROT0, "Sega", "Magical Truck Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, eca,              0, model3_21_5881, eca,      model3_state, init_eca,      ROT0, "Sega", "Emergency Call Ambulance (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, ecaj,           eca, model3_21_5881, eca,      model3_state, init_eca,      ROT0, "Sega", "Emergency Call Ambulance (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ecau,           eca, model3_21_5881, eca,      model3_state, init_eca,      ROT0, "Sega", "Emergency Call Ambulance (USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ecap,           eca, model3_21_5881, eca,      model3_state, init_eca,      ROT0, "Sega", "Emergency Call Ambulance (US location test?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

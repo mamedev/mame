@@ -4,10 +4,10 @@
 
     AMD Am79C90 CMOS Local Area Network Controller for Ethernet (C-LANCE)
 
-	TODO:
-		- Communication with the outside world
-		- Error handling
-		- Clocks
+    TODO:
+        - Communication with the outside world
+        - Error handling
+        - Clocks
 
 ******************************************************************************
                             _____   _____
@@ -45,17 +45,18 @@
 
 #include "hashing.h"
 
-class am79c90_device :  public device_t
+class am7990_device_base : public device_t
 {
 public:
-	am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
 	auto dma_out() { return m_dma_out_cb.bind(); }
 	auto dma_in() { return m_dma_in_cb.bind(); }
 	auto irq_out() { return m_irq_out_cb.bind(); }
 
 	DECLARE_READ16_MEMBER(regs_r);
 	DECLARE_WRITE16_MEMBER(regs_w);
+
+protected:
+	am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 private:
 	virtual void device_start() override;
@@ -197,6 +198,19 @@ private:
 	util::crc32_creator m_crc32;
 };
 
+class am7990_device : public am7990_device_base
+{
+public:
+	am7990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class am79c90_device : public am7990_device_base
+{
+public:
+	am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+DECLARE_DEVICE_TYPE(AM7990, am7990_device)
 DECLARE_DEVICE_TYPE(AM79C90, am79c90_device)
 
 #endif // MAME_MACHINE_AM79C90_H

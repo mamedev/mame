@@ -637,7 +637,7 @@ WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 
 WRITE8_MEMBER( geneve_state::external_operation )
 {
-	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP)
 		LOGMASKED(LOG_WARN, "External operation %s not implemented on Geneve board\n", extop[offset]);
 }

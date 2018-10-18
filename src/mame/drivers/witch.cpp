@@ -1172,8 +1172,8 @@ void witch_state::init_witch()
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 }
 
-GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System",     "Keirin Ou", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch (With ranking)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System", "Keirin Ou", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch (with ranking)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Sega license)", "Witch (Sega license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pbchmp95, witch, witch,    witch,    witch_state,    init_witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", MACHINE_SUPPORTS_SAVE )

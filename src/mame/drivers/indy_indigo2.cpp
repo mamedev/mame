@@ -96,10 +96,10 @@ private:
 
 	static void cdrom_config(device_t *device);
 
-	static const char* HAL2_TAG;
-	static const char* HPC3_TAG;
-	static const char* IOC2_TAG;
-	static const char* RTC_TAG;
+	static char const *const HAL2_TAG;
+	static char const *const HPC3_TAG;
+	static char const *const IOC2_TAG;
+	static char const *const RTC_TAG;
 
 	required_device<mips3_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_mainram;
@@ -114,10 +114,10 @@ private:
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
 
-/*static*/ const char* ip22_state::HAL2_TAG = "hal2";
-/*static*/ const char* ip22_state::HPC3_TAG = "hpc3";
-/*static*/ const char* ip22_state::IOC2_TAG = "ioc2";
-/*static*/ const char* ip22_state::RTC_TAG = "rtc";
+/*static*/ char const *const ip22_state::HAL2_TAG = "hal2";
+/*static*/ char const *const ip22_state::HPC3_TAG = "hpc3";
+/*static*/ char const *const ip22_state::IOC2_TAG = "ioc2";
+/*static*/ char const *const ip22_state::RTC_TAG = "rtc";
 
 #define VERBOSE_LEVEL ( 0 )
 

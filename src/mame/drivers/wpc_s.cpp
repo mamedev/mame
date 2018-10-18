@@ -2141,6 +2141,17 @@ ROM_START(jb_10b)
 	ROM_LOAD16_BYTE("jbsnd_u6.rom", 0x800000, 0x080000, CRC(7a1e2c3d) SHA1(0c6ccb937328509cb0a87e4c557a64c13bbed2db))
 ROM_END
 
+ROM_START(jb_04a) // WPC-S 5-Board
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("jack0_4a.rom", 0x00000, 0x80000, CRC(cc02e024) SHA1(5de886e4631c3c99b83f6692482259e2a6bf0bca))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("jbsnd_04a.u2", 0x000000, 0x080000, CRC(f90ebf0f) SHA1(d18362c1946504dd456f6edc28bb5812d584874a))
+	ROM_LOAD16_BYTE("jbsnd_u3.rom", 0x200000, 0x080000, CRC(76ad3aad) SHA1(012b44c48d1cbb282eb763e40db40b141397f426))
+	ROM_LOAD16_BYTE("jbsnd_u4.rom", 0x400000, 0x080000, CRC(038b1309) SHA1(a6e337476902ed9ec5123fe4e088a0608c0d5f48))
+	ROM_LOAD16_BYTE("jbsnd_u5.rom", 0x600000, 0x080000, CRC(0957e2ad) SHA1(0fb4e3fdb949b0979721064162a41cfba84d0013))
+	ROM_LOAD16_BYTE("jbsnd_u6.rom", 0x800000, 0x080000, CRC(7a1e2c3d) SHA1(0c6ccb937328509cb0a87e4c557a64c13bbed2db))
+ROM_END
+
 /*-----------------
 /  Johnny Mnemonic #50042
 /------------------*/
@@ -2753,6 +2764,7 @@ GAME(1995,  i500_10r,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0
 GAME(1995,  i500_11b,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",    MACHINE_MECHANICAL)
 GAME(1995,  jb_10r,     0,          wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0R)",                   MACHINE_MECHANICAL)
 GAME(1995,  jb_10b,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0B) (Belgium/Canada)",  MACHINE_MECHANICAL)
+GAME(1995,  jb_04a,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (0.4A prototype)",         MACHINE_MECHANICAL)
 GAME(1995,  jm_12r,     0,          wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2R)",            MACHINE_MECHANICAL)
 GAME(1995,  jm_12b,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2B) Belgium",    MACHINE_MECHANICAL)
 GAME(1995,  jm_05r,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (0.5R)",            MACHINE_MECHANICAL)

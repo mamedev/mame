@@ -340,9 +340,9 @@ READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= m_ppi8255_0->read(space, offset);
+		result &= m_ppi8255_0->read(offset);
 	if (!(offset & 8))
-		result &= m_ppi8255_1->read(space, offset);
+		result &= m_ppi8255_1->read(offset);
 	return result;
 }
 
@@ -351,9 +351,9 @@ WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		m_ppi8255_0->write(space, offset, data);
+		m_ppi8255_0->write(offset, data);
 	if (!(offset & 8))
-		m_ppi8255_1->write(space, offset, data);
+		m_ppi8255_1->write(offset, data);
 }
 
 
@@ -853,6 +853,8 @@ void astinvad_state::init_spcking2()
 {
 	/* don't have the schematics, but the blanking must center the screen here */
 	m_flip_yoffs = 0;
+
+	save_item(NAME(m_player));
 }
 
 

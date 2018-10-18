@@ -1,12 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
-/***************************************************************************
+// copyright-holders:Curt Coder, Robbbert
+/***************************************************************************************
 
-    Jugend+Technik CompJU+TEr
+Jugend+Technik CompJU+TEr
 
-    15/07/2009 Skeleton driver.
+2009-07-15 Skeleton driver.
 
-****************************************************************************/
+2018-09: Made mostly working
+
+To Do:
+- Figure out how to use the so-called "Basic", all documents are in German.
+- Fix any remaining CPU bugs
+- On jtces40, the use of ALT key will usually freeze the system. Normal, or a bug?
+- On jtces40, no backspace?
+- On jtces40, is there a way to type lower case?
+- On jtces40, hires gfx and colours to fix.
+
+****************************************************************************************/
 
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
@@ -15,11 +25,11 @@
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "imagedev/snapquik.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
-#define SCREEN_TAG      "screen"
 #define UB8830D_TAG     "ub8830d"
 #define CENTRONICS_TAG  "centronics"
 
@@ -35,14 +45,8 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, CENTRONICS_TAG)
-		, m_video_ram(*this, "video_ram")
+		, m_video_ram(*this, "videoram")
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
-	required_device<cassette_image_device> m_cassette;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<centronics_device> m_centronics;
 
 	virtual void machine_start() override;
 
@@ -52,13 +56,20 @@ public:
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 	DECLARE_PALETTE_INIT(jtc_es40);
-	optional_shared_ptr<uint8_t> m_video_ram;
+	DECLARE_QUICKLOAD_LOAD_MEMBER( jtc );
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	void basic(machine_config &config);
 	void jtc(machine_config &config);
 	void jtc_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<cassette_image_device> m_cassette;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<centronics_device> m_centronics;
+	optional_shared_ptr<uint8_t> m_video_ram;
 };
 
 
@@ -68,8 +79,8 @@ public:
 	jtces88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jtc_state(mconfig, type, tag)
 	{ }
+
 	void jtces88(machine_config &config);
-	void jtc_es1988_mem(address_map &map);
 };
 
 
@@ -80,8 +91,9 @@ public:
 		: jtc_state(mconfig, type, tag)
 	{ }
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void jtces23(machine_config &config);
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void jtc_es23_mem(address_map &map);
 };
 
@@ -93,6 +105,8 @@ public:
 		: jtc_state(mconfig, type, tag)
 	{ }
 
+	void jtces40(machine_config &config);
+private:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -104,7 +118,6 @@ public:
 	std::unique_ptr<uint8_t[]> m_color_ram_r;
 	std::unique_ptr<uint8_t[]> m_color_ram_g;
 	std::unique_ptr<uint8_t[]> m_color_ram_b;
-	void jtces40(machine_config &config);
 	void jtc_es40_mem(address_map &map);
 };
 
@@ -146,10 +159,6 @@ READ8_MEMBER( jtc_state::p3_r )
 	    P31
 	    P32
 	    P33     centronics busy input
-	    P34
-	    P35
-	    P36     tape output
-	    P37     speaker output
 
 	*/
 
@@ -167,10 +176,6 @@ WRITE8_MEMBER( jtc_state::p3_w )
 
 	    bit     description
 
-	    P30     tape input
-	    P31
-	    P32
-	    P33     centronics busy input
 	    P34
 	    P35
 	    P36     tape output
@@ -179,10 +184,11 @@ WRITE8_MEMBER( jtc_state::p3_w )
 	*/
 
 	/* tape */
-	m_cassette->output( BIT(data, 6) ? +1.0 : -1.0);
-
+	if (BIT(data, 7))
+		m_cassette->output( BIT(data, 6) ? +1.0 : -1.0);
+	else
 	/* speaker */
-	m_speaker->level_w(BIT(data, 7));
+		m_speaker->level_w(BIT(data, 6));
 }
 
 READ8_MEMBER( jtces40_state::videoram_r )
@@ -207,7 +213,7 @@ WRITE8_MEMBER( jtces40_state::videoram_w )
 
 WRITE8_MEMBER( jtces40_state::banksel_w )
 {
-	m_video_bank = offset & 0xf0;
+	m_video_bank = data;
 }
 
 /* Memory Maps */
@@ -233,7 +239,7 @@ void jtc_state::jtc_mem(address_map &map)
 	map(0x700e, 0x700e).mirror(0x0ff0).portr("Y14");
 	map(0x700f, 0x700f).mirror(0x0ff0).portr("Y15");
 	map(0xe000, 0xfdff).ram();
-	map(0xfe00, 0xffff).ram().share("video_ram");
+	map(0xfe00, 0xffff).ram().share("videoram");
 }
 
 void jtces23_state::jtc_es23_mem(address_map &map)
@@ -257,7 +263,7 @@ void jtces23_state::jtc_es23_mem(address_map &map)
 	map(0x700e, 0x700e).mirror(0x0ff0).portr("Y14");
 	map(0x700f, 0x700f).mirror(0x0ff0).portr("Y15");
 	map(0xe000, 0xf7ff).ram();
-	map(0xf800, 0xffff).ram().share("video_ram");
+	map(0xf800, 0xffff).ram().share("videoram");
 }
 
 void jtces40_state::jtc_es40_mem(address_map &map)
@@ -493,11 +499,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jtces40 )
 	PORT_START("Y0")
+
 	PORT_START("Y1")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHT3") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHT2") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHT2") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHT1") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("Y2")
@@ -505,7 +512,7 @@ static INPUT_PORTS_START( jtces40 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 
 	PORT_START("Y3")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -538,7 +545,7 @@ static INPUT_PORTS_START( jtces40 )
 	PORT_START("Y7")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 
@@ -572,7 +579,8 @@ static INPUT_PORTS_START( jtces40 )
 
 	PORT_START("Y12")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CLR") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('<') PORT_CHAR('>') PORT_CHAR('^')
+	// can't find this: PORT_NAME("CLR") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('+') PORT_CHAR('-') PORT_CHAR('\\')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('*') PORT_CHAR('/') PORT_CHAR('|')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RET") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_CHAR('?') PORT_CHAR('~')
@@ -581,6 +589,94 @@ static INPUT_PORTS_START( jtces40 )
 	PORT_START("Y14")
 	PORT_START("Y15")
 INPUT_PORTS_END
+
+QUICKLOAD_LOAD_MEMBER( jtc_state, jtc )
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	u16 i, quick_addr, quick_length;
+	std::vector<uint8_t> quick_data;
+	image_init_result result = image_init_result::FAIL;
+
+	quick_length = image.length();
+	if (image.is_filetype("jtc"))
+	{
+		if (quick_length < 0x0088)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+			image.message(" File too short");
+		}
+		else
+		if (quick_length > 0x8000)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.message(" File too long");
+		}
+		else
+		{
+			quick_data.resize(quick_length+1);
+			u16 read_ = image.fread( &quick_data[0], quick_length);
+			if (read_ != quick_length)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.message(" Cannot read the file");
+			}
+			else
+			{
+				quick_addr = quick_data[0x12] * 256 + quick_data[0x11];
+				quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
+				if (image.length() != quick_length)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid file header");
+					image.message(" Invalid file header");
+				}
+				else
+				{
+					for (i = 0x80; i < image.length(); i++)
+						space.write_byte(quick_addr+i-0x80, quick_data[i]);
+
+					/* display a message about the loaded quickload */
+					image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+
+					result = image_init_result::PASS;
+				}
+			}
+		}
+	}
+	else
+	if (image.is_filetype("bin"))
+	{
+		quick_addr = 0xe000;
+		if (quick_length > 0x8000)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+			image.message(" File too long");
+		}
+		else
+		{
+			quick_data.resize(quick_length+1);
+			u16 read_ = image.fread( &quick_data[0], quick_length);
+			if (read_ != quick_length)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.message(" Cannot read the file");
+			}
+			else
+			{
+				for (i = 0; i < image.length(); i++)
+					space.write_byte(quick_addr+i, quick_data[i]);
+
+				/* display a message about the loaded quickload */
+				image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
+
+				result = image_init_result::PASS;
+				m_maincpu->set_pc(quick_addr);
+			}
+		}
+	}
+
+	return result;
+}
+
 
 /* Video */
 
@@ -622,6 +718,8 @@ uint32_t jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 PALETTE_INIT_MEMBER(jtc_state,jtc_es40)
 {
+	for (u8 i = 8; i < 16; i++)
+		palette.set_pen_color(i, rgb_t(BIT(i, 0) ? 0xc0 : 0, BIT(i, 1) ? 0xc0 : 0, BIT(i, 2) ? 0xc0 : 0));
 }
 
 void jtces40_state::video_start()
@@ -643,21 +741,26 @@ void jtces40_state::video_start()
 
 uint32_t jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 i, y, sx;
+	u8 i, y, z, x;
+	u16 ma = 0;
 
-	for (y = 0; y < 192; y++)
+	for (y = 0; y < 64; y++)
 	{
-		for (sx = 0; sx < 40; sx++)
+		for (z = 0; z < 3; z++)
 		{
-			u8 data = m_video_ram[(y * 40) + sx];
-			u8 r = m_color_ram_r[(y * 40) + sx];
-			u8 g = m_color_ram_g[(y * 40) + sx];
-			u8 b = m_color_ram_b[(y * 40) + sx];
+			for (x = 0; x < 40; x++)
+			{
+				u8 data = m_video_ram[ma + x];
+				u8 r = ~m_color_ram_r[ma + x];
+				u8 g = ~m_color_ram_g[ma + x];
+				u8 b = ~m_color_ram_b[ma + x];
 
-			for (i = 0; i < 8; i++)
-				//bitmap.pix16(y, (sx * 8) + 7 - i) = (BIT(r, i) << 3) | (BIT(g, i) << 2) | (BIT(b, i) << 1) | BIT(data, i);
-				bitmap.pix16(y, (sx * 8) + 7 - i) = BIT(data, i) ? 0 : (BIT(r, i) << 0) | (BIT(g, i) << 1) | (BIT(b, i) << 2);
+				for (i = 0; i < 8; i++)
+					bitmap.pix16(y*3+z, (x * 8) + 7 - i) = (BIT(r, i) << 0) | (BIT(g, i) << 1) | (BIT(b, i) << 2) | (BIT(data, i) << 3);
+			}
+			ma+=40;
 		}
+		ma+=8;
 	}
 
 	return 0;
@@ -688,7 +791,7 @@ static const gfx_layout jtces23_charlayout =
 
 static const gfx_layout jtces40_charlayout =
 {
-	8, 8,                   /* 8 x 16 characters */
+	8, 8,                   /* 8 x 8 characters */
 	128,                    /* 128 characters */
 	1,                  /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes */
@@ -715,25 +818,27 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	MCFG_Z8_PORT_P3_READ_CB(READ8(*this, jtc_state, p3_r))
 	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(*this, jtc_state, p3_w))
 
+	/* cassette */
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
-
-	/* cassette */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* printer */
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, jtc_state, write_centronics_busy))
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", jtc_state, jtc, "jtc,bin", 2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jtc_state::jtc)
 	basic(config);
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(jtc_state, screen_update)
@@ -761,7 +866,7 @@ MACHINE_CONFIG_START(jtces23_state::jtces23)
 	MCFG_DEVICE_PROGRAM_MAP(jtc_es23_mem)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(jtces23_state, screen_update)
@@ -783,7 +888,7 @@ MACHINE_CONFIG_START(jtces40_state::jtces40)
 	MCFG_DEVICE_PROGRAM_MAP(jtc_es40_mem)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(jtces40_state, screen_update)
@@ -830,7 +935,7 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME                    FLAGS */
-COMP( 1987, jtc,     0,      0,      jtc,     jtc,     jtc_state,     empty_init, "Jugend+Technik", "CompJU+TEr",               MACHINE_NOT_WORKING )
-COMP( 1988, jtces88, jtc,    0,      jtces88, jtc,     jtces88_state, empty_init, "Jugend+Technik", "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
-COMP( 1989, jtces23, jtc,    0,      jtces23, jtces23, jtces23_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
-COMP( 1990, jtces40, jtc,    0,      jtces40, jtces40, jtces40_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )
+COMP( 1987, jtc,     0,      0,      jtc,     jtc,     jtc_state,     empty_init, "Jugend+Technik", "CompJU+TEr",               MACHINE_SUPPORTS_SAVE )
+COMP( 1988, jtces88, jtc,    0,      jtces88, jtc,     jtces88_state, empty_init, "Jugend+Technik", "CompJU+TEr (EMR-ES 1988)", MACHINE_SUPPORTS_SAVE )
+COMP( 1989, jtces23, jtc,    0,      jtces23, jtces23, jtces23_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 2.3)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1990, jtces40, jtc,    0,      jtces40, jtces40, jtces40_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 4.0)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

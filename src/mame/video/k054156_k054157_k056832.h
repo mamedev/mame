@@ -118,6 +118,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state
@@ -195,7 +196,6 @@ private:
 	void update_page_layout();
 	void change_rambank();
 	void change_rombank();
-	void postload();
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
 
 	template<class _BitmapClass>

@@ -107,7 +107,7 @@ uint8_t pofo_hpc101_device::nrdi_r(address_space &space, offs_t offset, uint8_t 
 
 		if ((offset & 0x0c) == 0x08)
 		{
-			data = m_ppi->read(space, offset & 0x03);
+			data = m_ppi->read(offset & 0x03);
 		}
 	}
 
@@ -125,7 +125,7 @@ void pofo_hpc101_device::nwri_w(address_space &space, offs_t offset, uint8_t dat
 	{
 		if ((offset & 0x0c) == 0x08)
 		{
-			m_ppi->write(space, offset & 0x03, data);
+			m_ppi->write(offset & 0x03, data);
 		}
 	}
 }

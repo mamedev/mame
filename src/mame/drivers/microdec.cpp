@@ -142,10 +142,8 @@ void microdec_state::microdec_io(address_map &map)
 	map(0xf7, 0xf7).rw(FUNC(microdec_state::portf7_r), FUNC(microdec_state::portf7_w));
 	map(0xf8, 0xf8).w(FUNC(microdec_state::portf8_w));
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
-	map(0xfc, 0xfc).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfd, 0xfd).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc, 0xfd).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfe, 0xff).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// AM_RANGE(0xf0, 0xf3) 8253 PIT (md3 only) used as a baud rate generator for serial ports
 	// AM_RANGE(0xf4, 0xf4) Centronics data
 	// AM_RANGE(0xf5, 0xf5) motor check (md1/2)

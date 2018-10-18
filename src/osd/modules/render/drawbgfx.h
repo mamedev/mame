@@ -80,7 +80,7 @@ public:
 		return &win->target()->get_primitives();
 	}
 
-	static const char* WINDOW_PREFIX;
+	static char const *const WINDOW_PREFIX;
 
 private:
 	void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);

@@ -40,8 +40,7 @@ void pp01_state::pp01_io(address_map &map)
 {
 	map(0xc0, 0xc3).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
 	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // user
-	map(0xc8, 0xc8).mirror(2).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc9, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc8, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xcc, 0xcf).w(FUNC(pp01_state::pp01_video_write_mode_w));
 	map(0xd0, 0xd3).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe0, 0xef).mirror(0x10).rw(FUNC(pp01_state::pp01_mem_block_r), FUNC(pp01_state::pp01_mem_block_w));

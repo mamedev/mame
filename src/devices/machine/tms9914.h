@@ -107,6 +107,20 @@ public:
 	template <class Object> devcb_base& set_accrq_write_cb(Object &&cb)
 	{ return m_accrq_write_func.set_callback(std::forward<Object>(cb)); }
 
+	auto dio_read_cb() { return m_dio_read_func.bind(); }
+	auto dio_write_cb() { return m_dio_write_func.bind(); }
+	auto eoi_write_cb() { return m_signal_wr_fns[IEEE_488_EOI].bind(); }
+	auto dav_write_cb() { return m_signal_wr_fns[IEEE_488_DAV].bind(); }
+	auto nrfd_write_cb() { return m_signal_wr_fns[IEEE_488_NRFD].bind(); }
+	auto ndac_write_cb() { return m_signal_wr_fns[IEEE_488_NDAC].bind(); }
+	auto ifc_write_cb() { return m_signal_wr_fns[IEEE_488_IFC].bind(); }
+	auto srq_write_cb() { return m_signal_wr_fns[IEEE_488_SRQ].bind(); }
+	auto atn_write_cb() { return m_signal_wr_fns[IEEE_488_ATN].bind(); }
+	auto ren_write_cb() { return m_signal_wr_fns[IEEE_488_REN].bind(); }
+
+	auto int_write_cb() { return m_int_write_func.bind(); }
+	auto accrq_write_cb() { return m_accrq_write_func.bind(); }
+
 	DECLARE_WRITE_LINE_MEMBER(eoi_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
 	DECLARE_WRITE_LINE_MEMBER(nrfd_w);
@@ -303,6 +317,7 @@ private:
 	void update_ifc();
 	void update_ren();
 	void set_accrq(bool state);
+	bool m_next_eoi;
 };
 
 // device type definition

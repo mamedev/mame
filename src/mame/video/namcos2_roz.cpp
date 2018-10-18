@@ -2,14 +2,14 @@
 // copyright-holders:David Haywood, Phil Stroffolino
 
 /*
-	Namco System 2 ROZ Tilemap - found on Namco System 2 video board (standard type)
-	
-	based on namcoic.txt this probably consists of the following
-	C102 - Controls CPU access to ROZ Memory Area.
-	(anything else?)
+    Namco System 2 ROZ Tilemap - found on Namco System 2 video board (standard type)
 
-	used by the following drivers
-	namcos2.cpp (all games EXCEPT Final Lap 1,2,3 , Lucky & Wild , Steel Gunner 1,2 , Suzuka 8 Hours 1,2 , Metal Hawk)
+    based on namcoic.txt this probably consists of the following
+    C102 - Controls CPU access to ROZ Memory Area.
+    (anything else?)
+
+    used by the following drivers
+    namcos2.cpp (all games EXCEPT Final Lap 1,2,3 , Lucky & Wild , Steel Gunner 1,2 , Suzuka 8 Hours 1,2 , Metal Hawk)
 
 
 */
@@ -17,20 +17,34 @@
 #include "emu.h"
 #include "namcos2_roz.h"
 
+static const gfx_layout layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8*8*8
+};
+
+GFXDECODE_START( namcos2_roz_device::gfxinfo )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout, 0, 16 )
+GFXDECODE_END
+
 DEFINE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device, "namcos2_roz", "Namco Sysem 2 ROZ (C102)")
 
 namcos2_roz_device::namcos2_roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCOS2_ROZ, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_rozram(*this, finder_base::DUMMY_TAG),
-	m_roz_ctrl(*this, finder_base::DUMMY_TAG),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, finder_base::DUMMY_TAG)
+	m_roz_ctrl(*this, finder_base::DUMMY_TAG)
 {
 }
 
 void namcos2_roz_device::device_start()
 {
-	m_tilemap_roz = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_roz_device::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
+	m_tilemap_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namcos2_roz_device::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 }
 
@@ -38,7 +52,7 @@ void namcos2_roz_device::device_start()
 TILE_GET_INFO_MEMBER(namcos2_roz_device::roz_tile_info)
 {
 	int tile = m_rozram[tile_index];
-	SET_TILE_INFO_MEMBER(3, tile, 0/*color*/, 0);
+	SET_TILE_INFO_MEMBER(0, tile, 0/*color*/, 0);
 }
 
 struct roz_param
@@ -113,30 +127,30 @@ draw_roz_helper(
 	if (bitmap.bpp() == 16)
 	{
 		/* On many processors, the simple approach of an outer loop over the
-			rows of the destination bitmap with an inner loop over the columns
-			of the destination bitmap has poor performance due to the order
-			that memory in the source bitmap is referenced when rotation
-			approaches 90 or 270 degrees.  The reason is that the inner loop
-			ends up reading pixels not sequentially in the source bitmap, but
-			instead at rozInfo->incxx increments, which is at its maximum at 90
-			degrees of rotation.  This means that only a few (or as few as
-			one) source pixels are in each cache line at a time.
+		    rows of the destination bitmap with an inner loop over the columns
+		    of the destination bitmap has poor performance due to the order
+		    that memory in the source bitmap is referenced when rotation
+		    approaches 90 or 270 degrees.  The reason is that the inner loop
+		    ends up reading pixels not sequentially in the source bitmap, but
+		    instead at rozInfo->incxx increments, which is at its maximum at 90
+		    degrees of rotation.  This means that only a few (or as few as
+		    one) source pixels are in each cache line at a time.
 
-			Instead of the above, this code iterates in NxN blocks through the
-			destination bitmap.  This has more overhead when there is little or
-			no rotation, but much better performance when there is closer to 90
-			degrees of rotation (as long as the chunk of the source bitmap that
-			corresponds to an NxN destination block fits in cache!).
+		    Instead of the above, this code iterates in NxN blocks through the
+		    destination bitmap.  This has more overhead when there is little or
+		    no rotation, but much better performance when there is closer to 90
+		    degrees of rotation (as long as the chunk of the source bitmap that
+		    corresponds to an NxN destination block fits in cache!).
 
-			N is defined by ROZ_BLOCK_SIZE below; the best N is one that is as
-			big as possible but at the same time not too big to prevent all of
-			the source bitmap pixels from fitting into cache at the same time.
-			Keep in mind that the block of source pixels used can be somewhat
-			scattered in memory.  8x8 works well on the few processors that
-			were tested; 16x16 seems to work even better for more modern
-			processors with larger caches, but since 8x8 works well enough and
-			is less likely to result in cache misses on processors with smaller
-			caches, it is used.
+		    N is defined by ROZ_BLOCK_SIZE below; the best N is one that is as
+		    big as possible but at the same time not too big to prevent all of
+		    the source bitmap pixels from fitting into cache at the same time.
+		    Keep in mind that the block of source pixels used can be somewhat
+		    scattered in memory.  8x8 works well on the few processors that
+		    were tested; 16x16 seems to work even better for more modern
+		    processors with larger caches, but since 8x8 works well enough and
+		    is less likely to result in cache misses on processors with smaller
+		    caches, it is used.
 		*/
 
 #define ROZ_BLOCK_SIZE 8

@@ -143,6 +143,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
+#include "bus/sunmouse/sunmouse.h"
 
 #include "screen.h"
 
@@ -156,6 +157,7 @@
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define KEYBOARD_TAG    "keyboard"
+#define MOUSE_TAG       "mouseport"
 
 class sun3x_state : public driver_device
 {
@@ -597,8 +599,10 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
 	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
@@ -621,7 +625,7 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	MCFG_DEVICE_ADD(ESP_TAG, NCR539X, 20000000/2)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 
-	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
+	N82077AA(config, m_fdc, n82077aa_device::MODE_PS2);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun3x_state::floppy_formats)
 
 	// the timekeeper has no interrupt output, so 3/80 includes a dedicated timer circuit

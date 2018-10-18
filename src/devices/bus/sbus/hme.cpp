@@ -4,11 +4,11 @@
 
     Sun SunSwift 10/100 + Fast Wide SCSI "Colossus" skeleton
 
-	Notable parts on board:
-	- 1x 32-pin PLCC ROM, label 525 / 1409 / -08 on separate lines
-	- 1x Sun STP2002QFP, marked 100-4156-05 / 609-0392458 / DP03972
-	- 1x National Semiconductor DP83840AVCE-1 Ethernet Physical Layer
-	- 1x National Semiconductor DP83223V Twisted Pair Transceiver
+    Notable parts on board:
+    - 1x 32-pin PLCC ROM, label 525 / 1409 / -08 on separate lines
+    - 1x Sun STP2002QFP, marked 100-4156-05 / 609-0392458 / DP03972
+    - 1x National Semiconductor DP83840AVCE-1 Ethernet Physical Layer
+    - 1x National Semiconductor DP83223V Twisted Pair Transceiver
 
 ***************************************************************************/
 

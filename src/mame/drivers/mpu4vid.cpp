@@ -1780,9 +1780,15 @@ ROM_START( v4psi )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("in220mpu4.p1",  0x00000, 0x04000,  CRC(75ff4b1f) SHA1(a3adaad9a91c30fe6ff42dc2003c34a199b28807) )
 
-	ROM_REGION( 0x10000, "altrevs", 0 )
-	ROM_LOAD( "in14d.p1", 0x0000, 0x004000, CRC(cb9a093a) SHA1(225ca4f191f64f6ca3ed6bc7b58819a893fdd36a) )
-	ROM_LOAD( "in20d.p1", 0x0000, 0x004000, CRC(e86e62a0) SHA1(97b0d41fa688cdd86bd6a1ef65cf143a34e23fac) )
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "in2-20p1.1",  0x000000, 0x10000, CRC(f34d9001) SHA1(2bae06f4a5a5510b15b918261ecb0de9e34a6b53) )
+	ROM_LOAD16_BYTE( "in2-20p1.2",  0x000001, 0x10000, CRC(1dc931b4) SHA1(c46626183edd52c7938c5edee2395aacb49e0730) )
+	ROM_LOAD16_BYTE( "in2-20p1.3",  0x020000, 0x10000, CRC(107aa448) SHA1(7b3d4053aaae3b97136cddefbc9edd5e61713ff7) )
+	ROM_LOAD16_BYTE( "in2-20p1.4",  0x020001, 0x10000, CRC(04933278) SHA1(97462aef782f7fe82b60f4bddcad0e6a6b50f3df) )
+ROM_END
+
+ROM_START( v4psi214 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "in214.p1", 0x0000, 0x004000, CRC(4fb02448) SHA1(c2f2413a460012e3aadf7effbf8a33b40bc02df1) )
 
 	ROM_REGION( 0x800000, "video", 0 )
@@ -1791,6 +1797,29 @@ ROM_START( v4psi )
 	ROM_LOAD16_BYTE( "in2-20p1.3",  0x020000, 0x10000, CRC(107aa448) SHA1(7b3d4053aaae3b97136cddefbc9edd5e61713ff7) )
 	ROM_LOAD16_BYTE( "in2-20p1.4",  0x020001, 0x10000, CRC(04933278) SHA1(97462aef782f7fe82b60f4bddcad0e6a6b50f3df) )
 ROM_END
+
+ROM_START( v4psi20d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "in20d.p1", 0x0000, 0x004000, CRC(e86e62a0) SHA1(97b0d41fa688cdd86bd6a1ef65cf143a34e23fac) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "in2-20p1.1",  0x000000, 0x10000, CRC(f34d9001) SHA1(2bae06f4a5a5510b15b918261ecb0de9e34a6b53) )
+	ROM_LOAD16_BYTE( "in2-20p1.2",  0x000001, 0x10000, CRC(1dc931b4) SHA1(c46626183edd52c7938c5edee2395aacb49e0730) )
+	ROM_LOAD16_BYTE( "in2-20p1.3",  0x020000, 0x10000, CRC(107aa448) SHA1(7b3d4053aaae3b97136cddefbc9edd5e61713ff7) )
+	ROM_LOAD16_BYTE( "in2-20p1.4",  0x020001, 0x10000, CRC(04933278) SHA1(97462aef782f7fe82b60f4bddcad0e6a6b50f3df) )
+ROM_END
+
+ROM_START( v4psi14d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "in14d.p1", 0x0000, 0x004000, CRC(cb9a093a) SHA1(225ca4f191f64f6ca3ed6bc7b58819a893fdd36a) )
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "in2-20p1.1",  0x000000, 0x10000, CRC(f34d9001) SHA1(2bae06f4a5a5510b15b918261ecb0de9e34a6b53) )
+	ROM_LOAD16_BYTE( "in2-20p1.2",  0x000001, 0x10000, CRC(1dc931b4) SHA1(c46626183edd52c7938c5edee2395aacb49e0730) )
+	ROM_LOAD16_BYTE( "in2-20p1.3",  0x020000, 0x10000, CRC(107aa448) SHA1(7b3d4053aaae3b97136cddefbc9edd5e61713ff7) )
+	ROM_LOAD16_BYTE( "in2-20p1.4",  0x020001, 0x10000, CRC(04933278) SHA1(97462aef782f7fe82b60f4bddcad0e6a6b50f3df) )
+ROM_END
+
 
 ROM_START( v4psia )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1845,9 +1874,18 @@ ROM_START( v4tetrs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("tetris22.p0",  0x00000, 0x04000, CRC(b711c7ae) SHA1(767b17ddf9021fdf79ff6c52f04a5d8ea60cf30e) )
 
-	ROM_REGION( 0x10000, "altrevs", 0 )
-	ROM_LOAD( "tetv1int", 0x0000, 0x004000, CRC(98de975d) SHA1(5b4fc06aa8008d3967c68f364c47f8377a1ba9df) )
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "tetris22.p1",  0x000000, 0x10000, CRC(e81dd182) SHA1(28b460224abf6fe24b637542ccd1c84040674555) )
+	ROM_LOAD16_BYTE( "tetris22.p2",  0x000001, 0x10000, CRC(68aa4f15) SHA1(4e4511a64391fc64e5f5b7ccb46a78fd2e1d94d6) )
+	ROM_LOAD16_BYTE( "tetris22.p3",  0x020000, 0x10000, CRC(b38b4763) SHA1(d28e77fdd6869cb5b5ec40ed1f300a2a947e0482) )
+	ROM_LOAD16_BYTE( "tetris22.p4",  0x020001, 0x10000, CRC(1649f604) SHA1(ca4ac303391a0969d41c8f988b8e81cfcee1a21c) )
+	ROM_LOAD16_BYTE( "tetris22.p5",  0x040001, 0x10000, CRC(02859676) SHA1(5293c767021a6b5253eecab0b0568aa082ea7084) )
+	ROM_LOAD16_BYTE( "tetris22.p6",  0x040001, 0x10000, CRC(40d24c82) SHA1(7ac3cf148af84ad93eaf11ce3420abbe45d986e2) )
+ROM_END
 
+ROM_START( v4tetrs1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tetv1int", 0x0000, 0x004000, CRC(98de975d) SHA1(5b4fc06aa8008d3967c68f364c47f8377a1ba9df) )
 
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD16_BYTE( "tetris22.p1",  0x000000, 0x10000, CRC(e81dd182) SHA1(28b460224abf6fe24b637542ccd1c84040674555) )
@@ -3659,7 +3697,11 @@ GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid,   mpu4,     mpu4vid_state, init_v4o
 GAME(  199?, v4vgpok,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Vegas Poker (prototype, release 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4psi,      0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4psia,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4psib,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS ) // bad dump
+GAME(  199?, v4psib,     0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psi14d,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v1.4D?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psi20d,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.0D?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4psi214,   0,        bwbvid,     mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Prize Space Invaders (v2.14?) (MPU4 Video)",GAME_FLAGS )
+// bad dump
 GAME(  199?, v4blox,     0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Blox (v2.0) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4bloxd,    v4blox,   bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Blox (v2.0, Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  1996, v4reno,     0,        bwbvid5,    mpu4,     mpu4vid_state, init_prizeinv,  ROT0, "BwB","Reno Reels (20p/10GBP Cash, release A) (MPU4 Video)",GAME_FLAGS )
@@ -3672,6 +3714,7 @@ GAME(  199?, v4shpwnd,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_in
 
 GAME(  199?, v4redhtp,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Red Hot Poker (20p/10GBP Cash, release 3) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4tetrs,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","BwB Tetris v 2.2 (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4tetrs1,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","BwB Tetris v 1.0? (MPU4 Video)",GAME_FLAGS )
 
 GAME(  199?, v4big40,    0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Big 40 Poker (Bwb) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4bulblx,   0,        bwbvid,     mpu4,     mpu4vid_state, empty_init,     ROT0, "BwB","Bullion Blox (Bwb) (MPU4 Video)",GAME_FLAGS ) // is this the same game as v4blox?

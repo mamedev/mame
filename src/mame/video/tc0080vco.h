@@ -34,11 +34,11 @@ public:
 	uint16_t scrram_r(int offset);
 	DECLARE_WRITE16_MEMBER( scrollram_w );
 	READ_LINE_MEMBER( flipscreen_r );
-	void postload();
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state

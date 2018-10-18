@@ -347,8 +347,7 @@ void pc100_state::pc100_io(address_map &map)
 	map(0x20, 0x23).r(FUNC(pc100_state::pc100_key_r)).umask16(0x00ff); //i/o, keyboard, mouse
 	map(0x22, 0x22).w(FUNC(pc100_state::pc100_output_w)); //i/o, keyboard, mouse
 	map(0x24, 0x24).w(FUNC(pc100_state::pc100_tc_w)); //i/o, keyboard, mouse
-	map(0x28, 0x28).rw("uart8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x2a, 0x2a).rw("uart8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x28, 0x2b).rw("uart8251", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x30, 0x30).rw(FUNC(pc100_state::pc100_shift_r), FUNC(pc100_state::pc100_shift_w)); // crtc shift
 	map(0x38, 0x38).w(FUNC(pc100_state::pc100_crtc_addr_w)); //crtc address reg
 	map(0x3a, 0x3a).w(FUNC(pc100_state::pc100_crtc_data_w)); //crtc data reg
@@ -668,9 +667,9 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	//i8251.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	i8251.rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc100_state, irqnmi_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, pc100_state, drqnmi_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(pc100_state::irqnmi_w));
+	m_fdc->drq_wr_callback().set(FUNC(pc100_state::drqnmi_w));
 
 	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL(32'768))
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_0_w))

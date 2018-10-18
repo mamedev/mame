@@ -136,8 +136,7 @@ void votrpss_state::votrpss_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).mirror(0x3c).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x40, 0x40).mirror(0x3e).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).mirror(0x3e).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x40, 0x41).mirror(0x3e).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x80, 0x83).mirror(0x3c).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xc0, 0xc0).mirror(0x3e).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xc1, 0xc1).mirror(0x3e).rw("ay", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));

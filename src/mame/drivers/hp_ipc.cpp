@@ -754,10 +754,18 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_1))
 //  MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_6))
 
-	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, 15.92_MHz_XTAL / 2)
-	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_2))
-	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_7))
-	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
+	hp_hil_mlc_device &mlc(HP_HIL_MLC(config, "mlc", XTAL(15'920'000)/2));
+	mlc.int_callback().set(FUNC(hp_ipc_state::irq_2));
+	mlc.nmi_callback().set(FUNC(hp_ipc_state::irq_7));
+	hp_hil_slot_device &keyboard(HP_HIL_SLOT(config, "hil1", 0));
+	hp_hil_devices(keyboard);
+	keyboard.set_default_option("hp_ipc_kbd");
+	keyboard.set_hp_hil_slot(this, "mlc");
+
+	hp_hil_slot_device &mouse(HP_HIL_SLOT(config, "hil2", 0));
+	hp_hil_devices(mouse);
+	mouse.set_default_option("hp_46060b");
+	mouse.set_hp_hil_slot(this, "mlc");
 
 	MCFG_DEVICE_ADD("hpib", TMS9914, 4_MHz_XTAL)
 	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp_ipc_state, irq_3))

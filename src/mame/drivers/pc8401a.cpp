@@ -361,8 +361,7 @@ void pc8401a_state::pc8500_io(address_map &map)
 	map(0x08, 0x08).portr("Y.8");
 	map(0x09, 0x09).portr("Y.9");
 	map(0x10, 0x10).w(FUNC(pc8401a_state::rtc_cmd_w));
-	map(0x20, 0x20).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x30, 0x30).rw(FUNC(pc8401a_state::mmr_r), FUNC(pc8401a_state::mmr_w));
 //  AM_RANGE(0x31, 0x31)
 	map(0x40, 0x40).rw(FUNC(pc8401a_state::rtc_r), FUNC(pc8401a_state::rtc_ctrl_w));
@@ -581,7 +580,7 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	i8255_device &ppi(I8255A(config, I8255A_TAG));
 	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));
@@ -621,7 +620,7 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	i8255_device &ppi(I8255A(config, I8255A_TAG));
 	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));

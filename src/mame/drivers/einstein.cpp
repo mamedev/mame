@@ -430,8 +430,7 @@ void einstein_state::einstein_io(address_map &map)
 	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
 	map(0x08, 0x08).mirror(0xff06).rw("vdp", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
 	map(0x09, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
-	map(0x10, 0x10).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x18, 0x1b).mirror(0xff04).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x20, 0x20).mirror(0xff00).rw(FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
 	map(0x21, 0x21).mirror(0xff00).w(FUNC(einstein_state::adcint_msk_w));

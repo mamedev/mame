@@ -1,13 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-/**************************\
-*
-*   SunPlus u'nSP disassembler
-*
-*    by Ryan Holtz
-*
-\**************************/
+/*****************************************************************************
 
+	SunPlus micro'nSP disassembler
+
+*****************************************************************************/
 
 #ifndef MAME_CPU_UNSP_UNSPDASM_H
 #define MAME_CPU_UNSP_UNSPDASM_H
@@ -22,11 +19,12 @@ public:
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+	offs_t disassemble(std::ostream &stream, offs_t pc, uint16_t op, uint16_t imm16);
 
 private:
-	static const char *reg[];
-	static const char *jmp[];
-	static const char *alu[];
+	static char const *const reg[];
+	static char const *const jmp[];
+	static char const *const alu[];
 };
 
 #endif

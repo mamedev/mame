@@ -2713,6 +2713,7 @@ if (CPUS["MB86901"]~=null) then
 		MAME_DIR .. "src/devices/cpu/sparc/mb86901.cpp",
 		MAME_DIR .. "src/devices/cpu/sparc/sparcv8ops.ipp",
 		MAME_DIR .. "src/devices/cpu/sparc/sparcdefs.h",
+		MAME_DIR .. "src/devices/cpu/sparc/sparc_intf.h",
 		MAME_DIR .. "src/devices/cpu/sparc/sparc.h",
 	}
 end

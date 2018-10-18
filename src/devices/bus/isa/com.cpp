@@ -8,18 +8,24 @@
 
 #include "emu.h"
 #include "com.h"
-#include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
-#include "bus/rs232/terminal.h"
+
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "machine/ins8250.h"
 
 static void isa_com(device_slot_interface &device)
 {
-	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
-	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
 	device.option_add("terminal", SERIAL_TERMINAL);
 	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 
 
@@ -55,7 +61,7 @@ MACHINE_CONFIG_START(isa8_com_device::device_add_mconfig)
 	uart3.out_rts_callback().set("serport3", FUNC(rs232_port_device::write_rts));
 	uart3.out_int_callback().set(FUNC(isa8_com_device::pc_com_interrupt_2));*/
 
-	MCFG_DEVICE_ADD( "serport0", RS232_PORT, isa_com, "microsoft_mouse" )
+	MCFG_DEVICE_ADD( "serport0", RS232_PORT, isa_com, "logitech_mouse" )
 	MCFG_RS232_RXD_HANDLER(WRITELINE(uart0, ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(uart0, ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(uart0, ins8250_uart_device, dsr_w))
@@ -156,7 +162,7 @@ MACHINE_CONFIG_START(isa8_com_at_device::device_add_mconfig)
 	uart3.out_dtr_callback().set("serport3", FUNC(rs232_port_device::write_dtr));
 	uart3.out_rts_callback().set("serport3", FUNC(rs232_port_device::write_rts));
 	uart3.out_int_callback().set(FUNC(isa8_com_device::pc_com_interrupt_2));*/
-	MCFG_DEVICE_ADD( "serport0", RS232_PORT, isa_com, "microsoft_mouse" )
+	MCFG_DEVICE_ADD( "serport0", RS232_PORT, isa_com, "logitech_mouse" )
 	MCFG_RS232_RXD_HANDLER(WRITELINE(uart0, ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(uart0, ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(uart0, ins8250_uart_device, dsr_w))

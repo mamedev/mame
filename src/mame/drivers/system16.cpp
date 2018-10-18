@@ -3196,6 +3196,44 @@ ROM_START( altbeastbl )
 	ROM_LOAD( "2.bin", 0x10000, 0x10000, CRC(7c653d8b) SHA1(f74355e12322ac3e3da1b5fc14d81908f61d01e6) )
 ROM_END
 
+ROM_START( altbeastbl2 ) // mostly same as mutantwarr. Only program ROMs differ, while sprites ROM are double sized but same content
+	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "al-3-4-27c010-a.ic2", 0x020000, 0x10000, CRC(2c41cb49) SHA1(1d666c94f679da93aea07bb8461da3331a1e75c6) )
+	ROM_CONTINUE( 0x000000, 0x10000)
+	ROM_LOAD16_BYTE( "al-5-6-27c010-a.ic5", 0x020001, 0x10000, CRC(fda831c9) SHA1(d8afc89044f9a5661664889bc1052958446f8fd3) )
+	ROM_CONTINUE( 0x000001, 0x10000)
+
+	ROM_REGION( 0x60000, "gfx1", ROMREGION_INVERT ) // tiles
+	ROM_LOAD( "al-15-27512-b.ic54",  0x00000, 0x10000,  CRC(a4967d10) SHA1(537b9ea604a38a919c111ece5dd3e55a5070d346) )
+	ROM_LOAD( "al-16-27512-b.ic63",  0x10000, 0x10000,  CRC(e091ae2c) SHA1(5a129f2445d13c321cb3ad0eff7ab8ea3f6ddf43) )
+	ROM_LOAD( "al-17-27512-b.ic72",  0x20000, 0x10000,  CRC(1a26cf3f) SHA1(3a488ee485db7b3f27d5ed6c6e7d263d4840bd6a) )
+	ROM_LOAD( "al-18-27512-b.ic144", 0x30000, 0x10000, BAD_DUMP CRC(277ef086) SHA1(d7a5e944f5287aa15d14ff940d1aca8d1e649d26) ) // dumped empty, using the mutantwarr one as all the others match
+	ROM_LOAD( "al-19-27512-b.ic145", 0x40000, 0x10000, CRC(661225af) SHA1(115303efeb5676ab059600a48edf36b8a56f6c15) )
+	ROM_LOAD( "al-20-27512-b.ic146", 0x50000, 0x10000, CRC(d7019da7) SHA1(682347a276e03a733608066ad911af1674a00ed9) )
+
+	ROM_REGION16_BE( 0x100000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "al-11-27c010-b.ic11", 0x000001, 0x020000, CRC(a01425cd) SHA1(72be5ec29e476601f9bf6aaedef9b73cedeb42f0) )
+	ROM_LOAD16_BYTE( "al-7-27c010-b.ic12",  0x000000, 0x020000, CRC(d9e03363) SHA1(995a7c6a8f0c61468b57a3bb407461a2a3ae8adc) )
+	ROM_LOAD16_BYTE( "al-12-27c010-b.ic24", 0x040001, 0x020000, CRC(17a9fc53) SHA1(85a9a605742ae5aab86db37189b9ee4d54c70e56) )
+	ROM_LOAD16_BYTE( "al-8-27c010-b.ic25",  0x040000, 0x020000, CRC(e3f77c5e) SHA1(6b3cb7918ab0c7c97a51cc5ea19ced3374ff3914) )
+	ROM_LOAD16_BYTE( "al-13-27c010-b.ic32", 0x080001, 0x020000, CRC(14dcc245) SHA1(1ca1b6e0f2b7bedad2a8ab70f52da8c54d40d3cf) )
+	ROM_LOAD16_BYTE( "al-9-27c010-b.ic33",  0x080000, 0x020000, CRC(f9a60f06) SHA1(0cffcfdb02733feaa869198b7e668c58b47c321a) )
+	ROM_LOAD16_BYTE( "al-14-27512-b.ic46",  0x0c0001, 0x010000, CRC(339987f7) SHA1(b5650f8bdbd44510e84686b20daf70bc4a564f28) )
+	ROM_LOAD16_BYTE( "al-10-27512-b.ic47",  0x0c0000, 0x010000, CRC(4fe406aa) SHA1(7f068b81f35be4cc4785824ed524d28f201ff0a5) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "al-1-27512-a.ic53", 0x00000, 0x10000, CRC(67e09da3) SHA1(1c57048b428027fb8fae531363930ac5fed961fe) )
+	ROM_LOAD( "al-2-27512-a.ic54", 0x10000, 0x10000, CRC(7c653d8b) SHA1(f74355e12322ac3e3da1b5fc14d81908f61d01e6) )
+
+	ROM_REGION( 0x120, "proms", 0) // currently not used by the emulation
+	ROM_LOAD( "2-82s129-b.ic142",    0x000, 0x100, CRC(a7c22d96) SHA1(160deae8053b09c09328325246598b3518c7e20b) ) // same as dduxbl, fpointbj and other bootlegs
+	ROM_LOAD( "3-tbp18s030n-b.ic22", 0x100, 0x020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) ) // same as dduxbl, fpointbj and other bootlegs
+
+	ROM_REGION( 0x600, "plds", 0) // currently not used by the emulation
+	ROM_LOAD( "pal16l8anc.ic51", 0x000, 0x104, CRC(99a637cb) SHA1(ce26f18290b9fe563fd05a743473efbd2db59c39) )
+	ROM_LOAD( "pal20l8a2.ic13",  0x200, 0x144, CRC(8563102a) SHA1(e5349a91a3c3e48ad9503259858531caba610d01) )
+	ROM_LOAD( "gal16v8.ic10",    0x400, 0x117, CRC(ce1ab1e1) SHA1(dcfc0015d8595ee6cb6bb02c95655161a7f3b017) ) // same as dduxbl and fpointbj
+ROM_END
 
 ROM_START( mutantwarr )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
@@ -4051,6 +4089,7 @@ GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,    goldnaxe, segas1x_bootleg_sta
 GAME( 1989, tturfbl,     tturf,     tturfbl,       tturf,    segas1x_bootleg_state,  init_tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, dduxbl,      ddux,      dduxbl,        ddux,     segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
 GAME( 1988, altbeastbl,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, altbeastbl2, altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg",         "Altered Beast (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // broken sprites
 GAME( 1988, mutantwarr,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Altered Beast - Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, eswatbl,     eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, eswatbl2,    eswat,     eswatbl2,      eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

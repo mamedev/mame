@@ -149,10 +149,10 @@ WRITE8_MEMBER(cpc_rs232_device::dart_w)
 
 READ8_MEMBER(cpc_rs232_device::pit_r)
 {
-	return m_pit->read(space,offset);
+	return m_pit->read(offset);
 }
 
 WRITE8_MEMBER(cpc_rs232_device::pit_w)
 {
-	m_pit->write(space,offset,data);
+	m_pit->write(offset,data);
 }

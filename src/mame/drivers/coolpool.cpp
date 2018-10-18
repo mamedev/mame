@@ -17,6 +17,8 @@
     The second CPU in Cool Pool and 9 Ball Shootout is a TMS320C26; the code
     is the same in the two games.
 
+    The audio DAC is a Micro Power Systems MP1210HN.
+
     Cool Pool:
     - The checksum test routine is wrong, e.g. when it says to be testing
       4U/8U it is actually reading 4U/8U/3U/7U, when testing 3U/7U it
@@ -746,7 +748,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -793,7 +795,7 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

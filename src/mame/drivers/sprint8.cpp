@@ -56,6 +56,7 @@ void sprint8_state::machine_start()
 	save_item(NAME(m_collision_reset));
 	save_item(NAME(m_collision_index));
 	save_item(NAME(m_dial));
+	save_item(NAME(m_team));
 }
 
 void sprint8_state::machine_reset()

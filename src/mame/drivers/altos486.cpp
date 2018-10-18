@@ -146,9 +146,9 @@ MACHINE_CONFIG_START(altos486_state::altos486)
 	pic8259.in_sp_callback().set_constant(1);
 	pic8259.read_slave_ack_callback().set(FUNC(altos486_state::read_rmx_ack));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	I8255(config, "ppi8255");
 
-	MCFG_UPD765A_ADD("fdc", false, false)
+	UPD765A(config, "fdc", false, false);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos486_floppies, "525qd", altos486_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
@@ -182,36 +182,36 @@ MACHINE_CONFIG_START(altos486_state::altos486)
 	i8274.out_rtsa_callback().set("rs422_wn", FUNC(rs232_port_device::write_rts));
 	//i8274.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio0", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio0", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio0", z80dart_device, ctsa_w))
-	//MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", altos486_terminal)
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set("sio0", FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set("sio0", FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set("sio0", FUNC(z80dart_device::ctsa_w));
+	//rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(altos486_terminal));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio0", z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio0", z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio0", z80dart_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set("sio0", FUNC(z80dart_device::rxb_w));
+	rs232b.dcd_handler().set("sio0", FUNC(z80dart_device::dcdb_w));
+	rs232b.cts_handler().set("sio0", FUNC(z80dart_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80dart_device, ctsa_w))
+	rs232_port_device &rs232c(RS232_PORT(config, "rs232c", default_rs232_devices, nullptr));
+	rs232c.rxd_handler().set("sio1", FUNC(z80dart_device::rxa_w));
+	rs232c.dcd_handler().set("sio1", FUNC(z80dart_device::dcda_w));
+	rs232c.cts_handler().set("sio1", FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs232d", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80dart_device, ctsb_w))
+	rs232_port_device &rs232d(RS232_PORT(config, "rs232d", default_rs232_devices, nullptr));
+	rs232d.rxd_handler().set("sio1", FUNC(z80dart_device::rxb_w));
+	rs232d.dcd_handler().set("sio1", FUNC(z80dart_device::dcdb_w));
+	rs232d.cts_handler().set("sio1", FUNC(z80dart_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("rs232_lp", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio2", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio2", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio2", z80dart_device, ctsa_w))
+	rs232_port_device &rs232_lp(RS232_PORT(config, "rs232_lp", default_rs232_devices, nullptr));
+	rs232_lp.rxd_handler().set("sio2", FUNC(z80dart_device::rxa_w));
+	rs232_lp.dcd_handler().set("sio2", FUNC(z80dart_device::dcda_w));
+	rs232_lp.cts_handler().set("sio2", FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs422_wn", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8274", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("i8274", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("i8274", z80dart_device, ctsa_w))
+	rs232_port_device &rs422_wn(RS232_PORT(config, "rs422_wn", default_rs232_devices, nullptr));
+	rs422_wn.rxd_handler().set("i8274", FUNC(z80dart_device::rxa_w));
+	rs422_wn.dcd_handler().set("i8274", FUNC(z80dart_device::dcda_w));
+	rs422_wn.cts_handler().set("i8274", FUNC(z80dart_device::ctsa_w));
 
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)

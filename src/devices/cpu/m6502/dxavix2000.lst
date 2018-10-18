@@ -1,20 +1,20 @@
 # license:BSD-3-Clause
 # copyright-holders:David Haywood
-# XaviX (SSD 2000) - m6502 with custom opcodes
-brk_xav_imp ora_idx     kil_non     slo_idx     nop_zpg     ora_zpg     asl_zpg     unk07_imp   php_imp     ora_imm     asl_acc     anc_imm     nop_aba     ora_aba     asl_aba     slo_aba
-bpl_rel     ora_idy     phx_imp     slo_idy     nop_zpx     ora_zpx     asl_zpx     slo_zpx     clc_imp     ora_aby     nop_imp     unk1b_imp   nop_abx     ora_abx     asl_abx     slo_abx
-jsr_adr     and_idx     callf_xa3   rla_idx     bit_zpg     and_zpg     rol_zpg     rla_zpg     plp_imp     and_imm     rol_acc     anc_imm     bit_aba     and_aba     rol_aba     rla_aba
-bmi_rel     and_idy     plx_imp     rla_idy     nop_zpx     and_zpx     rol_zpx     rla_zpx     sec_imp     and_aby     nop_imp     rla_aby     nop_abx     and_abx     rol_abx     rla_abx
-rti_xav_imp eor_idx     kil_non     sre_idx     nop_zpg     eor_zpg     lsr_zpg     sre_zpg     pha_imp     eor_imm     lsr_acc     asr_imm     jmp_adr     eor_aba     lsr_aba     sre_aba
-bvc_rel     eor_idy     phy_imp     sre_idy     nop_zpx     eor_zpx     lsr_zpx     sre_zpx     cli_imp     eor_aby     nop_imp     unk5b_imp   nop_abx     eor_abx     lsr_abx     sre_abx
-rts_imp     adc_idx     kil_non     rra_idx     nop_zpg     adc_zpg     ror_zpg     rra_zpg     pla_imp     adc_imm     ror_acc     arr_imm     jmp_ind     adc_aba     ror_aba     rra_aba
-bvs_rel     adc_idy     ply_imp     unk73_imp   nop_zpx     adc_zpx     ror_zpx     rra_zpx     sei_imp     adc_aby     nop_imp     rra_aby     nop_abx     adc_abx     ror_abx     rra_abx
-retf_imp    sta_idx     nop_imm     unk83_imm   sty_zpg     sta_zpg     stx_zpg     unk87_imm   dey_imp     nop_imm     txa_imp     ane_imm     sty_aba     sta_aba     stx_aba     sax_aba
-bcc_rel     sta_idy     kil_non     sha_idy     sty_zpx     sta_zpx     stx_zpy     sax_zpy     tya_imp     sta_aby     txs_imp     unk9b_imp   shy_abx     sta_abx     shx_aby     sha_aby
-ldy_imm     lda_idx     ldx_imm     unka3_imp   ldy_zpg     lda_zpg     ldx_zpg     unka7_imp   tay_imp     lda_imm     tax_imp     lxa_imm     ldy_aba     lda_aba     ldx_aba     lax_aba
-bcs_rel     lda_idy     unkb2_imp   lax_idy     ldy_zpx     lda_zpx     ldx_zpy     lax_zpy     clv_imp     lda_aby     tsx_imp     las_aby     ldy_abx     lda_abx     ldx_aby     lax_aby
-cpy_imm     cmp_idx     nop_imm     dcp_idx     cpy_zpg     cmp_zpg     dec_zpg     dcp_zpg     iny_imp     cmp_imm     dex_imp     sbx_imm     cpy_aba     cmp_aba     dec_aba     dcp_aba
-bne_rel     cmp_idy     kil_non     dcp_idy     nop_zpx     cmp_zpx     dec_zpx     dcp_zpx     cld_imp     cmp_aby     nop_imp     dcp_aby     nop_abx     cmp_abx     dec_abx     dcp_abx
-cpx_imm     sbc_idx     nop_imm     isb_idx     cpx_zpg     sbc_zpg     inc_zpg     isb_zpg     inx_imp     sbc_imm     nop_imp     sbc_imm     cpx_aba     sbc_aba     inc_aba     isb_aba
-beq_rel     sbc_idy     kil_non     isb_idy     nop_zpx     sbc_zpx     inc_zpx     isb_zpx     sed_imp     sbc_aby     nop_imp     isb_aby     nop_abx     sbc_abx     inc_abx     isb_abx
+# Super XaviX (SSD 2000) - m6502 with custom opcodes
+brk_xav_imp ora_idx     cmc_imp     oral0_acc   asr_zpg     ora_zpg     asl_zpg     oral1_acc   php_imp     ora_imm     asl_acc     oral2_acc   asr_aba     ora_aba     asl_aba     oral3_acc
+bpl_rel     ora_idy     phx_imp     orapa_imp   asr_zpx     ora_zpx     asl_zpx     orapb_imp   clc_imp     ora_aby     asr_acc     spa0_acc    asr_abx     ora_abx     asl_abx     spb0_acc
+jsr_adr     and_idx     callf_xa3   andl0_acc   bit_zpg     and_zpg     rol_zpg     andl1_acc   plp_imp     and_imm     rol_acc     andl2_acc   bit_aba     and_aba     rol_aba     andl3_acc
+bmi_rel     and_idy     plx_imp     andpa_imp   bit_zpx     and_zpx     rol_zpx     andpb_imp   sec_imp     and_aby     bit_imm     lpa0_acc    bit_abx     and_abx     rol_abx     lpb0_acc
+rti_xav_imp eor_idx     nop_imp     eorl0_acc   nop_imp     eor_zpg     lsr_zpg     eorl1_acc   pha_imp     eor_imm     lsr_acc     eorl2_acc   jmp_adr     eor_aba     lsr_aba     eorl3_acc
+bvc_rel     eor_idy     phy_imp     eorpa_imp   nop_imp     eor_zpx     lsr_zpx     eorpb_imp   cli_imp     eor_aby     nop_imp     spa1_acc    callf_aba   eor_abx     lsr_abx     spb1_acc
+rts_imp     adc_idx     nop_imp     adcl0_acc   nop_imp     adc_zpg     ror_zpg     adcl1_acc   pla_imp     adc_imm     ror_acc     adcl2_acc   jmp_ind     adc_aba     ror_aba     adcl3_acc
+bvs_rel     adc_idy     ply_imp     adcpa_imp   nop_imp     adc_zpx     ror_zpx     adcpb_imp   sei_imp     adc_aby     nop_imp     lpa1_acc    jmpf_ind    adc_abx     ror_abx     lpb1_acc
+retf_imp    sta_idx     stz_zpg     stal0_acc   sty_zpg     sta_zpg     stx_zpg     stal1_acc   dey_imp     sev_imp     txa_imp     stal2_acc   sty_aba     sta_aba     stx_aba     stal3_acc
+bcc_rel     sta_idy     stz_aba     stapa_imp   sty_zpx     sta_zpx     stx_zpy     stapb_imp   tya_imp     sta_aby     txs_imp     spa2_acc    sty_abx     sta_abx     stx_aby     spb2_acc
+ldy_imm     lda_idx     ldx_imm     ldal0_acc   ldy_zpg     lda_zpg     ldx_zpg     ldal1_acc   tay_imp     lda_imm     tax_imp     ldal2_acc   ldy_aba     lda_aba     ldx_aba     ldal3_acc
+bcs_rel     lda_idy     clr_acc     ldapa_imp   ldy_zpx     lda_zpx     ldx_zpy     ldapb_imp   clv_imp     lda_aby     tsx_imp     lpa2_acc    ldy_abx     lda_abx     ldx_aby     lpb2_acc
+cpy_imm     cmp_idx     dec_acc     cmpl0_acc   cpy_zpg     cmp_zpg     dec_zpg     cmpl1_acc   iny_imp     cmp_imm     dex_imp     cmpl2_acc   cpy_aba     cmp_aba     dec_aba     cmpl3_acc
+bne_rel     cmp_idy     not_acc     cmppa_imp   nop_imp     cmp_zpx     dec_zpx     cmppb_imp   cld_imp     cmp_aby     nop_imp     decpa_imp   nop_imp     cmp_abx     dec_abx     decpb_imp
+cpx_imm     sbc_idx     inc_acc     sbcl0_acc   cpx_zpg     sbc_zpg     inc_zpg     sbcl1_acc   inx_imp     sbc_imm     nop_imp     sbcl2_acc   cpx_aba     sbc_aba     inc_aba     sbcl3_acc
+beq_rel     sbc_idy     neg_acc     sbcpa_imp   nop_imp     sbc_zpx     inc_zpx     sbcpb_imp   sed_imp     sbc_aby     nop_imp     incpa_imp   nop_imp     sbc_abx     inc_abx     incpb_imp
 reset

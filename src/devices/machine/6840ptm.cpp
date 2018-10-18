@@ -136,7 +136,10 @@ void ptm6840_device::device_reset()
 	m_status_read_since_int = 0;
 	m_irq                   = 0;
 	m_t3_scaler             = 0;
-	m_hightime              = false;
+	m_hightime[0]           = false;
+	m_hightime[1]           = false;
+	m_hightime[2]           = false;
+
 	for (int i = 0; i < 3; i++)
 	{
 		m_counter[i] = 0xffff;
@@ -185,7 +188,7 @@ void ptm6840_device::subtract_from_counter(int counter, int count)
 			msb--;
 
 			// If MSB goes less than zero, we've expired
-			if ((msb == 0 && !m_hightime) || (msb < 0 && m_hightime))
+			if ((msb == 0 && !m_hightime[counter]) || (msb < 0 && m_hightime[counter]))
 			{
 				timeout(counter);
 				msb = (m_latch[counter] >> 8) + 1;
@@ -224,7 +227,7 @@ void ptm6840_device::subtract_from_counter(int counter, int count)
 		if (m_control_reg[counter] & COUNT_MODE_8BIT)
 		{
 			/* In dual 8 bit mode, let the counter fire when MSB == 0 */
-			m_hightime = !(clks & 0xff00);
+			m_hightime[counter] = !(clks & 0xff00);
 			clks &= 0xff00;
 		}
 
@@ -349,7 +352,7 @@ void ptm6840_device::reload_count(int idx)
 
 	// Copy the latched value in
 	m_counter[idx] = m_latch[idx];
-	m_hightime = false;
+
 	// If reset is held, don't start counting
 	if (m_control_reg[0] & RESET_TIMERS)
 		return;
@@ -370,10 +373,11 @@ void ptm6840_device::reload_count(int idx)
 	int count = m_counter[idx];
 	if (m_control_reg[idx] & COUNT_MODE_8BIT)
 	{
-		if (m_hightime)
+		if (m_hightime[idx])
 			count = 0xff;
 		else
 			count = ((count >> 8) + 1) * ((count & 0xff) + 1);
+
 	}
 	else
 	{
@@ -521,7 +525,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 					{
 						m_timer[i]->enable(false);
 						m_enabled[i] = 0;
-						m_hightime = false;
+						m_hightime[idx] = false;
 					}
 				}
 				// Releasing reset
@@ -529,6 +533,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 				{
 					for (int i = 0; i < 3; i++)
 					{
+						m_hightime[idx] = false;
 						reload_count(i);
 					}
 				}
@@ -540,6 +545,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 			// Changing the clock source? (e.g. Zwackery)
 			if (diffs & INTERNAL_CLK_EN)
 			{
+				m_hightime[idx] = false;
 				reload_count(idx);
 			}
 			break;
@@ -568,6 +574,7 @@ WRITE8_MEMBER( ptm6840_device::write )
 			// Reload the count if in an appropriate mode
 			if (!(m_control_reg[idx] & 0x10) || (m_control_reg[0] & RESET_TIMERS))
 			{
+				m_hightime[idx] = false;
 				reload_count(idx);
 			}
 
@@ -597,10 +604,11 @@ void ptm6840_device::timeout(int idx)
 		{
 			case 0:
 			case 2:
+
 				if (m_control_reg[idx] & COUNT_MODE_8BIT)
 				{
-					m_hightime = !m_hightime;
-					m_output[idx] = m_hightime;
+					m_hightime[idx] = !m_hightime[idx];
+					m_output[idx] = m_hightime[idx];
 					m_out_cb[idx](m_output[idx]);
 				}
 				else
@@ -645,6 +653,7 @@ void ptm6840_device::set_gate(int idx, int state)
 	{
 		if (state == 0 && m_gate[idx])
 		{
+			m_hightime[idx] = false;
 			reload_count(idx);
 		}
 	}

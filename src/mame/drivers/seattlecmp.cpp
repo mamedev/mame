@@ -83,8 +83,7 @@ void seattle_comp_state::io_map(address_map &map)
 	map(0xf0, 0xf1).rw("pic1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf2, 0xf3).rw("pic2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf4, 0xf5).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));
-	map(0xf6, 0xf6).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf7, 0xf7).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf6, 0xf7).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	//AM_RANGE(0xfc, 0xfd) Parallel data, status, serial DCD
 	//AM_RANGE(0xfe, 0xff) Eprom disable bit, read sense switches (bank of 8 dipswitches)
 }

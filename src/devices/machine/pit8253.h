@@ -135,8 +135,8 @@ public:
 	template <unsigned N, class Object> devcb_base &set_out_handler(Object &&cb) { return m_out_handler[N].set_callback(std::forward<Object>(cb)); }
 	template <unsigned N> auto out_handler() { return m_out_handler[N].bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	WRITE_LINE_MEMBER(write_gate0) { m_counter[0]->gate_w(state); }
 	WRITE_LINE_MEMBER(write_gate1) { m_counter[1]->gate_w(state); }

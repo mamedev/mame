@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(czk80_state::czk80)
 
 	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(czk80_state, kbd_put))
-	MCFG_UPD765A_ADD("fdc", true, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));

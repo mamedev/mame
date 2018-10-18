@@ -2111,13 +2111,13 @@ MACHINE_CONFIG_START(m72_state::poundfor)
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	UPD4701A(config, m_upd4701[0]);
+	m_upd4701[0]->set_portx_tag("TRACK0_X");
+	m_upd4701[0]->set_porty_tag("TRACK0_Y");
 
-	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	UPD4701A(config, m_upd4701[1]);
+	m_upd4701[1]->set_portx_tag("TRACK1_X");
+	m_upd4701[1]->set_porty_tag("TRACK1_Y");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
@@ -3484,7 +3484,7 @@ ROM_START( rtype2j )
 	ROM_REGION( 0x0200, "proms", 0 ) /* located on M84-B-A */
 	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
 	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
-	
+
 	/* stuff below isn't used but loaded because it was on the board .. */
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "rt2-a-2h-.5",  0x0000, 0x0104, NO_DUMP ) // TIBPAL-16L8-25

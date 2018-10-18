@@ -288,6 +288,7 @@ VIDEOS["CESBLIT"] = true
 VIDEOS["CRTC_EGA"] = true
 --VIDEOS["DL1416"] = true
 VIDEOS["DM9368"] = true
+VIDEOS["DP8350"] = true
 --VIDEOS["EF9340_1"] = true
 --VIDEOS["EF9345"] = true
 --VIDEOS["EF9364"] = true
@@ -573,7 +574,9 @@ MACHINES["SERFLASH"] = true
 MACHINES["SMC91C9X"] = true
 MACHINES["SEGA_SCU"] = true
 MACHINES["SMPC"] = true
+--MACHINES["SPG2XX"] = true
 MACHINES["STVCD"] = true
+--MACHINES["SUN4C_MMU"] = true
 MACHINES["TC0091LVC"] = true
 MACHINES["TE7750"] = true
 MACHINES["TICKET"] = true
@@ -1742,14 +1745,15 @@ files {
 	MAME_DIR .. "src/mame/includes/fantland.h",
 	MAME_DIR .. "src/mame/video/fantland.cpp",
 	MAME_DIR .. "src/mame/drivers/mwarr.cpp",
+	MAME_DIR .. "src/mame/drivers/stlforce.cpp",
+	MAME_DIR .. "src/mame/includes/stlforce.h",
+	MAME_DIR .. "src/mame/video/edevices.cpp",
+	MAME_DIR .. "src/mame/video/edevices.h",	
 	MAME_DIR .. "src/mame/drivers/mugsmash.cpp",
 	MAME_DIR .. "src/mame/includes/mugsmash.h",
 	MAME_DIR .. "src/mame/video/mugsmash.cpp",
 	MAME_DIR .. "src/mame/drivers/ppmast93.cpp",
 	MAME_DIR .. "src/mame/drivers/pzletime.cpp",
-	MAME_DIR .. "src/mame/drivers/stlforce.cpp",
-	MAME_DIR .. "src/mame/includes/stlforce.h",
-	MAME_DIR .. "src/mame/video/stlforce.cpp",
 	MAME_DIR .. "src/mame/drivers/twins.cpp",
 }
 
@@ -2784,8 +2788,16 @@ files {
 	MAME_DIR .. "src/mame/video/namcos2_roz.cpp",
 	MAME_DIR .. "src/mame/video/namcos2_roz.h",
 	MAME_DIR .. "src/mame/drivers/namcos21.cpp",
-	MAME_DIR .. "src/mame/includes/namcos21.h",
-	MAME_DIR .. "src/mame/video/namcos21.cpp",
+	MAME_DIR .. "src/mame/drivers/namcos21_de.cpp",
+	MAME_DIR .. "src/mame/drivers/namcos21_c67.cpp",
+	MAME_DIR .. "src/mame/video/namcos21_3d.cpp",
+	MAME_DIR .. "src/mame/video/namcos21_3d.h",
+	MAME_DIR .. "src/mame/machine/namcos21_dsp.cpp",
+	MAME_DIR .. "src/mame/machine/namcos21_dsp.h",
+	MAME_DIR .. "src/mame/machine/namcos21_dsp_c67.cpp",
+	MAME_DIR .. "src/mame/machine/namcos21_dsp_c67.h",
+	MAME_DIR .. "src/mame/machine/namco_c67.cpp",
+	MAME_DIR .. "src/mame/machine/namco_c67.h",
 	MAME_DIR .. "src/mame/drivers/namcos22.cpp",
 	MAME_DIR .. "src/mame/includes/namcos22.h",
 	MAME_DIR .. "src/mame/video/namcos22.cpp",

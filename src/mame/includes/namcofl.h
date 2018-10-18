@@ -7,21 +7,14 @@
 #include "video/namco_c116.h"
 #include "video/namco_c169roz.h"
 #include "video/namco_c355spr.h"
+#include "emupal.h"
 
 #define NAMCOFL_HTOTAL      (288)   /* wrong */
 #define NAMCOFL_HBSTART (288)
 #define NAMCOFL_VTOTAL      (262)   /* needs to be checked */
 #define NAMCOFL_VBSTART (224)
 
-#define NAMCOFL_TILEMASKREGION      "tilemask"
-#define NAMCOFL_TILEGFXREGION       "tile"
-#define NAMCOFL_SPRITEGFXREGION "sprite"
-#define NAMCOFL_ROTMASKREGION       "rotmask"
-#define NAMCOFL_ROTGFXREGION        "rot"
-
-#define NAMCOFL_TILEGFX     0
-#define NAMCOFL_SPRITEGFX       1
-#define NAMCOFL_ROTGFX          2
+#define NAMCOFL_SPRITEGFX       0
 
 class namcofl_state : public driver_device
 {
@@ -29,7 +22,6 @@ public:
 	namcofl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
 		m_c116(*this, "c116"),
 		m_screen(*this, "screen"),
 		m_c123tmap(*this, "c123tmap"),
@@ -52,13 +44,12 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
 	required_device<namco_c116_device> m_c116;
 	required_device<screen_device> m_screen;
-	required_device<namco_c123tmap_device> m_c123tmap; 
-	required_device<namco_c169roz_device> m_c169roz; 
-	required_device<namco_c355spr_device> m_c355spr; 
-    required_device<cpu_device> m_mcu;
+	required_device<namco_c123tmap_device> m_c123tmap;
+	required_device<namco_c169roz_device> m_c169roz;
+	required_device<namco_c355spr_device> m_c355spr;
+	required_device<cpu_device> m_mcu;
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_in2;

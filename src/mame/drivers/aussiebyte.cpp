@@ -503,12 +503,11 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(16_MHz_XTAL, 952, 0, 640, 336, 0, 288);
+	screen.set_screen_update("crtc", FUNC(sy6545_1_device::screen_update));
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_crt8002);
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

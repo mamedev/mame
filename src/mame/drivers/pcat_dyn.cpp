@@ -33,8 +33,8 @@ If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"
 #include "bus/isa/trident.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
 
 #include "screen.h"
 
@@ -145,7 +145,7 @@ INPUT_PORTS_END
 
 static void pcat_dyn_com(device_slot_interface &device)
 {
-	device.option_add("msmouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("msmouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 }
 
 static void pcat_dyn_isa8_cards(device_slot_interface &device)

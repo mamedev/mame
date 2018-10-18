@@ -10,12 +10,12 @@
 #include "bus/rs232/rs232.h"
 #include "machine/ioc2.h"
 
-/*static*/ const char *ioc2_device::SCC_TAG = "scc";
-/*static*/ const char *ioc2_device::PI1_TAG = "pi1";
-/*static*/ const char *ioc2_device::KBDC_TAG = "kbdc";
-/*static*/ const char *ioc2_device::PIT_TAG = "pit";
-/*static*/ const char *ioc2_device::RS232A_TAG = "rs232a";
-/*static*/ const char *ioc2_device::RS232B_TAG = "rs232b";
+/*static*/ char const *const ioc2_device::SCC_TAG = "scc";
+/*static*/ char const *const ioc2_device::PI1_TAG = "pi1";
+/*static*/ char const *const ioc2_device::KBDC_TAG = "kbdc";
+/*static*/ char const *const ioc2_device::PIT_TAG = "pit";
+/*static*/ char const *const ioc2_device::RS232A_TAG = "rs232a";
+/*static*/ char const *const ioc2_device::RS232B_TAG = "rs232b";
 
 /*static*/ const XTAL ioc2_device::SCC_PCLK = 10_MHz_XTAL;
 /*static*/ const XTAL ioc2_device::SCC_RXA_CLK = 3.6864_MHz_XTAL; // Needs verification
@@ -68,7 +68,7 @@ MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
 	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc85230_device, dcdb_w))
 	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc85230_device, rxb_w))
 
-	PC_LPT(config, m_pi1, 0);
+	PC_LPT(config, m_pi1);
 
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
@@ -260,7 +260,7 @@ READ32_MEMBER( ioc2_device::read )
 		case TIMER_COUNT1_REG:
 		case TIMER_COUNT2_REG:
 		case TIMER_CONTROL_REG:
-			return m_pit->read(space, offset - TIMER_COUNT0_REG);
+			return m_pit->read(offset - TIMER_COUNT0_REG);
 	}
 
 	return 0;
@@ -386,7 +386,7 @@ WRITE32_MEMBER( ioc2_device::write )
 		case TIMER_COUNT1_REG:
 		case TIMER_COUNT2_REG:
 		case TIMER_CONTROL_REG:
-			m_pit->write(space, offset - TIMER_COUNT0_REG, data & 0xff);
+			m_pit->write(offset - TIMER_COUNT0_REG, data & 0xff);
 			return;
 	}
 }

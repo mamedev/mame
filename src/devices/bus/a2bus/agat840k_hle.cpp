@@ -264,11 +264,11 @@ uint8_t a2bus_agat840k_hle_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 	case 0: case 1: case 2: case 3:
-		data = m_d14->read(machine().dummy_space(), offset);
+		data = m_d14->read(offset);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = m_d15->read(machine().dummy_space(), offset - 4);
+		data = m_d15->read(offset - 4);
 		break;
 
 	default:
@@ -289,11 +289,11 @@ void a2bus_agat840k_hle_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 0: case 1: case 2: case 3:
-		m_d14->write(machine().dummy_space(), offset, data);
+		m_d14->write(offset, data);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		m_d15->write(machine().dummy_space(), offset - 4, data);
+		m_d15->write(offset - 4, data);
 		break;
 
 	case 8: // write desync

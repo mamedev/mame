@@ -86,10 +86,10 @@ void hp9122c_device::device_start()
 	save_item(NAME(m_ds0));
 	save_item(NAME(m_ds1));
 
-	m_motor_timer = timer_alloc(0);
+	m_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9122c_device::motor_timeout), this));
 }
 
-void hp9122c_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(hp9122c_device::motor_timeout)
 {
 	floppy_image_device *floppy0 = m_floppy[0]->get_device();
 	floppy_image_device *floppy1 = m_floppy[1]->get_device();

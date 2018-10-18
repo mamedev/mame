@@ -70,8 +70,7 @@ void cit220_state::mem_map(address_map &map)
 void cit220_state::io_map(address_map &map)
 {
 	map(0x00, 0x0f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0x10, 0x10).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x20, 0x27).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
 	map(0xa0, 0xa0).rw("avdc", FUNC(scn2674_device::attr_buffer_r), FUNC(scn2674_device::attr_buffer_w));
 	map(0xc0, 0xc0).rw("avdc", FUNC(scn2674_device::buffer_r), FUNC(scn2674_device::buffer_w));

@@ -514,9 +514,9 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_dma, i8257_device, dreq0_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)

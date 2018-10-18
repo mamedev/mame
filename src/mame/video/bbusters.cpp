@@ -163,7 +163,7 @@ void bbusters_state::draw_block(screen_device &screen, bitmap_ind16 &dest,int x,
 					priorityline[(x+(x_index>>16)) & 0x1ff] = priority;
 					destline[(x+(x_index>>16)) & 0x1ff]= pen_base + pixel;
 				}
-				
+
 				if (flipx)
 					x_index-=xinc;
 				else
@@ -181,7 +181,7 @@ void bbusters_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	int offs;
 
-	// Sprites are stored in memory in back to front order.  
+	// Sprites are stored in memory in back to front order.
 	// We draw them here front to back with a priority buffer in case any sprite
 	// with priority under a tilemap is later in the list than a sprite with
 	// above tilemap priority (which would cause a cut-out as only the top-most sprite
@@ -191,7 +191,7 @@ void bbusters_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		int16_t y;
 		int block;
 		int priority;
-		
+
 		sprite=source[offs+1];
 		colour=source[offs+0];
 
@@ -227,7 +227,7 @@ void bbusters_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		// Palettes 0xc-0xf confirmed to be behind tilemap on Beast Busters for 2nd sprite chip
 		priority = (bank==2) ? (((colour&0xc)==0xc) ? 1 : 4) : 8;
-		
+
 		switch ((source[offs+0]>>8)&0x3) {
 			case 0:
 				scale=source[offs+0]&0x7;
@@ -273,7 +273,7 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	draw_sprites(screen, bitmap, m_spriteram[1]->buffer(), 2);
 	draw_sprites(screen, bitmap, m_spriteram[0]->buffer(), 1);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	
+
 	return 0;
 }
 

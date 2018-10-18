@@ -150,7 +150,7 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 
 	if (m_irq_priority != data)
 	{
-		static const char *dev[3] = { "tmpz84c015_ctc", "tmpz84c015_sio", "tmpz84c015_pio" };
+		static const char *const dev[3] = { "tmpz84c015_ctc", "tmpz84c015_sio", "tmpz84c015_pio" };
 		static const int prio[6][3] =
 		{
 			{ 0, 1, 2 }, // 0: ctc -> sio -> pio -> ext

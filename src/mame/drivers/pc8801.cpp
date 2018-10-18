@@ -1553,8 +1553,7 @@ void pc8801_state::pc8801_io(address_map &map)
 	map(0x0f, 0x0f).portr("KEY15");
 	map(0x00, 0x02).w(FUNC(pc8801_state::pc8801_pcg8100_w));
 	map(0x10, 0x10).w(FUNC(pc8801_state::pc8801_rtc_w));
-	map(0x20, 0x20).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)); /* RS-232C and CMT */
-	map(0x21, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write)); /* RS-232C and CMT */
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::pc8801_txt_cmt_ctrl_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::pc8801_gfx_ctrl_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::pc8801_misc_ctrl_r), FUNC(pc8801_state::pc8801_misc_ctrl_w));
@@ -1686,7 +1685,7 @@ void pc8801_state::pc8801fdc_io(address_map &map)
 	map(0xf4, 0xf4).w(FUNC(pc8801_state::fdc_drive_mode_w)); // Drive mode, 2d, 2dd, 2hd
 	map(0xf7, 0xf7).nopw(); // printer port output
 	map(0xf8, 0xf8).rw(FUNC(pc8801_state::upd765_tc_r), FUNC(pc8801_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
-	map(0xfa, 0xfb).m("upd765", FUNC(upd765a_device::map));
+	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xfc, 0xff).rw("d8255_slave", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
@@ -2352,7 +2351,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc8801_state,pc8801_irq_callback)
 
 	/* sub CPU(5 inch floppy drive) */
-	MCFG_DEVICE_ADD("fdccpu", Z80, MASTER_CLOCK)       /* 4 MHz */
+	MCFG_DEVICE_ADD(m_fdccpu, Z80, MASTER_CLOCK)       /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(pc8801fdc_mem)
 	MCFG_DEVICE_IO_MAP(pc8801fdc_io)
 
@@ -2371,13 +2370,13 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	d8255_slave.in_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_r));
 	d8255_slave.out_pc_callback().set(FUNC(pc8801_state::fdc_8255_c_w));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, INPUT_LINE_IRQ0);
 
 	#if USE_PROPER_I8214
 	I8214(config, I8214_TAG, MASTER_CLOCK);
 	#endif
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
