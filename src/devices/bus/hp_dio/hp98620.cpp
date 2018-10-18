@@ -188,9 +188,18 @@ READ16_MEMBER(dio16_98620_device::dma_r)
 		break;
 	case REG0_1TQ4_STATUS:
 		ret = 0;
+		if (m_regs[0].armed)
+			ret |= REG_1TQ4_STATUS_ARMED;
+		if (m_regs[0].irq)
+			ret |= REG_1TQ4_STATUS_INT;
 		break;
 	case REG1_1TQ4_STATUS:
 		ret = 0;
+		if (m_regs[1].armed)
+			ret |= REG_1TQ4_STATUS_ARMED;
+		if (m_regs[1].irq)
+			ret |= REG_1TQ4_STATUS_INT;
+
 		break;
 	default:
 		LOG("%s: unknown register read: %02X\n", __FUNCTION__, offset << 1);
@@ -204,7 +213,7 @@ void dio16_98620_device::update_ctrl(const int channel, const uint16_t data, con
 {
 	assert(channel < 2);
 
-	m_regs[channel].control = data;
+	m_regs[channel].control = data & ~REG_1TQ4_CONTROL_START;
 	m_regs[channel].ie = data & REG_CONTROL_IE;
 	m_regs[channel].irq_level = 3 + ((data >> REG_CONTROL_INT_SHIFT) & REG_CONTROL_INT_MASK);
 	m_regs[channel].lword = (data & REG_1TQ4_CONTROL_LWORD) && is_1tq4;
@@ -288,6 +297,16 @@ WRITE16_MEMBER(dio16_98620_device::dma_w)
 		update_ctrl(1, data, false);
 		break;
 
+	case REG_GENERAL_CONTROL:
+		if (data & REG_GENERAL_CONTROL_RESET0) {
+			m_regs[0].armed = 0;
+		}
+
+		if (data & REG_GENERAL_CONTROL_RESET1) {
+			m_regs[1].armed = 0;
+		}
+		break;
+
 	case REG0_1TQ4_CONTROL:
 		update_ctrl(0, data, true);
 		break;
@@ -342,8 +361,10 @@ void dio16_98620_device::dma_transfer(int channel)
 		if (m_regs[channel].tc-- == 0) {
 			LOG("DMA%d done\n", channel);
 			m_regs[channel].armed = false;
-			m_regs[channel].irq = true;
-			update_irq();
+			if (m_regs[channel].ie) {
+				m_regs[channel].irq = true;
+				update_irq();
+			}
 			return;
 		}
 
