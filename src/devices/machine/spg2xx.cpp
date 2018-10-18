@@ -1836,23 +1836,24 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 				if (!(changed & mask))
 					continue;
 
-				//if (channel_bit == 10)
-					//continue;
 				if (data & mask)
 				{
-					LOGMASKED(LOG_SPU_WRITES, "Enabling channel %d\n", channel_bit);
-					m_audio_regs[offset] |= mask;
-					if (!(m_audio_regs[AUDIO_CHANNEL_STOP] & mask))
+					if (!(m_audio_regs[AUDIO_CHANNEL_STATUS] & mask))
 					{
-						LOGMASKED(LOG_SPU_WRITES, "Stop not set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
-						m_audio_regs[AUDIO_CHANNEL_STATUS] |= mask;
-						m_sample_addr[channel_bit] = get_wave_addr(channel_bit);
-						m_envelope_addr[channel_bit] = get_envelope_addr(channel_bit);
-						set_envelope_count(channel, get_envelope_load(channel));
+						LOGMASKED(LOG_SPU_WRITES, "Enabling channel %d\n", channel_bit);
+						m_audio_regs[offset] |= mask;
+						if (!(m_audio_regs[AUDIO_CHANNEL_STOP] & mask))
+						{
+							LOGMASKED(LOG_SPU_WRITES, "Stop not set, starting playback on channel %d, mask %04x\n", channel_bit, mask);
+							m_audio_regs[AUDIO_CHANNEL_STATUS] |= mask;
+							m_sample_addr[channel_bit] = get_wave_addr(channel_bit);
+							m_envelope_addr[channel_bit] = get_envelope_addr(channel_bit);
+							set_envelope_count(channel, get_envelope_load(channel));
+						}
+						m_adpcm[channel_bit].reset();
+						m_sample_shift[channel_bit] = 0;
+						m_sample_count[channel_bit] = 0;
 					}
-					m_adpcm[channel_bit].reset();
-					m_sample_shift[channel_bit] = 0;
-					m_sample_count[channel_bit] = 0;
 				}
 				else
 				{
@@ -1975,7 +1976,8 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		case AUDIO_CHANNEL_STOP:
 			LOGMASKED(LOG_SPU_WRITES, "audio_w: Channel Stop Status: %04x\n", data);
-			m_audio_regs[offset] &= ~(data & AUDIO_CHANNEL_STOP_MASK);
+			m_audio_regs[offset] &= ~data;
+			m_audio_regs[AUDIO_CHANNEL_ENABLE] &= ~data;
 			break;
 
 		case AUDIO_CHANNEL_ZERO_CROSS:
