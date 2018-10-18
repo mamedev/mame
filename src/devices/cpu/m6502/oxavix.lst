@@ -111,3 +111,15 @@ rti_xav_imp
 	TMP2 = read(SP);
 	set_codebank(TMP2);
 	prefetch();
+
+
+xa_lda_idy
+	TMP2 = read_pc(); // we need to fetch the zero page part from zero page, but the rest as if zero page wasn't there, similar to the 6509
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A = read_special(TMP+Y);
+	set_nz(A);
+	prefetch();

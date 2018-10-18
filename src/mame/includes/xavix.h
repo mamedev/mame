@@ -53,6 +53,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void xavix_map(address_map &map);
+	void xavix_special_map(address_map &map);
+
 	void xavix_lowbus_map(address_map &map);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -68,6 +70,8 @@ private:
 	DECLARE_WRITE8_MEMBER(main_w);
 	DECLARE_READ8_MEMBER(main2_r);
 	DECLARE_WRITE8_MEMBER(main2_w);
+	DECLARE_READ8_MEMBER(main3_r);
+	DECLARE_WRITE8_MEMBER(main3_w);
 
 	DECLARE_WRITE8_MEMBER(extintrf_7900_w);
 	DECLARE_WRITE8_MEMBER(extintrf_7901_w);

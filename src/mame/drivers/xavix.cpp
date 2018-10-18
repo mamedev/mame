@@ -252,6 +252,12 @@ WRITE8_MEMBER(xavix_state::main_w)
    the value written and puts it in RAM.  Is stack actually still memory mapped at this point, or do stack operations always go to stack regardless?
    Do reads return databank/codebank/stack, or only zero page? is zero page visibility maybe even conditional on how it gets used?
 
+   in namcons1 the code at 00F3F2 has data bank set to 0x84 and expects to read from ROM using lda ($0a), y where the content of 0x0a is 0000
+   this means that 0a and 0b must be read as zero page, but the actual pointer read from is ROM, bypassing zero page entirely, I currently have a separate
+   address space called by that single opcode to handle this, it might need expanding to any other opcodes that aren't using zero page directly tho
+   possible stack is similar?
+
+
 */
 READ8_MEMBER(xavix_state::main2_r)
 {
@@ -292,6 +298,24 @@ void xavix_state::xavix_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
 	map(0x800000, 0xffffff).rw(FUNC(xavix_state::main2_r), FUNC(xavix_state::main2_w));
+}
+
+// used by the xa_lda_idy  ( lda ($**), y )opcodes
+READ8_MEMBER(xavix_state::main3_r)
+{
+	return m_rgn[(offset) & (m_rgnlen - 1)];
+}
+
+WRITE8_MEMBER(xavix_state::main3_w)
+{
+	//
+}
+
+
+void xavix_state::xavix_special_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
+	map(0x800000, 0xffffff).rw(FUNC(xavix_state::main3_r), FUNC(xavix_state::main3_w));
 }
 
 void xavix_state::xavix_lowbus_map(address_map &map)
@@ -703,9 +727,12 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",XAVIX,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
+	MCFG_DEVICE_ADDRESS_MAP(4, xavix_special_map)
 	MCFG_M6502_DISABLE_CACHE()
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
+
+
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xavix_state, scanline_cb, "screen", 0, 1)
 
@@ -750,6 +777,7 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 
 	MCFG_DEVICE_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
+	MCFG_DEVICE_ADDRESS_MAP(4, xavix_special_map)
 	MCFG_M6502_DISABLE_CACHE()
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
