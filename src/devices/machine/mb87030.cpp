@@ -408,6 +408,9 @@ void mb87030_device::step(bool timeout)
 
 	case State::TransferSendAck:
 
+		if (!(ctrl & S_INP))
+			m_temp = data;
+
 		scsi_set_ctrl(S_ACK, S_ACK);
 		scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
 
@@ -582,7 +585,7 @@ WRITE8_MEMBER(mb87030_device::scmd_w)
 	case SCMD_CMD_SET_ACK_REQ:
 		LOG("%s: Set ACK/REQ\n", __FUNCTION__);
 		if (m_ssts & SSTS_INIT_CONNECTED) {
-				if (m_pctl & 1) {
+				if (scsi_bus->ctrl_r() & S_INP) {
 					m_temp = scsi_bus->data_r();
 				} else {
 					scsi_bus->data_w(scsi_refid, m_temp);
@@ -701,7 +704,7 @@ WRITE8_MEMBER(mb87030_device::dreg_w)
 
 READ8_MEMBER(mb87030_device::temp_r)
 {
-	m_temp = scsi_bus->data_r();
+	step(false);
 	LOG("%s: %02X\n", __FUNCTION__, m_temp);
 	return m_temp;
 
