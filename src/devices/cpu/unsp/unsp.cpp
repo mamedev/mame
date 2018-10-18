@@ -245,6 +245,7 @@ void unsp_device::trigger_irq(int line)
 {
 	if (!m_enable_irq || m_irq || m_fiq)
 	{
+		//logerror("Enable %d, IRQ %d, FIQ %d, bailing\n", m_enable_irq ? 1 : 0, m_irq ? 1 : 0, m_fiq ? 1 : 0);
 		return;
 	}
 
@@ -279,10 +280,12 @@ void unsp_device::check_irqs()
 
 	if (highest_irq == UNSP_FIQ_LINE)
 	{
+		//logerror("Trying to trigger FIQ\n");
 		trigger_fiq();
 	}
 	else
 	{
+		//logerror("Trying to trigger IRQ\n");
 		trigger_irq(highest_irq - 1);
 	}
 }
@@ -620,7 +623,7 @@ void unsp_device::execute_run()
 			case 0x00: // r, [bp+imm6]
 				m_icount -= 6;
 
-				r2 = UNSP_REG(BP) + OPIMM;
+				r2 = (uint16_t)(UNSP_REG(BP) + OPIMM);
 				if (OP0 != 0x0d)
 					r1 = read16(r2);
 				break;
@@ -685,19 +688,19 @@ void unsp_device::execute_run()
 							if (OP0 != 0x0d)
 								r1 = read16(r2);
 							break;
-						case 1: // r, [<ds:>r--]
+						case 1: // r, [r--]
 							r2 = UNSP_REG_I(opb);
 							if (OP0 != 0x0d)
 								r1 = read16(r2);
 							UNSP_REG_I(opb)--;
 							break;
-						case 2: // r, [<ds:>r++]
+						case 2: // r, [r++]
 							r2 = UNSP_REG_I(opb);
 							if (OP0 != 0x0d)
 								r1 = read16(r2);
 							UNSP_REG_I(opb)++;
 							break;
-						case 3: // r, [<ds:>++r]
+						case 3: // r, [++r]
 							UNSP_REG_I(opb)++;
 							r2 = UNSP_REG_I(opb);
 							if (OP0 != 0x0d)

@@ -18,28 +18,34 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 
 #define LOG_IO_READS		(1U << 0)
 #define LOG_IO_WRITES		(1U << 1)
-#define LOG_IRQS			(1U << 2)
-#define LOG_VLINES			(1U << 3)
-#define LOG_GPIO			(1U << 4)
-#define LOG_UART			(1U << 5)
-#define LOG_I2C				(1U << 6)
-#define LOG_DMA				(1U << 7)
-#define LOG_WATCHDOG		(1U << 8)
-#define LOG_SPU_READS		(1U << 9)
-#define LOG_SPU_WRITES		(1U << 10)
-#define LOG_CHANNEL_READS	(1U << 11)
-#define LOG_CHANNEL_WRITES	(1U << 12)
-#define LOG_ENVELOPES		(1U << 13)
-#define LOG_SAMPLES			(1U << 14)
-#define LOG_RAMPDOWN		(1U << 15)
-#define LOG_BEAT			(1U << 16)
-#define LOG_PPU_READS		(1U << 17)
-#define LOG_PPU_WRITES		(1U << 18)
-#define LOG_IO				(LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA)
+#define LOG_UNKNOWN_IO		(1U << 2)
+#define LOG_IRQS			(1U << 3)
+#define LOG_VLINES			(1U << 4)
+#define LOG_GPIO			(1U << 5)
+#define LOG_UART			(1U << 6)
+#define LOG_I2C				(1U << 7)
+#define LOG_DMA				(1U << 8)
+#define LOG_SEGMENT			(1U << 9)
+#define LOG_WATCHDOG		(1U << 10)
+#define LOG_TIMERS			(1U << 11)
+#define LOG_SPU_READS		(1U << 12)
+#define LOG_SPU_WRITES		(1U << 13)
+#define LOG_UNKNOWN_SPU		(1U << 14)
+#define LOG_CHANNEL_READS	(1U << 15)
+#define LOG_CHANNEL_WRITES	(1U << 16)
+#define LOG_ENVELOPES		(1U << 17)
+#define LOG_SAMPLES			(1U << 18)
+#define LOG_RAMPDOWN		(1U << 19)
+#define LOG_BEAT			(1U << 20)
+#define LOG_PPU_READS		(1U << 21)
+#define LOG_PPU_WRITES		(1U << 22)
+#define LOG_UNKNOWN_PPU		(1U << 23)
+#define LOG_IO				(LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_UNKNOWN_IO)
 #define LOG_CHANNELS		(LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
-#define LOG_SPU				(LOG_SPU_READS | LOG_SPU_WRITES | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES | LOG_ENVELOPES | LOG_SAMPLES | LOG_RAMPDOWN | LOG_BEAT)
-#define LOG_PPU				(LOG_PPU_READS | LOG_PPU_WRITES)
-#define LOG_ALL				(LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES)
+#define LOG_SPU				(LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
+							| LOG_ENVELOPES | LOG_SAMPLES | LOG_RAMPDOWN | LOG_BEAT)
+#define LOG_PPU				(LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
+#define LOG_ALL				(LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT)
 
 #define VERBOSE				(0)
 #include "logmacro.h"
@@ -81,6 +87,7 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_eeprom_w(*this)
 	, m_eeprom_r(*this)
 	, m_uart_tx(*this)
+	, m_chip_sel(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_scrollram(*this, "scrollram")
@@ -127,6 +134,7 @@ void spg2xx_device::device_start()
 	m_eeprom_w.resolve_safe();
 	m_eeprom_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
+	m_chip_sel.resolve_safe();
 
 	m_tmb1 = timer_alloc(TIMER_TMB1);
 	m_tmb2 = timer_alloc(TIMER_TMB2);
@@ -597,7 +605,7 @@ READ16_MEMBER(spg2xx_device::video_r)
 		return VIDEO_IRQ_STATUS;
 
 	default:
-		LOGMASKED(LOG_PPU_READS, "video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
+		LOGMASKED(LOG_UNKNOWN_PPU, "video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
 		break;
 	}
 	return m_video_regs[offset];
@@ -776,7 +784,7 @@ WRITE16_MEMBER(spg2xx_device::video_w)
 		break;
 
 	default:
-		LOGMASKED(LOG_PPU_WRITES, "video_w: Unknown register %04x = %04x\n", 0x2800 + offset, data);
+		LOGMASKED(LOG_UNKNOWN_PPU, "video_w: Unknown register %04x = %04x\n", 0x2800 + offset, data);
 		m_video_regs[offset] = data;
 		break;
 	}
@@ -845,6 +853,7 @@ void spg2xx_device::uart_rx(uint8_t data)
 	{
 		m_uart_rx_fifo[m_uart_rx_index] = data;
 		m_uart_rx_index++;
+		m_io_regs[0x31] |= 1;
 		if (m_uart_rx_index > (m_io_regs[0x37] & 7))
 		{
 			const uint16_t old = IO_IRQ_STATUS;
@@ -910,6 +919,11 @@ READ16_MEMBER(spg2xx_device::io_r)
 		LOGMASKED(LOG_IO_READS, "io_r: ADC Control = %04x\n", val);
 		break;
 
+	case 0x27: // ADC Data
+		m_io_regs[0x27] = 0;
+		LOGMASKED(LOG_IO_READS, "io_r: ADC Data = %04x\n", val);
+		break;
+
 	case 0x29: // Wakeup Source
 		LOGMASKED(LOG_IO_READS, "io_r: Wakeup Source = %04x\n", val);
 		break;
@@ -929,7 +943,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 
 	case 0x2f: // Data Segment
 		val = m_cpu->state_int(UNSP_SR) >> 10;
-		LOGMASKED(LOG_IO_READS, "io_r: Data Segment = %04x\n", val);
+		LOGMASKED(LOG_SEGMENT, "io_r: Data Segment = %04x\n", val);
 		break;
 
 	case 0x31: // UART Status
@@ -988,7 +1002,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 		break;
 
 	default:
-		LOGMASKED(LOG_IO_READS, "io_r: Unknown register %04x\n", 0x3d00 + offset);
+		LOGMASKED(LOG_UNKNOWN_IO, "io_r: Unknown register %04x\n", 0x3d00 + offset);
 		break;
 	}
 
@@ -1212,6 +1226,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		LOGMASKED(LOG_IO_WRITES, "      WaitStates:%d, BusArbPrio:%s\n", (data >> 1) & 3, s_bus_arb[(data >> 3) & 7]);
 		LOGMASKED(LOG_IO_WRITES, "      ROMAddrDecode:%s\n", s_addr_decode[(data >> 6) & 3]);
 		LOGMASKED(LOG_IO_WRITES, "      RAMAddrDecode:%s\n", s_ram_decode[(data >> 8) & 15]);
+		m_chip_sel((data >> 6) & 3);
 		m_io_regs[offset] = data;
 		break;
 	}
@@ -1221,9 +1236,21 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		break;
 
 	case 0x25: // ADC Control
+	{
 		LOGMASKED(LOG_IO_WRITES, "io_w: ADC Control = %04x\n", data);
+		const uint16_t changed = m_io_regs[offset] ^ data;
 		m_io_regs[offset] = data;
+		if (BIT(changed, 12) && BIT(data, 12) && !BIT(m_io_regs[offset], 1))
+		{
+			m_io_regs[0x27] = 0x80ff;
+			const uint16_t old = IO_IRQ_STATUS;
+			IO_IRQ_STATUS |= 0x2000;
+			const uint16_t changed = IO_IRQ_STATUS ^ old;
+			if (changed)
+				check_irqs(changed);
+		}
 		break;
+	}
 
 	case 0x28: // Sleep Mode
 		LOGMASKED(LOG_IO_WRITES, "io_w: Sleep Mode (%s enter value) = %04x\n", data == 0xaa55 ? "valid" : "invalid", data);
@@ -1270,7 +1297,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	{
 		uint16_t ds = m_cpu->state_int(UNSP_SR);
 		m_cpu->set_state_int(UNSP_SR, (ds & 0x03ff) | ((data & 0x3f) << 10));
-		LOGMASKED(LOG_IO_WRITES, "io_w: Data Segment = %04x\n", data);
+		LOGMASKED(LOG_SEGMENT, "io_w: Data Segment = %04x\n", data);
 		break;
 	}
 
@@ -1279,18 +1306,23 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		static const char* const s_9th_bit[4] = { "0", "1", "Odd", "Even" };
 		LOGMASKED(LOG_UART, "io_w: UART Control = %04x (TxEn:%d, RxEn:%d, Bits:%d, MultiProc:%d, 9thBit:%s, TxIntEn:%d, RxIntEn:%d\n", data
 			, BIT(data, 7), BIT(data, 6), BIT(data, 5) ? 9 : 8, BIT(data, 4), s_9th_bit[(data >> 2) & 3], BIT(data, 1), BIT(data, 0));
+		const uint16_t changed = m_io_regs[offset] ^ data;
 		m_io_regs[offset] = data;
 		if (!BIT(data, 6))
 		{
 			m_uart_rx_index = 0;
 			memset(m_uart_rx_fifo, 0, 8);
 		}
+		if (BIT(changed, 7) && BIT(data, 7))
+		{
+			m_io_regs[0x31] |= 0x0002;
+		}
 		break;
 	}
 
 	case 0x31: // UART Status
-		LOGMASKED(LOG_UART, "io_w: UART Status (read only) = %04x\n", data);
-		m_io_regs[offset] = data;
+		LOGMASKED(LOG_UART, "io_w: UART Status = %04x\n", data);
+		//m_io_regs[offset] &= ~data;
 		break;
 
 	case 0x33: // UART Baud Rate
@@ -1301,6 +1333,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	case 0x35: // UART TX Data
 		LOGMASKED(LOG_UART, "io_w: UART Tx Data = %02x\n", data & 0x00ff);
 		m_io_regs[offset] = data;
+		m_uart_tx((uint8_t)data);
 		break;
 
 	case 0x36: // UART RX Data
@@ -1382,7 +1415,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		break;
 
 	default:
-		LOGMASKED(LOG_IO_WRITES, "io_w: Unknown register %04x = %04x\n", 0x3d00 + offset, data);
+		LOGMASKED(LOG_UNKNOWN_IO, "io_w: Unknown register %04x = %04x\n", 0x3d00 + offset, data);
 		m_io_regs[offset] = data;
 		break;
 	}
@@ -1394,21 +1427,17 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 		case TIMER_TMB1:
 		{
-			const uint16_t old = (IO_IRQ_ENABLE & IO_IRQ_STATUS);
+			LOGMASKED(LOG_TIMERS, "TMB1 elapsed, setting IRQ Status bit 0 (old:%04x, new:%04x, enable:%04x)\n", IO_IRQ_STATUS, IO_IRQ_STATUS | 1, IO_IRQ_ENABLE);
 			IO_IRQ_STATUS |= 1;
-			const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
-			if (changed)
-				check_irqs(changed);
+			check_irqs(0x0001);
 			break;
 		}
 
 		case TIMER_TMB2:
 		{
-			const uint16_t old = m_io_regs[0x22] & m_io_regs[0x21];
+			LOGMASKED(LOG_TIMERS, "TMB2 elapsed, setting IRQ Status bit 1 (old:%04x, new:%04x, enable:%04x)\n", IO_IRQ_STATUS, IO_IRQ_STATUS | 2, IO_IRQ_ENABLE);
 			IO_IRQ_STATUS |= 2;
-			const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
-			if (changed)
-				check_irqs(changed);
+			check_irqs(0x0002);
 			break;
 		}
 
@@ -1440,10 +1469,14 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 	//  }
 
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
+	{
 		m_cpu->set_input_line(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
+	}
 
 	if (changed & 0x2100) // UART, ADC IRQ
+	{
 		m_cpu->set_input_line(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
+	}
 
 	if (changed & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) // Beat IRQ
 	{
@@ -1460,13 +1493,20 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 	}
 
 	if (changed & 0x1200) // External IRQ
+	{
 		m_cpu->set_input_line(UNSP_IRQ5_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
+	}
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
+	{
 		m_cpu->set_input_line(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
+	}
 
 	if (changed & 0x008b) // TMB1, TMB2, 4Hz, key change IRQ
+	{
+		LOGMASKED(LOG_IRQS, "%ssserting timer IRQ (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
 		m_cpu->set_input_line(UNSP_IRQ7_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void spg2xx_device::do_gpio(uint32_t offset)
@@ -1665,7 +1705,7 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		default:
-			LOGMASKED(LOG_SPU_READS, "audio_r: Unknown register %04x = %04x\n", 0x3000 + offset, data);
+			LOGMASKED(LOG_UNKNOWN_SPU, "audio_r: Unknown register %04x = %04x\n", 0x3000 + offset, data);
 			break;
 		}
 	}
@@ -1767,13 +1807,13 @@ READ16_MEMBER(spg2xx_device::audio_r)
 			break;
 
 		default:
-			LOGMASKED(LOG_CHANNEL_READS, "audio_r: Unknown register %04x\n", 0x3000 + offset);
+			LOGMASKED(LOG_UNKNOWN_SPU, "audio_r: Unknown register %04x\n", 0x3000 + offset);
 			break;
 		}
 	}
 	else if (channel >= 16)
 	{
-		LOGMASKED(LOG_CHANNEL_READS, "audio_r: Trying to read from channel %d\n", channel);
+		LOGMASKED(LOG_UNKNOWN_SPU, "audio_r: Trying to read from channel %d\n", channel);
 	}
 	return data;
 }
@@ -2039,7 +2079,7 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		default:
 			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_SPU_WRITES, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
+			LOGMASKED(LOG_UNKNOWN_SPU, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
 			break;
 		}
 	}
@@ -2167,13 +2207,13 @@ WRITE16_MEMBER(spg2xx_device::audio_w)
 
 		default:
 			m_audio_regs[offset] = data;
-			LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
+			LOGMASKED(LOG_UNKNOWN_SPU, "audio_w: Unknown register %04x = %04x\n", 0x3000 + offset, data);
 			break;
 		}
 	}
 	else if (channel >= 16)
 	{
-		LOGMASKED(LOG_CHANNEL_WRITES, "audio_w: Trying to write to channel %d: %04x = %04x\n", channel, 0x3000 + offset, data);
+		LOGMASKED(LOG_UNKNOWN_SPU, "audio_w: Trying to write to channel %d: %04x = %04x\n", channel, 0x3000 + offset, data);
 	}
 	else
 	{

@@ -77,9 +77,10 @@ Detailed list of bugs:
 #include "emu.h"
 
 #include "cpu/unsp/unsp.h"
-#include "machine/spg2xx.h"
+#include "machine/bankdev.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
+#include "machine/spg2xx.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -100,7 +101,7 @@ public:
 		, m_debug_screen(*this, "debug_screen")
 #endif
 		, m_spg(*this, "spg")
-		, m_bank(*this, "cart")
+		, m_bank(*this, "cartbank")
 		, m_io_p1(*this, "P1")
 		, m_io_p2(*this, "P2")
 		, m_io_p3(*this, "P3")
@@ -142,7 +143,7 @@ protected:
 	required_device<screen_device> m_debug_screen;
 #endif
 	required_device<spg2xx_device> m_spg;
-	required_memory_bank m_bank;
+	optional_memory_bank m_bank;
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(poll_controls);
@@ -152,7 +153,7 @@ protected:
 
 	virtual void machine_reset() override;
 
-	void mem_map(address_map &map);
+	virtual void mem_map(address_map &map);
 
 	uint32_t m_current_bank;
 
@@ -178,6 +179,55 @@ protected:
 	DECLARE_READ16_MEMBER(rad_crik_hack_r);
 };
 
+class vsmile_state : public spg2xx_game_state
+{
+public:
+	vsmile_state(const machine_config &mconfig, device_type type, const char *tag)
+		: spg2xx_game_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
+		, m_bankdev(*this, "bank")
+		, m_cart_banks(*this, "cartbank%u", 0U)
+	{ }
+
+	void vsmile(machine_config &config);
+	void vsmilep(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	static const device_timer_id TIMER_PAD = 0;
+
+	virtual void mem_map(address_map &map) override;
+	void banked_map(address_map &map);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+
+	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_READ16_MEMBER(portc_r);
+	DECLARE_WRITE16_MEMBER(portb_w);
+	DECLARE_WRITE16_MEMBER(portc_w);
+
+	DECLARE_WRITE8_MEMBER(chip_sel_w);
+
+	DECLARE_WRITE8_MEMBER(uart_tx);
+
+	DECLARE_READ16_MEMBER(bank0_r);
+	DECLARE_READ16_MEMBER(bank1_r);
+	DECLARE_READ16_MEMBER(bank2_r);
+	DECLARE_READ16_MEMBER(bank3_r);
+	optional_device<generic_slot_device> m_cart;
+	memory_region *m_cart_rom;
+	required_device<address_map_bank_device> m_bankdev;
+	optional_memory_bank_array<4> m_cart_banks;
+
+	emu_timer *m_pad_timer;
+	uint8_t m_pad_counter;
+
+	uint16_t m_portb_data;
+	uint16_t m_portc_data;
+};
 
 class spg2xx_cart_state : public spg2xx_game_state
 {
@@ -188,33 +238,17 @@ public:
 	{ }
 
 	void vii(machine_config &config);
-	void vsmile(machine_config &config);
-	void vsmilep(machine_config &config);
-
-	void init_vii();
 
 private:
 	DECLARE_WRITE16_MEMBER(vii_portb_w);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
-
-	DECLARE_READ16_MEMBER(vsmile_porta_r);
-	DECLARE_READ16_MEMBER(vsmile_portb_r);
-	DECLARE_READ16_MEMBER(vsmile_portc_r);
-	DECLARE_WRITE16_MEMBER(vsmile_porta_w);
-	DECLARE_WRITE16_MEMBER(vsmile_portb_w);
-	DECLARE_WRITE16_MEMBER(vsmile_portc_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_rom;
-
-	uint16_t m_vsmile_porta_data;
-	uint16_t m_vsmile_portb_data;
-	uint16_t m_vsmile_portc_data;
 };
 
 #define VERBOSE_LEVEL   (4)
@@ -298,40 +332,119 @@ WRITE16_MEMBER(spg2xx_cart_state::vii_portb_w)
 	switch_bank(((data & 0x80) >> 7) | ((data & 0x20) >> 4));
 }
 
-READ16_MEMBER(spg2xx_cart_state::vsmile_porta_r)
+void vsmile_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	logerror("V.Smile Port A read, pull mask %04x\n", mem_mask);
-	return m_vsmile_porta_data & mem_mask;
+	if (id == TIMER_PAD)
+	{
+		m_pad_counter++;
+		if (m_pad_counter >= 100)
+		{
+			m_pad_counter = 0;
+			m_spg->uart_rx(0x55);
+		}
+	}
 }
 
-READ16_MEMBER(spg2xx_cart_state::vsmile_portb_r)
+#define VSMILE_PORTB_CS1		0x0001
+#define VSMILE_PORTB_CS2		0x0002
+#define VSMILE_PORTB_CART		0x0004
+#define VSMILE_PORTB_RESET		0x0008
+#define VSMILE_PORTB_FRONT24	0x0010
+#define VSMILE_PORTB_OFF		0x0020
+#define VSMILE_PORTB_OFF_SW		0x0040
+#define VSMILE_PORTB_ON_SW		0x0080
+
+#define VSMILE_PORTC_VER		0x000f
+#define VSMILE_PORTC_LOGO		0x0010
+#define VSMILE_PORTC_TEST		0x0020
+#define VSMILE_PORTC_AMP		0x0040
+#define VSMILE_PORTC_SYSRESET	0x0080
+
+READ16_MEMBER(vsmile_state::bank0_r)
 {
-	logerror("V.Smile Port B read, pull mask %04x\n", mem_mask);
-	return m_vsmile_portb_data & mem_mask;
+	const uint16_t data = ((uint16_t*)m_cart_rom->base())[offset];
+	//printf("bank0_r: %06x: %04x\n", offset, data);
+	return data;
 }
 
-READ16_MEMBER(spg2xx_cart_state::vsmile_portc_r)
+READ16_MEMBER(vsmile_state::bank1_r)
 {
-	logerror("V.Smile Port C read, pull mask %04x\n", mem_mask);
-	return m_vsmile_portc_data & mem_mask;
+	const uint16_t data = ((uint16_t*)m_cart_rom->base())[offset + 0x100000];
+	//printf("bank1_r: %06x: %04x\n", offset + 0x100000, data);
+	return data;
 }
 
-WRITE16_MEMBER(spg2xx_cart_state::vsmile_porta_w)
+READ16_MEMBER(vsmile_state::bank2_r)
 {
-	logerror("V.Smile Port A write %04x, push mask %04x\n", data, mem_mask);
-	m_vsmile_porta_data = data & mem_mask;
+	const uint16_t data = ((uint16_t*)m_cart_rom->base())[offset + 0x200000];
+	//printf("bank2_r: %06x: %04x\n", offset + 0x200000, data);
+	return data;
 }
 
-WRITE16_MEMBER(spg2xx_cart_state::vsmile_portb_w)
+READ16_MEMBER(vsmile_state::bank3_r)
 {
-	logerror("V.Smile Port B write %04x, push mask %04x\n", data, mem_mask);
-	m_vsmile_portb_data = data & mem_mask;
+	const uint16_t data = ((uint16_t*)memregion("maincpu")->base())[offset];
+	//printf("bank3_r: %06x: %04x\n", offset + 0x300000, data);
+	return data;
 }
 
-WRITE16_MEMBER(spg2xx_cart_state::vsmile_portc_w)
+READ16_MEMBER(vsmile_state::portb_r)
 {
-	logerror("V.Smile Port C write %04x, push mask %04x\n", data, mem_mask);
-	m_vsmile_portc_data = data & mem_mask;
+	//const uint8_t inputs = m_io_p2->read();
+	//const uint16_t input_bits = BIT(inputs, 0) ? VSMILE_PORTB_ON_SW : 0;
+	const uint16_t data = VSMILE_PORTB_ON_SW | (m_cart && m_cart->exists() ? VSMILE_PORTB_CART : 0);
+	logerror("V.Smile Port B read  %04x, mask %04x\n", data, mem_mask);
+	//printf("V.Smile Port B read  %04x, mask %04x\n", data, mem_mask);
+	return data;
+}
+
+READ16_MEMBER(vsmile_state::portc_r)
+{
+	const uint16_t data = VSMILE_PORTC_LOGO | 0x0004;
+	logerror("V.Smile Port C read  %04x, mask %04x\n", data, mem_mask);
+	return data;
+}
+
+WRITE16_MEMBER(vsmile_state::portb_w)
+{
+	m_portb_data = data & mem_mask;
+	logerror("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
+	//printf("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
+}
+
+WRITE16_MEMBER(vsmile_state::portc_w)
+{
+	m_portc_data = data & mem_mask;
+	logerror("V.Smile Port C write %04x, mask %04x\n", m_portc_data, mem_mask);
+	//printf("V.Smile Port C write %04x, mask %04x\n", m_portc_data, mem_mask);
+	//printf("%02x ", data >> 8);
+}
+
+WRITE8_MEMBER(vsmile_state::uart_tx)
+{
+	logerror("UART Tx: %02x\n", data);
+}
+
+WRITE8_MEMBER(vsmile_state::chip_sel_w)
+{
+	logerror("Chip select mode: %d\n", data);
+	const uint16_t cart_offset = m_cart && m_cart->exists() ? 4 : 0;
+	switch (data)
+	{
+		case 0:
+			logerror("Setting bank %d\n", cart_offset);
+			m_bankdev->set_bank(cart_offset);
+			break;
+		case 1:
+			logerror("Setting bank %d\n", 1 + cart_offset);
+			m_bankdev->set_bank(1 + cart_offset);
+			break;
+		case 2:
+		case 3:
+			logerror("Setting bank %d\n", 2 + cart_offset);
+			m_bankdev->set_bank(2 + cart_offset);
+			break;
+	}
 }
 
 READ16_MEMBER(spg2xx_game_state::walle_portc_r)
@@ -382,7 +495,46 @@ READ16_MEMBER(spg2xx_game_state::jakks_porta_r)
 
 void spg2xx_game_state::mem_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).bankr("cart");
+	map(0x000000, 0x3fffff).bankr("cartbank");
+	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
+}
+
+void vsmile_state::banked_map(address_map &map)
+{
+	map(0x0000000, 0x00fffff).rom().region("maincpu", 0);
+	map(0x0100000, 0x01fffff).rom().region("maincpu", 0);
+	map(0x0200000, 0x02fffff).rom().region("maincpu", 0);
+	map(0x0300000, 0x03fffff).rom().region("maincpu", 0);
+
+	map(0x0400000, 0x04fffff).rom().region("maincpu", 0);
+	map(0x0500000, 0x05fffff).rom().region("maincpu", 0);
+	map(0x0600000, 0x06fffff).rom().region("maincpu", 0);
+	map(0x0700000, 0x07fffff).rom().region("maincpu", 0);
+
+	map(0x0800000, 0x08fffff).rom().region("maincpu", 0);
+	map(0x0900000, 0x09fffff).rom().region("maincpu", 0);
+	map(0x0a00000, 0x0afffff).rom().region("maincpu", 0);
+	map(0x0b00000, 0x0bfffff).rom().region("maincpu", 0);
+
+	map(0x1000000, 0x10fffff).bankr("cartbank0");
+	map(0x1100000, 0x11fffff).bankr("cartbank0");
+	map(0x1200000, 0x12fffff).bankr("cartbank0");
+	map(0x1300000, 0x13fffff).bankr("cartbank0");
+
+	map(0x1400000, 0x14fffff).bankr("cartbank0");
+	map(0x1500000, 0x15fffff).bankr("cartbank0");
+	map(0x1600000, 0x16fffff).bankr("cartbank1");
+	map(0x1700000, 0x17fffff).bankr("cartbank1");
+
+	map(0x1800000, 0x18fffff).r(FUNC(vsmile_state::bank0_r));
+	map(0x1900000, 0x19fffff).r(FUNC(vsmile_state::bank1_r));
+	map(0x1a00000, 0x1afffff).nopr();
+	map(0x1b00000, 0x1bfffff).r(FUNC(vsmile_state::bank3_r));
+}
+
+void vsmile_state::mem_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).r(m_bankdev, FUNC(address_map_bank_device::read16));
 	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
@@ -429,6 +581,14 @@ static INPUT_PORTS_START( vsmile )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("X Button")
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x0001, 0x0001, "POWER ON" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "POWER OFF" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( walle )
@@ -620,10 +780,48 @@ void spg2xx_cart_state::machine_start()
 		m_bank->configure_entries(0, ceilf((float)m_cart_rom->bytes() / 0x800000), m_cart_rom->base(), 0x800000);
 		m_bank->set_entry(0);
 	}
+}
 
-	m_vsmile_porta_data = 0;
-	m_vsmile_portb_data = 0;
-	m_vsmile_portc_data = 0;
+void vsmile_state::machine_start()
+{
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
+	{
+		std::string region_tag;
+		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		for (uint32_t i = 0; i < 2; i++)
+		{
+			m_cart_banks[i]->configure_entries(0, (m_cart_rom->bytes() + 0x1fffff) / 0x200000, m_cart_rom->base(), 0x200000);
+			m_cart_banks[i]->set_entry(i);
+		}
+	}
+	else
+	{
+		for (uint32_t i = 0; i < 2; i++)
+		{
+			m_cart_rom = memregion("maincpu");
+			m_cart_banks[i]->configure_entries(0, (m_cart_rom->bytes() + 0x1fffff) / 0x200000, m_cart_rom->base(), 0x200000);
+			m_cart_banks[i]->set_entry(0);
+		}
+	}
+
+	m_bankdev->set_bank(m_cart && m_cart->exists() ? 4 : 0);
+
+	m_serial_eeprom = std::make_unique<uint8_t[]>(0x400);
+	if (m_nvram)
+		m_nvram->set_base(&m_serial_eeprom[0], 0x400);
+
+	m_pad_timer = timer_alloc(TIMER_PAD);
+	m_pad_timer->adjust(attotime::never);
+}
+
+void vsmile_state::machine_reset()
+{
+	m_portb_data = 0;
+	m_portc_data = 0;
+
+	m_pad_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+	m_pad_counter = 0;
 }
 
 void spg2xx_cart_state::machine_reset()
@@ -699,7 +897,7 @@ DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vii_cart)
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vsmile_cart)
+DEVICE_IMAGE_LOAD_MEMBER(vsmile_state, cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -778,7 +976,7 @@ void spg2xx_cart_state::vii(machine_config &config)
 	SOFTWARE_LIST(config, "vii_cart").set_original("vii");
 }
 
-void spg2xx_cart_state::vsmile(machine_config &config)
+void vsmile_state::vsmile(machine_config &config)
 {
 #if SPG2XX_VISUAL_AUDIO_DEBUG
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen, m_debug_screen);
@@ -786,22 +984,30 @@ void spg2xx_cart_state::vsmile(machine_config &config)
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 #endif
 	spg2xx_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsmile_state::mem_map);
 
-	m_spg->porta_in().set(FUNC(spg2xx_cart_state::vsmile_porta_r));
-	m_spg->portb_in().set(FUNC(spg2xx_cart_state::vsmile_portb_r));
-	m_spg->portc_in().set(FUNC(spg2xx_cart_state::vsmile_portc_r));
-	m_spg->porta_out().set(FUNC(spg2xx_cart_state::vsmile_porta_w));
-	m_spg->portb_out().set(FUNC(spg2xx_cart_state::vsmile_portb_w));
-	m_spg->portc_out().set(FUNC(spg2xx_cart_state::vsmile_portc_w));
+	m_spg->portb_in().set(FUNC(vsmile_state::portb_r));
+	m_spg->portc_in().set(FUNC(vsmile_state::portc_r));
+	m_spg->portb_out().set(FUNC(vsmile_state::portb_w));
+	m_spg->portc_out().set(FUNC(vsmile_state::portc_w));
+	m_spg->chip_select().set(FUNC(vsmile_state::chip_sel_w));
+	m_spg->uart_tx().set(FUNC(vsmile_state::uart_tx));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vsmile_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(device_image_load_delegate(&spg2xx_cart_state::device_image_load_vsmile_cart, this));
+	m_cart->set_device_load(device_image_load_delegate(&vsmile_state::device_image_load_cart, this));
+
+	ADDRESS_MAP_BANK(config, m_bankdev);
+	m_bankdev->set_addrmap(AS_PROGRAM, &vsmile_state::banked_map);
+	m_bankdev->set_endianness(ENDIANNESS_LITTLE);
+	m_bankdev->set_data_width(16);
+	m_bankdev->set_shift(-1);
+	m_bankdev->set_stride(0x400000);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmile_cart");
 }
 
-void spg2xx_cart_state::vsmilep(machine_config &config)
+void vsmile_state::vsmilep(machine_config &config)
 {
 	vsmile(config);
 	m_spg->set_pal(true);
@@ -1091,10 +1297,10 @@ ROM_END
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
 // VTech systems
-CONS( 2005, vsmile,  0,      0, vsmile,  vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (US)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileg, vsmile, 0, vsmilep, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmilef, vsmile, 0, vsmilep, vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile (France)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileb, 0,      0, vsmile,  vsmile, spg2xx_cart_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,  0,      0, vsmile,  vsmile, vsmile_state, empty_init, "VTech", "V.Smile (US)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileg, vsmile, 0, vsmilep, vsmile, vsmile_state, empty_init, "VTech", "V.Smile (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmilef, vsmile, 0, vsmilep, vsmile, vsmile_state, empty_init, "VTech", "V.Smile (France)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileb, 0,      0, vsmile,  vsmile, vsmile_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 // Jungle Soft TV games
 CONS( 2007, vii,      0, 0, vii,        vii,      spg2xx_cart_state, empty_init, "Jungle Soft / KenSingTon / Siatronics",    "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part

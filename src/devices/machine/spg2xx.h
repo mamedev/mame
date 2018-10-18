@@ -44,6 +44,8 @@ public:
 
 	auto uart_tx() { return m_uart_tx.bind(); }
 
+	auto chip_select() { return m_chip_sel.bind(); }
+
 	void uart_rx(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -455,6 +457,8 @@ protected:
 	devcb_read8 m_eeprom_r;
 
 	devcb_write8 m_uart_tx;
+
+	devcb_write8 m_chip_sel;
 
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;
