@@ -464,9 +464,9 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	ctc.zc_callback<2>().set("dart", FUNC(z80dart_device::rxtxcb_w));  // Z80DART Ch B
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set("sio", FUNC(z80dart_device::rxb_w));
-	rs232.dcd_handler().set("sio", FUNC(z80dart_device::dcdb_w));
-	rs232.cts_handler().set("sio", FUNC(z80dart_device::ctsb_w));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
+	rs232.dcd_handler().set("sio", FUNC(z80sio_device::dcdb_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
 
 	FD1797(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(altos5_state::fdc_intrq_w));
