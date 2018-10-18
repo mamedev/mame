@@ -135,7 +135,7 @@ WRITE8_MEMBER(xavix_state::adc_7b00_w)
 READ8_MEMBER(xavix_state::adc_7b80_r)
 {
 	logerror("%s: adc_7b80_r\n", machine().describe_context());
-	return 0xff;
+	return 0x00;//0xff;
 }
 
 WRITE8_MEMBER(xavix_state::adc_7b80_w)
@@ -150,7 +150,8 @@ WRITE8_MEMBER(xavix_state::adc_7b81_w)
 
 READ8_MEMBER(xavix_state::adc_7b81_r)
 {
-	return machine().rand();
+	return 0x00;
+//	return machine().rand();
 }
 
 
@@ -204,55 +205,80 @@ WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 	logerror("%s: dispctrl_posirq_y_w %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(xavix_state::io_0_r)
+READ8_MEMBER(xavix_state::io0_data_r)
 {
-	return m_in0->read();
+	uint8_t ret = m_in0->read() & ~m_io0_direction;
+	ret |= m_io0_data & m_io0_direction;
+	return ret;
 }
 
-READ8_MEMBER(xavix_state::io_1_r)
+READ8_MEMBER(xavix_state::io1_data_r)
 {
-	/*
-	int pc = m_maincpu->state_int(M6502_PC);
+	uint8_t ret = m_in1->read();
 
-	if (pc == 0x3acc) return 0x08;
-	if (pc == 0x3ae0) return 0x08;
-	if (pc == 0xfcb0) return 0xff;
+	if (m_i2cmem)
+	{
+		if (!(m_io1_direction & 0x08))
+		{
+			ret &= ~0x08;
+			ret |= (m_i2cmem->read_sda() & 1) << 3;
+		}
+	}
 
-	logerror("%04x: in1 read\n", pc);
-	*/
-	return m_in1->read();
+	ret &= ~m_io1_direction;
+
+	ret |= m_io1_data & m_io1_direction;
+	return ret;
 }
 
-// has_wamg crashes on boot if these return high, either it's a button causing the game to eventually crash, or an invalid input (inputs are ACTIVE HIGH so returning 0x00 is safer
-READ8_MEMBER(xavix_state::io_2_r)
+READ8_MEMBER(xavix_state::io0_direction_r)
 {
-	return 0x00;
+	return m_io0_direction;
 }
 
-READ8_MEMBER(xavix_state::io_3_r)
+READ8_MEMBER(xavix_state::io1_direction_r)
 {
-	return 0x00;
+	return m_io1_direction;
 }
 
 
-WRITE8_MEMBER(xavix_state::io_0_w)
+WRITE8_MEMBER(xavix_state::io0_data_w)
 {
-	logerror("%s: io_0_w %02x\n", machine().describe_context(), data);
+	m_io0_data = data;
+	logerror("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::io_1_w)
+WRITE8_MEMBER(xavix_state::io1_data_w)
 {
-	logerror("%s: io_1_w %02x\n", machine().describe_context(), data);
+	m_io1_data = data;
+	logerror("%s: io1_data_w %02x\n", machine().describe_context(), data);
+
+	if (m_i2cmem)
+	{
+		if (m_io1_direction & 0x08)
+		{
+			m_i2cmem->write_sda((data & 0x08) >> 3);
+		}
+
+		if (m_io1_direction & 0x10)
+		{
+			m_i2cmem->write_scl((data & 0x10) >> 4);
+		}
+	}
 }
 
-WRITE8_MEMBER(xavix_state::io_2_w)
+WRITE8_MEMBER(xavix_state::io0_direction_w)
 {
-	logerror("%s: io_2_w %02x\n", machine().describe_context(), data);
+	m_io0_direction = data;
+	logerror("%s: io0_direction_w %02x\n", machine().describe_context(), data);
+	io0_data_w(space,0,m_io0_data); 
 }
 
-WRITE8_MEMBER(xavix_state::io_3_w)
+WRITE8_MEMBER(xavix_state::io1_direction_w)
 {
-	logerror("%s: io_3_w %02x\n", machine().describe_context(), data);
+	m_io1_direction = data;
+	logerror("%s: io1_direction_w %02x\n", machine().describe_context(), data);
+	io1_data_w(space,0,m_io1_data); // requires this for i2cmem to work, is it correct tho?
 }
 
 READ8_MEMBER(xavix_state::arena_start_r)
@@ -460,6 +486,13 @@ void xavix_state::machine_reset()
 	std::fill_n(&m_fragment_sprite[0], 0x800, 0x00); // taito nostalgia 1 never initializes the ram at 0x6400 but there's no condition on using it at present?
 
 	m_lowbus->set_bank(0);
+
+	m_io0_data = 0x00;
+	m_io1_data = 0x00;
+
+	m_io0_direction = 0x00;
+	m_io1_direction = 0x00;
+
 }
 
 typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
