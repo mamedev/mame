@@ -789,10 +789,11 @@ void vsmile_state::machine_start()
 	{
 		std::string region_tag;
 		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		const uint32_t banks = (m_cart_rom->bytes() + 0x1fffff) / 0x200000;
 		for (uint32_t i = 0; i < 2; i++)
 		{
-			m_cart_banks[i]->configure_entries(0, (m_cart_rom->bytes() + 0x1fffff) / 0x200000, m_cart_rom->base(), 0x200000);
-			m_cart_banks[i]->set_entry(i);
+			m_cart_banks[i]->configure_entries(0, banks, m_cart_rom->base(), 0x200000);
+			m_cart_banks[i]->set_entry(i % banks);
 		}
 	}
 	else
