@@ -65,23 +65,31 @@ private:
 	/* general control registers */
 	static constexpr int REG_1TQ4_ID_LOW = 0x10;
 	static constexpr int REG_1TQ4_ID_HIGH = 0x12;
+	static constexpr int REG_GENERAL_CONTROL = 0x14;
+	static constexpr int REG_GENERAL_CONTROL_RESET0 = 1 << 4;
+	static constexpr int REG_GENERAL_CONTROL_RESET1 = 1 << 5;
 
 	/* channel specific registers */
-	static constexpr int REG0_1TQ4_ADDRESS_LOW = 0x100;
-	static constexpr int REG0_1TQ4_ADDRESS_HIGH = 0x102;
-	static constexpr int REG0_1TQ4_TRANSFER_COUNT_LOW = 0x104;
-	static constexpr int REG0_1TQ4_TRANSFER_COUNT_HIGH = 0x106;
+	static constexpr int REG0_1TQ4_ADDRESS_HIGH = 0x100;
+	static constexpr int REG0_1TQ4_ADDRESS_LOW = 0x102;
+	static constexpr int REG0_1TQ4_TRANSFER_COUNT_HIGH = 0x104;
+	static constexpr int REG0_1TQ4_TRANSFER_COUNT_LOW = 0x106;
+
 	static constexpr int REG0_1TQ4_CONTROL = 0x108;
 	static constexpr int REG0_1TQ4_STATUS = 0x10a;
 
 	static constexpr uint16_t REG_1TQ4_CONTROL_LWORD = 1 << 8;
 	static constexpr uint16_t REG_1TQ4_CONTROL_START = 1 << 15;
 
+	static constexpr uint16_t REG_1TQ4_STATUS_ARMED = 1 << 0;
+	static constexpr uint16_t REG_1TQ4_STATUS_INT = 1 << 1;
+
 	/* registers */
-	static constexpr int REG1_1TQ4_ADDRESS_LOW = 0x200;
-	static constexpr int REG1_1TQ4_ADDRESS_HIGH = 0x202;
-	static constexpr int REG1_1TQ4_TRANSFER_COUNT_LOW = 0x204;
-	static constexpr int REG1_1TQ4_TRANSFER_COUNT_HIGH = 0x206;
+	static constexpr int REG1_1TQ4_ADDRESS_HIGH = 0x200;
+	static constexpr int REG1_1TQ4_ADDRESS_LOW = 0x202;
+	static constexpr int REG1_1TQ4_TRANSFER_COUNT_HIGH = 0x204;
+	static constexpr int REG1_1TQ4_TRANSFER_COUNT_LOW = 0x206;
+
 	static constexpr int REG1_1TQ4_CONTROL = 0x208;
 	static constexpr int REG1_1TQ4_STATUS = 0x20a;
 
