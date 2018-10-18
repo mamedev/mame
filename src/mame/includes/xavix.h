@@ -207,6 +207,8 @@ private:
 	uint8_t m_6ff0;
 	uint8_t m_6ff8;
 
+	uint8_t m_io0_data;
+	uint8_t m_io1_data;
 	uint8_t m_io0_direction;
 	uint8_t m_io1_direction;
 
