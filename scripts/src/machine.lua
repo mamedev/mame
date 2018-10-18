@@ -3795,3 +3795,15 @@ if (MACHINES["SUN4C_MMU"]~=null) then
 		MAME_DIR .. "src/devices/machine/sun4c_mmu.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/z8038.h,MACHINES["Z8038"] = true
+---------------------------------------------------
+
+if (MACHINES["Z8038"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/z8038.cpp",
+		MAME_DIR .. "src/devices/machine/z8038.h",
+	}
+end
