@@ -183,23 +183,23 @@ ldal3_acc
 	prefetch();
 
 cmpl0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	do_cmp(A, (m_l & 0x000000ff) >> 0);
 	prefetch();
 
 cmpl1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	do_cmp(A, (m_l & 0x0000ff00) >> 8);
 	prefetch();
 
 cmpl2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	do_cmp(A, (m_l & 0x00ff0000) >> 16);
 	prefetch();
 
 cmpl3_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	do_cmp(A, (m_l & 0xff000000) >> 24);
 	prefetch();
 
 sbcl0_acc
@@ -396,8 +396,10 @@ cmppb_imp
 	prefetch();
 
 sbcpb_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
+	m_databank = (m_pb & 0xff0000)>>16;
+	do_sbc(read((m_pb&0xffff)+Y));
+	m_databank = TMP;
 	prefetch();
 
 stx_aby
@@ -472,8 +474,8 @@ cmc_imp
 	prefetch();
 
 sev_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
+	P |= F_V;
 	prefetch();
 
 callf_aba
