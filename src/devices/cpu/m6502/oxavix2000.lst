@@ -459,8 +459,7 @@ asr_zpx
 	prefetch();
 
 asr_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	A = do_asr(A);
 	prefetch();
 
 asr_abx
