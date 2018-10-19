@@ -3312,27 +3312,25 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	UPD7201_NEW(config, m_mpsc, 24.0734_MHz_XTAL / 5 / 2); // 2.4073 MHz (nominally 2.5 MHz)
 	m_mpsc->out_int_callback().set(FUNC(rainbow_state::mpsc_irq));
-	m_mpsc->out_txda_callback().set("comm", FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_txda_callback().set(m_comm_port, FUNC(rs232_port_device::write_txd));
 	m_mpsc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	// RTS and DTR outputs are not connected
 
-	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, dcda_w))
+	RS232_PORT(config, m_comm_port, default_rs232_devices, nullptr);
+	m_comm_port->rxd_handler().set(m_mpsc, FUNC(upd7201_new_device::rxa_w));
+	m_comm_port->cts_handler().set(m_mpsc, FUNC(upd7201_new_device::ctsa_w));
+	m_comm_port->dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::dcda_w));
 
-	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, upd7201_new_device, ctsb_w)) // actually DTR
+	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	printer.rxd_handler().set(m_mpsc, FUNC(upd7201_new_device::rxb_w));
+	printer.dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::ctsb_w)); // actually DTR
 
-	MCFG_DEVICE_MODIFY("comm")
-	MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE)
-	MCFG_SLOT_OPTION_ADD("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE)
-	MCFG_SLOT_OPTION_ADD("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE)
-	MCFG_SLOT_DEFAULT_OPTION("logitech_mouse")
+	m_comm_port->option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	m_comm_port->option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	m_comm_port->set_default_option("logitech_mouse");
 
-	MCFG_DEVICE_MODIFY("printer")
-	MCFG_SLOT_DEFAULT_OPTION("printer")
+	printer.set_default_option("printer");
 
 	I8251(config, m_kbd8251, 24.0734_MHz_XTAL / 5 / 2);
 	m_kbd8251->txd_handler().set(FUNC(rainbow_state::kbd_tx));

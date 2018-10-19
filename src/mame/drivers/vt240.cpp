@@ -681,9 +681,9 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_UPD7220_BLANK_CALLBACK(INPUTLINE("charcpu", I8085_RST55_LINE))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(7'372'800) / 2)
+	MCFG_DEVICE_ADD(m_duart, SCN2681, XTAL(7'372'800) / 2)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, vt240_state, irq13_w))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("host", rs232_port_device, write_txd))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m_host, rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("printer", rs232_port_device, write_txd))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, vt240_state, duartout_w))
 
@@ -699,14 +699,14 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 64) // 8251 is set to /64 on the clock input
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, vt240_state, write_keyboard_clock))
 
-	MCFG_DEVICE_ADD("host", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("duart", scn2681_device, ip5_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("duart", scn2681_device, ip0_w))
+	RS232_PORT(config, m_host, default_rs232_devices, "null_modem");
+	m_host->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
+	m_host->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w));
+	m_host->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w));
 
-	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("duart", scn2681_device, ip1_w))
+	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	printer.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
+	printer.dsr_handler().set(m_duart, FUNC(scn2681_device::ip1_w));
 
 	X2212(config, "x2212");
 MACHINE_CONFIG_END

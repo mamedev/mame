@@ -406,10 +406,10 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	m_i8251line->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_i8251line->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
+	rs232.rxd_handler().set(m_i8251line, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_i8251line, FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
 	// serial connection to KM-035 keyboard
 	I8251(config, m_i8251kbd, 0);
@@ -424,10 +424,10 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	I8251(config, m_i8251prn, 0);
 	m_i8251prn->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD("prtr", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251prn", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251prn", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251prn", i8251_device, write_dsr))
+	rs232_port_device &prtr(RS232_PORT(config, "prtr", default_rs232_devices, nullptr));
+	prtr.rxd_handler().set(m_i8251prn, FUNC(i8251_device::write_rxd));
+	prtr.cts_handler().set(m_i8251prn, FUNC(i8251_device::write_cts));
+	prtr.dsr_handler().set(m_i8251prn, FUNC(i8251_device::write_dsr));
 MACHINE_CONFIG_END
 
 ROM_START( sm7238 )

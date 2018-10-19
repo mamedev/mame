@@ -713,21 +713,21 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 	/* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
 	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq5_w))
 
-	MCFG_DEVICE_ADD(RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duscc", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("duscc", duscc68562_device, ctsb_w))
+	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
+	rs232p1.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxb_w));
+	rs232p1.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duscc2", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("duscc2", duscc68562_device, ctsa_w))
+	rs232_port_device &rs232p2(RS232_PORT(config, RS232P2_TAG, default_rs232_devices, nullptr));
+	rs232p2.rxd_handler().set("duscc2", FUNC(duscc68562_device::rxa_w));
+	rs232p2.cts_handler().set("duscc2", FUNC(duscc68562_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duscc2", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("duscc2", duscc68562_device, ctsb_w))
+	rs232_port_device &rs232p3(RS232_PORT(config, RS232P3_TAG, default_rs232_devices, nullptr));
+	rs232p3.rxd_handler().set("duscc2", FUNC(duscc68562_device::rxb_w));
+	rs232p3.cts_handler().set("duscc2", FUNC(duscc68562_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(RS232P4_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duscc", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("duscc", duscc68562_device, ctsa_w))
+	rs232_port_device &rs232p4(RS232_PORT(config, RS232P4_TAG, default_rs232_devices, "terminal"));
+	rs232p4.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxa_w));
+	rs232p4.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsa_w));
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
 	PIT68230(config, m_pit1, XTAL(16'000'000) / 2); // The PIT clock is not verified on schema but reversed from behaviour
