@@ -99,7 +99,8 @@ WRITE32_MEMBER(namcofl_state::namcofl_spritebank_w)
 
 int namcofl_state::FLobjcode2tile(int code)
 {
-	if ((code & 0x2000) && (m_sprbank & 2)) { code += 0x4000; }
+	if (BIT(code, 13))
+		return (m_sprbank << 13) | (code & 0x1fff);
 
 	return code;
 }

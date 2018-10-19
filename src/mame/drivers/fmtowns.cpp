@@ -2866,10 +2866,10 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	m_i8251->rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
 	m_i8251->txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251",i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251",i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251",i8251_device, write_cts))
+	rs232_port_device &rs232c(RS232_PORT(config, "rs232c", default_rs232_devices, nullptr));
+	rs232c.rxd_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
+	rs232c.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
+	rs232c.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
 
 	MCFG_FMT_ICMEMCARD_ADD("icmemcard")
 

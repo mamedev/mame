@@ -777,7 +777,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 
 	UPD7201(config, m_scc, MAIN_CLK/4); // channel b clock set by pit2 channel 2
 	// Channel A: Keyboard
-	m_scc->out_txda_callback().set("kbd", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set(m_kbd, FUNC(rs232_port_device::write_txd));
 	// Channel B: RS232
 	m_scc->out_txdb_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtrb_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
@@ -814,11 +814,11 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	FLOPPY_CONNECTOR(config, m_floppy[0], qx10_floppies, "525dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], qx10_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, upd7201_device, rxb_w))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_scc, FUNC(upd7201_device::rxb_w));
 
-	MCFG_DEVICE_ADD("kbd", RS232_PORT, keyboard, "qx10")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, z80dart_device, rxa_w))
+	RS232_PORT(config, m_kbd, keyboard, "qx10");
+	m_kbd->rxd_handler().set(m_scc, FUNC(upd7201_device::rxa_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K");
