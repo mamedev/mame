@@ -2123,7 +2123,7 @@ ROM_START( spangbl2 )
 	ROM_REGION( 0x008800, "extra", 0)
 	// "sp2-15" contains the same pattern repeated several times
 	ROM_LOAD( "sp2-15.bin", 0x00000, 0x08000, CRC(100dda13) SHA1(9a0b6d4439127abc4995c9df3839bfe1f13d8bc2) ) // 27C256
-	// "sp2-16" can be found as a 76161 PROM or as a 27C356 with its first 6KB empty
+	// "sp2-16" can be found as a 76161 PROM or as a 27C256 with its first 6KB empty
 	ROM_LOAD( "sp2-16.bin", 0x08000, 0x00800, CRC(16dbd461) SHA1(1759ad71df8deb5452b3ee92aa2ece1ee79ff469) ) // M1-76161-5
 
 	// Unsused
