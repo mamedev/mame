@@ -3282,14 +3282,13 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	m_hdc->out_step_callback().set(FUNC(rainbow_state::hdc_step));         // STEP PULSE
 	m_hdc->out_dirin_callback().set(FUNC(rainbow_state::hdc_direction));
 
-	m_hdc->in_wf_callback().set(FUNC(rainbow_state::hdc_write_fault));   // WRITE FAULT  (set to GND if not serviced)
+	// WF + DRDY are actually wired to a routine here:
+	m_hdc->in_wf_callback().set(FUNC(rainbow_state::hdc_write_fault));   // WRITE FAULT (fatal until next reset)
+	m_hdc->in_drdy_callback().set(FUNC(rainbow_state::hdc_drive_ready)); // DRIVE_READY (VCC = ready)
 
-	m_hdc->in_drdy_callback().set(FUNC(rainbow_state::hdc_drive_ready)); // DRIVE_READY  (set to VCC if not serviced)
-
-	m_hdc->in_sc_callback().set_constant(1);                                        // SEEK COMPLETE (set to VCC if not serviced)
-
-	m_hdc->in_tk000_callback().set_constant(1); // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
-	m_hdc->in_wf_callback().set_constant(1); //    "
+	// Always set seek complete and track 00 signal (not super clean, but does not affect operation):
+	m_hdc->in_sc_callback().set_constant(1);                             // SEEK COMPLETE (VCC = complete)
+	m_hdc->in_tk000_callback().set_constant(1); 			     // TRACK 00 signal (= from drive)
 
 	MCFG_HARDDISK_ADD("decharddisk1")
 	/// ******************************** / HARD DISK CONTROLLER ****************************************
