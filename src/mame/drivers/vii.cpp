@@ -393,7 +393,7 @@ READ16_MEMBER(vsmile_state::portb_r)
 	//const uint8_t inputs = m_io_p2->read();
 	//const uint16_t input_bits = BIT(inputs, 0) ? VSMILE_PORTB_ON_SW : 0;
 	const uint16_t data = VSMILE_PORTB_ON_SW | (m_cart && m_cart->exists() ? VSMILE_PORTB_CART : 0);
-	logerror("V.Smile Port B read  %04x, mask %04x\n", data, mem_mask);
+	//logerror("V.Smile Port B read  %04x, mask %04x\n", data, mem_mask);
 	//printf("V.Smile Port B read  %04x, mask %04x\n", data, mem_mask);
 	return data;
 }
@@ -401,47 +401,47 @@ READ16_MEMBER(vsmile_state::portb_r)
 READ16_MEMBER(vsmile_state::portc_r)
 {
 	const uint16_t data = VSMILE_PORTC_LOGO | 0x0004;
-	logerror("V.Smile Port C read  %04x, mask %04x\n", data, mem_mask);
+	//logerror("V.Smile Port C read  %04x, mask %04x\n", data, mem_mask);
 	return data;
 }
 
 WRITE16_MEMBER(vsmile_state::portb_w)
 {
 	m_portb_data = data & mem_mask;
-	logerror("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
+	//logerror("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
 	//printf("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
 }
 
 WRITE16_MEMBER(vsmile_state::portc_w)
 {
 	m_portc_data = data & mem_mask;
-	logerror("V.Smile Port C write %04x, mask %04x\n", m_portc_data, mem_mask);
+	//logerror("V.Smile Port C write %04x, mask %04x\n", m_portc_data, mem_mask);
 	//printf("V.Smile Port C write %04x, mask %04x\n", m_portc_data, mem_mask);
 	//printf("%02x ", data >> 8);
 }
 
 WRITE8_MEMBER(vsmile_state::uart_tx)
 {
-	logerror("UART Tx: %02x\n", data);
+	//logerror("UART Tx: %02x\n", data);
 }
 
 WRITE8_MEMBER(vsmile_state::chip_sel_w)
 {
-	logerror("Chip select mode: %d\n", data);
+	//logerror("Chip select mode: %d\n", data);
 	const uint16_t cart_offset = m_cart && m_cart->exists() ? 4 : 0;
 	switch (data)
 	{
 		case 0:
-			logerror("Setting bank %d\n", cart_offset);
+			//logerror("Setting bank %d\n", cart_offset);
 			m_bankdev->set_bank(cart_offset);
 			break;
 		case 1:
-			logerror("Setting bank %d\n", 1 + cart_offset);
+			//logerror("Setting bank %d\n", 1 + cart_offset);
 			m_bankdev->set_bank(1 + cart_offset);
 			break;
 		case 2:
 		case 3:
-			logerror("Setting bank %d\n", 2 + cart_offset);
+			//logerror("Setting bank %d\n", 2 + cart_offset);
 			m_bankdev->set_bank(2 + cart_offset);
 			break;
 	}
@@ -449,28 +449,11 @@ WRITE8_MEMBER(vsmile_state::chip_sel_w)
 
 READ16_MEMBER(spg2xx_game_state::walle_portc_r)
 {
-	char mask_buf[17];
-	mask_buf[16] = 0;
-	for (uint32_t i = 0; i < 16; i++)
-	{
-		mask_buf[i] = BIT(mem_mask, 15 - i) ? '1' : '0';
-	}
-	logerror("Wall-E Port C read 0000, pull mask %s\n", mask_buf);
 	return m_i2cmem->read_sda();
 }
 
 WRITE16_MEMBER(spg2xx_game_state::walle_portc_w)
 {
-	char data_buf[17];
-	char mask_buf[17];
-	data_buf[16] = 0;
-	mask_buf[16] = 0;
-	for (uint32_t i = 0; i < 16; i++)
-	{
-		data_buf[i] = BIT(data,     15 - i) ? '1' : '0';
-		mask_buf[i] = BIT(mem_mask, 15 - i) ? '1' : '0';
-	}
-	logerror("Wall-E Port C write %s, push mask %s\n", data_buf, mask_buf);
 	m_walle_portc_data = data & mem_mask;
 	if (BIT(mem_mask, 1))
 		m_i2cmem->write_scl(BIT(data, 1));

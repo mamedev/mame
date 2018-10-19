@@ -349,7 +349,7 @@ void spg2xx_device::blit_page(const rectangle &cliprect, int depth, uint32_t bit
 	{
 		for (uint32_t x0 = 0; x0 < wn; x0++)
 		{
-			uint16_t tile = (ctrl & PAGE_BLANK_MASK) ? 0 : space.read_word(tilemap + x0 + wn * y0);
+			uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + x0 + wn * y0);
 			uint16_t palette = 0;
 			uint32_t xx, yy;
 

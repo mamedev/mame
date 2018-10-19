@@ -12,7 +12,7 @@ bvs_rel     adc_idy     ply_imp     adcpa_imp   nop_imp     adc_zpx     ror_zpx 
 retf_imp    sta_idx     stz_zpg     stal0_acc   sty_zpg     sta_zpg     stx_zpg     stal1_acc   dey_imp     sev_imp     txa_imp     stal2_acc   sty_aba     sta_aba     stx_aba     stal3_acc
 bcc_rel     sta_idy     stz_aba     stapa_imp   sty_zpx     sta_zpx     stx_zpy     stapb_imp   tya_imp     sta_aby     txs_imp     spa2_acc    sty_abx     sta_abx     stx_aby     spb2_acc
 ldy_imm     lda_idx     ldx_imm     ldal0_acc   ldy_zpg     lda_zpg     ldx_zpg     ldal1_acc   tay_imp     lda_imm     tax_imp     ldal2_acc   ldy_aba     lda_aba     ldx_aba     ldal3_acc
-bcs_rel     lda_idy     clr_acc     ldapa_imp   ldy_zpx     lda_zpx     ldx_zpy     ldapb_imp   clv_imp     lda_aby     tsx_imp     lpa2_acc    ldy_abx     lda_abx     ldx_aby     lpb2_acc
+bcs_rel     xa_lda_idy  clr_acc     ldapa_imp   ldy_zpx     lda_zpx     ldx_zpy     ldapb_imp   clv_imp     lda_aby     tsx_imp     lpa2_acc    ldy_abx     lda_abx     ldx_aby     lpb2_acc
 cpy_imm     cmp_idx     dec_acc     cmpl0_acc   cpy_zpg     cmp_zpg     dec_zpg     cmpl1_acc   iny_imp     cmp_imm     dex_imp     cmpl2_acc   cpy_aba     cmp_aba     dec_aba     cmpl3_acc
 bne_rel     cmp_idy     not_acc     cmppa_imp   nop_imp     cmp_zpx     dec_zpx     cmppb_imp   cld_imp     cmp_aby     nop_imp     decpa_imp   nop_imp     cmp_abx     dec_abx     decpb_imp
 cpx_imm     sbc_idx     inc_acc     sbcl0_acc   cpx_zpg     sbc_zpg     inc_zpg     sbcl1_acc   inx_imp     sbc_imm     nop_imp     sbcl2_acc   cpx_aba     sbc_aba     inc_aba     sbcl3_acc

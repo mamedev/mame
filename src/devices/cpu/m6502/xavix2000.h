@@ -151,7 +151,7 @@ public:
 };
 
 enum {
-	SXAVIX_L = M6502_IR+1,
+	SXAVIX_L = XAVIX_CODEBANK+1,
 	SXAVIX_PA,
 	SXAVIX_PB
 };
