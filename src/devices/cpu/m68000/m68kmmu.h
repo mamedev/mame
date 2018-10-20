@@ -270,7 +270,6 @@ bool pmmu_atc_lookup(const uint32_t addr_in, int fc, const bool ptest, uint32_t&
 			}
 			addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
 //          printf("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, m_ppc, fc);
-//          pmmu_atc_count++;
 			return true;
 		}
 	}
@@ -296,10 +295,6 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 	uint32_t addr_out, tbl_entry = 0, tamode = 0, tbmode = 0, tcmode = 0;
 	uint32_t root_aptr, root_limit, tofs, ps, is, abits, bbits, cbits;
 	uint32_t resolved, tptr, shift, last_entry_ptr;
-//  int verbose = 0;
-
-//  static uint32_t pmmu_access_count = 0;
-//  static uint32_t pmmu_atc_count = 0;
 
 	resolved = 0;
 	addr_out = addr_in;
@@ -311,11 +306,6 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 	{
 		return addr_in;
 	}
-
-//  if ((++pmmu_access_count % 10000000) == 0) {
-//      printf("pmmu_translate_addr_with_fc: atc usage = %d%%\n", pmmu_atc_count*100/pmmu_access_count);
-//      pmmu_atc_count = pmmu_access_count = 0;
-//  }
 
 	// get page size (i.e. # of bits to ignore); ps is 10 or 12 for Apollo, 8 otherwise
 	ps = (m_mmu_tc >> 20) & 0xf;
