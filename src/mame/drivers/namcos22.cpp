@@ -1419,18 +1419,6 @@ WRITE8_MEMBER(namcos22_state::ss22_syscon_w)
 	}
 
 	m_syscontrol[offset] = data;
-
-	return;
-
-	std::string msg;
-	for (int i=0;i<0x20;i++)
-	{
-		if (i==0x10) msg+="\n";
-		char h[4];
-		sprintf(h, "%02X ",m_syscontrol[i]);
-		msg += h;
-	}
-	popmessage("%s",msg);
 }
 
 /*
