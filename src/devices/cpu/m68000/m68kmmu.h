@@ -305,17 +305,9 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 	addr_out = addr_in;
 	m_mmu_tmp_sr = 0;
 
-	if (fc == 7)
-	{
-		return addr_in;
-	}
-
-	if (pmmu_match_tt(addr_in, fc, m_mmu_tt0))
-	{
-		return addr_in;
-	}
-
-	if (pmmu_match_tt(addr_in, fc, m_mmu_tt1))
+	if (fc == 7 ||
+		pmmu_match_tt(addr_in, fc, m_mmu_tt0) ||
+		pmmu_match_tt(addr_in, fc, m_mmu_tt1))
 	{
 		return addr_in;
 	}
