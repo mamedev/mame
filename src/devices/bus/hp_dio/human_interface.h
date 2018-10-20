@@ -13,7 +13,7 @@
 #include "sound/sn76496.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
-
+#include "bus/ieee488/ieee488.h"
 namespace bus {
 	namespace hp_dio {
 class human_interface_device :
@@ -43,6 +43,7 @@ private:
 	/* GPIB */
 	DECLARE_READ8_MEMBER(gpib_r);
 	DECLARE_WRITE8_MEMBER(gpib_w);
+	DECLARE_WRITE8_MEMBER(ieee488_dio_w);
 
 	DECLARE_WRITE_LINE_MEMBER(gpib_irq);
 	DECLARE_WRITE_LINE_MEMBER(gpib_dreq);
@@ -57,12 +58,14 @@ private:
 
 	void dmack_w_in(int channel, uint8_t data) override;
 	uint8_t dmack_r_in(int channel) override;
+	void update_gpib_irq();
 
 	required_device<i8042_device> m_iocpu;
 	required_device<hp_hil_mlc_device> m_mlc;
 	required_device<sn76494_device> m_sound;
 	required_device<tms9914_device> m_tms9914;
 	required_device<msm58321_device> m_rtc;
+	required_device<ieee488_device> m_ieee488;
 
 	void iocpu_map(address_map &map);
 
@@ -73,17 +76,20 @@ private:
 	static constexpr uint8_t KBD_RESET = 0x40;
 	static constexpr uint8_t SN76494_EN = 0x80;
 
+	static constexpr uint8_t PPOLL_IE = 0x80;
+	static constexpr uint8_t PPOLL_IR = 0x40;
+
 	bool m_hil_read;
 	bool m_kbd_nmi;
 
-	bool gpib_irq_line;
+	bool m_gpib_irq_line;
 	bool m_old_latch_enable;
 
 	uint8_t m_hil_data;
 	uint8_t m_latch_data;
 	uint8_t m_rtc_data;
-
-
+	uint8_t m_ppoll_sc;
+	uint8_t m_ppoll_mask;
 };
 }
 }
