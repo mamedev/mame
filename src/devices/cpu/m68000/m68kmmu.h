@@ -102,6 +102,17 @@ uint32_t DECODE_EA_32(int ea)
 	return 0;
 }
 
+void pmmu_set_buserror(uint32_t addr_in)
+{
+	if (++m_mmu_tmp_buserror_occurred == 1)
+	{
+		m_mmu_tmp_buserror_address = addr_in;
+		m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
+		m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+		m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
+	}
+}
+
 /*
     pmmu_atc_add: adds this address to the ATC
 */
@@ -482,35 +493,11 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 
 	if (!ptest)
 	{
-		if (m_mmu_tmp_sr & M68K_MMU_SR_INVALID)
+		if ((m_mmu_tmp_sr & (M68K_MMU_SR_INVALID|M68K_MMU_SR_SUPERVISOR_ONLY)) ||
+				((m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !m_mmu_tmp_rw))
 		{
-			if (++m_mmu_tmp_buserror_occurred == 1)
-			{
-				m_mmu_tmp_buserror_address = addr_in;
-				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-			}
-		}
-		else if (m_mmu_tmp_sr & M68K_MMU_SR_SUPERVISOR_ONLY)
-		{
-			if (++m_mmu_tmp_buserror_occurred == 1)
-			{
-				m_mmu_tmp_buserror_address = addr_in;
-				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-			}
-		}
-		else if ((m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !m_mmu_tmp_rw)
-		{
-			if (++m_mmu_tmp_buserror_occurred == 1)
-			{
-				m_mmu_tmp_buserror_address = addr_in;
-				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-			}
+			pmmu_set_buserror(addr_in);
+
 		}
 
 		if (!m_mmu_tmp_buserror_occurred)
@@ -566,13 +553,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 			//          fprintf(stderr, "TT0 match on address %08x (TT0 = %08x, mask = %08x)\n", addr_in, tt0, mask);
 			if ((tt0 & 4) && !m_mmu_tmp_rw && !ptest)   // write protect?
 			{
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-				}
+				pmmu_set_buserror(addr_in);
 			}
 
 			return addr_in;
@@ -592,13 +573,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 			//          fprintf(stderr, "TT1 match on address %08x (TT0 = %08x, mask = %08x)\n", addr_in, tt1, mask);
 			if ((tt1 & 4) && !m_mmu_tmp_rw && !ptest)   // write protect?
 			{
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-				}
+					pmmu_set_buserror(addr_in);
 			}
 
 			return addr_in;
@@ -663,14 +638,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 			// write protected by the root or pointer entries?
 			if ((((root_entry & 4) && !m_mmu_tmp_rw) || ((pointer_entry & 4) && !m_mmu_tmp_rw)) && !ptest)
 			{
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-				}
-
+				pmmu_set_buserror(addr_in);
 				return addr_in;
 			}
 
@@ -678,14 +646,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 			if (!(pointer_entry & 2) && !ptest)
 			{
 //              fprintf(stderr, "Invalid pointer entry!  PC=%x, addr=%x\n", m_ppc, addr_in);
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-				}
-
+				pmmu_set_buserror(addr_in);
 				return addr_in;
 			}
 
@@ -697,13 +658,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 
 			if (!ptest)
 			{
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-					m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-				}
+				pmmu_set_buserror(addr_in);
 			}
 
 			return addr_in;
@@ -742,14 +697,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 		// is the page write protected or supervisor protected?
 		if ((((page_entry & 4) && !m_mmu_tmp_rw) || ((page_entry & 0x80) && !(fc&4))) && !ptest)
 		{
-			if (++m_mmu_tmp_buserror_occurred == 1)
-			{
-				m_mmu_tmp_buserror_address = addr_in;
-				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-				m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-			}
-
+			pmmu_set_buserror(addr_in);
 			return addr_in;
 		}
 
@@ -759,13 +707,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 //              fprintf(stderr, "Invalid page entry!  PC=%x, addr=%x\n", m_ppc, addr_in);
 				if (!ptest)
 				{
-					if (++m_mmu_tmp_buserror_occurred == 1)
-					{
-						m_mmu_tmp_buserror_address = addr_in;
-						m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-						m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-						m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
-					}
+					pmmu_set_buserror(addr_in);
 				}
 
 				return addr_in;
