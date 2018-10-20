@@ -276,6 +276,18 @@ bool pmmu_atc_lookup(const uint32_t addr_in, int fc, const bool ptest, uint32_t&
 	}
 	return false;
 }
+
+bool pmmu_match_tt(uint32_t addr_in, int fc, uint32_t tt)
+{
+	if (!(tt & 0x8000))
+		return false;
+
+	// transparent translation enabled
+	uint32_t address_base = tt & 0xff000000;
+	uint32_t address_mask = ((tt << 8) & 0xff000000) ^ 0xff000000;
+	return (addr_in & address_mask) == address_base && (fc & ~tt) == ((tt >> 4) & 7);
+}
+
 /*
     pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
 */
@@ -298,28 +310,14 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 		return addr_in;
 	}
 
-	if (m_mmu_tt0 & 0x8000)
+	if (pmmu_match_tt(addr_in, fc, m_mmu_tt0))
 	{
-		// transparent translation register 0 enabled
-		uint32_t address_base = m_mmu_tt0 & 0xff000000;
-		uint32_t address_mask = ((m_mmu_tt0 << 8) & 0xff000000) ^ 0xff000000;
-		if ((addr_in & address_mask) == address_base && (fc & ~m_mmu_tt0) == ((m_mmu_tt0 >> 4) & 7))
-		{
-//          printf("PMMU: pc=%x TT0 fc=%x addr_in=%08x address_mask=%08x address_base=%08x\n", m_ppc, fc, addr_in, address_mask, address_base);
-			return addr_in;
-		}
+		return addr_in;
 	}
 
-	if (m_mmu_tt1 & 0x8000)
+	if (pmmu_match_tt(addr_in, fc, m_mmu_tt1))
 	{
-		// transparent translation register 1 enabled
-		uint32_t address_base = m_mmu_tt1 & 0xff000000;
-		uint32_t address_mask = ((m_mmu_tt1 << 8) & 0xff000000) ^ 0xff000000;
-		if ((addr_in & address_mask) == address_base && (fc & ~m_mmu_tt1) == ((m_mmu_tt1 >> 4) & 7))
-		{
-//          printf("PMMU: pc=%x TT1 fc=%x addr_in=%08x address_mask=%08x address_base=%08x\n", m_ppc, fc, addr_in, address_mask, address_base);
-			return addr_in;
-		}
+		return addr_in;
 	}
 
 //  if ((++pmmu_access_count % 10000000) == 0) {
