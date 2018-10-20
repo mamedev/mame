@@ -439,7 +439,8 @@ void namco_c355spr_device::get_sprites()
 		get_list(1, &m_spriteram[buffer][0x14000/2], &m_spriteram[buffer][0x10000/2]);
 }
 
-void namco_c355spr_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+template<class _BitmapClass>
+void namco_c355spr_device::draw_sprites(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri)
 {
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if (pri == 0)
@@ -486,49 +487,14 @@ void namco_c355spr_device::draw(screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
+void namco_c355spr_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+{
+	draw_sprites(screen, bitmap, cliprect, pri);
+}
+
 void namco_c355spr_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
 {
-//  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
-	if (pri == 0)
-	{
-		screen.priority().fill(0, cliprect);
-		if (m_buffer == 0) // not buffered sprites
-			get_sprites();
-	}
-
-	for (int no = 0; no < 2; no++)
-	{
-		//if (offs == no)
-		{
-			int i = 0;
-			struct c355_sprite *sprite_ptr = m_spritelist[no];
-
-			while (sprite_ptr != m_sprite_end[no])
-			{
-				if (sprite_ptr->pri == pri)
-				{
-					sprite_ptr->clip &= cliprect;
-					for (int ind = 0; ind < sprite_ptr->size; ind++)
-					{
-						if ((sprite_ptr->tile[ind] & 0x8000) == 0)
-						{
-							zdrawgfxzoom(
-								screen,
-								bitmap,
-								sprite_ptr->clip,
-								m_gfxdecode->gfx(m_gfx_region),
-								m_code2tile(sprite_ptr->tile[ind]) + sprite_ptr->offset,
-								sprite_ptr->color,
-								sprite_ptr->flipx,sprite_ptr->flipy,
-								sprite_ptr->x[ind],sprite_ptr->y[ind],
-								sprite_ptr->zoomx[ind], sprite_ptr->zoomy[ind], i );
-						}
-					}
-				}
-				sprite_ptr++;
-			}
-		}
-	}
+	draw_sprites(screen, bitmap, cliprect, pri);
 }
 
 WRITE16_MEMBER( namco_c355spr_device::spriteram_w )
