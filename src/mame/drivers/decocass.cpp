@@ -970,7 +970,7 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	MCFG_DECOCASS_TAPE_ADD("cassette")
 

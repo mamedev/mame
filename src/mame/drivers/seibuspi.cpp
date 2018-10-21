@@ -1875,16 +1875,16 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 
-	MCFG_DEVICE_ADD("ds2404", DS2404, 32.768_kHz_XTAL)
-	MCFG_DS2404_REF_YEAR(1995)
-	MCFG_DS2404_REF_MONTH(1)
-	MCFG_DS2404_REF_DAY(1)
+	ds2404_device &rtc(DS2404(config, "ds2404", 32.768_kHz_XTAL));
+	rtc.ref_year(1995);
+	rtc.ref_month(1);
+	rtc.ref_day(1);
 
-	MCFG_INTEL_E28F008SA_ADD("soundflash1") // Sharp LH28F008 on newer mainboard revision
-	MCFG_INTEL_E28F008SA_ADD("soundflash2") // "
+	INTEL_E28F008SA(config, "soundflash1"); // Sharp LH28F008 on newer mainboard revision
+	INTEL_E28F008SA(config, "soundflash2"); // "
 
-	MCFG_FIFO7200_ADD("soundfifo1", 0x200) // LH5496D, but on single board hw it's one CY7C421
-	MCFG_FIFO7200_ADD("soundfifo2", 0x200) // "
+	FIFO7200(config, m_soundfifo[0], 0x200); // LH5496D, but on single board hw it's one CY7C421
+	FIFO7200(config, m_soundfifo[1], 0x200); // "
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1976,7 +1976,7 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2f)
 
 	MCFG_DEVICE_REMOVE("ds2404")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// Z80 is Z84C0006PCS instead of Z84C0008PEC
 	// clock is unknown, possibly slower than 7.159MHz
@@ -2010,7 +2010,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386i)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2066,7 +2066,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -6,9 +6,9 @@
  *
  *  27/10/2015
  *
- * I baught this hardware on Ebay to have something with a Z80 CPU to play with.
+ * I bought this hardware on Ebay to have something with a Z80 CPU to play with.
  * The hardware is a serial terminal controller with VGA output and a PC keyboard
- * and was manufactured mid 90:ies by a company from Vinnitsa,Ukraine called KRON.
+ * and was manufactured mid 90s by a company from Vinnitsa, Ukraine called KRON.
  * There is a character generator with support for both western and cyrilic characters.
  * The PCB is also filled with chips with cyrrilic characters on but thanks to this
  * page I managed to translate most of them into western TTL logic names:
@@ -192,7 +192,7 @@ void kron180_state::kron180_mem(address_map &map)
  *    0  1  1  0  x  x  x  x - Reset KBD
  *    0  1  1  1  x  x  x  x - DKA/DREQ0 Z180 = D0
  *
- * Now, in paralell there is alot of stuff going on in the upper I/O address lines
+ * Now, in parallel there is a lot of stuff going on in the upper I/O address lines
  * they are driving the character generator and some other signals
  *  A19 - not available on the DIP64 package
  *  A18 - multiplexed pin used as Tout pulsing the VT1 signal
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(kron180_state::kron180)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(kron180_state, screen_update)
 	MCFG_SCREEN_SIZE(80 * 10, 24 * 10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199) // TODO: This need to be fixed once the real chartable is used...
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199) // TODO: This need to be fixed once the real char table is used...
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")

@@ -932,7 +932,7 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1024188, okim6295_device::PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -981,8 +981,8 @@ ROM_END
 
 ROM_START( ddragon3j )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
-	ROM_LOAD16_BYTE( "30j15.ic78", 0x00001, 0x40000, CRC(40618cbc) SHA1(cb05498003a45d773983501d3a0f1584a25dcdd3) )
-	ROM_LOAD16_BYTE( "30j14.ic79", 0x00000, 0x20000, CRC(96827e80) SHA1(499c0c67d55ff4816ad8832d1d8836eb7432bd13) )
+	ROM_LOAD16_BYTE( "30j15-0.ic78", 0x00001, 0x40000, CRC(40618cbc) SHA1(cb05498003a45d773983501d3a0f1584a25dcdd3) )
+	ROM_LOAD16_BYTE( "30j14-0.ic79", 0x00000, 0x20000, CRC(96827e80) SHA1(499c0c67d55ff4816ad8832d1d8836eb7432bd13) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "30j13.ic43",   0x00000, 0x10000, CRC(1e974d9b) SHA1(8e54ff747efe587a2e971c15e729445c4e232f0f) )
@@ -1115,7 +1115,7 @@ ROM_START( ctribe )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-2.ic26", 0x00001, 0x20000, CRC(c46b2e63) SHA1(86ace715dca48c78a46da1d102de47e5f948a86c) )
 	ROM_LOAD16_BYTE( "28a15-2.ic25", 0x00000, 0x20000, CRC(3221c755) SHA1(0f6fe5cd6947f6547585eedb7fc5e6af8544b1f7) )
-	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j17-0.104",  0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
@@ -1145,11 +1145,11 @@ ROM_START( ctribe )
 	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
 ROM_END
 
-ROM_START( ctribe1 )
+ROM_START( ctribeua )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "1_28a16-2.ic26", 0x00001, 0x20000, CRC(f00f8443) SHA1(3c099b6bea9956cc60ce4a9a5d790ac2bf7d77bd) )
 	ROM_LOAD16_BYTE( "1_28a15-2.ic25", 0x00000, 0x20000, CRC(dd70079f) SHA1(321b523fefec2a962d0afa20b33428e7caea8958) )
-	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j17-0.104",    0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
@@ -1179,11 +1179,11 @@ ROM_START( ctribe1 )
 	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
 ROM_END
 
-ROM_START( ctribeo ) // only main program code differs from ctribe1 set
+ROM_START( ctribeu1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-1.ic26", 0x00001, 0x20000, CRC(d108f36f) SHA1(af53fa441b9ddfc639abb573864a9b351633c6b7) )
 	ROM_LOAD16_BYTE( "28a15-1.ic25", 0x00000, 0x20000, CRC(3f5693a3) SHA1(2d4516506ad1d68ac45242fe149bba1b4b53eb45) )
-	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j17-0.104",  0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
@@ -1215,9 +1215,9 @@ ROM_END
 
 ROM_START( ctribej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
-	ROM_LOAD16_BYTE( "28j16-02.26", 0x00001, 0x20000, CRC(658b8568) SHA1(899682f6ab28b184654c51c1169216974043f1b9) )
-	ROM_LOAD16_BYTE( "28j15-12.25", 0x00000, 0x20000, CRC(50aac7e7) SHA1(af77107f325f9b45a92c544328d3073ed1db5465) )
-	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j16-2.ic26", 0x00001, 0x20000, CRC(658b8568) SHA1(899682f6ab28b184654c51c1169216974043f1b9) )
+	ROM_LOAD16_BYTE( "28j15-2.ic25", 0x00000, 0x20000, CRC(50aac7e7) SHA1(af77107f325f9b45a92c544328d3073ed1db5465) )
+	ROM_LOAD16_BYTE( "28j17-0.104",  0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
@@ -1385,7 +1385,36 @@ ROM_START( wwfwfestu )
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
 
-ROM_START( wwfwfestb )
+ROM_START( wwfwfestu1 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
+	ROM_LOAD16_BYTE( "31a13-0.ic19", 0x00001, 0x40000, CRC(a01c7c95) SHA1(298b9eeaeb8a207cbb02f4bea87436f0421697fe) ) /* label had a blue stripe down the side */
+	ROM_LOAD16_BYTE( "31a14-0.ic18", 0x00000, 0x40000, CRC(30824d0b) SHA1(54281c76f380225516877648645a619d8417816e) ) /* label had a blue stripe down the side */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
+	ROM_LOAD( "31a11-0.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) ) /* == 31a11-2.ic42 */
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
+	ROM_LOAD( "31a12-0.ic33", 0x00000, 0x20000, CRC(d0803e20) SHA1(b68758e9a5522396f831a3972571f8aed54c64de) )
+
+	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16), 27080 Mask ROM's */
+	ROM_LOAD( "31j3.ic9",     0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
+	ROM_LOAD( "31j2.ic8",     0x100000, 0x100000, CRC(b5a97465) SHA1(08d82c29a5c02b83fdbd0bad649b74eb35ab7e54) ) /* Tiles 1 */
+	ROM_LOAD( "31j5.ic11",    0x200000, 0x100000, CRC(2ce545e8) SHA1(82173e58a8476a6fe9d2c990fce1f71af117a0ea) ) /* Tiles 0 */
+	ROM_LOAD( "31j4.ic10",    0x300000, 0x100000, CRC(00edb66a) SHA1(926606d1923936b6e75391b1ab03b369d9822d13) ) /* Tiles 1 */
+	ROM_LOAD( "31j6.ic12",    0x400000, 0x100000, CRC(79956cf8) SHA1(52207263620a6b6dde66d3f8749b772577899ea5) ) /* Tiles 0 */
+	ROM_LOAD( "31j7.ic13",    0x500000, 0x100000, CRC(74d774c3) SHA1(a723ac5d481bf91b12e17652fbb2d869c886dec0) ) /* Tiles 1 */
+	ROM_LOAD( "31j9.ic15",    0x600000, 0x100000, CRC(dd387289) SHA1(2cad42d4e7cd1a49346f844058ae18c38bc686a8) ) /* Tiles 0 */
+	ROM_LOAD( "31j8.ic14",    0x700000, 0x100000, CRC(44abe127) SHA1(c723e1dea117534e976d2d383e634faf073cd57b) ) /* Tiles 1 */
+
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 / BG1 Tiles (16x16) */
+	ROM_LOAD( "31j0.ic1",     0x40000, 0x40000, CRC(8a12b450) SHA1(2e15c949efcda8bb6f11afe3ff07ba1dee9c771c) ) /* 0,1 */
+	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
+ROM_END
+
+ROM_START( wwfwfestub )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "3",      0x00000, 0x40000, CRC(ea73369c) SHA1(be614a342f9014251810fa30ec56fec03f7c8ef3) )
 	ROM_LOAD16_BYTE( "2",      0x00001, 0x40000, CRC(632bb3a4) SHA1(9c04fed5aeefc683810cfbd9b3318e155ed9813f) )
@@ -1481,20 +1510,21 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",       "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",                         "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribe1,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US set 1?)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeo,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, older)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribej,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb,   ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb2,  ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeua,  ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeu1,  ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribej,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (Japan, rev 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb,   ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb2,  ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 2)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, wwfwfest,  0,        wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) // Euro label but shows FBI "Winners Don't Do drugs" logo
-GAME( 1991, wwfwfestu, wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan",                 "WWF WrestleFest (US)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestj, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestk, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfest,   0,        wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) // Euro label but shows FBI "Winners Don't Do drugs" logo
+GAME( 1991, wwfwfestu,  wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan",                 "WWF WrestleFest (US, rev 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestu1, wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan",                 "WWF WrestleFest (US)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestub, wwfwfest, wwfwfstb,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestj,  wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestk,  wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      MACHINE_SUPPORTS_SAVE )

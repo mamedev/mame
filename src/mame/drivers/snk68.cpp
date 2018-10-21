@@ -157,14 +157,14 @@ void snk68_state::sound_map(address_map &map)
 
 WRITE8_MEMBER(snk68_state::D7759_write_port_0_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
 WRITE8_MEMBER(snk68_state::D7759_upd_reset_w)
 {
-	m_upd7759->reset_w(data & 0x80);
+	m_upd7759->reset_w(BIT(data, 7));
 }
 
 void snk68_state::sound_io_map(address_map &map)
@@ -884,6 +884,44 @@ ROM_START( ikari3 )
 	ROM_LOAD16_BYTE( "ik3-4.c12",  0x000001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 ROM_END
 
+ROM_START( ikari3w ) /* Initial boot shows Ikari III The Rescue, then the title changes to the Japanese title - No demo play - proto or test set?? */
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ik_2.c10", 0x000000, 0x20000, CRC(d0b690d3) SHA1(6c31b27e6b9f1438e8ddbefe41fa8ded22cdb51c) ) /* Rotary Joystick - hand written label  */
+	ROM_LOAD16_BYTE( "ik_3.c9",  0x000001, 0x20000, CRC(11a9e664) SHA1(bf2d8a5f3f2aeff99a45d26279c88ebf04b7f79b) ) /* Rotary Joystick - hand written label  */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "ik3-5.16d",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
+
+	ROM_REGION( 0x010000, "gfx1", 0 )   /* characters */
+	ROM_LOAD( "ik3-7.16l",  0x000000, 0x08000, CRC(0b4804df) SHA1(66d16d245bfc404366164823faaea0bfec83e487) )
+	ROM_LOAD( "ik3-8.16m",  0x008000, 0x08000, CRC(10ab4e50) SHA1(dee8416eb720848cf6471e568dadc1cfc6c2e67f) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
+	ROM_LOAD16_BYTE( "ikari-880d_t53.d2", 0x000000, 0x80000, CRC(5855d95e) SHA1(808ed58fb927fb631ff54e8ae7a634d748739ffc) ) /* 4M mask ROM located on the A7007-SUB4M daughter board */
+	ROM_LOAD16_BYTE( "ikari-880c_t54.c2", 0x000001, 0x80000, CRC(6d728362) SHA1(e94bf03bd5a21c8826930acb419d44c2076908cc) ) /* 4M mask ROM located on the A7007-SUB4M daughter board */
+	ROM_LOAD16_BYTE( "ik_12.d1",          0x100000, 0x20000, CRC(4ebdba89) SHA1(f3ecfef4c9d2aba58dc3e6aa3cf5813d68686909) ) /* located on the A7007-SUB4M daughter board - hand written label */
+	ROM_LOAD16_BYTE( "ik_11.c1",          0x100001, 0x20000, CRC(c33971c2) SHA1(91f3eb301803f5a7027da1ff7dd2a28bc97e5125) ) /* located on the A7007-SUB4M daughter board - hand written label */
+	// 140000-1fffff empty
+	ROM_LOAD16_BYTE( "ikari-880b_t51.b2", 0x200000, 0x80000, CRC(e25380e6) SHA1(10a0c7891ce64a538a92fe6bd40cb955305c090e) ) /* 4M mask ROM located on the A7007-SUB4M daughter board */
+	ROM_LOAD16_BYTE( "ikari-880a_t52.a2", 0x200001, 0x80000, CRC(87607772) SHA1(cda4ab485fb9c930b564f98e8a776da111c66fe4) ) /* 4M mask ROM located on the A7007-SUB4M daughter board */
+	ROM_LOAD16_BYTE( "ik_10.b1",          0x300000, 0x20000, CRC(ba106245) SHA1(ac609ec3046c21fe6058f91dd4528c5c6448dc15) ) /* located on the A7007-SUB4M daughter board - hand written label */
+	ROM_LOAD16_BYTE( "ik_9.a1",           0x300001, 0x20000, CRC(711715ae) SHA1(90978c86884ca3d23c138d95b654e2fb3afc6f9a) ) /* located on the A7007-SUB4M daughter board - hand written label */
+	// 340000-3fffff empty
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
+	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
+
+	ROM_REGION16_BE( 0x40000, "user1", 0 ) /* Extra code bank */
+	ROM_LOAD16_BYTE( "ik3-1.c8",   0x000000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
+	ROM_LOAD16_BYTE( "ik3-4.c12",  0x000001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
+
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "a_pal20l10a.ic1", 0x0000, 0x00cc, CRC(1cadf26d) SHA1(348a9e4727df0a15247c7b9c5cd5ee935edd9752) )
+	ROM_LOAD( "b_pal20l10a.ic3", 0x0200, 0x00cc, CRC(c3d9e729) SHA1(f05f03eecf12b4d0793124ecd3195307be04046b) )
+	ROM_LOAD( "c_pal16l8a.ic2",  0x0400, 0x0104, CRC(e258b8d6) SHA1(9d000aa9a09b402208a5c2d98789cc62e23a2eb2) )
+ROM_END
+
 ROM_START( ikari3u )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ik3-2.c10", 0x000000, 0x20000, CRC(a7b34dcd) SHA1(7c2f20ae4f7dbebd3dfa3ec5408ed714e6535b6a) ) /* Rotary Joystick */
@@ -985,27 +1023,15 @@ ROM_START( ikari3k )
 	ROM_LOAD( "ik3-8k.16m",  0x008000, 0x08000, CRC(3f0fe576) SHA1(70f4438e31b06ee0dc4660c04f512ccf3b7fa55f) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
-	ROM_LOAD16_BYTE( "ik3-23.bin", 0x000000, 0x20000, CRC(d0fd5c77) SHA1(c171c64ad252f0ba5b0bbdf37808102fca37b488) ) /* Missing 4M mask ROM dumps from the A7007-SUB4M */
-	ROM_LOAD16_BYTE( "ik3-13.bin", 0x000001, 0x20000, CRC(9a56bd32) SHA1(9301b48f970b71a909fb44514b2e93c3f1516b38) ) /* ROM board. Assumed to be the same data */
-	ROM_LOAD16_BYTE( "ik3-22.bin", 0x040000, 0x20000, CRC(4878d883) SHA1(8cdb541bad00e707fb65399d637b7cc9288ada77) )
-	ROM_LOAD16_BYTE( "ik3-12.bin", 0x040001, 0x20000, CRC(0ce6a10a) SHA1(13a231aa0002b2c5a0d9404ba05a879e212d638e) )
-	ROM_LOAD16_BYTE( "ik3-21.bin", 0x080000, 0x20000, CRC(50d0fbf0) SHA1(9ff5fbea8d35d0f9a38ddd7eb093edcd91d9f874) )
-	ROM_LOAD16_BYTE( "ik3-11.bin", 0x080001, 0x20000, CRC(e4e2be43) SHA1(959d2799708ddae909b017c0696694c46a52697e) )
-	ROM_LOAD16_BYTE( "ik3-20.bin", 0x0c0000, 0x20000, CRC(9a851efc) SHA1(bc7be338ee4da7fbfe6fe44a9c7889817416bc44) )
-	ROM_LOAD16_BYTE( "ik3-10.bin", 0x0c0001, 0x20000, CRC(ac222372) SHA1(8a17e37699d691b962a6d0256a18550cc73ddfef) )
-	ROM_LOAD16_BYTE( "ik3-19.bin", 0x100000, 0x20000, CRC(4ebdba89) SHA1(f3ecfef4c9d2aba58dc3e6aa3cf5813d68686909) )
-	ROM_LOAD16_BYTE( "ik3-9.bin",  0x100001, 0x20000, CRC(c33971c2) SHA1(91f3eb301803f5a7027da1ff7dd2a28bc97e5125) )
+	ROM_LOAD16_BYTE( "ikari-880d_t53.d2", 0x000000, 0x80000, CRC(5855d95e) SHA1(808ed58fb927fb631ff54e8ae7a634d748739ffc) ) /* 4M mask ROM located on the A7007-SUB4M daughter board */
+	ROM_LOAD16_BYTE( "ikari-880c_t54.c2", 0x000001, 0x80000, CRC(6d728362) SHA1(e94bf03bd5a21c8826930acb419d44c2076908cc) ) /* 4M mask ROM located on the A7007-SUB4M daughter board */
+	ROM_LOAD16_BYTE( "ik12.d1",           0x100000, 0x20000, CRC(4ebdba89) SHA1(f3ecfef4c9d2aba58dc3e6aa3cf5813d68686909) ) /* located on the A7007-SUB4M daughter board - hand written label */
+	ROM_LOAD16_BYTE( "ik11.c1",           0x100001, 0x20000, CRC(c33971c2) SHA1(91f3eb301803f5a7027da1ff7dd2a28bc97e5125) ) /* located on the A7007-SUB4M daughter board - hand written label */
 	// 140000-1fffff empty
-	ROM_LOAD16_BYTE( "ik3-14.bin", 0x200000, 0x20000, CRC(453bea77) SHA1(f8f8d0c048fcf32ad99e1de622d9ab635bb86eae) )
-	ROM_LOAD16_BYTE( "ik3-24.bin", 0x200001, 0x20000, CRC(e9b26d68) SHA1(067d582d33157ed4b7980bd87f2f260ab74c347b) )
-	ROM_LOAD16_BYTE( "ik3-15.bin", 0x240000, 0x20000, CRC(781a81fc) SHA1(e08a6cf9c632d1002176afe618605bc06168e8aa) )
-	ROM_LOAD16_BYTE( "ik3-25.bin", 0x240001, 0x20000, CRC(073b03f1) SHA1(b8053139799fa06c7324cee928154c89d4425ab1) )
-	ROM_LOAD16_BYTE( "ik3-16.bin", 0x280000, 0x20000, CRC(80ba400b) SHA1(2cc3e53c45f239516a60c461ad9cfa5955164262) )
-	ROM_LOAD16_BYTE( "ik3-26.bin", 0x280001, 0x20000, CRC(9c613561) SHA1(fc7c9a642b18faa94e6a2ba53f35a4d756a25da3) )
-	ROM_LOAD16_BYTE( "ik3-17.bin", 0x2c0000, 0x20000, CRC(0cc3ce4a) SHA1(7b34435d0bbb089055a183b821ab255170db6bec) )
-	ROM_LOAD16_BYTE( "ik3-27.bin", 0x2c0001, 0x20000, CRC(16dd227e) SHA1(db3b1718dea65bc9a1a736aa62aa2be389313baf) )
-	ROM_LOAD16_BYTE( "ik3-18.bin", 0x300000, 0x20000, CRC(ba106245) SHA1(ac609ec3046c21fe6058f91dd4528c5c6448dc15) )
-	ROM_LOAD16_BYTE( "ik3-28.bin", 0x300001, 0x20000, CRC(711715ae) SHA1(90978c86884ca3d23c138d95b654e2fb3afc6f9a) )
+	ROM_LOAD16_BYTE( "ikari-880d_t52.b2", 0x200000, 0x80000, CRC(e25380e6) SHA1(10a0c7891ce64a538a92fe6bd40cb955305c090e) ) /* 4M mask ROM located on the A7007-SUB4M daughter board */
+	ROM_LOAD16_BYTE( "ikari-880c_t51.a2", 0x200001, 0x80000, CRC(87607772) SHA1(cda4ab485fb9c930b564f98e8a776da111c66fe4) ) /* 4M mask ROM located on the A7007-SUB4M daughter board */
+	ROM_LOAD16_BYTE( "ik10.b1",           0x300000, 0x20000, CRC(ba106245) SHA1(ac609ec3046c21fe6058f91dd4528c5c6448dc15) ) /* located on the A7007-SUB4M daughter board - hand written label */
+	ROM_LOAD16_BYTE( "ik9.a1",            0x300001, 0x20000, CRC(711715ae) SHA1(90978c86884ca3d23c138d95b654e2fb3afc6f9a) ) /* located on the A7007-SUB4M daughter board - hand written label */
 	// 340000-3fffff empty
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* UPD7759 samples */
@@ -1108,16 +1134,18 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, pow,       0,        pow,      pow,      snk68_state, empty_init, ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, powj,      pow,      pow,      powj,     snk68_state, empty_init, ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsm,  0,        streetsm, streetsm, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (US version 2)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsm1, streetsm, searchar, streetsm, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (US version 1)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsmw, streetsm, searchar, streetsj, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (World version 1)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1989, streetsmj, streetsm, searchar, streetsj, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (Japan version 1)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3,    0,        searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (World, 8-Way Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari Three (Korea, 8-Way Joystick)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searchar,  0,        searchar, searchar, snk68_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (World)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searcharu, searchar, searchar, searchar, snk68_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (US)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, searcharj, searchar, searchar, searchar, snk68_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, pow,       0,        pow,      pow,      snk68_state, empty_init, ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, powj,      pow,      pow,      powj,     snk68_state, empty_init, ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsm,  0,        streetsm, streetsm, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (US version 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsm1, streetsm, searchar, streetsm, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (US version 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsmw, streetsm, searchar, streetsj, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (World version 1)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, streetsmj, streetsm, searchar, streetsj, snk68_state, empty_init, ROT0,  "SNK", "Street Smart (Japan version 1)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3,    0,        searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (World version 1, 8-Way Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3w,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (World, Rotary Joystick)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3u,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari III - The Rescue (US, Rotary Joystick)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3j,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari Three (Japan, Rotary Joystick)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ikari3k,   ikari3,   searchar, ikari3,   snk68_state, empty_init, ROT0,  "SNK", "Ikari Three (Korea, 8-Way Joystick)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searchar,  0,        searchar, searchar, snk68_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (World)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searcharu, searchar, searchar, searchar, snk68_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (US)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, searcharj, searchar, searchar, searchar, snk68_state, empty_init, ROT90, "SNK", "SAR - Search And Rescue (Japan version 3)",                MACHINE_SUPPORTS_SAVE )
+

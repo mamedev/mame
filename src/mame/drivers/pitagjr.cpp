@@ -154,7 +154,6 @@
 #include "cpu/m6805/m6805.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -221,8 +220,6 @@ MACHINE_CONFIG_START(pitagjr_state::pitajr)
 	MCFG_SCREEN_SIZE( 200, 100 )    // FIXME
 	MCFG_SCREEN_VISIBLE_AREA( 0, 200-1, 0, 100-1 )
 	MCFG_SCREEN_PALETTE("palette")
-
-	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pitagjr_state, pitagjr)

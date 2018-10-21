@@ -163,6 +163,24 @@ void i8271_device::set_rate(int rate)
 	cur_rate = rate;
 }
 
+READ8_MEMBER(i8271_device::read)
+{
+	switch(offset & 0x03) {
+	case 0x00: return sr_r(space, 0);
+	case 0x01: return rr_r(space, 0);
+	}
+	return 0xff;
+}
+
+WRITE8_MEMBER(i8271_device::write)
+{
+	switch(offset & 0x03) {
+	case 0x00: cmd_w(space, 0, data); break;
+	case 0x01: param_w(space, 0, data); break;
+	case 0x02: reset_w(space, 0, data); break;
+	}
+}
+
 READ8_MEMBER(i8271_device::data_r)
 {
 	set_drq(false);

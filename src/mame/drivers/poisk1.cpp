@@ -553,17 +553,17 @@ READ8_MEMBER(p1_state::p1_ppi_r)
 	switch (offset)
 	{
 	case 0:
-		return m_ppi8255n1->read(space, 0);
+		return m_ppi8255n1->read(0);
 	case 9:
 	case 10:
 	case 11:
-		return m_ppi8255n1->read(space, offset - 8);
+		return m_ppi8255n1->read(offset - 8);
 	case 8:
-		return m_ppi8255n2->read(space, 0);
+		return m_ppi8255n2->read(0);
 	case 1:
 	case 2:
 	case 3:
-		return m_ppi8255n2->read(space, offset);
+		return m_ppi8255n2->read(offset);
 	default:
 		DBG_LOG(1, "p1ppi", ("R %.2x (unimp)\n", 0x60 + offset));
 		return 0xff;
@@ -575,17 +575,17 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
 	switch (offset)
 	{
 	case 0:
-		return m_ppi8255n1->write(space, 0, data);
+		return m_ppi8255n1->write(0, data);
 	case 9:
 	case 10:
 	case 11:
-		return m_ppi8255n1->write(space, offset - 8, data);
+		return m_ppi8255n1->write(offset - 8, data);
 	case 8:
-		return m_ppi8255n2->write(space, 0, data);
+		return m_ppi8255n2->write(0, data);
 	case 1:
 	case 2:
 	case 3:
-		return m_ppi8255n2->write(space, offset, data);
+		return m_ppi8255n2->write(offset, data);
 	default:
 		DBG_LOG(1, "p1ppi", ("W %.2x $%02x (unimp)\n", 0x60 + offset, data));
 		return;
@@ -666,17 +666,17 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("ppi8255n1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, p1_state, p1_ppi_porta_r)) /*60H*/
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, p1_state, p1_ppi_portb_r)) /*69H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, p1_state, p1_ppi_portc_w))   /*6AH*/
+	I8255A(config, m_ppi8255n1);
+	m_ppi8255n1->in_pa_callback().set(FUNC(p1_state::p1_ppi_porta_r)); /*60H*/
+	m_ppi8255n1->out_pa_callback().set(FUNC(p1_state::p1_ppi_porta_w));
+	m_ppi8255n1->in_pb_callback().set(FUNC(p1_state::p1_ppi_portb_r)); /*69H*/
+	m_ppi8255n1->in_pc_callback().set(FUNC(p1_state::p1_ppi_portc_r));
+	m_ppi8255n1->out_pc_callback().set(FUNC(p1_state::p1_ppi_portc_w));   /*6AH*/
 
-	MCFG_DEVICE_ADD("ppi8255n2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi2_porta_w))  /*68H*/
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, p1_state, p1_ppi2_portb_w))  /*61H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi2_portc_r))    /*62H*/
+	I8255A(config, m_ppi8255n2);
+	m_ppi8255n2->out_pa_callback().set(FUNC(p1_state::p1_ppi2_porta_w));  /*68H*/
+	m_ppi8255n2->out_pb_callback().set(FUNC(p1_state::p1_ppi2_portb_w));  /*61H*/
+	m_ppi8255n2->in_pc_callback().set(FUNC(p1_state::p1_ppi2_portc_r));    /*62H*/
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("maincpu")
@@ -709,8 +709,7 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_PALETTE_INIT_OWNER(p1_state, p1)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 MACHINE_CONFIG_END
 
 ROM_START( poisk1 )

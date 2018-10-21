@@ -59,12 +59,12 @@ public:
 	akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_mem_r_callback(Object &&cb) { return m_mem_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_mem_w_callback(Object &&cb) { return m_mem_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_int_w_callback(Object &&cb) { return m_int_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_scl_handler(Object &&cb) { return m_scl_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sda_read_handler(Object &&cb) { return m_sda_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sda_write_handler(Object &&cb) { return m_sda_w.set_callback(std::forward<Object>(cb)); }
+	auto mem_r_callback() { return m_mem_r.bind(); }
+	auto mem_w_callback() { return m_mem_w.bind(); }
+	auto int_callback() { return m_int_w.bind(); }
+	auto scl_callback() { return m_scl_w.bind(); }
+	auto sda_r_callback() { return m_sda_r.bind(); }
+	auto sda_w_callback() { return m_sda_w.bind(); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );

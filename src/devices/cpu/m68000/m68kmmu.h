@@ -102,6 +102,17 @@ uint32_t DECODE_EA_32(int ea)
 	return 0;
 }
 
+void pmmu_set_buserror(uint32_t addr_in)
+{
+	if (++m_mmu_tmp_buserror_occurred == 1)
+	{
+		m_mmu_tmp_buserror_address = addr_in;
+		m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
+		m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+		m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
+	}
+}
+
 /*
     pmmu_atc_add: adds this address to the ATC
 */
@@ -223,6 +234,48 @@ inline uint32_t get_dt3_table_entry(uint32_t tptr, uint8_t fc, uint8_t ptest)
 	return (tbl_entry & ~M68K_MMU_DF_DT) | dt;
 }
 
+bool pmmu_atc_lookup(const uint32_t addr_in, int fc, const bool ptest, uint32_t& addr_out)
+{
+
+	int ps = (m_mmu_tc >> 20) & 0xf;
+	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24) | addr_in >> ps;
+
+	// first see if this is already in the ATC
+	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
+	{
+		if (m_mmu_atc_tag[i] != atc_tag)
+		{
+			// tag bits and function code don't match
+		}
+		else if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
+		{
+			// write mode, but write protected
+		}
+		else if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
+		{
+			// first write; must set modified in PMMU tables as well
+		}
+		else
+		{
+			// read access or write access and not write protected
+			if (!m_mmu_tmp_rw && !ptest)
+			{
+				// FIXME: must set modified in PMMU tables as well
+				m_mmu_atc_data[i] |= M68K_MMU_ATC_MODIFIED;
+			}
+			else
+			{
+				// FIXME: supervisor mode?
+				m_mmu_tmp_sr = M68K_MMU_SR_MODIFIED;
+			}
+			addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
+//          printf("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, m_ppc, fc);
+//          pmmu_atc_count++;
+			return true;
+		}
+	}
+	return false;
+}
 /*
     pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
 */
@@ -231,8 +284,6 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 	uint32_t addr_out, tbl_entry = 0, tamode = 0, tbmode = 0, tcmode = 0;
 	uint32_t root_aptr, root_limit, tofs, ps, is, abits, bbits, cbits;
 	uint32_t resolved, tptr, shift, last_entry_ptr;
-	int i;
-	uint32_t atc_tag;
 //  int verbose = 0;
 
 //  static uint32_t pmmu_access_count = 0;
@@ -278,42 +329,9 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 
 	// get page size (i.e. # of bits to ignore); ps is 10 or 12 for Apollo, 8 otherwise
 	ps = (m_mmu_tc >> 20) & 0xf;
-	atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24) | addr_in >> ps;
 
-	// first see if this is already in the ATC
-	for (i = 0; i < MMU_ATC_ENTRIES; i++)
-	{
-		if (m_mmu_atc_tag[i] != atc_tag)
-		{
-			// tag bits and function code don't match
-		}
-		else if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
-		{
-			// write mode, but write protected
-		}
-		else if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
-		{
-			// first write; must set modified in PMMU tables as well
-		}
-		else
-		{
-			// read access or write access and not write protected
-			if (!m_mmu_tmp_rw && !ptest)
-			{
-				// FIXME: must set modified in PMMU tables as well
-				m_mmu_atc_data[i] |= M68K_MMU_ATC_MODIFIED;
-			}
-			else
-			{
-				// FIXME: supervisor mode?
-				m_mmu_tmp_sr = M68K_MMU_SR_MODIFIED;
-			}
-			addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
-//          printf("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, m_ppc, fc);
-//          pmmu_atc_count++;
-			return addr_out;
-		}
-	}
+	if (pmmu_atc_lookup(addr_in, fc, ptest, addr_out))
+		return addr_out;
 
 	// if SRP is enabled and we're in supervisor mode, use it
 	if ((m_mmu_tc & M68K_MMU_TC_SRE) && (fc & 4))
@@ -482,32 +500,11 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 
 	if (!ptest)
 	{
-		if (m_mmu_tmp_sr & M68K_MMU_SR_INVALID)
+		if ((m_mmu_tmp_sr & (M68K_MMU_SR_INVALID|M68K_MMU_SR_SUPERVISOR_ONLY)) ||
+				((m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !m_mmu_tmp_rw))
 		{
-			if (++m_mmu_tmp_buserror_occurred == 1)
-			{
-				m_mmu_tmp_buserror_address = addr_in;
-				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-			}
-		}
-		else if (m_mmu_tmp_sr & M68K_MMU_SR_SUPERVISOR_ONLY)
-		{
-			if (++m_mmu_tmp_buserror_occurred == 1)
-			{
-				m_mmu_tmp_buserror_address = addr_in;
-				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-			}
-		}
-		else if ((m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !m_mmu_tmp_rw)
-		{
-			if (++m_mmu_tmp_buserror_occurred == 1)
-			{
-				m_mmu_tmp_buserror_address = addr_in;
-				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-			}
+			pmmu_set_buserror(addr_in);
+
 		}
 
 		if (!m_mmu_tmp_buserror_occurred)
@@ -563,12 +560,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 			//          fprintf(stderr, "TT0 match on address %08x (TT0 = %08x, mask = %08x)\n", addr_in, tt0, mask);
 			if ((tt0 & 4) && !m_mmu_tmp_rw && !ptest)   // write protect?
 			{
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-				}
+				pmmu_set_buserror(addr_in);
 			}
 
 			return addr_in;
@@ -588,12 +580,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 			//          fprintf(stderr, "TT1 match on address %08x (TT0 = %08x, mask = %08x)\n", addr_in, tt1, mask);
 			if ((tt1 & 4) && !m_mmu_tmp_rw && !ptest)   // write protect?
 			{
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-				}
+					pmmu_set_buserror(addr_in);
 			}
 
 			return addr_in;
@@ -658,13 +645,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 			// write protected by the root or pointer entries?
 			if ((((root_entry & 4) && !m_mmu_tmp_rw) || ((pointer_entry & 4) && !m_mmu_tmp_rw)) && !ptest)
 			{
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-				}
-
+				pmmu_set_buserror(addr_in);
 				return addr_in;
 			}
 
@@ -672,13 +653,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 			if (!(pointer_entry & 2) && !ptest)
 			{
 //              fprintf(stderr, "Invalid pointer entry!  PC=%x, addr=%x\n", m_ppc, addr_in);
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-				}
-
+				pmmu_set_buserror(addr_in);
 				return addr_in;
 			}
 
@@ -690,12 +665,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 
 			if (!ptest)
 			{
-				if (++m_mmu_tmp_buserror_occurred == 1)
-				{
-					m_mmu_tmp_buserror_address = addr_in;
-					m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-					m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-				}
+				pmmu_set_buserror(addr_in);
 			}
 
 			return addr_in;
@@ -734,13 +704,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 		// is the page write protected or supervisor protected?
 		if ((((page_entry & 4) && !m_mmu_tmp_rw) || ((page_entry & 0x80) && !(fc&4))) && !ptest)
 		{
-			if (++m_mmu_tmp_buserror_occurred == 1)
-			{
-				m_mmu_tmp_buserror_address = addr_in;
-				m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-				m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-			}
-
+			pmmu_set_buserror(addr_in);
 			return addr_in;
 		}
 
@@ -750,12 +714,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 //              fprintf(stderr, "Invalid page entry!  PC=%x, addr=%x\n", m_ppc, addr_in);
 				if (!ptest)
 				{
-					if (++m_mmu_tmp_buserror_occurred == 1)
-					{
-						m_mmu_tmp_buserror_address = addr_in;
-						m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
-						m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
-					}
+					pmmu_set_buserror(addr_in);
 				}
 
 				return addr_in;
@@ -1016,7 +975,18 @@ void m68881_mmu_ops()
 
 												if (m_mmu_tc & 0x80000000)
 												{
-													m_pmmu_enabled = 1;
+													int bits = 0;
+													for(int shift = 20; shift >= 0; shift -= 4) {
+														bits += (m_mmu_tc >> shift) & 0x0f;
+													}
+
+													if (bits != 32 || !((m_mmu_tc >> 23) & 1)) {
+														logerror("MMU: TC invalid!\n");
+														m_mmu_tc &= ~0x80000000;
+														m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
+													} else {
+														m_pmmu_enabled = 1;
+													}
 //                                                  printf("PMMU enabled\n");
 												}
 												else
@@ -1036,6 +1006,12 @@ void m68881_mmu_ops()
 												m_mmu_srp_limit = (temp64>>32) & 0xffffffff;
 												m_mmu_srp_aptr = temp64 & 0xffffffff;
 //                                              printf("PMMU: SRP limit = %08x aptr = %08x\n", m_mmu_srp_limit, m_mmu_srp_aptr);
+												// SRP type 0 is not allowed
+												if ((m_mmu_srp_limit & 3) == 0) {
+													m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
+													return;
+												}
+
 												if (!(modes & 0x100))
 												{
 													pmmu_atc_flush();
@@ -1047,6 +1023,13 @@ void m68881_mmu_ops()
 												m_mmu_crp_limit = (temp64>>32) & 0xffffffff;
 												m_mmu_crp_aptr = temp64 & 0xffffffff;
 //                                              printf("PMMU: CRP limit = %08x aptr = %08x\n", m_mmu_crp_limit, m_mmu_crp_aptr);
+												// CRP type 0 is not allowed
+												if ((m_mmu_crp_limit & 3) == 0) {
+													m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
+													return;
+												}
+
+
 												if (!(modes & 0x100))
 												{
 													pmmu_atc_flush();

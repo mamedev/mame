@@ -254,7 +254,7 @@ void argus_state::reset_common()
 VIDEO_START_MEMBER(argus_state,argus)
 {
 	/*                           info                     offset             w   h  col  row */
-//	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 4096,    32); // full 65536 width tilemap
+//  m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 4096,    32); // full 65536 width tilemap
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 1024/16, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32,      32);
 	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_tx_tile_info<3>),this),     TILEMAP_SCAN_COLS,  8,  8, 32,      32);

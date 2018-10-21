@@ -20,8 +20,10 @@
 #include "bus/generic/slot.h"
 #include "bus/isa/fdc.h"
 #include "bus/pc_joy/pc_joy.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/terminal.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -512,8 +514,13 @@ static void pcjr_floppies(device_slot_interface &device)
 
 static void pcjr_com(device_slot_interface &device)
 {
-	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
-	device.option_add("mousesys_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal",SERIAL_TERMINAL);
+	device.option_add("null_modem",NULL_MODEM);
 }
 
 static const gfx_layout pc_8_charlayout =
@@ -604,24 +611,24 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
  */
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_pic8259, pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12)
 	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pcjr_state, out2_changed))
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_DEVICE_ADD(m_pic8259, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, pcjr_state, pic8259_set_int_line))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pcjr_state, pcjr_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pcjr_state, pcjr_ppi_portc_r))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.in_pa_callback().set_constant(0xff);
+	ppi.out_pb_callback().set(FUNC(pcjr_state::pcjr_ppi_portb_w));
+	ppi.in_pc_callback().set(FUNC(pcjr_state::pcjr_ppi_portc_r));
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
+	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
+	uart.out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
+	uart.out_dtr_callback().set("serport", FUNC(rs232_port_device::write_dtr));
+	uart.out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
+	uart.out_int_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
 	MCFG_DEVICE_ADD( "serport", RS232_PORT, pcjr_com, nullptr )
 	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
@@ -644,8 +651,8 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
-	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w))
+	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
+	lpt0.irq_handler().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -653,7 +660,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_CASSETTE_ADD( "cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_UPD765A_ADD("fdc", false, false)
+	UPD765A(config, m_fdc, false, false);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
@@ -670,9 +677,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_GENERIC_LOAD(pcjr_state, pcjr_cart2)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K")
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
@@ -699,9 +704,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ibmpcjx)
 	/* internal ram */
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("") // only boots with 512k currently
+	m_ram->set_default_size("512K").set_extra_options(""); // only boots with 512k currently
 MACHINE_CONFIG_END
 
 

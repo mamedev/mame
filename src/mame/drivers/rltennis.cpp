@@ -196,10 +196,11 @@ MACHINE_CONFIG_START(rltennis_state::rltennis)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_EEPROM_2864_ADD("eeprom")
+	EEPROM_2864(config, "eeprom");
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_RAMDAC_SPLIT_READ(1)
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac.set_addrmap(0, &rltennis_state::ramdac_map);
+	ramdac.set_split_read(1);
 
 	SPEAKER(config, "speaker").front_center();
 

@@ -309,7 +309,7 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 	/* only works if we're accessing the low byte */
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->port_w(space, 0, data & 0xff);
+		m_upd7759->port_w(data & 0xff);
 		m_upd7759->start_w(0);
 		m_upd7759->start_w(1);
 	}
@@ -485,7 +485,7 @@ WRITE8_MEMBER(segac2_state::io_porth_w)
 	if (m_sound_banks > 1)
 	{
 		newbank = (data >> 2) & (m_sound_banks - 1);
-		m_upd7759->set_bank_base(newbank * 0x20000);
+		m_upd7759->set_rom_bank(newbank);
 	}
 }
 
@@ -1551,7 +1551,7 @@ MACHINE_CONFIG_START(segac2_state::segac)
 
 	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
-	MCFG_NVRAM_ADD_1FILL("nvram") // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", XL2_CLOCK/6)); // clock divider guessed
 	io.in_pa_callback().set_ioport("P1");

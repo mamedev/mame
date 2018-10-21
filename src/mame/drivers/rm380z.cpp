@@ -260,11 +260,10 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	//m_cassette->change_state((BIT(data,x)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* RAM configurations */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("56K")
+	RAM(config, RAM_TAG).set_default_size("56K");
 
 	/* floppy disk */
-	MCFG_DEVICE_ADD("wd1771", FD1771, 1_MHz_XTAL)
+	FD1771(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)

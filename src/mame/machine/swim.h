@@ -24,6 +24,12 @@ DECLARE_DEVICE_TYPE(SWIM, swim_device)
 class swim_device : public applefdc_base_device
 {
 public:
+	swim_device(const machine_config &mconfig, const char *tag, device_t *owner, const applefdc_interface *intrf)
+		: swim_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_config(intrf);
+	}
+
 	swim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write

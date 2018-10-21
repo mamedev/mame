@@ -205,7 +205,7 @@ private:
 	void mz2500_reconfigure_screen();
 	uint8_t pal_256_param(int index, int param);
 	void reset_banks(uint8_t type);
-	
+
 	void mz2500_io(address_map &map);
 	void mz2500_map(address_map &map);
 	void mz2500_bank_window_map(address_map &map);

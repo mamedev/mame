@@ -435,27 +435,16 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vendetta_state,  irq)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, vendetta_state, banking_callback))
 
-	MCFG_DEVICE_ADD("videobank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(videobank0_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-
-	MCFG_DEVICE_ADD("videobank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(videobank1_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "videobank0").set_map(&vendetta_state::videobank0_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
+	ADDRESS_MAP_BANK(config, "videobank1").set_map(&vendetta_state::videobank1_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified with PCB */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 							/* interrupts are triggered by the main CPU */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -518,8 +507,7 @@ MACHINE_CONFIG_START(vendetta_state::esckids)
 	MCFG_DEVICE_MODIFY("k053246")
 	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 101, 6)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 6000000)
-	MCFG_K053252_OFFSETS(12*8, 1*8)
+	K053252(config, "k053252", 6000000).set_offsets(12*8, 1*8);
 MACHINE_CONFIG_END
 
 
@@ -581,6 +569,30 @@ ROM_END
 ROM_START( vendettaz )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081z01.17c", 0x00000, 0x40000, CRC(4d225a8d) SHA1(fe8f6e63d033cf04c9a287d870db244fddb81f03) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) )
+	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_LOAD64_WORD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
+	ROM_LOAD64_WORD( "081a05", 0x000002, 0x100000, CRC(4e173759) SHA1(ce803f2aca7d7dedad00ab30e112443848747bd2) ) /* sprites */
+	ROM_LOAD64_WORD( "081a06", 0x000004, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
+	ROM_LOAD64_WORD( "081a07", 0x000006, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
+
+	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
+	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
+ROM_END
+
+ROM_START( vendettaun )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_LOAD( "1.17c", 0x00000, 0x40000, CRC(1a7ceb1b) SHA1(c7454e11b7a06d10c94fe44ba6f83208bca4ced9) ) /* World 4 player, program rom found labeled simply as "1" */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -831,6 +843,7 @@ ROM_END
 GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaun,  vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
 GAME( 1991, vendetta2pw, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */

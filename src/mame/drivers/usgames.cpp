@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_DEVICE_PROGRAM_MAP(usgames_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(usgames_state, irq0_line_hold, 5*60) /* ?? */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -2172,9 +2172,9 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, ALPHA68K_PIXEL_CLOCK / ALPHA68K_HTOTAL / 2)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 13C
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, alpha68k_state, video_control2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, alpha68k_state, video_control3_w))
+	LS259(config, m_outlatch); // 13C
+	m_outlatch->q_out_cb<2>().set(FUNC(alpha68k_state::video_control2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(alpha68k_state::video_control3_w));
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)

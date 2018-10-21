@@ -433,9 +433,9 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gp)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
+	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 1000000)); // guessed
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
@@ -507,9 +507,9 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gpb)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
+	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 1000000)); // guessed
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));

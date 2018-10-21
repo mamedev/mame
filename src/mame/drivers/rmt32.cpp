@@ -360,8 +360,7 @@ MACHINE_CONFIG_START(mt32_state::mt32)
 	MCFG_DEVICE_PROGRAM_MAP( mt32_map )
 	MCFG_DEVICE_IO_MAP( mt32_io )
 
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
+	RAM( config, "ram" ).set_default_size( "32K" );
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE(50)

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+#include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "emupal.h"
@@ -9,6 +10,7 @@ class calomega_state : public driver_device
 public:
 	calomega_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_pia(*this, "pia%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_acia6850_0(*this, "acia6850_0"),
 		m_aciabaud(*this, "aciabaud"),
@@ -66,6 +68,8 @@ public:
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
+
+	optional_device_array<pia6821_device, 2> m_pia;
 
 private:
 	required_device<cpu_device> m_maincpu;

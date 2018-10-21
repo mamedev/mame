@@ -9,6 +9,8 @@
 #ifndef MAME_INCLUDES_Z88_H
 #define MAME_INCLUDES_Z88_H
 
+#pragma once
+
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "machine/upd65031.h"
@@ -20,7 +22,6 @@
 #include "bus/z88/z88.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 

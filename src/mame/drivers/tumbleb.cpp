@@ -651,6 +651,24 @@ void tumbleb_state::tumblepopb_main_map(address_map &map)
 	map(0x342400, 0x34247f).nopw();
 }
 
+void tumbleb_state::tumblepopba_main_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+#if TUMBLEP_HACK
+	map(0x000000, 0x07ffff).writeonly();   /* To write levels modifications */
+#endif
+	//map(0x100000, 0x100001).rw(FUNC(tumbleb_state::tumblepb_prot_r), FUNC(tumbleb_state::tumblepb_oki_w)); // where's the oki mapped?
+	map(0x120000, 0x123fff).ram().share("mainram");
+	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
+	map(0x1a0000, 0x1a07ff).ram().share("spriteram"); /* Bootleg sprite buffer */
+	map(0x1a1000, 0x1a1fff).ram(); // ?
+	map(0x200000, 0x200fff).ram(); // ?
+	//map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w)); // 0x180000?
+	map(0x320000, 0x320fff).w(FUNC(tumbleb_state::tumblepb_pf1_data_w)).share("pf1_data");
+	map(0x322000, 0x322fff).w(FUNC(tumbleb_state::tumblepb_pf2_data_w)).share("pf2_data");
+}
+
 void tumbleb_state::fncywld_main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
@@ -2056,6 +2074,11 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(tumbleb_state::tumblepba)
+	tumblepb(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tumblepopba_main_map)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 
@@ -2408,24 +2431,41 @@ ROM_START( tumbleb )
 ROM_END
 
 ROM_START( tumbleb2 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE ("thumbpop.2", 0x00000, 0x40000, CRC(34b016e1) SHA1(b4c496358d48469d170a69e8bba58e0ea919b418) )
-	ROM_LOAD16_BYTE( "thumbpop.3", 0x00001, 0x40000, CRC(89501c71) SHA1(2c202218934b845fdf7c99eaf280dccad90767f2) )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 27c208, 68000 code */
+	ROM_LOAD16_BYTE ("wj-2", 0x00000, 0x40000, CRC(34b016e1) SHA1(b4c496358d48469d170a69e8bba58e0ea919b418) )
+	ROM_LOAD16_BYTE( "wj-3", 0x00001, 0x40000, CRC(89501c71) SHA1(2c202218934b845fdf7c99eaf280dccad90767f2) )
 
 	ROM_REGION( 0x2d4c, "cpu1", 0 ) /* PIC16c57 */
 	ROM_LOAD( "pic_16c57", 0x00000, 0x2d4c, NO_DUMP ) // protected
 
-	ROM_REGION( 0x080000, "tilegfx", 0 )
-	ROM_LOAD16_BYTE( "thumbpop.19",  0x00000, 0x40000, CRC(0795aab4) SHA1(85b38804446f6b0b4d8c3a59a8958d520c567a4e) )
-	ROM_LOAD16_BYTE( "thumbpop.18",  0x00001, 0x40000, CRC(ad58df43) SHA1(2e562bfffb42543af767dd9e82a1d2465dfcd8b8) )
+	ROM_REGION( 0x080000, "tilegfx", 0 ) // 27c208
+	ROM_LOAD16_BYTE( "wj-9",  0x00000, 0x40000, CRC(0795aab4) SHA1(85b38804446f6b0b4d8c3a59a8958d520c567a4e) )
+	ROM_LOAD16_BYTE( "wj-8",  0x00001, 0x40000, CRC(ad58df43) SHA1(2e562bfffb42543af767dd9e82a1d2465dfcd8b8) )
 
-	ROM_REGION( 0x100000, "sprgfx", 0 )
-	ROM_LOAD( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )
-	ROM_LOAD( "map-00.rom",   0x80000, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e) )
+	ROM_REGION( 0x100000, "sprgfx", 0 ) // in the 0.35 beta cycle this bootleg was added with the same sprite ROMs as the original, but a PCB was found with the following 27c208 ROMs
+	ROM_LOAD16_BYTE( "wj-6", 0x00000, 0x40000, CRC(ee91db18) SHA1(06a2f15228a8233b685506077ed1248cd5fc3bb3) ) // map-01.rom   [even]     IDENTICAL
+	ROM_LOAD16_BYTE( "wj-7", 0x00001, 0x40000, CRC(87cffb06) SHA1(db3adbbf33cdbff72b6c5ee1228c760cc4897ad0) ) // map-01.rom   [odd]      IDENTICAL
+	ROM_LOAD16_BYTE( "wj-4", 0x80000, 0x40000, CRC(79a29725) SHA1(c47366dedaf821f452d8e5394d426f18a79d615e) ) // map-00.rom   [even]     IDENTICAL
+	ROM_LOAD16_BYTE( "wj-5", 0x80001, 0x40000, CRC(dda8932e) SHA1(bd20806916cc5774a5cc70907d88c7ab4eb7ac14) ) // map-00.rom   [odd]      IDENTICAL
+	//ROM_LOAD( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )
+	//ROM_LOAD( "map-00.rom",   0x80000, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e) )
 
-	ROM_REGION( 0x100000, "oki", 0 ) /* Oki samples */
-	ROM_LOAD( "thumbpop.snd", 0x00000, 0x80000, CRC(fabbf15d) SHA1(de60be43a5cd1d4b93c142bde6cbfc48a25545a3) )
+	ROM_REGION( 0x100000, "oki", 0 ) /* 27c408, Oki samples */
+	ROM_LOAD( "wj-1", 0x00000, 0x80000, CRC(fabbf15d) SHA1(de60be43a5cd1d4b93c142bde6cbfc48a25545a3) )
 	ROM_RELOAD(0x80000,0x80000)
+
+	ROM_REGION(0x1500, "plds", 0 ) // not dumped ones are soldered
+	ROM_LOAD( "palce16v8.1",   0x0000, 0x104, NO_DUMP )
+	ROM_LOAD( "palce20v8.2",   0x0000, 0x157, NO_DUMP )
+	ROM_LOAD( "palce16v8.3",   0x0200, 0x104, NO_DUMP )
+	ROM_LOAD( "palce16v8.4",   0x0400, 0x104, NO_DUMP )
+	ROM_LOAD( "palce16v8.5",   0x0600, 0x104, NO_DUMP )
+	ROM_LOAD( "palce16v8.6",   0x0800, 0x104, NO_DUMP )
+	ROM_LOAD( "palce16v8.7",   0x0a00, 0x104, NO_DUMP )
+	ROM_LOAD( "palce22v10.8",  0x0c00, 0x2dd, NO_DUMP )
+	ROM_LOAD( "palce22v10.9",  0x0f00, 0x2dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.10", 0x1100, 0x117, CRC(eef433f9) SHA1(996bfb88d114b661265edc975eef4c24d0f07b55) )
+	ROM_LOAD( "palce16v8.11",  0x1300, 0x104, NO_DUMP )
 ROM_END
 
 // different sprite / tilemap handling, might be Playmark style, it had Playmark stickers on the ROMs
@@ -3599,7 +3639,7 @@ void tumbleb_state::init_dquizgo()
 /* Misc 'bootleg' hardware - close to base Tumble Pop */
 GAME( 1991, tumbleb,  tumblep, tumblepb,    tumblepb, tumbleb_state, init_tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
 GAME( 1991, tumbleb2, tumblep, tumbleb2,    tumblepb, tumbleb_state, init_tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg with PIC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
-GAME( 1991, tumblepba,tumblep, tumblepb,    tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING  ) // Playmark stickers on ROMs
+GAME( 1991, tumblepba,tumblep, tumblepba,   tumblepb, tumbleb_state, init_tumblepba,ROT0, "bootleg (Playmark)", "Tumble Pop (Playmark bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING  ) // Playmark stickers on ROMs, offset pf1_alt tilemap, OKI not hooked up
 
 GAME( 1993, jumpkids, 0,       jumpkids,    tumblepb, tumbleb_state, init_jumpkids, ROT0, "Comad",    "Jump Kids", MACHINE_SUPPORTS_SAVE )
 

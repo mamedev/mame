@@ -66,7 +66,7 @@ private:
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ_LINE_MEMBER( t1_r );
-	DECLARE_WRITE8_MEMBER( i8243_port_w );
+	template<int P> void i8243_port_w(uint8_t data);
 };
 
 // device type definition

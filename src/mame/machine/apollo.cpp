@@ -853,7 +853,8 @@ DEFINE_DEVICE_TYPE(APOLLO_NI, apollo_ni, "node_id", "Apollo Node ID")
 
 apollo_ni::apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APOLLO_NI, tag, owner, clock),
-	device_image_interface(mconfig, *this)
+	device_image_interface(mconfig, *this),
+	m_wdc(*this, ":isa1:wdc")
 {
 }
 
@@ -1012,19 +1013,18 @@ void apollo_ni::call_unload()
 
 void apollo_ni::set_node_id_from_disk()
 {
-	omti8621_apollo_device *omti8621 = machine().device<omti8621_apollo_device>("isa1:wdc");
 	uint8_t db[0x50];
 
 	// check label of physical volume and get sector data of logical volume 1
 	// Note: sector data starts with 32 byte block header
 	// set node ID from UID of logical volume 1 of logical unit 0
-	if (omti8621
-			&& omti8621->get_sector(0, db, sizeof(db), 0) == sizeof(db)
+	if (m_wdc
+			&& m_wdc->get_sector(0, db, sizeof(db), 0) == sizeof(db)
 			&& memcmp(db + 0x22, "APOLLO", 6) == 0)
 	{
 		uint16_t sector1 = apollo_is_dn5500() ? 4 : 1;
 
-		if (omti8621->get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
+		if (m_wdc->get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
 		{
 			// set node_id from UID of logical volume 1 of logical unit 0
 			m_node_id = (((db[0x49] << 8) | db[0x4a]) << 8) | db[0x4b];
@@ -1093,19 +1093,20 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_pic8259_slave->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_slave_set_int_line));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD(APOLLO_PTM_TAG, PTM6840, 0)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 125000, 62500)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, apollo_state, apollo_ptm_irq_function))
+	PTM6840(config, m_ptm, 0);
+	m_ptm->set_external_clocks(250000, 125000, 62500);
+	m_ptm->irq_callback().set(FUNC(apollo_state::apollo_ptm_irq_function));
+
 	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, apollo_state, apollo_ptm_timer_tick))
 
-	MCFG_DEVICE_ADD(APOLLO_RTC_TAG, MC146818, 32.768_kHz_XTAL)
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	// FIXME: is this interrupt really only connected on DN3000?
-	//MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, apollo_state, apollo_rtc_irq_function))
-	MCFG_MC146818_UTC(true)
-	MCFG_MC146818_BINARY(false)
-	MCFG_MC146818_24_12(false)
-	MCFG_MC146818_EPOCH(0)
+	//m_rtc->irq().set(FUNC(apollo_state::apollo_rtc_irq_function));
+	m_rtc->set_use_utc(true);
+	m_rtc->set_binary(false);
+	m_rtc->set_24hrs(false);
+	m_rtc->set_epoch(0);
 
 	MCFG_APOLLO_NI_ADD(APOLLO_NI_TAG, 0)
 
@@ -1174,10 +1175,9 @@ MACHINE_CONFIG_START(apollo_state::apollo_terminal)
 	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(*this, apollo_state, sio_output))
 	MCFG_APOLLO_SIO_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_b_w))
-
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(APOLLO_SIO_TAG, FUNC(apollo_sio::rx_b_w));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(apollo_terminal));
 MACHINE_CONFIG_END
 
 void apollo_state::init_apollo()

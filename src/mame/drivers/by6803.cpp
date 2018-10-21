@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(by6803_state::by6803)
 	MCFG_DEVICE_PROGRAM_MAP(by6803_map)
 	MCFG_DEVICE_IO_MAP(by6803_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	//config.set_default_layout(layout_by6803);
@@ -393,22 +393,22 @@ MACHINE_CONFIG_START(by6803_state::by6803)
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, by6803_state, pia0_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by6803_state, pia0_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, by6803_state, pia0_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by6803_state, pia0_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by6803_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by6803_state, pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6803_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6803_IRQ_LINE))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpa_handler().set(FUNC(by6803_state::pia0_a_r));
+	m_pia0->writepa_handler().set(FUNC(by6803_state::pia0_a_w));
+	m_pia0->readpb_handler().set(FUNC(by6803_state::pia0_b_r));
+	m_pia0->writepb_handler().set(FUNC(by6803_state::pia0_b_w));
+	m_pia0->ca2_handler().set(FUNC(by6803_state::pia0_ca2_w));
+	m_pia0->cb2_handler().set(FUNC(by6803_state::pia0_cb2_w));
+	m_pia0->irqa_handler().set_inputline("maincpu", M6803_IRQ_LINE);
+	m_pia0->irqb_handler().set_inputline("maincpu", M6803_IRQ_LINE);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z", by6803_state, pia0_timer, attotime::from_hz(120)) // mains freq*2
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, by6803_state, pia1_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by6803_state, pia1_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by6803_state, pia1_b_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by6803_state, pia1_cb2_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(FUNC(by6803_state::pia1_a_r));
+	m_pia1->writepa_handler().set(FUNC(by6803_state::pia1_a_w));
+	m_pia1->writepb_handler().set(FUNC(by6803_state::pia1_b_w));
+	m_pia1->cb2_handler().set(FUNC(by6803_state::pia1_cb2_w));
 
 	//MCFG_SPEAKER_STANDARD_MONO("speaker")
 	//MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK) // Cheap Squeak Turbo

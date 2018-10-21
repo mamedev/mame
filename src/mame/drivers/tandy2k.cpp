@@ -321,7 +321,7 @@ void tandy2k_state::tandy2k_io(address_map &map)
 	map(0x00000, 0x00000).mirror(0x8).rw(FUNC(tandy2k_state::enable_r), FUNC(tandy2k_state::enable_w));
 	map(0x00002, 0x00002).mirror(0x8).w(FUNC(tandy2k_state::dma_mux_w));
 	map(0x00004, 0x00004).mirror(0x8).rw(FUNC(tandy2k_state::fldtc_r), FUNC(tandy2k_state::fldtc_w));
-	map(0x00010, 0x00013).mirror(0xc).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0x00ff);
+	map(0x00010, 0x00013).mirror(0xc).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x00030, 0x00033).mirror(0xc).m(m_fdc, FUNC(i8272a_device::map)).umask16(0x00ff);
 	map(0x00040, 0x00047).mirror(0x8).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x00050, 0x00057).mirror(0x8).rw(m_i8255a, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -786,19 +786,19 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, 16_MHz_XTAL * 28 / 20 / 8)
-	MCFG_DEVICE_ADDRESS_MAP(0, vpac_mem)
-	MCFG_CRT9007_CHARACTER_WIDTH(8)
-	MCFG_CRT9007_INT_CALLBACK(WRITELINE(I8259A_1_TAG, pic8259_device, ir1_w))
-	MCFG_CRT9007_VS_CALLBACK(WRITELINE(CRT9021B_TAG, crt9021_device, vsync_w))
-	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_vlt_w))
-	MCFG_CRT9007_CURS_CALLBACK(WRITELINE(CRT9021B_TAG, crt9021_device, cursor_w))
-	MCFG_CRT9007_DRB_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_drb_w))
-	MCFG_CRT9007_WBEN_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_wben_w))
-	MCFG_CRT9007_CBLANK_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_cblank_w))
-	MCFG_CRT9007_SLG_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_slg_w))
-	MCFG_CRT9007_SLD_CALLBACK(WRITELINE(*this, tandy2k_state, vpac_sld_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	crt9007_device &vpac(CRT9007(config, CRT9007_TAG, 16_MHz_XTAL * 28 / 20 / 8));
+	vpac.set_addrmap(0, &tandy2k_state::vpac_mem);
+	vpac.set_character_width(8);
+	vpac.int_callback().set(I8259A_1_TAG, FUNC(pic8259_device::ir1_w));
+	vpac.vs_callback().set(CRT9021B_TAG, FUNC(crt9021_device::vsync_w));
+	vpac.vlt_callback().set(FUNC(tandy2k_state::vpac_vlt_w));
+	vpac.curs_callback().set(CRT9021B_TAG, FUNC(crt9021_device::cursor_w));
+	vpac.drb_callback().set(FUNC(tandy2k_state::vpac_drb_w));
+	vpac.wben_callback().set(FUNC(tandy2k_state::vpac_wben_w));
+	vpac.cblank_callback().set(FUNC(tandy2k_state::vpac_cblank_w));
+	vpac.slg_callback().set(FUNC(tandy2k_state::vpac_slg_w));
+	vpac.sld_callback().set(FUNC(tandy2k_state::vpac_sld_w));
+	vpac.set_screen(SCREEN_TAG);
 
 	MCFG_DEVICE_ADD(CRT9212_0_TAG, CRT9212, 0)
 	MCFG_CRT9212_WEN2_VCC()
@@ -819,17 +819,17 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, tandy2k_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tandy2k_state, ppi_pc_w))
+	I8255A(config, m_i8255a);
+	m_i8255a->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_i8255a->in_pb_callback().set(FUNC(tandy2k_state::ppi_pb_r));
+	m_i8255a->out_pc_callback().set(FUNC(tandy2k_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, tandy2k_state, rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, tandy2k_state, txrdy_w))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart->rxrdy_handler().set(FUNC(tandy2k_state::rxrdy_w));
+	m_uart->txrdy_handler().set(FUNC(tandy2k_state::txrdy_w));
 
 	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
@@ -851,11 +851,11 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_DEVICE_ADD(I8259A_1_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
 
-	MCFG_I8272A_ADD(I8272A_TAG, true)
-	downcast<i8272a_device *>(device)->set_select_lines_connected(true);
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(I8259A_0_TAG, pic8259_device, ir4_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, tandy2k_state, fdc_drq_w))
-	MCFG_UPD765_HDL_CALLBACK(WRITELINE(*this, tandy2k_state, fdc_hdl_w))
+	I8272A(config, m_fdc, true);
+	m_fdc->set_select_lines_connected(true);
+	m_fdc->intrq_wr_callback().set(m_pic0, FUNC(pic8259_device::ir4_w));
+	m_fdc->drq_wr_callback().set(FUNC(tandy2k_state::fdc_drq_w));
+	m_fdc->hdl_wr_callback().set(FUNC(tandy2k_state::fdc_hdl_w));
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
 
@@ -880,9 +880,7 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tandy2k")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,384K,512K,640K,768K,896K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy2k_state::tandy2k_hd)

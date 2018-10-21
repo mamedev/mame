@@ -141,7 +141,7 @@ MACHINE_CONFIG_START(sacstate_state::sacstate)
 	MCFG_DEVICE_IO_MAP(sacstate_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sacstate_state, kbd_put))
 MACHINE_CONFIG_END
 

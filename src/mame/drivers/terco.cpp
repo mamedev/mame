@@ -5,8 +5,8 @@
  *
  * History of Terco
  *------------------
- * Terco, founded 1963, is a privatelly held company in Sweden that develops and distribute equipment for
- * technical vocational educations worldwide. In the mid 80:ies they had a number of state of the art
+ * Terco, founded 1963, is a privately held company in Sweden that develops and distribute equipment for
+ * technical vocational educations worldwide. In the mid 80s they had a number of state of the art
  * products for educations on CNC machines, both mill and lathe, all based on Motorola 8-bit CPU:s.
  *
  * Known products
@@ -25,11 +25,11 @@
  * ------
  *  - Display
  *  - Clickable Artwork
- *  - Serial communication for printer, plotter, paper tape and downlaod from the T4426
+ *  - Serial communication for printer, plotter, paper tape and download from the T4426
  *  - Identify expansion bus
  *  - Keyboard Controller
  *  - Dump keyboard ROM
- *  - Cassette i/f
+ *  - Cassette i/o
  */
 
 #include "emu.h"
@@ -70,7 +70,7 @@
  * 4527    - BCD Rate Multiplexer
  * 555     - analog timer circuit
  * 6800    - 8 bit CPU
- * 6821    - PIA paralell interface
+ * 6821    - PIA parallel interface
  * 6850    - ACIA serial interface
  * 7400    - Quad 2 input NAND gates
  * 7402    - Quad 2 input NOR gates

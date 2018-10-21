@@ -127,9 +127,7 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("64K, 128K, 256K");
 MACHINE_CONFIG_END
 
 ROM_START( asst128 )

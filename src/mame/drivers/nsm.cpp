@@ -128,7 +128,9 @@ void nsm_state::machine_reset()
 
 MACHINE_CONFIG_START(nsm_state::nsm)
 	// CPU TMS9995, standard variant; no line connection
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 11052000, nsm_map, nsm_io_map)
+	TMS9995(config, m_maincpu, 11052000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nsm_state::nsm_map);
+	m_maincpu->set_addrmap(AS_IO, &nsm_state::nsm_io_map);
 
 	/* Video */
 	config.set_default_layout(layout_nsm);

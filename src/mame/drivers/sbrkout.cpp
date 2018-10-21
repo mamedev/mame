@@ -182,7 +182,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 	m_dac->write((videoram[0x380 + 0x11] & (scanline >> 2)) != 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
-	if (scanline == m_screen->visible_area().max_y + 1)
+	if (scanline == m_screen->visible_area().bottom() + 1)
 	{
 		uint8_t potvalue = ioport("PADDLE")->read();
 		m_pot_timer->adjust(m_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128));
@@ -322,7 +322,7 @@ WRITE_LINE_MEMBER(sbrkout_state::coincount_w)
 READ8_MEMBER(sbrkout_state::sync_r)
 {
 	int hpos = m_screen->hpos();
-	m_sync2_value = (hpos >= 128 && hpos <= m_screen->visible_area().max_x);
+	m_sync2_value = (hpos >= 128 && hpos <= m_screen->visible_area().right());
 	return m_screen->vpos();
 }
 
@@ -573,13 +573,12 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 	// coin counter activity as stated in Atari bulletin B-0054 (which recommends tying it to the
 	// CPU reset line instead).
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbrkout)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sbrkout_state, screen_update_sbrkout)
 	MCFG_SCREEN_PALETTE("palette")

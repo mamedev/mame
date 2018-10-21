@@ -308,9 +308,9 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
@@ -361,9 +361,9 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	MCFG_K053251_ADD("k053251")
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

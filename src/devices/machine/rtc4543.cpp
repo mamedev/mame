@@ -25,7 +25,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-const char *rtc4543_device::s_reg_names[7] =
+char const *const rtc4543_device::s_reg_names[7] =
 {
 	"second",
 	"minute",
@@ -116,7 +116,7 @@ void rtc4543_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void rtc4543_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
+	static int const weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
 	m_regs[0] = convert_to_bcd(second);                     // seconds (BCD, 0-59) in bits 0-6, bit 7 = battery low
 	m_regs[1] = convert_to_bcd(minute);                     // minutes (BCD, 0-59)

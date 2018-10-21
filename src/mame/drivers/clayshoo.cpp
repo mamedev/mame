@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(clayshoo_state::clayshoo)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clayshoo_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,11 +340,11 @@ MACHINE_CONFIG_START(clayshoo_state::clayshoo)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_UPDATE_DRIVER(clayshoo_state, screen_update_clayshoo)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	I8255A(config, "ppi8255_0");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, clayshoo_state, input_port_select_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, clayshoo_state, input_port_r))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(clayshoo_state::input_port_select_w));
+	ppi1.in_pb_callback().set(FUNC(clayshoo_state::input_port_r));
 MACHINE_CONFIG_END
 
 

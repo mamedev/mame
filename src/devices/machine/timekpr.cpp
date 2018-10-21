@@ -18,6 +18,12 @@
 #include "machine/timekpr.h"
 #include "machine/timehelp.h"
 
+#define LOG_GENERAL (1U << 0)
+#define LOG_TICKS   (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 // device type definition
 DEFINE_DEVICE_TYPE(M48T02,  m48t02_device,  "m48t02",  "M48T02 Timekeeper")
 DEFINE_DEVICE_TYPE(M48T35,  m48t35_device,  "m48t35",  "M48T35 Timekeeper")
@@ -274,9 +280,11 @@ void timekeeper_device::counters_from_ram()
 
 void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	LOGMASKED(LOG_TICKS, "Tick\n");
 	if( ( m_seconds & SECONDS_ST ) != 0 ||
 		( m_control & CONTROL_W ) != 0 )
 	{
+		logerror("No Tick\n");
 		return;
 	}
 
@@ -368,6 +376,7 @@ WRITE8_MEMBER(timekeeper_device::watchdog_write)
 
 WRITE8_MEMBER( timekeeper_device::write )
 {
+	LOGMASKED(LOG_GENERAL, "timekeeper_device::write: %04x = %02x\n", offset, data);
 	if( offset == m_offset_control )
 	{
 		if( ( m_control & CONTROL_W ) != 0 &&
@@ -375,6 +384,13 @@ WRITE8_MEMBER( timekeeper_device::write )
 		{
 			counters_from_ram();
 		}
+
+		if( ( m_control & CONTROL_R ) != 0 &&
+			( data & CONTROL_W ) == 0 )
+		{
+			counters_to_ram();
+		}
+
 		m_control = data;
 	}
 	else if( offset == m_offset_day )
@@ -419,6 +435,7 @@ READ8_MEMBER( timekeeper_device::read )
 		m_reset_cb(CLEAR_LINE);
 		m_irq_cb(CLEAR_LINE);
 	}
+	LOGMASKED(LOG_GENERAL, "timekeeper_device::read: %04x (%02x)\n", offset, result);
 	return result;
 }
 

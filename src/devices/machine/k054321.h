@@ -6,16 +6,18 @@
 
 #pragma once
 
-#define MCFG_K054321_ADD(_tag, _left, _right)   \
-	MCFG_DEVICE_ADD(_tag, K054321, 0) \
-	downcast<k054321_device *>(device)->set_gain_devices(_left, _right);
-
 class k054321_device : public device_t
 {
 public:
-	k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template<typename T, typename U>
+	k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&left, U &&right)
+		: k054321_device(mconfig, tag, owner, 0)
+	{
+		m_left.set_tag(std::forward<T>(left));
+		m_right.set_tag(std::forward<U>(right));
+	}
 
-	void set_gain_devices(const char *_left, const char *_right);
+	k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -24,9 +26,11 @@ protected:
 	void device_start() override;
 
 private:
-	required_device<device_sound_interface> m_left, m_right;
+	required_device<device_sound_interface> m_left;
+	required_device<device_sound_interface> m_right;
 
-	u8 m_main1, m_main2;
+	u8 m_main1;
+	u8 m_main2;
 	u8 m_sound1;
 
 	u8 m_volume;

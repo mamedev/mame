@@ -4,6 +4,10 @@
 <softwarelist name="sorcerer_cass" description="Exidy Sorcerer cassettes">
 
 <!--
+Compiled by Robbbert
+-->
+
+<!--
      These come from tapes.
      Load the Basic ROM PAC, then from within it type CLOAD. When it has finished loading, type RUN.
  -->
@@ -777,7 +781,8 @@
 	<software name="interceptor">
 		<description>Interceptor</description>
 		<year>1983</year>
-		<publisher>Blair Rideout</publisher>
+		<publisher>System Software</publisher>
+		<info name="developer" value="Blair Rideout"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="7201560">
@@ -992,6 +997,79 @@
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="6220906">
 				<rom name="west.wav" size="6220906" crc="9e84b0f4" sha1="6f578e9d50b648e367763d9ec45eefd36889fe6b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<!-- Added 2018-07-24 -->
+	<software name="adv5">
+		<description>The Count</description>
+		<year>1979</year>
+		<publisher>Creative Computing</publisher>
+		<info name="developer" value="Scott Adams" />
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="13242052">
+				<rom name="adv5.wav" size="13242052" crc="9c599ac9" sha1="2ad41843f755c405033e611ad76039e602ae0cc0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="debug">
+		<description>Debug</description>
+		<year>1979</year>
+		<publisher>Quality Software</publisher>
+		<info name="developer" value="Bob Pierce" />
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="3584388">
+				<rom name="debug.wav" size="3584388" crc="cb0f1e8d" sha1="4f7ef89a79100269845250a4b69dac31056dbbb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="flite">
+		<description>Flight Simulator</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="12999370">
+				<rom name="flite.wav" size="12999370" crc="ae49e375" sha1="211817186e7fe9ad0788c1d69fa0c9072d335811" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="grotnik">
+		<description>Grotnik Wars</description>
+		<year>198?</year>
+		<publisher>System Software</publisher>
+		<info name="developer" value="Ross Williams" />
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="5572872">
+				<rom name="grotnik.wav" size="5572872" crc="03410170" sha1="e968fb3576bf702cd60752c94819755cb2d37262" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="nike2">
+		<description>Nike II</description>
+		<year>1980</year>
+		<publisher>Quality Software</publisher>
+		<info name="developer" value="Bob Broffel and Charles Finch" />
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="3032962">
+				<rom name="nike2.wav" size="3032962" crc="de304e7c" sha1="88f4ee50e1537ffb0d35c1edc7732681c792a6b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<!-- Added 2018-10-13 -->
+	<software name="crash">
+		<description>Head-on Collision</description>
+		<year>1980</year>
+		<publisher>Quality Software</publisher>
+		<info name="developer" value="Lee Anders" />
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="7824984">
+				<rom name="crash.wav" size="7824984" crc="f6a54d3f" sha1="6fff752fa4f2f1056a05e1d7d3368ec31828e9d3" offset="0" />
 			</dataarea>
 		</part>
 	</software>

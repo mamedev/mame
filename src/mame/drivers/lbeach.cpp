@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(lbeach_state::lbeach)
 	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'000'000) / 32) // Motorola MC6800P, 500kHz
 	MCFG_DEVICE_PROGRAM_MAP(lbeach_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

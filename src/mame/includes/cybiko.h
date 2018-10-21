@@ -80,9 +80,14 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybiko );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybikoxt );
-	void cybikoxt(machine_config &config);
-	void cybikov2(machine_config &config);
+
+	void cybikov1_base(machine_config &config);
+	void cybikov1_flash(machine_config &config);
+	void cybikov1_debug_serial(machine_config &config);
 	void cybikov1(machine_config &config);
+	void cybikov2(machine_config &config);
+	void cybikoxt(machine_config &config);
+
 	void cybikov1_io(address_map &map);
 	void cybikov1_mem(address_map &map);
 	void cybikov2_io(address_map &map);

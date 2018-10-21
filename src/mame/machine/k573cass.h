@@ -107,7 +107,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
 	required_device<x76f041_device> m_x76f041;
 };
 
@@ -128,7 +127,7 @@ public:
 	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d5) override;
 
-	ADC083X_INPUT_CB(punchmania_inputs_callback);
+	double punchmania_inputs_callback(uint8_t input);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -198,8 +197,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-private:
 	required_device<x76f100_device> m_x76f100;
+
+private:
 	devcb_write_line m_d0_handler;
 	devcb_write_line m_d1_handler;
 	devcb_write_line m_d2_handler;

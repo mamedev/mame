@@ -24,6 +24,7 @@
 #include "natkeyboard.h"
 #include "uiinput.h"
 #include "pluginopts.h"
+#include "softlist.h"
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
@@ -202,6 +203,11 @@ namespace sol
 						typestr = "unmap";
 						break;
 					case AMH_DEVICE_DELEGATE:
+					case AMH_DEVICE_DELEGATE_M:
+					case AMH_DEVICE_DELEGATE_S:
+					case AMH_DEVICE_DELEGATE_SM:
+					case AMH_DEVICE_DELEGATE_MO:
+					case AMH_DEVICE_DELEGATE_SMO:
 						typestr = "delegate";
 						break;
 					case AMH_PORT:
@@ -1782,7 +1788,7 @@ void lua_engine::initialize()
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
 			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },
 			"orientation", [](screen_device &sdev) {
-					uint32_t flags = sdev.machine().system().flags & machine_flags::MASK_ORIENTATION;
+					uint32_t flags = sdev.orientation();
 					int rotation_angle = 0;
 					switch (flags)
 					{
@@ -1981,6 +1987,7 @@ void lua_engine::initialize()
 			"manufacturer", &device_image_interface::manufacturer,
 			"year", &device_image_interface::year,
 			"software_list_name", &device_image_interface::software_list_name,
+			"software_parent", sol::property([](device_image_interface &di) { const software_info *si = di.software_entry(); return si ? si->parentname() : ""; }),
 			"image_type_name", &device_image_interface::image_type_name,
 			"load", &device_image_interface::load,
 			"unload", &device_image_interface::unload,

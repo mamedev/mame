@@ -706,15 +706,15 @@ MACHINE_CONFIG_START(z100_state::z100)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
 	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, z100_state, video_pia_A_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, z100_state, video_pia_B_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, z100_state, video_pia_CA2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, z100_state, video_pia_CB2_w))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->writepa_handler().set(FUNC(z100_state::video_pia_A_w));
+	m_pia0->writepb_handler().set(FUNC(z100_state::video_pia_B_w));
+	m_pia0->ca2_handler().set(FUNC(z100_state::video_pia_CA2_w));
+	m_pia0->cb2_handler().set(FUNC(z100_state::video_pia_CB2_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	PIA6821(config, m_pia1, 0);
 
-	MCFG_DEVICE_ADD("z207_fdc", FD1797, 1_MHz_XTAL)
+	FD1797(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:0", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:1", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
@@ -744,5 +744,5 @@ void z100_state::driver_init()
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT         COMPANY   FULLNAME  FLAGS
-COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, driver_init, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT         COMPANY                FULLNAME  FLAGS
+COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, driver_init, "Zenith Data Systems", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

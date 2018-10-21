@@ -613,14 +613,14 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/2/2)
 	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("adc", ADC0808, 16_MHz_XTAL/2/2/8)
-	MCFG_ADC0808_EOC_CB(WRITELINE(*this, othunder_state, adc_eoc_w))
-	MCFG_ADC0808_IN0_CB(IOPORT("P1X"))
-	MCFG_ADC0808_IN1_CB(IOPORT("P1Y"))
-	MCFG_ADC0808_IN2_CB(IOPORT("P2X"))
-	MCFG_ADC0808_IN3_CB(IOPORT("P2Y"))
+	adc0808_device &adc(ADC0808(config, "adc", 16_MHz_XTAL/2/2/8));
+	adc.eoc_callback().set(FUNC(othunder_state::adc_eoc_w));
+	adc.in_callback<0>().set_ioport("P1X");
+	adc.in_callback<1>().set_ioport("P1Y");
+	adc.in_callback<2>().set_ioport("P2X");
+	adc.in_callback<3>().set_ioport("P2Y");
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");

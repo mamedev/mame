@@ -69,6 +69,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void revlatns(machine_config &config);
+	void base(machine_config &config);
 	void cops(machine_config &config);
 	void cops_map(address_map &map);
 	void revlatns_map(address_map &map);
@@ -918,70 +919,54 @@ void cops_state::init_cops()
 	membank("sysbank1")->set_entry(2);
 }
 
-MACHINE_CONFIG_START(cops_state::cops)
+void cops_state::base(machine_config &config)
+{
+	M6502(config, m_maincpu, MAIN_CLOCK/2);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(cops_map)
+	SONY_LDP1450(config, m_ld, 9600);
+	m_ld->set_screen("screen");
 
-	/* video hardware */
-	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_SELF_RENDER);
+	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
+	screen.set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, cops_state, via1_irq))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, cops_state, via1_b_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITE8(*this, cops_state, via1_cb1_w))
+	via6522_device &via1(VIA6522(config, "via6522_1", MAIN_CLOCK/2));
+	via1.irq_handler().set(FUNC(cops_state::via1_irq));
+	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
+	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
 
-	MCFG_DEVICE_ADD("via6522_2", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, cops_state, via2_irq))
-
-	MCFG_DEVICE_ADD("via6522_3", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, cops_state, cdrom_data_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, cops_state, cdrom_data_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, cops_state, cdrom_ctrl_w))
+	SPEAKER(config, "mono").front_center();
 
 	/* acia (really a 65C52)*/
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
 	/* TODO: Verify clock */
-	MCFG_DEVICE_ADD("snsnd", SN76489, MAIN_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489(config, m_sn, MAIN_CLOCK/2);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_END
+void cops_state::cops(machine_config &config)
+{
+	base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::cops_map);
 
+	via6522_device &via2(VIA6522(config, "via6522_2", MAIN_CLOCK/2));
+	via2.irq_handler().set(FUNC(cops_state::via2_irq));
 
-MACHINE_CONFIG_START(cops_state::revlatns)
+	via6522_device &via3(VIA6522(config, "via6522_3", MAIN_CLOCK/2));
+	via3.readpa_handler().set(FUNC(cops_state::cdrom_data_r));
+	via3.writepa_handler().set(FUNC(cops_state::cdrom_data_w));
+	via3.writepb_handler().set(FUNC(cops_state::cdrom_ctrl_w));
+}
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(revlatns_map)
+void cops_state::revlatns(machine_config &config)
+{
+	base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::revlatns_map);
 
-	/* video hardware */
-	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-
-	/* via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, cops_state, via1_irq))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, cops_state, via1_b_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITE8(*this, cops_state, via1_cb1_w))
-
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-
-	/* acia (really a 65C52)*/
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	/* TODO: Verify clock */
-	MCFG_DEVICE_ADD("snsnd", SN76489, MAIN_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	MSM6242(config, "rtc", XTAL(32'768));
+}
 
 /***************************************************************************
 

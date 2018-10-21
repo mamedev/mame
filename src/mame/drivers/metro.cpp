@@ -1142,12 +1142,6 @@ void metro_state::mouja_okimap(address_map &map)
                                 Puzzlet
 ***************************************************************************/
 
-#define MCFG_PUZZLET_IO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PUZZLET_IO, 0)
-
-#define MCFG_PUZZLET_IO_DATA_CALLBACK(_devcb) \
-	puzzlet_io_device::set_data_cb(*device, DEVCB_##_devcb);
-
 class puzzlet_io_device : public device_t {
 public:
 	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -1155,7 +1149,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
 
-	template <class Object> static devcb_base &set_data_cb(device_t &device, Object &&cb) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(std::forward<Object>(cb)); }
+	auto data_callback() { return data_cb.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -3446,9 +3440,9 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	MCFG_DEVICE_PROGRAM_MAP(dokyusp_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config_384x224(config);
@@ -3474,9 +3468,9 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	MCFG_DEVICE_PROGRAM_MAP(gakusai_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config_320x240(config);
@@ -3503,9 +3497,9 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config_320x240(config);
@@ -3671,7 +3665,7 @@ MACHINE_CONFIG_START(metro_state::mouja)
 	MCFG_DEVICE_PROGRAM_MAP(mouja_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config(config);
@@ -3805,8 +3799,8 @@ MACHINE_CONFIG_START(metro_state::puzzlet)
 	MCFG_DEVICE_IO_MAP(puzzlet_io_map)
 
 	/* Coins/service */
-	MCFG_PUZZLET_IO_ADD("coins")
-	MCFG_PUZZLET_IO_DATA_CALLBACK(WRITELINE("maincpu:sci1", h8_sci_device, rx_w))
+	puzzlet_io_device &coins(PUZZLET_IO(config, "coins", 0));
+	coins.data_callback().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
 	MCFG_DEVICE_MODIFY("maincpu:sci1")
 	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("coins", puzzlet_io_device, ce_w))
 	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("coins", puzzlet_io_device, clk_w))

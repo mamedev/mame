@@ -127,7 +127,7 @@ private:
 	void tubep_second_map(address_map &map);
 	void tubep_second_portmap(address_map &map);
 	void tubep_sound_map(address_map &map);
-	void tubep_sound_portmap(address_map &map);	
-	
+	void tubep_sound_portmap(address_map &map);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

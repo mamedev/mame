@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef DEVICES_MACHINE_TE7750_H
-#define DEVICES_MACHINE_TE7750_H
+#ifndef MAME_MACHINE_TE7750_H
+#define MAME_MACHINE_TE7750_H
 
 #pragma once
 
@@ -132,4 +132,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TE7750, te7750_device)
 
-#endif // DEVICES_MACHINE_TE7750_H
+#endif // MAME_MACHINE_TE7750_H

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/er2055.h"
 #include "machine/timer.h"
@@ -28,6 +29,7 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_bullsdrt_tiles_bankram(*this, "bullsdrt_bank"),
 		m_maincpu(*this, "maincpu"),
+		m_outlatch(*this, "outlatch"),
 		m_earom(*this, "earom"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -59,6 +61,7 @@ private:
 	optional_shared_ptr<uint8_t> m_bullsdrt_tiles_bankram;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_outlatch;
 	optional_device<er2055_device> m_earom;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;

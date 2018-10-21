@@ -85,12 +85,9 @@ void zorba_state::zorba_io(address_map &map)
 	map(0x04, 0x04).rw(FUNC(zorba_state::rom_r), FUNC(zorba_state::rom_w));
 	map(0x05, 0x05).rw(FUNC(zorba_state::ram_r), FUNC(zorba_state::ram_w));
 	map(0x10, 0x11).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
-	map(0x20, 0x20).rw(m_uart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw(m_uart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x22, 0x22).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x23, 0x23).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x24, 0x24).rw(m_uart2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x25, 0x25).rw(m_uart2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).rw(m_uart0, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x22, 0x23).rw(m_uart1, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x24, 0x25).rw(m_uart2, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x26, 0x26).w(FUNC(zorba_state::intmask_w));
 	map(0x30, 0x30).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 	map(0x40, 0x43).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
@@ -160,15 +157,15 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<2>))
 
 	/* devices */
-	MCFG_DEVICE_ADD(m_dma, Z80DMA, 24_MHz_XTAL / 6)
+	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
 	// busack on cpu connects to bai pin
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, zorba_state, busreq_w))  //connects to busreq on cpu
-	MCFG_Z80DMA_OUT_INT_CB(WRITELINE("irq0", input_merger_device, in_w<0>))
+	m_dma->out_busreq_callback().set(FUNC(zorba_state::busreq_w));  //connects to busreq on cpu
+	m_dma->out_int_callback().set("irq0", FUNC(input_merger_device::in_w<0>));
 	//ba0 - not connected
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, zorba_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, zorba_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, zorba_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, zorba_state, io_write_byte))
+	m_dma->in_mreq_callback().set(FUNC(zorba_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(zorba_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(zorba_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(zorba_state::io_write_byte));
 
 	I8251(config, m_uart0, 0); // U32 COM port J2
 	m_uart0->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd)); // TODO: this line has a LED attached
@@ -226,9 +223,9 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// Floppies
-	MCFG_DEVICE_ADD(m_fdc, FD1793, 24_MHz_XTAL / 24)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("irq2", input_merger_device, in_w<0>))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("irq2", input_merger_device, in_w<1>))
+	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
+	m_fdc->intrq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<0>));
+	m_fdc->drq_wr_callback().set("irq2", FUNC(input_merger_device::in_w<1>));
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)

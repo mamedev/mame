@@ -1579,6 +1579,7 @@ static INPUT_PORTS_START( f1en )
 
 	PORT_MODIFY("slavepcb:SERVICE12_A")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("slavepcb:SERVICE34_A")
@@ -2226,7 +2227,7 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	io_chip.out_cnt1_callback().set(FUNC(segas32_state::display_enable_0_w));
 	io_chip.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
@@ -2325,17 +2326,17 @@ MACHINE_CONFIG_START(segas32_trackball_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_trackball_map)
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX1")
-	MCFG_UPD4701_PORTY("TRACKY1")
+	upd4701_device &upd1(UPD4701A(config, "upd1"));
+	upd1.set_portx_tag("TRACKX1");
+	upd1.set_porty_tag("TRACKY1");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX2")
-	MCFG_UPD4701_PORTY("TRACKY2")
+	upd4701_device &upd2(UPD4701A(config, "upd2"));
+	upd2.set_portx_tag("TRACKX2");
+	upd2.set_porty_tag("TRACKY2");
 
-	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX3")
-	MCFG_UPD4701_PORTY("TRACKY3")
+	upd4701_device &upd3(UPD4701A(config, "upd3"));
+	upd3.set_portx_tag("TRACKX3");
+	upd3.set_porty_tag("TRACKY3");
 
 	// 837-8685 I/O board has an unpopulated space for a fourth UPD4701A
 MACHINE_CONFIG_END
@@ -2364,10 +2365,10 @@ MACHINE_CONFIG_START(segas32_4player_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_4player_map)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_4PLAYER_DEVICE, segas32_4player_state, "segas32_pcb_4player", "Sega System 32 4-player/fighting PCB")
@@ -2489,19 +2490,19 @@ MACHINE_CONFIG_START(segas32_cd_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_cd_map)
 
-	MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, segas32_cd_state, scsi_irq_w))
-	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, segas32_cd_state, scsi_drq_w))
+	mb89352_device &scsictrl(MB89352A(config, "mb89352", 8000000));
+	scsictrl.set_scsi_port("scsi");
+	scsictrl.irq_cb().set(FUNC(segas32_cd_state::scsi_irq_w));
+	scsictrl.drq_cb().set(FUNC(segas32_cd_state::scsi_drq_w));
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(*this, segas32_cd_state, lamps1_w))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segas32_cd_state, lamps2_w))
-	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff)) // Ports C-E used for IEEE-488 printer interface
+	cxd1095_device &cxdio(CXD1095(config, "cxdio", 0));
+	cxdio.out_porta_cb().set(FUNC(segas32_cd_state::lamps1_w));
+	cxdio.out_portb_cb().set(FUNC(segas32_cd_state::lamps2_w));
+	cxdio.in_portd_cb().set_constant(0xff); // Ports C-E used for IEEE-488 printer interface
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")
@@ -2549,7 +2550,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
 	io_chip_1.out_cnt1_callback().set(FUNC(segas32_state::display_enable_1_w));
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
@@ -2662,10 +2663,10 @@ MACHINE_CONFIG_START(sega_multi32_6player_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multi32_6player_map)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_6PLAYER_DEVICE, sega_multi32_6player_state, "segas32_pcb_multi_6player", "Sega Multi 32 6-player PCB")

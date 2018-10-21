@@ -125,12 +125,12 @@ DEFINE_DEVICE_TYPE(VME_MZR8300, vme_mzr8300_card_device, "mzr8300", "Mizar 8300 
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vme_mzr8300_card_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("sio0", UPD7201_NEW, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232p1", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232p1", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232p1", rs232_port_device, write_rts))
+	upd7201_new_device& sio0(UPD7201_NEW(config, "sio0", XTAL(4'000'000)));
+	sio0.out_txdb_callback().set("rs232p1", FUNC(rs232_port_device::write_txd));
+	sio0.out_dtrb_callback().set("rs232p1", FUNC(rs232_port_device::write_dtr));
+	sio0.out_rtsb_callback().set("rs232p1", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("sio1", UPD7201_NEW, XTAL(4'000'000))
+	UPD7201_NEW(config, "sio1", XTAL(4'000'000));
 
 	MCFG_DEVICE_ADD("rs232p1", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio0", upd7201_new_device, rxb_w))

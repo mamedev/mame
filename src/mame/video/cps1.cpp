@@ -1462,6 +1462,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"mswordj",     CPS_B_13,     mapper_MS24B },   // wrong, this set uses MS22B, dumped but equations still not added
 	{"mtwins",      CPS_B_14,     mapper_CK24B },
 	{"chikij",      CPS_B_14,     mapper_CK24B },   // wrong, this set uses CK22B, dumped but equations still not added
+	{"mtwinsb",      CPS_B_14,    mapper_CK24B },   // wrong, bootleg hardware
 	{"nemo",        CPS_B_15,     mapper_NM24B },
 	{"nemor1",      CPS_B_15,     mapper_NM24B },
 	{"nemoj",       CPS_B_15,     mapper_NM24B },   // wrong, this set uses NM22B, still not dumped

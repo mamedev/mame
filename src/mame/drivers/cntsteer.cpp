@@ -979,11 +979,9 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)      /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_DEVICE_ADD("subcpu", MC6809E, 2000000)       /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)        /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -1002,6 +1000,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // ?
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zerotrgt)
 	MCFG_PALETTE_ADD("palette", 256)

@@ -32,7 +32,9 @@ public:
 	O(brk_xav_imp);
 	O(rti_xav_imp);
 
-	typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
+	O(xa_lda_idy);
+
+	typedef device_delegate<int16_t (int which, int half)> xavix_interrupt_vector_delegate;
 
 	template <typename Object> void set_vector_callback(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
 
@@ -71,6 +73,16 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual offs_t pc_to_external(u16 pc) override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config m_special_data_config;
+	address_space *m_special_data_space; 
+
+	uint8_t read_special(uint16_t adr);
 
 protected:
 	xavix_interrupt_vector_delegate m_vector_callback;
@@ -81,6 +93,12 @@ protected:
 	uint8_t get_databank();
 
 };
+
+enum {
+	XAVIX_DATABANK = M6502_IR+1,
+	XAVIX_CODEBANK,
+};
+
 
 DECLARE_DEVICE_TYPE(XAVIX, xavix_device)
 

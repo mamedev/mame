@@ -497,11 +497,10 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_DEVICE_PROGRAM_MAP(sprint2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL, 768, 0, 512, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint2_state, screen_update_sprint2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint2_state, screen_vblank_sprint2))
@@ -516,13 +515,13 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // at H8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT2_ATTRACT_EN>)) // also DOMINOS_ATTRACT_EN
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT2_SKIDSND1_EN>)) // also DOMINOS_TUMBLE_EN
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT2_SKIDSND2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) // START LAMP1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) // START LAMP2
-	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, sprint2_state, sprint2_spare_w))
+	F9334(config, m_outlatch); // at H8
+	m_outlatch->q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<SPRINT2_ATTRACT_EN>)); // also DOMINOS_ATTRACT_EN
+	m_outlatch->q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<SPRINT2_SKIDSND1_EN>)); // also DOMINOS_TUMBLE_EN
+	m_outlatch->q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<SPRINT2_SKIDSND2_EN>));
+	m_outlatch->q_out_cb<3>().set_output("led0"); // START LAMP1
+	m_outlatch->q_out_cb<4>().set_output("led1"); // START LAMP2
+	//m_outlatch->q_out_cb<6>().set(FUNC(sprint2_state::sprint2_spare_w));
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint2_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -559,12 +558,12 @@ MACHINE_CONFIG_START(sprint2_state::dominos)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sprint2_state::dominos4)
+void sprint2_state::dominos4(machine_config &config)
+{
 	dominos(config);
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led2")) // START LAMP3
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led3")) // START LAMP4
-MACHINE_CONFIG_END
+	m_outlatch->q_out_cb<5>().set_output("led2"); // START LAMP3
+	m_outlatch->q_out_cb<6>().set_output("led3"); // START LAMP4
+}
 
 ROM_START( sprint1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

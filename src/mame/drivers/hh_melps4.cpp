@@ -13,7 +13,6 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -23,8 +22,8 @@
 class hh_melps4_state : public driver_device
 {
 public:
-	hh_melps4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hh_melps4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_out_x(*this, "%u.%u", 0U, 0U),
@@ -311,7 +310,6 @@ MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(500, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 500-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -428,7 +426,6 @@ MACHINE_CONFIG_START(gjungler_state::gjungler)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(481, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 481-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */

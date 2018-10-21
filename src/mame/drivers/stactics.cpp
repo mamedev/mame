@@ -315,30 +315,30 @@ MACHINE_CONFIG_START(stactics_state::stactics)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stactics_state,  interrupt)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 50
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, stactics_state, coin_lockout_1_w)) // COIN REJECT 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, stactics_state, coin_lockout_2_w)) // COIN REJECT 2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, stactics_state, palette_bank_w)) // FLM COL 0
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, stactics_state, palette_bank_w)) // FLM COL 1
+	LS259(config, m_outlatch); // 50
+	m_outlatch->q_out_cb<0>().set(FUNC(stactics_state::coin_lockout_1_w)); // COIN REJECT 1
+	m_outlatch->q_out_cb<1>().set(FUNC(stactics_state::coin_lockout_2_w)); // COIN REJECT 2
+	m_outlatch->q_out_cb<6>().set(FUNC(stactics_state::palette_bank_w)); // FLM COL 0
+	m_outlatch->q_out_cb<7>().set(FUNC(stactics_state::palette_bank_w)); // FLM COL 1
 
-	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // 58 - TODO: implement these switches
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // MUTE
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // INV. DISTANCE A
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // INV. DISTANCE B
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // UFO
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // INVADER
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // EMEGENCY (sic)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, stactics_state, motor_w)) // overlaps rocket sound
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // SOUND ON
+	ls259_device &audiolatch(LS259(config, "audiolatch")); // 58 - TODO: implement these switches
+	audiolatch.q_out_cb<0>().set_nop(); // MUTE
+	audiolatch.q_out_cb<1>().set_nop(); // INV. DISTANCE A
+	audiolatch.q_out_cb<2>().set_nop(); // INV. DISTANCE B
+	audiolatch.q_out_cb<3>().set_nop(); // UFO
+	audiolatch.q_out_cb<4>().set_nop(); // INVADER
+	audiolatch.q_out_cb<5>().set_nop(); // EMEGENCY (sic)
+	audiolatch.q_out_cb<6>().set(FUNC(stactics_state::motor_w)); // overlaps rocket sound
+	audiolatch.q_out_cb<7>().set_nop(); // SOUND ON
 
-	MCFG_DEVICE_ADD("lamplatch", LS259, 0) // 96
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<4>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, stactics_state, base_lamp_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, stactics_state, start_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, stactics_state, barrier_lamp_w))
+	ls259_device &lamplatch(LS259(config, "lamplatch")); // 96
+	lamplatch.q_out_cb<0>().set(FUNC(stactics_state::base_lamp_w<4>));
+	lamplatch.q_out_cb<1>().set(FUNC(stactics_state::base_lamp_w<3>));
+	lamplatch.q_out_cb<2>().set(FUNC(stactics_state::base_lamp_w<2>));
+	lamplatch.q_out_cb<3>().set(FUNC(stactics_state::base_lamp_w<1>));
+	lamplatch.q_out_cb<4>().set(FUNC(stactics_state::base_lamp_w<0>));
+	lamplatch.q_out_cb<5>().set(FUNC(stactics_state::start_lamp_w));
+	lamplatch.q_out_cb<6>().set(FUNC(stactics_state::barrier_lamp_w));
 
 	/* video hardware */
 	stactics_video(config);

@@ -148,12 +148,11 @@ WRITE_LINE_MEMBER(cinemat_state::spacewar_sound4_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::spacewar_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, spacewar_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, spacewar_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, spacewar_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, spacewar_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, spacewar_sound4_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::spacewar_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::spacewar_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::spacewar_sound2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::spacewar_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::spacewar_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -202,10 +201,9 @@ WRITE_LINE_MEMBER(cinemat_state::barrier_sound2_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::barrier_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, barrier_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, barrier_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, barrier_sound2_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::barrier_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::barrier_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::barrier_sound2_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -259,10 +257,9 @@ WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::speedfrk_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, speedfrk_start_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, speedfrk_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, speedfrk_sound4_w))
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::speedfrk_start_led_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::speedfrk_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::speedfrk_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -341,13 +338,12 @@ WRITE_LINE_MEMBER(cinemat_state::starhawk_sound7_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::starhawk_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, starhawk_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, starhawk_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, starhawk_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, starhawk_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, starhawk_sound4_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, starhawk_sound7_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::starhawk_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::starhawk_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::starhawk_sound2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::starhawk_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::starhawk_sound4_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::starhawk_sound7_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -420,13 +416,12 @@ WRITE_LINE_MEMBER(cinemat_16level_state::sundance_sound7_w)
 }
 
 MACHINE_CONFIG_START(cinemat_16level_state::sundance_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound4_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_16level_state, sundance_sound7_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_16level_state::sundance_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_16level_state::sundance_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_16level_state::sundance_sound2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_16level_state::sundance_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_16level_state::sundance_sound4_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_16level_state::sundance_sound7_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -503,8 +498,7 @@ WRITE_LINE_MEMBER(cinemat_state::tailg_sound_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::tailg_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, tailg_sound_w))
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::tailg_sound_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -573,12 +567,11 @@ WRITE_LINE_MEMBER(cinemat_state::warrior_sound4_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::warrior_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, warrior_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, warrior_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, warrior_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, warrior_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, warrior_sound4_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::warrior_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::warrior_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::warrior_sound2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::warrior_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::warrior_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -673,12 +666,11 @@ WRITE_LINE_MEMBER(cinemat_state::armora_sound3_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::armora_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, armora_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, armora_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, armora_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, armora_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, armora_sound4_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::armora_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::armora_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::armora_sound2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::armora_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::armora_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -770,12 +762,11 @@ WRITE_LINE_MEMBER(cinemat_state::ripoff_sound7_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::ripoff_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, ripoff_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, ripoff_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, ripoff_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, ripoff_sound4_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, ripoff_sound7_w))
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::ripoff_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::ripoff_sound2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::ripoff_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::ripoff_sound4_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::ripoff_sound7_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -887,12 +878,11 @@ WRITE_LINE_MEMBER(cinemat_state::starcas_sound3_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::starcas_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, starcas_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, starcas_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, starcas_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, starcas_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, starcas_sound4_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::starcas_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::starcas_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::starcas_sound2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::starcas_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::starcas_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1021,10 +1011,9 @@ WRITE_LINE_MEMBER(cinemat_64level_state::solarq_sound0_w)
 }
 
 MACHINE_CONFIG_START(cinemat_64level_state::solarq_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_64level_state, solarq_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_64level_state, solarq_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_64level_state, solarq_sound4_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_64level_state::solarq_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_64level_state::solarq_sound1_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_64level_state::solarq_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1159,12 +1148,11 @@ WRITE_LINE_MEMBER(cinemat_color_state::boxingb_sound3_w)
 }
 
 MACHINE_CONFIG_START(cinemat_color_state::boxingb_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_color_state, boxingb_sound4_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_color_state::boxingb_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_color_state::boxingb_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_color_state::boxingb_sound2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_color_state::boxingb_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_color_state::boxingb_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1276,12 +1264,11 @@ WRITE_LINE_MEMBER(cinemat_state::wotw_sound3_w)
 }
 
 MACHINE_CONFIG_START(cinemat_state::wotw_sound)
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cinemat_state, wotw_sound0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, wotw_sound1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, wotw_sound2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, wotw_sound3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, wotw_sound4_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(cinemat_state::wotw_sound0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::wotw_sound1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(cinemat_state::wotw_sound2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(cinemat_state::wotw_sound3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(cinemat_state::wotw_sound4_w));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1408,16 +1395,15 @@ static const z80_daisy_config daisy_chain[] =
 MACHINE_CONFIG_START(demon_state::demon_sound)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(demon_sound_map)
-	MCFG_DEVICE_IO_MAP(demon_sound_ports)
+	z80_device& audiocpu(Z80(config, "audiocpu", 3579545));
+	audiocpu.set_daisy_config(daisy_chain);
+	audiocpu.set_addrmap(AS_PROGRAM, &demon_state::demon_sound_map);
+	audiocpu.set_addrmap(AS_IO, &demon_state::demon_sound_ports);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 3579545 /* same as "audiocpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", 3579545 /* same as "audiocpu" */));
+	ctc.intr_callback().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, demon_state, demon_sound4_w))
+	m_outlatch->q_out_cb<4>().set(FUNC(demon_state::demon_sound4_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1432,8 +1418,6 @@ MACHINE_CONFIG_START(demon_state::demon_sound)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DEVICE_ADD("ay3", AY8910, 3579545)
-
-
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, demon_state, sound_output_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1463,9 +1447,8 @@ void qb3_state::sound_reset()
 }
 
 
-MACHINE_CONFIG_START(qb3_state::qb3_sound)
+void qb3_state::qb3_sound(machine_config &config)
+{
 	demon_sound(config);
-
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // not mapped through LS259
-MACHINE_CONFIG_END
+	m_outlatch->q_out_cb<4>().set_nop(); // not mapped through LS259
+}

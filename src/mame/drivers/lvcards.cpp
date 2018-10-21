@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(lvcards_state::lvpoker)
 	lvcards(config);
 
 	// basic machine hardware
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(lvpoker_map)
 	MCFG_MACHINE_START_OVERRIDE(lvcards_state,lvpoker)
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(lvcards_state::ponttehk)
 	lvcards(config);
 
 	// basic machine hardware
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ponttehk_map)
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)

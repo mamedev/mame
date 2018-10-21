@@ -312,11 +312,11 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			break;
 		case AM_cbr:
 			offset = (int8_t) opcodes.r8(pos++);
-			util::stream_format(stream, "%s,$%04X", sm8500_cond[ op & 0x0F ], pc + pos + offset);
+			util::stream_format(stream, "%s,$%04X", sm8500_cond[ op & 0x0F ], pos + offset);
 			break;
 		case AM_rbr:
 			offset = (int8_t) opcodes.r8(pos++);
-			util::stream_format(stream, "r%02Xh,$%04X", op & 0x07, pc + pos + offset);
+			util::stream_format(stream, "r%02Xh,$%04X", op & 0x07, pos + offset);
 			break;
 		case AM_cjp:
 			ea = opcodes.r8(pos++) << 8;
@@ -431,7 +431,7 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case AM_Rbr:
 			ea = opcodes.r8(pos++);
 			offset = (int8_t) opcodes.r8(pos++);
-			util::stream_format(stream, "R%02Xh,#%d,$%04X", ea, op & 0x07, pc + pos + offset);
+			util::stream_format(stream, "R%02Xh,#%d,$%04X", ea, op & 0x07, pos + offset);
 			break;
 		case AM_Rb:
 			ea = opcodes.r8(pos++);
@@ -490,7 +490,7 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			}
 			util::stream_format(stream, ",#%d,", ea & 0x07);
 			offset = (int8_t) opcodes.r8(pos++);
-			util::stream_format(stream, "$%04X", pc + pos + offset);
+			util::stream_format(stream, "$%04X", pos + offset);
 			break;
 		case AM_1A:
 			ea = opcodes.r8(pos++);

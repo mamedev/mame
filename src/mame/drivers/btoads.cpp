@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(btoads_state::btoads)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(btoads_state, irq0_line_assert,  183)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

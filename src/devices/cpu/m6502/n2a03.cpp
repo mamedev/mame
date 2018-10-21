@@ -16,22 +16,22 @@ DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "Ricoh N2A03")
 
 READ8_MEMBER(n2a03_device::psg1_4014_r)
 {
-	return m_apu->read(space, 0x14);
+	return m_apu->read(0x14);
 }
 
 READ8_MEMBER(n2a03_device::psg1_4015_r)
 {
-	return m_apu->read(space, 0x15);
+	return m_apu->read(0x15);
 }
 
 WRITE8_MEMBER(n2a03_device::psg1_4015_w)
 {
-	m_apu->write(space, 0x15, data);
+	m_apu->write(0x15, data);
 }
 
 WRITE8_MEMBER(n2a03_device::psg1_4017_w)
 {
-	m_apu->write(space, 0x17, data);
+	m_apu->write(0x17, data);
 }
 
 
@@ -61,19 +61,6 @@ n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, devic
 std::unique_ptr<util::disasm_interface> n2a03_device::create_disassembler()
 {
 	return std::make_unique<n2a03_disassembler>();
-}
-
-void n2a03_device::device_start()
-{
-	if(!m_apu->started())
-		throw device_missing_dependencies();
-
-	m6502_device::device_start();
-}
-
-void n2a03_device::device_clock_changed()
-{
-	m_apu->set_unscaled_clock(clock());
 }
 
 WRITE_LINE_MEMBER(n2a03_device::apu_irq)

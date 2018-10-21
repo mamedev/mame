@@ -297,7 +297,6 @@ MACHINE_CONFIG_START(kdribble_state::kdribble)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1524-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -370,7 +369,6 @@ MACHINE_CONFIG_START(ktopgun_state::ktopgun)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1515-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -444,7 +442,6 @@ MACHINE_CONFIG_START(kcontra_state::kcontra)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1505-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -517,7 +514,6 @@ MACHINE_CONFIG_START(ktmnt_state::ktmnt)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1505-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -587,7 +583,6 @@ MACHINE_CONFIG_START(kgradius_state::kgradius)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1420-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -655,7 +650,6 @@ MACHINE_CONFIG_START(kloneran_state::kloneran)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1497-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -726,7 +720,6 @@ MACHINE_CONFIG_START(kblades_state::kblades)
 	MCFG_SCREEN_SIZE(1516, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1516-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -799,7 +792,6 @@ MACHINE_CONFIG_START(knfl_state::knfl)
 	MCFG_SCREEN_SIZE(1449, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1449-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -871,7 +863,6 @@ MACHINE_CONFIG_START(kbilly_state::kbilly)
 	MCFG_SCREEN_SIZE(1490, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1490-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -937,7 +928,6 @@ MACHINE_CONFIG_START(kbucky_state::kbucky)
 	MCFG_SCREEN_SIZE(1490, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1490-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1007,7 +997,6 @@ MACHINE_CONFIG_START(kgarfld_state::kgarfld)
 	MCFG_SCREEN_SIZE(1500, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1500-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1102,7 +1091,6 @@ MACHINE_CONFIG_START(gnw_mmouse_state::gnw_mmouse)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1711-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1143,6 +1131,90 @@ MACHINE_CONFIG_START(gnw_mmouse_state::exospace)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(1756, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1756-1, 0, 1080-1)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Donkey Kong (model DK-52)
+  * PCB label DK-52C
+  * Sharp SM510 label DK-52 52ZD (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_dkong_state : public hh_sm510_state
+{
+public:
+	gnw_dkong_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
+
+	void gnw_dkong(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_dkong )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Jump
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(gnw_dkong_state::gnw_dkong)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", SM510)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920/2, 1266/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1266/2-1)
+
+	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920/2, 1266/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1266/2-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1474,7 +1546,6 @@ MACHINE_CONFIG_START(gnw_dkjr_state::gnw_dkjr)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1647-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1556,7 +1627,6 @@ MACHINE_CONFIG_START(gnw_mariocm_state::gnw_mariocm)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1647-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1639,7 +1709,6 @@ MACHINE_CONFIG_START(gnw_smb_state::gnw_smb)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1677-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1742,7 +1811,6 @@ MACHINE_CONFIG_START(gnw_boxing_state::gnw_boxing)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 524-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1853,7 +1921,6 @@ MACHINE_CONFIG_START(tgaunt_state::tgaunt)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1425-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1956,7 +2023,6 @@ MACHINE_CONFIG_START(tddragon_state::tddragon)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1467-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2051,7 +2117,6 @@ MACHINE_CONFIG_START(tkarnov_state::tkarnov)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1477-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2145,7 +2210,6 @@ MACHINE_CONFIG_START(tvindictr_state::tvindictr)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1459-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2262,7 +2326,6 @@ MACHINE_CONFIG_START(tgaiden_state::tgaiden)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2352,7 +2415,6 @@ MACHINE_CONFIG_START(tbatman_state::tbatman)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1442-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2446,7 +2508,6 @@ MACHINE_CONFIG_START(tsharr2_state::tsharr2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1493-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2537,7 +2598,6 @@ MACHINE_CONFIG_START(tstrider_state::tstrider)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1479-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2632,7 +2692,6 @@ MACHINE_CONFIG_START(tgoldnaxe_state::tgoldnaxe)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1456-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2744,7 +2803,6 @@ MACHINE_CONFIG_START(trobocop2_state::trobocop2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1487-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2852,7 +2910,6 @@ MACHINE_CONFIG_START(taltbeast_state::taltbeast)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1455-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2947,7 +3004,6 @@ MACHINE_CONFIG_START(tsf2010_state::tsf2010)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1465-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3038,7 +3094,6 @@ MACHINE_CONFIG_START(tswampt_state::tswampt)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1450-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3133,7 +3188,6 @@ MACHINE_CONFIG_START(tspidman_state::tspidman)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1440-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3228,7 +3282,6 @@ MACHINE_CONFIG_START(txmen_state::txmen)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1467-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3323,7 +3376,6 @@ MACHINE_CONFIG_START(tddragon3_state::tddragon3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1514-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3418,7 +3470,6 @@ MACHINE_CONFIG_START(tflash_state::tflash)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1444-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3513,7 +3564,6 @@ MACHINE_CONFIG_START(tmchammer_state::tmchammer)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1471-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3608,7 +3658,6 @@ MACHINE_CONFIG_START(tbtoads_state::tbtoads)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1454-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3703,7 +3752,6 @@ MACHINE_CONFIG_START(thook_state::thook)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1489-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3797,7 +3845,6 @@ MACHINE_CONFIG_START(tbttf_state::tbttf)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1466-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3894,7 +3941,6 @@ MACHINE_CONFIG_START(taddams_state::taddams)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1464-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3989,7 +4035,6 @@ MACHINE_CONFIG_START(thalone_state::thalone)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1448-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4080,7 +4125,6 @@ MACHINE_CONFIG_START(txmenpx_state::txmenpx)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1464-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4175,7 +4219,6 @@ MACHINE_CONFIG_START(thalone2_state::thalone2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1454-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4263,7 +4306,6 @@ MACHINE_CONFIG_START(tsonic_state::tsonic)
 	MCFG_SCREEN_SIZE(1517, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1517-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4359,7 +4401,6 @@ MACHINE_CONFIG_START(trobocop3_state::trobocop3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1464-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4450,7 +4491,6 @@ MACHINE_CONFIG_START(tdummies_state::tdummies)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1441-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4545,7 +4585,6 @@ MACHINE_CONFIG_START(tsfight2_state::tsfight2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1444-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4640,7 +4679,6 @@ MACHINE_CONFIG_START(twworld_state::twworld)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1429-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4731,7 +4769,6 @@ MACHINE_CONFIG_START(tjpark_state::tjpark)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1454-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4819,7 +4856,6 @@ MACHINE_CONFIG_START(tsonic2_state::tsonic2)
 	MCFG_SCREEN_SIZE(1475, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1475-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4920,7 +4956,6 @@ MACHINE_CONFIG_START(tsddragon_state::tsddragon)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1503-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5016,7 +5051,6 @@ MACHINE_CONFIG_START(tdennis_state::tdennis)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1467-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5115,7 +5149,6 @@ MACHINE_CONFIG_START(tnmarebc_state::tnmarebc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1456-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5210,7 +5243,6 @@ MACHINE_CONFIG_START(ttransf2_state::ttransf2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1476-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5301,7 +5333,6 @@ MACHINE_CONFIG_START(topaliens_state::topaliens)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1450-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5397,7 +5428,6 @@ MACHINE_CONFIG_START(tmkombat_state::tmkombat)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1468-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5492,7 +5522,6 @@ MACHINE_CONFIG_START(tshadow_state::tshadow)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1484-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5587,7 +5616,6 @@ MACHINE_CONFIG_START(tskelwarr_state::tskelwarr)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1444-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5683,7 +5711,6 @@ MACHINE_CONFIG_START(tbatfor_state::tbatfor)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1493-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5779,7 +5806,6 @@ MACHINE_CONFIG_START(tjdredd_state::tjdredd)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1444-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5875,7 +5901,6 @@ MACHINE_CONFIG_START(tapollo13_state::tapollo13)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1467-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5971,7 +5996,6 @@ MACHINE_CONFIG_START(tgoldeye_state::tgoldeye)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1461-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6062,7 +6086,6 @@ MACHINE_CONFIG_START(tinday_state::tinday)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1463-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6153,7 +6176,6 @@ MACHINE_CONFIG_START(tsjam_state::tsjam)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1421-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6242,7 +6264,6 @@ MACHINE_CONFIG_START(tbatmana_state::tbatmana)
 	MCFG_SCREEN_SIZE(1478, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1478-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6346,7 +6367,6 @@ MACHINE_CONFIG_START(tigarden_state::tigarden)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1515-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6446,7 +6466,6 @@ MACHINE_CONFIG_START(nummunch_state::nummunch)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 875-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_svg);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -6622,6 +6641,16 @@ ROM_START( exospace )
 	ROM_LOAD( "exospace.svg", 0, 66790, BAD_DUMP CRC(df31043a) SHA1(2d8caf42894df699e469652e5f448beaebbcc1ae) )
 ROM_END
 
+ROM_START( gnw_dkong )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
+
+	ROM_REGION( 176706, "svg_top", 0)
+	ROM_LOAD( "gnw_dkong_top.svg", 0, 176706, CRC(db041556) SHA1(fb0f979dea3ecd25288d341fa80e35b5fd0a8349) )
+
+	ROM_REGION( 145397, "svg_bottom", 0)
+	ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145397, CRC(2c8c9d08) SHA1(658fd0bbccaabb0645b02e5cb81709c4b2a4250e) )
+ROM_END
 
 ROM_START( gnw_mickdon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -7194,6 +7223,7 @@ CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_sta
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
 
 // multi screen
+CONS( 1982, gnw_dkong,   0,          0, gnw_dkong,   gnw_dkong,   gnw_dkong_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_state, empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_dkong2,  0,          0, gnw_dkong2,  gnw_dkong2,  gnw_dkong2_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_state,   empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )

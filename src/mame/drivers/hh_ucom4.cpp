@@ -73,7 +73,6 @@ TODO:
 #include "includes/hh_ucom4.h"
 
 #include "video/hlcd0515.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -348,7 +347,6 @@ MACHINE_CONFIG_START(ufombs_state::ufombs)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(243, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 243-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -495,7 +493,6 @@ MACHINE_CONFIG_START(ssfball_state::ssfball)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 482)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 482-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -623,7 +620,6 @@ MACHINE_CONFIG_START(bmsoccer_state::bmsoccer)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(271, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 271-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -730,7 +726,6 @@ MACHINE_CONFIG_START(bmsafari_state::bmsafari)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(248, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 248-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -881,7 +876,6 @@ MACHINE_CONFIG_START(splasfgt_state::splasfgt)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 476)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 476-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -985,7 +979,6 @@ MACHINE_CONFIG_START(bcclimbr_state::bcclimbr)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(310, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 310-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -1202,7 +1195,6 @@ MACHINE_CONFIG_START(invspace_state::invspace)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(289, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 289-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -1418,7 +1410,6 @@ MACHINE_CONFIG_START(galaxy2_state::galaxy2)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(304, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -1537,7 +1528,6 @@ MACHINE_CONFIG_START(astrocmd_state::astrocmd)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 525)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 525-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -1633,7 +1623,6 @@ MACHINE_CONFIG_START(edracula_state::edracula)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 526)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 526-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -2026,7 +2015,6 @@ MACHINE_CONFIG_START(tccombat_state::tccombat)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(300, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 300-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -2184,7 +2172,6 @@ MACHINE_CONFIG_START(tmtennis_state::tmtennis)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 417)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 417-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -2293,7 +2280,6 @@ MACHINE_CONFIG_START(tmpacman_state::tmpacman)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 508)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 508-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -2396,7 +2382,6 @@ MACHINE_CONFIG_START(tmscramb_state::tmscramb)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 556)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 556-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -2495,7 +2480,6 @@ MACHINE_CONFIG_START(tcaveman_state::tcaveman)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1920, 559)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 559-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
@@ -2628,7 +2612,6 @@ MACHINE_CONFIG_START(alnchase_state::alnchase)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(365, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 365-1, 0, 1080-1)
-	config.set_default_layout(layout_svg);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */

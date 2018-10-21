@@ -496,11 +496,11 @@ MACHINE_CONFIG_START(splash_state::splash)
 	MCFG_DEVICE_PROGRAM_MAP(splash_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(splash_state, nmi_line_pulse, 60*64)   /* needed for the msm5205 to play the samples */
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // A8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, splash_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, splash_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, splash_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, splash_state, coin2_counter_w))
+	LS259(config, m_outlatch); // A8
+	m_outlatch->q_out_cb<0>().set(FUNC(splash_state::coin1_lockout_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(splash_state::coin2_lockout_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(splash_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(splash_state::coin2_counter_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -652,7 +652,7 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	MCFG_DEVICE_PROGRAM_MAP(funystrp_sound_map)
 	MCFG_DEVICE_IO_MAP(funystrp_sound_io_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

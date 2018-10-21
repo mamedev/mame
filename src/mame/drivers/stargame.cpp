@@ -40,7 +40,7 @@ private:
 	void maincpu_io(address_map &map);
 	void maincpu_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
 };
@@ -105,10 +105,10 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(stargame_state::stargame)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 15000000 / 4) // clock line marked as CK4 and derived from 15MHz crystal
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_DEVICE_IO_MAP(maincpu_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 15000000 / 4); // clock line marked as CK4 and derived from 15MHz crystal
+	m_maincpu->set_addrmap(AS_PROGRAM, &stargame_state::maincpu_map);
+	m_maincpu->set_addrmap(AS_IO, &stargame_state::maincpu_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 15000000 / 3) // ? check divider - clock line marked as CK6 and derived from 15MHz crystal
 	MCFG_DEVICE_PROGRAM_MAP(audiocpu_map)
@@ -119,9 +119,9 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 15000000 / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))    // SINT - turn on interrupt of the audiocpu
+	Z80CTC(config, m_ctc, 15000000 / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);    // SINT - turn on interrupt of the audiocpu
 
 	/* sound hardware */
 	genpin_audio(config);
@@ -144,7 +144,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 MACHINE_CONFIG_END
 
 ROM_START(spcship)

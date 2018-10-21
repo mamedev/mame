@@ -9,7 +9,6 @@
 #include "cpu/upd7810/upd7810.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -58,8 +57,6 @@ MACHINE_CONFIG_START(gamepock_state::gamepock)
 	screen.set_visarea(0, 74, 0, 63);
 	screen.set_screen_update(FUNC(gamepock_state::screen_update_gamepock));
 	screen.set_palette("palette");
-
-	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

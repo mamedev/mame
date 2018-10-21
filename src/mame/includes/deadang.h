@@ -57,7 +57,7 @@ protected:
 	tilemap_t *m_pf2_layer;
 	tilemap_t *m_pf1_layer;
 	tilemap_t *m_text_layer;
-	
+
 	DECLARE_WRITE16_MEMBER(text_w);
 	DECLARE_WRITE16_MEMBER(bank_w);
 

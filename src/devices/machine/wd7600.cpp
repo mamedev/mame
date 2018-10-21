@@ -21,7 +21,8 @@
 
 DEFINE_DEVICE_TYPE(WD7600, wd7600_device, "wd7600", "Western Digital WD7600 chipset")
 
-MACHINE_CONFIG_START(wd7600_device::device_add_mconfig)
+void wd7600_device::device_add_mconfig(machine_config & config)
+{
 	AM9517A(config, m_dma1, 0);
 	m_dma1->out_hreq_callback().set(m_dma2, FUNC(am9517a_device::dreq0_w));
 	m_dma1->out_eop_callback().set(FUNC(wd7600_device::dma1_eop_w));
@@ -73,9 +74,9 @@ MACHINE_CONFIG_START(wd7600_device::device_add_mconfig)
 	m_ctc->out_handler<2>().set(FUNC(wd7600_device::ctc_out2_w));
 
 	DS12885(config, m_rtc);
-	m_rtc->irq_callback().set(m_pic2, FUNC(pic8259_device::ir0_w));
+	m_rtc->irq().set(m_pic2, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
-MACHINE_CONFIG_END
+}
 
 
 wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -97,7 +98,9 @@ wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, dev
 	m_rtc(*this, "rtc"),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_keybc(*this, finder_base::DUMMY_TAG),
+	m_ram(*this, finder_base::DUMMY_TAG),
 	m_bios(*this, finder_base::DUMMY_TAG),
+	m_isa(*this, finder_base::DUMMY_TAG),
 	m_portb(0x0f),
 	m_iochck(1),
 	m_nmi_mask(1),
@@ -114,10 +117,8 @@ wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, dev
 
 void wd7600_device::device_start()
 {
-	ram_device *ram_dev = machine().device<ram_device>(RAM_TAG);
-
 	// make sure the ram device is already running
-	if (!ram_dev->started())
+	if (!m_ram->started())
 		throw device_missing_dependencies();
 
 	// resolve callbacks
@@ -134,18 +135,13 @@ void wd7600_device::device_start()
 	m_space = &m_cpu->space(AS_PROGRAM);
 	m_space_io = &m_cpu->space(AS_IO);
 
-	m_isa = machine().root_device().memregion(m_isatag)->base();
-
-	m_ram = ram_dev->pointer();
-	uint32_t ram_size = ram_dev->size();
-
 	// install base memory
-	m_space->install_ram(0x000000, 0x09ffff, m_ram);
-	m_space->install_ram(0x0d0000, 0x0effff, m_ram + 0xd0000);
+	m_space->install_ram(0x000000, 0x09ffff, m_ram->pointer());
+	m_space->install_ram(0x0d0000, 0x0effff, m_ram->pointer() + 0xd0000);
 
 	// install extended memory
-	if (ram_size > 0x100000)
-		m_space->install_ram(0x100000, ram_size - 1, m_ram + 0x100000);
+	if (m_ram->size() > 0x100000)
+		m_space->install_ram(0x100000, m_ram->size() - 1, m_ram->pointer() + 0x100000);
 
 	// install video BIOS (we should use the VGA BIOS at the beginning of the system BIOS ROM, but that gives a
 	// blank display (but still runs))
@@ -164,15 +160,15 @@ void wd7600_device::device_start()
 	{
 		// FIXME: are all these address ranges correct?
 		m_space_io->install_readwrite_handler(0x0000, 0x000f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffff);
-		m_space_io->install_readwrite_handler(0x0020, 0x003f, read8_delegate(FUNC(pic8259_device::read), &(*m_pic1)), write8_delegate(FUNC(pic8259_device::write), &(*m_pic1)), 0xffff);
-		m_space_io->install_readwrite_handler(0x0040, 0x0043, read8_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffff);
+		m_space_io->install_readwrite_handler(0x0020, 0x003f, read8sm_delegate(FUNC(pic8259_device::read), &(*m_pic1)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_pic1)), 0xffff);
+		m_space_io->install_readwrite_handler(0x0040, 0x0043, read8sm_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8sm_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffff);
 		m_space_io->install_readwrite_handler(0x0060, 0x0061, read8_delegate(FUNC(wd7600_device::keyb_data_r), this), write8_delegate(FUNC(wd7600_device::keyb_data_w), this), 0x00ff);
 		m_space_io->install_readwrite_handler(0x0060, 0x0061, read8_delegate(FUNC(wd7600_device::portb_r), this), write8_delegate(FUNC(wd7600_device::portb_w), this), 0xff00);
 		m_space_io->install_readwrite_handler(0x0064, 0x0065, read8_delegate(FUNC(wd7600_device::keyb_status_r), this), write8_delegate(FUNC(wd7600_device::keyb_cmd_w), this), 0x00ff);
 		m_space_io->install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(mc146818_device::read), &(*m_rtc)), write8_delegate(FUNC(wd7600_device::rtc_w), this), 0xffff);
 		m_space_io->install_readwrite_handler(0x0080, 0x008f, read8_delegate(FUNC(wd7600_device::dma_page_r), this), write8_delegate(FUNC(wd7600_device::dma_page_w), this), 0xffff);
 		m_space_io->install_readwrite_handler(0x0092, 0x0093, read8_delegate(FUNC(wd7600_device::a20_reset_r), this), write8_delegate(FUNC(wd7600_device::a20_reset_w), this), 0x00ff);
-		m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8_delegate(FUNC(pic8259_device::read), &(*m_pic2)), write8_delegate(FUNC(pic8259_device::write), &(*m_pic2)), 0xffff);
+		m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8sm_delegate(FUNC(pic8259_device::read), &(*m_pic2)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_pic2)), 0xffff);
 		m_space_io->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(am9517a_device::read), &(*m_dma2)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma2)), 0x00ff);
 		m_space_io->install_readwrite_handler(0x2072, 0x2073, read16_delegate(FUNC(wd7600_device::refresh_r), this), write16_delegate(FUNC(wd7600_device::refresh_w), this));
 		m_space_io->install_readwrite_handler(0x2872, 0x2873, read16_delegate(FUNC(wd7600_device::chipsel_r), this), write16_delegate(FUNC(wd7600_device::chipsel_w), this));
@@ -186,15 +182,15 @@ void wd7600_device::device_start()
 	{
 		assert(m_space_io->data_width() == 32);
 		m_space_io->install_readwrite_handler(0x0000, 0x000f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffffffff);
-		m_space_io->install_readwrite_handler(0x0020, 0x003f, read8_delegate(FUNC(pic8259_device::read), &(*m_pic1)), write8_delegate(FUNC(pic8259_device::write), &(*m_pic1)), 0x0000ffff);
-		m_space_io->install_readwrite_handler(0x0040, 0x0043, read8_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffffffff);
+		m_space_io->install_readwrite_handler(0x0020, 0x003f, read8sm_delegate(FUNC(pic8259_device::read), &(*m_pic1)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_pic1)), 0x0000ffff);
+		m_space_io->install_readwrite_handler(0x0040, 0x0043, read8sm_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8sm_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffffffff);
 		m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(wd7600_device::keyb_data_r), this), write8_delegate(FUNC(wd7600_device::keyb_data_w), this), 0x000000ff);
 		m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(wd7600_device::portb_r), this), write8_delegate(FUNC(wd7600_device::portb_w), this), 0x0000ff00);
 		m_space_io->install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(wd7600_device::keyb_status_r), this), write8_delegate(FUNC(wd7600_device::keyb_cmd_w), this), 0x000000ff);
 		m_space_io->install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(mc146818_device::read), &(*m_rtc)), write8_delegate(FUNC(wd7600_device::rtc_w), this), 0x0000ffff);
 		m_space_io->install_readwrite_handler(0x0080, 0x008f, read8_delegate(FUNC(wd7600_device::dma_page_r), this), write8_delegate(FUNC(wd7600_device::dma_page_w), this), 0xffffffff);
 		m_space_io->install_readwrite_handler(0x0090, 0x0093, read8_delegate(FUNC(wd7600_device::a20_reset_r), this), write8_delegate(FUNC(wd7600_device::a20_reset_w), this), 0x00ff0000);
-		m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8_delegate(FUNC(pic8259_device::read), &(*m_pic2)), write8_delegate(FUNC(pic8259_device::write), &(*m_pic2)), 0x0000ffff);
+		m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8sm_delegate(FUNC(pic8259_device::read), &(*m_pic2)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_pic2)), 0x0000ffff);
 		m_space_io->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(am9517a_device::read), &(*m_dma2)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma2)), 0x00ff00ff);
 		m_space_io->install_readwrite_handler(0x2070, 0x2073, read16_delegate(FUNC(wd7600_device::refresh_r), this), write16_delegate(FUNC(wd7600_device::refresh_w), this), 0xffff0000);
 		m_space_io->install_readwrite_handler(0x2870, 0x2873, read16_delegate(FUNC(wd7600_device::chipsel_r), this), write16_delegate(FUNC(wd7600_device::chipsel_w), this), 0xffff0000);

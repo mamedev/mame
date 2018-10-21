@@ -1056,7 +1056,7 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
 	MCFG_QUANTUM_TIME(attotime::from_hz(38400))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("dsw_sel", LS157, 0) // LS257 'A3'
 
@@ -1065,15 +1065,12 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos1_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos1_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_c116)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos1)
-
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_c116, gfx_namcos1)
 
 	NAMCO_C116(config, m_c116, 0);
-	m_c116->set_palette(m_palette);
+	m_c116->enable_shadows();
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1148,7 +1145,7 @@ ROM_START( shadowld )
 	ROM_LOAD( "yd_voi-1.bin",       0x20000, 0x20000, CRC(7809035c) SHA1(d1d12db8f1d2c25545ccb92c0a2f2af2d0267161) ) // yd1.v1 + yd1.v4
 	ROM_LOAD( "yd_voi-2.bin",       0x40000, 0x20000, CRC(73bffc16) SHA1(a927e503bf8650e6b638d5c357cb48586cfa025b) ) // yd1.v2 + yd1.v5
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "yd_chr-8.bin",       0x00000, 0x20000, CRC(0c8e69d0) SHA1(cedf12db2d9b14396cc8a15ccb025b96c92e190d) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1194,7 +1191,7 @@ ROM_START( youkaidk2 )
 	ROM_LOAD( "yd_voi-1.bin",       0x20000, 0x20000, CRC(7809035c) SHA1(d1d12db8f1d2c25545ccb92c0a2f2af2d0267161) ) // yd1.v1 + yd1.v4
 	ROM_LOAD( "yd_voi-2.bin",       0x40000, 0x20000, CRC(73bffc16) SHA1(a927e503bf8650e6b638d5c357cb48586cfa025b) ) // yd1.v2 + yd1.v5
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "yd_chr-8.bin",       0x00000, 0x20000, CRC(0c8e69d0) SHA1(cedf12db2d9b14396cc8a15ccb025b96c92e190d) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1239,7 +1236,7 @@ ROM_START( youkaidk1 )
 	ROM_LOAD( "yd_voi-1.bin",       0x20000, 0x20000, CRC(7809035c) SHA1(d1d12db8f1d2c25545ccb92c0a2f2af2d0267161) ) // yd1.v1 + yd1.v4
 	ROM_LOAD( "yd_voi-2.bin",       0x40000, 0x20000, CRC(73bffc16) SHA1(a927e503bf8650e6b638d5c357cb48586cfa025b) ) // yd1.v2 + yd1.v5
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "yd_chr-8.bin",       0x00000, 0x20000, CRC(0c8e69d0) SHA1(cedf12db2d9b14396cc8a15ccb025b96c92e190d) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1286,7 +1283,7 @@ ROM_START( dspirit )
 	ROM_LOAD( "ds_voi-3.bin",       0x60000, 0x20000, CRC(13e84c7e) SHA1(6ad0eb50eb3312f614a891ae8d66faca6b48d204) )
 	ROM_LOAD( "ds_voi-4.bin",       0x80000, 0x20000, CRC(34fbb8cd) SHA1(3f56f136e9d54d45924802f7149bfbc319e0933a) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "ds_chr-8.bin",       0x00000, 0x20000, CRC(946eb242) SHA1(6964fff430fe306c575ff07e4c054c70aa7d96ca) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1333,7 +1330,7 @@ ROM_START( dspirit2 )
 	ROM_LOAD( "ds_voi-3.bin",       0x60000, 0x20000, CRC(13e84c7e) SHA1(6ad0eb50eb3312f614a891ae8d66faca6b48d204) )
 	ROM_LOAD( "ds_voi-4.bin",       0x80000, 0x20000, CRC(34fbb8cd) SHA1(3f56f136e9d54d45924802f7149bfbc319e0933a) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "ds_chr-8.bin",       0x00000, 0x20000, CRC(946eb242) SHA1(6964fff430fe306c575ff07e4c054c70aa7d96ca) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1380,7 +1377,7 @@ ROM_START( dspirit1 )
 	ROM_LOAD( "ds_voi-3.bin",       0x60000, 0x20000, CRC(13e84c7e) SHA1(6ad0eb50eb3312f614a891ae8d66faca6b48d204) )
 	ROM_LOAD( "ds_voi-4.bin",       0x80000, 0x20000, CRC(34fbb8cd) SHA1(3f56f136e9d54d45924802f7149bfbc319e0933a) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "ds_chr-8.bin",       0x00000, 0x20000, CRC(946eb242) SHA1(6964fff430fe306c575ff07e4c054c70aa7d96ca) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1426,7 +1423,7 @@ ROM_START( blazer )
 	ROM_LOAD( "bz_voi-3.bin",       0x60000, 0x20000, CRC(26cfc510) SHA1(749680eaf3072db5331cc76a21cd022c50f95647) )
 	ROM_LOAD( "bz_voi-4.bin",       0x80000, 0x20000, CRC(d206b1bd) SHA1(32702fa67339ab337a2a70946e3861420a07b11b) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "bz_chr-8.bin",       0x00000, 0x20000, CRC(db28bfca) SHA1(510dd204da389db7eb5d9ce34dc0daf60bad1219) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1468,7 +1465,7 @@ ROM_START( quester )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD_HS( "qs1_v0.bin",      0x00000, 0x10000, CRC(6a2f3038) SHA1(00870da9b7f65536ff052c32da2d553f8c6b994b) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "qs1_c8.bin",         0x00000, 0x10000, CRC(06730d54) SHA1(53d79c27e2f1b192b1de781b6b5024eb1e8126ad) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1501,7 +1498,7 @@ ROM_START( questers )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD_HS( "qs1_v0.bin",      0x00000, 0x10000, CRC(6a2f3038) SHA1(00870da9b7f65536ff052c32da2d553f8c6b994b) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "qs1_c8.bin",         0x00000, 0x10000, CRC(06730d54) SHA1(53d79c27e2f1b192b1de781b6b5024eb1e8126ad) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1535,7 +1532,7 @@ ROM_START( pacmania )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD_HS( "pn2_v0.bin",      0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "pn2_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1571,7 +1568,7 @@ ROM_START( pacmaniao )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD_HS( "pac-mania_111187.voice0",      0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // identical to world version
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // same as the Japanese version
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1607,7 +1604,7 @@ ROM_START( pacmaniaj )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD_HS( "pn1_v0.bin",      0x00000, 0x10000, CRC(e2689f79) SHA1(b88e3435f2932901cc0a3b379b31a764bb9b2e2b) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1648,7 +1645,7 @@ ROM_START( galaga88 )
 	ROM_LOAD_HS( "g81_v4.bin",      0x80000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) )
 	ROM_LOAD_HS( "g81_v5.bin",      0xa0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "g8_chr-8.bin",       0x00000, 0x20000, CRC(3862ed0a) SHA1(4cae42bbfa434c7dce63fdceaa569fcb28768420) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1693,7 +1690,7 @@ ROM_START( galaga88j )
 	ROM_LOAD_HS( "g81_v4.bin",      0x80000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) )
 	ROM_LOAD_HS( "g81_v5.bin",      0xa0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "g8_chr-8.bin",       0x00000, 0x20000, CRC(3862ed0a) SHA1(4cae42bbfa434c7dce63fdceaa569fcb28768420) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1738,7 +1735,7 @@ ROM_START( galaga88a )
 	ROM_LOAD_HS( "g81_v4.bin",      0x80000, 0x10000, CRC(ac0279a7) SHA1(8d25292eec9953516fc5d25a94e30acc8159b360) ) // 12-11-87
 	ROM_LOAD_HS( "g81_v5.bin",      0xa0000, 0x10000, CRC(014ddba1) SHA1(26590b77a0c386dc076a8f8eccf6244c7e5a1e10) ) // 12-11-87
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "g8_chr-8.bin",       0x00000, 0x20000, CRC(3862ed0a) SHA1(4cae42bbfa434c7dce63fdceaa569fcb28768420) ) // 12-11-87
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1746,7 +1743,7 @@ ROM_START( galaga88a )
 	ROM_LOAD( "g8_chr-1.bin",       0x20000, 0x20000, CRC(3dc0f93f) SHA1(0db9f37cf6e06013b402df23e615b0ab0d32b9ee) ) // 12-11-87
 	ROM_LOAD( "g8_chr-2.bin",       0x40000, 0x20000, CRC(dbf26f1f) SHA1(e52723647a8fe6db0b9c5e11c02486b20a549506) ) // 12-11-87
 	ROM_LOAD( "g8_chr-3.bin",       0x60000, 0x20000, CRC(f5d6cac5) SHA1(3d098b8219de4a7729ec95547eebff17c9b505b9) ) // 12-11-87
-	ROM_LOAD( "g8chr-7.m8",       0xe0000, 0x20000, CRC(5f655016) SHA1(f6f1fa26dad363f1b50995fd1c52db0671365d83) ) // 10-27-87 (present, but not used by this version? possibly leftover from earlier development)
+	ROM_LOAD( "g8chr-7.m8",         0xe0000, 0x20000, CRC(5f655016) SHA1(f6f1fa26dad363f1b50995fd1c52db0671365d83) ) // 10-27-87 (present, but not used by this version? possibly leftover from earlier development)
 
 	ROM_REGION( 0x100000, "gfx3", 0 ) /* sprites */
 	ROM_LOAD( "g8_obj-0.bin",       0x00000, 0x20000, CRC(d7112e3f) SHA1(476f9e1b636b257e517fc789508dac923d05ef67) ) // 12-11-87
@@ -1781,7 +1778,7 @@ ROM_START( ws )
 	ROM_LOAD_HS( "ws1_voi0.bin",    0x00000, 0x10000, CRC(f6949199) SHA1(ef596b02060f8e58eac37765663dd16377244391) )
 	ROM_LOAD( "ws_voi-1.bin",       0x20000, 0x20000, CRC(210e2af9) SHA1(f8a1f8c6b9fbb8a9b3f298674600c1fbb9c5840e) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "ws_chr-8.bin",       0x00000, 0x20000, CRC(d1897b9b) SHA1(29906614b879e5623b49bc925e80006aee3997b9) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1822,7 +1819,7 @@ ROM_START( berabohm )
 	ROM_LOAD(    "bm_voi-1.bin",    0x20000, 0x20000, CRC(be9ce0a8) SHA1(a211216125615cb14e515317f56976c4ebe13f5f) )
 	ROM_LOAD_HS( "bm1_v2.bin",      0x40000, 0x10000, CRC(41225d04) SHA1(a670c5ce63ff1d2ed94aa5ea17cb2c91eb768f14) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "bm_chr-8.bin",       0x00000, 0x20000, CRC(92860e95) SHA1(d8c8d5aed956c876809f287700f33bc70a1b58a3) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1866,7 +1863,7 @@ ROM_START( berabohmb )
 	ROM_LOAD(    "bm_voi-1.bin",    0x20000, 0x20000, CRC(be9ce0a8) SHA1(a211216125615cb14e515317f56976c4ebe13f5f) )
 	ROM_LOAD_HS( "bm1_v2.bin",      0x40000, 0x10000, CRC(41225d04) SHA1(a670c5ce63ff1d2ed94aa5ea17cb2c91eb768f14) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "bm_chr-8.bin",       0x00000, 0x20000, CRC(92860e95) SHA1(d8c8d5aed956c876809f287700f33bc70a1b58a3) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1911,7 +1908,7 @@ ROM_START( mmaze )
 	ROM_LOAD( "mm_voi-0.bin",       0x00000, 0x20000, CRC(ee974cff) SHA1(f211c461a36dae9ce5ee614aaaabf92556181a85) )
 	ROM_LOAD( "mm_voi-1.bin",       0x20000, 0x20000, CRC(d09b5830) SHA1(954be797e30f7d126b4fc2b04f190bfd7dc23bff) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "mm_chr-8.bin",       0x00000, 0x20000, CRC(a3784dfe) SHA1(7bcd71e0c675cd16587b61c23b470abb8ba434d3) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1954,7 +1951,7 @@ ROM_START( mmaze2 )
 	ROM_LOAD( "mm_voi-0.bin",       0x00000, 0x20000, CRC(ee974cff) SHA1(f211c461a36dae9ce5ee614aaaabf92556181a85) )
 	ROM_LOAD( "mm_voi-1.bin",       0x20000, 0x20000, CRC(d09b5830) SHA1(954be797e30f7d126b4fc2b04f190bfd7dc23bff) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "mm_chr-8.bin",       0x00000, 0x20000, CRC(a3784dfe) SHA1(7bcd71e0c675cd16587b61c23b470abb8ba434d3) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -1996,7 +1993,7 @@ ROM_START( bakutotu )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD_HS( "bk1_v0.bin",      0x00000, 0x10000, CRC(008e290e) SHA1(87ac7291088f0d6a7179b1a5f3567a72dc92177c) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "bk_chr-8.bin",       0x00000, 0x20000, CRC(6c8d4029) SHA1(2eb6fd89ffaecfa53f9adcdebbe8f550199d067f) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2041,7 +2038,7 @@ ROM_START( wldcourt )
 	ROM_LOAD_HS( "wc1_voi0.bin",    0x00000, 0x10000, CRC(b57919f7) SHA1(5305c479513943a5d92988a63ad1671744e944b5) )
 	ROM_LOAD( "wc1_voi1.bin",       0x20000, 0x20000, CRC(97974b4b) SHA1(1e4d10ce28cabc01f1f233a0edc05e20874e0285) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "wc1_chr8.bin",       0x00000, 0x20000, CRC(23e1c399) SHA1(2d22da5c68c0924767f18fb19576cb76a016ae8e) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2204,7 +2201,7 @@ ROM_START( splatter )
 	ROM_LOAD( "sh_voi-2.bin",       0x40000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
 	ROM_LOAD( "sh_voi-3.bin",       0x60000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "sh_chr-8.bin",       0x00000, 0x20000, CRC(321f483b) SHA1(84d75367d2e3ae210ecd17c163b336f609628a91) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2250,7 +2247,7 @@ ROM_START( splatter2 )
 	ROM_LOAD( "sh_voi-2.bin",       0x40000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
 	ROM_LOAD( "sh_voi-3.bin",       0x60000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "sh_chr-8.bin",       0x00000, 0x20000, CRC(321f483b) SHA1(84d75367d2e3ae210ecd17c163b336f609628a91) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2296,7 +2293,7 @@ ROM_START( splatterj )
 	ROM_LOAD( "sh_voi-2.bin",       0x40000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
 	ROM_LOAD( "sh_voi-3.bin",       0x60000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "sh_chr-8.bin",       0x00000, 0x20000, CRC(321f483b) SHA1(84d75367d2e3ae210ecd17c163b336f609628a91) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2340,7 +2337,7 @@ ROM_START( faceoff )
 	ROM_LOAD_HS( "fo1_v0.bin",      0x00000, 0x10000, CRC(e6edf63e) SHA1(095f7fa93233e4b4f25e728868c212170be48550) )
 	ROM_LOAD_HS( "fo1_v1.bin",      0x20000, 0x10000, CRC(132a5d90) SHA1(d5ceae68d7aea7cdde43600453f9724f35834519) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "fo1_c8.bin",         0x00000, 0x10000, CRC(d397216c) SHA1(baa3747bf3e12246e2629eaf0abdb3df05e423bd) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2378,7 +2375,7 @@ ROM_START( rompers )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD( "rp_voi-0.bin",       0x00000, 0x20000, CRC(11caef7e) SHA1(c6470cbbc6402872794e0a4e822a5d08ca2448ef) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "rp1_chr8.bin",       0x00000, 0x10000, CRC(69cfe46a) SHA1(01c5af1b7fc337ec06a5afabd87b9a6a7dcf3503) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2418,7 +2415,7 @@ ROM_START( romperso )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD( "rp_voi-0.bin",       0x00000, 0x20000, CRC(11caef7e) SHA1(c6470cbbc6402872794e0a4e822a5d08ca2448ef) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "rp1_chr8.bin",       0x00000, 0x10000, CRC(69cfe46a) SHA1(01c5af1b7fc337ec06a5afabd87b9a6a7dcf3503) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2461,7 +2458,7 @@ ROM_START( blastoff )
 	ROM_LOAD( "bo_voi-1.bin",       0x20000, 0x20000, CRC(0308b18e) SHA1(7196abdf36d660089d739e3f3a362648768a6127) )
 	ROM_LOAD( "bo_voi-2.bin",       0x40000, 0x20000, CRC(88cab230) SHA1(659c4efeb8aa24f8b32509ee563407ed1e17d564) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "bo_chr-8.bin",       0x00000, 0x20000, CRC(e8b5f2d4) SHA1(70dd2898dcfed5f43f6c50f852660f24a9d7ec9d) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2504,7 +2501,7 @@ ROM_START( ws89 )
 	ROM_LOAD_HS( "ws1_voi0.bin",    0x00000, 0x10000, CRC(f6949199) SHA1(ef596b02060f8e58eac37765663dd16377244391) )
 	ROM_LOAD( "ws_voi-1.bin",       0x20000, 0x20000, CRC(210e2af9) SHA1(f8a1f8c6b9fbb8a9b3f298674600c1fbb9c5840e) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "ws_chr-8.bin",       0x00000, 0x20000, CRC(d1897b9b) SHA1(29906614b879e5623b49bc925e80006aee3997b9) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2543,7 +2540,7 @@ ROM_START( dangseed )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD( "dr_voi-0.bin",       0x00000, 0x20000, CRC(de4fdc0e) SHA1(b5e952aaf5a81a2b4ff1c7cae141d50360545770) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "dr_chr-8.bin",       0x00000, 0x20000, CRC(0fbaa10e) SHA1(18ea77544678d889aded927a96a11bc04ad42fa6) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2584,7 +2581,7 @@ ROM_START( ws90 )
 	ROM_LOAD_HS( "ws1_voi0.bin",    0x00000, 0x10000, CRC(f6949199) SHA1(ef596b02060f8e58eac37765663dd16377244391) )
 	ROM_LOAD( "ws_voi-1.bin",       0x20000, 0x20000, CRC(210e2af9) SHA1(f8a1f8c6b9fbb8a9b3f298674600c1fbb9c5840e) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "ws_chr-8.bin",       0x00000, 0x20000, CRC(d1897b9b) SHA1(29906614b879e5623b49bc925e80006aee3997b9) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2625,7 +2622,7 @@ ROM_START( pistoldm )
 	ROM_LOAD( "pd_voi-1.bin",       0x20000, 0x20000, CRC(2871c494) SHA1(9ac0dc559c22ac5083025c32f28e353b04348155) )
 	ROM_LOAD( "pd_voi-2.bin",       0x40000, 0x20000, CRC(e783f0c4) SHA1(6a43f22226d1637d507c8194244058e8d96f8692) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "pd_chr-8.bin",       0x00000, 0x20000, CRC(a5f516db) SHA1(262c3a99cfa3061b58331d8ed254b49a06bfdd9f) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2666,7 +2663,7 @@ ROM_START( boxyboy )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD_HS( "sb1_voi0.bin",    0x00000, 0x10000, CRC(63d9cedf) SHA1(117767c6b25325bf3005756d74196da56008498c) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "sb1_chr8.bin",       0x00000, 0x10000, CRC(5692b297) SHA1(ed20a0f4ce80674d01cd2a30571ffeff9f9066fd) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2699,7 +2696,7 @@ ROM_START( soukobdx )
 	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
 	ROM_LOAD_HS( "sb1_voi0.bin",    0x00000, 0x10000, CRC(63d9cedf) SHA1(117767c6b25325bf3005756d74196da56008498c) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "sb1_chr8.bin",       0x00000, 0x10000, CRC(5692b297) SHA1(ed20a0f4ce80674d01cd2a30571ffeff9f9066fd) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2732,7 +2729,7 @@ ROM_START( puzlclub )
 	ROM_REGION( 0xc0000, "voice", ROMREGION_ERASEFF )  /* MCU external ROM */
 	/* no voices */
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "pc1-c8.bin",         0x00000, 0x20000, CRC(4e196bcd) SHA1(2e27538bbbebeda32353c0c02f98d52f0d1994f9) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2772,7 +2769,7 @@ ROM_START( tankfrce )
 	ROM_LOAD( "tf1_voi0.bin",       0x00000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
 	ROM_LOAD( "tf1_voi1.bin",       0x20000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "tf1_chr8.bin",       0x00000, 0x20000, CRC(7d53b31e) SHA1(7e4b5fc92f7956477392f1e14c6edfc0cada2be0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2810,7 +2807,7 @@ ROM_START( tankfrce4 )
 	ROM_LOAD( "tf1_voi0.bin",       0x00000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
 	ROM_LOAD( "tf1_voi1.bin",       0x20000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "tf1_chr8.bin",       0x00000, 0x20000, CRC(7d53b31e) SHA1(7e4b5fc92f7956477392f1e14c6edfc0cada2be0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
@@ -2848,7 +2845,7 @@ ROM_START( tankfrcej )
 	ROM_LOAD( "tf1_voi0.bin",       0x00000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
 	ROM_LOAD( "tf1_voi1.bin",       0x20000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_REGION( 0x20000, "tmap_mask", 0 )  /* character mask */
 	ROM_LOAD( "tf1_chr8.bin",       0x00000, 0x20000, CRC(7d53b31e) SHA1(7e4b5fc92f7956477392f1e14c6edfc0cada2be0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */

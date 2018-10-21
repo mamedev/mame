@@ -1259,7 +1259,7 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, sound_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, sound_p2_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("t1_timer", videopkr_state, sound_t1_callback, attotime::from_hz(50))
 
@@ -1365,11 +1365,11 @@ MACHINE_CONFIG_START(videopkr_state::bpoker)
 	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ???
 	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // ???
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	//MCFG_I8255_OUT_PORTA_CB()
-	//MCFG_I8255_IN_PORTB_CB()
-	//MCFG_I8255_OUT_PORTC_CB()
-	//MCFG_I8255_IN_PORTC_CB()
+	I8255A(config, "ppi");
+	//ppi.out_pa_callback()
+	//ppi.in_pb_callback()
+	//ppi.out_pc_callback()
+	//ppi.in_pc_callback()
 MACHINE_CONFIG_END
 
 

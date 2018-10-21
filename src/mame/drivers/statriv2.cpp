@@ -613,16 +613,16 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_DEVICE_IO_MAP(statriv2_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", statriv2_state, statriv2_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	i8255_device &ppi(I8255A(config, "ppi8255"));
 	/* PPI 8255 group A & B set to Mode 0.
 	 Port A, B and lower 4 bits of C set as Input.
 	 High 4 bits of C set as Output */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, statriv2_state, ppi_portc_hi_w))
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
+	ppi.out_pc_callback().set(FUNC(statriv2_state::ppi_portc_hi_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -630,8 +630,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_SCREEN_UPDATE_DRIVER(statriv2_state, screen_update_statriv2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2/8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	TMS9927(config, m_tms, MASTER_CLOCK/2/8).set_char_width(8);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_horizontal)
 	MCFG_PALETTE_ADD("palette", 2*64)

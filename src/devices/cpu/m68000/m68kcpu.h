@@ -55,6 +55,7 @@ static constexpr int EXCEPTION_UNINITIALIZED_INTERRUPT = 15;
 static constexpr int EXCEPTION_SPURIOUS_INTERRUPT      = 24;
 static constexpr int EXCEPTION_INTERRUPT_AUTOVECTOR    = 24;
 static constexpr int EXCEPTION_TRAP_BASE               = 32;
+static constexpr int EXCEPTION_MMU_CONFIGURATION       = 56; // only on 020/030
 
 /* Function codes set by CPU during data/address bus activity */
 static constexpr int FUNCTION_CODE_USER_DATA          = 1;
@@ -590,7 +591,7 @@ inline uint32_t m68ki_read_imm_16()
 
 	m_mmu_tmp_fc = m_s_flag | FUNCTION_CODE_USER_PROGRAM;
 	m_mmu_tmp_rw = 1;
-
+	m_mmu_tmp_sz = M68K_SZ_WORD;
 	m68ki_check_address_error(m_pc, MODE_READ, m_s_flag | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 
 	if (m_pc != m_pref_addr)
@@ -617,7 +618,7 @@ inline uint32_t m68ki_read_imm_32()
 
 	m_mmu_tmp_fc = m_s_flag | FUNCTION_CODE_USER_PROGRAM;
 	m_mmu_tmp_rw = 1;
-
+	m_mmu_tmp_sz = M68K_SZ_LONG;
 	m68ki_check_address_error(m_pc, MODE_READ, m_s_flag | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 
 	if(m_pc != m_pref_addr)
@@ -652,6 +653,7 @@ inline uint32_t m68ki_read_8_fc(uint32_t address, uint32_t fc)
 {
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 1;
+	m_mmu_tmp_sz = M68K_SZ_BYTE;
 	return m_read8(address);
 }
 inline uint32_t m68ki_read_16_fc(uint32_t address, uint32_t fc)
@@ -662,6 +664,7 @@ inline uint32_t m68ki_read_16_fc(uint32_t address, uint32_t fc)
 	}
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 1;
+	m_mmu_tmp_sz = M68K_SZ_WORD;
 	return m_read16(address);
 }
 inline uint32_t m68ki_read_32_fc(uint32_t address, uint32_t fc)
@@ -672,6 +675,7 @@ inline uint32_t m68ki_read_32_fc(uint32_t address, uint32_t fc)
 	}
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 1;
+	m_mmu_tmp_sz = M68K_SZ_LONG;
 	return m_read32(address);
 }
 
@@ -679,6 +683,7 @@ inline void m68ki_write_8_fc(uint32_t address, uint32_t fc, uint32_t value)
 {
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 0;
+	m_mmu_tmp_sz = M68K_SZ_BYTE;
 	m_write8(address, value);
 }
 inline void m68ki_write_16_fc(uint32_t address, uint32_t fc, uint32_t value)
@@ -689,6 +694,7 @@ inline void m68ki_write_16_fc(uint32_t address, uint32_t fc, uint32_t value)
 	}
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 0;
+	m_mmu_tmp_sz = M68K_SZ_WORD;
 	m_write16(address, value);
 }
 inline void m68ki_write_32_fc(uint32_t address, uint32_t fc, uint32_t value)
@@ -699,6 +705,7 @@ inline void m68ki_write_32_fc(uint32_t address, uint32_t fc, uint32_t value)
 	}
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 0;
+	m_mmu_tmp_sz = M68K_SZ_LONG;
 	m_write32(address, value);
 }
 
@@ -715,6 +722,7 @@ inline void m68ki_write_32_pd_fc(uint32_t address, uint32_t fc, uint32_t value)
 	}
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 0;
+	m_mmu_tmp_sz = M68K_SZ_LONG;
 	m_write16(address+2, value>>16);
 	m_write16(address, value&0xffff);
 }
@@ -1219,6 +1227,7 @@ inline void m68ki_stack_frame_1010(uint32_t sr, uint32_t vector, uint32_t pc, ui
 {
 	int orig_rw = m_mmu_tmp_buserror_rw;    // this gets splatted by the following pushes, so save it now
 	int orig_fc = m_mmu_tmp_buserror_fc;
+	int orig_sz = m_mmu_tmp_buserror_sz;
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(0);
@@ -1247,7 +1256,7 @@ inline void m68ki_stack_frame_1010(uint32_t sr, uint32_t vector, uint32_t pc, ui
 	/* SPECIAL STATUS REGISTER */
 	// set bit for: Rerun Faulted bus Cycle, or run pending prefetch
 	// set FC
-	m68ki_push_16(0x0100 | orig_fc | orig_rw<<6);
+	m68ki_push_16(0x0100 | orig_fc | orig_rw<<6 | orig_sz<<4);
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(0);
@@ -1271,7 +1280,7 @@ inline void m68ki_stack_frame_1011(uint32_t sr, uint32_t vector, uint32_t pc, ui
 {
 	int orig_rw = m_mmu_tmp_buserror_rw;    // this gets splatted by the following pushes, so save it now
 	int orig_fc = m_mmu_tmp_buserror_fc;
-
+	int orig_sz = m_mmu_tmp_buserror_sz;
 	/* INTERNAL REGISTERS (18 words) */
 	m68ki_push_32(0);
 	m68ki_push_32(0);
@@ -1322,7 +1331,7 @@ inline void m68ki_stack_frame_1011(uint32_t sr, uint32_t vector, uint32_t pc, ui
 	m68ki_push_16(0);
 
 	/* SPECIAL STATUS REGISTER */
-	m68ki_push_16(0x0100 | orig_fc | orig_rw<<6);
+	m68ki_push_16(0x0100 | orig_fc | (orig_rw<<6) | (orig_sz<<4));
 
 	/* INTERNAL REGISTER */
 	m68ki_push_16(0);
@@ -1523,7 +1532,7 @@ inline void m68ki_exception_address_error()
 		m_stopped = STOP_LEVEL_HALT;
 		return;
 	}
-	
+
 	m_run_mode = RUN_MODE_BERR_AERR_RESET_WSF;
 
 	if (!CPU_TYPE_IS_010_PLUS())

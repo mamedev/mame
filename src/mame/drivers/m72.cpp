@@ -226,7 +226,7 @@ TIMER_CALLBACK_MEMBER(m72_state::synch_callback)
 void m72_state::machine_reset()
 {
 	m_mcu_sample_addr = 0;
-	m_mcu_snd_cmd_latch = 0;
+	//m_mcu_snd_cmd_latch = 0;
 
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::synch_callback),this));
@@ -306,76 +306,45 @@ The protection device does
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 {
-	uint16_t val = ((uint32_t) param) & 0xffff;
-	uint16_t offset = (((uint32_t) param) >> 16) & 0xffff;
-	uint16_t *ram = (uint16_t *)ptr;
+	uint16_t val = param & 0xffff;
+	uint16_t offset = (param >> 16) & 0x07ff;
+	uint16_t mem_mask = (BIT(param, 28) ? 0xff00 : 0x0000) | (BIT(param, 27) ? 0x00ff : 0x0000);
 
-	ram[offset] = val;
+	logerror("MB8421/MB8431 left_w(0x%03x, 0x%04x, 0x%04x)\n", offset, val, mem_mask);
+	m_dpram->left_w(machine().dummy_space(), offset, val, mem_mask);
 }
 
-
-WRITE16_MEMBER(m72_state::main_mcu_sound_w)
+TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
 {
-	if (data & 0xfff0)
-		logerror("sound_w: %04x %04x\n", mem_mask, data);
+	uint8_t val = param & 0xff;
+	uint16_t offset = (param >> 9) & 0x07ff;
 
-	if (ACCESSING_BITS_0_7)
-	{
-		m_mcu_snd_cmd_latch = data;
-		m_mcu->set_input_line(1, ASSERT_LINE);
-	}
+	if (BIT(param, 8))
+		m_dpram->right_w(machine().dummy_space(), offset, val << 8, 0xff00);
+	else
+		m_dpram->right_w(machine().dummy_space(), offset, val, 0x00ff);
 }
+
 
 WRITE16_MEMBER(m72_state::main_mcu_w)
 {
-	uint16_t val = m_protection_ram[offset];
-
-	COMBINE_DATA(&val);
-
-	/* 0x07fe is used for synchronization as well.
-	 * This address however will not trigger an interrupt
-	 */
-
-	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
-	{
-		m_protection_ram[offset] = val;
-		m_mcu->set_input_line(0, ASSERT_LINE);
-		/* Line driven, most likely by write line */
-		//machine().scheduler().timer_set(m_mcu->cycles_to_attotime(2), FUNC(mcu_irq0_clear));
-		//machine().scheduler().timer_set(m_mcu->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
-	}
-	else
-		machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), (offset<<16) | val, m_protection_ram.get());
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram16_w), this), offset << 16 | data | (mem_mask & 0x0180) << 20);
 }
 
 WRITE8_MEMBER(m72_state::mcu_data_w)
 {
-	uint16_t val;
-	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
-	else val = (m_protection_ram[offset/2] & 0xff00) | (data&0xff);
-
-	machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), ((offset >>1 ) << 16) | val, m_protection_ram.get());
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram8_w), this), offset << 8 | uint32_t(data));
 }
 
 READ8_MEMBER(m72_state::mcu_data_r)
 {
-	uint8_t ret;
-
-	if (offset == 0x0fff || offset == 0x0ffe)
-	{
-		m_mcu->set_input_line(0, CLEAR_LINE);
-	}
-
-	if (offset&1) ret = (m_protection_ram[offset/2] & 0xff00)>>8;
-	else ret = (m_protection_ram[offset/2] & 0x00ff);
-
-	return ret;
+	return (m_dpram->right_r(space, offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
 }
 
 INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
 {
 	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
-	m_mcu_snd_cmd_latch = 0x11;// | (machine().rand() & 1); /* 0x10 is special as well - FIXME */
+	//m_mcu_snd_cmd_latch = 0x11;// | (machine().rand() & 1); /* 0x10 is special as well - FIXME */
 	device.execute().set_input_line(1, ASSERT_LINE);
 }
 
@@ -384,17 +353,6 @@ READ8_MEMBER(m72_state::mcu_sample_r)
 	uint8_t sample;
 	sample = memregion("samples")->base()[m_mcu_sample_addr++];
 	return sample;
-}
-
-WRITE8_MEMBER(m72_state::mcu_ack_w)
-{
-	m_mcu->set_input_line(1, CLEAR_LINE);
-	m_mcu_snd_cmd_latch = 0;
-}
-
-READ8_MEMBER(m72_state::mcu_snd_r)
-{
-	return m_mcu_snd_cmd_latch;
 }
 
 WRITE8_MEMBER(m72_state::mcu_port1_w)
@@ -427,24 +385,11 @@ READ8_MEMBER(m72_state::snd_cpu_sample_r)
 
 void m72_state::init_m72_8751()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	address_space &io = m_maincpu->space(AS_IO);
-	address_space &sndio = m_soundcpu->space(AS_IO);
-
-	m_protection_ram = std::make_unique<uint16_t[]>(0x10000/2);
-	program.install_read_bank(0xb0000, 0xbffff, "bank1");
-	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::main_mcu_w),this));
-	membank("bank1")->configure_entry(0, m_protection_ram.get());
-
-	save_pointer(NAME(m_protection_ram), 0x10000/2);
 	save_item(NAME(m_mcu_sample_latch));
 	save_item(NAME(m_mcu_sample_addr));
-	save_item(NAME(m_mcu_snd_cmd_latch));
-
-	//io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::loht_sample_trigger_w),this));
-	io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::main_mcu_sound_w),this));
 
 	/* sound cpu */
+	address_space &sndio = m_soundcpu->space(AS_IO);
 	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_byte_interface::data_w),(dac_byte_interface *)m_dac));
 	sndio.install_read_handler (0x84, 0x84, read8_delegate(FUNC(m72_state::snd_cpu_sample_r),this));
 
@@ -883,11 +828,18 @@ void m72_state::rtype_map(address_map &map)
 	map(0x40000, 0x43fff).ram();    /* work RAM */
 }
 
+void m72_state::m72_protected_map(address_map &map)
+{
+	m72_map(map);
+	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
+}
+
 void m72_state::xmultiplm72_map(address_map &map)
 {
 	m72_cpu1_common_map(map);
 	map(0x00000, 0x7ffff).rom();
 	map(0x80000, 0x83fff).ram();    /* work RAM */
+	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
 }
 
 void m72_state::dbreedm72_map(address_map &map)
@@ -1002,6 +954,12 @@ void m72_state::m72_portmap(address_map &map)
 	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
 	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
+}
+
+void m72_state::m72_protected_portmap(address_map &map)
+{
+	m72_portmap(map);
+	map(0xc0, 0xc0).w("mculatch", FUNC(generic_latch_8_device::write));
 }
 
 void m72_state::m84_portmap(address_map &map)
@@ -1138,7 +1096,7 @@ void m72_state::mcu_io_map(address_map &map)
 	/* External access */
 	map(0x0000, 0x0000).rw(FUNC(m72_state::mcu_sample_r), FUNC(m72_state::mcu_low_w));
 	map(0x0001, 0x0001).w(FUNC(m72_state::mcu_high_w));
-	map(0x0002, 0x0002).rw(FUNC(m72_state::mcu_snd_r), FUNC(m72_state::mcu_ack_w));
+	map(0x0002, 0x0002).rw("mculatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	/* shared at b0000 - b0fff on the main cpu */
 	map(0xc000, 0xcfff).rw(FUNC(m72_state::mcu_data_r), FUNC(m72_state::mcu_data_w));
 }
@@ -1915,12 +1873,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m72_state::m72_8751)
 	m72_base(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m72_protected_map)
+	MCFG_DEVICE_IO_MAP(m72_protected_portmap)
 
-	MCFG_DEVICE_ADD("mcu",I8751, XTAL(8'000'000)) /* Uses its own XTAL */
+	MB8421_MB8431_16BIT(config, m_dpram);
+	//m_dpram->intl_callback().set("upd71059c", FUNC(pic8259_device::ir3_w)); // not actually used?
+	m_dpram->intr_callback().set_inputline("mcu", MCS51_INT0_LINE);
+
+	MCFG_GENERIC_LATCH_8_ADD("mculatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mcu", MCS51_INT1_LINE))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000)) /* Uses its own XTAL */
 	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, m72_state, mcu_port1_w))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, m72_state, mcu_port3_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
 MACHINE_CONFIG_END
 
 
@@ -2142,13 +2111,13 @@ MACHINE_CONFIG_START(m72_state::poundfor)
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	UPD4701A(config, m_upd4701[0]);
+	m_upd4701[0]->set_portx_tag("TRACK0_X");
+	m_upd4701[0]->set_porty_tag("TRACK0_Y");
 
-	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	UPD4701A(config, m_upd4701[1]);
+	m_upd4701[1]->set_portx_tag("TRACK1_X");
+	m_upd4701[1]->set_porty_tag("TRACK1_Y");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
@@ -3515,6 +3484,13 @@ ROM_START( rtype2j )
 	ROM_REGION( 0x0200, "proms", 0 ) /* located on M84-B-A */
 	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
 	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
+
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "rt2-a-2h-.5",  0x0000, 0x0104, NO_DUMP ) // TIBPAL-16L8-25
+	ROM_LOAD( "rt2-a-5l-.33", 0x0200, 0x0104, NO_DUMP ) // TIBPAL-16L8-25
+	ROM_LOAD( "rt2-a-7d-.45", 0x0400, 0x0104, CRC(53c1e087) SHA1(b214ba4e7cc3d582ee85616923f38fd4873dacb1) ) // TIBPAL-16L8-25
+	ROM_LOAD( "rt2-b-3a-.9",  0x0600, 0x0104, NO_DUMP ) // TIBPAL-16L8-25
 ROM_END
 
 ROM_START( rtype2jc )

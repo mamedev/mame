@@ -116,33 +116,32 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 	MCFG_DEVICE_IO_MAP(ct486_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("cs4031", cs4031_device, int_ack_r)
 
-	MCFG_CS4031_ADD("cs4031", XTAL(25'000'000), "maincpu", "isa", "bios", "keybc")
+	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc");
 	// cpu connections
-	MCFG_CS4031_HOLD(WRITELINE(*this, ct486_state, cs4031_hold));
-	MCFG_CS4031_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
-	MCFG_CS4031_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
-	MCFG_CS4031_CPURESET(INPUTLINE("maincpu", INPUT_LINE_RESET));
-	MCFG_CS4031_A20M(INPUTLINE("maincpu", INPUT_LINE_A20));
+	m_cs4031->hold().set(FUNC(ct486_state::cs4031_hold));
+	m_cs4031->nmi().set_inputline("maincpu", INPUT_LINE_NMI);
+	m_cs4031->intr().set_inputline("maincpu", INPUT_LINE_IRQ0);
+	m_cs4031->cpureset().set_inputline("maincpu", INPUT_LINE_RESET);
+	m_cs4031->a20m().set_inputline("maincpu", INPUT_LINE_A20);
 	// isa dma
-	MCFG_CS4031_IOR(READ16(*this, ct486_state, cs4031_ior))
-	MCFG_CS4031_IOW(WRITE16(*this, ct486_state, cs4031_iow))
-	MCFG_CS4031_TC(WRITE8(*this, ct486_state, cs4031_tc))
+	m_cs4031->ior().set(FUNC(ct486_state::cs4031_ior));
+	m_cs4031->iow().set(FUNC(ct486_state::cs4031_iow));
+	m_cs4031->tc().set(FUNC(ct486_state::cs4031_tc));
 	// speaker
-	MCFG_CS4031_SPKR(WRITELINE(*this, ct486_state, cs4031_spkr))
+	m_cs4031->spkr().set(FUNC(ct486_state::cs4031_spkr));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M");
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(WRITELINE("cs4031", cs4031_device, kbrst_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(WRITELINE("cs4031", cs4031_device, gatea20_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("cs4031", cs4031_device, irq01_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
+	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
+	keybc.hot_res().set("cs4031", FUNC(cs4031_device::kbrst_w));
+	keybc.gate_a20().set("cs4031", FUNC(cs4031_device::gatea20_w));
+	keybc.kbd_irq().set("cs4031", FUNC(cs4031_device::irq01_w));
+	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_kbc_device_base, kbd_clk_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_kbc_device_base, kbd_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)

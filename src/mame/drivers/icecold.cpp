@@ -368,28 +368,28 @@ MACHINE_CONFIG_START(icecold_state::icecold)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(6'000'000)/4) // 68A09E
 	MCFG_DEVICE_PROGRAM_MAP(icecold_map)
 
-	MCFG_DEVICE_ADD( "pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("JOY"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW3"))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set_ioport("JOY");
+	pia0.readpb_handler().set_ioport("DSW3");
+	pia0.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia0.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD( "pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, icecold_state, ay_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, icecold_state, ay_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, icecold_state, snd_ctrl_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(FUNC(icecold_state::ay_r));
+	m_pia1->writepa_handler().set(FUNC(icecold_state::ay_w));
+	m_pia1->writepb_handler().set(FUNC(icecold_state::snd_ctrl_w));
+	m_pia1->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
+	m_pia1->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	MCFG_DEVICE_ADD( "pia2", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia2(PIA6821(config, "pia2", 0));
+	pia2.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia2.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("i8279", I8279, XTAL(6'000'000)/4)
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("pia0", pia6821_device, cb1_w)) // irq
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, icecold_state, scanlines_w))        // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, icecold_state, digit_w))         // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, icecold_state, kbd_r))                // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(6'000'000)/4));
+	kbdc.out_irq_callback().set("pia0", FUNC(pia6821_device::cb1_w));   // irq
+	kbdc.out_sl_callback().set(FUNC(icecold_state::scanlines_w));       // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(icecold_state::digit_w));         // display A&B
+	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sint_timer", icecold_state, icecold_sint_timer, attotime::from_hz(30))

@@ -107,7 +107,7 @@
 
 
 
-class v53_base_device : public nec_common_device
+class v53_base_device : public v33_base_device
 {
 public:
 	DECLARE_WRITE8_MEMBER(BSEL_w);
@@ -191,19 +191,16 @@ public:
 
 	void v53_internal_port_map(address_map &map);
 protected:
-	v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
+	v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	void install_peripheral_io();
-
-	const address_space_config m_io_space_config;
-
-	virtual space_config_vector memory_space_config() const override;
 
 	uint8_t m_SCTL;
 	uint8_t m_OPSEL;

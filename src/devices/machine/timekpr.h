@@ -23,17 +23,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_M48T37_RESET_HANDLER(_devcb) \
-	downcast<timekeeper_device &>(*device).set_reset_handler(DEVCB_##_devcb);
-
-#define MCFG_M48T37_IRQ_HANDLER(_devcb) \
-	downcast<timekeeper_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -46,8 +35,9 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER(watchdog_write);
-	template <class Object> devcb_base &set_reset_handler(Object &&cb) { return m_reset_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+
+	auto reset_cb() { return m_reset_cb.bind(); }
+	auto irq_cb() { return m_irq_cb.bind(); }
 
 protected:
 	// construction/destruction
@@ -105,37 +95,37 @@ protected:
 class m48t02_device : public timekeeper_device
 {
 public:
-	m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class m48t35_device : public timekeeper_device
 {
 public:
-	m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class m48t37_device : public timekeeper_device
 {
 public:
-	m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class m48t58_device : public timekeeper_device
 {
 public:
-	m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class mk48t08_device : public timekeeper_device
 {
 public:
-	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class mk48t12_device : public timekeeper_device
 {
 public:
-	mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // device type definition

@@ -1144,7 +1144,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp2)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -1190,7 +1190,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state,  irq0_line_assert)
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -1245,7 +1245,7 @@ MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,mjyuugi)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")

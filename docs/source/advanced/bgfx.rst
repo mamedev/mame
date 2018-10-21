@@ -41,7 +41,7 @@ Configuration Settings
 ----------------------
 
 | **bgfx_path**
-| 
+|
 | 	This is where your BGFX shader files are stored. By default, this will be the BGFX folder in your MAME installation.
 |
 | **bgfx_backend**
@@ -54,7 +54,7 @@ Configuration Settings
 |	**metal** -- Metal Apple Graphics API (Requires OS X 10.11 El Capitan or newer)
 |
 | **bgfx_debug**
-| 
+|
 |	Enables BGFX debugging features. Most users will not need to use this.
 |
 | **bgfx_screen_chains**

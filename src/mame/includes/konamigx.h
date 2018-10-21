@@ -111,7 +111,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
-	ADC083X_INPUT_CB(adc0834_callback);
+	double adc0834_callback(uint8_t input);
 	K056832_CB_MEMBER(type2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
 	K055673_CB_MEMBER(type2_sprite_callback);

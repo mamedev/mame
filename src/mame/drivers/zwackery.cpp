@@ -499,26 +499,26 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 	MCFG_DEVICE_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
 	MCFG_DEVICE_PROGRAM_MAP(zwackery_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 7652400 / 10)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 6))
+	PTM6840(config, m_ptm, 7652400 / 10);
+	m_ptm->irq_callback().set_inputline("maincpu", 6);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, zwackery_state, pia0_porta_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, zwackery_state, pia0_irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, zwackery_state, pia0_irq_w))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpb_handler().set_ioport("IN0");
+	m_pia0->writepa_handler().set(FUNC(zwackery_state::pia0_porta_w));
+	m_pia0->irqa_handler().set(FUNC(zwackery_state::pia0_irq_w));
+	m_pia0->irqb_handler().set(FUNC(zwackery_state::pia0_irq_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, zwackery_state, pia1_porta_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, zwackery_state, pia1_porta_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, zwackery_state, pia1_portb_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE("csd", midway_cheap_squeak_deluxe_device, sirq_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set(FUNC(zwackery_state::pia1_porta_r));
+	m_pia1->writepa_handler().set(FUNC(zwackery_state::pia1_porta_w));
+	m_pia1->readpb_handler().set(FUNC(zwackery_state::pia1_portb_r));
+	m_pia1->ca2_handler().set("csd", FUNC(midway_cheap_squeak_deluxe_device::sirq_w));
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, zwackery_state, pia2_porta_r))
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->readpa_handler().set(FUNC(zwackery_state::pia2_porta_r));
+	m_pia2->readpb_handler().set_ioport("DSW");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

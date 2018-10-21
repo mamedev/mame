@@ -259,17 +259,17 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	MCFG_DEVICE_PROGRAM_MAP(prg_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HY6116ALP-12
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HY6116ALP-12
 
-	MCFG_DEVICE_ADD("ppi_outputs", I8255, 0) // M5L8255AP-5
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, clpoker_state, output_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, clpoker_state, output_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, clpoker_state, output_c_w))
+	i8255_device &ppi_outputs(I8255(config, "ppi_outputs")); // M5L8255AP-5
+	ppi_outputs.out_pa_callback().set(FUNC(clpoker_state::output_a_w));
+	ppi_outputs.out_pb_callback().set(FUNC(clpoker_state::output_b_w));
+	ppi_outputs.out_pc_callback().set(FUNC(clpoker_state::output_c_w));
 
-	MCFG_DEVICE_ADD("ppi_inputs", I8255, 0) // M5L8255AP-5
-	MCFG_I8255_IN_PORTA_CB(IOPORT("INA"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("INB"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("INC"))
+	i8255_device &ppi_inputs(I8255(config, "ppi_inputs")); // M5L8255AP-5
+	ppi_inputs.in_pa_callback().set_ioport("INA");
+	ppi_inputs.in_pb_callback().set_ioport("INB");
+	ppi_inputs.in_pc_callback().set_ioport("INC");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -283,7 +283,8 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, clpoker_state, vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HM86171
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette")); // HM86171
+	ramdac.set_addrmap(0, &clpoker_state::ramdac_map);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clpoker)
 

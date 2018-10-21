@@ -30,10 +30,11 @@ DEFINE_DEVICE_TYPE(C64_EASYFLASH, c64_easyflash_cartridge_device, "c64_easyflash
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_easyflash_cartridge_device::device_add_mconfig)
-	MCFG_AMD_29F040_ADD(AM29F040_0_TAG)
-	MCFG_AMD_29F040_ADD(AM29F040_1_TAG)
-MACHINE_CONFIG_END
+void c64_easyflash_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	AMD_29F040(config, AM29F040_0_TAG);
+	AMD_29F040(config, AM29F040_1_TAG);
+}
 
 
 //-------------------------------------------------

@@ -467,12 +467,7 @@ MACHINE_CONFIG_START(discoboy_state::discoboy)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(10'000'000)/2) /* 5 MHz? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rambank1_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
+	ADDRESS_MAP_BANK(config, "rambank1").set_map(&discoboy_state::rambank1_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -498,8 +493,8 @@ MACHINE_CONFIG_START(discoboy_state::discoboy)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, discoboy_state, yunsung8_adpcm_int)) /* interrupt function */

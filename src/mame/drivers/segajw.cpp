@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(segajw_state::segajw)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2000))
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a", 0)); // unknown clock
 	io1a.out_pa_callback().set(FUNC(segajw_state::coin_counter_w));
@@ -408,7 +408,8 @@ MACHINE_CONFIG_START(segajw_state::segajw)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac.set_addrmap(0, &segajw_state::ramdac_map);
 
 	MCFG_HD63484_ADD("hd63484", 8000000, segajw_hd63484_map) // unknown clock
 

@@ -23,7 +23,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -525,7 +524,7 @@ MACHINE_CONFIG_START(ti68k_state::ti89)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(ti89_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -538,9 +537,8 @@ MACHINE_CONFIG_START(ti68k_state::ti89)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(ti68k_state, ti68k)
-	config.set_default_layout(layout_lcd);
 
-	MCFG_SHARP_UNK128MBIT_ADD("flash")  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
+	SHARP_UNK128MBIT(config, "flash");  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ti68k_timer", ti68k_state, ti68k_timer_callback, attotime::from_hz(1<<14))
 MACHINE_CONFIG_END

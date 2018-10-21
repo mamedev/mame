@@ -244,10 +244,10 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)) // active for 1.1us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag68k_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

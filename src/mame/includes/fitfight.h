@@ -30,7 +30,7 @@ public:
 
 	void bbprot(machine_config &config);
 	void fitfight(machine_config &config);
-	
+
 	void init_hotmindff();
 	void init_fitfight();
 	void init_histryma();

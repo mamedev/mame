@@ -418,15 +418,15 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, junofrst_state, i8039_irqen_and_status_w))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, junofrst_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, junofrst_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, junofrst_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, junofrst_state, flip_screen_x_w)) // HFF
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, junofrst_state, flip_screen_y_w)) // VFLIP
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // B3
+	mainlatch.q_out_cb<0>().set(FUNC(junofrst_state::irq_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(junofrst_state::coin_counter_2_w));
+	mainlatch.q_out_cb<2>().set(FUNC(junofrst_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set_nop();
+	mainlatch.q_out_cb<4>().set(FUNC(junofrst_state::flip_screen_x_w)); // HFF
+	mainlatch.q_out_cb<5>().set(FUNC(junofrst_state::flip_screen_y_w)); // VFLIP
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)

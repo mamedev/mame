@@ -46,7 +46,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	
+
 	/* misc */
 	uint8_t m_pri;
 	int vblank_level;
@@ -61,7 +61,7 @@ protected:
 	uint16_t          m_fg_scrollx;
 	uint16_t          m_fg_scrolly;
 	uint16_t          m_bg_tilebase;
-	
+
 	uint16_t m_bg0_dx;
 	uint16_t m_bg1_dx[2];
 	uint16_t m_sprite_xoff;
@@ -83,7 +83,7 @@ private:
 	required_shared_ptr<uint16_t> m_fg_videoram;
 //  required_shared_ptr<uint16_t> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram;
-	
+
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;

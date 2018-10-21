@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 	MCFG_SCREEN_UPDATE_DRIVER(caswin_state, screen_update_vvillage)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vvillage)
 	MCFG_PALETTE_ADD("palette", 0x40)

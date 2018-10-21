@@ -15,7 +15,6 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -70,7 +69,7 @@ private:
 	void smc_write(uint8_t data);
 	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
-	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
+	//DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
 	void juicebox_map(address_map &map);
 };
 
@@ -320,7 +319,6 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(240, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240 - 1, 0, 160 - 1)
-	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c44b0", s3c44b0_device, video_update)
 
@@ -329,10 +327,11 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD("s3c44b0", S3C44B0, 10000000)
-	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(*this, juicebox_state, s3c44b0_gpio_port_r))
-	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(*this, juicebox_state, s3c44b0_gpio_port_w))
-	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16("dac", dac_word_interface, data_w))
+	S3C44B0(config, m_s3c44b0, 10000000);
+	m_s3c44b0->set_cpu("maincpu");
+	m_s3c44b0->gpio_port_r_cb().set(FUNC(juicebox_state::s3c44b0_gpio_port_r));
+	m_s3c44b0->gpio_port_w_cb().set(FUNC(juicebox_state::s3c44b0_gpio_port_w));
+	m_s3c44b0->i2s_data_w_cb().set("dac", FUNC(dac_word_interface::data_w));
 
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 

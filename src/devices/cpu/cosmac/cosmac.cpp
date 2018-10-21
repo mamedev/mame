@@ -273,6 +273,9 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_op(0),
 		m_state(cosmac_state::STATE_1_INIT),
 		m_mode(cosmac_mode::RESET),
+		m_pmode(cosmac_mode::RUN),
+		m_wait(true),
+		m_clear(true),
 		m_irq(CLEAR_LINE),
 		m_dmain(CLEAR_LINE),
 		m_dmaout(CLEAR_LINE),
@@ -901,13 +904,15 @@ inline void cosmac_device::fetch_instruction()
 inline void cosmac_device::reset_state()
 {
 	m_state = cosmac_state::STATE_1_INIT;
-	output_state_code();
 
 	m_op = 0;
 	I = 0;
 	N = 0;
 	set_q_flag(0);
 	IE = 1;
+
+	if (m_pmode != cosmac_mode::RESET)
+		output_state_code();
 }
 
 

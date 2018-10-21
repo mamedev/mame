@@ -812,8 +812,7 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	MCFG_DEVICE_IO_MAP(dunhuang_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dunhuang_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(5))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(5));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -827,7 +826,8 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dunhuang)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &dunhuang_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

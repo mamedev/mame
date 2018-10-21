@@ -5,6 +5,10 @@
     includes/x07.h
 
 *********************************************************************/
+#ifndef MAME_INCLUDES_X07_H
+#define MAME_INCLUDES_X07_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/beep.h"
@@ -18,7 +22,6 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "emupal.h"
-#include "rendlay.h"
 
 //default value for user defined keys, taken for official documentation
 static const char *const udk_ini[12] = {
@@ -291,3 +294,5 @@ private:
 	void x07_io(address_map &map);
 	void x07_mem(address_map &map);
 };
+
+#endif // MAME_INCLUDES_X07_H

@@ -990,11 +990,11 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_DEVICE_ADD("rs232" , RS232_PORT, default_rs232_devices , nullptr)
 
 	// UART (TR1602B)
-	MCFG_DEVICE_ADD("uart", AY51013, 0)
-	MCFG_AY51013_READ_SI_CB(READLINE("rs232" , rs232_port_device , rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE(*this, hp2645_state , async_txd_w))
-	MCFG_AY51013_WRITE_DAV_CB(WRITELINE(*this, hp2645_state , async_dav_w))
-	MCFG_AY51013_AUTO_RDAV(true)
+	AY51013(config, m_uart);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set(FUNC(hp2645_state::async_txd_w));
+	m_uart->write_dav_callback().set(FUNC(hp2645_state::async_dav_w));
+	m_uart->set_auto_rdav(true);
 
 	// Beep
 	SPEAKER(config, "mono").front_center();

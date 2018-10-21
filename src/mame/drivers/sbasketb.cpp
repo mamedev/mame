@@ -201,16 +201,16 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(14'318'181) / 4) /* 3.5795 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sbasketb_sound_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sbasketb_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sbasketb_state, irq_mask_w)) // INTST
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // MUT - not used?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, sbasketb_state, coin_counter_1_w)) // COIN 1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, sbasketb_state, coin_counter_2_w)) // COIN 2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, sbasketb_state, spriteram_select_w)) // OBJ CHE
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // END - not used
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // B3
+	mainlatch.q_out_cb<0>().set(FUNC(sbasketb_state::flipscreen_w)); // FLIP
+	mainlatch.q_out_cb<1>().set(FUNC(sbasketb_state::irq_mask_w)); // INTST
+	mainlatch.q_out_cb<2>().set_nop(); // MUT - not used?
+	mainlatch.q_out_cb<3>().set(FUNC(sbasketb_state::coin_counter_1_w)); // COIN 1
+	mainlatch.q_out_cb<4>().set(FUNC(sbasketb_state::coin_counter_2_w)); // COIN 2
+	mainlatch.q_out_cb<5>().set(FUNC(sbasketb_state::spriteram_select_w)); // OBJ CHE
+	mainlatch.q_out_cb<6>().set_nop(); // END - not used
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

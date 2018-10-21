@@ -16,7 +16,6 @@ The LCD is likely to be a SSD1828 LCD.
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -1768,8 +1767,7 @@ MACHINE_CONFIG_START(pokemini_state::pokemini)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x2000)
+	I2CMEM(config, "i2cmem", 0).set_data_size(0x2000);
 
 	/* This still needs to be improved to actually match the hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -1778,8 +1776,6 @@ MACHINE_CONFIG_START(pokemini_state::pokemini)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
 	MCFG_SCREEN_REFRESH_RATE( 72 )
 	MCFG_SCREEN_PALETTE("palette")
-
-	config.set_default_layout(layout_lcd);
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)

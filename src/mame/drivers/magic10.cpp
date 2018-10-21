@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magic10_state, irq1_line_hold)
 
 	// 1FILL is required by vanilla magic10 at least (otherwise gameplay won't work properly)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -247,7 +247,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return m_i8255->read(space, offset & 3);
+			return m_i8255->read(offset & 3);
 
 		case 0x1000/2:
 		{
@@ -371,14 +371,15 @@ WRITE8_MEMBER( segas16a_state::n7751_control_w )
 //  n7751_rom_offset_w - post expander callback
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::n7751_rom_offset_w )
+template<int Shift>
+void segas16a_state::n7751_rom_offset_w(uint8_t data)
 {
 	// P4 - address lines 0-3
 	// P5 - address lines 4-7
 	// P6 - address lines 8-11
 	// P7 - address lines 12-13
-	int mask = (0xf << (4 * offset)) & 0x3fff;
-	int newdata = (data << (4 * offset)) & mask;
+	int mask = (0xf << Shift) & 0x3fff;
+	int newdata = (data << Shift) & mask;
 	m_n7751_rom_address = (m_n7751_rom_address & ~mask) | newdata;
 }
 
@@ -405,7 +406,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 {
 	// read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048)
 	// bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used
-	return 0x80 | ((m_n7751_command & 0x07) << 4) | (m_n7751_i8243->p2_r(space, offset) & 0x0f);
+	return 0x80 | ((m_n7751_command & 0x07) << 4) | (m_n7751_i8243->p2_r() & 0x0f);
 }
 
 
@@ -416,7 +417,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 WRITE8_MEMBER( segas16a_state::n7751_p2_w )
 {
 	// write to P2; low 4 bits go to 8243
-	m_n7751_i8243->p2_w(space, offset, data & 0x0f);
+	m_n7751_i8243->p2_w(data & 0x0f);
 
 	// output of bit $80 indicates we are ready (1) or busy (0)
 	// no other outputs are used
@@ -627,7 +628,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			m_i8255->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+			m_i8255->write(param >> 8, param & 0xff);
 			break;
 	}
 }
@@ -1981,16 +1982,20 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, segas16a_state, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("n7751_8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("n7751_8243", CONSTANT(0), WRITE8(*this, segas16a_state,n7751_rom_offset_w))
+	I8243(config, m_n7751_i8243);
+	m_n7751_i8243->p4_out_cb().set(FUNC(segas16a_state::n7751_rom_offset_w<0>));
+	m_n7751_i8243->p5_out_cb().set(FUNC(segas16a_state::n7751_rom_offset_w<4>));
+	m_n7751_i8243->p6_out_cb().set(FUNC(segas16a_state::n7751_rom_offset_w<8>));
+	m_n7751_i8243->p7_out_cb().set(FUNC(segas16a_state::n7751_rom_offset_w<12>));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segas16a_state, misc_control_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segas16a_state, tilemap_sound_w))
+	I8255(config, m_i8255);
+	m_i8255->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_i8255->out_pb_callback().set(FUNC(segas16a_state::misc_control_w));
+	m_i8255->out_pc_callback().set(FUNC(segas16a_state::tilemap_sound_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

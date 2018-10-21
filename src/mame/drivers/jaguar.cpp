@@ -1853,12 +1853,12 @@ MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
 	MCFG_DEVICE_PROGRAM_MAP(dsp_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_VT83C461_ADD("ide", cojag_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, jaguar_state, external_int))
+	VT83C461(config, m_ide).options(cojag_devices, "hdd", nullptr, true);
+	m_ide->irq_handler().set(FUNC(jaguar_state::external_int));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1944,7 +1944,7 @@ MACHINE_CONFIG_START(jaguar_state::jaguar)
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","jaguar")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jaguar_state::jaguarcd)

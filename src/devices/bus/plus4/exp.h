@@ -101,6 +101,11 @@ public:
 	template <class Object> devcb_base &set_cd_wr_callback(Object &&cb) { return m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_aec_wr_callback(Object &&cb) { return m_write_aec.set_callback(std::forward<Object>(cb)); }
 
+	auto irq_wr_callback() { return m_write_irq.bind(); }
+	auto cd_rd_callback() { return m_read_dma_cd.bind(); }
+	auto cd_wr_callback() { return m_write_dma_cd.bind(); }
+	auto aec_wr_callback() { return m_write_aec.bind(); }
+
 	// computer interface
 	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 	void cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);

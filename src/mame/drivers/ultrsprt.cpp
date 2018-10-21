@@ -245,15 +245,15 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("P1X")
-	MCFG_UPD4701_PORTY("P1Y")
+	UPD4701A(config, m_upd[0]);
+	m_upd[0]->set_portx_tag("P1X");
+	m_upd[0]->set_porty_tag("P1Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("P2X")
-	MCFG_UPD4701_PORTY("P2Y")
+	UPD4701A(config, m_upd[1]);
+	m_upd[1]->set_portx_tag("P2X");
+	m_upd[1]->set_porty_tag("P2Y");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -267,8 +267,8 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_6))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_6);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

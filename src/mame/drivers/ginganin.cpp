@@ -256,9 +256,9 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, SOUND_CLOCK/2)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, ginganin_state, ptm_irq))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", SOUND_CLOCK/2));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(ginganin_state::ptm_irq));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

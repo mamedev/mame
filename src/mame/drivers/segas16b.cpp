@@ -1151,8 +1151,8 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 	{
 		// it is important to write in this order: if the /START line goes low
 		// at the same time /RESET goes low, no sample should be started
-		m_upd7759->start_w(data & 0x80);
-		m_upd7759->reset_w(data & 0x40);
+		m_upd7759->start_w(BIT(data, 7));
+		m_upd7759->reset_w(BIT(data, 6));
 
 		// banking depends on the ROM board
 		int bankoffs = 0;
@@ -3726,7 +3726,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK_10MHz)
 	MCFG_SEGA_315_5195_CPU("maincpu")
@@ -3752,6 +3752,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
+	MCFG_UPD7759_MD(0)
 	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas16b_state,upd7759_generate_nmi))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_CONFIG_END
@@ -3786,15 +3787,17 @@ MACHINE_CONFIG_START(segas16b_state::system16b_fd1094)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segas16b_state::aceattacb_fd1094)
+void segas16b_state::aceattacb_fd1094(machine_config &config)
+{
 	system16b_fd1094(config);
 	// 834-6602 I/O board
-	MCFG_DEVICE_ADD("upd4701a1", UPD4701A, 0)
-	MCFG_DEVICE_ADD("upd4701a2", UPD4701A, 0)
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("HANDX1"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("HANDX2"))
-MACHINE_CONFIG_END
+	UPD4701A(config, m_upd4701a[0]);
+	UPD4701A(config, m_upd4701a[1]);
+
+	CXD1095(config, m_cxdio, 0);
+	m_cxdio->in_porta_cb().set_ioport("HANDX1");
+	m_cxdio->in_portb_cb().set_ioport("HANDX2");
+}
 
 
 MACHINE_CONFIG_START(segas16b_state::system16b_i8751)
@@ -3927,7 +3930,7 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_DEVICE_IO_MAP(lockonph_sound_iomap)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockonph)

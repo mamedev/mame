@@ -380,7 +380,7 @@ void peplus_state::load_superdata(const char *bank_name)
 
 WRITE8_MEMBER(peplus_state::bgcolor_w)
 {
-	for (int i = 0; i < m_palette->entries(); i++)
+	for (int i = 0; i < m_palette->entries() / 16; i++)
 	{
 		/* red component */
 		int bit0 = (~data >> 0) & 0x01;
@@ -1376,7 +1376,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, peplus_state, paldata_w<0>))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, peplus_state, paldata_w<1>))
 
-	MCFG_NVRAM_ADD_0FILL("cmos")
+	NVRAM(config, "cmos", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD(m_screen, RASTER)

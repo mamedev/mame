@@ -727,8 +727,8 @@ MACHINE_CONFIG_START(sb2m600_state::osi600)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cassette ACIA */
-	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, sb2m600_state, cassette_tx))
+	ACIA6850(config, m_acia_0, 0);
+	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
 
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
@@ -737,9 +737,7 @@ MACHINE_CONFIG_START(sb2m600_state::osi600)
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("8K")
+	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(uk101_state::uk101)
@@ -752,8 +750,8 @@ MACHINE_CONFIG_START(uk101_state::uk101)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* cassette ACIA */
-	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, sb2m600_state, cassette_tx))
+	ACIA6850(config, m_acia_0, 0);
+	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
 
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 500000)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
@@ -762,9 +760,7 @@ MACHINE_CONFIG_START(uk101_state::uk101)
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("8K")
+	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c1p_state::c1p)
@@ -784,13 +780,13 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia_3", PIA6821, 0)
+	PIA6821(config, "pia_1", 0);
+	PIA6821(config, "pia_2", 0);
+	PIA6821(config, "pia_3", 0);
 
 	/* cassette ACIA */
-	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, sb2m600_state, cassette_tx))
+	ACIA6850(config, m_acia_0, 0);
+	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
 
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
@@ -799,9 +795,7 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("20K")
+	RAM(config, m_ram).set_default_size("8K").set_extra_options("20K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(c1pmf_state::c1pmf)
@@ -809,14 +803,14 @@ MACHINE_CONFIG_START(c1pmf_state::c1pmf)
 	MCFG_DEVICE_MODIFY(M6502_TAG)
 	MCFG_DEVICE_PROGRAM_MAP(c1pmf_mem)
 
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, c1pmf_state, osi470_pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, c1pmf_state, osi470_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, c1pmf_state, osi470_pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, c1pmf_state, osi470_pia_cb2_w))
+	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
+	pia0.readpa_handler().set(FUNC(c1pmf_state::osi470_pia_pa_r));
+	pia0.writepa_handler().set(FUNC(c1pmf_state::osi470_pia_pa_w));
+	pia0.writepb_handler().set(FUNC(c1pmf_state::osi470_pia_pb_w));
+	pia0.cb2_handler().set(FUNC(c1pmf_state::osi470_pia_cb2_w));
 
 	/* floppy ACIA */
-	MCFG_DEVICE_ADD("acia_1", ACIA6850, 0)
+	ACIA6850(config, "acia_1", 0);
 
 	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL(4'000'000)/8) // 250 kHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia_1", acia6850_device, write_txc))
@@ -825,8 +819,7 @@ MACHINE_CONFIG_START(c1pmf_state::c1pmf)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1", osi_floppies, nullptr,   floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("20K")
+	m_ram->set_default_size("20K");
 MACHINE_CONFIG_END
 
 /* ROMs */

@@ -1092,11 +1092,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cosmic_state::cosmicg)
 
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, COSMICG_MASTER_CLOCK/8, cosmicg_map, cosmicg_io_map)
-		/* 9.828 MHz Crystal */
-		/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
-		fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
-		1.5MHz.  So, if someone can check this... */
+	TMS9980A(config, m_maincpu, COSMICG_MASTER_CLOCK); // 9.828 MHz Crystal
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::cosmicg_map);
+	m_maincpu->set_addrmap(AS_IO, &cosmic_state::cosmicg_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
 	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmicg)
@@ -1455,7 +1453,7 @@ ROM_START( magspot2 )
 ROM_END
 
 ROM_START( devzone )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* all 2716 */
 	ROM_LOAD( "dv1.e3",       0x0000, 0x0800, CRC(c70faf00) SHA1(d3f0f071e6c7552724eba64a7182637dae4438c7) )
 	ROM_LOAD( "dv2.e4",       0x0800, 0x0800, CRC(eacfed61) SHA1(493c0d21fd1574b12978dd1f52e8735df6c1732c) )
 	ROM_LOAD( "dv3.e5",       0x1000, 0x0800, CRC(7973317e) SHA1(d236e3dad8c991c32a2550e561518b522a4580bc) )
@@ -1463,21 +1461,21 @@ ROM_START( devzone )
 	ROM_LOAD( "dv4.e6",       0x2000, 0x0800, CRC(a58c5b8c) SHA1(7ff08007aedd2ff1d7ef64263da92a5b77ae2dc4) )
 	ROM_LOAD( "dv6.e8",       0x2800, 0x0800, CRC(3930fb67) SHA1(919883e833d6caa8fe7c3ceaa184575a3b4932b6) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 ) /* sprites */
+	ROM_REGION( 0x1000, "gfx1", 0 ) /* sprites, all 2716 */
 	ROM_LOAD( "dv8.n2",       0x0000, 0x0800, CRC(da1cbec1) SHA1(08a668f19c68335f4fc9f98cd53b44047dd8aad9) )
 	ROM_LOAD( "dv7.n1",       0x0800, 0x0800, CRC(e7562fcf) SHA1(0a0833dbb8d4be69fbf8897aa3e045a87ae42024) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "ms.d9",        0x0000, 0x0020, CRC(36e2aa2a) SHA1(4813b013cb8260157858e3adc7323efc6654e170) )
+	ROM_LOAD( "m13.d9",        0x0000, 0x0020, CRC(36e2aa2a) SHA1(4813b013cb8260157858e3adc7323efc6654e170) ) // 82S123
 
 	ROM_REGION( 0x0400, "user1", 0 ) /* color map */
-	ROM_LOAD( "dz9.e2",       0x0000, 0x0400, CRC(693855b6) SHA1(1c29d72be511c1d38b30b9534d647d0813b2ef57) )
+	ROM_LOAD( "db9.e2",       0x0000, 0x0400, CRC(693855b6) SHA1(1c29d72be511c1d38b30b9534d647d0813b2ef57) ) // 2708
 
 	ROM_REGION( 0x0800, "user2", 0 ) /* grid horizontal line positions */
-	ROM_LOAD( "ic12.sub",     0x0000, 0x0800, CRC(f61c1c45) SHA1(9016710409ae2bccfc60f8e3d1131c125333c034) )
+	ROM_LOAD( "dv9.ic12",     0x0000, 0x0800, CRC(f61c1c45) SHA1(9016710409ae2bccfc60f8e3d1131c125333c034) ) // 2716
 
 	ROM_REGION( 0x0020, "user3", 0 ) /* grid vertical line positions */
-	ROM_LOAD( "ic1.sub",      0x0000, 0x0020, CRC(df974878) SHA1(2ef2e1b771923f9a0bfe1841444de61200298605) )
+	ROM_LOAD( "22.ic1",      0x0000, 0x0020, CRC(df974878) SHA1(2ef2e1b771923f9a0bfe1841444de61200298605) ) // 82S123
 ROM_END
 
 ROM_START( devzone2 )

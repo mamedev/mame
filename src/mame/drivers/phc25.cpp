@@ -334,8 +334,7 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, RAM_TAG).set_default_size("16K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")

@@ -526,14 +526,14 @@ MACHINE_CONFIG_START(pturn_state::pturn)
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(pturn_state, sub_intgen, 3*60)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pturn_state, flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pturn_state, nmi_main_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, pturn_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pturn_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, pturn_state, bgbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pturn_state, fgbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // toggles frequently during gameplay
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_w));
+	mainlatch.q_out_cb<1>().set(FUNC(pturn_state::nmi_main_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(pturn_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(pturn_state::coin_counter_2_w));
+	mainlatch.q_out_cb<4>().set(FUNC(pturn_state::bgbank_w));
+	mainlatch.q_out_cb<5>().set(FUNC(pturn_state::fgbank_w));
+	mainlatch.q_out_cb<6>().set_nop(); // toggles frequently during gameplay
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -219,7 +219,6 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(apogee_mem)
-	MCFG_MACHINE_RESET_OVERRIDE(apogee_state, radio86 )
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000)/9)
@@ -229,18 +228,18 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	MCFG_PIT8253_CLK2(XTAL(16'000'000)/9)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, apogee_state,pit8253_out2_changed))
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
+	I8255(config, m_ppi8255_1);
+	m_ppi8255_1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	m_ppi8255_1->in_pb_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
 	//MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(apogee_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma8257, i8257_device, dreq2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -259,12 +258,12 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	MCFG_SPEAKER_LEVELS(4, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8("i8275", i8275_device, dack_w))
-	MCFG_I8257_REVERSE_RW_MODE(1)
+	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
+	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
+	m_dma8257->set_reverse_rw_mode(1);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rka_cassette_formats)

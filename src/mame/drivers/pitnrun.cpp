@@ -283,20 +283,20 @@ MACHINE_CONFIG_START(pitnrun_state::pitnrun)
 	MCFG_DEVICE_PROGRAM_MAP(pitnrun_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 7B (mislabeled LS156 on schematic)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pitnrun_state, nmi_enable_w)) // NMION
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pitnrun_state, color_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // COLOR SEL 2 - not used ?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pitnrun_state, char_bank_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pitnrun_state, hflip_w)) // HFLIP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pitnrun_state, vflip_w)) // VFLIP
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 7B (mislabeled LS156 on schematic)
+	mainlatch.q_out_cb<0>().set(FUNC(pitnrun_state::nmi_enable_w)); // NMION
+	mainlatch.q_out_cb<1>().set(FUNC(pitnrun_state::color_select_w));
+	mainlatch.q_out_cb<4>().set_nop(); // COLOR SEL 2 - not used ?
+	mainlatch.q_out_cb<5>().set(FUNC(pitnrun_state::char_bank_select_w));
+	mainlatch.q_out_cb<6>().set(FUNC(pitnrun_state::hflip_w)); // HFLIP
+	mainlatch.q_out_cb<7>().set(FUNC(pitnrun_state::vflip_w)); // VFLIP
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000)/2)          /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(pitnrun_sound_map)
 	MCFG_DEVICE_IO_MAP(pitnrun_sound_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

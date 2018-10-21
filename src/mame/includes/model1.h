@@ -103,8 +103,8 @@ public:
 
 private:
 	// Machine
-	DECLARE_MACHINE_START(model1);
-	DECLARE_MACHINE_RESET(model1);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
@@ -165,7 +165,7 @@ private:
 	DECLARE_WRITE8_MEMBER(r360_w);
 
 	// Rendering
-	DECLARE_VIDEO_START(model1);
+	virtual void video_start() override;
 	DECLARE_READ16_MEMBER(model1_listctl_r);
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 

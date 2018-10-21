@@ -212,9 +212,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
+	RAM(config, RAM_TAG).set_default_size("6K").set_extra_options("2K,22K,38K,54K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxy_state::galaxyp)
@@ -255,8 +253,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("38K")
+	RAM(config, RAM_TAG).set_default_size("38K");
 MACHINE_CONFIG_END
 
 ROM_START (galaxy)

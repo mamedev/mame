@@ -55,12 +55,12 @@ Visual Studio builds are also possible, but you still need [build environment](h
 In order to generate solution and project files just run:
 
 ```
-make vs2015
+make vs2017
 ```
 or use this command to build it directly using msbuild
 
 ```
-make vs2015 MSBUILD=1
+make vs2017 MSBUILD=1
 ```
 
 

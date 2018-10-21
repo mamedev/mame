@@ -40,7 +40,7 @@
 class rtc4543_device :  public device_t,
 						public device_rtc_interface
 {
-	static const char *s_reg_names[7];
+	static char const *const s_reg_names[7];
 
 public:
 	// construction/destruction

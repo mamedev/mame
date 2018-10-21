@@ -151,6 +151,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/dp8350.h,VIDEOS["DP8350"] = true
+--------------------------------------------------
+
+if (VIDEOS["DP8350"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/dp8350.cpp",
+		MAME_DIR .. "src/devices/video/dp8350.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/ef9340_1.h,VIDEOS["EF9340_1"] = true
 --------------------------------------------------
 
@@ -492,6 +504,18 @@ if (VIDEOS["I8275"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/i8275.cpp",
 		MAME_DIR .. "src/devices/video/i8275.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ims_cvc.h,VIDEOS["IMS_CVC"] = true
+--------------------------------------------------
+
+if (VIDEOS["IMS_CVC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ims_cvc.cpp",
+		MAME_DIR .. "src/devices/video/ims_cvc.h",
 	}
 end
 
@@ -1088,5 +1112,27 @@ if (VIDEOS["NEREID"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/nereid.cpp",
 		MAME_DIR .. "src/devices/video/nereid.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ps2gif.h,VIDEOS["PS2GIF"] = true
+--------------------------------------------------
+if (VIDEOS["PS2GIF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ps2gif.cpp",
+		MAME_DIR .. "src/devices/video/ps2gif.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ps2gs.h,VIDEOS["PS2GS"] = true
+--------------------------------------------------
+if (VIDEOS["PS2GS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ps2gs.cpp",
+		MAME_DIR .. "src/devices/video/ps2gs.h",
 	}
 end

@@ -322,16 +322,15 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK/16)
-	MCFG_ADC0808_IN0_CB(IOPORT("STICK1_Y"))
-	MCFG_ADC0808_IN1_CB(IOPORT("STICK0_Y"))
-	MCFG_ADC0808_IN2_CB(IOPORT("STICK1_X"))
-	MCFG_ADC0808_IN3_CB(IOPORT("STICK0_X"))
+	adc0809_device &adc(ADC0809(config, "adc", MASTER_CLOCK/16));
+	adc.in_callback<0>().set_ioport("STICK1_Y");
+	adc.in_callback<1>().set_ioport("STICK0_Y");
+	adc.in_callback<2>().set_ioport("STICK1_X");
+	adc.in_callback<3>().set_ioport("STICK0_X");
 
 	X2212(config, "nvram").set_auto_save(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	MCFG_TIMER_DRIVER_ADD(m_scan_timer, foodf_state, scanline_update_timer)
 

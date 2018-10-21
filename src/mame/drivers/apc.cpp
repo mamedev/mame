@@ -309,7 +309,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 	uint8_t res;
 
 	if(offset & 1)
-		res = m_pit->read(space, (offset & 6) >> 1);
+		res = m_pit->read((offset & 6) >> 1);
 	else
 	{
 		if(offset & 4)
@@ -318,7 +318,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 			res = 0xff;
 		}
 		else
-			res = m_i8259_s->read(space, (offset & 2) >> 1);
+			res = m_i8259_s->read((offset & 2) >> 1);
 	}
 
 	return res;
@@ -327,13 +327,13 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 WRITE8_MEMBER(apc_state::apc_port_28_w)
 {
 	if(offset & 1)
-		m_pit->write(space, (offset & 6) >> 1, data);
+		m_pit->write((offset & 6) >> 1, data);
 	else
 	{
 		if(offset & 4)
 			printf("Write undefined port %02x\n",offset+0x28);
 		else
-			m_i8259_s->write(space, (offset & 2) >> 1, data);
+			m_i8259_s->write((offset & 2) >> 1, data);
 	}
 }
 
@@ -970,12 +970,12 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_dmac->out_dack_callback<2>().set(FUNC(apc_state::apc_dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(apc_state::apc_dack3_w));
 
-	MCFG_NVRAM_ADD_1FILL(m_cmos)
-	MCFG_UPD1990A_ADD(m_rtc, XTAL(32'768), NOOP, NOOP)
+	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
+	UPD1990A(config, m_rtc);
 
-	MCFG_UPD765A_ADD(m_fdc, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(m_i8259_s, pic8259_device, ir4_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_dmac, am9517a_device, dreq1_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")

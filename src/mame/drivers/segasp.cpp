@@ -38,7 +38,7 @@ todo: make this actually readable, we don't support unicode source files
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
-Bingo Galaxy                                ???-?????                 no          ???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
+Bingo Galaxy                                834-14788                 no          ???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
 Bingo Parade                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Brick People / Block People                 834-14881                 ROM  ANY    253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
 Dinosaur King                               834-14493-01 D            ROM  US     253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
@@ -304,11 +304,11 @@ MACHINE_CONFIG_START(segasp_state::segasp)
 	MCFG_DEVICE_PROGRAM_MAP(segasp_map)
 	MCFG_DEVICE_IO_MAP(onchip_port)
 
-	MCFG_DEVICE_ADD("main_eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_DEVICE_ADD("sp_eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "main_eeprom");
+	EEPROM_93C46_16BIT(config, "sp_eeprom");
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
-	MCFG_X76F100_ADD("naomibd_eeprom")  // actually not present
+	X76F100(config, "naomibd_eeprom");  // actually not present
 	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 

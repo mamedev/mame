@@ -51,21 +51,21 @@ public:
 	template<class Object> devcb_base &set_ym_read_callback(Object &&object)  { return m_ym_read_cb.set_callback(std::forward<Object>(object)); }
 	template<class Object> devcb_base &set_ym_write_callback(Object &&object) { return m_ym_write_cb.set_callback(std::forward<Object>(object)); }
 
-	DECLARE_READ8_MEMBER( main_r );
-	DECLARE_WRITE8_MEMBER( main_w );
-	DECLARE_WRITE16_MEMBER( main_mustb_w );
-	DECLARE_WRITE8_MEMBER( irq_clear_w );
-	DECLARE_WRITE8_MEMBER( rst10_ack_w );
-	DECLARE_WRITE8_MEMBER( rst18_ack_w );
-	DECLARE_READ8_MEMBER( ym_r );
-	DECLARE_WRITE8_MEMBER( ym_w );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_WRITE8_MEMBER( coin_w );
+	u8 main_r(offs_t offset);
+	void main_w(offs_t offset, u8 data);
+	void main_mustb_w(offs_t, u16 data, u16 mem_mask);
+	void irq_clear_w(u8);
+	void rst10_ack_w(u8);
+	void rst18_ack_w(u8);
+	u8 ym_r(offs_t offset);
+	void ym_w(offs_t offset, u8 data);
+	void bank_w(u8 data);
+	void coin_w(u8 data);
 	WRITE_LINE_MEMBER( fm_irqhandler );
-	DECLARE_READ8_MEMBER( soundlatch_r );
-	DECLARE_READ8_MEMBER( main_data_pending_r );
-	DECLARE_WRITE8_MEMBER( main_data_w );
-	DECLARE_WRITE8_MEMBER( pending_w );
+	u8 soundlatch_r(offs_t offset);
+	u8 main_data_pending_r();
+	void main_data_w(offs_t offset, u8 data);
+	void pending_w(u8);
 
 	IRQ_CALLBACK_MEMBER(im0_vector_cb);
 
@@ -113,8 +113,8 @@ class sei80bu_device : public device_t, public device_rom_interface
 public:
 	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_READ8_MEMBER(opcode_r);
+	u8 data_r(offs_t offset);
+	u8 opcode_r(offs_t offset);
 
 protected:
 	// device-level overrides
@@ -134,8 +134,8 @@ public:
 	~seibu_adpcm_device() {}
 
 	void decrypt();
-	DECLARE_WRITE8_MEMBER( adr_w );
-	DECLARE_WRITE8_MEMBER( ctl_w );
+	void adr_w(offs_t offset, u8 data);
+	void ctl_w(u8 data);
 
 protected:
 	// device-level overrides

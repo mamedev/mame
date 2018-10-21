@@ -230,21 +230,15 @@ MACHINE_CONFIG_START(miniframe_state::miniframe)
 	MCFG_DEVICE_PROGRAM_MAP(miniframe_mem)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M")
+	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M");
 
 	// RAM/ROM bank
-	MCFG_DEVICE_ADD("ramrombank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(ramrombank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400000)
+	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&miniframe_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);
 
 	// floppy
-	MCFG_DEVICE_ADD("wd2797", WD2797, 1000000)
-//  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_intrq_w))
-//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_drq_w))
+	WD2797(config, m_wd2797, 1000000);
+//  m_wd2797->intrq_wr_callback().set(FUNC(miniframe_state::wd2797_intrq_w));
+//  m_wd2797->drq_wr_callback().set(FUNC(miniframe_state::wd2797_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	// 8263s

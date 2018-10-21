@@ -469,8 +469,8 @@ WRITE16_MEMBER(jpmimpct_state::volume_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->set_bank_base(0x20000 * ((data >> 1) & 3));
-		m_upd7759->reset_w(data & 0x01);
+		m_upd7759->set_rom_bank((data >> 1) & 3);
+		m_upd7759->reset_w(BIT(data, 0));
 	}
 }
 
@@ -478,7 +478,7 @@ WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->port_w(space, 0, data);
+		m_upd7759->port_w(data);
 		m_upd7759->start_w(0);
 		m_upd7759->start_w(1);
 	}
@@ -856,7 +856,7 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD("duart_1_timer", jpmimpct_state, duart_1_timer_event)
 
@@ -1320,13 +1320,13 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impctawp)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impctawp)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jpmimpct_state, payen_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, jpmimpct_state, hopper_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, jpmimpct_state, hopper_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmimpct_state, display_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(jpmimpct_state::payen_a_w));
+	ppi.in_pb_callback().set(FUNC(jpmimpct_state::hopper_b_r));
+	ppi.in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
+	ppi.out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
 
 	MCFG_TIMER_DRIVER_ADD("duart_1_timer", jpmimpct_state, duart_1_timer_event)
 

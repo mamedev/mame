@@ -1086,7 +1086,7 @@ static INPUT_PORTS_START( breywood )
 INPUT_PORTS_END
 
 
-/* verified from HD6309 code - 'makyosen' coinage needs further checking when its REAL MCU is available */
+/* verified from HD6309 code */
 static INPUT_PORTS_START( gondo )
 	PORT_START("IN0")
 	PLAYER1_JOYSTICK
@@ -2756,8 +2756,8 @@ ROM_START( makyosen )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ds05.h5",  0x8000, 0x8000, CRC(e6e28ca9) SHA1(3b1f8219331db1910bfb428f8964f8fc1063df6f) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU based on 'gondo' one */
-	ROM_LOAD( "ds-a.b1",  0x0000, 0x1000, BAD_DUMP CRC(f61b77cf) SHA1(2d3549876ea08623ce9da1d637853cb4c740300a)) // ds.b1
+	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_LOAD( "ds-a.b1",  0x0000, 0x1000, CRC(08f36e35) SHA1(e8913da71704a89fad41d5bfba45682119166681))
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ds14.b18", 0x00000, 0x08000, CRC(00cbe9c8) SHA1(de7b640de8fd54ee79194945c96d5768d09f483b) )

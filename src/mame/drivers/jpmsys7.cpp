@@ -34,8 +34,8 @@ public:
 	{ }
 
 	void jpmsys7(machine_config &config);
-	
-private:	
+
+private:
 	void jpmsys7_map(address_map &map);
 
 	// devices

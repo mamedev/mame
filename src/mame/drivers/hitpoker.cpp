@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_DEVICE_IO_MAP(hitpoker_io)
 	MCFG_MC68HC11_CONFIG(0, 0x100, 0x01)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

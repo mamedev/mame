@@ -236,11 +236,10 @@ void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 	{
 		if (linescroll)
 		{
-			if ( (y < cliprect.min_y) || (y > cliprect.max_y) )
+			if ( (y < cliprect.top()) || (y > cliprect.bottom()) )
 				continue;
 
-			clip.min_y = y;
-			clip.max_y = y;
+			clip.sety(y, y);
 		}
 
 		int sx = (scroll[y] & 0xff) * 4;
@@ -824,10 +823,11 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &bmcpokr_state::ramdac_map);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmcpokr)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(10), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)    // hopper stuck low if too slow
 

@@ -1047,11 +1047,11 @@ MACHINE_CONFIG_START(equites_state::common_sound)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
 
-	MCFG_DEVICE_ADD("audio8155", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, equites_state, equites_8155_porta_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, equites_state, equites_8155_portb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, equites_state, equites_8155_portc_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, equites_state, equites_8155_timer_pulse))
+	i8155_device &i8155(I8155(config, "audio8155", 0));
+	i8155.out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
+	i8155.out_pb_callback().set(FUNC(equites_state::equites_8155_portb_w));
+	i8155.out_pc_callback().set(FUNC(equites_state::equites_8155_portc_w));
+	i8155.out_to_callback().set(FUNC(equites_state::equites_8155_timer_pulse));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1160,17 +1160,17 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_DEVICE_PROGRAM_MAP(equites_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, equites_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, equites_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, equites_state, mcu_switch_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::flip_screen_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(equites_state::mcu_start_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(equites_state::mcu_switch_w));
 
 	common_sound(config);
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1200,7 +1200,7 @@ MACHINE_CONFIG_START(gekisou_state::gekisou)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
 
 	// gekisou has battery-backed RAM to store settings
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -1211,11 +1211,11 @@ MACHINE_CONFIG_START(splndrbt_state::splndrbt)
 	MCFG_DEVICE_PROGRAM_MAP(splndrbt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", splndrbt_state, splndrbt_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, equites_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, equites_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, equites_state, mcu_switch_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, splndrbt_state, splndrbt_selchar_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(equites_state::flip_screen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::mcu_start_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(equites_state::mcu_switch_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(splndrbt_state::splndrbt_selchar_w));
 
 	common_sound(config);
 

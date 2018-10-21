@@ -534,9 +534,9 @@ MACHINE_CONFIG_START(omegrace_state::omegrace)
 	MCFG_DEVICE_IO_MAP(sound_port)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

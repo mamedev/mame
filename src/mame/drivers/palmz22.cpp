@@ -67,7 +67,6 @@ end
 #include "cpu/arm7/arm7.h"
 #include "machine/s3c2410.h"
 #include "machine/smartmed.h"
-#include "rendlay.h"
 #include "screen.h"
 
 #define PALM_Z22_BATTERY_LEVEL  75
@@ -78,10 +77,10 @@ class palmz22_state : public driver_device
 {
 public:
 	palmz22_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_s3c2410(*this, "s3c2410"),
-			m_nand(*this, "nand")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_s3c2410(*this, "s3c2410")
+		, m_nand(*this, "nand")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
@@ -300,7 +299,6 @@ MACHINE_CONFIG_START(palmz22_state::palmz22)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(160, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160 - 1, 0, 160 - 1)
-	config.set_default_layout(layout_lcd);
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 

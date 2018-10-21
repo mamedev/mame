@@ -80,7 +80,7 @@ MACHINE_CONFIG_START(gamemasters_state::gmsshoot)
 	MCFG_DEVICE_ADD("maincpu", R65C02, 4_MHz_XTAL / 4) // divider not verified
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // MK48Z02B-25
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02B-25
 
 	// LCD video?
 

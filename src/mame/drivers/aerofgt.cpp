@@ -118,14 +118,14 @@ WRITE8_MEMBER(aerofgt_state::aerfboot_okim6295_banking_w)
 
 WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_write_port_0_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
 WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_reset_w)
 {
-	m_upd7759->reset_w(data & 0x80);
+	m_upd7759->reset_w(BIT(data, 7));
 }
 
 template<int Layer>

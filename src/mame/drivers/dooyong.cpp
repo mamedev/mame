@@ -691,7 +691,7 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 			int const color = buffered_spriteram[offs+7] & 0x000f;
 			//TODO: This priority mechanism works for known games, but seems a bit strange.
 			//Are we missing something?  (The obvious spare palette bit isn't it.)
-			int const pri = (((color == 0x00) || (color == 0x0f)) ? 0xfc : 0xf0);
+			int const pri = GFX_PMASK_4 | (((color == 0x00) || (color == 0x0f)) ? GFX_PMASK_2 : 0);
 			int const width = buffered_spriteram[offs+1] & 0x000f;
 			int const height = (buffered_spriteram[offs+1] & 0x00f0) >> 4;
 
@@ -753,12 +753,12 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 	m_bg_bitmap[1].fill(m_palette->black_pen(), cliprect);
 	m_bg[1]->draw(screen, m_bg_bitmap[1], cliprect, 0, 1);
 
-	for (int y = cliprect.min_y; cliprect.max_y >= y; y++)
+	for (int y = cliprect.top(); cliprect.bottom() >= y; y++)
 	{
 		uint16_t const *const bg_src(&m_bg_bitmap[0].pix16(y, 0));
 		uint16_t const *const bg2_src(&m_bg_bitmap[1].pix16(y, 0));
 		uint16_t *const dst(&bitmap.pix16(y, 0));
-		for (int x = cliprect.min_x; cliprect.max_x >= x; x++)
+		for (int x = cliprect.left(); cliprect.right() >= x; x++)
 			dst[x] = 0x100U | (bg_src[x] << 4) | bg2_src[x];
 	}
 

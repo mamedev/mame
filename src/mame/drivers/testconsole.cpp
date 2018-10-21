@@ -180,7 +180,7 @@ MACHINE_CONFIG_START(whouse_testcons_state::whousetc)
 	MCFG_DEVICE_PROGRAM_MAP(program_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("i8155", I8155, 6.144_MHz_XTAL)
+	I8155(config, "i8155", 6.144_MHz_XTAL);
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 

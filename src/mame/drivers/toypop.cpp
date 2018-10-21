@@ -123,9 +123,9 @@ private:
 	bool m_slave_irq_enable;
 	uint8_t m_pal_bank;
 
-	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip);
+	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip);
+	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip);
 };
 
 PALETTE_INIT_MEMBER(namcos16_state, toypop)
@@ -177,7 +177,7 @@ PALETTE_INIT_MEMBER(namcos16_state, toypop)
 	}
 }
 
-void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip)
 {
 	int x, y;
 	const uint16_t pal_base = 0x300 + (m_pal_bank << 4);
@@ -187,18 +187,32 @@ void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		uint16_t *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
-		uint16_t *dst = &bitmap.pix16(y, cliprect.min_x);
+		uint16_t *dst;
+		if(!flip)
+			dst = &bitmap.pix16(y, cliprect.min_x);
+		else
+			dst = &bitmap.pix16(cliprect.max_y - y, cliprect.max_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			uint32_t srcpix = *src++;
-			*dst++ = m_palette->pen(((srcpix >> 8) & 0xf) + pal_base);
-			*dst++ = m_palette->pen((srcpix & 0xf) + pal_base);
+			int idx1 = ((srcpix >> 8) & 0xf) + pal_base;
+			int idx2 = (srcpix & 0xf) + pal_base;
+			if (!flip)
+			{
+				*dst++ = m_palette->pen(idx1);
+				*dst++ = m_palette->pen(idx2);
+			}
+			else
+			{
+				*dst-- = m_palette->pen(idx1);
+				*dst-- = m_palette->pen(idx2);
+			}
 		}
 	}
 }
 
-void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip)
 {
 	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
 	int count;
@@ -208,31 +222,52 @@ void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 		int x;// = (count % 32);
 		int y; //= count / 32;
 
-		if(count < 64)
+		if (!flip)
 		{
-			x = 34 + (count / 32);
-			y = (count % 32) - 2;
-		}
-		else if(count >= 32*30)
-		{
-			x = (count / 32) - 30;
-			y = (count % 32) - 2;
+			if(count < 64)
+			{
+				x = 34 + (count / 32);
+				y = (count % 32) - 2;
+			}
+			else if(count >= 32*30)
+			{
+				x = (count / 32) - 30;
+				y = (count % 32) - 2;
+			}
+			else
+			{
+				x = 2 + (count % 32);
+				y = (count / 32) - 2;
+			}
 		}
 		else
 		{
-			x = 2 + (count % 32);
-			y = (count / 32) - 2;
+			if(count < 64)
+			{
+				x = 1 - (count / 32);
+				y = 29 - (count % 32);
+			}
+			else if(count >= 32*30)
+			{
+				x = 65 - (count / 32);
+				y = 29 - (count % 32);
+			}
+			else
+			{
+				x = 33 - (count % 32);
+				y = 29 - (count / 32);
+			}
 		}
 
 		uint16_t tile = m_fgvram[count];
 		uint8_t color = (m_fgattr[count] & 0x3f) + (m_pal_bank<<6);
 
-		gfx_0->transpen(bitmap,cliprect,tile,color,0,0,x*8,y*8,0);
+		gfx_0->transpen(bitmap,cliprect,tile,color,flip,flip,x*8,y*8,0);
 	}
 }
 
 // TODO: this is likely to be a lot more complex, and maybe is per scanline too
-void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip)
 {
 	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
 	int count;
@@ -248,6 +283,11 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		if(enabled == false)
 			continue;
 
+		static const int gfx_offs[2][2] =
+		{
+			{ 0, 1 },
+			{ 2, 3 }
+		};
 		uint8_t tile = base_spriteram[count];
 		uint8_t color = base_spriteram[count+1];
 		int x = base_spriteram[count+bank1+1] + (base_spriteram[count+bank2+1] << 8);
@@ -263,6 +303,12 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		uint8_t width = ((base_spriteram[count+bank2] & 4) >> 2) + 1;
 		uint8_t height = ((base_spriteram[count+bank2] & 8) >> 3) + 1;
 
+		if (flip)
+		{
+			fx ^= 1;
+			fy ^= 1;
+		}
+
 		if(height == 2)
 			y -=16;
 
@@ -270,7 +316,7 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 		{
 			for(int xi=0;xi<width;xi++)
 			{
-				uint16_t sprite_offs = tile + (xi ^ ((width - 1) & fx)) + yi * 2;
+				uint16_t sprite_offs = tile + gfx_offs[yi ^ ((height - 1) * fy)][xi ^ ((width - 1) * fx)];
 				gfx_1->transmask(bitmap,cliprect,sprite_offs,color,fx,fy,x + xi*16,y + yi *16,m_palette->transpen_mask(*gfx_1, color, 0xff));
 			}
 		}
@@ -279,9 +325,10 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 
 uint32_t namcos16_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	legacy_bg_draw(bitmap,cliprect);
-	legacy_fg_draw(bitmap,cliprect);
-	legacy_obj_draw(bitmap,cliprect);
+	int flip = flip_screen();
+	legacy_bg_draw(bitmap,cliprect,flip);
+	legacy_fg_draw(bitmap,cliprect,flip);
+	legacy_obj_draw(bitmap,cliprect,flip);
 	return 0;
 }
 
@@ -560,9 +607,9 @@ static INPUT_PORTS_START( toypop )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, 0x80, "SWA:1" )
 
 	PORT_START("DSW2")  /* 56XX #1 pins 30-33 and 38-41 */
@@ -782,5 +829,5 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, empty_init, ROT0, "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
-GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, empty_init, ROT0, "Namco", "Toypop",        MACHINE_NO_COCKTAIL )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, empty_init, ROT0,   "Namco", "Libble Rabble", 0 )
+GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, empty_init, ROT180, "Namco", "Toypop",        0 )

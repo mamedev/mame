@@ -503,7 +503,7 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 	const pen_t *mram = &m_palette->pens()[(color_latch & 0xc0) << 7];
 
 	/* now do the nasty blend */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *an = &m_an_bitmap.pix16(y);
 		uint16_t *pf = &m_pf_bitmap.pix16(y);
@@ -514,7 +514,7 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 		/* Primal Rage: no TRAM, slightly different priorities */
 		if (m_is_primrage)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				uint8_t pfpri = (pf[x] >> 10) & 7;
 				uint8_t mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
@@ -548,7 +548,7 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 		/* T-Mek: full TRAM and all effects */
 		else
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				uint8_t pfpri = (pf[x] >> 10) & 7;
 				uint8_t mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;

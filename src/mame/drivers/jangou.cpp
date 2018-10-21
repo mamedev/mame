@@ -968,7 +968,7 @@ MACHINE_CONFIG_START(jangou_state::roylcrdn)
 
 	MCFG_DEVICE_REMOVE("cpu1")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(jangou_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)

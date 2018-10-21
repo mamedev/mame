@@ -29,7 +29,7 @@ OPTION_GUIDE_START(hd_option_guide)
 	OPTION_INT('K', "hunksize",         "Hunk Bytes")
 OPTION_GUIDE_END
 
-static const char *hd_option_spec =
+static char const *const hd_option_spec =
 	"C1-[512]-1024;H1/2/[4]/8;S1-[16]-64;L128/256/[512]/1024;K512/1024/2048/[4096]";
 
 

@@ -251,14 +251,14 @@ void firefox_state::video_start()
 {
 	m_bgtiles = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firefox_state::bgtile_get_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 	m_bgtiles->set_transparent_pen(0);
-	m_bgtiles->set_scrolldy(m_screen->visible_area().min_y, 0);
+	m_bgtiles->set_scrolldy(m_screen->visible_area().top(), 0);
 }
 
 
 uint32_t firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int sprite;
-	int gfxtop = screen.visible_area().min_y;
+	int gfxtop = screen.visible_area().top();
 
 	bitmap.fill(m_palette->pen_color(256), cliprect);
 
@@ -660,9 +660,9 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_XTAL/16) // nominally 900 kHz
-	MCFG_ADC0808_IN0_CB(IOPORT("PITCH"))
-	MCFG_ADC0808_IN1_CB(IOPORT("YAW"))
+	adc0809_device &adc(ADC0809(config, "adc", MASTER_XTAL/16)); // nominally 900 kHz
+	adc.in_callback<0>().set_ioport("PITCH");
+	adc.in_callback<1>().set_ioport("YAW");
 
 	ls259_device &latch0(LS259(config, "latch0")); // 7F
 	latch0.q_out_cb<0>().set(m_nvram_1c, FUNC(x2212_device::recall));      // NVRECALL
@@ -684,8 +684,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	latch1.q_out_cb<6>().set_output("led2").invert();
 	latch1.q_out_cb<7>().set_output("led3").invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_XTAL/8/16/16/16/16))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_XTAL/8/16/16/16/16));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firefox)
@@ -701,12 +700,12 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	X2212(config, "nvram_1c").set_auto_save(true);
 	X2212(config, "nvram_1d").set_auto_save(true);
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_XTAL/8)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, firefox_state, riot_porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, firefox_state, riot_porta_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8("tms", tms5220_device, status_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8("tms", tms5220_device, data_w))
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	riot6532_device &riot(RIOT6532(config, "riot", MASTER_XTAL/8));
+	riot.in_pa_callback().set(FUNC(firefox_state::riot_porta_r));
+	riot.out_pa_callback().set(FUNC(firefox_state::riot_porta_w));
+	riot.in_pb_callback().set("tms", FUNC(tms5220_device::status_r));
+	riot.out_pb_callback().set("tms", FUNC(tms5220_device::data_w));
+	riot.irq_callback().set_inputline("audiocpu", M6502_IRQ_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -152,29 +152,28 @@ MACHINE_CONFIG_START(kingpin_state::kingpin)
 	MCFG_DEVICE_PROGRAM_MAP(kingpin_program_map)
 	MCFG_DEVICE_IO_MAP(kingpin_io_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// PORT A read = watchdog?
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	ppi0.in_pb_callback().set_ioport("DSW1");
 	// PORT C read = unused?
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN0");
+	ppi1.in_pb_callback().set_ioport("IN1");
 	// PORT C read = unknown
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(kingpin_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(kingpin_state, irq0_line_hold,  1000) // unknown freq
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", 0))
-
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

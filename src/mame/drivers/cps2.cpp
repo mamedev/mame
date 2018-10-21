@@ -1334,7 +1334,7 @@ MACHINE_CONFIG_START(cps2_state::cps2)
 
 	MCFG_MACHINE_START_OVERRIDE(cps2_state, cps2)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

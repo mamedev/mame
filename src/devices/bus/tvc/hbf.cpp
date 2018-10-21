@@ -84,11 +84,13 @@ void tvc_hbf_device::device_reset()
 //  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tvc_hbf_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
-MACHINE_CONFIG_END
+void tvc_hbf_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+
+	FLOPPY_CONNECTOR(config, "fdc:0", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats);
+}
 
 
 //-------------------------------------------------
@@ -133,7 +135,7 @@ READ8_MEMBER(tvc_hbf_device::io_read)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			return m_fdc->read(space, offset & 3);
+			return m_fdc->read(offset & 3);
 		case 0x01:
 			return (m_fdc->drq_r()<<7) | (m_fdc->intrq_r() ? 0x01 : 0x00);
 		default:
@@ -150,7 +152,7 @@ WRITE8_MEMBER(tvc_hbf_device::io_write)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			m_fdc->write(space, offset & 3, data);
+			m_fdc->write(offset & 3, data);
 			break;
 		case 0x01:
 		{

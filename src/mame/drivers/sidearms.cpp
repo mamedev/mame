@@ -609,7 +609,7 @@ MACHINE_CONFIG_START(sidearms_state::sidearms)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
 	MCFG_DEVICE_PROGRAM_MAP(sidearms_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(sidearms_state::turtship)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
 	MCFG_DEVICE_PROGRAM_MAP(sidearms_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(sidearms_state::whizz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)

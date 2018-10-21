@@ -1633,9 +1633,9 @@ void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	if (((m_ddenlovr_layer_enable2 << 4) | m_ddenlovr_layer_enable) & (1 << layer))
 	{
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int pen = m_ddenlovr_pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
 				if ((pen & transmask) != transpen)
@@ -4370,7 +4370,7 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -9721,10 +9721,10 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(ddenlovr_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_blitter_irq_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_coincounter_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_coincounter_1_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<1>().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq_ack_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_0_w));
+	m_mainlatch->q_out_cb<5>().set(FUNC(ddenlovr_state::ddenlovr_coincounter_1_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,ddenlovr)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9769,8 +9769,9 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovj)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ddenlovj_map)
 
-	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_blitter_irq_ack_w))
+	m_mainlatch->q_out_cb<1>().set_nop();
+	m_mainlatch->q_out_cb<4>().set_nop();
+	m_mainlatch->q_out_cb<5>().set(FUNC(ddenlovr_state::ddenlovr_blitter_irq_ack_w));
 
 	MCFG_DEVICE_REPLACE("rtc", RTC62421, XTAL(32'768)) // internal oscillator
 MACHINE_CONFIG_END
@@ -9788,9 +9789,8 @@ MACHINE_CONFIG_START(ddenlovr_state::akamaru)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(akamaru_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, ddenlovr_state, akamaru_dsw2_sel_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ddenlovr_state, akamaru_dsw1_sel_w))
+	m_mainlatch->q_out_cb<2>().set(FUNC(ddenlovr_state::akamaru_dsw2_sel_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(ddenlovr_state::akamaru_dsw1_sel_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::quiz365)
@@ -9800,9 +9800,9 @@ MACHINE_CONFIG_START(ddenlovr_state::quiz365)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(quiz365_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch") // 7D has wire mod connecting to sample ROM at 1F
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, ddenlovr_state, quiz365_oki_bank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ddenlovr_state, quiz365_oki_bank2_w))
+	// 7D has wire mod connecting to sample ROM at 1F
+	m_mainlatch->q_out_cb<1>().set(FUNC(ddenlovr_state::quiz365_oki_bank1_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(ddenlovr_state::quiz365_oki_bank2_w));
 
 	MCFG_DEVICE_REPLACE("aysnd", YM2149, XTAL(28'636'363) / 16)  // or /8 ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -9827,7 +9827,7 @@ MACHINE_CONFIG_START(ddenlovr_state::ultrchmp)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ultrchmp_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)
 MACHINE_CONFIG_END

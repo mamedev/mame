@@ -3,7 +3,7 @@
 /********************************************************************************************
 
     PC-88VA (c) 1987 NEC
-	
+
 ********************************************************************************************/
 
 #pragma once
@@ -61,7 +61,7 @@ public:
 		m_tvram(*this, "tvram"),
 		m_gvram(*this, "gvram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	void pc88va(machine_config &config);

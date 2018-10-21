@@ -27,25 +27,6 @@ enum
 	INT_9995_INT4 = 3
 };
 
-#define MCFG_TMS9995_EXTOP_HANDLER( _extop) \
-	downcast<tms9995_device &>(*device).set_extop_callback(DEVCB_##_extop);
-
-#define MCFG_TMS9995_IAQ_HANDLER( _iaq )    \
-	downcast<tms9995_device &>(*device).set_iaq_callback(DEVCB_##_iaq);
-
-#define MCFG_TMS9995_CLKOUT_HANDLER( _clkout ) \
-	downcast<tms9995_device &>(*device).set_clkout_callback(DEVCB_##_clkout);
-
-#define MCFG_TMS9995_HOLDA_HANDLER( _holda ) \
-	downcast<tms9995_device &>(*device).set_holda_callback(DEVCB_##_holda);
-
-#define MCFG_TMS9995_DBIN_HANDLER( _dbin ) \
-	downcast<tms9995_device &>(*device).set_dbin_callback(DEVCB_##_dbin);
-
-#define MCFG_TMS9995_ENABLE_OVINT( _ovint ) \
-	downcast<tms9995_device*>(device)->set_overflow_interrupt( _ovint );
-
-
 class tms9995_device : public cpu_device
 {
 public:
@@ -68,11 +49,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( reset_line );
 
 	// Callbacks
-	template<class Object> devcb_base &set_extop_callback(Object &&cb) { return m_external_operation.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_iaq_callback(Object &&cb) { return m_iaq_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_clkout_callback(Object &&cb) { return m_clock_out_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_holda_callback(Object &&cb) { return m_holda_line.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_dbin_callback(Object &&cb) { return m_dbin_line.set_callback(std::forward<Object>(cb)); }
+	auto extop_cb() { return m_external_operation.bind(); }
+	auto iaq_cb() { return m_iaq_line.bind(); }
+	auto clkout_cb() { return m_clock_out_line.bind(); }
+	auto holda_cb() { return m_holda_line.bind(); }
+	auto dbin_cb() { return m_dbin_line.bind(); }
 
 	// For debugger access
 	uint8_t debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; };
@@ -107,7 +88,7 @@ protected:
 private:
 	// State / debug management
 	uint16_t  m_state_any;
-	static const char* s_statename[];
+	static char const *const s_statename[];
 	void    state_import(const device_state_entry &entry) override;
 	void    state_export(const device_state_entry &entry) override;
 	void    state_string_export(const device_state_entry &entry, std::string &str) const override;

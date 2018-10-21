@@ -278,8 +278,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	MCFG_DEVICE_PROGRAM_MAP(dragrace_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
 

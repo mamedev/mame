@@ -14,7 +14,6 @@
 #include "includes/fastfred.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -200,7 +199,7 @@ void fastfred_state::fastfred_map(address_map &map)
 	map(0xd860, 0xdbff).ram(); // Unused, but initialized
 	map(0xe000, 0xe000).portr("BUTTONS").writeonly().share("bgcolor");
 	map(0xe800, 0xe800).portr("JOYS");
-	map(0xf000, 0xf007).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf007).mirror(0x07f8).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).portr("DSW").nopw();
 	map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
@@ -219,7 +218,7 @@ void fastfred_state::jumpcoas_map(address_map &map)
 	map(0xe801, 0xe801).portr("DSW2");
 	map(0xe802, 0xe802).portr("BUTTONS");
 	map(0xe803, 0xe803).portr("JOYS");
-	map(0xf000, 0xf007).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf007).mirror(0x07f8).w(m_outlatch, FUNC(ls259_device::write_d0));
 	//AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  // Why doesn't this work???
 	map(0xf800, 0xf801).nopr().w("ay8910.1", FUNC(ay8910_device::address_data_w));
 }
@@ -241,7 +240,7 @@ void fastfred_state::imago_map(address_map &map)
 	map(0xe000, 0xe000).portr("BUTTONS");
 	map(0xe800, 0xe800).portr("JOYS");
 	map(0xf000, 0xf000).portr("DSW");
-	map(0xf000, 0xf007).mirror(0x03f8).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf007).mirror(0x03f8).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xf400, 0xf400).nopw(); // writes 0 or 2
 	map(0xf401, 0xf401).w(FUNC(fastfred_state::imago_sprites_bank_w));
 	map(0xf800, 0xf800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write));
@@ -643,16 +642,16 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(fastfred_state, sound_timer_irq, 4*60)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // "Control Signal Latch" at D10
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, fastfred_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, fastfred_state, colorbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, fastfred_state, colorbank2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, fastfred_state, charbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, fastfred_state, charbank2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, fastfred_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, fastfred_state, flip_screen_y_w))
+	LS259(config, m_outlatch); // "Control Signal Latch" at D10
+	m_outlatch->q_out_cb<1>().set(FUNC(fastfred_state::nmi_mask_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(fastfred_state::colorbank1_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(fastfred_state::colorbank2_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(fastfred_state::charbank1_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(fastfred_state::charbank2_w));
+	m_outlatch->q_out_cb<6>().set(FUNC(fastfred_state::flip_screen_x_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(fastfred_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -707,10 +706,9 @@ MACHINE_CONFIG_START(fastfred_state::imago)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(imago_map)
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // writes 1 when level starts, 0 when game over
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, fastfred_state, imago_dma_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, fastfred_state, imago_charbank_w))
+	m_outlatch->q_out_cb<0>().set_nop(); // writes 1 when level starts, 0 when game over
+	m_outlatch->q_out_cb<4>().set(FUNC(fastfred_state::imago_dma_irq_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(fastfred_state::imago_charbank_w));
 
 	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
 

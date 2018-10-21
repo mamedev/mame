@@ -355,46 +355,47 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 #define CPU_CLK (22.321_MHz_XTAL / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
-MACHINE_CONFIG_START(lwriter_state::lwriter)
-	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLK)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+void lwriter_state::lwriter(machine_config &config)
+{
+	M68000(config, m_maincpu, CPU_CLK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lwriter_state::maincpu_map);
 
-	MCFG_DEVICE_ADD("scc", SCC8530N, CPU_CLK)
-	MCFG_Z80SCC_OFFSETS(RXC_CLK, 0, RXC_CLK, 0)
+	SCC8530N(config, m_scc, CPU_CLK);
+	m_scc->configure_channels(RXC_CLK, 0, RXC_CLK, 0);
 	/* Port A */
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
+	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 	/* Port B */
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
+	m_scc->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	/* Interrupt */
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE("via", via6522_device, write_ca1))
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, lwriter_state, scc_int))
+	m_scc->out_int_callback().set("via", FUNC(via6522_device::write_ca1));
+	//m_scc->out_int_callback().set(FUNC(lwriter_state::scc_int));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", scc8530_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc", scc8530_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set("scc", FUNC(scc8530_device::rxa_w));
+	rs232a.cts_handler().set("scc", FUNC(scc8530_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", scc8530_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc", scc8530_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
+	rs232b.rxd_handler().set("scc", FUNC(scc8530_device::rxb_w));
+	rs232b.cts_handler().set("scc", FUNC(scc8530_device::ctsb_w));
 
 #if TPI
-	MCFG_DEVICE_ADD("tpi", TPI6525, 0)
+	TPI6525(config, "tpi", 0);
 #else
-	MCFG_DEVICE_ADD("via", VIA6522, CPU_CLK/10) // 68000 E clock presumed
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, lwriter_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, lwriter_state, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, lwriter_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, lwriter_state, via_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, lwriter_state, via_cb1_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, lwriter_state, via_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, lwriter_state, via_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, lwriter_state, via_int_w))
+	VIA6522(config, m_via, CPU_CLK/10); // 68000 E clock presumed
+	m_via->readpa_handler().set(FUNC(lwriter_state::via_pa_r));
+	m_via->readpb_handler().set(FUNC(lwriter_state::via_pb_r));
+	m_via->writepa_handler().set(FUNC(lwriter_state::via_pa_w));
+	m_via->writepb_handler().set(FUNC(lwriter_state::via_pb_w));
+	m_via->cb1_handler().set(FUNC(lwriter_state::via_cb1_w));
+	m_via->ca2_handler().set(FUNC(lwriter_state::via_ca2_w));
+	m_via->cb2_handler().set(FUNC(lwriter_state::via_cb2_w));
+	m_via->irq_handler().set(FUNC(lwriter_state::via_int_w));
 #endif
-MACHINE_CONFIG_END
+}
 
 /* SCC init sequence
  * :scc B Reg 09 <- c0 - Master Interrupt Control - Device reset

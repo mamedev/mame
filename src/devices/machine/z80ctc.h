@@ -32,27 +32,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_Z80CTC_INTR_CB(_devcb) \
-	downcast<z80ctc_device &>(*device).set_intr_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80CTC_ZC0_CB(_devcb) \
-	downcast<z80ctc_device &>(*device).set_zc_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80CTC_ZC1_CB(_devcb) \
-	downcast<z80ctc_device &>(*device).set_zc_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80CTC_ZC2_CB(_devcb) \
-	downcast<z80ctc_device &>(*device).set_zc_callback<2>(DEVCB_##_devcb);
-
-// not supported on a standard ctc, only used for the tmpz84c015
-#define MCFG_Z80CTC_ZC3_CB(_devcb) \
-	downcast<z80ctc_device &>(*device).set_zc_callback<3>(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -103,10 +82,8 @@ public:
 	// construction/destruction
 	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <class Object> devcb_base &set_intr_callback(Object &&cb) { return m_intr_cb.set_callback(std::forward<Object>(cb)); }
-	template <int Channel, class Object> devcb_base &set_zc_callback(Object &&cb) { return m_zc_cb[Channel].set_callback(std::forward<Object>(cb)); }
 	auto intr_callback() { return m_intr_cb.bind(); }
-	template <int Channel> auto zc_callback() { return m_zc_cb[Channel].bind(); }
+	template <int Channel> auto zc_callback() { return m_zc_cb[Channel].bind(); } // m_zc_cb[3] not supported on a standard ctc, only used for the tmpz84c015
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );

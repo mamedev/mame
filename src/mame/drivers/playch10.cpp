@@ -698,10 +698,11 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(playch10_state::playchnv)
+void playch10_state::playchnv(machine_config &config)
+{
 	playch10(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(playch10_state::playch10_hboard)
 	playch10(config);
@@ -1748,7 +1749,6 @@ GAME( 1987, pc_miket, playch10, playchnv, playch10, playch10_state, init_pceboar
 
 /* F-Board Games */
 GAME( 1987, pc_rcpam, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Rare",                                     "R.C. Pro-Am (PlayChoice-10)", 0 )
-GAME( 1987, pc_rrngr, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
 GAME( 1988, pc_ddrgn, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Technos Japan",                            "Double Dragon (PlayChoice-10)", 0 )
 GAME( 1989, pc_ngaid, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden (PlayChoice-10)", 0 )
 GAME( 1989, pc_tmnt,  playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles (PlayChoice-10)", 0 )
@@ -1756,6 +1756,7 @@ GAME( 1989, pc_ftqst, playch10, playch10, playch10, playch10_state, init_pcfboar
 GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, init_pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1989, pc_tbowl, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
 GAME( 1990, pc_virus, pc_drmro, playch10, playch10, playch10_state, init_virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
+GAME( 1990, pc_rrngr, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
 GAME( 1990, pc_drmro, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Nintendo",                                 "Dr. Mario (PlayChoice-10)", 0 )
 GAME( 1990, pc_bload, playch10, playch10, playch10, playch10_state, init_virus,    ROT0, "Jaleco (Nintendo of America license)",     "Bases Loaded (Prototype, PlayChoice-10)", 0 )
 GAME( 1990, pc_ynoid, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Yo! Noid (PlayChoice-10)", 0 )

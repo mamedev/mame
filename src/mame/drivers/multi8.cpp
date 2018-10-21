@@ -310,8 +310,7 @@ void multi8_state::multi8_io(address_map &map)
 	map(0x1a, 0x1a).r(FUNC(multi8_state::ay8912_1_r));
 	map(0x1c, 0x1c).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x1d, 0x1d).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x20, 0x20).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)); //cmt
+	map(0x20, 0x21).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write)); //cmt
 	map(0x24, 0x27).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)); //pit
 	map(0x28, 0x2b).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x2c, 0x2d).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write)); //i8259
@@ -600,10 +599,10 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(multi8_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, multi8_state, porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, multi8_state, portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, multi8_state, portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(multi8_state::porta_r));
+	m_ppi->out_pb_callback().set(FUNC(multi8_state::portb_w));
+	m_ppi->out_pc_callback().set(FUNC(multi8_state::portc_w));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
@@ -613,7 +612,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 
-	//MCFG_UPD765A_ADD("fdc", false, true)
+	//UPD765A(config, "fdc", false, true);
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 

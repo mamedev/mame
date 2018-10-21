@@ -1653,18 +1653,18 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_DEVICE_IO_MAP(io_map_skylncr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skylncr_state,  skylncr_vblank_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* 1x M5M82C255, or 2x PPI8255 */
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN1");
+	ppi0.in_pb_callback().set_ioport("IN2");
+	ppi0.in_pc_callback().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN4"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW2");
+	ppi1.in_pb_callback().set_ioport("IN3");
+	ppi1.in_pc_callback().set_ioport("IN4");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
@@ -1680,11 +1680,13 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skylncr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_RAMDAC_COLOR_BASE(0)
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &skylncr_state::ramdac_map);
+	ramdac.set_color_base(0);
 
-	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette")
-	MCFG_RAMDAC_COLOR_BASE(0x100)
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette));
+	ramdac2.set_addrmap(0, &skylncr_state::ramdac2_map);
+	ramdac2.set_color_base(0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

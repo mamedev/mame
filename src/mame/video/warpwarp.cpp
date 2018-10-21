@@ -248,14 +248,8 @@ void warpwarp_state::draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,p
 	{
 		int x,y,i,j;
 
-		if (flip_screen() & 1) {
-			x = 376 - m_ball_h;
-			y = 280 - m_ball_v;
-		}
-		else {
-			x = 264 - m_ball_h;
-			y = 240 - m_ball_v;
-		}
+		x = 264 - m_ball_h;
+		y = 240 - m_ball_v;
 
 		for (i = m_ball_sizey;i > 0;i--)
 			for (j = m_ball_sizex;j > 0;j--)

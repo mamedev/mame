@@ -3299,8 +3299,8 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_PCI_BUS_LEGACY_ADD(m_legacy_pci, 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, cobra_state, mpc106_pci_r, mpc106_pci_w)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, cobra_state, ide_interrupt))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set(FUNC(cobra_state::ide_interrupt));
 
 	/* video hardware */
 

@@ -604,10 +604,10 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	MCFG_DEVICE_PROGRAM_MAP(piratesh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", piratesh_state, piratesh_interrupt, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
+	K053252(config, m_k053252, XTAL(32'000'000)/4);
+	m_k053252->set_offsets(40, 16); // TODO
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)

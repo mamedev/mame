@@ -33,6 +33,8 @@ public:
 
 	template <class Object> devcb_base &set_irqf(Object &&cb) { return m_irq_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_adcf(Object &&cb) { return m_adc_func.set_callback(std::forward<Object>(cb)); }
+	auto irq_func() { return m_irq_func.bind(); }
+	auto adc_func() { return m_adc_func.bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -42,6 +44,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
 

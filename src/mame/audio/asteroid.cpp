@@ -321,13 +321,13 @@ MACHINE_CONFIG_START(asteroid_state::asteroid_sound)
 	MCFG_DEVICE_ADD("discrete", DISCRETE, asteroid_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 
-	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SND_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_FIRE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SEL>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SHIP_FIRE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_LIFE_EN>))
+	ls259_device &audiolatch(LS259(config, "audiolatch")); // M10
+	audiolatch.q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_SND_EN>));
+	audiolatch.q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_FIRE_EN>));
+	audiolatch.q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SAUCER_SEL>));
+	audiolatch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_THRUST_EN>));
+	audiolatch.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_SHIP_FIRE_EN>));
+	audiolatch.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_LIFE_EN>));
 MACHINE_CONFIG_END
 
 
@@ -337,6 +337,6 @@ MACHINE_CONFIG_START(asteroid_state::astdelux_sound)
 	MCFG_DEVICE_ADD("discrete", DISCRETE, astdelux_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
+	ls259_device &audiolatch(LS259(config, "audiolatch")); // M10
+	audiolatch.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<ASTEROID_THRUST_EN>));
 MACHINE_CONFIG_END

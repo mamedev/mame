@@ -1012,7 +1012,7 @@ MACHINE_CONFIG_START(m92_state::majtitl2)
 	m92_banked(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(majtitl2_map)
-	MCFG_NVRAM_ADD_0FILL("eeprom")
+	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(majtitl2_decryption_table)

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Charles MacDonald
 /*
-    HuC6280 sound chip emulator
+    Hudson PSG emulator
     by Charles MacDonald
     E-mail: cgfm2@hotmail.com
     WWW: http://cgfm2.emuviews.com
@@ -35,6 +35,10 @@
 
     - http://www.hudsonsoft.net/ww/about/about.html
     - http://www.hudson.co.jp/corp/eng/coinfo/history.html
+
+    Integrated on:
+    HuC6280 CPU (PC Engine/TurboGrafx 16)
+    HuC6230 Sound Chip (PC-FX, with OKI ADPCM)
 
 */
 
@@ -167,15 +171,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 /* MAME specific code                                                       */
 /*--------------------------------------------------------------------------*/
 
-READ8_MEMBER( c6280_device::c6280_r )
-{
-	return m_cpudevice->io_get_buffer();
-}
-
 WRITE8_MEMBER( c6280_device::c6280_w )
 {
-	m_cpudevice->io_set_buffer(data);
-
 	channel *chan = &m_channel[m_select];
 
 	/* Update stream */
@@ -256,12 +253,11 @@ WRITE8_MEMBER( c6280_device::c6280_w )
 	}
 }
 
-DEFINE_DEVICE_TYPE(C6280, c6280_device, "c6280", "Hudson HuC6280")
+DEFINE_DEVICE_TYPE(C6280, c6280_device, "c6280", "Hudson Soft HuC6280 PSG")
 
 c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C6280, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_cpudevice(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -277,14 +273,14 @@ void c6280_device::calculate_clocks()
 	/* Make waveform frequency table */
 	for (int i = 0; i < 4096; i += 1)
 	{
-		double step = ((clock() / rate) * 4096) / (i + 1);
+		double step = (16 * 4096) / (i + 1);
 		m_wave_freq_tab[(1 + i) & 0xFFF] = (uint32_t)step;
 	}
 
 	/* Make noise frequency table */
 	for (int i = 0; i < 32; i += 1)
 	{
-		double step = ((clock() / rate) * 32) / (i+1);
+		double step = (16 * 32) / (i+1);
 		m_noise_freq_tab[i] = (uint32_t)step;
 	}
 

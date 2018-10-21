@@ -75,6 +75,11 @@ public:
 	template <class Object> devcb_base &set_sm_dtr_wr_callback(Object &&cb) { return m_write_sm_dtr.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tuf_wr_callback(Object &&cb) { return m_write_tuf.set_callback(std::forward<Object>(cb)); }
 
+	auto tx_data_callback() { return m_write_tx_data.bind(); }
+	auto irq_callback() { return m_write_irq.bind(); }
+	auto sm_dtr_callback() { return m_write_sm_dtr.bind(); }
+	auto tuf_callback() { return m_write_tuf.bind(); }
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 

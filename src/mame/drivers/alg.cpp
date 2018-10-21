@@ -102,8 +102,8 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
 	if (xpos == -1 || ypos == -1)
 		return false;
 
-	*x = visarea.min_x + xpos * visarea.width() / 255;
-	*y = visarea.min_y + ypos * visarea.height() / 255;
+	*x = visarea.left() + xpos * visarea.width() / 255;
+	*y = visarea.top() + ypos * visarea.height() / 255;
 	return true;
 }
 
@@ -309,14 +309,9 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_PROGRAM_MAP(main_map_r1)
 
-	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&alg_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	ntsc_video(config);
@@ -336,13 +331,13 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
-	MCFG_PAULA_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(*this, amiga_state, paula_int_w))
+	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
+	paula.add_route(0, "lspeaker", 0.25);
+	paula.add_route(1, "rspeaker", 0.25);
+	paula.add_route(2, "rspeaker", 0.25);
+	paula.add_route(3, "lspeaker", 0.25);
+	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -356,13 +351,12 @@ MACHINE_CONFIG_START(alg_state::alg_r1)
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
 
-	/* fdc */
-	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
-	MCFG_AMIGA_FDC_INDEX_CALLBACK(WRITELINE("cia_1", mos8520_device, flag_w))
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(*this, amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(*this, amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(*this, amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(*this, amiga_state, fdc_dsksyn_w))
+	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
+	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
+	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
+	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
+	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
+	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
 MACHINE_CONFIG_END
 
 
@@ -706,7 +700,7 @@ ROM_START( marvice )
 
 	ROM_REGION( 0x800, "unk", ROMREGION_ERASEFF ) // nvram contents, should be x4 in size
 	ROM_LOAD( "mk48z02b-20.u13", 0x0000, 0x0800, BAD_DUMP CRC(e6079615) SHA1(f528b2a600ab047ad7f87f4dbae65a7e4cd10f8c) )
-	
+
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "marvice", 0, NO_DUMP )
 ROM_END

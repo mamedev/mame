@@ -224,11 +224,11 @@ uint32_t cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitma
 	{
 		int y;
 
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			int x;
 
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int pixel0 = s2636_0_bitmap.pix16(y, x);
 				int pixel1 = s2636_1_bitmap.pix16(y, x);
@@ -328,7 +328,7 @@ void cvs_state::cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect
 			if (flip_screen_y())
 				y = ~y;
 
-			if ((y >= cliprect.min_y) && (y <= cliprect.max_y) &&
+			if ((y >= cliprect.top()) && (y <= cliprect.bottom()) &&
 				(update_always || (m_palette->pen_indirect(bitmap.pix16(y, x)) == 0)))
 				bitmap.pix16(y, x) = star_pen;
 		}

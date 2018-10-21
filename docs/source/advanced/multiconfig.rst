@@ -12,7 +12,7 @@ Order of Config Loading
 2. **MAME.INI** (or other platform INI; e.g. **MESS.INI**) is parsed twice.
     The first pass may change various path settings, so the second pass is done to see if there is a valid config file at that new location (and if so, change settings using that file)
 3. **DEBUG.INI** if in debug mode.
-    This is an advanced config file, most people won't need to use it or be concerned by it. 
+    This is an advanced config file, most people won't need to use it or be concerned by it.
 4. System-specific INI files where appropriate (e.g. **NEOGEO_NOSLOT.INI** or **CPS2.INI**)
     As an example, Street Fighter Alpha is a CPS2 game, and so **CPS2.INI** would be loaded here.
 5. Monitor orientation INI file (either **HORIZONT.INI** or **VERTICAL.INI**)
@@ -21,7 +21,7 @@ Order of Config Loading
     Both Pac-Man and Street Fighter Alpha are arcade games, so **ARCADE.INI** would be loaded here. Atari 2600 would load **CONSOLE.INI**.
 7. Screen-type INI file  (**VECTOR.INI** for vector games, **RASTER.INI** for raster games, **LCD.INI** for LCD games)
     Pac-Man and Street Fighter Alpha are raster, so **RASTER.INI** gets loaded here. Tempest is a vector monitor game, and **VECTOR.INI** would be loaded here.
-8. Source INI files. 
+8. Source INI files.
     This is an advanced config file, most people won't need to use it and it can be safely ignored.
     MAME will attempt to load **SOURCE/SOURCEFILE.INI** and **SOURCEFILE.INI**, where sourcefile is the actual filename of the source code file.
     *mame -listsource <game>* will show the source file for a given game.

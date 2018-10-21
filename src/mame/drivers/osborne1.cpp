@@ -330,14 +330,13 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 	rs232.ri_handler().set(m_pia1, FUNC(pia6821_device::ca2_w));
 
-	MCFG_DEVICE_ADD(m_fdc, MB8877, MAIN_CLOCK/16)
-	MCFG_WD_FDC_FORCE_READY
+	MB8877(config, m_fdc, MAIN_CLOCK/16);
+	m_fdc->set_force_ready(true);
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("68K")    // 64kB main RAM and 4kbit video attribute RAM
+	RAM(config, RAM_TAG).set_default_size("68K"); // 64kB main RAM and 4kbit video attribute RAM
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 MACHINE_CONFIG_END

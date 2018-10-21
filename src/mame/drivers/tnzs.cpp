@@ -887,14 +887,10 @@ void tnzs_base_state::mainbank_map(address_map &map)
 	map(0x08000, 0x1ffff).rom().region(":maincpu", 0x8000);
 }
 
-MACHINE_CONFIG_START(tnzs_base_state::tnzs_mainbank)
-	MCFG_DEVICE_ADD("mainbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mainbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-MACHINE_CONFIG_END
+void tnzs_base_state::tnzs_mainbank(machine_config &config)
+{
+	ADDRESS_MAP_BANK(config, "mainbank").set_map(&tnzs_base_state::mainbank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x4000);
+}
 
 #define COMMON_IN2\
 	PORT_START("IN2")\
@@ -1607,12 +1603,13 @@ MACHINE_CONFIG_START(extrmatn_state::extrmatn)
 	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(extrmatn_state::plumppop)
+void extrmatn_state::plumppop(machine_config &config)
+{
 	extrmatn(config);
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("AN1")
-	MCFG_UPD4701_PORTY("AN2")
-MACHINE_CONFIG_END
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("AN1");
+	m_upd4701->set_porty_tag("AN2");
+}
 
 MACHINE_CONFIG_START(arknoid2_state::arknoid2)
 	plumppop(config);
@@ -1724,9 +1721,9 @@ MACHINE_CONFIG_START(jpopnics_state::jpopnics)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(jpopnics_sub_map)
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("AN1")
-	MCFG_UPD4701_PORTY("AN2")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("AN1");
+	m_upd4701->set_porty_tag("AN2");
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/s3c2410.h"
-#include "rendlay.h"
 #include "screen.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -296,9 +295,6 @@ MACHINE_CONFIG_START(hp49gp_state::hp49gp)
 	MCFG_SCREEN_SIZE(160, 85)
 	MCFG_SCREEN_VISIBLE_AREA(0, 131 - 1, 0, 80 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
-
-	config.set_default_layout(layout_lcd);
-
 
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
 	MCFG_S3C2410_PALETTE("palette")

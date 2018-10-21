@@ -32,10 +32,10 @@
  *
  * History of Nokia Multimedia Division
  *-------------------------------------
- * Luxor AB was a swedish home electronics and computer manufacturer located in Motala from 1923 and aquired
+ * Luxor AB was a swedish home electronics and computer manufacturer located in Motala from 1923 and acquired
  * by Nokia 1985. Luxor designed among other things TV setsm Radios and the famous ABC-80. The Nokia Multimedia
  * Division was formed in Linköping as a result of the Luxor aquesition. Their main design was a satellite
- * receiver, the first satellite in Europee was launched in 1988 and market was growing fast however it took
+ * receiver, the first satellite in Europe was launched in 1988 and the market was growing fast however it took
  * a long time, almost 10 years before the breakthrough came for Nokia, a deal with the Kirsch Gruppe was struck and
  * in 1996 the 68340 based Dbox-1 was released in Germany. The original design was expensive, so soon a cost reduced
  * version based on PPC, the Dbox-2, was released. The boxes sold in millions but the margins were negative or very
@@ -604,14 +604,14 @@ static INPUT_PORTS_START( dbox )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(dbox_state::dbox)
-	MCFG_DEVICE_ADD("maincpu", M68340, 0)       // The 68340 has an internal VCO as clock source, hence need no CPU clock
-	MCFG_MC68340_ADD_CRYSTAL(XTAL(32'768)) // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
-	MCFG_DEVICE_PROGRAM_MAP(dbox_map)
-	MCFG_MC68340_PA_OUTPUT_CB(WRITE8(*this, dbox_state, write_pa))
+	M68340(config, m_maincpu, 0);       // The 68340 has an internal VCO as clock source, hence need no CPU clock
+	m_maincpu->set_crystal(XTAL(32'768)); // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
+	m_maincpu->set_addrmap(AS_PROGRAM, &dbox_state::dbox_map);
+	m_maincpu->pa_out_callback().set(FUNC(dbox_state::write_pa));
 
 	/* Timer 2 is used to communicate with the descrambler module TODO: Write the descrambler  module */
-	//MCFG_MC68340_TOUT2_OUTPUT_CB(WRITELINE("dcs", descrambler_device,  txd_receiver))
-	//MCFG_MC68340_TGATE2_INPUT_CB(READLINE("dsc", descrambler_device,  rxd_receiver))
+	//m_maincpu->tout2_out_callback().set("dcs", FUNC(descrambler_device::txd_receiver));
+	//m_maincpu->tgate2_in_callback().set("dsc", FUNC(descrambler_device::rxd_receiver));
 
 	/* Configure the serial ports */
 	MCFG_DEVICE_MODIFY("maincpu:serial")
@@ -623,14 +623,15 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	MCFG_RS232_RXD_HANDLER (WRITELINE ("maincpu:serial", mc68340_serial_module_device, rx_b_w))
 
 	/* Add the boot flash */
-	MCFG_AMD_29F800B_16BIT_ADD("flash")
+	AMD_29F800B_16BIT(config, "flash");
 
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")
 	config.set_default_layout(layout_sda5708);
+
 	/* IP16 74256 8 bit latch */
-	MCFG_LATCH8_ADD("hct259.ip16")
-	MCFG_LATCH8_WRITE_4(WRITELINE("display", sda5708_device, reset_w))
+	LATCH8(config, m_ip16_74259);
+	m_ip16_74259->write_cb<4>().set("display", FUNC(sda5708_device::reset_w));
 MACHINE_CONFIG_END
 
 void dbox_state::init_dbox()

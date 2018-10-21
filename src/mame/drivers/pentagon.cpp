@@ -308,12 +308,12 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pentagon_state::pent1024)
+void pentagon_state::pent1024(machine_config &config)
+{
 	pentagon(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1024K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("1024K");
+}
 
 /***************************************************************************
 

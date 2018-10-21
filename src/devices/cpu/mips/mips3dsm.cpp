@@ -172,12 +172,12 @@ uint32_t mips3_disassembler::dasm_cop0(uint32_t pc, uint32_t op, std::ostream &s
 				case 0x02:  util::stream_format(stream, "tlbwi");                               break;
 				case 0x06:  util::stream_format(stream, "tlbwr");                               break;
 				case 0x08:  util::stream_format(stream, "tlbp");                                break;
-				case 0x10:  util::stream_format(stream, "rfe"); flags = STEP_OUT;				break;
-				case 0x18:  util::stream_format(stream, "eret");								break;
-				default:    dasm_extra_cop0(pc, op, stream);									break;
+				case 0x10:  util::stream_format(stream, "rfe"); flags = STEP_OUT;               break;
+				case 0x18:  util::stream_format(stream, "eret");                                break;
+				default:    dasm_extra_cop0(pc, op, stream);                                    break;
 			}
 			break;
-		default:    util::stream_format(stream, "dc.l      $%08x [invalid]", op);				break;
+		default:    util::stream_format(stream, "dc.l      $%08x [invalid]", op);               break;
 	}
 	return flags;
 }
@@ -841,9 +841,9 @@ uint32_t ee_disassembler::dasm_extra_special(uint32_t pc, uint32_t op, std::ostr
 
 	switch (op & 63)
 	{
-		case 0x28: util::stream_format(stream, "mfsa      %s", reg[rd]);			break;
-		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);			break;
-		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);	break;
+		case 0x28: util::stream_format(stream, "mfsa      %s", reg[rd]);            break;
+		case 0x29: util::stream_format(stream, "mtsa      %s", reg[rs]);            break;
+		default:   util::stream_format(stream, "dc.l      $%08x [invalid]", op);    break;
 	}
 	return 0;
 }

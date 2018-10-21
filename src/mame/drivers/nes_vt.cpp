@@ -1075,23 +1075,23 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_sp69_w)
 
 READ8_MEMBER(nes_vt_state::psg1_4014_r)
 {
-	//return m_apu->read(space, 0x14);
+	//return m_apu->read(0x14);
 	return 0x00;
 }
 
 READ8_MEMBER(nes_vt_state::psg1_4015_r)
 {
-	return m_apu->read(space, 0x15);
+	return m_apu->read(0x15);
 }
 
 WRITE8_MEMBER(nes_vt_state::psg1_4015_w)
 {
-	m_apu->write(space, 0x15, data);
+	m_apu->write(0x15, data);
 }
 
 WRITE8_MEMBER(nes_vt_state::psg1_4017_w)
 {
-	m_apu->write(space, 0x17, data);
+	m_apu->write(0x17, data);
 }
 
 WRITE8_MEMBER(nes_vt_state::nes_vh_sprite_dma_w)
@@ -1367,12 +1367,7 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	MCFG_PPU_VT03_READ_BG_CB(READ8(*this, nes_vt_state,chr_r))
 	MCFG_PPU_VT03_READ_SP_CB(READ8(*this, nes_vt_state,spr_r))
 
-	MCFG_DEVICE_ADD("prg", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(prg_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "prg").set_map(&nes_vt_state::prg_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x8000);
 
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", nes_control_port1_devices, "joypad")
 	//MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)

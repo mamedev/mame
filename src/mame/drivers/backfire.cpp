@@ -426,11 +426,11 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_DEVICE_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
 	MCFG_DEVICE_PROGRAM_MAP(backfire_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("adc", ADC0808, 1000000) // unknown clock
-	MCFG_ADC0808_IN0_CB(IOPORT("PADDLE0"))
-	MCFG_ADC0808_IN1_CB(IOPORT("PADDLE1"))
+	ADC0808(config, m_adc, 1000000); // unknown clock
+	m_adc->in_callback<0>().set_ioport("PADDLE0");
+	m_adc->in_callback<1>().set_ioport("PADDLE1");
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048)

@@ -36,7 +36,6 @@
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -248,13 +247,12 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(lcmate2_state, lcmate2)
-	config.set_default_layout(layout_lcd);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lcmate2)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

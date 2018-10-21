@@ -134,7 +134,7 @@ private:
 
 	// devices
 	optional_device<s16lf01_device> m_vfd;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device_array<z80pio_device, 5> m_z80pio;
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<z80sio_device> m_z80sio;
@@ -266,61 +266,62 @@ void proconn_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(proconn_state::proconn)
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
-	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(proconn_map)
-	MCFG_DEVICE_IO_MAP(proconn_portmap)
+	Z80(config, m_maincpu, 4000000); /* ?? Mhz */
+	m_maincpu->set_daisy_config(z80_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &proconn_state::proconn_map);
+	m_maincpu->set_addrmap(AS_IO, &proconn_state::proconn_portmap);
+
 	MCFG_S16LF01_ADD("vfd",0)
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, 4000000) /* ?? Mhz */
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, proconn_state,pio_1_m_out_int_w))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, proconn_state, pio_1_m_in_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, proconn_state, pio_1_m_out_pa_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, proconn_state, pio_1_m_out_ardy_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, proconn_state, pio_1_m_in_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, proconn_state, pio_1_m_out_pb_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, proconn_state, pio_1_m_out_brdy_w))
+	Z80PIO(config, m_z80pio[0], 4000000); /* ?? Mhz */
+	m_z80pio[0]->out_int_callback().set(FUNC(proconn_state::pio_1_m_out_int_w));
+	m_z80pio[0]->in_pa_callback().set(FUNC(proconn_state::pio_1_m_in_pa_r));
+	m_z80pio[0]->out_pa_callback().set(FUNC(proconn_state::pio_1_m_out_pa_w));
+	m_z80pio[0]->out_ardy_callback().set(FUNC(proconn_state::pio_1_m_out_ardy_w));
+	m_z80pio[0]->in_pb_callback().set(FUNC(proconn_state::pio_1_m_in_pb_r));
+	m_z80pio[0]->out_pb_callback().set(FUNC(proconn_state::pio_1_m_out_pb_w));
+	m_z80pio[0]->out_brdy_callback().set(FUNC(proconn_state::pio_1_m_out_brdy_w));
 
-	MCFG_DEVICE_ADD("z80pio_2", Z80PIO, 4000000) /* ?? Mhz */
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, proconn_state,pio_2_m_out_int_w))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, proconn_state, pio_2_m_in_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, proconn_state, pio_2_m_out_pa_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, proconn_state, pio_2_m_out_ardy_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, proconn_state, pio_2_m_in_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, proconn_state, pio_2_m_out_pb_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, proconn_state, pio_2_m_out_brdy_w))
+	Z80PIO(config, m_z80pio[1], 4000000); /* ?? Mhz */
+	m_z80pio[1]->out_int_callback().set(FUNC(proconn_state::pio_2_m_out_int_w));
+	m_z80pio[1]->in_pa_callback().set(FUNC(proconn_state::pio_2_m_in_pa_r));
+	m_z80pio[1]->out_pa_callback().set(FUNC(proconn_state::pio_2_m_out_pa_w));
+	m_z80pio[1]->out_ardy_callback().set(FUNC(proconn_state::pio_2_m_out_ardy_w));
+	m_z80pio[1]->in_pb_callback().set(FUNC(proconn_state::pio_2_m_in_pb_r));
+	m_z80pio[1]->out_pb_callback().set(FUNC(proconn_state::pio_2_m_out_pb_w));
+	m_z80pio[1]->out_brdy_callback().set(FUNC(proconn_state::pio_2_m_out_brdy_w));
 
-	MCFG_DEVICE_ADD("z80pio_3", Z80PIO, 4000000) /* ?? Mhz */
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, proconn_state,pio_3_m_out_int_w))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, proconn_state, pio_3_m_in_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, proconn_state, pio_3_m_out_pa_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, proconn_state, pio_3_m_out_ardy_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, proconn_state, pio_3_m_in_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, proconn_state, pio_3_m_out_pb_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, proconn_state, pio_3_m_out_brdy_w))
+	Z80PIO(config, m_z80pio[2], 4000000); /* ?? Mhz */
+	m_z80pio[2]->out_int_callback().set(FUNC(proconn_state::pio_3_m_out_int_w));
+	m_z80pio[2]->in_pa_callback().set(FUNC(proconn_state::pio_3_m_in_pa_r));
+	m_z80pio[2]->out_pa_callback().set(FUNC(proconn_state::pio_3_m_out_pa_w));
+	m_z80pio[2]->out_ardy_callback().set(FUNC(proconn_state::pio_3_m_out_ardy_w));
+	m_z80pio[2]->in_pb_callback().set(FUNC(proconn_state::pio_3_m_in_pb_r));
+	m_z80pio[2]->out_pb_callback().set(FUNC(proconn_state::pio_3_m_out_pb_w));
+	m_z80pio[2]->out_brdy_callback().set(FUNC(proconn_state::pio_3_m_out_brdy_w));
 
-	MCFG_DEVICE_ADD("z80pio_4", Z80PIO, 4000000) /* ?? Mhz */
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, proconn_state,pio_4_m_out_int_w))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, proconn_state, pio_4_m_in_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, proconn_state, pio_4_m_out_pa_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, proconn_state, pio_4_m_out_ardy_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, proconn_state, pio_4_m_in_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, proconn_state, pio_4_m_out_pb_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, proconn_state, pio_4_m_out_brdy_w))
+	Z80PIO(config, m_z80pio[3], 4000000); /* ?? Mhz */
+	m_z80pio[3]->out_int_callback().set(FUNC(proconn_state::pio_4_m_out_int_w));
+	m_z80pio[3]->in_pa_callback().set(FUNC(proconn_state::pio_4_m_in_pa_r));
+	m_z80pio[3]->out_pa_callback().set(FUNC(proconn_state::pio_4_m_out_pa_w));
+	m_z80pio[3]->out_ardy_callback().set(FUNC(proconn_state::pio_4_m_out_ardy_w));
+	m_z80pio[3]->in_pb_callback().set(FUNC(proconn_state::pio_4_m_in_pb_r));
+	m_z80pio[3]->out_pb_callback().set(FUNC(proconn_state::pio_4_m_out_pb_w));
+	m_z80pio[3]->out_brdy_callback().set(FUNC(proconn_state::pio_4_m_out_brdy_w));
 
-	MCFG_DEVICE_ADD("z80pio_5", Z80PIO, 4000000) /* ?? Mhz */
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, proconn_state,pio_5_m_out_int_w))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, proconn_state, pio_5_m_in_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, proconn_state, pio_5_m_out_pa_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, proconn_state, pio_5_m_out_ardy_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, proconn_state, pio_5_m_in_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, proconn_state, pio_5_m_out_pb_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, proconn_state, pio_5_m_out_brdy_w))
+	Z80PIO(config, m_z80pio[4], 4000000); /* ?? Mhz */
+	m_z80pio[4]->out_int_callback().set(FUNC(proconn_state::pio_5_m_out_int_w));
+	m_z80pio[4]->in_pa_callback().set(FUNC(proconn_state::pio_5_m_in_pa_r));
+	m_z80pio[4]->out_pa_callback().set(FUNC(proconn_state::pio_5_m_out_pa_w));
+	m_z80pio[4]->out_ardy_callback().set(FUNC(proconn_state::pio_5_m_out_ardy_w));
+	m_z80pio[4]->in_pb_callback().set(FUNC(proconn_state::pio_5_m_in_pb_r));
+	m_z80pio[4]->out_pb_callback().set(FUNC(proconn_state::pio_5_m_out_pb_w));
+	m_z80pio[4]->out_brdy_callback().set(FUNC(proconn_state::pio_5_m_out_brdy_w));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_z80ctc, 4000000);
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("z80sio", Z80SIO, 4000000) /* ?? Mhz */
+	Z80SIO(config, m_z80sio, 4000000); /* ?? Mhz */
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

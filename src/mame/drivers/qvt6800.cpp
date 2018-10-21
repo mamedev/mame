@@ -73,15 +73,15 @@ MACHINE_CONFIG_START(qvt6800_state::qvt102)
 	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'669'800) / 18)
 	MCFG_DEVICE_PROGRAM_MAP(qvt102_mem_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 2x TC5514-APL + 3V battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x TC5514-APL + 3V battery
 
 	//MCFG_DEVICE_ADD("crtc", MC6845, XTAL(16'669'800) / 9)
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'669'800) / 9)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("acia", acia6850_device, write_rxc))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'669'800) / 9));
+	ctc.zc_callback<0>().set("acia", FUNC(acia6850_device::write_txc));
+	ctc.zc_callback<1>().set("acia", FUNC(acia6850_device::write_rxc));
 
 	clock_device &ctcclk(CLOCK(config, "ctcclk", 16.6698_MHz_XTAL / 18)); // OR of CRTC CLK and ϕ1
 	ctcclk.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
@@ -103,7 +103,7 @@ MACHINE_CONFIG_START(qvt6800_state::qvt190)
 	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'669'800) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(qvt190_mem_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // V61C16P55L + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // V61C16P55L + battery
 
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
 

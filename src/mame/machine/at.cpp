@@ -126,7 +126,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_ISA_OUT_DRQ7_CB(WRITELINE(m_dma8237_2, am9517a_device, dreq3_w))
 
 	MC146818(config, m_mc146818, 32.768_kHz_XTAL);
-	m_mc146818->irq_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
+	m_mc146818->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
 	m_mc146818->set_century_index(0x32);
 
 	/* sound hardware */
@@ -134,15 +134,16 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, 12_MHz_XTAL)
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("pic8259_master", pic8259_device, ir1_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
+	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
+	keybc.hot_res().set_inputline(":maincpu", INPUT_LINE_RESET);
+	keybc.gate_a20().set_inputline(":maincpu", INPUT_LINE_A20);
+	keybc.kbd_irq().set("pic8259_master", FUNC(pic8259_device::ir1_w));
+	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_clk_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_data_w))
 MACHINE_CONFIG_END
 
 

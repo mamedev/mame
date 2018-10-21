@@ -93,6 +93,13 @@ void ieee488_slot_device::device_start()
 }
 
 
+void ieee488_slot_device::add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
+{
+	ieee488_slot_device &slot(IEEE488_SLOT(config, _tag, 0));
+	cbm_ieee488_devices(slot);
+	slot.set_default_option(_def_slot);
+	slot.set_address(_address);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

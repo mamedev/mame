@@ -2261,15 +2261,15 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,galaxold)
 
-	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(*this, galaxold_state,galaxold_7474_9m_1_callback))
+	TTL7474(config, m_7474_9m_1, 0);
+	m_7474_9m_1->output_cb().set(FUNC(galaxold_state::galaxold_7474_9m_1_callback));
 
-	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, galaxold_state,galaxold_7474_9m_2_q_callback))
+	TTL7474(config, m_7474_9m_2, 0);
+	m_7474_9m_2->comp_output_cb().set(FUNC(galaxold_state::galaxold_7474_9m_2_q_callback));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", galaxold_state, galaxold_interrupt_timer)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
@@ -2562,9 +2562,8 @@ MACHINE_CONFIG_START(galaxold_state::hunchbkg)
 	MCFG_DEVICE_DATA_MAP(hunchbkg_data)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
 
-	MCFG_DEVICE_MODIFY("7474_9m_1")
 	/* the nmi line seems to be inverted on the cpu plugin board */
-	MCFG_7474_COMP_OUTPUT_CB(INPUTLINE("maincpu", S2650_SENSE_LINE))
+	m_7474_9m_1->comp_output_cb().set_inputline("maincpu", S2650_SENSE_LINE);
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
 

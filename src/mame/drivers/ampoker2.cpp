@@ -1154,10 +1154,9 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	MCFG_DEVICE_IO_MAP(ampoker2_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(ampoker2_state, nmi_line_pulse, 1536)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* 200 ms, measured */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(200));   /* 200 ms, measured */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1306,6 +1305,17 @@ ROM_START( videomat )   /* polish bootleg */
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "rom0.u47", 0x0000, 0x4000, CRC(cefed6c7) SHA1(79591339eab2712b432dfe89929dbc97000a13d2) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
+ROM_END
+
+ROM_START( novopkr2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "novo_poker_2.bin", 0x0000, 0x10000, CRC(49fb5416) SHA1(44d7f891672d6b0b5a518abd793d0b9053245b3b) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "gfx.u47", 0x0000, 0x4000, CRC(cefed6c7) SHA1(79591339eab2712b432dfe89929dbc97000a13d2) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
@@ -1460,6 +1470,7 @@ GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  ampoker2_state, empty_init,
 GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Poker De Win",                       MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
 GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Videomat (Polish bootleg)",          MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
 GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, ampoker2_state, init_rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1990, novopkr2, ampoker2, ampoker2, ampoker2, ampoker2_state, empty_init,    ROT0, "bootleg",           "Novo Poker II (Spanish bootleg)",    MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
 GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, ampoker2_state, empty_init,    ROT0, "Sigma Inc.",        "Sigma Poker",                        MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
 GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  ampoker2_state, empty_init,    ROT0, "Sigma Inc.",        "Sigma Poker 2000",                   MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
 GAME(  1991, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, init_piccolop, ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                  MACHINE_SUPPORTS_SAVE )

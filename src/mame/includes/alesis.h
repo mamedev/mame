@@ -17,7 +17,6 @@
 #include "video/hd44780.h"
 #include "imagedev/cassette.h"
 #include "emupal.h"
-#include "rendlay.h"
 
 #define MCFG_ALESIS_DM3AG_ADD(_tag,_clock) \
 	MCFG_DEVICE_ADD( _tag, ALESIS_DM3AG, _clock )

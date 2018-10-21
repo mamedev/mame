@@ -61,7 +61,6 @@
 
 #include <queue>
 
-#define TERMINAL_TAG "terminal"
 
 /* Log defines */
 #define TRACE_FDC 0
@@ -92,7 +91,7 @@ public:
 		m_pdc(*this, "pdc"),
 		m_smioc(*this, "smioc"),
 		m_wd33c93(*this, "wd33c93"),
-		m_terminal(*this, TERMINAL_TAG),
+		m_terminal(*this, "terminal"),
 		m_main_ram(*this, "main_ram")
 	{
 	}
@@ -650,19 +649,19 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(r9751_state, kbd_put))
 
 	/* i/o hardware */
 	MCFG_DEVICE_ADD("smioc", SMIOC, 0)
 
 	/* disk hardware */
-	MCFG_DEVICE_ADD("pdc", PDC, 0)
-	MCFG_PDC_R_CB(READ8(*this, r9751_state, pdc_dma_r))
-	MCFG_PDC_W_CB(WRITE8(*this, r9751_state, pdc_dma_w))
+	PDC(config, m_pdc, 0);
+	m_pdc->m68k_r_callback().set(FUNC(r9751_state::pdc_dma_r));
+	m_pdc->m68k_w_callback().set(FUNC(r9751_state::pdc_dma_w));
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
+	WD33C93(config, m_wd33c93);
+	m_wd33c93->set_scsi_port("scsi");
 
 	/* software list */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","r9751")

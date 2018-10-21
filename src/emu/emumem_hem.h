@@ -8,7 +8,7 @@
 template<int Width, int AddrShift, int Endian> class handler_entry_read_memory : public handler_entry_read_address<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_read_address<Width, AddrShift, Endian>;
 
 	handler_entry_read_memory(address_space *space) : handler_entry_read_address<Width, AddrShift, Endian>(space, 0) {}
@@ -28,7 +28,7 @@ private:
 template<int Width, int AddrShift, int Endian> class handler_entry_write_memory : public handler_entry_write_address<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_write_address<Width, AddrShift, Endian>;
 
 	handler_entry_write_memory(address_space *space) : handler_entry_write_address<Width, AddrShift, Endian>(space, 0) {}
@@ -53,7 +53,7 @@ private:
 template<int Width, int AddrShift, int Endian> class handler_entry_read_memory_bank : public handler_entry_read_address<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_read_address<Width, AddrShift, Endian>;
 
 	handler_entry_read_memory_bank(address_space *space, memory_bank &bank) : handler_entry_read_address<Width, AddrShift, Endian>(space, 0), m_bank(bank) {}
@@ -71,7 +71,7 @@ private:
 template<int Width, int AddrShift, int Endian> class handler_entry_write_memory_bank : public handler_entry_write_address<Width, AddrShift, Endian>
 {
 public:
-	using uX = typename handler_entry_size<Width>::uX;
+	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_write_address<Width, AddrShift, Endian>;
 
 	handler_entry_write_memory_bank(address_space *space, memory_bank &bank) : handler_entry_write_address<Width, AddrShift, Endian>(space, 0), m_bank(bank) {}

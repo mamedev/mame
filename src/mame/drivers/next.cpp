@@ -258,19 +258,19 @@ void next_state::irq_check()
 	}
 }
 
-const char *next_state::dma_targets[0x20] = {
+char const *const next_state::dma_targets[0x20] = {
 	nullptr, "scsi", nullptr, nullptr, "soundout", "disk", nullptr, nullptr,
 	"soundin", "printer", nullptr, nullptr, "scc", "dsp", nullptr, nullptr,
 	"s-enetx", "enetx", nullptr, nullptr, "s-enetr", "enetr", nullptr, nullptr,
 	"video", nullptr, nullptr, nullptr, "r2m", "m2r", nullptr, nullptr
 };
 
-const int next_state::dma_irqs[0x20] = {
+int const next_state::dma_irqs[0x20] = {
 	-1, 26, -1, -1, 23, 25, -1, -1, 22, 24, -1, -1, 21, 20, -1, -1,
 	-1, 28, -1, -1, -1, 27, -1, -1,  5, -1, -1, -1, 18, 19, -1, -1
 };
 
-const bool next_state::dma_has_saved[0x20] = {
+bool const next_state::dma_has_saved[0x20] = {
 	false, false, false, false, false, false, false, false,
 	false, false, false, false, false, false, false, false,
 	false, true,  false, false, false, true,  false, false,
@@ -557,7 +557,7 @@ void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 	}
 }
 
-const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 };
+int const next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 };
 
 READ32_MEMBER( next_state::scsictrl_r )
 {
@@ -625,7 +625,7 @@ READ32_MEMBER( next_state::fdc_control_r )
 	// reason.  The kernel otoh behaves as expected.
 
 	if(fdc) {
-		floppy_image_device *fdev = machine().device<floppy_connector>(":fdc:0")->get_device();
+		floppy_image_device *fdev = floppy0->get_device();
 		if(fdev->exists()) {
 			uint32_t variant = fdev->get_variant();
 			switch(variant) {
@@ -1015,13 +1015,17 @@ MACHINE_CONFIG_START(next_state::next_base)
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
+
 	MCFG_DEVICE_ADD("rtc", MCCS1850, XTAL(32'768))
-	MCFG_DEVICE_ADD("scc", SCC8530, XTAL(25'000'000))
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(*this, next_state, scc_irq))
+
+	SCC8530(config, scc, XTAL(25'000'000));
+	scc->intrq_callback().set(FUNC(next_state::scc_irq));
+
 	MCFG_DEVICE_ADD("keyboard", NEXTKBD, 0)
 	MCFG_NEXTKBD_INT_CHANGE_CALLBACK(WRITELINE(*this, next_state, keyboard_irq))
 	MCFG_NEXTKBD_INT_POWER_CALLBACK(WRITELINE(*this, next_state, power_irq))
 	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(*this, next_state, nmi_irq))
+
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
 	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, nullptr, false)
@@ -1032,11 +1036,11 @@ MACHINE_CONFIG_START(next_state::next_base)
 	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
 
-	MCFG_DEVICE_ADD("net", MB8795, 0)
-	MCFG_MB8795_TX_IRQ_CALLBACK(WRITELINE(*this, next_state, net_tx_irq))
-	MCFG_MB8795_RX_IRQ_CALLBACK(WRITELINE(*this, next_state, net_rx_irq))
-	MCFG_MB8795_TX_DRQ_CALLBACK(WRITELINE(*this, next_state, net_tx_drq))
-	MCFG_MB8795_RX_DRQ_CALLBACK(WRITELINE(*this, next_state, net_rx_drq))
+	MB8795(config, net, 0);
+	net->tx_irq().set(FUNC(next_state::net_tx_irq));
+	net->rx_irq().set(FUNC(next_state::net_rx_irq));
+	net->tx_drq().set(FUNC(next_state::net_tx_drq));
+	net->rx_drq().set(FUNC(next_state::net_rx_drq));
 
 	MCFG_DEVICE_ADD("mo", NEXTMO, 0)
 	MCFG_NEXTMO_IRQ_CALLBACK(WRITELINE(*this, next_state, mo_irq))
@@ -1051,9 +1055,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(next_state::next_fdc_base)
 	next_base(config);
-	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, next_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, next_state, fdc_drq))
+	N82077AA(config, fdc, n82077aa_device::MODE_PS2);
+	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
+	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
 
 	// software list

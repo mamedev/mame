@@ -354,9 +354,7 @@ MACHINE_CONFIG_START(zx_state::zx80)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "zx80_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K,16K")
+	RAM(config, m_ram).set_default_size("1K").set_extra_options("1K,2K,3K,16K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zx_state::zx81)
@@ -373,34 +371,32 @@ MACHINE_CONFIG_START(zx_state::zx81)
 	MCFG_SOFTWARE_LIST_MODIFY("cass_list", "zx81_cass")
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,32K,48K")
+	m_ram->set_default_size("16K").set_extra_options("1K,32K,48K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(zx_state::zx81_spk )
+void zx_state::zx81_spk(machine_config &config)
+{
 	zx81(config);
 	/* sound hardware */
 	/* Used by pc8300/lambda/pow3000 */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(zx_state::ts1000)
+void zx_state::ts1000(machine_config &config)
+{
 	zx81(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,16K,32K,48K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("2K").set_extra_options("1K,16K,32K,48K");
+}
 
-MACHINE_CONFIG_START(zx_state::ts1500)
+void zx_state::ts1500(machine_config &config)
+{
 	ts1000(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("16K");
+}
 
 MACHINE_CONFIG_START(zx_state::pc8300)
 	zx81_spk(config);
@@ -408,8 +404,7 @@ MACHINE_CONFIG_START(zx_state::pc8300)
 	MCFG_DEVICE_IO_MAP(pc8300_io_map)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	m_ram->set_default_size("16K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zx_state::pow3000)
@@ -418,9 +413,7 @@ MACHINE_CONFIG_START(zx_state::pow3000)
 	MCFG_DEVICE_IO_MAP(pow3000_io_map)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("16K")
+	m_ram->set_default_size("2K").set_extra_options("16K");
 MACHINE_CONFIG_END
 
 

@@ -1112,7 +1112,7 @@ MACHINE_CONFIG_START(midyunit_state::zunit)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 8192)
@@ -1155,7 +1155,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_core)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 256)
@@ -1252,14 +1252,15 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_faster)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(midyunit_state::term2)
+void midyunit_state::term2(machine_config &config)
+{
 	yunit_adpcm_6bit_faster(config);
-	MCFG_ADC0844_ADD("adc") // U2 on Coil Lamp Driver Board (A-14915)
-	MCFG_ADC0844_CH1_CB(IOPORT("STICK0_X"))
-	MCFG_ADC0844_CH2_CB(IOPORT("STICK0_Y"))
-	MCFG_ADC0844_CH3_CB(IOPORT("STICK1_X"))
-	MCFG_ADC0844_CH4_CB(IOPORT("STICK1_Y"))
-MACHINE_CONFIG_END
+	ADC0844(config, m_term2_adc, 0); // U2 on Coil Lamp Driver Board (A-14915)
+	m_term2_adc->ch1_callback().set_ioport("STICK0_X");
+	m_term2_adc->ch2_callback().set_ioport("STICK0_Y");
+	m_term2_adc->ch3_callback().set_ioport("STICK1_X");
+	m_term2_adc->ch4_callback().set_ioport("STICK1_Y");
+}
 
 
 MACHINE_CONFIG_START(midyunit_state::mkyawdim)

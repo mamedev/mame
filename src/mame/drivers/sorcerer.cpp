@@ -123,41 +123,26 @@ for cassette unit 1 are duplicated on a set of phono plugs.
 We emulate the use of two cassette units. An option allows you to hear the sound
 of the tape during playback.
 
-
 ********************************************************************************
 
-NOTES (2011-01-09)
-1. Converted to MODERN driver as much as possible.
-2. Added 2 defines for work that needs doing at some time:
-- SORCERER_USING_RS232 - this is for when we can connect a serial interface.
-- SORCERER_USING_DISKS - the disk controller I believe most likely to be a
-                         'Micropolis Floppy Disk System' at 143KB on 13cm disks.
-                         There was a hard-sector system (top of ram = BBFF),
-                         and a soft-sector system (top of RAM = BDFF). You could
-                         use alternate systems (since you could attach a S-100
-                         unit), so not sure how this could be developed. The
-                         Micropolis seems completely undocumented in the technical
-                         sense. When using the hard-sector system, in the monitor
-                         enter GO BC00 to boot the disk. No idea how in other
-                         disk systems.
+Disk system on sorcererd:
+- Uses a Micropolis controller, disks holding 143KB. Top of RAM is BBFF.
+- To boot CP/M, insert the disk, then type GO BC00 at the monitor prompt.
 
-                         Note that the code within the defines has NOT been
-                         compiled or tested. You are on your own!
+Other rumoured disk possibilities (not emulated):
+- Soft-sectored, top of RAM is BDFF
+- Having the option of a S100 box, any random system could be used in theory.
 
 
-NOTES (2011-08-08)
-1. SORCERER_USING_DISKS removed, replaced with a new driver "sorcererd".
-                         This is disk-enabled, allowing CP/M to run.
-                         To initialise the disk system, you must enter
-                         GO BC00
-                         after the computer has booted. It is not particularly
-                         stable, so be prepared to cold boot whenever something
-                         goes wrong.
 
-NOTES (2016-06-06)
-1. SORCERER_USING_RS232 removed, since the core now supports RS-232 as a device.
-                         Not actually tested due to the bios bugs making it
-                         pretty much impossible to use.
+Exidy Sorcerer Video/Disk Unit:
+- Contains a screen and 2 floppy drives. No details available. Partial
+  emulation done but it's all guesswork. The unit contains 2 dipswitch units
+  (one has 4 switches and the other has 8), a 8 MHz crystal, 3 proms and a
+  FD1793-B01 fdc. Going by the code, it would appear to place the Z-80 into
+  WAIT while reading a sector. To try it out: GO BF00 at the monitor prompt.
+  Currently the CP/M sign-on message appears, followed by lockup due to a
+  fdc problem.
 
 ********************************************************************************/
 
@@ -184,15 +169,10 @@ void sorcerer_state::sorcerer_mem(address_map &map)
 void sorcerer_state::sorcererd_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).bankrw("boot");
-	map(0x0800, 0xbbff).ram();
+	sorcerer_mem(map);
 	map(0xbc00, 0xbcff).rom();
-	map(0xbe00, 0xbe03).rw("fdc", FUNC(micropolis_device::read), FUNC(micropolis_device::write));
-	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslot
-	map(0xe000, 0xefff).rom();                     /* rom pac and bios */
-	map(0xf000, 0xf7ff).ram().region("maincpu", 0xf000);        /* screen ram */
-	map(0xf800, 0xfbff).rom();                     /* char rom */
-	map(0xfc00, 0xffff).ram().region("maincpu", 0xfc00);        /* programmable chars */
+	map(0xbe00, 0xbe03).rw(m_fdc, FUNC(micropolis_device::read), FUNC(micropolis_device::write));
+	map(0xbf00, 0xbfff).rom();
 }
 
 void sorcerer_state::sorcerer_io(address_map &map)
@@ -200,10 +180,19 @@ void sorcerer_state::sorcerer_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0xfc, 0xfc).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xfd, 0xfd).rw(FUNC(sorcerer_state::sorcerer_fd_r), FUNC(sorcerer_state::sorcerer_fd_w));
-	map(0xfe, 0xfe).rw(FUNC(sorcerer_state::sorcerer_fe_r), FUNC(sorcerer_state::sorcerer_fe_w));
+	map(0xfd, 0xfd).rw(FUNC(sorcerer_state::port_fd_r), FUNC(sorcerer_state::port_fd_w));
+	map(0xfe, 0xfe).rw(FUNC(sorcerer_state::port_fe_r), FUNC(sorcerer_state::port_fe_w));
 	map(0xff, 0xff).r("cent_status_in", FUNC(input_buffer_device::bus_r));
-	map(0xff, 0xff).w(FUNC(sorcerer_state::sorcerer_ff_w));
+	map(0xff, 0xff).w(FUNC(sorcerer_state::port_ff_w));
+}
+
+void sorcerer_state::sorcererd_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	sorcerer_io(map);
+	map(0x28, 0x2b).rw(m_fdc2, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x2c, 0x2c).w(FUNC(sorcerer_state::port_2c_w));
 }
 
 static INPUT_PORTS_START(sorcerer)
@@ -440,10 +429,10 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
 	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
-	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(ES_UART_CLOCK)
-	MCFG_AY31015_RX_CLOCK(ES_UART_CLOCK)
-	MCFG_AY31015_AUTO_RDAV(true)
+	AY31015(config, m_uart);
+	m_uart->set_tx_clock(ES_UART_CLOCK);
+	m_uart->set_rx_clock(ES_UART_CLOCK);
+	m_uart->set_auto_rdav(true);
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
@@ -480,22 +469,35 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","sorcerer_cass")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("8K,16K,32K");
 MACHINE_CONFIG_END
+
+static void floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	sorcerer(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sorcererd_mem)
+	MCFG_DEVICE_IO_MAP(sorcererd_io)
 
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 
-	MCFG_DEVICE_ADD("fdc", MICROPOLIS, 0)
+	MCFG_DEVICE_ADD(m_fdc, MICROPOLIS, 0)
 	MCFG_MICROPOLIS_DEFAULT_DRIVE4_TAGS
-
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
+
+	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock
+	m_fdc2->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
+	m_fdc2->intrq_wr_callback().set(FUNC(sorcerer_state::intrq_w));
+	m_fdc2->drq_wr_callback().set(FUNC(sorcerer_state::drq_w));
+	MCFG_FLOPPY_DRIVE_ADD("fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sorcerer_flop")
 MACHINE_CONFIG_END
 
@@ -520,13 +522,18 @@ ROM_END
 
 ROM_START(sorcererd)
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("diskboot.dat", 0xbc00, 0x0100, CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b) )
+	ROM_LOAD("diskboot.dat", 0xbc00, 0x0100, CRC(d82a40d6) SHA1(cd1ef5fb0312cd1640e0853d2442d7d858bc3e3b) ) // micropolis floppy boot
+	ROM_LOAD("boot.bin",     0xbf00, 0x0100, CRC(352e36bc) SHA1(99678e3cc4f315a0cf7d52aae511e405dc314190) ) // video/disk unit floppy boot
 	ROM_LOAD("exmo1-1.1e",   0xe000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1) ) /* monitor roms */
 	ROM_LOAD("exmo1-2.2e",   0xe800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be) )
 	ROM_LOAD("exchr-1.20d",  0xf800, 0x0400, CRC(4a7e1cdd) SHA1(2bf07a59c506b6e0c01ec721fb7b747b20f5dced) ) /* char rom */
 
-	ROM_REGION( 0x200, "proms", 0 )
+	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD_OPTIONAL("bruce.15b",  0x0000, 0x0020, CRC(fae922cb) SHA1(470a86844cfeab0d9282242e03ff1d8a1b2238d1) ) /* video prom type 6331 */
+	// from video/disk unit
+	ROM_LOAD_OPTIONAL("sad4e.4e",  0x0100, 0x0100, CRC(b468a3f9) SHA1(8546f834901349baf59fc436c1a7cc57d541cddd) )
+	ROM_LOAD_OPTIONAL("l.2e",      0x0200, 0x0100, CRC(9cb2500e) SHA1(d473c8dc042a4ace75174a93069fc0e9451763bd) )
+	ROM_LOAD_OPTIONAL("h.3e",      0x0300, 0x0100, CRC(3c6163fb) SHA1(60ecefe461357eacfca64427931db6472283d0e3) )
 ROM_END
 
 ROM_START(sorcerer2)
@@ -538,6 +545,15 @@ ROM_START(sorcerer2)
 	ROM_SYSTEM_BIOS(1, "tvc", "TVI-MON-C-V1.5")
 	ROMX_LOAD("tvc-1.1e",    0xe000, 0x0800, CRC(efc15a18) SHA1(3dee821270a0d83453b18baed88a024dfd0d7a6c), ROM_BIOS(1) )
 	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "dwmon", "DWMON 2.2C")
+	ROMX_LOAD("dwmon.1e",    0xe000, 0x0800, CRC(a22db498) SHA1(ebedbce7454007f5a02fafe449fd09169173d7b3), ROM_BIOS(2) )
+	ROMX_LOAD("dwmon.2e",    0xe800, 0x0800, CRC(7b22b65a) SHA1(7f23dd308f34b6d795d6df06f2387dfd17f69edd), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(3, "ddmon", "DDMON 1.3")
+	ROMX_LOAD("ddmon.1e",    0xe000, 0x0800, CRC(6ce481da) SHA1(c927762b29a281b7c13d59bb17ea56494c64569b), ROM_BIOS(3) )
+	ROMX_LOAD("ddmon.2e",    0xe800, 0x0800, CRC(50069b13) SHA1(0808018830fac15cceaed8ff2b19900f77447470), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(4, "adsmon", "ADSMON") // This requires an unemulated 80-column card. You can type 64 to get 64-columns, but it's mostly off the side.
+	ROMX_LOAD("adsmon.1e",   0xe000, 0x0800, CRC(460f981a) SHA1(bdae1d87b9e8ae2cae11663acd349b9ed2387094), ROM_BIOS(4) )
+	ROMX_LOAD("adsmon.2e",   0xe800, 0x0800, CRC(cb3f1dda) SHA1(3fc14306e83d73b9b9afd9b543566e52ba3e008f), ROM_BIOS(4) )
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */

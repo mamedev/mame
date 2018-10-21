@@ -535,7 +535,7 @@ MACHINE_CONFIG_START(ltd_state::ltd3)
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(ltd3_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_ltd);
@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(ltd_state::ltd4)
 	MCFG_DEVICE_PROGRAM_MAP(ltd4_map)
 	MCFG_DEVICE_IO_MAP(ltd4_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_ltd);

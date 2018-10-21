@@ -1835,8 +1835,7 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // 30k r-2r network
 	MCFG_DEVICE_ADD("dacvol", DISCRETE, taitosj_dacvol_discrete)
@@ -1852,12 +1851,12 @@ MACHINE_CONFIG_START(taitosj_state::mcu)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL(3'000'000))   /* xtal is 3MHz, divided by 4 internally */
-	MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(LATCH)
-	MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(READ8(*this, taitosj_state, mcu_mem_r))
-	MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(WRITE8(*this, taitosj_state, mcu_mem_w))
-	MCFG_TAITO_SJ_SECURITY_MCU_68INTRQ_CB(WRITELINE(*this, taitosj_state, mcu_intrq_w))
-	MCFG_TAITO_SJ_SECURITY_MCU_BUSRQ_CB(WRITELINE(*this, taitosj_state, mcu_busrq_w))
+	TAITO_SJ_SECURITY_MCU(config, m_mcu, XTAL(3'000'000));   /* xtal is 3MHz, divided by 4 internally */
+	m_mcu->set_int_mode(taito_sj_security_mcu_device::int_mode::LATCH);
+	m_mcu->m68read_cb().set(FUNC(taitosj_state::mcu_mem_r));
+	m_mcu->m68write_cb().set(FUNC(taitosj_state::mcu_mem_w));
+	m_mcu->m68intrq_cb().set(FUNC(taitosj_state::mcu_intrq_w));
+	m_mcu->busrq_cb().set(FUNC(taitosj_state::mcu_busrq_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END

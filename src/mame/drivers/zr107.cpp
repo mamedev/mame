@@ -263,7 +263,7 @@ private:
 	uint32_t screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
 	WRITE_LINE_MEMBER(k054539_irq_gen);
-	ADC083X_INPUT_CB(adc0838_callback);
+	double adc0838_callback(uint8_t input);
 	K056832_CB_MEMBER(tile_callback);
 
 	void jetwave_map(address_map &map);
@@ -719,7 +719,7 @@ INPUT_PORTS_END
 
 /* ADC0838 Interface */
 
-ADC083X_INPUT_CB(zr107_state::adc0838_callback)
+double zr107_state::adc0838_callback(uint8_t input)
 {
 	switch (input)
 	{
@@ -729,16 +729,11 @@ ADC083X_INPUT_CB(zr107_state::adc0838_callback)
 		return (double)(5 * m_analog2->read()) / 255.0;
 	case ADC083X_CH2:
 		return (double)(5 * m_analog3->read()) / 255.0;
-	case ADC083X_CH3:
-		return 0;
-	case ADC083X_COM:
-		return 0;
-	case ADC083X_AGND:
-		return 0;
 	case ADC083X_VREF:
 		return 5;
+	default:
+		return 0;
 	}
-	return 0;
 }
 
 
@@ -789,12 +784,11 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(750000))// Very high sync needed to prevent lockups - why?
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
+	K056230(config, "k056230", "maincpu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -818,8 +812,8 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 	MCFG_K001006_GFX_REGION("gfx1")
 	MCFG_K001006_TEX_LAYOUT(0)
 
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_1);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -835,8 +829,8 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
-	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
+	adc0838_device &adc(ADC0838(config, "adc0838", 0));
+	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)
@@ -860,12 +854,11 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2000000)) // Very high sync needed to prevent lockups - why?
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
+	K056230(config, "k056230", "maincpu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -897,8 +890,8 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 	MCFG_K001006_GFX_REGION("gfx1")
 	MCFG_K001006_TEX_LAYOUT(0)
 
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_1);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -914,8 +907,8 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
-	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
+	adc0838_device &adc(ADC0838(config, "adc0838", 0));
+	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
 	MCFG_KONPPC_CGBOARD_NUMBER(1)
@@ -951,6 +944,32 @@ ROM_START( midnrun )
 	ROM_LOAD32_BYTE( "476ea1a02.17u", 0x000002, 0x80000, CRC(1462994f) SHA1(c8614c6c416f81737cc77c46eea6d8d440bc8cf3) )
 	ROM_LOAD32_BYTE( "476ea1a03.15u", 0x000001, 0x80000, CRC(b770ae46) SHA1(c61daa8353802957eb1c2e2c6204c3a98569627e) )
 	ROM_LOAD32_BYTE( "476ea1a04.13u", 0x000000, 0x80000, CRC(9644b277) SHA1(b9cb812b6035dfd93032d277c8aa0037cf6b3dbe) )
+
+	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
+	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
+
+	ROM_REGION(0x100000, "gfx2", 0) /* Tilemap */
+	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
+	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
+
+	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
+	ROM_LOAD32_BYTE( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
+	ROM_LOAD32_BYTE( "477a14.7h", 0x000001, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
+	ROM_LOAD32_BYTE( "477a15.5h", 0x000002, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
+	ROM_LOAD32_BYTE( "477a16.2h", 0x000003, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
+
+	ROM_REGION(0x600000, "k054539", 0)   /* Sound data */
+	ROM_LOAD( "477a08.5r", 0x000000, 0x200000, CRC(d320dbde) SHA1(eb602cad6ac7c7151c9f29d39b10041d5a354164) )
+	ROM_LOAD( "477a09.3r", 0x200000, 0x200000, CRC(f431e29f) SHA1(e6082d88f86abb63d02ac34e70873b58f88b0ddc) )
+	ROM_LOAD( "477a10.5n", 0x400000, 0x200000, CRC(8db31bd4) SHA1(d662d3bb6e8b44a01ffa158f5d7425454aad49a3) )
+ROM_END
+
+ROM_START( midnrunj )
+	ROM_REGION(0x200000, "user1", 0)    /* PowerPC program roms */
+	ROM_LOAD32_BYTE( "476ja1d01.20u", 0x000003, 0x80000, CRC(68d05950) SHA1(d0ff9b9b628563e18a3eaa7b96b7e9e442c001a9) ) /* Program version JAD, v1.10 (JPN) */
+	ROM_LOAD32_BYTE( "476ja1d02.17u", 0x000002, 0x80000, CRC(b12a14be) SHA1(d65281791874b90351442b94173d96582cfacd10) )
+	ROM_LOAD32_BYTE( "476ja1d03.15u", 0x000001, 0x80000, CRC(f768c8f1) SHA1(b8242995bdb4f9ac078fd59ffc70c31014396c92) )
+	ROM_LOAD32_BYTE( "476ja1d04.13u", 0x000000, 0x80000, CRC(6fd4fce7) SHA1(0ef25ec98a13f7beca1231db5a4db9004caadb0b) )
 
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
@@ -1182,6 +1201,7 @@ ROM_END
 /*****************************************************************************/
 
 GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, midnrunj, midnrun,  zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, midnruna, midnrun,  zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS )

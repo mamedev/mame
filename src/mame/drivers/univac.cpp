@@ -96,7 +96,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
 
-	required_device<cpu_device>     m_maincpu;
+	required_device<z80_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;
 	required_device<z80ctc_device>  m_ctc;
 	required_device<z80sio_device>  m_uart;
@@ -314,10 +314,10 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(univac_state::uts20)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &univac_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c10)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 2000000));
 	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));

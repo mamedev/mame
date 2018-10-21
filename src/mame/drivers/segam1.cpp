@@ -235,8 +235,7 @@ void segam1_state::segam1_comms_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa7ff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
-	map(0xc000, 0xc000).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc001, 0xc001).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc000, 0xc001).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xe003, 0xe003).nopw(); // ???
 }
 
@@ -375,8 +374,8 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 
 	MCFG_DEVICE_ADD("uart", I8251, 4000000) // unknown clock
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(INPUTLINE("m1comm", 0))
+	mb8421_device &dpram(MB8421(config, "dpram"));
+	dpram.intl_callback().set_inputline("m1comm", 0);
 
 	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
 	MCFG_GFX_PALETTE("palette")

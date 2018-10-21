@@ -194,6 +194,11 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out2_changed )
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
+WRITE_LINE_MEMBER( ibm5150_mb_device::pc_pit8253_out2_changed )
+{
+	ibm5160_mb_device::pc_pit8253_out2_changed(state);
+	m_cassette->output(m_pit_out2 ? 1.0 : -1.0);
+}
 
 /**********************************************************
  *
@@ -596,9 +601,8 @@ MACHINE_CONFIG_START(ibm5150_mb_device::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("pc_kbdc")
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, ibm5150_mb_device, keyboard_clock_w))
 
-	MCFG_DEVICE_MODIFY("ppi8255")
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ibm5150_mb_device, pc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ibm5150_mb_device, pc_ppi_portc_r))
+	m_ppi8255->out_pb_callback().set(FUNC(ibm5150_mb_device::pc_ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(ibm5150_mb_device::pc_ppi_portc_r));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
@@ -771,9 +775,8 @@ DEFINE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device, "ec1841_mb", "EC-1840 m
 MACHINE_CONFIG_START(ec1841_mb_device::device_add_mconfig)
 	ibm5160_mb_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("ppi8255")
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ec1841_mb_device, pc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ec1841_mb_device, pc_ppi_portc_r))
+	m_ppi8255->out_pb_callback().set(FUNC(ec1841_mb_device::pc_ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(ec1841_mb_device::pc_ppi_portc_r));
 
 	MCFG_DEVICE_MODIFY("pc_kbdc")
 	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, ec1841_mb_device, keyboard_clock_w))

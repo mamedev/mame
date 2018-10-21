@@ -161,9 +161,7 @@ MACHINE_CONFIG_START(coco_ssc_device::device_add_mconfig)
 	MCFG_TMS7000_IN_PORTD_CB(READ8(*this, coco_ssc_device, ssc_port_d_r))
 	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(*this, coco_ssc_device, ssc_port_d_w))
 
-	MCFG_RAM_ADD("staticram")
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, "staticram").set_default_size("2K").set_default_value(0);
 
 	SPEAKER(config, "ssc_audio").front_center();
 
@@ -450,7 +448,7 @@ WRITE8_MEMBER(coco_ssc_device::ssc_port_c_w)
 
 	if( (data & C_ALD) == 0 )
 	{
-		m_spo->ald_w(space, 0, m_tms7000_portd);
+		m_spo->ald_w(m_tms7000_portd);
 	}
 
 	if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )

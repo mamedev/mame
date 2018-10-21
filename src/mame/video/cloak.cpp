@@ -182,8 +182,8 @@ void cloak_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			pen_t pen = m_current_bitmap_videoram_displayed[(y << 8) | x] & 0x07;
 

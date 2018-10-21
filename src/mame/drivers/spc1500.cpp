@@ -647,7 +647,7 @@ WRITE8_MEMBER( spc1500_state::double_w)
 		if (offset < 0x1800) { pcg_w(space, offset, data); } else
 		if (offset < 0x1900) { crtc_w(space, offset, data); } else
 		if (offset < 0x1a00) {} else
-		if (offset < 0x1b00) { m_pio->write(space, offset, data);} else
+		if (offset < 0x1b00) { m_pio->write(offset, data); } else
 		if (offset < 0x1c00) { m_sound->data_w(space, offset, data);} else
 		if (offset < 0x1d00) { m_sound->address_w(space, offset, data);} else
 		if (offset < 0x1e00) { romsel(space, offset, data);} else
@@ -674,7 +674,7 @@ READ8_MEMBER( spc1500_state::io_r)
 	if (offset < 0x1800) { return pcg_r(space, offset); } else
 	if (offset < 0x1900) { return crtc_r(space, offset); } else
 	if (offset < 0x1a00) { return keyboard_r(space, offset); } else
-	if (offset < 0x1b00) { return m_pio->read(space, offset); } else
+	if (offset < 0x1b00) { return m_pio->read(offset); } else
 	if (offset < 0x1c00) { return m_sound->data_r(space, offset); } else
 	if (offset < 0x2000) {} else
 	if (offset < 0x10000){
@@ -902,11 +902,11 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, spc1500_state, portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spc1500_state, portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spc1500_state, portc_w))
+	I8255(config, m_pio);
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pb_callback().set(FUNC(spc1500_state::portb_r));
+	m_pio->out_pb_callback().set(FUNC(spc1500_state::portb_w));
+	m_pio->out_pc_callback().set(FUNC(spc1500_state::portc_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
 
@@ -931,8 +931,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1500_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

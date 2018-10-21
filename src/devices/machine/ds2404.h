@@ -13,30 +13,6 @@
 
 #pragma once
 
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DS2404_REF_YEAR(_ref_year) \
-	downcast<ds2404_device &>(*device).set_ref_year(_ref_year);
-
-#define MCFG_DS2404_REF_MONTH(_ref_month) \
-	downcast<ds2404_device &>(*device).set_ref_month(_ref_month);
-
-#define MCFG_DS2404_REF_DAY(_ref_day) \
-	downcast<ds2404_device &>(*device).set_ref_day(_ref_day);
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-
-// ======================> ds2404_device
-
 class ds2404_device : public device_t, public device_nvram_interface
 {
 public:
@@ -44,9 +20,9 @@ public:
 	ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	void set_ref_year(uint32_t year) { m_ref_year = year; }
-	void set_ref_month(uint8_t month) { m_ref_month = month; }
-	void set_ref_day(uint8_t day) { m_ref_day = day; }
+	void ref_year(uint32_t year) { m_ref_year = year; }
+	void ref_month(uint8_t month) { m_ref_month = month; }
+	void ref_day(uint8_t day) { m_ref_day = day; }
 
 	/* 1-wire interface reset  */
 	DECLARE_WRITE8_MEMBER(ds2404_1w_reset_w);
@@ -112,8 +88,6 @@ private:
 	int m_state_ptr;
 };
 
-
-// device type definition
 DECLARE_DEVICE_TYPE(DS2404, ds2404_device)
 
 #endif // MAME_MACHINE_DS2404_H

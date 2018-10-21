@@ -373,8 +373,8 @@ MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, yunsung8_state, adpcm_int)) /* interrupt function */
@@ -394,10 +394,10 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-                                    Magix
-
+Magix
 Yun Sung, 1995
 
+YS-ROCK-970712
 +-------------------------------------+
 |VOL YM3014      6116               04|
 |     M5205 400KHz                  03|
@@ -406,10 +406,10 @@ Yun Sung, 1995
 |    MCM2018AN45                      |
 |J   MCM2018AN45                      |
 |A DSW1       +--------+              |
-|M            |        |              |
-|M DSW2*      | Quick  |              |
-|A            | Logic  |              |
-|             |        |              |
+|M            | Quick  |              |
+|M DSW2*      | Logic  |              |
+|A            |QL12x16B|              |
+|             | OPL84C |              |
 | U66         +--------+            06|
 |    HM6264                         05|
 |     07     HM6264                   |
@@ -419,7 +419,7 @@ Yun Sung, 1995
  Main CPU: Z80B
 Sound CPU: Z80A
     Sound: Yamaha YM3812 + Oki M5205 + YM3014 DAC
-    Video: QuickLogic FPGA - unknown type / model
+    Video: QuickLogic QL12x16B-OPL84C FPGA
       OSC: 16MHz + 400Khz resonator
    Memory: 2 x MCM2018AN45, 2 x HM6264, CXK5118PN-15L, GM76C28-10 & 6116
      Misc: DSW1 is a 8 position dipswitch
@@ -477,7 +477,7 @@ ROM_END
 
 /***************************************************************************
 
-                                Cannon Ball
+Cannon Ball
 Yun Sung, 1995
 
 Cannon Ball (vertical)
@@ -557,28 +557,43 @@ ROM_END
 
 Rock Tris by Yunsung
 
-Pcb marked Ys-rock 940712
+YS-ROCK-970712
++-------------------------------------+
+|VOL YM3014      6116               04|
+|     M5205 400KHz                  03|
+|     Z80A      CXK5118PN-15L       02|
+|      08       GM76C28-10          01|
+|    MCM2018AN45                      |
+|J   MCM2018AN45                      |
+|A DSW1       +--------+              |
+|M            | Quick  |              |
+|M DSW2*      | Logic  |              |
+|A            |QL12x16B|              |
+|             | OPL84C |              |
+| U66         +--------+            06|
+|    HM6264                         05|
+|     07     HM6264                   |
+|    Z80B    YM3812           16MHz   |
++-------------------------------------+
 
-pcb has no sound, the osc for the msm5205 has been cut so I don't know the frequency
-
-Pcb has no markings in the sockets and eproms have anonymous stickers
-
-2x z80
-1x 16mhz
-1x UA010
-1x msm5205
-1x fpga
-1x dipswitch (there is place for another one, but the space is empty and
-they jumpered the first position)
+ Main CPU: Z80B
+Sound CPU: Z80A
+    Sound: Yamaha YM3812 (marked as UA010) + Oki M5205 + YM3014 DAC
+    Video: QuickLogic QL12x16B-OPL84C FPGA
+      OSC: 16MHz + 400Khz resonator
+   Memory: 2 x MCM2018AN45, 2 x HM6264, CXK5118PN-15L, GM76C28-10 & 6116
+     Misc: DSW1 is a 8 position dipswitch
+           DSW2 is not populated
+           VOL Volume pot
 
 ***************************************************************************/
 
 ROM_START( rocktris )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* Main Z80 Code */
-	ROM_LOAD( "cpu.bin", 0x00000, 0x20000, CRC(46e3b79c) SHA1(81a587b9f986c4e39b1888ec6ed6b86d1469b9a0) )
+	ROM_LOAD( "cpu07.bin", 0x00000, 0x20000, CRC(46e3b79c) SHA1(81a587b9f986c4e39b1888ec6ed6b86d1469b9a0) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound Z80 Code */
-	ROM_LOAD( "cpu2.bin", 0x00000, 0x20000, CRC(3a78a4cf) SHA1(f643c7a217cbb71f3a03f1f4a16545c546332819) )
+	ROM_LOAD( "cpu08.bin", 0x00000, 0x20000, CRC(3a78a4cf) SHA1(f643c7a217cbb71f3a03f1f4a16545c546332819) )
 
 	ROM_REGION( 0x200000, "bgfx", 0 )   /* Background */
 	ROM_LOAD( "gfx4.bin", 0x000000, 0x80000, CRC(abb49cac) SHA1(e2d766e950df398a8ec8b6888e128ffc3bdf1ce9) )

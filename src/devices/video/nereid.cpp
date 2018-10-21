@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "nereid.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEREID, nereid_device, "nereid", "HP Nereid ASIC")
@@ -31,6 +31,7 @@ void nereid_device::device_start()
 	save_item(NAME(m_blue));
 	save_item(NAME(m_index));
 	save_item(NAME(m_palette));
+	save_item(NAME(m_plane_mask));
 }
 
 void nereid_device::device_reset()
@@ -48,12 +49,12 @@ READ16_MEMBER(nereid_device::ctrl_r)
 	case NEREID_RED_DATA:
 		return 0xff00 | m_red;
 	case NEREID_GREEN_DATA:
-		return 0xff00 | m_red;
+		return 0xff00 | m_green;
 	case NEREID_BLUE_DATA:
-		return 0xff00 | m_red;
+		return 0xff00 | m_blue;
 	case NEREID_INDEX:
 		return 0xff00 | m_index;
-	case NEREID_STROBE:
+	case NEREID_WRITE_STROBE:
 		return 0xff00;
 	case NEREID_PLANE_MASK:
 		return 0xff00 | m_plane_mask;
@@ -80,10 +81,15 @@ WRITE16_MEMBER(nereid_device::ctrl_w)
 	case NEREID_INDEX:
 		m_index = ~data;
 		break;
-	case NEREID_STROBE:
+	case NEREID_WRITE_STROBE:
 		LOG("NEREID: set color index %u: rgb_t(%u,%u,%u)\n",
 			m_index, m_red, m_green, m_blue);
 		m_palette[m_index] = rgb_t(m_red, m_green, m_blue);
+		break;
+	case NEREID_READ_STROBE:
+		m_red = m_palette[m_index].r();
+		m_green = m_palette[m_index].g();
+		m_blue = m_palette[m_index].b();
 		break;
 	case NEREID_PLANE_MASK:
 		m_plane_mask = data;

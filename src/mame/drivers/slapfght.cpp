@@ -896,11 +896,11 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_DEVICE_PROGRAM_MAP(perfrman_map)
 	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, slapfght_state, palette_bank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
+	mainlatch.q_out_cb<6>().set(FUNC(slapfght_state::palette_bank_w));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/8) // 2MHz? XTAL is known, divider is guessed
 	MCFG_DEVICE_PROGRAM_MAP(perfrman_sound_map)
@@ -947,10 +947,10 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_map_mcu)
 	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
@@ -1018,11 +1018,11 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_DEVICE_PROGRAM_MAP(slapfigh_map_mcu)
 	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
+	mainlatch.q_out_cb<4>().set_membank("bank1");
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
@@ -1923,39 +1923,46 @@ ROM_START( getstarj )
 ROM_END
 
 ROM_START( getstarb1 )
-	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
-	ROM_LOAD( "gs_rb_1.bin",  0x00000, 0x4000, CRC(9afad7e0) SHA1(6b2e82a6b7fcbfed5f4d250959ecc571fdf0cbc2) )
-	ROM_LOAD( "gs_rb_2.bin",  0x04000, 0x4000, CRC(5feb0a60) SHA1(b1300055180ddf6ca96475eb3a27a17722273fc6) )
-	ROM_LOAD( "gs_rb_3.bin",  0x10000, 0x8000, CRC(e3cfb1ba) SHA1(bd21655c82a14e18ff9df4539c4d0bb2484c73f1) )
+	ROM_REGION( 0x18000, "maincpu", 0 )  /* Region 0 - main cpu code */
+	ROM_LOAD( "getstar_14_b.8p",  0x00000, 0x4000, CRC(9afad7e0) SHA1(6b2e82a6b7fcbfed5f4d250959ecc571fdf0cbc2) ) // gs_rb_1 // 27128 (matches the socket label)
+	ROM_LOAD( "getstar_13_b.8n",  0x04000, 0x4000, CRC(5feb0a60) SHA1(b1300055180ddf6ca96475eb3a27a17722273fc6) ) // gs_rb_2 // 27128 (matches the socket label)
+	ROM_LOAD( "getstar_12_b.8k",  0x10000, 0x8000, CRC(e3cfb1ba) SHA1(bd21655c82a14e18ff9df4539c4d0bb2484c73f1) ) // gs_rb_3 // 27256 (The socket is labeled as 27128)
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
-	ROM_LOAD( "a68-03",       0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Region 3 - sound cpu code */
+	ROM_LOAD( "getstar_5_a.12e",  0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) ) // a68-03 // 2764 (matches the socket label)
 
-	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
-	/* these roms were in the set, but they're corrupt */
-//  ROM_LOAD( "gs_rb_8.bin",  0x00000, 0x2000, CRC(a30aaf04) SHA1(2509554c3851a68eaec1cadc01f4d69c7aa2c09d) )  /* Chars */
-//  ROM_LOAD( "gs_rb_7.bin",  0x02000, 0x2000, CRC(f47a93c6) SHA1(441fee1fb195bb2583d220f30dfcff617a31742a) )
-	/* use the original roms instead */
-	ROM_LOAD( "a68_05.bin",   0x00000, 0x2000, CRC(e3d409e7) SHA1(0b6be4767f110729f4dd1a472ef8d9a0c718b684) )  /* Chars */
-	ROM_LOAD( "a68_04.bin",   0x02000, 0x2000, CRC(6e5ac9d4) SHA1(74f90b7a1ceb3b1c2fd92dff100d92dea0155530) )
+	ROM_REGION( 0x04000, "gfx1", 0 )     /* Region 1 - temporary for gfx */  /* Chars */  /* Verified on new bootleg PCB found */
+	ROM_LOAD( "getstar_7_b.6f",   0x00000, 0x2000, CRC(e3d409e7) SHA1(0b6be4767f110729f4dd1a472ef8d9a0c718b684) ) // 2764 (matches the socket label)
+	ROM_LOAD( "getstar_8_b.6g",   0x02000, 0x2000, CRC(6e5ac9d4) SHA1(74f90b7a1ceb3b1c2fd92dff100d92dea0155530) ) // 2764 (matches the socket label)
 
+	ROM_REGION( 0x20000, "gfx2", 0 )     /* Region 1 - temporary for gfx */  /* Tiles */
+	ROM_LOAD( "getstar_6_b.4m",   0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) ) // a68_09 // 27256 (the socket is labeled as 27128)
+	ROM_LOAD( "getstar_9_b.6m",   0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) ) // a68_08 // 27256 (The socket is labeled as 27128)
+	ROM_LOAD( "getstar_10_b.6n",  0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) ) // a68_07 // 27256 (The socket is labeled as 27128)
+	ROM_LOAD( "getstar_11_b.6p",  0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) ) // a68_06 // 27256 (The socket is labeled as 27128)
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68_09",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
-	ROM_LOAD( "a68_08",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
-	ROM_LOAD( "a68_07",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
-	ROM_LOAD( "a68_06",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
-
-	ROM_REGION( 0x20000, "gfx3", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68-13",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
-	ROM_LOAD( "a68-12",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
-	ROM_LOAD( "a68-11",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
-	ROM_LOAD( "a68-10",       0x18000, 0x8000, CRC(83161ed0) SHA1(a6aa28f22f487dc3a2ec07935e6d42bcdd1eff81) )
+	ROM_REGION( 0x20000, "gfx3", 0 )     /* Region 1 - temporary for gfx */  /* Sprites */
+	ROM_LOAD( "getstar_4_a.8j",   0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) ) // a68-13 // 27256 (the socket is labeled as 27128)
+	ROM_LOAD( "getstar_2_a.7j",   0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) ) // a68-12 // 27256 (the socket is labeled as 27128)
+	ROM_LOAD( "getstar_3_a.8h",   0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) ) // a68-11 // 27256 (the socket is labeled as 27128)
+	ROM_LOAD( "getstar_1_a.7h",   0x18000, 0x8000, CRC(83161ed0) SHA1(a6aa28f22f487dc3a2ec07935e6d42bcdd1eff81) ) // a68-10 // 27256 (the socket is labeled as 27128)
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "rom21",        0x0000,  0x0100, CRC(d6360b4d) SHA1(3e64548c82a3378fc091e104cdc2b0c7e592fc44) )
-	ROM_LOAD( "rom20",        0x0100,  0x0100, CRC(4ca01887) SHA1(2892c89d5e60f1d10593adffff55c1a9654e8209) )
-	ROM_LOAD( "rom19",        0x0200,  0x0100, CRC(513224f0) SHA1(15b34612206138f6fc5f7478925b1fff2ed56aa8) )
+	ROM_LOAD( "getstar_p7_a.12q", 0x0000,  0x0100, CRC(d6360b4d) SHA1(3e64548c82a3378fc091e104cdc2b0c7e592fc44) ) // rom21 // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p5_a.12m", 0x0100,  0x0100, CRC(4ca01887) SHA1(2892c89d5e60f1d10593adffff55c1a9654e8209) ) // rom20 // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p6_a.12n", 0x0200,  0x0100, CRC(35eefbbb) SHA1(b885938cc7ef322b354a0d60f9c7614686bb33ea) ) // rom19 //82S129N (matches the socket label)
+
+	/* Unused. Weren't on the first dump, but verified to be on the PCB */
+	ROM_REGION( 0x0500, "proms2", 0 )
+	ROM_LOAD( "getstar_p1_a.1c",  0x0000,  0x0100, CRC(d492e6c2) SHA1(5789adda3a63ef8656ebd012416fcf3f991241fe) ) // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p2_a.1e",  0x0100,  0x0100, CRC(59490887) SHA1(c894edecbcfc67972ad893cd7c8197d07862a20a) ) // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p3_a.2b",  0x0200,  0x0020, CRC(aa0ca5a5) SHA1(4c45be71658f40ebb05634febba5822f1a8a7f79) ) // 82S123N (matches the socket label)
+	ROM_LOAD( "getstar_p8_b.2c",  0x0300,  0x0100, CRC(4dc04453) SHA1(524e5a212ab496c52adc0def995b75e89aba48e7) ) // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p9_b.8b",  0x0400,  0x0100, CRC(48ac3db4) SHA1(6a73fe21529bc760b8df1893aee9e89fb60976eb) ) // 82S129N (matches the socket label)
+
+	/* Unused, but verified to be on the PCB */
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "getstar_p4_a.2e",  0x0000,  0x0104, NO_DUMP ) // PAL16R4ACN - Protected
 ROM_END
 
 ROM_START( getstarb2 )

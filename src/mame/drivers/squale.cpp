@@ -786,21 +786,21 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_DEVICE_PROGRAM_MAP(squale_mem)
 
 	/* Cartridge pia */
-	MCFG_DEVICE_ADD("pia_u72", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, squale_state, pia_u72_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, squale_state, pia_u72_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, squale_state, pia_u72_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, squale_state, pia_u72_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, squale_state, pia_u72_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u72_cb2_w))
+	PIA6821(config, m_pia_u72, 0);
+	m_pia_u72->readpa_handler().set(FUNC(squale_state::pia_u72_porta_r));
+	m_pia_u72->readpb_handler().set(FUNC(squale_state::pia_u72_portb_r));
+	m_pia_u72->writepa_handler().set(FUNC(squale_state::pia_u72_porta_w));
+	m_pia_u72->writepb_handler().set(FUNC(squale_state::pia_u72_portb_w));
+	m_pia_u72->ca2_handler().set(FUNC(squale_state::pia_u72_ca2_w));
+	m_pia_u72->cb2_handler().set(FUNC(squale_state::pia_u72_cb2_w));
 
 	/* Keyboard pia */
-	MCFG_DEVICE_ADD("pia_u75", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, squale_state, pia_u75_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, squale_state, pia_u75_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, squale_state, pia_u75_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, squale_state, pia_u75_portb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u75_cb2_w))
+	PIA6821(config, m_pia_u75, 0);
+	m_pia_u75->readpa_handler().set(FUNC(squale_state::pia_u75_porta_r));
+	m_pia_u75->readpb_handler().set(FUNC(squale_state::pia_u75_portb_r));
+	m_pia_u75->writepa_handler().set(FUNC(squale_state::pia_u75_porta_w));
+	m_pia_u75->writepb_handler().set(FUNC(squale_state::pia_u75_portb_w));
+	m_pia_u75->cb2_handler().set(FUNC(squale_state::pia_u75_cb2_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -830,7 +830,7 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
-	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL)
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")

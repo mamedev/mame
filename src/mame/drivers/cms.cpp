@@ -104,7 +104,7 @@ WRITE8_MEMBER(cms_state::map_select_w)
 	m_map_select = (data & 0x03) << 2;
 	logerror("map select %02x\n", data);
 	//if (m_map_select == 0x00)
-	//	m_bank1->set_entry(m_page_select);
+	//  m_bank1->set_entry(m_page_select);
 	//else
 		m_bank1->set_entry(m_map_select);
 }

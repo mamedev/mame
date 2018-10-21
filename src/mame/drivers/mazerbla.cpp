@@ -1000,7 +1000,7 @@ MACHINE_CONFIG_START(mazerbla_state::mazerbla)
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1043,7 +1043,7 @@ MACHINE_CONFIG_START(mazerbla_state::greatgun)
 	MCFG_MB_VCU_CPU("sub2")
 	MCFG_MB_VCU_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

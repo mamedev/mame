@@ -3964,11 +3964,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 MACHINE_CONFIG_START(nmk16_state::tharrier)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz */
+	MCFG_DEVICE_ADD("maincpu", M68000, 10_MHz_XTAL) // TMP68000P-12, 10 MHz
 	MCFG_DEVICE_PROGRAM_MAP(tharrier_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000) // Z0840006PSC, Unknown MHz
 	MCFG_DEVICE_PROGRAM_MAP(tharrier_sound_map)
 	MCFG_DEVICE_IO_MAP(tharrier_sound_io_map)
 
@@ -3987,18 +3987,18 @@ MACHINE_CONFIG_START(nmk16_state::tharrier)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL / 8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4_MHz_XTAL, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4_MHz_XTAL, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -6207,6 +6207,43 @@ ROM_END
 
 ROM_START( strahl )
 	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "strahl-02.ic82", 0x00000, 0x20000, CRC(e6709a0d) SHA1(ec5741f6a708ac2a6831fb65198d81dc7e6c5aea) )
+	ROM_LOAD16_BYTE( "strahl-01.ic83", 0x00001, 0x20000, CRC(bfd021cf) SHA1(fcf252c42a58e2f7e9982869931447ee8aa5baaa) )
+
+	ROM_REGION( 0x20000, "fgtile", 0 )
+	ROM_LOAD( "strahl-3.73",  0x000000, 0x10000, CRC(2273b33e) SHA1(fa53e91b80dfea3f8b2c1f0ce66e5c6920c4960f) ) /* Characters */
+
+	ROM_REGION( 0x40000, "bgtile", 0 )
+	ROM_LOAD( "str7b2r0.275", 0x000000, 0x40000, CRC(5769e3e1) SHA1(7d7a16b11027d0a7618df1ec1e3484224b772e90) ) /* Tiles */
+
+	ROM_REGION( 0x180000, "sprites", 0 )
+	ROM_LOAD( "strl3-01.32",  0x000000, 0x80000, CRC(d8337f15) SHA1(4df23fff2506b66a94dae4e0cf7d25499936b942) ) /* Sprites */
+	ROM_LOAD( "strl4-02.57",  0x080000, 0x80000, CRC(2a38552b) SHA1(82335fc6aa3de9145dd84952e5ed423493bf7141) )
+	ROM_LOAD( "strl5-03.58",  0x100000, 0x80000, CRC(a0e7d210) SHA1(96a762a3a1cdeaa91bde50429e0ac665fb81190b) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_LOAD( "str6b1w1.776", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) /* Tiles */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "strahl-4.66",    0x00000, 0x10000, CRC(60a799c4) SHA1(8ade3cf827a389f7cb4080957dc4d67077ea4166) )
+
+	ROM_REGION( 0xa0000, "oki1", 0 )    /* Oki sample data */
+	ROM_LOAD( "str8pmw1.540", 0x00000, 0x20000, CRC(01d6bb6a) SHA1(b157f6f921483ed8067a7e13e370f73fdb60d136) )
+	/* this is a mess */
+	ROM_CONTINUE(             0x60000, 0x20000 )    /* banked */
+	ROM_CONTINUE(             0x40000, 0x20000 )    /* banked */
+	ROM_CONTINUE(             0x20000, 0x20000 )    /* banked */
+
+	ROM_REGION( 0xa0000, "oki2", 0 )    /* Oki sample data */
+	ROM_LOAD( "str9pew1.639", 0x00000, 0x20000, CRC(6bb3eb9f) SHA1(9c1394df4f8a08f9098c85eb3d38fb862d6eabbb) )
+	/* this is a mess */
+	ROM_CONTINUE(             0x60000, 0x20000 )    /* banked */
+	ROM_CONTINUE(             0x40000, 0x20000 )    /* banked */
+	ROM_CONTINUE(             0x20000, 0x20000 )    /* banked */
+ROM_END
+
+ROM_START( strahlj )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "strahl-2.82", 0x00000, 0x20000, CRC(c9d008ae) SHA1(e9218a3143d5887e702df051354a9083a806c69c) )
 	ROM_LOAD16_BYTE( "strahl-1.83", 0x00001, 0x20000, CRC(afc3c4d6) SHA1(ab3dd7db692eb01e3a87f4216d322a702f3beaad) )
 
@@ -6242,7 +6279,7 @@ ROM_START( strahl )
 	ROM_CONTINUE(             0x20000, 0x20000 )    /* banked */
 ROM_END
 
-ROM_START( strahla )
+ROM_START( strahlja )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom2", 0x00000, 0x20000, CRC(f80a22ef) SHA1(22099eb0bbb445702e0276713c3e48d60de60c30) )
 	ROM_LOAD16_BYTE( "rom1", 0x00001, 0x20000, CRC(802ecbfc) SHA1(cc776023c7bd6b6d6af9659a0c822a2887e50199) )
@@ -6279,10 +6316,10 @@ ROM_START( strahla )
 	ROM_CONTINUE(             0x20000, 0x20000 )    /* banked */
 ROM_END
 
-ROM_START( hachamfb )
+ROM_START( hachamf )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 code */
-	ROM_LOAD16_BYTE( "8.bin",  0x00000, 0x20000, CRC(14845b65) SHA1(5cafd07a8a6f5ccbb36de7a90571f8b33ecf273e) )
-	ROM_LOAD16_BYTE( "7.bin",  0x00001, 0x20000, CRC(069ca579) SHA1(0db4c3c41e17fca613d11de89b388a4af206ec6b) )
+	ROM_LOAD16_BYTE( "7.93",  0x00000, 0x20000, CRC(9d847c31) SHA1(1d370d8db9cadadb9c2cb213e32f681947d81b7f) ) /* internally reports as 19th Sep. 1991 */
+	ROM_LOAD16_BYTE( "6.94",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* unknown  - sound cpu ?????? */
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
@@ -6305,10 +6342,36 @@ ROM_START( hachamfb )
 	/* 0x20000 - 0x80000 banked */
 ROM_END
 
-ROM_START( hachamf )
+ROM_START( hachamfa) /* reportedly a Korean PCB / version */
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 code */
-	ROM_LOAD16_BYTE( "7.93",  0x00000, 0x20000, CRC(9d847c31) SHA1(1d370d8db9cadadb9c2cb213e32f681947d81b7f) )
-	ROM_LOAD16_BYTE( "6.94",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
+	ROM_LOAD16_BYTE( "7.ic93",  0x00000, 0x20000, CRC(f437e52b) SHA1(061a75a7a9734034d1c499fc0bc2d8a61bb26da4) ) /* internally reports as 19th Sep. 1991 */
+	ROM_LOAD16_BYTE( "6.ic94",  0x00001, 0x20000, CRC(60d340d0) SHA1(3c6f862901b403d6ddf58823af7d6e3f67573788) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* unknown  - sound cpu ?????? */
+	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
+
+	ROM_REGION( 0x020000, "fgtile", 0 ) /* Smaller NMK logo plus alternate  Distributed by UPL  Company Limited  starting at tile 0xF80 */
+	ROM_LOAD( "5.ic95",  0x000000, 0x020000, CRC(a2c1e25d) SHA1(cf09cbfd9afc7e3907fef6b26fb269b743f2e036) )   /* 8x8 tiles */
+
+	ROM_REGION( 0x100000, "bgtile", 0 ) /* 16x16 tiles */
+	ROM_LOAD( "91076-4.101",  0x000000, 0x100000, CRC(df9653a4) SHA1(4a3204a98d7738c7895169fcece922fdf355f4fa) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "91076-8.57",  0x000000, 0x100000, CRC(7fd0f556) SHA1(d1b4bec0946869d3d7bcb870d9ae3bd17395a231) ) /* Sprites */
+
+	ROM_REGION( 0x080000, "oki1", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "91076-2.46",   0x00000, 0x80000, CRC(3f1e67f2) SHA1(413e78587d8a043a0eb94447313ba1b3c5b35be5) ) /* 1st & 2nd half identical, needs verifying */
+	/* 0x20000 - 0x80000 banked */
+
+	ROM_REGION( 0x080000, "oki2", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "91076-3.45",   0x00000, 0x80000, CRC(b25ed93b) SHA1(d7bc686bbccf982f40420a11158aa8e5dd4207c5) ) /* 1st & 2nd half identical, needs verifying */
+	/* 0x20000 - 0x80000 banked */
+ROM_END
+
+ROM_START( hachamfb ) /* Thunder Dragon conversion - unprotected prototype or bootleg? */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_BYTE( "8.bin",  0x00000, 0x20000, CRC(14845b65) SHA1(5cafd07a8a6f5ccbb36de7a90571f8b33ecf273e) ) /* internally reports as 19th Sep. 1991 */
+	ROM_LOAD16_BYTE( "7.bin",  0x00001, 0x20000, CRC(069ca579) SHA1(0db4c3c41e17fca613d11de89b388a4af206ec6b) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* unknown  - sound cpu ?????? */
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
@@ -6752,6 +6815,38 @@ ROM_START( arcadian )
 ROM_END
 
 ROM_START( raphero )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "3",      0x00000, 0x80000, CRC(3257bfbd) SHA1(12ba7bbbf811c9a574a7751979edaaf1f33b0764) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* tmp90c841 */
+	ROM_LOAD( "rhp94099.2",    0x00000, 0x20000, CRC(fe01ece1) SHA1(c469fb79f2774089848c814f92ddd3c9e384050f) )
+
+	ROM_REGION( 0x020000, "fgtile", 0 )
+	ROM_LOAD( "rhp94099.1",    0x000000, 0x020000, CRC(55a7a011) SHA1(87ded56bfdd38cbf8d3bd8b3789831f768550a12) )   /* 8x8 tiles */
+
+	ROM_REGION( 0x200000, "bgtile", 0 )
+	ROM_LOAD( "rhp94099.4", 0x000000, 0x200000,  CRC(076eee7b) SHA1(7c315fe33d0fcd92e0ce2f274996c8059228b005) ) /* 16x16 tiles */
+
+	ROM_REGION( 0x600000, "sprites", 0 ) /* sprites */
+	ROM_LOAD16_WORD_SWAP( "rhp94099.8", 0x000000, 0x200000, CRC(49892f07) SHA1(2f5d20cd193cffcba9041aa11d6665adebeffffa) )  /* 16x16 tiles */
+	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  /* 16x16 tiles */
+	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  /* 16x16 tiles */
+
+	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  /* all banked */
+	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  /* all banked */
+
+	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  /* all banked */
+	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  /* all banked */
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "prom1.u19",      0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) ) /* unknown */
+	ROM_LOAD( "prom2.u53",      0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) ) /* unknown */
+	ROM_LOAD( "prom3.u60",      0x0200, 0x0100, CRC(304f98c6) SHA1(8dfd9bf719087ec30c83efe95c4561666c7d1801) ) /* unknown */
+ROM_END
+
+ROM_START( rapheroa )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rhp94099.3",      0x00000, 0x80000, CRC(ec9b4f05) SHA1(e5bd797620dc449fd78b41d87e9ba5a764eb8b44) )
 
@@ -8156,13 +8251,15 @@ GAME( 1991, blkheartj,  blkheart, blkheart,     blkheart,     nmk16_state, empty
 
 GAME( 1991, acrobatm,   0,        acrobatm,     acrobatm,     nmk16_state, empty_init,           ROT270, "UPL (Taito license)",          "Acrobat Mission", 0 )
 
-GAME( 1992, strahl,     0,        strahl,       strahl,       nmk16_state, empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 1)", 0 )
-GAME( 1992, strahla,    strahl,   strahl,       strahl,       nmk16_state, empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", 0 )
+GAME( 1992, strahl,     0,        strahl,       strahl,       nmk16_state, empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (World)", 0 )
+GAME( 1992, strahlj,    strahl,   strahl,       strahl,       nmk16_state, empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 1)", 0 )
+GAME( 1992, strahlja,   strahl,   strahl,       strahl,       nmk16_state, empty_init,           ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", 0 )
 
 GAME( 1991, tdragon,    0,        tdragon,      tdragon,      nmk16_state, empty_init,           ROT270, "NMK (Tecmo license)",          "Thunder Dragon (8th Jan. 1992, unprotected)", 0 )
 GAME( 1991, tdragon1,   tdragon,  tdragon_prot, tdragon_prot, nmk16_state, init_tdragon_prot,    ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991, protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
 
-GAME( 1991, hachamf,    0,        hachamf_prot, hachamf_prot, nmk16_state, init_hachamf_prot,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // lots of things wrong due to protection
+GAME( 1991, hachamf,    0,        hachamf_prot, hachamf_prot, nmk16_state, init_hachamf_prot,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // lots of things wrong due to protection
+GAME( 1991, hachamfa,   hachamf,  hachamf_prot, hachamf_prot, nmk16_state, init_hachamf_prot,    ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991, protected, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // lots of things wrong due to protection
 GAME( 1991, hachamfb,   hachamf,  hachamf,      hachamfb,     nmk16_state, empty_init,           ROT0,   "bootleg",                      "Hacha Mecha Fighter (19th Sep. 1991, unprotected, bootleg Thunder Dragon conversion)", 0 ) // appears to be a Thunder Dragon conversion, could be bootleg?
 
 GAME( 1992, macross,    0,        macross,      macross,      nmk16_state, init_nmk,             ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", 0 )
@@ -8179,9 +8276,9 @@ GAME( 1993, tdragon2a,  tdragon2, tdragon2,     tdragon2,     nmk16_state, init_
 GAME( 1993, bigbang,    tdragon2, tdragon2,     tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", MACHINE_NO_COCKTAIL )
 GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state, init_banked_audiocpu, ROT270, "bootleg (Conny Co Ltd.)",      "Thunder Dragon 3 (bootleg of Thunder Dragon 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // based on 1st Oct. 1993 set, Sound system isn't hooked up correctly for this set
 
-/* arcadia was a name conflict to the Emerson Arcadia 2001 in mess */
 GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen
-GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero", 0 )    // ^^
+GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Rapid Hero (NMK)", 0 )           // ^^
+GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all romsets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
 GAME( 1992, sabotenb,   0,        bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )

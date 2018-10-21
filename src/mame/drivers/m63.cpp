@@ -763,12 +763,12 @@ MACHINE_CONFIG_START(m63_state::m63)
 	MCFG_DEVICE_PROGRAM_MAP(m63_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // probably chip at E7 obscured by pulldown resistor
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, m63_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, m63_state, m63_flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, m63_state, pal_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, m63_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, m63_state, coin2_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // probably chip at E7 obscured by pulldown resistor
+	outlatch.q_out_cb<0>().set(FUNC(m63_state::nmi_mask_w));
+	outlatch.q_out_cb<2>().set(FUNC(m63_state::m63_flipscreen_w));
+	outlatch.q_out_cb<3>().set(FUNC(m63_state::pal_bank_w));
+	outlatch.q_out_cb<6>().set(FUNC(m63_state::coin1_w));
+	outlatch.q_out_cb<7>().set(FUNC(m63_state::coin2_w));
 
 	MCFG_DEVICE_ADD("soundcpu",I8039,XTAL(12'000'000)/4) /* ????? */
 	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
@@ -821,10 +821,10 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 	MCFG_DEVICE_PROGRAM_MAP(fghtbskt_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, m63_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, m63_state, fghtbskt_flipscreen_w))
-	//MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, m63_state, fghtbskt_samples_w))
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<1>().set(FUNC(m63_state::nmi_mask_w));
+	outlatch.q_out_cb<2>().set(FUNC(m63_state::fghtbskt_flipscreen_w));
+	//outlatch.q_out_cb<7>().set(FUNC(m63_state::fghtbskt_samples_w));
 
 	MCFG_DEVICE_ADD("soundcpu", I8039,XTAL(12'000'000)/4)    /* ????? */
 	MCFG_DEVICE_PROGRAM_MAP(i8039_map)

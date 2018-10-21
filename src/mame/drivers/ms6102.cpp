@@ -135,8 +135,7 @@ void ms6102_state::ms6102_mem(address_map &map)
 void ms6102_state::ms6102_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_i8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0f).rw("589wa1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
@@ -312,8 +311,8 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_I8085A_INTE(WRITELINE("i8214", i8214_device, inte_w))
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms6102_state, ms6102_int_ack)
 
-	MCFG_DEVICE_ADD("i8214", I8214, XTAL(18'432'000) / 9)
-	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, ms6102_state, irq_w))
+	I8214(config, m_pic, XTAL(18'432'000) / 9);
+	m_pic->int_wr_callback().set(FUNC(ms6102_state::irq_w));
 
 	MCFG_DEVICE_ADD("earom", KR1601RR1, 0)
 
@@ -324,10 +323,10 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms6102)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(18'432'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, ms6102_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, ms6102_state, memory_read_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, ms6102_state, vdack_w))
+	I8257(config, m_dma8257, XTAL(18'432'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(ms6102_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(ms6102_state::memory_read_byte));
+	m_dma8257->out_iow_cb<2>().set(FUNC(ms6102_state::vdack_w));
 
 	MCFG_DEVICE_ADD("i8275_1", I8275, XTAL(16'400'000) / 8) // XXX
 	MCFG_I8275_CHARACTER_WIDTH(8)
@@ -342,13 +341,13 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// keyboard
-	MCFG_DEVICE_ADD("589wa1", AY31015, 0)
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(*this, ms6102_state, irq<1>))
-	MCFG_AY31015_AUTO_RDAV(true)
+	AY31015(config, m_kbd_uart);
+	m_kbd_uart->write_dav_callback().set(FUNC(ms6102_state::irq<1>));
+	m_kbd_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("ie5", RIPPLE_COUNTER, XTAL(16'400'000) / 30)
-	MCFG_RIPPLE_COUNTER_STAGES(2)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(*this, ms6102_state, kbd_uart_clock_w))
+	ripple_counter_device &ie5(RIPPLE_COUNTER(config, "ie5", XTAL(16'400'000) / 30));
+	ie5.set_stages(2);
+	ie5.count_out_cb().set(FUNC(ms6102_state::kbd_uart_clock_w));
 
 	MS7002(config, m_keyboard, 0).signal_out_callback().set(m_kbd_uart, FUNC(ay31015_device::write_si));
 

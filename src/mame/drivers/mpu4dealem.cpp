@@ -215,7 +215,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_AY8910_RES_LOADS(820, 0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

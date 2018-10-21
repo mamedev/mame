@@ -118,7 +118,7 @@ void apple3_state::apple3_write_charmem()
 
 
 
-VIDEO_START_MEMBER(apple3_state,apple3)
+void apple3_state::video_start()
 {
 	int i, j;
 	uint32_t v;
@@ -149,8 +149,8 @@ void apple3_state::text40(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	uint8_t *ram = m_ram->pointer();
 	uint32_t ram_size = m_ram->size();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
-	int beginrow = (cliprect.min_y - (cliprect.min_y % 8)) / 8;
-	int endrow = (cliprect.max_y - (cliprect.max_y % 8) + 7) / 8;
+	int beginrow = (cliprect.top() - (cliprect.top() % 8)) / 8;
+	int endrow = (cliprect.bottom() - (cliprect.bottom() % 8) + 7) / 8;
 
 	for (y = beginrow; y <= endrow; y++)
 	{
@@ -220,8 +220,8 @@ void apple3_state::text80(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	uint8_t *ram = m_ram->pointer();
 	uint32_t ram_size = m_ram->size();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
-	int beginrow = (cliprect.min_y - (cliprect.min_y % 8)) / 8;
-	int endrow = (cliprect.max_y - (cliprect.max_y % 8) + 7) / 8;
+	int beginrow = (cliprect.top() - (cliprect.top() % 8)) / 8;
+	int endrow = (cliprect.bottom() - (cliprect.bottom() % 8) + 7) / 8;
 
 	for (y = beginrow; y <= endrow; y++)
 	{
@@ -284,7 +284,7 @@ void apple3_state::graphics_hgr(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	uint8_t *ram = m_ram->pointer();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		ly = y;
 		if (m_smoothscr)
@@ -329,7 +329,7 @@ void apple3_state::graphics_chgr(bitmap_ind16 &bitmap, const rectangle &cliprect
 	uint8_t *ram = m_ram->pointer();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		ly = y;
 		if (m_smoothscr)
@@ -386,7 +386,7 @@ void apple3_state::graphics_shgr(bitmap_ind16 &bitmap, const rectangle &cliprect
 	uint8_t *ram = m_ram->pointer();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		ly = y;
 		if (m_smoothscr)
@@ -441,7 +441,7 @@ void apple3_state::graphics_chires(bitmap_ind16 &bitmap, const rectangle &clipre
 	uint8_t *ram = m_ram->pointer();
 	int smooth = m_va | (m_vb << 1) | (m_vc << 2);
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		ly = y;
 		if (m_smoothscr)
@@ -486,7 +486,7 @@ void apple3_state::graphics_chires(bitmap_ind16 &bitmap, const rectangle &clipre
 
 
 
-uint32_t apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t apple3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
 

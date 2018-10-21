@@ -6,7 +6,7 @@
  *---------------------------
  * The Candela computer was designed to be the big breakthough and developed by Candela Data AB, "a Didact Company".
  * The Candela system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a
- * propietary software including CDBASIC. The Candela system lost the battle of the swedish schools to
+ * proprietary software including CDBASIC. The Candela system lost the battle of the Swedish schools to
  * the Compis computer by TeleNova which was based on CP/M initially.  Later both lost to IBM PC as we know.
  * Candela Data continued to sell their system to the swedish industry without major successes despite great
  * innovation and spririt.
@@ -485,7 +485,7 @@ INPUT_PORTS_END
  * Candela Main Unit
  * TODO:
  * - Map PIA:S
- * - ROM/RAM paging by using the PIA:s and the myriad of 74138:s on the board
+ * - ROM/RAM paging by using the PIAs and the myriad of 74138s on the board
  * - Vram and screen for the 6845 CRTC
  * - Keyboard
  * - Serial port
@@ -504,6 +504,10 @@ public:
 		,m_bank1(*this, "bank1")
 		,m_crtc(*this, "crtc")
 	{ }
+
+	void can09(machine_config &config);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -513,9 +517,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pia1_B_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void can09(machine_config &config);
 	void can09_map(address_map &map);
-protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_bank1;
@@ -626,7 +628,7 @@ static INPUT_PORTS_START( can09 )
 INPUT_PORTS_END
 
 // traced and guessed from pcb images and debugger
-// It is very likelly that this is a PIA based dynamic address map, needs more analysis
+// It is very likely that this is a PIA based dynamic address map, needs more analysis
 void can09_state::can09_map(address_map &map)
 {
 /*
@@ -672,11 +674,11 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	MCFG_DEVICE_PROGRAM_MAP(can09t_map)
 
 	/* --PIA inits----------------------- */
-	MCFG_DEVICE_ADD(SYSPIA_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_READPA_HANDLER(READ8(*this, can09t_state, syspia_A_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, can09t_state, syspia_B_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, can09t_state, syspia_B_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, can09t_state, syspia_cb2_w))
+	PIA6821(config, m_syspia, 0); // CPU board
+	m_syspia->readpa_handler().set(FUNC(can09t_state::syspia_A_r));
+	m_syspia->readpb_handler().set(FUNC(can09t_state::syspia_B_r));
+	m_syspia->writepb_handler().set(FUNC(can09t_state::syspia_B_w));
+	m_syspia->cb2_handler().set(FUNC(can09t_state::syspia_cb2_w));
 	/* 0xE1FB 0xB112 (SYSPIA Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xE1FB 0xB113 (SYSPIA Control B) = 0x00 - Channel B IRQ disabled */
 	/* 0xE203 0xB110 (SYSPIA DDR A)     = 0x00 - Port A all inputs */
@@ -684,29 +686,30 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	/* 0xE20A 0xB112 (SYSPIA Control A) = 0x05 - IRQ A enabled on falling transition on CA2 */
 	/* 0xE20A 0xB113 (SYSPIA Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xE20E 0xB111 (SYSPIA port B)    = 0x10 - Data to port B */
-	MCFG_DEVICE_ADD(USRPIA_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, can09t_state, usrpia_cb2_w))
+
+	PIA6821(config, m_usrpia, 0); // CPU board
+	m_usrpia->cb2_handler().set(FUNC(can09t_state::usrpia_cb2_w));
 	/* 0xE212 0xB122 (USRPIA Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xE212 0xB123 (USRPIA Control B) = 0x00 - Channel B IRQ disabled */
 	/* 0xE215 0xB120 (USRPIA DDR A)     = 0x00 - Port A all inputs */
 	/* 0xE215 0xB121 (USRPIA DDR B)     = 0xFF - Port B all outputs */
 	/* 0xE21A 0xB122 (USRPIA Control A) = 0x34 - CA2 is low and lock DDRB */
 	/* 0xE21A 0xB123 (USRPIA Control B) = 0x34 - CB2 is low and lock DDRB */
-	MCFG_DEVICE_ADD(PIA3_TAG, PIA6821, 0) // ROM board
-	MCFG_DEVICE_ADD(PIA4_TAG, PIA6821, 0) // ROM board
+	PIA6821(config, m_pia3, 0); // ROM board
+	PIA6821(config, m_pia4, 0); // ROM board
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
+	PTM6840(config, "ptm", 0);
 
 	/* RS232 usage: mame can09t -window -debug -rs232 terminal */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE ("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE ("rs232", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE ("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE ("acia", acia6850_device, write_cts))
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD ("acia_clock", CLOCK, CAN09T_ACIA_CLOCK)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE (*this, can09t_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, can09t_state, write_acia_clock))
 MACHINE_CONFIG_END
 
 #define CAN09_X1_CLOCK 22.1184_MHz_XTAL        /* UKI 22118.40 Khz */
@@ -716,8 +719,7 @@ MACHINE_CONFIG_START(can09_state::can09)
 	MCFG_DEVICE_PROGRAM_MAP(can09_map)
 
 	/* RAM banks */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K")
+	RAM(config, RAM_TAG).set_default_size("768K");
 
 	// CRTC  init
 	MCFG_MC6845_ADD("crtc", H46505, "screen", CAN09_CPU_CLOCK) // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby
@@ -757,19 +759,19 @@ MACHINE_CONFIG_START(can09_state::can09)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Floppy */
-	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL) // TODO: Verify 8MHz UKI crystal assumed to be used
+	WD1770(config, "wd1770", 8_MHz_XTAL); // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop3_list", "candela")
 #endif
 
 	/* --PIA inits----------------------- */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_READPA_HANDLER(READ8(*this, can09_state, pia1_A_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, can09_state, pia1_A_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, can09_state, pia1_B_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, can09_state, pia1_B_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, can09_state, pia1_cb2_w))
+	PIA6821(config, m_pia1, 0); // CPU board
+	m_pia1->readpa_handler().set(FUNC(can09_state::pia1_A_r));
+	m_pia1->writepa_handler().set(FUNC(can09_state::pia1_A_w));
+	m_pia1->readpb_handler().set(FUNC(can09_state::pia1_B_r));
+	m_pia1->writepb_handler().set(FUNC(can09_state::pia1_B_w));
+	m_pia1->cb2_handler().set(FUNC(can09_state::pia1_cb2_w));
 	/* 0xFF7D 0xE035 (PIA1 Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xFF81 0xE037 (PIA1 Control B) = 0x00 - Channel A IRQ disabled */
 	/* 0xFF85 0xE034 (PIA1 DDR A)     = 0x1F - Port A mixed mode */

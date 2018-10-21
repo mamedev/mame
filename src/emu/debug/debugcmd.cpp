@@ -294,7 +294,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* set up the initial debugscript if specified */
 	const char* name = m_machine.options().debug_script();
 	if (name[0] != 0)
-		m_cpu.source_script(name);
+		m_console.source_script(name);
 
 	m_cheat.cpu[0] = m_cheat.cpu[1] = 0;
 }
@@ -3094,7 +3094,7 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
 
 void debugger_commands::execute_source(int ref, const std::vector<std::string> &params)
 {
-	m_cpu.source_script(params[0].c_str());
+	m_console.source_script(params[0].c_str());
 }
 
 
@@ -3162,7 +3162,7 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 					address_space &sp = memory.space(space);
 					bool octal = sp.is_octal();
 					int nc = octal ? (sp.addr_width() + 2) / 3 : (sp.addr_width() + 3) / 4;
-						
+
 					std::vector<memory_entry> entries[2];
 					sp.dump_maps(entries[0], entries[1]);
 					for (int mode = 0; mode < 2; mode ++)

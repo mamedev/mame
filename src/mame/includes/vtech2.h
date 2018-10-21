@@ -37,6 +37,8 @@ public:
 
 	void init_laser();
 
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
 private:
 	DECLARE_WRITE8_MEMBER(laser_bank_select_w);
 	DECLARE_WRITE8_MEMBER(laser_fdc_w);

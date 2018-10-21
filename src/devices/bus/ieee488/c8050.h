@@ -60,6 +60,7 @@ protected:
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ifc(int state) override;
 
+	void add_common_devices(machine_config &config);
 	inline void update_ieee_signals();
 
 	required_device<m6502_device> m_maincpu;

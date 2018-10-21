@@ -1287,10 +1287,10 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_NVRAM_ADD_0FILL("backupram")
+	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MB3773_ADD("watchdog") // IC95
+	MB3773(config, "watchdog"); // IC95
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", MASTER_CLOCK/8));
 	io.in_pa_callback().set_ioport("P1");
@@ -1363,9 +1363,9 @@ MACHINE_CONFIG_START(segaybd_state::yboard_link)
 	MCFG_DEVICE_PROGRAM_MAP(link_map)
 	MCFG_DEVICE_IO_MAP(link_portmap)
 
-	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(WRITELINE(*this, segaybd_state, mb8421_intl))
-	MCFG_MB8421_INTR_HANDLER(WRITELINE(*this, segaybd_state, mb8421_intr))
+	mb8421_device &mb8421(MB8421(config, "mb8421"));
+	mb8421.intl_callback().set(FUNC(segaybd_state::mb8421_intl));
+	mb8421.intr_callback().set(FUNC(segaybd_state::mb8421_intr));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaybd_state::yboard_deluxe)

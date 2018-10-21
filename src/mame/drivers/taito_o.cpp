@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_DEVICE_PROGRAM_MAP(parentj_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitoo_state, parentj_interrupt, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

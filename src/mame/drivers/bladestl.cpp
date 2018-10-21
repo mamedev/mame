@@ -89,7 +89,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 {
 	// bits 3-5 = ROM bank select
-	m_upd7759->set_bank_base(((data & 0x38) >> 3) * 0x20000);
+	m_upd7759->set_rom_bank((data & 0x38) >> 3);
 
 	// bit 2 = SSG-C rc filter enable
 	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

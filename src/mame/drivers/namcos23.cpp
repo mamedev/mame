@@ -1444,7 +1444,7 @@ public:
 	void timecrs2(machine_config &config);
 
 	void init_s23();
-	
+
 	render_t m_render;
 	const uint16_t *m_tmlrom;
 	const uint8_t *m_tmhrom;
@@ -1598,7 +1598,8 @@ private:
 	uint32_t m_c435_size;
 	const uint32_t *m_ptrom;
 	uint32_t m_ptrom_limit;
-
+	uint8_t m_mcu_unk;
+	
 	int m_vblank_count;
 
 // It may only be 128
@@ -2527,6 +2528,7 @@ READ16_MEMBER(namcos23_state::c417_r)
 	case 6:
 		if(m_c417.pointrom_adr >= m_ptrom_limit)
 			return 0xffff;
+		// TODO: rapid river wants auto-inc in some way here (NGs point ROM self test otherwise)
 		return m_ptrom[m_c417.pointrom_adr];
 	}
 
@@ -2883,19 +2885,37 @@ WRITE16_MEMBER(namcos23_state::mcuen_w)
 }
 
 
-
 // C?? (unknown comms)
 
 // while getting the subcpu to be ready, panicprk sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
 // timecrs2 locks up in a similar way as panicprk, at the beginning of the 2nd level, by reading/writing to this register a couple of times
 READ16_MEMBER(namcos23_state::sub_comm_r)
 {
-	return 2;
+	// status register
+	if (offset == 0)
+	{
+		// bit 1 tx fifo empty
+		// bit 0 rx fifo ready
+		// bit 4-6: error (reads data port and discards it) (PC=0xbfc03698)
+		// data ready is signalled thru MIPS irq 4
+		// 3f0fa8 (phys address) is where data pops up in TC2 & PP
+		// PC=0xbfc03838 bit 7 high => fail (data loaded must be parsed somehow)
+		return 1 | 2;
+	}
+	
+	m_maincpu->set_input_line(MIPS3_IRQ4, CLEAR_LINE);
+	// data rx, TBD 
+	return m_mcu_unk; //machine().rand();
 }
 
 WRITE16_MEMBER(namcos23_state::sub_comm_w)
 {
-	;
+	if( offset == 1 )
+	{
+		// data tx
+		m_mcu_unk = data & 0xff;
+		m_maincpu->set_input_line(MIPS3_IRQ4, ASSERT_LINE);
+	}
 }
 
 
@@ -2984,7 +3004,7 @@ void namcos23_state::gmen_mips_map(address_map &map)
 
 
 // SH2 memmap
-/* TODO: of course, I believe that area 0x008***** is actually a bank of some sort ... */
+// TODO: of course, I believe that area 0x008***** is actually a bank of some sort ...
 void namcos23_state::gmen_sh2_map(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).ram().share("gmen_sh2_shared");
@@ -3612,7 +3632,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3680,7 +3700,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3761,7 +3781,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	subcpu_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 	subcpu_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

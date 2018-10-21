@@ -883,19 +883,19 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apache3_state, irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
-	MCFG_DEVICE_ADD("adc", M58990, 1000000) // unknown clock
-	MCFG_ADC0808_IN0_CB(IOPORT("STICK_X"))
-	MCFG_ADC0808_IN1_CB(IOPORT("STICK_Y"))
-	MCFG_ADC0808_IN2_CB(CONSTANT(0)) // VSP1
-	MCFG_ADC0808_IN4_CB(READ8(*this, apache3_state, apache3_vr1_r))
-	MCFG_ADC0808_IN5_CB(IOPORT("THROTTLE"))
-	MCFG_ADC0808_IN6_CB(CONSTANT(0)) // RPSNC
-	MCFG_ADC0808_IN7_CB(CONSTANT(0)) // LPSNC
+	m58990_device &adc(M58990(config, "adc", 1000000)); // unknown clock
+	adc.in_callback<0>().set_ioport("STICK_X");
+	adc.in_callback<1>().set_ioport("STICK_Y");
+	adc.in_callback<2>().set_constant(0); // VSP1
+	adc.in_callback<4>().set(FUNC(apache3_state::apache3_vr1_r));
+	adc.in_callback<5>().set_ioport("THROTTLE");
+	adc.in_callback<6>().set_constant(0); // RPSNC
+	adc.in_callback<7>().set_constant(0); // LPSNC
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	I8255(config, "ppi");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -945,10 +945,10 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, roundup5_state, output_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.out_pc_callback().set(FUNC(roundup5_state::output_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1020,18 +1020,18 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	// saner sync value (avoids crashing after crediting)
 	MCFG_QUANTUM_TIME(attotime::from_hz(CLOCK_2 / 1024))
 
-	MCFG_DEVICE_ADD("io1", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_CXD1095_IN_PORTC_CB(IOPORT("P1"))
-	MCFG_CXD1095_IN_PORTD_CB(IOPORT("P2"))
-	MCFG_CXD1095_IN_PORTE_CB(IOPORT("DSW3"))
+	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	io1.in_portb_cb().set_ioport("SERVICE");
+	io1.in_portc_cb().set_ioport("P1");
+	io1.in_portd_cb().set_ioport("P2");
+	io1.in_porte_cb().set_ioport("DSW3");
 
-	MCFG_DEVICE_ADD("io2", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_CXD1095_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_CXD1095_IN_PORTD_CB(IOPORT("P4"))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, cyclwarr_state, cyclwarr_control_w))
+	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	io2.in_porta_cb().set_ioport("DSW1");
+	io2.in_portb_cb().set_ioport("DSW2");
+	io2.in_portc_cb().set_ioport("P3");
+	io2.in_portd_cb().set_ioport("P4");
+	io2.out_porte_cb().set(FUNC(cyclwarr_state::cyclwarr_control_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -272,14 +272,14 @@ uint32_t ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_in
 	}
 
 	/* draw the bitmap to the screen, looping over Y */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (m_syncprom[y] & 1)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 				dst[x] = black;
 		}
 
@@ -296,7 +296,7 @@ uint32_t ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_in
 			src = &m_videoram[effy * 128];
 
 			/* loop over X */
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				/* if we're in the HBLANK region, just store black */
 				if (x >= 256)

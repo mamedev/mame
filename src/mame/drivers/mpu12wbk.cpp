@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	MCFG_DEVICE_ADD("maincpu", MC6809, MASTER_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(mpu12wbk_map)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

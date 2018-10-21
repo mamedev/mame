@@ -183,13 +183,13 @@ WRITE8_MEMBER(rpunch_state::upd_control_w)
 		m_upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (m_upd_rom_bank + 1), 0x20000);
 	}
-	m_upd7759->reset_w(data >> 7);
+	m_upd7759->reset_w(BIT(data, 7));
 }
 
 
 WRITE8_MEMBER(rpunch_state::upd_data_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }

@@ -83,15 +83,16 @@ static const z80_daisy_config daisy_chain[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc_hdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(abc_hdc_mem)
-	MCFG_DEVICE_IO_MAP(abc_hdc_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+void abc_hdc_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_memory_map(&abc_hdc_device::abc_hdc_mem);
+	m_maincpu->set_io_map(&abc_hdc_device::abc_hdc_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
-MACHINE_CONFIG_END
+	scsi_port_device &scsi(SCSI_PORT(config, SASIBUS_TAG));
+	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+}
 
 
 //**************************************************************************

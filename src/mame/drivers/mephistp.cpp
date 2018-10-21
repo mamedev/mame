@@ -166,17 +166,19 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	MCFG_DEVICE_PROGRAM_MAP(mephisto_map)
 	//MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("muart", i8256_device, inta_cb)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	//MCFG_DEVICE_ADD("muart", I8256, XTAL(18'000'000)/3)
 	//MCFG_I8256_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	//MCFG_I8256_TXD_HANDLER(INPUTLINE("audiocpu", MCS51_RX_LINE))
 
-	MCFG_DEVICE_ADD("ic20", I8155, XTAL(18'000'000)/6)
-	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("muart", i8256_device, write_txc))
+	I8155(config, "ic20", XTAL(18'000'000)/6);
+	//i8155_device &i8155_1(I8155(config, "ic20", XTAL(18'000'000)/6));
+	//i8155_1.out_to_callback().set("muart", FUNC(i8256_device::write_txc));
 
-	MCFG_DEVICE_ADD("ic9", I8155, XTAL(18'000'000)/6)
-	//MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, mephisto_pinball_state, clk_shift_w))
+	I8155(config, "ic9", XTAL(18'000'000)/6);
+	//i8155_device &i8155_2(I8155(config, "ic9", XTAL(18'000'000)/6));
+	//i8155_2.out_to_callback().set(FUNC(mephisto_pinball_state::clk_shift_w));
 
 	MCFG_DEVICE_ADD("soundcpu", I8051, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(mephisto_8051_map) // EA tied high for external program ROM

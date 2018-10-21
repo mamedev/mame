@@ -22,7 +22,6 @@ ToDo:
 #include "includes/cybiko.h"
 
 #include "bus/rs232/rs232.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -390,7 +389,55 @@ static DEVICE_INPUT_DEFAULTS_START( debug_serial ) // set up debug port to defau
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
+MACHINE_CONFIG_START(cybiko_state::cybikov1_debug_serial)
+	auto &debug_serial(*subdevice<rs232_port_device>("debug_serial"));
+	debug_serial.rxd_handler().set("maincpu:sci2", FUNC(h8_sci_device::rx_w));
+	MCFG_DEVICE_MODIFY("maincpu:sci2")
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(cybiko_state::cybikov1_base)
+	// screen
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_SIZE( hd66421_device::WIDTH, hd66421_device::HEIGHT )
+	MCFG_SCREEN_VISIBLE_AREA( 0, hd66421_device::WIDTH - 1, 0, hd66421_device::HEIGHT - 1 )
+	MCFG_SCREEN_UPDATE_DEVICE("hd66421", hd66421_device, update_screen)
+	MCFG_SCREEN_PALETTE("hd66421:palette")
+	// video
+	MCFG_HD66421_ADD("hd66421")
+	// sound
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	// machine
+	/* rtc */
+	MCFG_PCF8593_ADD("rtc")
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	/* internal ram */
+	RAM(config, m_ram).set_default_size("512K").set_extra_options("1M");
+
+	/* serial debug port */
+	rs232_port_device &debug_serial(RS232_PORT(config, "debug_serial", default_rs232_devices, nullptr));
+	debug_serial.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(debug_serial));
+	debug_serial.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(debug_serial));
+	debug_serial.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(debug_serial));
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybiko, "bin,nv", 0)
+MACHINE_CONFIG_END
+
+void cybiko_state::cybikov1_flash(machine_config &config)
+{
+	AT45DB041(config, m_flash1, 0);
+	m_flash1->so_callback().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
+}
+
 MACHINE_CONFIG_START(cybiko_state::cybikov1)
+	cybikov1_base(config);
+
 	// cpu
 	MCFG_DEVICE_ADD( "maincpu", H8S2241, XTAL(11'059'200) )
 	MCFG_DEVICE_PROGRAM_MAP( cybikov1_mem )
@@ -400,52 +447,17 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("flash1", at45db041_device, si_w))
 	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("flash1", at45db041_device, sck_w))
 
-	// screen
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_SIZE( hd66421_device::WIDTH, hd66421_device::HEIGHT )
-	MCFG_SCREEN_VISIBLE_AREA( 0, hd66421_device::WIDTH - 1, 0, hd66421_device::HEIGHT - 1 )
-	MCFG_SCREEN_UPDATE_DEVICE("hd66421", hd66421_device, update_screen)
-	MCFG_SCREEN_PALETTE("hd66421:palette")
-	// video
-	MCFG_HD66421_ADD("hd66421")
-	config.set_default_layout(layout_lcd);
-	// sound
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	// machine
-	/* rtc */
-	MCFG_PCF8593_ADD("rtc")
-	MCFG_AT45DB041_ADD("flash1")
-	MCFG_AT45DBXXX_SO_CALLBACK(WRITELINE("maincpu:sci1", h8_sci_device, rx_w))
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("1M")
-
-	/* serial debug port */
-	MCFG_DEVICE_ADD ("debug_serial", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("null_modem", debug_serial)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", debug_serial)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("pty", debug_serial)
-
-	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("maincpu:sci2", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("maincpu:sci2")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
-
-	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybiko, "bin,nv", 0)
+	cybikov1_flash(config);
+	cybikov1_debug_serial(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cybiko_state::cybikov2)
-	cybikov1(config);
+	cybikov1_base(config);
+	cybikov1_flash(config);
+
 	// cpu
-	MCFG_DEVICE_REPLACE("maincpu", H8S2246, XTAL(11'059'200))
+	MCFG_DEVICE_ADD("maincpu", H8S2246, XTAL(11'059'200))
 	MCFG_DEVICE_PROGRAM_MAP(cybikov2_mem)
 	MCFG_DEVICE_IO_MAP(cybikov2_io)
 
@@ -454,38 +466,36 @@ MACHINE_CONFIG_START(cybiko_state::cybikov2)
 	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("flash1", at45db041_device, sck_w))
 
 	// machine
-	MCFG_SST_39VF020_ADD("flash2")
+	SST_39VF020(config, "flash2");
+	cybikov1_debug_serial(config);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
+	m_ram->set_default_size("256K").set_extra_options("512K,1M");
 
 	/* serial debug port */
-	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("maincpu:sci2", h8_sci_device, rx_w))
+	auto &debug_serial(*subdevice<rs232_port_device>("debug_serial"));
+	debug_serial.rxd_handler().set("maincpu:sci2", FUNC(h8_sci_device::rx_w));
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
 	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cybiko_state::cybikoxt)
-	cybikov1(config);
+	cybikov1_base(config);
+
 	// cpu
-	MCFG_DEVICE_REPLACE("maincpu", H8S2323, XTAL(18'432'000))
-	MCFG_DEVICE_PROGRAM_MAP(cybikoxt_mem )
-	MCFG_DEVICE_IO_MAP(cybikoxt_io )
+	MCFG_DEVICE_ADD("maincpu", H8S2323, XTAL(18'432'000))
+	MCFG_DEVICE_PROGRAM_MAP(cybikoxt_mem)
+	MCFG_DEVICE_IO_MAP(cybikoxt_io)
 
 	// machine
-	MCFG_DEVICE_REMOVE("flash1")
-	MCFG_SST_39VF400A_ADD("flashxt")
+	SST_39VF400A(config, "flashxt");
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	m_ram->set_default_size("2M");
 
 	/* serial debug port */
-	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("maincpu:sci2", h8_sci_device, rx_w))
+	auto &debug_serial(*subdevice<rs232_port_device>("debug_serial"));
+	debug_serial.rxd_handler().set("maincpu:sci2", FUNC(h8_sci_device::rx_w));
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
 	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("debug_serial", rs232_port_device, write_txd))
 

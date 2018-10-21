@@ -123,10 +123,10 @@ void bbc_tube_casper_device::device_reset()
 
 READ8_MEMBER(bbc_tube_casper_device::host_r)
 {
-	return m_via6522_0->read(space, offset & 0xf);
+	return m_via6522_0->read(offset & 0xf);
 }
 
 WRITE8_MEMBER(bbc_tube_casper_device::host_w)
 {
-	m_via6522_0->write(space, offset & 0xf, data);
+	m_via6522_0->write(offset & 0xf, data);
 }

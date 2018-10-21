@@ -312,13 +312,13 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(900))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 13A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, megazone_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, megazone_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, megazone_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, megazone_state, irq_mask_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 13A
+	mainlatch.q_out_cb<0>().set(FUNC(megazone_state::coin_counter_2_w));
+	mainlatch.q_out_cb<1>().set(FUNC(megazone_state::coin_counter_1_w));
+	mainlatch.q_out_cb<5>().set(FUNC(megazone_state::flipscreen_w));
+	mainlatch.q_out_cb<7>().set(FUNC(megazone_state::irq_mask_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

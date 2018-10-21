@@ -42,8 +42,8 @@
 class tmmjprd_state : public driver_device
 {
 public:
-	tmmjprd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tmmjprd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -57,7 +57,8 @@ public:
 		m_gfxroms(*this, "gfx2"),
 		m_pl1(*this, "PL1.%u", 1),
 		m_pl2(*this, "PL2.%u", 1),
-		m_system(*this, "SYSTEM") { }
+		m_system(*this, "SYSTEM")
+	{ }
 
 	void tmmjprd(machine_config &config);
 	void tmpdoki(machine_config &config);
@@ -738,12 +739,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 
 }
 
-MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
+MACHINE_CONFIG_START(tmmjprd_state::tmpdoki)
 	MCFG_DEVICE_ADD(m_maincpu,M68EC020,24000000) /* 24 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
 
-	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
+	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_tmmjprd)
 
@@ -756,9 +757,6 @@ MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 	MCFG_PALETTE_ADD(m_palette, 0x1000)
 	MCFG_PALETTE_FORMAT(XGRB)
 
-
-	config.set_default_layout(layout_dualhsxs);
-
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -766,15 +764,6 @@ MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_left)
-	MCFG_SCREEN_PALETTE(m_palette)
-
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 64*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_right)
 	MCFG_SCREEN_PALETTE(m_palette)
 
 
@@ -787,11 +776,19 @@ MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tmmjprd_state::tmpdoki)
-	tmmjprd(config);
-	config.set_default_layout(layout_horizont);
+MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
+	tmpdoki(config);
 
-	MCFG_DEVICE_REMOVE("rscreen")
+	config.set_default_layout(layout_dualhsxs);
+
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*16, 64*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_right)
+	MCFG_SCREEN_PALETTE(m_palette)
 MACHINE_CONFIG_END
 
 

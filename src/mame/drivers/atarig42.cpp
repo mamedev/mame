@@ -519,14 +519,9 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz / 16)
-	MCFG_ADC0808_IN0_CB(IOPORT("A2D0"))
-	MCFG_ADC0808_IN1_CB(IOPORT("A2D1"))
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig42)
@@ -559,6 +554,10 @@ MACHINE_CONFIG_START(atarig42_0x200_state::atarig42_0x200)
 	atarig42(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
 
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz / 16);
+	m_adc->in_callback<0>().set_ioport("A2D0");
+	m_adc->in_callback<1>().set_ioport("A2D1");
+
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
 MACHINE_CONFIG_END
@@ -569,8 +568,6 @@ MACHINE_CONFIG_START(atarig42_0x400_state::atarig42_0x400)
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_GUARDIANS)
-
-	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 

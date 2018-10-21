@@ -19,7 +19,7 @@
       hooked up by the current z80 core
     - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
       Making a patch for the latter makes the system to jump into a "DIP-Switch" display.
-	  bp f0b31,pc=0xf0b36,g
+      bp f0b31,pc=0xf0b36,g
     - unemulated upd71071 demand mode.
     - Fix floppy motor hook-up;
 
@@ -540,10 +540,10 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit)
 {
 	uint32_t target_offset = (spr_offset & 0xffff)/2;
-//	address_space &space = m_maincpu->space(AS_PROGRAM);
+//  address_space &space = m_maincpu->space(AS_PROGRAM);
 
-//	space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
-//	space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));
+//  space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
+//  space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));
 	m_tvram[target_offset] = (m_tvram[target_offset] & ~0x200) | (sw_bit & 0x200);
 }
 
@@ -764,7 +764,7 @@ WRITE16_MEMBER(pc88va_state::bios_bank_w)
 	---- ---- ---- xxxx RBC0 (0xe0000 - 0xeffff ROM bank)
 	*/
 	COMBINE_DATA(&m_bank_reg);
-	
+
 	/* SMBC */
 	m_sysbank->set_bank((m_bank_reg & 0xf00) >> 8);
 
@@ -1611,25 +1611,25 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 //  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc88va)
 
-	MCFG_DEVICE_ADD("d8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2s", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_2s", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, cpu_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, cpu_8255_c_w))
+	i8255_device &d8255_2(I8255(config, "d8255_2"));
+	d8255_2.in_pa_callback().set("d8255_2s", FUNC(i8255_device::pb_r));
+	d8255_2.in_pb_callback().set("d8255_2s", FUNC(i8255_device::pa_r));
+	d8255_2.in_pc_callback().set(FUNC(pc88va_state::cpu_8255_c_r));
+	d8255_2.out_pc_callback().set(FUNC(pc88va_state::cpu_8255_c_w));
 
-	MCFG_DEVICE_ADD("d8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pc88va_state, r232_ctrl_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc88va_state, r232_ctrl_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pc88va_state, r232_ctrl_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc88va_state, r232_ctrl_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, r232_ctrl_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, r232_ctrl_portc_w))
+	i8255_device &d8255_3(I8255(config, "d8255_3"));
+	d8255_3.in_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_r));
+	d8255_3.out_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_w));
+	d8255_3.in_pb_callback().set(FUNC(pc88va_state::r232_ctrl_portb_r));
+	d8255_3.out_pb_callback().set(FUNC(pc88va_state::r232_ctrl_portb_w));
+	d8255_3.in_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_r));
+	d8255_3.out_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_w));
 
-	MCFG_DEVICE_ADD("d8255_2s", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_2", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, fdc_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, fdc_8255_c_w))
+	i8255_device &d8255_2s(I8255(config, "d8255_2s"));
+	d8255_2s.in_pa_callback().set("d8255_2", FUNC(i8255_device::pb_r));
+	d8255_2s.in_pb_callback().set("d8255_2", FUNC(i8255_device::pa_r));
+	d8255_2s.in_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_r));
+	d8255_2s.out_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_w));
 
 	PIC8259(config, m_pic1, 0);
 	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
@@ -1648,9 +1648,9 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	m_dmac->in_memr_callback().set(FUNC(pc88va_state::dma_memr_cb));
 	m_dmac->out_memw_callback().set(FUNC(pc88va_state::dma_memw_cb));
 
-	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_irq))
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_drq))
+	UPD765A(config, m_fdc, false, true);
+	m_fdc->intrq_wr_callback().set(FUNC(pc88va_state::fdc_irq));
+	m_fdc->drq_wr_callback().set(FUNC(pc88va_state::fdc_drq));
 	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
@@ -1661,13 +1661,8 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	MCFG_PIT8253_CLK1(8000000) /* BEEP frequency setting */
 	MCFG_PIT8253_CLK2(8000000) /* RS232C baud rate setting */
 
-	MCFG_DEVICE_ADD("sysbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(sysbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18+4)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x40000)
-	
+	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 18+4, 0x40000);
+
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ym", YM2203, 3993600) //unknown clock / divider
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)

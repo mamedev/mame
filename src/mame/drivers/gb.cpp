@@ -274,7 +274,6 @@ space. This mapper uses 32KB sized banks.
 ***************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
 #include "includes/gb.h"
 #include "bus/gameboy/rom.h"
 #include "bus/gameboy/mbc.h"
@@ -617,16 +616,14 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 	MCFG_LR35902_HALT_BUG
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
-	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	config.set_default_layout(layout_lcd);
-//  MCFG_SCREEN_SIZE(20*8, 18*8)
-	MCFG_SCREEN_SIZE( 458, 154 )
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
+	screen.set_vblank_time(0);
+	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
+	screen.set_palette("palette");
+//  screen.set_size(20*8, 18*8);
+	screen.set_size(458, 154);
+	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 4)
@@ -660,15 +657,14 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(SGB_FRAMES_PER_SECOND)
-	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	config.set_default_layout(layout_horizont); /* runs on a TV, not an LCD */
-	MCFG_SCREEN_SIZE(32*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_physical_aspect(4, 3); // runs on a TV, not an LCD
+	screen.set_refresh_hz(SGB_FRAMES_PER_SECOND);
+	screen.set_vblank_time(0);
+	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
+	screen.set_palette("palette");
+	screen.set_size(32*8, 28*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -701,11 +697,10 @@ MACHINE_CONFIG_START(gb_state::supergb2)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
 
 	/* video hardware */
-	config.set_default_layout(layout_horizont); /* runs on a TV, not an LCD */
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(32*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_physical_aspect(4, 3); // runs on a TV, not an LCD
+	screen.set_size(32*8, 28*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32768)
@@ -738,16 +733,14 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
-	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	config.set_default_layout(layout_lcd);
-//  MCFG_SCREEN_SIZE(20*8, 18*8)
-	MCFG_SCREEN_SIZE( 458, 154 )
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
+	screen.set_vblank_time(0);
+	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
+	screen.set_palette("palette");
+//  screen.set_size(20*8, 18*8);
+	screen.set_size(458, 154);
+	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
@@ -764,8 +757,7 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
+	RAM(config, RAM_TAG).set_default_size("48K"); /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 
 	/* cartslot */
 	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
@@ -783,19 +775,17 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 	MCFG_LR35902_HALT_BUG
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
-	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
+	screen.set_vblank_time(0);
+	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
+	screen.set_palette("palette");
+	screen.set_size(20*8, 18*8);
+	screen.set_visarea(0*8, 20*8-1, 0*8, 18*8-1);
 
 	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck)
 	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck)
 
-	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
-	MCFG_SCREEN_SIZE(20*8, 18*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
-
-	config.set_default_layout(layout_lcd);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 4)

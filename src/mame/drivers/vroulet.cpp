@@ -286,17 +286,17 @@ MACHINE_CONFIG_START(vroulet_state::vroulet)
 	MCFG_DEVICE_IO_MAP(vroulet_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vroulet_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vroulet_state, ppi8255_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vroulet_state, ppi8255_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, vroulet_state, ppi8255_c_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(vroulet_state::ppi8255_a_w));
+	ppi1.out_pb_callback().set(FUNC(vroulet_state::ppi8255_b_w));
+	ppi1.out_pc_callback().set(FUNC(vroulet_state::ppi8255_c_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

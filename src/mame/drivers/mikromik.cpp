@@ -102,7 +102,7 @@ READ8_MEMBER( mm1_state::read )
 			break;
 
 		case 3:
-			data = m_pit->read(space, offset & 0x03);
+			data = m_pit->read(offset & 0x03);
 			break;
 
 		case 4:
@@ -171,7 +171,7 @@ WRITE8_MEMBER( mm1_state::write )
 			break;
 
 		case 3:
-			m_pit->write(space, offset & 0x03, data);
+			m_pit->write(offset & 0x03, data);
 			break;
 
 		case 4:
@@ -490,33 +490,32 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	m_pit->set_clk<2>(6.144_MHz_XTAL/2/2);
 	m_pit->out_handler<2>().set(FUNC(mm1_state::auxc_w));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, /* 16_MHz_XTAL/2/2 */ true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST55_LINE))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq3_w))
+	UPD765A(config, m_fdc, /* 16_MHz_XTAL/2/2, */ true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE);
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD(UPD7201_TAG, UPD7201, 6.144_MHz_XTAL/2)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(*this, mm1_state, drq2_w))
-	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(*this, mm1_state, drq1_w))
+	UPD7201(config, m_mpsc, 6.144_MHz_XTAL/2);
+	m_mpsc->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_mpsc->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_rxdrqa_callback().set(FUNC(mm1_state::drq2_w));
+	m_mpsc->out_txdrqa_callback().set(FUNC(mm1_state::drq1_w));
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxa_w))
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_DEVICE_ADD(RS232_C_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsb_w))
 
 	MCFG_DEVICE_ADD(KB_TAG, MM1_KEYBOARD, 2500) // actual KBCLK is 6.144_MHz_XTAL/2/16
 	MCFG_MM1_KEYBOARD_KBST_CALLBACK(WRITELINE(I8212_TAG, i8212_device, stb_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mm1_flop")

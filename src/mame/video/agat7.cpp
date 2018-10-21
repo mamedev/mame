@@ -168,8 +168,8 @@ void agat7video_device::text_update_lores(screen_device &screen, bitmap_ind16 &b
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row += 8)
 	{
@@ -198,8 +198,8 @@ void agat7video_device::text_update_hires(screen_device &screen, bitmap_ind16 &b
 	uint8_t ch;
 	int fg, bg;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	if (m_start_address & 0x800) {
 		fg = 7; bg = 0;
@@ -227,8 +227,8 @@ void agat7video_device::graph_update_mono(screen_device &screen, bitmap_ind16 &b
 	uint8_t gfx, v;
 	int fg = 7, bg = 0;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row++)
 	{
@@ -256,8 +256,8 @@ void agat7video_device::graph_update_hires(screen_device &screen, bitmap_ind16 &
 	uint16_t *p;
 	uint8_t gfx, v;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row++)
 	{
@@ -287,8 +287,8 @@ void agat7video_device::graph_update_lores(screen_device &screen, bitmap_ind16 &
 	uint16_t *p;
 	uint8_t gfx, v;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row++)
 	{

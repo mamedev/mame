@@ -41,7 +41,7 @@ ROM_END
 
 MACHINE_CONFIG_START(spectrum_intf1_device::device_add_mconfig)
 	/* rs232 */
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	/* microdrive */
 	MCFG_MICRODRIVE_ADD("mdv1")
@@ -49,7 +49,9 @@ MACHINE_CONFIG_START(spectrum_intf1_device::device_add_mconfig)
 	MCFG_MICRODRIVE_ADD("mdv2")
 
 	/* passthru */
-	MCFG_SPECTRUM_PASSTHRU_EXPANSION_SLOT_ADD()
+	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
+	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
+	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *spectrum_intf1_device::device_rom_region() const
@@ -66,13 +68,13 @@ const tiny_rom_entry *spectrum_intf1_device::device_rom_region() const
 //-------------------------------------------------
 
 spectrum_intf1_device::spectrum_intf1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SPECTRUM_INTF1, tag, owner, clock),
-		device_spectrum_expansion_interface(mconfig, *this),
-	m_exp(*this, "exp"),
-	m_rs232(*this, "rs232"),
-	m_mdv1(*this, "mdv1"),
-	m_mdv2(*this, "mdv2"),
-	m_rom(*this, "rom")
+	: device_t(mconfig, SPECTRUM_INTF1, tag, owner, clock)
+	, device_spectrum_expansion_interface(mconfig, *this)
+	, m_exp(*this, "exp")
+	, m_rs232(*this, "rs232")
+	, m_mdv1(*this, "mdv1")
+	, m_mdv2(*this, "mdv2")
+	, m_rom(*this, "rom")
 {
 }
 
@@ -82,7 +84,6 @@ spectrum_intf1_device::spectrum_intf1_device(const machine_config &mconfig, cons
 
 void spectrum_intf1_device::device_start()
 {
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
 }
 
 //-------------------------------------------------
@@ -91,6 +92,8 @@ void spectrum_intf1_device::device_start()
 
 void spectrum_intf1_device::device_reset()
 {
+	m_exp->set_io_space(&io_space());
+
 	m_romcs = 0;
 }
 
@@ -112,8 +115,6 @@ READ8_MEMBER(spectrum_intf1_device::mreq_r)
 	{
 		if (offset == 0x0008 || offset == 0x1708)
 			m_romcs = 1;
-		if (offset == 0x0700)
-			m_romcs = 0;
 	}
 
 	temp = m_exp->mreq_r(space, offset);
@@ -122,6 +123,12 @@ READ8_MEMBER(spectrum_intf1_device::mreq_r)
 
 	if (m_romcs)
 		data &= m_rom->base()[offset & 0x1fff];
+
+	if (!machine().side_effects_disabled())
+	{
+		if (offset == 0x0700)
+			m_romcs = 0;
+	}
 
 	return data;
 }

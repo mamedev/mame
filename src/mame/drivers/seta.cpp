@@ -1763,7 +1763,7 @@ void seta_state::calibr50_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).rom();                             // ROM
 	map(0x100000, 0x100001).r(FUNC(seta_state::ipl2_ack_r));
-	map(0x200000, 0x200fff).ram();                             // NVRAM
+	map(0x200000, 0x200fff).ram().share("nvram");              // NVRAM (battery backed)
 	map(0x300000, 0x300001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
 	map(0x400000, 0x400001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x500000, 0x500001).nopw();                        // ?
@@ -1831,7 +1831,7 @@ WRITE8_MEMBER(seta_state::usclssic_lockout_w)
 		machine().tilemap().mark_all_dirty();
 	m_tiles_offset = tiles_offset;
 
-	seta_coin_lockout_w(space, 0, data);
+	seta_coin_lockout_w(data);
 }
 
 
@@ -1919,6 +1919,12 @@ void seta_state::blandia_map(address_map &map)
 	map(0xf00000, 0xf00001).nopw();                        // ? Sound  IRQ Ack
 }
 
+void seta_state::blandia_x1_map(address_map &map)
+{
+	map(0x00000, 0xbffff).rom();
+	map(0xc0000, 0xfffff).bankr("x1_bank");
+}
+
 
 /***************************************************************************
     Blandia (proto), Gundhara, J.J.Squawkers, Rezon, War of Aero, Zing Zing Zip
@@ -1963,7 +1969,7 @@ void seta_state::blandiap_map(address_map &map)
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
-ADC083X_INPUT_CB(seta_state::zombraid_adc_cb)
+double seta_state::zombraid_adc_cb(uint8_t input)
 {
 	if (input == ADC083X_AGND)
 		return 0.0;
@@ -2041,6 +2047,12 @@ void seta_state::zombraid_map(address_map &map)
 	map(0x300000, 0x30ffff).ram().share("nvram");           // actually 8K x8 SRAM
 	map(0xf00000, 0xf00001).w(FUNC(seta_state::zombraid_gun_w));
 	map(0xf00002, 0xf00003).r(FUNC(seta_state::zombraid_gun_r));
+}
+
+void seta_state::zombraid_x1_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0xfffff).bankr("x1_bank");
 }
 
 READ16_MEMBER(seta_state::zingzipbl_unknown_r)
@@ -2204,7 +2216,7 @@ WRITE16_MEMBER(seta_state::keroppi_prize_w)
 	if ((data & 0x0010) && !m_keroppi_prize_hop)
 	{
 		m_keroppi_prize_hop = 1;
-		machine().scheduler().timer_set(attotime::from_seconds(3), timer_expired_delegate(FUNC(seta_state::keroppi_prize_hop_callback),this), 0x20);        /* 3 seconds */
+		m_keroppi_prize_hop_timer->adjust(attotime::from_seconds(3), 0x20);        /* 3 seconds */
 	}
 }
 
@@ -2233,6 +2245,8 @@ void seta_state::keroppi_map(address_map &map)
 
 MACHINE_START_MEMBER(seta_state,keroppi)
 {
+	m_keroppi_prize_hop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::keroppi_prize_hop_callback), this));
+
 	m_keroppi_prize_hop = 0;
 	m_keroppi_protection_count = 0;
 }
@@ -2941,7 +2955,7 @@ void seta_state::thunderlbl_map(address_map &map)
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
 	map(0xb00002, 0xb00003).portr("P2");                 // P2
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
-//  map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));   // Protection (not in wits)
+	map(0xb0000c, 0xb0000d).w(m_seta001, FUNC(seta001_device::spritectrl_w8)).umask16(0xff00); // the bootleg is modified to write the first byte of spritectrl here, rather than the usual address
 	map(0xb00008, 0xb00009).portr("P3"); // P3 (wits)
 	map(0xb00008, 0xb00008).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
@@ -3403,15 +3417,15 @@ void jockeyc_state::inttoote_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(seta_state::sub_bankswitch_w)
+void seta_state::sub_bankswitch_w(u8 data)
 {
 	m_subbank->set_entry(data >> 4);
 }
 
-WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)
+void seta_state::sub_bankswitch_lockout_w(u8 data)
 {
-	m_subbank->set_entry(data >> 4);
-	seta_coin_lockout_w(space, 0, data);
+	sub_bankswitch_w(data);
+	seta_coin_lockout_w(data);
 }
 
 
@@ -3514,7 +3528,7 @@ MACHINE_RESET_MEMBER(seta_state,calibr50)
 WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 {
 	// Bits 7-4: BK3-BK0
-	sub_bankswitch_w(space, 0, data);
+	sub_bankswitch_w(data);
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
@@ -3525,6 +3539,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 
 	// Bit 1: PCMMUTE
+	m_x1->set_output_gain(ALL_OUTPUTS, BIT(data, 0) ? 0.0f : 1.0f);
 }
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
@@ -3535,7 +3550,9 @@ WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 
 void seta_state::calibr50_sub_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(m_x1, FUNC(x1_010_device::read), FUNC(x1_010_device::write)); // Sound
+	map(0x0000, 0x1fff).lrw8("x1_soundram_rw",
+								 [this](offs_t offset) { return m_x1->read(offset ^ 0x1000); },
+								 [this](offs_t offset, u8 data) { m_x1->write(offset ^ 0x1000, data); }); // Sound
 	map(0x4000, 0x4000).r("soundlatch1", FUNC(generic_latch_8_device::read));             // From Main CPU
 	map(0x4000, 0x4000).w(FUNC(seta_state::calibr50_sub_bankswitch_w));        // Bankswitching
 	map(0x8000, 0xbfff).bankr("subbank");                        // Banked ROM
@@ -6052,17 +6069,6 @@ static INPUT_PORTS_START( thunderl )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( thunderlbl )
-	PORT_INCLUDE(thunderl)
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
 /***************************************************************************
                                 Thundercade (US)
 ***************************************************************************/
@@ -7913,7 +7919,7 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(57.42) // Possibly lower than 60Hz, Correct?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
@@ -8016,15 +8022,16 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(usclssic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX")
-	MCFG_UPD4701_PORTY("TRACKY")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("TRACKX");
+	m_upd4701->set_porty_tag("TRACKY");
 
 	HC157(config, m_buttonmux, 0);
 	m_buttonmux->out_callback().set(m_upd4701, FUNC(upd4701_device::middle_w)).bit(0);
@@ -8063,7 +8070,6 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8083,15 +8089,18 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+
+	WATCHDOG_TIMER(config, "watchdog");
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("ROT1")
-	MCFG_UPD4701_PORTY("ROT2")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("ROT1");
+	m_upd4701->set_porty_tag("ROT2");
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
@@ -8123,7 +8132,6 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -8256,6 +8264,7 @@ MACHINE_CONFIG_START(seta_state::blandia)
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, blandia_x1_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta_state::blandiap)
@@ -8293,6 +8302,7 @@ MACHINE_CONFIG_START(seta_state::blandiap)
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, blandia_x1_map)
 MACHINE_CONFIG_END
 
 
@@ -8547,7 +8557,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(setaroul_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
 	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
@@ -8556,10 +8566,10 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
+	UPD4992(config, m_rtc); // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
@@ -8602,7 +8612,7 @@ MACHINE_CONFIG_START(seta_state::eightfrc)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8627,6 +8637,7 @@ MACHINE_CONFIG_START(seta_state::eightfrc)
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, blandia_x1_map)
 MACHINE_CONFIG_END
 
 
@@ -8645,7 +8656,7 @@ MACHINE_CONFIG_START(seta_state::extdwnhl)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(extdwnhl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8709,7 +8720,7 @@ MACHINE_CONFIG_START(seta_state::gundhara)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 #endif  // __uPD71054_TIMER
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 #if __uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
@@ -8747,7 +8758,7 @@ MACHINE_CONFIG_END
                                 Zombie Raid
 ***************************************************************************/
 
-MACHINE_START_MEMBER(seta_state,zombraid){ m_gun_recoil.resolve(); }
+MACHINE_START_MEMBER(seta_state,zombraid) { m_gun_recoil.resolve(); }
 
 MACHINE_CONFIG_START(seta_state::zombraid)
 	gundhara(config);
@@ -8758,10 +8769,13 @@ MACHINE_CONFIG_START(seta_state::zombraid)
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state, zombraid)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("adc", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CB(seta_state, zombraid_adc_cb)
+	adc0834_device &adc(ADC0834(config, "adc", 0));
+	adc.set_input_callback(FUNC(seta_state::zombraid_adc_cb));
+
+	MCFG_DEVICE_MODIFY("x1snd")
+	MCFG_DEVICE_ADDRESS_MAP(0, zombraid_x1_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -8778,7 +8792,7 @@ MACHINE_CONFIG_START(seta_state::jjsquawk)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8854,7 +8868,7 @@ MACHINE_CONFIG_START(seta_state::kamenrid)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kamenrid_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)
@@ -8984,13 +8998,13 @@ MACHINE_CONFIG_START(seta_state::krzybowl)
 	MCFG_DEVICE_PROGRAM_MAP(krzybowl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	upd4701_device &upd1(UPD4701A(config, "upd1"));
+	upd1.set_portx_tag("TRACK1_X");
+	upd1.set_porty_tag("TRACK1_Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK2_X")
-	MCFG_UPD4701_PORTY("TRACK2_Y")
+	upd4701_device &upd2(UPD4701A(config, "upd2"));
+	upd2.set_portx_tag("TRACK2_X");
+	upd2.set_porty_tag("TRACK2_Y");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9038,7 +9052,7 @@ MACHINE_CONFIG_START(seta_state::madshark)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9078,7 +9092,7 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 	MCFG_DEVICE_PROGRAM_MAP(magspeed_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state, magspeed)
 
@@ -9250,7 +9264,7 @@ MACHINE_CONFIG_START(seta_state::kiwame)
 	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta_state, kiwame_row_select_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9293,7 +9307,7 @@ MACHINE_CONFIG_START(seta_state::rezon)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9582,7 +9596,7 @@ MACHINE_CONFIG_START(seta_state::wrofaero)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 #endif  // __uPD71054_TIMER
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 #if __uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
@@ -9636,7 +9650,7 @@ MACHINE_CONFIG_START(seta_state::zingzip)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9806,18 +9820,17 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // TMP68000N-8
 	MCFG_DEVICE_PROGRAM_MAP(jockeyc_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jockeyc_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2.0)) // jockeyc: watchdog test error if over 2.5s
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2.0)); // jockeyc: watchdog test error if over 2.5s
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
+	UPD4992(config, m_rtc); // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
@@ -10435,11 +10448,9 @@ ROM_START( blandia )
 	ROM_LOAD( "ux001012.u068", 0x040000, 0x080000, CRC(f29959f6) SHA1(edccea3d0bf972a07edd6339e18792d089033bff) )
 
 	/* The c0000-fffff region is bankswitched */
-	ROM_REGION( 0x240000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "ux001013.u69", 0x000000, 0x0c0000, CRC(5cd273cd) SHA1(602e1f10454e2b1c941f2e6983872bb9ca77a542) )
-	// skip c0000-fffff (banked region)
-	ROM_CONTINUE(             0x100000, 0x040000  )
-	ROM_LOAD( "ux001014.u70", 0x140000, 0x080000, CRC(86b49b4e) SHA1(045b352950d848907af4c22b817d154b2cfff382) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "ux001013.u69", 0x000000, 0x100000, CRC(5cd273cd) SHA1(602e1f10454e2b1c941f2e6983872bb9ca77a542) )
+	ROM_LOAD( "ux001014.u70", 0x100000, 0x080000, CRC(86b49b4e) SHA1(045b352950d848907af4c22b817d154b2cfff382) )
 ROM_END
 
 ROM_START( blandiap )
@@ -10476,23 +10487,23 @@ ROM_START( blandiap )
 	ROM_LOAD( "v2-3.bin",  0x0a0000, 0x020000, CRC(80ad0c3b) SHA1(00fcbcf7805784d7298b92136e7f256d65029c44) )
 
 	/* The c0000-fffff region is bankswitched */
-	ROM_REGION( 0x240000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x200000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "s-0.bin",  0x000000, 0x020000, CRC(a5fde408) SHA1(89efcd37ef6c5b313169d74a962a7c074a09b12a) )
-	ROM_CONTINUE(         0x140000, 0x020000  )
+	ROM_CONTINUE(         0x100000, 0x020000  )
 	ROM_LOAD( "s-1.bin",  0x020000, 0x020000, CRC(3083f9c4) SHA1(f5d2297c3d680eb1f128fa42a3a7f61badb9853a) )
-	ROM_CONTINUE(         0x160000, 0x020000  )
+	ROM_CONTINUE(         0x120000, 0x020000  )
 	ROM_LOAD( "s-2.bin",  0x040000, 0x020000, CRC(a591c9ef) SHA1(83e665e342c42fd3582c83becfacc27a3a3e5a54) )
-	ROM_CONTINUE(         0x180000, 0x020000  )
+	ROM_CONTINUE(         0x140000, 0x020000  )
 	ROM_LOAD( "s-3.bin",  0x060000, 0x020000, CRC(68826c9d) SHA1(a860b7b2140a5a506bf25110c08c6ea59db25743) )
-	ROM_CONTINUE(         0x1a0000, 0x020000  )
+	ROM_CONTINUE(         0x160000, 0x020000  )
 	ROM_LOAD( "s-4.bin",  0x080000, 0x020000, CRC(1c7dc8c2) SHA1(006459a23de83fe48e11bdd6ebe23ef6a18a87e8) )
-	ROM_CONTINUE(         0x1c0000, 0x020000  )
+	ROM_CONTINUE(         0x180000, 0x020000  )
 	ROM_LOAD( "s-5.bin",  0x0a0000, 0x020000, CRC(4bb0146a) SHA1(1e3c1739ea3c85296573426e55f25dce11f0ed2b) )
-	ROM_CONTINUE(         0x1e0000, 0x020000  )
-	ROM_LOAD( "s-6.bin",  0x100000, 0x020000, CRC(9f8f34ee) SHA1(60abb70ae87595ebae23df68d62f3b0ed4a2e768) )    // skip c0000-fffff (banked region)
-	ROM_CONTINUE(         0x200000, 0x020000  ) // this half is 0
-	ROM_LOAD( "s-7.bin",  0x120000, 0x020000, CRC(e077dd39) SHA1(a6f0881a026161710adc132bcf7cb95c4c8f2528) )
-	ROM_CONTINUE(         0x220000, 0x020000  ) // this half is 0
+	ROM_CONTINUE(         0x1a0000, 0x020000  )
+	ROM_LOAD( "s-6.bin",  0x0c0000, 0x020000, CRC(9f8f34ee) SHA1(60abb70ae87595ebae23df68d62f3b0ed4a2e768) )
+	ROM_CONTINUE(         0x1c0000, 0x020000  ) // this half is 0
+	ROM_LOAD( "s-7.bin",  0x0e0000, 0x020000, CRC(e077dd39) SHA1(a6f0881a026161710adc132bcf7cb95c4c8f2528) )
+	ROM_CONTINUE(         0x1e0000, 0x020000  ) // this half is 0
 ROM_END
 
 ROM_START( blockcar )
@@ -11044,11 +11055,9 @@ ROM_START( eightfrc )
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Layer 2 */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(c17aad22) SHA1(eabbae2142cad3eef6a94d542ea03221c8228e94) )
 
-	ROM_REGION( 0x240000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "u70.bin",  0x000000, 0x0c0000, CRC(dfdb67a3) SHA1(0fed6fb498dcfc1276facd0ecd2dfde45ff671f2) )
-	// skip c0000-fffff (banked region)
-	ROM_CONTINUE(         0x100000, 0x040000  )
-	ROM_LOAD( "u69.bin",  0x140000, 0x100000, CRC(82ec08f1) SHA1(f17300d3cf990ef5c11056fd922f8cae0b2c918f) )
+	ROM_REGION( 0x200000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "u70.bin",  0x000000, 0x100000, CRC(dfdb67a3) SHA1(0fed6fb498dcfc1276facd0ecd2dfde45ff671f2) )
+	ROM_LOAD( "u69.bin",  0x100000, 0x100000, CRC(82ec08f1) SHA1(f17300d3cf990ef5c11056fd922f8cae0b2c918f) )
 ROM_END
 
 ROM_START( kiwame )
@@ -11260,11 +11269,9 @@ ROM_START( zombraid )
 	ROM_LOAD       ( "fy001010.68", 0x000000, 0x200000, CRC(8b40ed7a) SHA1(05fcd7947a8419cab5ed2305fba9a671911e4850) )
 	ROM_LOAD16_BYTE( "fy001009.67", 0x200000, 0x100000, CRC(6bcca641) SHA1(49c9106e6f23e25e5b5917af11fc48d34457c61a) )
 
-	ROM_REGION( 0x480000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "fy001012.b",  0x000000, 0x080000, CRC(fd30e102) SHA1(ae02f94f69aa301b0c37921ca1117e3ad20467b5) )
-	// skip 80000-fffff (banked region)
-	ROM_CONTINUE(            0x100000, 0x180000  )
-	ROM_LOAD( "fy001011.a",  0x280000, 0x200000, CRC(e3c431de) SHA1(1030adacbbfabc00231417e09f3de40e3052f65c) )
+	ROM_REGION( 0x400000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "fy001012.b",  0x000000, 0x200000, CRC(fd30e102) SHA1(ae02f94f69aa301b0c37921ca1117e3ad20467b5) )
+	ROM_LOAD( "fy001011.a",  0x200000, 0x200000, CRC(e3c431de) SHA1(1030adacbbfabc00231417e09f3de40e3052f65c) )
 
 	ROM_REGION(0x10000, "nvram", 0)
 	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
@@ -11319,16 +11326,15 @@ ROM_START( zombraidp ) /* Prototype or test board version.  Data matches release
 	ROM_LOAD16_BYTE( "u152_master_scn_2-2_c00e.u152", 0x200000, 0x080000, CRC(0870ad58) SHA1(20e076fa665c24db0e316598a0a5d7fae9fc2f2a) )
 	ROM_LOAD16_BYTE( "u153_master_scn_2-5_e1da.u153", 0x300000, 0x080000, CRC(814ac66a) SHA1(1fd13a0bf73b9bdede82a865789413308d989c3a) )
 
-	ROM_REGION( 0x480000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x400000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u156_master_snd_0_f630.u156", 0x000000, 0x080000, CRC(bfc467bd) SHA1(a234cb8e0259a21b7bad40a72d99bf379a4b4046) ) /* These 8 roms dated 7/17/95 */
-	// skip 80000-fffff (banked region)
-	ROM_LOAD( "u157_master_snd_1_c20a.u157", 0x100000, 0x080000, CRC(b449a8ba) SHA1(3248a767132f60dec848fdc21a76481caa428cd2) )
-	ROM_LOAD( "u158_master_snd_2_5c69.u158", 0x180000, 0x080000, CRC(ed6de791) SHA1(416c39c03a9ac2214702eaea7716e9aa74c8c228) )
-	ROM_LOAD( "u159_master_snd_3_0727.u159", 0x200000, 0x080000, CRC(794cec21) SHA1(5c44286ea14c0e6a7a4588e523015f83d64dd1a7) )
-	ROM_LOAD( "u160_master_snd_4_5a70.u160", 0x280000, 0x080000, CRC(e81ace66) SHA1(f4984e855c222e1cf3287538f536f7b0275f03d5) )
-	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x300000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
-	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x380000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
-	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x400000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
+	ROM_LOAD( "u157_master_snd_1_c20a.u157", 0x080000, 0x080000, CRC(b449a8ba) SHA1(3248a767132f60dec848fdc21a76481caa428cd2) )
+	ROM_LOAD( "u158_master_snd_2_5c69.u158", 0x100000, 0x080000, CRC(ed6de791) SHA1(416c39c03a9ac2214702eaea7716e9aa74c8c228) )
+	ROM_LOAD( "u159_master_snd_3_0727.u159", 0x180000, 0x080000, CRC(794cec21) SHA1(5c44286ea14c0e6a7a4588e523015f83d64dd1a7) )
+	ROM_LOAD( "u160_master_snd_4_5a70.u160", 0x200000, 0x080000, CRC(e81ace66) SHA1(f4984e855c222e1cf3287538f536f7b0275f03d5) )
+	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x280000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
+	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x300000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
+	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x380000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
 
 	ROM_REGION(0x10000, "nvram", 0)
 	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
@@ -11367,16 +11373,15 @@ ROM_START( zombraidpj ) /* Prototype or test board version.  Data matches releas
 	ROM_LOAD16_BYTE( "u152_master_scn_2-2_c00e.u152", 0x200000, 0x080000, CRC(0870ad58) SHA1(20e076fa665c24db0e316598a0a5d7fae9fc2f2a) )
 	ROM_LOAD16_BYTE( "u153_master_scn_2-5_e1da.u153", 0x300000, 0x080000, CRC(814ac66a) SHA1(1fd13a0bf73b9bdede82a865789413308d989c3a) )
 
-	ROM_REGION( 0x480000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x400000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u156_master_snd_0_f630.u156", 0x000000, 0x080000, CRC(bfc467bd) SHA1(a234cb8e0259a21b7bad40a72d99bf379a4b4046) ) /* These 8 roms dated 7/17/95 */
-	// skip 80000-fffff (banked region)
-	ROM_LOAD( "u157_master_snd_1_c20a.u157", 0x100000, 0x080000, CRC(b449a8ba) SHA1(3248a767132f60dec848fdc21a76481caa428cd2) )
-	ROM_LOAD( "u158_master_snd_2_5c69.u158", 0x180000, 0x080000, CRC(ed6de791) SHA1(416c39c03a9ac2214702eaea7716e9aa74c8c228) )
-	ROM_LOAD( "u159_master_snd_3_0727.u159", 0x200000, 0x080000, CRC(794cec21) SHA1(5c44286ea14c0e6a7a4588e523015f83d64dd1a7) )
-	ROM_LOAD( "u160_master_snd_4_5a70.u160", 0x280000, 0x080000, CRC(e81ace66) SHA1(f4984e855c222e1cf3287538f536f7b0275f03d5) )
-	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x300000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
-	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x380000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
-	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x400000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
+	ROM_LOAD( "u157_master_snd_1_c20a.u157", 0x080000, 0x080000, CRC(b449a8ba) SHA1(3248a767132f60dec848fdc21a76481caa428cd2) )
+	ROM_LOAD( "u158_master_snd_2_5c69.u158", 0x100000, 0x080000, CRC(ed6de791) SHA1(416c39c03a9ac2214702eaea7716e9aa74c8c228) )
+	ROM_LOAD( "u159_master_snd_3_0727.u159", 0x180000, 0x080000, CRC(794cec21) SHA1(5c44286ea14c0e6a7a4588e523015f83d64dd1a7) )
+	ROM_LOAD( "u160_master_snd_4_5a70.u160", 0x200000, 0x080000, CRC(e81ace66) SHA1(f4984e855c222e1cf3287538f536f7b0275f03d5) )
+	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x280000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
+	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x300000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
+	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x380000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
 
 	ROM_REGION(0x10000, "nvram", 0)
 	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
@@ -11958,7 +11963,12 @@ void seta_state::init_metafox()
 }
 
 
-void seta_state::init_blandia()
+void seta_state::init_bankx1()
+{
+	m_x1_bank->configure_entries(0, 8, memregion("x1snd")->base(), 0x40000);
+}
+
+void seta_state::rearrange_gfx()
 {
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 	int rom_size = 0x80000;
@@ -11984,12 +11994,17 @@ void seta_state::init_blandia()
 	std::copy( buf.begin(), buf.end(), &rom[0] );
 }
 
+void seta_state::init_blandia()
+{
+	rearrange_gfx();
+	init_bankx1();
+}
 
 void seta_state::init_eightfrc()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500004, 0x500005);   // watchdog??
+	init_bankx1();
 }
-
 
 void seta_state::init_kiwame()
 {
@@ -12002,7 +12017,6 @@ void seta_state::init_kiwame()
 	RAM[0x66/2] = 0x0dca;
 }
 
-
 void seta_state::init_rezon()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
@@ -12014,6 +12028,13 @@ void seta_state::init_pairlove()
 	m_pairslove_protram_old = make_unique_clear<uint16_t[]>(0x200/2);
 	save_pointer(NAME(m_pairslove_protram), 0x200/2);
 	save_pointer(NAME(m_pairslove_protram_old), 0x200/2);
+}
+
+void seta_state::init_zombraid()
+{
+	/* bank 1 is never explicitly selected, 0 is used in its place */
+	m_x1_bank->configure_entry(0, memregion("x1snd")->base() + 0x80000);
+	m_x1_bank->configure_entries(1, 7, memregion("x1snd")->base() + 0x80000, 0x80000);
 }
 
 void seta_state::init_wiggie()
@@ -12050,7 +12071,7 @@ void seta_state::init_crazyfgt()
 
 	// fixed priorities?
 
-	init_blandia();
+	rearrange_gfx();
 }
 
 void jockeyc_state::init_inttoote()
@@ -12084,7 +12105,7 @@ GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     init_down
 
 GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
-GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50" , 0) // Country/License: DSW
+GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
 GAME( 1989, arbalest,  0,        metafox,   arbalest,  seta_state,     init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
 
@@ -12099,7 +12120,7 @@ GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_ini
 GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
 GAME( 1990, thunderl,  0,        thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderlbl,seta_state,     empty_init,     ROT90,  "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderl,  seta_state,     empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
 GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
@@ -12116,7 +12137,7 @@ GAME( 1991, stg,       0,        drgnunit,  stg,       seta_state,     empty_ini
 GAME( 1991, pairlove,  0,        pairlove,  pairlove,  seta_state,     init_pairlove,  ROT270, "Athena",                    "Pairs Love", 0 )
 
 GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     init_blandia,   ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     empty_init,     ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1992, blockcar,  0,        blockcar,  blockcar,  seta_state,     empty_init,     ROT90,  "Visco",                     "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
 GAME( 1992, blockcarb, blockcar, blockcarb, blockcar,  seta_state,     empty_init,     ROT90,  "bootleg",                   "Block Carnival / Thunder & Lightning 2 (bootleg)", MACHINE_IMPERFECT_SOUND)
@@ -12139,9 +12160,9 @@ GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_ini
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, jjsquawko, jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers (older)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
 
@@ -12179,8 +12200,8 @@ GAME( 1995, gundharac, gundhara, gundhara,  gundhara,  seta_state,     empty_ini
 
 GAME( 1995, sokonuke,  0,        extdwnhl,  sokonuke,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, zombraid,  0,        zombraid,  zombraid,  seta_state,     empty_init,     ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
-GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  seta_state,     empty_init,     ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  seta_state,     empty_init,     ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraid,  0,        zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
+GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
 GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  seta_state,     init_crazyfgt,  ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

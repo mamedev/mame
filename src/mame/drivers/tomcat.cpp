@@ -322,9 +322,9 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_DEVICE_DISABLE()
 	MCFG_DEVICE_PROGRAM_MAP( sound_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 12.096_MHz_XTAL / 16)
-	MCFG_ADC0808_IN0_CB(IOPORT("STICKY"))
-	MCFG_ADC0808_IN1_CB(IOPORT("STICKX"))
+	ADC0809(config, m_adc, 12.096_MHz_XTAL / 16);
+	m_adc->in_callback<0>().set_ioport("STICKY");
+	m_adc->in_callback<1>().set_ioport("STICKX");
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, 14.318181_MHz_XTAL / 8)
 	/*
@@ -354,9 +354,9 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	m_mainlatch->q_out_cb<6>().set(FUNC(tomcat_state::ack_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(tomcat_state::txbuff_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
 

@@ -74,7 +74,7 @@ class i8255_device : public device_t
 {
 public:
 	// construction/destruction
-	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_in_pa_callback(Object &&cb)  { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_in_pb_callback(Object &&cb)  { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
@@ -93,14 +93,14 @@ public:
 	auto tri_pa_callback() { return m_tri_pa_cb.bind(); }
 	auto tri_pb_callback() { return m_tri_pb_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data );
 
-	DECLARE_READ8_MEMBER( pa_r );
-	uint8_t read_pa();
+	uint8_t pa_r();
+	uint8_t acka_r();
 
-	DECLARE_READ8_MEMBER( pb_r );
-	uint8_t read_pb();
+	uint8_t pb_r();
+	uint8_t ackb_r();
 
 	DECLARE_WRITE_LINE_MEMBER( pc2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc4_w );
@@ -117,7 +117,7 @@ protected:
 	const bool m_force_portb_in;
 	const bool m_force_portc_out;
 	const bool m_dont_clear_output_latches;
-	
+
 private:
 	inline void check_interrupt(int port);
 	inline void set_ibf(int port, int state);
@@ -170,7 +170,7 @@ class ams40489_ppi_device : public i8255_device
 {
 public:
 	// construction/destruction
-	ams40489_ppi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ams40489_ppi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // device type definition

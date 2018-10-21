@@ -147,6 +147,70 @@ protected:
 		uint8_t present;
 	};
 
+	enum FEATURE_FLAGS : uint32_t {
+		// returned in the EDX register
+		FF_PBE = (u32)1 << 31, // Pend. Brk. EN.
+		FF_TM = 1 << 29,       // Thermal Monitor
+		FF_HTT = 1 << 28,      // Multi-threading
+		FF_SS = 1 << 27,       // Self Snoop
+		FF_SSE2 = 1 << 26,     // SSE2 Extensions
+		FF_SSE = 1 << 25,      // SSE Extensions
+		FF_FXSR = 1 << 24,     // FXSAVE/FXRSTOR
+		FF_MMX = 1 << 23,      // MMX Technology
+		FF_ACPI = 1 << 22,     // Thermal Monitor and Clock Ctrl
+		FF_DS = 1 << 21,       // Debug Store
+		FF_CLFSH = 1 << 19,    // CLFLUSH instruction
+		FF_PSN = 1 << 18,      // Processor Serial Number
+		FF_PSE36 = 1 << 17,    // 36 Bit Page Size Extension
+		FF_PAT = 1 << 16,      // Page Attribute Table
+		FF_CMOV = 1 << 15,     // Conditional Move/Compare Instruction
+		FF_MCA = 1 << 14,      // Machine Check Architecture
+		FF_PGE = 1 << 13,      // PTE Global Bit
+		FF_MTRR = 1 << 12,     // Memory Type Range Registers
+		FF_SEP = 1 << 11,      // SYSENTER and SYSEXIT
+		FF_APIC = 1 << 9,      // APIC on Chip
+		FF_CX8 = 1 << 8,       // CMPXCHG8B Inst.
+		FF_MCE = 1 << 7,       // Machine Check Exception
+		FF_PAE = 1 << 6,       // Physical Address Extensions
+		FF_MSR = 1 << 5,       // RDMSR and WRMSR Support
+		FF_TSC = 1 << 4,       // Time Stamp Counter
+		FF_PSE = 1 << 3,       // Page Size Extensions
+		FF_DE = 1 << 2,        // Debugging Extensions
+		FF_VME = 1 << 1,       // Virtual-8086 Mode Enhancement
+		FF_FPU = 1 << 0,       // x87 FPU on Chip
+		// retuned in the ECX register
+		FF_RDRAND = 1 << 30,
+		FF_F16C = 1 << 29,
+		FF_AVX = 1 << 28,
+		FF_OSXSAVE = 1 << 27,
+		FF_XSAVE = 1 << 26,
+		FF_AES = 1 << 25,
+		FF_TSCD = 1 << 24,     // Deadline
+		FF_POPCNT = 1 << 23,
+		FF_MOVBE = 1 << 22,
+		FF_x2APIC = 1 << 21,
+		FF_SSE4_2 = 1 << 20,   // SSE4.2
+		FF_SSE4_1 = 1 << 19,   // SSE4.1
+		FF_DCA = 1 << 18,      // Direct Cache Access
+		FF_PCID = 1 << 17,     // Process-context Identifiers
+		FF_PDCM = 1 << 15,     // Perf/Debug Capability MSR
+		FF_xTPR = 1 << 14,     // Update Control
+		FF_CMPXCHG16B = 1 << 13,
+		FF_FMA = 1 << 12,      // Fused Multiply Add
+		FF_SDBG = 1 << 11,
+		FF_CNXT_ID = 1 << 10,  // L1 Context ID
+		FF_SSSE3 = 1 << 9,     // SSSE3 Extensions
+		FF_TM2 = 1 << 8,       // Thermal Monitor 2
+		FF_EIST = 1 << 7,      // Enhanced Intel SpeedStep Technology
+		FF_SMX = 1 << 6,       // Safer Mode Extensions
+		FF_VMX = 1 << 5,       // Virtual Machine Extensions
+		FF_DS_CPL = 1 << 4,    // CPL Qualified Debug Store
+		FF_MONITOR = 1 << 3,   // MONITOR/MWAIT
+		FF_DTES64 = 1 << 2,    // 64 Bit DS Area
+		FF_PCLMULQDQ = 1 << 1, // Carryless Multiplication
+		FF_SSE3 = 1 << 0,      // SSE3 Extensions
+	};
+
 	typedef void (i386_device::*i386_modrm_func)(uint8_t modrm);
 	typedef void (i386_device::*i386_op_func)();
 	struct X86_OPCODE {
@@ -223,7 +287,7 @@ protected:
 	address_space *m_io;
 	uint32_t m_a20_mask;
 
-	int m_cpuid_max_input_value_eax;
+	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
 	uint32_t m_cpu_version;
 	uint32_t m_feature_flags;
@@ -1543,6 +1607,18 @@ protected:
 };
 
 
+class athlonxp_device : public pentium_device
+{
+public:
+	// construction/destruction
+	athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+
 class pentium4_device : public pentium_device
 {
 public:
@@ -1565,6 +1641,7 @@ DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
 DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
 DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)
+DECLARE_DEVICE_TYPE(ATHLONXP,    athlonxp_device)
 DECLARE_DEVICE_TYPE(PENTIUM4,    pentium4_device)
 
 #endif // MAME_CPU_I386_I386_H

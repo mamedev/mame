@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(unk_gambl_state::unkpacg)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(unkpacg_main_map)
 	MCFG_DEVICE_IO_MAP(unkpacg_main_portmap)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 //  SPEAKER(config, "mono").front_center();

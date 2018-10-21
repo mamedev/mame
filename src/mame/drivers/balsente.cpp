@@ -1333,7 +1333,7 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 	X2212(config, "nov0").set_auto_save(true); // system NOVRAM
 	X2212(config, "nov1").set_auto_save(true); // cart NOVRAM
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, interrupt_timer)
 	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, clock_counter_0_ff)
@@ -1344,17 +1344,17 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 	MCFG_PIT8253_CLK1(8_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK2(8_MHz_XTAL / 4)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U9H
+	LS259(config, m_outlatch); // U9H
 	// these outputs are generally used to control the various lamps
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, balsente_state, out0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, balsente_state, out1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, balsente_state, out2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, balsente_state, out3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, balsente_state, out4_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, balsente_state, out5_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, balsente_state, out6_w))
+	m_outlatch->q_out_cb<0>().set(FUNC(balsente_state::out0_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(balsente_state::out1_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(balsente_state::out2_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(balsente_state::out3_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(balsente_state::out4_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(balsente_state::out5_w));
+	m_outlatch->q_out_cb<6>().set(FUNC(balsente_state::out6_w));
 	// special case is output 7, which recalls the NVRAM data
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, balsente_state, nvrecall_w))
+	m_outlatch->q_out_cb<7>().set(FUNC(balsente_state::nvrecall_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

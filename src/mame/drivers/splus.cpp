@@ -685,8 +685,8 @@ MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, splus_state, splus_p3_r))
 
 	// Fill NVRAM
-	MCFG_NVRAM_ADD_0FILL("cmosl")
-	MCFG_NVRAM_ADD_0FILL("cmosh")
+	NVRAM(config, "cmosl", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "cmosh", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware (ALL FAKE, NO VIDEO)
 	MCFG_PALETTE_ADD("palette", 16*16)

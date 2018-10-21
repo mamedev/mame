@@ -67,7 +67,7 @@ public:
 	void init_stooges();
 	void init_qbert();
 	void init_qbertqub();
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
 

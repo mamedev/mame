@@ -17,8 +17,8 @@
     arkanoidu   USA version. MCU code properly dumped.
     arkanoidj   Japanese version.  Final revision, MCU code properly dumped.
     arkanoidja  Japanese version.  A later revision with level selector.
-                  The 68705 code for this one was not available; Brad Oliver[?]
-                  made it up from the bootleg A75-06.IC16 by changing the level
+                  The 68705 code for this one was not available; it has been
+                  made using the decapped Taito A75__06.IC16 by changing the level
                   data pointer table.
     arkanoidjbl Bootleg of the early Japanese version. The only difference is
                   that the warning text has been replaced by "WAIT"
@@ -757,10 +757,14 @@ Stephh's notes on 'tetrsark' (based on the game Z80 code and some tests) :
     write:
     d000      AY8910 control
     d001      AY8910 write
-    d008      bit0/1 = flip screen x/y
-              bit 4 = ROM bank??
-              bit 5 = char bank
-              other bits????????
+    d008      bit 0   flip screen x
+              bit 1   flip screen y
+              bit 2   paddle player select
+              bit 3   coin lockout
+              bit 4   ????????
+              bit 5 = graphics bank
+              bit 6 = palette bank
+              bit 7 = mcu reset
     d010      watchdog reset, or IRQ acknowledge, or both
     f000      ????????
 
@@ -1347,8 +1351,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_DEVICE_PROGRAM_MAP(arkanoid_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
 
 	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
 	m_mcuintf->portb_r_cb().set_ioport("MUX");
@@ -1425,7 +1428,7 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_DEVICE_PROGRAM_MAP(hexa_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1497,10 +1500,10 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 /* rom numbering, with guesses for version numbers and missing roms:
-    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED, arkatayt and arkangc and
-               maybe arkanoidjbl may actually be bootlegs of this undumped
-               version, so it might be possible to 'restore' this version by
-              'de-bootlegging' those sets?)
+    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED; it has been rumored that arkatayt
+               and arkangc and maybe arkanoidjbl might actually be bootlegs of this
+               undumped version, so, if true, it might be possible to 'restore' this
+               version by 'de-bootlegging' those sets.)
     A75 01-1 = Z80 code 1/2 v1.1 Japan and USA/Romstar and World
     A75 02   = Z80 code 2/2 v1.0 Japan (has 'Notice: This game is for use in Japan only' screen)
     A75 03   = GFX 1/3
@@ -1522,7 +1525,7 @@ MACHINE_CONFIG_END
     A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar (verified. dumped from MCU)
     A75 21   = Z80 code v2.0 1/2 Japan w/level select
     A75 22   = Z80 code v2.0 2/2 Japan w/level select
-    A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
+    A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED)
     A75 24   = Z80 code v2.1 1/2 Japan
     A75 25   = Z80 code v2.1 2/2 Japan
     A75 26   = MC68705P5 MCU code, v2.1 Japan (verified. dumped from MCU)
@@ -1648,8 +1651,7 @@ ROM_START( arkanoidja ) // V2.0 Japan w/level select
 	ROM_LOAD( "a75-22.ic16",   0x8000, 0x8000, CRC(3a2688d3) SHA1(9633a661352def3d85f95ca830f6d761b0b5450e) ) // v2 JPN level select?, region byte is 0x92
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	// the handcrafted value at 0x351 (0x9ddb) seems incorrect compared to other sets? (but it appears the value is never used, and the data it would usually point to does not exist in the program rom?)
-	ROM_LOAD( "a75-23.ic14",  0x0000, 0x0800, BAD_DUMP CRC(0a4abef6) SHA1(fdce0b7a2eab7fd4f1f4fc3b93120b1ebc16078e)  ) /* Hand crafted based on the bootleg a75-06 chip, need the real data here */
+	ROM_LOAD( "a75-23.ic14",  0x0000, 0x0800, BAD_DUMP CRC(543fed28) SHA1(0a0cafc229a9ece7d7f09d717b35a59653ccdc4d)  ) /* Hand crafted based on the original a75-06 chip, need the real data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )

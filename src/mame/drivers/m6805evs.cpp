@@ -107,7 +107,7 @@ MACHINE_CONFIG_START(m6805evs_state::m6805evs)
 	MCFG_DEVICE_ADD("maincpu", M6805, XTAL(4'000'000))
 
 //  Needs a 13-bits address bus wide version of the cpu
-//	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+//  MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START(m6805evs)

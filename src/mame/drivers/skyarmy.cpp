@@ -331,12 +331,12 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyarmy_state,  irq0_line_hold)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(skyarmy_state, nmi_source, 650)    /* Hz */
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 11C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, skyarmy_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, skyarmy_state, nmi_enable_w)) // ???
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, skyarmy_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, skyarmy_state, flip_screen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // video RAM buffering?
+	ls259_device &latch(LS259(config, "latch")); // 11C
+	latch.q_out_cb<0>().set(FUNC(skyarmy_state::coin_counter_w));
+	latch.q_out_cb<4>().set(FUNC(skyarmy_state::nmi_enable_w)); // ???
+	latch.q_out_cb<5>().set(FUNC(skyarmy_state::flip_screen_x_w));
+	latch.q_out_cb<6>().set(FUNC(skyarmy_state::flip_screen_y_w));
+	latch.q_out_cb<7>().set_nop(); // video RAM buffering?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_DEVICE_IO_MAP(limenko_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -756,7 +756,7 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, limenko_state, spotty_sound_cmd_r))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, limenko_state, spotty_sound_cmd_w)) //not sure about anything...
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

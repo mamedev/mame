@@ -703,7 +703,7 @@ MACHINE_CONFIG_START(umipoker_state::umipoker)
 	MCFG_DEVICE_PROGRAM_MAP(umipoker_audio_map)
 	MCFG_DEVICE_IO_MAP(umipoker_audio_io_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 
 	/* video hardware */

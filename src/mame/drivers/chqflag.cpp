@@ -325,16 +325,11 @@ MACHINE_CONFIG_START(chqflag_state::chqflag)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(chqflag_sound_map)
 
-	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank1000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "bank1000").set_map(&chqflag_state::bank1000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

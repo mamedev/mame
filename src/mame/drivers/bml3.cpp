@@ -999,13 +999,13 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, bml3_state, bml3_piaA_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set(FUNC(bml3_state::bml3_piaA_w));
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_tx_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bml3_state::bml3_acia_tx_w));
+	m_acia->rts_handler().set(FUNC(bml3_state::bml3_acia_rts_w));
+	m_acia->irq_handler().set(FUNC(bml3_state::bml3_acia_irq_w));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 9'600)); // 600 baud x 16(divider) = 9600
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));

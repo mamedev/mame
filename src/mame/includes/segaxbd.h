@@ -18,6 +18,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
 #include "machine/mb3773.h"
 #include "machine/watchdog.h"
 #include "video/resnet.h"
@@ -63,7 +64,7 @@ protected:
 	DECLARE_READ16_MEMBER(adc_r);
 	DECLARE_WRITE16_MEMBER(adc_w);
 	DECLARE_WRITE16_MEMBER(iocontrol_w);
-	
+
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -115,6 +116,7 @@ protected:
 	optional_device<z80_device> m_soundcpu2;
 	optional_device<i8751_device> m_mcu;
 	required_device<mb3773_device> m_watchdog;
+	required_device_array<cxd1095_device, 2> m_iochip;
 	required_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	required_device<sega_xboard_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;

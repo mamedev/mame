@@ -25,7 +25,6 @@
 
 #include "debugger.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -273,7 +272,6 @@ MACHINE_CONFIG_START(icatel_state::icatel)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	config.set_default_layout(layout_lcd);
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(icatel_state, icatel)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_icatel)

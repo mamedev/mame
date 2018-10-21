@@ -507,10 +507,10 @@ MACHINE_CONFIG_START(moo_state::moo)
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) // 8MHz
-	MCFG_K053252_OFFSETS(40, 16)
+	K053252(config, m_k053252, XTAL(32'000'000)/4); // 8MHz
+	m_k053252->set_offsets(40, 16);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -546,7 +546,7 @@ MACHINE_CONFIG_START(moo_state::moo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'000'000)/8) // 4MHz verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -567,7 +567,7 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

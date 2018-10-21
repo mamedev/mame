@@ -419,7 +419,6 @@ each direction to assign the boundries.
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "sound/pokey.h"
@@ -1749,14 +1748,14 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 
 	MCFG_DEVICE_ADD("earom", ER2055)
 
-	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<0>().set(FUNC(centiped_state::coin_counter_left_w));
-	outlatch.q_out_cb<1>().set(FUNC(centiped_state::coin_counter_center_w));
-	outlatch.q_out_cb<2>().set(FUNC(centiped_state::coin_counter_right_w));
-	outlatch.q_out_cb<3>().set_output("led0").invert(); // LED 1
-	outlatch.q_out_cb<4>().set_output("led1").invert(); // LED 2
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set(FUNC(centiped_state::coin_counter_left_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(centiped_state::coin_counter_center_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(centiped_state::coin_counter_right_w));
+	m_outlatch->q_out_cb<3>().set_output("led0").invert(); // LED 1
+	m_outlatch->q_out_cb<4>().set_output("led1").invert(); // LED 2
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* timer */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", centiped_state, generate_interrupt, "screen", 0, 16)
@@ -1781,8 +1780,8 @@ MACHINE_CONFIG_START(centiped_state::centiped)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(centiped_map)
 
-	MCFG_DEVICE_MODIFY("outlatch") // M10
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
+	// M10
+	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1808,8 +1807,7 @@ MACHINE_CONFIG_START(centiped_state::caterplr)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(caterplr_map)
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
+	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1827,8 +1825,7 @@ MACHINE_CONFIG_START(centiped_state::centipdb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(centipdb_map)
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
+	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1847,8 +1844,8 @@ MACHINE_CONFIG_START(centiped_state::magworm)
 	MCFG_DEVICE_PROGRAM_MAP(magworm_map)
 	MCFG_MACHINE_RESET_OVERRIDE(centiped_state,magworm)
 
-	MCFG_DEVICE_MODIFY("outlatch") // 12A
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
+	// 12A
+	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1866,10 +1863,10 @@ MACHINE_CONFIG_START(centiped_state::milliped)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(milliped_map)
 
-	MCFG_DEVICE_MODIFY("outlatch") // 12E
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, centiped_state, input_select_w)) // TBEN
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, control_select_w)) // CNTRLSEL
+	// 12E
+	m_outlatch->q_out_cb<5>().set(FUNC(centiped_state::input_select_w)); // TBEN
+	m_outlatch->q_out_cb<6>().set(FUNC(centiped_state::flip_screen_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::control_select_w)); // CNTRLSEL
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_milliped)
@@ -1901,7 +1898,7 @@ MACHINE_CONFIG_START(centiped_state::multiped)
 	MCFG_DEVICE_PROGRAM_MAP(multiped_map)
 
 	MCFG_DEVICE_REMOVE("earom")
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 
@@ -1915,9 +1912,9 @@ MACHINE_CONFIG_START(centiped_state::warlords)
 	MCFG_DEVICE_REMOVE("earom")
 
 	// these extra LEDs also appear on Centipede schematics
-	ls259_device &outlatch(*subdevice<ls259_device>("outlatch")); // P9
-	outlatch.q_out_cb<5>().set_output("led2").invert(); // LED 3
-	outlatch.q_out_cb<6>().set_output("led3").invert(); // LED 4
+	// P9
+	m_outlatch->q_out_cb<5>().set_output("led2").invert(); // LED 3
+	m_outlatch->q_out_cb<6>().set_output("led3").invert(); // LED 4
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_warlords)
@@ -1948,8 +1945,7 @@ MACHINE_CONFIG_START(centiped_state::mazeinv)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mazeinv_map)
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)
+	m_outlatch->q_out_cb<7>().set_nop();
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
@@ -1966,13 +1962,13 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 
 	MCFG_DEVICE_ADD("earom", ER2055)
 
-	ls259_device &outlatch(LS259(config, "outlatch"));
-	outlatch.q_out_cb<1>().set(FUNC(centiped_state::bullsdrt_coin_count_w));
-	outlatch.q_out_cb<3>().set_output("led0").invert();
-	outlatch.q_out_cb<4>().set_output("led1").invert();
-	outlatch.q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<1>().set(FUNC(centiped_state::bullsdrt_coin_count_w));
+	m_outlatch->q_out_cb<3>().set_output("led0").invert();
+	m_outlatch->q_out_cb<4>().set_output("led1").invert();
+	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

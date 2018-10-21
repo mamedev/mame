@@ -120,7 +120,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/mermaid.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "sound/msm5205.h"
 #include "speaker.h"
 
@@ -426,19 +425,19 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   // ???
 	MCFG_DEVICE_PROGRAM_MAP(mermaid_map)
 
-	MCFG_DEVICE_ADD("latch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mermaid_state, ay1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mermaid_state, ay2_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ???
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mermaid_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mermaid_state, flip_screen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mermaid_state, nmi_mask_w))
+	LS259(config, m_latch[0]);
+	m_latch[0]->q_out_cb<0>().set(FUNC(mermaid_state::ay1_enable_w));
+	m_latch[0]->q_out_cb<1>().set(FUNC(mermaid_state::ay2_enable_w));
+	m_latch[0]->q_out_cb<4>().set_nop(); // ???
+	m_latch[0]->q_out_cb<5>().set(FUNC(mermaid_state::flip_screen_x_w));
+	m_latch[0]->q_out_cb<6>().set(FUNC(mermaid_state::flip_screen_y_w));
+	m_latch[0]->q_out_cb<7>().set(FUNC(mermaid_state::nmi_mask_w));
 
-	MCFG_DEVICE_ADD("latch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // ???
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, mermaid_state, rougien_gfxbankswitch1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mermaid_state, rougien_gfxbankswitch2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // very frequent
+	LS259(config, m_latch[1]);
+	m_latch[1]->q_out_cb<0>().set_nop(); // ???
+	m_latch[1]->q_out_cb<4>().set(FUNC(mermaid_state::rougien_gfxbankswitch1_w));
+	m_latch[1]->q_out_cb<5>().set(FUNC(mermaid_state::rougien_gfxbankswitch2_w));
+	m_latch[1]->q_out_cb<7>().set_nop(); // very frequent
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -469,12 +468,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mermaid_state::rougien)
 	mermaid(config);
 
-	MCFG_DEVICE_MODIFY("latch1")
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mermaid_state, rougien_sample_playback_w))
+	m_latch[0]->q_out_cb<2>().set(FUNC(mermaid_state::rougien_sample_playback_w));
 
-	MCFG_DEVICE_MODIFY("latch2")
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mermaid_state, rougien_sample_rom_hi_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, mermaid_state, rougien_sample_rom_lo_w))
+	m_latch[1]->q_out_cb<2>().set(FUNC(mermaid_state::rougien_sample_rom_hi_w));
+	m_latch[1]->q_out_cb<3>().set(FUNC(mermaid_state::rougien_sample_rom_lo_w));
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mermaid_state,rougien)
@@ -484,10 +481,10 @@ MACHINE_CONFIG_START(mermaid_state::rougien)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD("adpcm_counter", RIPPLE_COUNTER, 0)
-	MCFG_DEVICE_ROM("adpcm")
-	MCFG_RIPPLE_COUNTER_STAGES(12)
-	MCFG_RIPPLE_COUNTER_ROM_OUT_CB(WRITE8(*this, mermaid_state, adpcm_data_w))
+	RIPPLE_COUNTER(config, m_adpcm_counter);
+	m_adpcm_counter->set_device_rom_tag("adpcm");
+	m_adpcm_counter->set_stages(12);
+	m_adpcm_counter->rom_out_cb().set(FUNC(mermaid_state::adpcm_data_w));
 MACHINE_CONFIG_END
 
 /* ROMs */

@@ -99,7 +99,7 @@ public:
 		m_tape_ctr(4)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
 	required_device<z80sio_device> m_sio;

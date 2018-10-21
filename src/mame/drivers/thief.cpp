@@ -399,10 +399,10 @@ MACHINE_CONFIG_START(thief_state::thief)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(thief_state, iack)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, thief_state, thief_input_select_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, thief_state, thief_io_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, thief_state, tape_control_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(thief_state::thief_input_select_w));
+	ppi.in_pb_callback().set(FUNC(thief_state::thief_io_r));
+	ppi.out_pc_callback().set(FUNC(thief_state::tape_control_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -410,9 +410,10 @@ MACHINE_CONFIG_START(thief_state::thief)
 	MCFG_SCREEN_UPDATE_DRIVER(thief_state, screen_update_thief)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tms", TMS9927, XTAL(20'000'000)/4/8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
-	MCFG_TMS9927_VSYN_CALLBACK(ASSERTLINE("maincpu", 0))
+	TMS9927(config, m_tms, XTAL(20'000'000)/4/8);
+	m_tms->set_char_width(8);
+	m_tms->vsyn_callback().set_inputline("maincpu", 0, ASSERT_LINE);
+
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// sound hardware

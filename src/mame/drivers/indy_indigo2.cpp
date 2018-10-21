@@ -70,10 +70,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mainram(*this, "mainram")
-		, m_sgi_mc(*this, "sgi_mc")
+		, m_mem_ctrl(*this, "memctrl")
+		, m_scsi_ctrl(*this, "wd33c93")
 		, m_newport(*this, "newport")
-		, m_dac(*this, "dac")
-		, m_scsi(*this, "wd33c93")
 		, m_hal2(*this, HAL2_TAG)
 		, m_hpc3(*this, HPC3_TAG)
 		, m_ioc2(*this, IOC2_TAG)
@@ -97,17 +96,16 @@ private:
 
 	static void cdrom_config(device_t *device);
 
-	static const char* HAL2_TAG;
-	static const char* HPC3_TAG;
-	static const char* IOC2_TAG;
-	static const char* RTC_TAG;
+	static char const *const HAL2_TAG;
+	static char const *const HPC3_TAG;
+	static char const *const IOC2_TAG;
+	static char const *const RTC_TAG;
 
 	required_device<mips3_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_mainram;
-	required_device<sgi_mc_device> m_sgi_mc;
+	required_device<sgi_mc_device> m_mem_ctrl;
+	required_device<wd33c93_device> m_scsi_ctrl;
 	required_device<newport_video_device> m_newport;
-	required_device<dac_word_interface> m_dac;
-	required_device<wd33c93_device> m_scsi;
 	required_device<hal2_device> m_hal2;
 	required_device<hpc3_device> m_hpc3;
 	required_device<ioc2_device> m_ioc2;
@@ -116,10 +114,10 @@ private:
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
 
-/*static*/ const char* ip22_state::HAL2_TAG = "hal2";
-/*static*/ const char* ip22_state::HPC3_TAG = "hpc3";
-/*static*/ const char* ip22_state::IOC2_TAG = "ioc2";
-/*static*/ const char* ip22_state::RTC_TAG = "rtc";
+/*static*/ char const *const ip22_state::HAL2_TAG = "hal2";
+/*static*/ char const *const ip22_state::HPC3_TAG = "hpc3";
+/*static*/ char const *const ip22_state::IOC2_TAG = "ioc2";
+/*static*/ char const *const ip22_state::RTC_TAG = "rtc";
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -140,14 +138,14 @@ inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_f
 WRITE32_MEMBER(ip22_state::ip22_write_ram)
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
-	if (m_sgi_mc->read(space, 0xc8/4, 0xffffffff) & 0x10001000)
+	if (m_mem_ctrl->read(space, 0xc8/4, 0xffffffff) & 0x10001000)
 	{
 		// a random perturbation so the memory test fails
 		data ^= 0xffffffff;
 	}
 
 	// if banks 0 or 1 have 2 membanks, also kill it, we only want 128 MB
-	if (m_sgi_mc->read(space, 0xc0/4, 0xffffffff) & 0x40004000)
+	if (m_mem_ctrl->read(space, 0xc0/4, 0xffffffff) & 0x40004000)
 	{
 		// a random perturbation so the memory test fails
 		data ^= 0xffffffff;
@@ -160,7 +158,7 @@ void ip22_state::ip225015_map(address_map &map)
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
 	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip22_state::ip22_write_ram));     /* 128 MB of main RAM */
 	map(0x1f0f0000, 0x1f0f1fff).rw(m_newport, FUNC(newport_video_device::rex3_r), FUNC(newport_video_device::rex3_w));
-	map(0x1fa00000, 0x1fa1ffff).rw(m_sgi_mc, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
+	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 	map(0x1fb90000, 0x1fb9ffff).rw(m_hpc3, FUNC(hpc3_device::hd_enet_r), FUNC(hpc3_device::hd_enet_w));
 	map(0x1fbb0000, 0x1fbb0003).ram();   /* unknown, but read a lot and discarded */
 	map(0x1fbc0000, 0x1fbc7fff).rw(m_hpc3, FUNC(hpc3_device::hd0_r), FUNC(hpc3_device::hd0_w));
@@ -210,47 +208,51 @@ void ip22_state::cdrom_config(device_t *device)
 	MCFG_SOUND_ROUTE(1, ":rspeaker", 1.0)
 }
 
-MACHINE_CONFIG_START(ip22_state::ip225015)
-	MCFG_DEVICE_ADD("maincpu", R5000BE, 50000000*3)
-	//MCFG_MIPS3_ICACHE_SIZE(32768)
-	//MCFG_MIPS3_DCACHE_SIZE(32768)
-	MCFG_DEVICE_PROGRAM_MAP(ip225015_map)
+void ip22_state::ip225015(machine_config &config)
+{
+	R5000BE(config, m_maincpu, 50000000*3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip225015_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1280+64, 1024+64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
-	MCFG_SCREEN_UPDATE_DEVICE("newport", newport_video_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1280+64, 1024+64);
+	screen.set_visarea(0, 1279, 0, 1023);
+	screen.set_screen_update("newport", FUNC(newport_video_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, "palette", 65536);
 
-	MCFG_DEVICE_ADD("newport", NEWPORT_VIDEO, 0)
+	NEWPORT_VIDEO(config, m_newport);
 
-	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
+	SGI_MC(config, m_mem_ctrl);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	dac_16bit_r2r_twos_complement_device &dac(DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0));
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "cdrom", SCSICD, SCSI_ID_4)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
+	voltage_regulator_device &vreg = VOLTAGE_REGULATOR(config, "vref");
+	vreg.set_output(5.0);
+	vreg.add_route(0, "dac",  1.0, DAC_VREF_POS_INPUT);
+	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_WD33C93_IRQ_CB(WRITELINE(HPC3_TAG, hpc3_device, scsi_irq))
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
+	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
+	scsi.set_slot_device(2, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+	scsi.slot(2).set_option_machine_config("cdrom", cdrom_config);
 
-	MCFG_DEVICE_ADD(HAL2_TAG, SGI_HAL2, 0)
-	MCFG_DEVICE_ADD(IOC2_TAG, SGI_IOC2_GUINNESS, 0, "maincpu")
-	MCFG_DEVICE_ADD(HPC3_TAG, SGI_HPC3, 0, "maincpu", "wd33c93", "ioc2")
+	WD33C93(config, m_scsi_ctrl);
+	m_scsi_ctrl->set_scsi_port("scsi");
+	m_scsi_ctrl->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi_irq));
 
-	MCFG_DEVICE_ADD(RTC_TAG, DS1386_8K, 32768)
+	SGI_HAL2(config, m_hal2);
+	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
+	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_ioc2);
+
+	DS1386_8K(config, m_rtc, 32768);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ip22_state::ip224613)

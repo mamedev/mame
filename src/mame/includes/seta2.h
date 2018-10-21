@@ -32,9 +32,9 @@ public:
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
 		m_flash(*this, "flash"),
-		m_rtc(*this, "rtc"),
 		m_dispenser(*this, "dispenser"),
 
+		m_x1_bank(*this,"x1_bank_%u", 1U),
 		m_nvram(*this, "nvram"),
 		m_spriteram(*this, "spriteram", 0),
 		m_tileram(*this, "tileram", 0),
@@ -65,7 +65,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vregs_w);
 	DECLARE_READ32_MEMBER(oki_read);
 	DECLARE_WRITE32_MEMBER(oki_write);
-	DECLARE_WRITE16_MEMBER(sound_bank_w);
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
 protected:
 
@@ -113,8 +113,9 @@ protected:
 	void reelquak_map(address_map &map);
 	void samshoot_map(address_map &map);
 	void telpacfl_map(address_map &map);
+	void x1_map(address_map &map);
 
-	virtual void machine_start() override { m_leds.resolve(); m_lamps.resolve(); }
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -127,9 +128,9 @@ protected:
 	optional_device<okim9810_device> m_oki;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<intelfsh16_device> m_flash;
-	optional_device<upd4992_device> m_rtc;
 	optional_device<ticket_dispenser_device> m_dispenser;
 
+	optional_memory_bank_array<8> m_x1_bank;
 	optional_shared_ptr<uint16_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_tileram;
@@ -209,6 +210,7 @@ class staraudi_state : public seta2_state
 public:
 	staraudi_state(const machine_config &mconfig, device_type type, const char *tag) :
 		seta2_state(mconfig, type, tag),
+		m_rtc(*this, "rtc"),
 		m_rgbram(*this, "rgbram", 0)
 	{
 	}
@@ -233,6 +235,7 @@ private:
 
 	void draw_rgbram(bitmap_ind16 &bitmap);
 
+	required_device<upd4992_device> m_rtc;
 	required_shared_ptr<uint16_t> m_rgbram;
 
 	uint16_t m_lamps1 = 0, m_lamps2 = 0, m_cam = 0;

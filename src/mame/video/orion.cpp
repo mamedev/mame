@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "includes/orion.h"
 
-VIDEO_START_MEMBER(orion_state,orion128)
+void orion_state::video_start()
 {
 }
 

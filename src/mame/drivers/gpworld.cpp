@@ -67,7 +67,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	void gpworld(machine_config &config);
-	
+
 	void init_gpworld();
 
 private:

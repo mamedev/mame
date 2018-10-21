@@ -86,11 +86,12 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ql_trump_card_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, 8000000)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", ql_trump_card_floppies, "35dd", ql_trump_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", ql_trump_card_floppies, nullptr, ql_trump_card_device::floppy_formats)
-MACHINE_CONFIG_END
+void ql_trump_card_device::device_add_mconfig(machine_config &config)
+{
+	WD1772(config, m_fdc, 8000000);
+	FLOPPY_CONNECTOR(config, m_floppy0, ql_trump_card_floppies, "35dd", ql_trump_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, ql_trump_card_floppies, nullptr, ql_trump_card_device::floppy_formats);
+}
 
 
 //**************************************************************************
@@ -182,7 +183,7 @@ uint8_t ql_trump_card_device::read(address_space &space, offs_t offset, uint8_t 
 
 	if (offset >= 0x1c000 && offset <= 0x1c003)
 	{
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 	}
 
 	if (offset >= 0x40000 && offset < 0xc0000)
@@ -223,7 +224,7 @@ void ql_trump_card_device::write(address_space &space, offs_t offset, uint8_t da
 {
 	if (offset >= 0x1c000 && offset <= 0x1c003)
 	{
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 	}
 
 	if (offset == 0x1e000)

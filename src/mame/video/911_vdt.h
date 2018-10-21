@@ -59,6 +59,9 @@ public:
 		return m_lineint_line.set_callback(std::forward<Object>(cb));
 	}
 
+	auto keyint_cb() { return m_keyint_line.bind(); }
+	auto lineint_cb() { return m_lineint_line.bind(); }
+
 protected:
 	// device-level overrides
 	void device_start() override;
@@ -113,11 +116,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(VDT911, vdt911_device)
-
-#define MCFG_VDT911_KEYINT_HANDLER( _intcallb ) \
-	downcast<vdt911_device &>(*device).set_keyint_callback(DEVCB_##_intcallb);
-
-#define MCFG_VDT911_LINEINT_HANDLER( _intcallb ) \
-	downcast<vdt911_device &>(*device).set_lineint_callback(DEVCB_##_intcallb);
 
 #endif // MAME_VIDEO_911_VDT_H

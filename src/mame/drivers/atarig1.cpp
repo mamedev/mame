@@ -404,15 +404,9 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
-	MCFG_ADC0808_IN0_CB(IOPORT("ADC0"))
-	MCFG_ADC0808_IN1_CB(IOPORT("ADC1"))
-	MCFG_ADC0808_IN2_CB(IOPORT("ADC2"))
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig1)
@@ -444,52 +438,54 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarig1_state::hydrap)
 	atarig1(config);
+
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	m_adc->in_callback<0>().set_ioport("ADC0");
+	m_adc->in_callback<1>().set_ioport("ADC1");
+	m_adc->in_callback<2>().set_ioport("ADC2");
+
 	MCFG_ATARIRLE_ADD("rle", modesc_hydra)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarig1_state::hydra)
+void atarig1_state::hydra(machine_config &config)
+{
 	hydrap(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 116, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, "slapstic", 116, true);
+}
 
 
 MACHINE_CONFIG_START(atarig1_state::pitfight9)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 114, true)
-	MCFG_DEVICE_REMOVE("adc")
+	SLAPSTIC(config, "slapstic", 114, true);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(atarig1_state::pitfight7)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 112, true)
-	MCFG_DEVICE_REMOVE("adc")
+	SLAPSTIC(config, "slapstic", 112, true);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(atarig1_state::pitfight)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 111, true)
-	MCFG_DEVICE_REMOVE("adc")
+	SLAPSTIC(config, "slapstic", 111, true);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(atarig1_state::pitfightj)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 113, true)
-	MCFG_DEVICE_REMOVE("adc")
+	SLAPSTIC(config, "slapstic", 113, true);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(atarig1_state::pitfightb)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 

@@ -2591,7 +2591,7 @@ MACHINE_CONFIG_START(ssv_state::drifto94)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2606,14 +2606,14 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gdfs_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock
-	MCFG_ADC0808_IN0_CB(IOPORT("GUNX1"))
-	MCFG_ADC0808_IN1_CB(IOPORT("GUNY1"))
-	MCFG_ADC0808_IN2_CB(IOPORT("GUNX2"))
-	MCFG_ADC0808_IN3_CB(IOPORT("GUNY2"))
-	MCFG_ADC0808_EOC_CB(WRITELINE(*this, ssv_state, gdfs_adc_int_w))
+	ADC0809(config, m_adc, 1000000); // unknown clock
+	m_adc->in_callback<0>().set_ioport("GUNX1");
+	m_adc->in_callback<1>().set_ioport("GUNY1");
+	m_adc->in_callback<2>().set_ioport("GUNX2");
+	m_adc->in_callback<3>().set_ioport("GUNY2");
+	m_adc->eoc_callback().set(FUNC(ssv_state::gdfs_adc_int_w));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2635,7 +2635,7 @@ MACHINE_CONFIG_START(ssv_state::hypreact)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hypreact_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2650,7 +2650,7 @@ MACHINE_CONFIG_START(ssv_state::hypreac2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hypreac2_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2691,9 +2691,9 @@ MACHINE_CONFIG_START(ssv_state::meosism)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(meosism_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2721,7 +2721,7 @@ MACHINE_CONFIG_START(ssv_state::ryorioh)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2735,7 +2735,7 @@ MACHINE_CONFIG_START(ssv_state::vasara)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2749,7 +2749,7 @@ MACHINE_CONFIG_START(ssv_state::srmp4)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(srmp4_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2764,7 +2764,7 @@ MACHINE_CONFIG_START(ssv_state::srmp7)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(srmp7_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2786,7 +2786,7 @@ MACHINE_CONFIG_START(ssv_state::stmblade)
 	/* don't need this, game just does a simple check at boot then the DSP stalls into a tight loop. */
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd6-0x26)*2-1, 0, (0xfe - 0x0e)-1)
@@ -2800,7 +2800,7 @@ MACHINE_CONFIG_START(ssv_state::survarts)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(survarts_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2825,13 +2825,13 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(eaglshot_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX")
-	MCFG_UPD4701_PORTY("TRACKY")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("TRACKX");
+	m_upd4701->set_porty_tag("TRACKY");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2850,9 +2850,9 @@ MACHINE_CONFIG_START(ssv_state::sxyreact)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2866,9 +2866,9 @@ MACHINE_CONFIG_START(ssv_state::sxyreac2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2882,9 +2882,9 @@ MACHINE_CONFIG_START(ssv_state::cairblad)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2904,7 +2904,7 @@ MACHINE_CONFIG_START(ssv_state::twineag2)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2919,7 +2919,7 @@ MACHINE_CONFIG_START(ssv_state::ultrax)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ultrax_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2936,7 +2936,7 @@ MACHINE_CONFIG_START(ssv_state::jsk)
 	MCFG_DEVICE_ADD("sub", V810,25000000)
 	MCFG_DEVICE_PROGRAM_MAP(jsk_v810_mem)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

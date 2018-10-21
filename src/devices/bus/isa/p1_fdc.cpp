@@ -62,13 +62,14 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(p1_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, p1_fdc_device, p1_fdc_irq_drq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, p1_fdc_device, p1_fdc_irq_drq))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void p1_fdc_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(p1_fdc_device::p1_fdc_irq_drq));
+	m_fdc->drq_wr_callback().set(FUNC(p1_fdc_device::p1_fdc_irq_drq));
+	FLOPPY_CONNECTOR(config, "fdc:0", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -189,8 +190,8 @@ void p1_fdc_device::device_start()
 	set_isa_device();
 	m_isa->install_rom(this, 0xe0000, 0xe07ff, "XXX", "p1_fdc");
 	m_isa->install_device(0x00c0, 0x00c3,
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_device, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_device, write) );
+						  read8sm_delegate(FUNC(fd1793_device::read), m_fdc.target()),
+						  write8sm_delegate(FUNC(fd1793_device::write), m_fdc.target()));
 	m_isa->install_device(0x00c4, 0x00c7, read8_delegate( FUNC(p1_fdc_device::p1_fdc_r), this ), write8_delegate( FUNC(p1_fdc_device::p1_fdc_w), this ) );
 }
 

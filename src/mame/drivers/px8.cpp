@@ -527,8 +527,7 @@ void px8_state::px8_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x0f);
 	map(0x00, 0x07).rw(FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
-	map(0x0c, 0x0c).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0d, 0x0d).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0c, 0x0d).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 //  AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, status_r, data_w)
 //  AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, data_r, command_w)
 }
@@ -800,8 +799,7 @@ MACHINE_CONFIG_START(px8_state::px8)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "px8_cart")

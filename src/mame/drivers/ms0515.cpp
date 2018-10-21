@@ -538,39 +538,39 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)
 
-	MCFG_DEVICE_ADD("vg93", KR1818VG93, 1000000)
+	KR1818VG93(config, m_fdc, 1000000);
 	MCFG_FLOPPY_DRIVE_ADD("vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("vg93:1", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ms0515_state, ms0515_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ms0515_state, ms0515_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ms0515_state, ms0515_portc_w))
+	i8255_device &ppi(I8255(config, "ppi8255_1"));
+	ppi.out_pa_callback().set(FUNC(ms0515_state::ms0515_porta_w));
+	ppi.in_pb_callback().set(FUNC(ms0515_state::ms0515_portb_r));
+	ppi.out_pc_callback().set(FUNC(ms0515_state::ms0515_portc_w));
 
 	// serial connection to printer
-	MCFG_DEVICE_ADD( "i8251line", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, ms0515_state, irq9_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, ms0515_state, irq8_w))
+	I8251(config, m_i8251line, 0);
+	m_i8251line->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251line->rxrdy_handler().set(FUNC(ms0515_state::irq9_w));
+	m_i8251line->txrdy_handler().set(FUNC(ms0515_state::irq8_w));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_i8251line, i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_i8251line, i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(m_i8251line, i8251_device, write_dsr))
 
 //  MCFG_DEVICE_ADD("line_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
 //  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))
 
 	// serial connection to MS7004 keyboard
-	MCFG_DEVICE_ADD("i8251kbd", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, ms0515_state, irq5_w))
-	MCFG_I8251_TXD_HANDLER(WRITELINE("ms7004", ms7004_device, write_rxd))
+	I8251(config, m_i8251kbd, 0);
+	m_i8251kbd->rxrdy_handler().set(FUNC(ms0515_state::irq5_w));
+	m_i8251kbd->txd_handler().set("ms7004", FUNC(ms7004_device::write_rxd));
 
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
-	MCFG_MS7004_RTS_HANDLER(WRITELINE("i8251kbd", i8251_device, write_cts))
+	MCFG_MS7004_TX_HANDLER(WRITELINE(m_i8251kbd, i8251_device, write_rxd))
+	MCFG_MS7004_RTS_HANDLER(WRITELINE(m_i8251kbd, i8251_device, write_cts))
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
@@ -589,8 +589,7 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

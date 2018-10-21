@@ -3425,9 +3425,9 @@ MACHINE_CONFIG_START(cps_state::forgottn)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(forgottn_map)
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("DIAL0")
-	MCFG_UPD4701_PORTY("DIAL1")
+	upd4701_device &upd4701(UPD4701A(config, "upd4701"));
+	upd4701.set_portx_tag("DIAL0");
+	upd4701.set_porty_tag("DIAL1");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::cps1_12MHz)
@@ -3438,12 +3438,13 @@ MACHINE_CONFIG_START(cps_state::cps1_12MHz)
 	MCFG_DEVICE_CLOCK( XTAL(12'000'000) )    /* verified on pcb */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cps_state::pang3)
+void cps_state::pang3(machine_config &config)
+{
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_16BIT(config, "eeprom");
+}
 
 MACHINE_CONFIG_START(cps_state::ganbare)
 	cps1_10MHz(config);
@@ -3471,7 +3472,7 @@ MACHINE_CONFIG_START(cps_state::qsound)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, qsound)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
@@ -3488,12 +3489,13 @@ MACHINE_CONFIG_START(cps_state::qsound)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cps_state::wofhfh)
+void cps_state::wofhfh(machine_config &config)
+{
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
 
 MACHINE_CONFIG_START(cps_state::sf2m3)
 	cps1_12MHz(config);
@@ -5820,6 +5822,28 @@ ROM_START( mtwins )
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "ck24b.1a",     0x0000, 0x0117, CRC(bd99c448) SHA1(2692c158f76769b0743103cc3a6d1c5d1f4f52ec) )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+ROM_END
+
+ROM_START( mtwinsb ) // board marked MGT-026
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "1-prg-27c4001.bin",     0x00001, 0x80000, CRC(8938a029) SHA1(50104d2afaec8d69d317780c071a4f2248e23e62) )
+	ROM_LOAD16_BYTE( "2-prg-27c4001.bin",     0x00000, 0x80000, CRC(7d5b8a97) SHA1(d3e456061a569765d400fc7c9b43e4fdacf17951) )
+
+	ROM_REGION( 0x200000, "gfx", 0 ) // identical to the original, but differently arranged
+	ROMX_LOAD( "g4.bin",  0x000004, 0x40000, CRC(11493e55) SHA1(0e45f53b034d66ce8d029346d4d88e46021df1a7), ROM_SKIP(7) )
+	ROM_CONTINUE(         0x000000, 0x40000)
+	ROMX_LOAD( "g3.bin",  0x000005, 0x40000, CRC(feda0f8b) SHA1(59c740478791ce95bf06feeda5173cc283a1eaea), ROM_SKIP(7) )
+	ROM_CONTINUE(         0x000001, 0x40000)
+	ROMX_LOAD( "g2.bin",  0x000006, 0x40000, CRC(745f0eba) SHA1(1cb07be5df7cc43b5aa236f114d303bf92436c74), ROM_SKIP(7) )
+	ROM_CONTINUE(         0x000002, 0x40000)
+	ROMX_LOAD( "g1.bin",  0x000007, 0x40000, CRC(8069026f) SHA1(3d5e9b36a349328bcd93d83d8d2fe3cd40e68a3b), ROM_SKIP(7) )
+	ROM_CONTINUE(         0x000003, 0x40000)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "4-snd-z80-27c512.bin", 0x00000, 0x10000, CRC(4d4255b7) SHA1(81a76b58043af7252a854b7efc4109957ef0e679) ) // identical to the original
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "3-snd-27c208.bin", 0x00000, 0x40000, CRC(a0c3de92) SHA1(5135cd982564f898f799ff1bc2bb2a75154be0cd) ) // identical to the original, but one single bigger ROM
 ROM_END
 
 /* B-Board 89625B-1 */
@@ -10238,43 +10262,43 @@ ROM_END
 
 /*
     05/13/92 MSTREET-6
-	
-	There are quite a few variations of this board. The main differences seem to be the amount and size of roms around the 68k.
-	Some variations have an additional "patch" rom and palce or gal that patches various chunks of code over the main program roms.
-	This adds the usual "rainbow edition" style gameplay hacks, such as air fireballs, change character mid-game, etc.
-	The boards can be run without the patch rom by removing it and the pal/gal and linking pins 1-19, 2-18, 11-16 of the empty gal socket.
-	(There is also a jumper that can be soldered instead for the third connection.)
-	
-	Luckily one of my boards has an unprotected gal so I was able to decode the rom patching:
-	
-	patch rom            program space
-	--------------------------------------
-	0x00000-0x07fff  ->  0x000000-0x007fff
-	0x08000-0x27fff  ->  0x030000-0x04ffff
-	0x28000-0x37fff  ->  0x170000-0x17ffff
-	
-	Gfx:
-	There are six 8Mbit roms which match the official sf2ce set almost exactly (7 bytes diff in one rom).
-	There are also another two 2Mbit roms which contain very near identical data.
-	Not sure why the bootleg hardware needs this or how it should be represented in emulation.
-	There is also a 512Kbit rom that's purpose is unknown (possibly related to priority according to notes in other bootleg sets).
-	
-	Sound:
-	YM2151 is clone marked "KA51".
+
+    There are quite a few variations of this board. The main differences seem to be the amount and size of roms around the 68k.
+    Some variations have an additional "patch" rom and palce or gal that patches various chunks of code over the main program roms.
+    This adds the usual "rainbow edition" style gameplay hacks, such as air fireballs, change character mid-game, etc.
+    The boards can be run without the patch rom by removing it and the pal/gal and linking pins 1-19, 2-18, 11-16 of the empty gal socket.
+    (There is also a jumper that can be soldered instead for the third connection.)
+
+    Luckily one of my boards has an unprotected gal so I was able to decode the rom patching:
+
+    patch rom            program space
+    --------------------------------------
+    0x00000-0x07fff  ->  0x000000-0x007fff
+    0x08000-0x27fff  ->  0x030000-0x04ffff
+    0x28000-0x37fff  ->  0x170000-0x17ffff
+
+    Gfx:
+    There are six 8Mbit roms which match the official sf2ce set almost exactly (7 bytes diff in one rom).
+    There are also another two 2Mbit roms which contain very near identical data.
+    Not sure why the bootleg hardware needs this or how it should be represented in emulation.
+    There is also a 512Kbit rom that's purpose is unknown (possibly related to priority according to notes in other bootleg sets).
+
+    Sound:
+    YM2151 is clone marked "KA51".
     YM3012 is clone marked "KA12".
-	MSM6295 is clone marked "TD735".
-	
-	Other:
-	All roms have nonsense markings such as KM418C256, KM416C256 etc.
-	Obviously they are not Samsung soj/tsop FPM DRAMs ;)
-	Main clock is 10MHz, rather than usual 12MHZ for champion edition.
-	Sets b and c:
-	  Turbo mode on SW(C):1.
-	  Press start to change character mid-game. (bug: screen goes dark when changing character, happens in attract mode as well).
+    MSM6295 is clone marked "TD735".
+
+    Other:
+    All roms have nonsense markings such as KM418C256, KM416C256 etc.
+    Obviously they are not Samsung soj/tsop FPM DRAMs ;)
+    Main clock is 10MHz, rather than usual 12MHZ for champion edition.
+    Sets b and c:
+      Turbo mode on SW(C):1.
+      Press start to change character mid-game. (bug: screen goes dark when changing character, happens in attract mode as well).
 */
 
 ROM_START( sf2cems6a )  /* 920313 USA (this set matches "sf2ceuab4" in FBA) */
-    ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_WORD_SWAP( "ms6.u196", 0x000000, 0x100000, CRC(596609d4) SHA1(4d876e6e44554eccbd0c5ea2d2d09e5024af0f9f) )  // == sf2m3: u196chp + u222chp (interleaved)
 	ROM_LOAD16_WORD_SWAP( "ms6.u10",  0x100000,  0x80000, CRC(ed4186bd) SHA1(f3dfe91d8f4384275190b0d86488843c1161d86f) )  // == sf2ce: s92_21a.6f 1st half doubled, also == sf2dkot2: turboii.21
 
@@ -10297,24 +10321,24 @@ ROM_START( sf2cems6a )  /* 920313 USA (this set matches "sf2ceuab4" in FBA) */
 	ROM_CONTINUE(         0x400004, 0x20000 )  // 1st half == ms6.u19 0x00000-0x20000, 2nd half == ms6.u19 0x80000-0xa0000
 	ROMX_LOAD( "ms6.u29", 0x400002, 0x20000, CRC(e4eca601) SHA1(acee4988f12a037a3b50f3923892fdac65f35805), ROM_GROUPWORD | ROM_SKIP(6) )  // == sf2m8: yyc-8.9 + yyc-9.8 (interleaved)
 	ROM_CONTINUE(         0x400006, 0x20000 )  // 1st half != ms6.u18 0x00000-0x20000 (4 bytes diff), 2nd half == ms6.u18 0x80000-0xa0000
-	
+
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* z80 code */
 	ROM_LOAD( "ms6.u191", 0x00000, 0x10000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )  // == sf2ce: s92_09.11a
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
 	ROM_LOAD( "ms6.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )  // == sf2ce: s92_18.11c + s92_19.12c, also == sf2amf2: fun-u210.bin, sf2rules: voice.u210, sf2m8: b-16.6
-	
+
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // == loads other bootleg sets
 ROM_END
 
 ROM_START( sf2cems6b )  /* 920322 USA */
-    ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
+	ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
 	ROM_LOAD16_WORD_SWAP( "ms6b.u0", 0x00000, 0x40000, CRC(b6f3724b) SHA1(aa8eea819fdaf205ca068067a4624715a8cf6c8c) )
-	
+
 	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld gal16v8 */
 	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
-	
+
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_WORD_SWAP( "ms6b.u196", 0x000000, 0x100000, CRC(435153d5) SHA1(3f6f318a9b3def8d62ee576dbaaef623d55c1c64) )
 	ROM_LOAD16_WORD_SWAP( "ms6b.u10",  0x100000,  0x40000, CRC(c812b7b2) SHA1(23ed0e1bd8b2015b39ad5e452dff0e372df0d5c9) )
@@ -10346,22 +10370,22 @@ ROM_START( sf2cems6b )  /* 920322 USA */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
 	ROM_LOAD( "ms6.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
-	
+
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
 ROM_END
 
 ROM_START( sf2cems6c )  /* 920322 USA */
-    ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
+	ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
 	ROM_LOAD16_WORD_SWAP( "ms6c.u0", 0x00000, 0x40000, CRC(04088b61) SHA1(03c361a0c9c70c21ef53351d5f975b06f51ce2e0) )
-	
+
 	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld palce16v8, protected, using gal dump from sf2cems6b */
 	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
-	
+
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_WORD_SWAP( "ms6b.u196", 0x000000, 0x100000, CRC(435153d5) SHA1(3f6f318a9b3def8d62ee576dbaaef623d55c1c64) )
 	ROM_LOAD16_WORD_SWAP( "ms6b.u10",  0x100000,  0x40000, CRC(c812b7b2) SHA1(23ed0e1bd8b2015b39ad5e452dff0e372df0d5c9) )
-	
+
 	ROM_COPY( "patch", 0x00000, 0x000000,  0x8000 )
 	ROM_COPY( "patch", 0x08000, 0x030000, 0x20000 )
 	ROM_COPY( "patch", 0x28000, 0x170000, 0x10000 )
@@ -10389,7 +10413,7 @@ ROM_START( sf2cems6c )  /* 920322 USA */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
 	ROM_LOAD( "ms6.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
-	
+
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
 ROM_END
@@ -12149,7 +12173,7 @@ ROM_START( pang3b )
 	ROMX_LOAD( "pa3-07m.2f", 0x000002, 0x100000, CRC(3a4a619d) SHA1(cfe68e24632b53fb6cd6d03b2166d6b5ba28b778) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROM_CONTINUE(            0x000006, 0x100000 )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "pa3_11.11f",  0x00000, 0x08000, CRC(90a08c46) SHA1(7544adab2d7e052e0d21c920bff7841d9d718345) )  // == pa3_11.11f but different size, resized by bootlegger
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
@@ -12881,6 +12905,7 @@ GAME( 1990, mercsur1,    mercs,    cps1_10MHz, mercs,    cps_state, init_cps1,  
 GAME( 1990, mercsj,      mercs,    cps1_10MHz, mercs,    cps_state, init_cps1,     ROT270, "Capcom", "Senjou no Ookami II (Japan 900302)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mtwins,      0,        cps1_10MHz, mtwins,   cps_state, init_cps1,     ROT0,   "Capcom", "Mega Twins (World 900619)", MACHINE_SUPPORTS_SAVE ) // "ETC" - (c) Capcom U.S.A. but World "warning"
 GAME( 1990, chikij,      mtwins,   cps1_10MHz, mtwins,   cps_state, init_cps1,     ROT0,   "Capcom", "Chiki Chiki Boys (Japan 900619)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mtwinsb,     mtwins,   cps1_10MHz, mtwins,   cps_state, init_cps1,     ROT0,   "Capcom", "Mega Twins (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // severe GFX problems due to different bootleg hardware
 GAME( 1990, msword,      0,        cps1_10MHz, msword,   cps_state, init_cps1,     ROT0,   "Capcom", "Magic Sword: Heroic Fantasy (World 900725)", MACHINE_SUPPORTS_SAVE )    // 25.07.1990  "OTHER COUNTRY"
 GAME( 1990, mswordr1,    msword,   cps1_10MHz, msword,   cps_state, init_cps1,     ROT0,   "Capcom", "Magic Sword: Heroic Fantasy (World 900623)", MACHINE_SUPPORTS_SAVE )    // 23.06.1990  "OTHER COUNTRY"
 GAME( 1990, mswordu,     msword,   cps1_10MHz, msword,   cps_state, init_cps1,     ROT0,   "Capcom", "Magic Sword: Heroic Fantasy (USA 900725)", MACHINE_SUPPORTS_SAVE )  // 25.07.1990  "U.S.A."

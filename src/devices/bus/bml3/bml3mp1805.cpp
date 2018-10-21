@@ -56,11 +56,12 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bml3bus_mp1805_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "mc6843", MC6843, 0 )
-	MCFG_MC6843_IRQ_CALLBACK(WRITELINE(*this, bml3bus_mp1805_device, bml3_mc6843_intrq_w))
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_mp1805_floppy_interface)
-MACHINE_CONFIG_END
+void bml3bus_mp1805_device::device_add_mconfig(machine_config &config)
+{
+	MC6843(config, m_mc6843, 0);
+	m_mc6843->irq().set(FUNC(bml3bus_mp1805_device::bml3_mc6843_intrq_w));
+	legacy_floppy_image_device::add_4drives(config, &bml3_mp1805_floppy_interface);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -656,7 +656,7 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, spinb_state, p3_r))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, spinb_state, p3_w))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -683,61 +683,61 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi60", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, spinb_state, ppi60a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppi60a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, spinb_state, ppi60b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppi60b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, sw_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppi60c_w))
+	i8255_device &ppi60(I8255A(config, "ppi60"));
+	//ppi60.in_pa_callback().set(FUNC(spinb_state::ppi60a_r));
+	ppi60.out_pa_callback().set(FUNC(spinb_state::ppi60a_w));
+	//ppi60.in_pb_callback().set(FUNC(spinb_state::ppi60b_r));
+	ppi60.out_pb_callback().set(FUNC(spinb_state::ppi60b_w));
+	ppi60.in_pc_callback().set(FUNC(spinb_state::sw_r));
+	//ppi60.out_pc_callback().set(FUNC(spinb_state::ppi60c_w));
 
-	MCFG_DEVICE_ADD("ppi64", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, spinb_state, ppi64a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppi64a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, spinb_state, ppi64b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppi64b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppi64c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppi64c_w))
+	i8255_device &ppi64(I8255A(config, "ppi64"));
+	//ppi64.in_pa_callback().set(FUNC(spinb_state::ppi64a_r));
+	//ppi64.out_pa_callback().set(FUNC(spinb_state::ppi64a_w));
+	//ppi64.in_pb_callback().set(FUNC(spinb_state::ppi64b_r));
+	//ppi64.out_pb_callback().set(FUNC(spinb_state::ppi64b_w));
+	//ppi64.in_pc_callback().set(FUNC(spinb_state::ppi64c_r));
+	ppi64.out_pc_callback().set(FUNC(spinb_state::ppi64c_w));
 
-	MCFG_DEVICE_ADD("ppi68", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, spinb_state, ppi68a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppi68a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, spinb_state, ppi68b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppi68b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppi68c_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppi68c_w))
+	I8255A(config, "ppi68");
+	//ppi68.in_pa_callback().set(FUNC(spinb_state::ppi68a_r));
+	//ppi68.out_pa_callback().set(FUNC(spinb_state::ppi68a_w));
+	//ppi68.in_pb_callback().set(FUNC(spinb_state::ppi68b_r));
+	//ppi68.out_pb_callback().set(FUNC(spinb_state::ppi68b_w));
+	//ppi68.in_pc_callback().set(FUNC(spinb_state::ppi68c_r));
+	//ppi68.out_pc_callback().set(FUNC(spinb_state::ppi68c_w));
 
-	MCFG_DEVICE_ADD("ppi6c", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, spinb_state, ppi6ca_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppi6ca_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, spinb_state, ppi6cb_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppi6cb_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppi6cc_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppi6cc_w))
+	I8255A(config, "ppi6c");
+	//ppi6c.in_pa_callback().set(FUNC(spinb_state::ppi6ca_r));
+	//ppi6c.out_pa_callback().set(FUNC(spinb_state::ppi6ca_w));
+	//ppi6c.in_pb_callback().set(FUNC(spinb_state::ppi6cb_r));
+	//ppi6c.out_pb_callback().set(FUNC(spinb_state::ppi6cb_w));
+	//ppi6c.in_pc_callback().set(FUNC(spinb_state::ppi6cc_r));
+	//ppi6c.out_pc_callback().set(FUNC(spinb_state::ppi6cc_w));
 
-	MCFG_DEVICE_ADD("ppia", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppia_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppia_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppia_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppia_c_w))
+	i8255_device &ppia(I8255A(config, "ppia"));
+	ppia.out_pa_callback().set(FUNC(spinb_state::ppia_a_w));
+	ppia.out_pb_callback().set(FUNC(spinb_state::ppia_b_w));
+	ppia.in_pc_callback().set(FUNC(spinb_state::ppia_c_r));
+	ppia.out_pc_callback().set(FUNC(spinb_state::ppia_c_w));
 
-	MCFG_DEVICE_ADD("ppim", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spinb_state, ppim_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spinb_state, ppim_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, spinb_state, ppim_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spinb_state, ppim_c_w))
+	i8255_device &ppim(I8255A(config, "ppim"));
+	ppim.out_pa_callback().set(FUNC(spinb_state::ppim_a_w));
+	ppim.out_pb_callback().set(FUNC(spinb_state::ppim_b_w));
+	ppim.in_pc_callback().set(FUNC(spinb_state::ppim_c_r));
+	ppim.out_pc_callback().set(FUNC(spinb_state::ppim_c_w));
 
-	MCFG_DEVICE_ADD("ic5a", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, spinb_state, ic5a_w))
+	TTL7474(config, m_ic5a, 0);
+	m_ic5a->comp_output_cb().set(FUNC(spinb_state::ic5a_w));
 
-	MCFG_DEVICE_ADD("ic14a", HC157, 0) // actually IC15 on Jolly Park
-	MCFG_74157_OUT_CB(WRITE8("msm_a", msm5205_device, data_w))
+	HC157(config, m_ic14a, 0); // actually IC15 on Jolly Park
+	m_ic14a->out_callback().set("msm_a", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("ic5m", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, spinb_state, ic5m_w))
+	TTL7474(config, m_ic5m, 0);
+	m_ic5m->comp_output_cb().set(FUNC(spinb_state::ic5m_w));
 
-	MCFG_DEVICE_ADD("ic14m", HC157, 0) // actually IC15 on Jolly Park
-	MCFG_74157_OUT_CB(WRITE8("msm_m", msm5205_device, data_w))
+	HC157(config, m_ic14m, 0); // actually IC15 on Jolly Park
+	m_ic14m->out_callback().set("msm_m", FUNC(msm5205_device::data_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(spinb_state::jolypark)

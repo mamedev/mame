@@ -487,9 +487,9 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
-	//MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("laserdisc", sony_ldp1000_device, write))
-	//MCFG_ACIA6850_RXD_HANDLER(READLINE("laserdisc", sony_ldp1000_device, read))
+	//ACIA6850(config, m_acia, 0);
+	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
+	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
 
 	/* sound hardware */
 	/* TODO: mixing */
