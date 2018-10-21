@@ -6,8 +6,7 @@
 
     Skeleton driver adapted from mini2440.cpp
 
-    TODO: bootloader fails b/c it can't find the second NAND.  Hookup in
-    s3c24xx may not be correct.
+    TODO: Linux kernel + initrd loads now but not much happens afterwards.
 
     To see bootloader messages, uncomment the UART_PRINTF define in s3c24xx.hxx.
 
@@ -145,24 +144,47 @@ READ32_MEMBER(hapyfish_state::s3c2440_core_pin_r)
 
 WRITE8_MEMBER(hapyfish_state::s3c2440_nand_command_w )
 {
-	printf("%08x to NAND command\n", data);
-	m_nand->command_w(data);
+	if ((m_port[8] & 0x1800) != 0)
+	{
+		m_nand->command_w(data);
+	}
+	else
+	{
+		m_nand2->command_w(data);
+	}
 }
 
 WRITE8_MEMBER(hapyfish_state::s3c2440_nand_address_w )
 {
-	printf("%08x to NAND address\n", data);
-	m_nand->address_w(data);
+	if ((m_port[8] & 0x1800) != 0)
+	{
+		m_nand->address_w(data);
+	}
+	else
+	{
+		m_nand2->address_w(data);
+	}
 }
 
 READ8_MEMBER(hapyfish_state::s3c2440_nand_data_r )
 {
-	return m_nand->data_r();
+	if ((m_port[8] & 0x1800) != 0)
+	{
+		return m_nand->data_r();
+	}
+
+	return m_nand2->data_r();
 }
 
 WRITE8_MEMBER(hapyfish_state::s3c2440_nand_data_w )
 {
-	m_nand->data_w(data);
+	if ((m_port[8] & 0x1800) != 0)
+	{
+		m_nand->data_w(data);
+		return;
+	}
+
+	m_nand2->data_w(data);
 }
 
 // I2S
@@ -189,12 +211,14 @@ void hapyfish_state::machine_start()
 {
 	m_nand->set_data_ptr(memregion("nand")->base());
 	m_nand2->set_data_ptr(memregion("nand2")->base());
+	m_port[8] = 0x1800; // select NAND #1 (S3C2440 bootloader will happen before machine_reset())
 }
 
 void hapyfish_state::machine_reset()
 {
 	m_maincpu->reset();
 	memset( m_port, 0, sizeof( m_port));
+	m_port[8] = 0x1800; // select NAND #1
 }
 
 /***************************************************************************
@@ -251,11 +275,12 @@ MACHINE_CONFIG_START(hapyfish_state::hapyfish)
 	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(*this, hapyfish_state, s3c2440_nand_data_w))
 
 	MCFG_DEVICE_ADD("nand", NAND, 0)
-	MCFG_NAND_TYPE(K9F1G08U0B)
+	MCFG_NAND_TYPE(K9LAG08U0M)
 	MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2440", s3c2440_device, frnb_w))
 
 	MCFG_DEVICE_ADD("nand2", NAND, 0)
-	MCFG_NAND_TYPE(K9F1G08U0B)
+	MCFG_NAND_TYPE(K9LAG08U0M)
+	MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2440", s3c2440_device, frnb_w))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hapyfish )
