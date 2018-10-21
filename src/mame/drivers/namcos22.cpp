@@ -33,7 +33,6 @@
  * - alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
  * - cybrcomm arrows(black part) should be below textlayer when a messagebox pops up
  * - cybrcycc speed dial needle is missing
- * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors), and alpinr2b character selection screen
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
  * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
  * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
@@ -3786,8 +3785,10 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_camera_zoom));
 	save_item(NAME(m_camera_vx));
 	save_item(NAME(m_camera_vy));
-	save_item(NAME(m_camera_vw));
-	save_item(NAME(m_camera_vh));
+	save_item(NAME(m_camera_vu));
+	save_item(NAME(m_camera_vd));
+	save_item(NAME(m_camera_vl));
+	save_item(NAME(m_camera_vr));
 	save_item(NAME(m_camera_lx));
 	save_item(NAME(m_camera_ly));
 	save_item(NAME(m_camera_lz));
