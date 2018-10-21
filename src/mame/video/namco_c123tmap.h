@@ -15,6 +15,12 @@ public:
 	namco_c123tmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_color_base(int color) { m_color_base = color; }
+	void set_offset(int xoffs, int yoffs)
+	{
+		m_xoffs = xoffs;
+		m_yoffs = yoffs;
+	}
+	void set_tmap3_half_height() { m_tmap3_half_height = true; }
 
 	typedef delegate<void(uint16_t, int*, int*)> c123_tilemap_delegate;
 	void set_tile_callback(c123_tilemap_delegate tilemap_cb) { m_tilemapinfo.cb = tilemap_cb; }
@@ -24,8 +30,14 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(control_r);
 
+	DECLARE_WRITE8_MEMBER(videoram8_w);
+	DECLARE_READ8_MEMBER(videoram8_r);
+	DECLARE_WRITE8_MEMBER(control8_w);
+	DECLARE_READ8_MEMBER(control8_r);
+
 	void mark_all_dirty(void);
-	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void init_scroll(int flip);
+	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int prival = 0);
 
 protected:
 	// device-level overrides
@@ -34,7 +46,6 @@ protected:
 private:
 	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
 	void set_tilemap_videoram(int offset, uint16_t newword);
-	void set_tilemap_control(int offset, uint16_t newword);
 
 	struct info
 	{
@@ -60,6 +71,8 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	int m_color_base;
+	int m_xoffs, m_yoffs;
+	bool m_tmap3_half_height;
 	required_region_ptr<uint8_t> m_mask;
 };
 
