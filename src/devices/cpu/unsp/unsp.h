@@ -17,7 +17,7 @@
 
 #pragma once
 
-#define UNSP_LOG_OPCODES		(1)
+#define UNSP_LOG_OPCODES		(0)
 
 enum
 {
@@ -60,14 +60,6 @@ enum
 	UNSP_NUM_LINES
 };
 
-struct unsp_timer
-{
-	uint32_t time;
-	uint32_t interval;
-	int index;
-	struct unsp_timer *next;
-};
-
 class unsp_device : public cpu_device
 {
 public:
@@ -75,8 +67,6 @@ public:
 	unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_timer_interval(int timer, uint32_t interval);
-
-	uint16_t get_video_line();
 
 protected:
 	// device-level overrides
@@ -108,9 +98,6 @@ private:
 
 	address_space_config m_program_config;
 
-	void timer_add(struct unsp_timer *timer);
-	void timer_run(uint32_t ticks);
-
 	uint16_t m_r[16];
 	bool m_enable_irq;
 	bool m_enable_fiq;
@@ -120,7 +107,6 @@ private:
 	uint16_t m_sirq;
 	uint8_t m_sb;
 	uint8_t m_saved_sb[3];
-	struct unsp_timer *timers;
 
 	address_space *m_program;
 	int m_icount;
@@ -140,7 +126,6 @@ private:
 	inline void trigger_fiq();
 	inline void trigger_irq(int line);
 	inline void check_irqs();
-	inline int get_irq();
 };
 
 

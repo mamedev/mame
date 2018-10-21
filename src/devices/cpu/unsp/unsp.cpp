@@ -177,20 +177,6 @@ void unsp_device::state_import(const device_state_entry &entry)
 	}
 }
 
-static struct unsp_timer timer_tmb1 = {
-	.time = 0,
-	.interval = 27000000/8,
-	.index = 0,
-	.next = nullptr
-};
-
-static struct unsp_timer timer_tmb2 = {
-	.time = 0,
-	.interval = 27000000/128,
-	.index = 1,
-	.next = nullptr
-};
-
 void unsp_device::device_reset()
 {
 	memset(m_r, 0, sizeof(uint16_t) * 16);
@@ -200,10 +186,6 @@ void unsp_device::device_reset()
 	m_enable_fiq = false;
 	m_irq = false;
 	m_fiq = false;
-
-	timers = nullptr;
-	timer_add(&timer_tmb1);
-	timer_add(&timer_tmb2);
 }
 
 /*****************************************************************************/
@@ -266,10 +248,7 @@ void unsp_device::trigger_fiq()
 void unsp_device::trigger_irq(int line)
 {
 	if (!m_enable_irq || m_irq || m_fiq)
-	{
-		//logerror("Enable %d, IRQ %d, FIQ %d, bailing\n", m_enable_irq ? 1 : 0, m_irq ? 1 : 0, m_fiq ? 1 : 0);
 		return;
-	}
 
 	m_irq = true;
 
@@ -282,74 +261,25 @@ void unsp_device::trigger_irq(int line)
 	UNSP_REG(SR) = 0;
 }
 
-int unsp_device::get_irq()
-{
-	if (!m_enable_irq || m_irq)
-		return -1;
-
-	// video
-	if (read16(0x2862) & read16(0x2863))
-		return UNSP_IRQ0_LINE;
-
-	const uint16_t enable = read16(0x3d21);
-	const uint16_t status = read16(0x3d22);
-
-	// timerA, timerB
-	if (enable & status & 0x0c00)
-		return UNSP_IRQ2_LINE;
-
-	// UART, ADC		XXX: also SPI
-	if (enable & status & 0x2100)
-		return UNSP_IRQ3_LINE;
-
-	// XXX audio, IRQ4
-
-	// extint1, extint2
-	if (enable & status & 0x1200)
-		return UNSP_IRQ5_LINE;
-
-	// 1024Hz, 2048HZ, 4096HZ
-	if (enable & status & 0x0070)
-		return UNSP_IRQ6_LINE;
-
-	// TMB1, TMB2, 4Hz, key change
-	if (enable & status & 0x008b)
-		return UNSP_IRQ7_LINE;
-
-	return -1;
-}
-
 void unsp_device::check_irqs()
 {
-	//if (!m_sirq)
-		//return;
-
-	int highest_irq = get_irq();
-	/*if (highest_irq == -1)
-	{
-		for (int i = 0; i <= 8; i++)
-		{
-			if (BIT(m_sirq, i))
-			{
-				highest_irq = i;
-				break;
-			}
-		}
-	}*/
-
-	if (highest_irq < 0)
+	if (!m_sirq)
 		return;
 
+	int highest_irq = -1;
+	for (int i = 0; i <= 8; i++)
+	{
+		if (BIT(m_sirq, i))
+		{
+			highest_irq = i;
+			break;
+		}
+	}
+
 	if (highest_irq == UNSP_FIQ_LINE)
-	{
-		//logerror("Trying to trigger FIQ\n");
 		trigger_fiq();
-	}
 	else
-	{
-		//printf("Trying to trigger IRQ%d\n", highest_irq - 1);
 		trigger_irq(highest_irq - 1);
-	}
 }
 
 void unsp_device::add_lpc(const int32_t offset)
@@ -359,11 +289,6 @@ void unsp_device::add_lpc(const int32_t offset)
 	UNSP_REG(SR) &= 0xffc0;
 	UNSP_REG(SR) |= (new_lpc >> 16) & 0x3f;
 }
-
-static const int32_t cycles_per_line = 1728;
-static uint32_t cycle_count = 0;
-static int32_t lines_per_frame = 312;
-static int32_t line_count = 0;
 
 inline void unsp_device::execute_one(const uint16_t op)
 {
@@ -382,162 +307,137 @@ inline void unsp_device::execute_one(const uint16_t op)
 				if(!(UNSP_REG(SR) & UNSP_C))
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 1: // JAE
 				if(UNSP_REG(SR) & UNSP_C)
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 2: // JGE
 				if(!(UNSP_REG(SR) & UNSP_S))
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 3: // JL
 				if(UNSP_REG(SR) & UNSP_S)
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 4: // JNE
 				if(!(UNSP_REG(SR) & UNSP_Z))
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 5: // JE
 				if(UNSP_REG(SR) & UNSP_Z)
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 6: // JPL
 				if(!(UNSP_REG(SR) & UNSP_N))
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 7: // JMI
 				if(UNSP_REG(SR) & UNSP_N)
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 8: // JBE
 				if((UNSP_REG(SR) & (UNSP_Z | UNSP_C)) != UNSP_C)
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 9: // JA
 				if((UNSP_REG(SR) & (UNSP_Z | UNSP_C)) == UNSP_C)
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 10: // JLE
 				if(UNSP_REG(SR) & (UNSP_Z | UNSP_S))
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 11: // JG
 				if(!(UNSP_REG(SR) & (UNSP_Z | UNSP_S)))
 				{
 					m_icount -= 4;
-					cycle_count += 4;
 					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				}
 				else
 				{
 					m_icount -= 2;
-					cycle_count += 2;
 				}
 				return;
 			case 14: // JMP
 				add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
 				m_icount -= 4;
-				cycle_count += 4;
 				return;
 			default:
 				unimplemented_opcode(op);
@@ -549,7 +449,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 		r0 = OPN;
 		r1 = OPA;
 		m_icount -= 4 + 2 * r0;
-		cycle_count += 4 + 2 * r0;
 
 		while (r0--)
 		{
@@ -562,7 +461,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 		if (op == 0x9a98) // reti
 		{
 			m_icount -= 8;
-			cycle_count += 8;
 			UNSP_REG(SR) = pop(&UNSP_REG(SP));
 			UNSP_REG(PC) = pop(&UNSP_REG(SP));
 
@@ -588,7 +486,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 			r0 = OPN;
 			r1 = OPA;
 			m_icount -= 4 + 2 * r0;
-			cycle_count += 4 + 2 * r0;
 
 			while (r0--)
 			{
@@ -605,7 +502,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 				if(OPN == 1 && OPA != 7)
 				{
 					m_icount -= 12;
-					cycle_count += 12;
 					lres = UNSP_REG_I(OPA) * UNSP_REG_I(OPB);
 					if(UNSP_REG_I(OPB) & 0x8000)
 					{
@@ -624,7 +520,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 				if(!(OPA & 1))
 				{
 					m_icount -= 9;
-					cycle_count += 9;
 					r1 = read16(UNSP_LPC);
 					add_lpc(1);
 					push(UNSP_REG(PC), &UNSP_REG(SP));
@@ -643,7 +538,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 				if (OPA == 7)
 				{
 					m_icount -= 5;
-					cycle_count += 5;
 					UNSP_REG(PC) = read16(UNSP_LPC);
 					UNSP_REG(SR) &= 0xffc0;
 					UNSP_REG(SR) |= OPIMM;
@@ -658,7 +552,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 				if(OPN == 1 && OPA != 7)
 				{
 					m_icount -= 12;
-					cycle_count += 12;
 					lres = UNSP_REG_I(OPA) * UNSP_REG_I(OPB);
 					if(UNSP_REG_I(OPB) & 0x8000)
 					{
@@ -679,7 +572,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 
 			case 0x05: // Interrupt flags
 				m_icount -= 2;
-				cycle_count += 2;
 				switch(OPIMM)
 				{
 					case 0:
@@ -732,7 +624,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 	{
 		case 0x00: // r, [bp+imm6]
 			m_icount -= 6;
-			cycle_count += 6;
 
 			r2 = (uint16_t)(UNSP_REG(BP) + OPIMM);
 			if (OP0 != 0x0d)
@@ -741,7 +632,6 @@ inline void unsp_device::execute_one(const uint16_t op)
 
 		case 0x01: // r, imm6
 			m_icount -= 2;
-			cycle_count += 2;
 
 			r1 = OPIMM;
 			break;
@@ -749,11 +639,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 		case 0x03: // Indirect
 		{
 			m_icount -= 6;
-			cycle_count += 6;
 			if (OPA == 7)
 			{
 				m_icount -= 1;
-				cycle_count += 1;
 			}
 
 			const uint8_t lsbits = OPN & 3;
@@ -834,11 +722,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 			{
 				case 0x00: // r
 					m_icount -= 3;
-					cycle_count += 3;
 					if (OPA == 7)
 					{
 						m_icount -= 2;
-						cycle_count += 2;
 					}
 
 					r1 = UNSP_REG_I(OPB);
@@ -846,11 +732,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 
 				case 0x01: // imm16
 					m_icount -= 4;
-					cycle_count += 4;
 					if (OPA == 7)
 					{
 						m_icount -= 1;
-						cycle_count += 1;
 					}
 
 					r0 = UNSP_REG_I(OPB);
@@ -860,11 +744,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 
 				case 0x02: // [imm16]
 					m_icount -= 7;
-					cycle_count += 7;
 					if (OPA == 7)
 					{
 						m_icount -= 1;
-						cycle_count += 1;
 					}
 
 					r0 = UNSP_REG_I(OPB);
@@ -879,11 +761,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 
 				case 0x03: // store [imm16], r
 					m_icount -= 7;
-					cycle_count += 7;
 					if (OPA == 7)
 					{
 						m_icount -= 1;
-						cycle_count += 1;
 					}
 
 					r1 = r0;
@@ -895,11 +775,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 				default: // Shifted ops
 				{
 					m_icount -= 3;
-					cycle_count += 3;
 					if (OPA == 7)
 					{
 						m_icount -= 2;
-						cycle_count += 2;
 					}
 
 					uint32_t shift = (UNSP_REG_I(OPB) << 4) | m_sb;
@@ -915,11 +793,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 
 		case 0x05: // More shifted ops
 			m_icount -= 3;
-			cycle_count += 3;
 			if (OPA == 7)
 			{
 				m_icount -= 2;
-				cycle_count += 2;
 			}
 
 			if (OPN & 4) // Shift right
@@ -939,11 +815,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 		case 0x06: // Rotated ops
 		{
 			m_icount -= 3;
-			cycle_count += 3;
 			if (OPA == 7)
 			{
 				m_icount -= 2;
-				cycle_count += 2;
 			}
 
 			uint32_t shift = (((m_sb << 16) | UNSP_REG_I(OPB)) << 4) | m_sb;
@@ -963,11 +837,9 @@ inline void unsp_device::execute_one(const uint16_t op)
 
 		case 0x07: // Direct 8
 			m_icount -= 5;
-			cycle_count += 5;
 			if (OPA == 7)
 			{
 				m_icount -= 1;
-				cycle_count += 1;
 			}
 
 			r2 = OPIMM;
@@ -1054,27 +926,7 @@ void unsp_device::execute_run()
 		{
 			std::stringstream strbuffer;
 			dasm.disassemble(strbuffer, UNSP_LPC, op, read16(UNSP_LPC+1));
-			uint32_t len = 1;
-			if ((OP0 < 14 && OP1 == 4 && (OPN == 1 || OPN == 2 || OPN == 3)) || (OP0 == 15 && (OP1 == 1 || OP1 == 2)))
-			{
-				len = 2;
-			}
-			if (len == 1)
-			{
-				logerror("%04x %04x %04x %04x %04x %04x %04x %04x  %02x %x%x%x%x %02x  %x   %x %d %x: %04x        %x %x %x %x %x   %s\n",
-					m_r[0], m_r[1], m_r[2], m_r[3], m_r[4], m_r[5], m_r[6], m_r[7],
-					m_r[6] & 0x3f, BIT(m_r[6], 9), BIT(m_r[6], 8), BIT(m_r[6], 7), BIT(m_r[6], 6), (m_r[6] >> 10) & 0x3f,
-					m_sb, m_enable_irq ? 1 : 0, cycle_count, UNSP_LPC, op, OP0, OPA, OP1, OPN, OPB, strbuffer.str().c_str());
-			}
-			else
-			{
-				logerror("%04x %04x %04x %04x %04x %04x %04x %04x  %02x %x%x%x%x %02x  %x   %x %d %x: %04x %04x   %x %x %x %x %x   %s\n",
-					m_r[0], m_r[1], m_r[2], m_r[3], m_r[4], m_r[5], m_r[6], m_r[7],
-					m_r[6] & 0x3f, BIT(m_r[6], 9), BIT(m_r[6], 8), BIT(m_r[6], 7), BIT(m_r[6], 6), (m_r[6] >> 10) & 0x3f,
-					m_sb, m_enable_irq ? 1 : 0, cycle_count, UNSP_LPC, op, read16(UNSP_LPC+1), OP0, OPA, OP1, OPN, OPB, strbuffer.str().c_str());
-			}
-			//logerror("%x: %s\n", UNSP_LPC, strbuffer.str().c_str());
-			//logerror("%x%04x: %d\n", UNSP_REG(SR) & 0x3f, UNSP_REG(PC), cycle_count);
+			logerror("%x: %s\n", UNSP_LPC, strbuffer.str().c_str());
 		}
 #endif
 
@@ -1082,26 +934,7 @@ void unsp_device::execute_run()
 
 		execute_one(op);
 
-		if (cycle_count >= cycles_per_line)
-		{
-			cycle_count -= cycles_per_line;
-
-			timer_run(cycles_per_line);
-
-			if (line_count == 240)
-				write16(0x3d61, 1);	// trigger vblank IRQ
-			if (line_count == read16(0x2836))
-				write16(0x3d61, 2);	// trigger vpos IRQ
-
-			check_irqs();
-
-			line_count++;
-			if (line_count == lines_per_frame)
-			{
-				line_count = 0;
-				write16(0x3d60, 0x0100);
-			}
-		}
+		check_irqs();
 	}
 }
 
@@ -1133,56 +966,4 @@ void unsp_device::execute_set_input(int irqline, int state)
 		case UNSP_BRK_LINE:
 			break;
 	}
-}
-
-void unsp_device::set_timer_interval(int timer, uint32_t interval)
-{
-	if (timer == 0)
-		timer_tmb1.interval = interval;
-	else if (timer == 1)
-		timer_tmb2.interval = interval;
-}
-
-void unsp_device::timer_add(struct unsp_timer *timer)
-{
-	if (timer->time == 0)
-		timer->time = timer->interval;
-
-	uint32_t time = timer->time;
-	struct unsp_timer **p = &timers;
-
-	while (*p && (*p)->time <= time) {
-		time -= (*p)->time;
-		p = &(*p)->next;
-	}
-
-	timer->next = *p;
-	*p = timer;
-	timer->time = time;
-	if (timer->next)
-		timer->next->time -= time;
-}
-
-void unsp_device::timer_run(uint32_t ticks)
-{
-	struct unsp_timer *timer;
-	while ((timer = timers) && timer->time <= ticks) {
-		timers = timer->next;
-		ticks -= timer->time;
-
-		write16(0x3d62, 1 << timer->index);
-
-		if (timer->interval) {
-			timer->time = timer->interval;
-			timer_add(timer);
-		}
-	}
-
-	if (timer)
-		timer->time -= ticks;
-}
-
-uint16_t unsp_device::get_video_line()
-{
-	return line_count;
 }
