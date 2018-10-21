@@ -42,36 +42,36 @@ namespace {
 }
 
 // Constants
-constexpr double FAST_SPEED	= 90.0;				// Fast speed: 90 ips
-constexpr double SLOW_SPEED = 22.0;				// Slow speed: 22 ips
-constexpr double MIN_RD_SPEED = 22.0;			// Minimum speed to read data off the tape
-constexpr double MOVING_THRESHOLD = 2.0;		// Tape is moving (from MVG bit POV) when speed > 2.0 ips
-constexpr double ACCELERATION = 1200.0;			// Acceleration when speed set point is changed: 1200 ips^2
-constexpr unsigned TACH_TICKS_PER_INCH = 483;	// Tachometer pulses per inch
-constexpr double INVERSION_MARGIN = 1e-5;		// Margin to ensure speed is away from 0 when motion is inverted (10 µs)
-constexpr hti_format_t::tape_pos_t TACH_TICK_LENGTH = hti_format_t::ONE_INCH_POS / TACH_TICKS_PER_INCH;	// Length of each tach tick
+constexpr double FAST_SPEED = 90.0;             // Fast speed: 90 ips
+constexpr double SLOW_SPEED = 22.0;             // Slow speed: 22 ips
+constexpr double MIN_RD_SPEED = 22.0;           // Minimum speed to read data off the tape
+constexpr double MOVING_THRESHOLD = 2.0;        // Tape is moving (from MVG bit POV) when speed > 2.0 ips
+constexpr double ACCELERATION = 1200.0;         // Acceleration when speed set point is changed: 1200 ips^2
+constexpr unsigned TACH_TICKS_PER_INCH = 483;   // Tachometer pulses per inch
+constexpr double INVERSION_MARGIN = 1e-5;       // Margin to ensure speed is away from 0 when motion is inverted (10 µs)
+constexpr hti_format_t::tape_pos_t TACH_TICK_LENGTH = hti_format_t::ONE_INCH_POS / TACH_TICKS_PER_INCH; // Length of each tach tick
 
 // Bits in command register
 enum : unsigned {
-	CMD_REG_MOTOR_BIT	= 7,	// Motor on (0)
-	CMD_REG_WR_GATE_BIT = 6,	// Write gate (0)
-	CMD_REG_SPEED_BIT = 5,		// Tape speed (1 = slow)
-	CMD_REG_DIR_BIT = 4,		// Tape direction (1 = fwd)
-	CMD_REG_FLG_SEL_BIT = 3,	// FLG selection (0 = tacho pulses, 1 = bit clock)
-	CMD_REG_THRESHOLD_BIT = 2,	// Threshold selection
-	CMD_REG_DMA_EN_BIT = 1,		// DMA enable (0)
-	CMD_REG_TRACK_SEL_BIT = 0	// Track selection (1 = A)
+	CMD_REG_MOTOR_BIT   = 7,    // Motor on (0)
+	CMD_REG_WR_GATE_BIT = 6,    // Write gate (0)
+	CMD_REG_SPEED_BIT = 5,      // Tape speed (1 = slow)
+	CMD_REG_DIR_BIT = 4,        // Tape direction (1 = fwd)
+	CMD_REG_FLG_SEL_BIT = 3,    // FLG selection (0 = tacho pulses, 1 = bit clock)
+	CMD_REG_THRESHOLD_BIT = 2,  // Threshold selection
+	CMD_REG_DMA_EN_BIT = 1,     // DMA enable (0)
+	CMD_REG_TRACK_SEL_BIT = 0   // Track selection (1 = A)
 };
 
 // Bits in status register
 enum : unsigned {
-	STAT_REG_WPR_BIT = 7,	// Write protected (1)
-	STAT_REG_DIR_BIT = 6,	// Tape direction (1 = rev)
-	STAT_REG_MVG_BIT = 5,	// Tape moving (1)
-	STAT_REG_GAP_BIT = 4,	// Gap (1) or data (0)
-	STAT_REG_COUT_BIT = 2,	// Cartridge out (1)
-	STAT_REG_SVF_BIT = 1,	// Servo failure (1)
-	STAT_REG_EOT_BIT = 0	// End of tape (1)
+	STAT_REG_WPR_BIT = 7,   // Write protected (1)
+	STAT_REG_DIR_BIT = 6,   // Tape direction (1 = rev)
+	STAT_REG_MVG_BIT = 5,   // Tape moving (1)
+	STAT_REG_GAP_BIT = 4,   // Gap (1) or data (0)
+	STAT_REG_COUT_BIT = 2,  // Cartridge out (1)
+	STAT_REG_SVF_BIT = 1,   // Servo failure (1)
+	STAT_REG_EOT_BIT = 0    // End of tape (1)
 };
 
 // Timers
@@ -100,19 +100,19 @@ hp9825_tape_device::hp9825_tape_device(const machine_config &mconfig, const char
 }
 
 MACHINE_CONFIG_START(hp9825_tape_device::device_add_mconfig)
-    TTL74123(config , m_short_gap_timer , 0);
-    m_short_gap_timer->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
-    m_short_gap_timer->set_resistor_value(RES_K(37.9));
-    m_short_gap_timer->set_capacitor_value(CAP_N(10));
-    m_short_gap_timer->set_a_pin_value(0);
-    m_short_gap_timer->set_clear_pin_value(1);
+	TTL74123(config , m_short_gap_timer , 0);
+	m_short_gap_timer->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_short_gap_timer->set_resistor_value(RES_K(37.9));
+	m_short_gap_timer->set_capacitor_value(CAP_N(10));
+	m_short_gap_timer->set_a_pin_value(0);
+	m_short_gap_timer->set_clear_pin_value(1);
 	m_short_gap_timer->out_cb().set(FUNC(hp9825_tape_device::short_gap_w));
 
 	TTL74123(config , m_long_gap_timer , 0);
-    m_long_gap_timer->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
-    m_long_gap_timer->set_resistor_value(RES_K(28.7));
-    m_long_gap_timer->set_capacitor_value(CAP_U(0.22));
-    m_long_gap_timer->set_clear_pin_value(1);
+	m_long_gap_timer->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_long_gap_timer->set_resistor_value(RES_K(28.7));
+	m_long_gap_timer->set_capacitor_value(CAP_U(0.22));
+	m_long_gap_timer->set_clear_pin_value(1);
 	m_long_gap_timer->out_cb().set(FUNC(hp9825_tape_device::long_gap_w));
 MACHINE_CONFIG_END
 
@@ -127,7 +127,7 @@ void hp9825_tape_device::device_start()
 	m_tacho_timer = timer_alloc(TACHO_TMR_ID);
 	m_hole_timer = timer_alloc(HOLE_TMR_ID);
 	m_inv_timer = timer_alloc(INV_TMR_ID);
-	
+
 	save_item(NAME(m_cmd_reg));
 	save_item(NAME(m_stat_reg));
 	save_item(NAME(m_flg));
@@ -196,7 +196,7 @@ void hp9825_tape_device::clear_state()
 	m_sts_handler(true);
 	m_dmar_handler(false);
 	m_led_handler(false);
-	
+
 	m_bit_timer->reset();
 	m_tacho_timer->reset();
 	m_hole_timer->reset();
@@ -210,7 +210,7 @@ void hp9825_tape_device::device_timer(emu_timer &timer, device_timer_id id, int 
 {
 	LOG_TMR("%.6f TMR %d s=%.3f p=%d a=%d\n" , machine().time().as_double() , id , m_speed , m_tape_pos , m_accelerating);
 	update_speed_pos();
-	
+
 	switch (id) {
 	case BIT_TMR_ID:
 		m_tape_pos = m_next_bit_pos;
@@ -270,7 +270,7 @@ void hp9825_tape_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	case INV_TMR_ID:
 		// In itself it does nothing (all work is in update_speed_pos)
 		break;
-		
+
 	default:
 		break;
 	}
@@ -280,7 +280,7 @@ void hp9825_tape_device::device_timer(emu_timer &timer, device_timer_id id, int 
 image_init_result hp9825_tape_device::internal_load(bool is_create)
 {
 	LOG("load %d\n" , is_create);
-	
+
 	device_reset();
 
 	io_generic io;
@@ -335,7 +335,7 @@ void hp9825_tape_device::call_unload()
 
 std::string hp9825_tape_device::call_display()
 {
-	// TODO: 
+	// TODO:
 	return std::string();
 }
 
@@ -347,7 +347,7 @@ const char *hp9825_tape_device::file_extensions() const
 READ16_MEMBER(hp9825_tape_device::tape_r)
 {
 	uint16_t res = 0;
-	
+
 	switch (offset) {
 	case 0:
 		// R4: read data out
@@ -495,7 +495,7 @@ void hp9825_tape_device::update_sts()
 	// m_in_gap
 	auto prev_set_point = get_speed_set_point();
 	auto prev_exception = m_exception;
-	
+
 	m_exception =
 		BIT(m_stat_reg , STAT_REG_EOT_BIT) ||
 		BIT(m_stat_reg , STAT_REG_COUT_BIT) ||
@@ -689,7 +689,7 @@ void hp9825_tape_device::update_speed_pos()
 			m_led_handler(false);
 		}
 	}
-	
+
 	hti_format_t::tape_pos_t delta_pos = (hti_format_t::tape_pos_t)((space_const_a + m_speed * time_const_v) * hti_format_t::ONE_INCH_POS);
 	LOG_DBG("dp=%d\n" , delta_pos);
 	if (!hti_format_t::pos_offset(m_tape_pos , true , delta_pos)) {
@@ -731,7 +731,7 @@ void hp9825_tape_device::time_to_distance(hti_format_t::tape_pos_t distance , ht
 		target_timer->reset();
 		return;
 	}
-		
+
 	double space = double(distance) / hti_format_t::ONE_INCH_POS;
 	double set_point = get_speed_set_point();
 	double time_const_a;
@@ -918,7 +918,7 @@ void hp9825_tape_device::rd_bit(bool bit)
 		m_in_gap = false;
 		m_long_gap_timer->a_w(m_in_gap);
 		update_sts();
-	}		
+	}
 }
 
 void hp9825_tape_device::wr_bit(bool bit)

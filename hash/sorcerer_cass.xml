@@ -1073,4 +1073,17 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
+	<!-- Added 2018-10-22 -->
+	<software name="landarc">
+		<description>Lander Arcade</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Jeffrey A Bell" />
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="14521900">
+				<rom name="luna.wav" size="14521900" crc="8240d8fc" sha1="78c7a2060bcadf2325112a93f452e964fe45e3e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
