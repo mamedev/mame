@@ -1327,7 +1327,7 @@ public:
 static INPUT_PORTS_START( gnw_ghouse )
 	PORT_START("IN.0") // S1
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Jump
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Spray
 
 	PORT_START("IN.1") // S2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
@@ -1344,8 +1344,13 @@ static INPUT_PORTS_START( gnw_ghouse )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("B") // MCU B(beta) pin pulled to GND
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1359,6 +1364,7 @@ MACHINE_CONFIG_START(gnw_ghouse_state::gnw_ghouse)
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
 	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
 	MCFG_SM510_READ_B_CB(IOPORT("B"))
 
 	/* video hardware */
