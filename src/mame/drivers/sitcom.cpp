@@ -372,8 +372,8 @@ MACHINE_CONFIG_START(sitcom_state::sitcom)
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_state, update_ds<1>))
 
 	// host interface
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, sitcom_state, update_rxd))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
+	rs232.rxd_handler().set(FUNC(sitcom_state::update_rxd));
 
 	MCFG_SOFTWARE_LIST_ADD("bitb_list", "sitcom")
 	config.set_default_layout(layout_sitcom);

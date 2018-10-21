@@ -619,9 +619,9 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_DEVICE_ADD("quart2", SC28C94, XTAL(24'000'000) / 6)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I960_IRQ0))
 
-	MCFG_DEVICE_ADD("diag", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("quart1", sc28c94_device, rx_d_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &diag(RS232_PORT(config, "diag", default_rs232_devices, nullptr));
+	diag.rxd_handler().set("quart1", FUNC(sc28c94_device::rx_d_w));
+	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igt_gameking)
 

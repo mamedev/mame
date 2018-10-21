@@ -599,6 +599,7 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	m_c123tmap->set_color_base(0x1000);
 
 	NAMCO_C116(config, m_c116, 0);
+	m_c116->enable_shadows();
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 

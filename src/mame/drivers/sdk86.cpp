@@ -145,11 +145,12 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(sdk86_state::sdk86)
+void sdk86_state::sdk86(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(14'745'600)/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
-	MCFG_DEVICE_PROGRAM_MAP(sdk86_mem)
-	MCFG_DEVICE_IO_MAP(sdk86_io)
+	I8086(config, m_maincpu, XTAL(14'745'600)/3); /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sdk86_state::sdk86_mem);
+	m_maincpu->set_addrmap(AS_IO, &sdk86_state::sdk86_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_sdk86);
@@ -160,10 +161,10 @@ MACHINE_CONFIG_START(sdk86_state::sdk86)
 	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	i8251.rts_handler().set(I8251_TAG, FUNC(i8251_device::write_cts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(14'745'600)/3/16));
 	usart_clock.signal_handler().set(I8251_TAG, FUNC(i8251_device::write_txc));
@@ -176,9 +177,9 @@ MACHINE_CONFIG_START(sdk86_state::sdk86)
 	kbdc.in_shift_callback().set_constant(0);                   // Shift key
 	kbdc.in_ctrl_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD("port1", I8255A, 0)
-	MCFG_DEVICE_ADD("port2", I8255A, 0)
-MACHINE_CONFIG_END
+	I8255A(config, "port1");
+	I8255A(config, "port2");
+}
 
 /* ROM definition */
 ROM_START( sdk86 )

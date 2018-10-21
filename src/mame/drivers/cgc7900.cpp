@@ -505,9 +505,9 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	m_i8251_0->rxrdy_handler().set(FUNC(cgc7900_state::irq<0xf>));
 	m_i8251_0->txrdy_handler().set(FUNC(cgc7900_state::irq<0x3>));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8251_0_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8251_0_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
+	rs232.rxd_handler().set(m_i8251_0, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_i8251_0, FUNC(i8251_device::write_dsr));
 
 	I8251(config, m_i8251_1, 0);
 	m_i8251_1->txd_handler().set("rs449", FUNC(rs232_port_device::write_txd));
@@ -516,9 +516,9 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	m_i8251_1->rxrdy_handler().set(FUNC(cgc7900_state::irq<0x8>));
 	m_i8251_1->txrdy_handler().set(FUNC(cgc7900_state::irq<0x1>));
 
-	MCFG_DEVICE_ADD("rs449", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8251_1_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8251_1_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs449(RS232_PORT(config, "rs449", default_rs232_devices, nullptr));
+	rs449.rxd_handler().set(m_i8251_1, FUNC(i8251_device::write_rxd));
+	rs449.dsr_handler().set(m_i8251_1, FUNC(i8251_device::write_dsr));
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -8,12 +8,17 @@
     an E²PROM overlay. Besides having separate data input and output
     lines (and only one of each), its interface differs slightly from
     the later NOVRAMs in requiring an active chip select during recall
-    and store operations.
+    and store operations. The CS and STORE lines, however, may be
+    deactivated before the operation completes (in 2 to 4 ms).
 
     While US patent 4535411A suggests that this device was sometimes
     used in groups of eight to simulate a byte-wide memory, the
     emulation (for the most part) assumes each bit will be accessed
     separately and packs them into bytes for storage efficiency.
+
+    X2202 has the same internal organization and data addressing as
+    X2201, but its recall operation works on individual bits instead
+    of the entire array.
 
 **********************************************************************/
 

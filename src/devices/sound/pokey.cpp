@@ -818,7 +818,7 @@ READ8_MEMBER( pokey_device::read )
 		}
 		else if( !m_allpot_r_cb.isnull() )
 		{
-			data = m_allpot_r_cb(offset);
+			m_ALLPOT = data = m_allpot_r_cb(offset);
 			LOG(("%s: POKEY '%s' ALLPOT callback $%02x\n", machine().describe_context(), tag(), data));
 		}
 		else

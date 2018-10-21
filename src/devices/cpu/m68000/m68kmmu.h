@@ -335,7 +335,7 @@ bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits,
 uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest)
 {
 	uint32_t addr_out, tbl_entry;
-	uint32_t root_aptr, root_limit, abits, bbits, cbits, dbits;
+	uint32_t abits, bbits, cbits, dbits;
 
 	m_mmu_tmp_sr = 0;
 
@@ -354,13 +354,11 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 	// if SRP is enabled and we're in supervisor mode, use it
 	if ((m_mmu_tc & M68K_MMU_TC_SRE) && (fc & 4))
 	{
-		root_aptr = m_mmu_srp_aptr;
-		root_limit = m_mmu_srp_limit;
+		tbl_entry = (m_mmu_srp_aptr & 0xfffffff0) | (m_mmu_srp_limit & M68K_MMU_DF_DT);
 	}
 	else    // else use the CRP
 	{
-		root_aptr = m_mmu_crp_aptr;
-		root_limit = m_mmu_crp_limit;
+		tbl_entry = (m_mmu_crp_aptr & 0xfffffff0) | (m_mmu_crp_limit & M68K_MMU_DF_DT);
 	}
 
 	abits = (m_mmu_tc >> 12) & 0xf;
@@ -368,7 +366,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 	cbits = (m_mmu_tc >> 4) & 0xf;
 	dbits = m_mmu_tc & 0x0f;
 
-	tbl_entry = (root_aptr & 0xfffffff0) | (root_limit & M68K_MMU_DF_DT);
+
 	if (!pmmu_walk_table(tbl_entry, addr_in, 0                    , abits, ptest, fc, 0, addr_out) &&
 		!pmmu_walk_table(tbl_entry, addr_in, abits                , bbits, ptest, fc, 1, addr_out) &&
 		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits        , cbits, ptest, fc, 2, addr_out) &&

@@ -8198,6 +8198,9 @@ ROM_END
 //  Time Scanner, Sega System 16B
 //  CPU: 68000
 //  ROM Board type: 171-5358
+//  Sega game ID: 833-6207-01 TIME SCANNER
+//    Main board: 837-6224-01
+//     Rom board: 834-6223-01
 //
 ROM_START( timescan )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code

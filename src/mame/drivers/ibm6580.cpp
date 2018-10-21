@@ -938,10 +938,10 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	upd8251a.rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
 	upd8251a.txrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251a", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("upd8251a", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("upd8251a", i8251_device, write_cts))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set("upd8251a", FUNC(i8251_device::write_rxd));
+	rs232a.dsr_handler().set("upd8251a", FUNC(i8251_device::write_dsr));
+	rs232a.cts_handler().set("upd8251a", FUNC(i8251_device::write_cts));
 
 	i8251_device &upd8251b(I8251(config, "upd8251b", 0));
 	upd8251b.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
@@ -950,10 +950,10 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	upd8251b.rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
 	upd8251b.txrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251b", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("upd8251b", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("upd8251b", i8251_device, write_cts))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set("upd8251b", FUNC(i8251_device::write_rxd));
+	rs232b.dsr_handler().set("upd8251b", FUNC(i8251_device::write_dsr));
+	rs232b.cts_handler().set("upd8251b", FUNC(i8251_device::write_cts));
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "ibm6580")
 MACHINE_CONFIG_END

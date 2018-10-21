@@ -456,9 +456,9 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("usart", FUNC(i8251_device::write_dsr));
 	*/
 
 	ER1400(config, m_nvm);
