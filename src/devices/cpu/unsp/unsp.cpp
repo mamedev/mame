@@ -1,10 +1,14 @@
-// license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// license:GPL-2.0+
+// copyright-holders:Segher Boessenkool,Ryan Holtz
 /*****************************************************************************
 
-	SunPlus micro'nSP core
+	SunPlus micro'nSP emulator
 
-	based primarily on Unununium, by segher
+	Copyright 2008-2017  Segher Boessenkool  <segher@kernel.crashing.org>
+	Licensed under the terms of the GNU GPL, version 2
+	http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+
+	Ported to MAME framework by Ryan Holtz
 
 *****************************************************************************/
 
@@ -173,6 +177,20 @@ void unsp_device::state_import(const device_state_entry &entry)
 	}
 }
 
+static struct unsp_timer timer_tmb1 = {
+	.time = 0,
+	.interval = 27000000/8,
+	.index = 0,
+	.next = nullptr
+};
+
+static struct unsp_timer timer_tmb2 = {
+	.time = 0,
+	.interval = 27000000/128,
+	.index = 1,
+	.next = nullptr
+};
+
 void unsp_device::device_reset()
 {
 	memset(m_r, 0, sizeof(uint16_t) * 16);
@@ -182,6 +200,10 @@ void unsp_device::device_reset()
 	m_enable_fiq = false;
 	m_irq = false;
 	m_fiq = false;
+
+	timers = nullptr;
+	timer_add(&timer_tmb1);
+	timer_add(&timer_tmb2);
 }
 
 /*****************************************************************************/
@@ -260,20 +282,60 @@ void unsp_device::trigger_irq(int line)
 	UNSP_REG(SR) = 0;
 }
 
+int unsp_device::get_irq()
+{
+	if (!m_enable_irq || m_irq)
+		return -1;
+
+	// video
+	if (read16(0x2862) & read16(0x2863))
+		return UNSP_IRQ0_LINE;
+
+	const uint16_t enable = read16(0x3d21);
+	const uint16_t status = read16(0x3d22);
+
+	// timerA, timerB
+	if (enable & status & 0x0c00)
+		return UNSP_IRQ2_LINE;
+
+	// UART, ADC		XXX: also SPI
+	if (enable & status & 0x2100)
+		return UNSP_IRQ3_LINE;
+
+	// XXX audio, IRQ4
+
+	// extint1, extint2
+	if (enable & status & 0x1200)
+		return UNSP_IRQ5_LINE;
+
+	// 1024Hz, 2048HZ, 4096HZ
+	if (enable & status & 0x0070)
+		return UNSP_IRQ6_LINE;
+
+	// TMB1, TMB2, 4Hz, key change
+	if (enable & status & 0x008b)
+		return UNSP_IRQ7_LINE;
+
+	return -1;
+}
+
 void unsp_device::check_irqs()
 {
-	if (!m_sirq)
-		return;
+	//if (!m_sirq)
+		//return;
 
-	int highest_irq = -1;
-	for (int i = 0; i <= 8; i++)
+	int highest_irq = get_irq();
+	/*if (highest_irq == -1)
 	{
-		if (BIT(m_sirq, i))
+		for (int i = 0; i <= 8; i++)
 		{
-			highest_irq = i;
-			break;
+			if (BIT(m_sirq, i))
+			{
+				highest_irq = i;
+				break;
+			}
 		}
-	}
+	}*/
 
 	if (highest_irq < 0)
 		return;
@@ -285,9 +347,695 @@ void unsp_device::check_irqs()
 	}
 	else
 	{
-		//logerror("Trying to trigger IRQ\n");
+		//printf("Trying to trigger IRQ%d\n", highest_irq - 1);
 		trigger_irq(highest_irq - 1);
 	}
+}
+
+void unsp_device::add_lpc(const int32_t offset)
+{
+	const uint32_t new_lpc = UNSP_LPC + offset;
+	UNSP_REG(PC) = (uint16_t)new_lpc;
+	UNSP_REG(SR) &= 0xffc0;
+	UNSP_REG(SR) |= (new_lpc >> 16) & 0x3f;
+}
+
+static const int32_t cycles_per_line = 1728;
+static uint32_t cycle_count = 0;
+static int32_t lines_per_frame = 312;
+static int32_t line_count = 0;
+
+inline void unsp_device::execute_one(const uint16_t op)
+{
+	uint32_t lres = 0;
+	uint16_t r0 = 0;
+	uint16_t r1 = 0;
+	uint32_t r2 = 0;
+
+	const uint8_t lower_op = (OP1 << 4) | OP0;
+
+	if(OP0 < 0xf && OPA == 0x7 && OP1 < 2)
+	{
+		switch(OP0)
+		{
+			case 0: // JB
+				if(!(UNSP_REG(SR) & UNSP_C))
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 1: // JAE
+				if(UNSP_REG(SR) & UNSP_C)
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 2: // JGE
+				if(!(UNSP_REG(SR) & UNSP_S))
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 3: // JL
+				if(UNSP_REG(SR) & UNSP_S)
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 4: // JNE
+				if(!(UNSP_REG(SR) & UNSP_Z))
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 5: // JE
+				if(UNSP_REG(SR) & UNSP_Z)
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 6: // JPL
+				if(!(UNSP_REG(SR) & UNSP_N))
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 7: // JMI
+				if(UNSP_REG(SR) & UNSP_N)
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 8: // JBE
+				if((UNSP_REG(SR) & (UNSP_Z | UNSP_C)) != UNSP_C)
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 9: // JA
+				if((UNSP_REG(SR) & (UNSP_Z | UNSP_C)) == UNSP_C)
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 10: // JLE
+				if(UNSP_REG(SR) & (UNSP_Z | UNSP_S))
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 11: // JG
+				if(!(UNSP_REG(SR) & (UNSP_Z | UNSP_S)))
+				{
+					m_icount -= 4;
+					cycle_count += 4;
+					add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				}
+				else
+				{
+					m_icount -= 2;
+					cycle_count += 2;
+				}
+				return;
+			case 14: // JMP
+				add_lpc((OP1 == 0) ? OPIMM : (0 - OPIMM));
+				m_icount -= 4;
+				cycle_count += 4;
+				return;
+			default:
+				unimplemented_opcode(op);
+				return;
+		}
+	}
+	else if (lower_op == 0x2d) // Push
+	{
+		r0 = OPN;
+		r1 = OPA;
+		m_icount -= 4 + 2 * r0;
+		cycle_count += 4 + 2 * r0;
+
+		while (r0--)
+		{
+			push(UNSP_REG_I(r1--), &UNSP_REG_I(OPB));
+		}
+		return;
+	}
+	else if (lower_op == 0x29) // Pop
+	{
+		if (op == 0x9a98) // reti
+		{
+			m_icount -= 8;
+			cycle_count += 8;
+			UNSP_REG(SR) = pop(&UNSP_REG(SP));
+			UNSP_REG(PC) = pop(&UNSP_REG(SP));
+
+			if(m_fiq)
+			{
+				m_fiq = false;
+				m_saved_sb[2] = m_sb;
+				m_sb = m_saved_sb[m_irq ? 1 : 0];
+			}
+			else if(m_irq)
+			{
+				m_irq = false;
+				m_saved_sb[1] = m_sb;
+				m_sb = m_saved_sb[0];
+			}
+			m_curirq = 0;
+
+			check_irqs();
+			return;
+		}
+		else
+		{
+			r0 = OPN;
+			r1 = OPA;
+			m_icount -= 4 + 2 * r0;
+			cycle_count += 4 + 2 * r0;
+
+			while (r0--)
+			{
+				UNSP_REG_I(++r1) = pop(&UNSP_REG_I(OPB));
+			}
+			return;
+		}
+	}
+	else if (OP0 == 0xf)
+	{
+		switch (OP1)
+		{
+			case 0x00: // Multiply, Unsigned * Signed
+				if(OPN == 1 && OPA != 7)
+				{
+					m_icount -= 12;
+					cycle_count += 12;
+					lres = UNSP_REG_I(OPA) * UNSP_REG_I(OPB);
+					if(UNSP_REG_I(OPB) & 0x8000)
+					{
+						lres -= UNSP_REG_I(OPA) << 16;
+					}
+					UNSP_REG(R4) = lres >> 16;
+					UNSP_REG(R3) = (uint16_t)lres;
+				}
+				else
+				{
+					unimplemented_opcode(op);
+				}
+				return;
+
+			case 0x01: // Call
+				if(!(OPA & 1))
+				{
+					m_icount -= 9;
+					cycle_count += 9;
+					r1 = read16(UNSP_LPC);
+					add_lpc(1);
+					push(UNSP_REG(PC), &UNSP_REG(SP));
+					push(UNSP_REG(SR), &UNSP_REG(SP));
+					UNSP_REG(PC) = r1;
+					UNSP_REG(SR) &= 0xffc0;
+					UNSP_REG(SR) |= OPIMM;
+				}
+				else
+				{
+					unimplemented_opcode(op);
+				}
+				return;
+
+			case 0x02: // Far Jump
+				if (OPA == 7)
+				{
+					m_icount -= 5;
+					cycle_count += 5;
+					UNSP_REG(PC) = read16(UNSP_LPC);
+					UNSP_REG(SR) &= 0xffc0;
+					UNSP_REG(SR) |= OPIMM;
+				}
+				else
+				{
+					unimplemented_opcode(op);
+				}
+				return;
+
+			case 0x04: // Multiply, Signed * Signed
+				if(OPN == 1 && OPA != 7)
+				{
+					m_icount -= 12;
+					cycle_count += 12;
+					lres = UNSP_REG_I(OPA) * UNSP_REG_I(OPB);
+					if(UNSP_REG_I(OPB) & 0x8000)
+					{
+						lres -= UNSP_REG_I(OPA) << 16;
+					}
+					if(UNSP_REG_I(OPA) & 0x8000)
+					{
+						lres -= UNSP_REG_I(OPB) << 16;
+					}
+					UNSP_REG(R4) = lres >> 16;
+					UNSP_REG(R3) = (uint16_t)lres;
+				}
+				else
+				{
+					unimplemented_opcode(op);
+				}
+				return;
+
+			case 0x05: // Interrupt flags
+				m_icount -= 2;
+				cycle_count += 2;
+				switch(OPIMM)
+				{
+					case 0:
+						m_enable_irq = false;
+						m_enable_fiq = false;
+						break;
+					case 1:
+						m_enable_irq = true;
+						m_enable_fiq = false;
+						break;
+					case 2:
+						m_enable_irq = false;
+						m_enable_fiq = true;
+						break;
+					case 3:
+						m_enable_irq = true;
+						m_enable_fiq = true;
+						break;
+					case 8: // irq off
+						m_enable_irq = false;
+						break;
+					case 9: // irq on
+						m_enable_irq = true;
+						break;
+					case 12: // fiq off
+						m_enable_fiq = false;
+						break;
+					case 14: // fiq on
+						m_enable_fiq = true;
+						break;
+					case 37: // nop
+						break;
+					default:
+						unimplemented_opcode(op);
+						break;
+				}
+				return;
+
+			default:
+				unimplemented_opcode(op);
+				return;
+		}
+	}
+
+	// At this point, we should be dealing solely with ALU ops.
+
+	r0 = UNSP_REG_I(OPA);
+
+	switch (OP1)
+	{
+		case 0x00: // r, [bp+imm6]
+			m_icount -= 6;
+			cycle_count += 6;
+
+			r2 = (uint16_t)(UNSP_REG(BP) + OPIMM);
+			if (OP0 != 0x0d)
+				r1 = read16(r2);
+			break;
+
+		case 0x01: // r, imm6
+			m_icount -= 2;
+			cycle_count += 2;
+
+			r1 = OPIMM;
+			break;
+
+		case 0x03: // Indirect
+		{
+			m_icount -= 6;
+			cycle_count += 6;
+			if (OPA == 7)
+			{
+				m_icount -= 1;
+				cycle_count += 1;
+			}
+
+			const uint8_t lsbits = OPN & 3;
+			const uint8_t opb = OPB;
+			if (OPN & 4)
+			{
+				switch (lsbits)
+				{
+					case 0: // r, [r]
+						r2 = UNSP_LREG_I(opb);
+						if (OP0 != 0x0d)
+							r1 = read16(r2);
+						break;
+					case 1: // r, [<ds:>r--]
+						r2 = UNSP_LREG_I(opb);
+						if (OP0 != 0x0d)
+							r1 = read16(r2);
+						UNSP_REG_I(opb)--;
+						if (UNSP_REG_I(opb) == 0xffff)
+							UNSP_REG(SR) -= 0x0400;
+						break;
+					case 2: // r, [<ds:>r++]
+						r2 = UNSP_LREG_I(opb);
+						if (OP0 != 0x0d)
+							r1 = read16(r2);
+						UNSP_REG_I(opb)++;
+						if (UNSP_REG_I(opb) == 0x0000)
+							UNSP_REG(SR) += 0x0400;
+						break;
+					case 3: // r, [<ds:>++r]
+						UNSP_REG_I(opb)++;
+						if (UNSP_REG_I(opb) == 0x0000)
+							UNSP_REG(SR) += 0x0400;
+						r2 = UNSP_LREG_I(opb);
+						if (OP0 != 0x0d)
+							r1 = read16(r2);
+						break;
+					default:
+						break;
+				}
+			}
+			else
+			{
+				switch (lsbits)
+				{
+					case 0: // r, [r]
+						r2 = UNSP_REG_I(opb);
+						if (OP0 != 0x0d)
+							r1 = read16(r2);
+						break;
+					case 1: // r, [r--]
+						r2 = UNSP_REG_I(opb);
+						if (OP0 != 0x0d)
+							r1 = read16(r2);
+						UNSP_REG_I(opb)--;
+						break;
+					case 2: // r, [r++]
+						r2 = UNSP_REG_I(opb);
+						if (OP0 != 0x0d)
+							r1 = read16(r2);
+						UNSP_REG_I(opb)++;
+						break;
+					case 3: // r, [++r]
+						UNSP_REG_I(opb)++;
+						r2 = UNSP_REG_I(opb);
+						if (OP0 != 0x0d)
+							r1 = read16(r2);
+						break;
+					default:
+						break;
+				}
+			}
+			break;
+		}
+
+		case 0x04: // 16-bit ops
+			switch (OPN)
+			{
+				case 0x00: // r
+					m_icount -= 3;
+					cycle_count += 3;
+					if (OPA == 7)
+					{
+						m_icount -= 2;
+						cycle_count += 2;
+					}
+
+					r1 = UNSP_REG_I(OPB);
+					break;
+
+				case 0x01: // imm16
+					m_icount -= 4;
+					cycle_count += 4;
+					if (OPA == 7)
+					{
+						m_icount -= 1;
+						cycle_count += 1;
+					}
+
+					r0 = UNSP_REG_I(OPB);
+					r1 = read16(UNSP_LPC);
+					add_lpc(1);
+					break;
+
+				case 0x02: // [imm16]
+					m_icount -= 7;
+					cycle_count += 7;
+					if (OPA == 7)
+					{
+						m_icount -= 1;
+						cycle_count += 1;
+					}
+
+					r0 = UNSP_REG_I(OPB);
+					r2 = read16(UNSP_LPC);
+					add_lpc(1);
+
+					if (OP0 != 0x0d)
+					{
+						r1 = read16(r2);
+					}
+					break;
+
+				case 0x03: // store [imm16], r
+					m_icount -= 7;
+					cycle_count += 7;
+					if (OPA == 7)
+					{
+						m_icount -= 1;
+						cycle_count += 1;
+					}
+
+					r1 = r0;
+					r0 = UNSP_REG_I(OPB);
+					r2 = read16(UNSP_LPC);
+					add_lpc(1);
+					break;
+
+				default: // Shifted ops
+				{
+					m_icount -= 3;
+					cycle_count += 3;
+					if (OPA == 7)
+					{
+						m_icount -= 2;
+						cycle_count += 2;
+					}
+
+					uint32_t shift = (UNSP_REG_I(OPB) << 4) | m_sb;
+					if (shift & 0x80000)
+						shift |= 0xf00000;
+					shift >>= (OPN - 3);
+					m_sb = shift & 0x0f;
+					r1 = (uint16_t)(shift >> 4);
+					break;
+				}
+			}
+			break;
+
+		case 0x05: // More shifted ops
+			m_icount -= 3;
+			cycle_count += 3;
+			if (OPA == 7)
+			{
+				m_icount -= 2;
+				cycle_count += 2;
+			}
+
+			if (OPN & 4) // Shift right
+			{
+				const uint32_t shift = ((UNSP_REG_I(OPB) << 4) | m_sb) >> (OPN - 3);
+				m_sb = shift & 0x0f;
+				r1 = (uint16_t)(shift >> 4);
+			}
+			else // Shift left
+			{
+				const uint32_t shift = ((m_sb << 16) | UNSP_REG_I(OPB)) << (OPN + 1);
+				m_sb = (shift >> 16) & 0x0f;
+				r1 = (uint16_t)shift;
+			}
+			break;
+
+		case 0x06: // Rotated ops
+		{
+			m_icount -= 3;
+			cycle_count += 3;
+			if (OPA == 7)
+			{
+				m_icount -= 2;
+				cycle_count += 2;
+			}
+
+			uint32_t shift = (((m_sb << 16) | UNSP_REG_I(OPB)) << 4) | m_sb;
+			if (OPN & 4) // Rotate right
+			{
+				shift >>= (OPN - 3);
+				m_sb = shift & 0x0f;
+			}
+			else
+			{
+				shift <<= (OPN + 1);
+				m_sb = (shift >> 20) & 0x0f;
+			}
+			r1 = (uint16_t)(shift >> 4);
+			break;
+		}
+
+		case 0x07: // Direct 8
+			m_icount -= 5;
+			cycle_count += 5;
+			if (OPA == 7)
+			{
+				m_icount -= 1;
+				cycle_count += 1;
+			}
+
+			r2 = OPIMM;
+			r1 = read16(OPIMM);
+			break;
+
+		default:
+			break;
+	}
+
+	switch (OP0)
+	{
+		case 0x00: // Add
+			lres = r0 + r1;
+			break;
+		case 0x01: // Add w/ carry
+			lres = r0 + r1;
+			if(UNSP_REG(SR) & UNSP_C)
+				lres++;
+			break;
+		case 0x02: // Subtract
+		case 0x04: // Compare
+			lres = r0 + (uint16_t)(~r1) + 1;
+			break;
+		case 0x03: // Subtract w/ carry
+			lres = r0 + (uint16_t)(~r1);
+			if(UNSP_REG(SR) & UNSP_C)
+				lres++;
+			break;
+		case 0x06: // Negate
+			lres = -r1;
+			break;
+		case 0x08: // XOR
+			lres = r0 ^ r1;
+			break;
+		case 0x09: // Load
+			lres = r1;
+			break;
+		case 0x0a: // OR
+			lres = r0 | r1;
+			break;
+		case 0x0b: // AND
+		case 0x0c: // Test
+			lres = r0 & r1;
+			break;
+		case 0x0d: // Store
+			write16(r2, r0);
+			return;
+		default:
+			unimplemented_opcode(op);
+			return;
+	}
+
+	if (OP0 != 0x0d && OPA != 7) // If not a store opcode and not updating the PC, update negative/zero flags.
+	{
+		update_nz(lres);
+	}
+
+	if (OP0 < 0x05 && OPA != 7) // If Add, Add w/ Carry, Subtract, Subtract w/ Carry, Compare, and not updating the PC, update sign/carry flags.
+		update_sc(lres, r0, r1);
+
+	if (OP0 == 0x04 || OP0 == 0x0c) // Compare and Test don't write back results.
+		return;
+
+	if (OP1 == 0x04 && OPN == 0x03) // store [imm16], r
+		write16(r2, lres);
+	else
+		UNSP_REG_I(OPA) = lres;
 }
 
 void unsp_device::execute_run()
@@ -296,15 +1044,8 @@ void unsp_device::execute_run()
 	unsp_disassembler dasm;
 #endif
 
-	uint32_t lres = 0;
-	uint16_t r0 = 0;
-	uint16_t r1 = 0;
-	uint32_t r2 = 0;
-
 	while (m_icount > 0)
 	{
-		check_irqs();
-
 		debugger_instruction_hook(UNSP_LPC);
 		const uint32_t op = read16(UNSP_LPC);
 
@@ -313,578 +1054,54 @@ void unsp_device::execute_run()
 		{
 			std::stringstream strbuffer;
 			dasm.disassemble(strbuffer, UNSP_LPC, op, read16(UNSP_LPC+1));
-			logerror("%06x: %s\n", UNSP_LPC, strbuffer.str().c_str());
-		}
-#endif
-
-		UNSP_REG(PC)++;
-
-		const uint8_t lower_op = (OP1 << 4) | OP0;
-
-		if(OP0 < 0xf && OPA == 0x7 && OP1 < 2)
-		{
-			switch(OP0)
+			uint32_t len = 1;
+			if ((OP0 < 14 && OP1 == 4 && (OPN == 1 || OPN == 2 || OPN == 3)) || (OP0 == 15 && (OP1 == 1 || OP1 == 2)))
 			{
-				case 0: // JB
-					if(!(UNSP_REG(SR) & UNSP_C))
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 1: // JAE
-					if(UNSP_REG(SR) & UNSP_C)
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 2: // JGE
-					if(!(UNSP_REG(SR) & UNSP_S))
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 3: // JL
-					if(UNSP_REG(SR) & UNSP_S)
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 4: // JNE
-					if(!(UNSP_REG(SR) & UNSP_Z))
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 5: // JE
-					if(UNSP_REG(SR) & UNSP_Z)
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 6: // JPL
-					if(!(UNSP_REG(SR) & UNSP_N))
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 7: // JMI
-					if(UNSP_REG(SR) & UNSP_N)
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 8: // JBE
-					if((UNSP_REG(SR) & (UNSP_Z | UNSP_C)) != UNSP_C)
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 9: // JA
-					if((UNSP_REG(SR) & (UNSP_Z | UNSP_C)) == UNSP_C)
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 10: // JLE
-					if(UNSP_REG(SR) & (UNSP_Z | UNSP_S))
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 11: // JG
-					if(!(UNSP_REG(SR) & (UNSP_Z | UNSP_S)))
-					{
-						m_icount -= 4;
-						UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					}
-					else
-						m_icount -= 2;
-					continue;
-				case 14: // JMP
-					UNSP_REG(PC) += (OP1 == 0) ? OPIMM : (0 - OPIMM);
-					m_icount -= 4;
-					continue;
-				default:
-					unimplemented_opcode(op);
-					continue;
+				len = 2;
 			}
-		}
-		else if (lower_op == 0x2d) // Push
-		{
-			r0 = OPN;
-			r1 = OPA;
-			m_icount -= 4 + 2 * r0;
-
-			while (r0--)
+			if (len == 1)
 			{
-				push(UNSP_REG_I(r1--), &UNSP_REG_I(OPB));
-			}
-			continue;
-		}
-		else if (lower_op == 0x29) // Pop
-		{
-			if (op == 0x9a98) // reti
-			{
-				m_icount -= 8;
-				UNSP_REG(SR) = pop(&UNSP_REG(SP));
-				UNSP_REG(PC) = pop(&UNSP_REG(SP));
-
-				if(m_fiq)
-				{
-					m_fiq = false;
-					m_saved_sb[2] = m_sb;
-					m_sb = m_saved_sb[m_irq ? 1 : 0];
-				}
-				else if(m_irq)
-				{
-					m_irq = false;
-					m_saved_sb[1] = m_sb;
-					m_sb = m_saved_sb[0];
-				}
-				m_curirq = 0;
-
-				check_irqs();
-				continue;
+				logerror("%04x %04x %04x %04x %04x %04x %04x %04x  %02x %x%x%x%x %02x  %x   %x %d %x: %04x        %x %x %x %x %x   %s\n",
+					m_r[0], m_r[1], m_r[2], m_r[3], m_r[4], m_r[5], m_r[6], m_r[7],
+					m_r[6] & 0x3f, BIT(m_r[6], 9), BIT(m_r[6], 8), BIT(m_r[6], 7), BIT(m_r[6], 6), (m_r[6] >> 10) & 0x3f,
+					m_sb, m_enable_irq ? 1 : 0, cycle_count, UNSP_LPC, op, OP0, OPA, OP1, OPN, OPB, strbuffer.str().c_str());
 			}
 			else
 			{
-				r0 = OPN;
-				r1 = OPA;
-				m_icount -= 4 + 2 * r0;
-
-				while (r0--)
-				{
-					UNSP_REG_I(++r1) = pop(&UNSP_REG_I(OPB));
-				}
-				continue;
+				logerror("%04x %04x %04x %04x %04x %04x %04x %04x  %02x %x%x%x%x %02x  %x   %x %d %x: %04x %04x   %x %x %x %x %x   %s\n",
+					m_r[0], m_r[1], m_r[2], m_r[3], m_r[4], m_r[5], m_r[6], m_r[7],
+					m_r[6] & 0x3f, BIT(m_r[6], 9), BIT(m_r[6], 8), BIT(m_r[6], 7), BIT(m_r[6], 6), (m_r[6] >> 10) & 0x3f,
+					m_sb, m_enable_irq ? 1 : 0, cycle_count, UNSP_LPC, op, read16(UNSP_LPC+1), OP0, OPA, OP1, OPN, OPB, strbuffer.str().c_str());
 			}
+			//logerror("%x: %s\n", UNSP_LPC, strbuffer.str().c_str());
+			//logerror("%x%04x: %d\n", UNSP_REG(SR) & 0x3f, UNSP_REG(PC), cycle_count);
 		}
-		else if (OP0 == 0xf)
+#endif
+
+		add_lpc(1);
+
+		execute_one(op);
+
+		if (cycle_count >= cycles_per_line)
 		{
-			switch (OP1)
+			cycle_count -= cycles_per_line;
+
+			timer_run(cycles_per_line);
+
+			if (line_count == 240)
+				write16(0x3d61, 1);	// trigger vblank IRQ
+			if (line_count == read16(0x2836))
+				write16(0x3d61, 2);	// trigger vpos IRQ
+
+			check_irqs();
+
+			line_count++;
+			if (line_count == lines_per_frame)
 			{
-				case 0x00: // Multiply, Unsigned * Signed
-					if(OPN == 1 && OPA != 7)
-					{
-						m_icount -= 12;
-						lres = UNSP_REG_I(OPA) * UNSP_REG_I(OPB);
-						if(UNSP_REG_I(OPB) & 0x8000)
-						{
-							lres -= UNSP_REG_I(OPA) << 16;
-						}
-						UNSP_REG(R4) = lres >> 16;
-						UNSP_REG(R3) = (uint16_t)lres;
-					}
-					else
-					{
-						unimplemented_opcode(op);
-					}
-					continue;
-
-				case 0x01: // Call
-					if(!(OPA & 1))
-					{
-						m_icount -= 9;
-						r1 = read16(UNSP_LPC);
-						UNSP_REG(PC)++;
-						push(UNSP_REG(PC), &UNSP_REG(SP));
-						push(UNSP_REG(SR), &UNSP_REG(SP));
-						UNSP_REG(PC) = r1;
-						UNSP_REG(SR) &= 0xffc0;
-						UNSP_REG(SR) |= OPIMM;
-					}
-					else
-					{
-						unimplemented_opcode(op);
-					}
-					continue;
-
-				case 0x02: // Far Jump
-					if (OPA == 7)
-					{
-						m_icount -= 5;
-						UNSP_REG(PC) = read16(UNSP_LPC);
-						UNSP_REG(SR) &= 0xffc0;
-						UNSP_REG(SR) |= OPIMM;
-					}
-					else
-					{
-						unimplemented_opcode(op);
-					}
-					continue;
-
-				case 0x04: // Multiply, Signed * Signed
-					if(OPN == 1 && OPA != 7)
-					{
-						m_icount -= 12;
-						lres = UNSP_REG_I(OPA) * UNSP_REG_I(OPB);
-						if(UNSP_REG_I(OPB) & 0x8000)
-						{
-							lres -= UNSP_REG_I(OPA) << 16;
-						}
-						if(UNSP_REG_I(OPA) & 0x8000)
-						{
-							lres -= UNSP_REG_I(OPB) << 16;
-						}
-						UNSP_REG(R4) = lres >> 16;
-						UNSP_REG(R3) = (uint16_t)lres;
-					}
-					else
-					{
-						unimplemented_opcode(op);
-					}
-					continue;
-
-				case 0x05: // Interrupt flags
-					m_icount -= 2;
-					switch(OPIMM)
-					{
-						case 0:
-							m_enable_irq = false;
-							m_enable_fiq = false;
-							break;
-						case 1:
-							m_enable_irq = true;
-							m_enable_fiq = false;
-							break;
-						case 2:
-							m_enable_irq = false;
-							m_enable_fiq = true;
-							break;
-						case 3:
-							m_enable_irq = true;
-							m_enable_fiq = true;
-							break;
-						case 8: // irq off
-							m_enable_irq = false;
-							break;
-						case 9: // irq on
-							m_enable_irq = true;
-							break;
-						case 12: // fiq off
-							m_enable_fiq = false;
-							break;
-						case 14: // fiq on
-							m_enable_fiq = true;
-							break;
-						case 37: // nop
-							break;
-						default:
-							unimplemented_opcode(op);
-							break;
-					}
-					continue;
-
-				default:
-					unimplemented_opcode(op);
-					continue;
+				line_count = 0;
+				write16(0x3d60, 0x0100);
 			}
 		}
-
-		// At this point, we should be dealing solely with ALU ops.
-
-		r0 = UNSP_REG_I(OPA);
-
-		switch (OP1)
-		{
-			case 0x00: // r, [bp+imm6]
-				m_icount -= 6;
-
-				r2 = (uint16_t)(UNSP_REG(BP) + OPIMM);
-				if (OP0 != 0x0d)
-					r1 = read16(r2);
-				break;
-
-			case 0x01: // r, imm6
-				m_icount -= 2;
-
-				r1 = OPIMM;
-				break;
-
-			case 0x03: // Indirect
-			{
-				m_icount -= 6;
-				if (OPA == 7)
-					m_icount -= 1;
-
-				const uint8_t lsbits = OPN & 3;
-				const uint8_t opb = OPB;
-				if (OPN & 4)
-				{
-					switch (lsbits)
-					{
-						case 0: // r, [r]
-							r2 = UNSP_LREG_I(opb);
-							if (OP0 != 0x0d)
-								r1 = read16(r2);
-							break;
-						case 1: // r, [<ds:>r--]
-							r2 = UNSP_LREG_I(opb);
-							if (OP0 != 0x0d)
-								r1 = read16(r2);
-							UNSP_REG_I(opb)--;
-							if (UNSP_REG_I(opb) == 0xffff)
-								UNSP_REG(SR) -= 0x0400;
-							break;
-						case 2: // r, [<ds:>r++]
-							r2 = UNSP_LREG_I(opb);
-							if (OP0 != 0x0d)
-								r1 = read16(r2);
-							UNSP_REG_I(opb)++;
-							if (UNSP_REG_I(opb) == 0x0000)
-								UNSP_REG(SR) += 0x0400;
-							break;
-						case 3: // r, [<ds:>++r]
-							UNSP_REG_I(opb)++;
-							if (UNSP_REG_I(opb) == 0x0000)
-								UNSP_REG(SR) += 0x0400;
-							r2 = UNSP_LREG_I(opb);
-							if (OP0 != 0x0d)
-								r1 = read16(r2);
-							break;
-						default:
-							break;
-					}
-				}
-				else
-				{
-					switch (lsbits)
-					{
-						case 0: // r, [r]
-							r2 = UNSP_REG_I(opb);
-							if (OP0 != 0x0d)
-								r1 = read16(r2);
-							break;
-						case 1: // r, [r--]
-							r2 = UNSP_REG_I(opb);
-							if (OP0 != 0x0d)
-								r1 = read16(r2);
-							UNSP_REG_I(opb)--;
-							break;
-						case 2: // r, [r++]
-							r2 = UNSP_REG_I(opb);
-							if (OP0 != 0x0d)
-								r1 = read16(r2);
-							UNSP_REG_I(opb)++;
-							break;
-						case 3: // r, [++r]
-							UNSP_REG_I(opb)++;
-							r2 = UNSP_REG_I(opb);
-							if (OP0 != 0x0d)
-								r1 = read16(r2);
-							break;
-						default:
-							break;
-					}
-				}
-				break;
-			}
-
-			case 0x04: // 16-bit ops
-				switch (OPN)
-				{
-					case 0x00: // r
-						m_icount -= 3;
-						if (OPA == 7)
-							m_icount -= 2;
-
-						r1 = UNSP_REG_I(OPB);
-						break;
-
-					case 0x01: // imm16
-						m_icount -= 4;
-						if (OPA == 7)
-							m_icount -= 1;
-
-						r0 = UNSP_REG_I(OPB);
-						r1 = read16(UNSP_LPC);
-						UNSP_REG(PC)++;
-						break;
-
-					case 0x02: // [imm16]
-						m_icount -= 7;
-						if (OPA == 7)
-							m_icount -= 1;
-
-						r0 = UNSP_REG_I(OPB);
-						r2 = read16(UNSP_LPC);
-						UNSP_REG(PC)++;
-
-						if (OP0 != 0x0d)
-						{
-							r1 = read16(r2);
-						}
-						break;
-
-					case 0x03: // store [imm16], r
-						m_icount -= 7;
-						if (OPA == 7)
-							m_icount -= 1;
-
-						r1 = r0;
-						r0 = UNSP_REG_I(OPB);
-						r2 = read16(UNSP_LPC);
-						UNSP_REG(PC)++;
-						break;
-
-					default: // Shifted ops
-					{
-						m_icount -= 3;
-						if (OPA == 7)
-							m_icount -= 2;
-
-						uint32_t shift = (UNSP_REG_I(OPB) << 4) | m_sb;
-						if (shift & 0x80000)
-							shift |= 0xf00000;
-						shift >>= (OPN - 3);
-						m_sb = shift & 0x0f;
-						r1 = (uint16_t)(shift >> 4);
-						break;
-					}
-				}
-				break;
-
-			case 0x05: // More shifted ops
-				m_icount -= 3;
-				if (OPA == 7)
-					m_icount -= 2;
-
-				if (OPN & 4) // Shift right
-				{
-					const uint32_t shift = ((UNSP_REG_I(OPB) << 4) | m_sb) >> (OPN - 3);
-					m_sb = shift & 0x0f;
-					r1 = (uint16_t)(shift >> 4);
-				}
-				else // Shift left
-				{
-					const uint32_t shift = ((m_sb << 16) | UNSP_REG_I(OPB)) << (OPN + 1);
-					m_sb = (shift >> 16) & 0x0f;
-					r1 = (uint16_t)shift;
-				}
-				break;
-
-			case 0x06: // Rotated ops
-			{
-				m_icount -= 3;
-				if (OPA == 7)
-					m_icount -= 2;
-
-				uint32_t shift = (((m_sb << 16) | UNSP_REG_I(OPB)) << 4) | m_sb;
-				if (OPN & 4) // Rotate right
-				{
-					shift >>= (OPN - 3);
-					m_sb = shift & 0x0f;
-				}
-				else
-				{
-					shift <<= (OPN + 1);
-					m_sb = (shift >> 20) & 0x0f;
-				}
-				r1 = (uint16_t)(shift >> 4);
-				break;
-			}
-
-			case 0x07: // Direct 8
-				m_icount -= 5;
-				if (OPA == 7)
-					m_icount -= 1;
-
-				r1 = read16(OPIMM);
-				break;
-
-			default:
-				break;
-		}
-
-		switch (OP0)
-		{
-			case 0x00: // Add
-				lres = r0 + r1;
-				break;
-			case 0x01: // Add w/ carry
-				lres = r0 + r1;
-				if(UNSP_REG(SR) & UNSP_C)
-					lres++;
-				break;
-			case 0x02: // Subtract
-			case 0x04: // Compare
-				lres = r0 + (uint16_t)(~r1) + 1;
-				break;
-			case 0x03: // Subtract w/ carry
-				lres = r0 + (uint16_t)(~r1);
-				if(UNSP_REG(SR) & UNSP_C)
-					lres++;
-				break;
-			case 0x06: // Negate
-				lres = -r1;
-				break;
-			case 0x08: // XOR
-				lres = r0 ^ r1;
-				break;
-			case 0x09: // Load
-				lres = r1;
-				break;
-			case 0x0a: // OR
-				lres = r0 | r1;
-				break;
-			case 0x0b: // AND
-			case 0x0c: // Test
-				lres = r0 & r1;
-				break;
-			case 0x0d: // Store
-				write16(r2, r0);
-				continue;
-			default:
-				unimplemented_opcode(op);
-				continue;
-		}
-
-		if (OP0 != 0x0d && OPA != 7) // If not a store opcode and not updating the PC, update negative/zero flags.
-			update_nz(lres);
-
-		if (OP0 < 0x05 && OPA != 7) // If Add, Add w/ Carry, Subtract, Subtract w/ Carry, Compare, and not updating the PC, update sign/carry flags.
-			update_sc(lres, r0, r1);
-
-		if (OP0 == 0x04 || OP0 == 0x0c) // Compare and Test don't write back results.
-			continue;
-
-		if (OP1 == 0x04 && OPN == 0x03) // store [imm16], r
-			write16(r2, lres);
-		else
-			UNSP_REG_I(OPA) = lres;
 	}
 }
 
@@ -916,4 +1133,56 @@ void unsp_device::execute_set_input(int irqline, int state)
 		case UNSP_BRK_LINE:
 			break;
 	}
+}
+
+void unsp_device::set_timer_interval(int timer, uint32_t interval)
+{
+	if (timer == 0)
+		timer_tmb1.interval = interval;
+	else if (timer == 1)
+		timer_tmb2.interval = interval;
+}
+
+void unsp_device::timer_add(struct unsp_timer *timer)
+{
+	if (timer->time == 0)
+		timer->time = timer->interval;
+
+	uint32_t time = timer->time;
+	struct unsp_timer **p = &timers;
+
+	while (*p && (*p)->time <= time) {
+		time -= (*p)->time;
+		p = &(*p)->next;
+	}
+
+	timer->next = *p;
+	*p = timer;
+	timer->time = time;
+	if (timer->next)
+		timer->next->time -= time;
+}
+
+void unsp_device::timer_run(uint32_t ticks)
+{
+	struct unsp_timer *timer;
+	while ((timer = timers) && timer->time <= ticks) {
+		timers = timer->next;
+		ticks -= timer->time;
+
+		write16(0x3d62, 1 << timer->index);
+
+		if (timer->interval) {
+			timer->time = timer->interval;
+			timer_add(timer);
+		}
+	}
+
+	if (timer)
+		timer->time -= ticks;
+}
+
+uint16_t unsp_device::get_video_line()
+{
+	return line_count;
 }

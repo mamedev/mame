@@ -186,7 +186,7 @@ public:
 		: spg2xx_game_state(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
 		, m_bankdev(*this, "bank")
-		, m_cart_banks(*this, "cartbank%u", 0U)
+		, m_system_region(*this, "maincpu")
 	{ }
 
 	void vsmile(machine_config &config);
@@ -218,9 +218,9 @@ private:
 	DECLARE_READ16_MEMBER(bank2_r);
 	DECLARE_READ16_MEMBER(bank3_r);
 	optional_device<generic_slot_device> m_cart;
-	memory_region *m_cart_rom;
 	required_device<address_map_bank_device> m_bankdev;
-	optional_memory_bank_array<4> m_cart_banks;
+	memory_region *m_cart_region;
+	required_memory_region m_system_region;
 
 	emu_timer *m_pad_timer;
 	uint8_t m_pad_counter;
@@ -248,7 +248,7 @@ private:
 	virtual void machine_reset() override;
 
 	optional_device<generic_slot_device> m_cart;
-	memory_region *m_cart_rom;
+	memory_region *m_cart_region;
 };
 
 #define VERBOSE_LEVEL   (4)
@@ -340,7 +340,7 @@ void vsmile_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		if (m_pad_counter >= 100)
 		{
 			m_pad_counter = 0;
-			m_spg->uart_rx(0x55);
+			//m_spg->uart_rx(0x55);
 		}
 	}
 }
@@ -362,59 +362,55 @@ void vsmile_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 READ16_MEMBER(vsmile_state::bank0_r)
 {
-	const uint16_t data = ((uint16_t*)m_cart_rom->base())[offset];
-	//printf("bank0_r: %06x: %04x\n", offset, data);
-	return data;
+	return ((uint16_t*)m_cart_region->base())[offset];
 }
 
 READ16_MEMBER(vsmile_state::bank1_r)
 {
-	const uint16_t data = ((uint16_t*)m_cart_rom->base())[offset + 0x100000];
-	//printf("bank1_r: %06x: %04x\n", offset + 0x100000, data);
-	return data;
+	return ((uint16_t*)m_cart_region->base())[offset + 0x100000];
 }
 
 READ16_MEMBER(vsmile_state::bank2_r)
 {
-	const uint16_t data = ((uint16_t*)m_cart_rom->base())[offset + 0x200000];
-	//printf("bank2_r: %06x: %04x\n", offset + 0x200000, data);
-	return data;
+	return ((uint16_t*)m_cart_region->base())[offset + 0x200000];
 }
 
 READ16_MEMBER(vsmile_state::bank3_r)
 {
-	const uint16_t data = ((uint16_t*)memregion("maincpu")->base())[offset];
-	//printf("bank3_r: %06x: %04x\n", offset + 0x300000, data);
-	return data;
+	return ((uint16_t*)m_system_region->base())[offset];
 }
 
 READ16_MEMBER(vsmile_state::portb_r)
 {
 	//const uint8_t inputs = m_io_p2->read();
 	//const uint16_t input_bits = BIT(inputs, 0) ? VSMILE_PORTB_ON_SW : 0;
-	const uint16_t data = VSMILE_PORTB_ON_SW | (m_cart && m_cart->exists() ? VSMILE_PORTB_CART : 0);
+	//const uint16_t data = VSMILE_PORTB_ON_SW | VSMILE_PORTB_OFF_SW | (m_cart && m_cart->exists() ? VSMILE_PORTB_CART : 0);
 	//logerror("V.Smile Port B read  %04x, mask %04x\n", data, mem_mask);
 	//printf("V.Smile Port B read  %04x, mask %04x\n", data, mem_mask);
-	return data;
+	return m_portb_data;// | data;
 }
 
 READ16_MEMBER(vsmile_state::portc_r)
 {
-	const uint16_t data = VSMILE_PORTC_LOGO | 0x0004;
+	uint16_t data = 0x0004;
+	if (m_portc_data & 0x0100)
+		data |= 0x0400;
+	if (m_portc_data & 0x0200)
+		data |= 0x1000;
 	//logerror("V.Smile Port C read  %04x, mask %04x\n", data, mem_mask);
-	return data;
+	return (m_portc_data & ~0x000f) | data;
 }
 
 WRITE16_MEMBER(vsmile_state::portb_w)
 {
-	m_portb_data = data & mem_mask;
+	m_portb_data = data;//(m_portb_data &~ mem_mask) | (data & mem_mask);
 	//logerror("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
 	//printf("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
 }
 
 WRITE16_MEMBER(vsmile_state::portc_w)
 {
-	m_portc_data = data & mem_mask;
+	m_portc_data = data;//(m_portc_data &~ mem_mask) | (data & mem_mask);
 	//logerror("V.Smile Port C write %04x, mask %04x\n", m_portc_data, mem_mask);
 	//printf("V.Smile Port C write %04x, mask %04x\n", m_portc_data, mem_mask);
 	//printf("%02x ", data >> 8);
@@ -422,26 +418,22 @@ WRITE16_MEMBER(vsmile_state::portc_w)
 
 WRITE8_MEMBER(vsmile_state::uart_tx)
 {
-	//logerror("UART Tx: %02x\n", data);
+	logerror("UART Tx: %02x\n", data);
 }
 
 WRITE8_MEMBER(vsmile_state::chip_sel_w)
 {
-	//logerror("Chip select mode: %d\n", data);
 	const uint16_t cart_offset = m_cart && m_cart->exists() ? 4 : 0;
 	switch (data)
 	{
 		case 0:
-			//logerror("Setting bank %d\n", cart_offset);
 			m_bankdev->set_bank(cart_offset);
 			break;
 		case 1:
-			//logerror("Setting bank %d\n", 1 + cart_offset);
 			m_bankdev->set_bank(1 + cart_offset);
 			break;
 		case 2:
 		case 3:
-			//logerror("Setting bank %d\n", 2 + cart_offset);
 			m_bankdev->set_bank(2 + cart_offset);
 			break;
 	}
@@ -499,15 +491,10 @@ void vsmile_state::banked_map(address_map &map)
 	map(0x0a00000, 0x0afffff).rom().region("maincpu", 0);
 	map(0x0b00000, 0x0bfffff).rom().region("maincpu", 0);
 
-	map(0x1000000, 0x10fffff).bankr("cartbank0");
-	map(0x1100000, 0x11fffff).bankr("cartbank0");
-	map(0x1200000, 0x12fffff).bankr("cartbank0");
-	map(0x1300000, 0x13fffff).bankr("cartbank0");
+	map(0x1000000, 0x13fffff).r(FUNC(vsmile_state::bank0_r));
 
-	map(0x1400000, 0x14fffff).bankr("cartbank0");
-	map(0x1500000, 0x15fffff).bankr("cartbank0");
-	map(0x1600000, 0x16fffff).bankr("cartbank1");
-	map(0x1700000, 0x17fffff).bankr("cartbank1");
+	map(0x1400000, 0x15fffff).r(FUNC(vsmile_state::bank0_r));
+	map(0x1600000, 0x17fffff).r(FUNC(vsmile_state::bank1_r));
 
 	map(0x1800000, 0x18fffff).r(FUNC(vsmile_state::bank0_r));
 	map(0x1900000, 0x19fffff).r(FUNC(vsmile_state::bank1_r));
@@ -759,8 +746,8 @@ void spg2xx_cart_state::machine_start()
 	if (m_cart && m_cart->exists())
 	{
 		std::string region_tag;
-		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-		m_bank->configure_entries(0, ceilf((float)m_cart_rom->bytes() / 0x800000), m_cart_rom->base(), 0x800000);
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_bank->configure_entries(0, ceilf((float)m_cart_region->bytes() / 0x800000), m_cart_region->base(), 0x800000);
 		m_bank->set_entry(0);
 	}
 }
@@ -771,22 +758,7 @@ void vsmile_state::machine_start()
 	if (m_cart && m_cart->exists())
 	{
 		std::string region_tag;
-		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-		const uint32_t banks = (m_cart_rom->bytes() + 0x1fffff) / 0x200000;
-		for (uint32_t i = 0; i < 2; i++)
-		{
-			m_cart_banks[i]->configure_entries(0, banks, m_cart_rom->base(), 0x200000);
-			m_cart_banks[i]->set_entry(i % banks);
-		}
-	}
-	else
-	{
-		for (uint32_t i = 0; i < 2; i++)
-		{
-			m_cart_rom = memregion("maincpu");
-			m_cart_banks[i]->configure_entries(0, (m_cart_rom->bytes() + 0x1fffff) / 0x200000, m_cart_rom->base(), 0x200000);
-			m_cart_banks[i]->set_entry(0);
-		}
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	}
 
 	m_bankdev->set_bank(m_cart && m_cart->exists() ? 4 : 0);
