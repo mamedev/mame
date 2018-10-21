@@ -21,10 +21,12 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-1
 #include "machine/z80dart.h"
 #include "machine/clock.h"
 #include "machine/x2212.h"
+#include "sound/beep.h"
 //#include "video/crt9006.h"
 #include "video/crt9007.h"
 //#include "video/crt9021.h"
 #include "screen.h"
+#include "speaker.h"
 
 class altos2_state : public driver_device
 {
@@ -34,6 +36,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_novram(*this, "novram")
 		, m_vpac(*this, "vpac")
+		, m_bell(*this, "bell")
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 	{ }
@@ -54,6 +57,7 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<x2210_device> m_novram;
 	required_device<crt9007_device> m_vpac;
+	required_device<beep_device> m_bell;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
 };
@@ -89,7 +93,9 @@ WRITE8_MEMBER(altos2_state::video_mode_w)
 		m_vpac->set_character_width(10);
 	}
 
-	logerror("Writing %02X to mode register at %s\n", data, machine().describe_context());
+	m_bell->set_state(BIT(data, 4));
+
+	//logerror("Writing %02X to mode register at %s\n", data, machine().describe_context());
 }
 
 u32 altos2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -133,7 +139,7 @@ void altos2_state::altos2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &altos2_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 4.9152_MHz_XTAL / 2)); // ctc & dart connections are guesswork
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 4.9152_MHz_XTAL / 4));
 	ctc_clock.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
 	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg1));
 	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
@@ -142,9 +148,9 @@ void altos2_state::altos2(machine_config &config)
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set("dart1", FUNC(z80dart_device::txca_w));
 	ctc.zc_callback<0>().append("dart1", FUNC(z80dart_device::rxca_w));
-	ctc.zc_callback<1>().set("dart1", FUNC(z80dart_device::rxtxcb_w));
-	ctc.zc_callback<2>().set("dart2", FUNC(z80dart_device::rxca_w));
-	ctc.zc_callback<2>().append("dart2", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<1>().set("dart2", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<1>().append("dart2", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<2>().set("dart1", FUNC(z80dart_device::rxtxcb_w));
 
 	z80dart_device &dart1(Z80DART(config, "dart1", 8_MHz_XTAL / 2));
 	dart1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -163,6 +169,9 @@ void altos2_state::altos2(machine_config &config)
 	m_vpac->set_screen("screen");
 	m_vpac->set_character_width(10);
 	m_vpac->int_callback().set("ctc", FUNC(z80ctc_device::trg3));
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_bell, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 ROM_START( altos2 )
@@ -177,4 +186,4 @@ ROM_START( altos2 )
 	ROM_LOAD( "358_7258", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos Computer Systems", "Altos II Terminal", MACHINE_IS_SKELETON )
+COMP(1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos Computer Systems", "Altos II Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
