@@ -636,7 +636,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		if (m_vs)
 		{
 			// reset all other bits except Light Pen Update to logic 0
-			m_status &= STATUS_LIGHT_PEN_UPDATE;
+			m_status &= (STATUS_LIGHT_PEN_UPDATE | STATUS_INTERRUPT_PENDING);
 		}
 		else
 		{
