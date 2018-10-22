@@ -683,6 +683,18 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_zbuffer.fill(0, cliprect);
 
+
+	if (m_bmp_base)
+	{
+		if (m_bmp_base[0x14] & 0x01)
+		{
+			popmessage("bitmap %02x %02x %02x %02x %02x %02x %02x %02x  %02x %02x %02x %02x %02x %02x %02x %02x  %02x %02x %02x %02x %02x %02x %02x %02x",
+				                         m_bmp_base[0x00], m_bmp_base[0x01], m_bmp_base[0x02], m_bmp_base[0x03], m_bmp_base[0x04], m_bmp_base[0x05], m_bmp_base[0x06], m_bmp_base[0x07],
+										 m_bmp_base[0x08], m_bmp_base[0x09], m_bmp_base[0x0a], m_bmp_base[0x0b], m_bmp_base[0x0c], m_bmp_base[0x0d], m_bmp_base[0x0e], m_bmp_base[0x0f],
+									  	 m_bmp_base[0x10], m_bmp_base[0x11], m_bmp_base[0x12], m_bmp_base[0x13], m_bmp_base[0x14], m_bmp_base[0x15], m_bmp_base[0x16], m_bmp_base[0x17]);
+		}
+	}
+
 	rectangle clip = cliprect;
 
 	clip.min_y = cliprect.min_y;

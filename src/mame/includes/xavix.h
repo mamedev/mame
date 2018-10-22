@@ -29,6 +29,7 @@ public:
 		m_palram_l(*this, "palram_l"),
 		m_bmp_palram_sh(*this, "bmp_palram_sh"),
 		m_bmp_palram_l(*this, "bmp_palram_l"),
+		m_bmp_base(*this, "bmp_base"),
 		m_colmix_sh(*this, "colmix_sh"),
 		m_colmix_l(*this, "colmix_l"),
 		m_colmix_ctrl(*this, "colmix_ctrl"),
@@ -247,6 +248,7 @@ private:
 
 	optional_shared_ptr<uint8_t> m_bmp_palram_sh;
 	optional_shared_ptr<uint8_t> m_bmp_palram_l;
+	optional_shared_ptr<uint8_t> m_bmp_base;
 
 	required_shared_ptr<uint8_t> m_colmix_sh;
 	required_shared_ptr<uint8_t> m_colmix_l;

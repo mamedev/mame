@@ -391,9 +391,11 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 {
 	xavix_lowbus_map(map);
 
+	// bitmap layer palette
 	map(0x6c00, 0x6cff).ram().share("bmp_palram_sh");
 	map(0x6d00, 0x6dff).ram().share("bmp_palram_l");
 
+	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 }
 
 static INPUT_PORTS_START( xavix )
