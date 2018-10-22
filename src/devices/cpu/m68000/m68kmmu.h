@@ -194,14 +194,15 @@ void pmmu_atc_flush()
 }
 
 
-inline uint32_t get_dt2_table_entry(uint32_t tptr, uint8_t ptest)
+inline uint32_t get_dt2_table_entry(uint32_t tptr, uint8_t ptest, bool indirect)
 {
 	uint32_t tbl_entry = m_program->read_dword(tptr);
 	uint32_t dt = tbl_entry & M68K_MMU_DF_DT;
 
-	m_mmu_tmp_sr |= tbl_entry & 0x0004 ? M68K_MMU_SR_WRITE_PROTECT : 0;
+	if (!indirect)
+		m_mmu_tmp_sr |= tbl_entry & 0x0004 ? M68K_MMU_SR_WRITE_PROTECT : 0;
 
-	if (!ptest && dt != M68K_MMU_DF_DT0)
+	if (!ptest && !indirect && dt != M68K_MMU_DF_DT0)
 	{
 		if (dt == M68K_MMU_DF_DT1 && !m_mmu_tmp_rw && !(m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
 		{
@@ -326,12 +327,12 @@ bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits,
 
 			if (bits)
 			{
-				tbl_entry = get_dt2_table_entry(tptr + tofs,  ptest || !nextbits);
+				tbl_entry = get_dt2_table_entry(tptr + tofs,  ptest, !nextbits);
 				return false;
 			} else
 			{
 				tptr = tbl_entry & 0xfffffffc;
-				tbl_entry = get_dt2_table_entry(tptr, ptest);
+				tbl_entry = get_dt2_table_entry(tptr, ptest, 0);
 				return false;
 			}
 			MMULOG("PMMU: %sDT2 read table entry at %08x: %08x\n", bits ? "" : "indirect ", tofs + tptr, tbl_entry);
@@ -378,6 +379,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 		tbl_entry = (m_mmu_crp_aptr & 0xfffffff0) | (m_mmu_crp_limit & M68K_MMU_DF_DT);
 	}
 
+	m_mmu_tmp_sr = 0;
 	abits = (m_mmu_tc >> 12) & 0xf;
 	bbits = (m_mmu_tc >> 8) & 0xf;
 	cbits = (m_mmu_tc >> 4) & 0xf;
