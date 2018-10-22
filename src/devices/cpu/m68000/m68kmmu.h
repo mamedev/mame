@@ -241,46 +241,44 @@ inline uint32_t get_dt3_table_entry(uint32_t tptr, uint8_t fc, uint8_t ptest)
 	return (tbl_entry & ~M68K_MMU_DF_DT) | dt;
 }
 
-bool pmmu_atc_lookup(const uint32_t addr_in, int fc, const bool ptest, uint32_t& addr_out)
+bool pmmu_atc_lookup(const uint32_t addr_in, const int fc,
+                                const int ptest, uint32_t& addr_out)
 {
+	const int ps = (m_mmu_tc >> 20) & 0xf;
+        const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | (addr_in >> ps);
 
-	int ps = (m_mmu_tc >> 20) & 0xf;
-	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24) | addr_in >> ps;
+        for (int i = 0; i < MMU_ATC_ENTRIES; i++) {
+                if (m_mmu_atc_tag[i] != atc_tag)
+                        continue;
 
-	// first see if this is already in the ATC
-	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
-	{
-		if (m_mmu_atc_tag[i] != atc_tag)
-		{
-			// tag bits and function code don't match
-		}
-		else if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
-		{
-			// write mode, but write protected
-		}
-		else if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
-		{
-			// first write; must set modified in PMMU tables as well
-		}
-		else
-		{
-			// read access or write access and not write protected
-			if (!m_mmu_tmp_rw && !ptest)
-			{
-				// FIXME: must set modified in PMMU tables as well
-				m_mmu_atc_data[i] |= M68K_MMU_ATC_MODIFIED;
-			}
-			else
-			{
-				// FIXME: supervisor mode?
-				m_mmu_tmp_sr = M68K_MMU_SR_MODIFIED;
-			}
-			addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
-          MMULOG("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, m_ppc, fc);
-			return true;
-		}
-	}
-	return false;
+                if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
+                        continue;
+                if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
+                        continue;
+
+                // read access or write access and not write protected
+                if (!ptest) {
+                                // FIXME: must set modified in PMMU tables as well
+                                m_mmu_atc_data[i] |= (!m_mmu_tmp_rw ? M68K_MMU_ATC_MODIFIED : 0);
+                } else {
+                        uint16_t sr = 0;
+
+                        if (m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED)
+                                sr = M68K_MMU_SR_MODIFIED;
+
+                        if (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR)
+                                sr |= M68K_MMU_SR_WRITE_PROTECT;
+
+                        if (m_mmu_atc_data[i] & M68K_MMU_ATC_BUSERROR)
+                                sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
+                        m_mmu_tmp_sr = sr;
+                }
+                addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
+                return true;
+        }
+        if (ptest)
+                m_mmu_tmp_sr = M68K_MMU_SR_INVALID;
+        return false;
 }
 
 bool pmmu_match_tt(uint32_t addr_in, int fc, uint32_t tt)
@@ -294,7 +292,7 @@ bool pmmu_match_tt(uint32_t addr_in, int fc, uint32_t tt)
 	return (addr_in & address_mask) == address_base && (fc & ~tt) == ((tt >> 4) & 7);
 }
 
-bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits, bool ptest, int fc, int level, uint32_t &addr_out)
+bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits, int nextbits, bool ptest, int fc, int level, uint32_t &addr_out)
 {
 	// get table offset
 	uint32_t tofs;
@@ -306,13 +304,15 @@ bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits,
 	shift += is;
 	tofs = (addr_in << shift) >> (32 - bits);
 
-	MMULOG("walk_table: addr_in %08x, table %08x, offset %08x is %d, bits %d\n", addr_in, tptr, tofs, shift, bits);
+	MMULOG("walk_table: addr_in %08x, tbl_entry %08x, tofs %08x shift %d, bits %d, nextbits %d\n", addr_in, tbl_entry, tofs, shift, bits, nextbits);
 
 	switch (tbl_entry & M68K_MMU_DF_DT)
 	{
 		case M68K_MMU_DF_DT0:   // invalid, will cause MMU exception
+			m_mmu_tmp_sr &= 0xfffffff0;
 			m_mmu_tmp_sr |= M68K_MMU_SR_INVALID | level;
 			addr_out = tbl_entry;
+			MMULOG("PMMU: DT0 PC=%x (addr_in %08x -> %08x)\n", m_ppc, addr_in, addr_out);
 			return true;
 
 		case M68K_MMU_DF_DT1:   // page descriptor, will cause direct mapping
@@ -323,8 +323,18 @@ bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits,
 
 		case M68K_MMU_DF_DT2:   // valid 4 byte descriptors
 			tofs *= 4;
-			tbl_entry = get_dt2_table_entry(tptr + tofs,  ptest);
-			MMULOG("PMMU: DT2 read table entry at %08x: %08x\n", tofs + tptr, tbl_entry);
+
+			if (bits)
+			{
+				tbl_entry = get_dt2_table_entry(tptr + tofs,  ptest || !nextbits);
+				return false;
+			} else
+			{
+				tptr = tbl_entry & 0xfffffffc;
+				tbl_entry = get_dt2_table_entry(tptr, ptest);
+				return false;
+			}
+			MMULOG("PMMU: %sDT2 read table entry at %08x: %08x\n", bits ? "" : "indirect ", tofs + tptr, tbl_entry);
 			return false;
 
 		case M68K_MMU_DF_DT3: // valid 8 byte descriptors
@@ -335,6 +345,7 @@ bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits,
 	}
 	return true;
 }
+
 /*
     pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
 */
@@ -373,10 +384,11 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest
 	dbits = m_mmu_tc & 0x0f;
 
 
-	if (!pmmu_walk_table(tbl_entry, addr_in, 0                    , abits, ptest, fc, 0, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits                , bbits, ptest, fc, 1, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits        , cbits, ptest, fc, 2, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits + cbits, dbits, ptest, fc, 3, addr_out))
+	if (!pmmu_walk_table(tbl_entry, addr_in, 0                            , abits, bbits, ptest, fc, 0, addr_out) &&
+		!pmmu_walk_table(tbl_entry, addr_in, abits                        , bbits, cbits, ptest, fc, 2, addr_out) &&
+		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits                , cbits, dbits, ptest, fc, 3, addr_out) &&
+		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits + cbits        , dbits,     0, ptest, fc, 4, addr_out) &&
+		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits + cbits + dbits,     0,     0, ptest, fc, 5, addr_out))
 	{
 		fatalerror("Table walk did not resolve\n");
 	}
