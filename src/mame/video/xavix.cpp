@@ -406,9 +406,10 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 {
 	int alt_addressing = 0;
 
-	if (m_spritereg == 0x00)
+	if ((m_spritereg == 0x00) || (m_spritereg == 0x01))
 	{
 		// 8-bit addressing  (Tile Number)
+		// 16-bit addressing (Tile Number) (rad_rh)
 		alt_addressing = 1;
 	}
 	else if (m_spritereg == 0x02)
@@ -425,6 +426,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 	{
 		popmessage("unknown sprite reg %02x", m_spritereg);
 	}
+
 
 	//logerror("frame\n");
 	// priority doesn't seem to be based on list order, there are bad sprite-sprite priorities with either forward or reverse
@@ -506,7 +508,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			ypos_adjust -= 4;
 		}
 
-		// Everything except direct addressing (Addressing Mode 2) goes through the segment registers?
+		// Everything except directdirect addressing (Addressing Mode 2) goes through the segment registers?
 		if (alt_addressing != 0)
 		{
 			// tile based addressing takes into account tile size (and bpp?)

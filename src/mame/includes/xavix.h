@@ -51,6 +51,8 @@ public:
 
 	void init_xavix();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(rad_rh_in1_08_r);
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

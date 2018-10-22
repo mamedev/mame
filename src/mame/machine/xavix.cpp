@@ -313,14 +313,14 @@ WRITE8_MEMBER(xavix_state::io1_data_w)
 WRITE8_MEMBER(xavix_state::io0_direction_w)
 {
 	m_io0_direction = data;
-	logerror("%s: io0_direction_w %02x\n", machine().describe_context(), data);
+	printf("%s: io0_direction_w %02x\n", machine().describe_context().c_str(), data);
 	io0_data_w(space, 0, m_io0_data);
 }
 
 WRITE8_MEMBER(xavix_state::io1_direction_w)
 {
 	m_io1_direction = data;
-	logerror("%s: io1_direction_w %02x\n", machine().describe_context(), data);
+	printf("%s: io1_direction_w %02x\n", machine().describe_context().c_str(), data);
 	io1_data_w(space, 0, m_io1_data); // requires this for i2cmem to work, is it correct tho?
 }
 
