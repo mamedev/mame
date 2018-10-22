@@ -169,8 +169,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::scanline_cb)
 
 INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 {
-	if (m_6ff8 & 0x20)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (m_video_ctrl & 0x20)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_video_ctrl |= 0x80;
+	}
 }
 
 
@@ -179,30 +182,70 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 WRITE8_MEMBER(xavix_state::colmix_6ff2_w)
 {
 	logerror("%s: colmix_6ff2_w %02x\n", machine().describe_context(), data);
+	m_colmix_ctrl[0] = data;
 }
 
 
 READ8_MEMBER(xavix_state::dispctrl_6ff8_r)
 {
+	// 0x80 = main IRQ asserted flag
+	// 0x40 = raster IRQ asserted flag
+	// 0x20 = main IRQ enable
+	// 0x10 = raster IRQ enable?
+
 	//logerror("%s: dispctrl_6ff8_r\n", machine().describe_context());
-	return m_6ff8;
+	return m_video_ctrl;
 }
 
 WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 {
 	// I think this is something to do with IRQ ack / enable
-	m_6ff8 = data;
-	logerror("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
+
+	// 0x80 = main IRQ ack?
+	// 0x40 = raster IRQ ack?
+	// 0x20 = main IRQ enable
+	// 0x10 = raster IRQ enable?
+
+	if (data & 0x40)
+	{
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+	}
+
+	if (data & 0x80)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+
+	m_video_ctrl = data&0x3f;
+//	printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
 }
+
+
+TIMER_CALLBACK_MEMBER(xavix_state::interrupt_gen)
+{
+	if (m_video_ctrl & 0x10)
+	{
+		//printf("callback on scanline %d %d with IRQ enabled\n", m_screen->vpos(), m_screen->hpos());
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_video_ctrl |= 0x40;
+		m_screen->update_partial(m_screen->vpos());
+	}
+	m_interrupt_timer->adjust(attotime::never, 0);
+}
+
 
 WRITE8_MEMBER(xavix_state::dispctrl_posirq_x_w)
 {
 	logerror("%s: dispctrl_posirq_x_w %02x\n", machine().describe_context(), data);
+	m_posirq_x[0] = data;
 }
 
 WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 {
 	logerror("%s: dispctrl_posirq_y_w %02x\n", machine().describe_context(), data);
+	m_posirq_y[0] = data;
+
+	m_interrupt_timer->adjust(m_screen->time_until_pos(m_posirq_y[0], m_posirq_x[0]), 0);
 }
 
 READ8_MEMBER(xavix_state::io0_data_r)
@@ -414,17 +457,18 @@ READ8_MEMBER(xavix_state::irq_source_r)
 	/* the 2nd IRQ routine (regular IRQ) reads here before deciding what to do
 
 	 the following bits have been seen to be checked (active low?)
+	 monster truck does most extensive checking
 
 	  0x80 - Sound Irq
 	  0x40 - Picture / Arena Irq?
-	  0x20 - DMA Irq
+	  0x20 - DMA Irq  (most routines check this as first priority, and ignore other requests if it is set?)
 	  0x10 - Timer / Counter IRQ
 	  0x08 - IO Irq (ADC? - used for analog control on Monster Truck) (uses 7a80 top bit to determine direction, and 7a81 0x08 as an output, presumably to clock)
 	  0x04 - ADC IRQ - loads/stores 7b81
 	*/
 
 	logerror("%s: irq_source_r\n", machine().describe_context());
-	return 0xff;
+	return 0x00;
 }
 
 WRITE8_MEMBER(xavix_state::irq_source_w)
@@ -439,6 +483,8 @@ void xavix_state::machine_start()
 	// card night expects RAM to be initialized to 0xff or it will show the pause menu over the startup graphics?!
 	// don't do this every reset or it breaks the baseball 2 secret mode toggle which flips a bit in RAM
 	std::fill_n(&m_mainram[0], 0x4000, 0xff);
+
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen),this));
 }
 
 void xavix_state::machine_reset()
@@ -459,7 +505,7 @@ void xavix_state::machine_reset()
 	m_irq_vector_lo_data = 0;
 	m_irq_vector_hi_data = 0;
 
-	m_6ff8 = 0;
+	m_video_ctrl = 0;
 
 	m_arena_control = 0;
 	m_arena_start = 0;

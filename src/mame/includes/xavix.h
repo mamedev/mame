@@ -29,6 +29,9 @@ public:
 		m_palram_l(*this, "palram_l"),
 		m_colmix_sh(*this, "colmix_sh"),
 		m_colmix_l(*this, "colmix_l"),
+		m_colmix_ctrl(*this, "colmix_ctrl"),
+		m_posirq_x(*this, "posirq_x"),
+		m_posirq_y(*this, "posirq_y"),
 		m_segment_regs(*this, "segment_regs"),
 		m_palette(*this, "palette"),
 		m_in0(*this, "IN0"),
@@ -134,9 +137,6 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_WRITE8_MEMBER(dispctrl_posirq_x_w);
-	DECLARE_WRITE8_MEMBER(dispctrl_posirq_y_w);
-
 	DECLARE_READ8_MEMBER(sound_75f0_r);
 	DECLARE_WRITE8_MEMBER(sound_75f0_w);
 
@@ -214,7 +214,7 @@ private:
 	uint8_t m_arena_control;
 
 	uint8_t m_6ff0;
-	uint8_t m_6ff8;
+	uint8_t m_video_ctrl;
 
 	uint8_t m_io0_data;
 	uint8_t m_io1_data;
@@ -226,6 +226,12 @@ private:
 	uint8_t m_timer_baseval;
 
 	int16_t get_vectors(int which, int half);
+	
+	// raster IRQ
+	TIMER_CALLBACK_MEMBER(interrupt_gen);
+	emu_timer *m_interrupt_timer;
+	DECLARE_WRITE8_MEMBER(dispctrl_posirq_x_w);
+	DECLARE_WRITE8_MEMBER(dispctrl_posirq_y_w);
 
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_fragment_sprite;
@@ -237,7 +243,10 @@ private:
 	required_shared_ptr<uint8_t> m_palram_l;
 	required_shared_ptr<uint8_t> m_colmix_sh;
 	required_shared_ptr<uint8_t> m_colmix_l;
+	required_shared_ptr<uint8_t> m_colmix_ctrl;
 
+	required_shared_ptr<uint8_t> m_posirq_x;
+	required_shared_ptr<uint8_t> m_posirq_y;
 
 	required_shared_ptr<uint8_t> m_segment_regs;
 

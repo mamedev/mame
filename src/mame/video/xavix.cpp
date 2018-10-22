@@ -39,6 +39,9 @@ inline uint8_t xavix_state::get_next_bit()
 	return bit;
 }
 
+
+
+
 inline uint8_t xavix_state::get_next_byte()
 {
 	uint8_t dat = 0;
@@ -197,22 +200,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	if ((tileregs[0x7] & 0x7f) == 0x04)
 		alt_tileaddressing2 = 2;
-
-	/*
-	static int hackx = 1;
-
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		hackx--;
-		logerror("%02x\n", hackx);
-	}
-
-	if (machine().input().code_pressed_once(KEYCODE_W))
-	{
-		hackx++;
-		logerror("%02x\n", hackx);
-	}
-	*/
 
 	//logerror("draw tilemap %d, regs base0 %02x base1 %02x base2 %02x tilesize,bpp %02x scrollx %02x scrolly %02x pal %02x mode %02x\n", which, tileregs[0x0], tileregs[0x1], tileregs[0x2], tileregs[0x3], tileregs[0x4], tileregs[0x5], tileregs[0x6], tileregs[0x7]);
 
@@ -603,55 +590,75 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 	// set the address here so we can increment in bits in the draw function
 	set_data_address(tile, 0);
 
+	ypos += 16; // based on raster IRQ writes the system counts the first visible scanline as 16
+
 	for (int y = 0; y < drawheight; y++)
 	{
 		int row;
 		if (flipy)
 		{
-			row = ypos + (drawheight-1) - y;
+			row = ypos + (drawheight - 1) - y;
 		}
 		else
 		{
 			row = ypos + y;
 		}
 
-		for (int x = 0; x < drawwidth; x++)
+		if ((row >= cliprect.min_y && row <= cliprect.max_y))
 		{
-
-			int col;
-
-			if (flipx)
+			for (int x = 0; x < drawwidth; x++)
 			{
-				col = xpos + (drawwidth-1) - x;
-			}
-			else
-			{
-				col = xpos + x;
-			}
+				int col;
 
-			uint8_t dat = 0;
+				if (flipx)
+				{
+					col = xpos + (drawwidth - 1) - x;
+				}
+				else
+				{
+					col = xpos + x;
+				}
 
+				if ((col >= cliprect.min_x && col <= cliprect.max_x))
+				{
+					uint8_t dat = 0;
+
+					for (int i = 0; i < bpp; i++)
+					{
+						dat |= (get_next_bit() << i);
+					}
+
+					uint16_t* rowptr = &bitmap.pix16(row);
+					uint16_t* zrowptr = &m_zbuffer.pix16(row);
+
+					if (zval >= zrowptr[col])
+					{
+						int pen = (dat + (pal << 4)) & 0xff;
+
+						if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
+						{
+							rowptr[col] = pen;
+							zrowptr[col] = zval;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			// row is clipped, increase source pointer to pass over it
 			for (int i = 0; i < bpp; i++)
 			{
-				dat |= (get_next_bit() << i);
-			}
-
-			if ((row >= cliprect.min_y && row <= cliprect.max_y) && (col >= cliprect.min_x && col <= cliprect.max_x))
-			{
-				uint16_t* rowptr = &bitmap.pix16(row);
-				uint16_t* zrowptr = &m_zbuffer.pix16(row);
-
-
-				if (zval >= zrowptr[col])
+				for (int x = 0; x < drawwidth; x++)
 				{
-					int pen = (dat + (pal << 4)) & 0xff;
+					m_tmp_databit++;
 
-					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
+					if (m_tmp_databit == 8)
 					{
-						rowptr[col] = pen;
-						zrowptr[col] = zval;
+						m_tmp_databit = 0;
+						m_tmp_dataaddress++;
 					}
-				}			
+				}
 			}
 		}
 	}
