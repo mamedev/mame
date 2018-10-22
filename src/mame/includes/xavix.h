@@ -27,6 +27,8 @@ public:
 		m_rom_dma_len(*this,"rom_dma_len"),
 		m_palram_sh(*this, "palram_sh"),
 		m_palram_l(*this, "palram_l"),
+		m_bmp_palram_sh(*this, "bmp_palram_sh"),
+		m_bmp_palram_l(*this, "bmp_palram_l"),
 		m_colmix_sh(*this, "colmix_sh"),
 		m_colmix_l(*this, "colmix_l"),
 		m_colmix_ctrl(*this, "colmix_ctrl"),
@@ -38,7 +40,6 @@ public:
 		m_in1(*this, "IN1"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		//m_lowbus(*this, "lowbus"),
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
@@ -60,6 +61,7 @@ private:
 	void xavix_map(address_map &map);
 
 	void xavix_lowbus_map(address_map &map);
+	void superxavix_lowbus_map(address_map &map);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
@@ -242,6 +244,10 @@ private:
 
 	required_shared_ptr<uint8_t> m_palram_sh;
 	required_shared_ptr<uint8_t> m_palram_l;
+
+	optional_shared_ptr<uint8_t> m_bmp_palram_sh;
+	optional_shared_ptr<uint8_t> m_bmp_palram_l;
+
 	required_shared_ptr<uint8_t> m_colmix_sh;
 	required_shared_ptr<uint8_t> m_colmix_l;
 	required_shared_ptr<uint8_t> m_colmix_ctrl;
@@ -259,7 +265,7 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* ramsh, uint8_t* raml, int size, int basecol);
 	double hue2rgb(double p, double q, double t);
 	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval);
 	void draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
@@ -281,8 +287,6 @@ private:
 	uint8_t get_next_byte();
 
 	int get_current_address_byte();
-
-	//required_device<address_map_bank_device> m_lowbus;
 	optional_device<i2cmem_device> m_i2cmem;
 };
 

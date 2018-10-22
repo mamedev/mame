@@ -62,25 +62,16 @@ double xavix_state::hue2rgb(double p, double q, double t)
 	return p;
 }
 
-void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* ramsh, uint8_t* raml, int size, int basecol)
 {
 	// not verified
 	int offs = 0;
-	for (int index = 0; index < 257; index++)
+	for (int index = 0; index < size; index++)
 	{
 		uint16_t dat;
-
-		if (index < 256)
-		{
-			dat = m_palram_sh[offs];
-			dat |= m_palram_l[offs] << 8;
-		}
-		else
-		{
-			dat = m_colmix_sh[0];
-			dat |= m_colmix_l[0] << 8;
-		}
-
+		dat = ramsh[offs];
+		dat |= raml[offs] << 8;
+	
 		offs++;
 
 		int l_raw = (dat & 0x1f00) >> 8;
@@ -117,7 +108,7 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 		int g_real = g * 255.0f;
 		int b_real = b * 255.0f;
 
-		m_palette->set_pen_color(index, r_real, g_real, b_real);
+		m_palette->set_pen_color(basecol+index, r_real, g_real, b_real);
 
 	}
 }
@@ -589,8 +580,17 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
+	//const pen_t *paldata = m_palette->pens();
+
 	if (flipy)
 		line = drawheight - line;
+
+	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
+		return;
+
+	if ((xpos > cliprect.max_x) || ((xpos+drawwidth) < cliprect.min_x))
+		return;
+
 
 	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
 	{
@@ -623,7 +623,6 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 
 			if ((col >= cliprect.min_x && col <= cliprect.max_x))
 			{
-				uint16_t* yposptr = &bitmap.pix16(ypos);
 				uint16_t* zyposptr = &m_zbuffer.pix16(ypos);
 
 				if (zval >= zyposptr[col])
@@ -632,7 +631,12 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 
 					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
 					{
+						uint16_t* yposptr = &bitmap.pix16(ypos);
 						yposptr[col] = pen;
+
+						//uint32_t* yposptr = &bitmap.pix32(ypos);
+						//yposptr[col] = paldata[pen];
+
 						zyposptr[col] = zval;
 					}
 				}
@@ -643,7 +647,17 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 
 uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	handle_palette(screen, bitmap, cliprect);
+	handle_palette(screen, bitmap, cliprect, m_palram_sh, m_palram_l, 256, 0);
+
+	if (m_bmp_palram_sh)
+	{
+		handle_palette(screen, bitmap, cliprect, m_bmp_palram_sh, m_bmp_palram_l, 256, 256);
+		handle_palette(screen, bitmap, cliprect, m_colmix_sh, m_colmix_l, 1, 512);
+	}
+	else
+	{
+		handle_palette(screen, bitmap, cliprect, m_colmix_sh, m_colmix_l, 1, 256);
+	}
 
 	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
 	bitmap.fill(m_palette->black_pen(), cliprect);

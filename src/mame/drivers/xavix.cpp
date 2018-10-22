@@ -387,6 +387,15 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector_hi_w));
 }
 
+void xavix_state::superxavix_lowbus_map(address_map &map)
+{
+	xavix_lowbus_map(map);
+
+	map(0x6c00, 0x6cff).ram().share("bmp_palram_sh");
+	map(0x6d00, 0x6dff).ram().share("bmp_palram_l");
+
+}
+
 static INPUT_PORTS_START( xavix )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x00, "IN0" )
@@ -741,10 +750,13 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 
 	MCFG_DEVICE_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
-	MCFG_DEVICE_ADDRESS_MAP(5, xavix_lowbus_map)
+	MCFG_DEVICE_ADDRESS_MAP(5, superxavix_lowbus_map)
 	MCFG_M6502_DISABLE_CACHE()
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
+
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 512+1)
 
 MACHINE_CONFIG_END
 
