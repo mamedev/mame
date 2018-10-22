@@ -241,46 +241,44 @@ inline uint32_t get_dt3_table_entry(uint32_t tptr, uint8_t fc, uint8_t ptest)
 	return (tbl_entry & ~M68K_MMU_DF_DT) | dt;
 }
 
-bool pmmu_atc_lookup(const uint32_t addr_in, int fc, const bool ptest, uint32_t& addr_out)
+bool pmmu_atc_lookup(const uint32_t addr_in, const int fc,
+                                const int ptest, uint32_t& addr_out)
 {
+	const int ps = (m_mmu_tc >> 20) & 0xf;
+        const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | (addr_in >> ps);
 
-	int ps = (m_mmu_tc >> 20) & 0xf;
-	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24) | addr_in >> ps;
+        for (int i = 0; i < MMU_ATC_ENTRIES; i++) {
+                if (m_mmu_atc_tag[i] != atc_tag)
+                        continue;
 
-	// first see if this is already in the ATC
-	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
-	{
-		if (m_mmu_atc_tag[i] != atc_tag)
-		{
-			// tag bits and function code don't match
-		}
-		else if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
-		{
-			// write mode, but write protected
-		}
-		else if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
-		{
-			// first write; must set modified in PMMU tables as well
-		}
-		else
-		{
-			// read access or write access and not write protected
-			if (!m_mmu_tmp_rw && !ptest)
-			{
-				// FIXME: must set modified in PMMU tables as well
-				m_mmu_atc_data[i] |= M68K_MMU_ATC_MODIFIED;
-			}
-			else
-			{
-				// FIXME: supervisor mode?
-				m_mmu_tmp_sr = M68K_MMU_SR_MODIFIED;
-			}
-			addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
-          MMULOG("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, m_ppc, fc);
-			return true;
-		}
-	}
-	return false;
+                if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
+                        continue;
+                if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
+                        continue;
+
+                // read access or write access and not write protected
+                if (!ptest) {
+                                // FIXME: must set modified in PMMU tables as well
+                                m_mmu_atc_data[i] |= (!m_mmu_tmp_rw ? M68K_MMU_ATC_MODIFIED : 0);
+                } else {
+                        uint16_t sr = 0;
+
+                        if (m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED)
+                                sr = M68K_MMU_SR_MODIFIED;
+
+                        if (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR)
+                                sr |= M68K_MMU_SR_WRITE_PROTECT;
+
+                        if (m_mmu_atc_data[i] & M68K_MMU_ATC_BUSERROR)
+                                sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
+                        m_mmu_tmp_sr = sr;
+                }
+                addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
+                return true;
+        }
+        if (ptest)
+                m_mmu_tmp_sr = M68K_MMU_SR_INVALID;
+        return false;
 }
 
 bool pmmu_match_tt(uint32_t addr_in, int fc, uint32_t tt)
