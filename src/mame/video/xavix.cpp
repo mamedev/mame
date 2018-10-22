@@ -587,64 +587,63 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval)
 {
+	for (int yy = 0; yy < drawheight; yy++)
+	{
+		int tileline = yy;
 
-	int bits_per_row = drawwidth * bpp;
+		if (flipy)
+			tileline = drawheight - yy;
 
+		draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos, ypos + yy, drawheight, drawwidth, flipx, flipy, pal, zval, tileline);
+	}
+}
+
+void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
+{
 	ypos += 16; // based on raster IRQ writes the system counts the first visible scanline as 16
 
-	for (int y = 0; y < drawheight; y++)
+	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
 	{
-		int row;
-		if (flipy)
-		{
-			row = ypos + (drawheight - 1) - y;
-		}
-		else
-		{
-			row = ypos + y;
-		}
+		int bits_per_tileline = drawwidth * bpp;
 
-		if ((row >= cliprect.min_y && row <= cliprect.max_y))
-		{
-			// set the address here so we can increment in bits in the draw function
-			set_data_address(tile, 0);
-			m_tmp_dataaddress = m_tmp_dataaddress + ((y * bits_per_row) / 8);
-			m_tmp_databit = (y * bits_per_row) % 8;
+		// set the address here so we can increment in bits in the draw function
+		set_data_address(tile, 0);
+		m_tmp_dataaddress = m_tmp_dataaddress + ((line * bits_per_tileline) / 8);
+		m_tmp_databit = (line * bits_per_tileline) % 8;
 
-			for (int x = 0; x < drawwidth; x++)
+		for (int x = 0; x < drawwidth; x++)
+		{
+			int col;
+
+			if (flipx)
 			{
-				int col;
+				col = xpos + (drawwidth - 1) - x;
+			}
+			else
+			{
+				col = xpos + x;
+			}
 
-				if (flipx)
+			uint8_t dat = 0;
+
+			for (int i = 0; i < bpp; i++)
+			{
+				dat |= (get_next_bit() << i);
+			}
+
+			if ((col >= cliprect.min_x && col <= cliprect.max_x))
+			{
+				uint16_t* yposptr = &bitmap.pix16(ypos);
+				uint16_t* zyposptr = &m_zbuffer.pix16(ypos);
+
+				if (zval >= zyposptr[col])
 				{
-					col = xpos + (drawwidth - 1) - x;
-				}
-				else
-				{
-					col = xpos + x;
-				}
+					int pen = (dat + (pal << 4)) & 0xff;
 
-				uint8_t dat = 0;
-
-				for (int i = 0; i < bpp; i++)
-				{
-					dat |= (get_next_bit() << i);
-				}
-
-				if ((col >= cliprect.min_x && col <= cliprect.max_x))
-				{
-					uint16_t* rowptr = &bitmap.pix16(row);
-					uint16_t* zrowptr = &m_zbuffer.pix16(row);
-
-					if (zval >= zrowptr[col])
+					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
 					{
-						int pen = (dat + (pal << 4)) & 0xff;
-
-						if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
-						{
-							rowptr[col] = pen;
-							zrowptr[col] = zval;
-						}
+						yposptr[col] = pen;
+						zyposptr[col] = zval;
 					}
 				}
 			}
