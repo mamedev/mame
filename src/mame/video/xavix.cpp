@@ -292,7 +292,7 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 			else if (alt_tileaddressing2 == 2)
 			{
-				// 24-bit addressing
+				// 24-bit addressing (check if this is still needed)
 				tile |= 0x800000;
 			}
 
@@ -523,12 +523,6 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 			tile &= 0xffff;
 			int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 			tile += gfxbase;
-		}
-		else
-		{
-			// ?? in 24-bit mode the upper bit isn't being set, which causes some things to be drawn from RAM instead
-			// which is not what we want at all. are the segment registers still involved even in this mode?
-		//	tile |= 0x800000;
 		}
 
 		/* coordinates are signed, based on screen position 0,0 being at the center of the screen
