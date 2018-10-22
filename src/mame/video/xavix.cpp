@@ -587,8 +587,8 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval)
 {
-	// set the address here so we can increment in bits in the draw function
-	set_data_address(tile, 0);
+
+	int bits_per_row = drawwidth * bpp;
 
 	ypos += 16; // based on raster IRQ writes the system counts the first visible scanline as 16
 
@@ -606,6 +606,11 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 		if ((row >= cliprect.min_y && row <= cliprect.max_y))
 		{
+			// set the address here so we can increment in bits in the draw function
+			set_data_address(tile, 0);
+			m_tmp_dataaddress = m_tmp_dataaddress + ((y * bits_per_row) / 8);
+			m_tmp_databit = (y * bits_per_row) % 8;
+
 			for (int x = 0; x < drawwidth; x++)
 			{
 				int col;
@@ -619,15 +624,15 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 					col = xpos + x;
 				}
 
+				uint8_t dat = 0;
+
+				for (int i = 0; i < bpp; i++)
+				{
+					dat |= (get_next_bit() << i);
+				}
+
 				if ((col >= cliprect.min_x && col <= cliprect.max_x))
 				{
-					uint8_t dat = 0;
-
-					for (int i = 0; i < bpp; i++)
-					{
-						dat |= (get_next_bit() << i);
-					}
-
 					uint16_t* rowptr = &bitmap.pix16(row);
 					uint16_t* zrowptr = &m_zbuffer.pix16(row);
 
@@ -640,23 +645,6 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 							rowptr[col] = pen;
 							zrowptr[col] = zval;
 						}
-					}
-				}
-			}
-		}
-		else
-		{
-			// row is clipped, increase source pointer to pass over it
-			for (int i = 0; i < bpp; i++)
-			{
-				for (int x = 0; x < drawwidth; x++)
-				{
-					m_tmp_databit++;
-
-					if (m_tmp_databit == 8)
-					{
-						m_tmp_databit = 0;
-						m_tmp_dataaddress++;
 					}
 				}
 			}
@@ -692,8 +680,8 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		*/
 		if (((m_arena_start != 0x00) && (m_arena_end != 0x00)) && ((m_arena_start != 0xff) && (m_arena_end != 0xff)))
 		{
-			clip.max_x = m_arena_start - 3;
-			clip.min_x = m_arena_end - 1;
+			clip.max_x = m_arena_start - 3; // must be -3 to hide garbage on the right hand side of snowboarder
+			clip.min_x = m_arena_end - 2; // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
 
 			if (clip.min_x < cliprect.min_x)
 				clip.min_x = cliprect.min_x;
