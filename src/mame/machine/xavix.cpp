@@ -350,7 +350,8 @@ WRITE8_MEMBER(xavix_state::arena_end_w)
 
 READ8_MEMBER(xavix_state::arena_control_r)
 {
-	m_arena_control ^= 0x40; // unknown, xavtenni expects this to become high, also seems to be running in some kind of interlace mode, so could be a field flag?
+	// xavtenni expects 0x40 to go high (interlace related?)
+	m_arena_control ^= 0x40;
 	return m_arena_control;
 }
 
@@ -358,6 +359,10 @@ WRITE8_MEMBER(xavix_state::arena_control_w)
 {
 	logerror("%s: arena_control_w %02x\n", machine().describe_context(), data);
 	m_arena_control = data;
+
+	// rad_bb2 waits on this in the IRQ (what does it want?) is this hblank related?
+	if (data & 0x80)
+		m_arena_control &= ~0x80;
 }
 
 
