@@ -32,7 +32,7 @@ public:
 	O(brk_xav_imp);
 	O(rti_xav_imp);
 
-	O(xa_lda_idy);
+	O(xavlda_idy);
 
 	typedef device_delegate<int16_t (int which, int half)> xavix_interrupt_vector_delegate;
 
@@ -40,6 +40,20 @@ public:
 
 
 #undef O
+
+	void write_full_data(uint8_t databank, uint16_t adr, uint8_t val);
+	uint8_t read_full_code(address_space* space, uint8_t codebank, uint16_t adr);
+	uint8_t read_full_code(memory_access_cache<0, 0, ENDIANNESS_LITTLE> * space, uint8_t codebank, uint16_t adr);
+
+	uint8_t read_full_code(uint32_t addr);
+
+	uint8_t read_full_data(uint8_t databank, uint16_t addr);
+	uint8_t read_full_data_sp(uint8_t databank, uint16_t adr);
+	uint8_t read_full_special(uint32_t adr);
+
+	uint8_t read_full_data(uint32_t addr);
+
+	void write_full_data(uint32_t addr, uint8_t val);
 
 protected:
 	class mi_xavix_normal : public memory_interface {
@@ -81,6 +95,8 @@ protected:
 
 	address_space_config m_special_data_config;
 	address_space *m_special_data_space; 
+	address_space_config m_lowbus_config;
+	address_space *m_lowbus_space; 
 
 	uint8_t read_special(uint16_t adr);
 

@@ -211,26 +211,12 @@
 
 READ8_MEMBER(xavix_state::main_r)
 {
-	if (offset & 0x8000)
-	{
-		return  m_rgn[(offset) & (m_rgnlen - 1)];
-	}
-	else
-	{
-		return m_lowbus->read8(space, offset&0x7fff);
-	}
+	return m_rgn[(offset) & (m_rgnlen - 1)];
 }
 
 WRITE8_MEMBER(xavix_state::main_w)
 {
-	if (offset & 0x8000)
-	{
-		logerror("write to ROM area?\n");
-	}
-	else
-	{
-		m_lowbus->write8(space, offset & 0x7fff, data);
-	}
+	logerror("write to ROM area?\n");
 }
 
 /* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably
@@ -259,63 +245,13 @@ WRITE8_MEMBER(xavix_state::main_w)
 
 
 */
-READ8_MEMBER(xavix_state::main2_r)
-{
-	if (offset & 0x8000)
-	{
-		return m_rgn[(offset) & (m_rgnlen - 1)];
-	}
-	else
-	{
-		if ((offset & 0xffff) >= 0x200)
-		{
-			return m_rgn[(offset) & (m_rgnlen - 1)];
-		}
-		else
-			return m_lowbus->read8(space, offset & 0x7fff);
-	}
-}
-
-WRITE8_MEMBER(xavix_state::main2_w)
-{
-
-	if (offset & 0x8000)
-	{
-
-	}
-	else
-	{
-		if ((offset & 0xffff) >= 0x200)
-			logerror("write to ROM area?\n");
-		else
-			m_lowbus->write8(space, offset & 0x7fff, data);
-	}
-}
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
+// access to external bus / ROM
 void xavix_state::xavix_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
-	map(0x800000, 0xffffff).rw(FUNC(xavix_state::main2_r), FUNC(xavix_state::main2_w));
-}
-
-// used by the xa_lda_idy  ( lda ($**), y )opcodes
-READ8_MEMBER(xavix_state::main3_r)
-{
-	return m_rgn[(offset) & (m_rgnlen - 1)];
-}
-
-WRITE8_MEMBER(xavix_state::main3_w)
-{
-	//
-}
-
-
-void xavix_state::xavix_special_map(address_map &map)
-{
-	map(0x000000, 0x7fffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
-	map(0x800000, 0xffffff).rw(FUNC(xavix_state::main3_r), FUNC(xavix_state::main3_w));
+	map(0x000000, 0xffffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
 }
 
 void xavix_state::xavix_lowbus_map(address_map &map)
@@ -758,14 +694,13 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",XAVIX,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
-	MCFG_DEVICE_ADDRESS_MAP(4, xavix_special_map)
+	MCFG_DEVICE_ADDRESS_MAP(5, xavix_lowbus_map)
+
 	MCFG_M6502_DISABLE_CACHE()
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xavix_state, scanline_cb, "screen", 0, 1)
-
-	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -806,7 +741,7 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 
 	MCFG_DEVICE_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
-	MCFG_DEVICE_ADDRESS_MAP(4, xavix_special_map)
+	MCFG_DEVICE_ADDRESS_MAP(5, xavix_lowbus_map)
 	MCFG_M6502_DISABLE_CACHE()
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)

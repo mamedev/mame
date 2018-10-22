@@ -38,7 +38,7 @@ public:
 		m_in1(*this, "IN1"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lowbus(*this, "lowbus"),
+		//m_lowbus(*this, "lowbus"),
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
@@ -58,7 +58,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void xavix_map(address_map &map);
-	void xavix_special_map(address_map &map);
 
 	void xavix_lowbus_map(address_map &map);
 
@@ -193,7 +192,7 @@ private:
 	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<xavix_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	
 	uint8_t m_vectorenable;
@@ -283,7 +282,7 @@ private:
 
 	int get_current_address_byte();
 
-	required_device<address_map_bank_device> m_lowbus;
+	//required_device<address_map_bank_device> m_lowbus;
 	optional_device<i2cmem_device> m_i2cmem;
 };
 

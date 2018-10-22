@@ -17,8 +17,6 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 
 		logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
 
-		address_space& destspace = m_maincpu->space(AS_PROGRAM);
-
 		for (int i = 0; i < len; i++)
 		{
 			uint32_t m_tmpaddress = source + i;
@@ -26,19 +24,8 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 			// many games explicitly want to access with the high bank bit set, so probably the same logic as when grabbing tile data
 			// we have to be careful here or we get the zero page memory read, hence not just using read8 on the whole space
 			// this again probably indicates there is 'data space' where those don't appear
-			uint8_t dat = 0;
-			// if bank is > 0x80, or address is >0x8000 it's a plain ROM read
-			if ((m_tmpaddress >= 0x80000) || (m_tmpaddress & 0x8000))
-			{
-				dat = m_rgn[m_tmpaddress & (m_rgnlen - 1)];
-			}
-			else
-			{
-				address_space& mainspace = m_maincpu->space(AS_PROGRAM);
-				dat = m_lowbus->read8(mainspace, m_tmpaddress & 0x7fff);
-			}
-
-			destspace.write_byte(dest + i, dat);
+			uint8_t dat = m_maincpu->read_full_special(m_tmpaddress);
+			m_maincpu->write_full_data(dest+i, dat);
 		}
 	}
 	else // the interrupt routine writes 0x80 to the trigger, maybe 'clear IRQ?'
@@ -536,7 +523,7 @@ void xavix_state::machine_reset()
 	std::fill(std::begin(m_txarray), std::end(m_txarray), 0x00);
 	std::fill_n(&m_fragment_sprite[0], 0x800, 0x00); // taito nostalgia 1 never initializes the ram at 0x6400 but there's no condition on using it at present?
 
-	m_lowbus->set_bank(0);
+	//m_lowbus->set_bank(0);
 
 	m_io0_data = 0x00;
 	m_io1_data = 0x00;
