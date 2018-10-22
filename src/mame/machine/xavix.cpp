@@ -21,7 +21,7 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 
 		for (int i = 0; i < len; i++)
 		{
-			uint32_t m_tmpaddress = source+i;
+			uint32_t m_tmpaddress = source + i;
 
 			// many games explicitly want to access with the high bank bit set, so probably the same logic as when grabbing tile data
 			// we have to be careful here or we get the zero page memory read, hence not just using read8 on the whole space
@@ -30,7 +30,7 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 			// if bank is > 0x80, or address is >0x8000 it's a plain ROM read
 			if ((m_tmpaddress >= 0x80000) || (m_tmpaddress & 0x8000))
 			{
-				dat= m_rgn[m_tmpaddress & (m_rgnlen - 1)];
+				dat = m_rgn[m_tmpaddress & (m_rgnlen - 1)];
 			}
 			else
 			{
@@ -151,7 +151,7 @@ WRITE8_MEMBER(xavix_state::adc_7b81_w)
 READ8_MEMBER(xavix_state::adc_7b81_r)
 {
 	return 0x00;
-//	return machine().rand();
+	//	return machine().rand();
 }
 
 
@@ -216,8 +216,8 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
-	m_video_ctrl = data&0x3f;
-//	printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
+	m_video_ctrl = data & 0x3f;
+	//	printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
 }
 
 
@@ -314,14 +314,14 @@ WRITE8_MEMBER(xavix_state::io0_direction_w)
 {
 	m_io0_direction = data;
 	logerror("%s: io0_direction_w %02x\n", machine().describe_context(), data);
-	io0_data_w(space,0,m_io0_data); 
+	io0_data_w(space, 0, m_io0_data);
 }
 
 WRITE8_MEMBER(xavix_state::io1_direction_w)
 {
 	m_io1_direction = data;
 	logerror("%s: io1_direction_w %02x\n", machine().describe_context(), data);
-	io1_data_w(space,0,m_io1_data); // requires this for i2cmem to work, is it correct tho?
+	io1_data_w(space, 0, m_io1_data); // requires this for i2cmem to work, is it correct tho?
 }
 
 READ8_MEMBER(xavix_state::arena_start_r)
@@ -421,8 +421,8 @@ WRITE8_MEMBER(xavix_state::mult_param_w)
 		int param2 = m_multparams[2];
 
 #if 0
-		int signparam1 = (m_multparams[0] & 0x02)>>1;
-		int signparam2 = (m_multparams[0] & 0x01)>>0;
+		int signparam1 = (m_multparams[0] & 0x02) >> 1;
+		int signparam2 = (m_multparams[0] & 0x01) >> 0;
 
 		if (signparam1) param1 = -param1;
 		if (signparam2) param2 = -param2;
@@ -446,8 +446,8 @@ WRITE8_MEMBER(xavix_state::mult_param_w)
 			popmessage("unknown multiplier mode %02n", m_multparams[0] & 0xc0);
 		}
 
-		m_multresults[1] = (result>>8)&0xff;
-		m_multresults[0] = result&0xff;
+		m_multresults[1] = (result >> 8) & 0xff;
+		m_multresults[0] = result & 0xff;
 	}
 }
 
@@ -484,7 +484,7 @@ void xavix_state::machine_start()
 	// don't do this every reset or it breaks the baseball 2 secret mode toggle which flips a bit in RAM
 	std::fill_n(&m_mainram[0], 0x4000, 0xff);
 
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen),this));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
 }
 
 void xavix_state::machine_reset()
@@ -541,11 +541,11 @@ void xavix_state::machine_reset()
 
 }
 
-typedef device_delegate<uint8_t (int which, int half)> xavix_interrupt_vector_delegate;
+typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
 
 int16_t xavix_state::get_vectors(int which, int half)
 {
-//  logerror("get_vectors %d %d\n", which, half);
+	//  logerror("get_vectors %d %d\n", which, half);
 	if (m_vectorenable == 0)
 		return -1;
 
