@@ -608,7 +608,7 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
 		return;
 
-	if ((xpos > cliprect.max_x) || ((xpos+drawwidth) < cliprect.min_x))
+	if ((xpos > cliprect.max_x) || ((xpos + drawwidth) < cliprect.min_x))
 		return;
 
 
@@ -684,16 +684,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_zbuffer.fill(0, cliprect);
 
 
-	if (m_bmp_base)
-	{
-		if (m_bmp_base[0x14] & 0x01)
-		{
-			popmessage("bitmap %02x %02x %02x %02x %02x %02x %02x %02x  %02x %02x %02x %02x %02x %02x %02x %02x  %02x %02x %02x %02x %02x %02x %02x %02x",
-				                         m_bmp_base[0x00], m_bmp_base[0x01], m_bmp_base[0x02], m_bmp_base[0x03], m_bmp_base[0x04], m_bmp_base[0x05], m_bmp_base[0x06], m_bmp_base[0x07],
-										 m_bmp_base[0x08], m_bmp_base[0x09], m_bmp_base[0x0a], m_bmp_base[0x0b], m_bmp_base[0x0c], m_bmp_base[0x0d], m_bmp_base[0x0e], m_bmp_base[0x0f],
-									  	 m_bmp_base[0x10], m_bmp_base[0x11], m_bmp_base[0x12], m_bmp_base[0x13], m_bmp_base[0x14], m_bmp_base[0x15], m_bmp_base[0x16], m_bmp_base[0x17]);
-		}
-	}
+
 
 	rectangle clip = cliprect;
 
@@ -732,6 +723,43 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_sprites(screen, bitmap, clip);
 
 	//popmessage("%02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x", m_soundregs[0],m_soundregs[1],m_soundregs[2],m_soundregs[3],m_soundregs[4],m_soundregs[5],m_soundregs[6],m_soundregs[7],m_soundregs[8],m_soundregs[9],m_soundregs[10],m_soundregs[11],m_soundregs[12],m_soundregs[13],m_soundregs[14],m_soundregs[15]);
+
+	// temp, needs priority, transparency etc. also it's far bigger than the screen, I guess it must get scaled?!
+	if (m_bmp_base)
+	{
+		if (m_bmp_base[0x14] & 0x01)
+		{
+			popmessage("bitmap %02x %02x %02x %02x %02x %02x %02x %02x  -- -- %02x %02x %02x %02x %02x %02x  -- -- %02x %02x %02x %02x %02x %02x",
+				m_bmp_base[0x00], m_bmp_base[0x01], m_bmp_base[0x02], m_bmp_base[0x03], m_bmp_base[0x04], m_bmp_base[0x05], m_bmp_base[0x06], m_bmp_base[0x07],
+				/*m_bmp_base[0x08], m_bmp_base[0x09],*/ m_bmp_base[0x0a], m_bmp_base[0x0b], m_bmp_base[0x0c], m_bmp_base[0x0d], m_bmp_base[0x0e], m_bmp_base[0x0f],
+				/*m_bmp_base[0x10], m_bmp_base[0x11],*/ m_bmp_base[0x12], m_bmp_base[0x13], m_bmp_base[0x14], m_bmp_base[0x15], m_bmp_base[0x16], m_bmp_base[0x17]);
+
+			int base = ((m_bmp_base[0x11] << 8) | m_bmp_base[0x10]) * 0x800;
+			int base2 = ((m_bmp_base[0x09] << 8) | m_bmp_base[0x08]) * 0x8;
+
+			//int count = 0;
+			set_data_address(base + base2, 0);
+	
+			for (int y = 0; y < 256; y++)
+			{
+				for (int x = 0; x < 512; x++)
+				{
+					uint16_t* yposptr = &bitmap.pix16(y);
+
+					int bpp = 6;
+
+					uint8_t dat = 0;
+					for (int i = 0; i < bpp; i++)
+					{
+						dat |= (get_next_bit() << i);
+					}
+
+					yposptr[x] = dat + 0x100;
+				}
+			}
+
+		}
+	}
 
 	return 0;
 }
