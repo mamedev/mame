@@ -775,15 +775,15 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	i8155_io.out_to_callback().set(FUNC(vixen_state::io_i8155_to_w));
 
 	I8251(config, m_usart, 0);
-	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
-	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_usart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
 	m_usart->rxrdy_handler().set(FUNC(vixen_state::rxrdy_w));
 	m_usart->txrdy_handler().set(FUNC(vixen_state::txrdy_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_dsr))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	m_rs232->dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr));
 
 	FD1797(config, m_fdc, 23.9616_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set(FUNC(vixen_state::fdc_intrq_w));

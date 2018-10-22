@@ -335,12 +335,12 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	m_uart->out_dtrb_callback().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_uart->out_rtsb_callback().set("modem", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsa_w))
-	MCFG_DEVICE_ADD("modem", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxb_w))
-	//MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsb_w))
+	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", default_rs232_devices, "keyboard"));
+	keyboard.rxd_handler().set(m_uart, FUNC(z80sio_device::rxa_w));
+	keyboard.cts_handler().set(m_uart, FUNC(z80sio_device::ctsa_w));
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	modem.rxd_handler().set(m_uart, FUNC(z80sio_device::rxb_w));
+	//modem.cts_handler().set(m_uart, FUNC(z80sio_device::ctsb_w));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 1000);
