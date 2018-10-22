@@ -24,11 +24,12 @@
  * - improve ss22 lighting:
  *       + mountains in alpinr2b selection screen
  *       + ridgerac waving flag shadowing
- *       + cybrcomm enemies should flash white when you shoot them, probably lighting related
+ *       + cybrcomm enemies should flash white when you shoot them, probably lighting related - applies to some objects in timecris too
  * - improve ss22 spot:
  *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
  *       + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
  *       + what is the high bit in spot_factor for? darkness instead of brightness? not used anywhere
+ * - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snowmelting effect)
  * - support for text layer video partial updates after posirq, alpinesa does raster effects on it
  * - alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
  * - cybrcomm arrows(black part) should be below textlayer when a messagebox pops up
@@ -1630,11 +1631,8 @@ WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
 READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 {
 	// Like other Namco hardware, this chip is used for protection as well as
-	// reading random values in some games for example in timecris to determine
-	// where certain enemies will emerge.
+	// reading random values in some games.
 	// It works in combination with keycus_w, but not yet understood how.
-
-//  printf("Hit keycus offs %x mask %x PC=%x\n", offset, mem_mask, m_maincpu->pc());
 
 	// protection (not used for all games)
 	// note: some games will XOR this register against a magic value, but that doesn't mean
@@ -2148,7 +2146,6 @@ void namcos22_state::point_write(offs_t offs, u32 data)
 
 s32 namcos22_state::pointram_read(offs_t offs) // called from point_read
 {
-	// point ram, only used in ram test and ridgerac flag?
 	s32 result = -1;
 	if (m_is_ss22)
 	{
@@ -2219,9 +2216,14 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 	m_dsp_master_bioz = 1;
 	u16 offs = (m_is_ss22) ? pdp_polygonram_read(0x7fff) : m_pdp_base;
 
-	if (!m_is_ss22)
-		return 0;
+	if (m_is_ss22)
+		pdp_handle_commands(offs);
 
+	return 0;
+}
+
+void namcos22_state::pdp_handle_commands(u16 offs)
+{
 	for (;;)
 	{
 		offs &= 0x7fff;
@@ -2229,7 +2231,7 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 		u16 cmd = pdp_polygonram_read(offs++);
 		u32 srcAddr;
 		u32 dstAddr;
-		u32 numWords;
+		u16 numWords;
 		u32 data;
 		switch (cmd)
 		{
@@ -2263,6 +2265,16 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 					pdp_polygonram_write(dstAddr++, data);
 				}
 				break;
+
+			case 0xfff8:
+				// unknown
+				data = pdp_polygonram_read(offs++); // address probably, whatfor?
+				break;
+
+			case 0xfff9:
+				// unknown, modify pointram somehow?
+				logerror("unknown PDP cmd=0x%04x, offs=0x%x\n", cmd, 4 * (offs - 1));
+				return;
 
 			case 0xfffa:
 				// read block from point ram
@@ -2322,17 +2334,15 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 				{
 					// MAME will get stuck with a "goto self", so bail out
 					// in reality, the cpu can overwrite this address or retrigger pdp_begin
-					return 0;
+					return;
 				}
 				break;
 
 			default:
-				logerror("unknown PDP cmd = 0x%04x!\n", cmd);
-				return 0;
+				logerror("unknown PDP cmd=0x%04x, offs=0x%x\n", cmd, 4 * (offs - 1));
+				return;
 		}
 	}
-
-	return 0;
 }
 
 READ16_MEMBER(namcos22_state::dsp_hold_signal_r)
@@ -2582,7 +2592,7 @@ READ16_MEMBER(namcos22_state::dsp_slave_port3_r)
 READ16_MEMBER(namcos22_state::dsp_slave_port4_r)
 {
 	return 0;
-//  return ReadDataFromSlaveBuf();
+	//return ReadDataFromSlaveBuf();
 }
 
 READ16_MEMBER(namcos22_state::dsp_slave_port5_r)
@@ -3841,7 +3851,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_DEVICE_PROGRAM_MAP(iomcu_s22_program)
 	MCFG_DEVICE_IO_MAP(iomcu_s22_io)
 
-	EEPROM_2864(config, "eeprom").write_time(attotime::from_nsec(10));
+	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

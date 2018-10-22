@@ -381,6 +381,7 @@ private:
 	void handle_driving_io();
 	void handle_coinage(u16 flags);
 	void handle_cybrcomm_io();
+	void pdp_handle_commands(u16 offs);
 	inline u32 pdp_polygonram_read(offs_t offs) { return m_polygonram[offs & 0x7fff]; }
 	inline void pdp_polygonram_write(offs_t offs, u32 data) { m_polygonram[offs & 0x7fff] = data; }
 	void point_write(offs_t offs, u32 data);

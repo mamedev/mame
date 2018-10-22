@@ -1352,7 +1352,17 @@ void namcos22_state::simulate_slavedsp()
 		u16 code = *src++;
 		u16 len = *src++;
 		s32 index = src - (s32 *)m_polygonram.target();
-		if ((index + len) >= 0x7fff)
+
+		// alpinr2b titlescreen includes commands to modify pointram on the fly
+		if (m_gametype == NAMCOS22_ALPINE_RACER_2 && code == 0xfff8)
+		{
+			pdp_handle_commands(index - 2);
+
+			// skip to end for now
+			src += 0x56;
+			continue;
+		}
+		else if ((index + len) >= 0x7fff)
 		{
 			logerror("simulate_slavedsp buffer overflow: len=0x%x code=0x%x addr=0x%x\n", len, code, index);
 			return;
