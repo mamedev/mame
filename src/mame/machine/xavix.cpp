@@ -150,8 +150,8 @@ WRITE8_MEMBER(xavix_state::adc_7b81_w)
 
 READ8_MEMBER(xavix_state::adc_7b81_r)
 {
-	return 0x00;
-	//	return machine().rand();
+//	has_wamg polls this if interrupt is enabled
+	return machine().rand();
 }
 
 
@@ -473,7 +473,7 @@ READ8_MEMBER(xavix_state::irq_source_r)
 	*/
 
 	logerror("%s: irq_source_r\n", machine().describe_context());
-	return 0x00;
+	return 0x40;
 }
 
 WRITE8_MEMBER(xavix_state::irq_source_w)
