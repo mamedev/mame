@@ -138,5 +138,5 @@ void k054321_device::propagate_volume()
 	for (int i = 0; i < m_left->inputs(); i++)
 		m_left->set_input_gain(i, m_active & 2 ? vol : 0.0);
 	for (int i = 0; i < m_right->inputs(); i++)
-		m_right->set_input_gain(0, m_active & 1 ? vol : 0.0);
+		m_right->set_input_gain(i, m_active & 1 ? vol : 0.0);
 }
