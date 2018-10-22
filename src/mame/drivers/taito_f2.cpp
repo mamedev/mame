@@ -5211,6 +5211,33 @@ ROM_START( pulirulaj )
 	/* no Delta-T samples */
 ROM_END
 
+ROM_START( pulirulaa ) // dumped from an original PCB without original ROM labels. The maincpu and audiocpu ROMs differ from the parent.
+	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 768k for 68000 code */
+	ROM_LOAD16_BYTE( "ic46.bin", 0x00000, 0x40000, CRC(584ae599) SHA1(c114442d93080aaf0641c1a9204569f0017af000) )
+	ROM_LOAD16_BYTE( "ic45.bin", 0x00001, 0x40000, CRC(08024086) SHA1(09ebbc6c6c8034ee500bf116ce2a1e854e8e0bb7) )
+	ROM_LOAD16_BYTE( "ic44.bin", 0x80000, 0x20000, CRC(da9d31fd) SHA1(9300f1e8888ac48c7a10c96f5773b2acc4de5692) )
+	ROM_LOAD16_BYTE( "ic43.bin", 0x80001, 0x20000, CRC(1feea319) SHA1(9799cbbd825dbc7bca6c283643070cadf9ef16ea) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
+	ROM_LOAD( "c98-04.rom", 0x000000, 0x100000, CRC(0e1fe3b2) SHA1(37bf8e946ee4239de104a07ff87727cb6e2a3932) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* OBJ */
+	ROM_LOAD( "c98-02.rom", 0x000000, 0x100000, CRC(4a2ad2b3) SHA1(3296cf2855203d06170c991d187c65ccc3751952) )
+	ROM_LOAD( "c98-03.rom", 0x100000, 0x100000, CRC(589a678f) SHA1(228b959046bec10b28599d83d9e58fd149273473) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* pivot gfx */
+	ROM_LOAD( "c98-05.rom", 0x000000, 0x080000, CRC(9ddd9c39) SHA1(4005a540c5cef6754284361da79a9e5e15612146) )
+
+	ROM_REGION( 0x2c000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "ic50.bin", 0x00000, 0x04000, CRC(e8b68cb8) SHA1(e2ff9df8ae635ffaa3056a97e308b9f0396bdfc6) )
+	ROM_CONTINUE(           0x10000, 0x1c000 ) /* banked stuff */
+
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_LOAD( "c98-01.rom", 0x000000, 0x100000, CRC(197f66f5) SHA1(cc5d104033f9ab7d614afd47eeb61a22ef5714ea) )
+
+	/* no Delta-T samples */
+ROM_END
+
 ROM_START( metalb )
 	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 768k for 68000 code */
 	ROM_LOAD16_BYTE( "d16-16.8",   0x00000, 0x40000, CRC(3150be61) SHA1(63e0e6c6dc3a64da77bc83a160bbcd0f7d98ca52) )
@@ -5721,6 +5748,7 @@ GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr,   taitof2_state, empty_in
 GAME( 1991, qzquest,    0,        qzquest ,  qzquest,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, pulirula,   0,        pulirula,  pulirula,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pulirulaa,  pulirula, pulirula,  pulirulaj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "PuLiRuLa (World, earlier?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, metalb,     0,        metalb,    metalb,     taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Metal Black (World)", MACHINE_SUPPORTS_SAVE )
