@@ -97,7 +97,7 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 		offs++;
 
 		int l_raw = (dat & 0x1f00) >> 8;
-		int sl_raw =(dat & 0x00e0) >> 5;
+		int s_raw =(dat & 0x00e0) >> 5;
 		int h_raw = (dat & 0x001f) >> 0;
 
 		//if (h_raw > 24)
@@ -106,12 +106,12 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 		//if (l_raw > 17)
 		//  logerror("lraw >17 (%02x)\n", l_raw);
 
-		//if (sl_raw > 7)
-		//  logerror("sl_raw >5 (%02x)\n", sl_raw);
+		//if (s_raw > 7)
+		//  logerror("s_raw >5 (%02x)\n", s_raw);
 
 		double l = (double)l_raw / 17.0f;
-		double s = (double)sl_raw / 7.0f;
-		double h = (double)h_raw / 24.0f;
+		double s = (double)s_raw / 7.0f;
+		double h = (double)h_raw / 24.0f; // hue values 24-31 render as transparent
 
 		double r, g, b;
 
@@ -137,6 +137,15 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		draw_tilemap_line(screen, bitmap, cliprect, which, y);
+	}
+}
+
+
+void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line)
+{
 	uint8_t* tileregs;
 	if (which == 0)
 	{
@@ -148,7 +157,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 
 	// bail if tilemap is disabled
-	if (!(tileregs[0x7] & 0x80)) 
+	if (!(tileregs[0x7] & 0x80))
 		return;
 
 	int alt_tileaddressing = 0;
@@ -158,6 +167,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	int xdimension = 0;
 	int ytilesize = 0;
 	int xtilesize = 0;
+	int yshift = 0;
 
 	switch (tileregs[0x3] & 0x30)
 	{
@@ -166,6 +176,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xdimension = 32;
 		ytilesize = 8;
 		xtilesize = 8;
+		yshift = 3;
 		break;
 
 	case 0x10:
@@ -173,6 +184,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xdimension = 16;
 		ytilesize = 8;
 		xtilesize = 16;
+		yshift = 3;
 		break;
 
 	case 0x20: // guess
@@ -180,6 +192,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xdimension = 32;
 		ytilesize = 16;
 		xtilesize = 8;
+		yshift = 4;
 		break;
 
 	case 0x30:
@@ -187,6 +200,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		xdimension = 16;
 		ytilesize = 16;
 		xtilesize = 16;
+		yshift = 4;
 		break;
 	}
 
@@ -205,190 +219,191 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	// there's a tilemap register to specify base in main ram, although in the monster truck test mode it points to an unmapped region
 	// and expected a fixed layout, we handle that in the memory map at the moment
-	int count = 0;
-	for (int y = 0; y < ydimension; y++)
+
+	int drawline = line;
+	int scrolly = tileregs[0x5];
+
+	drawline += scrolly;
+
+	drawline &= ((ydimension * ytilesize)-1);
+
+	int y = drawline >> yshift;
+	int yyline = drawline & (ytilesize-1);
+
+	for (int x = 0; x < xdimension; x++)
 	{
-		for (int x = 0; x < xdimension; x++)
+		int count = (y * xdimension) + x;
+
+		address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+
+		int tile = 0;
+
+		// the register being 0 probably isn't the condition here
+		if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0] << 8) + count);
+
+		// only read the next byte if we're not in an 8-bit mode
+		if (((tileregs[0x7] & 0x7f) != 0x00) && ((tileregs[0x7] & 0x7f) != 0x08))
+			tile |= mainspace.read_byte((tileregs[0x1] << 8) + count) << 8;
+
+		// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
+		if (alt_tileaddressing2 == 2)
+			tile |= mainspace.read_byte((tileregs[0x2] << 8) + count) << 16;
+
+
+		int bpp = (tileregs[0x3] & 0x0e) >> 1;
+		bpp++;
+		int pal = (tileregs[0x6] & 0xf0) >> 4;
+		int zval = (tileregs[0x6] & 0x0f) >> 0;
+		int scrollx = tileregs[0x4];
+
+		int basereg;
+		int flipx = 0;
+		int flipy = 0;
+		int gfxbase;
+
+		// tile 0 is always skipped, doesn't even point to valid data packets in alt mode
+		// this is consistent with the top layer too
+		// should we draw as solid in solid layer?
+		if (tile == 0)
 		{
-			address_space& mainspace = m_maincpu->space(AS_PROGRAM);
+			continue;
+		}
 
-			int tile = 0;
+		const int debug_packets = 0;
+		int test = 0;
 
-			// the register being 0 probably isn't the condition here
-			if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0] << 8) + count);
-			
-			// only read the next byte if we're not in an 8-bit mode
-			if (((tileregs[0x7] & 0x7f) != 0x00) && ((tileregs[0x7] & 0x7f) != 0x08))
-				tile |= mainspace.read_byte((tileregs[0x1] << 8) + count) << 8;
-		
-			// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
-			if (alt_tileaddressing2 == 2)
-				tile |= mainspace.read_byte((tileregs[0x2] << 8) + count) << 16;
-
-
-			int bpp = (tileregs[0x3] & 0x0e) >> 1;
-			bpp++;
-			int pal = (tileregs[0x6] & 0xf0) >> 4;
-			int zval = (tileregs[0x6] & 0x0f) >> 0;
-			int scrolly = tileregs[0x5];
-			int scrollx = tileregs[0x4];
-
-			int basereg;
-			int flipx = 0;
-			int flipy = 0;
-			int gfxbase;
-
-			// tile 0 is always skipped, doesn't even point to valid data packets in alt mode
-			// this is consistent with the top layer too
-			// should we draw as solid in solid layer?
-			if (tile == 0)
+		if (!alt_tileaddressing)
+		{
+			if (alt_tileaddressing2 == 0)
 			{
-				count++;
-				continue;
-			}
+				// Tile Based Addressing takes into account Tile Sizes and bpp
+				const int offset_multiplier = (ytilesize * xtilesize) / 8;
 
-			const int debug_packets = 0;
-			int test = 0;
-
-			if (!alt_tileaddressing)
-			{
-				if (alt_tileaddressing2 == 0)
-				{
-					// Tile Based Addressing takes into account Tile Sizes and bpp
-					const int offset_multiplier = (ytilesize * xtilesize)/8;
-					
-					basereg = 0;
-					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-
-					tile = tile * (offset_multiplier * bpp);
-					tile += gfxbase;
-				}
-				else if (alt_tileaddressing2 == 1)
-				{
-					// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
-					tile = tile * 8;
-					basereg = (tile & 0x70000) >> 16;
-					tile &= 0xffff;
-					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-					tile += gfxbase;
-				}
-				else if (alt_tileaddressing2 == 2)
-				{
-					// 24-bit addressing
-					tile |= 0x800000;
-				}
-
-				// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
-				if (tileregs[0x7] & 0x08)
-				{
-					uint8_t extraattr = mainspace.read_byte((tileregs[0x2] << 8) + count);
-					// make use of the extraattr stuff?
-					pal = (extraattr & 0xf0)>>4;
-					zval = (extraattr & 0x0f) >> 0;
-				}
-			}
-			else
-			{
-				// Addressing Mode 2 (plus Inline Header)
-
-				if (debug_packets) logerror("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
-
-
-				basereg = (tile & 0xf000) >> 12;
-				tile &= 0x0fff;
+				basereg = 0;
 				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 
+				tile = tile * (offset_multiplier * bpp);
 				tile += gfxbase;
-				set_data_address(tile, 0);
-
-				// there seems to be a packet stored before the tile?!
-				// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
-				uint8_t byte1 = 0;
-				int done = 0;
-				int skip = 0;
-
-				do
-				{
-					byte1 = get_next_byte();
-
-					if (debug_packets) logerror(" %02x, ", byte1);
-
-					if (skip == 1)
-					{
-						skip = 0;
-						//test = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x01)
-					{
-						// used
-					}
-					else if ((byte1 & 0x0f) == 0x03)
-					{
-						// causes next byte to be skipped??
-						skip = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x05)
-					{
-						// the upper bits are often 0x00, 0x10, 0x20, 0x30, why?
-						flipx = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
-					{
-						// tile data will follow after this, always?
-						pal = (byte1 & 0xf0) >> 4;
-						done = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x07)
-					{
-						// causes next byte to be skipped??
-						skip = 1;
-					}
-					else if ((byte1 & 0x0f) == 0x09)
-					{
-						// used
-					}
-					else if ((byte1 & 0x0f) == 0x0a)
-					{
-						// not seen
-					}
-					else if ((byte1 & 0x0f) == 0x0b)
-					{
-						// used
-					}
-					else if ((byte1 & 0x0f) == 0x0c)
-					{
-						// not seen
-					}
-					else if ((byte1 & 0x0f) == 0x0d)
-					{
-						// used
-					}
-					else if ((byte1 & 0x0f) == 0x0e)
-					{
-						// not seen
-					}
-					else if ((byte1 & 0x0f) == 0x0f)
-					{
-						// used
-					}
-
-				} while (done == 0);
-				if (debug_packets) logerror("\n");
-				tile = get_current_address_byte();
+			}
+			else if (alt_tileaddressing2 == 1)
+			{
+				// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
+				tile = tile * 8;
+				basereg = (tile & 0x70000) >> 16;
+				tile &= 0xffff;
+				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+				tile += gfxbase;
+			}
+			else if (alt_tileaddressing2 == 2)
+			{
+				// 24-bit addressing
+				tile |= 0x800000;
 			}
 
-			if (test == 1) pal = machine().rand() & 0xf;
-
-
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, zval);
-			draw_tile(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-y
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, ((y * ytilesize) - 16) - scrolly, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-x
-			draw_tile(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, (((y * ytilesize) - 16) - scrolly) + 256, ytilesize, xtilesize, flipx, flipy, pal, zval); // wrap-y and x
-		
-			count++;
+			// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
+			if (tileregs[0x7] & 0x08)
+			{
+				uint8_t extraattr = mainspace.read_byte((tileregs[0x2] << 8) + count);
+				// make use of the extraattr stuff?
+				pal = (extraattr & 0xf0) >> 4;
+				zval = (extraattr & 0x0f) >> 0;
+			}
 		}
+		else
+		{
+			// Addressing Mode 2 (plus Inline Header)
+
+			if (debug_packets) logerror("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
+
+
+			basereg = (tile & 0xf000) >> 12;
+			tile &= 0x0fff;
+			gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+
+			tile += gfxbase;
+			set_data_address(tile, 0);
+
+			// there seems to be a packet stored before the tile?!
+			// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
+			uint8_t byte1 = 0;
+			int done = 0;
+			int skip = 0;
+
+			do
+			{
+				byte1 = get_next_byte();
+
+				if (debug_packets) logerror(" %02x, ", byte1);
+
+				if (skip == 1)
+				{
+					skip = 0;
+					//test = 1;
+				}
+				else if ((byte1 & 0x0f) == 0x01)
+				{
+					// used
+				}
+				else if ((byte1 & 0x0f) == 0x03)
+				{
+					// causes next byte to be skipped??
+					skip = 1;
+				}
+				else if ((byte1 & 0x0f) == 0x05)
+				{
+					// the upper bits are often 0x00, 0x10, 0x20, 0x30, why?
+					flipx = 1;
+				}
+				else if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
+				{
+					// tile data will follow after this, always?
+					pal = (byte1 & 0xf0) >> 4;
+					done = 1;
+				}
+				else if ((byte1 & 0x0f) == 0x07)
+				{
+					// causes next byte to be skipped??
+					skip = 1;
+				}
+				else if ((byte1 & 0x0f) == 0x09)
+				{
+					// used
+				}
+				else if ((byte1 & 0x0f) == 0x0a)
+				{
+					// not seen
+				}
+				else if ((byte1 & 0x0f) == 0x0b)
+				{
+					// used
+				}
+				else if ((byte1 & 0x0f) == 0x0c)
+				{
+					// not seen
+				}
+				else if ((byte1 & 0x0f) == 0x0d)
+				{
+					// used
+				}
+				else if ((byte1 & 0x0f) == 0x0e)
+				{
+					// not seen
+				}
+				else if ((byte1 & 0x0f) == 0x0f)
+				{
+					// used
+				}
+
+			} while (done == 0);
+			if (debug_packets) logerror("\n");
+			tile = get_current_address_byte();
+		}
+
+		if (test == 1) pal = machine().rand() & 0xf;
+
+		draw_tile_line(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, line, ytilesize, xtilesize, flipx, flipy, pal, zval, yyline);
+		draw_tile_line(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, line, ytilesize, xtilesize, flipx, flipy, pal, zval, yyline); // wrap-x
 	}
-	
 }
 
 void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -466,9 +481,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		int drawwidth = 16;
 
 		int xpos_adjust = 0;
-		int ypos_adjust = 0;
-
-		tile &= (m_rgnlen - 1);
+		int ypos_adjust = -16;
 
 		// taito nost attr1 is 84 / 80 / 88 / 8c for the various elements of the xavix logo.  monster truck uses ec / fc / dc / 4c / 5c / 6c (final 6 sprites ingame are 00 00 f0 f0 f0 f0, radar?)
 
@@ -481,20 +494,20 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		{
 			drawheight = 16;
 			drawwidth = 8;
-			xpos_adjust = 4;
+			xpos_adjust += 4;
 		}
 		else if ((attr1 & 0x0c) == 0x04)
 		{
 			drawheight = 8;
 			drawwidth = 16;
-			ypos_adjust = -4;
+			ypos_adjust -= 4;
 		}
 		else if ((attr1 & 0x0c) == 0x00)
 		{
 			drawheight = 8;
 			drawwidth = 8;
-			xpos_adjust = 4;
-			ypos_adjust = -4;
+			xpos_adjust += 4;
+			ypos_adjust -= 4;
 		}
 
 		// Everything except direct addressing (Addressing Mode 2) goes through the segment registers?
@@ -517,7 +530,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 		{
 			// ?? in 24-bit mode the upper bit isn't being set, which causes some things to be drawn from RAM instead
 			// which is not what we want at all. are the segment registers still involved even in this mode?
-			tile |= 0x800000;
+		//	tile |= 0x800000;
 		}
 
 		/* coordinates are signed, based on screen position 0,0 being at the center of the screen
@@ -589,18 +602,14 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 {
 	for (int yy = 0; yy < drawheight; yy++)
 	{
-		int tileline = yy;
-
-		if (flipy)
-			tileline = drawheight - yy;
-
-		draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos, ypos + yy, drawheight, drawwidth, flipx, flipy, pal, zval, tileline);
+		draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos, ypos + yy, drawheight, drawwidth, flipx, flipy, pal, zval, yy);
 	}
 }
 
 void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
-	ypos += 16; // based on raster IRQ writes the system counts the first visible scanline as 16
+	if (flipy)
+		line = drawheight - line;
 
 	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
 	{
