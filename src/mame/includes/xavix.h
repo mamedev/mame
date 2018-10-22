@@ -283,6 +283,8 @@ private:
 	// variables used by rendering
 	int m_tmp_dataaddress;
 	int m_tmp_databit;
+	uint8_t m_bit;
+
 	void set_data_address(int address, int bit);
 	uint8_t get_next_bit();
 	uint8_t get_next_byte();
