@@ -2073,7 +2073,33 @@ ROM_START( spangbl )
 	ROM_LOAD( "ic125.14",  0x030000, 0x10000, CRC(bd5c2f4b) SHA1(3c71d63637633a98ab513e4336e2954af3f964f4) )
 ROM_END
 
-// There is a bank of 8 dipswitches that needs to be hooked up
+// "spangbl2"
+// TODO: There is a bank of 8 dipswitches that needs to be hooked up with this set up:
+// ______________________________________________________
+// |                    | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
+// |--------------------|---|---|---|---|---|---|---|---|
+// | 1 Coin - 1 Credit  | ON| ON| ON|   |   |   |   |   |
+// | 1 Coin - 2 Credits |OFF| ON| ON|   |   |   |   |   |
+// | 1 Coin - 3 Credits | ON|OFF| ON|   |   |   |   |   |
+// | 1 Coin - 4 Credits |OFF|OFF| ON|   |   |   |   |   |
+// | 1 Coin - 6 Credits | ON| ON|OFF|   |   |   |   |   |
+// | 2 Coin - 1 Credit  |OFF| ON|OFF|   |   |   |   |   |
+// | 3 Coin - 1 Credit  | ON|OFF|OFF|   |   |   |   |   |
+// | 4 Coin - 1 Credit  |OFF|OFF|OFF|   |   |   |   |   |
+// |--------------------|---|---|---|---|---|---|---|---|
+// | 1 Player           |   |   |   | ON| ON|   |   |   |
+// | 2 Players          |   |   |   |OFF| ON|   |   |   |
+// | 3 Players          |   |   |   | ON|OFF|   |   |   |
+// | 4 Players          |   |   |   |OFF|OFF|   |   |   |
+// |--------------------|---|---|---|---|---|---|---|---|
+// | Easy               |   |   |   |   |   | ON| ON|   |
+// | Normal             |   |   |   |   |   |OFF| ON|   |
+// | Dificult           |   |   |   |   |   | ON|OFF|   |
+// | Very dificult      |   |   |   |   |   |OFF|OFF|   |
+// |--------------------|---|---|---|---|---|---|---|---|
+// | No demo sounds     |   |   |   |   |   |   |   | ON|
+// | Demo sounds        |   |   |   |   |   |   |   |OFF|
+// |____________________________________________________|
 ROM_START( spangbl2 )
 	ROM_REGION( 0x50000*2, "maincpu", ROMREGION_ERASEFF )
 	// IC2 can be found as 27C512 with 1st and 2nd half identical or as 27C256
