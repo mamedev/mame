@@ -1088,14 +1088,14 @@ MACHINE_CONFIG_START(abc800_state::common)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CASSETTE_TAG, abc800_state, cassette_input_tick, attotime::from_hz(44100))
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_sio, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_sio, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_sio, FUNC(z80dart_device::ctsa_w));
+	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_sio, FUNC(z80dart_device::rxa_w));
-	rs232b.dcd_handler().set(m_sio, FUNC(z80dart_device::dcda_w));
-	rs232b.cts_handler().set(m_sio, FUNC(z80dart_device::ctsa_w));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 
 	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, nullptr)
 	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))
