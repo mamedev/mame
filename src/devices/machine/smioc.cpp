@@ -142,13 +142,12 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 		AM9517A(config, dma, 20_MHz_XTAL / 4); // Clock division unknown
 
 	/* RS232 */	
-	/* Port 1: Console */
-	MCFG_DEVICE_ADD("rs232_p1", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 	for (required_device<rs232_port_device> &rs232_port : m_rs232_p)
 		RS232_PORT(config, rs232_port, default_rs232_devices, nullptr);
-
 	
+	m_rs232_p[0]->set_default_option("terminal");
+	m_rs232_p[0]->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+
 
 	/* SCC2698B */
 	scc2698b_device &scc2698b(SCC2698B(config, "scc2698b", XTAL(3'686'400)));
@@ -167,28 +166,25 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	//MCFG_SCC2698B_MPP2_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq2_w).invert())
 
 	/* The first dma8237 is set up in cascade mode, and each of its four channels provides HREQ/HACK to the other 4 DMA controllers*/
-	MCFG_DEVICE_MODIFY("dma8237_1")
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE("dma8237_2", am9517a_device, hack_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE("dma8237_3", am9517a_device, hack_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE("dma8237_4", am9517a_device, hack_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE("dma8237_5", am9517a_device, hack_w))
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma8237_1", am9517a_device, hack_w))
+
+	m_dma8237[0]->out_dack_callback<0>().set("dma8237_2", FUNC(am9517a_device::hack_w));
+	m_dma8237[0]->out_dack_callback<1>().set("dma8237_3", FUNC(am9517a_device::hack_w));
+	m_dma8237[0]->out_dack_callback<2>().set("dma8237_4", FUNC(am9517a_device::hack_w));
+	m_dma8237[0]->out_dack_callback<3>().set("dma8237_5", FUNC(am9517a_device::hack_w));
+	m_dma8237[0]->out_hreq_callback().set("dma8237_1", FUNC(am9517a_device::hack_w));
+
 	/* Connect base DMA controller's Hold Request to its own Hold ACK
 		The CPU doesn't support hold request / hold ack pins, so we will pretend that the DMA controller immediately gets what it wants every time it asks.
 		This will keep things moving forward, but the CPU will continue going through DMA requests rather than halting for a few cycles each time.
 		It shouldn't cause a problem though.
 		*/
 
-	MCFG_DEVICE_MODIFY("dma8237_2")
-	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, smioc_device, dma8237_2_dmaread))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, smioc_device, dma8237_2_dmawrite))
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma8237_1", am9517a_device, dreq0_w))
+	m_dma8237[1]->in_memr_callback().set(FUNC(smioc_device::dma8237_2_dmaread));
+	m_dma8237[1]->out_memw_callback().set(FUNC(smioc_device::dma8237_2_dmawrite));
+	m_dma8237[1]->out_hreq_callback().set("dma8237_1", FUNC(am9517a_device::dreq0_w));
 
-
-	MCFG_DEVICE_MODIFY("rs232_p1")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc2698b", scc2698b_device, port_a_rx_w))
-	MCFG_DEVICE_MODIFY("rs232_p2")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc2698b", scc2698b_device, port_b_rx_w))
+	m_rs232_p[0]->rxd_handler().set("scc2698b", FUNC(scc2698b_device::port_a_rx_w));
+	m_rs232_p[1]->rxd_handler().set("scc2698b", FUNC(scc2698b_device::port_b_rx_w));
 
 
 MACHINE_CONFIG_END
@@ -205,8 +201,7 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, SMIOC, tag, owner, clock),
 	m_smioccpu(*this, I188_TAG),
 	m_dma8237(*this, "dma8237_%u", 1),
-	m_rs232_p1(*this, "rs232_p1"),
-	m_rs232_p(*this, "rs232_p%u", 2),
+	m_rs232_p(*this, "rs232_p%u", 1),
 	m_scc2698b(*this, "scc2698b"),
 	m_smioc_ram(*this, "smioc_ram"),
 	m_dma_timer(nullptr),
