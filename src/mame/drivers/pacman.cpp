@@ -4791,6 +4791,58 @@ ROM_START( pengopac )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
 ROM_END
 
+/** Marti Colls bootleg (set 1) */
+ROM_START( pengomc1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pengomc_01.bin", 0x0000, 0x1000, CRC(ea415ede) SHA1(da005876d96361c5b807a3cf1b82ec066c678c87) )
+	ROM_LOAD( "pengomc_02.bin", 0x4000, 0x1000, CRC(dfe9640e) SHA1(c0366399092cafecba1e407b256a62c0c3b538c0) )
+	ROM_LOAD( "pengomc_03.bin", 0x5000, 0x1000, CRC(0ac08ae4) SHA1(29eadd0ef0d1f584785e4e6f6cc9561c7dbfb70c) )
+	ROM_LOAD( "pengomc_04.bin", 0x6000, 0x1000, CRC(1717a7d9) SHA1(d550a7644be3712ddbcbf008d45f99c0743976bb) )
+	ROM_LOAD( "pengomc_05.bin", 0x7000, 0x1000, CRC(cb6eb19c) SHA1(c66256e0fc7ccdcac997775ae9186aef1e0819d9) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pengomc_09.bin", 0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) ) // same as pengoa.bin on "pengojpm"
+	ROM_LOAD( "pengomc_11.bin", 0x0800, 0x0800, CRC(cb208b9f) SHA1(63b64b52c9c3e18b2d2823e79095160fb1a71f00) ) // same as pengoc.bin on "pengojpm"
+	ROM_LOAD( "pengomc_10.bin", 0x1000, 0x0800, CRC(bae319a3) SHA1(88f0562ba2501f16ddfaffb12c4d1c00315f4225) ) // same as pengob.bin on "pengojpm"
+	ROM_LOAD( "pengomc_12.bin", 0x1800, 0x0800, CRC(5a5190e8) SHA1(caf49a348c649fbf959e97c632832bdb5bc068be) ) // same as pengod.bin on "pengojpm"
+
+        /* Undumped on the Marti Colls PCB, taken from "pengojpm" set */
+	ROM_REGION( 0x0420, "proms", 0 )
+	ROM_LOAD( "pr1633.78", 0x0000, 0x0020, CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) /* color palette */
+        ROM_LOAD( "pr1634.88", 0x0020, 0x0400, CRC(766b139b) SHA1(3fcd66610fcaee814953a115bf5e04788923181f) ) /* color lookup */
+
+        /* Undumped on the Marti Colls PCB, taken from "pengojpm" set */
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+        ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */
+ROM_END
+
+/** Marti Colls bootleg (set 2) */
+ROM_START( pengomc2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pengomc2_01.bin", 0x4000, 0x1000, CRC(4ebc5a8b) SHA1(2208288f68f0fc0fc010760290db2857f420bd16) )
+	ROM_LOAD( "pengomc2_02.bin", 0x0000, 0x1000, CRC(41dccc7c) SHA1(e018806bdac8a9ca53821f65f53cf5a4e1ddd45c) )
+	ROM_LOAD( "pengomc2_03.bin", 0x5000, 0x1000, CRC(1b90c32c) SHA1(1761add93d71d29840b1462b9747a3d463b7148d) ) // same as pengo2.bin on "pengojpm"
+	ROM_LOAD( "pengomc2_04.bin", 0x6000, 0x1000, CRC(aff4fba1) SHA1(8083352b3a2a4a70b2db778074826a55177e06ab) ) // same as pengo3.bin on "pengojpm"
+	ROM_LOAD( "pengomc2_05.bin", 0x7000, 0x1000, CRC(1628eb6d) SHA1(44bd9d30828bb2440599fcd4a46f20fd798c24d5) ) // same as pengo4.bin on "pengojpm"
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pengomc_09.bin", 0x0000, 0x0800, CRC(ad88978a) SHA1(a568baf751753660223958b722980f031310eba1) ) // same as pengoa.bin on "pengojpm"
+	ROM_LOAD( "pengomc_11.bin", 0x0800, 0x0800, CRC(cb208b9f) SHA1(63b64b52c9c3e18b2d2823e79095160fb1a71f00) ) // same as pengoc.bin on "pengojpm"
+	ROM_LOAD( "pengomc_10.bin", 0x1000, 0x0800, CRC(bae319a3) SHA1(88f0562ba2501f16ddfaffb12c4d1c00315f4225) ) // same as pengob.bin on "pengojpm"
+	ROM_LOAD( "pengomc_12.bin", 0x1800, 0x0800, CRC(5a5190e8) SHA1(caf49a348c649fbf959e97c632832bdb5bc068be) ) // same as pengod.bin on "pengojpm"
+
+        /* Undumped on the Marti Colls PCB, taken from "pengojpm" set */
+	ROM_REGION( 0x0420, "proms", 0 )
+	ROM_LOAD( "pr1633.78", 0x0000, 0x0020, CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) /* color palette */
+        ROM_LOAD( "pr1634.88", 0x0020, 0x0400, CRC(766b139b) SHA1(3fcd66610fcaee814953a115bf5e04788923181f) ) /* color lookup */
+
+        /* Undumped on the Marti Colls PCB, taken from "pengojpm" set */
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+        ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */
+ROM_END
+
 ROM_START( pinguinos )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pg0_2732.bin", 0x0000, 0x1000, CRC(1a79436c) SHA1(341a0c86784b794c1206842d03da8111487099b0) )
@@ -7574,4 +7626,6 @@ GAME( 1999, superabco,superabc, superabc, superabc, pacman_state,  init_superabc
 
 GAME( 1981, pengojpm, pengo,    pengojpm, pengojpm, pacman_state,  empty_init,    ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 1)", MACHINE_SUPPORTS_SAVE ) // conversion of pacmanjpm board with wire mods
 GAME( 1981, pengopac, pengo,    pengojpm, pengojpm, pacman_state,  empty_init,    ROT90,  "bootleg", "Pengo (bootleg on Pac-Man hardware, set 2)", MACHINE_SUPPORTS_SAVE ) // different conversion?
+GAME( 1982, pengomc1, pengo,    pengojpm, pengojpm, pacman_state,  empty_init,    ROT90,  "bootleg (Marti Colls)", "Pengo (Marti Colls bootleg on Pac-Man hardware, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1982, pengomc2, pengo,    pengojpm, pengojpm, pacman_state,  empty_init,    ROT90,  "bootleg (Marti Colls)", "Pengo (Marti Colls bootleg on Pac-Man hardware, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1982, pinguinos,pengo,    pengojpm, pengojpm, pacman_state,  empty_init,    ROT90,  "bootleg (Aincar)", "Pinguinos (Spanish bootleg on Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )
