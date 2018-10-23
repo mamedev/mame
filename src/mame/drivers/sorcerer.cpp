@@ -434,8 +434,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	m_uart->set_rx_clock(ES_UART_CLOCK);
 	m_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, "rs232", default_rs232_devices, "null_modem").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* printer */
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "covox")

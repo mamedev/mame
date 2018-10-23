@@ -932,7 +932,7 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
 	m_rtc->irq().set(FUNC(hx20_state::rtc_irq_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")
 	MCFG_EPSON_SIO_RX(WRITELINE(*this, hx20_state, sio_rx_w))

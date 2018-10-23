@@ -39,12 +39,12 @@ MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
 	m_usart->rxrdy_handler().set(FUNC(isa8_myb3k_com_device::com_int_rx));
 	m_usart->txrdy_handler().set(FUNC(isa8_myb3k_com_device::com_int_tx));
 
-	MCFG_DEVICE_ADD( "com1", RS232_PORT, isa8_myb3k_com, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("usart", i8251_device, write_cts))
-	MCFG_RS232_RI_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, ri_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, dcd_w))
+	rs232_port_device &com1(RS232_PORT(config, "com1", isa8_myb3k_com, nullptr));
+	com1.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	com1.dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr));
+	com1.cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
+	com1.ri_handler().set(FUNC(isa8_myb3k_com_device::ri_w));
+	com1.dcd_handler().set(FUNC(isa8_myb3k_com_device::dcd_w));
 	// TODO: configure RxC and TxC from RS232 connector when these are defined is rs232.h
 
 	/* Timer chip */

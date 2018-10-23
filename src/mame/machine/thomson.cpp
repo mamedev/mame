@@ -530,10 +530,10 @@ MACHINE_CONFIG_START(to7_io_line_device::device_add_mconfig)
 	m_pia_io->irqa_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
 	m_pia_io->irqb_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, to7_io_line_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, to7_io_line_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, to7_io_line_device, write_dsr))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(to7_io_line_device::write_rxd));
+	m_rs232->cts_handler().set(FUNC(to7_io_line_device::write_cts));
+	m_rs232->dsr_handler().set(FUNC(to7_io_line_device::write_dsr));
 
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(THOM_PIA_IO, pia6821_device, cb1_w))

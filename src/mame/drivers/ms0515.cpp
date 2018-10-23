@@ -551,14 +551,14 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 
 	// serial connection to printer
 	I8251(config, m_i8251line, 0);
-	m_i8251line->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251line->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_i8251line->rxrdy_handler().set(FUNC(ms0515_state::irq9_w));
 	m_i8251line->txrdy_handler().set(FUNC(ms0515_state::irq8_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_i8251line, i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_i8251line, i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_i8251line, i8251_device, write_dsr))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_i8251line, FUNC(i8251_device::write_rxd));
+	m_rs232->cts_handler().set(m_i8251line, FUNC(i8251_device::write_cts));
+	m_rs232->dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
 //  MCFG_DEVICE_ADD("line_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
 //  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))

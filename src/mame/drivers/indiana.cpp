@@ -114,9 +114,9 @@ MACHINE_CONFIG_START(indiana_state::indiana)
 	mfp.set_tx_clock(0);
 	mfp.out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MFP_TAG, mc68901_device, write_rx))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", default_rs232_devices, "keyboard"));
+	keyboard.rxd_handler().set(MFP_TAG, FUNC(mc68901_device::write_rx));
+	keyboard.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 MACHINE_CONFIG_END
 
 /* ROM definition */
