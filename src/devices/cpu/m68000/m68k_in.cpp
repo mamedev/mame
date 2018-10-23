@@ -8258,7 +8258,7 @@ M68KMAKE_OP(pmmu, 32, ., .)
 {
 	if ((CPU_TYPE_IS_EC020_PLUS()) && (m_has_pmmu))
 	{
-		m68881_mmu_ops();
+		m68851_mmu_ops();
 	}
 	else
 	{
