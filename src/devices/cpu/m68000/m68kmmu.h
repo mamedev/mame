@@ -691,11 +691,259 @@ uint32_t pmmu_translate_addr(uint32_t addr_in)
     m68851_mmu_ops: COP 0 MMU opcode handling
 */
 
-void m68881_mmu_ops()
+void m68851_pload(const uint32_t ea, const uint16_t modes)
+{
+	uint32_t ltmp = DECODE_EA_32(ea);
+	uint32_t ptmp;
+
+	ptmp = ltmp;
+	if (m_pmmu_enabled)
+	{
+		if (CPU_TYPE_IS_040_PLUS())
+		{
+			ptmp = pmmu_translate_addr_with_fc_040(ltmp, modes & 0x07, 0);
+		}
+		else
+		{
+			ptmp = pmmu_translate_addr_with_fc(ltmp, modes & 0x07, 0);
+		}
+	}
+
+	MMULOG("680x0: PLOADing ATC with logical %08x => phys %08x\n", ltmp, ptmp);
+	// FIXME: rw bit?
+	pmmu_atc_add(ltmp, ptmp,  modes & 0x07);
+}
+
+void m68851_ptest(const uint32_t ea, const uint16_t modes)
+{
+	uint32_t v_addr = DECODE_EA_32(ea);
+	uint32_t p_addr;
+	uint32_t fc = modes & 0x1f;
+	switch (fc >> 3) {
+	case 0:
+		fc = fc == 0 ? m_sfc :  m_dfc;
+		break;
+	case 1:
+		fc = REG_D()[fc &7] &7;
+		break;
+	case 2:
+		fc &=7;
+		break;
+	}
+
+	if (CPU_TYPE_IS_040_PLUS())
+	{
+		p_addr = pmmu_translate_addr_with_fc_040(v_addr, fc, 1);
+	}
+	else
+	{
+		p_addr = pmmu_translate_addr_with_fc(v_addr, fc, 1);
+	}
+	m_mmu_sr = m_mmu_tmp_sr;
+
+	MMULOG("PMMU: pc=%08x sp=%08x va=%08x pa=%08x PTEST fc=%x level=%x mmu_sr=%04x\n",
+			m_ppc, REG_A()[7], v_addr, p_addr, fc, (modes >> 10) & 0x07, m_mmu_sr);
+
+	if (modes & 0x100)
+	{
+		int areg = (modes >> 5) & 7;
+		WRITE_EA_32(0x08 | areg, p_addr);
+	}
+}
+
+void m68851_pmove_get(uint32_t ea, uint16_t modes)
+{
+	switch ((modes>>10) & 0x3f)
+	{
+	case 0x02: // transparent translation register 0
+		WRITE_EA_32(ea, m_mmu_tt0);
+		MMULOG("PMMU: pc=%x PMOVE from mmu_tt0=%08x\n", m_ppc, m_mmu_tt0);
+		break;
+	case 0x03: // transparent translation register 1
+		WRITE_EA_32(ea, m_mmu_tt1);
+		MMULOG("PMMU: pc=%x PMOVE from mmu_tt1=%08x\n", m_ppc, m_mmu_tt1);
+		break;
+	case 0x10:  // translation control register
+		WRITE_EA_32(ea, m_mmu_tc);
+		MMULOG("PMMU: pc=%x PMOVE from mmu_tc=%08x\n", m_ppc, m_mmu_tc);
+		break;
+
+	case 0x12: // supervisor root pointer
+		WRITE_EA_64(ea, (uint64_t)m_mmu_srp_limit<<32 | (uint64_t)m_mmu_srp_aptr);
+		MMULOG("PMMU: pc=%x PMOVE from SRP limit = %08x, aptr = %08x\n", m_ppc, m_mmu_srp_limit, m_mmu_srp_aptr);
+		break;
+
+	case 0x13: // CPU root pointer
+		WRITE_EA_64(ea, (uint64_t)m_mmu_crp_limit<<32 | (uint64_t)m_mmu_crp_aptr);
+		MMULOG("PMMU: pc=%x PMOVE from CRP limit = %08x, aptr = %08x\n", m_ppc, m_mmu_crp_limit, m_mmu_crp_aptr);
+		break;
+
+	default:
+		logerror("680x0: PMOVE from unknown MMU register %x, PC %x\n", (modes>>10) & 7, m_pc);
+		break;
+	}
+}
+
+void m68851_pmove_put(uint32_t ea, uint16_t modes)
+{
+	uint64_t temp64;
+	switch ((modes>>13) & 7)
+	{
+	case 0:
+	{
+		uint32_t temp = READ_EA_32(ea);
+
+		if (((modes>>10) & 7) == 2)
+		{
+			MMULOG("WRITE TT0 = 0x%08x\n", m_mmu_tt0);
+			m_mmu_tt0 = temp;
+		}
+		else if (((modes>>10) & 7) == 3)
+		{
+			MMULOG("WRITE TT1 = 0x%08x\n", m_mmu_tt1);
+			m_mmu_tt1 = temp;
+		}
+		break;
+	}
+	case 1:
+		logerror("680x0: unknown PMOVE case 1, PC %x\n", m_pc);
+		break;
+
+	case 2:
+		switch ((modes>>10) & 7)
+		{
+		case 0: // translation control register
+			m_mmu_tc = READ_EA_32(ea);
+			MMULOG("PMMU: TC = %08x\n", m_mmu_tc);
+
+			if (m_mmu_tc & 0x80000000)
+			{
+				int bits = 0;
+				for(int shift = 20; shift >= 0; shift -= 4) {
+					bits += (m_mmu_tc >> shift) & 0x0f;
+				}
+
+				if (bits != 32 || !((m_mmu_tc >> 23) & 1)) {
+					logerror("MMU: TC invalid!\n");
+					m_mmu_tc &= ~0x80000000;
+					m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
+				} else {
+					m_pmmu_enabled = 1;
+				}
+				MMULOG("PMMU enabled\n");
+			}
+			else
+			{
+				m_pmmu_enabled = 0;
+				MMULOG("PMMU disabled\n");
+			}
+
+			if (!(modes & 0x100))   // flush ATC on moves to TC, SRP, CRP with FD bit clear
+			{
+				pmmu_atc_flush();
+			}
+			break;
+
+		case 2: // supervisor root pointer
+			temp64 = READ_EA_64(ea);
+			m_mmu_srp_limit = (temp64>>32) & 0xffffffff;
+			m_mmu_srp_aptr = temp64 & 0xffffffff;
+			MMULOG("PMMU: SRP limit = %08x aptr = %08x\n", m_mmu_srp_limit, m_mmu_srp_aptr);
+			// SRP type 0 is not allowed
+			if ((m_mmu_srp_limit & 3) == 0) {
+				m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
+				return;
+			}
+
+			if (!(modes & 0x100))
+			{
+				pmmu_atc_flush();
+			}
+			break;
+
+		case 3: // CPU root pointer
+			temp64 = READ_EA_64(ea);
+			m_mmu_crp_limit = (temp64>>32) & 0xffffffff;
+			m_mmu_crp_aptr = temp64 & 0xffffffff;
+			MMULOG("PMMU: CRP limit = %08x aptr = %08x\n", m_mmu_crp_limit, m_mmu_crp_aptr);
+			// CRP type 0 is not allowed
+			if ((m_mmu_crp_limit & 3) == 0) {
+				m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
+				return;
+			}
+
+
+			if (!(modes & 0x100))
+			{
+				pmmu_atc_flush();
+			}
+			break;
+
+		case 7: // MC68851 Access Control Register
+			if (m_cpu_type == CPU_TYPE_020)
+			{
+				// DomainOS on Apollo DN3000 will only reset this to 0
+				uint16_t mmu_ac = READ_EA_16(ea);
+				if (mmu_ac != 0)
+				{
+					MMULOG("680x0 PMMU: pc=%x PMOVE to mmu_ac=%08x\n",
+							m_ppc, mmu_ac);
+				}
+				break;
+			}
+			// fall through; unknown PMOVE mode unless MC68020 with MC68851
+
+		default:
+			logerror("680x0: PMOVE to unknown MMU register %x, PC %x\n", (modes>>10) & 7, m_pc);
+			break;
+		}
+		break;
+		case 3: // MMU status
+			uint32_t temp = READ_EA_32(ea);
+			logerror("680x0: unsupported PMOVE %x to MMU status, PC %x\n", temp, m_pc);
+			break;
+	}
+}
+
+
+void m68851_pmove(uint32_t ea, uint16_t modes)
+{
+	switch ((modes>>13) & 0x7)
+	{
+	case 0: // MC68030/040 form with FD bit
+	case 2: // MC68851 form, FD never set
+		if (modes & 0x200)
+		{
+			m68851_pmove_get(ea, modes);
+			break;
+		}
+		else    // top 3 bits of modes: 010 for this, 011 for status, 000 for transparent translation regs
+		{
+			m68851_pmove_put(ea, modes);
+			break;
+		}
+	case 3: // MC68030 to/from status reg
+		if (modes & 0x200)
+		{
+			WRITE_EA_16(ea, m_mmu_sr);
+		}
+		else
+		{
+			m_mmu_sr = READ_EA_16(ea);
+		}
+		break;
+
+	default:
+		logerror("680x0: unknown PMOVE mode %x (modes %04x) (PC %x)\n", (modes>>13) & 0x7, modes, m_pc);
+		break;
+
+	}
+}
+
+void m68851_mmu_ops()
 {
 	uint16_t modes;
 	uint32_t ea = m_ir & 0x3f;
-	uint64_t temp64;
 
 
 	// catch the 2 "weird" encodings up front (PBcc)
@@ -723,25 +971,7 @@ void m68881_mmu_ops()
 
 				if ((modes & 0xfde0) == 0x2000) // PLOAD
 				{
-					uint32_t ltmp = DECODE_EA_32(ea);
-					uint32_t ptmp;
-
-					ptmp = ltmp;
-					if (m_pmmu_enabled)
-					{
-						if (CPU_TYPE_IS_040_PLUS())
-						{
-							ptmp = pmmu_translate_addr_with_fc_040(ltmp, modes & 0x07, 0);
-						}
-						else
-						{
-							ptmp = pmmu_translate_addr_with_fc(ltmp, modes & 0x07, 0);
-						}
-					}
-
-					MMULOG("680x0: PLOADing ATC with logical %08x => phys %08x\n", ltmp, ptmp);
-					// FIXME: rw bit?
-					pmmu_atc_add(ltmp, ptmp,  modes & 0x07);
+					m68851_pload(ea, modes);
 					return;
 				}
 				else if ((modes & 0xe200) == 0x2000)    // PFLUSH
@@ -766,219 +996,12 @@ void m68881_mmu_ops()
 				}
 				else if ((modes & 0xe000) == 0x8000)    // PTEST
 				{
-					uint32_t v_addr = DECODE_EA_32(ea);
-					uint32_t p_addr;
-					uint32_t fc = modes & 0x1f;
-					switch (fc >> 3) {
-					case 0:
-						fc = fc == 0 ? m_sfc :  m_dfc;
-						break;
-					case 1:
-						fc = REG_D()[fc &7] &7;
-						break;
-					case 2:
-						fc &=7;
-						break;
-					}
-
-					if (CPU_TYPE_IS_040_PLUS())
-					{
-						p_addr = pmmu_translate_addr_with_fc_040(v_addr, fc, 1);
-					}
-					else
-					{
-						p_addr = pmmu_translate_addr_with_fc(v_addr, fc, 1);
-					}
-					m_mmu_sr = m_mmu_tmp_sr;
-
-					MMULOG("PMMU: pc=%08x sp=%08x va=%08x pa=%08x PTEST fc=%x level=%x mmu_sr=%04x\n",
-							m_ppc, REG_A()[7], v_addr, p_addr, fc, (modes >> 10) & 0x07, m_mmu_sr);
-
-					if (modes & 0x100)
-					{
-						int areg = (modes >> 5) & 7;
-						WRITE_EA_32(0x08 | areg, p_addr);
-					}
+					m68851_ptest(ea, modes);
 					return;
 				}
 				else
 				{
-					switch ((modes>>13) & 0x7)
-					{
-						case 0: // MC68030/040 form with FD bit
-						case 2: // MC68881 form, FD never set
-							if (modes & 0x200)
-							{
-									switch ((modes>>10) & 0x3f)
-									{
-										case 0x02: // transparent translation register 0
-											WRITE_EA_32(ea, m_mmu_tt0);
-											MMULOG("PMMU: pc=%x PMOVE from mmu_tt0=%08x\n", m_ppc, m_mmu_tt0);
-											break;
-										case 0x03: // transparent translation register 1
-											WRITE_EA_32(ea, m_mmu_tt1);
-											MMULOG("PMMU: pc=%x PMOVE from mmu_tt1=%08x\n", m_ppc, m_mmu_tt1);
-											break;
-										case 0x10:  // translation control register
-											WRITE_EA_32(ea, m_mmu_tc);
-											MMULOG("PMMU: pc=%x PMOVE from mmu_tc=%08x\n", m_ppc, m_mmu_tc);
-											break;
-
-										case 0x12: // supervisor root pointer
-											WRITE_EA_64(ea, (uint64_t)m_mmu_srp_limit<<32 | (uint64_t)m_mmu_srp_aptr);
-											MMULOG("PMMU: pc=%x PMOVE from SRP limit = %08x, aptr = %08x\n", m_ppc, m_mmu_srp_limit, m_mmu_srp_aptr);
-											break;
-
-										case 0x13: // CPU root pointer
-											WRITE_EA_64(ea, (uint64_t)m_mmu_crp_limit<<32 | (uint64_t)m_mmu_crp_aptr);
-											MMULOG("PMMU: pc=%x PMOVE from CRP limit = %08x, aptr = %08x\n", m_ppc, m_mmu_crp_limit, m_mmu_crp_aptr);
-											break;
-
-										default:
-											logerror("680x0: PMOVE from unknown MMU register %x, PC %x\n", (modes>>10) & 7, m_pc);
-											break;
-								}
-
-							}
-							else    // top 3 bits of modes: 010 for this, 011 for status, 000 for transparent translation regs
-							{
-								switch ((modes>>13) & 7)
-								{
-									case 0:
-										{
-											uint32_t temp = READ_EA_32(ea);
-
-											if (((modes>>10) & 7) == 2)
-											{
-												m_mmu_tt0 = temp;
-											}
-											else if (((modes>>10) & 7) == 3)
-											{
-												m_mmu_tt1 = temp;
-											}
-										}
-										break;
-
-									case 1:
-										logerror("680x0: unknown PMOVE case 1, PC %x\n", m_pc);
-										break;
-
-									case 2:
-										switch ((modes>>10) & 7)
-										{
-											case 0: // translation control register
-												m_mmu_tc = READ_EA_32(ea);
-												MMULOG("PMMU: TC = %08x\n", m_mmu_tc);
-
-												if (m_mmu_tc & 0x80000000)
-												{
-													int bits = 0;
-													for(int shift = 20; shift >= 0; shift -= 4) {
-														bits += (m_mmu_tc >> shift) & 0x0f;
-													}
-
-													if (bits != 32 || !((m_mmu_tc >> 23) & 1)) {
-														logerror("MMU: TC invalid!\n");
-														m_mmu_tc &= ~0x80000000;
-														m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
-													} else {
-														m_pmmu_enabled = 1;
-													}
-													MMULOG("PMMU enabled\n");
-												}
-												else
-												{
-													m_pmmu_enabled = 0;
-													MMULOG("PMMU disabled\n");
-												}
-
-												if (!(modes & 0x100))   // flush ATC on moves to TC, SRP, CRP with FD bit clear
-												{
-													pmmu_atc_flush();
-												}
-												break;
-
-											case 2: // supervisor root pointer
-												temp64 = READ_EA_64(ea);
-												m_mmu_srp_limit = (temp64>>32) & 0xffffffff;
-												m_mmu_srp_aptr = temp64 & 0xffffffff;
-												MMULOG("PMMU: SRP limit = %08x aptr = %08x\n", m_mmu_srp_limit, m_mmu_srp_aptr);
-												// SRP type 0 is not allowed
-												if ((m_mmu_srp_limit & 3) == 0) {
-													m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
-													return;
-												}
-
-												if (!(modes & 0x100))
-												{
-													pmmu_atc_flush();
-												}
-												break;
-
-											case 3: // CPU root pointer
-												temp64 = READ_EA_64(ea);
-												m_mmu_crp_limit = (temp64>>32) & 0xffffffff;
-												m_mmu_crp_aptr = temp64 & 0xffffffff;
-												MMULOG("PMMU: CRP limit = %08x aptr = %08x\n", m_mmu_crp_limit, m_mmu_crp_aptr);
-												// CRP type 0 is not allowed
-												if ((m_mmu_crp_limit & 3) == 0) {
-													m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
-													return;
-												}
-
-
-												if (!(modes & 0x100))
-												{
-													pmmu_atc_flush();
-												}
-												break;
-
-												case 7: // MC68851 Access Control Register
-													if (m_cpu_type == CPU_TYPE_020)
-													{
-														// DomainOS on Apollo DN3000 will only reset this to 0
-														uint16_t mmu_ac = READ_EA_16(ea);
-														if (mmu_ac != 0)
-														{
-															MMULOG("680x0 PMMU: pc=%x PMOVE to mmu_ac=%08x\n",
-																	m_ppc, mmu_ac);
-														}
-														break;
-													}
-													// fall through; unknown PMOVE mode unless MC68020 with MC68851
-
-											default:
-												logerror("680x0: PMOVE to unknown MMU register %x, PC %x\n", (modes>>10) & 7, m_pc);
-												break;
-										}
-										break;
-
-									case 3: // MMU status
-										{
-											uint32_t temp = READ_EA_32(ea);
-											logerror("680x0: unsupported PMOVE %x to MMU status, PC %x\n", temp, m_pc);
-										}
-										break;
-								}
-							}
-							break;
-
-						case 3: // MC68030 to/from status reg
-							if (modes & 0x200)
-							{
-								WRITE_EA_16(ea, m_mmu_sr);
-							}
-							else
-							{
-								m_mmu_sr = READ_EA_16(ea);
-							}
-							break;
-
-						default:
-							logerror("680x0: unknown PMOVE mode %x (modes %04x) (PC %x)\n", (modes>>13) & 0x7, modes, m_pc);
-							break;
-
-					}
+					m68851_pmove(ea, modes);
 				}
 				break;
 
