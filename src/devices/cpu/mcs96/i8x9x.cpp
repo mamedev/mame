@@ -13,8 +13,13 @@
 #include "i8x9xd.h"
 
 i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	mcs96_device(mconfig, type, tag, owner, clock, 8),
-	io_config("io", ENDIANNESS_LITTLE, 16, 16, -1), io(nullptr), base_timer2(0), ad_done(0), hso_command(0), ad_command(0), hso_time(0), ad_result(0),
+	mcs96_device(mconfig, type, tag, owner, clock, 8, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
+	m_ach_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
+	m_serial_tx_cb(*this),
+	m_in_p0_cb(*this),
+	m_out_p1_cb(*this), m_in_p1_cb(*this),
+	m_out_p2_cb(*this), m_in_p2_cb(*this),
+	base_timer2(0), ad_done(0), hso_command(0), ad_command(0), hso_time(0), ad_result(0),
 	ios0(0), ios1(0), ioc0(0), ioc1(0), sbuf(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0)
 {
 }
@@ -24,18 +29,21 @@ std::unique_ptr<util::disasm_interface> i8x9x_device::create_disassembler()
 	return std::make_unique<i8x9x_disassembler>();
 }
 
-device_memory_interface::space_config_vector i8x9x_device::memory_space_config() const
+void i8x9x_device::device_resolve_objects()
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &program_config),
-		std::make_pair(AS_IO,      &io_config)
-	};
+	for (auto &cb : m_ach_cb)
+		cb.resolve_safe(0);
+	m_serial_tx_cb.resolve_safe();
+	m_in_p0_cb.resolve_safe(0);
+	m_out_p1_cb.resolve_safe();
+	m_in_p1_cb.resolve_safe(0);
+	m_out_p2_cb.resolve_safe();
+	m_in_p2_cb.resolve_safe(0);
 }
 
 void i8x9x_device::device_start()
 {
 	mcs96_device::device_start();
-	io = &space(AS_IO);
 	cycles_scaling = 3;
 }
 
@@ -73,7 +81,7 @@ void i8x9x_device::commit_hso_cam()
 
 void i8x9x_device::ad_start(uint64_t current_time)
 {
-	ad_result = (io->read_word((ad_command & 7) + A0) << 6) | 8 | (ad_command & 7);
+	ad_result = (m_ach_cb[ad_command & 7]() << 6) | 8 | (ad_command & 7);
 	ad_done = current_time + 88;
 	internal_update(current_time);
 }
@@ -87,184 +95,217 @@ void i8x9x_device::serial_send(uint8_t data)
 void i8x9x_device::serial_send_done()
 {
 	serial_send_timer = 0;
-	io->write_word(SERIAL, serial_send_buf);
+	m_serial_tx_cb(serial_send_buf);
 	pending_irq |= IRQ_SERIAL;
 	sp_stat |= 0x20;
 	check_irq();
 }
 
-void i8x9x_device::io_w8(uint8_t adr, uint8_t data)
+void i8x9x_device::internal_regs(address_map &map)
 {
-	switch(adr) {
-	case 0x02:
-		ad_command = data;
-		if(ad_command & 8)
-			ad_start(total_cycles());
-		break;
-	case 0x03:
-		logerror("%s: hsi_mode %02x (%04x)\n", tag(), data, PPC);
-		break;
-	case 0x04:
-		hso_time = (hso_time & 0xff00) | data;
-		break;
-	case 0x05:
-		hso_time = (hso_time & 0x00ff) | (data << 8);
-		commit_hso_cam();
-		break;
-	case 0x06:
-		hso_command = data;
-		break;
-	case 0x07:
-		logerror("%s: sbuf %02x (%04x)\n", tag(), data, PPC);
-		serial_send(data);
-		break;
-	case 0x08:
-		PSW = (PSW & 0xff00) | data;
-		check_irq();
-		break;
-	case 0x09:
-		pending_irq = data;
-		logerror("%s: int_pending %02x (%04x)\n", tag(), data, PPC);
-		break;
-	case 0x0a:
-		logerror("%s: watchdog %02x (%04x)\n", tag(), data, PPC);
-		break;
-	case 0x0e:
-		logerror("%s: baud rate %02x (%04x)\n", tag(), data, PPC);
-		break;
-	case 0x0f:
-		logerror("%s: io port 1 %02x (%04x)\n", tag(), data, PPC);
-		io->write_word(P1, data);
-		break;
-	case 0x10:
-		logerror("%s: io port 2 %02x (%04x)\n", tag(), data, PPC);
-		io->write_word(P2, data);
-		break;
-	case 0x11:
-		logerror("%s: sp con %02x (%04x)\n", tag(), data, PPC);
-		break;
-	case 0x15:
-		logerror("%s: ioc0 %02x (%04x)\n", tag(), data, PPC);
-		ioc0 = data;
-		break;
-	case 0x16:
-		logerror("%s: ioc1 %02x (%04x)\n", tag(), data, PPC);
-		ioc1 = data;
-		break;
-	case 0x17:
-		logerror("%s: pwm control %02x (%04x)\n", tag(), data, PPC);
-		break;
-	}
-	return;
+	map(0x00, 0x01).lr16("r0", []() -> u16 { return 0; }).nopw();
+	map(0x02, 0x03).r(FUNC(i8x9x_device::ad_result_r)); // 8-bit access
+	map(0x02, 0x02).w(FUNC(i8x9x_device::ad_command_w));
+	map(0x03, 0x03).w(FUNC(i8x9x_device::hsi_mode_w));
+	map(0x04, 0x05).rw(FUNC(i8x9x_device::hsi_time_r), FUNC(i8x9x_device::hso_time_w)); // 16-bit access
+	map(0x06, 0x06).rw(FUNC(i8x9x_device::hsi_status_r), FUNC(i8x9x_device::hso_command_w));
+	map(0x08, 0x08).rw(FUNC(i8x9x_device::int_mask_r), FUNC(i8x9x_device::int_mask_w));
+	map(0x09, 0x09).rw(FUNC(i8x9x_device::int_pending_r), FUNC(i8x9x_device::int_pending_w));
+	map(0x0a, 0x0b).r(FUNC(i8x9x_device::timer1_r)); // 16-bit access
+	map(0x0c, 0x0d).r(FUNC(i8x9x_device::timer2_r)); // 16-bit access
+	map(0x0a, 0x0a).w(FUNC(i8x9x_device::watchdog_w));
+	map(0x0e, 0x0e).rw(FUNC(i8x9x_device::port0_r), FUNC(i8x9x_device::baud_rate_w));
+	map(0x0f, 0x0f).rw(FUNC(i8x9x_device::port1_r), FUNC(i8x9x_device::port1_w));
+	map(0x10, 0x10).rw(FUNC(i8x9x_device::port2_r), FUNC(i8x9x_device::port2_w));
+	map(0x11, 0x11).rw(FUNC(i8x9x_device::sp_stat_r), FUNC(i8x9x_device::sp_con_w));
+	map(0x15, 0x15).rw(FUNC(i8x9x_device::ios0_r), FUNC(i8x9x_device::ioc0_w));
+	map(0x16, 0x16).rw(FUNC(i8x9x_device::ios1_r), FUNC(i8x9x_device::ioc1_w));
+	map(0x17, 0x17).w(FUNC(i8x9x_device::pwm_control_w));
+	map(0x18, 0xff).ram().share("register_file");
 }
 
-void i8x9x_device::io_w16(uint8_t adr, uint16_t data)
+void i8x9x_device::ad_command_w(u8 data)
 {
-	switch(adr) {
-	case 0:
-		break;
-	case 4:
-		hso_time = data;
-		commit_hso_cam();
-		break;
-	default:
-		io_w8(adr, data);
-		io_w8(adr+1, data>>8);
-		break;
-	}
-	return;
+	ad_command = data;
+	if (ad_command & 8)
+		ad_start(total_cycles());
 }
 
-uint8_t i8x9x_device::io_r8(uint8_t adr)
+u8 i8x9x_device::ad_result_r(offs_t offset)
 {
-	switch(adr) {
-	case 0x00:
-		return 0x00;
-	case 0x01:
-		return 0x00;
-	case 0x02:
-		return ad_result;
-	case 0x03:
-		return ad_result >> 8;
-	case 0x04:
-		logerror("%s: read hsi time l (%04x)\n", tag(), PPC);
-		return 0x00;
-	case 0x05:
-		logerror("%s: read hsi time h (%04x)\n", tag(), PPC);
-		return 0x00;
-	case 0x06:
-		logerror("%s: read hsi status (%04x)\n", tag(), PPC);
-		return 0x00;
-	case 0x07:
-		logerror("%s: read sbuf %02x (%04x)\n", tag(), sbuf, PPC);
-		return sbuf;
-	case 0x08:
-		return PSW;
-	case 0x09:
-		logerror("%s: read int pending (%04x)\n", tag(), PPC);
-		return pending_irq;
-	case 0x0a:
-		logerror("%s: read timer1 l (%04x)\n", tag(), PPC);
-		return timer_value(1, total_cycles());
-	case 0x0b:
-		logerror("%s: read timer1 h (%04x)\n", tag(), PPC);
-		return timer_value(1, total_cycles()) >> 8;
-	case 0x0c:
-		logerror("%s: read timer2 l (%04x)\n", tag(), PPC);
-		return timer_value(2, total_cycles());
-	case 0x0d:
-		logerror("%s: read timer2 h (%04x)\n", tag(), PPC);
-		return timer_value(2, total_cycles()) >> 8;
-	case 0x0e: {
-		static int last = -1;
-		if(io->read_word(P0) != last) {
-			last = io->read_word(P0);
-			logerror("%s: read p0 %02x\n", tag(), io->read_word(P0*2));
-		}
-		return io->read_word(P0);
+	return ad_result >> (offset ? 8 : 0);
+}
+
+void i8x9x_device::hsi_mode_w(u8 data)
+{
+	logerror("hsi_mode %02x (%04x)\n", data, PPC);
+}
+
+void i8x9x_device::hso_time_w(u16 data)
+{
+	hso_time = data;
+	commit_hso_cam();
+}
+
+u16 i8x9x_device::hsi_time_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("read hsi time (%04x)\n", PPC);
+	return 0x0000;
+}
+
+void i8x9x_device::hso_command_w(u8 data)
+{
+	hso_command = data;
+}
+
+u8 i8x9x_device::hsi_status_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("read hsi status (%04x)\n", PPC);
+	return 0x00;
+}
+
+void i8x9x_device::sbuf_w(u8 data)
+{
+	logerror("sbuf %02x (%04x)\n", data, PPC);
+	serial_send(data);
+}
+
+u8 i8x9x_device::sbuf_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("read sbuf %02x (%04x)\n", sbuf, PPC);
+	return sbuf;
+}
+
+void i8x9x_device::int_mask_w(u8 data)
+{
+	PSW = (PSW & 0xff00) | data;
+	check_irq();
+}
+
+u8 i8x9x_device::int_mask_r()
+{
+	return PSW;
+}
+
+void i8x9x_device::int_pending_w(u8 data)
+{
+	pending_irq = data;
+	logerror("int_pending %02x (%04x)\n", data, PPC);
+}
+
+u8 i8x9x_device::int_pending_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("read int pending (%04x)\n", PPC);
+	return pending_irq;
+}
+
+void i8x9x_device::watchdog_w(u8 data)
+{
+	logerror("watchdog %02x (%04x)\n", data, PPC);
+}
+
+u16 i8x9x_device::timer1_r()
+{
+	u16 data = timer_value(1, total_cycles());
+	if (!machine().side_effects_disabled())
+		logerror("read timer1 %04x (%04x)\n", data, PPC);
+	return data;
+}
+
+u16 i8x9x_device::timer2_r()
+{
+	u16 data = timer_value(2, total_cycles());
+	if (!machine().side_effects_disabled())
+		logerror("read timer2 %04x (%04x)\n", data, PPC);
+	return data;
+}
+
+void i8x9x_device::baud_rate_w(u8 data)
+{
+	logerror("baud rate %02x (%04x)\n", data, PPC);
+}
+
+u8 i8x9x_device::port0_r()
+{
+	static int last = -1;
+	if (!machine().side_effects_disabled() && m_in_p0_cb() != last)
+	{
+		last = m_in_p0_cb();
+		logerror("read p0 %02x\n", last);
 	}
-	case 0x0f:
-		return io->read_word(P1);
-	case 0x10:
-		return io->read_word(P2);
-	case 0x11: {
-		uint8_t res = sp_stat;
+	return m_in_p0_cb();
+}
+
+void i8x9x_device::port1_w(u8 data)
+{
+	logerror("io port 1 %02x (%04x)\n", data, PPC);
+	m_out_p1_cb(data);
+}
+
+u8 i8x9x_device::port1_r()
+{
+	return m_in_p1_cb();
+}
+
+void i8x9x_device::port2_w(u8 data)
+{
+	logerror("io port 2 %02x (%04x)\n", data, PPC);
+	m_out_p2_cb(data);
+}
+
+u8 i8x9x_device::port2_r()
+{
+	return m_in_p2_cb();
+}
+
+void i8x9x_device::sp_con_w(u8 data)
+{
+	logerror("sp con %02x (%04x)\n", data, PPC);
+}
+
+u8 i8x9x_device::sp_stat_r()
+{
+	uint8_t res = sp_stat;
+	if (!machine().side_effects_disabled())
+	{
 		sp_stat &= 0x80;
-		logerror("%s: read sp stat %02x (%04x)\n", tag(), res, PPC);
-		return res;
+		logerror("read sp stat %02x (%04x)\n", res, PPC);
 	}
-	case 0x15:
-		logerror("%s: read ios 0 %02x (%04x)\n", tag(), ios0, PPC);
-		return ios0;
-	case 0x16: {
-		uint8_t res = ios1;
-		ios1 = ios1 & 0xc0;
-		return res;
-	}
-	default:
-		logerror("%s: io_r8 %02x (%04x)\n", tag(), adr, PPC);
-		return 0x00;
-	}
+	return res;
 }
 
-uint16_t i8x9x_device::io_r16(uint8_t adr)
+void i8x9x_device::ioc0_w(u8 data)
 {
-	switch(adr) {
-	case 0x00:
-		return 0x0000;
-	case 0x02:
-		return ad_result;
-	case 0x04:
-		logerror("%s: read hsi time (%04x)\n", tag(), PPC);
-		return 0x0000;
-	case 0x0a:
-		return timer_value(1, total_cycles());
-	case 0x0c:
-		logerror("%s: read timer2 (%04x)\n", tag(), PPC);
-		return timer_value(2, total_cycles());
-	default:
-		return io_r8(adr) | (io_r8(adr+1) << 8);
-	}
+	logerror("ioc0 %02x (%04x)\n", data, PPC);
+}
+
+u8 i8x9x_device::ios0_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("read ios 0 %02x (%04x)\n", ios0, PPC);
+	return ios0;
+}
+
+void i8x9x_device::ioc1_w(u8 data)
+{
+	logerror("ioc1 %02x (%04x)\n", data, PPC);
+}
+
+u8 i8x9x_device::ios1_r()
+{
+	uint8_t res = ios1;
+	if (!machine().side_effects_disabled())
+		ios1 = ios1 & 0xc0;
+	return res;
+}
+
+void i8x9x_device::pwm_control_w(u8 data)
+{
+	logerror("pwm control %02x (%04x)\n", data, PPC);
 }
 
 void i8x9x_device::do_exec_partial()

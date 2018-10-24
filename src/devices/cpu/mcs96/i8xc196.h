@@ -22,10 +22,7 @@ protected:
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
-	virtual void io_w8(uint8_t adr, uint8_t data) override;
-	virtual void io_w16(uint8_t adr, uint16_t data) override;
-	virtual uint8_t io_r8(uint8_t adr) override;
-	virtual uint16_t io_r16(uint8_t adr) override;
+	void internal_regs(address_map &map);
 
 #define O(o) void o ## _196_full(); void o ## _196_partial()
 
