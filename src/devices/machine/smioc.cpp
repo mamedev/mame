@@ -99,16 +99,19 @@ const tiny_rom_entry *smioc_device::device_rom_region() const
 //  ADDRESS_MAP( smioc_mem )
 //-------------------------------------------------
 
-void smioc_device::smioc_mem(address_map &map)
-{
-	map(0x00000, 0x07FFF).ram().share("smioc_ram");
-	map(0xC0080, 0xC008F).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Probably RAM DMA
-	map(0xC0090, 0xC009F).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
-	map(0xC00A0, 0xC00AF).rw("dma8237_3", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
-	map(0xC00B0, 0xC00BF).rw("dma8237_4", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
-	map(0xC00C0, 0xC00CF).rw("dma8237_5", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
-	map(0xF8000, 0xFFFFF).rom().region("rom", 0);
-}
+static ADDRESS_MAP_START(smioc_mem, AS_PROGRAM, 8, smioc_device)
+	AM_RANGE(0x00000, 0x07FFF) AM_RAM AM_SHARE("smioc_ram")
+	AM_RANGE(0x40000, 0x4FFFF) AM_READWRITE(ram2_mmio_r, ram2_mmio_w)
+	AM_RANGE(0x50000, 0x5FFFF) AM_READWRITE(dma68k_r, dma68k_w)
+	AM_RANGE(0xC0080, 0xC008F) AM_DEVREADWRITE("dma8237_1", am9517a_device, read, write) // Probably RAM DMA
+	AM_RANGE(0xC0090, 0xC009F) AM_DEVREADWRITE("dma8237_2", am9517a_device, read, write) // Serial DMA
+	AM_RANGE(0xC00A0, 0xC00AF) AM_DEVREADWRITE("dma8237_3", am9517a_device, read, write) // Serial DMA
+	AM_RANGE(0xC00B0, 0xC00BF) AM_DEVREADWRITE("dma8237_4", am9517a_device, read, write) // Serial DMA
+	AM_RANGE(0xC00C0, 0xC00CF) AM_DEVREADWRITE("dma8237_5", am9517a_device, read, write) // Serial DMA
+	AM_RANGE(0xC0100, 0xC011F) AM_READWRITE(boardlogic_mmio_r, boardlogic_mmio_w)
+	AM_RANGE(0xC0200, 0xC023F) AM_READWRITE(scc2698b_mmio_r, scc2698b_mmio_w) // Future: Emulate the SCC2698B UART as a separate component
+	AM_RANGE(0xF8000, 0xFFFFF) AM_ROM AM_REGION("rom", 0)
+ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* CPU - Intel 80C188 */
@@ -118,8 +121,13 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* DMA */
 	for (required_device<am9517a_device> &dma : m_dma8237)
 		AM9517A(config, dma, 20_MHz_XTAL / 4); // Clock division unknown
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(smioc_device, dma8237_2_hreq_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(smioc_device, dma8237_dack_2_0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(smioc_device, dma8237_dack_2_1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(smioc_device, dma8237_dack_2_2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(smioc_device, dma8237_dack_2_3_w))
 
-	/* RS232 */
+	/* RS232 */	
 	/* Port 1: Console */
 	for (required_device<rs232_port_device> &rs232_port : m_rs232_p)
 		RS232_PORT(config, rs232_port, default_rs232_devices, nullptr);
@@ -138,8 +146,12 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 	m_smioccpu(*this, I188_TAG),
 	m_dma8237(*this, "dma8237_%u", 1),
 	m_rs232_p(*this, "rs232_p%u", 1),
-	m_smioc_ram(*this, "smioc_ram")
+	m_smioc_ram(*this, "smioc_ram"),
+	m_dma_timer(nullptr),
+	m_m68k_r_cb(*this),
+	m_m68k_w_cb(*this)
 {
+
 }
 
 //-------------------------------------------------
@@ -148,6 +160,7 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 
 void smioc_device::device_start()
 {
+	m_dma_timer = timer_alloc(0, nullptr);
 }
 
 //-------------------------------------------------
@@ -158,4 +171,236 @@ void smioc_device::device_reset()
 {
 	/* Reset CPU */
 	m_smioccpu->reset();
+	m_smioccpu->drq0_w(1);
+
+	/* Resolve callbacks */
+	m_m68k_r_cb.resolve_safe(0);
+	m_m68k_w_cb.resolve_safe();
+
+	// Attempt to get DMA working by just holding DREQ high for the first dma chip
+	m_dma8237_2->dreq1_w(1);
+	m_dma8237_2->dreq3_w(1);
 }
+
+void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+{
+	switch (tid)
+	{
+	case 0: // DMA Timer
+		m_smioccpu->drq0_w(1);
+		break;
+	}
+}
+
+void smioc_device::SendCommand(u16 command)
+{
+	m_commandValue = command;
+	m_requestFlags_11D |= 1;
+	m_deviceBusy = 1;
+	
+	//m_smioccpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
+	m_smioccpu->int2_w(HOLD_LINE);
+	
+}
+
+void smioc_device::ClearStatus()
+{
+	m_status = 0;
+}
+void smioc_device::ClearStatus2()
+{
+	m_status2 = 0;
+}
+
+
+void smioc_device::update_and_log(u16& reg, u16 newValue, const char* register_name)
+{
+	if (reg != newValue)
+	{
+		logerror("Update %s %04X -> %04X\n", register_name, reg, newValue);
+		reg = newValue;
+	}
+}
+
+READ8_MEMBER(smioc_device::ram2_mmio_r)
+{
+	u8 data = 0;
+	switch (offset)
+	{
+	case 0xCC2: // Command from 68k?
+		data = m_commandValue & 0xFF;
+		break;
+	case 0xCC3:
+		data = m_commandValue >> 8;
+		break;
+
+	case 0xCD8: // DMA source address (for writing characters) - Port 0
+		data = m_dmaSendAddress & 0xFF;
+		break;
+	case 0xCD9:
+		data = m_dmaSendAddress >> 8;
+		break;
+
+	case 0xCE8: // DMA Length (for writing characters) - Port 0
+		data = m_dmaSendLength & 0xFF;
+		break;
+	case 0xCE9:
+		data = m_dmaSendLength >> 8;
+		break;
+
+	}
+
+
+	logerror("ram2[%04X] => %02X\n", offset, data);
+	return data;
+}
+
+WRITE8_MEMBER(smioc_device::ram2_mmio_w)
+{
+	switch (offset) // Offset based on C0100 register base
+	{
+		
+	case 0xC84:
+		update_and_log(m_status2, (m_status2 & 0xFF00) | data, "Status2[40C84]");
+		return;
+	case 0xC85:
+		update_and_log(m_status2, (m_status2 & 0xFF) | (data<<8), "Status2[40C85]");
+		return;
+
+	/*
+	case 0xC88:
+		update_and_log(m_status, (m_status & 0xFF00) | data, "Status[40C88]");
+		return;
+	case 0xC89:
+		update_and_log(m_status, (m_status & 0xFF) | (data<<8), "Status[40C89]");
+		return;
+	*/
+	case 0xCC4:
+		update_and_log(m_status, (m_status & 0xFF) | (data<<8), "Status[40CC4]");
+		break; // return;
+	case 0xCC5:
+		update_and_log(m_status, (m_status & 0xFF00) | (data), "Status[40CC5]");
+		break; // return;
+
+	}
+
+
+	logerror("ram2[%04X] <= %02X\n", offset, data);
+}
+
+READ8_MEMBER(smioc_device::dma68k_r)
+{
+	u8 data = 0;
+
+	m_dma_timer->adjust(attotime::from_usec(10));
+
+	data = m_m68k_r_cb(offset);
+	logerror("dma68k[%04X] => %02X\n", offset, data);
+	return data;
+}
+
+WRITE8_MEMBER(smioc_device::dma68k_w)
+{
+
+	m_dma_timer->adjust(attotime::from_usec(10));
+
+	m_m68k_w_cb(offset, data);
+
+	logerror("dma68k[%04X] <= %02X\n", offset, data);
+}
+
+READ8_MEMBER(smioc_device::boardlogic_mmio_r)
+{
+	u8 data = 0xFF;
+	switch (offset)
+	{
+
+		case 0x19: // Hardware revision?
+			// Top bit controls which set of register locations in RAM2 are polled
+			data = 0x7F;
+			break;
+
+		case 0x1D: // C011D (HW Request flags)
+			data = m_requestFlags_11D;
+			// Assume this is a clear-on-read register - It is read in one location and all set bits are acted on once it is read.
+			m_requestFlags_11D = 0;
+
+
+			break;
+
+		case 0x1F: // C011F (HW Status flags?)
+			// 0x80, 0x40 seem to be HW request to cancel ongoing DMA requests, maybe related to board reset?
+			// 0x01 - When this is 0, advance some state perhaps related to talking to the 8051
+			data = 0xFF;
+			break;
+
+	}
+	logerror("logic[%04X] => %02X\n", offset, data);
+	return data;
+}
+
+WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
+{
+	switch (offset)
+	{
+	case 0x10: // C0110 (Clear interrupt? This seems to happen a lot but without being related to actually completing anything.)
+		m_smioccpu->int2_w(CLEAR_LINE);
+		m_deviceBusy = m_requestFlags_11D;
+		break;
+
+	case 0x11: // C0111 - Set to 1 after providing a status - Acknowledge by hardware by raising bit 4 in C011D (SMIOC E2E flag 0x200
+		m_requestFlags_11D |= 0x10; // bit 4
+		m_smioccpu->int2_w(HOLD_LINE);
+		break;
+
+	case 0x12: // C0112 - Set to 1 after providing a status(2?) - Acknowledge by hardware by raising bit 5 in C011D (SMIOC E2E flag 0x100)
+		m_requestFlags_11D |= 0x20; // bit 5
+		m_smioccpu->int2_w(HOLD_LINE);
+		break;
+
+	case 0x16: // C0116 - Set to 1 after processing 11D & 0x40
+		break;
+	case 0x17: // C0117 - Set to 1 after processing 11D & 0x80
+		break;
+
+	}
+	logerror("logic[%04X] <= %02X\n", offset, data);
+}
+
+
+
+READ8_MEMBER(smioc_device::scc2698b_mmio_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(smioc_device::scc2698b_mmio_w)
+{
+	
+}
+
+// The logic on the SMIOC board somehow proxies the UART's information about what channels are ready into the DMA DREQ lines.
+// It's not 100% clear how this works, but a rough guess is it's providing !(RDYN) & (!DACK).
+// For now pretend the UART is always ready.
+WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_0_w)
+{
+	m_dma8237_2->dreq0_w(1); // Disable channel 0 (UART 0 RX)
+}
+WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_1_w)
+{
+	m_dma8237_2->dreq1_w(!state); // Uart 0 TX
+}
+WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_2_w)
+{
+	m_dma8237_2->dreq2_w(1); // Disable channel 2 (UART 1 RX)
+}
+WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_3_w)
+{
+	m_dma8237_2->dreq3_w(!state);
+}
+
+WRITE_LINE_MEMBER(smioc_device::dma8237_2_hreq_w)
+{
+	m_dma8237_2->hack_w(state);
+}
+

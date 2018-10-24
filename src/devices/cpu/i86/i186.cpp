@@ -8,11 +8,11 @@
 #include "debugger.h"
 #include "i86inline.h"
 
-#define LOG_PORTS           0
+#define LOG_PORTS           1
 #define LOG_INTERRUPTS      0
 #define LOG_INTERRUPTS_EXT  0
 #define LOG_TIMER           0
-#define LOG_DMA             0
+#define LOG_DMA             1
 
 /* external int priority masks */
 
@@ -1776,6 +1776,10 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 				// TODO: don't do this
 				while(m_dma[which].control & ST_STOP)
 					drq_callback(which);
+			}
+			if((m_dma[which].control & ST_STOP) == ST_STOP && (m_dma[which].control & SYNC_MASK) != 0)
+			{
+				if (m_dma[which].drq_state) drq_callback(which);
 			}
 			break;
 
