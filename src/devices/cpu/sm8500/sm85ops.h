@@ -903,7 +903,7 @@ case 0x2C:  /* EXTS Rr - 6 cycles - Flags affected: -------- */
 	mycycles += 6;
 	break;
 case 0x2D:  /* unk2D - 4 cycles */
-logerror( "%04X: unk%02x\n", m_PC-1,op );
+	logerror( "%04X: unk%02x\n", m_PC-1,op );
 	mycycles += 4;
 	break;
 case 0x2E:  /* MOV PS0,#00 - 4 cycles - Flags affected: -------- */
@@ -1054,7 +1054,7 @@ case 0x3C:  /* MOVW RRr,RRs - 7 cycles - Flags affected: -------- */
 	mycycles += 7;
 	break;
 case 0x3D:  /* unk3D DM??? 3D 0E -> DM R0Eh ?? - 4,4 cycles */
-logerror( "%04X: unk%02x\n", m_PC-1,op );
+	logerror( "%04X: unk%02x\n", m_PC-1,op );
 	mycycles += 4;
 	break;
 case 0x3E:  /* JMP RRr/@ww/ww(RRr) - 7/15/19 cycles - Flags affected: -------- */
@@ -1149,6 +1149,7 @@ case 0x4B:  /* MOVW RRr,ww - 9 cycles - Flags affected: -------- */
 case 0x4C:  /* MULT Rrr,Rs - 24 cycles - Flags affected: -Z-0---- */
 	// operation is not known if r1 is odd, assuming same as even for now
 	ARG_RR;
+	if (r1 & 1) logerror( "%04X: %02x odd register used\n", m_PC-1,op );
 	res = mem_readbyte( r1 | 1 ) * mem_readbyte( r2 );
 	mem_writeword( r1 & 0xfe, res & 0xFFFF );
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
@@ -1158,6 +1159,7 @@ case 0x4C:  /* MULT Rrr,Rs - 24 cycles - Flags affected: -Z-0---- */
 case 0x4D:  /* MULT RRr,i - 24 cycles - Flags affected: -Z-0---- */
 	// operation is not known if r1 is odd, assuming same as even for now
 	ARG_iR;
+	if (r1 & 1) logerror( "%04X: %02x odd register used\n", m_PC-1,op );
 	res = mem_readbyte( r1 | 1 ) * r2;
 	mem_writeword( r1 & 0xfe, res & 0xFFFF );
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
@@ -1165,6 +1167,7 @@ case 0x4D:  /* MULT RRr,i - 24 cycles - Flags affected: -Z-0---- */
 	mycycles += 24;
 	break;
 case 0x4E:  /* BMOV Rr,#b,BF/BF,Rr,#b - 6 cycles - Flags affected: --------/-Z-0--B- */
+	// unconfirmed if V or Z are affected. It seems no games depend on it.
 	r2 = mem_readbyte( m_PC++ );
 	r1 = mem_readbyte( m_PC++ );
 	switch( r2 & 0xC0 ) {
@@ -1192,6 +1195,7 @@ case 0x4E:  /* BMOV Rr,#b,BF/BF,Rr,#b - 6 cycles - Flags affected: --------/-Z-0
 	mycycles += 6;
 	break;
 case 0x4F:  /* BCMP/BAND/BOR/BXOR BF,Rr,#b - 6 cycles - Flags affected: -Z-0---- / -Z-0--B- */
+	// unconfirmed if V or Z are affected. It seems no games depend on it.
 	r2 = mem_readbyte( m_PC++ );
 	r1 = mem_readbyte( m_PC++ );
 	s1 = mem_readbyte( r1 ) & ( 1 << ( r2 & 0x07 ) );
@@ -1271,7 +1275,7 @@ case 0x58:  /* MOV Rr,i - 6 cycles - Flags affected: -------- */
 	mycycles += 6;
 	break;
 case 0x59:  /* Invalid - 2? cycles - Flags affected: --------? */
-	logerror( "%04X: 59h: Invalid instruction\n", m_PC-1 );
+	logerror( "%04X: unk%02x\n", m_PC-1,op );
 	mycycles += 2;
 	break;
 case 0x5A:  /* unk5A - 7,8,12,9,8 cycles */
@@ -1285,24 +1289,34 @@ case 0x5A:  /* unk5A - 7,8,12,9,8 cycles */
        Arcade Classics) uses it at 6DC9. */
 	ARG_iR;
 	s2 = mem_readbyte(r2);
-	logerror( "%04X: unk%02x (cmp r%02X->(%02X)->%02X to %02X)\n",
-		m_PC-3,op,r2,s2,mem_readbyte(s2),r1 );
+	logerror( "%04X: unk%02x (cmp r%02X->(%02X)->%02X to %02X)\n", m_PC-3,op,r2,s2,mem_readbyte(s2),r1 );
 	OP_CMP8( mem_readbyte(s2), r1 );
 	mycycles += 7;
 	break;
 case 0x5B:  /* unk5B - 6,7,11,8,7 cycles */
-	logerror( "%04X: unk%02x\n", m_PC-1,op );
-/* NOTE: This unknown command is used in several carts, the code below allows those carts to boot */
+/* NOTE: This unknown command appears to have several variants, but all the games that use it only
+       use one specific instruction. We code for that here, and log anything else that may turn up.
+       It appears to move a literal to a register pointed to by another register.
+         Example:
+         move r02, E9
+         unk 5b 42 00     (move 00 into register E9, then increment r02)
+*/
 	ARG_iR;
-	r1 = r2 & 7;
-	res = mem_readbyte( r1 ) + 1;
-	mem_writebyte( r1, res );
+	if (r2 == 0x42)   // only code used is 5B 42 00. This code allows those games to boot.
+	{ // MOV (Rr)+,i  -- or maybe -- AND (Rr)+,i
+		s1 = r2 & 7;
+		res = mem_readbyte( s1 );
+		mem_writebyte( res, r1 );
+		mem_writebyte( s1, res + 1 );
+	}
+	else
+		logerror( "%04X: unk%02X %02X %02X\n", m_PC-1,op,r2,r1 );
+
 	mycycles += 6;
 	break;
 case 0x5C:  /* DIV RRr,RRs - 47 cycles - Flags affected: -Z-V---- */
 		/* lower 8 bits of RRs is used to divide */
 		/* remainder in stored upper 8 bits of RRs */
-//  logerror( "%04X: DIV RRr,Rs!\n", m_PC-1 );
 	ARG_RR;
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
 	s1 = mem_readbyte( r2 + 1 );
@@ -1647,6 +1661,7 @@ case 0xF0:  /* STOP - 2 cycles - Flags affected: -------- */
 		/* TODO: Add a bunch of additional cycles */
 		m_clock_changed = 0;
 	}
+	logerror( "%04X: unk%02x\n", m_PC-1,op );
 	break;
 case 0xF1:  /* HALT - 2 cycles - Flags affected: -------- */
 	m_halted = 1;
@@ -1658,6 +1673,7 @@ case 0xF4:
 case 0xF5:
 case 0xF6:
 case 0xF7:
+	logerror( "%04X: unk%02x\n", m_PC-1,op );
 	mycycles += 2;
 	break;
 case 0xF8:  /* RET - 10,8 cycles - Flags affected: -------- */
