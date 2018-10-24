@@ -4,7 +4,7 @@
 
  Arcade games (hacks of console games) running on SNES harware.
 
- Driver (based on nss.c) by Tomasz Slanina  analog[at]op.pl
+ Driver (based on nss.cpp) by Tomasz Slanina  analog[at]op.pl
 
     Supported games:
     - Killer Instinct
@@ -14,6 +14,7 @@
     - Sonic Blast Man 2
     - Gundam Wing: Endless Duel
     - Legend
+    - Rushing Beat
 
     Not dumped:
     - Final Fight 3
@@ -26,8 +27,9 @@ TODO:
    so you are awarded 55 credits on a hard reset)
  - sblast2b : dipswitches
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
- - denseib  :  fix gfx glitches, missing texts
+ - denseib  : fix gfx glitches, missing texts
  - legendsb : dipswitches
+ - rushbeat : everything
 
 ***************************************************************************
 
@@ -171,6 +173,7 @@ public:
 	void init_endless();
 	void init_mk3snes();
 	void init_legendsb();
+	void init_rushbeat();
 
 private:
 	std::unique_ptr<int8_t[]> m_shared_ram;
@@ -1047,6 +1050,12 @@ void snesb_state::init_endless()
 	init_snes();
 }
 
+void snesb_state::init_rushbeat()
+{
+	//TODO: decryption
+
+	init_snes();
+}
 
 ROM_START( kinstb )
 	ROM_REGION( 0x400000, "user3", 0 )
@@ -1223,7 +1232,20 @@ ROM_START( endless )
 	ROM_LOAD( "endlessduel.unknownposition4", 0x180000, 0x80000, CRC(9a9493ad) SHA1(82ee4fce9cc2014cb8404fd43eebb7941cdb9ac1) )
 ROM_END
 
+ROM_START( rushbeat )
+	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
 
+	ROM_REGION(0x100,           "sound_ipl", 0)
+	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )
+
+	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x200000, "user7", 0 )
+	ROM_LOAD( "ic19.bin", 0x000000, 0x80000, CRC(8aa0ad59) SHA1(83facb65c53ade99f1f057a8de27bee4a9c2efd8) )
+	ROM_LOAD( "ic20.bin", 0x080000, 0x80000, CRC(a8afe28b) SHA1(16d1c4f957804d22dc05a97c56ae10c408dbc1f2) )
+	ROM_LOAD( "ic21.bin", 0x100000, 0x80000, CRC(2f6e8711) SHA1(fe4030ef3445594455fe93e374a41e9ba2147bf6) )
+	ROM_LOAD( "ic22.bin", 0x180000, 0x80000, CRC(95a234d2) SHA1(31a556c8ed395f61ba198631ee086c18cc740792) )
+ROM_END
 
 GAME( 199?, kinstb,       0,     kinstb,         kinstb,   snesb_state, init_kinstb,   ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 199?, mk3snes,      0,     mk3snes,        kinstb,   snesb_state, init_mk3snes,  ROT0, "bootleg",  "Mortal Kombat 3 (SNES bootleg)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -1233,3 +1255,4 @@ GAME( 1996, denseib,      0,     kinstb,         denseib,  snesb_state, init_den
 GAME( 1997, sblast2b,     0,     kinstb,         sblast2b, snesb_state, init_sblast2b, ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
 GAME( 1996, endless,      0,     kinstb,         endless,  snesb_state, init_endless,  ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, legendsb,     0,     kinstb,         kinstb,   snesb_state, init_legendsb, ROT0, "bootleg",  "Legend (SNES bootleg)",                          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, rushbeat,     0,     kinstb,         kinstb,   snesb_state, init_rushbeat, ROT0, "bootleg",  "Rushing Beat (SNES bootleg)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // Encrypted

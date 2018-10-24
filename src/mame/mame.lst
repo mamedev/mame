@@ -35282,10 +35282,11 @@ denseib                         // bootleg
 endless                         // bootleg
 ffight2b                        // bootleg
 iron                            // bootleg
+legendsb                        // bootleg
 kinstb                          // bootleg
 mk3snes                         // bootleg
+rushbeat                        // bootleg
 sblast2b                        // bootleg
-legendsb                        // bootleg
 
 @source:snk.cpp
 alphamis                        // (c) 1985
