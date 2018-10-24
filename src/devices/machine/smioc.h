@@ -73,11 +73,6 @@ public:
 
 	u8 m_deviceBusy;
 
-	u16 m_dmaSendAddress;
-	u16 m_dmaSendLength;
-	u16 m_dmaSendAddress2;
-	u16 m_dmaSendLength2;
-
 	u8 m_requestFlags_11D;
 	u16 m_commandValue;
 	u16 m_commandValue2;
@@ -103,6 +98,7 @@ public:
 
 	void SetDmaParameter(smioc_dma_parameter_t param, u16 value);
 
+
 	void WriteRamParameter(const char* function, const char* register_name, int address, int value);
 
 protected:
@@ -113,6 +109,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	u16 ReadDmaParameter(smioc_dma_parameter_t param);
+	int DmaParameterAddress(smioc_dma_parameter_t param);
 
 private:
 	/* Attached devices */

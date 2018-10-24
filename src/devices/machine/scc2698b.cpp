@@ -30,11 +30,12 @@ DEFINE_DEVICE_TYPE(SCC2698B, scc2698b_device, "scc2698b", "SCC2698B Octal UART")
 DEFINE_DEVICE_TYPE(SCC2698B_CHANNEL, scc2698b_channel, "scc2698b_channel", "UART channel")
 
 #define TRACE_ENABLE 0
+#define TRACE_CONFIG_CHANGE 0
 
 
 #define TRACE_REGISTER_WRITE(ofs, data, reg_name)	if(TRACE_ENABLE) { log_register_access((ofs), (data), "<<", (reg_name)); }
 #define TRACE_REGISTER_READ(ofs, data, reg_name)	if(TRACE_ENABLE) { log_register_access((ofs), (data), ">>", (reg_name)); }
-
+#define TRACE_CONFIG if(TRACE_CONFIG_CHANGE) logerror
 
 // Divider values for baud rate generation
 // Expecting a crystal of 3.6864MHz, baud rate is crystal frequency / (divider value * 8)
@@ -267,7 +268,7 @@ void scc2698b_channel::update_serial_configuration()
 
 	const char* parity_strings[] = { "None", "Odd", "Even", "Mark", "Space" };
 	const char* stop_bit_strings[] = { "0","1","1.5","2" };
-	logerror("Reconfigured channel to %d data bits, %s Parity, %s stop bits\n", data_bit_count, parity_strings[parity_mode], stop_bit_strings[stop_bits]);
+	TRACE_CONFIG("Reconfigured channel to %d data bits, %s Parity, %s stop bits\n", data_bit_count, parity_strings[parity_mode], stop_bit_strings[stop_bits]);
 
 
 	set_data_frame(start_bit_count, data_bit_count, parity_mode, stop_bits);
@@ -810,7 +811,7 @@ attotime scc2698b_device::generate_baudrate(int block, int tx, int table_index)
 		}
 
 		int frequency = configured_clock() / (divider * 8);
-		logerror("Set %s baud rate to %dHz (clock divider = %d)\n", tx ? "Transmit" : "Receive", frequency, divider * 8);
+		TRACE_CONFIG("Set %s baud rate to %dHz (clock divider = %d)\n", tx ? "Transmit" : "Receive", frequency, divider * 8);
 
 		return attotime::from_hz(configured_clock()) * (divider * 8);
 	}

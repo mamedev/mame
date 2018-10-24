@@ -20,11 +20,11 @@
         * CPU - Intel N80C188 L0450591 @ ??MHz - U23
         * MCU - Signetics SC87C451CCA68 220CP079109KA 97D8641 - U70
         * DMA - KS82C37A - U46, U47, U48, U49, U50
-    * SCC - Signetics SCC2698BC1A84 - U67
+		* SCC - Signetics SCC2698BC1A84 - U67
         * Memory - NEC D43256AGU-10LL 8948A9038 SRAM 32KB - U51
         * Memory - Mitsubishi M5M187AJ 046101-35 SRAM 64K X 1?? - U37
-    * Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U53
-    * Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U54
+		* Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U53
+		* Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U54
 
     Logic:
         * U8 - 22V10-25JC
@@ -42,23 +42,21 @@
     Program Memory:
         * 0x00000 - 0x07FFF : SRAM D43256AGU-10LL 32KB
         * 0xF8000 - 0xFFFFF : ROM 27C256 PLCC32 32KB
-    * 0xC0080 - 0xC008F : KS82C37A - Probably RAM DMA
-    * 0xC0090 - 0xC009F : KS82C37A - Serial DMA (Port 1 and 2?)
-    * 0xC00A0 - 0xC00AF : KS82C37A - Serial DMA (Port 3 and 4?)
-    * 0xC00B0 - 0xC00BF : KS82C37A - Serial DMA (Port 5 and 6?)
-    * 0xC00C0 - 0xC00CF : KS82C37A - Serial DMA (Port 7 and 8?)
+		* 0xC0080 - 0xC008F : KS82C37A - Probably RAM DMA
+		* 0xC0090 - 0xC009F : KS82C37A - Serial DMA (Port 1 and 2?)
+		* 0xC00A0 - 0xC00AF : KS82C37A - Serial DMA (Port 3 and 4?)
+		* 0xC00B0 - 0xC00BF : KS82C37A - Serial DMA (Port 5 and 6?)
+		* 0xC00C0 - 0xC00CF : KS82C37A - Serial DMA (Port 7 and 8?)
 
     IO Memory:
         * Unknown
 
     TODO:
-    * Emulate SCC and hook up RS232 ports
-    * Hook up console to RS232 port 1
-    * Hook up System Monitor II to RS232 port 2
-    * Dump 87C451 rom data and emulate MCU
-    * Dump 87C51 on SMIOC interconnect box
-    * Dump all PAL chips
-    * Hook up status LEDs
+		* Hook up System Monitor II to RS232 port 2
+		* Dump 87C451 rom data and emulate MCU
+		* Dump 87C51 on SMIOC interconnect box
+		* Dump all PAL chips
+		* Hook up status LEDs
 */
 
 #include "emu.h"
@@ -71,12 +69,19 @@
 
 #define I188_TAG     "smioc_i188" // U23
 
+/* Trace information about commands issued to SMIOC */
+#define ENABLE_LOG_COMMAND 0
+/* Trace accesses to parameter ram (used for DMA parameters from 68k) */
+#define ENABLE_LOG_PARAMETER_RAM 0
+/* Log DMA related memory movement and access to C01xx register space */
 #define ENABLE_LOG_REGISTER_ACCESS 0
-#define ENABLE_LOG_COMMAND 1
+/* Trace some accesses to C01xx register space, related to command handling, command/status flow control */
+#define ENABLE_LOG_REGISTER_DETAILS 0
 
-
-#define LOG_REGISTER_ACCESS if(ENABLE_LOG_REGISTER_ACCESS) logerror
 #define LOG_COMMAND if(ENABLE_LOG_COMMAND) logerror
+#define LOG_PARAMETER_RAM if(ENABLE_LOG_PARAMETER_RAM) logerror
+#define LOG_REGISTER_ACCESS if(ENABLE_LOG_REGISTER_ACCESS) logerror
+#define LOG_REGISTER_DETAILS if(ENABLE_LOG_REGISTER_DETAILS) logerror
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -131,23 +136,23 @@ static DEVICE_INPUT_DEFAULTS_START(terminal)
 DEVICE_INPUT_DEFAULTS_END
 
 
-MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
+void smioc_device::device_add_mconfig(machine_config &config)
+{
 	/* CPU - Intel 80C188 */
-	MCFG_DEVICE_ADD(I188_TAG, I80188, XTAL(20'000'000)) // Clock division unknown
-	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
-	MCFG_DEVICE_PROGRAM_MAP(smioc_mem)
+	I80188(config, m_smioccpu, XTAL(20'000'000)); // Clock division unknown
+	config.m_minimum_quantum = attotime::from_hz(1000);
+	m_smioccpu->set_addrmap(AS_PROGRAM, smioc_device::smioc_mem);
 
 	/* DMA */
 	for (required_device<am9517a_device> &dma : m_dma8237)
 		AM9517A(config, dma, 20_MHz_XTAL / 4); // Clock division unknown
 
-	/* RS232 */	
+	/* RS232 */
 	for (required_device<rs232_port_device> &rs232_port : m_rs232_p)
 		RS232_PORT(config, rs232_port, default_rs232_devices, nullptr);
-	
+
 	m_rs232_p[0]->set_default_option("terminal");
 	m_rs232_p[0]->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
-
 
 	/* SCC2698B */
 	scc2698b_device &scc2698b(SCC2698B(config, "scc2698b", XTAL(3'686'400)));
@@ -158,15 +163,7 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	scc2698b.mpp1_callback('b').set("dma8237_2", FUNC(am9517a_device::dreq3_w)).invert();
 	scc2698b.mpp2_callback('b').set("dma8237_2", FUNC(am9517a_device::dreq2_w)).invert();
 
-	//MCFG_SCC2698B_TX_CALLBACK(a, WRITELINE("rs232_p1", rs232_port_device, write_txd))
-	//MCFG_SCC2698B_MPP1_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq1_w).invert()) // MPP1 output is TxRDY (Active High), DREQ1 is UART 0 TX request (Active Low)
-	//MCFG_SCC2698B_MPP2_CALLBACK(a, WRITELINE("dma8237_2", am9517a_device, dreq0_w).invert()) // MPP2 output is RxRDY (Active High), DREQ0 is UART 0 RX request (Active Low)
-	//MCFG_SCC2698B_TX_CALLBACK(b, WRITELINE("rs232_p2", rs232_port_device, write_txd))
-	//MCFG_SCC2698B_MPP1_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq3_w).invert())
-	//MCFG_SCC2698B_MPP2_CALLBACK(b, WRITELINE("dma8237_2", am9517a_device, dreq2_w).invert())
-
 	/* The first dma8237 is set up in cascade mode, and each of its four channels provides HREQ/HACK to the other 4 DMA controllers*/
-
 	m_dma8237[0]->out_dack_callback<0>().set("dma8237_2", FUNC(am9517a_device::hack_w));
 	m_dma8237[0]->out_dack_callback<1>().set("dma8237_3", FUNC(am9517a_device::hack_w));
 	m_dma8237[0]->out_dack_callback<2>().set("dma8237_4", FUNC(am9517a_device::hack_w));
@@ -186,8 +183,7 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	m_rs232_p[0]->rxd_handler().set("scc2698b", FUNC(scc2698b_device::port_a_rx_w));
 	m_rs232_p[1]->rxd_handler().set("scc2698b", FUNC(scc2698b_device::port_b_rx_w));
 
-
-MACHINE_CONFIG_END
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -268,7 +264,7 @@ void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 
 void smioc_device::SendCommand(u16 command)
 {
-	LOG_COMMAND("%s SMIOC Command %04x (Address %04x, Length %04x)\n", machine().time().as_string(), command, m_dmaSendAddress, m_dmaSendLength);
+	LOG_COMMAND("%s SMIOC Command %04x (Address %04x, Length %04x)\n", machine().time().as_string(), command, ReadDmaParameter(smiocdma_sendaddress), ReadDmaParameter(smiocdma_sendlength));
 
 	// Command 0xxx is a special value that tells the hardware what channel/port it's working with for the purpose of writing DMA base / length registers
 	if (command < 0x1000)
@@ -280,16 +276,12 @@ void smioc_device::SendCommand(u16 command)
 	m_commandValue = command;
 	m_requestFlags_11D |= 1;
 	m_deviceBusy = 1;
-
-	// Additionally send command bits to clear status and parameters for previous commands
-	//m_requestFlags_11D |= 0x12;
 	
 	// Invalidate status if we hit a command.
 	m_status = 0;
 	m_statusvalid = false;
 	m_enable_hacky_status = false;
 
-	//m_smioccpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
 	m_smioccpu->int2_w(CLEAR_LINE);
 	m_smioccpu->int2_w(HOLD_LINE);
 	
@@ -297,16 +289,13 @@ void smioc_device::SendCommand(u16 command)
 
 void smioc_device::SendCommand2(u16 command)
 {
-	LOG_COMMAND("%s SMIOC Command2 %04x (Address %04x, Length %04x)\n", machine().time().as_string(), command, m_dmaSendAddress2, m_dmaSendLength2);
+	LOG_COMMAND("%s SMIOC Command2 %04x (Address %04x, Length %04x)\n", machine().time().as_string(), command, ReadDmaParameter(smiocdma_sendaddress), ReadDmaParameter(smiocdma_sendlength));
 
 	m_commandValue2 = command;
 	m_requestFlags_11D |= 4;
 	m_deviceBusy = 1;
 
-	// Additionally send command bits to clear status and parameters for previous commands
-	//m_requestFlags_11D |= 0x28;
-
-	//m_smioccpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
+	m_smioccpu->int2_w(CLEAR_LINE);
 	m_smioccpu->int2_w(HOLD_LINE);
 
 }
@@ -329,24 +318,10 @@ void smioc_device::SetCommandParameter2(u16 parameter)
 
 u16 smioc_device::GetStatus()
 {
-	if (!m_statusvalid && m_enable_hacky_status)
-	{
-		m_status_hack_counter = (m_status_hack_counter + 1) & 0x0F;
-		if (m_status_hack_counter == 0)
-		{
-			//m_wordcount = 1;
-			//return 0x8040;
-		}
-
-	}
 	return m_status | 0x0008;
 }
 u16 smioc_device::GetStatus2()
 {
-	if (m_status2 == 0 && m_deviceBusy == 0)
-	{
-		//return 0x8040;
-	}
 	return m_status2 | 0x0008;
 }
 
@@ -388,6 +363,26 @@ void smioc_device::ClearParameter2()
 }
 void smioc_device::SetDmaParameter(smioc_dma_parameter_t param, u16 value)
 {
+	int address = DmaParameterAddress(param);
+
+	const char* paramNames[] = { "smiocdma_sendaddress", "smiocdma_sendlength", "smiocdma_recvaddress", "smiocdma_recvlength" };
+	const char* paramName = "?";
+	if (param >= 0 && param < (sizeof(paramNames) / sizeof(*paramNames)))
+	{
+		paramName = paramNames[param];
+	}
+
+	WriteRamParameter("SetDmaParameter", paramName, address, value);
+}
+
+u16 smioc_device::ReadDmaParameter(smioc_dma_parameter_t param)
+{
+	int address = DmaParameterAddress(param);
+	return m_logic_ram[address] | (m_logic_ram[address + 1] << 8);
+}
+
+int smioc_device::DmaParameterAddress(smioc_dma_parameter_t param)
+{
 	int baseAddress = -1;
 	int p4offset = 0xC0; // The address offset from port 0 to port 4
 	switch (param)
@@ -395,6 +390,7 @@ void smioc_device::SetDmaParameter(smioc_dma_parameter_t param, u16 value)
 	case smiocdma_sendaddress: // Send to SMIOC - For Serial TX data
 		baseAddress = 0xCD8;
 		break;
+
 	case smiocdma_sendlength:
 		baseAddress = 0xCE8;
 		break;
@@ -407,21 +403,17 @@ void smioc_device::SetDmaParameter(smioc_dma_parameter_t param, u16 value)
 		baseAddress = 0xCF8;
 		break;
 	}
-
 	if (baseAddress != -1)
 	{
 		int portOffset = (m_activePortIndex & 1) * 4 + (m_activePortIndex & 2) + ((m_activePortIndex & 4) ? p4offset : 0);
 
 		int address = baseAddress + portOffset;
 
-		const char* paramNames[] = { "smiocdma_sendaddress", "smiocdma_sendlength", "smiocdma_recvaddress", "smiocdma_recvlength" };
-		const char* paramName = "?";
-		if (param >= 0 && param < (sizeof(paramNames) / sizeof(*paramNames)))
-		{
-			paramName = paramNames[param];
-		}
-
-		WriteRamParameter("SetDmaParameter", paramName, address, value);
+		return address;
+	}
+	else
+	{
+		fatalerror("Invalid DMA Parameter 0x%x - unable to continue.", param);
 	}
 }
 
@@ -435,7 +427,7 @@ void smioc_device::WriteRamParameter(const char* function, const char* register_
 	m_logic_ram[address] = value & 0xFF;
 	m_logic_ram[address + 1] = (value >> 8) & 0xFF;
 
-	logerror("%s %s (%s) ram2[0x%04x] = %04X\n", machine().time().as_string(), function, register_name, address, value);
+	LOG_PARAMETER_RAM("%s %s (%s) ram2[0x%04x] = %04X\n", machine().time().as_string(), function, register_name, address, value);
 }
 
 
@@ -443,11 +435,8 @@ void smioc_device::WriteRamParameter(const char* function, const char* register_
 
 void smioc_device::update_and_log(u16& reg, u16 newValue, const char* register_name)
 {
-	//if (reg != newValue)
-	{
-		logerror("%s Update %s %04X -> %04X\n", machine().time().as_string(), register_name, reg, newValue);
-		reg = newValue;
-	}
+	LOG_PARAMETER_RAM("%s Update %s %04X -> %04X\n", machine().time().as_string(), register_name, reg, newValue);
+	reg = newValue;
 }
 
 READ8_MEMBER(smioc_device::ram2_mmio_r)
@@ -490,26 +479,21 @@ READ8_MEMBER(smioc_device::ram2_mmio_r)
 		break;
 
 	case 0xCD8: // DMA source address (for writing characters) - Port 0
-		data = m_dmaSendAddress & 0xFF;
 		description = "(DMA Source)";
 		break;
 	case 0xCD9:
-		data = m_dmaSendAddress >> 8;
 		description = "(DMA Source)";
 		break;
 
 	case 0xCE8: // DMA Length (for writing characters) - Port 0
-		data = m_dmaSendLength & 0xFF;
 		description = "(DMA Length)";
 		break;
 	case 0xCE9:
-		data = m_dmaSendLength >> 8;
 		description = "(DMA Length)";
 		break;
 
 	}
-
-	logerror("ram2[%04X] => %02X %s\n", offset, data, description);
+	LOG_PARAMETER_RAM("ram2[%04X] => %02X %s\n", offset, data, description);
 	return data;
 }
 
@@ -570,8 +554,7 @@ WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 		return;
 	}
 
-
-	logerror("ram2[%04X] <= %02X %s\n", offset, data, description);
+	LOG_PARAMETER_RAM("ram2[%04X] <= %02X %s\n", offset, data, description);
 }
 
 READ8_MEMBER(smioc_device::dma68k_r)
@@ -615,7 +598,7 @@ READ8_MEMBER(smioc_device::boardlogic_mmio_r)
 
 		case 0x1D: // C011D (HW Request flags)
 			data = m_requestFlags_11D;
-			logerror("%s C011D Read => %02X\n", machine().time().as_string(), data);
+			LOG_REGISTER_DETAILS("%s C011D Read => %02X\n", machine().time().as_string(), data);
 			// Assume this is a clear-on-read register - It is read in one location and all set bits are acted on once it is read.
 			m_requestFlags_11D = 0;
 
@@ -645,7 +628,7 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 	switch (offset)
 	{
 	case 0x10: // C0110 (Clear interrupt? This seems to happen a lot but without being related to actually completing anything.)		
-		logerror("%s C0110 Write, DeviceBusy = %02X, RequestFlags = %02X\n", machine().time().as_string(), m_deviceBusy, m_requestFlags_11D);
+		LOG_REGISTER_DETAILS("%s C0110 Write, DeviceBusy = %02X, RequestFlags = %02X\n", machine().time().as_string(), m_deviceBusy, m_requestFlags_11D);
 		m_deviceBusy = m_requestFlags_11D;
 		m_smioccpu->int2_w(CLEAR_LINE);
 		if (m_requestFlags_11D)
@@ -656,8 +639,6 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 
 	case 0x11: // C0111 - Set to 1 after providing a status - Acknowledge by hardware by raising bit 4 in C011D (SMIOC E2E flag 0x200
 		// Hypothesis: Status needs to be acknowledged before we trigger the interrupt - so moving the following code to clear status callback.
-		//m_requestFlags_11D |= 0x10; // bit 4
-		//m_smioccpu->int2_w(HOLD_LINE);
 
 		m_statusrequest = true;
 		if (!m_statusvalid)
@@ -670,18 +651,16 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 			// Wait until host clears status to proceed.
 		}
 
-		logerror("%s C0111 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
+		LOG_REGISTER_DETAILS("%s C0111 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
 		break;
 
 	case 0x12: // C0112 - Set to 1 after providing a status(2?) - Acknowledge by hardware by raising bit 5 in C011D (SMIOC E2E flag 0x100)
-		//m_requestFlags_11D |= 0x20; // bit 5
-		//m_smioccpu->int2_w(HOLD_LINE);
 		m_statusrequest2 = true;
 		if (!m_statusvalid2)
 		{
 			AdvanceStatus2();
 		}
-		logerror("%s C0112 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
+		LOG_REGISTER_DETAILS("%s C0112 Write, RequestFlags = %02X\n", machine().time().as_string(), m_requestFlags_11D);
 		break;
 
 	case 0x16: // C0116 - Set to 1 after processing 11D & 0x40
