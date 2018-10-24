@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Brandon Munger
+// copyright-holders:Brandon Munger, Stephen Stair
 /******************************************************************************
 *
 * Rolm CBX 9751 Driver

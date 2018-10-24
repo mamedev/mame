@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Brandon Munger
+// copyright-holders:Brandon Munger, Stephen Stair
 /**********************************************************************
 
     ROLM 9751 9005 System Monitor Input/Output Card emulation
@@ -141,7 +141,7 @@ void smioc_device::device_add_mconfig(machine_config &config)
 	/* CPU - Intel 80C188 */
 	I80188(config, m_smioccpu, XTAL(20'000'000)); // Clock division unknown
 	config.m_minimum_quantum = attotime::from_hz(1000);
-	m_smioccpu->set_addrmap(AS_PROGRAM, smioc_device::smioc_mem);
+	m_smioccpu->set_addrmap(AS_PROGRAM, &smioc_device::smioc_mem);
 
 	/* DMA */
 	for (required_device<am9517a_device> &dma : m_dma8237)
