@@ -1,8 +1,12 @@
-// license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// license:GPL-2.0
+// copyright-holders:Segher Boessenkool
 /*****************************************************************************
 
 	SunPlus micro'nSP disassembler
+
+	Copyright 2008-2017  Segher Boessenkool  <segher@kernel.crashing.org>
+	Licensed under the terms of the GNU GPL, version 2
+	http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
 *****************************************************************************/
 
@@ -22,9 +26,13 @@ public:
 	offs_t disassemble(std::ostream &stream, offs_t pc, uint16_t op, uint16_t imm16);
 
 private:
-	static char const *const reg[];
-	static char const *const jmp[];
-	static char const *const alu[];
+	void print_alu_op_start(std::ostream &stream, uint8_t op0, uint8_t opA);
+	void print_alu_op3(std::ostream &stream, uint8_t op0, uint8_t opB);
+	void print_alu_op_end(std::ostream &stream, uint8_t op0);
+	void print_indirect_op(std::ostream &stream, uint8_t opN, uint8_t opB);
+
+	static char const *const regs[];
+	static char const *const jumps[];
 };
 
 #endif

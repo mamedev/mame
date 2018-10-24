@@ -571,8 +571,8 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	sio2.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	sio2.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio2", z80sio_device, rxa_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard");
+	m_rs232->rxd_handler().set("sio2", FUNC(z80sio_device::rxa_w));
 
 	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(aussiebyte_state::fdc_intrq_w));

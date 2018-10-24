@@ -439,8 +439,7 @@ protected:
 	uint16_t m_audio_curr_beat_base_count;
 
 	uint16_t m_io_regs[0x200];
-	uint8_t m_uart_rx_fifo[8];
-	uint8_t m_uart_rx_index;
+	bool m_uart_rx_available;
 
 	uint16_t m_video_regs[0x100];
 	size_t m_sprite_limit;
@@ -468,7 +467,7 @@ protected:
 	sound_stream *m_stream;
 	oki_adpcm_state m_adpcm[16];
 
-	required_device<cpu_device> m_cpu;
+	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint16_t> m_scrollram;
 	required_shared_ptr<uint16_t> m_paletteram;

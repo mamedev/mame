@@ -213,6 +213,7 @@ public:
 	void init_kodb();
 	void init_dinopic();
 	void init_knightsb();
+	void init_mtwinsb();
 	void init_punipic();
 	void init_punipic3();
 	void init_sf2m1();
@@ -228,6 +229,7 @@ public:
 	DECLARE_MACHINE_START(dinopic);
 	DECLARE_MACHINE_START(knightsb);
 	DECLARE_MACHINE_START(kodb);
+	DECLARE_MACHINE_START(mtwinsb);
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(sf2mdt);
 	DECLARE_MACHINE_START(slampic);
@@ -236,6 +238,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
 	DECLARE_WRITE16_MEMBER(knightsb_layer_w);
 	DECLARE_WRITE16_MEMBER(kodb_layer_w);
+	DECLARE_WRITE16_MEMBER(mtwinsb_layer_w);
 	DECLARE_WRITE16_MEMBER(punipic_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
@@ -274,6 +277,7 @@ public:
 	void sf2mdta(machine_config &config);
 	void sf2m1(machine_config &config);
 	void kodb(machine_config &config);
+	void mtwinsb(machine_config &config);
 	void varthb(machine_config &config);
 	void sgyxz(machine_config &config);
 	void wofabl(machine_config &config);
@@ -302,6 +306,7 @@ public:
 	void kodb_map(address_map &map);
 	void kodb_sound_map(address_map &map);
 	void main_map(address_map &map);
+	void mtwinsb_map(address_map &map);
 	void punipic_map(address_map &map);
 	void qsound_decrypted_opcodes_map(address_map &map);
 	void qsound_main_map(address_map &map);
@@ -509,6 +514,7 @@ extern gfx_decode_entry const gfx_cps1[];
 
 INPUT_PORTS_EXTERN( dino );
 INPUT_PORTS_EXTERN( knights );
+INPUT_PORTS_EXTERN( mtwins );
 INPUT_PORTS_EXTERN( punisher );
 INPUT_PORTS_EXTERN( sf2 );
 INPUT_PORTS_EXTERN( slammast );

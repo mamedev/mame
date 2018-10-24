@@ -951,9 +951,9 @@ MACHINE_CONFIG_START(ql_state::ql)
 	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(WRITELINE(MDV_2, microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD(MDV_2)
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DCE
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DTE
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
+	RS232_PORT(config, m_ser1, default_rs232_devices, nullptr); // wired as DCE
+	RS232_PORT(config, m_ser2, default_rs232_devices, nullptr); // wired as DTE
+	m_ser2->cts_handler().set(m_zx8302, FUNC(zx8302_device::write_cts2));
 
 	MCFG_DEVICE_ADD("exp", QL_EXPANSION_SLOT, 0, ql_expansion_cards, nullptr) // FIXME: what's the clock on the slot?
 	//MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK()

@@ -1208,7 +1208,6 @@ ampoker2                        // (c) 1990 Novomatic
 piccolop                        // (c) 1991 Admiral - Novomatic
 pkrdewin                        // 1990 bootleg
 rabbitpk                        // 1990 bootleg
-novopkr2                        // 1990 bootleg
 sigma2k                         // (c) 2000 Sigma
 sigmapkr                        // (c) 1995 Sigma
 videomat                        // 1990 bootleg
@@ -10182,7 +10181,6 @@ mswordj                         // 23/06/1990 (c) 1990 (Japan)
 mswordr1                        // 23/06/1990 (c) 1990 (World)
 mswordu                         // 25/07/1990 (c) 1990 (USA)
 mtwins                          // 19/06/1990 (c) 1990 (World)
-mtwinsb                         // bootleg
 nemo                            // 30/11/1990 (c) 1990 (World)
 nemoj                           // 20/11/1990 (c) 1990 (Japan)
 nemor1                          // 09/11/1990 (c) 1990 (World)
@@ -12734,6 +12732,7 @@ ffightbl                        // bootleg
 ffightbla                       // bootleg
 knightsb                        // bootleg
 kodb                            // bootleg
+mtwinsb                         // bootleg
 punipic                         // bootleg
 punipic2                        // bootleg
 punipic3                        // bootleg
@@ -14946,6 +14945,7 @@ gnw_dkjr                        // Nintendo
 gnw_dkong                       // Nintendo
 gnw_dkong2                      // Nintendo
 gnw_egg                         // Nintendo
+gnw_ghouse                      // Nintendo
 gnw_mario                       // Nintendo
 gnw_mariocm                     // Nintendo
 gnw_mmouse                      // Nintendo
@@ -36537,6 +36537,7 @@ ninjak                          // 1991.?? C85 (c) 1990 Taito Corporation Japan 
 ninjakj                         // 1991.04 C85 (c) 1990 Taito Corporation (Japan)
 ninjaku                         // 1991.03 C85 (c) 1990 Taito Corporation (Japan)
 pulirula                        // 1991.?? C98 (c) 1991 Taito Corporation Japan (World)
+pulirulaa                       // 1991.?? C98 (c) 1991 Taito Corporation Japan (World)
 pulirulaj                       // 1991.11 C98 (c) 1991 Taito Corporation (Japan)
 qcrayon                         // 1993.08 D55 (c) 1993 Taito Corporation (Japan)
 qcrayon2                        // 1994.01 D63 (c) 1993 Taito Corporation (Japan)
@@ -37051,6 +37052,7 @@ teleguide                       //
 @source:terracre.cpp
 amatelas                        // (c) 1986
 amazon                          // (c) 1986
+amazont                         // (c) 1986
 boobhack                        // bootleg
 horekid                         // (c) 1987
 horekidb                        // bootleg

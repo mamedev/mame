@@ -48,7 +48,8 @@ ioport_constructor ioc2_device::device_input_ports() const
 	return INPUT_PORTS_NAME(front_panel);
 }
 
-MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
+void ioc2_device::device_add_mconfig(machine_config &config)
+{
 	SCC85230(config, m_scc, SCC_PCLK);
 	m_scc->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
 	m_scc->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
@@ -58,15 +59,15 @@ MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
 	m_scc->out_dtrb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc85230_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc85230_device, dcda_w))
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc85230_device, rxa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.cts_handler().set(m_scc, FUNC(scc85230_device::ctsa_w));
+	rs232a.dcd_handler().set(m_scc, FUNC(scc85230_device::dcda_w));
+	rs232a.rxd_handler().set(m_scc, FUNC(scc85230_device::rxa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc85230_device, ctsb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc85230_device, dcdb_w))
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc85230_device, rxb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.cts_handler().set(m_scc, FUNC(scc85230_device::ctsb_w));
+	rs232b.dcd_handler().set(m_scc, FUNC(scc85230_device::dcdb_w));
+	rs232b.rxd_handler().set(m_scc, FUNC(scc85230_device::rxb_w));
 
 	PC_LPT(config, m_pi1);
 
@@ -79,7 +80,7 @@ MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
 	m_pit->set_clk<1>(1000000);
 	m_pit->set_clk<2>(1000000);
 	m_pit->out_handler<2>().set(m_kbdc, FUNC(kbdc8042_device::write_out2));
-MACHINE_CONFIG_END
+}
 
 
 ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

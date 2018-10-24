@@ -91,7 +91,8 @@ private:
 		TIMER_VLT,
 		TIMER_CURS,
 		TIMER_DRB,
-		TIMER_DMA
+		TIMER_DMA,
+		TIMER_FRAME
 	};
 
 	void crt9007(address_map &map);
@@ -166,6 +167,7 @@ private:
 	emu_timer *m_curs_timer;
 	emu_timer *m_drb_timer;
 	emu_timer *m_dma_timer;
+	emu_timer *m_frame_timer;
 };
 
 

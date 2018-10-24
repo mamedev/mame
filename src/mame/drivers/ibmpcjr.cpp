@@ -630,12 +630,12 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	uart.out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
 	uart.out_int_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD( "serport", RS232_PORT, pcjr_com, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ins8250", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("ins8250", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_uart_device, cts_w))
+	rs232_port_device &serport(RS232_PORT(config, "serport", pcjr_com, nullptr));
+	serport.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
+	serport.dcd_handler().set("ins8250", FUNC(ins8250_uart_device::dcd_w));
+	serport.dsr_handler().set("ins8250", FUNC(ins8250_uart_device::dsr_w));
+	serport.ri_handler().set("ins8250", FUNC(ins8250_uart_device::ri_w));
+	serport.cts_handler().set("ins8250", FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)

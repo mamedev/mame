@@ -27,15 +27,20 @@ public:
 		m_rom_dma_len(*this,"rom_dma_len"),
 		m_palram_sh(*this, "palram_sh"),
 		m_palram_l(*this, "palram_l"),
+		m_bmp_palram_sh(*this, "bmp_palram_sh"),
+		m_bmp_palram_l(*this, "bmp_palram_l"),
+		m_bmp_base(*this, "bmp_base"),
 		m_colmix_sh(*this, "colmix_sh"),
 		m_colmix_l(*this, "colmix_l"),
+		m_colmix_ctrl(*this, "colmix_ctrl"),
+		m_posirq_x(*this, "posirq_x"),
+		m_posirq_y(*this, "posirq_y"),
 		m_segment_regs(*this, "segment_regs"),
 		m_palette(*this, "palette"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lowbus(*this, "lowbus"),
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
@@ -48,14 +53,16 @@ public:
 
 	void init_xavix();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(rad_rh_in1_08_r);
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void xavix_map(address_map &map);
-	void xavix_special_map(address_map &map);
 
 	void xavix_lowbus_map(address_map &map);
+	void superxavix_lowbus_map(address_map &map);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
@@ -134,9 +141,6 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_WRITE8_MEMBER(dispctrl_posirq_x_w);
-	DECLARE_WRITE8_MEMBER(dispctrl_posirq_y_w);
-
 	DECLARE_READ8_MEMBER(sound_75f0_r);
 	DECLARE_WRITE8_MEMBER(sound_75f0_w);
 
@@ -191,7 +195,7 @@ private:
 	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<xavix_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	
 	uint8_t m_vectorenable;
@@ -214,7 +218,7 @@ private:
 	uint8_t m_arena_control;
 
 	uint8_t m_6ff0;
-	uint8_t m_6ff8;
+	uint8_t m_video_ctrl;
 
 	uint8_t m_io0_data;
 	uint8_t m_io1_data;
@@ -226,6 +230,12 @@ private:
 	uint8_t m_timer_baseval;
 
 	int16_t get_vectors(int which, int half);
+	
+	// raster IRQ
+	TIMER_CALLBACK_MEMBER(interrupt_gen);
+	emu_timer *m_interrupt_timer;
+	DECLARE_WRITE8_MEMBER(dispctrl_posirq_x_w);
+	DECLARE_WRITE8_MEMBER(dispctrl_posirq_y_w);
 
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_fragment_sprite;
@@ -235,9 +245,17 @@ private:
 
 	required_shared_ptr<uint8_t> m_palram_sh;
 	required_shared_ptr<uint8_t> m_palram_l;
+
+	optional_shared_ptr<uint8_t> m_bmp_palram_sh;
+	optional_shared_ptr<uint8_t> m_bmp_palram_l;
+	optional_shared_ptr<uint8_t> m_bmp_base;
+
 	required_shared_ptr<uint8_t> m_colmix_sh;
 	required_shared_ptr<uint8_t> m_colmix_l;
+	required_shared_ptr<uint8_t> m_colmix_ctrl;
 
+	required_shared_ptr<uint8_t> m_posirq_x;
+	required_shared_ptr<uint8_t> m_posirq_y;
 
 	required_shared_ptr<uint8_t> m_segment_regs;
 
@@ -249,11 +267,14 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* ramsh, uint8_t* raml, int size, int basecol);
 	double hue2rgb(double p, double q, double t);
-	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval);
+	void draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
 	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
+	void draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int line);
+
 	bitmap_ind16 m_zbuffer;
 
 	uint8_t m_spritereg;
@@ -264,13 +285,13 @@ private:
 	// variables used by rendering
 	int m_tmp_dataaddress;
 	int m_tmp_databit;
+	uint8_t m_bit;
+
 	void set_data_address(int address, int bit);
 	uint8_t get_next_bit();
 	uint8_t get_next_byte();
 
 	int get_current_address_byte();
-
-	required_device<address_map_bank_device> m_lowbus;
 	optional_device<i2cmem_device> m_i2cmem;
 };
 

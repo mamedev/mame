@@ -1600,7 +1600,7 @@ INPUT_PORTS_END
      - 0xff14ab.w : energy (player 1)
      - 0xff156b.w : energy (player 2)
 */
-static INPUT_PORTS_START( mtwins )
+INPUT_PORTS_START( mtwins )
 	PORT_INCLUDE( cps1_3b )
 
 	PORT_MODIFY("IN0")
@@ -5822,28 +5822,6 @@ ROM_START( mtwins )
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "ck24b.1a",     0x0000, 0x0117, CRC(bd99c448) SHA1(2692c158f76769b0743103cc3a6d1c5d1f4f52ec) )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
-ROM_END
-
-ROM_START( mtwinsb ) // board marked MGT-026
-	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "1-prg-27c4001.bin",     0x00001, 0x80000, CRC(8938a029) SHA1(50104d2afaec8d69d317780c071a4f2248e23e62) )
-	ROM_LOAD16_BYTE( "2-prg-27c4001.bin",     0x00000, 0x80000, CRC(7d5b8a97) SHA1(d3e456061a569765d400fc7c9b43e4fdacf17951) )
-
-	ROM_REGION( 0x200000, "gfx", 0 ) // identical to the original, but differently arranged
-	ROMX_LOAD( "g4.bin",  0x000004, 0x40000, CRC(11493e55) SHA1(0e45f53b034d66ce8d029346d4d88e46021df1a7), ROM_SKIP(7) )
-	ROM_CONTINUE(         0x000000, 0x40000)
-	ROMX_LOAD( "g3.bin",  0x000005, 0x40000, CRC(feda0f8b) SHA1(59c740478791ce95bf06feeda5173cc283a1eaea), ROM_SKIP(7) )
-	ROM_CONTINUE(         0x000001, 0x40000)
-	ROMX_LOAD( "g2.bin",  0x000006, 0x40000, CRC(745f0eba) SHA1(1cb07be5df7cc43b5aa236f114d303bf92436c74), ROM_SKIP(7) )
-	ROM_CONTINUE(         0x000002, 0x40000)
-	ROMX_LOAD( "g1.bin",  0x000007, 0x40000, CRC(8069026f) SHA1(3d5e9b36a349328bcd93d83d8d2fe3cd40e68a3b), ROM_SKIP(7) )
-	ROM_CONTINUE(         0x000003, 0x40000)
-
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "4-snd-z80-27c512.bin", 0x00000, 0x10000, CRC(4d4255b7) SHA1(81a76b58043af7252a854b7efc4109957ef0e679) ) // identical to the original
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "3-snd-27c208.bin", 0x00000, 0x40000, CRC(a0c3de92) SHA1(5135cd982564f898f799ff1bc2bb2a75154be0cd) ) // identical to the original, but one single bigger ROM
 ROM_END
 
 /* B-Board 89625B-1 */
@@ -12905,7 +12883,6 @@ GAME( 1990, mercsur1,    mercs,    cps1_10MHz, mercs,    cps_state, init_cps1,  
 GAME( 1990, mercsj,      mercs,    cps1_10MHz, mercs,    cps_state, init_cps1,     ROT270, "Capcom", "Senjou no Ookami II (Japan 900302)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mtwins,      0,        cps1_10MHz, mtwins,   cps_state, init_cps1,     ROT0,   "Capcom", "Mega Twins (World 900619)", MACHINE_SUPPORTS_SAVE ) // "ETC" - (c) Capcom U.S.A. but World "warning"
 GAME( 1990, chikij,      mtwins,   cps1_10MHz, mtwins,   cps_state, init_cps1,     ROT0,   "Capcom", "Chiki Chiki Boys (Japan 900619)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mtwinsb,     mtwins,   cps1_10MHz, mtwins,   cps_state, init_cps1,     ROT0,   "Capcom", "Mega Twins (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // severe GFX problems due to different bootleg hardware
 GAME( 1990, msword,      0,        cps1_10MHz, msword,   cps_state, init_cps1,     ROT0,   "Capcom", "Magic Sword: Heroic Fantasy (World 900725)", MACHINE_SUPPORTS_SAVE )    // 25.07.1990  "OTHER COUNTRY"
 GAME( 1990, mswordr1,    msword,   cps1_10MHz, msword,   cps_state, init_cps1,     ROT0,   "Capcom", "Magic Sword: Heroic Fantasy (World 900623)", MACHINE_SUPPORTS_SAVE )    // 23.06.1990  "OTHER COUNTRY"
 GAME( 1990, mswordu,     msword,   cps1_10MHz, msword,   cps_state, init_cps1,     ROT0,   "Capcom", "Magic Sword: Heroic Fantasy (USA 900725)", MACHINE_SUPPORTS_SAVE )  // 25.07.1990  "U.S.A."
