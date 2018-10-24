@@ -28,7 +28,7 @@
 #define LOG_INT_MASK    (LOG_REG_MASK << 1)
 #define LOG_INT(...)    LOGMASKED(LOG_INT_MASK, __VA_ARGS__)
 #undef VERBOSE
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE 0
 
 // Bit manipulation
 namespace {
@@ -716,7 +716,20 @@ void tms9914_device::update_fsm()
 					m_sh_vsts = true;
 				}
 				if (!get_signal(IEEE_488_NDAC)) {
-					LOG("%.6f TX %02x/%d\n" , machine().time().as_double() , m_dio , m_signals[ IEEE_488_EOI ]);
+#if VERBOSE
+					bool iscmd = m_signals[IEEE_488_ATN];
+					char cmd[16] = "";
+					if (iscmd) {
+						uint8_t tmp = m_dio & 0x7f;
+						if (tmp >= 0x20 && tmp <= 0x3f)
+							snprintf(cmd, 16, "MLA%d", tmp & 0x1f);
+						else if (tmp >= 0x40 && tmp <= 0x5f)
+							snprintf(cmd, 16, "MTA%d", tmp & 0x1f);
+						else if (tmp >= 0x60 && tmp <= 0x7f)
+							snprintf(cmd, 16, "MSA%d", tmp & 0x1f);
+					}
+					LOG("%.6f TX %s %02X/%d %s\n" , machine().time().as_double() , m_signals[IEEE_488_ATN] ? "C" : "D", m_dio , m_signals[ IEEE_488_EOI ], cmd);
+#endif
 					m_sh_state = FSM_SH_SGNS;
 				}
 				break;
