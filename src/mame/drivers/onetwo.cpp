@@ -54,9 +54,8 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 class onetwo_state : public driver_device
 {
 public:
-	onetwo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_paletteram(*this, "paletteram%u", 1U),
+	onetwo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
@@ -74,7 +73,6 @@ protected:
 
 private:
 	/* memory pointers */
-	required_shared_ptr_array<uint8_t, 2> m_paletteram;
 	required_shared_ptr<uint8_t> m_fgram;
 	required_memory_bank m_mainbank;
 
@@ -92,10 +90,9 @@ private:
 	DECLARE_WRITE8_MEMBER(fgram_w);
 	DECLARE_WRITE8_MEMBER(cpubank_w);
 	DECLARE_WRITE8_MEMBER(coin_counters_w);
-	template<uint8_t Which> DECLARE_WRITE8_MEMBER(palette_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_color(int offset);
+	DECLARE_PALETTE_DECODER(BBBGGGGGxBBRRRRR);
 	void main_cpu(address_map &map);
 	void main_cpu_io(address_map &map);
 	void sound_cpu(address_map &map);
@@ -155,18 +152,12 @@ WRITE8_MEMBER(onetwo_state::coin_counters_w)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
 
-void onetwo_state::set_color(int offset)
+PALETTE_DECODER_MEMBER(onetwo_state, BBBGGGGGxBBRRRRR)
 {
-	int r = m_paletteram[0][offset] & 0x1f;
-	int g = m_paletteram[1][offset] & 0x1f;
-	int b = ((m_paletteram[0][offset] & 0x60) >> 2) | ((m_paletteram[1][offset] & 0xe0) >> 5);
-	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
-}
-template<uint8_t Which>
-WRITE8_MEMBER(onetwo_state::palette_w)
-{
-	m_paletteram[Which][offset] = data;
-	set_color(offset);
+	uint8_t const r = pal5bit((raw >> 0) & 0x1f);
+	uint8_t const g = pal5bit((raw >> 8) & 0x1f);
+	uint8_t const b = pal5bit(((raw >> 2) & 0x18) | ((raw >> 13) & 0x7));
+	return rgb_t(r, g, b);
 }
 
 /*************************************
@@ -179,8 +170,8 @@ void onetwo_state::main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0xbfff).bankr(m_mainbank);
-	map(0xc800, 0xc87f).ram().w(FUNC(onetwo_state::palette_w<0>)).share(m_paletteram[0]);
-	map(0xc900, 0xc97f).ram().w(FUNC(onetwo_state::palette_w<1>)).share(m_paletteram[1]);
+	map(0xc800, 0xc87f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc900, 0xc97f).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xd000, 0xdfff).ram().w(FUNC(onetwo_state::fgram_w)).share(m_fgram);
 	map(0xe000, 0xffff).ram();
 }
@@ -327,8 +318,8 @@ static const gfx_layout tiles8x8x6_layout =
 	RGN_FRAC(1,3),
 	6,
 	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+4, RGN_FRAC(0,3)+0, RGN_FRAC(0,3)+4, RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP4(0,1), STEP4(4*2*8,1) },
+	{ STEP8(0,4*2) },
 	16*8
 };
 
@@ -372,7 +363,7 @@ void onetwo_state::onetwo(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_onetwo);
-	PALETTE(config, m_palette, 0x80);
+	PALETTE(config, m_palette, 0x80).set_format(raw_to_rgb_converter(2, &onetwo_state::BBBGGGGGxBBRRRRR_decoder));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -405,7 +396,7 @@ ROM_START( onetwo )
 	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "3_graphics", 0x000000, 0x80000, CRC(c72ff3a0) SHA1(17394d8a8b5ef4aee9522d87ba92ef1285f4d76a) )
 	ROM_LOAD( "4_graphics", 0x080000, 0x80000, CRC(0ca40557) SHA1(ca2db57d64ece90f2066f15b276c8d5827dcb4fa) )
-	ROM_LOAD( "5_graphics",   0x100000, 0x80000, CRC(664b6679) SHA1(f9f78bd34fb58e24f890a540382392e1c9d01220) )
+	ROM_LOAD( "5_graphics", 0x100000, 0x80000, CRC(664b6679) SHA1(f9f78bd34fb58e24f890a540382392e1c9d01220) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sample", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
