@@ -1681,7 +1681,7 @@ case 0xF0:  /* STOP - 2 cycles - Flags affected: -------- */
 		/* TODO: Add a bunch of additional cycles */
 		m_clock_changed = 0;
 	}
-	logerror( "%04X: %02x, cpu-clock-change, unhandled\n", m_PC-1,op );
+	//logerror( "%04X: %02x, cpu-clock-change, unhandled\n", m_PC-1,op ); // fills up error log when unit sleeps
 	break;
 case 0xF1:  /* HALT - 2 cycles - Flags affected: -------- */
 	m_halted = 1;
