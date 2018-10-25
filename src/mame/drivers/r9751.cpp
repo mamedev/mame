@@ -154,12 +154,12 @@ private:
 	void trace_system(int table, int offset, int data, const char* direction);
 
 	uint32_t m_device_trace_enable[2];
-	int m_trace_last_address[64];
-	int m_trace_last_data[64];
-	int m_trace_repeat_count[64];
-	char const * m_trace_last_direction[64];
-	char const * m_generic_command_names[256];
-	char const ** m_specific_command_tables[64];
+	//int m_trace_last_address[64];
+	//int m_trace_last_data[64];
+	//int m_trace_repeat_count[64];
+	//char const * m_trace_last_direction[64];
+	//char const * m_generic_command_names[256];
+	//char const ** m_specific_command_tables[64];
 	void device_trace_init();
 	void device_trace_teardown();
 	void device_trace_enable_all();
