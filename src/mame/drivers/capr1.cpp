@@ -205,17 +205,17 @@ MACHINE_CONFIG_START(capr1_state::cspin2)
 	MCFG_DEVICE_PROGRAM_MAP(cspin2_map)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(capr1_state, nmi_line_pulse, 20)
 
-	MCFG_DEVICE_ADD("te7750", TE7750, 0) // guess
-	MCFG_TE7750_IOS_CB(CONSTANT(7))
-	MCFG_TE7750_IN_PORT1_CB(IOPORT("IN1"))
-	MCFG_TE7750_IN_PORT2_CB(IOPORT("IN2"))
-	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3"))
-	MCFG_TE7750_IN_PORT4_CB(IOPORT("IN4"))
-	MCFG_TE7750_IN_PORT5_CB(IOPORT("IN5"))
-	MCFG_TE7750_IN_PORT6_CB(IOPORT("IN6"))
-	MCFG_TE7750_IN_PORT7_CB(IOPORT("IN7"))
-	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN8"))
-	MCFG_TE7750_OUT_PORT9_CB(WRITE8(*this, capr1_state, output_w))
+	te7750_device &te7750(TE7750(config, "te7750", 0)); // guess
+	te7750.ios_cb().set_constant(7);
+	te7750.in_port1_cb().set_ioport("IN1");
+	te7750.in_port2_cb().set_ioport("IN2");
+	te7750.in_port3_cb().set_ioport("IN3");
+	te7750.in_port4_cb().set_ioport("IN4");
+	te7750.in_port5_cb().set_ioport("IN5");
+	te7750.in_port6_cb().set_ioport("IN6");
+	te7750.in_port7_cb().set_ioport("IN7");
+	te7750.in_port8_cb().set_ioport("IN8");
+	te7750.out_port9_cb().set(FUNC(capr1_state::output_w));
 
 	/* no video! */
 

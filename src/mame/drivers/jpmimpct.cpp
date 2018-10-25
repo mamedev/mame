@@ -1092,22 +1092,22 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 
 		case 0x02:
 		{
-			m_reel0->update((data >> 0)& 0x0F);
-			m_reel1->update((data >> 1)& 0x0F);
-			m_reel2->update((data >> 2)& 0x0F);
-			m_reel3->update((data >> 3)& 0x0F);
-			awp_draw_reel(machine(),"reel1", *m_reel0);
-			awp_draw_reel(machine(),"reel2", *m_reel1);
-			awp_draw_reel(machine(),"reel3", *m_reel2);
-			awp_draw_reel(machine(),"reel4", *m_reel3);
+			m_reel[0]->update((data >> 0)& 0x0F);
+			m_reel[1]->update((data >> 1)& 0x0F);
+			m_reel[2]->update((data >> 2)& 0x0F);
+			m_reel[3]->update((data >> 3)& 0x0F);
+			awp_draw_reel(machine(),"reel1", *m_reel[0]);
+			awp_draw_reel(machine(),"reel2", *m_reel[1]);
+			awp_draw_reel(machine(),"reel3", *m_reel[2]);
+			awp_draw_reel(machine(),"reel4", *m_reel[3]);
 			break;
 		}
 		case 0x04:
 		{
-			m_reel4->update((data >> 4)& 0x0F);
-			m_reel5->update((data >> 5)& 0x0F);
-			awp_draw_reel(machine(),"reel5", *m_reel4);
-			awp_draw_reel(machine(),"reel6", *m_reel5);
+			m_reel[4]->update((data >> 4)& 0x0F);
+			m_reel[5]->update((data >> 5)& 0x0F);
+			awp_draw_reel(machine(),"reel5", *m_reel[4]);
+			awp_draw_reel(machine(),"reel6", *m_reel[5]);
 			break;
 		}
 		case 0x06:
@@ -1335,18 +1335,18 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	config.set_default_layout(layout_jpmimpct);
 
-	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel3_optic_cb))
-	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel4_optic_cb))
-	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel5_optic_cb))
+	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[0]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[1]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[2]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[3]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<3>));
+	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[4]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<4>));
+	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[5]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<5>));
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(5)
