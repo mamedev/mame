@@ -22,7 +22,13 @@ public:
 	enum {
 		MCS96_PC = 1,
 		MCS96_PSW,
-		MCS96_R       // 0x74 entries
+		MCS96_INT_PENDING,
+		MCS96_SP,
+		MCS96_AX, MCS96_AL, MCS96_AH,
+		MCS96_DX, MCS96_DL, MCS96_DH,
+		MCS96_BX, MCS96_BL, MCS96_BH,
+		MCS96_CX, MCS96_CL, MCS96_CH,
+		MCS96_LAST_REG = MCS96_CH
 	};
 
 protected:
@@ -86,6 +92,11 @@ protected:
 	inline void next_noirq(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH_NOIRQ; }
 	void check_irq();
 	inline uint8_t read_pc() { return m_pr8(PC++); }
+
+	void int_mask_w(u8 data);
+	u8 int_mask_r();
+	void int_pending_w(u8 data);
+	u8 int_pending_r();
 
 	void reg_w8(uint8_t adr, uint8_t data);
 	void reg_w16(uint8_t adr, uint16_t data);

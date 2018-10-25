@@ -16,9 +16,20 @@
 class i8x9x_device : public mcs96_device {
 public:
 	enum {
-		A0, A1, A2, A3, A4, A5, A6, A7,
-		SERIAL,
-		P0, P1, P2
+		I8X9X_HSI_MODE = MCS96_LAST_REG + 1,
+		I8X9X_HSO_TIME,
+		I8X9X_HSO_COMMAND,
+		I8X9X_AD_COMMAND,
+		I8X9X_AD_RESULT,
+		I8X9X_PWM_CONTROL,
+		I8X9X_SBUF_RX,
+		I8X9X_SBUF_TX,
+		I8X9X_SP_CON,
+		I8X9X_SP_STAT,
+		I8X9X_IOC0,
+		I8X9X_IOC1,
+		I8X9X_IOS0,
+		I8X9X_IOS1
 	};
 
 	auto ach0_cb() { return m_ach_cb[0].bind(); }
@@ -62,10 +73,6 @@ protected:
 	u8 hsi_status_r();
 	void sbuf_w(u8 data);
 	u8 sbuf_r();
-	void int_mask_w(u8 data);
-	u8 int_mask_r();
-	void int_pending_w(u8 data);
-	u8 int_pending_r();
 	void watchdog_w(u8 data);
 	u16 timer1_r();
 	u16 timer2_r();
@@ -116,10 +123,11 @@ private:
 	hso_cam_entry hso_cam_hold;
 
 	uint64_t base_timer2, ad_done;
-	uint8_t hso_command, ad_command;
+	uint8_t hsi_mode, hso_command, ad_command;
 	uint16_t hso_time, ad_result;
+	uint8_t pwm_control;
 	uint8_t ios0, ios1, ioc0, ioc1;
-	uint8_t sbuf, sp_stat;
+	uint8_t sbuf, sp_con, sp_stat;
 	uint8_t serial_send_buf;
 	uint64_t serial_send_timer;
 

@@ -19,9 +19,18 @@ i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, cons
 	m_in_p0_cb(*this),
 	m_out_p1_cb(*this), m_in_p1_cb(*this),
 	m_out_p2_cb(*this), m_in_p2_cb(*this),
-	base_timer2(0), ad_done(0), hso_command(0), ad_command(0), hso_time(0), ad_result(0),
-	ios0(0), ios1(0), ioc0(0), ioc1(0), sbuf(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0)
+	base_timer2(0), ad_done(0), hsi_mode(0), hso_command(0), ad_command(0), hso_time(0), ad_result(0), pwm_control(0),
+	ios0(0), ios1(0), ioc0(0), ioc1(0), sbuf(0), sp_con(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0)
 {
+	for (auto &hso : hso_info)
+	{
+		hso.active = false;
+		hso.command = 0;
+		hso.time = 0;
+	}
+	hso_cam_hold.active = false;
+	hso_cam_hold.command = 0;
+	hso_cam_hold.time = 0;
 }
 
 std::unique_ptr<util::disasm_interface> i8x9x_device::create_disassembler()
@@ -45,20 +54,40 @@ void i8x9x_device::device_start()
 {
 	mcs96_device::device_start();
 	cycles_scaling = 3;
+
+	state_add(I8X9X_HSI_MODE,    "HSI_MODE",    hsi_mode);
+	state_add(I8X9X_HSO_TIME,    "HSO_TIME",    hso_time);
+	state_add(I8X9X_HSO_COMMAND, "HSO_COMMAND", hso_command);
+	state_add(I8X9X_AD_COMMAND,  "AD_COMMAND",  ad_command).mask(0xf);
+	state_add(I8X9X_AD_RESULT,   "AD_RESULT",   ad_result);
+	state_add(I8X9X_PWM_CONTROL, "PWM_CONTROL", pwm_control);
+	state_add(I8X9X_SBUF_RX,     "SBUF_RX",     sbuf);
+	state_add(I8X9X_SBUF_TX,     "SBUF_TX",     serial_send_buf);
+	state_add(I8X9X_SP_CON,      "SP_CON",      sp_con).mask(0x1f);
+	state_add(I8X9X_SP_STAT,     "SP_STAT",     sp_stat).mask(0xe0);
+	state_add(I8X9X_IOC0,        "IOC0",        ioc0);
+	state_add(I8X9X_IOC1,        "IOC1",        ioc1);
+	state_add(I8X9X_IOS0,        "IOS0",        ios0);
+	state_add(I8X9X_IOS1,        "IOS1",        ios1);
 }
 
 void i8x9x_device::device_reset()
 {
 	mcs96_device::device_reset();
-	memset(hso_info, 0, sizeof(hso_info));
-	memset(&hso_cam_hold, 0, sizeof(hso_cam_hold));
+	for (auto &hso : hso_info)
+		hso.active = false;
+	hso_cam_hold.active = false;
 	hso_command = 0;
 	hso_time = 0;
 	base_timer2 = 0;
-	ios0 = ios1 = ioc0 = ioc1 = 0x00;
+	ios0 = ios1 = 0x00;
+	ioc0 &= 0xaa;
+	ioc1 = (ioc1 & 0xae) | 0x01;
 	ad_result = 0;
 	ad_done = 0;
-	sp_stat = 0;
+	pwm_control = 0x00;
+	sp_con &= 0x17;
+	sp_stat &= 0x80;
 	serial_send_timer = 0;
 }
 
@@ -126,7 +155,7 @@ void i8x9x_device::internal_regs(address_map &map)
 
 void i8x9x_device::ad_command_w(u8 data)
 {
-	ad_command = data;
+	ad_command = data & 0xf;
 	if (ad_command & 8)
 		ad_start(total_cycles());
 }
@@ -138,6 +167,7 @@ u8 i8x9x_device::ad_result_r(offs_t offset)
 
 void i8x9x_device::hsi_mode_w(u8 data)
 {
+	hsi_mode = data;
 	logerror("hsi_mode %02x (%04x)\n", data, PPC);
 }
 
@@ -177,30 +207,6 @@ u8 i8x9x_device::sbuf_r()
 	if (!machine().side_effects_disabled())
 		logerror("read sbuf %02x (%04x)\n", sbuf, PPC);
 	return sbuf;
-}
-
-void i8x9x_device::int_mask_w(u8 data)
-{
-	PSW = (PSW & 0xff00) | data;
-	check_irq();
-}
-
-u8 i8x9x_device::int_mask_r()
-{
-	return PSW;
-}
-
-void i8x9x_device::int_pending_w(u8 data)
-{
-	pending_irq = data;
-	logerror("int_pending %02x (%04x)\n", data, PPC);
-}
-
-u8 i8x9x_device::int_pending_r()
-{
-	if (!machine().side_effects_disabled())
-		logerror("read int pending (%04x)\n", PPC);
-	return pending_irq;
 }
 
 void i8x9x_device::watchdog_w(u8 data)
@@ -264,7 +270,7 @@ u8 i8x9x_device::port2_r()
 
 void i8x9x_device::sp_con_w(u8 data)
 {
-	logerror("sp con %02x (%04x)\n", data, PPC);
+	sp_con = data & 0x1f;
 }
 
 u8 i8x9x_device::sp_stat_r()
@@ -280,7 +286,7 @@ u8 i8x9x_device::sp_stat_r()
 
 void i8x9x_device::ioc0_w(u8 data)
 {
-	logerror("ioc0 %02x (%04x)\n", data, PPC);
+	ioc0 = data;
 }
 
 u8 i8x9x_device::ios0_r()
@@ -292,7 +298,7 @@ u8 i8x9x_device::ios0_r()
 
 void i8x9x_device::ioc1_w(u8 data)
 {
-	logerror("ioc1 %02x (%04x)\n", data, PPC);
+	ioc1 = data;
 }
 
 u8 i8x9x_device::ios1_r()
@@ -305,7 +311,7 @@ u8 i8x9x_device::ios1_r()
 
 void i8x9x_device::pwm_control_w(u8 data)
 {
-	logerror("pwm control %02x (%04x)\n", data, PPC);
+	pwm_control = data;
 }
 
 void i8x9x_device::do_exec_partial()
@@ -372,7 +378,7 @@ void i8x9x_device::internal_update(uint64_t current_time)
 			}
 		}
 
-	if(current_time == ad_done) {
+	if(ad_done && current_time >= ad_done) {
 		ad_done = 0;
 		ad_result &= ~8;
 	}
