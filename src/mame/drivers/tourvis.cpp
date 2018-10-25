@@ -11,8 +11,10 @@
 
     Todo: complete jamma interface emulation.
 
-    By now, six known BIOS versions, U4-52 (dumped from a board with-subboard PCB),
-    U4-55 (dumped from an integrated PCB) and U4-60 (dumped from a board with-subboard PCB).
+    By now, ten known BIOS versions.
+    U4-52 (dumped from a board with-subboard PCB).
+    U4-55 (dumped from an integrated PCB).
+    U4-60 (dumped from a board with-subboard PCB).
 
     Known games list can be found in hash/pce_tourvision.xml.
 
@@ -448,21 +450,23 @@ MACHINE_CONFIG_END
 	ROMX_LOAD( "v4-53.ic29", 0x0000, 0x8000, CRC(bccb53c9) SHA1(a27113d70cf348c7eafa39fc7a76f55f63723ad7), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 3, "52", "V4-52" ) \
 	ROMX_LOAD( "v4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) ) \
-	ROM_SYSTEM_BIOS( 4, "43", "V4-43" ) \
-	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(4) ) \
-	ROM_SYSTEM_BIOS( 5, "40", "V4-40" ) \
-	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(5) ) \
-	ROM_SYSTEM_BIOS( 6, "20", "VT-20" ) \
-	ROMX_LOAD( "vt_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(6) ) \
-	ROM_SYSTEM_BIOS( 7, "11", "VT-11" ) \
-	ROMX_LOAD( "vt_1.1.bin", 0x0000, 0x8000, CRC(27abbc36) SHA1(881ea7802b9e241473bc8ced0472e0f1851c9886), ROM_BIOS(7) )
-
+	ROM_SYSTEM_BIOS( 4, "51", "V4-51" ) \
+	ROMX_LOAD( "v4-51.ic29", 0x0000, 0x8000, CRC(2de0b946) SHA1(c13051453aff3a2329f18ebade75c69aa3b1c28d), ROM_BIOS(4) ) \
+	ROM_SYSTEM_BIOS( 5, "43", "V4-43" ) \
+	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(5) ) \
+	ROM_SYSTEM_BIOS( 6, "42", "V4-42" ) \
+	ROMX_LOAD( "v4-42.ic29", 0x0000, 0x8000, CRC(0372606d) SHA1(8c6a63865b0b4951ea032725cf022d353115b93b), ROM_BIOS(6) ) \
+	ROM_SYSTEM_BIOS( 7, "40", "V4-40" ) \
+	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(7) ) \
+	ROM_SYSTEM_BIOS( 8, "20", "VT-20" ) \
+	ROMX_LOAD( "vt_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(8) ) \
+	ROM_SYSTEM_BIOS( 9, "11", "VT-11" ) \
+	ROMX_LOAD( "vt_1.1.bin", 0x0000, 0x8000, CRC(27abbc36) SHA1(881ea7802b9e241473bc8ced0472e0f1851c9886), ROM_BIOS(9) )
 
 ROM_START(tourvis)
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 
 	TOURVISION_BIOS /* BIOS rom type is 27C256 */
 ROM_END
-
 
 GAME( 19??, tourvis, 0, tourvision, tourvision, tourvision_state, init_pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
