@@ -3425,8 +3425,8 @@ EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
 USA, Korea and Australia is missing.
 
 EPR-21604  - No known dumps (Development BOOT ROM)
-EPR-21609  - No known dumps (Korea)
-EPR-21610  - No known dumps (Australia)
+EPR-?????  - No known dumps (Korea)
+EPR-?????  - No known dumps (Australia)
 
 EPR-23605B, EPR-23607B & EPR-23608B all differ by 8 bytes:
 
