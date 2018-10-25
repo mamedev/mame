@@ -3807,3 +3807,17 @@ if (MACHINES["Z8038"]~=null) then
 		MAME_DIR .. "src/devices/machine/z8038.h",
 	}
 end
+
+
+---------------------------------------------------
+--
+--@src/devices/machine/scc2698b.h,MACHINES["SCC2698B"] = true
+---------------------------------------------------
+
+if (MACHINES["SCC2698B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/scc2698b.cpp",
+		MAME_DIR .. "src/devices/machine/scc2698b.h",
+	}
+end
+
