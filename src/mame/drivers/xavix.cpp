@@ -206,17 +206,31 @@
 #include "emu.h"
 #include "includes/xavix.h"
 
-// not confirmed for all games
+// NTSC clock for regular XaviX?
 #define MAIN_CLOCK XTAL(21'477'272)
 
 READ8_MEMBER(xavix_state::main_r)
 {
-	return m_rgn[(offset) & (m_rgnlen - 1)];
+	if (offset & 0x8000)
+	{
+		return m_rgn[(offset) & (m_rgnlen - 1)];
+	}
+	else
+	{
+		return m_lowbus->read8(space, offset & 0x7fff);
+	}
 }
 
 WRITE8_MEMBER(xavix_state::main_w)
 {
-	logerror("write to ROM area?\n");
+	if (offset & 0x8000)
+	{
+		logerror("write to ROM area?\n");
+	}
+	else
+	{
+		m_lowbus->write8(space, offset & 0x7fff, data);
+	}
 }
 
 /* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably
@@ -233,7 +247,7 @@ WRITE8_MEMBER(xavix_state::main_w)
    this can't be correct, it breaks monster truck which expects ROM at 8000 even in the >0x800000 region, maybe code + data mappings need
    to be kept separate, with >0x800000 showing both ROM banks for code, but still having the zero page area etc. for data?
 
-   The code at 00EA84 in Ping Pong stores 8e to the data bank, reads 16 bit pointer from from 0000 + y (expecting it to come from zero page ram - value 3081) 
+   The code at 00EA84 in Ping Pong stores 8e to the data bank, reads 16 bit pointer from from 0000 + y (expecting it to come from zero page ram - value 3081)
    then reads data from 3081, pushes it to stack (which is expected to work) then sets data bank back to 00 (writes to ff, expecting it to work) then pulls
    the value written and puts it in RAM.  Is stack actually still memory mapped at this point, or do stack operations always go to stack regardless?
    Do reads return databank/codebank/stack, or only zero page? is zero page visibility maybe even conditional on how it gets used?
@@ -245,14 +259,51 @@ WRITE8_MEMBER(xavix_state::main_w)
 
 
 */
+READ8_MEMBER(xavix_state::main2_r)
+{
+	if (offset & 0x8000)
+	{
+		return m_rgn[(offset) & (m_rgnlen - 1)];
+	}
+	else
+	{
+		if ((offset & 0xffff) >= 0x200)
+		{
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
+		else
+			return m_lowbus->read8(space, offset & 0x7fff);
+	}
+}
 
-// DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
+WRITE8_MEMBER(xavix_state::main2_w)
+{
+	if (offset & 0x8000)
+	{
+		logerror("write to ROM area?\n");
+	}
+	else
+	{
+		if ((offset & 0xffff) >= 0x200)
+			logerror("write to ROM area?\n");
+		else
+			m_lowbus->write8(space, offset & 0x7fff, data);
+	}
+}
 
-// access to external bus / ROM
+// this is only used for opcode / oprand reads, data memory addressing is handled in core, doing the opcode / oprand addressing in core causes disassembly issues when running from lowbus space (ram, interrupts on most games)
 void xavix_state::xavix_map(address_map &map)
 {
-	map(0x000000, 0xffffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
+	map(0x000000, 0x7fffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
+	map(0x800000, 0xffffff).rw(FUNC(xavix_state::main2_r), FUNC(xavix_state::main2_w));
 }
+
+// this is used by data reads / writes after some processing in the core to decide if data reads can see lowbus, zeropage, stack, bank registers etc. and only falls through to here on a true external bus access
+void xavix_state::xavix_extbus_map(address_map &map)
+{
+	map(0x000000, 0xffffff).rw(FUNC(xavix_state::extbus_r), FUNC(xavix_state::extbus_w));
+}
+
 
 void xavix_state::xavix_lowbus_map(address_map &map)
 {
@@ -276,7 +327,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 
 	// Tilemap 2 Registers
 	map(0x6fd0, 0x6fd7).rw(FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
-	
+
 	// Sprite Registers
 	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::spriteregs_w));
 
@@ -344,10 +395,10 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7986, 0x7987).ram().w(FUNC(xavix_state::rom_dmalen_w)).share("rom_dma_len");
 
 	// IO Ports
-	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io0_data_r),FUNC(xavix_state::io0_data_w));
-	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io1_data_r),FUNC(xavix_state::io1_data_w));
-	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io0_direction_r),FUNC(xavix_state::io0_direction_w));
-	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io1_direction_r),FUNC(xavix_state::io1_direction_w));
+	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io0_data_r), FUNC(xavix_state::io0_data_w));
+	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io1_data_r), FUNC(xavix_state::io1_data_w));
+	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io0_direction_r), FUNC(xavix_state::io0_direction_w));
+	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io1_direction_r), FUNC(xavix_state::io1_direction_w));
 
 	// Interrupt control registers
 	map(0x7a80, 0x7a80).w(FUNC(xavix_state::xavix_7a80_w)); // still IO? ADC related?
@@ -357,7 +408,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 
 	// Lightgun / pen 2 control
 	//map(0x7b18, 0x7b1b)
-		
+
 	// ADC registers
 	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::adc_7b80_r), FUNC(xavix_state::adc_7b80_w)); // rad_snow (not often)
 	map(0x7b81, 0x7b81).rw(FUNC(xavix_state::adc_7b81_r), FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
@@ -397,6 +448,7 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 
 	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 }
+
 
 static INPUT_PORTS_START( xavix )
 	PORT_START("IN0")
@@ -665,7 +717,7 @@ static const gfx_layout char16layout =
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
-	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4, 9*4,8*4,11*4,10*4,13*4,12*4,15*4,14*4   },
+	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4, 9*4,8*4,11*4,10*4,13*4,12*4,15*4,14*4 },
 	{ STEP16(0,4*16) },
 	16*16*4
 };
@@ -693,7 +745,7 @@ static const gfx_layout char16layout8bpp =
 };
 
 static GFXDECODE_START( gfx_xavix )
-	GFXDECODE_ENTRY( "bios", 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "bios", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout8bpp, 0, 1 )
@@ -706,12 +758,14 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_DEVICE_ADD("maincpu",XAVIX,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
 	MCFG_DEVICE_ADDRESS_MAP(5, xavix_lowbus_map)
-
+	MCFG_DEVICE_ADDRESS_MAP(6, xavix_extbus_map)
 	MCFG_M6502_DISABLE_CACHE()
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state, interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xavix_state, scanline_cb, "screen", 0, 1)
+
+	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -753,8 +807,9 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 	MCFG_DEVICE_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
 	MCFG_DEVICE_ADDRESS_MAP(5, superxavix_lowbus_map)
+	MCFG_DEVICE_ADDRESS_MAP(6, xavix_extbus_map)
 	MCFG_M6502_DISABLE_CACHE()
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state, interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_DEVICE_REMOVE("palette")
