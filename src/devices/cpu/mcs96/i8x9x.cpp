@@ -364,13 +364,21 @@ void i8x9x_device::trigger_cam(int id, u64 current_time)
 
 	case 0x8: case 0x9: case 0xa: case 0xb:
 		ios1 |= 1 << (cam.command & 3);
-		pending_irq |= IRQ_SOFT;
-		check_irq();
+		break;
+
+	case 0xf:
+		ad_start(current_time);
 		break;
 
 	default:
 		logerror("%s: Action %x unimplemented\n", tag(), cam.command & 0x0f);
 		break;
+	}
+
+	if(BIT(cam.command, 4))
+	{
+		pending_irq |= BIT(cam.command, 3) ? IRQ_SOFT : IRQ_HSO;
+		check_irq();
 	}
 }
 
