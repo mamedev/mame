@@ -314,9 +314,9 @@ MACHINE_CONFIG_START(palmz22_state::palmz22)
 	MCFG_S3C2410_NAND_DATA_R_CB(READ8(*this, palmz22_state, s3c2410_nand_data_r))
 	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(*this, palmz22_state, s3c2410_nand_data_w))
 
-	MCFG_DEVICE_ADD(m_nand, NAND, 0)
-	MCFG_NAND_TYPE(K9F5608U0D_J)
-	MCFG_NAND_RNB_CALLBACK(WRITELINE(m_s3c2410, s3c2410_device, frnb_w))
+	NAND(config, m_nand, 0);
+	m_nand->set_nand_type(nand_device::chip::K9F5608U0D_J);
+	m_nand->rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::frnb_w));
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( palmz22 )

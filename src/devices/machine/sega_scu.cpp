@@ -125,10 +125,10 @@ void sega_scu_device::regs_map(address_map &map)
 	map(0x005c, 0x005f).r(FUNC(sega_scu_device::dma_status_r));
 //  AM_RANGE(0x0060, 0x0063) AM_WRITE(dma_force_stop_w)
 	map(0x007c, 0x007f).r(FUNC(sega_scu_device::dma_status_r));
-	map(0x0080, 0x0083).rw("scudsp", FUNC(scudsp_cpu_device::program_control_r), FUNC(scudsp_cpu_device::program_control_w));
-	map(0x0084, 0x0087).w("scudsp", FUNC(scudsp_cpu_device::program_w));
-	map(0x0088, 0x008b).w("scudsp", FUNC(scudsp_cpu_device::ram_address_control_w));
-	map(0x008c, 0x008f).rw("scudsp", FUNC(scudsp_cpu_device::ram_address_r), FUNC(scudsp_cpu_device::ram_address_w));
+	map(0x0080, 0x0083).rw(m_scudsp, FUNC(scudsp_cpu_device::program_control_r), FUNC(scudsp_cpu_device::program_control_w));
+	map(0x0084, 0x0087).w(m_scudsp, FUNC(scudsp_cpu_device::program_w));
+	map(0x0088, 0x008b).w(m_scudsp, FUNC(scudsp_cpu_device::ram_address_control_w));
+	map(0x008c, 0x008f).rw(m_scudsp, FUNC(scudsp_cpu_device::ram_address_r), FUNC(scudsp_cpu_device::ram_address_w));
 	map(0x0090, 0x0093).w(FUNC(sega_scu_device::t0_compare_w));
 	map(0x0094, 0x0097).w(FUNC(sega_scu_device::t1_setdata_w));
 	map(0x009a, 0x009b).w(FUNC(sega_scu_device::t1_mode_w));
@@ -147,7 +147,8 @@ void sega_scu_device::regs_map(address_map &map)
 
 sega_scu_device::sega_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA_SCU, tag, owner, clock),
-	  m_scudsp(*this, "scudsp")
+	m_scudsp(*this, "scudsp"),
+	m_hostcpu(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -177,12 +178,13 @@ WRITE16_MEMBER(sega_scu_device::scudsp_dma_w)
 	m_hostspace->write_word(addr, data,mem_mask);
 }
 
-MACHINE_CONFIG_START(sega_scu_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("scudsp", SCUDSP, XTAL(57'272'727)/4) // 14 MHz
-	MCFG_SCUDSP_OUT_IRQ_CB(WRITELINE(DEVICE_SELF, sega_scu_device, scudsp_end_w))
-	MCFG_SCUDSP_IN_DMA_CB(READ16(*this, sega_scu_device, scudsp_dma_r))
-	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(*this, sega_scu_device, scudsp_dma_w))
-MACHINE_CONFIG_END
+void sega_scu_device::device_add_mconfig(machine_config &config)
+{
+	SCUDSP(config, m_scudsp, XTAL(57'272'727)/4); // 14 MHz
+	m_scudsp->out_irq_callback().set(DEVICE_SELF, FUNC(sega_scu_device::scudsp_end_w));
+	m_scudsp->in_dma_callback().set(FUNC(sega_scu_device::scudsp_dma_r));
+	m_scudsp->out_dma_callback().set(FUNC(sega_scu_device::scudsp_dma_w));
+}
 
 
 //-------------------------------------------------
@@ -231,7 +233,6 @@ void sega_scu_device::device_start()
 	save_item(NAME(m_dma[2].rup));
 	save_item(NAME(m_dma[2].wup));
 
-	m_hostcpu = machine().device<sh2_device>(m_hostcpu_tag);
 	m_hostspace = &m_hostcpu->space(AS_PROGRAM);
 
 	m_dma_timer[0] = timer_alloc(DMALV0_ID);

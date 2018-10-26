@@ -1138,24 +1138,24 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
 	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
 
-	MCFG_SEGA_SCU_ADD("scu")
-	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
+	SEGA_SCU(config, m_scu, 0);
+	m_scu->set_hostcpu(m_maincpu);
 
-	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
-	MCFG_SMPC_HLE_SCREEN("screen")
-	downcast<smpc_hle_device &>(*device).set_region_code(0);
-	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(*this, stv_state, pdr1_input_r))
-	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(*this, stv_state, pdr2_input_r))
-	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(*this, stv_state, pdr1_output_w))
-	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(*this, stv_state, pdr2_output_w))
-	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(*this, saturn_state, master_sh2_reset_w))
-	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(*this, saturn_state, master_sh2_nmi_w))
-	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(*this, saturn_state, slave_sh2_reset_w))
-//  MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(*this, saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
-	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(*this, saturn_state, system_reset_w))
-	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(*this, saturn_state, system_halt_w))
-	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(*this, saturn_state, dot_select_w))
-	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE("scu", sega_scu_device, smpc_irq_w))
+	SMPC_HLE(config, m_smpc_hle, XTAL(4'000'000));
+	m_smpc_hle->set_screen_tag("screen");
+	m_smpc_hle->set_region_code(0);
+	m_smpc_hle->pdr1_in_handler().set(FUNC(stv_state::pdr1_input_r));
+	m_smpc_hle->pdr2_in_handler().set(FUNC(stv_state::pdr2_input_r));
+	m_smpc_hle->pdr1_out_handler().set(FUNC(stv_state::pdr1_output_w));
+	m_smpc_hle->pdr2_out_handler().set(FUNC(stv_state::pdr2_output_w));
+	m_smpc_hle->master_reset_handler().set(FUNC(saturn_state::master_sh2_reset_w));
+	m_smpc_hle->master_nmi_handler().set(FUNC(saturn_state::master_sh2_nmi_w));
+	m_smpc_hle->slave_reset_handler().set(FUNC(saturn_state::slave_sh2_reset_w));
+//  m_smpc_hle->sound_reset_handler().set(FUNC(saturn_state::sound_68k_reset_w)); // ST-V games controls reset line via PDR2
+	m_smpc_hle->system_reset_handler().set(FUNC(saturn_state::system_reset_w));
+	m_smpc_hle->system_halt_handler().set(FUNC(saturn_state::system_halt_w));
+	m_smpc_hle->dot_select_handler().set(FUNC(saturn_state::dot_select_w));
+	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(sega_scu_device::smpc_irq_w));
 
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
