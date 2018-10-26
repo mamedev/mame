@@ -58,6 +58,7 @@ void mcs96_device::device_start()
 	state_add(MCS96_CH,        "CH",        reinterpret_cast<u8 *>(&register_file[5])[BYTE_XOR_LE(1)]).noshow();
 
 	save_item(NAME(inst_state));
+	save_item(NAME(pending_irq));
 	save_item(NAME(PC));
 	save_item(NAME(PPC));
 	save_item(NAME(PSW));
@@ -74,7 +75,6 @@ void mcs96_device::device_reset()
 	PC = 0x2080;
 	PPC = PC;
 	PSW = 0;
-	pending_irq = 0x00;
 	irq_requested = false;
 	inst_state = STATE_FETCH;
 }
