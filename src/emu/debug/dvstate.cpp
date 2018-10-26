@@ -57,6 +57,9 @@ debug_view_state::debug_view_state(running_machine &machine, debug_view_osd_upda
 	enumerate_sources();
 	if (m_source_list.count() == 0)
 		throw std::bad_alloc();
+
+	// configure the view
+	m_supports_cursor = true;
 }
 
 
@@ -150,6 +153,8 @@ void debug_view_state::recompute()
 	// add a divider entry
 	m_state_list.emplace_back(REG_DIVIDER, "", 0);
 
+	m_registers_start = m_state_list.size();
+
 	// add all registers into it
 	for (auto &entry : source.m_stateintf->state_entries())
 	{
@@ -177,6 +182,10 @@ void debug_view_state::recompute()
 	m_topleft.x = 0;
 	m_topleft.y = 0;
 
+	// setting up cursor position
+	m_cursor.x = m_divider + 1;
+	m_cursor.y = m_registers_start;
+
 	// no longer need to recompute
 	m_recompute = false;
 }
@@ -189,7 +198,24 @@ void debug_view_state::recompute()
 
 void debug_view_state::view_notify(debug_view_notification type)
 {
-	if (type == VIEW_NOTIFY_SOURCE_CHANGED)
+	if (type == VIEW_NOTIFY_CURSOR_CHANGED)
+	{
+		if (m_cursor.y < m_registers_start)
+			m_cursor.y = m_registers_start;
+		else if (m_cursor.y >= m_state_list.size())
+				m_cursor.y = m_state_list.size() - 1;
+
+		if (m_cursor.x < m_divider + 1)
+			m_cursor.x = m_divider + 1;
+		else
+		{
+			state_item &curitem(m_state_list[m_cursor.y]);
+
+			if (m_cursor.x > m_divider + curitem.value_length())
+				m_cursor.x = m_divider + curitem.value_length();
+		}
+	}
+	else if (type == VIEW_NOTIFY_SOURCE_CHANGED)
 		m_recompute = true;
 }
 
@@ -292,6 +318,9 @@ void debug_view_state::view_update()
 				{
 					dest->byte = temp[effcol++];
 					dest->attrib = attrib | ((effcol <= m_divider) ? DCA_ANCILLARY : DCA_NORMAL);
+
+					if (m_cursor_visible && index == m_cursor.y && (effcol - 1) == m_cursor.x)
+						dest->attrib |= DCA_SELECTED;
 				}
 			}
 		}
@@ -308,6 +337,127 @@ void debug_view_state::view_update()
 
 	// remember the last update
 	m_last_update = total_cycles;
+}
+
+
+//-------------------------------------------------
+//  view_char - handle a character typed within
+//  the current view
+//-------------------------------------------------
+
+void debug_view_state::view_char(int chval)
+{
+	bool update_all_disasm_views = false;
+
+	if (m_cursor_visible == false)
+		return;
+
+	// handle the incoming key
+	switch (chval)
+	{
+	case DCH_UP:
+		if (m_cursor.y > m_registers_start)
+		{
+			m_cursor.y--;
+
+			if (m_cursor.x > m_divider + m_state_list[m_cursor.y].value_length())
+				m_cursor.x = m_divider + m_state_list[m_cursor.y].value_length();
+		}
+		break;
+
+	case DCH_DOWN:
+		if (m_cursor.y < m_state_list.size() - 1)
+		{
+			m_cursor.y++;
+
+			if (m_cursor.x > m_divider + m_state_list[m_cursor.y].value_length())
+				m_cursor.x = m_divider + m_state_list[m_cursor.y].value_length();
+		}
+		break;
+
+	case DCH_CTRLLEFT:
+	case DCH_HOME:
+		m_cursor.x = m_divider + 1;
+		break;
+
+	case DCH_CTRLRIGHT:
+	case DCH_END:
+		m_cursor.x = m_divider + m_state_list[m_cursor.y].value_length();
+		break;
+
+	case DCH_PUP:
+		m_cursor.y = m_registers_start;
+		m_cursor.x = m_divider + 1;
+		break;
+
+	case DCH_PDOWN:
+		m_cursor.y = m_state_list.size() - 1;
+		m_cursor.x = m_divider + 1;
+		break;
+
+	default:
+	{
+		static const char hexvals[] = "0123456789abcdef";
+		char *hexchar = (char *)strchr(hexvals, tolower(chval));
+		if (hexchar == nullptr)
+			break;
+
+		state_item &curitem(m_state_list[m_cursor.y]);
+
+		u64 data = curitem.value();
+		u8 digit_pos = (curitem.value_length() - 1) - (m_cursor.x - (m_divider + 1));
+		u8 shift = digit_pos * 4;
+
+		data &= ~(u64(0x0f) << shift);
+		data |= u64(hexchar - hexvals) << shift;
+
+		debug_view_state_source const &source(downcast<debug_view_state_source const &>(*m_source));
+
+		source.m_stateintf->set_state_int(curitem.index(), data);
+
+		/* set flag to update all disassembly views if PC affected */
+		if (curitem.index() == STATE_GENPC)
+			update_all_disasm_views = true;
+
+		// fall through to the right-arrow press
+	}
+	case DCH_RIGHT:
+		if (m_cursor.x < m_divider + m_state_list[m_cursor.y].value_length())
+			m_cursor.x++;
+		break;
+
+	case DCH_LEFT:
+		if (m_cursor.x > m_divider + 1)
+			m_cursor.x--;
+		break;
+	}
+
+	// update state view
+	force_update();
+
+	// update all opened debug views to be in sync with PC
+	if (update_all_disasm_views)
+	{
+		machine().debug_view().update_all(DVT_DISASSEMBLY);
+		machine().debug_view().flush_osd_updates();
+	}
+}
+
+
+//-------------------------------------------------
+//  view_click - handle a mouse click within the
+//  current view
+//-------------------------------------------------
+
+void debug_view_state::view_click(const int button, const debug_view_xy& pos)
+{
+	m_cursor = pos;
+
+	/* send a cursor changed notification */
+	begin_update();
+	view_notify(VIEW_NOTIFY_CURSOR_CHANGED);
+	m_update_pending = true;
+	end_update();
 }
 
 

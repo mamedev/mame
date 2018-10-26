@@ -47,6 +47,8 @@ protected:
 	// view overrides
 	virtual void view_update() override;
 	virtual void view_notify(debug_view_notification type) override;
+	virtual void view_char(int chval) override;
+	virtual void view_click(const int button, const debug_view_xy& pos) override;
 
 private:
 	class state_item
@@ -82,6 +84,7 @@ private:
 
 	// internal state
 	int                     m_divider;              // dividing column
+	int                     m_registers_start;      // first register row
 	u64                     m_last_update;          // execution counter at last update
 	std::vector<state_item> m_state_list;           // state data
 
