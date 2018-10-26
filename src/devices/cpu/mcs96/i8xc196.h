@@ -26,13 +26,13 @@ protected:
 
 #define O(o) void o ## _196_full(); void o ## _196_partial()
 
-	O(bmov_direct_2);
-	O(bmovi_direct_2);
-	O(cmpl_direct_2);
-	O(djnzw_rrel8);
+	O(bmov_direct_2w);
+	O(bmovi_direct_2w);
+	O(cmpl_direct_2w);
+	O(djnzw_wrrel8);
 	O(idlpd_none);
-	O(pop_indexed_1);
-	O(pop_indirect_1);
+	O(pop_indexed_1w);
+	O(pop_indirect_1w);
 	O(popa_none);
 	O(pusha_none);
 
