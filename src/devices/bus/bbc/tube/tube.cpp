@@ -119,9 +119,37 @@ WRITE8_MEMBER(bbc_tube_slot_device::host_w)
 #include "tube_arm.h"
 #include "tube_casper.h"
 //#include "tube_pmsb2p.h"
+//#include "tube_rc6502.h"
 //#include "tube_x25.h"
 #include "tube_z80.h"
 #include "tube_zep100.h"
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( bbc_tube_devices )
+//-------------------------------------------------
+
+void bbc_tube_devices(device_slot_interface &device)
+{
+	device.option_add("6502",   BBC_TUBE_6502);    /* Acorn ANC01 6502 2nd processor */
+	device.option_add("z80",    BBC_TUBE_Z80);     /* Acorn ANC04 Z80 2nd processor */
+	//device.option_add("32016", BBC_TUBE_32016);    /* Acorn ANC05 32016 2nd processor */
+	device.option_add("arm",    BBC_TUBE_ARM);     /* Acorn ANC13 ARM Evaluation System */
+	device.option_add("80286",  BBC_TUBE_80286);   /* Acorn 80286 2nd Processor */
+	//device.option_add("a500",   BBC_TUBE_A500);    /* Acorn A500 2nd Processor */
+	device.option_add("casper", BBC_TUBE_CASPER);  /* Casper 68000 2nd Processor */
+	//device.option_add("pmsb2p", BBC_TUBE_PMSB2P);  /* PMS B2P-6502 */
+	//device.option_add("hdp68k", BBC_TUBE_HDP68K);  /* Torch Unicorn (HDP68K) */
+	//device.option_add("x25",    BBC_TUBE_X25);     /* Econet X25 Gateway */
+	device.option_add("zep100", BBC_TUBE_ZEP100);  /* Torch Z80 Communicator (ZEP100) (Torch) */
+	//device.option_add("zep100l", BBC_TUBE_ZEP100L); /* Torch Z80 Communicator (ZEP100) (Acorn 8271) */
+	//device.option_add("zep100w", BBC_TUBE_ZEP100W); /* Torch Z80 Communicator (ZEP100) (Acorn 1770) */
+	/* Acorn ANC21 Universal 2nd Processor Unit */
+	device.option_add("65c102", BBC_TUBE_65C102);  /* Acorn ADC06 65C102 co-processor */
+	device.option_add("80186",  BBC_TUBE_80186);   /* Acorn ADC08 80186 co-processor */
+	//device.option_add("rc6502", BBC_TUBE_RC6502);   /* ReCo6502 (6502) */
+	//device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
+}
 
 
 //-------------------------------------------------
@@ -130,22 +158,18 @@ WRITE8_MEMBER(bbc_tube_slot_device::host_w)
 
 void bbc_extube_devices(device_slot_interface &device)
 {
-	device.option_add("6502",   BBC_TUBE_6502);    /* Acorn ANC01 6502 2nd processor */
-	device.option_add("z80",    BBC_TUBE_Z80);     /* Acorn ANC04 Z80 2nd processor */
-//  device.option_add("32016", BBC_TUBE_32016);    /* Acorn ANC05 32016 2nd processor */
-	device.option_add("arm",    BBC_TUBE_ARM);     /* Acorn ANC13 ARM Evaluation System */
-	device.option_add("80286",  BBC_TUBE_80286);   /* Acorn 80286 2nd Processor */
-	//device.option_add("a500",   BBC_TUBE_A500);    /* Acorn A500 2nd Processor */
-	device.option_add("casper", BBC_TUBE_CASPER);  /* Casper 68000 2nd Processor */
-	//device.option_add("pmsb2p", BBC_TUBE_PMSB2P);  /* PMS B2P-6502 */
-	//device.option_add("hdp68k", BBC_TUBE_HDP68K);  /* Torch Unicorn (HDP68K) */
-	device.option_add("zep100", BBC_TUBE_ZEP100);  /* Torch Z80 Communicator (ZEP100) (Torch) */
-	//device.option_add("zep100l", BBC_TUBE_ZEP100L);  /* Torch Z80 Communicator (ZEP100) (Acorn 8271) */
-	//device.option_add("zep100w", BBC_TUBE_ZEP100W);  /* Torch Z80 Communicator (ZEP100) (Acorn 1770) */
-	//device.option_add("zep100m", BBC_TUBE_ZEP100M);  /* Torch Z80 Communicator (ZEP100) (Master) */
+	device.option_add("6502",   BBC_TUBE_6502);     /* Acorn ANC01 6502 2nd processor */
+	device.option_add("z80",    BBC_TUBE_Z80);      /* Acorn ANC04 Z80 2nd processor */
+	//device.option_add("32016", BBC_TUBE_32016);   /* Acorn ANC05 32016 2nd processor */
+	device.option_add("arm",    BBC_TUBE_ARM);      /* Acorn ANC13 ARM Evaluation System */
+	device.option_add("80286",  BBC_TUBE_80286);    /* Acorn 80286 2nd Processor */
+	//device.option_add("a500",   BBC_TUBE_A500);   /* Acorn A500 2nd Processor */
+	//device.option_add("pmsb2p", BBC_TUBE_PMSB2P);   /* PMS B2P-6502 */
 	/* Acorn ANC21 Universal 2nd Processor Unit */
-	device.option_add("65c102", BBC_TUBE_65C102);  /* Acorn ADC06 65C102 co-processor */
-	device.option_add("80186",  BBC_TUBE_80186);   /* Acorn ADC08 80186 co-processor */
+	device.option_add("65c102", BBC_TUBE_65C102);   /* Acorn ADC06 65C102 co-processor */
+	device.option_add("80186",  BBC_TUBE_80186);    /* Acorn ADC08 80186 co-processor */
+	//device.option_add("rc6502", BBC_TUBE_RC6502);   /* ReCo6502 (6502) */
+	//device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
 }
 
 
@@ -157,7 +181,10 @@ void bbc_intube_devices(device_slot_interface &device)
 {
 	device.option_add("65c102", BBC_TUBE_65C102);  /* Acorn ADC06 65C102 co-processor */
 	device.option_add("80186",  BBC_TUBE_80186);   /* Acorn ADC08 80186 co-processor */
-//  device.option_add("arm7",   BBC_TUBE_ARM7);    /* Sprow ARM7 co-processor */
+	//device.option_add("zep100m", BBC_TUBE_ZEP100M); /* Torch Z80 Communicator (ZEP100) (Master) */
+	//device.option_add("arm7",    BBC_TUBE_ARM7);    /* Sprow ARM7 co-processor */
+	//device.option_add("rc6502",  BBC_TUBE_RC6502);  /* ReCo6502 (6502) */
+	//device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
 }
 
 
@@ -172,12 +199,6 @@ void electron_tube_devices(device_slot_interface &device)
 	device.option_add("arm",    BBC_TUBE_ARM);     /* Acorn ANC13 ARM Evaluation System */
 	device.option_add("65c102", BBC_TUBE_65C102);  /* Acorn ADC06 65C102 co-processor */
 	device.option_add("80186",  BBC_TUBE_80186);   /* Acorn ADC08 80186 co-processor */
+	//device.option_add("rc6502",  BBC_TUBE_RC6502);  /* ReCo6502 (6502) */
+	//device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
 }
-
-//-------------------------------------------------
-//  SLOT_INTERFACE( bbc_x25tube_devices )
-//-------------------------------------------------
-
-//void bbc_x25tube_devices(device_slot_interface &device)
-//  device.option_add("x25", BBC_TUBE_X25);        /* Econet X25 Gateway */
-//}
