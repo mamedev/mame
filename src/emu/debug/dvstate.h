@@ -59,20 +59,24 @@ private:
 		state_item &operator=(state_item &&) = default;
 
 		u64 value() const { return m_currval; }
-		bool changed() const { return m_lastval != m_currval; }
+		bool changed() const { return m_changed; }
 		int index() const { return m_index; }
 		u8 value_length() const { return m_vallen; }
 
-		void update(u64 newval, bool save);
+		bool update(u64 newval, bool save);
+		void update_lastval_str(std::string newvalstr);
 
 	private:
 		u64         m_lastval;          // last value
 		u64         m_currval;          // current value
+		std::string m_currval_str;      // current value string
 		int         m_index;            // index
 		u8          m_vallen;           // number of value chars
+		bool        m_changed;          // current value changed flag
 
 	public:
 		std::string m_symbol;           // symbol
+		std::string m_lastval_str;      // last value string
 	};
 
 	// internal helpers

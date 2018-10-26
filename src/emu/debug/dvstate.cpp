@@ -167,7 +167,7 @@ void debug_view_state::recompute()
 	{
 		count++;
 		maxtaglen = (std::max)(maxtaglen, item.m_symbol.length());
-		maxvallen = (std::max)(maxvallen, item.value_length());
+		maxvallen = (std::max)(maxvallen, u8(item.value_length() * 2 + 1));
 	}
 
 	// set the current divider and total cols
@@ -217,6 +217,8 @@ void debug_view_state::view_update()
 	{
 		bool const visible((index >= m_topleft.y) && (index < limit));
 		u32 col(0);
+		bool show_lastval = false;
+		bool update_lastval_str = false;
 
 		if (it != m_state_list.end())
 		{
@@ -256,8 +258,9 @@ void debug_view_state::view_update()
 				break;
 
 			default:
-				curitem.update(source.m_stateintf->state_int(curitem.index()), cycles_changed);
+				update_lastval_str = curitem.update(source.m_stateintf->state_int(curitem.index()), cycles_changed);
 				valstr = source.m_stateintf->state_string(curitem.index());
+				show_lastval = true;
 			}
 
 			// if this row is visible, add it to the buffer
@@ -283,6 +286,19 @@ void debug_view_state::view_update()
 
 				memcpy(&temp[len], valstr.c_str(), curitem.value_length());
 				len += curitem.value_length();
+
+				if (show_lastval)
+				{
+					if(update_lastval_str)
+						curitem.update_lastval_str(valstr);
+
+					if(curitem.m_lastval_str != "")
+					{
+						temp[len++] = ' ';
+						memcpy(&temp[len], curitem.m_lastval_str.c_str(), curitem.value_length());
+						len += curitem.value_length();
+					}
+				}
 
 				temp[len++] = ' ';
 				temp[len] = 0;
@@ -318,9 +334,12 @@ void debug_view_state::view_update()
 debug_view_state::state_item::state_item(int index, const char *name, u8 valuechars)
 	: m_lastval(0)
 	, m_currval(0)
+	, m_currval_str("")
 	, m_index(index)
 	, m_vallen(valuechars)
 	, m_symbol(name)
+	, m_lastval_str("")
+	, m_changed(false)
 {
 }
 
@@ -329,9 +348,34 @@ debug_view_state::state_item::state_item(int index, const char *name, u8 valuech
 //  update - update value and save previous
 //-------------------------------------------------
 
-void debug_view_state::state_item::update(u64 newval, bool save)
+bool debug_view_state::state_item::update(u64 newval, bool save)
 {
+	bool updte_lasteval_str = false;
+
 	if (save)
-		m_lastval = m_currval;
+	{
+		m_changed = newval != m_currval;
+
+		if (m_changed)
+		{
+			m_lastval = m_currval;
+			updte_lasteval_str = true;
+		}
+	}
+
 	m_currval = newval;
+
+	return updte_lasteval_str;
+}
+
+
+//-------------------------------------------------
+//  update_lastval_str - update last value string 
+//  if current value changed
+//-------------------------------------------------
+
+void debug_view_state::state_item::update_lastval_str(std::string newvalstr)
+{
+	m_lastval_str = m_currval_str;
+	m_currval_str = newvalstr;
 }
