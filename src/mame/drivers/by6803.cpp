@@ -48,6 +48,12 @@ public:
 	{ }
 
 	void init_by6803();
+	void by6803(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+private:
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_READ8_MEMBER(port2_r);
@@ -62,13 +68,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
-	void by6803(machine_config &config);
-	void by6803_io(address_map &map);
+
 	void by6803_map(address_map &map);
-private:
+
 	uint8_t m_pia0_a;
 	uint8_t m_pia0_b;
 	uint8_t m_pia1_a;
@@ -99,12 +102,6 @@ void by6803_state::by6803_map(address_map &map)
 	map(0x0040, 0x0043).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x17ff).ram().share("nvram"); // 6116 ram
 	map(0x8000, 0xffff).rom();
-}
-
-void by6803_state::by6803_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(by6803_state::port1_r), FUNC(by6803_state::port1_w)); // P10-P17
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(by6803_state::port2_r), FUNC(by6803_state::port2_w)); // P20-P24
 }
 
 static INPUT_PORTS_START( by6803 )
@@ -380,9 +377,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
 
 MACHINE_CONFIG_START(by6803_state::by6803)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(by6803_map)
-	MCFG_DEVICE_IO_MAP(by6803_io)
+	M6803(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &by6803_state::by6803_map);
+	m_maincpu->in_p1_cb().set(FUNC(by6803_state::port1_r)); // P10-P17
+	m_maincpu->out_p1_cb().set(FUNC(by6803_state::port1_w)); // P10-P17
+	m_maincpu->in_p2_cb().set(FUNC(by6803_state::port2_r)); // P20-P24
+	m_maincpu->out_p2_cb().set(FUNC(by6803_state::port2_w)); // P20-P24
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

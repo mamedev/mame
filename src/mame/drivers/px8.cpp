@@ -547,19 +547,6 @@ void px8_state::px8_slave_mem(address_map &map)
 	map(0xf000, 0xffff).rom().region(HD6303_TAG, 0); /* internal mask rom */
 }
 
-/*-------------------------------------------------
-    ADDRESS_MAP( px8_slave_io )
--------------------------------------------------*/
-
-void px8_state::px8_slave_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(M6801_PORT1, M6801_PORT1);
-	map(M6801_PORT2, M6801_PORT2);
-	map(M6801_PORT3, M6801_PORT3);
-	map(M6801_PORT4, M6801_PORT4);
-}
-
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
@@ -759,7 +746,6 @@ MACHINE_CONFIG_START(px8_state::px8)
 	/* slave cpu (HD6303) */
 	MCFG_DEVICE_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
 	MCFG_DEVICE_PROGRAM_MAP(px8_slave_mem)
-	MCFG_DEVICE_IO_MAP(px8_slave_io)
 	MCFG_DEVICE_DISABLE()
 
 	/* sub CPU (uPD7508) */

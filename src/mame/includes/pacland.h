@@ -54,7 +54,6 @@ public:
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(irq_2_ctrl_w);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE8_MEMBER(scroll0_w);
@@ -77,5 +76,4 @@ public:
 	void pacland(machine_config &config);
 	void main_map(address_map &map);
 	void mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 };

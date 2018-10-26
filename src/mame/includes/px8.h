@@ -86,7 +86,6 @@ private:
 	DECLARE_PALETTE_INIT(px8);
 	void px8_io(address_map &map);
 	void px8_mem(address_map &map);
-	void px8_slave_io(address_map &map);
 	void px8_slave_mem(address_map &map);
 };
 

@@ -43,7 +43,6 @@ private:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 
-	void mpu401_io_map(address_map &map);
 	void mpu401_map(address_map &map);
 
 	required_device<m6801_cpu_device> m_ourcpu;

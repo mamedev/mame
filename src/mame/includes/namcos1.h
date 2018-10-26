@@ -141,7 +141,6 @@ private:
 
 	void main_map(address_map &map);
 	void mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void virtual_map(address_map &map);
