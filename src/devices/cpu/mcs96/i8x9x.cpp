@@ -42,7 +42,7 @@ std::unique_ptr<util::disasm_interface> i8x9x_device::create_disassembler()
 void i8x9x_device::device_resolve_objects()
 {
 	for (auto &cb : m_ach_cb)
-		cb.resolve_safe(0);
+		cb.resolve();
 	m_hso_cb.resolve_safe();
 	m_serial_tx_cb.resolve_safe();
 	m_in_p0_cb.resolve_safe(0);
@@ -67,10 +67,38 @@ void i8x9x_device::device_start()
 	state_add(I8X9X_SBUF_TX,     "SBUF_TX",     serial_send_buf);
 	state_add(I8X9X_SP_CON,      "SP_CON",      sp_con).mask(0x1f);
 	state_add(I8X9X_SP_STAT,     "SP_STAT",     sp_stat).mask(0xe0);
-	state_add(I8X9X_IOC0,        "IOC0",        ioc0);
+	state_add(I8X9X_IOC0,        "IOC0",        ioc0).mask(0xfd);
 	state_add(I8X9X_IOC1,        "IOC1",        ioc1);
 	state_add(I8X9X_IOS0,        "IOS0",        ios0);
 	state_add(I8X9X_IOS1,        "IOS1",        ios1);
+
+	for(int i = 0; i < 8; i++)
+	{
+		save_item(NAME(hso_info[i].active), i);
+		save_item(NAME(hso_info[i].command), i);
+		save_item(NAME(hso_info[i].time), i);
+	}
+	save_item(NAME(hso_cam_hold.active));
+	save_item(NAME(hso_cam_hold.command));
+	save_item(NAME(hso_cam_hold.time));
+
+	save_item(NAME(base_timer2));
+	save_item(NAME(ad_done));
+	save_item(NAME(hsi_mode));
+	save_item(NAME(hso_command));
+	save_item(NAME(ad_command));
+	save_item(NAME(hso_time));
+	save_item(NAME(ad_result));
+	save_item(NAME(pwm_control));
+	save_item(NAME(ios0));
+	save_item(NAME(ios1));
+	save_item(NAME(ioc0));
+	save_item(NAME(ioc1));
+	save_item(NAME(sbuf));
+	save_item(NAME(sp_con));
+	save_item(NAME(sp_stat));
+	save_item(NAME(serial_send_buf));
+	save_item(NAME(serial_send_timer));
 }
 
 void i8x9x_device::device_reset()
@@ -81,7 +109,7 @@ void i8x9x_device::device_reset()
 	hso_cam_hold.active = false;
 	hso_command = 0;
 	hso_time = 0;
-	base_timer2 = 0;
+	timer2_reset(total_cycles());
 	ios0 = ios1 = 0x00;
 	ioc0 &= 0xaa;
 	ioc1 = (ioc1 & 0xae) | 0x01;
@@ -98,8 +126,7 @@ void i8x9x_device::commit_hso_cam()
 {
 	for(int i=0; i<8; i++)
 		if(!hso_info[i].active) {
-			if(hso_command != 0x18 && hso_command != 0x19)
-				logerror("%s: hso cam %02x %04x in slot %d (%04x)\n", tag(), hso_command, hso_time, i, PPC);
+			//logerror("hso cam %02x %04x in slot %d (%04x)\n", hso_command, hso_time, i, PPC);
 			hso_info[i].active = true;
 			hso_info[i].command = hso_command;
 			hso_info[i].time = hso_time;
@@ -113,7 +140,11 @@ void i8x9x_device::commit_hso_cam()
 
 void i8x9x_device::ad_start(u64 current_time)
 {
-	ad_result = (m_ach_cb[ad_command & 7]() << 6) | 8 | (ad_command & 7);
+	ad_result = 8 | (ad_command & 7);
+	if (m_ach_cb[ad_command & 7].isnull())
+		logerror("Analog input on ACH%d not configured\n", ad_command & 7);
+	else
+		ad_result |= m_ach_cb[ad_command & 7]() << 6;
 	ad_done = current_time + 88;
 	internal_update(current_time);
 }
@@ -290,7 +321,9 @@ u8 i8x9x_device::sp_stat_r()
 
 void i8x9x_device::ioc0_w(u8 data)
 {
-	ioc0 = data;
+	ioc0 = data & 0xfd;
+	if (BIT(data, 1))
+		timer2_reset(total_cycles());
 }
 
 u8 i8x9x_device::ios0_r()
@@ -345,6 +378,11 @@ u64 i8x9x_device::timer_time_until(int timer, u64 current_time, u16 timer_value)
 	return timer_base + ((delta + tdelta) << 3);
 }
 
+void i8x9x_device::timer2_reset(u64 current_time)
+{
+	base_timer2 = current_time;
+}
+
 void i8x9x_device::trigger_cam(int id, u64 current_time)
 {
 	hso_cam_entry &cam = hso_info[id];
@@ -366,12 +404,16 @@ void i8x9x_device::trigger_cam(int id, u64 current_time)
 		ios1 |= 1 << (cam.command & 3);
 		break;
 
+	case 0xe:
+		timer2_reset(current_time);
+		break;
+
 	case 0xf:
 		ad_start(current_time);
 		break;
 
 	default:
-		logerror("%s: Action %x unimplemented\n", tag(), cam.command & 0x0f);
+		logerror("HSO action %x undefined\n", cam.command & 0x0f);
 		break;
 	}
 
@@ -402,9 +444,7 @@ void i8x9x_device::internal_update(u64 current_time)
 			u16 t = hso_info[i].time;
 			if(((cmd & 0x40) && t == current_timer2) ||
 				(!(cmd & 0x40) && t == current_timer1)) {
-				if(cmd != 0x18 && cmd != 0x19)
-					logerror("%s: hso cam %02x %04x in slot %d triggered\n",
-								tag(), cmd, t, i);
+				//logerror("hso cam %02x %04x in slot %d triggered\n", cmd, t, i);
 				trigger_cam(i, current_time);
 			}
 		}

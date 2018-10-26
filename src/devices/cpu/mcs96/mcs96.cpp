@@ -56,6 +56,17 @@ void mcs96_device::device_start()
 	state_add(MCS96_BH,        "BH",        reinterpret_cast<u8 *>(&register_file[4])[BYTE_XOR_LE(1)]).noshow();
 	state_add(MCS96_CL,        "CL",        reinterpret_cast<u8 *>(&register_file[5])[BYTE_XOR_LE(0)]).noshow();
 	state_add(MCS96_CH,        "CH",        reinterpret_cast<u8 *>(&register_file[5])[BYTE_XOR_LE(1)]).noshow();
+
+	save_item(NAME(inst_state));
+	save_item(NAME(PC));
+	save_item(NAME(PPC));
+	save_item(NAME(PSW));
+	save_item(NAME(OP1));
+	save_item(NAME(OP2));
+	save_item(NAME(OP3));
+	save_item(NAME(OPI));
+	save_item(NAME(TMP));
+	save_item(NAME(irq_requested));
 }
 
 void mcs96_device::device_reset()

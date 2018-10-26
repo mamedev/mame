@@ -135,6 +135,7 @@ private:
 
 	u16 timer_value(int timer, u64 current_time) const;
 	u64 timer_time_until(int timer, u64 current_time, u16 timer_value) const;
+	void timer2_reset(u64 current_time);
 	void commit_hso_cam();
 	void trigger_cam(int id, u64 current_time);
 	void set_hso(u8 mask, bool state);
