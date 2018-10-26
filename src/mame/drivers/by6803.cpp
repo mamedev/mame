@@ -611,6 +611,15 @@ ROM_START(hvymetap)
 	ROM_LOAD16_BYTE("u11.rom", 0x00000, 0x10000, CRC(b7e4de7d) SHA1(bcc89e10c368cdbc5137d8f585e109c0be25522d))
 ROM_END
 
+ROM_START(hvymetapg)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "u2g.rom", 0x8000, 0x4000, CRC(e50b500a) SHA1(c4f3502bf8afaa94610e008ce6b719ab4c4be712))
+	ROM_LOAD( "u3g.rom", 0xc000, 0x4000, CRC(7d018d0d) SHA1(07ba3bd5c15b96d6fc72e0a1de3b5d8defcc53b9))
+	ROM_REGION(0x01000000, "cpu2", 0)
+	ROM_LOAD16_BYTE("u12.rom", 0x00001, 0x10000, CRC(77933258) SHA1(42a01e97440dbb7d3da92dbfbad2516f4b553a5f))
+	ROM_LOAD16_BYTE("u11.rom", 0x00000, 0x10000, CRC(b7e4de7d) SHA1(bcc89e10c368cdbc5137d8f585e109c0be25522d))
+ROM_END
+
 /*------------------------------------
 / Lady Luck #OE34
 /------------------------------------*/
@@ -760,6 +769,7 @@ GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, init_by6803, ROT0
 GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hvymetapg, hvymetap, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Heavy Metal Meltdown (German)",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Escape from the Lost World",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Escape from the Lost World (German)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Dungeons & Dragons",                    MACHINE_IS_SKELETON_MECHANICAL)
