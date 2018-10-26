@@ -40,6 +40,7 @@ public:
 	auto ach5_cb() { return m_ach_cb[5].bind(); }
 	auto ach6_cb() { return m_ach_cb[6].bind(); }
 	auto ach7_cb() { return m_ach_cb[7].bind(); }
+	auto hso_cb() { return m_hso_cb.bind(); }
 	auto serial_tx_cb() { return m_serial_tx_cb.bind(); }
 
 	auto in_p0_cb() { return m_in_p0_cb.bind(); }
@@ -48,10 +49,10 @@ public:
 	auto out_p2_cb() { return m_out_p2_cb.bind(); }
 	auto in_p2_cb() { return m_in_p2_cb.bind(); }
 
-	void serial_w(uint8_t val);
+	void serial_w(u8 val);
 
 protected:
-	i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -61,7 +62,7 @@ protected:
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
-	virtual void internal_update(uint64_t current_time) override;
+	virtual void internal_update(u64 current_time) override;
 
 	void internal_regs(address_map &map);
 	void ad_command_w(u8 data);
@@ -104,11 +105,12 @@ private:
 
 	struct hso_cam_entry {
 		bool active;
-		uint8_t command;
-		uint16_t time;
+		u8 command;
+		u16 time;
 	};
 
 	devcb_read16 m_ach_cb[8];
+	devcb_write8 m_hso_cb;
 	devcb_write8 m_serial_tx_cb;
 
 	devcb_read8 m_in_p0_cb;
@@ -122,32 +124,33 @@ private:
 	hso_cam_entry hso_info[8];
 	hso_cam_entry hso_cam_hold;
 
-	uint64_t base_timer2, ad_done;
-	uint8_t hsi_mode, hso_command, ad_command;
-	uint16_t hso_time, ad_result;
-	uint8_t pwm_control;
-	uint8_t ios0, ios1, ioc0, ioc1;
-	uint8_t sbuf, sp_con, sp_stat;
-	uint8_t serial_send_buf;
-	uint64_t serial_send_timer;
+	u64 base_timer2, ad_done;
+	u8 hsi_mode, hso_command, ad_command;
+	u16 hso_time, ad_result;
+	u8 pwm_control;
+	u8 ios0, ios1, ioc0, ioc1;
+	u8 sbuf, sp_con, sp_stat;
+	u8 serial_send_buf;
+	u64 serial_send_timer;
 
-	uint16_t timer_value(int timer, uint64_t current_time) const;
-	uint64_t timer_time_until(int timer, uint64_t current_time, uint16_t timer_value) const;
+	u16 timer_value(int timer, u64 current_time) const;
+	u64 timer_time_until(int timer, u64 current_time, u16 timer_value) const;
 	void commit_hso_cam();
-	void trigger_cam(int id, uint64_t current_time);
-	void ad_start(uint64_t current_time);
-	void serial_send(uint8_t data);
+	void trigger_cam(int id, u64 current_time);
+	void set_hso(u8 mask, bool state);
+	void ad_start(u64 current_time);
+	void serial_send(u8 data);
 	void serial_send_done();
 };
 
 class c8095_device : public i8x9x_device {
 public:
-	c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class p8098_device : public i8x9x_device {
 public:
-	p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 DECLARE_DEVICE_TYPE(C8095, c8095_device)

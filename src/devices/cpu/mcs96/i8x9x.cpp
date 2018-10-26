@@ -12,9 +12,10 @@
 #include "i8x9x.h"
 #include "i8x9xd.h"
 
-i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	mcs96_device(mconfig, type, tag, owner, clock, 8, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
 	m_ach_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
+	m_hso_cb(*this),
 	m_serial_tx_cb(*this),
 	m_in_p0_cb(*this),
 	m_out_p1_cb(*this), m_in_p1_cb(*this),
@@ -42,6 +43,7 @@ void i8x9x_device::device_resolve_objects()
 {
 	for (auto &cb : m_ach_cb)
 		cb.resolve_safe(0);
+	m_hso_cb.resolve_safe();
 	m_serial_tx_cb.resolve_safe();
 	m_in_p0_cb.resolve_safe(0);
 	m_out_p1_cb.resolve_safe();
@@ -89,6 +91,7 @@ void i8x9x_device::device_reset()
 	sp_con &= 0x17;
 	sp_stat &= 0x80;
 	serial_send_timer = 0;
+	m_hso_cb(0);
 }
 
 void i8x9x_device::commit_hso_cam()
@@ -108,14 +111,14 @@ void i8x9x_device::commit_hso_cam()
 	hso_cam_hold.time = hso_time;
 }
 
-void i8x9x_device::ad_start(uint64_t current_time)
+void i8x9x_device::ad_start(u64 current_time)
 {
 	ad_result = (m_ach_cb[ad_command & 7]() << 6) | 8 | (ad_command & 7);
 	ad_done = current_time + 88;
 	internal_update(current_time);
 }
 
-void i8x9x_device::serial_send(uint8_t data)
+void i8x9x_device::serial_send(u8 data)
 {
 	serial_send_buf = data;
 	serial_send_timer = total_cycles() + 9600;
@@ -276,7 +279,7 @@ void i8x9x_device::sp_con_w(u8 data)
 
 u8 i8x9x_device::sp_stat_r()
 {
-	uint8_t res = sp_stat;
+	u8 res = sp_stat;
 	if (!machine().side_effects_disabled())
 	{
 		sp_stat &= 0x80;
@@ -292,8 +295,6 @@ void i8x9x_device::ioc0_w(u8 data)
 
 u8 i8x9x_device::ios0_r()
 {
-	if (!machine().side_effects_disabled())
-		logerror("read ios 0 %02x (%04x)\n", ios0, PPC);
 	return ios0;
 }
 
@@ -304,7 +305,7 @@ void i8x9x_device::ioc1_w(u8 data)
 
 u8 i8x9x_device::ios1_r()
 {
-	uint8_t res = ios1;
+	u8 res = ios1;
 	if (!machine().side_effects_disabled())
 		ios1 = ios1 & 0xc0;
 	return res;
@@ -319,7 +320,7 @@ void i8x9x_device::do_exec_partial()
 {
 }
 
-void i8x9x_device::serial_w(uint8_t val)
+void i8x9x_device::serial_w(u8 val)
 {
 	sbuf = val;
 	sp_stat |= 0x40;
@@ -327,28 +328,40 @@ void i8x9x_device::serial_w(uint8_t val)
 	check_irq();
 }
 
-uint16_t i8x9x_device::timer_value(int timer, uint64_t current_time) const
+u16 i8x9x_device::timer_value(int timer, u64 current_time) const
 {
 	if(timer == 2)
 		current_time -= base_timer2;
 	return current_time >> 3;
 }
 
-uint64_t i8x9x_device::timer_time_until(int timer, uint64_t current_time, uint16_t timer_value) const
+u64 i8x9x_device::timer_time_until(int timer, u64 current_time, u16 timer_value) const
 {
-	uint64_t timer_base = timer == 2 ? base_timer2 : 0;
-	uint64_t delta = (current_time - timer_base) >> 3;
-	uint32_t tdelta = uint16_t(timer_value - delta);
+	u64 timer_base = timer == 2 ? base_timer2 : 0;
+	u64 delta = (current_time - timer_base) >> 3;
+	u32 tdelta = u16(timer_value - delta);
 	if(!tdelta)
 		tdelta = 0x10000;
 	return timer_base + ((delta + tdelta) << 3);
 }
 
-void i8x9x_device::trigger_cam(int id, uint64_t current_time)
+void i8x9x_device::trigger_cam(int id, u64 current_time)
 {
 	hso_cam_entry &cam = hso_info[id];
 	cam.active = false;
 	switch(cam.command & 0x0f) {
+	case 0x0: case 0x1: case 0x2: case 0x3: case 0x4: case 0x5:
+		set_hso(1 << (cam.command & 7), BIT(cam.command, 5));
+		break;
+
+	case 0x6:
+		set_hso(0x03, BIT(cam.command, 5));
+		break;
+
+	case 0x7:
+		set_hso(0x0c, BIT(cam.command, 5));
+		break;
+
 	case 0x8: case 0x9: case 0xa: case 0xb:
 		ios1 |= 1 << (cam.command & 3);
 		pending_irq |= IRQ_SOFT;
@@ -361,15 +374,24 @@ void i8x9x_device::trigger_cam(int id, uint64_t current_time)
 	}
 }
 
-void i8x9x_device::internal_update(uint64_t current_time)
+void i8x9x_device::set_hso(u8 mask, bool state)
 {
-	uint16_t current_timer1 = timer_value(1, current_time);
-	uint16_t current_timer2 = timer_value(2, current_time);
+	if(state)
+		ios0 |= mask;
+	else
+		ios0 &= ~mask;
+	m_hso_cb(0, ios0 & 0x3f, mask);
+}
+
+void i8x9x_device::internal_update(u64 current_time)
+{
+	u16 current_timer1 = timer_value(1, current_time);
+	u16 current_timer2 = timer_value(2, current_time);
 
 	for(int i=0; i<8; i++)
 		if(hso_info[i].active) {
-			uint8_t cmd = hso_info[i].command;
-			uint16_t t = hso_info[i].time;
+			u8 cmd = hso_info[i].command;
+			u16 t = hso_info[i].time;
 			if(((cmd & 0x40) && t == current_timer2) ||
 				(!(cmd & 0x40) && t == current_timer1)) {
 				if(cmd != 0x18 && cmd != 0x19)
@@ -387,7 +409,7 @@ void i8x9x_device::internal_update(uint64_t current_time)
 	if(current_time == serial_send_timer)
 		serial_send_done();
 
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 	for(int i=0; i<8; i++) {
 		if(!hso_info[i].active && hso_cam_hold.active) {
 			hso_info[i] = hso_cam_hold;
@@ -395,7 +417,7 @@ void i8x9x_device::internal_update(uint64_t current_time)
 			logerror("%s: hso cam %02x %04x in slot %d from hold\n", tag(), hso_cam_hold.command, hso_cam_hold.time, i);
 		}
 		if(hso_info[i].active) {
-			uint64_t new_time = timer_time_until(hso_info[i].command & 0x40 ? 2 : 1, current_time, hso_info[i].time);
+			u64 new_time = timer_time_until(hso_info[i].command & 0x40 ? 2 : 1, current_time, hso_info[i].time);
 			if(!event_time || new_time < event_time)
 				event_time = new_time;
 		}
@@ -410,12 +432,12 @@ void i8x9x_device::internal_update(uint64_t current_time)
 	recompute_bcount(event_time);
 }
 
-c8095_device::c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+c8095_device::c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	i8x9x_device(mconfig, C8095, tag, owner, clock)
 {
 }
 
-p8098_device::p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+p8098_device::p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	i8x9x_device(mconfig, P8098, tag, owner, clock)
 {
 }
