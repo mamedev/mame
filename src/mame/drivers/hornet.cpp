@@ -1,22 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-/*  Konami Hornet System
+/*  Konami 'Hornet' Hardware
+    Konami, 1997-2000
+    
     Driver by Ville Linde
 
-
-    Konami 'Hornet' Hardware
-    Konami, 1997-1999
-
-    Known games on this hardware include....
-
-    Game                             (C)      Year
-    ----------------------------------------------
-    Gradius 4 : Fukkatsu             Konami   1999
-    NBA Play by Play                 Konami   1998
-    Silent Scope                     Konami   1999
-    Silent Scope 2 : Fatal Judgement Konami   2000
-    Silent Scope 2 : Dark Silhouette Konami   2000
-    Terraburst                       Konami   1998
 
     Hardware overview:
 
@@ -44,15 +32,15 @@
         3DFX 500-0010-01 (Voodoo 2) TMU with 4MB RAM
 
 
-    Hardware configurations:
-    ------------------------
+    Known games on this hardware:
 
-    Game              KONAMI ID  CPU PCB    GFX Board(s)  LAN PCB
+    Game              KONAMI ID  CPU PCB    CG Board(s)   Other
     --------------------------------------------------------------
     Gradius 4         GX837      GN715(A)   GN715(B)
     NBA Play By Play  GX778      GN715(A)   GN715(B)
+    Teraburst	      GN715	 GN715(A)   GN715(B)	  GN680(E) I/O Board
     Silent Scope      GQ830      GN715(A)   2x GN715(B)
-    Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H)
+    Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H) LAN PCB
 
 
     PCB Layouts
@@ -149,7 +137,7 @@
     NBA P/Play   778A01  -    -     778A09  778A10  778A11  778A12  778A04  778A05  -    -   778A08
     S/Scope      830B01  -    -     830A09  830A10  -       -       -       -       -    -   830A08
     S/Scope 2    931D01  -    -     931A09  931A10  931A11  -       931A04  -       -    -   931A08
-    Terraburst
+    Teraburst
 
 
     Bottom Board
@@ -216,14 +204,41 @@
     ROM Usage
     ---------
                  |------ ROM Locations -------|
-    Game         24U     24V     32U     32V
+    Game         24U     24V     32U     32V 
     -------------------------------------------
     Gradius 4    837A13  837A15  837A14  837A16
     NBA P/Play   778A13  778A15  778A14  778A16
     S/Scope      -       -       -       -          (no ROMs, not used)
     S/Scope 2    -       -       -       -          (no ROMs, not used)
-    Terraburst
+    Teraburst
 
+    I/O Board used for Teraburst (and previously Operation: Thunder Hurricane)
+
+    GN680 PWB(E)403381B
+    |------------------------------------------|
+    |CN11  CN12    CN8      CN9    CN10  DSW(4)|
+    |                 NRPS11     NRPS11        |
+    |                                          |
+    |                        LM1881   LM1881   |
+    |                                          |
+    |LED(x4)                                   |
+    |                                          |
+    |           68EC000FN16  8464              |
+    |    RESET_SW            8464              |
+    |32MHz                           715A17.20K|
+    |8464                 PAL(002962)          |
+    |CN4   056230         PAL(002961)          |
+    |   PAL(056787A)      PAL(002960)          |
+    |CN5                                       |
+    |------------------------------------------|
+    Notes:
+          68EC000 - Motorola MC68EC000, running at 16.0MHz (32/2)
+          CN11/12 - Power connectors
+          CN8/9   - 6-pin ccd camera control connectors
+          CN10    - 4-pin power output connector for two LEDs at the top (Not used for Teraburst)
+          NRPS11  - Idec NRPS11 PC Board circuit protector
+          LM1881  - Texas Instruments Video sync separator (DIP8)
+          Analog inputs are read from two ccd cameras. One from each gun.
 
 
     LAN PCB: GQ931 PWB(H)      (C) 1999 Konami
@@ -958,7 +973,7 @@ static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
 	PORT_DIPSETTING(0x00, "4 Player")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(terabrst) //Uses a ccd camera and sensor for gun inputs much similar to thunderh. Need to hook that up as well as the gun board.
+static INPUT_PORTS_START(terabrst)
 	PORT_INCLUDE(hornet)
 
 	PORT_MODIFY("IN0")
@@ -1599,14 +1614,14 @@ ROM_START(terabrst)
 	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
 	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68K Program */
+	ROM_REGION(0x80000, "audiocpu", 0)      /* 68K program */
 	ROM_LOAD16_WORD_SWAP( "715a08.7s",    0x000000, 0x080000, CRC(3aa2f4a5) SHA1(bb43e5f5ef4ac51f228d4d825be66d3c720d51ea) )
 
 	ROM_REGION16_LE(0x1000000, "rfsnd", 0)       /* PCM sample roms */
 	ROM_LOAD( "715a09.16p",   0x000000, 0x400000, CRC(65845866) SHA1(d2a63d0deef1901e6fa21b55c5f96e1f781dceda) )
 	ROM_LOAD( "715a10.14p",   0x400000, 0x400000, CRC(294fe71b) SHA1(ac5fff5627df1cee4f1e1867377f208b34334899) )
 
-	ROM_REGION(0x20000, "gn680", 0)     /* 68K Program */
+	ROM_REGION(0x20000, "gn680", 0)     /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
 
 	ROM_REGION(0x2000, "m48t58",0)
@@ -1641,19 +1656,19 @@ ROM_START(terabrsta)
 ROM_END
 
 /*************************************************************************/
-
-GAME(  1998, gradius4,  0,        hornet,        gradius4,hornet_state, init_gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbp,    0,        hornet,        nbapbp,  hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpa,   nbapbp,   hornet,        nbapbp,  hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, terabrst,  0,        terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, terabrsta, terabrst, terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,  0,        hornet,        gradius4,  hornet_state, init_gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,    0,        hornet,        nbapbp,    hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpa,   nbapbp,   hornet,        nbapbp,    hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, terabrst,  0,        terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", GAME_FLAGS
+GAME(  1998, terabrsta, terabrst, terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", GAME_FLAGS
 
 // The region comes from the Timekeeper NVRAM, without a valid default all sets except 'xxD, Ver 1.33' will init their NVRAM to UAx versions, the xxD set seems to incorrectly init it to JXD, which isn't a valid
 // version, and thus can't be booted.  If you copy the NVRAM from another already initialized set, it will boot as UAD.
 // to get the actual game to boot you must calibrate the guns etc.
-GAMEL( 2000, sscope,    0,        hornet_2board, sscope,  hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopec,   sscope,   hornet_2board, sscope,  hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxC, Ver 1.30)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopeb,   sscope,   hornet_2board, sscope,  hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopea,   sscope,   hornet_2board, sscope,  hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope,    0,        hornet_2board, sscope,    hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxD, Ver 1.33)", GAME_FLAGS, layout_dualhsxs )
+GAMEL( 2000, sscopec,   sscope,   hornet_2board, sscope,    hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxC, Ver 1.30)", GAME_FLAGS, layout_dualhsxs )
+GAMEL( 2000, sscopeb,   sscope,   hornet_2board, sscope,    hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", GAME_FLAGS, layout_dualhsxs )
+GAMEL( 2000, sscopea,   sscope,   hornet_2board, sscope,    hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", GAME_FLAGS, layout_dualhsxs )
 
-GAMEL( 2000, sscope2,   0,        sscope2,       sscope2, hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,   0,        sscope2,       sscope2,   hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", GAME_FLAGS | MACHINE_NODEVICE_LAN, layout_dualhsxs )
