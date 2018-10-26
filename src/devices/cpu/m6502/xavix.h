@@ -41,15 +41,17 @@ public:
 
 #undef O
 
-	void write_full_data(uint8_t databank, uint16_t adr, uint8_t val);
 
 	uint8_t read_full_data(uint8_t databank, uint16_t addr);
-	uint8_t read_full_data_sp(uint8_t databank, uint16_t adr);
-	uint8_t read_full_special(uint32_t adr);
-
 	uint8_t read_full_data(uint32_t addr);
-
+	void write_full_data(uint8_t databank, uint16_t adr, uint8_t val);
 	void write_full_data(uint32_t addr, uint8_t val);
+
+	// used for opcodes etc. that can't see certain things in banks > 0x80
+	uint8_t read_full_data_sp(uint8_t databank, uint16_t adr);
+	uint8_t read_full_data_sp(uint32_t adr);
+	void write_full_data_sp(uint8_t databank, uint16_t adr, uint8_t val);
+	void write_full_data_sp(uint32_t adr, uint8_t val);
 
 protected:
 	class mi_xavix_normal : public memory_interface {

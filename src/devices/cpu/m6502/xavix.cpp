@@ -111,9 +111,14 @@ inline uint8_t xavix_device::read_special(uint16_t adr)
 }
 
 // used by DMA and video operations (and custom new opcodes) where full address is specified
-inline uint8_t xavix_device::read_full_special(uint32_t adr)
+uint8_t xavix_device::read_full_data_sp(uint32_t adr)
 {
 	return read_full_data_sp((adr&0xff0000)>>16, adr&0xffff);
+}
+
+void xavix_device::write_full_data_sp(uint32_t adr, uint8_t val)
+{
+	write_full_data_sp((adr&0xff0000)>>16, adr&0xffff, val);
 }
 
 xavix_device::mi_xavix_normal::mi_xavix_normal(xavix_device *_base)
@@ -219,9 +224,8 @@ void xavix_device::write_full_data(uint32_t addr, uint8_t val)
 	write_full_data((addr & 0xff0000)>>16, addr & 0xffff, val);
 }
 
-
 // data writes
-void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_t val)
+inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_t val)
 {
 	if (databank < 0x80)
 	{
@@ -276,6 +280,24 @@ void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_t val)
 	}
 }
 
+inline void xavix_device::write_full_data_sp(uint8_t databank, uint16_t adr, uint8_t val)
+{
+	if (databank < 0x80)
+	{
+		if (adr < 0x8000)
+		{
+			m_lowbus_space->write_byte(adr, val);
+		}
+		else
+		{
+			m_extbus_space->write_byte((databank << 16) | adr, val);
+		}
+	}
+	else
+	{
+		m_extbus_space->write_byte((databank << 16) | adr, val);
+	}
+}
 
 void xavix_device::mi_xavix_normal::write(uint16_t adr, uint8_t val)
 {

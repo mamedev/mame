@@ -27,7 +27,7 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 			// many games explicitly want to access with the high bank bit set, so probably the same logic as when grabbing tile data
 			// we have to be careful here or we get the zero page memory read, hence not just using read8 on the whole space
 			// this again probably indicates there is 'data space' where those don't appear
-			uint8_t dat = m_maincpu->read_full_special(m_tmpaddress);
+			uint8_t dat = m_maincpu->read_full_data_sp(m_tmpaddress);
 			m_maincpu->write_full_data(dest+i, dat);
 		}
 	}
