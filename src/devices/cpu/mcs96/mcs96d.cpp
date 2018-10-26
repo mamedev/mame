@@ -308,7 +308,7 @@ offs_t mcs96_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 				util::stream_format(stream, " %04x[%s]", opcodes.r16(pc+2), regname16(opcodes.r8(pc+1)-1, false));
 			flags |= 4;
 		} else {
-			util::stream_format(stream, "%s", regname_indexed(opcodes.r8(pc+1), opcodes.r8(pc+2)));
+			util::stream_format(stream, " %s", regname_indexed(opcodes.r8(pc+1), opcodes.r8(pc+2)));
 			flags |= 3;
 		}
 		break;
