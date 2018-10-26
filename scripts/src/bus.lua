@@ -361,6 +361,8 @@ if (BUSES["BBC_TUBE"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_arm.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_rc6502.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_rc6502.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_zep100.cpp",

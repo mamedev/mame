@@ -119,7 +119,7 @@ WRITE8_MEMBER(bbc_tube_slot_device::host_w)
 #include "tube_arm.h"
 #include "tube_casper.h"
 //#include "tube_pmsb2p.h"
-//#include "tube_rc6502.h"
+#include "tube_rc6502.h"
 //#include "tube_x25.h"
 #include "tube_z80.h"
 #include "tube_zep100.h"
@@ -147,8 +147,8 @@ void bbc_tube_devices(device_slot_interface &device)
 	/* Acorn ANC21 Universal 2nd Processor Unit */
 	device.option_add("65c102", BBC_TUBE_65C102);  /* Acorn ADC06 65C102 co-processor */
 	device.option_add("80186",  BBC_TUBE_80186);   /* Acorn ADC08 80186 co-processor */
-	//device.option_add("rc6502", BBC_TUBE_RC6502);   /* ReCo6502 (6502) */
-	//device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
+	device.option_add("rc6502", BBC_TUBE_RC6502);   /* ReCo6502 (6502) */
+	device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
 }
 
 
@@ -168,8 +168,8 @@ void bbc_extube_devices(device_slot_interface &device)
 	/* Acorn ANC21 Universal 2nd Processor Unit */
 	device.option_add("65c102", BBC_TUBE_65C102);   /* Acorn ADC06 65C102 co-processor */
 	device.option_add("80186",  BBC_TUBE_80186);    /* Acorn ADC08 80186 co-processor */
-	//device.option_add("rc6502", BBC_TUBE_RC6502);   /* ReCo6502 (6502) */
-	//device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
+	device.option_add("rc6502", BBC_TUBE_RC6502);   /* ReCo6502 (6502) */
+	device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
 }
 
 
@@ -183,8 +183,8 @@ void bbc_intube_devices(device_slot_interface &device)
 	device.option_add("80186",  BBC_TUBE_80186);   /* Acorn ADC08 80186 co-processor */
 	//device.option_add("zep100m", BBC_TUBE_ZEP100M); /* Torch Z80 Communicator (ZEP100) (Master) */
 	//device.option_add("arm7",    BBC_TUBE_ARM7);    /* Sprow ARM7 co-processor */
-	//device.option_add("rc6502",  BBC_TUBE_RC6502);  /* ReCo6502 (6502) */
-	//device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
+	device.option_add("rc6502",  BBC_TUBE_RC6502);  /* ReCo6502 (6502) */
+	device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
 }
 
 
@@ -199,6 +199,6 @@ void electron_tube_devices(device_slot_interface &device)
 	device.option_add("arm",    BBC_TUBE_ARM);     /* Acorn ANC13 ARM Evaluation System */
 	device.option_add("65c102", BBC_TUBE_65C102);  /* Acorn ADC06 65C102 co-processor */
 	device.option_add("80186",  BBC_TUBE_80186);   /* Acorn ADC08 80186 co-processor */
-	//device.option_add("rc6502",  BBC_TUBE_RC6502);  /* ReCo6502 (6502) */
-	//device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
+	device.option_add("rc6502", BBC_TUBE_RC6502);  /* ReCo6502 (6502) */
+	device.option_add("rc65816", BBC_TUBE_RC65816); /* ReCo6502 (65816) */
 }
