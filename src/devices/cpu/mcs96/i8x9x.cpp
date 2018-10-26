@@ -138,6 +138,7 @@ void i8x9x_device::internal_regs(address_map &map)
 	map(0x03, 0x03).w(FUNC(i8x9x_device::hsi_mode_w));
 	map(0x04, 0x05).rw(FUNC(i8x9x_device::hsi_time_r), FUNC(i8x9x_device::hso_time_w)); // 16-bit access
 	map(0x06, 0x06).rw(FUNC(i8x9x_device::hsi_status_r), FUNC(i8x9x_device::hso_command_w));
+	map(0x07, 0x07).rw(FUNC(i8x9x_device::sbuf_r), FUNC(i8x9x_device::sbuf_w));
 	map(0x08, 0x08).rw(FUNC(i8x9x_device::int_mask_r), FUNC(i8x9x_device::int_mask_w));
 	map(0x09, 0x09).rw(FUNC(i8x9x_device::int_pending_r), FUNC(i8x9x_device::int_pending_w));
 	map(0x0a, 0x0b).r(FUNC(i8x9x_device::timer1_r)); // 16-bit access
