@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-/*  Konami GTI Club System
+/*  Konami 'GTI Club' Hardware
+    Konami, 1996-1998
 
     Driver by Ville Linde
 
-
-
+    
     Hardware overview:
 
     GN672 CPU board:
@@ -22,32 +22,22 @@
         Konami K001604 (2D tilemaps + 2x ROZ)
         2x KS10071 (custom 3D pixel unit)
         2x KS10081 (custom 3D texel unit)
+	
+    GN680 I/O Board (later used for Teraburst):
+    ---------------
+	Motorola 68000 @ 16MHz
+	
 
+    Known games on this hardware:
 
-
-    Hardware configurations:
-
-    Game                           | ID        | CPU PCB      | CG Board(s)    | notes
+    Game                           | ID        | CPU PCB      | CG Board(s)    | Other
     -----------------------------------------------------------------------------------------------
+    Jet Wave/Wave Shark		   | GX678     | ZR107(A)     | GN678(B)       |
     GTI Club                       | GX688     | GN672(A)     | GN678(B)       |
-    Operation Thunder Hurricane    | GX792     | GN672(A)     | GN678(B)       | extra board for gun controls(?)
-    Solar Assault                  | GX680     | GN672(A)     | GN678(B)       |
+    Operation: Thunder Hurricane   | GX792     | GN672(A)     | GN678(B)       | GN680(E) I/O Board
+    Solar Assault (Revised)        | GX680     | GN672(A)     | GN678(B)       |
+    Hang Pilot                     | GN685     | GN672(A)     | 2x ??(B)       | 3dfx based cg board
 
-    Hang Pilot                     | GN685     | GN672(A)     | 2x ??          | 3dfx-based CG boards
-
-
-Konami 'GTI Club' Hardware
-Konami, 1996-1998
-
-Known games on this hardware include....
-
-Game                        (C)      Year
------------------------------------------
-GTI Club                    Konami   1996
-Jet Wave / Wave Shark       Konami   1996 (video board only)
-Operation Thunder Hurricane Konami   1997
-Solar Assault               Konami   1997
-Solar Assault : Revised     Konami   1998
 
 
 PCB Layouts
@@ -113,42 +103,9 @@ ROM Usage
 Game                        13K     2S      5S      7S      9S      12U     14U     19R       19U       21R       21U
 --------------------------------------------------------------------------------------------------------------------------
 GTI Club                    688A07  688A12  688A11  688A10  688A09  688A06  688A05  688AAA04  688AAA02  688AAA03  688AAA01
-Jet Wave                    - see note -
 Hang Pilot                  685A07  -       -       685A10  685A09  685A06  685A05  685JAB04  685JAB02  685JAB03  685JAB01
 Operation Thunder Hurricane 680A07  680A12  680A11  680A10  680A09  680A06  680A05  680UAA04  680UAA02  680UAA03  680UAA01
-Solar Assault               792A07  792A12  792A11  792A10  792A09  792A06  792A05  792UAA04  792UAA02  792UAA03  792UAA01
-Solar Assault : Revised     - N/A -
-
-Note : Jet Wave uses the lower board (GN678) from GTI Club, but it uses a different top board (ZR107 PWB(A)300769A)
-Check zr107.c for details on the top board.
-
-Operation Thunder Hurricane uses an additional top board for sound, network and analog
-control functions...
-
-GN680 PWB(E)403381B
-|------------------------------------------|
-|CN11  CN12    CN8      CN9    CN10  DSW(4)|
-|                 NRPS11     NRPS11        |
-|                                          |
-|                        LM1881   LM1881   |
-|                                          |
-|LED(x4)                                   |
-|                                          |
-|           68EC000FN16  8464              |
-|    RESET_SW            8464              |
-|32MHz                           680C22.20K|
-|8464                 PAL(002962)          |
-|CN4   056230         PAL(002961)          |
-|   PAL(056787A)      PAL(002960)          |
-|CN5                                       |
-|------------------------------------------|
-Notes:
-      68000 @ 16MHz (32/2)
-      CN11/12 - Power connectors
-      CN8/9   - 6-pin analog control connectors
-      CN10    - 4-pin sound output connector
-      NRPS11  - Idec NRPS11 PC Board circuit protector
-      LM1881  - Video sync separator (DIP8)
+Solar Assault (Revised)     792A07  792A12  792A11  792A10  792A09  792A06  792A05  792UAA04  792UAA02  792UAA03  792UAA01
 
 
 Bottom Board
@@ -210,14 +167,49 @@ ROM Usage
 Game                        2D      4D      6D      9D      11D     13D     16D     18D
 ------------------------------------------------------------------------------------------
 GTI Club                    -       688A16  -       688A15  -       688A14  -       688A13
-Jet Wave                    -       678A16  -       678A15  -       678A14  -       678A13
+Jet Wave/Wave Shark         -       678A16  -       678A15  -       678A14  -       678A13
 Operation Thunder Hurricane -       680A16  -       680A15  -       680A14  -       680A13
-Solar Assault               -       792A16  -       792A15  -       792A14  -       792A13
-Solar Assault : Revised     - N/A -
+Solar Assault (Revised)     -       792A16  -       792A15  -       792A14  -       792A13f
 
-Hang Pilot (uses an unknown but similar video board)                12W             4W
-                            -       -       -       -       -       678A14  -       678A13
 
+Hang Pilot (different rom locations from both GN678 and GN715)      12W             4W
+                            -       -       -       -       -       658A14  -       658A13
+
+I/O Board used in Operation: Thunder Hurricane (and later Teraburst)
+
+GN680 PWB(E)403381B
+|------------------------------------------|
+|CN11  CN12    CN8      CN9    CN10  DSW(4)|
+|                 NRPS11     NRPS11        |
+|                                          |
+|                        LM1881   LM1881   |
+|                                          |
+|LED(x4)                                   |
+|                                          |
+|           68EC000FN16  8464              |
+|    RESET_SW            8464              |
+|32MHz                           680C22.20K|
+|8464                 PAL(002962)          |
+|CN4   056230         PAL(002961)          |
+|   PAL(056787A)      PAL(002960)          |
+|CN5                                       |
+|------------------------------------------|
+Notes:
+      68EC000 - Motorola MC68EC000, running at 16.0MHz (32/2)
+      CN11/12 - Power connectors
+      CN8/9   - 6-pin ccd camera control connectors
+      CN10    - 4-pin power output connector for two LEDs at the top (Not used for Teraburst)
+      NRPS11  - Idec NRPS11 PC Board circuit protector
+      LM1881  - Texas Instruments Video sync separator (DIP8)
+      Analog inputs are read from two ccd cameras. One from each gun.
+      
+TODO:
+-Finish K056230 for linked cabinets.
+-Hook analog inputs for Operation: Thunder Hurricane.
+-The sticky 3d title screen on Solar Assault and its clones.
+-Solar Assault sometimes crashes nearly halfway into Stage 3 right before the first set of pillar arches (SHARC related?)
+-Eventually remove unnecessary hacks
+-Other small gaphical (and maybe SHARC) problems
 */
 
 #include "emu.h"
@@ -1281,7 +1273,7 @@ ROM_START( thunderh ) /* Euro version EAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* 68k program for outboard sound? network? board */
+	ROM_REGION(0x20000, "gn680", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
@@ -1311,7 +1303,7 @@ ROM_START( thunderhu ) /* USA version UAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* 68k program for outboard sound? network? board */
+	ROM_REGION(0x20000, "gn680", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
@@ -1507,12 +1499,12 @@ void gticlub_state::init_hangpltu()
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
 GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
