@@ -410,8 +410,11 @@ void i8x9x_device::internal_update(u64 current_time)
 		}
 
 	if(ad_done && current_time >= ad_done) {
+		// A/D conversion complete
 		ad_done = 0;
 		ad_result &= ~8;
+		pending_irq |= IRQ_AD;
+		check_irq();
 	}
 
 	if(current_time == serial_send_timer)
