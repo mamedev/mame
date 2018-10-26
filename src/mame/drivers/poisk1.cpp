@@ -553,17 +553,17 @@ READ8_MEMBER(p1_state::p1_ppi_r)
 	switch (offset)
 	{
 	case 0:
-		return m_ppi8255n1->read(space, 0);
+		return m_ppi8255n1->read(0);
 	case 9:
 	case 10:
 	case 11:
-		return m_ppi8255n1->read(space, offset - 8);
+		return m_ppi8255n1->read(offset - 8);
 	case 8:
-		return m_ppi8255n2->read(space, 0);
+		return m_ppi8255n2->read(0);
 	case 1:
 	case 2:
 	case 3:
-		return m_ppi8255n2->read(space, offset);
+		return m_ppi8255n2->read(offset);
 	default:
 		DBG_LOG(1, "p1ppi", ("R %.2x (unimp)\n", 0x60 + offset));
 		return 0xff;
@@ -575,17 +575,17 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
 	switch (offset)
 	{
 	case 0:
-		return m_ppi8255n1->write(space, 0, data);
+		return m_ppi8255n1->write(0, data);
 	case 9:
 	case 10:
 	case 11:
-		return m_ppi8255n1->write(space, offset - 8, data);
+		return m_ppi8255n1->write(offset - 8, data);
 	case 8:
-		return m_ppi8255n2->write(space, 0, data);
+		return m_ppi8255n2->write(0, data);
 	case 1:
 	case 2:
 	case 3:
-		return m_ppi8255n2->write(space, offset, data);
+		return m_ppi8255n2->write(offset, data);
 	default:
 		DBG_LOG(1, "p1ppi", ("W %.2x $%02x (unimp)\n", 0x60 + offset, data));
 		return;

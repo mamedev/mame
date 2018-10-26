@@ -312,7 +312,7 @@ WRITE8_MEMBER( ecb_grip21_device::ppi_pc_w )
 	m_sti->i7_w(m_ia);
 
 	// PROF-80 handshaking
-	m_ppi_pc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->read_pa() & 0x3f);
+	m_ppi_pc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->pa_r() & 0x3f);
 }
 
 //-------------------------------------------------

@@ -28,11 +28,6 @@ public:
 	// construction/destruction
 	bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(wd1770l_write);
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(ramdisk_r);
-	DECLARE_WRITE8_MEMBER(ramdisk_w);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -41,6 +36,11 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual DECLARE_READ8_MEMBER(fred_r) override;
+	virtual DECLARE_WRITE8_MEMBER(fred_w) override;
+	virtual DECLARE_READ8_MEMBER(jim_r) override;
+	virtual DECLARE_WRITE8_MEMBER(jim_w) override;
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);

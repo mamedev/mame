@@ -46,8 +46,7 @@ void ec7915_state::io_map(address_map &map)
 {
 	map(0x00, 0x03).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x04, 0x07).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x08, 0x08).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x09, 0x09).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x08, 0x09).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0c, 0x0f).rw("ppi3", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).w("pit", FUNC(pit8253_device::write));
 	//map(0x14, 0x14).w("picu", FUNC(i8214_device::write));

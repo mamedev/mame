@@ -212,10 +212,8 @@ void peoplepc_state::peoplepc_io(address_map &map)
 	map(0x0020, 0x0031).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0048, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x0054, 0x0054).rw(m_8251key, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0056, 0x0056).rw(m_8251key, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x005c, 0x005c).rw(m_8251ser, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x005e, 0x005e).rw(m_8251ser, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0054, 0x0057).rw(m_8251key, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x005c, 0x005f).rw(m_8251ser, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x0064, 0x0067).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0x006c, 0x006c).w("h46505", FUNC(mc6845_device::address_w));
 	map(0x006e, 0x006e).rw("h46505", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -290,9 +288,9 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	m_dmac->in_ior_cb<0>().set("upd765", FUNC(upd765a_device::mdma_r));
 	m_dmac->out_iow_cb<0>().set("upd765", FUNC(upd765a_device::mdma_w));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic8259_0", pic8259_device, ir2_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_dmac, i8257_device, dreq0_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set("pic8259_0", FUNC(pic8259_device::ir2_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 
@@ -300,9 +298,9 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	m_8251key->rxrdy_handler().set("pic8259_1", FUNC(pic8259_device::ir1_w));
 	m_8251key->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("kbd", RS232_PORT, peoplepc_keyboard_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_0", i8251_device, write_rxd))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	rs232_port_device &kbd(RS232_PORT(config, "kbd", peoplepc_keyboard_devices, "keyboard"));
+	kbd.rxd_handler().set(m_8251key, FUNC(i8251_device::write_rxd));
+	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	I8251(config, m_8251ser, 0);
 MACHINE_CONFIG_END

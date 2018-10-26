@@ -239,7 +239,7 @@ FLOPPY_FORMATS_END
 
 void abc_fd2_device::device_add_mconfig(machine_config &config)
 {
- 	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
+	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc_fd2_device::abc_fd2_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc_fd2_device::abc_fd2_io);
 	m_maincpu->set_daisy_config(daisy_chain);

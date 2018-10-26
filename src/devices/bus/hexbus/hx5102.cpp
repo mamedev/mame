@@ -151,7 +151,7 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 
 WRITE8_MEMBER( hx5102_device::external_operation )
 {
-	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) LOGMASKED(LOG_WARN, "External operation %s not implemented on HX5102 board\n", extop[offset]);
 }
 
@@ -688,8 +688,7 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	// Not connected: Select lines (DS0, DS1), Head load (HDL), VCO
 	// Tied to 1: READY
 	// Tied to 0: TC
-	I8272A(config, m_floppy_ctrl, 0);
-	m_floppy_ctrl->set_ready_line_connected(false);
+	I8272A(config, m_floppy_ctrl, false);
 	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
 	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
 

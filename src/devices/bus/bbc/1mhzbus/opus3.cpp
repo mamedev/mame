@@ -70,11 +70,11 @@ ROM_START( opus3 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
 	ROM_DEFAULT_BIOS("ch103")
 	ROM_SYSTEM_BIOS(0, "ch100", "Challenger 1.00")
-	ROMX_LOAD("ch100.rom", 0x0000, 0x4000, CRC(740a8335) SHA1(f3c75c21bcd7d4a4dfff922fd287230dcdb91d0e), ROM_BIOS(0))
+	ROMX_LOAD("chal100.rom", 0x0000, 0x4000, CRC(740a8335) SHA1(f3c75c21bcd7d4a4dfff922fd287230dcdb91d0e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ch101", "Challenger 1.01")
-	ROMX_LOAD("ch101.rom", 0x0000, 0x4000, CRC(2f64503d) SHA1(37ee3f20bed50555720703b279f62aab0ed28922), ROM_BIOS(1))
+	ROMX_LOAD("chal101.rom", 0x0000, 0x4000, CRC(2f64503d) SHA1(37ee3f20bed50555720703b279f62aab0ed28922), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "ch103", "Challenger 1.03")
-	ROMX_LOAD("ch103.rom", 0x0000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33), ROM_BIOS(2))
+	ROMX_LOAD("chal103.rom", 0x0000, 0x4000, CRC(98367cf4) SHA1(eca3631aa420691f96b72bfdf2e9c2b613e1bf33), ROM_BIOS(2))
 ROM_END
 
 //-------------------------------------------------
@@ -86,8 +86,9 @@ void bbc_opus3_device::device_add_mconfig(machine_config &config)
 	/* fdc */
 	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
 	m_fdc->drq_wr_callback().set(FUNC(bbc_opus3_device::fdc_drq_w));
+
 	FLOPPY_CONNECTOR(config, m_floppy0, bbc_floppies, "525qd", floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies, "525qd", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, bbc_floppies, nullptr, floppy_formats).enable_sound(true);
 
 	/* ram disk */
 	RAM(config, m_ramdisk).set_default_size("512K").set_extra_options("256K").set_default_value(0);
@@ -113,7 +114,8 @@ bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, const char *ta
 		m_ramdisk(*this, "ramdisk"),
 		m_fdc(*this, "wd1770"),
 		m_floppy0(*this, "wd1770:0"),
-		m_floppy1(*this, "wd1770:1")
+		m_floppy1(*this, "wd1770:1"),
+		m_ramdisk_page(0)
 {
 }
 
@@ -123,13 +125,6 @@ bbc_opus3_device::bbc_opus3_device(const machine_config &mconfig, const char *ta
 
 void bbc_opus3_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<bbc_1mhzbus_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfcf8, 0xfcfb, read8sm_delegate(FUNC(wd1770_device::read), m_fdc.target()), write8sm_delegate(FUNC(wd1770_device::write), m_fdc.target()));
-	space.install_write_handler(0xfcfc, 0xfcfc, WRITE8_DELEGATE(bbc_opus3_device, wd1770l_write));
-	space.install_write_handler(0xfcfe, 0xfcff, WRITE8_DELEGATE(bbc_opus3_device, page_w));
-	space.install_readwrite_handler(0xfd00, 0xfdff, READ8_DELEGATE(bbc_opus3_device, ramdisk_r), WRITE8_DELEGATE(bbc_opus3_device, ramdisk_w));
 }
 
 //-------------------------------------------------
@@ -146,24 +141,57 @@ void bbc_opus3_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(bbc_opus3_device::wd1770l_write)
+READ8_MEMBER(bbc_opus3_device::fred_r)
+{
+	uint8_t data = 0xff;
+
+	switch (offset)
+	{
+	case 0xf8:
+	case 0xf9:
+	case 0xfa:
+	case 0xfb:
+		data = m_fdc->read(offset & 0x03);
+		break;
+	}
+	return data;
+}
+
+WRITE8_MEMBER(bbc_opus3_device::fred_w)
 {
 	floppy_image_device *floppy = nullptr;
 
-	// bit 1, 2: drive select
-	if (BIT(data, 1)) floppy = m_floppy0->get_device();
-	if (BIT(data, 2)) floppy = m_floppy1->get_device();
-	m_fdc->set_floppy(floppy);
+	switch (offset)
+	{
+	case 0xf8:
+	case 0xf9:
+	case 0xfa:
+	case 0xfb:
+		m_fdc->write(offset & 0x03, data);
+		break;
+	case 0xfc:
+		// bit 1, 2: drive select
+		if (BIT(data, 1)) floppy = m_floppy0->get_device();
+		if (BIT(data, 2)) floppy = m_floppy1->get_device();
+		m_fdc->set_floppy(floppy);
 
-	// bit 0: side select
-	if (floppy)
-		floppy->ss_w(BIT(data, 0));
+		// bit 0: side select
+		if (floppy)
+			floppy->ss_w(BIT(data, 0));
 
-	// bit 4: interrupt enabled
-	m_fdc_ie = BIT(data, 4);
+		// bit 4: interrupt enabled
+		m_fdc_ie = BIT(data, 4);
 
-	// bit 5: density
-	m_fdc->dden_w(BIT(data, 5));
+		// bit 5: density
+		m_fdc->dden_w(BIT(data, 5));
+		break;
+	case 0xfe:
+		m_ramdisk_page = (m_ramdisk_page & 0x00ff) | (data << 8);
+		break;
+	case 0xff:
+		m_ramdisk_page = (m_ramdisk_page & 0xff00) | (data << 0);
+		break;
+	}
 }
 
 WRITE_LINE_MEMBER(bbc_opus3_device::fdc_drq_w)
@@ -173,16 +201,7 @@ WRITE_LINE_MEMBER(bbc_opus3_device::fdc_drq_w)
 	m_slot->nmi_w((m_fdc_drq && m_fdc_ie) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(bbc_opus3_device::page_w)
-{
-	switch (offset)
-	{
-	case 0x00: m_ramdisk_page = (m_ramdisk_page & 0x00ff) | (data << 8); break;
-	case 0x01: m_ramdisk_page = (m_ramdisk_page & 0xff00) | (data << 0); break;
-	}
-}
-
-READ8_MEMBER(bbc_opus3_device::ramdisk_r)
+READ8_MEMBER(bbc_opus3_device::jim_r)
 {
 	if ((m_ramdisk_page << 8) < m_ramdisk->size())
 		return m_ramdisk->read((m_ramdisk_page << 8) + offset);
@@ -190,7 +209,7 @@ READ8_MEMBER(bbc_opus3_device::ramdisk_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(bbc_opus3_device::ramdisk_w)
+WRITE8_MEMBER(bbc_opus3_device::jim_w)
 {
 	if ((m_ramdisk_page << 8) < m_ramdisk->size())
 		m_ramdisk->write((m_ramdisk_page << 8) + offset, data);

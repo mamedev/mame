@@ -1736,7 +1736,7 @@ void ncr53c7xx_device::tc_int()
 
 const char* ncr53c7xx_device::disassemble_scripts()
 {
-	static const char* phases[] =
+	static char const *const phases[] =
 	{
 		"Data Out",
 		"Data In",
@@ -1760,7 +1760,7 @@ const char* ncr53c7xx_device::disassemble_scripts()
 		}
 		case 1:
 		{
-			static const char* ops[] =
+			static char const *const ops[] =
 			{
 				"SELECT",
 				"DISCONNECT",
@@ -1777,7 +1777,7 @@ const char* ncr53c7xx_device::disassemble_scripts()
 		}
 		case 2:
 		{
-			static const char* ops[] =
+			static char const *const ops[] =
 			{
 				"JUMP",
 				"CALL",

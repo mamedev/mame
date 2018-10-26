@@ -9,20 +9,8 @@
 
 #include "emu.h"
 #include "hp_hil.h"
-
-
-#define VERBOSE_DBG 0
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
-
+//#define VERBOSE 1
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -88,6 +76,13 @@ void hp_hil_mlc_device::device_start()
 	// resolve callbacks
 	int_cb.resolve_safe();
 	nmi_cb.resolve_safe();
+
+	save_item(NAME(m_r2));
+	save_item(NAME(m_r3));
+	save_item(NAME(m_w1));
+	save_item(NAME(m_w2));
+	save_item(NAME(m_w3));
+	save_item(NAME(m_loop));
 }
 
 
@@ -107,17 +102,17 @@ WRITE8_MEMBER(hp_hil_mlc_device::write)
 {
 	device_hp_hil_interface *entry = m_device_list.first();
 	uint16_t tmp = data | (m_w1 << 8);
-	DBG_LOG(2,"Write", ("%d <- %02x\n", offset, data));
 
 	switch (offset)
 	{
 	case 0:
-		DBG_LOG(1,"Transmit", ("%scommand 0x%02x to device %d\n", !m_loop?"loopback ":"", data, m_w1 & 7));
+		LOG("write: %scommand 0x%02x to device %d\n", !m_loop?"loopback ":"", data, m_w1 & 7);
 
 		m_fifo.clear();
 
 		if (m_loop & 2) // no devices on 2nd link loop
 			return;
+
 		if (m_loop == 0)
 		{
 			if (!m_fifo.full()) {
@@ -138,14 +133,17 @@ WRITE8_MEMBER(hp_hil_mlc_device::write)
 		break;
 
 	case 1:
+		LOG("write: W1=%02x\n", 0xf);
 		m_w1 = data & 0xf;
 		break;
 
 	case 2:
+		LOG("write: W2=%02x\n", data);
 		m_w2 = data;
 		break;
 
 	case 3:
+		LOG("write: W3=%02x\n", data);
 		m_w3 = data;
 		break;
 
@@ -183,15 +181,17 @@ READ8_MEMBER(hp_hil_mlc_device::read)
 		break;
 	}
 
-	DBG_LOG(2,"Read", ("%d == %02x\n", offset, data));
+	LOG("Read %d == %02x\n", offset, data);
 
 	return data;
 }
 
 void hp_hil_mlc_device::hil_write(uint16_t data)
 {
-	DBG_LOG(1,"Receive", ("%s %04X fifo %s\n",
-		BIT(data, 11)?"command":"data", data, m_fifo.full()?"full":(m_fifo.empty()?"empty":"ok")));
+	LOG("hil_write: %s %04X fifo %s\n",
+			BIT(data, 11) ? "command" : "data",
+					data,
+					m_fifo.full() ? "full" : (m_fifo.empty()?"empty":"ok"));
 
 	if (!m_fifo.full())
 	{
@@ -247,7 +247,6 @@ device_hp_hil_interface::device_hp_hil_interface(const machine_config &mconfig, 
 	, m_next(nullptr)
 {
 }
-
 
 //-------------------------------------------------
 //  ~device_hp_hil_interface - destructor

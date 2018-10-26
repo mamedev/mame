@@ -68,6 +68,8 @@ i960 CPU, needs to write its clip and raster values byteswapped.
 #include "emu.h"
 #include "video/namco_c116.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(NAMCO_C116, namco_c116_device, "namco_c116", "Namco C116 Video Controller")
 
 //-------------------------------------------------
@@ -75,9 +77,10 @@ DEFINE_DEVICE_TYPE(NAMCO_C116, namco_c116_device, "namco_c116", "Namco C116 Vide
 //-------------------------------------------------
 
 namco_c116_device::namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C116, tag, owner, clock),
-		device_gfx_interface(mconfig, *this),
-		device_video_interface(mconfig, *this)
+	: device_t(mconfig, NAMCO_C116, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_enable_shadows(false)
 {
 }
 
@@ -91,7 +94,7 @@ void namco_c116_device::device_start()
 	m_ram_r.resize(0x2000);
 	m_ram_g.resize(0x2000);
 	m_ram_b.resize(0x2000);
-	memset(m_regs, 0, sizeof(m_regs));
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 
 	save_item(NAME(m_ram_r));
 	save_item(NAME(m_ram_g));
@@ -175,5 +178,5 @@ WRITE8_MEMBER(namco_c116_device::write)
 	}
 	int color = ((offset & 0x6000) >> 2) | (offset & 0x7ff);
 	RAM[color] = data;
-	palette().set_pen_color(color,m_ram_r[color],m_ram_g[color],m_ram_b[color]);
+	set_pen_color(color,m_ram_r[color],m_ram_g[color],m_ram_b[color]);
 }

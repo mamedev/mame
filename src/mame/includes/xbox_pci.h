@@ -78,10 +78,14 @@ DECLARE_DEVICE_TYPE(MCPX_LPC, mcpx_lpc_device)
  * SMBus
  */
 
+class smbus_interface {
+public:
+	virtual int execute_command(int command, int rw, int data) = 0;
+};
+
 class mcpx_smbus_device : public pci_device {
 public:
 	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void register_device(int address, std::function<int(int command, int rw, int data)> callback) { if (address < 128) smbusst.devices[address] = callback; }
 
 	template<class Object> devcb_base &set_interrupt_handler(Object &&cb) { return m_interrupt_handler.set_callback(std::forward<Object>(cb)); }
 
@@ -101,7 +105,7 @@ private:
 		int data;
 		int command;
 		int rw;
-		std::function<int(int command, int rw, int data)> devices[128];
+		smbus_interface *devices[128];
 		uint32_t words[256 / 4];
 	} smbusst;
 	void smbus_io0(address_map &map);

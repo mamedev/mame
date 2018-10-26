@@ -47,11 +47,11 @@ MACHINE_CONFIG_START(cpc_rs232_device::device_add_mconfig)
 	m_dart->out_dtra_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_dart->out_rtsa_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232",RS232_PORT,default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart,z80dart_device,rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_dart,z80dart_device,dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_dart,z80dart_device,ctsa_w))
-//  MCFG_RS232_RI_HANDLER(WRITELINE(m_dart,z80dart_device,ria_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
+	m_rs232->dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
+	m_rs232->cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
+//  m_rs232->ri_handler().set(m_dart, FUNC(z80dart_device::ria_w));
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
@@ -149,10 +149,10 @@ WRITE8_MEMBER(cpc_rs232_device::dart_w)
 
 READ8_MEMBER(cpc_rs232_device::pit_r)
 {
-	return m_pit->read(space,offset);
+	return m_pit->read(offset);
 }
 
 WRITE8_MEMBER(cpc_rs232_device::pit_w)
 {
-	m_pit->write(space,offset,data);
+	m_pit->write(offset,data);
 }

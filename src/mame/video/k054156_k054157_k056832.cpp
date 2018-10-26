@@ -327,9 +327,6 @@ void k056832_device::finalize_init()
 	save_item(NAME(m_use_ext_linescroll));
 	save_item(NAME(m_uses_tile_banks));
 	save_item(NAME(m_cur_tile_bank));
-
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(k056832_device::postload), this));
 }
 
 
@@ -1942,7 +1939,7 @@ int k056832_device::read_register( int regnum )
 	return(m_regs[regnum]);
 }
 
-void k056832_device::postload()
+void k056832_device::device_post_load()
 {
 	update_page_layout();
 	change_rambank();

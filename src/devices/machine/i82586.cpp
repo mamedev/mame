@@ -2,32 +2,32 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
-* An implementation of the Intel 82586 and 82596 Ethernet controller devices.
-*
-* This driver covers the following devices:
-*
-*   - 82586 - 16/24 data/address bus, 6/8/10 MHz
-*   - 82596SX - 16/32 data/address bus, 16/20 MHz
-*   - 82596DX - 32/32 data/address bus, 25/33 MHz
-*   - 82596CA - 32/32 data/address bus, 16/20/25/33 MHz
-*
-* This implementation should cover all of the above reasonably well, but
-* no testing of big endian mode in particular, and very limited testing
-* of the 82596 in non-linear modes has been done so far.
-*
-* Some documents covering the above include:
-*
-*   http://bitsavers.org/pdf/intel/_dataBooks/1991_Microcommunications.pdf
-*   http://bitsavers.org/pdf/intel/_dataBooks/1996_Networking.pdf
-*   https://www.intel.com/assets/pdf/general/82596ca.pdf
-*
-* TODO
-*   - testing for 82596 big endian and non-linear modes
-*   - more complete statistics capturing
-*   - 82596 monitor mode
-*   - throttle timers and diagnostic command
-*   - special case handling for different 82596 steppings in big endian mode
-*/
+ * An implementation of the Intel 82586 and 82596 Ethernet controller devices.
+ *
+ * This driver covers the following devices:
+ *
+ *   - 82586 - 16/24 data/address bus, 6/8/10 MHz
+ *   - 82596SX - 16/32 data/address bus, 16/20 MHz
+ *   - 82596DX - 32/32 data/address bus, 25/33 MHz
+ *   - 82596CA - 32/32 data/address bus, 16/20/25/33 MHz
+ *
+ * This implementation should cover all of the above reasonably well, but
+ * no testing of big endian mode in particular, and very limited testing
+ * of the 82596 in non-linear modes has been done so far.
+ *
+ * Sources:
+ *
+ *   http://bitsavers.org/pdf/intel/_dataBooks/1991_Microcommunications.pdf
+ *   http://bitsavers.org/pdf/intel/_dataBooks/1996_Networking.pdf
+ *   https://www.intel.com/assets/pdf/general/82596ca.pdf
+ *
+ * TODO
+ *   - testing for 82596 big endian and non-linear modes
+ *   - more complete statistics capture
+ *   - 82596 monitor mode
+ *   - throttle timers and diagnostic command
+ *   - special case handling for different 82596 steppings in big endian mode
+ */
 
 #include "emu.h"
 #include "i82586.h"

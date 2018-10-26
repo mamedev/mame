@@ -1120,8 +1120,8 @@ GAME( 1984, sbagmans,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init,
 
 GAME( 1983, pickin,    0,       pickin,   pickin,    bagman_state,   empty_init, ROT270, "Valadon Automation", "Pickin'", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,   0,       botanic,  botanici,  bagman_state,   empty_init, ROT90,  "Itisa",                              "Botanic (English / Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   empty_init, ROT90,  "Itisa",                              "Botanic (English / Spanish, with TMS5110)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // At the title screen, Botanic in corrupted in the first loop, ok from the second on. Colors likely wrong, too.
+GAME( 1983, botanic,   0,       botanic,  botanici,  bagman_state,   empty_init, ROT90,  "Itisa", "Botanic (English / Spanish, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   empty_init, ROT90,  "Itisa", "Botanic (English / Spanish, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // At the title screen, Botanic in corrupted in the first loop, ok from the second on. Colors likely wrong, too. Has a leftover 5110.
 GAME( 1984, botanicf,  botanic, botanic,  botanicf,  bagman_state,   empty_init, ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, squaitsa,  0,       botanic,  squaitsa,  squaitsa_state, empty_init, ROT0,   "Itisa", "Squash (Itisa)", MACHINE_SUPPORTS_SAVE )

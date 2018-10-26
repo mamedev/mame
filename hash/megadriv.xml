@@ -1918,7 +1918,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only USA is confirmed -->
 	<software name="dstrike">
-		<description>Desert Strike (Euro, USA)</description>
+		<description>Desert Strike - Return to the Gulf (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -14050,7 +14050,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="dstrikej" cloneof="dstrike">
-		<description>Desert Strike (Jpn, Kor)</description>
+		<description>Desert Strike - Return to the Gulf (Jpn, Kor)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="EM20010"/>
@@ -23317,7 +23317,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="rrash3">
 		<!-- the same checksum is shared by the Beta 3 prototype (19950106), released by drx, i.e. the proto is actually final -->
-		<description>Road 3 Rash - Tour de Force (Euro, USA)</description>
+		<description>Road Rash 3 - Tour de Force (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="Road 3 Rash (Box)"/>
@@ -23332,7 +23332,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="rrash3p" cloneof="rrash3">
-		<description>Road 3 Rash - World Warriors (USA, Prototype)</description>
+		<description>Road Rash 3 - World Warriors (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">

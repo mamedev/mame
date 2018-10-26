@@ -20,6 +20,10 @@ MIPS III/IV emulator.
 #include "cpu/drcuml.h"
 #include "ps2vu.h"
 
+DECLARE_DEVICE_TYPE(R4000BE, r4000be_device)
+DECLARE_DEVICE_TYPE(R4000LE, r4000le_device)
+DECLARE_DEVICE_TYPE(R4400BE, r4400be_device)
+DECLARE_DEVICE_TYPE(R4400LE, r4400le_device)
 // NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
 DECLARE_DEVICE_TYPE(VR4300BE, vr4300be_device)
 DECLARE_DEVICE_TYPE(VR4300LE, vr4300le_device)
@@ -278,6 +282,8 @@ protected:
 	enum mips3_flavor {
 		/* MIPS III variants */
 		MIPS3_TYPE_MIPS_III,
+		MIPS3_TYPE_R4000,
+		MIPS3_TYPE_R4400,
 		MIPS3_TYPE_VR4300,
 		MIPS3_TYPE_R4600,
 		MIPS3_TYPE_R4650,
@@ -632,6 +638,42 @@ private:
 	void load_elf();
 };
 
+
+class r4000be_device : public mips3_device {
+public:
+	// construction/destruction
+	r4000be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, R4000BE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_BIG, 32)
+	{
+	}
+};
+
+class r4000le_device : public mips3_device {
+public:
+	// construction/destruction
+	r4000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, R4000LE, tag, owner, clock, MIPS3_TYPE_R4000, ENDIANNESS_LITTLE, 32)
+	{
+	}
+};
+
+class r4400be_device : public mips3_device {
+public:
+	// construction/destruction
+	r4400be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, R4400BE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_BIG, 32)
+	{
+	}
+};
+
+class r4400le_device : public mips3_device {
+public:
+	// construction/destruction
+	r4400le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, R4400LE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_LITTLE, 32)
+	{
+	}
+};
 
 class vr4300be_device : public mips3_device {
 public:

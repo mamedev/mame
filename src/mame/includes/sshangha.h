@@ -11,7 +11,7 @@ public:
 	sshangha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_deco146(*this, "ioprot"),
-		m_deco_tilegen1(*this, "tilegen1"),
+		m_tilegen(*this, "tilegen"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_sound_shared_ram(*this, "sound_shared"),
@@ -25,16 +25,19 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void sshanghb(machine_config &config);
+	void sshanghab(machine_config &config);
 	void sshangha(machine_config &config);
 
 	void init_sshangha();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	optional_device<deco146_device> m_deco146;
-	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_tilegen;
 	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_spriteram2;
+	required_shared_ptr<uint16_t> m_spriteram2;
 
 	required_shared_ptr<uint16_t> m_sound_shared_ram;
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;
@@ -42,8 +45,11 @@ private:
 
 	optional_shared_ptr<uint16_t> m_prot_data;
 
-	optional_device<decospr_device> m_sprgen1;
-	optional_device<decospr_device> m_sprgen2;
+	required_device<decospr_device> m_sprgen1;
+	required_device<decospr_device> m_sprgen2;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<palette_device> m_palette;
 
 	int m_video_control;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -52,26 +58,20 @@ private:
 	DECLARE_WRITE16_MEMBER(sshangha_protection_region_8_146_w);
 	DECLARE_READ16_MEMBER(sshangha_protection_region_d_146_r);
 	DECLARE_WRITE16_MEMBER(sshangha_protection_region_d_146_w);
+	DECLARE_READ16_MEMBER(deco_71_r);
+	DECLARE_READ16_MEMBER(sshanghab_protection16_r);
 
 	DECLARE_READ16_MEMBER(palette_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 
-	DECLARE_READ16_MEMBER(sshanghb_protection16_r);
-	DECLARE_READ16_MEMBER(deco_71_r);
-	DECLARE_READ8_MEMBER(sshangha_sound_shared_r);
-	DECLARE_WRITE8_MEMBER(sshangha_sound_shared_w);
+	DECLARE_READ8_MEMBER(sound_shared_r);
+	DECLARE_WRITE8_MEMBER(sound_shared_w);
 
-	DECLARE_WRITE16_MEMBER(sshangha_video_w);
+	DECLARE_WRITE16_MEMBER(video_w);
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<palette_device> m_palette;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void sshangha_map(address_map &map);
-	void sshangha_sound_map(address_map &map);
-	void sshanghb_map(address_map &map);
+	void sound_map(address_map &map);
+	void sshanghab_map(address_map &map);
 };

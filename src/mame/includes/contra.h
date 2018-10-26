@@ -20,6 +20,7 @@ public:
 		m_tx_cram(*this, "tx_cram"),
 		m_tx_vram(*this, "tx_vram"),
 		m_spriteram(*this, "spriteram"),
+		m_spriteram_2(*this, "spriteram_2"),
 		m_bg_cram(*this, "bg_cram"),
 		m_bg_vram(*this, "bg_vram"),
 		m_audiocpu(*this, "audiocpu"),
@@ -38,6 +39,7 @@ public:
 	required_shared_ptr<uint8_t> m_tx_cram;
 	required_shared_ptr<uint8_t> m_tx_vram;
 	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram_2;
 	required_shared_ptr<uint8_t> m_bg_cram;
 	required_shared_ptr<uint8_t> m_bg_vram;
 

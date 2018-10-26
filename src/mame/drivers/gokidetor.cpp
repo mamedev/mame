@@ -127,18 +127,18 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	// IRQ from ???
 	// NMI related to E002 input and TE7750 port 7
 
-	MCFG_DEVICE_ADD("te7750", TE7750, 0)
-	MCFG_TE7750_IOS_CB(CONSTANT(3))
-	MCFG_TE7750_IN_PORT1_CB(IOPORT("IN1"))
-	MCFG_TE7750_IN_PORT2_CB(IOPORT("IN2"))
-	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3"))
-	MCFG_TE7750_OUT_PORT4_CB(WRITE8(*this, gokidetor_state, out4_w))
-	MCFG_TE7750_OUT_PORT5_CB(WRITE8(*this, gokidetor_state, out5_w))
-	MCFG_TE7750_OUT_PORT6_CB(WRITE8(*this, gokidetor_state, out6_w))
-	MCFG_TE7750_OUT_PORT7_CB(WRITE8(*this, gokidetor_state, out7_w))
-	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN8"))
-	MCFG_TE7750_OUT_PORT8_CB(WRITE8(*this, gokidetor_state, out8_w))
-	MCFG_TE7750_OUT_PORT9_CB(WRITE8(*this, gokidetor_state, out9_w))
+	te7750_device &te7750(TE7750(config, "te7750", 0));
+	te7750.ios_cb().set_constant(3);
+	te7750.in_port1_cb().set_ioport("IN1");
+	te7750.in_port2_cb().set_ioport("IN2");
+	te7750.in_port3_cb().set_ioport("IN3");
+	te7750.out_port4_cb().set(FUNC(gokidetor_state::out4_w));
+	te7750.out_port5_cb().set(FUNC(gokidetor_state::out5_w));
+	te7750.out_port6_cb().set(FUNC(gokidetor_state::out6_w));
+	te7750.out_port7_cb().set(FUNC(gokidetor_state::out7_w));
+	te7750.in_port8_cb().set_ioport("IN8");
+	te7750.out_port8_cb().set(FUNC(gokidetor_state::out8_w));
+	te7750.out_port9_cb().set(FUNC(gokidetor_state::out9_w));
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)

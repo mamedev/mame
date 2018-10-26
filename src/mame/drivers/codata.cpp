@@ -62,10 +62,11 @@ void codata_state::machine_reset()
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(codata_state::codata)
+void codata_state::codata(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	M68000(config, m_maincpu, XTAL(16'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &codata_state::mem_map);
 
 	upd7201_new_device& uart(UPD7201_NEW(config, "uart", 16_MHz_XTAL / 4));
 	uart.out_txda_callback().set("rs423a", FUNC(rs232_port_device::write_txd));
@@ -83,14 +84,14 @@ MACHINE_CONFIG_START(codata_state::codata)
 	timer.out5_cb().set("uart", FUNC(upd7201_new_device::rxcb_w));
 	timer.out5_cb().append("uart", FUNC(upd7201_new_device::txcb_w));
 
-	MCFG_DEVICE_ADD("rs423a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", upd7201_new_device, rxa_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", upd7201_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", upd7201_new_device, ctsa_w))
+	rs232_port_device &rs423a(RS232_PORT(config, "rs423a", default_rs232_devices, "terminal"));
+	rs423a.rxd_handler().set("uart", FUNC(upd7201_new_device::rxa_w));
+	rs423a.dsr_handler().set("uart", FUNC(upd7201_new_device::dcda_w));
+	rs423a.cts_handler().set("uart", FUNC(upd7201_new_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs423b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", upd7201_new_device, rxb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs423b(RS232_PORT(config, "rs423b", default_rs232_devices, nullptr));
+	rs423b.rxd_handler().set("uart", FUNC(upd7201_new_device::rxb_w));
+}
 
 /* ROM definition */
 ROM_START( codata )

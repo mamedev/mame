@@ -430,8 +430,7 @@ void einstein_state::einstein_io(address_map &map)
 	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
 	map(0x08, 0x08).mirror(0xff06).rw("vdp", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
 	map(0x09, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
-	map(0x10, 0x10).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x18, 0x1b).mirror(0xff04).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x20, 0x20).mirror(0xff00).rw(FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
 	map(0x21, 0x21).mirror(0xff00).w(FUNC(einstein_state::adcint_msk_w));
@@ -653,10 +652,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	ic_i060.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	// rs232 port
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IC_I060, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(IC_I060, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(IC_I060, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(IC_I060, FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set(IC_I060, FUNC(i8251_device::write_cts));
 
 	// floppy
 	WD1770(config, m_fdc, XTAL_X002);

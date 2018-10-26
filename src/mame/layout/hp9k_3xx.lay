@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Sven Schnelle
+Hewlett-Packard 9000/3xx Layout
+-->
+<mamelayout version="2">
+	<element name="background"><rect><color red="0.30" green="0.30" blue="0.30"/></rect></element>
+	<element name="ledr" defstate="0">
+		<disk state="0"><color red="1.0" green="0.0" blue="0.0"/></disk>
+		<disk state="1"><color red="0.2" green="0.2" blue="0.2"/></disk>
+	</element>
+	<element name="ledg" defstate="1">
+		<disk state="0"><color red="0.2" green="0.2" blue="0.2"/></disk>
+		<disk state="1"><color red="0.0" green="1.0" blue="0.0"/></disk>
+	</element>
+
+
+	<element name="led_diag_7s"> <text string="7"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="led_diag_6s"> <text string="6"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="led_diag_5s"> <text string="5"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="led_diag_4s"> <text string="4"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="led_diag_3s"> <text string="3"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="led_diag_2s"> <text string="2"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="led_diag_1s"> <text string="1"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="led_diag_0s"> <text string="0"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+
+	<element name="led_power_s"> <text string="Power"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+
+	<view name="HP9000/3xx">
+		<bezel element="background"><bounds left="0" top="768" right="1024" bottom="832"/></bezel>
+		<bezel name="led_diag_7" element="ledr"><bounds left="20" top="776" right="36" bottom="792"/></bezel>
+		<bezel name="led_diag_7s" element="led_diag_7s"><bounds left="20" top="800" right="36" bottom="816"/></bezel>
+		<bezel name="led_diag_6" element="ledr"><bounds left="40" top="776" right="56" bottom="792"/></bezel>
+		<bezel name="led_diag_6s" element="led_diag_6s"><bounds left="40" top="800" right="56" bottom="816"/></bezel>
+		<bezel name="led_diag_5" element="ledr"><bounds left="60" top="776" right="76" bottom="792"/></bezel>
+		<bezel name="led_diag_5s" element="led_diag_5s"><bounds left="60" top="800" right="76" bottom="816"/></bezel>
+		<bezel name="led_diag_4" element="ledr"><bounds left="80" top="776" right="96" bottom="792"/></bezel>
+		<bezel name="led_diag_4s" element="led_diag_4s"><bounds left="80" top="800" right="96" bottom="816"/></bezel>
+		<bezel name="led_diag_3" element="ledr"><bounds left="100" top="776" right="116" bottom="792"/></bezel>
+		<bezel name="led_diag_3s" element="led_diag_3s"><bounds left="100" top="800" right="116" bottom="816"/></bezel>
+		<bezel name="led_diag_2" element="ledr"><bounds left="120" top="776" right="136" bottom="792"/></bezel>
+		<bezel name="led_diag_2s" element="led_diag_2s"><bounds left="120" top="800" right="136" bottom="816"/></bezel>
+		<bezel name="led_diag_1" element="ledr"><bounds left="140" top="776" right="156" bottom="792"/></bezel>
+		<bezel name="led_diag_1s" element="led_diag_1s"><bounds left="140" top="800" right="156" bottom="816"/></bezel>
+		<bezel name="led_diag_0" element="ledr"><bounds left="160" top="776" right="176" bottom="792"/></bezel>
+		<bezel name="led_diag_0s" element="led_diag_0s"><bounds left="160" top="800" right="176" bottom="816"/></bezel>
+
+		<bezel name="led_power_s" element="led_power_s"><bounds left="980" top="800" right="1016" bottom="816"/></bezel>
+
+		<bezel name="led_power" element="ledg"><bounds left="990" top="776" right="1006" bottom="792"/></bezel>
+		<screen index="0"><bounds x="0" y="0" width="1024" height="768"/></screen>
+	</view>
+	<view name="XGA Screen">
+                <screen index="0">
+                        <bounds x="0" y="0" width="1024" height="768" />
+                </screen>
+	</view>
+</mamelayout>

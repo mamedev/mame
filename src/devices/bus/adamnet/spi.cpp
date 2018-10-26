@@ -82,7 +82,7 @@ MACHINE_CONFIG_START(adam_spi_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD(MC2661_TAG, MC2661, XTAL(4'915'200))
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
 	centronics.set_data_input_buffer("cent_data_in");

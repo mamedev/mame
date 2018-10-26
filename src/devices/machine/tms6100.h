@@ -20,10 +20,6 @@
 // 4-bit mode (mask option)
 // note: in 4-bit mode, use data_r, otherwise use data_line_r
 
-#define MCFG_TMS6100_4BIT_MODE() \
-	downcast<tms6100_device &>(*device).enable_4bit_mode(true);
-
-
 // pinout reference
 
 /*

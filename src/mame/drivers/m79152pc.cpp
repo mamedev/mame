@@ -30,6 +30,7 @@
 #include "machine/z80sio.h"
 #include "machine/clock.h"
 #include "sound/beep.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
@@ -193,7 +194,7 @@ void m79152pc_state::screen_draw_line(bitmap_ind16 &bitmap, unsigned y)
 	for (u16 x = ma; x < ma + 80; x++)
 	{
 		// BIT(attr, 3) should probably be blinking
-		// BIT(attr, 1) may be used for high-intensity text (
+		// BIT(attr, 1) may be used for high-intensity text
 		u8 chr = m_videoram[x];
 		u8 attr = m_attributes[x];
 		u8 gfx = m_chargen[(chr << 4) | (BIT(attr, 2) && ra == 15 ? 3 : ra)];
@@ -304,7 +305,19 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	mculatch.int_wr_callback().set(m_uart, FUNC(z80sio_device::ctsb_w)).invert();
 	mculatch.int_wr_callback().append(FUNC(m79152pc_state::latch_full_w));
 
-	I8255A(config, "ppi"); // NEC D8255AD-2
+	i8255_device &ppi(I8255A(config, "ppi")); // NEC D8255AD-2
+	ppi.out_pb_callback().set("printer", FUNC(centronics_device::write_data0)).bit(0);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data1)).bit(1);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data2)).bit(2);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data3)).bit(3);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data4)).bit(4);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data5)).bit(5);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data6)).bit(6);
+	ppi.out_pb_callback().append("printer", FUNC(centronics_device::write_data7)).bit(7);
+	ppi.out_pc_callback().set("printer", FUNC(centronics_device::write_strobe)).bit(1);
+
+	centronics_device &printer(CENTRONICS(config, "printer", centronics_devices, nullptr));
+	printer.ack_handler().set("ppi", FUNC(i8255_device::pc2_w));
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4'000'000));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -322,12 +335,12 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	m_uart->out_dtrb_callback().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_uart->out_rtsb_callback().set("modem", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsa_w))
-	MCFG_DEVICE_ADD("modem", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, z80sio_device, rxb_w))
-	//MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, z80sio_device, ctsb_w))
+	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", default_rs232_devices, "keyboard"));
+	keyboard.rxd_handler().set(m_uart, FUNC(z80sio_device::rxa_w));
+	keyboard.cts_handler().set(m_uart, FUNC(z80sio_device::ctsa_w));
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	modem.rxd_handler().set(m_uart, FUNC(z80sio_device::rxb_w));
+	//modem.cts_handler().set(m_uart, FUNC(z80sio_device::ctsb_w));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 1000);

@@ -146,7 +146,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		/* if SEL == 1 && BUSY == 1, we write data to internal registers */
 		else if ((data & 5) == 5)
 		{
-			m_ppi->write(space, m_nvram_address_latch & 0x03, m_parallel_data);
+			m_ppi->write(m_nvram_address_latch & 0x03, m_parallel_data);
 		}
 
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
@@ -170,7 +170,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", m_nvram_address_latch);
-			m_nvram_data_latch = m_ppi->read(space, m_nvram_address_latch & 0x03);
+			m_nvram_data_latch = m_ppi->read(m_nvram_address_latch & 0x03);
 		}
 
 		/* if SEL == 0, we read NVRAM */

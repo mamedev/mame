@@ -547,10 +547,10 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	m_usart[2]->txrdy_handler().set(m_pic1, FUNC(pic8259_device::ir4_w));
 	m_usart[2]->txd_handler().set("rs232_2", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart[0], mc2661_device, rx_w))
-	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart[2], mc2661_device, rx_w))
+	rs232_port_device &rs232_1(RS232_PORT(config, "rs232_1", default_rs232_devices, nullptr));
+	rs232_1.rxd_handler().set(m_usart[0], FUNC(mc2661_device::rx_w));
+	rs232_port_device &rs232_2(RS232_PORT(config, "rs232_2", default_rs232_devices, nullptr));
+	rs232_2.rxd_handler().set(m_usart[2], FUNC(mc2661_device::rx_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -1326,9 +1326,9 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	m_epci->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_epci->txemt_dschg_handler().set(FUNC(wangpc_state::epci_irq_w));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, wangpc_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, wangpc_state, fdc_drq))
+	UPD765A(config, m_fdc, false, false);
+	m_fdc->intrq_wr_callback().set(FUNC(wangpc_state::fdc_irq));
+	m_fdc->drq_wr_callback().set(FUNC(wangpc_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 
@@ -1342,8 +1342,8 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	INPUT_BUFFER(config, m_cent_data_in);
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCN2661_TAG, mc2661_device, rx_w))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_epci, FUNC(mc2661_device::rx_w));
 
 	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 

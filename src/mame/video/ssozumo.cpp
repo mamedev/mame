@@ -137,6 +137,8 @@ void ssozumo_state::video_start()
 			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	save_item(NAME(m_color_bank));
 }
 
 void ssozumo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

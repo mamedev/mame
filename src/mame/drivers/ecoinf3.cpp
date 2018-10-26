@@ -660,20 +660,18 @@ static INPUT_PORTS_START( ecoinf3 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
+void ecoinf3_state::ecoinf3_pyramid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
-
-	MCFG_DEVICE_PROGRAM_MAP(pyramid_memmap)
-	MCFG_DEVICE_IO_MAP(pyramid_portmap)
+	Z180(config, m_maincpu, 8000000); // certainly not a plain z80 at least, invalid opcodes for that
+	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf3_state::pyramid_memmap);
+	m_maincpu->set_addrmap(AS_IO, &ecoinf3_state::pyramid_portmap);
 
 	config.set_default_layout(layout_ecoinf3);
 
 	SPEAKER(config, "mono").front_center();
 
-
-	MCFG_DEVICE_ADD("sn1", SN76489, 4000000) // no idea what the sound chip is, this sounds terrible
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 0.30); // no idea what the sound chip is, this sounds terrible
 
 	i8255_device &ppia(I8255(config, "ppi8255_a"));
 	ppia.in_pa_callback().set(FUNC(ecoinf3_state::ppi8255_intf_a_read_a));
@@ -739,15 +737,15 @@ MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
 	ppih.in_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_h_read_c));
 	ppih.out_pc_callback().set(FUNC(ecoinf3_state::ppi8255_intf_h_write_c));
 
-	MCFG_DEVICE_ADD("reel0", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<3>))
-MACHINE_CONFIG_END
+	REEL(config, m_reels[0], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[0]->optic_handler().set(FUNC(ecoinf3_state::reel_optic_cb<0>));
+	REEL(config, m_reels[1], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[1]->optic_handler().set(FUNC(ecoinf3_state::reel_optic_cb<1>));
+	REEL(config, m_reels[2], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[2]->optic_handler().set(FUNC(ecoinf3_state::reel_optic_cb<2>));
+	REEL(config, m_reels[3], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[3]->optic_handler().set(FUNC(ecoinf3_state::reel_optic_cb<3>));
+}
 
 
 /********************************************************************************************************************

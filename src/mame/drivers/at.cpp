@@ -684,15 +684,15 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
 
 	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
-	keybc.system_reset_cb().set("wd7600", FUNC(wd7600_device::kbrst_w));
-	keybc.gate_a20_cb().set("wd7600", FUNC(wd7600_device::gatea20_w));
-	keybc.input_buffer_full_cb().set("wd7600", FUNC(wd7600_device::irq01_w));
-	keybc.keyboard_clock_cb().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	keybc.keyboard_data_cb().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+	keybc.hot_res().set("wd7600", FUNC(wd7600_device::kbrst_w));
+	keybc.gate_a20().set("wd7600", FUNC(wd7600_device::gatea20_w));
+	keybc.kbd_irq().set("wd7600", FUNC(wd7600_device::irq01_w));
+	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_clk_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
@@ -783,9 +783,10 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_VT82C496_ADD("chipset")
-	MCFG_VT82C496_CPU("maincpu")
-	MCFG_VT82C496_REGION("isa")
+	vt82c496_device &chipset(VT82C496(config, "chipset"));
+	chipset.set_cputag(m_maincpu);
+	chipset.set_ramtag(m_ram);
+	chipset.set_isatag("isa");
 MACHINE_CONFIG_END
 
 // Compaq Portable III

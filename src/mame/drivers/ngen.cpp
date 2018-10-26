@@ -320,18 +320,18 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 		break;
 	case 0x10c:
 		if(ACCESSING_BITS_0_7)
-			m_pic->write(space,0,data & 0xff);
+			m_pic->write(0,data & 0xff);
 		break;
 	case 0x10d:
 		if(ACCESSING_BITS_0_7)
-			m_pic->write(space,1,data & 0xff);
+			m_pic->write(1,data & 0xff);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
 		if(ACCESSING_BITS_0_7)
-			m_pit->write(space,offset-0x110,data & 0xff);
+			m_pit->write(offset-0x110,data & 0xff);
 		break;
 	case 0x141:
 		// bit 1 enables speaker?
@@ -346,12 +346,9 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 			m_crtc->register_w(space,0,data & 0xff);
 		break;
 	case 0x146:
-		if(ACCESSING_BITS_0_7)
-			m_viduart->data_w(space,0,data & 0xff);
-		break;
 	case 0x147:
 		if(ACCESSING_BITS_0_7)
-			m_viduart->control_w(space,0,data & 0xff);
+			m_viduart->write(offset & 1, data & 0xff);
 		break;
 	case 0x1a0:  // serial?
 		logerror("Serial(?) 0x1a0 write offset %04x data %04x mask %04x\n",offset,data,mem_mask);
@@ -395,18 +392,18 @@ READ16_MEMBER(ngen_state::peripheral_r)
 		break;
 	case 0x10c:
 		if(ACCESSING_BITS_0_7)
-			ret = m_pic->read(space,0);
+			ret = m_pic->read(0);
 		break;
 	case 0x10d:
 		if(ACCESSING_BITS_0_7)
-			ret = m_pic->read(space,1);
+			ret = m_pic->read(1);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
 		if(ACCESSING_BITS_0_7)
-			ret = m_pit->read(space,offset-0x110);
+			ret = m_pit->read(offset-0x110);
 		break;
 	case 0x141:
 		ret = m_periph141;
@@ -420,13 +417,10 @@ READ16_MEMBER(ngen_state::peripheral_r)
 			ret = m_crtc->register_r(space,0);
 		break;
 	case 0x146:
-		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->data_r(space,0);
-		break;
 	case 0x147:  // keyboard UART
-		// expects bit 0 to be set (UART transmit ready)
+		// status expects bit 0 to be set (UART transmit ready)
 		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->status_r(space,0);
+			ret = m_viduart->read(offset & 1);
 		break;
 	case 0x1a0:  // I/O control register?
 		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Bit 6 is set during a transfer?
@@ -528,7 +522,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x0a:
 		case 0x0b:
 			if(ACCESSING_BITS_0_7)
-				m_fdc_timer->write(space,offset-0x08,data & 0xff);
+				m_fdc_timer->write(offset-0x08,data & 0xff);
 			break;
 		case 0x10:
 		case 0x11:
@@ -547,7 +541,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x1a:
 		case 0x1b:
 			if(ACCESSING_BITS_0_7)
-				m_hdc_timer->write(space,offset-0x18,data & 0xff);
+				m_hdc_timer->write(offset-0x18,data & 0xff);
 			break;
 	}
 }
@@ -577,7 +571,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x0a:
 		case 0x0b:
 			if(ACCESSING_BITS_0_7)
-				ret = m_fdc_timer->read(space,offset-0x08);
+				ret = m_fdc_timer->read(offset-0x08);
 			break;
 		case 0x10:
 		case 0x11:
@@ -596,7 +590,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x1a:
 		case 0x1b:
 			if(ACCESSING_BITS_0_7)
-				ret = m_hdc_timer->read(space,offset-0x18);
+				ret = m_hdc_timer->read(offset-0x18);
 			break;
 	}
 
@@ -791,13 +785,10 @@ READ16_MEMBER( ngen_state::b38_keyboard_r )
 	switch(offset)
 	{
 	case 0:
-		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->data_r(space,0);
-		break;
 	case 1:  // keyboard UART
-		// expects bit 0 to be set (UART transmit ready)
+		// status expects bit 0 to be set (UART transmit ready)
 		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->status_r(space,0);
+			ret = m_viduart->read(offset & 1);
 		break;
 	}
 	return ret;
@@ -808,12 +799,9 @@ WRITE16_MEMBER( ngen_state::b38_keyboard_w )
 	switch(offset)
 	{
 	case 0:
-		if(ACCESSING_BITS_0_7)
-			m_viduart->data_w(space,0,data & 0xff);
-		break;
 	case 1:
 		if(ACCESSING_BITS_0_7)
-			m_viduart->control_w(space,0,data & 0xff);
+			m_viduart->write(offset & 1, data & 0xff);
 		break;
 	}
 }
@@ -829,7 +817,7 @@ READ16_MEMBER( ngen_state::b38_crtc_r )
 		break;
 	case 1:
 		if(ACCESSING_BITS_0_7)
-			ret = m_viduart->data_r(space,0);
+			ret = m_viduart->data_r();
 		break;
 	}
 	return ret;
@@ -985,17 +973,17 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	m_iouart->out_rtsa_callback().set("rs232_a", FUNC(rs232_port_device::write_rts));
 	m_iouart->out_rtsb_callback().set("rs232_b", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232_a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("iouart", upd7201_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("iouart", upd7201_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("iouart", upd7201_device, dcda_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("iouart", upd7201_device, ria_w))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232_a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_iouart, FUNC(upd7201_device::rxa_w));
+	rs232a.cts_handler().set(m_iouart, FUNC(upd7201_device::ctsa_w));
+	rs232a.dcd_handler().set(m_iouart, FUNC(upd7201_device::dcda_w));
+	rs232a.ri_handler().set(m_iouart, FUNC(upd7201_device::ria_w));
 
-	MCFG_DEVICE_ADD("rs232_b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("iouart", upd7201_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("iouart", upd7201_device, ctsb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("iouart", upd7201_device, dcdb_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("iouart", upd7201_device, rib_w))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232_b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_iouart, FUNC(upd7201_device::rxb_w));
+	rs232b.cts_handler().set(m_iouart, FUNC(upd7201_device::ctsb_w));
+	rs232b.dcd_handler().set(m_iouart, FUNC(upd7201_device::dcdb_w));
+	rs232b.ri_handler().set(m_iouart, FUNC(upd7201_device::rib_w));
 
 	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
 
@@ -1016,8 +1004,8 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
 //  m_viduart->txempty_handler().set(m_pic, FUNC(pic8259_device::ir4_w));
 	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
-	MCFG_DEVICE_ADD("keyboard", RS232_PORT, keyboard, "ngen")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_viduart, i8251_device, write_rxd))
+	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
+	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
 	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen_state,timer_clk_out))
@@ -1097,17 +1085,17 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	m_iouart->out_rtsa_callback().set("rs232_a", FUNC(rs232_port_device::write_rts));
 	m_iouart->out_rtsb_callback().set("rs232_b", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232_a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("iouart", upd7201_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("iouart", upd7201_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("iouart", upd7201_device, dcda_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("iouart", upd7201_device, ria_w))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232_a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_iouart, FUNC(upd7201_device::rxa_w));
+	rs232a.cts_handler().set(m_iouart, FUNC(upd7201_device::ctsa_w));
+	rs232a.dcd_handler().set(m_iouart, FUNC(upd7201_device::dcda_w));
+	rs232a.ri_handler().set(m_iouart, FUNC(upd7201_device::ria_w));
 
-	MCFG_DEVICE_ADD("rs232_b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("iouart", upd7201_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("iouart", upd7201_device, ctsb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("iouart", upd7201_device, dcdb_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("iouart", upd7201_device, rib_w))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232_b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_iouart, FUNC(upd7201_device::rxb_w));
+	rs232b.cts_handler().set(m_iouart, FUNC(upd7201_device::ctsb_w));
+	rs232b.dcd_handler().set(m_iouart, FUNC(upd7201_device::dcdb_w));
+	rs232b.ri_handler().set(m_iouart, FUNC(upd7201_device::rib_w));
 
 	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
 
@@ -1128,8 +1116,8 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
 //  m_viduart->txempty_handler().set("pic", FUNC(pic8259_device::ir4_w));
 	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
-	MCFG_DEVICE_ADD("keyboard", RS232_PORT, keyboard, "ngen")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_viduart, i8251_device, write_rxd))
+	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
+	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
 	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ngen386_state,timer_clk_out))

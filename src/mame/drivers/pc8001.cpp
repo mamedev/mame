@@ -188,8 +188,7 @@ void pc8001_state::pc8001_io(address_map &map)
 	map(0x08, 0x08).portr("Y8");
 	map(0x09, 0x09).portr("Y9");
 	map(0x10, 0x10).mirror(0x0f).w(FUNC(pc8001_state::port10_w));
-	map(0x20, 0x20).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x30, 0x30).mirror(0x0f).w(FUNC(pc8001_state::port30_w));
 	map(0x40, 0x40).mirror(0x0f).rw(FUNC(pc8001_state::port40_r), FUNC(pc8001_state::port40_w));
 	map(0x50, 0x51).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
@@ -508,7 +507,7 @@ MACHINE_CONFIG_START(pc8001_state::pc8001)
 	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
 	m_dma->out_iow_cb<2>().set(UPD3301_TAG, FUNC(upd3301_device::dack_w));
 
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
@@ -556,7 +555,7 @@ MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
 	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
 	m_dma->out_iow_cb<2>().set(UPD3301_TAG, FUNC(upd3301_device::dack_w));
 
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
 	MCFG_UPD3301_CHARACTER_WIDTH(8)

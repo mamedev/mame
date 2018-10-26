@@ -961,13 +961,7 @@ void hp64k_state::hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state)
 
 READ16_MEMBER(hp64k_state::hp64k_usart_r)
 {
-		uint16_t tmp;
-
-		if ((offset & 1) == 0) {
-				tmp = m_uart->status_r(space , 0);
-		} else {
-				tmp = m_uart->data_r(space , 0);
-		}
+		uint16_t tmp = m_uart->read(~offset & 1);
 
 		// bit 8 == bit 7 rear panel switches (modem/terminal) ???
 
@@ -982,11 +976,7 @@ READ16_MEMBER(hp64k_state::hp64k_usart_r)
 
 WRITE16_MEMBER(hp64k_state::hp64k_usart_w)
 {
-		if ((offset & 1) == 0) {
-				m_uart->control_w(space , 0 , (uint8_t)(data & 0xff));
-		} else {
-				m_uart->data_w(space , 0 , (uint8_t)(data & 0xff));
-		}
+		m_uart->write(~offset & 1, data & 0xff);
 }
 
 WRITE_LINE_MEMBER(hp64k_state::hp64k_rxrdy_w)
@@ -1385,11 +1375,12 @@ static void hp64k_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(hp64k_state::hp64k)
-	MCFG_DEVICE_ADD("cpu" , HP_5061_3011 , 6250000)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
-	MCFG_DEVICE_IO_MAP(cpu_io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp64k_state , hp64k_irq_callback)
-	MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	HP_5061_3011(config , m_cpu , 6250000);
+	m_cpu->set_rw_cycles(6 , 6);
+	m_cpu->set_relative_mode(true);
+	m_cpu->set_addrmap(AS_PROGRAM , &hp64k_state::cpu_mem_map);
+	m_cpu->set_addrmap(AS_IO , &hp64k_state::cpu_io_map);
+	m_cpu->set_irq_acknowledge_callback(FUNC(hp64k_state::hp64k_irq_callback));
 
 	// Actual keyboard refresh rate should be between 1 and 2 kHz
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", hp64k_state, hp64k_kb_scan, attotime::from_hz(100))

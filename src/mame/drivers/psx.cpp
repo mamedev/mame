@@ -23,6 +23,7 @@
 #include "video/psx.h"
 
 #include "debugger.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -518,8 +519,8 @@ void psx1_state::subcpu_map(address_map &map)
 
 MACHINE_CONFIG_START(psx1_state::psj)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( psx_map )
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &psx1_state::psx_map);
 
 	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
@@ -529,13 +530,16 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
 	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
 
-	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_txd))
+	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
+	sio0.dtr_handler().set("controllers", FUNC(psxcontrollerports_device::write_dtr));
+	sio0.sck_handler().set("controllers", FUNC(psxcontrollerports_device::write_sck));
+	sio0.txd_handler().set("controllers", FUNC(psxcontrollerports_device::write_txd));
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -568,8 +572,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psx1_state::pse)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( psx_map)
+	CXD8530AQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &psx1_state::psx_map);
 
 	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
@@ -579,14 +583,17 @@ MACHINE_CONFIG_START(psx1_state::pse)
 	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
 	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
 
-	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_txd))
+	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
+	sio0.dtr_handler().set("controllers", FUNC(psxcontrollerports_device::write_dtr));
+	sio0.sck_handler().set("controllers", FUNC(psxcontrollerports_device::write_sck));
+	sio0.txd_handler().set("controllers", FUNC(psxcontrollerports_device::write_txd));
 
 	/* video hardware */
 	/* TODO: visible area and refresh rate */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -171,7 +171,7 @@ const int m37710_cpu_device::m37710_irq_levels[M37710_LINE_MAX] =
 	0x77,   // Timer A2     14
 	0x76,   // Timer A1     15
 	0x75,   // Timer A0     16
-	0x7f,                                                                                                                                                                                          // IRQ 2         13
+	0x7f,   // IRQ 2        13
 	0x7e,   // IRQ 1        18
 	0x7d,   // IRQ 0        19
 
@@ -692,7 +692,7 @@ WRITE8_MEMBER(m37710_cpu_device::m37710_internal_w)
 	}
 }
 
-const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes[4] =
+const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes[4] =
 {
 	m37710i_opcodes_M0X0,
 	m37710i_opcodes_M0X1,
@@ -700,7 +700,7 @@ const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes[4] =
 	m37710i_opcodes_M1X1,
 };
 
-const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes2[4] =
+const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes2[4] =
 {
 	m37710i_opcodes42_M0X0,
 	m37710i_opcodes42_M0X1,
@@ -708,7 +708,7 @@ const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes2[4] =
 	m37710i_opcodes42_M1X1,
 };
 
-const m37710_cpu_device::opcode_func *m37710_cpu_device::m37710i_opcodes3[4] =
+const m37710_cpu_device::opcode_func *const m37710_cpu_device::m37710i_opcodes3[4] =
 {
 	m37710i_opcodes89_M0X0,
 	m37710i_opcodes89_M0X1,

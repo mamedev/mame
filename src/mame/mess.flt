@@ -203,6 +203,7 @@ elektronmono.cpp
 elf.cpp
 elwro800.cpp
 emate.cpp
+emma2.cpp
 enmirage.cpp
 ep64.cpp
 esprit.cpp
@@ -220,6 +221,8 @@ evmbug.cpp
 excali64.cpp
 exelv.cpp
 exp85.cpp
+facit4440.cpp
+falco5220.cpp
 fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
@@ -265,6 +268,7 @@ h8.cpp
 h89.cpp
 harriet.cpp
 hazeltin.cpp
+hazl1420.cpp
 hec2hrp.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
@@ -287,6 +291,7 @@ hp48.cpp
 hp49gp.cpp
 hp64k.cpp
 hp700.cpp
+hp9825.cpp
 hp9845.cpp
 hp9k.cpp
 hp9k_3xx.cpp
@@ -308,7 +313,6 @@ icatel.cpp
 icebox.cpp
 ie15.cpp
 if800.cpp
-imds.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -327,12 +331,15 @@ iq151.cpp
 iqunlim.cpp
 iris3130.cpp
 irisha.cpp
+is48x.cpp
 isbc.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
+itt1700.cpp
 itt3030.cpp
 jade.cpp
+jazz.cpp
 jonos.cpp
 jr100.cpp
 jr200.cpp
@@ -359,6 +366,7 @@ lc80.cpp
 lcmate2.cpp
 leapster.cpp
 learnwin.cpp
+lee1214.cpp
 lft.cpp
 lg-dvd.cpp
 lilith.cpp
@@ -418,6 +426,7 @@ minicom.cpp
 miniforce.cpp
 miniframe.cpp
 minitel_2_rpic.cpp
+mips.cpp
 mits680b.cpp
 mk1.cpp
 mk14.cpp
@@ -469,6 +478,7 @@ nes.cpp
 nes_vt.cpp
 newbrain.cpp
 next.cpp
+nforcepc.cpp
 ngen.cpp
 ngp.cpp
 nokia_3310.cpp
@@ -630,6 +640,7 @@ sc2.cpp
 scopus.cpp
 scorpion.cpp
 scv.cpp
+sdk51.cpp
 sdk80.cpp
 sdk85.cpp
 sdk86.cpp
@@ -640,6 +651,7 @@ segapm.cpp
 selz80.cpp
 sg1000.cpp
 sh4robot.cpp
+si5500.cpp
 sitcom.cpp
 sk1.cpp
 slc1.cpp

@@ -336,7 +336,7 @@ READ8_MEMBER( v1050_state::kb_data_r )
 
 READ8_MEMBER( v1050_state::kb_status_r )
 {
-	uint8_t val = m_uart_kb->status_r(space, 0);
+	uint8_t val = m_uart_kb->status_r();
 
 	return val | (m_keyavail ? 0x02 : 0x00);
 }
@@ -481,12 +481,10 @@ void v1050_state::v1050_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x84, 0x87).rw(m_ppi_disp, FUNC(i8255_device::read), FUNC(i8255_device::write));
-//  AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(I8251A_KB_TAG, i8251_device, data_r, data_w)
-//  AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(I8251A_KB_TAG, i8251_device, status_r, control_w)
+//  map(0x88, 0x89).rw(m_uart_kb, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x88, 0x88).r(FUNC(v1050_state::kb_data_r)).w(m_uart_kb, FUNC(i8251_device::data_w));
 	map(0x89, 0x89).r(FUNC(v1050_state::kb_status_r)).w(m_uart_kb, FUNC(i8251_device::control_w));
-	map(0x8c, 0x8c).rw(m_uart_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x8d, 0x8d).rw(m_uart_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x8c, 0x8d).rw(m_uart_sio, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x90, 0x93).rw(I8255A_MISC_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x94, 0x97).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write));
 	map(0x9c, 0x9f).rw(I8255A_RTC_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -1093,9 +1091,9 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	m_uart_sio->rxrdy_handler().set(FUNC(v1050_state::sio_rxrdy_w));
 	m_uart_sio->txrdy_handler().set(FUNC(v1050_state::sio_txrdy_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_SIO_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart_sio, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_uart_sio, FUNC(i8251_device::write_dsr));
 
 	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, 16_MHz_XTAL/4)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_sio_clock))

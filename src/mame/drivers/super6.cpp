@@ -443,7 +443,8 @@ void super6_state::machine_reset()
 //  MACHINE_CONFIG( super6 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(super6_state::super6)
+void super6_state::super6(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &super6_state::super6_mem);
@@ -474,10 +475,8 @@ MACHINE_CONFIG_START(super6_state::super6)
 	m_fdc->intrq_wr_callback().set(FUNC(super6_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(super6_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, super6_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, m_floppy0, super6_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, super6_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	Z80DART(config, m_dart, 24_MHz_XTAL / 4);
 	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
@@ -488,11 +487,11 @@ MACHINE_CONFIG_START(super6_state::super6)
 	m_dart->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
 
 	COM8116(config, m_brg, 5.0688_MHz_XTAL);
 	m_brg->fr_handler().set(m_dart, FUNC(z80dart_device::txca_w));
@@ -504,8 +503,8 @@ MACHINE_CONFIG_START(super6_state::super6)
 	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "super6")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("super6");
+}
 
 
 

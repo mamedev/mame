@@ -55,10 +55,10 @@
 //  CONSTANTS
 //============================================================
 
-const uint16_t renderer_bgfx::CACHE_SIZE = 1024;
-const uint32_t renderer_bgfx::PACKABLE_SIZE = 128;
-const uint32_t renderer_bgfx::WHITE_HASH = 0x87654321;
-const char* renderer_bgfx::WINDOW_PREFIX = "Window 0, ";
+uint16_t const renderer_bgfx::CACHE_SIZE = 1024;
+uint32_t const renderer_bgfx::PACKABLE_SIZE = 128;
+uint32_t const renderer_bgfx::WHITE_HASH = 0x87654321;
+char const *const renderer_bgfx::WINDOW_PREFIX = "Window 0, ";
 
 //============================================================
 //  MACROS

@@ -24,6 +24,7 @@
 #include "natkeyboard.h"
 #include "uiinput.h"
 #include "pluginopts.h"
+#include "softlist.h"
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
@@ -1986,6 +1987,7 @@ void lua_engine::initialize()
 			"manufacturer", &device_image_interface::manufacturer,
 			"year", &device_image_interface::year,
 			"software_list_name", &device_image_interface::software_list_name,
+			"software_parent", sol::property([](device_image_interface &di) { const software_info *si = di.software_entry(); return si ? si->parentname() : ""; }),
 			"image_type_name", &device_image_interface::image_type_name,
 			"load", &device_image_interface::load,
 			"unload", &device_image_interface::unload,

@@ -42,8 +42,7 @@ void b2m_state::b2m_io(address_map &map)
 	map(0x0c, 0x0c).rw(FUNC(b2m_state::b2m_localmachine_r), FUNC(b2m_state::b2m_localmachine_w));
 	map(0x10, 0x13).rw(FUNC(b2m_state::b2m_palette_r), FUNC(b2m_state::b2m_palette_w));
 	map(0x14, 0x15).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x1c, 0x1f).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 }
 
@@ -56,8 +55,7 @@ void b2m_state::b2m_rom_io(address_map &map)
 	map(0x0c, 0x0c).rw(FUNC(b2m_state::b2m_localmachine_r), FUNC(b2m_state::b2m_localmachine_w));
 	map(0x10, 0x13).rw(FUNC(b2m_state::b2m_palette_r), FUNC(b2m_state::b2m_palette_w));
 	map(0x14, 0x15).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 

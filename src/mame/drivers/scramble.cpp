@@ -111,22 +111,22 @@ void scramble_state::ckongs_map(address_map &map)
 
 READ8_MEMBER(scramble_state::mars_ppi8255_0_r)
 {
-	return m_ppi8255_0->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
+	return m_ppi8255_0->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 READ8_MEMBER(scramble_state::mars_ppi8255_1_r)
 {
-	return m_ppi8255_1->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
+	return m_ppi8255_1->read(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 WRITE8_MEMBER(scramble_state::mars_ppi8255_0_w)
 {
-	m_ppi8255_0->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+	m_ppi8255_0->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 WRITE8_MEMBER(scramble_state::mars_ppi8255_1_w)
 {
-	m_ppi8255_1->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
+	m_ppi8255_1->write(((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 void scramble_state::mars_map(address_map &map)
@@ -2293,7 +2293,7 @@ GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, init_mariner
 GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1981, 800fatha, mariner,  mariner,  800fath,  scramble_state, init_mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms (older)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, init_ckongs,       ROT90, "bootleg",             "Crazy Kong (Scramble hardware)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, empty_init,        ROT90, "bootleg",             "Crazy Kong (Scramble hardware)",     MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, mars,     0,        mars,     mars,     scramble_state, init_mars,         ROT90, "Artic",               "Mars",                               MACHINE_SUPPORTS_SAVE )
 

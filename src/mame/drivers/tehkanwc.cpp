@@ -932,7 +932,7 @@ ROM_START( tehkanwch )
 	ROM_LOAD( "worldcup_5.bin",   0x0000, 0x4000, CRC(e3112be2) SHA1(7859e51b4312dc5df01c88e1d97cf608abc7ca72) ) // 27128
 
 	ROM_REGION( 0x04000, "gfx1", 0 ) /* fg tiles */
-	ROM_LOAD( "worldcup_9.bin",  0x00000, 0x4000, CRC(79383e09) SHA1(cefc6483412bee9b01b210b690ed0335617b766c) ) // 27128
+	ROM_LOAD( "worldcup_9.bin",  0x00000, 0x4000, CRC(a9e274f8) SHA1(02b46e1b149a856f0be74a23faaeb792935b66c7) ) // 27128
 
 	ROM_REGION( 0x10000, "gfx2", 0 ) /* sprites */
 	ROM_LOAD( "worldcup_7.bin",  0x00000, 0x8000, CRC(055a5264) SHA1(fe294ba57c2c858952e2fab0be1b8859730846cb) ) // 24256
@@ -1004,6 +1004,10 @@ ROM_START( teedoff )
 ROM_END
 
 
+/* There are some dumps out there that only have the year hacked to 1986 and a little bunch of bytes
+   from the graphics zone. I think that not worth to support these hacks...
+*/
+ 
 
 GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )

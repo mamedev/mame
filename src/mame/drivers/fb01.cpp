@@ -82,8 +82,7 @@ void fb01_state::fb01_io(address_map &map)
 	map(0x01, 0x01).rw("ym2164", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 
 	// 10-11  USART uPD71051C  4MHz & 4MHz / 8
-	map(0x10, 0x10).rw(m_upd71051, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).rw(m_upd71051, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).rw(m_upd71051, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 	// 20     PANEL SWITCH
 	map(0x20, 0x20).portr("PANEL");

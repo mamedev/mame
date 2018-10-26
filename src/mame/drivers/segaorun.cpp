@@ -642,7 +642,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			return m_i8255->read(space, offset & 3);
+			return m_i8255->read(offset & 3);
 
 		case 0x10/2:
 		{
@@ -678,7 +678,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
-				m_i8255->write(space, offset & 3, data);
+				m_i8255->write(offset & 3, data);
 			return;
 
 		case 0x20/2:
@@ -1884,7 +1884,7 @@ ROM_END
 //*************************************************************************************************************************
 //  Super Hangon
 //  CPU: 68000 (317-????)
-//   GAME BD SUPER HANG-ON  834-6277-07
+//   GAME BD SUPER HANG-ON  834-6277-07 SUPER HANG ON
 //   CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
 //   VIDEO BD SUPER HANG-ON 837-6279-01
 //

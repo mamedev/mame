@@ -669,6 +669,10 @@ void m68000_base_device::postload()
 
 void m68000_base_device::m68k_cause_bus_error()
 {
+	m_mmu_tmp_buserror_fc = m_mmu_tmp_fc;
+	m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
+	m_mmu_tmp_buserror_sz = m_mmu_tmp_sz;
+
 	// Halt the cpu on berr when writing the stack frame.
 	if (m_run_mode == RUN_MODE_BERR_AERR_RESET_WSF)
 	{

@@ -1133,9 +1133,9 @@ MACHINE_CONFIG_START(taitojc_state::dendego)
 	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_dendego)
 
 	/* sound hardware */
-	SPEAKER(config, "subwoofer", 0.0, 0.0, 1.0);
+	SPEAKER(config, "vibration").subwoofer();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "subwoofer", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "vibration", 0.20)
 MACHINE_CONFIG_END
 
 

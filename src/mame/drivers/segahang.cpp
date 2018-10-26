@@ -167,7 +167,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 	switch (offset & 0x3020/2)
 	{
 		case 0x0000/2: // PPI @ 4B
-			return m_i8255_1->read(space, offset & 3);
+			return m_i8255_1->read(offset & 3);
 
 		case 0x1000/2: // Input ports and DIP switches
 		{
@@ -176,7 +176,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 		}
 
 		case 0x3000/2: // PPI @ 4C
-			return m_i8255_2->read(space, offset & 3);
+			return m_i8255_2->read(offset & 3);
 
 		case 0x3020/2: // ADC0804 data output
 			return m_adc_ports[m_adc_select].read_safe(0);
@@ -203,7 +203,7 @@ WRITE16_MEMBER( segahang_state::hangon_io_w )
 				return;
 
 			case 0x3000/2: // PPI @ 4C
-				m_i8255_2->write(space, offset & 3, data & 0xff);
+				m_i8255_2->write(offset & 3, data & 0xff);
 				return;
 
 			case 0x3020/2: // ADC0804
@@ -224,7 +224,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 	switch (offset & 0x0030/2)
 	{
 		case 0x0000/2:
-			return m_i8255_1->read(space, offset & 3);
+			return m_i8255_1->read(offset & 3);
 
 		case 0x0010/2: // Input ports and DIP switches
 		{
@@ -234,7 +234,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 
 		case 0x0020/2: // PPI @ 4C
 			if (offset == 2) return 0;
-			return m_i8255_2->read(space, offset & 3);
+			return m_i8255_2->read(offset & 3);
 
 		case 0x0030/2: // ADC0804 data output
 			return m_adc_ports[m_adc_select].read_safe(0);
@@ -262,7 +262,7 @@ WRITE16_MEMBER( segahang_state::sharrier_io_w )
 				return;
 
 			case 0x0020/2: // PPI @ 4C
-				m_i8255_2->write(space, offset & 3, data & 0xff);
+				m_i8255_2->write(offset & 3, data & 0xff);
 				return;
 
 			case 0x0030/2: // ADC0804
@@ -362,7 +362,7 @@ void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			m_i8255_1->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+			m_i8255_1->write(param >> 8, param & 0xff);
 			break;
 	}
 }
@@ -1027,7 +1027,11 @@ MACHINE_CONFIG_END
 //   ASSY CPU BD 834-5704-01
 //   ASSY CONTROL BD 834-5668
 //   ASSY ROM BD 834-5669
-//   ASSY SOUND BD 834-5670
+//   ASSY SOUND BD 834-5670-01 (stickered 834-5706-01 HANG ON)
+//
+// PCBs also found stickered as:
+//   834-5667-01 HANG ON REV.A
+//   (FOR SIT-DOWN UP-RIGHT)
 //
 ROM_START( hangon )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -1082,7 +1086,7 @@ ROM_END
 //   ASSY CPU BD 834-5704-01
 //   ASSY CONTROL BD 834-5668
 //   ASSY ROM BD 834-5669
-//   ASSY SOUND BD 834-5670
+//   ASSY SOUND BD 834-5670-01 (stickered 834-5706-01 HANG ON)
 //
 ROM_START( hangon1 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -1134,14 +1138,18 @@ ROM_END
 //  Hang On (Ride-On version)
 //  CPU: HD68000P8 (no custom Sega label)
 //
-//   ASSY CPU BD 834-5704, and stickers 834-5667 and REV A
+//   ASSY CPU BD 834-5704
 //   ASSY CONTROL BD 834-5668
 //   ASSY ROM BD 834-5669
-//   ASSY SOUND BD 834-5670
+//   ASSY SOUND BD 834-5670-01 (stickered 834-5706-01 HANG ON)
 //
 //   ROM & SOUND boards were missing, but Manual No. 420-5244 2nd Printing confirms they are the same with the same data / roms.
 //
-ROM_START( hangon2 ) // no labels on the main CPU roms just a black sticker, likely the result of repair job in 1995
+//  No labels on the main CPU roms just a black sticker, likely the result of repair job in 1995
+//  A second PCB has been seen with hand written labels with matching sum16 values listed, though not labelled as "A" revision
+//  Although the both PCBs were stickered 834-5667-01 REV.A, it's not likely correct for this rom set
+//
+ROM_START( hangon2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-6851a__,needs_verification.ic22", 0x000000, 0x8000, CRC(1e4d2217) SHA1(197d8939b7c9eea0496aecac55cce3dec51be042) ) // as per the manual
 	ROM_LOAD16_BYTE( "epr-6849a__,needs_verification.ic8",  0x000001, 0x8000, CRC(3793e50e) SHA1(ffcad02696ca6d67f6bd5001a0d4aa41e23e21bd) ) // as per the manual

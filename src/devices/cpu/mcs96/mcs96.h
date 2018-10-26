@@ -22,7 +22,13 @@ public:
 	enum {
 		MCS96_PC = 1,
 		MCS96_PSW,
-		MCS96_R       // 0x74 entries
+		MCS96_INT_PENDING,
+		MCS96_SP,
+		MCS96_AX, MCS96_AL, MCS96_AH,
+		MCS96_DX, MCS96_DL, MCS96_DH,
+		MCS96_BX, MCS96_BL, MCS96_BH,
+		MCS96_CX, MCS96_CL, MCS96_CH,
+		MCS96_LAST_REG = MCS96_CH
 	};
 
 protected:
@@ -42,7 +48,7 @@ protected:
 	};
 
 
-	mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width);
+	mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width, address_map_constructor regs_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -63,9 +69,10 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	address_space_config program_config;
-	address_space *program;
+	address_space_config program_config, regs_config;
+	address_space *program, *regs;
 	std::function<u8 (offs_t address)> m_pr8;
+	required_shared_ptr<u16> register_file;
 
 	int icount, bcount, inst_state, cycles_scaling;
 	uint8_t pending_irq;
@@ -73,16 +80,11 @@ protected:
 	uint16_t OP1;
 	uint8_t OP2, OP3, OPI;
 	uint32_t TMP;
-	uint16_t R[0x74];
 	bool irq_requested;
 
 	virtual void do_exec_full() = 0;
 	virtual void do_exec_partial() = 0;
 	virtual void internal_update(uint64_t current_time) = 0;
-	virtual void io_w8(uint8_t adr, uint8_t data) = 0;
-	virtual void io_w16(uint8_t adr, uint16_t data) = 0;
-	virtual uint8_t io_r8(uint8_t adr) = 0;
-	virtual uint16_t io_r16(uint8_t adr) = 0;
 
 	void recompute_bcount(uint64_t event_time);
 
@@ -90,6 +92,11 @@ protected:
 	inline void next_noirq(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH_NOIRQ; }
 	void check_irq();
 	inline uint8_t read_pc() { return m_pr8(PC++); }
+
+	void int_mask_w(u8 data);
+	u8 int_mask_r();
+	void int_pending_w(u8 data);
+	u8 int_pending_r();
 
 	void reg_w8(uint8_t adr, uint8_t data);
 	void reg_w16(uint8_t adr, uint16_t data);

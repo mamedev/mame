@@ -133,8 +133,7 @@ void sagitta180_state::maincpu_map(address_map &map)
 void sagitta180_state::maincpu_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("DSW");
-	map(0x20, 0x20).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x30, 0x31).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x40, 0x48).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 }
@@ -192,10 +191,10 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 19218)); // 19218 / 19222 ? guesses...
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));

@@ -1157,12 +1157,12 @@ MACHINE_CONFIG_START(missile_state::missile)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 8)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(missile_state, screen_update_missile)
 	MCFG_SCREEN_PALETTE("palette")

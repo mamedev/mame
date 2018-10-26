@@ -203,12 +203,12 @@ WRITE16_MEMBER(m20_state::port21_w)
 
 READ16_MEMBER(m20_state::m20_i8259_r)
 {
-	return m_i8259->read(space, offset)<<1;
+	return m_i8259->read(offset)<<1;
 }
 
 WRITE16_MEMBER(m20_state::m20_i8259_w)
 {
-	m_i8259->write(space, offset, (data>>1));
+	m_i8259->write(offset, (data>>1));
 }
 
 WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
@@ -841,11 +841,11 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_DEVICE_ADD(m_i8259, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, m20_state, int_w))
 
-	MCFG_DEVICE_ADD("kbd", RS232_PORT, keyboard, "m20")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_1", i8251_device, write_rxd))
+	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard, "m20"));
+	kbd.rxd_handler().set(m_kbdi8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_2", i8251_device, write_rxd))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_ttyi8251, FUNC(i8251_device::write_rxd));
 
 	MCFG_DEVICE_ADD("apb", M20_8086, "maincpu", m_i8259, RAM_TAG)
 

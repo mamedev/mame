@@ -766,15 +766,15 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	m_uart8274->out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir7_w));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8274, i8274_new_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxa_w));
+	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcda_w));
+	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8274, i8274_new_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxb_w));
+	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcdb_w));
+	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsb_w));
 
 	I8255A(config, "ppi", 0);
 

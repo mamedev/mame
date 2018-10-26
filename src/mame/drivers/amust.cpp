@@ -193,10 +193,8 @@ void amust_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x02, 0x02).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x03, 0x03).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x02, 0x03).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0d, 0x0d).nopr().w(FUNC(amust_state::port0d_w));
@@ -480,17 +478,17 @@ MACHINE_CONFIG_START(amust_state::amust)
 	uart1.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("uart1", FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 
 	I8251(config, "uart2", 0);
 	//uart2.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//uart2.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	//uart2.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	PIT8253(config, "pit", 0);
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set(FUNC(amust_state::port04_r));

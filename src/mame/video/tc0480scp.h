@@ -57,12 +57,11 @@ public:
 	/* Undrfire needs to read this for a sprite/tile priority hack */
 	DECLARE_READ8_MEMBER( pri_reg_r );
 
-	void postload();
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state

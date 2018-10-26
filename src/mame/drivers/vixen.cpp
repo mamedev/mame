@@ -292,8 +292,7 @@ void vixen_state::vixen_io(address_map &map)
 	map(0x18, 0x18).mirror(0x07).r(FUNC(vixen_state::ieee488_r));
 	map(0x20, 0x21).mirror(0x04).w(m_io_i8155, FUNC(i8155_device::ale_w));
 	map(0x28, 0x28).mirror(0x05).rw(m_io_i8155, FUNC(i8155_device::read), FUNC(i8155_device::write));
-	map(0x30, 0x30).mirror(0x06).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x31, 0x31).mirror(0x06).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x30, 0x31).mirror(0x06).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x38, 0x38).mirror(0x07).r(FUNC(vixen_state::port3_r));
 //  AM_RANGE(0xf0, 0xff) Hard Disk?
 }
@@ -776,15 +775,15 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	i8155_io.out_to_callback().set(FUNC(vixen_state::io_i8155_to_w));
 
 	I8251(config, m_usart, 0);
-	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
-	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_usart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
 	m_usart->rxrdy_handler().set(FUNC(vixen_state::rxrdy_w));
 	m_usart->txrdy_handler().set(FUNC(vixen_state::txrdy_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(P8251A_TAG, i8251_device, write_dsr))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	m_rs232->dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr));
 
 	FD1797(config, m_fdc, 23.9616_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set(FUNC(vixen_state::fdc_intrq_w));

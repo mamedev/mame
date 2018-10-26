@@ -177,14 +177,14 @@ READ8_MEMBER(bbc_tube_zep100_device::io_r)
 	if (!machine().side_effects_disabled())
 		m_rom_enabled = !BIT(offset, 2);
 
-	data = m_ppi->read(space, offset & 0x03);
+	data = m_ppi->read(offset & 0x03);
 
 	return data;
 }
 
 WRITE8_MEMBER(bbc_tube_zep100_device::io_w)
 {
-	m_ppi->write(space, offset & 0x03, data);
+	m_ppi->write(offset & 0x03, data);
 }
 
 

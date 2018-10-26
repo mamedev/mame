@@ -233,7 +233,7 @@ INPUT_PORTS_END
 // This came from pinmame, even though there's no spb640 chip
 READ8_MEMBER( idsa_state::portb0_r )
 {
-	uint16_t data = m_speech->spb640_r(space, offset / 2);
+	uint16_t data = m_speech->spb640_r(offset / 2);
 	return offset % 2 ? (uint8_t)(data >> 8) : (uint8_t)(data & 0xff);
 }
 
@@ -251,9 +251,9 @@ WRITE8_MEMBER( idsa_state::ppi_control_w )
 {
 	//logerror("%s: AY1 port A = %02X\n", machine().describe_context(), data);
 	if (!BIT(data, 2))
-		m_ppi[0]->write(space, data & 0x03, m_ppi_data);
+		m_ppi[0]->write(data & 0x03, m_ppi_data);
 	if (!BIT(data, 3))
-		m_ppi[1]->write(space, data & 0x03, m_ppi_data);
+		m_ppi[1]->write(data & 0x03, m_ppi_data);
 }
 
 WRITE8_MEMBER( idsa_state::ppi_data_w )

@@ -469,7 +469,7 @@ READ8_MEMBER(turbo_state::buckrog_port_3_r)
 
 TIMER_CALLBACK_MEMBER(turbo_state::delayed_i8255_w)
 {
-	m_i8255_0->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+	m_i8255_0->write(param >> 8, param & 0xff);
 }
 
 
@@ -870,10 +870,10 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	m_i8255_3->in_pb_callback().set_ioport("DSW2");
 	m_i8255_3->out_pc_callback().set(FUNC(turbo_state::turbo_ppi3c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));	// unknown clock
-	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w));	// scan SL lines
-	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));	// display A&B
-	kbdc.in_rl_callback().set_ioport("DSW1");					// kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
+	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // IC125 - outputs passed through CN5
 	outlatch.q_out_cb<0>().set(FUNC(turbo_state::coin_meter_1_w));
@@ -915,10 +915,10 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::subroc3d_sound_b_w));
 	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::subroc3d_sound_c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));	// unknown clock
-	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w));	// scan SL lines
-	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));	// display A&B
-	kbdc.in_rl_callback().set_ioport("DSW1");					// kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
+	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
@@ -963,10 +963,10 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::buckrog_sound_b_w));
 	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::buckrog_ppi1c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));	// unknown clock
-	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w));	// scan SL lines
-	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));	// display A&B
-	kbdc.in_rl_callback().set_ioport("DSW1");					// kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
+	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)

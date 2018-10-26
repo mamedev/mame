@@ -331,7 +331,7 @@ static INPUT_PORTS_START( pacland )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SWB:3,2,1")
-	PORT_DIPSETTING(    0xe0, "30K 80K 130K 300K 500K 1M" )     // "A"
+	PORT_DIPSETTING(    0xe0, "30K 80K 150K 300K 500K 1M" )     // "A"
 	PORT_DIPSETTING(    0x80, "30K 80K every 100K" )            // "D"
 	PORT_DIPSETTING(    0x40, "30K 80K 150K" )                  // "F"
 	PORT_DIPSETTING(    0xc0, "30K 100K 200K 400K 600K 1M" )    // "B"

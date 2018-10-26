@@ -14,6 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/74157.h"
 #include "sound/msm5205.h"
+#include "video/bufsprite.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 #include "emupal.h"
@@ -54,7 +55,7 @@ public:
 private:
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 3> m_videoram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_memory_bank m_adpcm_bank;
 
 	/* video-related */
@@ -64,6 +65,7 @@ private:
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tile_bitmap_bg;
 	bitmap_ind16 m_tile_bitmap_fg;
+	bitmap_ind16 m_tile_bitmap_tx;
 	uint16_t      m_tx_scroll_x;
 	uint16_t      m_tx_scroll_y;
 	uint16_t      m_bg_scroll_x;
@@ -127,7 +129,9 @@ private:
 	DECLARE_VIDEO_START(gaiden);
 	DECLARE_VIDEO_START(drgnbowl);
 	DECLARE_VIDEO_START(raiga);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	uint32_t screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_raiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void descramble_drgnbowl(int descramble_cpu);

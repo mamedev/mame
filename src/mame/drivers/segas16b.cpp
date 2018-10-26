@@ -3787,16 +3787,17 @@ MACHINE_CONFIG_START(segas16b_state::system16b_fd1094)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segas16b_state::aceattacb_fd1094)
+void segas16b_state::aceattacb_fd1094(machine_config &config)
+{
 	system16b_fd1094(config);
 	// 834-6602 I/O board
-	MCFG_DEVICE_ADD("upd4701a1", UPD4701A, 0)
-	MCFG_DEVICE_ADD("upd4701a2", UPD4701A, 0)
+	UPD4701A(config, m_upd4701a[0]);
+	UPD4701A(config, m_upd4701a[1]);
 
 	CXD1095(config, m_cxdio, 0);
 	m_cxdio->in_porta_cb().set_ioport("HANDX1");
 	m_cxdio->in_portb_cb().set_ioport("HANDX2");
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(segas16b_state::system16b_i8751)
@@ -8197,6 +8198,9 @@ ROM_END
 //  Time Scanner, Sega System 16B
 //  CPU: 68000
 //  ROM Board type: 171-5358
+//  Sega game ID: 833-6207-01 TIME SCANNER
+//    Main board: 837-6224-01
+//     Rom board: 834-6223-01
 //
 ROM_START( timescan )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code

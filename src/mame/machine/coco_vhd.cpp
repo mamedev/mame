@@ -48,7 +48,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #define VHDSTATUS_OK                    0x00
 #define VHDSTATUS_NO_VHD_ATTACHED       0x02

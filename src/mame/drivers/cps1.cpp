@@ -1602,7 +1602,7 @@ INPUT_PORTS_END
      - 0xff14ab.w : energy (player 1)
      - 0xff156b.w : energy (player 2)
 */
-static INPUT_PORTS_START( mtwins )
+INPUT_PORTS_START( mtwins )
 	PORT_INCLUDE( cps1_3b )
 
 	PORT_MODIFY("IN0")
@@ -3427,9 +3427,9 @@ MACHINE_CONFIG_START(cps_state::forgottn)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(forgottn_map)
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("DIAL0")
-	MCFG_UPD4701_PORTY("DIAL1")
+	upd4701_device &upd4701(UPD4701A(config, "upd4701"));
+	upd4701.set_portx_tag("DIAL0");
+	upd4701.set_porty_tag("DIAL1");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::cps1_12MHz)

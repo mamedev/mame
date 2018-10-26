@@ -1763,6 +1763,7 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	ide.irq_handler().set(PCI_ID_NILE, FUNC(vrc5074_device::pci_intr_d));
 	//ide.set_pif(0x8f);
 
+	/* video hardware */
 	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(2);
 	voodoo.set_tmumem(4, 4);
@@ -1775,15 +1776,13 @@ MACHINE_CONFIG_START(vegas_state::vegascore)
 	SMC91C94(config, m_ethernet, 0);
 	m_ethernet->irq_handler().set(FUNC(vegas_state::ethernet_interrupt));
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	/* screen */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// Screeen size and timing is re-calculated later in voodoo card
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DEVICE(PCI_ID_VIDEO, voodoo_pci_device, screen_update)
-
-	/* sound hardware */
+	screen.set_refresh_hz(57);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
 MACHINE_CONFIG_END
 
 

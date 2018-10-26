@@ -219,8 +219,7 @@ void mc1502_state::mc1502_map(address_map &map)
 void mc1502_state::mc1502_io(address_map &map)
 {
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0028, 0x0028).rw(m_upd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0029, 0x0029).rw(m_upd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0028, 0x0029).rw(m_upd8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw(m_ppi8255n1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0068, 0x006B).rw(m_ppi8255n2, FUNC(i8255_device::read), FUNC(i8255_device::write));    // keyboard poll
@@ -271,10 +270,10 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	m_upd8251->txrdy_handler().set("pic8259", FUNC(pic8259_device::ir7_w));
 	m_upd8251->syndet_handler().set(FUNC(mc1502_state::mc1502_i8251_syndet));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("upd8251", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("upd8251", i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_upd8251, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_upd8251, FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set(m_upd8251, FUNC(i8251_device::write_cts));
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("maincpu")

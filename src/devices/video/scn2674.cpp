@@ -601,7 +601,13 @@ void scn2674_device::write_interrupt_mask(bool enabled, uint8_t bits)
 	if (BIT(changed_bits, 3))
 		LOGMASKED(LOG_INTR, "Line Zero IRQ %s\n", enabled ? "enabled" : "disabled");
 	if (BIT(changed_bits, 4))
+	{
 		LOGMASKED(LOG_INTR, "V-Blank IRQ %s\n", enabled ? "enabled" : "disabled");
+
+		// hack to allow PC-X to get its first interrupt
+		if (BIT(bits, 4) && !m_display_enabled)
+			recompute_parameters();
+	}
 }
 
 void scn2674_device::write_delayed_command(uint8_t data)
@@ -919,9 +925,10 @@ WRITE8_MEMBER( scn2674_device::write )
 
 void scn2674_device::recompute_parameters()
 {
-	int horiz_pix_total = ((m_equalizing_constant + (m_horz_sync_width << 1)) << 1) * m_hpixels_per_column;
+	int horiz_chars_total = (m_equalizing_constant + (m_horz_sync_width << 1)) << 1;
+	int horiz_pix_total = horiz_chars_total * m_hpixels_per_column;
 	int vert_pix_total = m_rows_per_screen * m_scanline_per_char_row + m_vert_front_porch + m_vert_back_porch + m_vsync_width;
-	attoseconds_t refresh = screen().frame_period().attoseconds();
+	attoseconds_t refresh = screen().frame_period().as_attoseconds();
 	int max_visible_x = (m_character_per_row * m_hpixels_per_column) - 1;
 	int max_visible_y = (m_rows_per_screen * m_scanline_per_char_row) - 1;
 
@@ -931,10 +938,10 @@ void scn2674_device::recompute_parameters()
 		return;
 	}
 
-	LOGMASKED(LOG_IR, "width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	//attoseconds_t refresh = clocks_to_attotime(horiz_chars_total * vert_pix_total).as_attoseconds();
+	LOGMASKED(LOG_IR, "width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, ATTOSECONDS_TO_HZ(refresh));
 
-	rectangle visarea;
-	visarea.set(0, max_visible_x, 0, max_visible_y);
+	rectangle visarea(0, max_visible_x, 0, max_visible_y);
 	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 	m_scanline_timer->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());

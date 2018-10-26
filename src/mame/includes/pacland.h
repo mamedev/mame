@@ -40,8 +40,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_fg_bitmap;
-	bitmap_ind16 m_sprite1_bitmap;
-	bitmap_ind16 m_sprite2_bitmap;
+	bitmap_ind16 m_sprite_bitmap;
 	std::unique_ptr<uint32_t[]> m_transmask[3];
 	uint16_t m_scroll0;
 	uint16_t m_scroll1;

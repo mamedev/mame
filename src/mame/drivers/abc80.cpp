@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abc80_cards, "abcexp")
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(abc80_state, kbd_w))
 

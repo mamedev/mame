@@ -482,29 +482,40 @@ void snug_bwg_device::set_drive()
 {
 	LOGMASKED(LOG_CRU, "new DSEL = %d\n", m_DSEL);
 
-	if ((m_DSEL != 0) && (m_DSEL != 1) && (m_DSEL != 2) && (m_DSEL != 4) && (m_DSEL != 8))
+	int bits = m_DSEL & 0x0f;
+	int num = -1;
+
+	// If the selected floppy drive is not attached, remove that line
+	if (m_floppy[3] == nullptr) bits &= 0x07;  // 0111
+	if (m_floppy[2] == nullptr) bits &= 0x0b;  // 1011
+	if (m_floppy[1] == nullptr) bits &= 0x0d;  // 1101
+	if (m_floppy[0] == nullptr) bits &= 0x0e;  // 1110
+
+	if ((bits != 0) && (bits != 1) && (bits != 2) && (bits != 4) && (bits != 8))
 		LOGMASKED(LOG_WARN, "Warning - multiple drives selected\n");
 
 	// The schematics do not reveal any countermeasures against multiple selection
 	// so we assume that the highest value wins.
 
-	int bits = m_DSEL & 0x0f;
-	int i = -1;
-
-	while (bits != 0)
-	{
-		bits >>= 1;
-		i++;
-	}
-	if (i != -1)
-	{
-		m_current_floppy = m_floppy[i];
-		LOGMASKED(LOG_CRU, "Selected floppy %d\n", i);
-	}
-	else
+	if (bits==0)
 	{
 		m_current_floppy = nullptr;
 		LOGMASKED(LOG_CRU, "All drives deselected\n");
+	}
+	else
+	{
+		if ((bits & 0x08)!=0) num = 3;
+		else
+		{
+			if ((bits & 0x04)!=0) num = 2;
+			else
+			{
+				if ((bits & 0x02)!=0) num = 1;
+				else num = 0;
+			}
+		}
+		LOGMASKED(LOG_CRU, "Selected floppy DSK%d\n", num+1);
+		m_current_floppy = m_floppy[num];
 	}
 	m_wd1773->set_floppy(m_current_floppy);
 }

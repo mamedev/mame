@@ -18,7 +18,6 @@ public:
 	namcoc68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto in_pb_callback() { return m_in_pb_cb.bind(); }
-	auto in_pb2_callback() { return m_in_pb2_cb.bind(); }
 
 	auto in_pc_callback() { return m_in_pc_cb.bind(); }
 	auto in_ph_callback() { return m_in_ph_cb.bind(); }
@@ -57,7 +56,6 @@ private:
 	required_device<m37450_device> m_mcu;
 
 	devcb_read8        m_in_pb_cb;
-	devcb_read8        m_in_pb2_cb;
 
 	devcb_read8        m_in_pc_cb;
 	devcb_read8        m_in_ph_cb;
@@ -76,12 +74,9 @@ private:
 	DECLARE_READ8_MEMBER(dpram_byte_r);
 	DECLARE_WRITE8_MEMBER(dpram_byte_w);
 
-	DECLARE_READ8_MEMBER(mcub_r) { return m_in_pb_cb(); }
-	DECLARE_READ8_MEMBER(mcub2_r) { return m_in_pb2_cb(); }
+	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_READ8_MEMBER(mcuc_r);
 
-
-	DECLARE_READ8_MEMBER(mcuc_r) { return m_in_pc_cb(); }
-	DECLARE_READ8_MEMBER(mcuh_r) { return m_in_ph_cb(); }
 	DECLARE_READ8_MEMBER(mcudsw_r) { return m_in_pdsw_cb(); }
 
 	DECLARE_READ8_MEMBER(mcudi0_r) { return m_port_dial_in_cb[0](); }

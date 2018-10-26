@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "machine/nscsi_cd.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
@@ -37,7 +37,6 @@ MACHINE_CONFIG_END
 
 void nscsi_cdrom_device::set_block_size(u32 block_size)
 {
-	assert_always(!started(), "block size should not be set after device start");
 	assert_always(bytes_per_sector % block_size == 0, "block size must be a factor of sector size");
 
 	bytes_per_block = block_size;
@@ -49,6 +48,7 @@ uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 	if(id != 2)
 		return nscsi_full_device::scsi_get_data(id, pos);
 	const int sector = (lba * bytes_per_block + pos) / bytes_per_sector;
+	const int extra_pos = (lba * bytes_per_block) % bytes_per_sector;
 	if(sector != cur_sector) {
 		cur_sector = sector;
 		if(!cdrom_read_data(cdrom, sector, sector_buffer, CD_TRACK_MODE1)) {
@@ -56,7 +56,26 @@ uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 			std::fill_n(sector_buffer, sizeof(sector_buffer), 0);
 		}
 	}
-	return sector_buffer[pos & (bytes_per_sector - 1)];
+	return sector_buffer[(pos + extra_pos) & (bytes_per_sector - 1)];
+}
+
+void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
+{
+	if(id != 2) {
+		nscsi_full_device::scsi_put_data(id, pos, data);
+		return;
+	}
+
+	// process mode parameter header and one block descriptor
+	if(pos < sizeof(mode_data)) {
+		mode_data[pos] = data;
+
+		// is this the last byte of the mode parameter block descriptor?
+		if(pos == sizeof(mode_data) - 1)
+			// is there exactly one block descriptor?
+			if(mode_data[3] == 8)
+				set_block_size((mode_data[9] << 16) | (mode_data[10] << 8) | (mode_data[11] << 0));
+	}
 }
 
 void nscsi_cdrom_device::return_no_cd()
@@ -112,6 +131,22 @@ void nscsi_cdrom_device::scsi_command()
 		int lun = get_lun(scsi_cmdbuf[1] >> 5);
 		LOG("command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
 					lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
+
+		/*
+		 * 7.5.3 Selection of an invalid logical unit
+		 *
+		 * The logical unit may not be valid because:
+		 * a) the target does not support the logical unit (e.g. some targets
+		 *    support only one peripheral device). In response to an INQUIRY
+		 *    command, the target shall return the INQUIRY data with the
+		 *    peripheral qualifier set to the value required in 8.2.5.1.
+		 *
+		 * If the logic from the specification above is applied, Sun SCSI probe
+		 * code gets confused and reports multiple valid logical units are
+		 * attached; proper behaviour is produced when check condition status
+		 * is returned with sense data ILLEGAL REQUEST and LOGICAL UNIT NOT
+		 * SUPPORTED.
+		 */
 		if(lun) {
 			bad_lun();
 			return;
@@ -144,6 +179,16 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 	}
+
+	case SC_MODE_SELECT_6:
+		LOG("command MODE SELECT 6 length %d\n", scsi_cmdbuf[4]);
+
+		// accept mode select parameter data
+		if(scsi_cmdbuf[4])
+			scsi_data_out(2, scsi_cmdbuf[4]);
+
+		scsi_status_complete(SS_GOOD);
+		break;
 
 	case SC_START_STOP_UNIT:
 		LOG("command %s UNIT%s\n", (scsi_cmdbuf[4] & 0x1) ? "START" : "STOP",
@@ -223,7 +268,7 @@ void nscsi_cdrom_device::scsi_command()
 		int pmin = page == 0x3f ? 0x00 : page;
 		for(int page=pmax; page >= pmin; page--) {
 			switch(page) {
-			case 0x00: // Unit attention parameters page (weird)
+			case 0x00: // Vendor specific (does not require page format)
 				scsi_cmdbuf[pos++] = 0x80; // PS, page id
 				scsi_cmdbuf[pos++] = 0x02; // Page length
 				scsi_cmdbuf[pos++] = 0x00; // Meh
