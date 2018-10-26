@@ -310,6 +310,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/exp/exp.h,BUSES["BBC_EXP"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_EXP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/exp/exp.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/exp/exp.h",
+		MAME_DIR .. "src/devices/bus/bbc/exp/mertec.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/exp/mertec.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/joyport/joyport.h,BUSES["BBC_JOYPORT"] = true
 ---------------------------------------------------
 

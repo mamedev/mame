@@ -43,7 +43,7 @@
 //#include "bus/bbc/internal/internal.h"
 #include "bus/bbc/tube/tube.h"
 #include "bus/bbc/userport/userport.h"
-//#include "bus/bbc/exp/exp.h"
+#include "bus/bbc/exp/exp.h"
 #include "bus/bbc/joyport/joyport.h"
 
 #include "bus/generic/slot.h"
@@ -86,7 +86,7 @@ public:
 		, m_1mhzbus(*this, "1mhzbus")
 		, m_userport(*this, "userport")
 //		, m_internal(*this, "internal")
-//		, m_exp(*this, "exp")
+		, m_exp(*this, "exp")
 		, m_rtc(*this, "rtc")
 		, m_i2cmem(*this, "i2cmem")
 		, m_fdc(*this, "fdc")
@@ -270,7 +270,7 @@ protected:
 	optional_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	optional_device<bbc_userport_slot_device> m_userport;
 	//optional_device<bbc_internal_slot_device> m_internal;
-	//optional_device<bbc_exp_slot_device> m_exp;
+	optional_device<bbc_exp_slot_device> m_exp;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<bbc_fdc_slot_device> m_fdc;

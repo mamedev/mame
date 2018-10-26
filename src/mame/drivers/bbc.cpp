@@ -298,9 +298,9 @@ void bbcm_state::bbcmc_bankdev(address_map &map)
 	map.unmap_value_high();
 	/* ACCCON TST bit - normal state */
 	map(0x0000, 0x03ff).rom().region("mos", 0x3c00);                                                                                  //    fc00-ffff                 OS ROM (continued)
-	//map(0x0000, 0x00ff).mirror(0x400).rw(m_exp, FUNC(bbc_exp_slot_device::fred_r), FUNC(bbc_exp_slot_device::fred_w));                //    fc00-fcff  Compact        FRED Address Page
-	//map(0x0100, 0x01ff).mirror(0x400).rw(m_exp, FUNC(bbc_exp_slot_device::jim_r), FUNC(bbc_exp_slot_device::jim_w));                  //    fd00-fdff  Compact        JIM Address Page
-	//map(0x0200, 0x02ff).mirror(0x400).rw(m_exp, FUNC(bbc_exp_slot_device::sheila_r), FUNC(bbc_exp_slot_device::sheila_w));            //    fd00-fdff  Compact        SHEILA Address Page
+	map(0x0000, 0x00ff).mirror(0x400).rw(m_exp, FUNC(bbc_exp_slot_device::fred_r), FUNC(bbc_exp_slot_device::fred_w));                //    fc00-fcff  Compact        FRED Address Page
+	map(0x0100, 0x01ff).mirror(0x400).rw(m_exp, FUNC(bbc_exp_slot_device::jim_r), FUNC(bbc_exp_slot_device::jim_w));                  //    fd00-fdff  Compact        JIM Address Page
+	map(0x0200, 0x02ff).mirror(0x400).rw(m_exp, FUNC(bbc_exp_slot_device::sheila_r), FUNC(bbc_exp_slot_device::sheila_w));            //    fd00-fdff  Compact        SHEILA Address Page
 	map(0x0200, 0x0200).mirror(0x406).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));                    //    fe00-fe07  6845 CRTC      Video controller
 	map(0x0201, 0x0201).mirror(0x406).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
 	map(0x0208, 0x020f).mirror(0x400).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));                          //    fe08-fe0f  6850 ACIA      Serial controller
@@ -1671,9 +1671,9 @@ void bbcm_state::bbcmc(machine_config &config)
 
 	/* user via */
 	m_via6522_1->readpb_handler().set(m_joyport, FUNC(bbc_joyport_slot_device::pb_r)).mask(0x1f);
-	//m_via6522_1->readpb_handler().append(m_exp, FUNC(bbc_exp_slot_device::pb_r)).mask(0xe0);
+	m_via6522_1->readpb_handler().append(m_exp, FUNC(bbc_exp_slot_device::pb_r)).mask(0xe0);
 	m_via6522_1->writepb_handler().set(m_joyport, FUNC(bbc_joyport_slot_device::pb_w)).mask(0x1f);
-	//m_via6522_1->writepb_handler().append(m_exp, FUNC(bbc_exp_slot_device::pb_w)).mask(0xe0);
+	m_via6522_1->writepb_handler().append(m_exp, FUNC(bbc_exp_slot_device::pb_w)).mask(0xe0);
 
 	/* cartridge sockets */
 	config.device_remove("cartslot1");
@@ -1699,9 +1699,9 @@ void bbcm_state::bbcmc(machine_config &config)
 	config.device_remove("cart_ls_m");
 
 	/* expansion ports */
-	//BBC_EXP_SLOT(config, m_exp, bbc_exp_devices, nullptr);
-	//m_exp->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
-	//m_exp->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
+	BBC_EXP_SLOT(config, m_exp, bbc_exp_devices, nullptr);
+	m_exp->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
+	m_exp->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 
 	BBC_JOYPORT_SLOT(config, m_joyport, bbc_joyport_devices, "joystick");
 	m_joyport->cb1_handler().set(m_via6522_1, FUNC(via6522_device::write_cb1));
