@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-/*
-    Konami 'ZR107' Hardware
+/*  Konami 'ZR107' Hardware
     Konami, 1995-1996
 
     Driver by Ville Linde
@@ -23,14 +22,6 @@
         Konami K056832 tilemap chip
         KS10071 (custom 3D pixel unit)
         KS10081 (custom 3D texel unit)
-
-    GN678 GFX board (same as in gticlub.c):
-    ----------------
-        Analog Devices ADSP-21062 SHARC DSP at 36MHz
-        Konami K001604 (2D tilemaps + 2x ROZ)
-        2x KS10071 (custom 3D pixel unit)
-        2x KS10081 (custom 3D texel unit)
-
 
     Known games on this hardware:
 
@@ -160,8 +151,15 @@ Midnight Run     477A12  477A11  477A16  477A15  477A14  477A13
 Jet Wave         - see note -
 Winding Heat     677A12  677A11  677A16  677A15  677A14  677A13
 
-Note: Jet Wave uses the lower board from GTI Club (GN678), and a ZR107(PWB(A)300769A top board.
-Check gticlub.c for details on the bottom board.
+Note: Jet Wave uses the cg board from GTI Club (GN678) See gticlub.cpp for details
+
+TODO:
+- Finish K056320 for linked cabinets
+- GX tilemaps cropped on windheat and midrun
+- windheat will sometimes reset at the end of a race with a glitched boot screen crashing shortly after 18R is checked bad
+- windheat's AI cars are always Toyota Tundras if traffic is enabled.
+- Random 3d graphic flickering. Happens less if the network ID is changed to 1.
+- Other small gaphical (and maybe SHARC) problems.
 
 */
 
@@ -1200,13 +1198,13 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, midnrunj, midnrun,  zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, midnruna, midnrun,  zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, windheata,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jetwave,  0,        jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnrunj, midnrun,  zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnruna, midnrun,  zr107,   midnrun,  zr107_state, init_zr107,   ROT0, "Konami", "Midnight Run: Road Fighters 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheata,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwave,  0,        jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
