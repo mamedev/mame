@@ -3599,7 +3599,7 @@ M68KMAKE_OP(chk2cmp2, 8, ., pcdi)
 		int32_t upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-		if (lower_bound > upper_bound || compare < 0)
+		if (lower_bound & 0x80)
 		{
 			lower_bound = (int32_t)(int8_t)lower_bound;
 			upper_bound = (int32_t)(int8_t)upper_bound;
@@ -3633,7 +3633,7 @@ M68KMAKE_OP(chk2cmp2, 8, ., pcix)
 		int32_t upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-		if (lower_bound > upper_bound || compare < 0)
+		if (lower_bound & 0x80)
 		{
 			lower_bound = (int32_t)(int8_t)lower_bound;
 			upper_bound = (int32_t)(int8_t)upper_bound;
@@ -3667,7 +3667,7 @@ M68KMAKE_OP(chk2cmp2, 8, ., .)
 		int32_t upper_bound = m68ki_read_8(ea + 1);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-		if (lower_bound > upper_bound || compare < 0)
+		if (lower_bound & 0x80)
 		{
 			lower_bound = (int32_t)(int8_t)lower_bound;
 			upper_bound = (int32_t)(int8_t)upper_bound;
@@ -3701,7 +3701,7 @@ M68KMAKE_OP(chk2cmp2, 16, ., pcdi)
 		int32_t upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-		if (lower_bound > upper_bound || compare < 0)
+		if (lower_bound & 0x8000)
 		{
 			lower_bound = (int32_t)(int16_t)lower_bound;
 			upper_bound = (int32_t)(int16_t)upper_bound;
@@ -3735,7 +3735,7 @@ M68KMAKE_OP(chk2cmp2, 16, ., pcix)
 		int32_t upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-		if (lower_bound > upper_bound || compare < 0)
+		if (lower_bound & 0x8000)
 		{
 			lower_bound = (int32_t)(int16_t)lower_bound;
 			upper_bound = (int32_t)(int16_t)upper_bound;
@@ -3769,7 +3769,7 @@ M68KMAKE_OP(chk2cmp2, 16, ., .)
 		int32_t upper_bound = m68ki_read_16(ea + 2);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-		if (lower_bound > upper_bound || compare < 0)
+		if (lower_bound & 0x8000)
 		{
 			lower_bound = (int32_t)(int16_t)lower_bound;
 			upper_bound = (int32_t)(int16_t)upper_bound;
@@ -3800,7 +3800,7 @@ M68KMAKE_OP(chk2cmp2, 32, ., pcdi)
 		int64_t upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-		if (lower_bound > upper_bound)
+		if (lower_bound & 0x80000000)
 		{
 			lower_bound = (int64_t)(int32_t)lower_bound;
 			upper_bound = (int64_t)(int32_t)upper_bound;
@@ -3829,7 +3829,7 @@ M68KMAKE_OP(chk2cmp2, 32, ., pcix)
 		int64_t upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-		if (lower_bound > upper_bound)
+		if (lower_bound & 0x80000000)
 		{
 			lower_bound = (int64_t)(int32_t)lower_bound;
 			upper_bound = (int64_t)(int32_t)upper_bound;
@@ -3858,7 +3858,7 @@ M68KMAKE_OP(chk2cmp2, 32, ., .)
 		int64_t upper_bound = m68ki_read_32(ea + 4);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-		if (lower_bound > upper_bound)
+		if (lower_bound & 0x80000000)
 		{
 			lower_bound = (int64_t)(int32_t)lower_bound;
 			upper_bound = (int64_t)(int32_t)upper_bound;
