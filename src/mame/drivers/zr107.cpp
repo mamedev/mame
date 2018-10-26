@@ -157,9 +157,9 @@ TODO:
 - Finish K056320 for linked cabinets
 - GX tilemaps cropped on windheat and midrun
 - windheat will sometimes reset at the end of a race with a glitched boot screen crashing shortly after 18R is checked bad
-- windheat's AI cars are always Toyota Tundras if traffic is enabled.
-- Random 3d graphic flickering. Happens less if the network ID is changed to 1.
-- Other small gaphical (and maybe SHARC) problems.
+- windheat's AI cars are always Toyota Tundras if traffic is enabled
+- Random 3d graphic flickering. Happens less if the network ID is changed to 1
+- Other small gaphical (and maybe SHARC) problems
 
 */
 
