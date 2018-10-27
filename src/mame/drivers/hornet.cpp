@@ -322,6 +322,23 @@
 
     27G  XC9536           Xilinx, CPLD, Konami no. Q830B1
     21C  MC44200FT        Motorola, 3 Channel video D/A converter
+    
+    TODO:
+    - All games crash if when test mode rom check is enabled only running video -d3d. Why?
+     +terabrst's test mode check screen is glitched on the other hand
+    - Hook player 3 and 4 inputs for nbapbp
+    - terabrst's other problems besides no analog/gun inputs
+     + major sticky 3d issue after "certain" explosion effects. These being the gas station from Stage 1 and all bosses if killed with anything other than a homing missile
+     + Stage 2 boss takes an extremely long time to spawn. He is supposed to spawn in by a UFO but the UFO never spawns in. Need to verify on original hw
+     + High score and alternate intro 3d text appear behind the backround
+    - sscope has bad timings causing the game to run at half speed (regression)
+    - sscope and sccope2's right/scope screen doesn't properly sync with the left/main screen. The right screen has a low frame rate currently
+    - sscope randomly crashes in attract mode (regression)
+    - sscope (and possibly sscope2)'s analog inputs work in test mode but not ingame (regression from long ago)
+    - sscope2 crashes with a SHARC related error after the first boot screen.
+    - Other small gaphical (and maybe SHARC) problems
+    - Eventually finish sscope2's LAN board for linking
+    
 */
 
 #include "emu.h"
