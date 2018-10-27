@@ -1090,18 +1090,18 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	config.set_default_layout(layout_sc1_vfd);
 
-	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<3>))
-	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<4>))
-	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc1_state, reel_optic_cb<5>))
+	REEL(config, m_reels[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[0]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<0>));
+	REEL(config, m_reels[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[1]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<1>));
+	REEL(config, m_reels[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[2]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<2>));
+	REEL(config, m_reels[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[3]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<3>));
+	REEL(config, m_reels[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[4]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<4>));
+	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[5]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<5>));
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)

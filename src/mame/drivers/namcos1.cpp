@@ -449,12 +449,6 @@ void namcos1_state::mcu_map(address_map &map)
 	map(0xf000, 0xffff).rom().region("mcu", 0); /* internal ROM */
 }
 
-void namcos1_state::mcu_port_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).portr("COIN").w(FUNC(namcos1_state::coin_w));
-	map(M6801_PORT2, M6801_PORT2).nopr().w(FUNC(namcos1_state::dac_gain_w));
-}
-
 
 // #define PRIORITY_EASINESS_TO_PLAY
 
@@ -1043,10 +1037,12 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_port_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+	HD63701(config, m_mcu, XTAL(49'152'000)/8);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos1_state::mcu_map);
+	m_mcu->in_p1_cb().set_ioport("COIN");
+	m_mcu->out_p1_cb().set(FUNC(namcos1_state::coin_w));
+	m_mcu->out_p2_cb().set(FUNC(namcos1_state::dac_gain_w));
+	m_mcu->set_vblank_int("screen", FUNC(namcos1_state::irq0_line_assert));
 
 	MCFG_DEVICE_ADD("c117", NAMCO_C117, 0)
 	MCFG_DEVICE_PROGRAM_MAP(virtual_map)

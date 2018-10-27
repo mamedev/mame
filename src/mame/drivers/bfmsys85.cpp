@@ -78,10 +78,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
-		m_reel0(*this, "reel0"),
-		m_reel1(*this, "reel1"),
-		m_reel2(*this, "reel2"),
-		m_reel3(*this, "reel3"),
+		m_reel(*this, "reel%u", 0U),
 		m_acia6850_0(*this, "acia6850_0"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U)
@@ -116,18 +113,12 @@ private:
 	uint8_t m_sys85_data_line_t; // never read
 	optional_device<rocvfd_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
+	required_device_array<stepper_device, 4> m_reel;
 	required_device<acia6850_device> m_acia6850_0;
 	required_device<meters_device> m_meters;
 	output_finder<256> m_lamps;
 
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 	DECLARE_READ8_MEMBER(irqlatch_r);
 	DECLARE_WRITE8_MEMBER(reel12_w);
@@ -220,22 +211,22 @@ READ8_MEMBER(bfmsys85_state::irqlatch_r)
 
 WRITE8_MEMBER(bfmsys85_state::reel12_w)
 {
-	m_reel0->update((data>>4)&0x0f);
-	m_reel1->update( data    &0x0f);
+	m_reel[0]->update((data>>4)&0x0f);
+	m_reel[1]->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel1", *m_reel0);
-	awp_draw_reel(machine(),"reel2", *m_reel1);
+	awp_draw_reel(machine(),"reel1", *m_reel[0]);
+	awp_draw_reel(machine(),"reel2", *m_reel[1]);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 WRITE8_MEMBER(bfmsys85_state::reel34_w)
 {
-	m_reel2->update((data>>4)&0x0f);
-	m_reel3->update( data    &0x0f);
+	m_reel[2]->update((data>>4)&0x0f);
+	m_reel[3]->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel3", *m_reel2);
-	awp_draw_reel(machine(),"reel4", *m_reel3);
+	awp_draw_reel(machine(),"reel3", *m_reel[2]);
+	awp_draw_reel(machine(),"reel4", *m_reel[3]);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -427,14 +418,14 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);                       // load/save nv RAM
 
-	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfmsys85_state, reel3_optic_cb))
+	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[0]->optic_handler().set(FUNC(bfmsys85_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[1]->optic_handler().set(FUNC(bfmsys85_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[2]->optic_handler().set(FUNC(bfmsys85_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reel[3]->optic_handler().set(FUNC(bfmsys85_state::reel_optic_cb<3>));
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)

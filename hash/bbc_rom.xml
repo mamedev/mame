@@ -1,0 +1,843 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="bbc_rom" description="Acorn BBC Micro ROMs">
+
+	<software name="accel100" cloneof="accel">
+		<description>Accelerator 1.00</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Accelerator-1.00.rom" size="8192" crc="ec9e1b6e" sha1="b211ffb59f1fcdb86582be293e732c0841639204" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AcceleratorGCode-1.00.rom" size="16384" crc="cd68c6df" sha1="137da07a9f56ecbf18147b9f0009930f04d00ebc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="accel102" cloneof="accel">
+		<description>Accelerator 1.02</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Accelerator-1.02.rom" size="8192" crc="49697bef" sha1="2a1acaee818a72069c7e921984737dd9f312344b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AcceleratorGCode-1.02.rom" size="16384" crc="302b24a1" sha1="13ad4fcc3a0febb82669cb3fa7ae0f0fe0669571" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="accel">
+		<description>Accelerator 1.05</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Accelerator-1.05.rom" size="16384" crc="0ca9c0dc" sha1="3a95ba8a3fd4b46fcc856ad28f942d0597ad74e0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AcceleratorGCode-1.05.rom" size="16384" crc="e54f59db" sha1="e9c69d482d4c4bde7bd140268fa1d7719a2ebc9c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="accel106" cloneof="accel">
+		<description>Accelerator 1.06</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Accelerator-1.06.rom" size="16384" crc="e5435cf5" sha1="86d1adfff0cfc31156aa8e3787b796d33f533dcb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebcalc12b" cloneof="beebcalc">
+		<description>BeebCalc 1.2B</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="BeebCalc-1.2B.rom" size="8192" crc="5df48818" sha1="0b2c1c82a503368e05f6fbd6588b89ee24d2e255" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebcalc12c" cloneof="beebcalc">
+		<description>BeebCalc 1.2C</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="BeebCalc-1.2C.rom" size="8192" crc="78365f25" sha1="eaae24567468c339c4563a5a36d7adb7f7242aac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebcalc12d" cloneof="beebcalc">
+		<description>BeebCalc 1.2D</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="BeebCalc-1.2D.rom" size="8192" crc="7a1a0b48" sha1="acbec76e7c485b25f26621367a02955f2b218646" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebcalc">
+		<description>BeebCalc 1.2E</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="BeebCalc-1.2E.rom" size="8192" crc="df656c8e" sha1="3c89d858760630854eb1ac92d03b9d3bb07bebcb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caretakr100" cloneof="caretakr">
+		<description>Caretaker 1.00</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Caretaker-1.00.rom" size="8192" crc="865e9b1d" sha1="8aea34ac0201945bd940e19b67f4399d35b38cd8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caretakr101" cloneof="caretakr">
+		<description>Caretaker 1.01</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Caretaker-1.01.rom" size="8192" crc="4e920514" sha1="362e4972c4b726fa2de17de876a20a0d7f3e37fd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caretakr102" cloneof="caretakr">
+		<description>Caretaker 1.02</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Caretaker-1.02.rom" size="8192" crc="3e7b5c87" sha1="280267215a22262188e60460adf97e2bf02a3310" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caretakr">
+		<description>Caretaker 1.03</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Caretaker-1.03.rom" size="8192" crc="18a50e7c" sha1="e38a68a7cd6877b6bcbbaadf4dde149ce64569d4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commnctr09" cloneof="commnctr">
+		<description>Communicator 0.90</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Communicator-0.90.rom" size="16384" crc="23571dcd" sha1="2572f0821173000671fe18d159997ecd0d04eaa8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commnctr104a" cloneof="commnctr">
+		<description>Communicator 1.04a</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Communicator-1.04a.rom" size="16384" crc="65a19e0d" sha1="d49fb643178793e0cdbdae4fbc7b3f3cf7ba1be3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commnctr">
+		<description>Communicator A2.1</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Communicator-A2.1.rom" size="16384" crc="b34f47e5" sha1="6e93f1d2cd7b92b11b3d533b5dd699d39ec79a48" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conquest" supported="no">
+		<description>ConQuest</description>
+		<year>1987</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="ConQuest-1.00.rom" size="32768" crc="f9634ece" sha1="d2785df6a617089dc72069baa0e1abb1f6e01b27" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="debug">
+		<description>Debug</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Debug-8.31.rom" size="16384" crc="6b9baa95" sha1="218f35dd10b9e22358bf54692214dee2e55aa3f6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdoc105" cloneof="discdoc">
+		<description>Disc Doctor 1.05</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DiscDoctor-1.05.rom" size="8192" crc="905b69de" sha1="a2811b5f0111964a195907c4f2bbc5aace3141c6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdoc106" cloneof="discdoc">
+		<description>Disc Doctor 1.06</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DiscDoctor-1.06.rom" size="8192" crc="c68b02c1" sha1="365b73eec694146a5b59a9be2b484d12f56a432f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdoc107" cloneof="discdoc">
+		<description>Disc Doctor 1.07</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DiscDoctor-1.07.rom" size="8192" crc="5e9194c7" sha1="5090744fabdf51494a08b0932ee4acc231eaea40" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdoc109" cloneof="discdoc">
+		<description>Disc Doctor 1.09</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DiscDoctor-1.09.rom" size="8192" crc="3fc454d7" sha1="4b0ed56f4c19df9c78129164da0ca783942efb64" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdoc10a" cloneof="discdoc">
+		<description>Disc Doctor 1.0A</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="DiscDoctor-1.0A.rom" size="16384" crc="a14fa003" sha1="c5aa32079c5b597866b47353146344598f6c84e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="discdoc">
+		<description>Disc Doctor 1.0B</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DiscDoctor-1.0B.rom" size="8192" crc="68f95584" sha1="162a7a0ea544986db166bd15d8402b7f1568ca93" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphics102" cloneof="graphics">
+		<description>Graphics Extension 1.02</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="GraphicsExtension-1.02.rom" size="8192" crc="6ad97e31" sha1="b26d6cde6f52f8db6449ca03fc318f21283e2692" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphics">
+		<description>Graphics Extension 1.03</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="GraphicsExtension-1.03.rom" size="8192" crc="f012f8d1" sha1="baba70851a8c04dd855e5bbfabc86b3c4cf16945" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphics209" cloneof="graphics">
+		<description>Graphics Extension 2.09</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="GraphicsExtension-2.09.rom" size="8192" crc="c4e34f78" sha1="3d76bd5889d82c34c9e096c30ac6cc566d533159" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gremlin120" cloneof="gremlin">
+		<description>Gremlin 1.20</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Gremlin-1.20.rom" size="8192" crc="995e07e7" sha1="089b61d32d9b7c7bd0eec0ee300c03f0d57cd8b6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gremlin">
+		<description>Gremlin 1.21</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Gremlin-1.21.rom" size="16384" crc="3f769690" sha1="a5449f70c2b4ff84ec195a32fb966f64c7e42fa9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ichart101" cloneof="ichart">
+		<description>Inter-Chart 1.01</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterChart-1.01.rom" size="16384" crc="873bae42" sha1="c74cb6a5da8158aa793bb9798489b507e3fa3f5d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ichart">
+		<description>Inter-Chart 1.02</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterChart-1.02.rom" size="16384" crc="b126ad8d" sha1="956a43256044c80d5b41be64d878642cded8f45a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ichart103a" cloneof="ichart">
+		<description>Inter-Chart 1.03a</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterChart-1.03a.rom" size="16384" crc="4afaf7dc" sha1="f191e0202559475c689d06a6dfabadcf89547183" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isheet047" cloneof="isheet">
+		<description>Inter-Sheet 0.47</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="InterSheet-0.47-1.rom" size="8192" crc="302156d0" sha1="2fe348bd216422db6f1437376e1014e37d13efb1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-0.47-2.rom" size="16384" crc="716fe5bd" sha1="af02bd5e194f68a19b1b9c364f6f5cb9362691c4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isheet100" cloneof="isheet">
+		<description>Inter-Sheet 1.00</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="InterSheet-1.00-1.rom" size="8192" crc="b65e87fd" sha1="3c5934b10d841f4a1fd989e38f0b1740da562048" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-1.00-2.rom" size="16384" crc="74adddac" sha1="d56b464236ef36af25d32cc6b3d0a4cf0eb8e727" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isheet102" cloneof="isheet">
+		<description>Inter-Sheet 1.02</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="InterSheet-1.02-1.rom" size="8192" crc="8ecd55e7" sha1="a05a8922c1b562a1aa430191390e6a53f11ab0e4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-1.02-2.rom" size="16384" crc="e791ec75" sha1="970ecd614e7bcc114c6e5cf5b5ffefa0d50a242c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isheet103" cloneof="isheet">
+		<description>Inter-Sheet 1.03</description>
+		<year>198?</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="InterSheet-1.03-1.rom" size="8192" crc="a3d24cbe" sha1="9e9a0a74fa2d4a118362f0b809ffe15362c60148" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-1.03-2.rom" size="16384" crc="e791ec75" sha1="970ecd614e7bcc114c6e5cf5b5ffefa0d50a242c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isheet">
+		<description>Inter-Sheet 1.06</description>
+		<year>1986</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-1.06-1.rom" size="16384" crc="af87aafe" sha1="d8304cc0957dba7f4d49023efb4f9f65644fe774" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-1.06-2.rom" size="16384" crc="3dc2bc50" sha1="c0640d7f8f9e4c1a728c255d1c5f771959adc654" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isheet106c" cloneof="isheet">
+		<description>Inter-Sheet 1.06c</description>
+		<year>1986</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-1.06c-1.rom" size="16384" crc="af87aafe" sha1="d8304cc0957dba7f4d49023efb4f9f65644fe774" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-1.06c-2.rom" size="16384" crc="3af6ecc2" sha1="56e1ca5e850aa97fdbbc51debdf882c689515070" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isheet106s" cloneof="isheet">
+		<description>Inter-Sheet 1.06s</description>
+		<year>1986</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-1.06s-1.rom" size="16384" crc="af87aafe" sha1="d8304cc0957dba7f4d49023efb4f9f65644fe774" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="InterSheet-1.06s-2.rom" size="16384" crc="9e47c869" sha1="e7a0ef299894be858ca582e0abc0442a99b0e57a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iword" supported="no">
+		<description>Inter-Word 1.02</description>
+		<year>1986</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="InterWord-1.02.rom" size="32768" crc="9c48e363" sha1="e771ff00d0cda3697f33be1260d7ca9f95acea25" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moffice2" supported="no">
+		<description>Instant Mini Office II</description>
+		<year>1986</year>
+		<publisher>Database Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="131072">
+				<rom name="MiniOfficeII-1.rom" size="32768" crc="5e0f6853" sha1="3deef1b1680c9a1449009b11899bf5ab360f89ef" offset="0x00000"/>
+				<rom name="MiniOfficeII-2.rom" size="32768" crc="afb646cc" sha1="d7ead85e32930b0f35ad87d3a825f48896abc8e1" offset="0x08000"/>
+				<rom name="MiniOfficeII-3.rom" size="32768" crc="e8a1cbd8" sha1="9e31542d2099c98605032c175c196f3ea073de5f" offset="0x10000"/>
+				<rom name="MiniOfficeII-4.rom" size="32768" crc="d041fe31" sha1="cd0297096009c71ebb00709cfb32a6c56e7eea8b" offset="0x18000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntmcan">
+		<description>Printmaster (Canon) 1.08</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Printmaster-Canon-1.08.rom" size="8192" crc="4b35d6f7" sha1="5267c3acde21690441d7b355cbf628d37902a3d0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntmeps100" cloneof="prntmeps">
+		<description>Printmaster (Epson) 1.00</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Printmaster-Epson-1.00.rom" size="8192" crc="9858235d" sha1="b3c83462864f29deebc1a86a00c1db9c754fc14f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntmeps101" cloneof="prntmeps">
+		<description>Printmaster (Epson) 1.01</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Printmaster-Epson-1.01.rom" size="8192" crc="4c9cfe6d" sha1="2c61b30d68fcdcb56fda93b4b3571c119037a813" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntmeps102" cloneof="prntmeps">
+		<description>Printmaster (Epson) 1.02</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Printmaster-Epson-1.02.rom" size="8192" crc="480c7c23" sha1="27f99b6b75a219aa6d04c00f230f2f3f20423a1c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntmeps108" cloneof="prntmeps">
+		<description>Printmaster (Epson) 1.08</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Printmaster-Epson-1.08.rom" size="8192" crc="d62709c7" sha1="464b3b1e2c602042848550d9efba4153f1624dc1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntmeps">
+		<description>Printmaster (Epson) 1.10</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Printmaster-Epson-1.10.rom" size="8192" crc="df873ea0" sha1="03ebfd0d2bda6a04469f2c933162075ecac3c6b0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntmstr">
+		<description>Printmaster (Star) 1.10</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Printmaster-Star-1.10.rom" size="8192" crc="95808eee" sha1="cf2280f917f91831593fb7f69b7ace90e7e74a40" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="questpnt" supported="no">
+		<description>Quest Paint 1.10</description>
+		<year>1986</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="QuestPaint-1.10.rom" size="32768" crc="839a9b34" sha1="e863067fc2a2b0f0c7129a17f189b31a0ee23594" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="questpnt104" cloneof="questpnt" supported="no">
+		<description>Quest Paint 1.04</description>
+		<year>1986</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="QuestPaint-1.04.rom" size="32768" crc="7880eb9a" sha1="a9ac2fafe0f97a567005abe5679707fa0dbd7ef3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speech">
+		<description>Speech</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<sharedfeat name="compatibility" value="B,B+"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Speech-1.0.rom" size="8192" crc="e63f7fb7" sha1="182b1dd258ba9721d4a9a79b3fb4f8d7a2c1fb61" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellmst166" cloneof="spellmst" supported="no">
+		<description>SpellMaster 1.66</description>
+		<year>1987</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="131072">
+				<rom name="SpellMaster-1.66-128K.rom" size="65536" crc="4e096d33" sha1="c1d72d32528888c595a2565220f3f7686028bdbf" offset="0x0000"/>
+				<rom name="SpellMaster-1.66-Spell.rom" size="65536" crc="42457ecf" sha1="20fc4a01c0d295ee34be57fdcbd687608781cbae" offset="0x10000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellmst" supported="no">
+		<description>SpellMaster 1.69</description>
+		<year>1987</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="131072">
+				<rom name="SpellMaster-1.69.rom" size="131072" crc="c26533ec" sha1="deb5e62b18caf75b24ab48dd565f77e200371f67" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="termi2">
+		<description>Termi II A1.5</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="TermiII-A1.5.rom" size="8192" crc="f10d4139" sha1="d08aaba8f12f8432ddf6aba93ec09a391388b174" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="termi205" cloneof="termi">
+		<description>Termi 2.05</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Termi-2.05.rom" size="8192" crc="11885f73" sha1="1e563e34ca84da20eae3f6b5d70dc447adbf55be" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="termi206" cloneof="termi">
+		<description>Termi 2.06</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Termi-2.06.rom" size="8192" crc="5cfc3d5c" sha1="098b59af17a28be9f11a8f31b8b3c86f4d9ca246" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="termi">
+		<description>Termi  2.07</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Termi-2.07.rom" size="8192" crc="bb745d79" sha1="f79ddbc6127dbc58d1c8f6020bedf2a70af758eb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="termi210" cloneof="termi">
+		<description>Termi 2.10</description>
+		<year>1985</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Termi-2.10.rom" size="8192" crc="ad74352f" sha1="a149f6515d9aea0c9cc67a6b5d842eb34a836f3b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tts">
+		<description>Text To Speech</description>
+		<year>1986</year>
+		<publisher>Computer Concepts</publisher>
+		<sharedfeat name="compatibility" value="B,B+"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TextToSpeech-1.01.rom" size="16384" crc="80f4417b" sha1="b01956f3f9467c6012ad13df776cf2783988abc1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wapping" supported="no">
+		<description>The Wapping Editor</description>
+		<year>1988</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="65536">
+				<rom name="WappingEditor-1.30.rom" size="65536" crc="26431b44" sha1="2bb36ec8f22ab1858ffd4da343d131140b29a46d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordwise100" cloneof="wordwise">
+		<description>Wordwise 1.00</description>
+		<year>1982</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Wordwise-1.00.rom" size="8192" crc="ec45fdee" sha1="e0d5a304e32aa56110838e9fd6994b4af741a73d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordwise110" cloneof="wordwise">
+		<description>Wordwise 1.10</description>
+		<year>1982</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Wordwise-1.10.rom" size="8192" crc="eaf041fb" sha1="4cdbe47b9c87931359b7600dea2d0562a6cf7c6e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordwise117" cloneof="wordwise">
+		<description>WordWise 1.17</description>
+		<year>1982</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="WordWise-1.17.rom" size="8192" crc="c9510583" sha1="098763e97595a12274f56de92beb8cdd722c64a5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordwise117b" cloneof="wordwise">
+		<description>WordWise 1.17 (Beebug)</description>
+		<year>1982</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="WordWise-1.17-Beebug.rom" size="8192" crc="dd860ed8" sha1="7d4fa77eb9db48aac4c1be1077a01b8f5fe16186" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordwise">
+		<description>Wordwise 1.20</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Wordwise-1.20.rom" size="8192" crc="dbfc7082" sha1="babf33aeca8e3d79332159aa8cc2b928d771643c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwplus148" cloneof="wwplus">
+		<description>Wordwise Plus 1.48</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WordwisePlus-1.48.ROM" size="16384" crc="ac714154" sha1="f5af233c8dc3d9d7ec1060f538b20d7f89e1eab5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwplus149" cloneof="wwplus">
+		<description>Wordwise Plus 1.49</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WordwisePlus-1.49.rom" size="16384" crc="38404e38" sha1="f81519afc1d461cfda7a2d21176de8de89588420" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwplus14a" cloneof="wwplus">
+		<description>Wordwise Plus 1.4A</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WordwisePlus-1.4A.rom" size="16384" crc="3311e672" sha1="f3f6fc3d28bd1daf1493be4663c92ff0ff6050ba" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwplus14b" cloneof="wwplus">
+		<description>Wordwise Plus 1.4B</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WordwisePlus-1.4B.rom" size="16384" crc="32693f79" sha1="3c80afb16c42e8e3aaf3b7c9564af4d4412c1203" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwplus14c" cloneof="wwplus">
+		<description>Wordwise Plus 1.4C</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WordwisePlus-1.4C.rom" size="16384" crc="a1a4e453" sha1="82f95fc8f30e829c8f86f1dab3dde27750c44fe3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwplus14e" cloneof="wwplus">
+		<description>Wordwise Plus 1.4E</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WordwisePlus-1.4E.rom" size="16384" crc="066b8ee7" sha1="f5882f6da5312d5637038e88534754bacda9933d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwplus">
+		<description>Wordwise Plus 1.4F</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WordwisePlus-1.4F.rom" size="16384" crc="a8c75290" sha1="55183c74f1eb31a7135ce5141bf05966275b2c5d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

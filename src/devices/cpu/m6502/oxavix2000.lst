@@ -322,24 +322,15 @@ eorpa_imp
 	prefetch();
 
 adcpa_imp
-	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
-	m_databank = (m_pa & 0xff0000)>>16;
-	do_adc(read((m_pa&0xffff)+Y));
-	m_databank = TMP;
+	do_adc(read_full_data_sp(m_pa+Y));
 	prefetch();
 
 stapa_imp
-	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
-	m_databank = (m_pa & 0xff0000)>>16;
-	write((m_pa&0xffff)+Y, A);
-	m_databank = TMP;
+	write_full_data_sp(m_pa+Y, A);
 	prefetch();
 
 ldapa_imp
-	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
-	m_databank = (m_pa & 0xff0000)>>16;
-	A = read((m_pa&0xffff)+Y);
-	m_databank = TMP;
+	A = read_full_data_sp(m_pa+Y);
 	prefetch();
 
 cmppa_imp
@@ -348,10 +339,7 @@ cmppa_imp
 	prefetch();
 
 sbcpa_imp
-	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
-	m_databank = (m_pa & 0xff0000)>>16;
-	do_sbc(read((m_pa&0xffff)+Y));
-	m_databank = TMP;
+	do_sbc(read_full_data_sp(m_pa+Y));
 	prefetch();
 	
 orapb_imp
@@ -370,24 +358,15 @@ eorpb_imp
 	prefetch();
 
 adcpb_imp
-	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
-	m_databank = (m_pb & 0xff0000)>>16;
-	do_adc(read((m_pb&0xffff)+Y));
-	m_databank = TMP;
+	do_adc(read_full_data_sp(m_pb+Y));
 	prefetch();
 
 stapb_imp
-	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
-	m_databank = (m_pb & 0xff0000)>>16;
-	write((m_pb&0xffff)+Y, A);
-	m_databank = TMP;
+	write_full_data_sp(m_pb+Y, A);
 	prefetch();
 
 ldapb_imp
-	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
-	m_databank = (m_pb & 0xff0000)>>16;
-	A = read((m_pb&0xffff)+Y);
-	m_databank = TMP;
+	A = read_full_data_sp(m_pb+Y);
 	prefetch();
 
 cmppb_imp
@@ -396,10 +375,7 @@ cmppb_imp
 	prefetch();
 
 sbcpb_imp
-	TMP = m_databank; // TODO: Flags, how does bank boundary crossing get handled?
-	m_databank = (m_pb & 0xff0000)>>16;
-	do_sbc(read((m_pb&0xffff)+Y));
-	m_databank = TMP;
+	do_sbc(read_full_data_sp(m_pb+Y));
 	prefetch();
 
 stx_aby

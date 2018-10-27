@@ -432,7 +432,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #define MHFU_RESET              -250
 
 // ----------------------------------------------------------------------------------------------
-// NEC 7220 GDC     ***************** GDC-NEW ********************
+// NEC 7220 GDC     *************************************
 
 // Indirect Register, port $53, see page 181 of AA-AE36A (PDF):
 // (actual values : see comments)
@@ -527,10 +527,10 @@ public:
 		m_ext_ram(*this, "ext_ram"),
 
 		m_rtc(*this, "rtc"),
-		m_hgdc(*this, "upd7220"), // GDC-NEW
+		m_hgdc(*this, "upd7220"), // GDC
 
 		m_screen2(*this, "screen2"),
-		m_palette2(*this, "palette2"), // GDC-NEW
+		m_palette2(*this, "palette2"), // GDC
 		m_video_ram(*this, "vram"),
 
 		m_digits(*this, "digit%u", 0U)
@@ -688,7 +688,7 @@ private:
 
 	optional_device<ds1315_device> m_rtc;
 
-	required_device<upd7220_device> m_hgdc;  // GDC-NEW
+	required_device<upd7220_device> m_hgdc;  // GDC
 	required_device<screen_device> m_screen2;
 	required_device<palette_device> m_palette2;
 	required_shared_ptr<uint16_t> m_video_ram;
@@ -1102,7 +1102,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("GRAPHICS OPTION") // GDC-NEW
+	PORT_START("GRAPHICS OPTION") // GDC
 	PORT_DIPNAME(0x01, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
@@ -1139,7 +1139,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("MONITOR CONFIGURATION") // GDC-NEW
+	PORT_START("MONITOR CONFIGURATION") // GDC
 	PORT_DIPNAME(0x03, 0x03, "MONITOR CONFIGURATION")
 	PORT_DIPSETTING(0x01, "MONO ONLY / 4 to 16 monochrome shades (single VR-201)")
 	PORT_DIPSETTING(0x02, "COLOR ONLY (single VR-241 with BCC-17 cable)")
@@ -2561,7 +2561,7 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 	return intnum;
 }
 
-// NEC7220 Vsync IRQ ***************************************** GDC-NEW
+// NEC7220 Vsync IRQ ***************************************** GDC
 
 // VERIFY: SCROLL_MAP & COLOR_MAP are updated at the next VSYNC (not immediately)... Are there more registers?
 WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
@@ -3204,7 +3204,7 @@ static GFXDECODE_START(gfx_rainbow)
 	GFXDECODE_ENTRY("chargen", 0x0000, rainbow_charlayout, 0, 1)
 GFXDECODE_END
 
-// Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC-NEW):
+// Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC):
 void rainbow_state::upd7220_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rw(FUNC(rainbow_state::vram_r), FUNC(rainbow_state::vram_w)).share("vram");
@@ -3325,9 +3325,9 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	printer.dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::ctsb_w)); // actually DTR
 
 	m_comm_port->option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-	m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
-	m_comm_port->option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
-	m_comm_port->set_default_option("logitech_mouse");
+	//m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	//m_comm_port->option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	m_comm_port->set_default_option("microsoft_mouse");
 
 	printer.set_default_option("printer");
 

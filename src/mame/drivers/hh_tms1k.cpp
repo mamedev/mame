@@ -4726,11 +4726,11 @@ MACHINE_CONFIG_START(ginv2000_state::ginv2000)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ginv2000_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ginv2000_state, write_o))
 
-	MCFG_DEVICE_ADD("expander", TMS1024, 0)
-	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, ginv2000_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, ginv2000_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, ginv2000_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, ginv2000_state, expander_w))
+	TMS1024(config, m_expander);
+	m_expander->write_port4_callback().set(FUNC(ginv2000_state::expander_w));
+	m_expander->write_port5_callback().set(FUNC(ginv2000_state::expander_w));
+	m_expander->write_port6_callback().set(FUNC(ginv2000_state::expander_w));
+	m_expander->write_port7_callback().set(FUNC(ginv2000_state::expander_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -8883,7 +8883,7 @@ public:
 		m_expander(*this, "expander")
 	{ }
 
-	required_device<tms1024_device> m_expander;
+	required_device<tms1025_device> m_expander;
 	u8 m_exp_port[7];
 	DECLARE_WRITE8_MEMBER(expander_w);
 
@@ -9020,14 +9020,14 @@ MACHINE_CONFIG_START(tbreakup_state::tbreakup)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tbreakup_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tbreakup_state, write_o))
 
-	MCFG_DEVICE_ADD("expander", TMS1025, 0)
-	MCFG_TMS1025_WRITE_PORT_CB(PORT1, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT2, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT3, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, tbreakup_state, expander_w))
+	TMS1025(config, m_expander);
+	m_expander->write_port1_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port2_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port3_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port4_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port5_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port6_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port7_callback().set(FUNC(tbreakup_state::expander_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_tbreakup);

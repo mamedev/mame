@@ -9165,6 +9165,7 @@ esclwrldg                       //
 hardbody                        //
 hardbodyg                       //
 hvymetap                        //
+hvymetapg                       //
 ladyluck                        //
 motrdome                        //
 motrdomeg                       //
@@ -15851,14 +15852,20 @@ x5jokers                        // (c) 200? Electronic Projects
 @source:itgamble.cpp
 abacus                          // (c) 200? unknown
 bookthr                         // (c) 200? unknown
+bowlroad                        // (c) 2001 Nazionale Elettronica
+bowlroad14                      // (c) 2001 Nazionale Elettronica
+bowlroad14n                     // (c) 2001 Nazionale Elettronica
 capcor                          // (c) 2001 Nazionale Elettronica
 capunc                          // (c) 2000 Nazionale Elettronica
 euro2k2                         // (c) 2001 Nazionale Elettronica
 euro2k2a                        // (c) 2001 Nazionale Elettronica
 euro2k2s                        // (c) 2002 Nazionale Elettronica
+labrinth                        // (c) 2001 Nazionale Elettronica
 laperla                         // (c) 2002 Nazionale Elettronica
 laperlag                        // (c) 2001 Nazionale Elettronica
 mnumber                         // (c) 200? M.M. - B.R.L.
+pinups                          // (c) 200? Nazionale Elettronica
+uforobot                        // (c) 2001 Nazionale Elettronica
 wcup                            // (c) 2001 Nazionale Elettronica
 wcup14                          // (c) 2001 Nazionale Elettronica
 
@@ -29471,6 +29478,7 @@ mslug6                          // 2006.02 Metal Slug 6
 mushi2k4                        // 2004.?? MushiKing The King Of Beetles 2004 Second (Japan)
 mushi2k5                        // 2005.?? MushiKing The King Of Beetles 2005 First (Japan)
 mushike                         // 2004.?? MushiKing The King Of Beetle (World)
+mushikep                        // 2004.?? MushiKing The King Of Beetle (Prototype)
 mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001) (World)
 mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001) (World)
 mushik4e                        // 2007.?? Mushiking The King Of Beetles IV / V / VI (World)
@@ -30726,6 +30734,7 @@ mspacman                        // (c) 1981 Midway  // made by General Computer
 mspacmanbcc                     // bootleg
 mspacmanbco                     // bootleg
 mspacmanbg                      // bootleg
+mspacmanbg2                     // bootleg
 mspacmanbgd                     // bootleg
 mspacmanblt                     // bootleg
 mspacmanbhe                     // bootleg
@@ -30756,6 +30765,8 @@ pacuman                         // bootleg
 paintrlr                        // 1981 bootleg
 pengojpm                        // bootleg
 pengopac                        // bootleg
+pengomc1                        // bootleg (Marti Colls)
+pengomc2                        // bootleg (Marti Colls)
 pinguinos                       // bootleg
 piranha                         // GL
 piranhah                        // hack
@@ -31776,6 +31787,7 @@ ketb                            //
 ketbl                           //
 killbld                         // (c) 1998 The Killing Blade
 killbld104                      //
+killbld106                      //
 killbldp                        // (c) 2004 Killing Blade Plus
 kov                             // (c) 1999 Knights of Valor
 kov100                          //
@@ -35280,10 +35292,11 @@ denseib                         // bootleg
 endless                         // bootleg
 ffight2b                        // bootleg
 iron                            // bootleg
+legendsb                        // bootleg
 kinstb                          // bootleg
 mk3snes                         // bootleg
+rushbeat                        // bootleg
 sblast2b                        // bootleg
-legendsb                        // bootleg
 
 @source:snk.cpp
 alphamis                        // (c) 1985

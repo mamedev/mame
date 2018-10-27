@@ -61,26 +61,17 @@ void adam_spi_device::adam_spi_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( adam_spi_io )
-//-------------------------------------------------
-
-void adam_spi_device::adam_spi_io(address_map &map)
-{
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_spi_device::p2_r), FUNC(adam_spi_device::p2_w));
-}
-
-
-//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(adam_spi_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(adam_spi_mem)
-	MCFG_DEVICE_IO_MAP(adam_spi_io)
-	MCFG_DEVICE_DISABLE()
+	M6801(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &adam_spi_device::adam_spi_mem);
+	m_maincpu->in_p2_cb().set(FUNC(adam_spi_device::p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(adam_spi_device::p2_w));
+	m_maincpu->set_disable();
 
-	MCFG_DEVICE_ADD(MC2661_TAG, MC2661, XTAL(4'915'200))
+	MC2661(config, MC2661_TAG, XTAL(4'915'200));
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 

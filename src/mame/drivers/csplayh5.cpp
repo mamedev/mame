@@ -361,15 +361,15 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
+	MCFG_DEVICE_ADD(m_maincpu,M68000,16000000) /* TMP68301-16 */
 	MCFG_DEVICE_PROGRAM_MAP(csplayh5_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, csplayh5_state, tmp68301_parallel_port_w))
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
+	m_tmp68301->out_parallel_callback().set(FUNC(csplayh5_state::tmp68301_parallel_port_w));
 
 #if USE_H8
 	MCFG_DEVICE_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */

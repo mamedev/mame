@@ -292,20 +292,6 @@ void pacland_state::mcu_map(address_map &map)
 }
 
 
-READ8_MEMBER(pacland_state::readFF)
-{
-	return 0xff;
-}
-
-void pacland_state::mcu_port_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).portr("IN2");
-	map(M6801_PORT1, M6801_PORT1).w(FUNC(pacland_state::coin_w));
-	map(M6801_PORT2, M6801_PORT2).r(FUNC(pacland_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(FUNC(pacland_state::led_w));
-}
-
-
 
 static INPUT_PORTS_START( pacland )
 	PORT_START("DSWA")
@@ -433,9 +419,12 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) /* 1.536 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* 6.144 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	HD63701(config, m_mcu, XTAL(49'152'000)/8); /* 6.144 MHz? */
+	m_mcu->set_addrmap(AS_PROGRAM, &pacland_state::mcu_map);
+	m_mcu->in_p1_cb().set_ioport("IN2");
+	m_mcu->out_p1_cb().set(FUNC(pacland_state::coin_w));
+	m_mcu->in_p2_cb().set_constant(0xff);  /* leds won't work otherwise */
+	m_mcu->out_p2_cb().set(FUNC(pacland_state::led_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synching between the MCU and the CPU */
 

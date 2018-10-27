@@ -2924,18 +2924,20 @@ MACHINE_CONFIG_START(taitof2_state::taito_f2_tc0510nio )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(taitof2_state::taito_f2_te7750 )
+void taitof2_state::taito_f2_te7750(machine_config &config)
+{
 	taito_f2(config);
-	MCFG_DEVICE_ADD("te7750", TE7750, 0)
-	MCFG_TE7750_IN_PORT1_CB(IOPORT("DSWA"))
-	MCFG_TE7750_IN_PORT2_CB(IOPORT("DSWB"))
-	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN2"))
-	MCFG_TE7750_OUT_PORT4_CB(WRITE8(*this, taitof2_state, taitof2_4p_coin_word_w))
-	MCFG_TE7750_IN_PORT6_CB(IOPORT("IN0"))
-	MCFG_TE7750_IN_PORT7_CB(IOPORT("IN1"))
-	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN3"))
-	MCFG_TE7750_IN_PORT9_CB(IOPORT("IN4"))
-MACHINE_CONFIG_END
+
+	te7750_device &te7750(TE7750(config, "te7750", 0));
+	te7750.in_port1_cb().set_ioport("DSWA");
+	te7750.in_port2_cb().set_ioport("DSWB");
+	te7750.in_port3_cb().set_ioport("IN2");
+	te7750.out_port4_cb().set(FUNC(taitof2_state::taitof2_4p_coin_word_w));
+	te7750.in_port6_cb().set_ioport("IN0");
+	te7750.in_port7_cb().set_ioport("IN1");
+	te7750.in_port8_cb().set_ioport("IN3");
+	te7750.in_port9_cb().set_ioport("IN4");
+}
 
 
 MACHINE_CONFIG_START(taitof2_state::finalb)
@@ -3370,15 +3372,15 @@ MACHINE_CONFIG_START(taitof2_state::ninjak)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ninjak_map)
 
-	MCFG_DEVICE_ADD("te7750", TE7750, 0)
-	MCFG_TE7750_IN_PORT1_CB(IOPORT("DSWA"))
-	MCFG_TE7750_IN_PORT2_CB(IOPORT("DSWB"))
-	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN0"))
-	MCFG_TE7750_IN_PORT4_CB(IOPORT("IN1"))
-	MCFG_TE7750_IN_PORT5_CB(IOPORT("IN3"))
-	MCFG_TE7750_IN_PORT6_CB(IOPORT("IN4"))
-	MCFG_TE7750_IN_PORT7_CB(IOPORT("IN2"))
-	MCFG_TE7750_OUT_PORT8_CB(WRITE8(*this, taitof2_state, taitof2_4p_coin_word_w))
+	te7750_device &te7750(TE7750(config, "te7750", 0));
+	te7750.in_port1_cb().set_ioport("DSWA");
+	te7750.in_port2_cb().set_ioport("DSWB");
+	te7750.in_port3_cb().set_ioport("IN0");
+	te7750.in_port4_cb().set_ioport("IN1");
+	te7750.in_port5_cb().set_ioport("IN3");
+	te7750.in_port6_cb().set_ioport("IN4");
+	te7750.in_port7_cb().set_ioport("IN2");
+	te7750.out_port8_cb().set(FUNC(taitof2_state::taitof2_4p_coin_word_w));
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_ninjak)

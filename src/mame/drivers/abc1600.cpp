@@ -70,7 +70,7 @@
         - port C, open drain output bit PC1 (RTC/NVRAM data)
     - hard disk
         - 4105 SASI interface card
-        - SASI interface (scsibus.c)
+        - SASI interface (scsibus.cpp)
     - connect RS-232 port A
 
 */
@@ -537,7 +537,7 @@ void abc1600_state::mac_mem(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( abc1600 )
-	// inputs defined in machine/abc99.c
+	// inputs defined in machine/abc99.cpp
 INPUT_PORTS_END
 
 
@@ -886,7 +886,9 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	MCFG_ABC1600_MOVER_ADD()
 
 	// devices
-	MCFG_ABC1600_MAC_ADD(MC68008P8_TAG, mac_mem)
+	abc1600_mac_device &mac(ABC1600_MAC(config, "mac", 0));
+	mac.set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
+	mac.set_cpu_tag(m_maincpu);
 
 	Z80DMA(config, m_dma0, 64_MHz_XTAL / 16);
 	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));

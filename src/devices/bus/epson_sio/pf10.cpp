@@ -35,12 +35,6 @@ void epson_pf10_device::cpu_mem(address_map &map)
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
-void epson_pf10_device::cpu_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(epson_pf10_device::port1_r), FUNC(epson_pf10_device::port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(epson_pf10_device::port2_r), FUNC(epson_pf10_device::port2_w));
-}
-
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -67,10 +61,13 @@ static void pf10_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("maincpu", HD6303Y, XTAL(4'915'200)) // HD63A03XF
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mem)
-	MCFG_DEVICE_IO_MAP(cpu_io)
-	MCFG_M6801_SER_TX(WRITELINE(DEVICE_SELF, epson_pf10_device, hd6303_tx_w))
+	HD6303Y(config, m_cpu, XTAL(4'915'200)); // HD63A03XF
+	m_cpu->set_addrmap(AS_PROGRAM, &epson_pf10_device::cpu_mem);
+	m_cpu->in_p1_cb().set(FUNC(epson_pf10_device::port1_r));
+	m_cpu->out_p1_cb().set(FUNC(epson_pf10_device::port1_w));
+	m_cpu->in_p2_cb().set(FUNC(epson_pf10_device::port2_r));
+	m_cpu->out_p2_cb().set(FUNC(epson_pf10_device::port2_w));
+	m_cpu->out_ser_tx_cb().set(FUNC(epson_pf10_device::hd6303_tx_w));
 
 	UPD765A(config, m_fdc, false, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "smd165", floppy_image_device::default_floppy_formats)

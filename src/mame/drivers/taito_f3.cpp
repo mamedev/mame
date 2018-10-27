@@ -3467,7 +3467,7 @@ ROM_START( kirameki )
 	ROM_LOAD( "d77-20.37",   0x0000, 0x0117, CRC(6bfbec07) SHA1(5dce4f2e9fc13273cd50b67f1d9a0d90128e7397) ) // PALCE16V8
 ROM_END
 
-ROM_START( puchicar )
+ROM_START( puchicar ) // an Asia cart was dumped and all ROMs match
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
 	ROM_LOAD32_BYTE("e46-16", 0x000000, 0x80000, CRC(cf2accdf) SHA1(b1e9808299a3c68c939009275108ee76cd7f5749) )
 	ROM_LOAD32_BYTE("e46-15", 0x000001, 0x80000, CRC(c32c6ed8) SHA1(b0c4cca836e6957ecabdaddff23439f9d038a161) )

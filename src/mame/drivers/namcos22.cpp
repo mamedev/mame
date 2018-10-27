@@ -13,7 +13,6 @@
  * TODO:
  * - finish slave DSP emulation
  * - emulate System22 I/O board C74
- * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit.
  * - alpinesa doesn't work, protection related?
  * - C139 for linked cabinets, as well as in RR fullscale
  * - confirm DSP and MCU clocks and their IRQ timing
@@ -24,7 +23,8 @@
  * - improve ss22 lighting:
  *       + mountains in alpinr2b selection screen
  *       + ridgerac waving flag shadowing
- *       + cybrcomm enemies should flash white when you shoot them, probably lighting related - applies to some objects in timecris too
+ *       + cybrcomm enemies should flash white when you shoot them, probably lighting related
+ *       + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
  * - improve ss22 spot:
  *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
  *       + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
@@ -2073,7 +2073,7 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 {
 	u32 value = m_polygonram[offset];
 
-	switch (m_dspram_bank)
+	switch (m_dspram_bank & 3)
 	{
 		case 0:
 			value &= 0xffff;
@@ -2088,8 +2088,9 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 			value &= 0xffff;
 			break;
 
-		default:
-			break;
+		case 3:
+			// ready status?
+			return 0;
 	}
 
 	return value;
@@ -2101,7 +2102,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 	u16 lo = value & 0xffff;
 	u16 hi = value >> 16;
 
-	switch (m_dspram_bank)
+	switch (m_dspram_bank & 3)
 	{
 		case 0:
 			COMBINE_DATA(&lo);
@@ -5775,7 +5776,7 @@ GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, init_time
 GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl, 0,         propcycl,  propcycl,  namcos22_state, init_propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
 GAME( 1996, alpinesa, 0,         alpinesa,  alpiner,   namcos22_state, init_alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
-GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?
+GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
 GAME( 1996, aquajet,  0,         cybrcycc,  aquajet,   namcos22_state, init_aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
 GAME( 1996, alpinr2b, 0,         alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
 GAME( 1996, alpinr2a, alpinr2b,  alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05

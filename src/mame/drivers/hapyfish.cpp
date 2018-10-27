@@ -274,13 +274,13 @@ MACHINE_CONFIG_START(hapyfish_state::hapyfish)
 	MCFG_S3C2440_NAND_DATA_R_CB(READ8(*this, hapyfish_state, s3c2440_nand_data_r))
 	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(*this, hapyfish_state, s3c2440_nand_data_w))
 
-	MCFG_DEVICE_ADD("nand", NAND, 0)
-	MCFG_NAND_TYPE(K9LAG08U0M)
-	MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2440", s3c2440_device, frnb_w))
+	NAND(config, m_nand, 0);
+	m_nand->set_nand_type(nand_device::chip::K9LAG08U0M);
+	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 
-	MCFG_DEVICE_ADD("nand2", NAND, 0)
-	MCFG_NAND_TYPE(K9LAG08U0M)
-	MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2440", s3c2440_device, frnb_w))
+	NAND(config, m_nand2, 0);
+	m_nand2->set_nand_type(nand_device::chip::K9LAG08U0M);
+	m_nand2->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hapyfish )
