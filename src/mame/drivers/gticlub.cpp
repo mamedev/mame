@@ -27,7 +27,7 @@
 
     Game                           | ID        | CPU PCB      | CG Board(s)    | Other
     -----------------------------------------------------------------------------------------------
-    Jet Wave/Wave Shark		   | GX678     | ZR107(A)     | GN678(B)       |
+    Jet Wave/Wave Shark            | GX678     | ZR107(A)     | GN678(B)       |
     GTI Club                       | GX688     | GN672(A)     | GN678(B)       |
     Operation: Thunder Hurricane   | GX792     | GN672(A)     | GN678(B)       | GN680(E) I/O Board
     Solar Assault (Revised)        | GX680     | GN672(A)     | GN678(B)       |
@@ -203,9 +203,9 @@ TODO:
 - The sticky 3d title screen on slrasslt and its clones
 - slrasslt sometimes crashes nearly halfway into Stage 3 right before the first set of pillar arches (SHARC related?)
 - Eventually remove unnecessary hacks
-- hangplt's cg board. Is it identical to GN715 used in hornet?
+- hangplt's cg board. Is it identical to GN676 used in nwk-tr or GN715 used in hornet?
 - Other small gaphical (and maybe SHARC) problems
-- MCFG removal
+- MCFG removal and other cleanups
 
 */
 
@@ -240,6 +240,7 @@ public:
 		m_dsp(*this, "dsp"),
 		m_dsp2(*this, "dsp2"),
 		m_k056800(*this, "k056800"),
+		m_gn680(*this, "gn680"),
 		m_adc1038(*this, "adc1038"),
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette"),
@@ -282,6 +283,7 @@ private:
 	required_device<adsp21062_device> m_dsp;
 	optional_device<adsp21062_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
+	optional_device<cpu_device> m_gn680;
 	required_device<adc1038_device> m_adc1038;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
@@ -295,13 +297,14 @@ private:
 	optional_device<screen_device> m_lscreen;
 	optional_device<screen_device> m_rscreen;
 	optional_device_array<voodoo_device, 2> m_voodoo;
-
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-
 	optional_ioport m_analog0, m_analog1, m_analog2, m_analog3;
-
 	required_ioport_array<4> m_ports;
+	
+	uint16_t m_gn680_latch;
+	uint16_t m_gn680_ret0;
+	uint16_t m_gn680_ret1;
 
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);
@@ -312,6 +315,11 @@ private:
 	DECLARE_WRITE32_MEMBER(gticlub_k001604_reg_w);
 	DECLARE_READ8_MEMBER(sysreg_r);
 	DECLARE_WRITE8_MEMBER(sysreg_w);
+	DECLARE_READ32_MEMBER(gun_r);
+	DECLARE_WRITE32_MEMBER(gun_w);
+	DECLARE_WRITE16_MEMBER(gn680_sysctrl);
+	DECLARE_READ16_MEMBER(gn680_latch_r);
+	DECLARE_WRITE16_MEMBER(gn680_latch_w);
 	DECLARE_READ32_MEMBER(dsp_dataram0_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
 	DECLARE_READ32_MEMBER(dsp_dataram1_r);
@@ -334,13 +342,13 @@ private:
 	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void gn680_memmap(address_map &map);
 	void gticlub_map(address_map &map);
 	void hangplt_map(address_map &map);
 	void hangplt_sharc0_map(address_map &map);
 	void hangplt_sharc1_map(address_map &map);
 	void sharc_map(address_map &map);
 	void sound_memmap(address_map &map);
-
 	void gticlub_led_setreg(int offset, uint8_t data);
 
 	uint8_t m_gticlub_led_reg[2];
@@ -402,6 +410,20 @@ WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
 	k001604->reg_w(space, offset, data, mem_mask);
+}
+
+READ32_MEMBER(gticlub_state::gun_r)
+{
+	return m_gn680_ret0<<16 | m_gn680_ret1;
+}
+
+WRITE32_MEMBER(gticlub_state::gun_w)
+{
+	if (mem_mask == 0xffff0000)
+	{
+		m_gn680_latch = data>>16;
+		m_gn680->set_input_line(M68K_IRQ_6, HOLD_LINE);
+	}
 }
 
 
@@ -560,6 +582,43 @@ void gticlub_state::sound_memmap(address_map &map)
 	map(0x400000, 0x400fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));      /* Ricoh RF5C400 */
 	map(0x500000, 0x500001).w(FUNC(gticlub_state::soundtimer_en_w)).nopr();
 	map(0x600000, 0x600001).w(FUNC(gticlub_state::soundtimer_count_w)).nopr();
+}
+
+/*****************************************************************************/
+
+WRITE16_MEMBER(gticlub_state::gn680_sysctrl)
+{
+	// bit 15 = watchdog toggle
+	// lower 4 bits = LEDs
+}
+
+READ16_MEMBER(gticlub_state::gn680_latch_r)
+{
+	m_gn680->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+
+	return m_gn680_latch;
+}
+
+WRITE16_MEMBER(gticlub_state::gn680_latch_w)
+{
+	if (offset)
+	{
+		m_gn680_ret1 = data;
+	}
+	else
+	{
+		m_gn680_ret0 = data;
+	}
+}
+
+void gticlub_state::gn680_memmap(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x203fff).ram();
+	map(0x300000, 0x300001).w(FUNC(gticlub_state::gn680_sysctrl));
+	map(0x314000, 0x317fff).ram();
+	map(0x400000, 0x400003).rw(FUNC(gticlub_state::gn680_latch_r), FUNC(gticlub_state::gn680_latch_w));
+	map(0x400008, 0x400009).nopw();    // writes 0001 00fe each time IRQ 6 triggers
 }
 
 /*****************************************************************************/
@@ -1020,7 +1079,11 @@ MACHINE_CONFIG_START(gticlub_state::thunderh)
 
 	m_adc1038->set_gti_club_hack(false);
 
-	m_k056230->set_thunderh_hack(true);
+	m_k056230->set_thunderh_hack(true); //Is this hack even necessary now that the GN680 I/O board is hooked?
+
+	M68000(config, m_gn680, XTAL(32'000'000) / 2);   /* 16MHz */
+	m_gn680->set_addrmap(AS_PROGRAM, &gticlub_state::gn680_memmap);
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gticlub_state::slrasslt)
@@ -1462,7 +1525,6 @@ ROM_END
 void gticlub_state::init_gticlub()
 {
 	m_sharc_dataram_0 = std::make_unique<uint32_t[]>(0x100000/4);
-
 	m_dsp->enable_recompiler();
 }
 
