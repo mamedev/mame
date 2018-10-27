@@ -130,14 +130,14 @@
 
     ROM Usage
     ---------
-                 |------------------------------- ROM Locations ----------------------------------|
-    Game         27P     25P  22P   16P     14P     12P     9P      16T     14T     12T  9T  7S
-    -----------------------------------------------------------------------------------------------
-    Gradius 4    837C01  -    -     837A09  837A10  -       778A12  837A04  837A05  -    -   837A08
-    NBA P/Play   778A01  -    -     778A09  778A10  778A11  778A12  778A04  778A05  -    -   778A08
-    S/Scope      830B01  -    -     830A09  830A10  -       -       -       -       -    -   830A08
-    S/Scope 2    931D01  -    -     931A09  931A10  931A11  -       931A04  -       -    -   931A08
-    Teraburst
+                            |------------------------------- ROM Locations ------------------------------------------------|
+    Game                    27P     25P      22P     16P     14P     12P     9P      16T     14T     12T     9T      7S
+    ------------------------------------------------------------------------------------------------------------------------
+    Gradius 4               837C01  -        -       837A09  837A10  -       778A12  837A04  837A05  -       -       837A08
+    NBA Play by Play        778A01  -        -       778A09  778A10  778A11  778A12  778A04  778A05  -       -       778A08
+    Teraburst               -       715l02   715l03  715A09  715A10  -       -       715A04  715A05  -       -       715A08
+    Silent Scope            830B01  -        -       830A09  830A10  -       -       -       -       -       -       830A08
+    Silent Scope 2          931D01  -        -       931A09  931A10  931A11  -       931A04  -       -       -       931A08
 
 
     Bottom Board
@@ -203,14 +203,14 @@
 
     ROM Usage
     ---------
-                 |------ ROM Locations -------|
-    Game         24U     24V     32U     32V 
+                       |------ ROM Locations -------|
+    Game               24U     24V     32U     32V 
     -------------------------------------------
-    Gradius 4    837A13  837A15  837A14  837A16
-    NBA P/Play   778A13  778A15  778A14  778A16
-    S/Scope      -       -       -       -          (no ROMs, not used)
-    S/Scope 2    -       -       -       -          (no ROMs, not used)
-    Teraburst
+    Gradius 4          837A13  837A15  837A14  837A16
+    NBA Play by Play   778A13  778A15  778A14  778A16
+    Teraburst          715A13  -       715A14  -
+    Silent Scope       -       -       -       -          (no ROMs, not used)
+    Silent Scope 2     -       -       -       -          (no ROMs, not used)
 
     I/O Board used for Teraburst (and previously Operation: Thunder Hurricane)
 
@@ -335,7 +335,8 @@
     - sscope and sccope2's right/scope screen doesn't properly sync with the left/main screen. The right screen has a low frame rate currently
     - sscope randomly crashes in attract mode (regression)
     - sscope (and possibly sscope2)'s analog inputs work in test mode but not ingame (regression from long ago)
-    - sscope2 crashes with a SHARC related error after the first boot screen.
+    - sscope2 crashes with a SHARC related error after the first boot screen
+     +It's boot test mode also fails as well
     - Other small gaphical (and maybe SHARC) problems
     - Eventually finish sscope2's LAN board for linking
     
@@ -397,12 +398,12 @@ public:
 
 	void terabrst(machine_config &config);
 	void sscope2(machine_config &config);
-	void hornet_2board(machine_config &config);
-	void hornet_2board_v2(machine_config &config);
+	void sscope(machine_config &config);
+	void sscope_v2(machine_config &config);
 	void hornet(machine_config &config);
 
 	void init_hornet();
-	void init_hornet_2board();
+	void init_sscope();
 	void init_gradius4();
 	void init_nbapbp();
 	void init_terabrst();
@@ -473,7 +474,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(hornet_2board);
+	DECLARE_MACHINE_RESET(sscope);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
@@ -981,7 +982,7 @@ static INPUT_PORTS_START( gradius4 )
 	PORT_DIPSETTING( 0x00, "15KHz" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
+static INPUT_PORTS_START(nbapbp)
 	PORT_INCLUDE(gradius4)
 
 	PORT_MODIFY("DSW")
@@ -990,18 +991,16 @@ static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
 	PORT_DIPSETTING(0x00, "4 Player")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(terabrst)
+static INPUT_PORTS_START(terabrst) //Button 3 is used to speed the gun cursor during gameplay while held when using jamma inputs. This was most likely used for testing purposes as evidence in the game's attract mode.
 	PORT_INCLUDE(hornet)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 Trigger")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P1 Bomb")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sscope )
@@ -1159,7 +1158,14 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HORNET);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(hornet_state::hornet_2board)
+MACHINE_CONFIG_START(hornet_state::terabrst)
+	hornet(config);
+
+	M68000(config, m_gn680, XTAL(32'000'000) / 2);   /* 16MHz */
+	m_gn680->set_addrmap(AS_PROGRAM, &hornet_state::gn680_memmap);
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(hornet_state::sscope)
 	hornet(config);
 
 	ADSP21062(config, m_dsp2, XTAL(36'000'000));
@@ -1204,15 +1210,8 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board)
 	m_konppc->set_num_boards(2);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(hornet_state::terabrst)
-	hornet(config);
-
-	M68000(config, m_gn680, XTAL(32'000'000) / 2);   /* 16MHz */
-	m_gn680->set_addrmap(AS_PROGRAM, &hornet_state::gn680_memmap);
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
-	hornet_2board(config);
+MACHINE_CONFIG_START(hornet_state::sscope2)
+	sscope(config);
 	VOODOO_2(config.replace(), m_voodoo[0], STD_VOODOO_2_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4, 0);
@@ -1226,16 +1225,10 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
 	m_voodoo[1]->set_screen_tag("rscreen");
 	m_voodoo[1]->set_cpu_tag("dsp2"); // ??
 	m_voodoo[1]->vblank_callback().set(FUNC(hornet_state::voodoo_vblank_1));
-MACHINE_CONFIG_END
-
-void hornet_state::sscope2(machine_config &config)
-{
-	hornet_2board_v2(config);
 
 	DS2401(config, "lan_serial_id");
 	EEPROM_93C46_16BIT(config, "lan_eeprom");
-}
-
+MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
@@ -1382,35 +1375,14 @@ void hornet_state::init_hornet()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
-
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
+	m_dsp->enable_recompiler();
 }
 
-void hornet_state::init_hornet_2board()
+void hornet_state::init_sscope()
 {
-	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
+	init_hornet();
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
-	m_led_reg0 = m_led_reg1 = 0x7f;
-
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
-}
-
-void hornet_state::init_gradius4()
-{
-	init_hornet();
-	m_dsp->enable_recompiler();
-}
-
-void hornet_state::init_nbapbp()
-{
-	init_hornet();
-	m_dsp->enable_recompiler();
-}
-
-void hornet_state::init_terabrst()
-{
-	init_hornet();
-	m_dsp->enable_recompiler();
 }
 
 /*****************************************************************************/
@@ -1620,7 +1592,7 @@ ROM_END
 
 ROM_START(terabrst)
 	ROM_REGION32_BE(0x400000, "user1", 0)   /* PowerPC program */
-		ROM_LOAD32_WORD_SWAP( "715l02.25p",   0x000000, 0x200000, CRC(79586f19) SHA1(8dcfed5d101ebe49d958a7a38d5472323f75dd1d) )
+	ROM_LOAD32_WORD_SWAP( "715l02.25p",   0x000000, 0x200000, CRC(79586f19) SHA1(8dcfed5d101ebe49d958a7a38d5472323f75dd1d) )
 	ROM_LOAD32_WORD_SWAP( "715l03.22p",   0x000002, 0x200000, CRC(c193021e) SHA1(c934b7c4bdab0ceff0f1699fcf2fb7d90e2e8962) )
 
 	ROM_REGION32_BE(0x800000, "user2", 0)   /* Data roms */
@@ -1674,18 +1646,18 @@ ROM_END
 
 /*************************************************************************/
 #define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4,  0,        hornet,        gradius4,  hornet_state, init_gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbp,    0,        hornet,        nbapbp,    hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpa,   nbapbp,   hornet,        nbapbp,    hornet_state, init_nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, terabrst,  0,        terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", GAME_FLAGS
-GAME(  1998, terabrsta, terabrst, terabrst,      terabrst,  hornet_state, init_terabrst,      ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", GAME_FLAGS
+GAME(  1998, gradius4,  0,        hornet,   gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,    0,        hornet,   nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpa,   nbapbp,   hornet,   nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, terabrst,  0,        terabrst, terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", GAME_FLAGS
+GAME(  1998, terabrsta, terabrst, terabrst, terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", GAME_FLAGS
 
 // The region comes from the Timekeeper NVRAM, without a valid default all sets except 'xxD, Ver 1.33' will init their NVRAM to UAx versions, the xxD set seems to incorrectly init it to JXD, which isn't a valid
 // version, and thus can't be booted.  If you copy the NVRAM from another already initialized set, it will boot as UAD.
 // to get the actual game to boot you must calibrate the guns etc.
-GAMEL( 2000, sscope,    0,        hornet_2board, sscope,    hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxD, Ver 1.33)", GAME_FLAGS, layout_dualhsxs )
-GAMEL( 2000, sscopec,   sscope,   hornet_2board, sscope,    hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxC, Ver 1.30)", GAME_FLAGS, layout_dualhsxs )
-GAMEL( 2000, sscopeb,   sscope,   hornet_2board, sscope,    hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", GAME_FLAGS, layout_dualhsxs )
-GAMEL( 2000, sscopea,   sscope,   hornet_2board, sscope,    hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", GAME_FLAGS, layout_dualhsxs )
+GAMEL( 2000, sscope,    0,        sscope,   sscope,   hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver xxD, Ver 1.33)", GAME_FLAGS, layout_dualhsxs )
+GAMEL( 2000, sscopec,   sscope,   sscope,   sscope,   hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver xxC, Ver 1.30)", GAME_FLAGS, layout_dualhsxs )
+GAMEL( 2000, sscopeb,   sscope,   sscope,   sscope,   hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", GAME_FLAGS, layout_dualhsxs )
+GAMEL( 2000, sscopea,   sscope,   sscope,   sscope,   hornet_state, init_sscope, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", GAME_FLAGS, layout_dualhsxs )
 
-GAMEL( 2000, sscope2,   0,        sscope2,       sscope2,   hornet_state, init_hornet_2board, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", GAME_FLAGS | MACHINE_NODEVICE_LAN, layout_dualhsxs )
+GAMEL( 2000, sscope2,   0,        sscope2,  sscope2,  hornet_state, init_sscope, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", GAME_FLAGS | MACHINE_NODEVICE_LAN, layout_dualhsxs )
