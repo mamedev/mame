@@ -173,9 +173,9 @@ MACHINE_CONFIG_START(micro20_state::micro20)
 	MCFG_DEVICE_ADD(DUART_A_TAG, MC68681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(DUART_A_TAG, mc68681_device, rx_a_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(DUART_A_TAG, FUNC(mc68681_device::rx_a_w));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	MCFG_DEVICE_ADD(DUART_B_TAG, MC68681, 3.6864_MHz_XTAL)
 

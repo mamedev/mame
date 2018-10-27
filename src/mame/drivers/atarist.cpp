@@ -1213,19 +1213,6 @@ void st_state::ikbd_map(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( ikbd_io_map )
-//-------------------------------------------------
-
-void st_state::ikbd_io_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).r(FUNC(st_state::ikbd_port1_r));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(st_state::ikbd_port2_r), FUNC(st_state::ikbd_port2_w));
-	map(M6801_PORT3, M6801_PORT3).w(FUNC(st_state::ikbd_port3_w));
-	map(M6801_PORT4, M6801_PORT4).rw(FUNC(st_state::ikbd_port4_r), FUNC(st_state::ikbd_port4_w));
-}
-
-
-//-------------------------------------------------
 //  ADDRESS_MAP( st_map )
 //-------------------------------------------------
 
@@ -2007,6 +1994,18 @@ static void atari_floppies(device_slot_interface &device)
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
+void st_state::keyboard(machine_config &config)
+{
+	hd6301_cpu_device &ikbd(HD6301(config, HD6301V1_TAG, Y2/8));
+	ikbd.set_addrmap(AS_PROGRAM, &st_state::ikbd_map);
+	ikbd.in_p1_cb().set(FUNC(st_state::ikbd_port1_r));
+	ikbd.in_p2_cb().set(FUNC(st_state::ikbd_port2_r));
+	ikbd.out_p2_cb().set(FUNC(st_state::ikbd_port2_w));
+	ikbd.out_p3_cb().set(FUNC(st_state::ikbd_port3_w));
+	ikbd.in_p4_cb().set(FUNC(st_state::ikbd_port4_r));
+	ikbd.out_p4_cb().set(FUNC(st_state::ikbd_port4_w));
+}
+
 //-------------------------------------------------
 //  MACHINE_CONFIG( st )
 //-------------------------------------------------
@@ -2017,9 +2016,7 @@ MACHINE_CONFIG_START(st_state::st)
 	MCFG_DEVICE_PROGRAM_MAP(st_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
-	MCFG_DEVICE_ADD(HD6301V1_TAG, HD6301, Y2/8)
-	MCFG_DEVICE_PROGRAM_MAP(ikbd_map)
-	MCFG_DEVICE_IO_MAP(ikbd_io_map)
+	keyboard(config);
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -2110,9 +2107,7 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_DEVICE_PROGRAM_MAP(megast_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
-	MCFG_DEVICE_ADD(HD6301V1_TAG, HD6301, Y2/8)
-	MCFG_DEVICE_PROGRAM_MAP(ikbd_map)
-	MCFG_DEVICE_IO_MAP(ikbd_io_map)
+	keyboard(config);
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -2204,9 +2199,7 @@ MACHINE_CONFIG_START(ste_state::ste)
 	MCFG_DEVICE_PROGRAM_MAP(ste_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
 
-	MCFG_DEVICE_ADD(HD6301V1_TAG, HD6301, Y2/8)
-	MCFG_DEVICE_PROGRAM_MAP(ikbd_map)
-	MCFG_DEVICE_IO_MAP(ikbd_io_map)
+	keyboard(config);
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

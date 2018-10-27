@@ -9256,13 +9256,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::kiwame)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kiwame_map)
 	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta_state, kiwame_row_select_w))
+	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
+	tmp68301.set_cputag(m_maincpu);
+	tmp68301.out_parallel_callback().set(FUNC(seta_state::kiwame_row_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

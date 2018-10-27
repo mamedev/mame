@@ -825,15 +825,15 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	m_i8255a->out_pc_callback().set(FUNC(tandy2k_state::ppi_pc_w));
 
 	I8251(config, m_uart, 0);
-	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
-	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_uart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_uart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
 	m_uart->rxrdy_handler().set(FUNC(tandy2k_state::rxrdy_w));
 	m_uart->txrdy_handler().set(FUNC(tandy2k_state::txrdy_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_dsr))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
+	m_rs232->dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 	// TODO pin 15 external transmit clock
 	// TODO pin 17 external receiver clock
 

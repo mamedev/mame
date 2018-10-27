@@ -2575,13 +2575,13 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 }
 
 MACHINE_CONFIG_START(seta2_state::seta2)
-	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_ADD(m_maincpu, M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
 	MCFG_DEVICE_PROGRAM_MAP(mj4simai_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -2613,9 +2613,8 @@ MACHINE_CONFIG_START(seta2_state::gundamex)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gundamex_map)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, seta2_state, gundamex_eeprom_r))
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, gundamex_eeprom_w))
+	m_tmp68301->in_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_r));
+	m_tmp68301->out_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2697,8 +2696,7 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(reelquak_map)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, reelquak_leds_w))
+	m_tmp68301->out_parallel_callback().set(FUNC(seta2_state::reelquak_leds_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2717,8 +2715,7 @@ MACHINE_CONFIG_START(seta2_state::samshoot)
 	MCFG_DEVICE_PROGRAM_MAP(samshoot_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("DSW2"))
+	m_tmp68301->in_parallel_callback().set_ioport("DSW2");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2750,8 +2747,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(telpacfl_map)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("KNOB"))
+	m_tmp68301->in_parallel_callback().set_ioport("KNOB");
 
 	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
@@ -2859,13 +2855,13 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seta2_state::namcostr)
-	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_ADD(m_maincpu, M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
 	MCFG_DEVICE_PROGRAM_MAP(namcostr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)  // does this have a ticket dispenser?
-	MCFG_TMP68301_CPU("maincpu")
+	TMP68301(config, m_tmp68301, 0);  // does this have a ticket dispenser?
+	m_tmp68301->set_cputag(m_maincpu);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

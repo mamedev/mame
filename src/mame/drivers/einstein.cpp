@@ -652,10 +652,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	ic_i060.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	// rs232 port
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IC_I060, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(IC_I060, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(IC_I060, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(IC_I060, FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set(IC_I060, FUNC(i8251_device::write_cts));
 
 	// floppy
 	WD1770(config, m_fdc, XTAL_X002);

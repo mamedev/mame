@@ -966,12 +966,12 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	m_kb_uart->rxrdy_handler().set("pic_slave", FUNC(pic8259_device::ir4_w));
 	m_kb_uart->dtr_handler().set(FUNC(octopus_state::spk_w));
 	m_kb_uart->rts_handler().set(FUNC(octopus_state::beep_w));
-	MCFG_DEVICE_ADD("keyboard_port", RS232_PORT, keyboard, "octopus")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("keyboard", i8251_device, write_rxd))
+	rs232_port_device &keyboard_port(RS232_PORT(config, "keyboard_port", keyboard, "octopus"));
+	keyboard_port.rxd_handler().set(m_kb_uart, FUNC(i8251_device::write_rxd));
 	MCFG_DEVICE_ADD("keyboard_clock_rx", CLOCK, 9600 * 64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("keyboard",i8251_device,write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(m_kb_uart,i8251_device,write_rxc))
 	MCFG_DEVICE_ADD("keyboard_clock_tx", CLOCK, 1200 * 64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("keyboard",i8251_device,write_txc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(m_kb_uart,i8251_device,write_txc))
 
 	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir5_w));

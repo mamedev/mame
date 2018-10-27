@@ -332,6 +332,7 @@ const double XTAL::known_xtals[] = {
 	 42'954'545, /* 42.954545_MHz_XTAL     CPS3 (12x NTSC subcarrier)*/
 	 43'320'000, /* 43.32_MHz_XTAL         DEC VT420 */
 	 44'100'000, /* 44.1_MHz_XTAL          Subsino's Bishou Jan */
+	 44'236'800, /* 44.2368_MHz_XTAL       ReCo6502 */
 	 44'452'800, /* 44.4528_MHz_XTAL       TeleVideo 965 */
 	 45'000'000, /* 45_MHz_XTAL            Eolith with Hyperstone CPUs */
 	 45'158'000, /* 45.158_MHz_XTAL        Sega Model 2A video board, Model 3 CPU board */

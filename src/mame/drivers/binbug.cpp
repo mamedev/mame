@@ -320,8 +320,7 @@ MACHINE_CONFIG_START(binbug_state::binbug)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard").set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )

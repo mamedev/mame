@@ -669,9 +669,10 @@ DEVICE_INPUT_DEFAULTS_END
 #define CAN09T_BAUDGEN_CLOCK 1.8432_MHz_XTAL
 #define CAN09T_ACIA_CLOCK (CAN09T_BAUDGEN_CLOCK / 12)
 
-MACHINE_CONFIG_START(can09t_state::can09t)
-	MCFG_DEVICE_ADD("maincpu", MC6809, 4.9152_MHz_XTAL) // IPL crystal
-	MCFG_DEVICE_PROGRAM_MAP(can09t_map)
+void can09t_state::can09t(machine_config &config)
+{
+	MC6809(config, m_maincpu, 4.9152_MHz_XTAL); // IPL crystal
+	m_maincpu->set_addrmap(AS_PROGRAM, &can09t_state::can09t_map);
 
 	/* --PIA inits----------------------- */
 	PIA6821(config, m_syspia, 0); // CPU board
@@ -704,13 +705,12 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD ("acia_clock", CLOCK, CAN09T_ACIA_CLOCK)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, can09t_state, write_acia_clock))
-MACHINE_CONFIG_END
+	CLOCK(config, "acia_clock", CAN09T_ACIA_CLOCK).signal_handler().set(FUNC(can09t_state::write_acia_clock));
+}
 
 #define CAN09_X1_CLOCK 22.1184_MHz_XTAL        /* UKI 22118.40 Khz */
 #define CAN09_CPU_CLOCK (CAN09_X1_CLOCK / 16) /* ~1.38MHz Divider needs to be check but is the most likelly */

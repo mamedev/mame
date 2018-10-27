@@ -1208,7 +1208,6 @@ ampoker2                        // (c) 1990 Novomatic
 piccolop                        // (c) 1991 Admiral - Novomatic
 pkrdewin                        // 1990 bootleg
 rabbitpk                        // 1990 bootleg
-novopkr2                        // 1990 bootleg
 sigma2k                         // (c) 2000 Sigma
 sigmapkr                        // (c) 1995 Sigma
 videomat                        // 1990 bootleg
@@ -9166,6 +9165,7 @@ esclwrldg                       //
 hardbody                        //
 hardbodyg                       //
 hvymetap                        //
+hvymetapg                       //
 ladyluck                        //
 motrdome                        //
 motrdomeg                       //
@@ -10182,7 +10182,6 @@ mswordj                         // 23/06/1990 (c) 1990 (Japan)
 mswordr1                        // 23/06/1990 (c) 1990 (World)
 mswordu                         // 25/07/1990 (c) 1990 (USA)
 mtwins                          // 19/06/1990 (c) 1990 (World)
-mtwinsb                         // bootleg
 nemo                            // 30/11/1990 (c) 1990 (World)
 nemoj                           // 20/11/1990 (c) 1990 (Japan)
 nemor1                          // 09/11/1990 (c) 1990 (World)
@@ -12734,6 +12733,7 @@ ffightbl                        // bootleg
 ffightbla                       // bootleg
 knightsb                        // bootleg
 kodb                            // bootleg
+mtwinsb                         // bootleg
 punipic                         // bootleg
 punipic2                        // bootleg
 punipic3                        // bootleg
@@ -14946,6 +14946,7 @@ gnw_dkjr                        // Nintendo
 gnw_dkong                       // Nintendo
 gnw_dkong2                      // Nintendo
 gnw_egg                         // Nintendo
+gnw_ghouse                      // Nintendo
 gnw_mario                       // Nintendo
 gnw_mariocm                     // Nintendo
 gnw_mmouse                      // Nintendo
@@ -15851,14 +15852,20 @@ x5jokers                        // (c) 200? Electronic Projects
 @source:itgamble.cpp
 abacus                          // (c) 200? unknown
 bookthr                         // (c) 200? unknown
+bowlroad                        // (c) 2001 Nazionale Elettronica
+bowlroad14                      // (c) 2001 Nazionale Elettronica
+bowlroad14n                     // (c) 2001 Nazionale Elettronica
 capcor                          // (c) 2001 Nazionale Elettronica
 capunc                          // (c) 2000 Nazionale Elettronica
 euro2k2                         // (c) 2001 Nazionale Elettronica
 euro2k2a                        // (c) 2001 Nazionale Elettronica
 euro2k2s                        // (c) 2002 Nazionale Elettronica
+labrinth                        // (c) 2001 Nazionale Elettronica
 laperla                         // (c) 2002 Nazionale Elettronica
 laperlag                        // (c) 2001 Nazionale Elettronica
 mnumber                         // (c) 200? M.M. - B.R.L.
+pinups                          // (c) 200? Nazionale Elettronica
+uforobot                        // (c) 2001 Nazionale Elettronica
 wcup                            // (c) 2001 Nazionale Elettronica
 wcup14                          // (c) 2001 Nazionale Elettronica
 
@@ -29471,6 +29478,7 @@ mslug6                          // 2006.02 Metal Slug 6
 mushi2k4                        // 2004.?? MushiKing The King Of Beetles 2004 Second (Japan)
 mushi2k5                        // 2005.?? MushiKing The King Of Beetles 2005 First (Japan)
 mushike                         // 2004.?? MushiKing The King Of Beetle (World)
+mushikep                        // 2004.?? MushiKing The King Of Beetle (Prototype)
 mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001) (World)
 mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001) (World)
 mushik4e                        // 2007.?? Mushiking The King Of Beetles IV / V / VI (World)
@@ -30726,6 +30734,7 @@ mspacman                        // (c) 1981 Midway  // made by General Computer
 mspacmanbcc                     // bootleg
 mspacmanbco                     // bootleg
 mspacmanbg                      // bootleg
+mspacmanbg2                     // bootleg
 mspacmanbgd                     // bootleg
 mspacmanblt                     // bootleg
 mspacmanbhe                     // bootleg
@@ -30756,6 +30765,8 @@ pacuman                         // bootleg
 paintrlr                        // 1981 bootleg
 pengojpm                        // bootleg
 pengopac                        // bootleg
+pengomc1                        // bootleg (Marti Colls)
+pengomc2                        // bootleg (Marti Colls)
 pinguinos                       // bootleg
 piranha                         // GL
 piranhah                        // hack
@@ -31776,6 +31787,7 @@ ketb                            //
 ketbl                           //
 killbld                         // (c) 1998 The Killing Blade
 killbld104                      //
+killbld106                      //
 killbldp                        // (c) 2004 Killing Blade Plus
 kov                             // (c) 1999 Knights of Valor
 kov100                          //
@@ -35280,10 +35292,11 @@ denseib                         // bootleg
 endless                         // bootleg
 ffight2b                        // bootleg
 iron                            // bootleg
+legendsb                        // bootleg
 kinstb                          // bootleg
 mk3snes                         // bootleg
+rushbeat                        // bootleg
 sblast2b                        // bootleg
-legendsb                        // bootleg
 
 @source:snk.cpp
 alphamis                        // (c) 1985
@@ -36537,6 +36550,7 @@ ninjak                          // 1991.?? C85 (c) 1990 Taito Corporation Japan 
 ninjakj                         // 1991.04 C85 (c) 1990 Taito Corporation (Japan)
 ninjaku                         // 1991.03 C85 (c) 1990 Taito Corporation (Japan)
 pulirula                        // 1991.?? C98 (c) 1991 Taito Corporation Japan (World)
+pulirulaa                       // 1991.?? C98 (c) 1991 Taito Corporation Japan (World)
 pulirulaj                       // 1991.11 C98 (c) 1991 Taito Corporation (Japan)
 qcrayon                         // 1993.08 D55 (c) 1993 Taito Corporation (Japan)
 qcrayon2                        // 1994.01 D63 (c) 1993 Taito Corporation (Japan)
@@ -37051,6 +37065,7 @@ teleguide                       //
 @source:terracre.cpp
 amatelas                        // (c) 1986
 amazon                          // (c) 1986
+amazont                         // (c) 1986
 boobhack                        // bootleg
 horekid                         // (c) 1987
 horekidb                        // bootleg

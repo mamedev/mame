@@ -71,7 +71,8 @@ struct namcos22_scenenode
 
 		struct
 		{
-			float vx, vy, vw, vh;
+			float vx, vy;
+			float vu, vd, vl, vr;
 			int texturebank;
 			int color;
 			int cmode;
@@ -148,8 +149,8 @@ private:
 	struct namcos22_scenenode m_scenenode_root;
 	struct namcos22_scenenode *m_scenenode_cur;
 
-	int m_clipx;
-	int m_clipy;
+	float m_clipx;
+	float m_clipy;
 	rectangle m_cliprect;
 
 	inline u8 nthbyte(const u32 *src, int n) { return (src[n / 4] << ((n & 3) * 8)) >> 24; }
@@ -380,6 +381,7 @@ private:
 	void handle_driving_io();
 	void handle_coinage(u16 flags);
 	void handle_cybrcomm_io();
+	void pdp_handle_commands(u16 offs);
 	inline u32 pdp_polygonram_read(offs_t offs) { return m_polygonram[offs & 0x7fff]; }
 	inline void pdp_polygonram_write(offs_t offs, u32 data) { m_polygonram[offs & 0x7fff] = data; }
 	void point_write(offs_t offs, u32 data);
@@ -555,8 +557,10 @@ private:
 	float m_camera_zoom;
 	float m_camera_vx;
 	float m_camera_vy;
-	float m_camera_vw;
-	float m_camera_vh;
+	float m_camera_vu;
+	float m_camera_vd;
+	float m_camera_vl;
+	float m_camera_vr;
 	float m_camera_lx; // unit vector for light direction
 	float m_camera_ly; // "
 	float m_camera_lz; // "

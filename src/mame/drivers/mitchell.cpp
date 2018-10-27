@@ -2073,11 +2073,38 @@ ROM_START( spangbl )
 	ROM_LOAD( "ic125.14",  0x030000, 0x10000, CRC(bd5c2f4b) SHA1(3c71d63637633a98ab513e4336e2954af3f964f4) )
 ROM_END
 
-// There is a bank of 8 dipswitches that needs to be hooked up
+// "spangbl2"
+// TODO: There is a bank of 8 dipswitches that needs to be hooked up with this set up:
+// ______________________________________________________
+// |                    | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
+// |--------------------|---|---|---|---|---|---|---|---|
+// | 1 Coin - 1 Credit  | ON| ON| ON|   |   |   |   |   |
+// | 1 Coin - 2 Credits |OFF| ON| ON|   |   |   |   |   |
+// | 1 Coin - 3 Credits | ON|OFF| ON|   |   |   |   |   |
+// | 1 Coin - 4 Credits |OFF|OFF| ON|   |   |   |   |   |
+// | 1 Coin - 6 Credits | ON| ON|OFF|   |   |   |   |   |
+// | 2 Coin - 1 Credit  |OFF| ON|OFF|   |   |   |   |   |
+// | 3 Coin - 1 Credit  | ON|OFF|OFF|   |   |   |   |   |
+// | 4 Coin - 1 Credit  |OFF|OFF|OFF|   |   |   |   |   |
+// |--------------------|---|---|---|---|---|---|---|---|
+// | 1 Player           |   |   |   | ON| ON|   |   |   |
+// | 2 Players          |   |   |   |OFF| ON|   |   |   |
+// | 3 Players          |   |   |   | ON|OFF|   |   |   |
+// | 4 Players          |   |   |   |OFF|OFF|   |   |   |
+// |--------------------|---|---|---|---|---|---|---|---|
+// | Easy               |   |   |   |   |   | ON| ON|   |
+// | Normal             |   |   |   |   |   |OFF| ON|   |
+// | Dificult           |   |   |   |   |   | ON|OFF|   |
+// | Very dificult      |   |   |   |   |   |OFF|OFF|   |
+// |--------------------|---|---|---|---|---|---|---|---|
+// | No demo sounds     |   |   |   |   |   |   |   | ON|
+// | Demo sounds        |   |   |   |   |   |   |   |OFF|
+// |____________________________________________________|
 ROM_START( spangbl2 )
 	ROM_REGION( 0x50000*2, "maincpu", ROMREGION_ERASEFF )
 	// IC2 can be found as 27C512 with 1st and 2nd half identical or as 27C256
 	ROM_LOAD( "sp2-19.ic2", 0x00000, 0x08000, CRC(6f52f8df) SHA1(a203e5cee601ea660860c38ac8e377a54f619c12) ) // 27C256
+	ROM_RELOAD(0x50000, 0x08000)
 	ROM_LOAD( "sp-18.ic18", 0x60000, 0x04000, CRC(6f377832) SHA1(25755ed77a797f50fdfbb4c42a04f51d3d08f87c) ) // 27C020
 	ROM_CONTINUE(0x10000,0x4000)
 	ROM_CONTINUE(0x64000,0x4000)
@@ -2126,7 +2153,7 @@ ROM_START( spangbl2 )
 	// "sp2-16" can be found as a 76161 PROM or as a 27C256 with its first 6KB empty
 	ROM_LOAD( "sp2-16.bin", 0x08000, 0x00800, CRC(16dbd461) SHA1(1759ad71df8deb5452b3ee92aa2ece1ee79ff469) ) // M1-76161-5
 
-	// Unsused
+	// Unused
 	ROM_REGION( 0x000505, "plds", 0)
 	ROM_LOAD( "1-hy18cv8s.ic4",    0x0000, 0x0155, CRC(a93edbf5) SHA1(57ac314e6d501be903e313aec4e083d642bebebe) )
 	ROM_LOAD( "2-pal16l8acn.ic32", 0x0155, 0x0104, CRC(b78ee715) SHA1(df9ed2bef394b4e26ac87bd39d81f4df2b5cefe5) )

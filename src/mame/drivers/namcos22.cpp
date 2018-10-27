@@ -13,7 +13,6 @@
  * TODO:
  * - finish slave DSP emulation
  * - emulate System22 I/O board C74
- * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit.
  * - alpinesa doesn't work, protection related?
  * - C139 for linked cabinets, as well as in RR fullscale
  * - confirm DSP and MCU clocks and their IRQ timing
@@ -25,15 +24,16 @@
  *       + mountains in alpinr2b selection screen
  *       + ridgerac waving flag shadowing
  *       + cybrcomm enemies should flash white when you shoot them, probably lighting related
+ *       + timecris helicopter, car, grenade boxes should flash white when you shoot them (similar to cybrcomm)
  * - improve ss22 spot:
  *       + dirtdash record time message creates a 'gap' in the spotlight when entering the jungle level
  *       + how is it enabled exactly? the enable bit in spotram is set in tokyowar too(which doesn't use spot)
  *       + what is the high bit in spot_factor for? darkness instead of brightness? not used anywhere
+ * - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snowmelting effect)
  * - support for text layer video partial updates after posirq, alpinesa does raster effects on it
  * - alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
  * - cybrcomm arrows(black part) should be below textlayer when a messagebox pops up
  * - cybrcycc speed dial needle is missing
- * - window clipping is wrong in acedrvrw, victlapw (see rear-view mirrors), and alpinr2b character selection screen
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
  * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
  * - ridgerac fogging isn't applied to the upper/side part of the sky (best seen when driving down a hill), it's fine in ridgera2
@@ -1631,11 +1631,8 @@ WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
 READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 {
 	// Like other Namco hardware, this chip is used for protection as well as
-	// reading random values in some games for example in timecris to determine
-	// where certain enemies will emerge.
+	// reading random values in some games.
 	// It works in combination with keycus_w, but not yet understood how.
-
-//  printf("Hit keycus offs %x mask %x PC=%x\n", offset, mem_mask, m_maincpu->pc());
 
 	// protection (not used for all games)
 	// note: some games will XOR this register against a magic value, but that doesn't mean
@@ -2076,7 +2073,7 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 {
 	u32 value = m_polygonram[offset];
 
-	switch (m_dspram_bank)
+	switch (m_dspram_bank & 3)
 	{
 		case 0:
 			value &= 0xffff;
@@ -2091,8 +2088,9 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 			value &= 0xffff;
 			break;
 
-		default:
-			break;
+		case 3:
+			// ready status?
+			return 0;
 	}
 
 	return value;
@@ -2104,7 +2102,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 	u16 lo = value & 0xffff;
 	u16 hi = value >> 16;
 
-	switch (m_dspram_bank)
+	switch (m_dspram_bank & 3)
 	{
 		case 0:
 			COMBINE_DATA(&lo);
@@ -2149,7 +2147,6 @@ void namcos22_state::point_write(offs_t offs, u32 data)
 
 s32 namcos22_state::pointram_read(offs_t offs) // called from point_read
 {
-	// point ram, only used in ram test and ridgerac flag?
 	s32 result = -1;
 	if (m_is_ss22)
 	{
@@ -2220,9 +2217,14 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 	m_dsp_master_bioz = 1;
 	u16 offs = (m_is_ss22) ? pdp_polygonram_read(0x7fff) : m_pdp_base;
 
-	if (!m_is_ss22)
-		return 0;
+	if (m_is_ss22)
+		pdp_handle_commands(offs);
 
+	return 0;
+}
+
+void namcos22_state::pdp_handle_commands(u16 offs)
+{
 	for (;;)
 	{
 		offs &= 0x7fff;
@@ -2230,7 +2232,7 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 		u16 cmd = pdp_polygonram_read(offs++);
 		u32 srcAddr;
 		u32 dstAddr;
-		u32 numWords;
+		u16 numWords;
 		u32 data;
 		switch (cmd)
 		{
@@ -2264,6 +2266,16 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 					pdp_polygonram_write(dstAddr++, data);
 				}
 				break;
+
+			case 0xfff8:
+				// unknown
+				data = pdp_polygonram_read(offs++); // address probably, whatfor?
+				break;
+
+			case 0xfff9:
+				// unknown, modify pointram somehow?
+				logerror("unknown PDP cmd=0x%04x, offs=0x%x\n", cmd, 4 * (offs - 1));
+				return;
 
 			case 0xfffa:
 				// read block from point ram
@@ -2323,17 +2335,15 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 				{
 					// MAME will get stuck with a "goto self", so bail out
 					// in reality, the cpu can overwrite this address or retrigger pdp_begin
-					return 0;
+					return;
 				}
 				break;
 
 			default:
-				logerror("unknown PDP cmd = 0x%04x!\n", cmd);
-				return 0;
+				logerror("unknown PDP cmd=0x%04x, offs=0x%x\n", cmd, 4 * (offs - 1));
+				return;
 		}
 	}
-
-	return 0;
 }
 
 READ16_MEMBER(namcos22_state::dsp_hold_signal_r)
@@ -2583,7 +2593,7 @@ READ16_MEMBER(namcos22_state::dsp_slave_port3_r)
 READ16_MEMBER(namcos22_state::dsp_slave_port4_r)
 {
 	return 0;
-//  return ReadDataFromSlaveBuf();
+	//return ReadDataFromSlaveBuf();
 }
 
 READ16_MEMBER(namcos22_state::dsp_slave_port5_r)
@@ -3786,8 +3796,10 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_camera_zoom));
 	save_item(NAME(m_camera_vx));
 	save_item(NAME(m_camera_vy));
-	save_item(NAME(m_camera_vw));
-	save_item(NAME(m_camera_vh));
+	save_item(NAME(m_camera_vu));
+	save_item(NAME(m_camera_vd));
+	save_item(NAME(m_camera_vl));
+	save_item(NAME(m_camera_vr));
 	save_item(NAME(m_camera_lx));
 	save_item(NAME(m_camera_ly));
 	save_item(NAME(m_camera_lz));
@@ -3840,7 +3852,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_DEVICE_PROGRAM_MAP(iomcu_s22_program)
 	MCFG_DEVICE_IO_MAP(iomcu_s22_io)
 
-	EEPROM_2864(config, "eeprom").write_time(attotime::from_nsec(10));
+	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5764,7 +5776,7 @@ GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, init_time
 GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22_state, init_timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl, 0,         propcycl,  propcycl,  namcos22_state, init_propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
 GAME( 1996, alpinesa, 0,         alpinesa,  alpiner,   namcos22_state, init_alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/07/01 15:19:23. major problems, protection?
-GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?
+GAME( 1996, tokyowar, 0,         tokyowar,  tokyowar,  namcos22_state, init_tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
 GAME( 1996, aquajet,  0,         cybrcycc,  aquajet,   namcos22_state, init_aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
 GAME( 1996, alpinr2b, 0,         alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 97/01/10 17:10:59
 GAME( 1996, alpinr2a, alpinr2b,  alpine,    alpiner,   namcos22_state, init_alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/12/06 13:45:05

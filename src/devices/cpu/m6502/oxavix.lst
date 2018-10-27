@@ -113,7 +113,7 @@ rti_xav_imp
 	prefetch();
 
 
-xa_lda_idy
+xavlda_idy
 	TMP2 = read_pc(); // we need to fetch the zero page part from zero page, but the rest as if zero page wasn't there, similar to the 6509
 	TMP = read(TMP2);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));

@@ -296,10 +296,9 @@ void imagetek_i4100_device::device_start()
 	save_item(NAME(m_screen_yoffset));
 	save_item(NAME(m_layer_priority));
 	save_item(NAME(m_background_color));
-//  save_item(NAME(m_window));
-//  save_item(NAME(m_scroll));
 	save_item(NAME(m_screen_blank));
 	save_item(NAME(m_screen_flip));
+	save_item(NAME(m_layer_tile_select));
 
 //  memory_region *devregion =  machine().root_device().memregion(":gfx1");
 //  m_gfxrom = devregion->base();

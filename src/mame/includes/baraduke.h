@@ -24,7 +24,6 @@ public:
 	DECLARE_WRITE8_MEMBER(baraduke_lamps_w);
 	DECLARE_WRITE8_MEMBER(baraduke_irq_ack_w);
 	DECLARE_READ8_MEMBER(soundkludge_r);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_READ8_MEMBER(baraduke_videoram_r);
 	DECLARE_WRITE8_MEMBER(baraduke_videoram_w);
 	DECLARE_READ8_MEMBER(baraduke_textram_r);
@@ -48,7 +47,6 @@ public:
 	void baraduke(machine_config &config);
 	void baraduke_map(address_map &map);
 	void mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;

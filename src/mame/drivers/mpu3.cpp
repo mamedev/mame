@@ -883,14 +883,14 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	m_pia6->irqa_handler().set(FUNC(mpu3_state::cpu0_irq));
 	m_pia6->irqb_handler().set(FUNC(mpu3_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD("reel0", REEL, MPU3_48STEP_REEL, 1, 3, 0x00, 2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, mpu3_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, MPU3_48STEP_REEL, 1, 3, 0x00, 2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, mpu3_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, MPU3_48STEP_REEL, 1, 3, 0x00, 2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, mpu3_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, MPU3_48STEP_REEL, 1, 3, 0x00, 2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, mpu3_state, reel_optic_cb<3>))
+	REEL(config, m_reels[0], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
+	m_reels[0]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<0>));
+	REEL(config, m_reels[1], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
+	m_reels[1]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<1>));
+	REEL(config, m_reels[2], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
+	m_reels[2]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<2>));
+	REEL(config, m_reels[3], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
+	m_reels[3]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<3>));
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)

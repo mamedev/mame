@@ -1,10 +1,14 @@
-// license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// license:GPL-2.0+
+// copyright-holders:Segher Boessenkool,Ryan Holtz
 /*****************************************************************************
 
-	SunPlus micro'nSP core
+	SunPlus micro'nSP emulator
 
-	based primarily on Unununium, by segher
+	Copyright 2008-2017  Segher Boessenkool  <segher@kernel.crashing.org>
+	Licensed under the terms of the GNU GPL, version 2
+	http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+
+	Ported to MAME framework by Ryan Holtz
 
 *****************************************************************************/
 
@@ -56,12 +60,13 @@ enum
 	UNSP_NUM_LINES
 };
 
-
 class unsp_device : public cpu_device
 {
 public:
 	// construction/destruction
 	unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_timer_interval(int timer, uint32_t interval);
 
 protected:
 	// device-level overrides
@@ -87,6 +92,10 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	void add_lpc(const int32_t offset);
+
+	inline void execute_one(const uint16_t op);
+
 	address_space_config m_program_config;
 
 	uint16_t m_r[16];

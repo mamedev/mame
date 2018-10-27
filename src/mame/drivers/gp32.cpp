@@ -1696,7 +1696,7 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
+	SMARTMEDIA(config, m_smartmedia, 0);
 
 	MCFG_SOFTWARE_LIST_ADD("memc_list","gp32")
 MACHINE_CONFIG_END

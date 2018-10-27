@@ -701,12 +701,11 @@ MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	AY51013(config, m_uart); // Tesla MHB1012
 	m_uart->set_tx_clock(XTAL(12'288'000) / 80); // not actual rate?
 	m_uart->set_rx_clock(XTAL(12'288'000) / 80); // not actual rate?
-	m_uart->read_si_callback().set("v24", FUNC(rs232_port_device::rxd_r));
-	m_uart->write_so_callback().set("v24", FUNC(rs232_port_device::write_txd));
+	m_uart->read_si_callback().set(m_v24, FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set(m_v24, FUNC(rs232_port_device::write_txd));
 	m_uart->set_auto_rdav(true); // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
 
-	MCFG_DEVICE_ADD("v24", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, m_v24, default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

@@ -489,19 +489,19 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	m_uart_a->dtr_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart_a->rts_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart_a, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart_a, i8251_device, write_dsr))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_uart_a, FUNC(i8251_device::write_rxd));
+	rs232a.dsr_handler().set(m_uart_a, FUNC(i8251_device::write_dsr));
 
 	I8251(config, m_uart_b, 0/*8_MHz_XTAL / 2,*/);
 	m_uart_b->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart_b->dtr_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart_b->rts_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart_b, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart_b, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart_b, i8251_device, write_cts))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, "terminal"));
+	rs232b.rxd_handler().set(m_uart_b, FUNC(i8251_device::write_rxd));
+	rs232b.dsr_handler().set(m_uart_b, FUNC(i8251_device::write_dsr));
+	rs232b.cts_handler().set(m_uart_b, FUNC(i8251_device::write_cts));
 
 	com8116_device &brg(COM8116(config, COM5016_TAG, 5.0688_MHz_XTAL));
 	brg.fr_handler().set(m_uart_a, FUNC(i8251_device::write_txc));

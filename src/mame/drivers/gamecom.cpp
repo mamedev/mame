@@ -10,16 +10,21 @@ Todo:
 - RS232 port
 - Sound ports 1,2 do not sound anything like the real thing
 - Sound port 3 (noise channel)
-- Sound dac port (mostly works but is the wrong speed in some places)
+- Sound dac port (mostly works but is the wrong speed in some places).
+  dac pitch is controlled by how often TIM1_INT occurs. This same
+  interrupt also controls the seconds countdown in some games, such as
+  Quiz Wiz and Scrabble. Currently this countdown goes twice as fast
+  as it should. If the INT is slowed down to compensate, the dac sound
+  is so slow as to be unintelligible. Need to find a way to keep both happy.
+- System seems slower than it should. Probably wrong cycle count in the CPU.
+  What we have there is a guess as the real info has not been found.
+  -speed 1.2 makes the sound more natural
+  -speed 1.7 if TIM1_INT is slowed to fix the countdown.
 
 Game Status:
 - Inbuilt ROM and PDA functions all work
 - Due to an irritating message, the NVRAM is commented out in the machine config
 - All carts appear to work except:
-- - Henry: misbehaviour just after "HENRY" button clicked.
-- --- You can still click where the invisible HENRY button is, and have one
-      turn. After that, it's game over, and you can't play any more until
-      you cold boot the emulation.
 - - Lost World: freeze just after entering Stage 2 (the nest).
 - --- If you do nothing it freezes at the point where the stegasaurus
       should turn around. So, straight away start moving to the right

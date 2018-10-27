@@ -122,6 +122,7 @@ using util::BIT;
 #include "cpu/spc700/spc700ds.h"
 #include "cpu/ssem/ssemdasm.h"
 #include "cpu/ssp1601/ssp1601d.h"
+#include "cpu/st62xx/st62xx_dasm.h"
 #include "cpu/superfx/sfx_dasm.h"
 #include "cpu/t11/t11dasm.h"
 #include "cpu/tlcs870/tlcs870d.h"
@@ -219,7 +220,7 @@ struct s2650_unidasm_t : s2650_disassembler::config
 	virtual ~s2650_unidasm_t() override = default;
 	virtual bool get_z80_mnemonics_mode() const override { return z80_mnemonics; }
 } s2650_unidasm;
-
+ 
 // Configuration missing
 struct saturn_unidasm_t : saturn_disassembler::config
 {
@@ -450,6 +451,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "spc700",          le,  0, []() -> util::disasm_interface * { return new spc700_disassembler; } },
 	{ "ssem",            le,  0, []() -> util::disasm_interface * { return new ssem_disassembler; } },
 	{ "ssp1601",         be, -1, []() -> util::disasm_interface * { return new ssp1601_disassembler; } },
+	{ "st62xx",          le,  0, []() -> util::disasm_interface * { return new st62xx_disassembler; } },
 	{ "superfx",         le,  0, []() -> util::disasm_interface * { return new superfx_disassembler(&superfx_unidasm); } },
 	{ "t11",             le,  0, []() -> util::disasm_interface * { return new t11_disassembler; } },
 	{ "tlcs870",         le,  0, []() -> util::disasm_interface * { return new tlcs870_disassembler; } },

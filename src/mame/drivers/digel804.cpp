@@ -74,8 +74,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_ram(*this, RAM_TAG),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
 		m_acia(*this, "acia"),
+		m_speaker(*this, "speaker"),
 		m_vfd(*this, "vfd"),
 		m_kb(*this, "74c923"),
 		m_rambank(*this, "bankedram"),
@@ -119,11 +119,11 @@ protected:
 	void z80_io_1_4(address_map &map);
 
 	required_device<ram_device> m_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<mos6551_device> m_acia;
 
 private:
-	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<mos6551_device> m_acia;
 	required_device<roc10937_device> m_vfd;
 	required_device<mm74c922_device> m_kb;
 	required_memory_bank m_rambank;
@@ -633,7 +633,7 @@ WRITE_LINE_MEMBER( ep804_state::ep804_acia_irq_w )
 
 MACHINE_CONFIG_START(digel804_state::digel804)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3.6864_MHz_XTAL/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
+	MCFG_DEVICE_ADD(m_maincpu, Z80, 3.6864_MHz_XTAL/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_DEVICE_PROGRAM_MAP(z80_mem_804_1_4)
 	MCFG_DEVICE_IO_MAP(z80_io_1_4)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -651,19 +651,19 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_MM74C922_X4_CALLBACK(IOPORT("LINE3"))
 
 	/* acia */
-	mos6551_device &acia(MOS6551(config, "acia", 0));
-	acia.set_xtal(3.6864_MHz_XTAL/2);
-	acia.irq_handler().set(FUNC(digel804_state::acia_irq_w));
-	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	acia.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(3.6864_MHz_XTAL/2);
+	m_acia->irq_handler().set(FUNC(digel804_state::acia_irq_w));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", mos6551_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("null_modem", digel804_rs232_defaults)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", digel804_rs232_defaults)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
+	rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(digel804_rs232_defaults));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(digel804_rs232_defaults));
 
 	RAM(config, m_ram).set_default_size("256K").set_extra_options("32K,64K,128K");
 
@@ -673,18 +673,19 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ep804_state::ep804)
+void ep804_state::ep804(machine_config &config)
+{
 	digel804(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem_804_1_2)
-	MCFG_DEVICE_IO_MAP(z80_io_1_2)
+	/* Z80, X1(aka E0 on schematics): 3.6864Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ep804_state::z80_mem_804_1_2);
+	m_maincpu->set_addrmap(AS_IO, &ep804_state::z80_io_1_2);
 
-	subdevice<mos6551_device>("acia")->irq_handler().set(FUNC(ep804_state::ep804_acia_irq_w));
+	m_acia->irq_handler().set(FUNC(ep804_state::ep804_acia_irq_w));
 
 	m_ram->set_default_size("32K").set_extra_options("64K");
-MACHINE_CONFIG_END
+}
 
 
 

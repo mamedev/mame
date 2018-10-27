@@ -181,8 +181,8 @@ private:
 	/* These were statically allocated in the r/w routines */
 	int m_color_state_r;
 	int m_color_state_w;
-	int p0_state;
-	int pattern_name_base_r,pattern_name_base_w;     /* pattern name table base address */
+	int m_p0_state;
+	int m_pattern_name_base_r,m_pattern_name_base_w;     /* pattern name table base address */
 
 	// === new variable handling starts here ===
 	uint8_t m_screen_status;    /**< port #6: status port r/w */

@@ -396,9 +396,9 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	kbusart.rxrdy_handler().set("kbint", FUNC(input_merger_device::in_w<0>));
 	kbusart.txrdy_handler().set("kbint", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("kbd", RS232_PORT, duet16_keyboard_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("kbusart", i8251_device, write_rxd))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	rs232_port_device &kbd(RS232_PORT(config, "kbd", duet16_keyboard_devices, "keyboard"));
+	kbd.rxd_handler().set("kbusart", FUNC(i8251_device::write_rxd));
+	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir5_w)) // INT2

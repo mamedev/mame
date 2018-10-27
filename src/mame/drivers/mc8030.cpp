@@ -237,9 +237,9 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("asp_sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("asp_sio", z80sio_device, ctsa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("asp_sio", FUNC(z80sio_device::rxa_w));
+	rs232.cts_handler().set("asp_sio", FUNC(z80sio_device::ctsa_w));
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -32,7 +32,7 @@ public:
 	O(brk_xav_imp);
 	O(rti_xav_imp);
 
-	O(xa_lda_idy);
+	O(xavlda_idy);
 
 	typedef device_delegate<int16_t (int which, int half)> xavix_interrupt_vector_delegate;
 
@@ -40,6 +40,18 @@ public:
 
 
 #undef O
+
+
+	uint8_t read_full_data(uint8_t databank, uint16_t addr);
+	uint8_t read_full_data(uint32_t addr);
+	void write_full_data(uint8_t databank, uint16_t adr, uint8_t val);
+	void write_full_data(uint32_t addr, uint8_t val);
+
+	// used for opcodes etc. that can't see certain things in banks > 0x80
+	uint8_t read_full_data_sp(uint8_t databank, uint16_t adr);
+	uint8_t read_full_data_sp(uint32_t adr);
+	void write_full_data_sp(uint8_t databank, uint16_t adr, uint8_t val);
+	void write_full_data_sp(uint32_t adr, uint8_t val);
 
 protected:
 	class mi_xavix_normal : public memory_interface {
@@ -81,6 +93,10 @@ protected:
 
 	address_space_config m_special_data_config;
 	address_space *m_special_data_space; 
+	address_space_config m_lowbus_config;
+	address_space_config m_extbus_config;
+	address_space *m_lowbus_space; 
+	address_space *m_extbus_space; 
 
 	uint8_t read_special(uint16_t adr);
 

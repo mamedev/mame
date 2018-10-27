@@ -264,16 +264,12 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 	extra.prioverchar |= m_state.m_is_ss22 ? 2 : 0;
 
 	// scene clip
-	int cx = 320 + node->data.quad.vx;
-	int cy = 240 + node->data.quad.vy;
+	float cx = 320.0f + node->data.quad.vx;
+	float cy = 240.0f + node->data.quad.vy;
 	m_clipx = cx;
 	m_clipy = cy;
-	m_cliprect.set(
-		std::max<s32>(cx + node->data.quad.vw, 0),
-		std::min<s32>(cx - node->data.quad.vw, 639),
-		std::max<s32>(cy + node->data.quad.vh, 0),
-		std::min<s32>(cy - node->data.quad.vh, 479)
-	);
+	m_cliprect.set(cx + node->data.quad.vl, cx - node->data.quad.vr, cy + node->data.quad.vu, cy - node->data.quad.vd);
+	m_cliprect &= screen.visible_area();
 
 	// non-direct case: project and z-clip
 	if (!direct)
@@ -483,12 +479,8 @@ void namcos22_renderer::poly3d_drawsprite(
 void namcos22_renderer::render_sprite(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node)
 {
 	// scene clip
-	m_cliprect.set(
-		std::max<s32>(node->data.sprite.cx_min, 0),
-		std::min<s32>(node->data.sprite.cx_max, 639),
-		std::max<s32>(node->data.sprite.cy_min, 0),
-		std::min<s32>(node->data.sprite.cy_max, 479)
-	);
+	m_cliprect.set(node->data.sprite.cx_min, node->data.sprite.cx_max, node->data.sprite.cy_min, node->data.sprite.cy_max);
+	m_cliprect &= screen.visible_area();
 
 	int offset = 0;
 
@@ -849,8 +841,10 @@ void namcos22_state::draw_direct_poly(const u16 *src)
 	node->data.quad.direct = 1;
 	node->data.quad.vx = 0;
 	node->data.quad.vy = 0;
-	node->data.quad.vw = -320;
-	node->data.quad.vh = -240;
+	node->data.quad.vu = -240;
+	node->data.quad.vd = -240;
+	node->data.quad.vl = -320;
+	node->data.quad.vr = -320;
 }
 
 /**
@@ -1028,8 +1022,10 @@ void namcos22_state::blit_single_quad(u32 color, u32 addr, float m[4][4], int po
 	node->data.quad.direct = 0;
 	node->data.quad.vx = m_camera_vx;
 	node->data.quad.vy = m_camera_vy;
-	node->data.quad.vw = m_camera_vw;
-	node->data.quad.vh = m_camera_vh;
+	node->data.quad.vu = m_camera_vu;
+	node->data.quad.vd = m_camera_vd;
+	node->data.quad.vl = m_camera_vl;
+	node->data.quad.vr = m_camera_vr;
 }
 
 
@@ -1221,14 +1217,30 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	m_camera_ly = dspfixed_to_nativefloat(src[0x3]);
 	m_camera_lz = dspfixed_to_nativefloat(src[0x4]);
 
-	m_reflection = src[0x2] >> 16 & 0x30; // z too?
-	m_cullflip = (m_reflection == 0x10 || m_reflection == 0x20);
 	m_absolute_priority = src[0x3] >> 16;
 	m_camera_vx = (s16)(src[0x5] >> 16);
 	m_camera_vy = (s16)(src[0x5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
-	m_camera_vw = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom;
-	m_camera_vh = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom;
+	m_camera_vl = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom;
+	m_camera_vr = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom;
+	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom;
+	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom;
+
+	m_reflection = src[0x2] >> 16 & 0x30; // z too?
+	m_cullflip = (m_reflection == 0x10 || m_reflection == 0x20);
+
+	if (m_reflection & 0x10)
+	{
+		float vl = m_camera_vl;
+		m_camera_vl = m_camera_vr;
+		m_camera_vr = vl;
+	}
+	if (m_reflection & 0x20)
+	{
+		float vu = m_camera_vu;
+		m_camera_vu = m_camera_vd;
+		m_camera_vd = vu;
+	}
 
 	m_viewmatrix[0][0] = dspfixed_to_nativefloat(src[0x0c]);
 	m_viewmatrix[1][0] = dspfixed_to_nativefloat(src[0x0d]);
@@ -1340,7 +1352,17 @@ void namcos22_state::simulate_slavedsp()
 		u16 code = *src++;
 		u16 len = *src++;
 		s32 index = src - (s32 *)m_polygonram.target();
-		if ((index + len) >= 0x7fff)
+
+		// alpinr2b titlescreen includes commands to modify pointram on the fly
+		if (m_gametype == NAMCOS22_ALPINE_RACER_2 && code == 0xfff8)
+		{
+			pdp_handle_commands(index - 2);
+
+			// skip to end for now
+			src += 0x56;
+			continue;
+		}
+		else if ((index + len) >= 0x7fff)
 		{
 			logerror("simulate_slavedsp buffer overflow: len=0x%x code=0x%x addr=0x%x\n", len, code, index);
 			return;
