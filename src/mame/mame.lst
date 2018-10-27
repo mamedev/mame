@@ -10550,6 +10550,7 @@ ssf2tbh                         // 05/10/1993 (c) 1993 (Hispanic)
 ssf2tbj                         // 05/10/1993 (c) 1993 (Japan)
 ssf2tbj1                        // 11/09/1993 (c) 1993 (Japan)
 ssf2tbr1                        // 11/09/1993 (c) 1993 (World)
+ssf2tbu                         // 11/09/1993 (c) 1993 (USA)
 ssf2th                          // 23/02/1994 (c) 1994 (Hispanic)
 ssf2tu                          // 23/03/1994 (c) 1994 (USA)
 ssf2tur1                        // 23/02/1994 (c) 1994 (USA)
@@ -31457,6 +31458,7 @@ peset001                        // (c) 1987 IGT - International Game Technology
 peset004                        // (c) 1987 IGT - International Game Technology
 peset012                        // (c) 1987 IGT - International Game Technology
 peset022                        // (c) 1987 IGT - International Game Technology
+peset033                        // (c) 1987 IGT - International Game Technology
 peset038                        // (c) 1987 IGT - International Game Technology
 peset100                        // (c) 1987 IGT - International Game Technology
 peset117                        // (c) 1987 IGT - International Game Technology
@@ -35600,7 +35602,10 @@ splash10                        // (c) 1992 - Ref 922804
 ringball                        // not a gaelco game but based on splash code
 
 @source:splus.cpp
-spss4240                        //
+spset005                        // (c) 1993 IGT - International Game Technology
+spset015                        // (c) 1993 IGT - International Game Technology
+spset026                        // (c) 1996 IGT - International Game Technology
+spss4240                        // (c) 1987 IGT - International Game Technology
 
 @source:spoker.cpp
 spk306us                        // (c) 1996 IGS

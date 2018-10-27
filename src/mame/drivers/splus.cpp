@@ -711,6 +711,23 @@ MACHINE_CONFIG_END
 *        Rom Load        *
 *************************/
 
+ROM_START( spset005 ) /* Set Chip, not sure how it works but archive for future use */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "set005.u52",   0x00000, 0x10000, CRC(43b70e2e) SHA1(30d610c988fc7e7e9fd54ff378c4a1fecfe5fffe) ) /* 09/24/93   @ IGT L93-1769 */
+	ROM_LOAD( "set017.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a seperate romdef */
+	ROM_LOAD( "set020.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a seperate romdef */
+ROM_END
+
+ROM_START( spset015 ) /* Set Chip, not sure how it works but archive for future use */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "set015.u52",   0x00000, 0x10000, CRC(01641946) SHA1(81a0632ef96731907b28963293ab12db2073f4a6) )
+ROM_END
+
+ROM_START( spset026 ) /* Set Chip, not sure how it works but archive for future use */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "set026.u52",   0x00000, 0x10000, CRC(01641946) SHA1(81a0632ef96731907b28963293ab12db2073f4a6) ) /* 11/06/96   @ IGT NV */
+ROM_END
+
 ROM_START( spss4240 ) /* Coral Reef (SS4240) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sp1271.u52",   0x00000, 0x10000, CRC(dc164599) SHA1(7114652a733b26cd711dbe4d65dde065ba73619f) )
@@ -724,4 +741,8 @@ ROM_END
 *************************/
 
 //     YEAR  NAME      PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
+GAMEL( 1993, spset005, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET005 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1993, spset015, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET015 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+GAMEL( 1996, spset026, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus SET026 Set chip",  MACHINE_NOT_WORKING, layout_splus )
+
 GAMEL( 1994, spss4240, 0,      splus,   splus, splus_state, init_splus, ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )
