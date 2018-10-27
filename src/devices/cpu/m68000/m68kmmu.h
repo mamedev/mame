@@ -125,15 +125,13 @@ void pmmu_set_buserror(uint32_t addr_in)
 */
 void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc)
 {
-	int i, found;
-
 	// get page size (i.e. # of bits to ignore); is 10 for Apollo
 	int ps = (m_mmu_tc >> 20) & 0xf;
 	// Note: exact emulation would use (logical >> ps) << (ps-8)
 	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24)| logical >> ps;
 
 	// first see if this is already in the cache
-	for (i = 0; i < MMU_ATC_ENTRIES; i++)
+	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
 		// if tag bits and function code match, don't add
 		if (m_mmu_atc_tag[i] == atc_tag)
@@ -143,8 +141,8 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc)
 	}
 
 	// find an open entry
-	found = -1;
-	for (i = 0; i < MMU_ATC_ENTRIES; i++)
+	int found = -1;
+	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
 		if (!(m_mmu_atc_tag[i] & M68K_MMU_ATC_VALID))
 		{
@@ -182,10 +180,9 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc)
 */
 void pmmu_atc_flush()
 {
-	int i;
 	MMULOG("ATC flush: pc=%08x\n", m_ppc);
 
-	for (i = 0; i < MMU_ATC_ENTRIES; i++)
+	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
 		m_mmu_atc_tag[i] = 0;
 	}
@@ -242,48 +239,47 @@ inline uint32_t get_dt3_table_entry(uint32_t tptr, uint8_t fc, uint8_t ptest)
 	return (tbl_entry & ~M68K_MMU_DF_DT) | dt;
 }
 
-bool pmmu_atc_lookup(const uint32_t addr_in, const int fc,
-                                const int ptest, uint32_t& addr_out)
+bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const int ptest, uint32_t& addr_out)
 {
 	const int ps = (m_mmu_tc >> 20) & 0xf;
-        const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | (addr_in >> ps);
+	const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | (addr_in >> ps);
 
-        for (int i = 0; i < MMU_ATC_ENTRIES; i++)
+	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
+	{
+		if (m_mmu_atc_tag[i] != atc_tag)
+				continue;
+
+		if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
+				continue;
+		if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
+				continue;
+
+		// read access or write access and not write protected
+		if (!ptest)
 		{
-                if (m_mmu_atc_tag[i] != atc_tag)
-                        continue;
+			// FIXME: must set modified in PMMU tables as well
+			m_mmu_atc_data[i] |= (!m_mmu_tmp_rw ? M68K_MMU_ATC_MODIFIED : 0);
+		}
+		else
+		{
+			uint16_t sr = 0;
 
-                if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
-                        continue;
-                if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
-                        continue;
+			if (m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED)
+				sr = M68K_MMU_SR_MODIFIED;
 
-                // read access or write access and not write protected
-                if (!ptest)
-				{
-                                // FIXME: must set modified in PMMU tables as well
-                                m_mmu_atc_data[i] |= (!m_mmu_tmp_rw ? M68K_MMU_ATC_MODIFIED : 0);
-                }
-				else
-				{
-                        uint16_t sr = 0;
+			if (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR)
+				sr |= M68K_MMU_SR_WRITE_PROTECT;
 
-                        if (m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED)
-                                sr = M68K_MMU_SR_MODIFIED;
-
-                        if (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR)
-                                sr |= M68K_MMU_SR_WRITE_PROTECT;
-
-                        if (m_mmu_atc_data[i] & M68K_MMU_ATC_BUSERROR)
-                                sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
-                        m_mmu_tmp_sr = sr;
-                }
-                addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
-                return true;
-        }
-        if (ptest)
-                m_mmu_tmp_sr = M68K_MMU_SR_INVALID;
-        return false;
+			if (m_mmu_atc_data[i] & M68K_MMU_ATC_BUSERROR)
+				sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
+			m_mmu_tmp_sr = sr;
+		}
+		addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
+		return true;
+	}
+	if (ptest)
+		m_mmu_tmp_sr = M68K_MMU_SR_INVALID;
+	return false;
 }
 
 bool pmmu_match_tt(uint32_t addr_in, int fc, uint32_t tt)
