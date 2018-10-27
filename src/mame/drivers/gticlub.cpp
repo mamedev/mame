@@ -22,11 +22,6 @@
         Konami K001604 (2D tilemaps + 2x ROZ)
         2x KS10071 (custom 3D pixel unit)
         2x KS10081 (custom 3D texel unit)
-	
-    GN680 I/O Board (later used for Teraburst):
-    ---------------
-	Motorola 68000 @ 16MHz
-	
 
     Known games on this hardware:
 
@@ -37,7 +32,6 @@
     Operation: Thunder Hurricane   | GX792     | GN672(A)     | GN678(B)       | GN680(E) I/O Board
     Solar Assault (Revised)        | GX680     | GN672(A)     | GN678(B)       |
     Hang Pilot                     | GN685     | GN672(A)     | 2x ??(B)       | 3dfx based cg board
-
 
 
 PCB Layouts
@@ -204,12 +198,15 @@ Notes:
       Analog inputs are read from two ccd cameras. One from each gun.
       
 TODO:
--Finish K056230 for linked cabinets.
--Hook analog inputs for Operation: Thunder Hurricane.
--The sticky 3d title screen on Solar Assault and its clones.
--Solar Assault sometimes crashes nearly halfway into Stage 3 right before the first set of pillar arches (SHARC related?)
--Eventually remove unnecessary hacks
--Other small gaphical (and maybe SHARC) problems
+- Finish K056230 for linked cabinets
+- Hook gun/analog inputs for thunderh
+- The sticky 3d title screen on slrasslt and its clones
+- slrasslt sometimes crashes nearly halfway into Stage 3 right before the first set of pillar arches (SHARC related?)
+- Eventually remove unnecessary hacks
+- hangplt's cg board. Is it identical to GN715 used in hornet?
+- Other small gaphical (and maybe SHARC) problems
+- MCFG removal
+
 */
 
 #include "emu.h"
