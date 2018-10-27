@@ -1030,7 +1030,8 @@ spacepir                        // (c) 1992
 spacepir_14                     // (c) 1992
 wsjr                            // (c) 1991
 wsjr_15                         // (c) 1991
-zortonbr                        // (c) 1993 Web Picmatic
+zortonbr                        // (c) 1994 Web Picmatic
+zortonbr_100                    // (c) 1993 Web Picmatic
 
 @source:alien.cpp
 alien                           // (c) 2005 Capcom
