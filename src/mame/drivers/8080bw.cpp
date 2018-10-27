@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert
+// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni, Lee Taylor, Valerio Verrando, Zsolt Vasvari, Aaron Giles, Jonathan Gevaryahu, hap, Robbbert
 // thanks-to:Michael Strutts, Marco Cassili
 /*****************************************************************************
 
@@ -2720,11 +2720,11 @@ READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
 
 WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
 {
-		/* bit 0 goes high when first coin inserted
-		   bit 1 also goes high when subsequent coins are inserted
-		      These may be for indicator lamps under the start buttons.
-		   bit 2 goes high while player 2 is playing     */
-
+	/* bit 0 goes high when first coin inserted
+	   bit 1 also goes high when subsequent coins are inserted
+	      These may be for indicator lamps under the start buttons.
+	   bit 2 goes high while player 2 is playing
+	*/
 	m_flip_screen = BIT(data, 2) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 }
 
@@ -4990,8 +4990,6 @@ ROM_START( yosakdon )
 	ROM_LOAD( "yd5.bin",      0x1400, 0x0400, CRC(38804ff1) SHA1(9b7527b9d2b106355f0c8df46666b1e3f286b2e3) )
 	ROM_LOAD( "yd6.bin",      0x1800, 0x0400, CRC(988d2362) SHA1(deaf864b4e287cbc2585c2a11343b1ae82e15463) )
 	ROM_LOAD( "yd7.bin",      0x1c00, 0x0400, CRC(2744e68b) SHA1(5ad5a7a615d36f57b6d560425e035c15e25e9005) )
-
-	/* No proms, only colour overlay */
 ROM_END
 
 ROM_START( yosakdona )
@@ -5003,8 +5001,6 @@ ROM_START( yosakdona )
 	ROM_LOAD( "yosaku5",      0x1400, 0x0400, CRC(ae422a43) SHA1(5219680f9d6c5d984b29167f85106fa375856121) )
 	ROM_LOAD( "yosaku6",      0x1800, 0x0400, CRC(26b24a12) SHA1(387589fa4027d41b6fb06555661d4f92fe2f990c) )
 	ROM_LOAD( "yosaku7",      0x1c00, 0x0400, CRC(878d5a18) SHA1(6adc8763d5644602eed7fe6d9186a48be105aace) )
-
-	/* No proms, only colour overlay */
 ROM_END
 
 ROM_START( indianbt )
@@ -5208,7 +5204,7 @@ GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_i
 GAME( 1979, lrescuem,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescuem2,   lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, desterth,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg", "Destination Earth (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAMEL( 1980,escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg", "Escape from Mars (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
+GAMEL(1980, escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg", "Escape from Mars (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
 
 GAME( 1979, schaser,     0,        schaser,   schaser,   _8080bw_state,  empty_init,    ROT270, "Taito", "Space Chaser (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, schasera,    schaser,  schaser,   schaser,   _8080bw_state,  empty_init,    ROT270, "Taito", "Space Chaser (set 2)", MACHINE_SUPPORTS_SAVE )
@@ -5264,8 +5260,8 @@ GAME( 1979, ozmawarsmr,  ozmawars, invaders,  ozmawars,  mw8080bw_state, empty_i
 GAME( 1979, spaceph,     ozmawars, invaders,  spaceph,   mw8080bw_state, empty_init,    ROT270, "bootleg? (Zilec Games)", "Space Phantoms (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, solfight,    ozmawars, invaders,  ozmawars,  mw8080bw_state, empty_init,    ROT270, "bootleg", "Solar Fight (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 1979,yosakdon,    0,        yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_yosakdon )
-GAMEL( 1979,yosakdona,   yosakdon, yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_yosakdon )
+GAMEL(1979, yosakdon,    0,        yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_yosakdon )
+GAMEL(1979, yosakdona,   yosakdon, yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_yosakdon )
 
 GAMEL(1979, shuttlei,    0,        shuttlei,  shuttlei,  _8080bw_state,  empty_init,    ROT270, "Omori Electric Co., Ltd.", "Shuttle Invader", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_shuttlei )
 
