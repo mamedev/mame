@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="overlay">
+		<rect>
+			<bounds left="0" top="0" right="74" bottom="16" />
+			<color red="0.125" green="1.0" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds left="75" top="0" right="146" bottom="16" />
+			<color red="0.25" green="1.0" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="147" top="0" right="224" bottom="16" />
+			<color red="1.0" green="0.125" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds left="0" top="17" right="74" bottom="32" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds left="75" top="17" right="146" bottom="32" />
+			<color red="0.25" green="1.0" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="147" top="17" right="224" bottom="32" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds left="0" top="33" right="224" bottom="56" />
+			<color red="0.25" green="1.0" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="0" top="57" right="224" bottom="96" />
+			<color red="0.52" green="0.74" blue="0.97" />
+		</rect>
+		<rect>
+			<bounds left="0" top="96" right="224" bottom="127" />
+			<color red="0.125" green="1.0" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds left="0" top="128" right="224" bottom="159" />
+			<color red="1.0" green="0.9" blue="0.1" />
+		</rect>
+		<rect>
+			<bounds left="0" top="160" right="224" bottom="191" />
+			<color red="1.0" green="0.125" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds left="0" top="191" right="224" bottom="215" />
+			<color red="1.0" green="0.25" blue="0.25" />
+		</rect>
+		<rect>
+			<bounds left="0" top="216" right="224" bottom="231" />
+			<color red="0.125" green="1.0" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds left="0" top="232" right="224" bottom="239" />
+			<color red="1.0" green="0.25" blue="0.25" />
+		</rect>
+		<rect>
+			<bounds left="0" top="240" right="130" bottom="259" />
+			<color red="0.125" green="1.0" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds left="131" top="240" right="186" bottom="259" />
+			<color red="1.0" green="1.0" blue="0.125" />
+		</rect>
+		<rect>
+			<bounds left="187" top="240" right="224" bottom="259" />
+			<color red="0.125" green="1.0" blue="1.0" />
+		</rect>
+	</element>
+
+	<view name="Color_Overlay">
+		<screen index="0">
+			<bounds x="0" y="0" width="3" height="4" />
+		</screen>
+		<overlay element="overlay">
+			<bounds x="0" y="0" width="3" height="4" />
+		</overlay>
+	</view>
+</mamelayout>
