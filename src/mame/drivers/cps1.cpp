@@ -6621,9 +6621,8 @@ ROM_START( sf2en )
 	ROMX_LOAD( "epr-b-12.12b", 0x400006, 0x40000, CRC(c9d4ed76) SHA1(c79ab721cb7ca3769e99e8db256e2ee0d9df7e09) , ROM_SKIP(7) )
 	ROMX_LOAD( "epr-b-06.12a", 0x400007, 0x40000, CRC(67dcc295) SHA1(0bcec5d2dcd7e3423a577eeb458b5f7cff3c571c) , ROM_SKIP(7) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks), data matches parent */
-	ROM_LOAD( "27c512.13b",   0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) ) // not labeled
-	ROM_CONTINUE(            0x10000, 0x08000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks), data matches parent */
+	ROM_LOAD( "27c512.13b",   0x00000, 0x10000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) ) // not labeled
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples, 27c010, data matches parent */
 	ROM_LOAD( "epr-b-01.12c",  0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
