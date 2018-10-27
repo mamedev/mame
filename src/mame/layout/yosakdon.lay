@@ -10,10 +10,6 @@
 			<color red="1.0" green="0.2" blue="1.0" />
 		</rect>
 		<rect>
-			<bounds left="0" top="17" right="74" bottom="32" />
-			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
-		<rect>
 			<bounds left="75" top="0" right="146" bottom="40" />
 			<color red="0.25" green="1.0" blue="0.2" />
 		</rect>
