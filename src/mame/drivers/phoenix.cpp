@@ -437,7 +437,6 @@ GFXDECODE_END
 
 MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 {
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
 }
 
 
