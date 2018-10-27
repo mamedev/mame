@@ -2,23 +2,23 @@
 // copyright-holders:Brandon Munger, Stephen Stair
 /*********************************************************************
 
-	scc2698b.cpp
+    scc2698b.cpp
 
-	Enhanced Octal Universal Asynchronous Receiver/Transmitter
+    Enhanced Octal Universal Asynchronous Receiver/Transmitter
 
 Notes:
-	This device is similiar to four 2681 DUART chips tied together
-	in a single package, with some shared resources.
-	The 2681 DUART is implemented in scn2681_device - but this
-	chip is being independently emulated seperately for mainly
-	educational purposes. When functionality for this device is
-	completed we will consider merging the devices if it's
-	practical.
+    This device is similiar to four 2681 DUART chips tied together
+    in a single package, with some shared resources.
+    The 2681 DUART is implemented in scn2681_device - but this
+    chip is being independently emulated seperately for mainly
+    educational purposes. When functionality for this device is
+    completed we will consider merging the devices if it's
+    practical.
 
 Quirks:
-	* Reading the RX Holding register will advance the HW FIFO even if
-	  there is no data to be read. This is not currently emulated but
-	  might be interesting to characterize in HW and emulate properly.
+    * Reading the RX Holding register will advance the HW FIFO even if
+      there is no data to be read. This is not currently emulated but
+      might be interesting to characterize in HW and emulate properly.
 
 *********************************************************************/
 
@@ -26,24 +26,28 @@ Quirks:
 #include "emu.h"
 #include "scc2698b.h"
 
+#define LOG_GENERAL (1U << 0)
+#define LOG_CONFIG_CHANGE (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_CONFIG_CHANGE)
+#include "logmacro.h"
+
+#define TRACE_REGISTER_WRITE(ofs, data, reg_name)   LOG("[0x%02X] << 0x%02X (%s)\n", (ofs), (data), (reg_name));
+#define TRACE_REGISTER_READ(ofs, data, reg_name)    LOG("[0x%02X] >> 0x%02X (%s)\n", (ofs), (data), (reg_name));
+#define TRACE_CONFIG(...)                           LOGMASKED(LOG_CONFIG_CHANGE, __VA_ARGS__)
+
+
 DEFINE_DEVICE_TYPE(SCC2698B, scc2698b_device, "scc2698b", "SCC2698B Octal UART")
 DEFINE_DEVICE_TYPE(SCC2698B_CHANNEL, scc2698b_channel, "scc2698b_channel", "UART channel")
 
-#define TRACE_ENABLE 0
-#define TRACE_CONFIG_CHANGE 0
-
-
-#define TRACE_REGISTER_WRITE(ofs, data, reg_name)	if(TRACE_ENABLE) { log_register_access((ofs), (data), "<<", (reg_name)); }
-#define TRACE_REGISTER_READ(ofs, data, reg_name)	if(TRACE_ENABLE) { log_register_access((ofs), (data), ">>", (reg_name)); }
-#define TRACE_CONFIG if(TRACE_CONFIG_CHANGE) logerror
 
 // Divider values for baud rate generation
 // Expecting a crystal of 3.6864MHz, baud rate is crystal frequency / (divider value * 8)
-static const int BAUD_DIVIDER_ACR7_0[16] =
+static constexpr int BAUD_DIVIDER_ACR7_0[16] =
 {
 	9216,4189,3426,2304,1536,768,384,439,192,96,64,48,12,0,0,0
 };
-static const int BAUD_DIVIDER_ACR7_1[16] =
+static constexpr int BAUD_DIVIDER_ACR7_1[16] =
 {
 	6144,4189,12,3072,1536,768,384,230,192,96,256,48,24,0,0,0
 };
@@ -86,7 +90,7 @@ void scc2698b_channel::rcv_complete()
 	// Completed Byte Receive
 	receive_register_extract();
 
-	if (rx_enable == false)
+	if (!rx_enable)
 	{
 		// Skip receive
 		return;
@@ -126,7 +130,7 @@ void scc2698b_channel::tra_callback()
 
 void scc2698b_channel::write_TXH(int txh)
 {
-	if (tx_enable == false)
+	if (!tx_enable)
 	{
 		logerror("Warning: TX Holding byte ignored because transmitter is disabled.\n");
 		return;
@@ -206,7 +210,7 @@ void scc2698b_channel::set_tx_enable(bool enable)
 }
 void scc2698b_channel::set_rx_enable(bool enable)
 {
-	if (rx_enable == false && enable == true)
+	if (!rx_enable && enable)
 	{
 		receive_register_reset();
 	}
@@ -218,7 +222,7 @@ void scc2698b_channel::set_rx_enable(bool enable)
 void scc2698b_channel::update_serial_configuration()
 {
 	// void set_data_frame(int start_bit_count, int data_bit_count, parity_t parity, stop_bits_t stop_bits);
-	
+
 	// Note: unimplemented RTS/CTS control, Error mode bit.
 
 	int start_bit_count = 1;
@@ -266,10 +270,9 @@ void scc2698b_channel::update_serial_configuration()
 		logerror("Warning: Unsupported channel mode selected.\n");
 	}
 
-	const char* parity_strings[] = { "None", "Odd", "Even", "Mark", "Space" };
-	const char* stop_bit_strings[] = { "0","1","1.5","2" };
+	static char const *const parity_strings[] = { "None", "Odd", "Even", "Mark", "Space" };
+	static char const *const stop_bit_strings[] = { "0","1","1.5","2" };
 	TRACE_CONFIG("Reconfigured channel to %d data bits, %s Parity, %s stop bits\n", data_bit_count, parity_strings[parity_mode], stop_bit_strings[stop_bits]);
-
 
 	set_data_frame(start_bit_count, data_bit_count, parity_mode, stop_bits);
 }
@@ -324,13 +327,13 @@ void scc2698b_channel::recompute_pin_output(bool force)
 
 		if (new_mpp1 != mpp1_value || force)
 		{
-			if (TRACE_ENABLE) logerror("Channel %d MPP1 => %d\n", channel_port, new_mpp1);
+			LOG("Channel %d MPP1 => %d\n", channel_port, new_mpp1);
 			parent->write_line_mpp1(channel_port, new_mpp1);
 			mpp1_value = new_mpp1;
 		}
 		if (new_mpp2 != mpp2_value || force)
 		{
-			if(TRACE_ENABLE) logerror("Channel %d MPP2 => %d\n", channel_port, new_mpp2);
+			LOG("Channel %d MPP2 => %d\n", channel_port, new_mpp2);
 			parent->write_line_mpp2(channel_port, new_mpp2);
 			mpp2_value = new_mpp2;
 		}
@@ -356,10 +359,10 @@ scc2698b_device::scc2698b_device(const machine_config &mconfig, const char *tag,
 	write_intr_B(*this),
 	write_intr_C(*this),
 	write_intr_D(*this),
-	write_a_tx(*this), write_b_tx(*this), write_c_tx(*this), write_d_tx(*this), write_e_tx(*this), write_f_tx(*this), write_g_tx(*this), write_h_tx(*this),
-	write_a_mpp1(*this), write_b_mpp1(*this), write_c_mpp1(*this), write_d_mpp1(*this), write_e_mpp1(*this), write_f_mpp1(*this), write_g_mpp1(*this), write_h_mpp1(*this),
-	write_a_mpp2(*this), write_b_mpp2(*this), write_c_mpp2(*this), write_d_mpp2(*this), write_e_mpp2(*this), write_f_mpp2(*this), write_g_mpp2(*this), write_h_mpp2(*this),
-	write_a_mpo(*this), write_b_mpo(*this), write_c_mpo(*this), write_d_mpo(*this), write_e_mpo(*this), write_f_mpo(*this), write_g_mpo(*this), write_h_mpo(*this)
+	write_tx{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this} },
+	write_mpp1{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
+	write_mpp2{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } },
+	write_mpo{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
 
 {
 
@@ -380,38 +383,14 @@ void scc2698b_device::device_start()
 	write_intr_C.resolve_safe();
 	write_intr_D.resolve_safe();
 
-	write_a_tx.resolve_safe();
-	write_b_tx.resolve_safe();
-	write_c_tx.resolve_safe();
-	write_d_tx.resolve_safe();
-	write_e_tx.resolve_safe();
-	write_f_tx.resolve_safe();
-	write_g_tx.resolve_safe();
-	write_h_tx.resolve_safe();
-	write_a_mpp1.resolve_safe();
-	write_b_mpp1.resolve_safe();
-	write_c_mpp1.resolve_safe();
-	write_d_mpp1.resolve_safe();
-	write_e_mpp1.resolve_safe();
-	write_f_mpp1.resolve_safe();
-	write_g_mpp1.resolve_safe();
-	write_h_mpp1.resolve_safe();
-	write_a_mpp2.resolve_safe();
-	write_b_mpp2.resolve_safe();
-	write_c_mpp2.resolve_safe();
-	write_d_mpp2.resolve_safe();
-	write_e_mpp2.resolve_safe();
-	write_f_mpp2.resolve_safe();
-	write_g_mpp2.resolve_safe();
-	write_h_mpp2.resolve_safe();
-	write_a_mpo.resolve_safe();
-	write_b_mpo.resolve_safe();
-	write_c_mpo.resolve_safe();
-	write_d_mpo.resolve_safe();
-	write_e_mpo.resolve_safe();
-	write_f_mpo.resolve_safe();
-	write_g_mpo.resolve_safe();
-	write_h_mpo.resolve_safe();
+	for (auto &cb : write_tx)
+		cb.resolve_safe();
+	for (auto &cb : write_mpp1)
+		cb.resolve_safe();
+	for (auto &cb : write_mpp2)
+		cb.resolve_safe();
+	for (auto &cb : write_mpo)
+		cb.resolve_safe();
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -430,64 +409,34 @@ void scc2698b_device::device_reset()
 
 void scc2698b_device::write_line_tx(int port, int value)
 {
-	switch (port)
-	{
-	case 0: write_a_tx(value); break;
-	case 1: write_b_tx(value); break;
-	case 2: write_c_tx(value); break;
-	case 3: write_d_tx(value); break;
-	case 4: write_e_tx(value); break;
-	case 5: write_f_tx(value); break;
-	case 6: write_g_tx(value); break;
-	case 7: write_h_tx(value); break;
-	default: logerror("Unsupported port %d in write_line_tx\n", port);
-	}
+	if ((0 <= port) && (ARRAY_LENGTH(write_tx) > port))
+		write_tx[port](value);
+	else
+		logerror("Unsupported port %d in write_line_tx\n", port);
 }
+
 void scc2698b_device::write_line_mpp1(int port, int value)
 {
-	switch (port)
-	{
-	case 0: write_a_mpp1(value); break;
-	case 1: write_b_mpp1(value); break;
-	case 2: write_c_mpp1(value); break;
-	case 3: write_d_mpp1(value); break;
-	case 4: write_e_mpp1(value); break;
-	case 5: write_f_mpp1(value); break;
-	case 6: write_g_mpp1(value); break;
-	case 7: write_h_mpp1(value); break;
-	default: logerror("Unsupported port %d in write_line_mpp1\n", port);
-	}
+	if ((0 <= port) && (ARRAY_LENGTH(write_mpp1) > port))
+		write_mpp1[port](value);
+	else
+		logerror("Unsupported port %d in write_line_mpp1\n", port);
 }
 
 void scc2698b_device::write_line_mpp2(int port, int value)
 {
-	switch (port)
-	{
-	case 0: write_a_mpp2(value); break;
-	case 1: write_b_mpp2(value); break;
-	case 2: write_c_mpp2(value); break;
-	case 3: write_d_mpp2(value); break;
-	case 4: write_e_mpp2(value); break;
-	case 5: write_f_mpp2(value); break;
-	case 6: write_g_mpp2(value); break;
-	case 7: write_h_mpp2(value); break;
-	default: logerror("Unsupported port %d in write_line_mpp2\n", port);
-	}
+	if ((0 <= port) && (ARRAY_LENGTH(write_mpp2) > port))
+		write_mpp2[port](value);
+	else
+		logerror("Unsupported port %d in write_line_mpp2\n", port);
 }
+
 void scc2698b_device::write_line_mpo(int port, int value)
 {
-	switch (port)
-	{
-	case 0: write_a_mpo(value); break;
-	case 1: write_b_mpo(value); break;
-	case 2: write_c_mpo(value); break;
-	case 3: write_d_mpo(value); break;
-	case 4: write_e_mpo(value); break;
-	case 5: write_f_mpo(value); break;
-	case 6: write_g_mpo(value); break;
-	case 7: write_h_mpo(value); break;
-	default: logerror("Unsupported port %d in write_line_mpo\n", port);
-	}
+	if ((0 <= port) && (ARRAY_LENGTH(write_mpo) > port))
+		write_mpo[port](value);
+	else
+		logerror("Unsupported port %d in write_line_mpo\n", port);
 }
 
 
@@ -500,13 +449,6 @@ WRITE8_MEMBER(scc2698b_device::write)
 {
 	write_reg(offset, data);
 }
-
-
-void scc2698b_device::log_register_access(int offset, int value, const char* direction, const char* reg_name)
-{
-	logerror("[0x%02X] %s 0x%02X (%s)\n", offset, direction, value, reg_name);
-}
-
 
 
 uint8_t scc2698b_device::read_reg(int offset)
@@ -694,7 +636,7 @@ void scc2698b_device::write_MR(int port, int value)
 void scc2698b_device::write_CSR(int port, int value)
 {
 	scc2698b_channel* channel = get_channel(port);
-	
+
 	channel->CSR = value;
 	update_port_baudrate(port);
 }

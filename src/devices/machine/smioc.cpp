@@ -20,11 +20,11 @@
         * CPU - Intel N80C188 L0450591 @ ??MHz - U23
         * MCU - Signetics SC87C451CCA68 220CP079109KA 97D8641 - U70
         * DMA - KS82C37A - U46, U47, U48, U49, U50
-		* SCC - Signetics SCC2698BC1A84 - U67
+        * SCC - Signetics SCC2698BC1A84 - U67
         * Memory - NEC D43256AGU-10LL 8948A9038 SRAM 32KB - U51
         * Memory - Mitsubishi M5M187AJ 046101-35 SRAM 64K X 1?? - U37
-		* Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U53
-		* Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U54
+        * Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U53
+        * Memory - AT&T M79018DX-15B 2K X 9 Dual Port SRAM - U54
 
     Logic:
         * U8 - 22V10-25JC
@@ -42,21 +42,21 @@
     Program Memory:
         * 0x00000 - 0x07FFF : SRAM D43256AGU-10LL 32KB
         * 0xF8000 - 0xFFFFF : ROM 27C256 PLCC32 32KB
-		* 0xC0080 - 0xC008F : KS82C37A - Probably RAM DMA
-		* 0xC0090 - 0xC009F : KS82C37A - Serial DMA (Port 1 and 2?)
-		* 0xC00A0 - 0xC00AF : KS82C37A - Serial DMA (Port 3 and 4?)
-		* 0xC00B0 - 0xC00BF : KS82C37A - Serial DMA (Port 5 and 6?)
-		* 0xC00C0 - 0xC00CF : KS82C37A - Serial DMA (Port 7 and 8?)
+        * 0xC0080 - 0xC008F : KS82C37A - Probably RAM DMA
+        * 0xC0090 - 0xC009F : KS82C37A - Serial DMA (Port 1 and 2?)
+        * 0xC00A0 - 0xC00AF : KS82C37A - Serial DMA (Port 3 and 4?)
+        * 0xC00B0 - 0xC00BF : KS82C37A - Serial DMA (Port 5 and 6?)
+        * 0xC00C0 - 0xC00CF : KS82C37A - Serial DMA (Port 7 and 8?)
 
     IO Memory:
         * Unknown
 
     TODO:
-		* Hook up System Monitor II to RS232 port 2
-		* Dump 87C451 rom data and emulate MCU
-		* Dump 87C51 on SMIOC interconnect box
-		* Dump all PAL chips
-		* Hook up status LEDs
+        * Hook up System Monitor II to RS232 port 2
+        * Dump 87C451 rom data and emulate MCU
+        * Dump 87C51 on SMIOC interconnect box
+        * Dump all PAL chips
+        * Hook up status LEDs
 */
 
 #include "emu.h"
@@ -156,12 +156,12 @@ void smioc_device::device_add_mconfig(machine_config &config)
 
 	/* SCC2698B */
 	scc2698b_device &scc2698b(SCC2698B(config, "scc2698b", XTAL(3'686'400)));
-	scc2698b.tx_callback('a').set("rs232_p1", FUNC(rs232_port_device::write_txd));
-	scc2698b.mpp1_callback('a').set("dma8237_2", FUNC(am9517a_device::dreq1_w)).invert();
-	scc2698b.mpp2_callback('a').set("dma8237_2", FUNC(am9517a_device::dreq0_w)).invert();
-	scc2698b.tx_callback('b').set("rs232_p2", FUNC(rs232_port_device::write_txd));
-	scc2698b.mpp1_callback('b').set("dma8237_2", FUNC(am9517a_device::dreq3_w)).invert();
-	scc2698b.mpp2_callback('b').set("dma8237_2", FUNC(am9517a_device::dreq2_w)).invert();
+	scc2698b.tx_callback<'a'>().set("rs232_p1", FUNC(rs232_port_device::write_txd));
+	scc2698b.mpp1_callback<'a'>().set("dma8237_2", FUNC(am9517a_device::dreq1_w)).invert();
+	scc2698b.mpp1_callback<'a'>().set("dma8237_2", FUNC(am9517a_device::dreq0_w)).invert();
+	scc2698b.tx_callback<'b'>().set("rs232_p2", FUNC(rs232_port_device::write_txd));
+	scc2698b.mpp1_callback<'b'>().set("dma8237_2", FUNC(am9517a_device::dreq3_w)).invert();
+	scc2698b.mpp2_callback<'b'>().set("dma8237_2", FUNC(am9517a_device::dreq2_w)).invert();
 
 	/* The first dma8237 is set up in cascade mode, and each of its four channels provides HREQ/HACK to the other 4 DMA controllers*/
 	m_dma8237[0]->out_dack_callback<0>().set("dma8237_2", FUNC(am9517a_device::hack_w));
@@ -171,10 +171,10 @@ void smioc_device::device_add_mconfig(machine_config &config)
 	m_dma8237[0]->out_hreq_callback().set("dma8237_1", FUNC(am9517a_device::hack_w));
 
 	/* Connect base DMA controller's Hold Request to its own Hold ACK
-		The CPU doesn't support hold request / hold ack pins, so we will pretend that the DMA controller immediately gets what it wants every time it asks.
-		This will keep things moving forward, but the CPU will continue going through DMA requests rather than halting for a few cycles each time.
-		It shouldn't cause a problem though.
-		*/
+	    The CPU doesn't support hold request / hold ack pins, so we will pretend that the DMA controller immediately gets what it wants every time it asks.
+	    This will keep things moving forward, but the CPU will continue going through DMA requests rather than halting for a few cycles each time.
+	    It shouldn't cause a problem though.
+	    */
 
 	m_dma8237[1]->in_memr_callback().set(FUNC(smioc_device::dma8237_2_dmaread));
 	m_dma8237[1]->out_memw_callback().set(FUNC(smioc_device::dma8237_2_dmawrite));
@@ -276,7 +276,7 @@ void smioc_device::SendCommand(u16 command)
 	m_commandValue = command;
 	m_requestFlags_11D |= 1;
 	m_deviceBusy = 1;
-	
+
 	// Invalidate status if we hit a command.
 	m_status = 0;
 	m_statusvalid = false;
@@ -284,7 +284,7 @@ void smioc_device::SendCommand(u16 command)
 
 	m_smioccpu->int2_w(CLEAR_LINE);
 	m_smioccpu->int2_w(HOLD_LINE);
-	
+
 }
 
 void smioc_device::SendCommand2(u16 command)
@@ -365,7 +365,7 @@ void smioc_device::SetDmaParameter(smioc_dma_parameter_t param, u16 value)
 {
 	int address = DmaParameterAddress(param);
 
-	const char* paramNames[] = { "smiocdma_sendaddress", "smiocdma_sendlength", "smiocdma_recvaddress", "smiocdma_recvlength" };
+	static char const *const paramNames[] = { "smiocdma_sendaddress", "smiocdma_sendlength", "smiocdma_recvaddress", "smiocdma_recvlength" };
 	const char* paramName = "?";
 	if (param >= 0 && param < (sizeof(paramNames) / sizeof(*paramNames)))
 	{
@@ -441,7 +441,7 @@ void smioc_device::update_and_log(u16& reg, u16 newValue, const char* register_n
 
 READ8_MEMBER(smioc_device::ram2_mmio_r)
 {
-	const char * description = "";
+	const char *description = "";
 	u8 data = m_logic_ram[offset & 0xFFF];
 	switch (offset)
 	{
@@ -458,7 +458,7 @@ READ8_MEMBER(smioc_device::ram2_mmio_r)
 	case 0xB86: // Command parameter 2 - C011D Bit 7
 		description = "(Command Parameter 2)";
 		break;
-	case 0xB87: 
+	case 0xB87:
 		description = "(Command Parameter 2)";
 		break;
 
@@ -499,7 +499,7 @@ READ8_MEMBER(smioc_device::ram2_mmio_r)
 
 WRITE8_MEMBER(smioc_device::ram2_mmio_w)
 {
-	const char * description = "";
+	const char *description = "";
 
 	m_logic_ram[offset & 0xFFF] = data;
 
@@ -590,34 +590,30 @@ READ8_MEMBER(smioc_device::boardlogic_mmio_r)
 	u8 data = 0xFF;
 	switch (offset)
 	{
+	case 0x19: // Hardware revision?
+		// Top bit controls which set of register locations in RAM2 are polled
+		data = 0x7F;
+		break;
 
-		case 0x19: // Hardware revision?
-			// Top bit controls which set of register locations in RAM2 are polled
-			data = 0x7F;
-			break;
+	case 0x1D: // C011D (HW Request flags)
+		data = m_requestFlags_11D;
+		LOG_REGISTER_DETAILS("%s C011D Read => %02X\n", machine().time().as_string(), data);
+		// Assume this is a clear-on-read register - It is read in one location and all set bits are acted on once it is read.
+		m_requestFlags_11D = 0;
 
-		case 0x1D: // C011D (HW Request flags)
-			data = m_requestFlags_11D;
-			LOG_REGISTER_DETAILS("%s C011D Read => %02X\n", machine().time().as_string(), data);
-			// Assume this is a clear-on-read register - It is read in one location and all set bits are acted on once it is read.
-			m_requestFlags_11D = 0;
+		break;
 
+	case 0x1F: // C011F (HW Status flags?)
+		// 0x80, 0x40 seem to be HW request to cancel ongoing DMA requests, maybe related to board reset?
+		// 0x01 - When this is 0, advance some state perhaps related to talking to the 8051
+		data = 0xFF;
+		break;
 
-			break;
-
-		case 0x1F: // C011F (HW Status flags?)
-			// 0x80, 0x40 seem to be HW request to cancel ongoing DMA requests, maybe related to board reset?
-			// 0x01 - When this is 0, advance some state perhaps related to talking to the 8051
-			data = 0xFF;
-			break;
-
-
-		case 0x80: // C0180 - Related to talking to the 87C451 chip interfacing to the breakout box
-			data = 0x05; // Hack hack
-			// We need the 8051 to provide a pair of bytes with 0x05 followed by a byte with the bottom bit set.
-			// For now 0x05 should work to provide this condition, and might make the required status work.
-			break;
-
+	case 0x80: // C0180 - Related to talking to the 87C451 chip interfacing to the breakout box
+		data = 0x05; // Hack hack
+		// We need the 8051 to provide a pair of bytes with 0x05 followed by a byte with the bottom bit set.
+		// For now 0x05 should work to provide this condition, and might make the required status work.
+		break;
 	}
 	LOG_REGISTER_ACCESS("logic[%04X] => %02X\n", offset, data);
 	return data;
@@ -627,7 +623,7 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 {
 	switch (offset)
 	{
-	case 0x10: // C0110 (Clear interrupt? This seems to happen a lot but without being related to actually completing anything.)		
+	case 0x10: // C0110 (Clear interrupt? This seems to happen a lot but without being related to actually completing anything.)
 		LOG_REGISTER_DETAILS("%s C0110 Write, DeviceBusy = %02X, RequestFlags = %02X\n", machine().time().as_string(), m_deviceBusy, m_requestFlags_11D);
 		m_deviceBusy = m_requestFlags_11D;
 		m_smioccpu->int2_w(CLEAR_LINE);

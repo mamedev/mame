@@ -130,7 +130,7 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc)
 	// get page size (i.e. # of bits to ignore); is 10 for Apollo
 	int ps = (m_mmu_tc >> 20) & 0xf;
 	// Note: exact emulation would use (logical >> ps) << (ps-8)
-	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24)| logical >> ps;
+	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24)| logical >> ps;
 
 	// first see if this is already in the cache
 	for (i = 0; i < MMU_ATC_ENTRIES; i++)
@@ -165,9 +165,9 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc)
 	}
 
 	// add the entry
-	MMULOG("ATC[%2d] add: log %08x -> phys %08x (fc=%d)\n", found, (logical>>ps) << ps, (physical >> ps) << ps, fc);
+	MMULOG("ATC[%2d] add: log %08x -> phys %08x (fc=%d)\n", found, (logical >> ps) << ps, (physical >> ps) << ps, fc);
 	m_mmu_atc_tag[found] = atc_tag;
-	m_mmu_atc_data[found] = (physical >> ps) << (ps-8);
+	m_mmu_atc_data[found] = (physical >> ps) << (ps - 8);
 
 	if (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT)
 	{
@@ -248,7 +248,8 @@ bool pmmu_atc_lookup(const uint32_t addr_in, const int fc,
 	const int ps = (m_mmu_tc >> 20) & 0xf;
         const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | (addr_in >> ps);
 
-        for (int i = 0; i < MMU_ATC_ENTRIES; i++) {
+        for (int i = 0; i < MMU_ATC_ENTRIES; i++)
+		{
                 if (m_mmu_atc_tag[i] != atc_tag)
                         continue;
 
@@ -258,10 +259,13 @@ bool pmmu_atc_lookup(const uint32_t addr_in, const int fc,
                         continue;
 
                 // read access or write access and not write protected
-                if (!ptest) {
+                if (!ptest)
+				{
                                 // FIXME: must set modified in PMMU tables as well
                                 m_mmu_atc_data[i] |= (!m_mmu_tmp_rw ? M68K_MMU_ATC_MODIFIED : 0);
-                } else {
+                }
+				else
+				{
                         uint16_t sr = 0;
 
                         if (m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED)
@@ -441,14 +445,14 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 	}
 	else
 	{
-		fatalerror("68040: function code %d is neither data nor program!\n", fc&7);
+		fatalerror("68040: function code %d is neither data nor program!\n", fc & 7);
 	}
 
 	if (tt0 & 0x8000)
 	{
-		static int fcmask[4] = { 4, 4, 0, 0 };
-		static int fcmatch[4] = { 0, 4, 0, 0 };
-		uint32_t mask = (tt0>>16) & 0xff;
+		static constexpr int fcmask[4] = { 4, 4, 0, 0 };
+		static constexpr int fcmatch[4] = { 0, 4, 0, 0 };
+		uint32_t mask = (tt0 >> 16) & 0xff;
 		mask ^= 0xff;
 		mask <<= 24;
 
@@ -468,7 +472,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 	{
 		static int fcmask[4] = { 4, 4, 0, 0 };
 		static int fcmatch[4] = { 0, 4, 0, 0 };
-		uint32_t mask = (tt1>>16) & 0xff;
+		uint32_t mask = (tt1 >> 16) & 0xff;
 		mask ^= 0xff;
 		mask <<= 24;
 
@@ -486,8 +490,8 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 
 	if (m_pmmu_enabled)
 	{
-		uint32_t root_idx = (addr_in>>25) & 0x7f;
-		uint32_t ptr_idx = (addr_in>>18) & 0x7f;
+		uint32_t root_idx = (addr_in >> 25) & 0x7f;
+		uint32_t ptr_idx = (addr_in >> 18) & 0x7f;
 		uint32_t page_idx, page;
 		uint32_t root_ptr, pointer_ptr, page_ptr;
 		uint32_t root_entry, pointer_entry, page_entry;
@@ -599,7 +603,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 		m_mmu_last_page_entry = page_entry;
 
 		// is the page write protected or supervisor protected?
-		if ((((page_entry & 4) && !m_mmu_tmp_rw) || ((page_entry & 0x80) && !(fc&4))) && !ptest)
+		if ((((page_entry & 4) && !m_mmu_tmp_rw) || ((page_entry & 0x80) && !(fc & 4))) && !ptest)
 		{
 			pmmu_set_buserror(addr_in);
 			return addr_in;
@@ -678,7 +682,8 @@ uint32_t pmmu_translate_addr(uint32_t addr_in)
 		addr_out = pmmu_translate_addr_with_fc(addr_in, m_mmu_tmp_fc, 0);
 	}
 
-//  if (m_mmu_tmp_buserror_occurred > 0) {
+//  if (m_mmu_tmp_buserror_occurred > 0)
+//  {
 //      MMULOG("PMMU: pc=%08x sp=%08x va=%08x pa=%08x - invalid Table mode for level=%d (buserror %d)\n",
 //              m_ppc, REG_A()[7], addr_in, addr_out, m_mmu_tmp_sr & M68K_MMU_SR_LEVEL_3,
 //              m_mmu_tmp_buserror_occurred);
@@ -908,7 +913,7 @@ void m68851_pmove_put(uint32_t ea, uint16_t modes)
 
 void m68851_pmove(uint32_t ea, uint16_t modes)
 {
-	switch ((modes>>13) & 0x7)
+	switch ((modes >> 13) & 0x7)
 	{
 	case 0: // MC68030/040 form with FD bit
 	case 2: // MC68851 form, FD never set
@@ -934,7 +939,7 @@ void m68851_pmove(uint32_t ea, uint16_t modes)
 		break;
 
 	default:
-		logerror("680x0: unknown PMOVE mode %x (modes %04x) (PC %x)\n", (modes>>13) & 0x7, modes, m_pc);
+		logerror("680x0: unknown PMOVE mode %x (modes %04x) (PC %x)\n", (modes >> 13) & 0x7, modes, m_pc);
 		break;
 
 	}
@@ -964,7 +969,7 @@ void m68851_mmu_ops()
 	}
 	else    // the rest are 1111000xxxXXXXXX where xxx is the instruction family
 	{
-		switch ((m_ir>>9) & 0x7)
+		switch ((m_ir >> 9) & 0x7)
 		{
 			case 0:
 				modes = OPER_I_16();
@@ -1006,7 +1011,7 @@ void m68851_mmu_ops()
 				break;
 
 			default:
-				logerror("680x0: unknown PMMU instruction group %d\n", (m_ir>>9) & 0x7);
+				logerror("680x0: unknown PMMU instruction group %d\n", (m_ir >> 9) & 0x7);
 				break;
 		}
 	}

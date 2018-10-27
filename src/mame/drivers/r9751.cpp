@@ -170,7 +170,7 @@ private:
 
 #if ENABLE_TRACE_ALL_DEVICES
 // Device tracing
-static const char * DeviceNames[] = {
+static char const *const DeviceNames[] = {
 	nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,"??", // 0x00-0x07
 	"??","HDD",nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0x08-0x0F
 	nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0x10-0x17
@@ -180,6 +180,7 @@ static const char * DeviceNames[] = {
 	"??",nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr, // 0x30-0x37
 	"SMIOCc?",nullptr,"SMIOCd?",nullptr,nullptr,nullptr,nullptr,"??" // 0x38-0x3F
 };
+
 struct GenericCommandRecord {
 	u32 AddressPattern;
 	const char * Name;
@@ -392,8 +393,8 @@ static const SystemRegisterInfo SystemRegisters[] = {
 };
 
 
-static const int MaxSystemTables = 256; // FF00xxxx through FFFFxxxx
-static const int MaxSystemRegisters = 0x400; // FF0x0000 through FF0x0FFC
+static constexpr int MaxSystemTables = 256; // FF00xxxx through FFFFxxxx
+static constexpr int MaxSystemRegisters = 0x400; // FF0x0000 through FF0x0FFC
 void r9751_state::system_trace_init()
 {
 	const SystemRegisterInfo*** trace_context;
