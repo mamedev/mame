@@ -155,11 +155,12 @@ Note: Jet Wave uses the cg board from GTI Club (GN678) See gticlub.cpp for detai
 
 TODO:
 - Finish K056320 for linked cabinets
-- GX tilemaps cropped on windheat and midrun
+- GX tilemaps cropped on windheat and midrun. 
 - windheat will sometimes reset at the end of a race with a glitched boot screen crashing shortly after 18R is checked bad
 - windheat's AI cars are always Toyota Tundras if traffic is enabled
-- Random 3d graphic flickering. Happens less if the network ID is changed to 1
+- Random 3d graphic flickering. Doesn't flicker as often if the network ID is set to 1
 - Other small gaphical (and maybe SHARC) problems
+- MCFG removal
 
 */
 
@@ -216,9 +217,7 @@ public:
 	void zr107(machine_config &config);
 	void jetwave(machine_config &config);
 
-	void init_common();
 	void init_zr107();
-	void init_jetwave();
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -594,6 +593,23 @@ static INPUT_PORTS_START( zr107 )
 	PORT_START("IN2")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0838", adc083x_device, do_read)
+	
+	PORT_START("IN3")
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0c, 0x0c, "Network ID" ) PORT_DIPLOCATION("SW:2,1")
+	PORT_DIPSETTING( 0x0c, "1" )
+	PORT_DIPSETTING( 0x08, "2" )
+	PORT_DIPSETTING( 0x04, "3" )
+	PORT_DIPSETTING( 0x00, "4" )
+	PORT_DIPNAME( 0x02, 0x02, "AT/MT (Always off)" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING( 0x02, "Off" )
+	PORT_DIPSETTING( 0x00, "'On" )
+	PORT_DIPNAME( 0x01, 0x01, "CG Board Setting (Always off)" ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING( 0x01, "Off" )
+	PORT_DIPSETTING( 0x00, "On" )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* PARAACK */
@@ -610,67 +626,15 @@ static INPUT_PORTS_START( zr107 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", adc083x_device, cs_write)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", adc083x_device, di_write)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0838", adc083x_device, clk_write)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( midnrun )
-	PORT_INCLUDE( zr107 )
-
-	PORT_START("IN3")
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // COIN2?
-	PORT_DIPNAME( 0x0c, 0x00, "Network ID" ) PORT_DIPLOCATION("SW:2,1")
-	PORT_DIPSETTING( 0x0c, "1" )
-	PORT_DIPSETTING( 0x08, "2" )
-	PORT_DIPSETTING( 0x04, "3" )
-	PORT_DIPSETTING( 0x00, "4" )
-	PORT_DIPNAME( 0x02, 0x02, "Transmission Type" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING( 0x02, "Button" )
-	PORT_DIPSETTING( 0x00, "'T'Gate" )
-	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x01, DEF_STR( Single ) )
-	PORT_DIPSETTING( 0x00, "Twin" )
-
+	
 	PORT_START("ANALOG1")       // Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
 	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
 	PORT_START("ANALOG3")       // Brake pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( windheat )
-	PORT_INCLUDE( zr107 )
-
-	PORT_START("IN3")
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // COIN2?
-	PORT_DIPNAME( 0x0c, 0x00, "Network ID" ) PORT_DIPLOCATION("SW:2,1")
-	PORT_DIPSETTING( 0x0c, "1" )
-	PORT_DIPSETTING( 0x08, "2" )
-	PORT_DIPSETTING( 0x04, "3" )
-	PORT_DIPSETTING( 0x00, "4" )
-	PORT_DIPNAME( 0x02, 0x02, "Transmission Type" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING( 0x02, "Button" )
-	PORT_DIPSETTING( 0x00, "'T'Gate" )
-	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x01, DEF_STR( Single ) )
-	PORT_DIPSETTING( 0x00, "Twin" )
-
-	PORT_START("ANALOG1")       // Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-	PORT_START("ANALOG3")       // Brake pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
 INPUT_PORTS_END
 
@@ -678,39 +642,20 @@ static INPUT_PORTS_START( jetwave )
 	PORT_INCLUDE( zr107 )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("View Shift")        // View Shift
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("View Shift")    // View Shift
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("T-Center")      // T-Center
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_BUTTON3 ) PORT_NAME("Angle")         // Angle
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Turn")     // Left Turn
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Right Turn")        // Right Turn
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Right Turn")    // Right Turn
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x08, 0x00, "DIP 1" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP 2" ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP 3" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x00, "DIP 4" ) PORT_DIPLOCATION("SW:4")
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("ANALOG1")       // Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
-
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
-	PORT_START("ANALOG3")       // Brake pedal
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_MODIFY("ANALOG1")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_REVERSE
 
 INPUT_PORTS_END
 
@@ -915,23 +860,13 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-void zr107_state::init_common()
+void zr107_state::init_zr107()
 {
 	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 	m_ccu_vcth = m_ccu_vctl = 0;
 
 	m_dsp->enable_recompiler();
-}
-
-void zr107_state::init_zr107()
-{
-	init_common();
-}
-
-void zr107_state::init_jetwave()
-{
-	init_common();
 }
 
 /*****************************************************************************/
@@ -1205,6 +1140,6 @@ GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, init_zr107,   RO
 GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1996, windheata,windheat, zr107,   windheat, zr107_state, init_zr107,   ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, jetwave,  0,        jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  zr107_state, init_jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwave,  0,        jetwave, jetwave,  zr107_state, init_zr107, ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  zr107_state, init_zr107, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  zr107_state, init_zr107, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
