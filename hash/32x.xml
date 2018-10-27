@@ -1127,7 +1127,7 @@
 		</part>
 	</software>
 
-	<software name="cf2" supported="no">
+	<software name="cf2">
 		<description>Clay Fighter 2 (Jpn, USA, Euro Prototype)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
