@@ -3953,7 +3953,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_DEVICE_PROGRAM_MAP(mcu_program)
 	MCFG_DEVICE_IO_MAP(mcu_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_irq", namcos22_state, mcu_irq, "screen", 0, 240)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // erratic inputs otherwise, probably mcu vs maincpu shareram
+	MCFG_QUANTUM_TIME(attotime::from_hz(9000)) // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	MCFG_DEVICE_REMOVE("iomcu")
 
