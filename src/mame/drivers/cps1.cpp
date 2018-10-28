@@ -7064,8 +7064,8 @@ ROM_START( sf2uh ) /* same as sf2jh - Street Fighter II: The World Warrior (Japa
 	ROM_LOAD16_BYTE( "sf2u_37h.11f", 0x00001, 0x20000, CRC(e4dffbfe) SHA1(79c523d11be8a2b4991221c03020e671f48f5c14) )	// 1 byte difference to sf2j_37h.11f - 0x4C0 == 0x02 vs 0x00 for Japanese set
 	ROM_LOAD16_BYTE( "sf2u_31h.12e", 0x40000, 0x20000, CRC(69a0a301) SHA1(86a3954335310865b14ce8b4e0e4499feb14fc12) )   // == sf2j_31h.12e / sf2e_31g.12e
 	ROM_LOAD16_BYTE( "sf2u_38h.12f", 0x40001, 0x20000, CRC(a659f678) SHA1(f3b99ebaa59edb889498cf5c9d7ceb939da1dedc) )   // == sf2j_38h.12f
-	ROM_LOAD16_BYTE( "sf2j_28h.9e",  0x80000, 0x20000, CRC(8a5c8ee0) SHA1(a6df46e96bf7596665177b18213a3aee4cc7c378) )   // == sf2j_28h.9e
-	ROM_LOAD16_BYTE( "sf2j_35h.9f",  0x80001, 0x20000, CRC(c828fc4d) SHA1(0025630bef45862d8b72a2d19a6c5adf96905bd5) )   // == sf2j_35h.9f
+	ROM_LOAD16_BYTE( "sf2u_28h.9e",  0x80000, 0x20000, CRC(8a5c8ee0) SHA1(a6df46e96bf7596665177b18213a3aee4cc7c378) )   // == sf2j_28h.9e
+	ROM_LOAD16_BYTE( "sf2u_35h.9f",  0x80001, 0x20000, CRC(c828fc4d) SHA1(0025630bef45862d8b72a2d19a6c5adf96905bd5) )   // == sf2j_35h.9f
 	ROM_LOAD16_BYTE( "sf2_29b.10e",  0xc0000, 0x20000, CRC(bb4af315) SHA1(75f0827f4f7e9f292add46467f8d4fe19b2514c9) )
 	ROM_LOAD16_BYTE( "sf2_36b.10f",  0xc0001, 0x20000, CRC(c02a13eb) SHA1(b807cc495bff3f95d03b061fc629c95f965cb6d8) )
 
