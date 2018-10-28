@@ -18,13 +18,12 @@
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98265A, bus::hp_dio, dio16_98265a_device, "hp98265a", "HP98265A SCSI S16 Interface")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus { namespace hp_dio {
 
 static void scsi_devices(device_slot_interface &device)
 {
-        device.option_add("cdrom", NSCSI_CDROM);
-        device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
 }
 
 void dio16_98265a_device::mb87030_scsi_adapter(device_t *device)
@@ -299,5 +298,4 @@ WRITE_LINE_MEMBER(dio16_98265a_device::dmar0_w)
 
 }
 
-}
-}
+} } // namespace bus::hp_dio

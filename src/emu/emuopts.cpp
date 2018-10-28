@@ -389,7 +389,7 @@ namespace
 		if (!same_name)
 			result.push_back(image.brief_instance_name());
 
-		if( image.instance_name() != image.cannonical_instance_name() )
+		if (image.instance_name() != image.cannonical_instance_name())
 		{
 			result.push_back(image.cannonical_instance_name());
 			if (!same_name)

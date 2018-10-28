@@ -213,7 +213,7 @@ public:
 		m_p2(*this, "P2"),
 		m_mcup5a(*this, "MCUP5A"),
 		m_mcup5b(*this, "MCUP5B"),
-		m_led(*this, "led"),
+		m_mcuout(*this, "mcuout%u", 0U),
 		m_cpuled(*this, "cpuled%u", 0U)
 	{ }
 
@@ -357,11 +357,8 @@ private:
 	DECLARE_READ8_MEMBER(mcu_port5_r);
 	DECLARE_WRITE8_MEMBER(mcu_port6_w);
 	DECLARE_READ8_MEMBER(mcu_port6_r);
-	DECLARE_WRITE8_MEMBER(mcu_port7_w);
-	DECLARE_READ8_MEMBER(mcu_port7_r);
 	DECLARE_READ8_MEMBER(namcos22s_mcu_adc_r);
-	DECLARE_WRITE8_MEMBER(propcycle_mcu_port5_w);
-	DECLARE_WRITE8_MEMBER(alpine_mcu_port5_w);
+	DECLARE_WRITE8_MEMBER(alpine_mcu_port4_w);
 	DECLARE_READ8_MEMBER(mcu_port4_s22_r);
 	DECLARE_READ8_MEMBER(iomcu_port4_s22_r);
 	DECLARE_READ16_MEMBER(mcu141_speedup_r);
@@ -463,7 +460,6 @@ private:
 	void mcu_s22_program(address_map &map);
 	void namcos22_am(address_map &map);
 	void namcos22s_am(address_map &map);
-	void propcycl_io_map(address_map &map);
 	void slave_dsp_data(address_map &map);
 	void slave_dsp_io(address_map &map);
 	void slave_dsp_program(address_map &map);
@@ -494,7 +490,7 @@ private:
 	optional_ioport m_p2;
 	optional_ioport m_mcup5a;
 	optional_ioport m_mcup5b;
-	output_finder<> m_led;
+	output_finder<16> m_mcuout;
 	output_finder<8> m_cpuled;
 
 	u8 m_syscontrol[0x20];
@@ -518,7 +514,8 @@ private:
 	int m_UploadDestIdx;
 	u32 m_alpinesa_protection;
 	int m_motor_status;
-	int m_p4;
+	u8 m_mcu_iocontrol;
+	u8 m_mcu_outdata;
 	u16 m_su_82;
 	u16 m_keycus_id;
 	u16 m_keycus_rng;

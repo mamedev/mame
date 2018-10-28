@@ -4,7 +4,7 @@
 
     Mertec Compact Companion
 
-		http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Mertec_CompactComp.html
+        http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Mertec_CompactComp.html
 
 **********************************************************************/
 

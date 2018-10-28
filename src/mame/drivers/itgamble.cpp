@@ -19,7 +19,7 @@
 There are at least 4 variants for this hardware.
 The first 3 share the same layout, the latest is a complete redesign.
 
----------  
+---------
 The oldest revision (green) is marked "H83048" with the following hardware:
 (note that @IC2 is unpopulated)
   CPU:
@@ -27,7 +27,7 @@ The oldest revision (green) is marked "H83048" with the following hardware:
     (128KB ROM; 4KB RAM)
   Sound:
     1x OKI 6295 or clones                @IC24
-	1x LM358N dual operational amplifier @IC27
+    1x LM358N dual operational amplifier @IC27
     1x TDA2003 audio amplifier           @IC26
   PLDs:
     1x ispLSI2064-80LJ                   @IC12
@@ -89,14 +89,14 @@ A complete redesign (green) is marked "ND 2001 Rev 1.0" and uses smaller factor 
     (128KB ROM; 4KB RAM)
   Sound:
     1x OKI 6295 or clones                @IC15
-	1x LM358N dual operational amplifier @IC13
+    1x LM358N dual operational amplifier @IC13
     1x TDA2003 audio amplifier           @IC8
   PLDs:
     1x ispLSI2064-80LJ                   @IC24
   Clock:
     1x Xtal 30.000 MHz                   @OSC1
     1x Resonator ZTB1000J (1000 kHz)     @X1
-	1x Xtal K0SoF                        @X2
+    1x Xtal K0SoF                        @X2
   ROMs:
     1x 27C010 (sound)                    @IC1
     2x 27C040 (graphics)                 @IC7,8
@@ -112,8 +112,8 @@ A complete redesign (green) is marked "ND 2001 Rev 1.0" and uses smaller factor 
 Known games on this hardware revision are:
 2001.11     Bowling Road (Ver 1.4)
 2001.12     World Cup (Ver 1.4)
-  
-  
+
+
 *******************************************************************/
 
 #include "emu.h"
@@ -476,7 +476,7 @@ ROM_END
 /* Pin Ups (Ver 1.0 Rev A)
 PCB is marked: "CE H83048" on component side
 PCB is marked: "H83048 bottom" on solder side
-PCB is labeled: "PIN UPS VER.1.0 REV.A" on component side 
+PCB is labeled: "PIN UPS VER.1.0 REV.A" on component side
 */
 ROM_START( pinups )
 	ROM_REGION( 0x1000000, "maincpu", 0 )

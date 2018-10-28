@@ -414,9 +414,8 @@ IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint32_t IntPend = space.read_dword(0x01800c0c);
-	int i;
 
-	for (i = 0; i < 32; ++i)
+	for (int i = 0; i < 32; ++i)
 	{
 		if (BIT(IntPend, i))
 		{
@@ -498,15 +497,14 @@ WRITE32_MEMBER(crystal_state::DMA_w)
 {
 	if (((data ^ m_DMActrl[Which]) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
 	{
-		uint32_t CTR = data;
-		uint32_t SRC = space.read_dword(0x01800804 + Which * 0x10);
-		uint32_t DST = space.read_dword(0x01800808 + Which * 0x10);
-		uint32_t CNT = space.read_dword(0x0180080C + Which * 0x10);
-		int i;
+		uint32_t const CTR = data;
+		uint32_t const SRC = space.read_dword(0x01800804 + Which * 0x10);
+		uint32_t const DST = space.read_dword(0x01800808 + Which * 0x10);
+		uint32_t const CNT = space.read_dword(0x0180080C + Which * 0x10);
 
 		if (CTR & 0x2)  //32 bits
 		{
-			for (i = 0; i < CNT; ++i)
+			for (int i = 0; i < CNT; ++i)
 			{
 				uint32_t v = space.read_dword(SRC + i * 4);
 				space.write_dword(DST + i * 4, v);
@@ -514,7 +512,7 @@ WRITE32_MEMBER(crystal_state::DMA_w)
 		}
 		else if (CTR & 0x1) //16 bits
 		{
-			for (i = 0; i < CNT; ++i)
+			for (int i = 0; i < CNT; ++i)
 			{
 				uint16_t v = space.read_word(SRC + i * 2);
 				space.write_word(DST + i * 2, v);
@@ -522,7 +520,7 @@ WRITE32_MEMBER(crystal_state::DMA_w)
 		}
 		else    //8 bits
 		{
-			for (i = 0; i < CNT; ++i)
+			for (int i = 0; i < CNT; ++i)
 			{
 				uint8_t v = space.read_byte(SRC + i);
 				space.write_byte(DST + i, v);
@@ -1067,7 +1065,6 @@ uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	uint16_t *Front, *Back;
 	uint16_t *Visible, *DrawDest;
 	uint16_t *srcline;
-	int y;
 	uint16_t head, tail;
 	uint32_t width = cliprect.width();
 
@@ -1113,9 +1110,9 @@ uint32_t crystal_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		SetVidReg(space, 0x8e, GetVidReg(space, 0x8e) ^ 1);
 
 	srcline = (uint16_t *) Visible;
-	uint32_t dx = cliprect.left();
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
-		std::copy_n( &srcline[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
+	uint32_t const dx = cliprect.left();
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		std::copy_n(&srcline[(y * 1024) + dx], width, &bitmap.pix16(y, dx));
 
 	return 0;
 }

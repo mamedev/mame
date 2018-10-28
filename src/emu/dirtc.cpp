@@ -197,8 +197,8 @@ void device_rtc_interface::advance_days()
 
 	if (m_register[RTC_MONTH] > 0 && m_register[RTC_DAY] > DAYS_PER_MONTH[m_register[RTC_MONTH] - 1])
 	{
-		if (m_register[RTC_MONTH] != 2 || m_register[RTC_DAY] != 29  || !rtc_feature_leap_year() ||
-				(m_register[RTC_YEAR] % 4) != 0) {
+		if (m_register[RTC_MONTH] != 2 || m_register[RTC_DAY] != 29 || !rtc_feature_leap_year() || !(m_register[RTC_YEAR] % 4))
+		{
 			m_register[RTC_DAY] = 1;
 			m_register[RTC_MONTH]++;
 		}

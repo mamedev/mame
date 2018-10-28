@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(twins_state::twinsed1)
 MACHINE_CONFIG_END
 
 
-/* The Ecogames set and the Electronic Devices second set has different palette hardware 
+/* The Ecogames set and the Electronic Devices second set has different palette hardware
    and a different port map than Electronic Devices first set */
 
 void twins_state::twins_io(address_map &map)

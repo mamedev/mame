@@ -92,11 +92,11 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_special_data_config;
-	address_space *m_special_data_space; 
+	address_space *m_special_data_space;
 	address_space_config m_lowbus_config;
 	address_space_config m_extbus_config;
-	address_space *m_lowbus_space; 
-	address_space *m_extbus_space; 
+	address_space *m_lowbus_space;
+	address_space *m_extbus_space;
 
 	uint8_t read_special(uint16_t adr);
 

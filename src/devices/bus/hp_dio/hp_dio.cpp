@@ -257,11 +257,11 @@ void dio16_device::install_memory(offs_t start, offs_t end,
 	switch (m_prgwidth) {
 	case 16:
 		m_prgspace->install_readwrite_handler(start, end, rhandler,
-						      whandler);
+							  whandler);
 		break;
 	case 32:
 		m_prgspace->install_readwrite_handler(start, end, rhandler,
-						      whandler, 0xffffffff);
+							  whandler, 0xffffffff);
 		break;
 	default:
 		fatalerror("DIO: Bus width %d not supported\n", m_prgwidth);

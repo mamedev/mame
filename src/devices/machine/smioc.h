@@ -124,7 +124,7 @@ private:
 	required_device<scc2698b_device> m_scc2698b;
 
 	required_shared_ptr<uint8_t> m_smioc_ram;
-	
+
 	u8 m_logic_ram[4096]; // 4kb of ram in the 0x4xxxx window, mainly used by the board's logic to proxy command parameters and data.
 
 	void smioc_mem(address_map &map);

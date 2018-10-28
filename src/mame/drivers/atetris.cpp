@@ -484,7 +484,7 @@ ROM_START( atetrisb2 )
 	ROM_LOAD( "b-gal16v8-b.bin", 0x117, 0x117, CRC(b1dfab0f) SHA1(e9e4db5459617a35a13df4b7a4586dd1b7be04ac) ) // sub PCB - Same content as "a"
 	ROM_LOAD( "c-gal16v8-b.bin", 0x22e, 0x117, CRC(e1a9db0b) SHA1(5bbac24e37a4d9b8a1387054722fa35478ca7941) ) // sub PCB
 	ROM_LOAD( "1-pal16l8-a.3g" , 0x345, 0x104, CRC(dcf0d2fe) SHA1(0496acaa605ec5008b110c387136bbc714441384) ) // main PCB - Found also as GAL16v8 on some PCBs
-	ROM_LOAD( "2-pal16r4-a.3r" , 0x449, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) ) // main PCB 
+	ROM_LOAD( "2-pal16r4-a.3r" , 0x449, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) ) // main PCB
 	ROM_LOAD( "3-pal16r4-a.8p" , 0x54D, 0x104, CRC(e007edf2) SHA1(4f1bc31abd64e402edb4c900ddb21f258d6782c8) ) // main PCB - Found also as GAL16v8 on some PCBs
 	ROM_LOAD( "4-pal16l8-a.9n" , 0x651, 0x104, CRC(3630e734) SHA1(a29dc202ffc75ac48815115b85e984fc0c9d5b59) ) // main PCB - Found also as GAL16v8 on some PCBs
 	ROM_LOAD( "5-pal16l8-a.9m" , 0x755, 0x104, CRC(53b64be1) SHA1(2bf712b766541c90c38c0810ee16848e448c5205) ) // main PCB - Found also as GAL16v8 on some PCBs
@@ -569,7 +569,7 @@ H |74LS04  PAL16R8  ___________            |      |  | UN  |74LS161 |
 I |74LS32  74LS373  |__________|   74LS32            | PU  |PAL16L8 |
   |                  __________              74LS04  | LA  |        |
 J |74LS374 74LS357   | X2804AP |   74LS257   74LS138 | TED |PAL16?? |
-  |____________      |_________|   74LS257   74LS257 |     |        |                 
+  |____________      |_________|   74LS257   74LS257 |     |        |
 K ||D3 27PC256 |                                     |_____|74LS161 |
   ||___________|     74LS245   74LS245                              |
 L |________________  _______________         74LS257 74LS74 74LS161 |

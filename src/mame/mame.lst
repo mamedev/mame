@@ -1030,7 +1030,8 @@ spacepir                        // (c) 1992
 spacepir_14                     // (c) 1992
 wsjr                            // (c) 1991
 wsjr_15                         // (c) 1991
-zortonbr                        // (c) 1993 Web Picmatic
+zortonbr                        // (c) 1994 Web Picmatic
+zortonbr_100                    // (c) 1993 Web Picmatic
 
 @source:alien.cpp
 alien                           // (c) 2005 Capcom
@@ -10267,6 +10268,7 @@ sf2ud                           // 18/03/1991 (c) 1991 (USA)
 sf2ue                           // 28/02/1991 (c) 1991 (USA)
 sf2uf                           // 11/04/1991 (c) 1991 (USA)
 sf2ug                           // 22/05/1991 (c) 1991 (USA, Rev. G)
+sf2uh                           // 22/05/1991 (c) 1991 (USA, Rev. H)
 sf2ui                           // 22/05/1991 (c) 1991 (USA, Rev. I)
 sf2uk                           // 01/11/1991 (c) 1991 (USA)
 sf2v004                         // hack

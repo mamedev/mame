@@ -52,8 +52,8 @@ Hewlett-Packard 9000/3xx Layout
 		<screen index="0"><bounds x="0" y="0" width="1024" height="768"/></screen>
 	</view>
 	<view name="XGA Screen">
-                <screen index="0">
-                        <bounds x="0" y="0" width="1024" height="768" />
-                </screen>
+		<screen index="0">
+			<bounds x="0" y="0" width="1024" height="768" />
+		</screen>
 	</view>
 </mamelayout>

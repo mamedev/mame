@@ -21,6 +21,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 #define VERBOSE_LEVEL ( 0 )
 
 class hapyfish_state : public driver_device
@@ -34,7 +36,7 @@ public:
 		m_nand2(*this, "nand2"),
 		m_ldac(*this, "ldac"),
 		m_rdac(*this, "rdac")
-		{ }
+	{ }
 
 	void hapyfish(machine_config &config);
 
@@ -70,10 +72,10 @@ inline void hapyfish_state::verboselog(int n_level, const char *s_fmt, ...)
 	{
 		va_list v;
 		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine().describe_context(), buf);
+		va_start(v, s_fmt);
+		vsprintf(buf, s_fmt, v);
+		va_end(v);
+		logerror("%s: %s", machine().describe_context(), buf);
 	}
 }
 
@@ -191,7 +193,7 @@ WRITE8_MEMBER(hapyfish_state::s3c2440_nand_data_w )
 
 WRITE16_MEMBER(hapyfish_state::s3c2440_i2s_data_w )
 {
-	if ( offset )
+	if (offset)
 		m_ldac->write(data);
 	else
 		m_rdac->write(data);
@@ -217,7 +219,7 @@ void hapyfish_state::machine_start()
 void hapyfish_state::machine_reset()
 {
 	m_maincpu->reset();
-	memset( m_port, 0, sizeof( m_port));
+	std::fill(std::begin(m_port), std::end(m_port), 0);
 	m_port[8] = 0x1800; // select NAND #1
 }
 

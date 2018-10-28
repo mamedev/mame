@@ -325,7 +325,7 @@ win_window_info::win_window_info(
 	m_non_fullscreen_bounds.right  = 0;
 	m_non_fullscreen_bounds.bottom = 0;
 	m_prescale = video_config.prescale;
-    m_index = index;
+	m_index = index;
 }
 
 POINT win_window_info::s_saved_cursor_pos = { -1, -1 };

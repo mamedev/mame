@@ -43,8 +43,8 @@
 class namcos16_state : public driver_device
 {
 public:
-	namcos16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	namcos16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_master_cpu(*this,"maincpu"),
 		m_slave_cpu(*this, "slave"),
 		m_sound_cpu(*this, "audiocpu"),
@@ -59,7 +59,8 @@ public:
 		m_bgvram(*this, "bgvram"),
 		m_fgvram(*this, "fgvram"),
 		m_fgattr(*this, "fgattr")
-	{ }
+	{
+	}
 
 	void toypop(machine_config &config);
 	void liblrabl(machine_config &config);
@@ -123,9 +124,9 @@ private:
 	bool m_slave_irq_enable;
 	uint8_t m_pal_bank;
 
-	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip);
-	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip);
-	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip);
+	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
+	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
+	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip);
 };
 
 PALETTE_INIT_MEMBER(namcos16_state, toypop)
@@ -177,27 +178,22 @@ PALETTE_INIT_MEMBER(namcos16_state, toypop)
 	}
 }
 
-void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip)
+void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
 {
-	int x, y;
 	const uint16_t pal_base = 0x300 + (m_pal_bank << 4);
 	const uint32_t src_base = 0x200/2;
 	const uint16_t src_pitch = 288 / 2;
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		uint16_t *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
-		uint16_t *dst;
-		if(!flip)
-			dst = &bitmap.pix16(y, cliprect.min_x);
-		else
-			dst = &bitmap.pix16(cliprect.max_y - y, cliprect.max_x);
+		uint16_t *dst = &bitmap.pix16(flip ? (cliprect.max_y - y) : y, flip ? cliprect.max_x : cliprect.min_x);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
-			uint32_t srcpix = *src++;
-			int idx1 = ((srcpix >> 8) & 0xf) + pal_base;
-			int idx2 = (srcpix & 0xf) + pal_base;
+			uint32_t const srcpix = *src++;
+			int const idx1 = ((srcpix >> 8) & 0xf) + pal_base;
+			int const idx2 = (srcpix & 0xf) + pal_base;
 			if (!flip)
 			{
 				*dst++ = m_palette->pen(idx1);
@@ -212,62 +208,63 @@ void namcos16_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 	}
 }
 
-void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip)
+void namcos16_state::legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
 {
-	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
-	int count;
+	gfx_element *const gfx_0 = m_gfxdecode->gfx(0);
 
-	for (count=0;count<32*32;count++)
+	for (int count = 0; count < 32*32; count++)
 	{
+		int const xoffs(count >> 5);
+		int const yoffs(count & 0x1f);
 		int x;// = (count % 32);
 		int y; //= count / 32;
 
 		if (!flip)
 		{
-			if(count < 64)
+			if (count < 64)
 			{
-				x = 34 + (count / 32);
-				y = (count % 32) - 2;
+				x = 34 + xoffs;
+				y = yoffs - 2;
 			}
-			else if(count >= 32*30)
+			else if (count >= 32*30)
 			{
-				x = (count / 32) - 30;
-				y = (count % 32) - 2;
+				x = xoffs - 30;
+				y = yoffs - 2;
 			}
 			else
 			{
-				x = 2 + (count % 32);
-				y = (count / 32) - 2;
+				x = 2 + yoffs;
+				y = xoffs - 2;
 			}
 		}
 		else
 		{
-			if(count < 64)
+			if (count < 64)
 			{
-				x = 1 - (count / 32);
-				y = 29 - (count % 32);
+				x = 1 - xoffs;
+				y = 29 - yoffs;
 			}
-			else if(count >= 32*30)
+			else if (count >= 32*30)
 			{
-				x = 65 - (count / 32);
-				y = 29 - (count % 32);
+				x = 65 - xoffs;
+				y = 29 - yoffs;
 			}
 			else
 			{
-				x = 33 - (count % 32);
-				y = 29 - (count / 32);
+				x = 33 - yoffs;
+				y = 29 - xoffs;
 			}
 		}
 
 		uint16_t tile = m_fgvram[count];
-		uint8_t color = (m_fgattr[count] & 0x3f) + (m_pal_bank<<6);
+		uint8_t color = (m_fgattr[count] & 0x3f) + (m_pal_bank << 6);
 
-		gfx_0->transpen(bitmap,cliprect,tile,color,flip,flip,x*8,y*8,0);
+		gfx_0->transpen(bitmap, cliprect, tile, color, flip, flip, x*8, y*8, 0);
 	}
 }
 
 // TODO: this is likely to be a lot more complex, and maybe is per scanline too
-void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flip)
+void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
 {
 	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
 	int count;
@@ -309,12 +306,12 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 			fy ^= 1;
 		}
 
-		if(height == 2)
+		if (height == 2)
 			y -=16;
 
-		for(int yi=0;yi<height;yi++)
+		for (int yi=0; yi<height; yi++)
 		{
-			for(int xi=0;xi<width;xi++)
+			for(int xi=0; xi<width; xi++)
 			{
 				uint16_t sprite_offs = tile + gfx_offs[yi ^ ((height - 1) * fy)][xi ^ ((width - 1) * fx)];
 				gfx_1->transmask(bitmap,cliprect,sprite_offs,color,fx,fy,x + xi*16,y + yi *16,m_palette->transpen_mask(*gfx_1, color, 0xff));
@@ -325,7 +322,7 @@ void namcos16_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 
 uint32_t namcos16_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int flip = flip_screen();
+	bool const flip = flip_screen();
 	legacy_bg_draw(bitmap,cliprect,flip);
 	legacy_fg_draw(bitmap,cliprect,flip);
 	legacy_obj_draw(bitmap,cliprect,flip);

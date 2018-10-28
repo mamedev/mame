@@ -17,6 +17,7 @@
  * - C139 for linked cabinets, as well as in RR fullscale
  * - confirm DSP and MCU clocks and their IRQ timing
  * - EEPROM write timing should be around 5ms, it doesn't do any data/rdy polling
+ * - where is the steering wheel motor torque output for dirtdash?
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
  *       it used to be much worse with the legacy_poly_manager
  * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
@@ -32,6 +33,8 @@
  * - PDP command 0xfff9, used in alpinr2b to modify titlescreen logo animation in pointram (should show a snowmelting effect)
  * - support for text layer video partial updates after posirq, alpinesa does raster effects on it
  * - alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
+ * - ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
+ * - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
  * - cybrcomm arrows(black part) should be below textlayer when a messagebox pops up
  * - cybrcycc speed dial needle is missing
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
@@ -2733,38 +2736,97 @@ void namcos22_state::iomcu_s22_io(address_map &map)
 
 // System Super22 M37710
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
-{
-	int scanline = param;
+/*
+  SS22 MCU outputs
+  ----------------
+  sent to mcuoutx where x = 0 to 15
+  mcuout0 = coincounter
 
-	/* TODO: real sources of these */
-	if (scanline == 480)
-		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
-	else if (scanline == 0)
-		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-	else if (scanline == 240)
-		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
-}
+  Air Combat 22:
+  1 = start button lamp
 
+  Alpine Racer 1,2, Alpine Surfer:
+  1 = steplock motor lock
+  2 = steplock motor on
+  4 = start button lamp
+  5 = left button lamp
+  6 = right button lamp
+
+  Aqua Jet:
+  1 = ?
+  2 = fan motor
+  4 = start button lamp
+  7 = air spring
+
+  Armadillo Racing:
+  4 = start button lamp
+
+  Cyber Cycles:
+  1 = 1 lamp
+  2 = 2 lamp
+  3 = 3 lamp
+  4 = 4 lamp
+  5 = red lamp
+  6 = yellow lamp
+  7 = blue lamp
+  8 = green lamp
+  9 = start button lamp
+
+  Dirt Dash:
+  1 = steering wheel motor on
+  4 = front left valve
+  5 = front right valve
+  6 = rear left valve
+  7 = rear right valve
+  where is steering wheel torque?
+
+  Prop Cycle:
+  1 = fan motor
+  2 = start button lamp
+
+  Time Crisis:
+  1 = gun solenoid
+
+  Tokyo Wars:
+  1 = start button lamp
+  other: ?
+*/
 
 WRITE8_MEMBER(namcos22_state::mcu_port4_w)
 {
-	m_p4 = data;
+	// d3: input port select for port 5
+	// d4: port 5 direction?
+	// d5,d6: output strobe for port 5
+
+	if (~m_mcu_iocontrol & data & 0x20)
+	{
+		for (int i = 0; i < 8; i++)
+			m_mcuout[i] = BIT(m_mcu_outdata, i);
+
+		machine().bookkeeping().coin_counter_w(0, m_mcu_outdata & 1);
+	}
+	if (~m_mcu_iocontrol & data & 0x40)
+	{
+		for (int i = 0; i < 8; i++)
+			m_mcuout[8+i] = BIT(m_mcu_outdata, i);
+	}
+
+	m_mcu_iocontrol = data;
 }
 
 READ8_MEMBER(namcos22_state::mcu_port4_r)
 {
-	return m_p4;
+	return m_mcu_iocontrol;
 }
 
 WRITE8_MEMBER(namcos22_state::mcu_port5_w)
 {
-	;
+	m_mcu_outdata = data;
 }
 
 READ8_MEMBER(namcos22_state::mcu_port5_r)
 {
-	if (m_p4 & 8)
+	if (m_mcu_iocontrol & 8)
 		return m_mcup5a.read_safe(0xff);
 	else
 		return m_mcup5b.read_safe(0xff);
@@ -2772,21 +2834,12 @@ READ8_MEMBER(namcos22_state::mcu_port5_r)
 
 WRITE8_MEMBER(namcos22_state::mcu_port6_w)
 {
-	;
+	// always 2?
 }
 
 READ8_MEMBER(namcos22_state::mcu_port6_r)
 {
-	return 0;
-}
-
-WRITE8_MEMBER(namcos22_state::mcu_port7_w)
-{
-	;
-}
-
-READ8_MEMBER(namcos22_state::mcu_port7_r)
-{
+	// discarded
 	return 0;
 }
 
@@ -2812,8 +2865,20 @@ void namcos22_state::mcu_io(address_map &map)
 	map(M37710_PORT4, M37710_PORT4).rw(FUNC(namcos22_state::mcu_port4_r), FUNC(namcos22_state::mcu_port4_w));
 	map(M37710_PORT5, M37710_PORT5).rw(FUNC(namcos22_state::mcu_port5_r), FUNC(namcos22_state::mcu_port5_w));
 	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namcos22_state::mcu_port6_r), FUNC(namcos22_state::mcu_port6_w));
-	map(M37710_PORT7, M37710_PORT7).rw(FUNC(namcos22_state::mcu_port7_r), FUNC(namcos22_state::mcu_port7_w));
 	map(M37710_ADC0_L, M37710_ADC7_H).r(FUNC(namcos22_state::namcos22s_mcu_adc_r));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
+{
+	int scanline = param;
+
+	/* TODO: real sources of these */
+	if (scanline == 480)
+		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+	else if (scanline == 0)
+		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+	else if (scanline == 240)
+		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
 /*********************************************************************************************/
@@ -2919,52 +2984,42 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::alpine_steplock_callback)
 	m_motor_status = param;
 }
 
-WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
+WRITE8_MEMBER(namcos22_state::alpine_mcu_port4_w)
 {
-	// bits 1+2 are steplock motor outputs
-	if ((data & 6) == 6)
+	if (~m_mcu_iocontrol & data & 0x20)
 	{
-		if (m_motor_status == 2)
+		// bits 1+2 are steplock motor outputs
+		if ((m_mcu_outdata & 6) == 6)
 		{
-			// free steps
-			m_motor_status = 0;
-			m_motor_timer->adjust(attotime::from_msec(500), 1);
+			if (m_motor_status == 2)
+			{
+				// free steps
+				m_motor_status = 0;
+				m_motor_timer->adjust(attotime::from_msec(500), 1);
+			}
+		}
+		else if (m_mcu_outdata & 4)
+		{
+			if (m_motor_status == 1)
+			{
+				// lock steps
+				m_motor_status = 0;
+				m_motor_timer->adjust(attotime::from_msec(500), 2);
+			}
 		}
 	}
-	else if (data & 4)
-	{
-		if (m_motor_status == 1)
-		{
-			// lock steps
-			m_motor_status = 0;
-			m_motor_timer->adjust(attotime::from_msec(500), 2);
-		}
-	}
+
+	mcu_port4_w(space, offset, data);
 }
 
 void namcos22_state::alpine_io_map(address_map &map)
 {
 	mcu_io(map);
-	map(M37710_PORT5, M37710_PORT5).w(FUNC(namcos22_state::alpine_mcu_port5_w));
+	map(M37710_PORT4, M37710_PORT4).w(FUNC(namcos22_state::alpine_mcu_port4_w));
 }
 
 
 // Prop Cycle
-
-WRITE8_MEMBER(namcos22_state::propcycle_mcu_port5_w)
-{
-	// prop cycle outputs:
-	// bit 1 = fan
-	// bit 2 = button light
-	output().set_value("fan0", data & 1);
-	m_led = BIT(data, 1);
-}
-
-void namcos22_state::propcycl_io_map(address_map &map)
-{
-	mcu_io(map);
-	map(M37710_PORT5, M37710_PORT5).w(FUNC(namcos22_state::propcycle_mcu_port5_w));
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
 {
@@ -3553,7 +3608,7 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("MCUP5B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TRACKX")
@@ -3723,7 +3778,7 @@ ALLOW_SAVE_TYPE(namcos22_dsp_upload_state);
 
 void namcos22_state::machine_start()
 {
-	m_led.resolve();
+	m_mcuout.resolve();
 	m_cpuled.resolve();
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
@@ -3731,7 +3786,7 @@ void namcos22_state::machine_start()
 	m_keycus_rng = 0;
 	m_su_82 = 0;
 	m_irq_state = 0;
-	m_p4 = 0;
+	m_mcu_iocontrol = 0;
 	m_old_coin_state = 0;
 	m_credits1 = m_credits2 = 0;
 
@@ -3771,7 +3826,8 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_UploadDestIdx));
 	save_item(NAME(m_alpinesa_protection));
 	save_item(NAME(m_motor_status));
-	save_item(NAME(m_p4));
+	save_item(NAME(m_mcu_iocontrol));
+	save_item(NAME(m_mcu_outdata));
 	save_item(NAME(m_su_82));
 	save_item(NAME(m_keycus_id));
 	save_item(NAME(m_keycus_rng));
@@ -3971,9 +4027,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos22_state::propcycl)
 	namcos22s(config);
-
-	MCFG_DEVICE_MODIFY("mcu")
-	MCFG_DEVICE_IO_MAP(propcycl_io_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pc_p_upd", namcos22_state, propcycl_pedal_update, attotime::from_msec(20))
 	MCFG_TIMER_DRIVER_ADD("pc_p_int", namcos22_state, propcycl_pedal_interrupt)

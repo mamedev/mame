@@ -16,42 +16,42 @@
 DEFINE_DEVICE_TYPE(SPG24X, spg24x_device, "spg24x", "SPG240-series System-on-a-Chip")
 DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-Chip")
 
-#define LOG_IO_READS		(1U << 0)
-#define LOG_IO_WRITES		(1U << 1)
-#define LOG_UNKNOWN_IO		(1U << 2)
-#define LOG_IRQS			(1U << 3)
-#define LOG_VLINES			(1U << 4)
-#define LOG_GPIO			(1U << 5)
-#define LOG_UART			(1U << 6)
-#define LOG_I2C				(1U << 7)
-#define LOG_DMA				(1U << 8)
-#define LOG_SEGMENT			(1U << 9)
-#define LOG_WATCHDOG		(1U << 10)
-#define LOG_TIMERS			(1U << 11)
-#define LOG_SPU_READS		(1U << 12)
-#define LOG_SPU_WRITES		(1U << 13)
-#define LOG_UNKNOWN_SPU		(1U << 14)
-#define LOG_CHANNEL_READS	(1U << 15)
-#define LOG_CHANNEL_WRITES	(1U << 16)
-#define LOG_ENVELOPES		(1U << 17)
-#define LOG_SAMPLES			(1U << 18)
-#define LOG_RAMPDOWN		(1U << 19)
-#define LOG_BEAT			(1U << 20)
-#define LOG_PPU_READS		(1U << 21)
-#define LOG_PPU_WRITES		(1U << 22)
-#define LOG_UNKNOWN_PPU		(1U << 23)
-#define LOG_IO				(LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_UNKNOWN_IO)
-#define LOG_CHANNELS		(LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
-#define LOG_SPU				(LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
+#define LOG_IO_READS        (1U << 0)
+#define LOG_IO_WRITES       (1U << 1)
+#define LOG_UNKNOWN_IO      (1U << 2)
+#define LOG_IRQS            (1U << 3)
+#define LOG_VLINES          (1U << 4)
+#define LOG_GPIO            (1U << 5)
+#define LOG_UART            (1U << 6)
+#define LOG_I2C             (1U << 7)
+#define LOG_DMA             (1U << 8)
+#define LOG_SEGMENT         (1U << 9)
+#define LOG_WATCHDOG        (1U << 10)
+#define LOG_TIMERS          (1U << 11)
+#define LOG_SPU_READS       (1U << 12)
+#define LOG_SPU_WRITES      (1U << 13)
+#define LOG_UNKNOWN_SPU     (1U << 14)
+#define LOG_CHANNEL_READS   (1U << 15)
+#define LOG_CHANNEL_WRITES  (1U << 16)
+#define LOG_ENVELOPES       (1U << 17)
+#define LOG_SAMPLES         (1U << 18)
+#define LOG_RAMPDOWN        (1U << 19)
+#define LOG_BEAT            (1U << 20)
+#define LOG_PPU_READS       (1U << 21)
+#define LOG_PPU_WRITES      (1U << 22)
+#define LOG_UNKNOWN_PPU     (1U << 23)
+#define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_UNKNOWN_IO)
+#define LOG_CHANNELS        (LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
+#define LOG_SPU             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
 							| LOG_ENVELOPES | LOG_SAMPLES | LOG_RAMPDOWN | LOG_BEAT)
-#define LOG_PPU				(LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
-#define LOG_ALL				(LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT)
+#define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
+#define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT)
 
-#define VERBOSE				(0)
+#define VERBOSE             (0)
 #include "logmacro.h"
 
-#define SPG_DEBUG_VIDEO		(0)
-#define SPG_DEBUG_AUDIO		(0)
+#define SPG_DEBUG_VIDEO     (0)
+#define SPG_DEBUG_AUDIO     (0)
 
 #if SPG2XX_VISUAL_AUDIO_DEBUG
 static const uint32_t s_visual_debug_palette[8] = {
@@ -70,8 +70,8 @@ static const uint32_t s_visual_debug_palette[8] = {
 #define SPG_VDB_VOL 4
 #endif
 
-#define IO_IRQ_ENABLE		m_io_regs[0x21]
-#define IO_IRQ_STATUS		m_io_regs[0x22]
+#define IO_IRQ_ENABLE       m_io_regs[0x21]
+#define IO_IRQ_STATUS       m_io_regs[0x22]
 #define VIDEO_IRQ_ENABLE    m_video_regs[0x62]
 #define VIDEO_IRQ_STATUS    m_video_regs[0x63]
 

@@ -4,21 +4,23 @@
 
     American Laser Game Hardware
 
-    Amiga 500 + sony ldp1450 laserdisc player
+    Amiga 500 + sony laserdisc player LDP-1450
+    (LDP-3300P for Zorton Brothers, LDP-1500 for Marbella Vice)
 
     Games Supported:
 
         Mad Dog McCree [3 versions]
         Who Shot Johnny Rock? [2 versions]
-        Mad Dog II: The Lost Gold [2 versions]
-        Space Pirates
-        Gallagher's Gallery
-        Crime Patrol
+        Mad Dog II: The Lost Gold [4 versions]
+        Space Pirates [2 versions]
+        Gallagher's Gallery [2 versions]
+        Crime Patrol [3 versions]
         Crime Patrol 2: Drug Wars [2 versions]
-        The Last Bounty Hunter
-        Fast Draw Showdown
+        The Last Bounty Hunter [2 versions]
+        Fast Draw Showdown [2 versions]
         Platoon
-        Zorton Brothers (Los Justicieros)
+        Zorton Brothers (Los Justicieros) [2 versions]
+        Marbella Vice
 
 **************************************************************************************/
 
@@ -679,7 +681,28 @@ ROM_START( aplatoon )
 	DISK_IMAGE_READONLY( "platoon", 0, NO_DUMP )
 ROM_END
 
+// zortonbr v1.01
+// ROM board labeled "PICMATIC LM6 04-01-92"
+// Uses Sony LaserMax LDP-3300P, a separate video encoder PCB with a Motorola MC1378B and a standard A500+ PCB.
+// ROM contains text: "Marbella Vice CopyRight 1994 Picmatic S.A. Program chief Brian Meitiner" (but it's Zorton Brothers)
+// References to linked libraries: Audio Master IV, AMAS II Version 1.1
+// Has a blacklist for high scores:
+//   "FUCK SHIT CUNT PRICK PENUS BALLS PUTA JODER POLLA PUTO MAMON PICHA COJON TETA TETAS TITS CHULO CULO PENE PIJO LEFA LISTO"
 ROM_START( zortonbr )
+	ALG_BIOS
+
+	ROM_REGION( 0x40000, "game_program", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_odd.u2",  0x000000, 0x10000, CRC(21e63949) SHA1(0a62ad108f8cfa00dc8f03dea2ff6f1b277e8d5d) )
+	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_even.u3", 0x000001, 0x10000, CRC(6a051c6a) SHA1(f8daafab068fef57e47287bd72be860b84e2e75c) )
+
+	ROM_REGION( 0x00800, "unused_nvram", ROMREGION_ERASEFF ) //NVRAM, unused
+	ROM_LOAD( "zort_mk48z02b.u13", 0x0000, 0x0800, CRC(45b064a9) SHA1(f446be2b0e3929e182b9f97989c30b3ee308c103) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "zortonbr", 0, NO_DUMP )
+ROM_END
+
+ROM_START( zortonbr_100 )
 	ALG_BIOS
 
 	ROM_REGION( 0x40000, "game_program", ROMREGION_ERASEFF )
@@ -853,5 +876,6 @@ GAME( 1995, fastdraw_130, fastdraw, alg_r2,   alg_2p, alg_state, init_palr6,    
 GAME( 199?, aplatoon,     alg_bios, alg_r2,   alg,    alg_state, init_aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* Web Picmatic games PAL tv standard, own rom board */
-GAME( 1993, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.01 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, zortonbr_100, alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.00 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, marvice,      alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

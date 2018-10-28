@@ -255,7 +255,7 @@ WRITE16_MEMBER(cps_state::knightsb_layer_w)
 WRITE16_MEMBER(cps_state::mtwinsb_layer_w)
 {
 	m_cps_a_regs[0x06 / 2] = 0x9100; // bit of a hack - the game never writes this, but does need it
-	
+
 	switch (offset)
 	{
 	case 0x00:

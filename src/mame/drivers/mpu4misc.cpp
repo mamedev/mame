@@ -265,7 +265,7 @@ GAME_CUSTOM( 199?, m4rhrock__a,    m4rhrock,   "rhr_v300_1216_ce52_nlv.bin", 0x0
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "redhotwheelssnd.p1", 0x0000, 0x080000, CRC(7b274a71) SHA1(38ba69084819133253b41f2eb1d784104e5f10f7) ) \
 	ROM_LOAD( "redhotwheelssnd.p2", 0x0000, 0x080000, CRC(e36e19e2) SHA1(204554622c9020479b095acd4fbab1f21f829137) )
-	
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -325,11 +325,11 @@ GAME_CUSTOM( 199?, m4shoknr__a,    m4shoknr,   "snr_v300_1221_c8ff_nlv.bin",   0
 GAME_CUSTOM( 199?, m4shoknr__b,    m4shoknr,   "snr_v200_1145_047f_lv.bin",    0x0000, 0x040000, CRC(73ef1e1a) SHA1(6ccaf64daa5acacfba4df576281bb5478f2fbd29), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4shoknr__c,    m4shoknr,   "snr_v200_1655_5a69_nlv.bin",   0x0000, 0x040000, CRC(50ba0c6b) SHA1(767fd59858fc55ae95f096f00c54bd619369a56c), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 4)" )
 
-// 71000300.lo.hex and 71000300.hi.hex converted 
+// 71000300.lo.hex and 71000300.hi.hex converted
 #define M4TORNAD_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "tornadosnd.p1", 0x000000, 0x080000, CRC(cac88f25) SHA1(6ccbf372d983a47a49caedb8a526fc7703b31ed4) ) \
-	ROM_LOAD( "tornadosnd.p2", 0x080000, 0x080000, CRC(ef4f563d) SHA1(1268061edd93474296e3454e0a2e706b90c0621c) ) 
+	ROM_LOAD( "tornadosnd.p2", 0x080000, 0x080000, CRC(ef4f563d) SHA1(1268061edd93474296e3454e0a2e706b90c0621c) )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -353,7 +353,7 @@ GAME_CUSTOM( 199?, m4tornad__g,    m4tornad,   "tornsp_v200_1626_ec93_lv.bin",  
 #define M4SHKWAV_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "shocksnd.p1", 0x000000, 0x080000, CRC(54bf0ddb) SHA1(693b855367972b5a45e9d2d6152849ab2cde38a7) ) \
-	ROM_LOAD( "shocksnd.p2", 0x080000, 0x080000, CRC(facebc55) SHA1(75367473646cfc735f4d1267e13a9c92ea19c4e3) ) 
+	ROM_LOAD( "shocksnd.p2", 0x080000, 0x080000, CRC(facebc55) SHA1(75367473646cfc735f4d1267e13a9c92ea19c4e3) )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \

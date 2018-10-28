@@ -22,7 +22,9 @@ public:
 
 	// static configuration
 	auto intr_callback() { return m_intr_cb.bind(); }
+	auto breq_callback() { return m_breq_cb.bind(); }
 	void set_character_width(int value) { m_hpixels_per_column = value; }
+
 	template <class FunctionClass>
 	void set_display_callback(void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, uint8_t, uint16_t, bool, bool, bool, bool, bool), const char *name)
 	{
@@ -59,6 +61,7 @@ protected:
 //protected:
 	bitmap_rgb32 m_bitmap;
 	devcb_write_line m_intr_cb;
+	devcb_write_line m_breq_cb;
 
 	uint8_t m_IR_pointer;
 	uint16_t m_screen1_address;

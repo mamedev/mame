@@ -68,7 +68,7 @@ int hle_hp_46060b_device::hil_poll()
 		frames+=2;
 	}
 
-	while (!m_fifo.empty())	{
+	while (!m_fifo.empty()) {
 		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
 		frames++;
 	}

@@ -143,8 +143,8 @@ protected:
 	bool m_page_valid[16384];
 
 	// Internal MAME device state
-	uint8_t m_ctx_mask;			// SS2 is sun4c but has 16 contexts; most have 8
-	uint8_t m_pmeg_mask;		// SS2 is sun4c but has 16384 PTEs; most have 8192
+	uint8_t m_ctx_mask;         // SS2 is sun4c but has 16 contexts; most have 8
+	uint8_t m_pmeg_mask;        // SS2 is sun4c but has 16384 PTEs; most have 8192
 	uint32_t m_ram_set_mask[4]; // Used for mirroring within 4 megabyte sets
 	uint32_t m_ram_set_base[4];
 	uint32_t m_populated_ram_words;
