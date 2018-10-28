@@ -76,7 +76,7 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 		uint16_t dat;
 		dat = ramsh[offs];
 		dat |= raml[offs] << 8;
-	
+
 		offs++;
 
 		int l_raw = (dat & 0x1f00) >> 8;
@@ -578,7 +578,7 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 				tile += gfxbase;
 			}
 
-	
+
 
 
 			int bpp = 1;
@@ -591,7 +591,7 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 			/*
 			if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
 			{
-				LOG("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", spr_ypos[i], spr_attr0[i], spr_attr1[i], spr_xpos[i], spr_addr_lo[i], spr_addr_md[i], spr_addr_hi[i] );
+			    LOG("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", spr_ypos[i], spr_attr0[i], spr_attr1[i], spr_xpos[i], spr_addr_lo[i], spr_addr_md[i], spr_addr_hi[i] );
 			}
 			*/
 		}
@@ -739,7 +739,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			//int count = 0;
 			set_data_address(base + base2, 0);
-	
+
 			for (int y = 0; y < 256; y++)
 			{
 				for (int x = 0; x < 512; x++)
@@ -831,33 +831,33 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	   0x2 pointer to upper tile bits
 
 	   0x3 Fftt bbb-  Ff = flip Y,X
-					  tt = tile/tilemap size
-					  b = bpp
-					  - = unused
+	                  tt = tile/tilemap size
+	                  b = bpp
+	                  - = unused
 
 	   0x4 scroll
 	   0x5 scroll
 
 	   0x6 pppp zzzz  p = palette
-					  z = priority
+	                  z = priority
 
 	   0x7 e--m mmmm  e = enable
-					  m = mode
+	                  m = mode
 
 	   modes are
-		---0 0000 (00) 8-bit addressing  (Tile Number)
-		---0 0001 (01) 16-bit addressing (Tile Number) (monster truck, ekara)
-		---0 0010 (02) 16-bit addressing (8-byte alignment Addressing Mode) (boxing)
-		---0 0011 (03) 16-bit addressing (Addressing Mode 2)
-		---0 0100 (04) 24-bit addressing (Addressing Mode 2) (epo_efdx)
+	    ---0 0000 (00) 8-bit addressing  (Tile Number)
+	    ---0 0001 (01) 16-bit addressing (Tile Number) (monster truck, ekara)
+	    ---0 0010 (02) 16-bit addressing (8-byte alignment Addressing Mode) (boxing)
+	    ---0 0011 (03) 16-bit addressing (Addressing Mode 2)
+	    ---0 0100 (04) 24-bit addressing (Addressing Mode 2) (epo_efdx)
 
-		---0 1000 (08) 8-bit+8 addressing  (Tile Number + 8-bit Attribute)
-		---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute) (Taito Nostalgia 2)
-		---0 1010 (0a) 16-bit+8 addressing (8-byte alignment Addressing Mode + 8-bit Attribute) (boxing, Snowboard)
-		---0 1011 (0b) 16-bit+8 addressing (Addressing Mode 2 + 8-bit Attribute)
+	    ---0 1000 (08) 8-bit+8 addressing  (Tile Number + 8-bit Attribute)
+	    ---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute) (Taito Nostalgia 2)
+	    ---0 1010 (0a) 16-bit+8 addressing (8-byte alignment Addressing Mode + 8-bit Attribute) (boxing, Snowboard)
+	    ---0 1011 (0b) 16-bit+8 addressing (Addressing Mode 2 + 8-bit Attribute)
 
-		---1 0011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)  (monster truck)
-		---1 0100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
+	    ---1 0011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)  (monster truck)
+	    ---1 0100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
 
 	*/
 
@@ -885,16 +885,16 @@ WRITE8_MEMBER(xavix_state::spriteregs_w)
 {
 	LOG("%s: spriteregs_w data %02x\n", machine().describe_context(), data);
 	/*
-		This is similar to Tilemap reg 7 and is used to set the addressing mode for sprite data
+	    This is similar to Tilemap reg 7 and is used to set the addressing mode for sprite data
 
-		---0 -000 (00) 8-bit addressing  (Tile Number)
-		---0 -001 (01) 16-bit addressing (Tile Number)
-		---0 -010 (02) 16-bit addressing (8-byte alignment Addressing Mode)
-		---0 -011 (03) 16-bit addressing (Addressing Mode 2)
-		---0 -100 (04) 24-bit addressing (Addressing Mode 2)
+	    ---0 -000 (00) 8-bit addressing  (Tile Number)
+	    ---0 -001 (01) 16-bit addressing (Tile Number)
+	    ---0 -010 (02) 16-bit addressing (8-byte alignment Addressing Mode)
+	    ---0 -011 (03) 16-bit addressing (Addressing Mode 2)
+	    ---0 -100 (04) 24-bit addressing (Addressing Mode 2)
 
-		---1 -011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)
-		---1 -100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
+	    ---1 -011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)
+	    ---1 -100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
 	*/
 	m_spritereg = data;
 }

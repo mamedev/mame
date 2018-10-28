@@ -241,7 +241,7 @@ TIMER_CALLBACK_MEMBER(hp9k3xx_state::bus_error_timeout)
 WRITE16_MEMBER(hp9k3xx_state::led_w)
 {
 	if (!(mem_mask & 0xff))
-	       return;
+	   return;
 
 	LOG("LED: %02x\n", data & 0xff);
 
@@ -290,7 +290,7 @@ void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mas
 
 	m_bus_error = true;
 	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
-        m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
 

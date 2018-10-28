@@ -457,11 +457,11 @@ void mb87030_device::device_start()
 	save_item(NAME(m_hdb));
 	save_item(NAME(m_hdb_loaded));
 	save_item(NAME(m_send_atn_during_selection));
-//	save_item(NAME(m_fifo));
+//  save_item(NAME(m_fifo));
 	save_item(NAME(m_scsi_phase));
 	save_item(NAME(m_scsi_ctrl));
 	save_item(NAME(m_dma_transfer));
-//	save_item(NAME(m_state));
+//  save_item(NAME(m_state));
 }
 
 void mb87030_device::scsi_ctrl_changed()
@@ -551,9 +551,9 @@ WRITE8_MEMBER(mb87030_device::scmd_w)
 		break;
 	case SCMD_CMD_RESET_ATN:
 		LOG("%s: Reset ATN\n", __FUNCTION__);
-//		if (m_state == State::Idle)
+//      if (m_state == State::Idle)
 			m_send_atn_during_selection = false;
-//		else
+//      else
 			scsi_set_ctrl(0, S_ATN);
 		break;
 	case SCMD_CMD_SET_ATN:

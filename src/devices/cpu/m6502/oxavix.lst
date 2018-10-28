@@ -64,7 +64,7 @@ brk_xav_imp
 			else
 			{
 				PC = read_arg(0xfffa);
-				PC = set_h(PC, read_arg(0xfffb));		
+				PC = set_h(PC, read_arg(0xfffb));
 			}
 		}
 
@@ -86,7 +86,7 @@ brk_xav_imp
 			else
 			{
 				PC = read_arg(0xfffe);
-				PC = set_h(PC, read_arg(0xffff));		
+				PC = set_h(PC, read_arg(0xffff));
 			}
 		}
 

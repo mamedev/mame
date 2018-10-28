@@ -1285,7 +1285,7 @@ ROM_START( tazmaniet )
 	ROM_LOAD( "prom.bin",   0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) ) // same as hustler?! Gives wrong colors
 
 	ROM_REGION( 0x200, "unused_proms", 0) // TODO: are these the correct color PROMs?
-	ROM_LOAD( "13209.prom", 0x0000, 0x0100, CRC(da1708c9) SHA1(b2633eba050866c6f555ed0fd9be369d69f13683) ) 
+	ROM_LOAD( "13209.prom", 0x0000, 0x0100, CRC(da1708c9) SHA1(b2633eba050866c6f555ed0fd9be369d69f13683) )
 	ROM_LOAD( "13210.prom", 0x0100, 0x0100, CRC(e54d042a) SHA1(e3259b5c178fc5ab43eda27f07107b65555512d3) )
 ROM_END
 

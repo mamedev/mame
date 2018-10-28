@@ -202,7 +202,7 @@ void superxavix_lowbus_map(address_map &map);
 
 	required_device<xavix_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	
+
 	uint8_t m_vectorenable;
 	uint8_t m_nmi_vector_lo_data;
 	uint8_t m_nmi_vector_hi_data;
@@ -235,7 +235,7 @@ void superxavix_lowbus_map(address_map &map);
 	uint8_t m_timer_baseval;
 
 	int16_t get_vectors(int which, int half);
-	
+
 	// raster IRQ
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
 	emu_timer *m_interrupt_timer;

@@ -475,7 +475,7 @@ int hle_hp_ipc_device::hil_poll()
 		return frames;
 
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
-	while (!m_fifo.empty())	{
+	while (!m_fifo.empty()) {
 		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
 		frames++;
 	}
@@ -490,7 +490,7 @@ int hle_hp_itf_device::hil_poll()
 	LOG("KBD HAVE DATA\n");
 	frames++;
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
-	while (!m_fifo.empty())	{
+	while (!m_fifo.empty()) {
 		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
 		frames++;
 	}

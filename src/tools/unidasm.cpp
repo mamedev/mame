@@ -220,7 +220,7 @@ struct s2650_unidasm_t : s2650_disassembler::config
 	virtual ~s2650_unidasm_t() override = default;
 	virtual bool get_z80_mnemonics_mode() const override { return z80_mnemonics; }
 } s2650_unidasm;
- 
+
 // Configuration missing
 struct saturn_unidasm_t : saturn_disassembler::config
 {

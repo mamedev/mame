@@ -247,12 +247,12 @@ bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const int ptest, uint
 	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
 		if (m_mmu_atc_tag[i] != atc_tag)
-				continue;
+			continue;
 
 		if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
-				continue;
+			continue;
 		if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
-				continue;
+			continue;
 
 		// read access or write access and not write protected
 		if (!ptest)

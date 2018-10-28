@@ -104,54 +104,54 @@ bit sig XSn ????n
 14  22  4   3
 15  23  5   4
 
-0xc9	KEY_LANGLE_RANGLE	'резервная клавиша'
-0xbc	KEY_DELETE	ЗБ
-0xbd	KEY_RETURN	ВК
-0xbf	KEY_TILDE	'; +'
-0xc4	-		'Ъ'
-0xca	-		'/ ?'
-0xed	KEY_PERIOD	'Ю @'
-0xf1	-		'_'
+0xc9    KEY_LANGLE_RANGLE   'резервная клавиша'
+0xbc    KEY_DELETE  ЗБ
+0xbd    KEY_RETURN  ВК
+0xbf    KEY_TILDE   '; +'
+0xc4    -       'Ъ'
+0xca    -       '/ ?'
+0xed    KEY_PERIOD  'Ю @'
+0xf1    -       '_'
 <...>
 
-0x56	KEY_F1		СТОП КАДР
-0x57	KEY_F2		ПЕЧАТЬ КАДРА
-0x58	KEY_F3		ПАУЗА
-0x59	KEY_F4		УСТ РЕЖИМА
-0x5a	KEY_F5		Ф5
+0x56    KEY_F1      СТОП КАДР
+0x57    KEY_F2      ПЕЧАТЬ КАДРА
+0x58    KEY_F3      ПАУЗА
+0x59    KEY_F4      УСТ РЕЖИМА
+0x5a    KEY_F5      Ф5
 
-0x64	KEY_F6		ПРЕРЫВ
-0x65	KEY_F7		ПРОДОЛЖ
-0x66	KEY_F8		ОТМЕН
-0x67	KEY_F9		ОСНОВН КАДР
-0x69	KEY_F10		ВЫХОД
+0x64    KEY_F6      ПРЕРЫВ
+0x65    KEY_F7      ПРОДОЛЖ
+0x66    KEY_F8      ОТМЕН
+0x67    KEY_F9      ОСНОВН КАДР
+0x69    KEY_F10     ВЫХОД
 
-0x71	KEY_F11		Ф11 (АР2)
-0x72	KEY_F12		Ф12 (ВШ)
-0x73	KEY_F13		Ф13 (ПС)
-0x74	KEY_F14		ДОП ВАРИАНТ
+0x71    KEY_F11     Ф11 (АР2)
+0x72    KEY_F12     Ф12 (ВШ)
+0x73    KEY_F13     Ф13 (ПС)
+0x74    KEY_F14     ДОП ВАРИАНТ
 
-0x7c	KEY_HELP	ПМ
-0x7d	KEY_MENU	ИСП
+0x7c    KEY_HELP    ПМ
+0x7d    KEY_MENU    ИСП
 
-0x80	KEY_F17		Ф17
-0x81	KEY_F18		Ф18
-0x82	KEY_F19		Ф19
-0x83	KEY_F20		Ф20
+0x80    KEY_F17     Ф17
+0x81    KEY_F18     Ф18
+0x82    KEY_F19     Ф19
+0x83    KEY_F20     Ф20
 
-0xb0	KEY_LOCK	ФКС
-0xae	KEY_SHIFT	ВР
-0xaf	KEY_CTRL	СУ
+0xb0    KEY_LOCK    ФКС
+0xae    KEY_SHIFT   ВР
+0xaf    KEY_CTRL    СУ
 
-0xb1	KEY_META	КМП
-0xb2	-		РУС/ЛАТ
+0xb1    KEY_META    КМП
+0xb2    -       РУС/ЛАТ
 
-0x8a	KEY_FIND	НТ
-0x8b	KEY_INSERT_HERE	ВСТ
-0x8c	KEY_REMOVE	УДАЛ
-0x8d	KEY_SELECT	ВЫБР
-0x8e	KEY_PREV_SCREEN	ПРЕД КАДР
-0x8f	KEY_NEXT_SCREEN	СЛЕД КАДР
+0x8a    KEY_FIND    НТ
+0x8b    KEY_INSERT_HERE ВСТ
+0x8c    KEY_REMOVE  УДАЛ
+0x8d    KEY_SELECT  ВЫБР
+0x8e    KEY_PREV_SCREEN ПРЕД КАДР
+0x8f    KEY_NEXT_SCREEN СЛЕД КАДР
 
 nothing sends '@' or '`'
 

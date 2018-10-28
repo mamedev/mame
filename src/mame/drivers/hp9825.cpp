@@ -215,7 +215,7 @@ void hp9825_state::cpu_mem_map(address_map &map)
 
 READ16_MEMBER(hp9825_state::kb_scancode_r)
 {
-    // TODO:
+	// TODO:
 	uint8_t res = m_scancode;
 	if (m_shift_key->read()) {
 		BIT_SET(res , 7);
@@ -788,7 +788,7 @@ static INPUT_PORTS_START(hp9825)
 	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                            // 5,11: N/U
 	PORT_BIT(IOP_MASK(28) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                            // 5,12: N/U
 	PORT_BIT(IOP_MASK(29) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                            // 5,13: N/U
-	PORT_BIT(IOP_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("↑ √")                                                // 5,14: ^
+	PORT_BIT(IOP_MASK(30) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_NAME(u8"\u2191 \u221A")                                    // 5,14: ^ (↑ √)
 	PORT_BIT(IOP_MASK(31) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                            // 5,15: N/U
 
 	PORT_START("KEY3")
@@ -819,9 +819,9 @@ static INPUT_PORTS_START(hp9825)
 	PORT_BIT(IOP_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')                                       // 7,8: X
 	PORT_BIT(IOP_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')                                       // 7,9: Y
 	PORT_BIT(IOP_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')                                       // 7,10: Z
-	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("π |")                                                                         // 7,11: Pi
+	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME(u8"π |")                                                                       // 7,11: Pi
 	PORT_BIT(IOP_MASK(28) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                            // 7,12: N/U
-	PORT_BIT(IOP_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_END) PORT_NAME("→")                                                    // 7,13: Gazinta
+	PORT_BIT(IOP_MASK(29) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_END) PORT_NAME(u8"\u2192")                                             // 7,13: Gazinta (→)
 	PORT_BIT(IOP_MASK(30) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                            // 7,14: N/U
 	PORT_BIT(IOP_MASK(31) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                            // 7,15: N/U
 

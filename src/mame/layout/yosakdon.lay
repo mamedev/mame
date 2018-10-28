@@ -51,7 +51,7 @@
 		</rect>
 	</element>
 
-	<view name="Color_Overlay">
+	<view name="Color Overlay">
 		<screen index="0">
 			<bounds x="0" y="0" width="3" height="4" />
 		</screen>

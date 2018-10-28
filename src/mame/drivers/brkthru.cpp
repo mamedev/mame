@@ -553,7 +553,7 @@ ROM_START( brkthruj )
 	ROM_LOAD( "brkthru.5",    0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) )
 ROM_END
 
-// Tecfri PCB with Data East license. 
+// Tecfri PCB with Data East license.
 // Although only program ROM "8.bin" is marked as BAD_DUMP, it would be better to redump all program ROMs, to be 100% sure it's a good set.
 ROM_START( brkthrut )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for main CPU + 64k for banked ROMs */
@@ -569,7 +569,7 @@ ROM_START( brkthrut )
 	/* background */
 	/* we do a lot of scatter loading here, to place the data in a format */
 	/* which can be decoded by MAME's standard functions */
-	ROM_LOAD( "2.bin", 0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) ) /* bitplanes 1,2 for bank 1,2 */ /* Same as parent */  
+	ROM_LOAD( "2.bin", 0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) ) /* bitplanes 1,2 for bank 1,2 */ /* Same as parent */
 	ROM_CONTINUE(             0x08000, 0x4000 )             /* bitplanes 1,2 for bank 3,4 */
 	ROM_LOAD( "1.bin", 0x10000, 0x4000, CRC(6c47dc43) SHA1(3274fb8ddf0e0c91f5796677255ade78e3b3f9d6) ) /* bitplanes 1,2 for bank 5,6 */
 	ROM_CONTINUE(             0x18000, 0x4000 )             /* bitplanes 1,2 for bank 7,8 */

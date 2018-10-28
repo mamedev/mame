@@ -1599,7 +1599,7 @@ private:
 	const uint32_t *m_ptrom;
 	uint32_t m_ptrom_limit;
 	uint8_t m_mcu_unk;
-	
+
 	int m_vblank_count;
 
 // It may only be 128
@@ -2902,9 +2902,9 @@ READ16_MEMBER(namcos23_state::sub_comm_r)
 		// PC=0xbfc03838 bit 7 high => fail (data loaded must be parsed somehow)
 		return 1 | 2;
 	}
-	
+
 	m_maincpu->set_input_line(MIPS3_IRQ4, CLEAR_LINE);
-	// data rx, TBD 
+	// data rx, TBD
 	return m_mcu_unk; //machine().rand();
 }
 

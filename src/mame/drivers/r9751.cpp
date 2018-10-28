@@ -113,7 +113,7 @@ private:
 	DECLARE_WRITE32_MEMBER(r9751_mmio_fff8_w);
 
 	DECLARE_READ8_MEMBER(pdc_dma_r);
-	DECLARE_WRITE8_MEMBER(pdc_dma_w);	
+	DECLARE_WRITE8_MEMBER(pdc_dma_w);
 	DECLARE_READ8_MEMBER(smioc_dma_r);
 	DECLARE_WRITE8_MEMBER(smioc_dma_w);
 
@@ -193,7 +193,7 @@ static const GenericCommandRecord GenericCommands[] = {
 	{ 0x2800, "DMA Busy" },
 	{ 0x3000, "Command Result" },
 	{ 0x4000, "Command" },  // Also a write length.
-	//{ 0x8000, "various" },  // Read address, 
+	//{ 0x8000, "various" },  // Read address,
 	//{ 0xC000, "various" },  // Write address, Read length
 };
 
@@ -268,7 +268,7 @@ void r9751_state::trace_device(int address, int data, const char* direction)
 		// Device is not enabled for tracing.
 		return;
 	}
-	
+
 	if ((address == m_trace_last_address[dev]) && (data == m_trace_last_data[dev]) && (direction == m_trace_last_direction[dev]))
 	{
 		m_trace_repeat_count[dev]++;
@@ -699,7 +699,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		case 0x0198: // SMIOC soft reset?
 			// It's not clear what exactly this register write does.
 			//   It isn't a soft reset of the SMIOC because the 68k does not wait long enough for the SMIOC to finish rebooting.
-			//	 Also the 68k does this twice in succession, with a status clear in between.
+			//   Also the 68k does this twice in succession, with a status clear in between.
 			// The theory now is that a write to this register causes the status registers on the SMIOC to be
 			//   set to the magic value 0x0100 (which is set after initialization is complete) - which serves as a trigger
 			//   for the disktool software to reinitialize the SMIOC and proceed into a working state.

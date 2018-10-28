@@ -61,7 +61,7 @@ public:
 	O(adcl1_acc);
 	O(adcl2_acc);
 	O(adcl3_acc);
-	
+
 	O(stal0_acc);
 	O(stal1_acc);
 	O(stal2_acc);

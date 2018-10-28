@@ -623,7 +623,7 @@ WRITE8_MEMBER(bbc_state::via_system_porta_w)
 	/* Write enable to the sound generator */
 	//if (!m_latch->q0_r() && m_sn)
 	//{
-	//	m_sn->write(m_via_system_porta);
+	//  m_sn->write(m_via_system_porta);
 	//}
 	/* Keyboard write enable */
 	if (!m_latch->q3_r())
@@ -1332,7 +1332,7 @@ void bbc_state::setup_banks(memory_bank *membank, uint32_t shift)
 		/* TODO: expansion devices currently use machine().root_device(), add method to slot interfaces to return pointer to memregion("rom") */
 		//if (m_fdc->rom_region[i])
 		//{
-		//	membank->configure_entry(i, m_fdc->rom_region[i] + shift);
+		//  membank->configure_entry(i, m_fdc->rom_region[i] + shift);
 		//}
 		/* romslots populated by user override expansion devices */
 		if (m_rom[i] && (rom_region = memregion(region_tag.assign(m_rom[i]->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))

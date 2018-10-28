@@ -13,11 +13,11 @@
     - GFX rom banking is a mystery (bad ROMs? Encryption?)
     - Where is the extra data ROM mapped?
 
-	gynotai TODOs:
-	- printer (disable it in service mode);
-	- ball sensors aren't understood;
-	- Seems to dislike our YGV608 row/colscroll handling;
-	
+    gynotai TODOs:
+    - printer (disable it in service mode);
+    - ball sensors aren't understood;
+    - Seems to dislike our YGV608 row/colscroll handling;
+
     To make abcheck run when the EEPROM is clear:
     - F2 to enter service mode
     - Player 3 A/B to navigate to GAME OPTIONS
@@ -522,7 +522,7 @@ ROM_START( gynotai )
 
 	ROM_REGION( 0x800000, "ygv608", 0 )    /* 8MB character generator */
 	ROM_LOAD( "gy1cg0.10e",   0x000000, 0x400000, CRC(938c7912) SHA1(36278a945a00e1549ae55ec65a9b4001537023b0) )
-    ROM_LOAD( "gy1cg1.10f",   0x400000, 0x400000, CRC(5a518733) SHA1(b6ea91629bc6ddf67c47c4189084aa947f4e31ed) )
+	ROM_LOAD( "gy1cg1.10f",   0x400000, 0x400000, CRC(5a518733) SHA1(b6ea91629bc6ddf67c47c4189084aa947f4e31ed) )
 
 	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD( "gy1voic.7c",     0x000000, 0x200000, CRC(f135e79b) SHA1(01ce3e3b366d0b9045ad8599b60ca33c6d21f150) )
@@ -539,9 +539,9 @@ ROM_START( abcheck )
 	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
 	// TODO: gynotai proves these might be underdumped, please check.
 	ROM_LOAD( "an1cg0.10e",   0x000000, 0x200000, BAD_DUMP CRC(6dae0531) SHA1(2f4a4a22d461eb9a5bb88bdfccc3aff44cd3faee) )
-	ROM_RELOAD(				  0x200000, 0x200000 )
+	ROM_RELOAD(               0x200000, 0x200000 )
 	ROM_LOAD( "an1cg1.10f",   0x400000, 0x200000, BAD_DUMP CRC(8485607a) SHA1(1b9a1950c6db61a2b546fe2f5e56333593e93fb4) )
-	ROM_RELOAD(				  0x600000, 0x200000 )
+	ROM_RELOAD(               0x600000, 0x200000 )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "an1voice.7c",  0x000000, 0x200000, CRC(d2bfa453) SHA1(6b7d6bb4d65290d8fd3df5d12b41ae7dce5f3f1c) )

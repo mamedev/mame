@@ -926,7 +926,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 
 	UPD765A(config, m_fdc, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(ibm6580_state::floppy_intrq));
-//	m_fdc->intrq_wr_callback().append("pic8259", FUNC(pic8259_device::ir4_w));
+//  m_fdc->intrq_wr_callback().append("pic8259", FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", dw_floppies, "8sssd", floppy_image_device::default_floppy_formats)

@@ -345,20 +345,20 @@ void vsmile_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-#define VSMILE_PORTB_CS1		0x0001
-#define VSMILE_PORTB_CS2		0x0002
-#define VSMILE_PORTB_CART		0x0004
-#define VSMILE_PORTB_RESET		0x0008
-#define VSMILE_PORTB_FRONT24	0x0010
-#define VSMILE_PORTB_OFF		0x0020
-#define VSMILE_PORTB_OFF_SW		0x0040
-#define VSMILE_PORTB_ON_SW		0x0080
+#define VSMILE_PORTB_CS1        0x0001
+#define VSMILE_PORTB_CS2        0x0002
+#define VSMILE_PORTB_CART       0x0004
+#define VSMILE_PORTB_RESET      0x0008
+#define VSMILE_PORTB_FRONT24    0x0010
+#define VSMILE_PORTB_OFF        0x0020
+#define VSMILE_PORTB_OFF_SW     0x0040
+#define VSMILE_PORTB_ON_SW      0x0080
 
-#define VSMILE_PORTC_VER		0x000f
-#define VSMILE_PORTC_LOGO		0x0010
-#define VSMILE_PORTC_TEST		0x0020
-#define VSMILE_PORTC_AMP		0x0040
-#define VSMILE_PORTC_SYSRESET	0x0080
+#define VSMILE_PORTC_VER        0x000f
+#define VSMILE_PORTC_LOGO       0x0010
+#define VSMILE_PORTC_TEST       0x0020
+#define VSMILE_PORTC_AMP        0x0040
+#define VSMILE_PORTC_SYSRESET   0x0080
 
 READ16_MEMBER(vsmile_state::bank0_r)
 {

@@ -140,7 +140,7 @@ WRITE8_MEMBER(xavix_state::adc_7b81_w)
 
 READ8_MEMBER(xavix_state::adc_7b81_r)
 {
-//	has_wamg polls this if interrupt is enabled
+//  has_wamg polls this if interrupt is enabled
 	return machine().rand();
 }
 
@@ -207,7 +207,7 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 	}
 
 	m_video_ctrl = data & 0x3f;
-	//	printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
+	//  printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
 }
 
 
