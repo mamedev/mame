@@ -558,9 +558,6 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 
 			xpos += 128 - 8;
 
-
-
-
 			// Everything except directdirect addressing (Addressing Mode 2) goes through the segment registers?
 			if (alt_addressing != 0)
 			{
@@ -578,15 +575,12 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 				tile += gfxbase;
 			}
 
-
-
-
 			int bpp = 1;
 
 			bpp = (attr0 & 0x0e) >> 1;
 			bpp += 1;
 
-			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos, line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
+			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
 
 			/*
 			if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
@@ -601,16 +595,11 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
 	//const pen_t *paldata = m_palette->pens();
-
-	if (flipy)
-		line = drawheight - line;
-
 	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
 		return;
 
 	if ((xpos > cliprect.max_x) || ((xpos + drawwidth) < cliprect.min_x))
 		return;
-
 
 	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
 	{
@@ -618,6 +607,10 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		// set the address here so we can increment in bits in the draw function
 		set_data_address(tile, 0);
+
+		if (flipy)
+			line = (drawheight - 1) - line;
+
 		m_tmp_dataaddress = m_tmp_dataaddress + ((line * bits_per_tileline) / 8);
 		m_tmp_databit = (line * bits_per_tileline) % 8;
 
@@ -682,9 +675,6 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_zbuffer.fill(0, cliprect);
-
-
-
 
 	rectangle clip = cliprect;
 
