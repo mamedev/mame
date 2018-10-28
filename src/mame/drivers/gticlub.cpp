@@ -163,7 +163,7 @@ Game                        2D      4D      6D      9D      11D     13D     16D 
 GTI Club                    -       688A16  -       688A15  -       688A14  -       688A13
 Jet Wave/Wave Shark         -       678A16  -       678A15  -       678A14  -       678A13
 Operation Thunder Hurricane -       680A16  -       680A15  -       680A14  -       680A13
-Solar Assault (Revised)     -       792A16  -       792A15  -       792A14  -       792A13f
+Solar Assault (Revised)     -       792A16  -       792A15  -       792A14  -       792A13
 
 
 Hang Pilot (different rom locations from both GN678 and GN715)      12W             4W
