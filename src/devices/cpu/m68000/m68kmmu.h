@@ -10,7 +10,7 @@
 // MMU status register bit definitions
 
 
-#if 0
+#if 1
 #define MMULOG logerror
 #else
 #define MMULOG(...)
@@ -838,10 +838,8 @@ int fc_from_modes(const uint16_t modes)
 void m68851_pload(const uint32_t ea, const uint16_t modes)
 {
 	uint32_t ltmp = DECODE_EA_32(ea);
-	uint32_t ptmp;
 	const int fc = fc_from_modes(modes);
 	bool rw = (modes & 0x200);
-	ptmp = ltmp;
 
 	MMULOG("%s: PLOAD%c addr=%08x, fc=%d\n", __func__, rw ? 'R' : 'W', ltmp, fc);
 
@@ -850,20 +848,18 @@ void m68851_pload(const uint32_t ea, const uint16_t modes)
 	{
 		if (CPU_TYPE_IS_040_PLUS())
 		{
-			ptmp = pmmu_translate_addr_with_fc_040(ltmp, fc, 0);
+			pmmu_translate_addr_with_fc_040(ltmp, fc, 0);
 		}
 		else
 		{
 
-			ptmp = pmmu_translate_addr_with_fc(ltmp, fc, rw, 0, 1);
+			pmmu_translate_addr_with_fc(ltmp, fc, rw, 0, 1);
 		}
 	} else {
 		MMULOG("PLOAD with MMU disabled on MC68851\n");
 		m68ki_exception_trap(57);
 		return;
 	}
-
-	MMULOG("680x0: PLOADed ATC with logical %08x => phys %08x fc=%d rw=%d\n", ltmp, ptmp, fc, rw);
 }
 
 void m68851_ptest(const uint32_t ea, const uint16_t modes)
