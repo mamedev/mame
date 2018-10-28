@@ -38,7 +38,7 @@
     --------------------------------------------------------------
     Gradius 4         GX837      GN715(A)   GN715(B)
     NBA Play By Play  GX778      GN715(A)   GN715(B)
-    Teraburst	      GN715	 GN715(A)   GN715(B)	  GN680(E) I/O Board
+    Teraburst         GN715      GN715(A)   GN715(B)      GN680(E) I/O Board
     Silent Scope      GQ830      GN715(A)   2x GN715(B)
     Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H) LAN PCB
 
@@ -399,7 +399,6 @@ public:
 	void terabrst(machine_config &config);
 	void sscope2(machine_config &config);
 	void sscope(machine_config &config);
-	void sscope_v2(machine_config &config);
 	void hornet(machine_config &config);
 
 	void init_hornet();
