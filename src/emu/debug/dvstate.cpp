@@ -416,7 +416,7 @@ void debug_view_state::view_char(int chval)
 		source.m_stateintf->set_state_int(curitem.index(), data);
 
 		/* set flag to update all disassembly views if PC affected */
-		if (curitem.index() == STATE_GENPC)
+		if (curitem.m_symbol == "PC")
 			update_all_disasm_views = true;
 
 		// fall through to the right-arrow press
