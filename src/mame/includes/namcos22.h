@@ -209,10 +209,14 @@ public:
 		m_pc_pedal_interrupt(*this, "pc_p_int"),
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
-		m_p1(*this, "P1"),
-		m_p2(*this, "P2"),
-		m_mcup5a(*this, "MCUP5A"),
-		m_mcup5b(*this, "MCUP5B"),
+		m_dsw(*this, "DSW"),
+		m_inputs(*this, "INPUTS"),
+		m_custom(*this, "CUSTOM.%u", 0),
+		m_pedal(*this, "PEDAL"),
+		m_trackx(*this, "TRACKX"),
+		m_tracky(*this, "TRACKY"),
+		m_lightx(*this, "LIGHTX"),
+		m_lighty(*this, "LIGHTY"),
 		m_mcuout(*this, "mcuout%u", 0U),
 		m_cpuled(*this, "cpuled%u", 0U)
 	{ }
@@ -346,7 +350,7 @@ private:
 	DECLARE_READ16_MEMBER(namcos22_portbit_r);
 	DECLARE_WRITE16_MEMBER(namcos22_portbit_w);
 	DECLARE_READ16_MEMBER(namcos22_dipswitch_r);
-	DECLARE_READ32_MEMBER(namcos22_gun_r);
+	DECLARE_READ16_MEMBER(namcos22_gun_r);
 	DECLARE_WRITE16_MEMBER(namcos22_cpuleds_w);
 	DECLARE_READ32_MEMBER(alpinesa_prot_r);
 	DECLARE_WRITE32_MEMBER(alpinesa_prot_w);
@@ -431,7 +435,6 @@ private:
 	void install_c74_speedup();
 	void install_130_speedup();
 	void install_141_speedup();
-	void namcos22_init(int game_type);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	DECLARE_MACHINE_START(adillor);
@@ -486,10 +489,14 @@ private:
 	optional_device<timer_device> m_pc_pedal_interrupt;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
-	optional_ioport m_p1;
-	optional_ioport m_p2;
-	optional_ioport m_mcup5a;
-	optional_ioport m_mcup5b;
+	required_ioport m_dsw;
+	required_ioport m_inputs;
+	optional_ioport_array<2> m_custom;
+	optional_ioport m_pedal;
+	optional_ioport m_trackx;
+	optional_ioport m_tracky;
+	optional_ioport m_lightx;
+	optional_ioport m_lighty;
 	output_finder<16> m_mcuout;
 	output_finder<8> m_cpuled;
 
