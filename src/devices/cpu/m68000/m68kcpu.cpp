@@ -725,7 +725,7 @@ bool m68000_base_device::memory_translate(int space, int intention, offs_t &addr
 			}
 			else
 			{
-				address = pmmu_translate_addr_with_fc(address, mode, 1);
+				address = pmmu_translate_addr_with_fc(address, mode, (intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ, 0, 0);
 			}
 
 			if ((m_mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {
@@ -1280,7 +1280,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 
 	m_readimm16 = [this, ocache](offs_t address) -> u16 {
 		if (m_pmmu_enabled) {
-			address = pmmu_translate_addr(address);
+			address = pmmu_translate_addr(address, 1);
 			if (m_mmu_tmp_buserror_occurred)
 			return ~0;
 		}
@@ -1290,7 +1290,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 
 	m_read8   = [this](offs_t address) -> u8     {
 		if (m_pmmu_enabled) {
-				address = pmmu_translate_addr(address);
+				address = pmmu_translate_addr(address, 1);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 		}
@@ -1299,12 +1299,12 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 
 	m_read16  = [this](offs_t address) -> u16    {
 		if (m_pmmu_enabled) {
-			u32 address0 = pmmu_translate_addr(address);
+			u32 address0 = pmmu_translate_addr(address, 1);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
 			if (WORD_ALIGNED(address))
 				return m_space->read_word(address0);
-			u32 address1 = pmmu_translate_addr(address + 1);
+			u32 address1 = pmmu_translate_addr(address + 1, 1);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
 			u16 result = m_space->read_byte(address0) << 8;
@@ -1319,7 +1319,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 
 	m_read32  = [this](offs_t address) -> u32    {
 		if (m_pmmu_enabled) {
-			u32 address0 = pmmu_translate_addr(address);
+			u32 address0 = pmmu_translate_addr(address, 1);
 			if (m_mmu_tmp_buserror_occurred)
 				return ~0;
 			if ((address +3) & 0xfc)
@@ -1328,15 +1328,15 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 			else if (DWORD_ALIGNED(address)) // 0
 				return m_space->read_dword(address0);
 			else {
-				u32 address2 = pmmu_translate_addr(address+2);
+				u32 address2 = pmmu_translate_addr(address+2, 1);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 				if (WORD_ALIGNED(address)) { // 2
 					u32 result = m_space->read_word(address0) << 16;
 					return result | m_space->read_word(address2);
 				}
-				u32 address1 = pmmu_translate_addr(address+1);
-				u32 address3 = pmmu_translate_addr(address+3);
+				u32 address1 = pmmu_translate_addr(address+1, 1);
+				u32 address3 = pmmu_translate_addr(address+3, 1);
 				if (m_mmu_tmp_buserror_occurred)
 					return ~0;
 				u32 result = m_space->read_byte(address0) << 24;
@@ -1357,7 +1357,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 
 	m_write8  = [this](offs_t address, u8  data) {
 		if (m_pmmu_enabled) {
-			address = pmmu_translate_addr(address);
+			address = pmmu_translate_addr(address, 0);
 			if (m_mmu_tmp_buserror_occurred)
 				return;
 		}
@@ -1366,14 +1366,14 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 
 	m_write16 = [this](offs_t address, u16 data) {
 		if (m_pmmu_enabled) {
-			u32 address0 = pmmu_translate_addr(address);
+			u32 address0 = pmmu_translate_addr(address, 0);
 			if (m_mmu_tmp_buserror_occurred)
 				return;
 			if (WORD_ALIGNED(address)) {
 				m_space->write_word(address0, data);
 				return;
 			}
-			u32 address1 = pmmu_translate_addr(address + 1);
+			u32 address1 = pmmu_translate_addr(address + 1, 0);
 			if (m_mmu_tmp_buserror_occurred)
 				return;
 			m_space->write_byte(address0, data >> 8);
@@ -1391,7 +1391,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 
 	m_write32 = [this](offs_t address, u32 data) {
 		if (m_pmmu_enabled) {
-			u32 address0 = pmmu_translate_addr(address);
+			u32 address0 = pmmu_translate_addr(address, 0);
 			if (m_mmu_tmp_buserror_occurred)
 				return;
 			if ((address +3) & 0xfc) {
@@ -1401,7 +1401,7 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 				m_space->write_dword(address0, data);
 				return;
 			} else {
-				u32 address2 = pmmu_translate_addr(address+2);
+				u32 address2 = pmmu_translate_addr(address+2, 0);
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 				if (WORD_ALIGNED(address)) { // 2
@@ -1409,8 +1409,8 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 					m_space->write_word(address2, data);
 					return;
 				}
-				u32 address1 = pmmu_translate_addr(address+1);
-				u32 address3 = pmmu_translate_addr(address+3);
+				u32 address1 = pmmu_translate_addr(address+1, 0);
+				u32 address3 = pmmu_translate_addr(address+3, 0);
 				if (m_mmu_tmp_buserror_occurred)
 					return;
 				m_space->write_byte(address0, data >> 24);
