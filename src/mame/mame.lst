@@ -39458,12 +39458,16 @@ wwfsstaru4                      // TA-0024 (c) 1989 (US)
 @source:wy100.cpp
 wy100                           // WY-100
 
-@source:wyse.cpp
+@source:wy50.cpp
 wy50                            // WY-50
+wy75                            // WY-75
+
+@source:wy85.cpp
+wy85                            // WY-85
+
+@source:wyse.cpp
 wy55                            // WY-55
 wy60                            // WY-60
-wy75                            // WY-75
-wy85                            // WY-85
 wy120                           // WY-120
 wy150                           // WY-150
 wy160                           // WY-160
