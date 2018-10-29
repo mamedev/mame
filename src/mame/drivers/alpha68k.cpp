@@ -3177,7 +3177,7 @@ ROM_START( tnextspc ) /* MASKROM for gfx */
 	ROM_LOAD( "4.p4",        0x0700,  0x0400,  CRC(cc9ff769) SHA1(e9de0371fd8bae7f08924891d78799ace97902b1) ) /* Clut low nibble */
 ROM_END
 
-ROM_START( tnextspc2 ) /* EPROMs for gfx */
+ROM_START( tnextspc2 ) // two bootleg PCBs have been found with the same ROMs as this set, the only difference being ns_2.bin being double sized with 1st and 2nd half identical
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ns_4.bin", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) ) /* b18.ic13 */
 	ROM_LOAD16_BYTE( "ns_3.bin", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) ) /* b17.ic11 */
@@ -3185,7 +3185,7 @@ ROM_START( tnextspc2 ) /* EPROMs for gfx */
 	ROM_REGION( 0x10000, "audiocpu", 0 )   /* Sound CPU */
 	ROM_LOAD( "ns_1.bin",    0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) /* b1.ic129 */
 
-	ROM_REGION( 0x080000, "gfx1", 0 )   /* Graphics are odd/even interleaved */
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* EPROMs, graphics are odd/even interleaved */
 	ROM_LOAD16_BYTE( "b3.ic49",  0x00001, 0x10000, CRC(2bddf94d) SHA1(e064f48d0e3bb089753c1b59c863bb46bfa2bcee) )
 	ROM_LOAD16_BYTE( "b7.ic53",  0x00000, 0x10000, CRC(a8b13a9a) SHA1(2f808c17e97a272be14099c53b287e665dd90b14) )
 	ROM_LOAD16_BYTE( "b4.ic50",  0x20001, 0x10000, CRC(80c6c841) SHA1(ab0aa4cad6dcadae62f849e53c3c5cd909f77971) )
