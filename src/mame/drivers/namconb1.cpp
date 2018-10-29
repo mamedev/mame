@@ -1064,7 +1064,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
-	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
 	m_c355spr->set_palxor(0x0);
 	m_c355spr->set_buffer(2); // triple buffered

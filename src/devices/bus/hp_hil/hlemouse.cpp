@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Sven Schnelle
 #include "emu.h"
-#include "hlekbd.h"
+#include "hlemouse.h"
 
-#include "machine/keyboard.ipp"
 //#define VERBOSE 1
 #include "logmacro.h"
 

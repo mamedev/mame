@@ -22,7 +22,7 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const 
 	device_video_interface(mconfig, *this),
 	m_gfx_region(0),
 	m_palxor(0),
-	m_is_namcofl(false),
+	m_scrolloffs{ 0, 0 },
 	m_buffer(0),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
@@ -189,13 +189,24 @@ void namco_c355spr_device::device_start()
 	std::fill(std::begin(m_position), std::end(m_position), 0x0000);
 	for (int i = 0; i < 2; i++)
 	{
-		m_spritelist[i] = auto_alloc_array(machine(), struct c355_sprite, 0x100);
-		m_sprite_end[i] = m_spritelist[i];
-		m_spriteram[i].resize(0x20000/2, 0);
-		save_item(NAME(m_spriteram[i]), i);
+		m_spritelist[i] = std::make_unique<c355_sprite []>(0x100);
+		m_sprite_end[i] = m_spritelist[i].get();
+		m_spriteram[i] = std::make_unique<uint16_t []>(0x20000/2);
+		std::fill_n(m_spriteram[i].get(), 0x20000/2, 0);
+		save_pointer(NAME(m_spriteram[i]), 0x20000/2, i);
 	}
 
 	save_item(NAME(m_position));
+}
+
+void namco_c355spr_device::device_stop()
+{
+	for (auto &spritelist : m_spritelist)
+		spritelist.reset();
+	for (auto &spriteram : m_spriteram)
+		spriteram.reset();
+
+	device_t::device_stop();
 }
 
 
@@ -222,7 +233,7 @@ READ16_MEMBER( namco_c355spr_device::position_r )
  * 0x10000 sprite attr (page1)
  * 0x14000 sprite list (page1)
  */
-void namco_c355spr_device::get_single_sprite(const uint16_t *pSource, struct c355_sprite *sprite_ptr)
+void namco_c355spr_device::get_single_sprite(const uint16_t *pSource, c355_sprite *sprite_ptr)
 {
 	uint16_t *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
 	unsigned screen_height_remaining, screen_width_remaining;
@@ -289,14 +300,8 @@ void namco_c355spr_device::get_single_sprite(const uint16_t *pSource, struct c35
 	}
 	else
 	{
-		if (m_is_namcofl)
-		{ /* Namco FL: don't adjust and things line up fine */
-		}
-		else
-		{ /* Namco NB1, Namco System 2 */
-			xscroll += 0x26;
-			yscroll += 0x19;
-		}
+		xscroll += m_scrolloffs[0];
+		yscroll += m_scrolloffs[1];
 	}
 
 	hpos -= xscroll;
@@ -415,7 +420,7 @@ int namco_c355spr_device::default_code2tile(int code)
 void namco_c355spr_device::get_list(int no, const uint16_t *pSpriteList16, const uint16_t *pSpriteTable)
 {
 	/* draw the sprites */
-	struct c355_sprite *sprite_ptr = m_spritelist[no];
+	c355_sprite *sprite_ptr = m_spritelist[no].get();
 	for (int i = 0; i < 256; i++)
 	{
 		sprite_ptr->disable = false;
@@ -455,7 +460,7 @@ void namco_c355spr_device::draw_sprites(screen_device &screen, _BitmapClass &bit
 		//if (offs == no)
 		{
 			int i = 0;
-			struct c355_sprite *sprite_ptr = m_spritelist[no];
+			c355_sprite *sprite_ptr = m_spritelist[no].get();
 
 			while (sprite_ptr != m_sprite_end[no])
 			{
@@ -515,7 +520,7 @@ WRITE_LINE_MEMBER( namco_c355spr_device::vblank )
 			get_sprites();
 
 		if (m_buffer > 1)
-			std::copy(m_spriteram[0].begin(), m_spriteram[0].end(), m_spriteram[1].begin());
+			std::copy_n(m_spriteram[0].get(), 0x20000/2, m_spriteram[1].get());
 	}
 }
 

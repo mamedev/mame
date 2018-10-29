@@ -2910,7 +2910,7 @@ READ16_MEMBER(namcos23_state::sub_comm_r)
 
 WRITE16_MEMBER(namcos23_state::sub_comm_w)
 {
-	if( offset == 1 )
+	if (offset == 1)
 	{
 		// data tx
 		m_mcu_unk = data & 0xff;

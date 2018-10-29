@@ -92,6 +92,10 @@ public:
 
 	void hp9825b(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<hp_09825_67907_cpu_device> m_cpu;
 	required_device<timer_device> m_cursor_timer;
@@ -126,9 +130,6 @@ private:
 	uint8_t m_printer_mem[ 16 ];
 	uint8_t m_printer_idx;
 	unsigned m_printer_line;    // 0: printer idle, 1..10: line being printed
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);

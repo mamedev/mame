@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(namco_de_pcbstack_device::device_add_mconfig)
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
-	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr->set_palxor(0xf); // reverse mapping
 	m_c355spr->set_gfxregion(0);
