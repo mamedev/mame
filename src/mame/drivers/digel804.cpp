@@ -638,7 +638,7 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_DEVICE_IO_MAP(z80_io_1_4)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_ROC10937_ADD("vfd",0) // RIGHT_TO_LEFT
+	ROC10937(config, m_vfd); // RIGHT_TO_LEFT
 
 	/* video hardware */
 	config.set_default_layout(layout_digel804);

@@ -3623,8 +3623,8 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+	RTC4543(config, m_rtc, XTAL(32'768));
+	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
 
 	// FIXME: need better syntax for configuring H8 onboard devices
 	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
@@ -3691,8 +3691,8 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+	RTC4543(config, m_rtc, XTAL(32'768));
+	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
 
 	// FIXME: need better syntax for configuring H8 onboard devices
 	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));
@@ -3772,8 +3772,8 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+	RTC4543(config, m_rtc, XTAL(32'768));
+	m_rtc->data_cb().set("subcpu:sci1", FUNC(h8_sci_device::rx_w));
 
 	// FIXME: need better syntax for configuring H8 onboard devices
 	h8_sci_device &subcpu_sci1(*m_subcpu->subdevice<h8_sci_device>("sci1"));

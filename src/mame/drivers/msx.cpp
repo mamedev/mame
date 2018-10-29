@@ -1455,7 +1455,7 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	MCFG_CASSETTE_INTERFACE("msx_cass")
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", RP5C01, 32.768_kHz_XTAL)
+	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")
@@ -1514,7 +1514,7 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	MCFG_CASSETTE_INTERFACE("msx_cass")
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", RP5C01, 32.768_kHz_XTAL)
+	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")

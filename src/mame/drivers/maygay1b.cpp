@@ -792,7 +792,7 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	mainlatch.q_out_cb<5>().set(FUNC(maygay1b_state::wdog_w));      // WDog
 	mainlatch.q_out_cb<6>().set(FUNC(maygay1b_state::srsel_w));     // Srsel
 
-	MCFG_S16LF01_ADD("vfd",0)
+	S16LF01(config, m_vfd);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("aysnd", YM2149, M1_MASTER_CLOCK)

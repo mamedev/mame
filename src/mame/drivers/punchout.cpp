@@ -688,9 +688,9 @@ MACHINE_CONFIG_START(punchout_state::spnchout)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(spnchout_io_map)
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, 0) // OSCIN -> Vcc
-	MCFG_RP5C01_REMOVE_BATTERY()
-	MCFG_RP5H01_ADD("rp5h01")
+	RP5C01(config, m_rtc, 0); // OSCIN -> Vcc
+	m_rtc->remove_battery();
+	RP5H01(config, m_rp5h01, 0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)
 MACHINE_CONFIG_END

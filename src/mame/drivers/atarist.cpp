@@ -2126,7 +2126,7 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
+	RP5C15(config, RP5C15_TAG, XTAL(32'768));
 
 	WD1772(config, m_fdc, Y2/4);
 	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
@@ -2297,7 +2297,7 @@ MACHINE_CONFIG_START(megaste_state::megaste)
 	ste(config);
 	MCFG_DEVICE_MODIFY(M68000_TAG)
 	MCFG_DEVICE_PROGRAM_MAP(megaste_map)
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
+	RP5C15(config, RP5C15_TAG, XTAL(32'768));
 	SCC8530(config, Z8530_TAG, Y2/4);
 
 	/* internal ram */

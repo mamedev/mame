@@ -715,8 +715,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	m_znmcu->analog2_handler().set_ioport("ANALOG2");
 
 	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
-	MCFG_DEVICE_ADD("rf5c296", RF5C296, 0)
-	MCFG_RF5C296_SLOT("pccard")
+	RF5C296(config, "rf5c296", 0).set_pccard("pccard");
 
 	MCFG_DEVICE_ADD("pccard", PCCARD_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(slot_ataflash, nullptr, false)

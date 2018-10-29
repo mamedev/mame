@@ -122,18 +122,20 @@ ioport_constructor vme_hcpu30_card_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vme_hcpu30_card_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("maincpu", M68030, 2*16670000)
-	MCFG_DEVICE_PROGRAM_MAP(hcpu30_mem)
+void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
+{
+	M68030(config, m_maincpu, 2*16670000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_hcpu30_card_device::hcpu30_mem);
 
-	MCFG_DUSCC68562_ADD("duscc", DUSCC_CLOCK, 0, 0, 0, 0)
-	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
-	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
-//  MCFG_DUSCC_OUT_INT_CB(WRITELINE()
+	DUSCC68562(config, m_dusccterm, DUSCC_CLOCK);
+	m_dusccterm->configure_channels(0, 0, 0, 0);
+	m_dusccterm->out_txda_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
+	m_dusccterm->out_dtra_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dusccterm->out_rtsa_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_rts));
+	m_dusccterm->out_txdb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_txd));
+	m_dusccterm->out_dtrb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dusccterm->out_rtsb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_rts));
+//  m_dusccterm->out_int_callback(),set(FUNC());
 
 	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
 	rs232p1.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxa_w));
@@ -142,7 +144,7 @@ MACHINE_CONFIG_START(vme_hcpu30_card_device::device_add_mconfig)
 	rs232_port_device &rs232p2(RS232_PORT(config, RS232P2_TAG, default_rs232_devices, nullptr));
 	rs232p2.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxb_w));
 	rs232p2.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsb_w));
-MACHINE_CONFIG_END
+}
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset */
 READ32_MEMBER(vme_hcpu30_card_device::bootvect_r)

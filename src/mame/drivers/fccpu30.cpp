@@ -689,29 +689,31 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 #define RS232P3_TAG      "rs232p3"
 #define RS232P4_TAG      "rs232p4"
 
-	MCFG_DUSCC68562_ADD("duscc", DUSCC_CLOCK, 0, 0, 0, 0 )
+	DUSCC68562(config, m_dusccterm, DUSCC_CLOCK);
+	m_dusccterm->configure_channels(0, 0, 0, 0);
 	/* Port 1 on Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	m_dusccterm->out_txdb_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
+	m_dusccterm->out_dtrb_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dusccterm->out_rtsb_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_rts));
 	/* Port 4 on Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
+	m_dusccterm->out_txda_callback().set(RS232P4_TAG, FUNC(rs232_port_device::write_txd));
+	m_dusccterm->out_dtra_callback().set(RS232P4_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dusccterm->out_rtsa_callback().set(RS232P4_TAG, FUNC(rs232_port_device::write_rts));
 	/* DUSCC1 interrupt signal REQN is connected to LOCAL IRQ4 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq4_w))
+	m_dusccterm->out_int_callback().set(m_fga002, FUNC(fga002_device::lirq4_w));
 
-	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
+	duscc68562_device &duscc2(DUSCC68562(config, "duscc2", DUSCC_CLOCK));
+	duscc2.configure_channels(0, 0, 0, 0);
 	/* Port 2 on Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	duscc2.out_txda_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_txd));
+	duscc2.out_dtra_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_dtr));
+	duscc2.out_rtsa_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_rts));
 	/* Port 3 on Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	duscc2.out_txdb_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_txd));
+	duscc2.out_dtrb_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_dtr));
+	duscc2.out_rtsb_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_rts));
 	/* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq5_w))
+	duscc2.out_int_callback().set(m_fga002, FUNC(fga002_device::lirq5_w));
 
 	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
 	rs232p1.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxb_w));
@@ -736,7 +738,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 	m_pit1->pb_out_callback().set(FUNC(cpu30_state::flop_dmac_w));
 	m_pit1->pc_in_callback().set(FUNC(cpu30_state::pit1c_r));
 	m_pit1->pc_out_callback().set(FUNC(cpu30_state::pit1c_w));
-//  m_pit1->timer_irq_callback().set("fga002", FUNC(fga002_device::lirq2_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+//  m_pit1->timer_irq_callback().set(m_fga002, FUNC(fga002_device::lirq2_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	PIT68230(config, m_pit2, XTAL(16'000'000) / 2); // Th PIT clock is not verified on schema but reversed from behaviour
 	m_pit2->pb_in_callback().set(FUNC(cpu30_state::board_mem_id_rd));
@@ -744,7 +746,7 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 	m_pit2->pa_out_callback().set(FUNC(cpu30_state::pit2a_w));
 	m_pit2->pc_in_callback().set(FUNC(cpu30_state::pit2c_r));
 	m_pit2->pc_out_callback().set(FUNC(cpu30_state::pit2c_w));
-//  m_pit2->timer_irq_callback().set("fga002", FUNC(fga002_device::lirq3_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+//  m_pit2->timer_irq_callback().set(m_fga002, FUNC(fga002_device::lirq3_w)); // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
 	fga002_device &fga002(FGA002(config, m_fga002, 0));
