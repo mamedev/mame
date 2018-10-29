@@ -278,10 +278,11 @@ inline uint32_t get_dt2_table_entry(uint32_t tptr, const bool rw, uint8_t ptest,
 		return tbl_entry;
 	}
 
-	if (tbl_entry & M68K_MMU_DF_WP)
+	if ((tbl_entry & M68K_MMU_DF_WP) && !ptest)
 	{
 		MMULOG("set WP flag in SR\n");
 		m_mmu_tmp_sr |= M68K_MMU_SR_WRITE_PROTECT;
+		return tbl_entry;
 	}
 
 	if (ptest)
@@ -383,7 +384,9 @@ bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits,
 	m_mmu_tmp_sr &= 0xfffffff0;
 	m_mmu_tmp_sr |= level;
 
-	if (m_mmu_tmp_sr & M68K_MMU_SR_BUS_ERROR)
+	if ((m_mmu_tmp_sr & M68K_MMU_SR_BUS_ERROR) ||
+		(!rw && (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT)))
+	{
 		return true;
 
 	switch (tbl_entry & M68K_MMU_DF_DT)
