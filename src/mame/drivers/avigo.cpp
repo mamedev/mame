@@ -790,8 +790,8 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, avigo_state, tc8521_alarm_int))
+	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
+	rtc.out_alarm_callback().set(FUNC(avigo_state::tc8521_alarm_int));
 
 	/* flash ROMs */
 	AMD_29F080(config, "flash0");

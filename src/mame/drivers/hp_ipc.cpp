@@ -757,15 +757,9 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	hp_hil_mlc_device &mlc(HP_HIL_MLC(config, "mlc", XTAL(15'920'000)/2));
 	mlc.int_callback().set(FUNC(hp_ipc_state::irq_2));
 	mlc.nmi_callback().set(FUNC(hp_ipc_state::irq_7));
-	hp_hil_slot_device &keyboard(HP_HIL_SLOT(config, "hil1", 0));
-	hp_hil_devices(keyboard);
-	keyboard.set_default_option("hp_ipc_kbd");
-	keyboard.set_hp_hil_slot(this, "mlc");
 
-	hp_hil_slot_device &mouse(HP_HIL_SLOT(config, "hil2", 0));
-	hp_hil_devices(mouse);
-	mouse.set_default_option("hp_46060b");
-	mouse.set_hp_hil_slot(this, "mlc");
+	HP_HIL_SLOT(config, "hil1", "mlc", hp_hil_devices, "hp_ipc_kbd");
+	HP_HIL_SLOT(config, "hil2", "mlc", hp_hil_devices, "hp_46060b");
 
 	tms9914_device &hpib(TMS9914(config, "hpib", 4_MHz_XTAL));
 	hpib.int_write_cb().set(FUNC(hp_ipc_state::irq_3));

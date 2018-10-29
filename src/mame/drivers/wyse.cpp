@@ -97,7 +97,7 @@ ROM_END
 
 COMP( 1986, wy60,  0,     0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-60",  MACHINE_IS_SKELETON )
 COMP( 1987, wy120, 0,     0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-120", MACHINE_IS_SKELETON )
-COMP( 1988, wy150, wy150, 0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-150", MACHINE_IS_SKELETON )
+COMP( 1988, wy150, 0,     0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-150", MACHINE_IS_SKELETON )
 COMP( 1990, wy160, 0,     0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-160", MACHINE_IS_SKELETON )
 COMP( 1991, wy30p, 0,     0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-30+", MACHINE_IS_SKELETON )
 COMP( 1993, wy55,  0,     0, wyse, wyse, wyse_state, empty_init, "Wyse Technology", "WY-55",  MACHINE_IS_SKELETON )

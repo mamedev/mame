@@ -475,7 +475,7 @@ MACHINE_CONFIG_START(cv1k_state::cv1k)
 	MCFG_DEVICE_IO_MAP(cv1k_port)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
 
-	MCFG_RTC9701_ADD("eeprom")
+	RTC9701(config, m_eeprom);
 	SERFLASH(config, m_serflash, 0);
 
 	/* video hardware */

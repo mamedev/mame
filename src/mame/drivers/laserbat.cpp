@@ -177,9 +177,9 @@ void laserbat_state_base::laserbat_map(address_map &map)
 	map(0x7800, 0x7bff).rom();
 
 	map(0x1400, 0x14ff).mirror(0x6000).nopw();
-	map(0x1500, 0x15ff).mirror(0x6000).rw(m_pvi1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1600, 0x16ff).mirror(0x6000).rw(m_pvi2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1700, 0x17ff).mirror(0x6000).rw(m_pvi3, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_pvi[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(m_pvi[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(m_pvi[2], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1800, 0x1bff).mirror(0x6000).w(FUNC(laserbat_state_base::videoram_w));
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 }
@@ -480,17 +480,17 @@ MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 
 	MCFG_PLS100_ADD(m_gfxmix)
 
-	MCFG_DEVICE_ADD(m_pvi1, S2636, XTAL(14'318'181)/3)
-	MCFG_S2636_OFFSETS(-8, -16)
-	MCFG_S2636_DIVIDER(3)
+	S2636(config, m_pvi[0], XTAL(14'318'181)/3);
+	m_pvi[0]->set_offsets(-8, -16);
+	m_pvi[0]->set_divider(3);
 
-	MCFG_DEVICE_ADD(m_pvi2, S2636, XTAL(14'318'181)/3)
-	MCFG_S2636_OFFSETS(-8, -16)
-	MCFG_S2636_DIVIDER(3)
+	S2636(config, m_pvi[1], XTAL(14'318'181)/3);
+	m_pvi[1]->set_offsets(-8, -16);
+	m_pvi[1]->set_divider(3);
 
-	MCFG_DEVICE_ADD(m_pvi3, S2636, XTAL(14'318'181)/3)
-	MCFG_S2636_OFFSETS(-8, -16)
-	MCFG_S2636_DIVIDER(3)
+	S2636(config, m_pvi[2], XTAL(14'318'181)/3);
+	m_pvi[2]->set_offsets(-8, -16);
+	m_pvi[2]->set_divider(3);
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_laserbat)
 
@@ -620,7 +620,7 @@ ROM_END
 /*
 Zaccaria "Cat 'N Mouse" 1982
 
-similar to "Quasar" execept it uses an 82s100 for color table lookup
+similar to "Quasar" except it uses an 82s100 for color table lookup
 and has a larger program prom
 
 

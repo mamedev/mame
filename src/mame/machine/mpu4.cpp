@@ -2984,7 +2984,7 @@ void mpu4_state::mpu4_bwb_7reel(machine_config &config)
 MACHINE_CONFIG_START(mpu4_state::mpu4_common)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu4_state, gen_50hz, attotime::from_hz(100))
 
-	MCFG_MSC1937_ADD("vfd",0)
+	MSC1937(config, m_vfd);
 	/* 6840 PTM */
 	PTM6840(config, m_6840ptm, MPU4_MASTER_CLOCK / 4);
 	m_6840ptm->set_external_clocks(0, 0, 0);

@@ -91,8 +91,9 @@ private:
 	uint8_t m_ppoll_sc;
 	uint8_t m_ppoll_mask;
 };
-}
-}
+
+} } // namespace bus::hp_dio
+
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_HUMAN_INTERFACE, bus::hp_dio, human_interface_device)
 
