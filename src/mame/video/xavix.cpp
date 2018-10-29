@@ -749,7 +749,8 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						dat |= (get_next_bit() << i);
 					}
 
-					yposptr[x] = dat + 0x100;
+					if (x < cliprect.max_x)
+						yposptr[x] = dat + 0x100;
 				}
 			}
 
