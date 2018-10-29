@@ -1095,8 +1095,8 @@ void m68851_pmove(uint32_t ea, uint16_t modes)
 		}
 		else
 		{
-			MMULOG("%s: write SR = %04X\n", __func__, m_mmu_sr);
 			m_mmu_sr = READ_EA_16(ea);
+			MMULOG("%s: write SR = %04X\n", __func__, m_mmu_sr);
 		}
 		break;
 
