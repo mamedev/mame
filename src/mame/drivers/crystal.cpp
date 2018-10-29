@@ -541,7 +541,7 @@ READ32_MEMBER(crystal_state::crtc_r)
 	switch (offset)
 	{
 		case 0: // CRTC Status / Mode
-			if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interrace
+			if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interlace
 				vdisp <<= 1;
 
 			if (m_screen->vpos() <= vdisp) // Vertical display enable status
@@ -635,12 +635,11 @@ void crystal_state::crtc_update()
 	// TODO : Implement other CRTC parameters
 	uint32_t hdisp = m_crtcregs[0x0c / 4] + 1;
 	uint32_t vdisp = m_crtcregs[0x1c / 4] + 1;
-	if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interrace
+	if ((m_crtcregs[0x30 / 4] & 1) == 0) // Interlace
 		vdisp <<= 1;
 
-	rectangle visarea;
-	visarea.set(0, hdisp - 1, 0, vdisp - 1);
-	m_screen->configure(hdisp, vdisp, visarea, m_screen->frame_period().attoseconds() );
+	rectangle const visarea(0, hdisp - 1, 0, vdisp - 1);
+	m_screen->configure(hdisp, vdisp, visarea, m_screen->frame_period().attoseconds());
 }
 
 void crystal_state::internal_map(address_map &map)
