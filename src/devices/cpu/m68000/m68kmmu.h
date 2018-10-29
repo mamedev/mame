@@ -9,8 +9,7 @@
 
 // MMU status register bit definitions
 
-
-#if 1
+#if 0
 #define MMULOG logerror
 #else
 #define MMULOG(...)
@@ -199,7 +198,7 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc, const int rw)
 void pmmu_atc_flush()
 {
 	MMULOG("ATC flush: pc=%08x\n", m_ppc);
-	memset(m_mmu_atc_tag, 0, sizeof(m_mmu_atc_tag));
+	std::fill(std::begin(m_mmu_atc_tag), std::end(m_mmu_atc_tag), 0);
 	m_mmu_atc_rr = 0;
 }
 
@@ -213,7 +212,6 @@ bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const bool rw,
 
 	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
-
 		if (m_mmu_atc_tag[i] != atc_tag)
 		{
 			continue;
@@ -260,53 +258,6 @@ bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const bool rw,
 		m_mmu_tmp_sr = M68K_MMU_SR_INVALID;
 	}
 	return false;
-}
-
-inline uint32_t get_dt2_table_entry(uint32_t tptr, const bool rw, uint8_t ptest, bool indirect)
-{
-	uint32_t tbl_entry = m_program->read_dword(tptr);
-	uint32_t dt = tbl_entry & M68K_MMU_DF_DT;
-	MMULOG("read %sDT2 entry: %08x @ %08x\n", indirect ? "indirect " : "", tbl_entry, tptr);
-
-	if (indirect)
-	{
-		return tbl_entry;
-	}
-
-	if (m_mmu_tmp_sr & M68K_MMU_SR_BUS_ERROR)
-	{
-		return tbl_entry;
-	}
-
-	if ((tbl_entry & M68K_MMU_DF_WP) && !ptest)
-	{
-		MMULOG("set WP flag in SR\n");
-		m_mmu_tmp_sr |= M68K_MMU_SR_WRITE_PROTECT;
-		return tbl_entry;
-	}
-
-	if (ptest)
-	{
-		return tbl_entry;
-	}
-
-	if (dt == M68K_MMU_DF_DT0)
-	{
-		return tbl_entry;
-	}
-
-	if (dt == M68K_MMU_DF_DT1 && !rw && !(m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
-	{
-		// set used and modified
-		MMULOG("%s: set M+U @ %08x\n", __func__, tptr);
-		m_program->write_dword( tptr, tbl_entry | M68K_MMU_DF_USED | M68K_MMU_DF_MODIFIED);
-	}
-	else if (!(tbl_entry & M68K_MMU_DF_USED))
-	{
-		MMULOG("%s: set U @ %08x\n", __func__, tptr);
-		m_program->write_dword( tptr, tbl_entry | M68K_MMU_DF_USED);
-	}
-	return tbl_entry;
 }
 
 inline uint32_t get_dt3_table_entry(uint32_t tptr, uint8_t fc, const bool rw, uint8_t ptest)
@@ -367,29 +318,52 @@ bool pmmu_match_tt(uint32_t addr_in, const int fc, const uint32_t tt, const bool
 	return true;
 }
 
-bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits, int nextbits, bool ptest, int fc, int level, const bool rw, uint32_t &addr_out)
+void update_table_descriptor(uint32_t tptr, uint32_t tbl_entry, const bool rw)
+{
+	MMULOG("%s: set U @ %08x\n", __func__, tptr);
+	m_program->write_dword( tptr, tbl_entry | M68K_MMU_DF_USED);
+}
+
+void update_page_descriptor(uint32_t tptr, uint32_t tbl_entry, const bool rw)
+{
+	if (!rw && !(m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
+	{
+		// set used and modified
+		MMULOG("%s: set M+U @ %08x\n", __func__, tptr);
+		m_program->write_dword( tptr, tbl_entry | M68K_MMU_DF_USED | M68K_MMU_DF_MODIFIED);
+	}
+	else if (!(tbl_entry & M68K_MMU_DF_USED))
+	{
+		MMULOG("%s: set U @ %08x\n", __func__, tptr);
+		m_program->write_dword( tptr, tbl_entry | M68K_MMU_DF_USED);
+	}
+}
+
+bool pmmu_walk_table(uint32_t& tbl_entry, int &type, uint32_t addr_in, int shift, int bits, bool ptest, int fc, int &level, const bool rw, uint32_t &addr_out)
 {
 	// get table offset
 	uint32_t tofs;
-	uint32_t tptr = tbl_entry & 0xfffffff0;
 	int ps = (m_mmu_tc >> 20) & 0xf;
 	// get initial shift (# of top bits to ignore)
 	int is = (m_mmu_tc >> 16) & 0xf;
-
 	shift += is;
 	tofs = (addr_in << shift) >> (32 - bits);
 
-	MMULOG("walk_table: SR %04x addr_in %08x, tbl_entry %08x, tofs %08x shift %d, bits %d, nextbits %d rw %d level %d\n",
-			m_mmu_tmp_sr, addr_in, tbl_entry, tofs, shift, bits, nextbits, rw, level);
+	MMULOG("walk_table: SR %04x type %d, addr_in %08x, addr_out %08x, tbl_entry %08x, tofs %08x shift %d, bits %d, rw %d level %d\n",
+			m_mmu_tmp_sr, type, addr_in, addr_out, tbl_entry, tofs, shift, bits, rw, level);
+
+	// abort page table walk immediately on buserror,
+	// but accumulate status bits on PTEST
+	if ((m_mmu_tmp_sr & M68K_MMU_SR_BUS_ERROR) ||
+		(!ptest && !rw && (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT)))
+	{
+		return true;
+	}
+
 	m_mmu_tmp_sr &= 0xfffffff0;
 	m_mmu_tmp_sr |= level;
 
-	if ((m_mmu_tmp_sr & M68K_MMU_SR_BUS_ERROR) ||
-		(!rw && (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT)))
-	{
-		return true;
-
-	switch (tbl_entry & M68K_MMU_DF_DT)
+	switch (type)
 	{
 		case M68K_MMU_DF_DT0:   // invalid, will cause MMU exception
 			m_mmu_tmp_sr |= M68K_MMU_SR_INVALID;
@@ -397,14 +371,22 @@ bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits,
 			return true;
 
 		case M68K_MMU_DF_DT1:   // page descriptor, will cause direct mapping
-			if (ptest && (tbl_entry & M68K_MMU_DF_MODIFIED))
+			if (tbl_entry & M68K_MMU_DF_MODIFIED)
 			{
 				MMULOG("%s: set modified in SR\n", __func__);
 				m_mmu_tmp_sr |= M68K_MMU_SR_MODIFIED;
 			}
-			tbl_entry &= (~0 << ps);
+
+			if (tbl_entry & M68K_MMU_DF_WP)
+			{
+				m_mmu_tmp_sr |= M68K_MMU_SR_WRITE_PROTECT;
+			}
+
 			if (!ptest)
 			{
+				if (level)
+					update_page_descriptor(addr_out, tbl_entry, rw);
+				tbl_entry &= (~0 << ps);
 				addr_out = ((addr_in << shift) >> shift) + tbl_entry;
 			}
 			MMULOG("PMMU: DT1 PC=%x (addr_in %08x -> %08x)\n", m_ppc, addr_in, addr_out);
@@ -415,22 +397,35 @@ bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits,
 
 			if (bits)
 			{
-				addr_out = tptr + tofs;
-				tbl_entry = get_dt2_table_entry(tptr + tofs,  rw, ptest, !nextbits);
+				// Short table descriptor
+				if (level)
+				{
+					update_table_descriptor(addr_out, tbl_entry, rw);
+				}
+
+				if (tbl_entry & M68K_MMU_DF_WP)
+				{
+					m_mmu_tmp_sr |= M68K_MMU_SR_WRITE_PROTECT;
+				}
+
+				addr_out = (tbl_entry & 0xfffffff0) + tofs;
 			}
 			else
 			{
-				addr_out = tptr;
-				tptr = tbl_entry & 0xfffffffc;
-				tbl_entry = get_dt2_table_entry(tptr, rw, ptest, 0);
+				// Indirect descriptor (no flags, but 30 bit address)
+				addr_out = (tbl_entry & 0xfffffffc);
 			}
-			return false;
+			tbl_entry = m_program->read_dword(addr_out);
+			type = tbl_entry & M68K_MMU_DF_DT;
+			level++;
+
+				return false;
 
 		case M68K_MMU_DF_DT3: // valid 8 byte descriptors
 			tofs *= 8;
-			addr_out = tptr + tofs;
-			tbl_entry = get_dt3_table_entry(tofs + tptr, fc,  rw, ptest);
-			MMULOG("PMMU: DT3 read table A entries at %08x\n", tofs + tptr, tbl_entry);
+			addr_out = (tbl_entry & 0xfffffff0) + tofs;
+			tbl_entry = get_dt3_table_entry(addr_out, fc,  rw, ptest);
+			MMULOG("PMMU: DT3 read table A entries at %08x = %08x\n", addr_out, tbl_entry);
 			return false;
 	}
 	return true;
@@ -442,8 +437,7 @@ bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits,
 uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, bool ptest, bool pload, const int limit = 7)
 {
 	uint32_t addr_out, tbl_entry;
-	uint32_t abits, bbits, cbits, dbits;
-	int level = 0;
+
 
 	MMULOG("%s: addr_in=%08x, fc=%d, ptest=%d, rw=%d, limit=%d\n",
 			__func__, addr_in, fc, ptest, rw, limit);
@@ -468,41 +462,44 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, bool
 	}
 
 	if (ptest && limit == 0)
+	{
 		return addr_out;
+	}
+
+	int type;
 
 	// if SRP is enabled and we're in supervisor mode, use it
 	if ((m_mmu_tc & M68K_MMU_TC_SRE) && (fc & 4))
 	{
-		tbl_entry = (m_mmu_srp_aptr & 0xfffffff0) | (m_mmu_srp_limit & M68K_MMU_DF_DT);
+		tbl_entry = m_mmu_srp_aptr & 0xfffffff0;
+		type = m_mmu_srp_limit & M68K_MMU_DF_DT;
 	}
 	else    // else use the CRP
 	{
-		tbl_entry = (m_mmu_crp_aptr & 0xfffffff0) | (m_mmu_crp_limit & M68K_MMU_DF_DT);
+		tbl_entry = m_mmu_crp_aptr & 0xfffffff0;
+		type = m_mmu_crp_limit & M68K_MMU_DF_DT;
 	}
 
 	m_mmu_tmp_sr = 0;
-
-	abits = (m_mmu_tc >> 12) & 0xf;
-	bbits = (m_mmu_tc >> 8) & 0xf;
-	cbits = (m_mmu_tc >> 4) & 0xf;
-	dbits = m_mmu_tc & 0x0f;
-
-	addr_out = tbl_entry & 0xfffffff0;
+	int abits = (m_mmu_tc >> 12) & 0xf;
+	int bbits = (m_mmu_tc >> 8) & 0xf;
+	int cbits = (m_mmu_tc >> 4) & 0xf;
+	int dbits = m_mmu_tc & 0x0f;
+	int level = 0;
 
 	m_mmu_tablewalk = true;
 
 	if (m_mmu_tc & M68K_MMU_TC_FCL)
 	{
-		if (pmmu_walk_table(tbl_entry, fc, 0, 32, abits, ptest, fc, 0, rw, addr_out))
+		if (pmmu_walk_table(tbl_entry, type, fc, 0, 32, ptest, fc, level, rw, addr_out))
 			goto out;
-		level = 1;
 	}
 
-	if (!pmmu_walk_table(tbl_entry, addr_in, 0                            , abits, bbits, ptest, fc, level, rw, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits                        , bbits, cbits, ptest, fc, level + 1, rw, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits                , cbits, dbits, ptest, fc, level + 2, rw, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits + cbits        , dbits,     0, ptest, fc, level + 3, rw, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits + cbits + dbits,     0,     0, ptest, fc, level + 4, rw, addr_out))
+	if (!pmmu_walk_table(tbl_entry, type, addr_in, 0                            , abits, ptest, fc, level, rw, addr_out) &&
+		!pmmu_walk_table(tbl_entry, type, addr_in, abits                        , bbits, ptest, fc, level, rw, addr_out) &&
+		!pmmu_walk_table(tbl_entry, type, addr_in, abits + bbits                , cbits, ptest, fc, level, rw, addr_out) &&
+		!pmmu_walk_table(tbl_entry, type, addr_in, abits + bbits + cbits        , dbits, ptest, fc, level, rw, addr_out) &&
+		!pmmu_walk_table(tbl_entry, type, addr_in, abits + bbits + cbits + dbits,     0, ptest, fc, level, rw, addr_out))
 	{
 		fatalerror("Table walk did not resolve\n");
 	}
@@ -518,9 +515,11 @@ out:
 			((m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !rw))
 	{
 		MMULOG("%s: set buserror (SR %04X)\n", __func__, m_mmu_tmp_sr);
-		pmmu_set_buserror(addr_in);
+		if (!pload)
+		{
+			pmmu_set_buserror(addr_in);
+		}
 	}
-
 	pmmu_atc_add(addr_in, addr_out, fc, rw);
 	MMULOG("PMMU: [%08x] => [%08x] (SR %04x)\n", addr_in, addr_out, m_mmu_tmp_sr);
 	return addr_out;
@@ -858,7 +857,9 @@ void m68851_pload(const uint32_t ea, const uint16_t modes)
 
 			pmmu_translate_addr_with_fc(ltmp, fc, rw, 0, 1);
 		}
-	} else {
+	}
+	else
+	{
 		MMULOG("PLOAD with MMU disabled on MC68851\n");
 		m68ki_exception_trap(57);
 		return;
