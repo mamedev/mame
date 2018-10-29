@@ -603,6 +603,11 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
 	{
+		// if bpp>4 then ignore unaligned palette selects bits based on bpp
+		// ttv_lotr uses 5bpp graphics (so 32 colour alignment) but sets palette 0xf (a 16 colour boundary) when it expects palette 0xe
+		if (bpp>4)
+			pal &= (0xf<<(bpp-4));
+
 		int bits_per_tileline = drawwidth * bpp;
 
 		// set the address here so we can increment in bits in the draw function
