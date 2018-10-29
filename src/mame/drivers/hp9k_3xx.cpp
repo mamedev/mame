@@ -287,7 +287,7 @@ void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mas
 {
 	if (m_bus_error)
 		return;
-
+	m_maincpu->m68851_buserror();
 	m_bus_error = true;
 	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
