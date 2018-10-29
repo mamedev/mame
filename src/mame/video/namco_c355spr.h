@@ -72,7 +72,7 @@ private:
 	void get_single_sprite(const uint16_t *pSource, struct c355_sprite *sprite_ptr);
 	void get_list(int no, const uint16_t *pSpriteList16, const uint16_t *pSpriteTable);
 	void get_sprites();
-	template<class _BitmapClass> void draw_sprites(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri);
+	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
 	struct c355_sprite *m_spritelist[2];
 	const struct c355_sprite *m_sprite_end[2];
@@ -94,4 +94,3 @@ private:
 DECLARE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device)
 
 #endif // MAME_VIDEO_NAMCO_C355SPR_H
-
