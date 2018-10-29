@@ -486,7 +486,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, bool
 	int cbits = (m_mmu_tc >> 4) & 0xf;
 	int dbits = m_mmu_tc & 0x0f;
 	int level = 0;
-
+	int roottype = type;
 	m_mmu_tablewalk = true;
 
 	if (m_mmu_tc & M68K_MMU_TC_FCL)
@@ -520,7 +520,11 @@ out:
 			pmmu_set_buserror(addr_in);
 		}
 	}
-	pmmu_atc_add(addr_in, addr_out, fc, rw);
+
+	// it seems like at least the 68030 sets the M bit in the MMU SR
+	// if the root descriptor is of PAGE type, so do a logical and
+	// between RW and the root type
+	pmmu_atc_add(addr_in, addr_out, fc, rw && roottype != 1);
 	MMULOG("PMMU: [%08x] => [%08x] (SR %04x)\n", addr_in, addr_out, m_mmu_tmp_sr);
 	return addr_out;
 }
