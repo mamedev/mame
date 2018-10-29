@@ -10,6 +10,16 @@
 // general DMA to/from entire main map (not dedicated sprite DMA)
 WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 {
+	// 0x80 is set in the IRQ routine, presumably to ack it
+	if (data & 0x80)
+	{
+		if (m_irqsource & 0x20)
+		{
+			m_maincpu->set_input_line(0, CLEAR_LINE);
+			m_irqsource &= ~0x20;
+		}
+	}
+
 	if (data & 0x01) // namcons2 writes 0x81, most of the time things write 0x01
 	{
 		LOG("%s: rom_dmatrg_w (do DMA?) %02x\n", machine().describe_context(), data);
@@ -30,6 +40,13 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 			uint8_t dat = m_maincpu->read_full_data_sp(m_tmpaddress);
 			m_maincpu->write_full_data(dest+i, dat);
 		}
+
+		if (data & 0x40) // or merely the absense of 0x80 being set? (ttv_lotr and drgqst are the only games needing the IRQ and both set 0x40 tho)
+		{
+			m_irqsource |= 0x20;
+			m_maincpu->set_input_line(0, ASSERT_LINE);
+		}
+
 	}
 	else // the interrupt routine writes 0x80 to the trigger, maybe 'clear IRQ?'
 	{
@@ -463,7 +480,7 @@ READ8_MEMBER(xavix_state::irq_source_r)
 	*/
 
 	LOG("%s: irq_source_r\n", machine().describe_context());
-	return 0x40;
+	return m_irqsource;
 }
 
 WRITE8_MEMBER(xavix_state::irq_source_w)
@@ -480,6 +497,8 @@ void xavix_state::machine_start()
 	std::fill_n(&m_mainram[0], 0x4000, 0xff);
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
+
+	m_irqsource = 0x40;
 }
 
 void xavix_state::machine_reset()
