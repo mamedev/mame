@@ -274,12 +274,6 @@ TIMER_CALLBACK_MEMBER(pbaction_tecfri_state::sub_trigger)
 {
 	m_ctc2->trg1(0);
 	m_ctc2->trg1(1);
-
-	m_ctc2->trg2(0);
-	m_ctc2->trg2(1);
-
-	m_ctc2->trg3(0);
-	m_ctc2->trg3(1);
 }
 
 
