@@ -531,7 +531,7 @@ ROM_START( pbactiont )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )    /* 64k for a third Z80 (not emulated) */
+	ROM_REGION( 0x10000, "cpu2", 0 )    /* 64k for the 2xZ80 subboard (not emulated) */
 	ROM_LOAD( "pba17.bin",    0x0000,  0x4000, CRC(2734ae60) SHA1(4edcdfac1611c49c4f890609efbe8352b8161f8e) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -551,7 +551,7 @@ ROM_START( pbactiont )
 	ROM_LOAD( "b-f7.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
 ROM_END
 
-READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
+READ8_MEMBER(pbaction_state::pbaction2_prot_kludge_r)
 {
 	/* on startup, the game expect this location to NOT act as RAM */
 	if (m_maincpu->pc() == 0xab80)
@@ -560,7 +560,7 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 	return m_work_ram[0];
 }
 
-void pbaction_state::init_pbactio3()
+void pbaction_state::init_pbaction2()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -571,13 +571,13 @@ void pbaction_state::init_pbactio3()
 	}
 
 	/* install a protection (?) workaround */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbactio3_prot_kludge_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbaction2_prot_kludge_r),this) );
 }
 
 
 // some of these are probably bootlegs
-GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init,    ROT90, "Tehkan",                  "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbactionx, pbaction, pbaction_state, init_pbactio3, ROT90, "Tehkan",                  "Pinball Action (set 2, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan",                  "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan",                  "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbactiont, pbaction, pbactiont, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan (Tecfri license)", "Pinball Action (Tecfri license)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbactionx, pbaction, pbaction_state, init_pbaction2, ROT90, "Tehkan",                  "Pinball Action (set 2, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbactiont, pbaction, pbactiont, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan (Tecfri license)", "Pinball Action (Tecfri license)",   MACHINE_SUPPORTS_SAVE )
