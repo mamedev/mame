@@ -925,7 +925,7 @@ void lua_engine::initialize()
  * thread.result() - get thread result as string
  * thread.busy - check if thread is running
  * thread.yield - check if thread is yielded
-*/
+ */
 
 	emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>(),
 			"start", [](context &ctx, const char *scr) {
@@ -981,6 +981,14 @@ void lua_engine::initialize()
 			"busy", sol::readonly(&context::busy),
 			"yield", sol::readonly(&context::yield));
 
+/*
+ * emu.item(item_index)
+ * item.size - size of the raw data type
+ * item.count - number of entries
+ * item:read(entry_index) - read entry value by index
+ * item:read_block(entry_index, count) - read array of entry values
+ * item:write(entry_index, value) - write entry value by index
+ */
 	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
 					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
 					{
@@ -1340,7 +1348,7 @@ void lua_engine::initialize()
  * device:debug() - debug interface, cpus only
  * device.spaces[] - device address spaces table
  * device.state[] - device state entries table
- * device.items[] - device save state items table
+ * device.items[] - device save state items table (item name is key, item index is value)
  */
 
 	sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor,
