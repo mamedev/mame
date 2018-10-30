@@ -695,6 +695,11 @@ REF 010131
 
 */
 
+/*
+   PRG ROM useful locations:
+   0x64C44 Country: 0 - no information, 1 - Spain, 2 - UK (this dump), 3 - Italy, 4 - USA
+   0x727AC 1 - enable Develop/debug option in test mode
+*/
 ROM_START( smashdrv ) // Version: 3.3, Version 3D: 1.9, Checksum: 707C 
 	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
 	ROM_LOAD("prg.ic23", 0x0000000, 0x0400000, CRC(5cc6d3ac) SHA1(0c8426774212d891796b59c95b8c70f64db5b67a) )
