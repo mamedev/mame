@@ -99,12 +99,13 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "machine/segacrpt_device.h"
 #include "screen.h"
 #include "speaker.h"
+#include "pbactiont.lh"
 
 
 WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pbaction_state::sound_trigger), this));
+	m_soundcommand_timer->adjust(attotime::zero, 0);
 }
 
 TIMER_CALLBACK_MEMBER(pbaction_state::sound_trigger)
@@ -167,7 +168,7 @@ void pbaction_state::pbaction_sound_map(address_map &map)
 	map(0xffff, 0xffff).w(FUNC(pbaction_state::sound_irq_ack_w));
 }
 
-void pbaction_state::pbactiont_sound_map(address_map &map)
+void pbaction_state::pbaction_alt_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
@@ -179,8 +180,106 @@ void pbaction_state::pbaction_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x11).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x12, 0x13).nopw(); // unknown
 	map(0x20, 0x21).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x30, 0x31).w("ay3", FUNC(ay8910_device::address_data_w));
+}
+
+WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8000_w)
+{
+	// writes data to latch (only a single bit matters?)
+	m_outlatch = data & 1;
+}
+
+WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8001_w)
+{
+	// writes 01 , 00 to clock after writing data to 8000
+	// does this process 24 times between each 8008 write
+	if (data & 0x01)
+	{
+		if (m_outshift < 24)
+		{
+			if (m_outlatch)
+				m_outbytes[m_outshift] |= (0xff & m_outmask);
+			else
+				m_outbytes[m_outshift] &= ~(0xff & m_outmask);
+		}
+
+		m_digits[m_outshift] = m_outbytes[m_outshift];
+
+		m_outshift++;
+	}
+}
+
+WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8008_w)
+{
+	// writes 7 different values which seems to determine shift (01,02,04,08,10,20,40) (7 values, 7-seg? or coincidence, doesn't seem to decode like that) 
+	// but then writes 00 before writing to above (possibly 00 is 'start data' and other values are 'send')
+	if (data != 0x00)
+	{
+		m_outmask = data;
+		m_outshift = 0;
+	}
+}
+
+WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_subtomain_w)
+{
+	//m_subtomainlatch->write(space, offset, data); // where does this go if it can't go to maincpu?
+}
+
+READ8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_maintosub_r)
+{
+	return m_maintosublatch->read(space, offset);
+}
+
+READ8_MEMBER(pbaction_tecfri_state::subcpu_r)
+{
+	return 0x00; // other values stop the flippers from working? are there different inputs from the custom cabinet in here somehow?
+//	return m_subtomainlatch->read(space, offset);
+}
+
+WRITE8_MEMBER(pbaction_tecfri_state::subcpu_w)
+{
+	m_maintosublatch->write(space, offset, data);
+	m_subcommand_timer->adjust(attotime::zero, 0);
+}
+
+void pbaction_tecfri_state::pbaction_tecfri_sub_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+	map(0x4000, 0x47ff).ram();
+
+	map(0x8000, 0x8000).w(FUNC(pbaction_tecfri_state::pbaction_tecfri_sub8000_w));
+	map(0x8001, 0x8001).w(FUNC(pbaction_tecfri_state::pbaction_tecfri_sub8001_w));
+	//map(0x8002, 0x8007).nopw(); // startup only
+	map(0x8008, 0x8008).w(FUNC(pbaction_tecfri_state::pbaction_tecfri_sub8008_w));
+
+	map(0x8010, 0x8010).r(FUNC(pbaction_tecfri_state::pbaction_tecfri_maintosub_r));
+	map(0x8018, 0x8018).w(FUNC(pbaction_tecfri_state::pbaction_tecfri_subtomain_w));	
+}
+
+void pbaction_tecfri_state::pbaction_tecfri_sub_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_ctc2, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
+
+void pbaction_tecfri_state::pbaction_tecfri_main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(FUNC(pbaction_tecfri_state::subcpu_r), FUNC(pbaction_tecfri_state::subcpu_w));
+}
+
+TIMER_CALLBACK_MEMBER(pbaction_tecfri_state::sub_trigger)
+{
+	m_ctc2->trg1(0);
+	m_ctc2->trg1(1);
+
+	m_ctc2->trg2(0);
+	m_ctc2->trg2(1);
+
+	m_ctc2->trg3(0);
+	m_ctc2->trg3(1);
 }
 
 
@@ -263,8 +362,6 @@ static INPUT_PORTS_START( pbaction )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-
-
 static const gfx_layout charlayout1 =
 {
 	8,8,
@@ -318,6 +415,7 @@ GFXDECODE_END
 
 void pbaction_state::machine_start()
 {
+	m_soundcommand_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pbaction_state::sound_trigger), this));
 	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_scroll));
 }
@@ -390,22 +488,52 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pbaction_state::pbactiont)
+MACHINE_CONFIG_START(pbaction_state::pbactionx)
 	pbaction(config);
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbactiont_sound_map);
-	m_audiocpu->irqack_cb().set(FUNC(pbaction_state::sound_irq_clear));
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pbaction_state::pbactionx)
-	pbactiont(config);
 	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5128, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(pbaction_map)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_alt_sound_map);
+	m_audiocpu->irqack_cb().set(FUNC(pbaction_state::sound_irq_clear));
 MACHINE_CONFIG_END
 
+static const z80_daisy_config daisy_chain2[] =
+{
+	{ "ctc2" },
+	{ nullptr }
+};
 
+void pbaction_tecfri_state::machine_start()
+{
+	pbaction_state::machine_start();
+
+	m_subcommand_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pbaction_tecfri_state::sub_trigger), this));
+	m_digits.resolve();
+}
+
+MACHINE_CONFIG_START(pbaction_tecfri_state::pbactiont)
+	pbaction(config);
+	
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(pbaction_tecfri_main_io_map)
+
+	Z80(config, m_subcpu, 4_MHz_XTAL);
+	m_subcpu->set_addrmap(AS_PROGRAM, &pbaction_tecfri_state::pbaction_tecfri_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &pbaction_tecfri_state::pbaction_tecfri_sub_io_map);
+	m_subcpu->set_daisy_config(daisy_chain2);
+
+	MCFG_GENERIC_LATCH_8_ADD("maintosublatch")
+	//MCFG_GENERIC_LATCH_8_ADD("subtomainlatch")
+
+	Z80CTC(config, m_ctc2, 12_MHz_XTAL/4);
+	m_ctc2->intr_callback().set_inputline(m_subcpu, 0);
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_alt_sound_map);
+	m_audiocpu->irqack_cb().set(FUNC(pbaction_state::sound_irq_clear));
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -531,7 +659,7 @@ ROM_START( pbactiont )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )    /* 64k for the 2xZ80 subboard (not emulated) */
+	ROM_REGION( 0x10000, "subcpu", 0 )    /* 64k for the 2xZ80 subboard (not emulated) */
 	ROM_LOAD( "pba17.bin",    0x0000,  0x4000, CRC(2734ae60) SHA1(4edcdfac1611c49c4f890609efbe8352b8161f8e) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )
@@ -576,8 +704,8 @@ void pbaction_state::init_pbaction2()
 
 
 // some of these are probably bootlegs
-GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbactionx, pbaction, pbaction_state, init_pbaction2, ROT90, "Tehkan",                  "Pinball Action (set 2, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbactiont, pbaction, pbactiont, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan (Tecfri license)", "Pinball Action (Tecfri license)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE ) // possible bootleg due to not being encrypted + different sound map
+GAME( 1985, pbaction2, pbaction, pbactionx, pbaction, pbaction_state, init_pbaction2, ROT90, "Tehkan",                  "Pinball Action (set 2, encrypted)", MACHINE_SUPPORTS_SAVE ) // likely bootleg due to extra protectoin on top of usual
+GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE ) // possible bootleg due to oversized ROMs
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, empty_init,     ROT90, "Tehkan",                  "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE ) // original?
+GAMEL(1985, pbactiont, pbaction, pbactiont, pbaction, pbaction_tecfri_state, empty_init,     ROT90, "Tehkan (Tecfri license)", "Pinball Action (Tecfri license)",   MACHINE_SUPPORTS_SAVE, layout_pbactiont )
