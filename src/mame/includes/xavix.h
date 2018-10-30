@@ -188,6 +188,9 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(timer_freq_w);
 	uint8_t m_timer_control;
 	uint8_t m_timer_freq;
+	TIMER_CALLBACK_MEMBER(freq_timer_done);
+	emu_timer *m_freq_timer;
+
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);

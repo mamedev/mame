@@ -447,6 +447,12 @@ WRITE8_MEMBER(xavix_state::timer_freq_w)
 		LOG("%s: unexpected upper bits in timer freq %02x\n", machine().describe_context(), data & 0xf0);
 }
 
+TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
+{
+
+}
+
+
 
 READ8_MEMBER(xavix_state::mult_r)
 {
@@ -547,6 +553,7 @@ void xavix_state::machine_start()
 	std::fill_n(&m_mainram[0], 0x4000, 0xff);
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
+	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
 }
 
 void xavix_state::machine_reset()
