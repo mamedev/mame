@@ -989,6 +989,7 @@ void lua_engine::initialize()
  * item:read_block(entry_index, count) - read array of entry values
  * item:write(entry_index, value) - write entry value by index
  */
+ 
 	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
 					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
 					{
