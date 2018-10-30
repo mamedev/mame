@@ -304,7 +304,7 @@ void balsente_state::cpu2_map(address_map &map)
 void balsente_state::cpu2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x00, 0x03).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x08, 0x0f).r(FUNC(balsente_state::counter_state_r));
 	map(0x08, 0x09).w(FUNC(balsente_state::counter_control_w));
 	map(0x0a, 0x0b).w(FUNC(balsente_state::dac_data_w));
@@ -1338,11 +1338,11 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, interrupt_timer)
 	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, clock_counter_0_ff)
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, balsente_state, counter_0_set_out))
-	MCFG_PIT8253_OUT2_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_PIT8253_CLK1(8_MHz_XTAL / 4)
-	MCFG_PIT8253_CLK2(8_MHz_XTAL / 4)
+	PIT8253(config, m_pit, 0);
+	m_pit->out_handler<0>().set(FUNC(balsente_state::counter_0_set_out));
+	m_pit->out_handler<2>().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_pit->set_clk<1>(8_MHz_XTAL / 4);
+	m_pit->set_clk<2>(8_MHz_XTAL / 4);
 
 	LS259(config, m_outlatch); // U9H
 	// these outputs are generally used to control the various lamps

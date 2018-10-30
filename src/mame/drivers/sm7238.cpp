@@ -383,21 +383,21 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("t_hblank", PIT8253, 0)
-	MCFG_PIT8253_CLK1(16.384_MHz_XTAL/9) // XXX workaround -- keyboard is slower and doesn't sync otherwise
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, sm7238_state, write_keyboard_clock))
+	PIT8253(config, m_t_hblank, 0);
+	m_t_hblank->set_clk<1>(16.384_MHz_XTAL/9); // XXX workaround -- keyboard is slower and doesn't sync otherwise
+	m_t_hblank->out_handler<1>().set(FUNC(sm7238_state::write_keyboard_clock));
 
-	MCFG_DEVICE_ADD("t_vblank", PIT8253, 0)
-	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, sm7238_state, write_printer_clock))
+	PIT8253(config, m_t_vblank, 0);
+	m_t_vblank->set_clk<2>(16.5888_MHz_XTAL/9);
+	m_t_vblank->out_handler<2>().set(FUNC(sm7238_state::write_printer_clock));
 
-	MCFG_DEVICE_ADD("t_color", PIT8253, 0)
+	PIT8253(config, m_t_color, 0);
 
-	MCFG_DEVICE_ADD("t_iface", PIT8253, 0)
-	MCFG_PIT8253_CLK1(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("i8251line", i8251_device, write_txc))
-	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("i8251line", i8251_device, write_rxc))
+	PIT8253(config, m_t_iface, 0);
+	m_t_iface->set_clk<1>(16.5888_MHz_XTAL/9);
+	m_t_iface->out_handler<1>().set(m_i8251line, FUNC(i8251_device::write_txc));
+	m_t_iface->set_clk<2>(16.5888_MHz_XTAL/9);
+	m_t_iface->out_handler<2>().set(m_i8251line, FUNC(i8251_device::write_rxc));
 
 	// serial connection to host
 	I8251(config, m_i8251line, 0);

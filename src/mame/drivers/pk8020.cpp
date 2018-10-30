@@ -222,13 +222,13 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 
 	I8255(config, m_ppi8255_3);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(20_MHz_XTAL / 10)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out0))
-	MCFG_PIT8253_CLK1(20_MHz_XTAL / 10)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out1))
-	MCFG_PIT8253_CLK2((20_MHz_XTAL / 8) / 164)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259", pic8259_device, ir5_w))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(20_MHz_XTAL / 10);
+	m_pit8253->out_handler<0>().set(FUNC(pk8020_state::pk8020_pit_out0));
+	m_pit8253->set_clk<1>(20_MHz_XTAL / 10);
+	m_pit8253->out_handler<1>().set(FUNC(pk8020_state::pk8020_pit_out1));
+	m_pit8253->set_clk<2>((20_MHz_XTAL / 8) / 164);
+	m_pit8253->out_handler<2>().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))

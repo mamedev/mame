@@ -970,13 +970,13 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	m_dma8257->out_dack_cb<3>().set(FUNC(myb3k_state::dack3_w));
 
 	/* Timer */
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'318'181) / 12.0) /* TIMINT straight into IRQ0 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(14'318'181) / 12.0) /* speaker if port c bit 5 is low */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, myb3k_state, pit_out1_changed))
-	//  MCFG_PIT8253_CLK2(XTAL(14'318'181) / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
-	//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, myb3k_state, pit_out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(14'318'181) / 12.0); /* TIMINT straight into IRQ0 */
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(14'318'181) / 12.0); /* speaker if port c bit 5 is low */
+	m_pit8253->out_handler<1>().set(FUNC(myb3k_state::pit_out1_changed));
+	// m_pit8253->set_clk<2>(XTAL(14'318'181) / 12.0); /* ANDed with port c bit 6 but marked as "not use"*/
+	// m_pit8253->out_handler<2>().set(FUNC(myb3k_state::pit_out2_changed));
 
 	/* Video controller */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181) / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */

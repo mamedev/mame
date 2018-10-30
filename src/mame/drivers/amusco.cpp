@@ -542,11 +542,11 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIT_CLOCK0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(PIT_CLOCK1)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(PIT_CLOCK0);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(PIT_CLOCK1);
+	m_pit->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir2_w));
 
 	i8255_device &ppi_outputs(I8255(config, "ppi_outputs"));
 	ppi_outputs.out_pa_callback().set(FUNC(amusco_state::output_a_w));

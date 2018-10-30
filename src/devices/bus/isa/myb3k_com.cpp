@@ -31,7 +31,8 @@ DEFINE_DEVICE_TYPE(ISA8_MYB3K_COM, isa8_myb3k_com_device, "isa8_myb3k_com", "ADP
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
+void isa8_myb3k_com_device::device_add_mconfig(machine_config &config)
+{
 	I8251( config, m_usart, XTAL(15'974'400) / 8 );
 	m_usart->txd_handler().set("com1", FUNC(rs232_port_device::write_txd));
 	m_usart->dtr_handler().set("com1", FUNC(rs232_port_device::write_dtr));
@@ -48,13 +49,13 @@ MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
 	// TODO: configure RxC and TxC from RS232 connector when these are defined is rs232.h
 
 	/* Timer chip */
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(15'974'400) / 8 ) /* TxC */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, pit_txc))
-	MCFG_PIT8253_CLK1(XTAL(15'974'400) / 8 ) /* RxC */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, pit_rxc))
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(XTAL(15'974'400) / 8); /* TxC */
+	pit.out_handler<0>().set(FUNC(isa8_myb3k_com_device::pit_txc));
+	pit.set_clk<1>(XTAL(15'974'400) / 8); /* RxC */
+	pit.out_handler<1>().set(FUNC(isa8_myb3k_com_device::pit_rxc));
 	// Timer 2 is not used/connected to anything on the schematics
-MACHINE_CONFIG_END
+}
 
 // PORT definitions moved to the end of this file as it became very long
 

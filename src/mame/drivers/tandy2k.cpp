@@ -837,13 +837,13 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	// TODO pin 15 external transmit clock
 	// TODO pin 17 external receiver clock
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(16_MHz_XTAL / 16)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, tandy2k_state, outspkr_w))
-	MCFG_PIT8253_CLK1(16_MHz_XTAL / 8)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, tandy2k_state, intbrclk_w))
-	//MCFG_PIT8253_CLK2(16_MHz_XTAL / 8)
-	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, tandy2k_state, rfrqpulse_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(16_MHz_XTAL / 16);
+	m_pit->out_handler<0>().set(FUNC(tandy2k_state::outspkr_w));
+	m_pit->set_clk<1>(16_MHz_XTAL / 8);
+	m_pit->out_handler<1>().set(FUNC(tandy2k_state::intbrclk_w));
+	//m_pit->set_clk<2>(16_MHz_XTAL / 8);
+	//m_pit->out_handler<2>().set(FUNC(tandy2k_state::rfrqpulse_w));
 
 	MCFG_DEVICE_ADD(I8259A_0_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(I80186_TAG, i80186_cpu_device, int0_w))

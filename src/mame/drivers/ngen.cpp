@@ -94,10 +94,10 @@ public:
 		m_pit(*this,"pit"),
 		m_hdc(*this,"hdc"),
 		m_fdc(*this,"fdc"),
-		m_disk_rom(*this,"disk"),
-		m_fd0(*this,"fdc:0"),
 		m_fdc_timer(*this,"fdc_timer"),
 		m_hdc_timer(*this,"hdc_timer"),
+		m_disk_rom(*this,"disk"),
+		m_fd0(*this,"fdc:0"),
 		m_hd_buffer(*this,"hd_buffer_ram")
 	{
 	}
@@ -150,6 +150,8 @@ protected:
 	required_device<pit8254_device> m_pit;
 	optional_device<wd2010_device> m_hdc;
 	optional_device<wd2797_device> m_fdc;
+	optional_device<pit8253_device> m_fdc_timer;
+	optional_device<pit8253_device> m_hdc_timer;
 
 private:
 	DECLARE_WRITE16_MEMBER(cpu_peripheral_cb);
@@ -182,8 +184,6 @@ private:
 	memory_array m_vram;
 	memory_array m_fontram;
 	optional_device<floppy_connector> m_fd0;
-	optional_device<pit8253_device> m_fdc_timer;
-	optional_device<pit8253_device> m_hdc_timer;
 	optional_shared_ptr<uint8_t> m_hd_buffer;
 
 	void set_dma_channel(int channel, int state);
@@ -1015,13 +1015,14 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	m_fdc->intrq_wr_callback().set(FUNC(ngen_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 	m_fdc->set_force_ready(true);
-	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_pic,pic8259_device,ir5_w))  // clocked on FDC data register access
-	MCFG_PIT8253_CLK1(20_MHz_XTAL / 20)
-//  MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_pic,pic8259_device,ir5_w))  // 1MHz
-	MCFG_PIT8253_CLK2(20_MHz_XTAL / 20)
-//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(m_pic,pic8259_device,ir5_w))
+
+	PIT8253(config, m_fdc_timer, 0);
+	m_fdc_timer->set_clk<0>(0);
+	m_fdc_timer->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir5_w));  // clocked on FDC data register access
+	m_fdc_timer->set_clk<1>(20_MHz_XTAL / 20);
+//  m_fdc_timer->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w));  // 1MHz
+	m_fdc_timer->set_clk<2>(20_MHz_XTAL / 20);
+//  m_fdc_timer->out_handler<2>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
 	// TODO: WD1010 HDC (not implemented), use WD2010 for now
 	WD2010(config, m_hdc, 20_MHz_XTAL / 4);
@@ -1034,8 +1035,9 @@ MACHINE_CONFIG_START(ngen_state::ngen)
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
-	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
-	MCFG_PIT8253_CLK2(20_MHz_XTAL / 10)  // 2MHz
+	PIT8253(config, m_hdc_timer, 0);
+	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
+
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_HARDDISK_ADD("hard0")
 
@@ -1127,13 +1129,14 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	m_fdc->intrq_wr_callback().set(FUNC(ngen386_state::fdc_irq_w));
 	//m_fdc->drq_wr_callback().set(m_i386cpu, FUNC(i80186_cpu_device_device::drq1_w));
 	m_fdc->set_force_ready(true);
-	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))  // clocked on FDC data register access
-	MCFG_PIT8253_CLK1(20_MHz_XTAL / 20)
-//  MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))  // 1MHz
-	MCFG_PIT8253_CLK2(20_MHz_XTAL / 20)
-//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic",pic8259_device,ir5_w))
+
+	PIT8253(config, m_fdc_timer, 0);
+	m_fdc_timer->set_clk<0>(0);
+	m_fdc_timer->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir5_w));  // clocked on FDC data register access
+	m_fdc_timer->set_clk<1>(20_MHz_XTAL / 20);
+//  m_fdc_timer->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w));  // 1MHz
+	m_fdc_timer->set_clk<2>(20_MHz_XTAL / 20);
+//  m_fdc_timer->out_handler<2>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
 	// TODO: WD1010 HDC (not implemented), use WD2010 for now
 	WD2010(config, m_hdc, 20_MHz_XTAL / 4);
@@ -1146,8 +1149,9 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
-	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
-	MCFG_PIT8253_CLK2(20_MHz_XTAL / 10)  // 2MHz
+	PIT8253(config, m_hdc_timer, 0);
+	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
+
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_HARDDISK_ADD("hard0")
 MACHINE_CONFIG_END
