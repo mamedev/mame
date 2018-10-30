@@ -58,14 +58,14 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
-	DECLARE_READ8_MEMBER(pbactio3_prot_kludge_r);
+	DECLARE_READ8_MEMBER(pbaction2_prot_kludge_r);
 	DECLARE_WRITE8_MEMBER(pbaction_videoram_w);
 	DECLARE_WRITE8_MEMBER(pbaction_colorram_w);
 	DECLARE_WRITE8_MEMBER(pbaction_videoram2_w);
 	DECLARE_WRITE8_MEMBER(pbaction_colorram2_w);
 	DECLARE_WRITE8_MEMBER(pbaction_scroll_w);
 	DECLARE_WRITE8_MEMBER(pbaction_flipscreen_w);
-	void init_pbactio3();
+	void init_pbaction2();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
