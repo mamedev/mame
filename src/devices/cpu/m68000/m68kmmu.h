@@ -15,43 +15,41 @@
 #define MMULOG(...)
 #endif
 
-static constexpr uint16_t M68K_MMU_SR_BUS_ERROR = 0x8000;
+static constexpr uint16_t M68K_MMU_SR_BUS_ERROR       = 0x8000;
 static constexpr uint16_t M68K_MMU_SR_SUPERVISOR_ONLY = 0x2000;
-static constexpr uint16_t M68K_MMU_SR_WRITE_PROTECT = 0x0800;
-static constexpr uint16_t M68K_MMU_SR_INVALID = 0x0400;
-static constexpr uint16_t M68K_MMU_SR_MODIFIED = 0x0200;
-static constexpr uint16_t M68K_MMU_SR_TRANSPARENT = 0x0040;
-static constexpr uint16_t M68K_MMU_SR_LEVEL_0 = 0x0000;
-static constexpr uint16_t M68K_MMU_SR_LEVEL_1 = 0x0001;
-static constexpr uint16_t M68K_MMU_SR_LEVEL_2 = 0x0002;
-static constexpr uint16_t M68K_MMU_SR_LEVEL_3 = 0x0003;
+static constexpr uint16_t M68K_MMU_SR_WRITE_PROTECT   = 0x0800;
+static constexpr uint16_t M68K_MMU_SR_INVALID         = 0x0400;
+static constexpr uint16_t M68K_MMU_SR_MODIFIED        = 0x0200;
+static constexpr uint16_t M68K_MMU_SR_TRANSPARENT     = 0x0040;
 
 // MMU translation table descriptor field definitions
 
-static constexpr int M68K_MMU_DF_DT         = 0x0003;
-static constexpr int M68K_MMU_DF_DT0        = 0x0000;
-static constexpr int M68K_MMU_DF_DT1        = 0x0001;
-static constexpr int M68K_MMU_DF_DT2        = 0x0002;
-static constexpr int M68K_MMU_DF_DT3        = 0x0003;
-static constexpr int M68K_MMU_DF_WP         = 0x0004;
-static constexpr int M68K_MMU_DF_USED       = 0x0008;
-static constexpr int M68K_MMU_DF_MODIFIED   = 0x0010;
-static constexpr int M68K_MMU_DF_CI         = 0x0040;
-static constexpr int M68K_MMU_DF_SUPERVISOR = 0x0100;
-
+static constexpr uint32_t M68K_MMU_DF_DT              = 0x00000003;
+static constexpr uint32_t M68K_MMU_DF_DT_INVALID      = 0x00000000;
+static constexpr uint32_t M68K_MMU_DF_PAGE            = 0x00000001;
+static constexpr uint32_t M68K_MMU_DF_DT_TABLE_4BYTE     = 0x00000002;
+static constexpr uint32_t M68K_MMU_DF_DT_TABLE_8BYTE     = 0x00000003;
+static constexpr uint32_t M68K_MMU_DF_WP              = 0x00000004;
+static constexpr uint32_t M68K_MMU_DF_USED            = 0x00000008;
+static constexpr uint32_t M68K_MMU_DF_MODIFIED        = 0x00000010;
+static constexpr uint32_t M68K_MMU_DF_CI              = 0x00000040;
+static constexpr uint32_t M68K_MMU_DF_SUPERVISOR      = 0000000100;
+static constexpr uint32_t M68K_MMU_DF_ADDR_MASK       = 0xfffffff0;
+static constexpr uint32_t M68K_MMU_DF_IND_ADDR_MASK   = 0xfffffffc;
 // MMU ATC Fields
 
-static constexpr int M68K_MMU_ATC_BUSERROR  = 0x08000000;
-static constexpr int M68K_MMU_ATC_CACHE_IN  = 0x04000000;
-static constexpr int M68K_MMU_ATC_WRITE_PR  = 0x02000000;
-static constexpr int M68K_MMU_ATC_MODIFIED  = 0x01000000;
-static constexpr int M68K_MMU_ATC_MASK      = 0x00ffffff;
-static constexpr int M68K_MMU_ATC_SHIFT     = 8;
-static constexpr int M68K_MMU_ATC_VALID     = 0x08000000;
+static constexpr uint32_t M68K_MMU_ATC_BUSERROR       = 0x08000000;
+static constexpr uint32_t M68K_MMU_ATC_CACHE_IN       = 0x04000000;
+static constexpr uint32_t M68K_MMU_ATC_WRITE_PR       = 0x02000000;
+static constexpr uint32_t M68K_MMU_ATC_MODIFIED       = 0x01000000;
+static constexpr uint32_t M68K_MMU_ATC_MASK           = 0x00ffffff;
+static constexpr uint32_t M68K_MMU_ATC_SHIFT          = 8;
+static constexpr uint32_t M68K_MMU_ATC_VALID          = 0x08000000;
 
 // MMU Translation Control register
-static constexpr int M68K_MMU_TC_SRE        = 0x02000000;
-static constexpr int M68K_MMU_TC_FCL        = 0x01000000;
+static constexpr uint32_t M68K_MMU_TC_SRE             = 0x02000000;
+static constexpr uint32_t M68K_MMU_TC_FCL             = 0x01000000;
+
 
 /* decodes the effective address */
 uint32_t DECODE_EA_32(int ea)
@@ -269,9 +267,9 @@ inline uint32_t get_dt3_table_entry(uint32_t tptr, uint8_t fc, const bool rw, ui
 	m_mmu_tmp_sr |= ((tbl_entry2 & 0x0100) && !(fc & 4)) ? M68K_MMU_SR_SUPERVISOR_ONLY : 0;
 	m_mmu_tmp_sr |= tbl_entry2 & 0x0004 ? M68K_MMU_SR_WRITE_PROTECT : 0;
 
-	if (!ptest && dt != M68K_MMU_DF_DT0)
+	if (!ptest && dt != M68K_MMU_DF_DT_INVALID)
 	{
-		if (dt == M68K_MMU_DF_DT1 && !rw && !(m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
+		if (dt == M68K_MMU_DF_PAGE && !rw && !(m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
 		{
 			// set modified
 			m_program->write_dword( tptr, tbl_entry2 | M68K_MMU_DF_USED | M68K_MMU_DF_MODIFIED);
@@ -360,17 +358,17 @@ bool pmmu_walk_table(uint32_t& tbl_entry, int &type, uint32_t addr_in, int shift
 		return true;
 	}
 
-	m_mmu_tmp_sr &= 0xfffffff0;
+	m_mmu_tmp_sr &= ~M68K_MMU_DF_DT;
 	m_mmu_tmp_sr |= level;
 
 	switch (type)
 	{
-		case M68K_MMU_DF_DT0:   // invalid, will cause MMU exception
+		case M68K_MMU_DF_DT_INVALID:   // invalid, will cause MMU exception
 			m_mmu_tmp_sr |= M68K_MMU_SR_INVALID;
 			MMULOG("PMMU: DT0 PC=%x (addr_in %08x -> %08x)\n", m_ppc, addr_in, addr_out);
 			return true;
 
-		case M68K_MMU_DF_DT1:   // page descriptor, will cause direct mapping
+		case M68K_MMU_DF_PAGE:   // page descriptor, will cause direct mapping
 			if (tbl_entry & M68K_MMU_DF_MODIFIED)
 			{
 				MMULOG("%s: set modified in SR\n", __func__);
@@ -392,7 +390,7 @@ bool pmmu_walk_table(uint32_t& tbl_entry, int &type, uint32_t addr_in, int shift
 			MMULOG("PMMU: DT1 PC=%x (addr_in %08x -> %08x)\n", m_ppc, addr_in, addr_out);
 			return true;
 
-		case M68K_MMU_DF_DT2:   // valid 4 byte descriptors
+		case M68K_MMU_DF_DT_TABLE_4BYTE:   // valid 4 byte descriptors
 			tofs *= 4;
 
 			if (bits)
@@ -408,12 +406,12 @@ bool pmmu_walk_table(uint32_t& tbl_entry, int &type, uint32_t addr_in, int shift
 					m_mmu_tmp_sr |= M68K_MMU_SR_WRITE_PROTECT;
 				}
 
-				addr_out = (tbl_entry & 0xfffffff0) + tofs;
+				addr_out = (tbl_entry & M68K_MMU_DF_ADDR_MASK) + tofs;
 			}
 			else
 			{
 				// Indirect descriptor (no flags, but 30 bit address)
-				addr_out = (tbl_entry & 0xfffffffc);
+				addr_out = (tbl_entry & M68K_MMU_DF_IND_ADDR_MASK);
 			}
 			tbl_entry = m_program->read_dword(addr_out);
 			type = tbl_entry & M68K_MMU_DF_DT;
@@ -421,9 +419,9 @@ bool pmmu_walk_table(uint32_t& tbl_entry, int &type, uint32_t addr_in, int shift
 
 				return false;
 
-		case M68K_MMU_DF_DT3: // valid 8 byte descriptors
+		case M68K_MMU_DF_DT_TABLE_8BYTE: // valid 8 byte descriptors
 			tofs *= 8;
-			addr_out = (tbl_entry & 0xfffffff0) + tofs;
+			addr_out = (tbl_entry & M68K_MMU_DF_ADDR_MASK) + tofs;
 			tbl_entry = get_dt3_table_entry(addr_out, fc,  rw, ptest);
 			MMULOG("PMMU: DT3 read table A entries at %08x = %08x\n", addr_out, tbl_entry);
 			return false;
@@ -471,12 +469,12 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, bool
 	// if SRP is enabled and we're in supervisor mode, use it
 	if ((m_mmu_tc & M68K_MMU_TC_SRE) && (fc & 4))
 	{
-		tbl_entry = m_mmu_srp_aptr & 0xfffffff0;
+		tbl_entry = m_mmu_srp_aptr & M68K_MMU_DF_ADDR_MASK;
 		type = m_mmu_srp_limit & M68K_MMU_DF_DT;
 	}
 	else    // else use the CRP
 	{
-		tbl_entry = m_mmu_crp_aptr & 0xfffffff0;
+		tbl_entry = m_mmu_crp_aptr & M68K_MMU_DF_ADDR_MASK;
 		type = m_mmu_crp_limit & M68K_MMU_DF_DT;
 	}
 
