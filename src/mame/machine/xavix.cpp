@@ -15,8 +15,8 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 	{
 		if (m_irqsource & 0x20)
 		{
-			m_maincpu->set_input_line(0, CLEAR_LINE);
 			m_irqsource &= ~0x20;
+			update_irqs();
 		}
 	}
 
@@ -44,7 +44,7 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 		if (data & 0x40) // or merely the absense of 0x80 being set? (ttv_lotr and drgqst are the only games needing the IRQ and both set 0x40 tho)
 		{
 			m_irqsource |= 0x20;
-			m_maincpu->set_input_line(0, ASSERT_LINE);
+			update_irqs();
 		}
 
 	}
@@ -206,8 +206,6 @@ READ8_MEMBER(xavix_state::dispctrl_6ff8_r)
 
 WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 {
-	// I think this is something to do with IRQ ack / enable
-
 	// 0x80 = main IRQ ack?
 	// 0x40 = raster IRQ ack?
 	// 0x20 = main IRQ enable
@@ -215,7 +213,8 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 
 	if (data & 0x40)
 	{
-		m_maincpu->set_input_line(0, CLEAR_LINE);
+		m_irqsource &= ~0x40;
+		update_irqs();
 	}
 
 	if (data & 0x80)
@@ -227,14 +226,27 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 	//  printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
 }
 
+void xavix_state::update_irqs()
+{
+	if (m_irqsource != 0x00)
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+	}
+}
 
 TIMER_CALLBACK_MEMBER(xavix_state::interrupt_gen)
 {
 	if (m_video_ctrl & 0x10)
 	{
 		//printf("callback on scanline %d %d with IRQ enabled\n", m_screen->vpos(), m_screen->hpos());
-		m_maincpu->set_input_line(0, ASSERT_LINE);
 		m_video_ctrl |= 0x40;
+		m_irqsource |= 0x40;
+		update_irqs();
+
 		m_screen->update_partial(m_screen->vpos());
 	}
 	m_interrupt_timer->adjust(attotime::never, 0);
@@ -497,8 +509,6 @@ void xavix_state::machine_start()
 	std::fill_n(&m_mainram[0], 0x4000, 0xff);
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
-
-	m_irqsource = 0x40;
 }
 
 void xavix_state::machine_reset()
@@ -553,6 +563,7 @@ void xavix_state::machine_reset()
 	m_io0_direction = 0x00;
 	m_io1_direction = 0x00;
 
+	m_irqsource = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;

@@ -206,6 +206,7 @@ void superxavix_lowbus_map(address_map &map);
 	required_device<xavix_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	
+	void update_irqs();
 	uint8_t m_irqsource;
 
 	uint8_t m_vectorenable;

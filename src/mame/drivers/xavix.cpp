@@ -1014,51 +1014,51 @@ ROM_END
 
 /* Standalone TV Games */
 
-CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_IS_SKELETON )
+CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_IS_SKELETON )
+CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2000, rad_ping,  0,          0,  xavix,  rad_ping, xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2000, rad_ping,  0,          0,  xavix,  rad_ping, xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 
-CONS( 2003, rad_mtrk,  0,          0,  xavix,  rad_mtrk, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_IS_SKELETON )
-CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavixp, rad_mtrkp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_IS_SKELETON )
+CONS( 2003, rad_mtrk,  0,          0,  xavix,  rad_mtrk, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavixp, rad_mtrkp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxin' (NTSC)", MACHINE_IS_SKELETON)
-CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxin' (PAL)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IS_SKELETON)
-CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 2002, rad_bb2,   0,          0,  xavix,  rad_bb2,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
+CONS( 2002, rad_bb2,   0,          0,  xavix,  rad_bb2,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  rad_bass, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bass,  0,          0,  xavix,  rad_bass, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
-CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
+CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // no Play TV branding, USA only release?
 
-CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
+CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // USA only release? doesn't change logo for PAL
 
-CONS( 200?, rad_rh,    0,          0,  xavix,  rad_rh,   xavix_state, init_xavix,    "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_IS_SKELETON)
+CONS( 200?, rad_rh,    0,          0,  xavix,  rad_rh,   xavix_state, init_xavix,    "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  xavix,    xavix_state, init_xavix,    "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_IS_SKELETON)
+CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  xavix,    xavix_state, init_xavix,    "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
+CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, eka_base,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+CONS( 200?, eka_base,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT)
 
-CONS( 200?, eka_strt,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, eka_strt,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, eka_vol1,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
+CONS( 200?, eka_vol1,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // insert calls it 'HIT MIX Vol 1'
 
-CONS( 200?, eka_vol2,  eka_base,   0,   xavix,  xavix  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
+CONS( 200?, eka_vol2,  eka_base,   0,   xavix,  xavix  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // insert calls it 'HIT MIX Vol 2'
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
@@ -1093,9 +1093,9 @@ ROM_START( drgqst )
 ROM_END
 
 
-CONS( 2004, xavtenni, 0, 0, xavix2000_i2c_24c04, xavix, xavix_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
+CONS( 2004, xavtenni, 0, 0, xavix2000_i2c_24c04, xavix, xavix_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx, xavix_state, init_xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
-CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, xavix, xavix_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx, xavix_state, init_xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, xavix, xavix_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
