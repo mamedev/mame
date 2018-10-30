@@ -72,56 +72,34 @@ WRITE8_MEMBER(fantland_state::fantland_nmi_enable_w)
 		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", m_maincpu->pc(), data);
 }
 
-WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
-{
-	if (ACCESSING_BITS_0_7)
-		fantland_nmi_enable_w(space, offset * 2, data);
-}
-
-WRITE8_MEMBER(fantland_state::fantland_soundlatch_w)
+WRITE8_MEMBER(fantland_state::soundlatch_w)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-WRITE16_MEMBER(fantland_state::fantland_soundlatch_16_w)
-{
-	if (ACCESSING_BITS_0_7)
-		fantland_soundlatch_w(space, offset * 2, data);
 }
 
 /***************************************************************************
                                 Fantasy Land
 ***************************************************************************/
 
-READ16_MEMBER(fantland_state::spriteram_16_r)
+READ8_MEMBER(fantland_state::spriteram_r)
 {
-	uint8_t *spriteram = m_spriteram;
-	return spriteram[2 * offset + 0] | (spriteram[2 * offset + 1] << 8);
+	return m_spriteram[offset];
 }
 
-READ16_MEMBER(fantland_state::spriteram2_16_r)
+READ8_MEMBER(fantland_state::spriteram2_r)
 {
-	uint8_t *spriteram_2 = m_spriteram2;
-	return spriteram_2[2 * offset + 0] | (spriteram_2[2 * offset + 1] << 8);
+	return m_spriteram2[offset];
 }
 
-WRITE16_MEMBER(fantland_state::spriteram_16_w)
+WRITE8_MEMBER(fantland_state::spriteram_w)
 {
-	uint8_t *spriteram = m_spriteram;
-	if (ACCESSING_BITS_0_7)
-		spriteram[2 * offset + 0] = data;
-	if (ACCESSING_BITS_8_15)
-		spriteram[2 * offset + 1] = data >> 8;
+	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-WRITE16_MEMBER(fantland_state::spriteram2_16_w)
+WRITE8_MEMBER(fantland_state::spriteram2_w)
 {
-	uint8_t *spriteram_2 = m_spriteram2;
-	if (ACCESSING_BITS_0_7)
-		spriteram_2[2 * offset + 0] = data;
-	if (ACCESSING_BITS_8_15)
-		spriteram_2[2 * offset + 1] = data >> 8;
+	COMBINE_DATA(&m_spriteram2[offset]);
 }
 
 void fantland_state::fantland_map(address_map &map)
@@ -131,11 +109,13 @@ void fantland_state::fantland_map(address_map &map)
 
 	map(0xa2000, 0xa21ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0xa3000, 0xa3001).portr("a3000").w(FUNC(fantland_state::fantland_nmi_enable_16_w));
-	map(0xa3002, 0xa3003).portr("a3002").w(FUNC(fantland_state::fantland_soundlatch_16_w));
+	map(0xa3000, 0xa3000).w(FUNC(fantland_state::fantland_nmi_enable_w));
+	map(0xa3000, 0xa3001).portr("a3000");
+	map(0xa3002, 0xa3002).w(FUNC(fantland_state::soundlatch_w));
+	map(0xa3002, 0xa3003).portr("a3002");
 
-	map(0xa4000, 0xa67ff).rw(FUNC(fantland_state::spriteram_16_r), FUNC(fantland_state::spriteram_16_w)).share("spriteram");
-	map(0xc0000, 0xcffff).rw(FUNC(fantland_state::spriteram2_16_r), FUNC(fantland_state::spriteram2_16_w)).share("spriteram2");
+	map(0xa4000, 0xa67ff).rw(FUNC(fantland_state::spriteram_r), FUNC(fantland_state::spriteram_w)).share("spriteram");
+	map(0xc0000, 0xcffff).rw(FUNC(fantland_state::spriteram2_r), FUNC(fantland_state::spriteram2_w)).share("spriteram2");
 
 	map(0xe0000, 0xfffff).rom();
 }
@@ -154,7 +134,7 @@ void fantland_state::galaxygn_map(address_map &map)
 
 	map(0x53000, 0x53000).portr("P1").w(FUNC(fantland_state::fantland_nmi_enable_w));
 	map(0x53001, 0x53001).portr("P2");
-	map(0x53002, 0x53002).portr("DSW1").w(FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53002, 0x53002).portr("DSW1").w(FUNC(fantland_state::soundlatch_w));
 	map(0x53003, 0x53003).portr("DSW2");
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -245,7 +225,7 @@ void fantland_state::borntofi_map(address_map &map)
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x53000, 0x53001).rw(FUNC(fantland_state::borntofi_inputs_r), FUNC(fantland_state::borntofi_nmi_enable_w));
-	map(0x53002, 0x53002).portr("DSW").w(FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53002, 0x53002).portr("DSW").w(FUNC(fantland_state::soundlatch_w));
 	map(0x53003, 0x53003).portr("Controls");
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -277,7 +257,7 @@ void fantland_state::wheelrun_map(address_map &map)
 
 	map(0x53000, 0x53000).portr("53000").w(FUNC(fantland_state::borntofi_nmi_enable_w));
 	map(0x53001, 0x53001).portr("53001");
-	map(0x53002, 0x53002).portr("53002").w(FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53002, 0x53002).portr("53002").w(FUNC(fantland_state::soundlatch_w));
 	map(0x53003, 0x53003).portr("53003").nopw();
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -319,17 +299,17 @@ void fantland_state::galaxygn_sound_iomap(address_map &map)
                            Born To Fight
 ***************************************************************************/
 
-void fantland_state::borntofi_adpcm_start( msm5205_device *device, int voice )
+void fantland_state::borntofi_adpcm_start( int voice )
 {
-	device->reset_w(0);
+	m_msm[voice]->reset_w(0);
 	m_adpcm_playing[voice] = 1;
 	m_adpcm_nibble[voice] = 0;
 //  logerror("%s: adpcm start = %06x, stop = %06x\n", device->machine().describe_context(), m_adpcm_addr[0][voice], m_adpcm_addr[1][voice]);
 }
 
-void fantland_state::borntofi_adpcm_stop( msm5205_device *device, int voice )
+void fantland_state::borntofi_adpcm_stop( int voice )
 {
-	device->reset_w(1);
+	m_msm[voice]->reset_w(1);
 	m_adpcm_playing[voice] = 0;
 }
 
@@ -337,24 +317,14 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 {
 	int voice = offset / 8;
 	int reg = offset % 8;
-	msm5205_device *msm;
-
-	switch (voice)
-	{
-		default:
-		case 0: msm = m_msm1; break;
-		case 1: msm = m_msm2; break;
-		case 2: msm = m_msm3; break;
-		case 3: msm = m_msm4; break;
-	}
 
 	if (reg == 0)
 	{
 		// Play / Stop
 		switch(data)
 		{
-			case 0x00:      borntofi_adpcm_stop(msm, voice); break;
-			case 0x03:      borntofi_adpcm_start(msm, voice); break;
+			case 0x00:      borntofi_adpcm_stop(voice); break;
+			case 0x03:      borntofi_adpcm_start(voice); break;
 			default:        logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", m_audiocpu->pc(), reg, data);
 		}
 	}
@@ -368,43 +338,38 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 	}
 }
 
-void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
+void fantland_state::borntofi_adpcm_int( int voice )
 {
-	uint8_t *rom;
-	size_t len;
-	int start, stop;
-
 	if (!m_adpcm_playing[voice])
 		return;
 
-	rom = memregion("adpcm")->base();
-	len = memregion("adpcm")->bytes() * 2;
+	size_t const len = m_adpcm_rom.bytes() * 2;
 
-	start = m_adpcm_addr[0][voice] + m_adpcm_nibble[voice];
-	stop = m_adpcm_addr[1][voice];
+	int const start = m_adpcm_addr[0][voice] + m_adpcm_nibble[voice];
+	int const stop = m_adpcm_addr[1][voice];
 
 	if (start >= len)
 	{
-		borntofi_adpcm_stop(device, voice);
+		borntofi_adpcm_stop(voice);
 		logerror("adpcm address out of range: %06x\n", start);
 		return;
 	}
 
 	if (start >= stop)
 	{
-		borntofi_adpcm_stop(device, voice);
+		borntofi_adpcm_stop(voice);
 	}
 	else
 	{
-		device->write_data(rom[start / 2] >> ((start & 1) * 4));
+		m_msm[voice]->write_data(m_adpcm_rom[start / 2] >> ((start & 1) * 4));
 		m_adpcm_nibble[voice]++;
 	}
 }
 
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_0) { borntofi_adpcm_int(m_msm1, 0); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_1) { borntofi_adpcm_int(m_msm2, 1); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_2) { borntofi_adpcm_int(m_msm3, 2); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_3) { borntofi_adpcm_int(m_msm4, 3); }
+WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_0) { borntofi_adpcm_int(0); }
+WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_1) { borntofi_adpcm_int(1); }
+WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_2) { borntofi_adpcm_int(2); }
+WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_3) { borntofi_adpcm_int(3); }
 
 
 void fantland_state::borntofi_sound_map(address_map &map)
@@ -827,12 +792,12 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(fantland_state,fantland)
+void fantland_state::machine_start()
 {
 	save_item(NAME(m_nmi_enable));
 }
 
-MACHINE_RESET_MEMBER(fantland_state,fantland)
+void fantland_state::machine_reset()
 {
 	m_nmi_enable = 0;
 }
@@ -860,9 +825,6 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(fantland_state, fantland_sound_irq,  8000)
 	// NMI when soundlatch is written
 
-	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
-	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
-
 	MCFG_QUANTUM_TIME(attotime::from_hz(8000))  // sound irq must feed the DAC at 8kHz
 
 	/* video hardware */
@@ -871,7 +833,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(352,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
+	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
@@ -910,16 +872,13 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_DEVICE_IO_MAP(galaxygn_sound_iomap)
 	// IRQ by YM2151, NMI when soundlatch is written
 
-	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
-	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(352,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
+	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
@@ -941,7 +900,7 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(fantland_state,borntofi)
 {
-	MACHINE_START_CALL_MEMBER(fantland);
+	machine_start();
 
 	save_item(NAME(m_old_x));
 	save_item(NAME(m_old_y));
@@ -957,7 +916,7 @@ MACHINE_RESET_MEMBER(fantland_state,borntofi)
 {
 	int i;
 
-	MACHINE_RESET_CALL_MEMBER(fantland);
+	machine_reset();
 
 	for (i = 0; i < 2; i++)
 	{
@@ -975,10 +934,10 @@ MACHINE_RESET_MEMBER(fantland_state,borntofi)
 		m_adpcm_nibble[i] = 0;
 	}
 
-	borntofi_adpcm_stop(m_msm1, 0);
-	borntofi_adpcm_stop(m_msm2, 1);
-	borntofi_adpcm_stop(m_msm3, 2);
-	borntofi_adpcm_stop(m_msm4, 3);
+	borntofi_adpcm_stop(0);
+	borntofi_adpcm_stop(1);
+	borntofi_adpcm_stop(2);
+	borntofi_adpcm_stop(3);
 }
 
 MACHINE_CONFIG_START(fantland_state::borntofi)
@@ -999,7 +958,7 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(352,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
+	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
@@ -1045,16 +1004,13 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_DEVICE_PROGRAM_MAP(wheelrun_sound_map)
 	// IRQ by YM3526, NMI when soundlatch is written
 
-	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
-	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256,224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
+	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
