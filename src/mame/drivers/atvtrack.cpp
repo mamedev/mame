@@ -695,7 +695,7 @@ REF 010131
 
 */
 
-ROM_START( smashdrv )
+ROM_START( smashdrv ) // Version: 3.3, Version 3D: 1.9, Checksum: 707C 
 	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
 	ROM_LOAD("prg.ic23", 0x0000000, 0x0400000, CRC(5cc6d3ac) SHA1(0c8426774212d891796b59c95b8c70f64db5b67a) )
 
