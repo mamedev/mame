@@ -180,10 +180,14 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(sound_75fe_w);
 	DECLARE_WRITE8_MEMBER(sound_75ff_w);
 
+	DECLARE_READ8_MEMBER(timer_status_r);
 	DECLARE_WRITE8_MEMBER(timer_control_w);
 	DECLARE_READ8_MEMBER(timer_baseval_r);
 	DECLARE_WRITE8_MEMBER(timer_baseval_w);
+	DECLARE_READ8_MEMBER(timer_freq_r);
 	DECLARE_WRITE8_MEMBER(timer_freq_w);
+	uint8_t m_timer_control;
+	uint8_t m_timer_freq;
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);

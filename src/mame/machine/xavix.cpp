@@ -391,9 +391,17 @@ READ8_MEMBER(xavix_state::timer_baseval_r)
 	return m_timer_baseval;
 }
 
+READ8_MEMBER(xavix_state::timer_status_r)
+{
+	uint8_t ret = m_timer_control;
+	LOG("%s: timer_status_r\n", machine().describe_context());
+	return ret;
+}
+
 WRITE8_MEMBER(xavix_state::timer_control_w)
 {
 	LOG("%s: timer_control_w %02x\n", machine().describe_context(), data);
+	m_timer_control = data;
 }
 
 WRITE8_MEMBER(xavix_state::timer_baseval_w)
@@ -403,10 +411,40 @@ WRITE8_MEMBER(xavix_state::timer_baseval_w)
 	LOG("%s: timer_baseval_w %02x\n", machine().describe_context(), data);
 }
 
+READ8_MEMBER(xavix_state::timer_freq_r)
+{
+	LOG("%s: timer_freq_r\n", machine().describe_context());
+	return m_timer_freq;
+}
+
 WRITE8_MEMBER(xavix_state::timer_freq_w)
 {
 	// 4-bit prescale
 	LOG("%s: timer_freq_w %02x\n", machine().describe_context(), data);
+
+	/* if master clock (MC) is XTAL(21'477'272) (NTSC master)
+
+	   0x0 = MC / 2      = 10.738636 MHz
+	   0x1 = MC / 4      = 5.369318 MHz
+	   0x2 = MC / 8      = 2.684659 MHz
+	   0x3 = MC / 16     = 1.3423295 MHz
+	   0x4 = MC / 32     = 671.16475 kHz
+	   0x5 = MC / 64     = 335.582375 kHz
+	   0x6 = MC / 128    = 167.7911875 kHz
+	   0x7 = MC / 256    = 83.89559375 kHz
+	   0x8 = MC / 512    = 41.947796875 kHz
+	   0x9 = MC / 1024   = 20.9738984375 kHz
+	   0xa = MC / 2048   = 10.48694921875 kHz
+	   0xb = MC / 4096   = 5.243474609375 kHz
+	   0xc = MC / 8192   = 2.6217373046875 kHz
+	   0xd = MC / 16384  = 1.31086865234375 kHz
+	   0xe = MC / 32768  = 655.434326171875 Hz
+	   0xf = MC / 65536  = 327.7171630859375 Hz
+	*/
+	m_timer_freq = data & 0x0f;
+
+	if (data & 0xf0)
+		LOG("%s: unexpected upper bits in timer freq %02x\n", machine().describe_context(), data & 0xf0);
 }
 
 
@@ -564,6 +602,8 @@ void xavix_state::machine_reset()
 	m_io1_direction = 0x00;
 
 	m_irqsource = 0x00;
+
+	m_timer_control = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
