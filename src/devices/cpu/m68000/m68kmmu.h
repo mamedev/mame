@@ -423,6 +423,8 @@ bool pmmu_walk_table(uint32_t& tbl_entry, int &type, uint32_t addr_in, int shift
 			tofs *= 8;
 			addr_out = (tbl_entry & M68K_MMU_DF_ADDR_MASK) + tofs;
 			tbl_entry = get_dt3_table_entry(addr_out, fc,  rw, ptest);
+			type = tbl_entry & M68K_MMU_DF_DT;
+			level++;
 			MMULOG("PMMU: DT3 read table A entries at %08x = %08x\n", addr_out, tbl_entry);
 			return false;
 	}
