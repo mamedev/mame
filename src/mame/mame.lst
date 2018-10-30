@@ -30900,7 +30900,7 @@ pbaction                        // (c) 1985 Tehkan
 pbaction2                       // (c) 1985 Tehkan
 pbaction3                       // (c) 1985 Tehkan
 pbaction4                       // (c) 1985 Tehkan
-pbaction5                       // (c) 1985 Tehkan
+pbactiont                       // (c) 1985 Tehkan (Tecfri license)
 
 @source:pc.cpp
 ataripc1                        // Atari PC1
