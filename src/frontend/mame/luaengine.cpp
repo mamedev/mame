@@ -1718,13 +1718,13 @@ void lua_engine::initialize()
 			"max_update_rate", &render_manager::max_update_rate,
 			"ui_target", &render_manager::ui_target,
 			"ui_container", &render_manager::ui_container,
-			"targets", [this](render_manager &r) {
+			"targets", sol::property([this](render_manager &r) {
 					sol::table target_table = sol().create_table();
 					int tc = 0;
 					for(render_target &curr_rt : r.targets())
 						target_table[tc++] = &curr_rt;
 					return target_table;
-				});
+				}));
 
 /* machine.screens[screen_tag]
  * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol
