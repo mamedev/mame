@@ -1711,7 +1711,7 @@ void lua_engine::initialize()
  * render:max_update_rate() -
  * render:ui_target() - target for ui drawing
  * render:ui_container() - container for ui drawing
- * render.target[] - render_target table
+ * render.targets[] - render_target table
  */
 
 	sol().registry().new_usertype<render_manager>("render", "new", sol::no_constructor,
