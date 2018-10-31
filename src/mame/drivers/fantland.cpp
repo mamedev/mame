@@ -64,7 +64,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fantland_state::fantland_nmi_enable_w)
+WRITE8_MEMBER(fantland_state::nmi_enable_w)
 {
 	m_nmi_enable = data;
 
@@ -105,11 +105,12 @@ WRITE8_MEMBER(fantland_state::spriteram2_w)
 void fantland_state::fantland_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
-	map(0x08000, 0x7ffff).rom();
+	map(0x08000, 0x3ffff).rom().region("maincpu", 0x08000);
+	map(0x40000, 0x7ffff).rom().region("maincpu", 0x00000);
 
 	map(0xa2000, 0xa21ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0xa3000, 0xa3000).w(FUNC(fantland_state::fantland_nmi_enable_w));
+	map(0xa3000, 0xa3000).w(FUNC(fantland_state::nmi_enable_w));
 	map(0xa3000, 0xa3001).portr("a3000");
 	map(0xa3002, 0xa3002).w(FUNC(fantland_state::soundlatch_w));
 	map(0xa3002, 0xa3003).portr("a3002");
@@ -117,7 +118,7 @@ void fantland_state::fantland_map(address_map &map)
 	map(0xa4000, 0xa67ff).rw(FUNC(fantland_state::spriteram_r), FUNC(fantland_state::spriteram_w)).share("spriteram");
 	map(0xc0000, 0xcffff).rw(FUNC(fantland_state::spriteram2_r), FUNC(fantland_state::spriteram2_w)).share("spriteram2");
 
-	map(0xe0000, 0xfffff).rom();
+	map(0xe0000, 0xfffff).rom().region("maincpu", 0xe0000);
 }
 
 
@@ -128,11 +129,11 @@ void fantland_state::fantland_map(address_map &map)
 void fantland_state::galaxygn_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
-	map(0x10000, 0x2ffff).rom();
+	map(0x10000, 0x2ffff).rom().region("maincpu", 0x10000);
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0x53000, 0x53000).portr("P1").w(FUNC(fantland_state::fantland_nmi_enable_w));
+	map(0x53000, 0x53000).portr("P1").w(FUNC(fantland_state::nmi_enable_w));
 	map(0x53001, 0x53001).portr("P2");
 	map(0x53002, 0x53002).portr("DSW1").w(FUNC(fantland_state::soundlatch_w));
 	map(0x53003, 0x53003).portr("DSW2");
@@ -140,8 +141,7 @@ void fantland_state::galaxygn_map(address_map &map)
 	map(0x54000, 0x567ff).ram().share("spriteram");
 	map(0x60000, 0x6ffff).ram().share("spriteram2");
 
-	map(0x70000, 0x7ffff).rom();
-	map(0xf0000, 0xfffff).rom();
+	map(0x70000, 0x7ffff).rom().region("maincpu", 0x70000).mirror(0x80000);
 }
 
 
@@ -149,20 +149,21 @@ void fantland_state::galaxygn_map(address_map &map)
                            Born To Fight
 ***************************************************************************/
 
-WRITE8_MEMBER(fantland_state::borntofi_nmi_enable_w)
+// data & 0x31 changes when lightgun fires
+#if 0
+WRITE8_MEMBER(borntofi_state::nmi_enable_w)
 {
 	m_nmi_enable = data;
-
-	// data & 0x31 changes when lightgun fires
 
 	if ((m_nmi_enable != 0) && (m_nmi_enable != 8))
 		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", m_maincpu->pc(), data);
 
 //  popmessage("%02X", data);
 }
+#endif
 
 // Trackball doesn't work correctly
-READ8_MEMBER(fantland_state::borntofi_inputs_r)
+READ8_MEMBER(borntofi_state::inputs_r)
 {
 	int x, y, f;
 
@@ -218,14 +219,14 @@ READ8_MEMBER(fantland_state::borntofi_inputs_r)
 	return m_input_ret[offset];
 }
 
-void fantland_state::borntofi_map(address_map &map)
+void borntofi_state::main_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
-	map(0x10000, 0x2ffff).rom();
+	map(0x10000, 0x2ffff).rom().region("maincpu", 0x10000);
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x53000, 0x53001).rw(FUNC(fantland_state::borntofi_inputs_r), FUNC(fantland_state::borntofi_nmi_enable_w));
-	map(0x53002, 0x53002).portr("DSW").w(FUNC(fantland_state::soundlatch_w));
+	map(0x53000, 0x53001).rw(FUNC(borntofi_state::inputs_r), FUNC(borntofi_state::nmi_enable_w));
+	map(0x53002, 0x53002).portr("DSW").w(FUNC(borntofi_state::soundlatch_w));
 	map(0x53003, 0x53003).portr("Controls");
 
 	map(0x54000, 0x567ff).ram().share("spriteram");
@@ -237,8 +238,7 @@ void fantland_state::borntofi_map(address_map &map)
 
 	map(0x60000, 0x6ffff).ram().share("spriteram2");
 
-	map(0x70000, 0x7ffff).rom();
-	map(0xf0000, 0xfffff).rom();
+	map(0x70000, 0x7ffff).rom().region("maincpu", 0x70000).mirror(0x80000);
 }
 
 
@@ -250,12 +250,11 @@ void fantland_state::wheelrun_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
 
-	map(0x30000, 0x3ffff).rom();
-	map(0x70000, 0x7ffff).rom();
+	map(0x30000, 0x3ffff).rom().region("maincpu", 0x30000);
 
 	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0x53000, 0x53000).portr("53000").w(FUNC(fantland_state::borntofi_nmi_enable_w));
+	map(0x53000, 0x53000).portr("53000").w(FUNC(fantland_state::nmi_enable_w));
 	map(0x53001, 0x53001).portr("53001");
 	map(0x53002, 0x53002).portr("53002").w(FUNC(fantland_state::soundlatch_w));
 	map(0x53003, 0x53003).portr("53003").nopw();
@@ -263,7 +262,7 @@ void fantland_state::wheelrun_map(address_map &map)
 	map(0x54000, 0x567ff).ram().share("spriteram");
 	map(0x60000, 0x6ffff).ram().share("spriteram2");
 
-	map(0xf0000, 0xfffff).rom();
+	map(0x70000, 0x7ffff).rom().region("maincpu", 0x70000).mirror(0x80000);
 }
 
 
@@ -278,7 +277,7 @@ void fantland_state::fantland_sound_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram();
 	map(0x80000, 0x9ffff).rom();
-	map(0xc0000, 0xfffff).rom();
+	map(0xc0000, 0xfffff).rom().region("maincpu", 0xc0000);
 }
 
 void fantland_state::fantland_sound_iomap(address_map &map)
@@ -299,7 +298,7 @@ void fantland_state::galaxygn_sound_iomap(address_map &map)
                            Born To Fight
 ***************************************************************************/
 
-void fantland_state::borntofi_adpcm_start( int voice )
+void borntofi_state::adpcm_start(int voice)
 {
 	m_msm[voice]->reset_w(0);
 	m_adpcm_playing[voice] = 1;
@@ -307,13 +306,13 @@ void fantland_state::borntofi_adpcm_start( int voice )
 //  logerror("%s: adpcm start = %06x, stop = %06x\n", device->machine().describe_context(), m_adpcm_addr[0][voice], m_adpcm_addr[1][voice]);
 }
 
-void fantland_state::borntofi_adpcm_stop( int voice )
+void borntofi_state::adpcm_stop(int voice)
 {
 	m_msm[voice]->reset_w(1);
 	m_adpcm_playing[voice] = 0;
 }
 
-WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
+WRITE8_MEMBER(borntofi_state::msm5205_w)
 {
 	int voice = offset / 8;
 	int reg = offset % 8;
@@ -323,8 +322,8 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 		// Play / Stop
 		switch(data)
 		{
-			case 0x00:      borntofi_adpcm_stop(voice); break;
-			case 0x03:      borntofi_adpcm_start(voice); break;
+			case 0x00:      adpcm_stop(voice); break;
+			case 0x03:      adpcm_start(voice); break;
 			default:        logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", m_audiocpu->pc(), reg, data);
 		}
 	}
@@ -338,47 +337,42 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 	}
 }
 
-void fantland_state::borntofi_adpcm_int( int voice )
+template<int Voice>
+WRITE_LINE_MEMBER(borntofi_state::adpcm_int)
 {
-	if (!m_adpcm_playing[voice])
+	if (!m_adpcm_playing[Voice])
 		return;
 
 	size_t const len = m_adpcm_rom.bytes() * 2;
 
-	int const start = m_adpcm_addr[0][voice] + m_adpcm_nibble[voice];
-	int const stop = m_adpcm_addr[1][voice];
+	int const start = m_adpcm_addr[0][Voice] + m_adpcm_nibble[Voice];
+	int const stop = m_adpcm_addr[1][Voice];
 
 	if (start >= len)
 	{
-		borntofi_adpcm_stop(voice);
+		adpcm_stop(Voice);
 		logerror("adpcm address out of range: %06x\n", start);
 		return;
 	}
 
 	if (start >= stop)
 	{
-		borntofi_adpcm_stop(voice);
+		adpcm_stop(Voice);
 	}
 	else
 	{
-		m_msm[voice]->write_data(m_adpcm_rom[start / 2] >> ((start & 1) * 4));
-		m_adpcm_nibble[voice]++;
+		m_msm[Voice]->write_data(m_adpcm_rom[start / 2] >> ((start & 1) * 4));
+		m_adpcm_nibble[Voice]++;
 	}
 }
 
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_0) { borntofi_adpcm_int(0); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_1) { borntofi_adpcm_int(1); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_2) { borntofi_adpcm_int(2); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_3) { borntofi_adpcm_int(3); }
 
-
-void fantland_state::borntofi_sound_map(address_map &map)
+void borntofi_state::sound_map(address_map &map)
 {
 	map(0x00000, 0x003ff).ram();
 	map(0x04000, 0x04000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x04000, 0x0401f).w(FUNC(fantland_state::borntofi_msm5205_w));
-	map(0x08000, 0x0ffff).rom();
-	map(0xf8000, 0xfffff).rom();
+	map(0x04000, 0x0401f).w(FUNC(borntofi_state::msm5205_w));
+	map(0x08000, 0x0ffff).rom().region("audiocpu", 0x08000).mirror(0xf0000);
 }
 
 
@@ -802,7 +796,7 @@ void fantland_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-WRITE_LINE_MEMBER(fantland_state::fantland_irq)
+WRITE_LINE_MEMBER(fantland_state::vblank_irq)
 {
 	if (state && BIT(m_nmi_enable, 3))
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -835,7 +829,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -880,7 +874,7 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -898,9 +892,9 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(fantland_state,borntofi)
+void borntofi_state::machine_start()
 {
-	machine_start();
+	fantland_state::machine_start();
 
 	save_item(NAME(m_old_x));
 	save_item(NAME(m_old_y));
@@ -912,11 +906,11 @@ MACHINE_START_MEMBER(fantland_state,borntofi)
 	save_item(NAME(m_adpcm_nibble));
 }
 
-MACHINE_RESET_MEMBER(fantland_state,borntofi)
+void borntofi_state::machine_reset()
 {
 	int i;
 
-	machine_reset();
+	fantland_state::machine_reset();
 
 	for (i = 0; i < 2; i++)
 	{
@@ -934,23 +928,20 @@ MACHINE_RESET_MEMBER(fantland_state,borntofi)
 		m_adpcm_nibble[i] = 0;
 	}
 
-	borntofi_adpcm_stop(0);
-	borntofi_adpcm_stop(1);
-	borntofi_adpcm_stop(2);
-	borntofi_adpcm_stop(3);
+	adpcm_stop(0);
+	adpcm_stop(1);
+	adpcm_stop(2);
+	adpcm_stop(3);
 }
 
-MACHINE_CONFIG_START(fantland_state::borntofi)
+MACHINE_CONFIG_START(borntofi_state::borntofi)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
-	MCFG_DEVICE_PROGRAM_MAP(borntofi_map)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
-	MCFG_DEVICE_PROGRAM_MAP(borntofi_sound_map)
-
-	MCFG_MACHINE_START_OVERRIDE(fantland_state,borntofi)
-	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,borntofi)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -958,9 +949,9 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(352,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(borntofi_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, borntofi_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -973,22 +964,22 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 
 	// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
 	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fantland_state, borntofi_adpcm_int_0))   /* IRQ handler */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, borntofi_state, adpcm_int<0>))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fantland_state, borntofi_adpcm_int_1))   /* IRQ handler */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, borntofi_state, adpcm_int<1>))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEVICE_ADD("msm3", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fantland_state, borntofi_adpcm_int_2))   /* IRQ handler */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, borntofi_state, adpcm_int<2>))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEVICE_ADD("msm4", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fantland_state, borntofi_adpcm_int_3))   /* IRQ handler */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, borntofi_state, adpcm_int<3>))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -1012,7 +1003,7 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -1062,14 +1053,13 @@ ROM_START( fantland )
 	ROM_REGION( 0x100000, "maincpu", 0 )                    // Main CPU
 	ROM_LOAD16_BYTE( "fantasyl.ev2", 0x00000, 0x20000, CRC(f5bdca0e) SHA1(d05cf6f68d4d1a3dcc0171f7cf220c4920bd47bb) )
 	ROM_LOAD16_BYTE( "fantasyl.od2", 0x00001, 0x20000, CRC(9db35023) SHA1(81e2accd67dcf8563a68b2c4e35526f23a40150c) )
-	ROM_COPY( "maincpu",     0x000000, 0x40000, 0x40000 )
 	ROM_LOAD16_BYTE( "fantasyl.ev1", 0xe0000, 0x10000, CRC(70e0ee30) SHA1(5253213da56b3f97e2811f2b10927d0e542447f0) )
 	ROM_LOAD16_BYTE( "fantasyl.od1", 0xe0001, 0x10000, CRC(577b4bd7) SHA1(1f08202d99c3e39e0dd1ed4947b928b695a5b411) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )                   // Sound CPU
 	ROM_LOAD( "fantasyl.s2", 0x80000, 0x20000, CRC(f23837d8) SHA1(4048784f759781e50ae445ea61f1ca908e8e6ac1) )   // samples (8 bit unsigned)
 	ROM_LOAD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) )
-	ROM_COPY( "audiocpu",          0xc0000, 0xe0000, 0x20000 )
+	ROM_COPY( "audiocpu",    0xc0000, 0xe0000, 0x20000 )
 
 	ROM_REGION( 0x480000, "gfx1", 0 )   // Sprites
 	ROMX_LOAD( "fantasyl.m00", 0x000000, 0x80000, CRC(82d819ff) SHA1(2b5b0759de8260eaa84ddded9dc2d12a6e0f5ec9) , ROM_GROUPWORD | ROM_SKIP(1) )
@@ -1091,14 +1081,13 @@ ROM_START( fantlanda )
 	ROM_REGION( 0x100000, "maincpu", 0 )                    // Main CPU
 	ROM_LOAD16_BYTE( "fantasyl.ev2", 0x00000, 0x20000, CRC(f5bdca0e) SHA1(d05cf6f68d4d1a3dcc0171f7cf220c4920bd47bb) ) // 04.bin (was first half only)
 	ROM_LOAD16_BYTE( "fantasyl.od2", 0x00001, 0x20000, CRC(9db35023) SHA1(81e2accd67dcf8563a68b2c4e35526f23a40150c) ) // 03.bin (was first half only)
-	ROM_COPY( "maincpu",     0x000000, 0x40000, 0x40000 )
 	ROM_LOAD16_BYTE( "02.bin",       0xe0000, 0x10000, CRC(8b835eed) SHA1(6a6b3fe116145f685b91dcd5301165f17973697c) )
 	ROM_LOAD16_BYTE( "01.bin",       0xe0001, 0x10000, CRC(4fa3eb8b) SHA1(56da42a4e2972a696ef28811116cbc20bb5ba3e8) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )                   // Sound CPU
 	ROM_LOAD( "fantasyl.s2", 0x80000, 0x20000, CRC(f23837d8) SHA1(4048784f759781e50ae445ea61f1ca908e8e6ac1) ) // 05.bin (was first half only)
 	ROM_LOAD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) ) // 06.bin (was first half only)
-	ROM_COPY( "audiocpu",          0xc0000, 0xe0000, 0x20000 )
+	ROM_COPY( "audiocpu",    0xc0000, 0xe0000, 0x20000 )
 
 	ROM_REGION( 0x480000, "gfx1", 0 )   // Sprites
 	ROMX_LOAD( "fantasyl.m00", 0x000000, 0x80000, CRC(82d819ff) SHA1(2b5b0759de8260eaa84ddded9dc2d12a6e0f5ec9) , ROM_GROUPWORD | ROM_SKIP(1) )
@@ -1120,11 +1109,10 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( galaxygn )
-	ROM_REGION( 0x100000, "maincpu", 0 )                    // Main CPU
+	ROM_REGION( 0x80000, "maincpu", 0 )                    // Main CPU
 	ROM_LOAD( "gg03.bin", 0x10000, 0x10000, CRC(9e469189) SHA1(07e5d36ca9665bdd13e3bb4241d34b9042371b79) )
 	ROM_LOAD( "gg02.bin", 0x20000, 0x10000, CRC(b87a438f) SHA1(96c39cc4d51a2fc0779f148971220117967173c0) )
-	ROM_LOAD( "gg01.bin", 0xf0000, 0x10000, CRC(ad0e5b29) SHA1(f9a7ebce9f47a009af213e4e10811bb1c26f891a) )
-	ROM_COPY( "maincpu",0xf0000, 0x70000, 0x10000 )
+	ROM_LOAD( "gg01.bin", 0x70000, 0x10000, CRC(ad0e5b29) SHA1(f9a7ebce9f47a009af213e4e10811bb1c26f891a) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )                   // Sound CPU
 	ROM_LOAD( "gg20.bin", 0xc0000, 0x10000, CRC(f5c65a85) SHA1(a094fa9531ea4e68ec0a448568e7d4b2307c8185) )
@@ -1241,15 +1229,13 @@ Notes:
 */
 
 ROM_START( borntofi )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* V20 */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* V20 */
 	ROM_LOAD( "3.bin", 0x10000, 0x10000, CRC(5f07f4a2) SHA1(240864d1d5d9e26d229bc21aa39ee03f4bd25814) )
 	ROM_LOAD( "2.bin", 0x20000, 0x10000, CRC(5d2b3395) SHA1(ac87f352f380b67802c26232824663063549ac7b) )
-	ROM_LOAD( "1.bin", 0xf0000, 0x10000, CRC(0a5e2f32) SHA1(5167a85329e5ea35c686af85e44d62227cf5800e) )
-	ROM_COPY( "maincpu", 0xf0000, 0x70000, 0x10000 )
+	ROM_LOAD( "1.bin", 0x70000, 0x10000, CRC(0a5e2f32) SHA1(5167a85329e5ea35c686af85e44d62227cf5800e) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) /* 8088 */
-	ROM_LOAD( "5.bin", 0xf8000, 0x08000, CRC(b5d587ce) SHA1(07687abd264ec80a6eb473cb3f3ab97ec6b365a2) )
-	ROM_COPY( "audiocpu", 0xf8000, 0x08000, 0x08000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 8088 */
+	ROM_LOAD( "5.bin", 0x08000, 0x08000, CRC(b5d587ce) SHA1(07687abd264ec80a6eb473cb3f3ab97ec6b365a2) )
 
 	ROM_REGION( 0xc0000, "adpcm", 0 ) /* m5205 samples */
 	ROM_LOAD( "6.bin",  0x00000, 0x10000, CRC(731c523b) SHA1(b649a838ce70d5af607f8b9faf8b012e2ff1104b) )
@@ -1337,12 +1323,11 @@ Hardware info by f205v
 ***************************************************************************/
 
 ROM_START( wheelrun )
-	ROM_REGION( 0x100000, "maincpu", 0 ) // V20
+	ROM_REGION( 0x80000, "maincpu", 0 ) // V20
 	ROM_LOAD( "4.4", 0x30000, 0x10000, CRC(359303df) SHA1(583b70f65b775e99856ffda61334be3b85046ed1) )
 	ROM_LOAD( "3.3", 0x70000, 0x10000, CRC(c28d0b31) SHA1(add8c4ffe529755c101b72a3b0530e796948876b) )
-	ROM_COPY( "maincpu", 0x70000, 0xf0000, 0x10000 )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 ) // Z80
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80
 	ROM_LOAD( "1.1", 0x00000, 0x10000, CRC(67b5f31f) SHA1(5553b132077686221fb7a21a0246fd55cb443332) )   // 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0xc0000, "gfx1",0 ) // gfx
@@ -1381,7 +1366,7 @@ ROM_START( wheelrun )
 ROM_END
 
 
-GAME( 19??, borntofi,  0,        borntofi, borntofi, fantland_state, empty_init, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
+GAME( 19??, borntofi,  0,        borntofi, borntofi, borntofi_state, empty_init, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
 GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
