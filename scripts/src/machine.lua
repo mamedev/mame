@@ -3808,7 +3808,6 @@ if (MACHINES["Z8038"]~=null) then
 	}
 end
 
-
 ---------------------------------------------------
 --
 --@src/devices/machine/scc2698b.h,MACHINES["SCC2698B"] = true
@@ -3821,3 +3820,14 @@ if (MACHINES["SCC2698B"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/aic6250.h,MACHINES["AIC6250"] = true
+---------------------------------------------------
+
+if (MACHINES["AIC6250"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/aic6250.cpp",
+		MAME_DIR .. "src/devices/machine/aic6250.h",
+	}
+end
