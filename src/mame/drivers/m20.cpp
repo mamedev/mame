@@ -819,7 +819,7 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_UPDATE_ROW_CB(m20_state, update_row)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	I8255A(config, m_i8255, 0);
 
 	I8251(config, m_kbdi8251, 0);
 	m_kbdi8251->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
@@ -830,13 +830,13 @@ MACHINE_CONFIG_START(m20_state::m20)
 	m_ttyi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir3_w));
 	m_ttyi8251->txrdy_handler().set(m_i8259, FUNC(pic8259_device::ir5_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(1230782)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, m20_state, tty_clock_tick_w))
-	MCFG_PIT8253_CLK1(1230782)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, m20_state, kbd_clock_tick_w))
-	MCFG_PIT8253_CLK2(1230782)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, m20_state, timer_tick_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(1230782);
+	pit8253.out_handler<0>().set(FUNC(m20_state::tty_clock_tick_w));
+	pit8253.set_clk<1>(1230782);
+	pit8253.out_handler<1>().set(FUNC(m20_state::kbd_clock_tick_w));
+	pit8253.set_clk<2>(1230782);
+	pit8253.out_handler<2>().set(FUNC(m20_state::timer_tick_w));
 
 	MCFG_DEVICE_ADD(m_i8259, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, m20_state, int_w))

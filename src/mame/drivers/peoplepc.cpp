@@ -249,13 +249,13 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	MCFG_DEVICE_IO_MAP(peoplepc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_0", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'745'600)/6)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, peoplepc_state, kbd_clock_tick_w))
-	MCFG_PIT8253_CLK1(XTAL(14'745'600)/6)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, peoplepc_state, tty_clock_tick_w))
-	MCFG_PIT8253_CLK2(XTAL(14'745'600)/6)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259_0", pic8259_device, ir0_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(XTAL(14'745'600)/6);
+	pit8253.out_handler<0>().set(FUNC(peoplepc_state::kbd_clock_tick_w));
+	pit8253.set_clk<1>(XTAL(14'745'600)/6);
+	pit8253.out_handler<1>().set(FUNC(peoplepc_state::tty_clock_tick_w));
+	pit8253.set_clk<2>(XTAL(14'745'600)/6);
+	pit8253.out_handler<2>().set("pic8259_0", FUNC(pic8259_device::ir0_w));
 
 	MCFG_DEVICE_ADD("pic8259_0", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))

@@ -2,22 +2,24 @@
 // copyright-holders:Sven Schnelle
 
 #include "emu.h"
-#define VERBOSE 0
-#include "logmacro.h"
 #include "mb87030.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(MB87030, mb87030_device, "mb87030", "Fujitsu MB87030 SCSI controller")
 
 mb87030_device::mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		mb87030_device(mconfig, MB87030, tag, owner, clock)
+	mb87030_device(mconfig, MB87030, tag, owner, clock)
 {
 
 }
 
 mb87030_device::mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-		nscsi_device(mconfig, type, tag, owner, clock),
-		m_irq_handler(*this),
-		m_dreq_handler(*this)
+	nscsi_device(mconfig, type, tag, owner, clock),
+	m_irq_handler(*this),
+	m_dreq_handler(*this)
 {
 
 }
@@ -71,7 +73,7 @@ void mb87030_device::device_reset()
 
 auto mb87030_device::get_state_name(State state) const
 {
-	switch(state) {
+	switch (state) {
 	case State::Idle:
 		return "Idle";
 	case State::ArbitrationWaitBusFree:
@@ -504,7 +506,7 @@ void mb87030_device::update_ints()
 READ8_MEMBER(mb87030_device::bdid_r)
 {
 	LOG("%s %02X\n", __FUNCTION__, (1 << m_bdid));
-	return (1 << m_bdid);
+	return 1 << m_bdid;
 }
 
 WRITE8_MEMBER(mb87030_device::bdid_w)

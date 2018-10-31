@@ -1655,11 +1655,11 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(8000000) /* general purpose timer 1 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pc88va_state, pc88va_pit_out0_changed))
-	MCFG_PIT8253_CLK1(8000000) /* BEEP frequency setting */
-	MCFG_PIT8253_CLK2(8000000) /* RS232C baud rate setting */
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(8000000); /* general purpose timer 1 */
+	pit8253.out_handler<0>().set(FUNC(pc88va_state::pc88va_pit_out0_changed));
+	pit8253.set_clk<1>(8000000); /* BEEP frequency setting */
+	pit8253.set_clk<2>(8000000); /* RS232C baud rate setting */
 
 	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 18+4, 0x40000);
 

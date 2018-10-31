@@ -413,10 +413,10 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/16) // clocks unknown, fix above when found
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/16)
-	MCFG_PIT8253_CLK2(XTAL(16'000'000)/16)
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(16'000'000)/16); // clocks unknown, fix above when found
+	m_pit->set_clk<1>(XTAL(16'000'000)/16);
+	m_pit->set_clk<2>(XTAL(16'000'000)/16);
 
 	// floppy disk controller
 	UPD765A(config, "fdc", true, true); // Rockwell R7675P
@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
 	Z80SIO2(config, "sio", 4000000);
 

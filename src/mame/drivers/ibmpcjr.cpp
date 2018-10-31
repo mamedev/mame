@@ -609,12 +609,12 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
   based on bit 4(/5?) written to output port A0h. This is not
   supported yet.
  */
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_pic8259, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12)
-	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pcjr_state, out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(14'318'181)/12);
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(14'318'181)/12);
+	m_pit8253->set_clk<2>(XTAL(14'318'181)/12);
+	m_pit8253->out_handler<2>().set(FUNC(pcjr_state::out2_changed));
 
 	MCFG_DEVICE_ADD(m_pic8259, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, pcjr_state, pic8259_set_int_line))

@@ -576,17 +576,16 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_keyboard_clock))
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(2'000'000))
-//  MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ms0515_state, write_keyboard_clock))
-	MCFG_PIT8253_CLK1(XTAL(2'000'000))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))
-	MCFG_PIT8253_CLK2(XTAL(2'000'000))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, ms0515_state, pit8253_out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(2'000'000));
+//  m_pit8253->out_handler<0>().set(FUNC(ms0515_state::write_keyboard_clock));
+	m_pit8253->set_clk<1>(XTAL(2'000'000));
+	m_pit8253->out_handler<0>().set(FUNC(ms0515_state::write_line_clock));
+	m_pit8253->set_clk<2>(XTAL(2'000'000));
+	m_pit8253->out_handler<2>().set(FUNC(ms0515_state::pit8253_out2_changed));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.45);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K");

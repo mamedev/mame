@@ -269,13 +269,13 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	I8251(config, m_kb_uart, 0);
 	m_kb_uart->rxrdy_handler().set(PIC8259_TAG, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIT_C0_CLOCK)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(PIT_C1_CLOCK)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir1_w))
-	MCFG_PIT8253_CLK2(PIT_C2_CLOCK)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mbc55x_state, pit8253_t2))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(PIT_C0_CLOCK);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(PIT_C1_CLOCK);
+	m_pit->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_pit->set_clk<2>(PIT_C2_CLOCK);
+	m_pit->out_handler<2>().set(FUNC(mbc55x_state::pit8253_t2));
 
 	MCFG_DEVICE_ADD(PIC8259_TAG, PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_IRQ0))
