@@ -21663,7 +21663,8 @@ eca                             // 1999.10 Kyukyuusya Emergency Call Ambulance
 ecap                            // 1999.12 Emergency Call Ambulance - US proto or location test
 ecaj                            //
 ecau                            //
-fvipers2                        // 1998.04 Fighting Vipers 2
+fvipers2                        // 1998.04 Fighting Vipers 2 (rev A)
+fvipers2o                       // 1998.?? Fighting Vipers 2
 getbass                         //
 harley                          // 199?.?? Harley Davidson & L.A.Riders (rev B)
 harleya                         // 1997.12 Harley Davidson & L.A.Riders (rev A)
@@ -21682,14 +21683,16 @@ spikeofe                        // 1999.01 Spikeout Final Edition
 spikeout                        // 1998.09 Spikeout
 srally2                         // 1998.02 Sega Rally 2 Championship
 srally2x                        //
-swtrilgy                        // 1998.11 Star Wars Trilogy Arcade
-swtrilgya                       //
+swtrilgy                        // 1998.12 Star Wars Trilogy Arcade (rev A)
+swtrilgya                       // 1998.11 Star Wars Trilogy Arcade
+swtrilgyp                       // 1998.09 Star Wars Trilogy Arcade (prototype)
 vf3                             // 1996.09 Virtua Fighter 3
 vf3a                            //
 vf3c                            //
 vf3tb                           // 1997.10 Virtua Fighter 3tb
-von2                            // 1998.03 Dennou Senki Virtual-On Oratorio Tangram
-von2a                           // 1998.03 Dennou Senki Virtual-On Oratorio Tangram
+von2                            // 1998.03 Dennou Senki Virtual-On Oratorio Tangram (rev B)
+von2a                           // 1998.03 Dennou Senki Virtual-On Oratorio Tangram (rev A)
+von2o                           // 1998.03 Dennou Senki Virtual-On Oratorio Tangram
 von254g                         // 1999.05 Dennou Senki Virtual-On Oratorio Tangram ver.5.4
 vs2                             // 1997.06 Virtua Striker 2
 vs215                           // 1997.06 Virtua Striker 2
