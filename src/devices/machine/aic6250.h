@@ -29,7 +29,9 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 	u8 dma_r();
+	u16 dma16_r();
 	void dma_w(u8 data);
+	void dma16_w(u16 data);
 
 protected:
 	// standard device_interface overrides

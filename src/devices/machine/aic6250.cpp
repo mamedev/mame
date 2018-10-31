@@ -1011,9 +1011,28 @@ u8 aic6250_device::dma_r()
 	return data;
 }
 
+u16 aic6250_device::dma16_r()
+{
+	u16 data = m_fifo.dequeue();
+
+	data |= u16(m_fifo.dequeue()) << 8;
+
+	LOGMASKED(LOG_DMA, "dma16_r 0x%04x\n", data);
+
+	return data;
+}
+
 void aic6250_device::dma_w(u8 data)
 {
 	LOGMASKED(LOG_DMA, "dma_w 0x%02x\n", data);
 
 	m_fifo.enqueue(data);
+}
+
+void aic6250_device::dma16_w(u16 data)
+{
+	LOGMASKED(LOG_DMA, "dma16_w 0x%04x\n", data);
+
+	m_fifo.enqueue(data);
+	m_fifo.enqueue(data >> 8);
 }
