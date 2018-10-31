@@ -985,9 +985,9 @@ void lua_engine::initialize()
  * emu.item(item_index)
  * item.size - size of the raw data type
  * item.count - number of entries
- * item:read(entry_index) - read entry value by index
- * item:read_block(entry_index, count) - read array of entry values
- * item:write(entry_index, value) - write entry value by index
+ * item:read(offset) - read entry value by index
+ * item:read_block(offset, count) - read a block of entry values as a string (byte addressing)
+ * item:write(offset, value) - write entry value by index
  */
  
 	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
@@ -1026,7 +1026,7 @@ void lua_engine::initialize()
 					if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
 						buff->set_len(0);
 					else
-						memcpy(buff->get_ptr(), item.base, buff->get_len());
+						memcpy(buff->get_ptr(), (uint8_t *)item.base + offset, buff->get_len());
 					return buff;
 				},
 			"write", [](save_item &item, int offset, uint64_t value) {
