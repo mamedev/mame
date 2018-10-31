@@ -73,11 +73,15 @@ public:
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
 protected:
+	pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual bool is_x86() const { return m_is_x86; }
 
 private:
 	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
@@ -131,6 +135,16 @@ private:
 	uint8_t m_is_x86;
 };
 
+class v5x_icu_device : public pic8259_device
+{
+public:
+	v5x_icu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual bool is_x86() const override { return true; }
+};
+
 DECLARE_DEVICE_TYPE(PIC8259, pic8259_device)
+DECLARE_DEVICE_TYPE(V5X_ICU, v5x_icu_device)
 
 #endif // MAME_MACHINE_PIC8259_H

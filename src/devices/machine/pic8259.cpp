@@ -110,7 +110,7 @@ uint32_t pic8259_device::acknowledge()
 			}
 			else
 			{
-				if (m_is_x86)
+				if (is_x86())
 				{
 					/* For x86 mode*/
 					return irq + m_base;
@@ -124,7 +124,7 @@ uint32_t pic8259_device::acknowledge()
 		}
 	}
 	logerror("Spurious IRQ\n");
-	if (m_is_x86)
+	if (is_x86())
 		return m_base + 7;
 	else
 		return 0xcd0000 + (m_vector_addr_high << 8) + m_vector_addr_low + (7 << (3-m_vector_size));
@@ -409,14 +409,25 @@ void pic8259_device::device_reset()
 }
 
 DEFINE_DEVICE_TYPE(PIC8259, pic8259_device, "pic8259", "Intel 8259 PIC")
+DEFINE_DEVICE_TYPE(V5X_ICU, v5x_icu_device, "v5x_icu", "NEC V5X ICU")
 
-pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PIC8259, tag, owner, clock)
+pic8259_device::pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_out_int_func(*this)
 	, m_in_sp_func(*this)
 	, m_read_slave_ack_func(*this)
 	, m_irr(0)
 	, m_irq_lines(0)
 	, m_level_trig_mode(0)
+{
+}
+
+pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pic8259_device(mconfig, PIC8259, tag, owner, clock)
+{
+}
+
+v5x_icu_device::v5x_icu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pic8259_device(mconfig, V5X_ICU, tag, owner, clock)
 {
 }
