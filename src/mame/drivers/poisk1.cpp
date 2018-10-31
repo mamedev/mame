@@ -655,13 +655,13 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
 	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
 
-	MCFG_DEVICE_ADD( "pit8253", PIT8253 ,0)
-	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12) /* keyboard poll -- XXX edge or level triggered? */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, p1_state, p1_pit8253_out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(15'000'000)/12); /* heartbeat IRQ */
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(15'000'000)/12); /* keyboard poll -- XXX edge or level triggered? */
+	m_pit8253->out_handler<1>().set(m_pic8259, FUNC(pic8259_device::ir6_w));
+	m_pit8253->set_clk<2>(XTAL(15'000'000)/12); /* pio port c pin 4, and speaker polling enough */
+	m_pit8253->out_handler<2>().set(FUNC(p1_state::p1_pit8253_out2_changed));
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))

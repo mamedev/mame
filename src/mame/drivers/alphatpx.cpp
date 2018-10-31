@@ -1337,11 +1337,11 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i8088", 0))
 	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(100000)  // 15Mhz osc with unknown divisor
-	MCFG_PIT8253_CLK1(100000)
-	MCFG_PIT8253_CLK2(100000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(100000);  // 15Mhz osc with unknown divisor
+	pit.set_clk<1>(100000);
+	pit.set_clk<2>(100000);
+	pit.out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 MACHINE_CONFIG_END
 
 //**************************************************************************

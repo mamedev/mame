@@ -39,30 +39,30 @@ MACHINE_CONFIG_START(p1_sound_device::device_add_mconfig)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_DEVICE_ADD("d14", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(12'500'000)/10)
+	PIT8253(config, m_d14, 0);
+	m_d14->set_clk<0>(XTAL(12'500'000)/10);
 //  sampler at 10 KHz
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, p1_sound_device, sampler_sync))
-	MCFG_PIT8253_CLK1(XTAL(12'500'000)/10)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("midi", i8251_device, write_txc))
-	MCFG_PIT8253_CLK2(XTAL(12'500'000)/10)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("midi", i8251_device, write_rxc))
+	m_d14->out_handler<0>().set(FUNC(p1_sound_device::sampler_sync));
+	m_d14->set_clk<1>(XTAL(12'500'000)/10);
+	m_d14->out_handler<1>().set(m_midi, FUNC(i8251_device::write_txc));
+	m_d14->set_clk<2>(XTAL(12'500'000)/10);
+	m_d14->out_handler<2>().set(m_midi, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("d16", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT0_HANDLER(XXX)
-	MCFG_PIT8253_CLK1(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT1_HANDLER(XXX)
-	MCFG_PIT8253_CLK2(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT2_HANDLER(XXX)
+	PIT8253(config, m_d16, 0);
+	m_d16->set_clk<0>(XTAL(12'500'000)/10);
+//  m_d16->out_handler<0>().set(FUNC(XXX));
+	m_d16->set_clk<1>(XTAL(12'500'000)/10);
+//  m_d16->out_handler<1>().set(FUNC(XXX));
+	m_d16->set_clk<2>(XTAL(12'500'000)/10);
+//  m_d16->out_handler<2>().set(FUNC(XXX));
 
-	MCFG_DEVICE_ADD("d17", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT0_HANDLER(XXX)
-	MCFG_PIT8253_CLK1(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT1_HANDLER(XXX)
-	MCFG_PIT8253_CLK2(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT2_HANDLER(XXX)
+	PIT8253(config, m_d17, 0);
+	m_d17->set_clk<0>(XTAL(12'500'000)/10);
+//  m_d17->out_handler<0>().set(FUNC(XXX));
+	m_d17->set_clk<1>(XTAL(12'500'000)/10);
+//  m_d17->out_handler<1>().set(FUNC(XXX));
+	m_d17->set_clk<2>(XTAL(12'500'000)/10);
+//  m_d17->out_handler<2>().set(FUNC(XXX));
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("filter", FILTER_RC)

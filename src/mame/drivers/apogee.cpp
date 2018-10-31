@@ -220,13 +220,13 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(apogee_mem)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/9)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, apogee_state,pit8253_out0_changed))
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/9)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, apogee_state,pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000)/9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, apogee_state,pit8253_out2_changed))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(XTAL(16'000'000)/9);
+	pit8253.out_handler<0>().set(FUNC(apogee_state::pit8253_out0_changed));
+	pit8253.set_clk<1>(XTAL(16'000'000)/9);
+	pit8253.out_handler<1>().set(FUNC(apogee_state::pit8253_out1_changed));
+	pit8253.set_clk<2>(XTAL(16'000'000)/9);
+	pit8253.out_handler<2>().set(FUNC(apogee_state::pit8253_out2_changed));
 
 	I8255(config, m_ppi8255_1);
 	m_ppi8255_1->out_pa_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));

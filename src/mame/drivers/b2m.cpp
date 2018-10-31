@@ -207,13 +207,13 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(b2m_state, b2m)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, b2m_state,bm2_pit_out1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk0))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(0);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_pit->set_clk<1>(2000000);
+	m_pit->out_handler<1>().set(FUNC(b2m_state::bm2_pit_out1));
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set(m_pit, FUNC(pit8253_device::write_clk0));
 
 	i8255_device &ppi1(I8255(config, "ppi8255_1"));
 	ppi1.out_pa_callback().set(FUNC(b2m_state::b2m_8255_porta_w));

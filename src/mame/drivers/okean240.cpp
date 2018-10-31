@@ -563,8 +563,7 @@ MACHINE_CONFIG_START(okean240_state::okean240a)
 	m_ppikbd->in_pb_callback().set(FUNC(okean240_state::okean240a_port41_r));
 	m_ppikbd->in_pc_callback().set(FUNC(okean240_state::okean240a_port42_r));
 
-	MCFG_DEVICE_MODIFY("pit")
-	MCFG_PIT8253_CLK1(1536000) // artificial rate
+	subdevice<pit8253_device>("pit")->set_clk<1>(1536000); // artificial rate
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(okean240_state::okean240)
@@ -574,8 +573,7 @@ MACHINE_CONFIG_START(okean240_state::okean240)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240)
 	MCFG_DEVICE_REMOVE("uart")
 	MCFG_DEVICE_REMOVE("rs232")
-	MCFG_DEVICE_MODIFY("pit")
-	MCFG_PIT8253_OUT1_HANDLER(NOOP)
+	subdevice<pit8253_device>("pit")->out_handler<1>().set_nop();
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(okean240_state, kbd_put))
 MACHINE_CONFIG_END

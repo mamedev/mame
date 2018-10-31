@@ -60,6 +60,8 @@ protected:
 	optional_device_array<dac_byte_interface, 8> m_dac;
 	optional_device<dac_word_interface> m_dac9;
 	optional_device_array<dac_byte_interface, 8> m_dacvol;
+	optional_device_array<pit8254_device, 3> m_pit;
+	optional_device<i80186_cpu_device> m_audiocpu;
 
 	void ataxx_80186_map_io(address_map &map);
 	void leland_80186_map_io(address_map &map);
@@ -81,9 +83,7 @@ private:
 	uint8_t m_ext_active;
 	uint8_t* m_ext_base;
 
-	optional_device_array<pit8254_device, 3> m_pit;
 	optional_device<ym2151_device> m_ymsnd;
-	optional_device<i80186_cpu_device> m_audiocpu;
 	required_device<cpu_device> m_master;
 };
 

@@ -367,17 +367,16 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Programmable timer */
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-//  MCFG_PIT8253_CLK0(XTAL(4'000'000) / 2) /* TODO: verify on PCB */
-//  MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, i7000_state,i7000_pit_out0))
-//  MCFG_PIT8253_CLK1(XTAL(4'000'000) / 2) /* TODO: verify on PCB */
-//  MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, i7000_state,i7000_pit_out1))
-	MCFG_PIT8253_CLK2(XTAL(4'000'000) / 2) /* TODO: verify on PCB */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+//  pit8253.set_clk<0>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */
+//  pit8253.out_handler<0>().set(FUNC(i7000_state::i7000_pit_out0));
+//  pit8253.set_clk<1>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */
+//  pit8253.out_handler<1>().set(FUNC(i7000_state::i7000_pit_out1));
+	pit8253.set_clk<2>(XTAL(4'000'000) / 2); /* TODO: verify on PCB */
+	pit8253.out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* Keyboard interface */
 	i8279_device &kbdc(I8279(config, "i8279", 4000000)); /* guessed value. TODO: verify on PCB */

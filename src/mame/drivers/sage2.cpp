@@ -427,21 +427,21 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	ppi1.in_pb_callback().set(FUNC(sage2_state::ppi1_pb_r));
 	ppi1.out_pc_callback().set(FUNC(sage2_state::ppi1_pc_w));
 
-	MCFG_DEVICE_ADD(I8253_0_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(0) // from U75 OUT0
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir6_w))
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/2/125)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(I8253_0_TAG, pit8253_device, write_clk2))
-	MCFG_PIT8253_CLK2(0) // from OUT2
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(I8259_TAG, pic8259_device, ir0_w))
+	pit8253_device &i8253_0(PIT8253(config, I8253_0_TAG, 0));
+	i8253_0.set_clk<0>(0); // from U75 OUT0
+	i8253_0.out_handler<0>().set(m_pic, FUNC(pic8259_device::ir6_w));
+	i8253_0.set_clk<1>(XTAL(16'000'000)/2/125);
+	i8253_0.out_handler<1>().set(I8253_0_TAG, FUNC(pit8253_device::write_clk2));
+	i8253_0.set_clk<2>(0); // from OUT2
+	i8253_0.out_handler<2>().set(m_pic, FUNC(pic8259_device::ir0_w));
 
-	MCFG_DEVICE_ADD(I8253_1_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/2/125)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8253_0_TAG, pit8253_device, write_clk0))
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/2/13)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, sage2_state, br1_w))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000)/2/13)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, sage2_state, br2_w))
+	pit8253_device &i8253_1(PIT8253(config, I8253_1_TAG, 0));
+	i8253_1.set_clk<0>(XTAL(16'000'000)/2/125);
+	i8253_1.out_handler<0>().set(I8253_0_TAG, FUNC(pit8253_device::write_clk0));
+	i8253_1.set_clk<1>(XTAL(16'000'000)/2/13);
+	i8253_1.out_handler<1>().set(FUNC(sage2_state::br1_w));
+	i8253_1.set_clk<2>(XTAL(16'000'000)/2/13);
+	i8253_1.out_handler<2>().set(FUNC(sage2_state::br2_w));
 
 	I8251(config, m_usart0, 0);
 	m_usart0->txd_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));

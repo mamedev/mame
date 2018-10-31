@@ -2793,19 +2793,19 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "lspeaker", 0.50).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(307200)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, towns_state, towns_pit_out0_changed))
-	MCFG_PIT8253_CLK1(307200)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, towns_state, towns_pit_out1_changed))
-	MCFG_PIT8253_CLK2(307200)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, towns_state, pit_out2_changed))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(307200);
+	m_pit->out_handler<0>().set(FUNC(towns_state::towns_pit_out0_changed));
+	m_pit->set_clk<1>(307200);
+	m_pit->out_handler<1>().set(FUNC(towns_state::towns_pit_out1_changed));
+	m_pit->set_clk<2>(307200);
+	m_pit->out_handler<2>().set(FUNC(towns_state::pit_out2_changed));
 
-	MCFG_DEVICE_ADD("pit2", PIT8253, 0)
-	MCFG_PIT8253_CLK0(307200) // reserved
-	MCFG_PIT8253_CLK1(1228800) // RS-232
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, towns_state, pit2_out1_changed))
-	MCFG_PIT8253_CLK2(307200) // reserved
+	pit8253_device &pit2(PIT8253(config, "pit2", 0));
+	pit2.set_clk<0>(307200); // reserved
+	pit2.set_clk<1>(1228800); // RS-232
+	pit2.out_handler<1>().set(FUNC(towns_state::pit2_out1_changed));
+	pit2.set_clk<2>(307200); // reserved
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))

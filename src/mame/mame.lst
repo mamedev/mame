@@ -21388,6 +21388,7 @@ mightyframe                     // Convergent
 mikie                           // GX469 (c) 1984
 mikiehs                         // GX469 (c) 1984
 mikiej                          // GX469 (c) 1984
+mikiek                          // GX469 (c) 1984
 
 @source:mikro80.cpp
 kristall2                       //
@@ -30900,7 +30901,7 @@ pbaction                        // (c) 1985 Tehkan
 pbaction2                       // (c) 1985 Tehkan
 pbaction3                       // (c) 1985 Tehkan
 pbaction4                       // (c) 1985 Tehkan
-pbaction5                       // (c) 1985 Tehkan
+pbactiont                       // (c) 1985 Tehkan (Tecfri license)
 
 @source:pc.cpp
 ataripc1                        // Atari PC1
@@ -34444,6 +34445,8 @@ titlefj                         // 1993.03 Title Fight (Japan)
 titlefu                         // 1993.04 Title Fight (US)
 
 @source:segasp.cpp
+bingogal                        // 2009.05 Bingo Galaxy (main)
+bingogals                       // 2009.05 Bingo Galaxy (satellite)
 brickppl                        //
 dinoki25                        //
 dinoking                        // 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
