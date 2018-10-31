@@ -372,7 +372,8 @@ void borntofi_state::sound_map(address_map &map)
 	map(0x00000, 0x003ff).ram();
 	map(0x04000, 0x04000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x04000, 0x0401f).w(FUNC(borntofi_state::msm5205_w));
-	map(0x08000, 0x0ffff).rom().region("audiocpu", 0x08000).mirror(0xf0000);
+	map(0x08000, 0x0ffff).rom().region("audiocpu", 0x08000);
+	map(0xf8000, 0xfffff).rom().region("audiocpu", 0x08000);
 }
 
 
