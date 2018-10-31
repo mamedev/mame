@@ -188,7 +188,8 @@ void pbaction_state::pbaction_sound_io_map(address_map &map)
 WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8000_w)
 {
 	// writes data to latch (only a single bit matters?)
-	m_outlatch = data & 1;
+	m_outlatch = (data & 0x01)>>0;
+
 }
 
 WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8001_w)
@@ -197,19 +198,11 @@ WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8001_w)
 	// does this process 24 times between each 8008 write
 	if (data & 0x01)
 	{
-		if (m_outshift < 24)
-		{
-			if (m_outlatch)
-				m_outbytes[m_outshift] |= (0xff & m_outmask);
-			else
-				m_outbytes[m_outshift] &= ~(0xff & m_outmask);
-		}
-
-		m_digits[m_outshift] = m_outbytes[m_outshift];
-
-		m_outshift++;
+		m_outdata = (m_outdata << 1) | m_outlatch;
 	}
 }
+
+//bitswap<8>( x^0xca , 3,2,1,0,7,4,6,5 );
 
 WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8008_w)
 {
@@ -217,8 +210,30 @@ WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8008_w)
 	// but then writes 00 before writing to above (possibly 00 is 'start data' and other values are 'send')
 	if (data != 0x00)
 	{
-		m_outmask = data;
-		m_outshift = 0;
+		int base = 0;
+
+		switch (data)
+		{
+
+		case 0x01: base = 0*3; break;
+		case 0x02: base = 1*3; break;
+		case 0x04: base = 2*3; break;
+		case 0x08: base = 3*3; break;
+		case 0x10: base = 4*3; break;
+		case 0x20: base = 5*3; break;
+		case 0x40: base = 6*3; break;
+	
+		default: break;
+		}
+
+		m_digits[base+0] = (~m_outdata >> 0) & 0xff;
+		m_digits[base+1] = (~m_outdata >> 8) & 0xff;
+		m_digits[base+2] = (~m_outdata >> 16) & 0xff;
+
+	}
+	else
+	{
+		m_outdata = 0;
 	}
 }
 

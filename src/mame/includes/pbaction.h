@@ -125,8 +125,6 @@ private:
 	required_device<generic_latch_8_device> m_maintosublatch;
 	//required_device<generic_latch_8_device> m_subtomainlatch;
 	output_finder<24> m_digits;
-	uint8_t m_outmask;
 	uint8_t m_outlatch;
-	uint8_t m_outbytes[24];
-	uint8_t m_outshift;
+	uint32_t m_outdata;
 };
