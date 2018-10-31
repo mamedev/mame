@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_FANTLAND_H
+#define MAME_INCLUDES_FANTLAND_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
@@ -18,7 +22,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram", 0),
-		m_spriteram2(*this, "spriteram2", 0)  { }
+		m_spriteram2(*this, "spriteram2", 0)
+	{ }
 
 	void fantland(machine_config &config);
 	void wheelrun(machine_config &config);
@@ -27,10 +32,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
 
 protected:
-	/* memory pointers */
-//  uint8_t *    m_spriteram;   // currently directly used in a 16bit map...
-//  uint8_t *    m_spriteram_2; // currently directly used in a 16bit map...
-
 	/* misc */
 	uint8_t    m_nmi_enable;
 
@@ -42,8 +43,10 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_spriteram2;
+
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(soundlatch_w);
 	virtual void machine_start() override;
@@ -104,3 +107,5 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FANTLAND_H
