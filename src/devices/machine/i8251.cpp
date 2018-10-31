@@ -26,7 +26,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(I8251,   i8251_device,  "i8251",    "Intel 8251 USART")
-DEFINE_DEVICE_TYPE(V53_SCU, v53_scu_device, "v63_scu", "NEC V53 SCU")
+DEFINE_DEVICE_TYPE(V5X_SCU, v5x_scu_device, "v5x_scu", "NEC V5X SCU")
 
 
 //-------------------------------------------------
@@ -61,8 +61,8 @@ i8251_device::i8251_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-v53_scu_device::v53_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8251_device(mconfig, V53_SCU, tag, owner, clock)
+v5x_scu_device::v5x_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i8251_device(mconfig, V5X_SCU, tag, owner, clock)
 {
 }
 
@@ -739,4 +739,45 @@ WRITE_LINE_MEMBER(i8251_device::write_txc)
 READ_LINE_MEMBER(i8251_device::txrdy_r)
 {
 	return is_tx_enabled() && (m_status & I8251_STATUS_TX_READY) != 0;
+}
+
+void v5x_scu_device::device_start()
+{
+	i8251_device::device_start();
+
+	save_item(NAME(m_simk));
+}
+
+void v5x_scu_device::device_reset()
+{
+	// FIXME: blindly copied from v53.cpp - not verified
+	m_simk = 0x03;
+
+	i8251_device::device_reset();
+}
+
+u8 v5x_scu_device::read(offs_t offset)
+{
+	u8 data = 0;
+
+	switch (offset)
+	{
+	case 0: data = data_r(); break;
+	case 1: data = status_r(); break;
+	case 2: break;
+	case 3: data = simk_r(); break;
+	}
+
+	return data;
+}
+
+void v5x_scu_device::write(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+	case 0: data_w(data); break;
+	case 1: control_w(data); break;
+	case 2: mode_w(data); break;
+	case 3: simk_w(data); break;
+	}
 }
