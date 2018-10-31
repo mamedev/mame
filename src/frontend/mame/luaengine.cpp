@@ -925,7 +925,7 @@ void lua_engine::initialize()
  * thread.result() - get thread result as string
  * thread.busy - check if thread is running
  * thread.yield - check if thread is yielded
-*/
+ */
 
 	emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>(),
 			"start", [](context &ctx, const char *scr) {
@@ -981,6 +981,15 @@ void lua_engine::initialize()
 			"busy", sol::readonly(&context::busy),
 			"yield", sol::readonly(&context::yield));
 
+/*
+ * emu.item(item_index)
+ * item.size - size of the raw data type
+ * item.count - number of entries
+ * item:read(offset) - read entry value by index
+ * item:read_block(offset, count) - read a block of entry values as a string (byte addressing)
+ * item:write(offset, value) - write entry value by index
+ */
+ 
 	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
 					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
 					{
@@ -1017,7 +1026,7 @@ void lua_engine::initialize()
 					if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
 						buff->set_len(0);
 					else
-						memcpy(buff->get_ptr(), item.base, buff->get_len());
+						memcpy(buff->get_ptr(), (uint8_t *)item.base + offset, buff->get_len());
 					return buff;
 				},
 			"write", [](save_item &item, int offset, uint64_t value) {
@@ -1340,7 +1349,7 @@ void lua_engine::initialize()
  * device:debug() - debug interface, cpus only
  * device.spaces[] - device address spaces table
  * device.state[] - device state entries table
- * device.items[] - device save state items table
+ * device.items[] - device save state items table (item name is key, item index is value)
  */
 
 	sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor,
