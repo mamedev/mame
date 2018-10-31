@@ -2470,7 +2470,7 @@ GAME( 1984, triviag1,  0,        balsente, triviag1, balsente_state, init_trivia
 GAME( 1984, triviag2,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes, ROT0, "Bally/Sente",  "Trivial Pursuit (Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nametune,  0,        balsente, nametune, balsente_state, init_nametune, ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
 
