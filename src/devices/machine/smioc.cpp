@@ -158,7 +158,7 @@ void smioc_device::device_add_mconfig(machine_config &config)
 	scc2698b_device &scc2698b(SCC2698B(config, "scc2698b", XTAL(3'686'400)));
 	scc2698b.tx_callback<'a'>().set("rs232_p1", FUNC(rs232_port_device::write_txd));
 	scc2698b.mpp1_callback<'a'>().set("dma8237_2", FUNC(am9517a_device::dreq1_w)).invert();
-	scc2698b.mpp1_callback<'a'>().set("dma8237_2", FUNC(am9517a_device::dreq0_w)).invert();
+	scc2698b.mpp2_callback<'a'>().set("dma8237_2", FUNC(am9517a_device::dreq0_w)).invert();
 	scc2698b.tx_callback<'b'>().set("rs232_p2", FUNC(rs232_port_device::write_txd));
 	scc2698b.mpp1_callback<'b'>().set("dma8237_2", FUNC(am9517a_device::dreq3_w)).invert();
 	scc2698b.mpp2_callback<'b'>().set("dma8237_2", FUNC(am9517a_device::dreq2_w)).invert();

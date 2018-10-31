@@ -3,7 +3,7 @@
 <softwarelist name="mac_hdflop" description="Macintosh High Density Disk images">
 
 	<!-- S/N: Z93350-001A -->
-	<software name="clarisw">
+	<software name="clarisw" supported="no">
 		<description>ClarisWorks (Swedish)</description>
 		<year>1993</year>
 		<publisher>Claris</publisher>

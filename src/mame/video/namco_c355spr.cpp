@@ -444,8 +444,8 @@ void namco_c355spr_device::get_sprites()
 		get_list(1, &m_spriteram[buffer][0x14000/2], &m_spriteram[buffer][0x10000/2]);
 }
 
-template<class _BitmapClass>
-void namco_c355spr_device::draw_sprites(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int pri)
+template<class BitmapClass>
+void namco_c355spr_device::draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri)
 {
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if (pri == 0)
