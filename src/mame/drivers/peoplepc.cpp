@@ -244,10 +244,10 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(14'745'600)/3)
-	MCFG_DEVICE_PROGRAM_MAP(peoplepc_map)
-	MCFG_DEVICE_IO_MAP(peoplepc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_0", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, XTAL(14'745'600)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &peoplepc_state::peoplepc_map);
+	m_maincpu->set_addrmap(AS_IO, &peoplepc_state::peoplepc_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_0", FUNC(pic8259_device::inta_cb));
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
 	pit8253.set_clk<0>(XTAL(14'745'600)/6);
@@ -257,16 +257,16 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	pit8253.set_clk<2>(XTAL(14'745'600)/6);
 	pit8253.out_handler<2>().set("pic8259_0", FUNC(pic8259_device::ir0_w));
 
-	MCFG_DEVICE_ADD("pic8259_0", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, peoplepc_state, get_slave_ack))
+	pic8259_device &pic8259_0(PIC8259(config, "pic8259_0", 0));
+	pic8259_0.out_int_callback().set_inputline(m_maincpu, 0);
+	pic8259_0.in_sp_callback().set_constant(1);
+	pic8259_0.read_slave_ack_callback().set(FUNC(peoplepc_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_0", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pic_1, 0);
+	m_pic_1->out_int_callback().set("pic8259_0", FUNC(pic8259_device::ir7_w));
+	m_pic_1->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	I8255(config, "ppi8255");
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(XTAL(22'000'000),640,0,640,475,0,475)

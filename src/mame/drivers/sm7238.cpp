@@ -373,15 +373,15 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
 	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_pic8259, pic8259_device, ir2_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm7238_state, sm7238)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sm7238)
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	PIT8253(config, m_t_hblank, 0);
 	m_t_hblank->set_clk<1>(16.384_MHz_XTAL/9); // XXX workaround -- keyboard is slower and doesn't sync otherwise

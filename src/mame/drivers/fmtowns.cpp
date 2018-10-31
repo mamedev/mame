@@ -776,8 +776,6 @@ READ8_MEMBER(towns_state::towns_port60_r)
 
 WRITE8_MEMBER(towns_state::towns_port60_w)
 {
-	//device_t* dev = m_pic_master;
-
 	if(data & 0x80)
 	{
 		//towns_pic_irq(dev,0);
@@ -2807,14 +2805,14 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	pit2.out_handler<1>().set(FUNC(towns_state::pit2_out1_changed));
 	pit2.set_clk<2>(307200); // reserved
 
-	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, towns_state, get_slave_ack))
+	PIC8259(config, m_pic_master, 0);
+	m_pic_master->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic_master->in_sp_callback().set_constant(1);
+	m_pic_master->read_slave_ack_callback().set(FUNC(towns_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pic_slave, 0);
+	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir7_w));
+	m_pic_slave->in_sp_callback().set_constant(0);
 
 	MB8877(config, m_fdc, 8'000'000 / 4);  // clock unknown
 	m_fdc->intrq_wr_callback().set(FUNC(towns_state::mb8877a_irq_w));

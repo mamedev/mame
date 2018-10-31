@@ -414,8 +414,8 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_DEVICE_PROGRAM_MAP(sage2_mem)
 
 	// devices
-	MCFG_DEVICE_ADD(I8259_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_1))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, M68K_IRQ_1);
 
 	i8255_device &ppi0(I8255A(config, I8255A_0_TAG));
 	ppi0.in_pa_callback().set_ioport("J7");
@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	m_usart0->dtr_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart0->rts_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
 	m_usart0->rxrdy_handler().set_inputline(M68000_TAG, M68K_IRQ_5);
-	m_usart0->txrdy_handler().set(I8259_TAG, FUNC(pic8259_device::ir2_w));
+	m_usart0->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, "terminal"));
 	rs232a.rxd_handler().set(m_usart0, FUNC(i8251_device::write_rxd));
@@ -460,8 +460,8 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	m_usart1->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart1->dtr_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart1->rts_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
-	m_usart1->rxrdy_handler().set(I8259_TAG, FUNC(pic8259_device::ir1_w));
-	m_usart1->txrdy_handler().set(I8259_TAG, FUNC(pic8259_device::ir3_w));
+	m_usart1->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_usart1->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_usart1, FUNC(i8251_device::write_rxd));

@@ -941,14 +941,14 @@ MACHINE_CONFIG_START(xbox_base_state::xbox_base)
 	MCFG_MCPX_NV2A_GPU_CPU(m_maincpu)
 	MCFG_MCPX_NV2A_GPU_INTERRUPT_HANDLER(WRITELINE(*this, xbox_base_state, xbox_nv2a_interrupt_changed))
 
-	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, xbox_base_state, xbox_pic8259_1_set_int_line))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, xbox_base_state, get_slave_ack))
+	pic8259_device &pic8259_1(PIC8259(config, "pic8259_1", 0));
+	pic8259_1.out_int_callback().set(FUNC(xbox_base_state::xbox_pic8259_1_set_int_line));
+	pic8259_1.in_sp_callback().set_constant(1);
+	pic8259_1.read_slave_ack_callback().set(FUNC(xbox_base_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_2", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_1", pic8259_device, ir2_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	pic8259_device &pic8259_2(PIC8259(config, "pic8259_2", 0));
+	pic8259_2.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir2_w));
+	pic8259_2.in_sp_callback().set_constant(0);
 
 	pit8254_device &pit8254(PIT8254(config, "pit8254", 0));
 	pit8254.set_clk<0>(1125000); /* heartbeat IRQ */

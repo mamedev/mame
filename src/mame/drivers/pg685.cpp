@@ -427,9 +427,9 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	MCFG_DEVICE_PROGRAM_MAP(pg675_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
+	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
+	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
+	mainpic.in_sp_callback().set_constant(1);
 
 	// i/o cpu
 
@@ -476,9 +476,9 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	MCFG_DEVICE_PROGRAM_MAP(pg685_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
+	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
+	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
+	mainpic.in_sp_callback().set_constant(1);
 
 	// i/o cpu
 
@@ -527,9 +527,9 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	MCFG_DEVICE_PROGRAM_MAP(pg685oua12_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
+	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
+	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
+	mainpic.in_sp_callback().set_constant(1);
 
 	// i/o cpu
 

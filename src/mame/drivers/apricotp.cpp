@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
 
 	AM9517A(config, m_dmac, 250000);
 	m_dmac->out_eop_callback().set(m_pic, FUNC(pic8259_device::ir7_w));

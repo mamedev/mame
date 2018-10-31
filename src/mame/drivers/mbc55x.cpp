@@ -243,10 +243,10 @@ static void mbc55x_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU_TAG, I8088, 3600000)
-	MCFG_DEVICE_PROGRAM_MAP(mbc55x_mem)
-	MCFG_DEVICE_IO_MAP(mbc55x_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(PIC8259_TAG, pic8259_device, inta_cb)
+	I8088(config, m_maincpu, 3600000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbc55x_state::mbc55x_io);
+	m_maincpu->set_irq_acknowledge_callback(PIC8259_TAG, FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 
 	/* Devices */
 	I8251(config, m_kb_uart, 0);
-	m_kb_uart->rxrdy_handler().set(PIC8259_TAG, FUNC(pic8259_device::ir3_w));
+	m_kb_uart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(PIT_C0_CLOCK);
@@ -277,8 +277,8 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_pit->set_clk<2>(PIT_C2_CLOCK);
 	m_pit->out_handler<2>().set(FUNC(mbc55x_state::pit8253_t2));
 
-	MCFG_DEVICE_ADD(PIC8259_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_IRQ0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(mbc55x_state::mbc55x_ppi_porta_r));

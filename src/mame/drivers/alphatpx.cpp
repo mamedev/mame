@@ -1325,24 +1325,25 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
+void alphatp_34_state::alphatp30(machine_config &config)
+{
 	alphatp3(config);
-	MCFG_DEVICE_ADD("i8088", I8088, 6000000) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(alphatp30_8088_map)
-	MCFG_DEVICE_IO_MAP(alphatp30_8088_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-	MCFG_DEVICE_DISABLE()
+	I8088(config, m_i8088, 6000000); // unknown clock
+	m_i8088->set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp30_8088_map);
+	m_i8088->set_addrmap(AS_IO, &alphatp_34_state::alphatp30_8088_io);
+	m_i8088->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_i8088->set_disable();
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i8088", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_i8088, 0);
+	m_pic->in_sp_callback().set_constant(0);
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<0>(100000);  // 15Mhz osc with unknown divisor
 	pit.set_clk<1>(100000);
 	pit.set_clk<2>(100000);
 	pit.out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
-MACHINE_CONFIG_END
+}
 
 //**************************************************************************
 //  ROM DEFINITIONS
