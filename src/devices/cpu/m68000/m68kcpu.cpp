@@ -725,7 +725,7 @@ bool m68000_base_device::memory_translate(int space, int intention, offs_t &addr
 			}
 			else
 			{
-				address = pmmu_translate_addr_with_fc(address, mode, (intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ, 0, 0);
+				address = pmmu_translate_addr_with_fc<false, false>(address, mode, (intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ);
 			}
 
 			if ((m_mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {
