@@ -59,6 +59,8 @@ This subboard controls a vertical board panel with three 7-seg displays (like on
 one for player 1 (7 digits), another for player 2 (7 digits) and the third for game scores (with
 three goups: two digits - one digit - two digits).
 
+One of the Z80s on this board is the main game Z80, the other is for the Pinball cabinet
+
 
 
 Stephh's notes (based on the game Z80 code and some tests) :
@@ -187,7 +189,6 @@ void pbaction_state::pbaction_sound_io_map(address_map &map)
 
 WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8000_w)
 {
-	// writes data to latch (only a single bit matters?)
 	m_outlatch = (data & 0x01)>>0;
 
 }
@@ -195,40 +196,34 @@ WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8000_w)
 WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8001_w)
 {
 	// writes 01 , 00 to clock after writing data to 8000
-	// does this process 24 times between each 8008 write
 	if (data & 0x01)
 	{
 		m_outdata = (m_outdata << 1) | m_outlatch;
 	}
 }
 
-//bitswap<8>( x^0xca , 3,2,1,0,7,4,6,5 );
-
 WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8008_w)
 {
-	// writes 7 different values which seems to determine shift (01,02,04,08,10,20,40) (7 values, 7-seg? or coincidence, doesn't seem to decode like that) 
-	// but then writes 00 before writing to above (possibly 00 is 'start data' and other values are 'send')
 	if (data != 0x00)
 	{
 		int base = 0;
 
 		switch (data)
 		{
+		case 0x01: base = 6; break;
+		case 0x02: base = 5; break;
+		case 0x04: base = 4; break;
+		case 0x08: base = 3; break;
+		case 0x10: base = 2; break;
+		case 0x20: base = 1; break;
+		case 0x40: base = 0; break;
 
-		case 0x01: base = 0*3; break;
-		case 0x02: base = 1*3; break;
-		case 0x04: base = 2*3; break;
-		case 0x08: base = 3*3; break;
-		case 0x10: base = 4*3; break;
-		case 0x20: base = 5*3; break;
-		case 0x40: base = 6*3; break;
-	
 		default: break;
 		}
 
-		m_digits[base+0] = (~m_outdata >> 0) & 0xff;
-		m_digits[base+1] = (~m_outdata >> 8) & 0xff;
-		m_digits[base+2] = (~m_outdata >> 16) & 0xff;
+		m_digits[base + 0] = (~m_outdata >> 0) & 0xff;
+		m_digits[base + 7] = (~m_outdata >> 8) & 0xff;
+		m_digits[base + 14] = (~m_outdata >> 16) & 0xff;
 
 	}
 	else
@@ -668,7 +663,7 @@ ROM_START( pbactiont )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
-	ROM_REGION( 0x10000, "subcpu", 0 )    /* 64k for the 2xZ80 subboard (not emulated) */
+	ROM_REGION( 0x10000, "subcpu", 0 )    /* 64k for the subboard  */
 	ROM_LOAD( "pba17.bin",    0x0000,  0x4000, CRC(2734ae60) SHA1(4edcdfac1611c49c4f890609efbe8352b8161f8e) )
 
 	ROM_REGION( 0x06000, "fgchars", 0 )

@@ -2,7 +2,7 @@
 <mamelayout version="2">
 
 <!-- Mini Flipper cabinet, used by Tecfri versions of Pinball Action -->
-<!-- this is copied from Speed Ball, need to verify number of elements etc. -->
+<!-- based on Speed Ball layout, which used a similar cabinet -->
   
 <!-- define elements -->
 
@@ -106,16 +106,16 @@
 			<bounds left="104" top="-34" right="136" bottom="-25" />
 		</bezel>
 
-		<bezel name="digit7" element="digit">
+		<bezel name="digit15" element="digit">
 			<bounds left="110" top="-20" right="120" bottom="-8" />
 		</bezel>
-		<bezel name="digit8" element="digit">
+		<bezel name="digit16" element="digit">
 			<bounds left="120" top="-20" right="130" bottom="-8" />
 		</bezel>
 
 
 <!-- ball -->
-<!-- note: digit32 and digit52 are left unused -->
+<!-- note: digit14 (before credit) and digit17 (before ball) are left unused -->
 
 		<bezel element="static_red">
 			<bounds left="139" top="-23" right="161" bottom="-5" />
@@ -128,7 +128,7 @@
 			<bounds left="139" top="-34" right="161" bottom="-25" />
 		</bezel>
 
-		<bezel name="digit9" element="digit">
+		<bezel name="digit18" element="digit">
 			<bounds left="145" top="-20" right="155" bottom="-8" />
 		</bezel>
 
@@ -146,10 +146,10 @@
 			<bounds left="164" top="-34" right="196" bottom="-25" />
 		</bezel>
 
-		<bezel name="digit10" element="digit">
+		<bezel name="digit19" element="digit">
 			<bounds left="170" top="-20" right="180" bottom="-8" />
 		</bezel>
-		<bezel name="digit11" element="digit">
+		<bezel name="digit20" element="digit">
 			<bounds left="180" top="-20" right="190" bottom="-8" />
 		</bezel>
 
@@ -167,28 +167,28 @@
 			<bounds left="214" top="-34" right="296" bottom="-25" />
 		</bezel>
 
-		<bezel name="digit12" element="digit">
+		<bezel name="digit7" element="digit">
 			<bounds left="220" top="-20" right="230" bottom="-8" />
 		</bezel>
-		<bezel name="digit13" element="digit">
+		<bezel name="digit8" element="digit">
 			<bounds left="230" top="-20" right="240" bottom="-8" />
 		</bezel>
-		<bezel name="digit14" element="digit">
+		<bezel name="digit9" element="digit">
 			<bounds left="240" top="-20" right="250" bottom="-8" />
 		</bezel>
-		<bezel name="digit15" element="digit">
+		<bezel name="digit10" element="digit">
 			<bounds left="250" top="-20" right="260" bottom="-8" />
 		</bezel>
-		<bezel name="digit16" element="digit">
+		<bezel name="digit11" element="digit">
 			<bounds left="260" top="-20" right="270" bottom="-8" />
 		</bezel>
-		<bezel name="digit17" element="digit">
+		<bezel name="digit12" element="digit">
 			<bounds left="270" top="-20" right="280" bottom="-8" />
 		</bezel>
-		<bezel name="digit18" element="digit">
+		<bezel name="digit13" element="digit">
 			<bounds left="280" top="-20" right="290" bottom="-8" />
 		</bezel>
-
+    
     </view>
 
 </mamelayout>
