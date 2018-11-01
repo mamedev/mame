@@ -400,8 +400,39 @@ READ8_MEMBER(xavix_state::timer_status_r)
 
 WRITE8_MEMBER(xavix_state::timer_control_w)
 {
-	LOG("%s: timer_control_w %02x\n", machine().describe_context(), data);
+	/* timer is actively used by
+	   ttv_lotr, ttv_sw, drgqst, has_wamg, rad_rh, eka_*, epo_efdx, rad_bass, rad_bb2
+	   
+	   gets turned on briefly during the bootup of rad_crdn, but then off again
+
+	   runs during rad_fb / rad_madf, but with IRQs turned off
+
+	   disabled for rad_snow, rad_ping, rad_mtrk, rad_box, *nostalgia, ttv_mx, xavtenni
+	   */
+
+	//LOG("%s: timer_control_w %02x\n", machine().describe_context(), data);
 	m_timer_control = data;
+
+	if (data & 0x80) // tends to read+write address to ack interrupts, assume it's similar to other things and top bit will clear IRQ (usually gets written all the time when starting timer)
+	{
+		if (m_irqsource & 0x10)
+		{
+			m_irqsource &= ~0x10;
+			update_irqs();
+		}
+	}
+
+	// has_wamg, ttv_sw, eka_*, rad_bass set bit 0x02 too (maybe reload related?)
+
+	// rad_fb / rad_madf don't set bit 0x40 (and doesn't seem to have a valid interrupt handler for timer, so probably means it generates no IRQ?)
+	if (data & 0x01) // timer start?
+	{
+		m_freq_timer->adjust(attotime::from_usec(50000));
+	}
+	else
+	{
+		m_freq_timer->adjust(attotime::never, 0);
+	}
 }
 
 WRITE8_MEMBER(xavix_state::timer_baseval_w)
@@ -449,7 +480,16 @@ WRITE8_MEMBER(xavix_state::timer_freq_w)
 
 TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 {
-
+	if (m_timer_control & 0x40) // Timer IRQ enable?
+	{
+		m_irqsource |= 0x10;
+		m_timer_control |= 0x80;
+		update_irqs();
+	}
+	
+	//logerror("freq_timer_done\n");
+	// reload
+	//m_freq_timer->adjust(attotime::from_usec(50000));
 }
 
 

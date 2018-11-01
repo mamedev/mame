@@ -612,6 +612,14 @@ static INPUT_PORTS_START( rad_bass )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( eka_base )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( rad_bassp )
 	PORT_INCLUDE(rad_bass)
 
@@ -1052,13 +1060,13 @@ CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  xavix,    xavix_state, 
 
 CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, eka_base,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT)
+CONS( 200?, eka_base,  0,          0,  xavix,  eka_base,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT)
 
-CONS( 200?, eka_strt,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 200?, eka_strt,  eka_base,   0,   xavix,  eka_base,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, eka_vol1,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // insert calls it 'HIT MIX Vol 1'
+CONS( 200?, eka_vol1,  eka_base,   0,   xavix,  eka_base,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // insert calls it 'HIT MIX Vol 1'
 
-CONS( 200?, eka_vol2,  eka_base,   0,   xavix,  xavix  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // insert calls it 'HIT MIX Vol 2'
+CONS( 200?, eka_vol2,  eka_base,   0,   xavix,  eka_base  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // insert calls it 'HIT MIX Vol 2'
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
