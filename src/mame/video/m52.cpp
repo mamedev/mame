@@ -10,7 +10,7 @@
 #include "video/resnet.h"
 #include "includes/m52.h"
 
-#define BGHEIGHT 64
+#define BGHEIGHT 128
 
 
 /*************************************
@@ -182,8 +182,8 @@ void m52_alpha1v_state::video_start()
 	m_do_bg_fills = false; // or you get solid green areas below the stars bg image.  does the doubled up tilemap ROM maybe mean double height instead?
 
 	// the scrolling orange powerups 'orbs' are a single tile in the tilemap, your ship is huge, it is unclear where the hitboxes are meant to be
-	// using the same value as mpatrol puts the collision at the very back of your ship, and causes draw-in issues on the tilemap
-	// maybe the sprite positioning is incorrect instead?
+	// using the same value as mpatrol puts the collision at the very back of your ship
+	// maybe the sprite positioning is incorrect instead or this is just how the game is designed
 	//m_tx_tilemap->set_scrolldx(127+8, 127-8);
 }
 
@@ -462,10 +462,10 @@ uint32_t m52_state::screen_update_m52(screen_device &screen, bitmap_rgb32 &bitma
 		if (!(m_bgcontrol & 0x10))
 			draw_background(bitmap, cliprect, m_bg2xpos, m_bg2ypos, 0); /* distant mountains */
 
+		// only one of these be drawn at once (they share the same scroll register) (alpha1v leaves everything enabled)
 		if (!(m_bgcontrol & 0x02))
 			draw_background(bitmap, cliprect, m_bg1xpos, m_bg1ypos, 1); /* hills */
-
-		if (!(m_bgcontrol & 0x04))
+		else if (!(m_bgcontrol & 0x04))
 			draw_background(bitmap, cliprect, m_bg1xpos, m_bg1ypos, 2); /* cityscape */
 	}
 

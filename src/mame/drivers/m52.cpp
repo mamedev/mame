@@ -347,14 +347,14 @@ static const uint32_t bgcharlayout_xoffset[256] =
 	STEP4(0x1e0,1), STEP4(0x1e8,1), STEP4(0x1f0,1), STEP4(0x1f8,1)
 };
 
-static const uint32_t bgcharlayout_yoffset[64] =
+static const uint32_t bgcharlayout_yoffset[128] =
 {
-	STEP32(0x0000,0x200), STEP32(0x4000,0x200)
+	STEP32(0x0000,0x200), STEP32(0x4000,0x200), STEP32(0x8000,0x200), STEP32(0xc000,0x200)
 };
 
 static const gfx_layout bgcharlayout =
 {
-	256, 64, /* 256x64 image format */
+	256, 128, /* 256x64 image format */
 	1,       /* 1 image */
 	2,       /* 2 bits per pixel */
 	{ 4, 0 },       /* the two bitplanes for 4 pixels are packed into one byte */
@@ -480,13 +480,14 @@ ROM_START(mpatrol)
 	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))
 	ROM_LOAD("mpb-1.3n", 0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2))
 
-	ROM_REGION(0x1000, "bg0", 0)
+	/* 0x1000-01fff is intentionally left as 0xff fill for the bg regions */
+	ROM_REGION(0x2000, "bg0", ROMREGION_ERASEFF)
 	ROM_LOAD("mpe-1.3l", 0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84))
 
-	ROM_REGION(0x1000, "bg1", 0)
+	ROM_REGION(0x2000, "bg1", ROMREGION_ERASEFF)
 	ROM_LOAD("mpe-2.3k", 0x0000, 0x1000, CRC(c7aa1fb0) SHA1(14c6c76e1d0db2c0745e5d6d33ea6945fac8e9ee))
 
-	ROM_REGION(0x1000, "bg2", 0)
+	ROM_REGION(0x2000, "bg2", ROMREGION_ERASEFF)
 	ROM_LOAD("mpe-3.3h", 0x0000, 0x1000, CRC(a0919392) SHA1(8a090cb8d483a3d67c7360058e3fdd70e151cd62))
 
 	ROM_REGION(0x0200, "tx_pal", 0)
@@ -520,13 +521,14 @@ ROM_START(mpatrolw)
 	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))
 	ROM_LOAD("mpb-1.3n", 0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2))
 
-	ROM_REGION(0x1000, "bg0", 0)
+	/* 0x1000-01fff is intentionally left as 0xff fill for the bg regions */
+	ROM_REGION(0x2000, "bg0", ROMREGION_ERASEFF)
 	ROM_LOAD("mpe-1.3l", 0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84))
 
-	ROM_REGION(0x1000, "bg1", 0)
+	ROM_REGION(0x2000, "bg1", ROMREGION_ERASEFF)
 	ROM_LOAD("mpe-2.3k", 0x0000, 0x1000, CRC(c7aa1fb0) SHA1(14c6c76e1d0db2c0745e5d6d33ea6945fac8e9ee))
 
-	ROM_REGION(0x1000, "bg2", 0)
+	ROM_REGION(0x2000, "bg2", ROMREGION_ERASEFF)
 	ROM_LOAD("mpe-3.3h", 0x0000, 0x1000, CRC(a0919392) SHA1(8a090cb8d483a3d67c7360058e3fdd70e151cd62))
 
 	ROM_REGION(0x0200, "tx_pal", 0)
@@ -560,13 +562,14 @@ ROM_START(mranger)
 	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))
 	ROM_LOAD("mpb-1.3n", 0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2))
 
-	ROM_REGION(0x1000, "bg0", 0)
+	/* 0x1000-01fff is intentionally left as 0xff fill for the bg regions */
+	ROM_REGION(0x2000, "bg0", ROMREGION_ERASEFF)
 	ROM_LOAD("mpe-1.3l", 0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84))
 
-	ROM_REGION(0x1000, "bg1", 0)
+	ROM_REGION(0x2000, "bg1", ROMREGION_ERASEFF)
 	ROM_LOAD("mpe-2.3k", 0x0000, 0x1000, CRC(c7aa1fb0) SHA1(14c6c76e1d0db2c0745e5d6d33ea6945fac8e9ee))
 
-	ROM_REGION(0x1000, "bg2", 0)
+	ROM_REGION(0x2000, "bg2", ROMREGION_ERASEFF)
 	ROM_LOAD("mpe-3.3h", 0x0000, 0x1000, CRC(a0919392) SHA1(8a090cb8d483a3d67c7360058e3fdd70e151cd62))
 
 	ROM_REGION(0x0200, "tx_pal", 0)
@@ -605,16 +608,16 @@ ROM_START(alpha1v)
 	ROM_LOAD("16-l3", 0x1000, 0x1000, CRC(39b9863b) SHA1(da9da9a1066188f050c422dfed1bbbd3ba612ccc))
 	ROM_LOAD("17-k3", 0x2000, 0x1000, CRC(cfd90773) SHA1(052e126888b6de636db9c521a090699c282b620b))
 
-	/* all the background roms just contain stars.. */
-	ROM_REGION(0x1000, "bg0", 0)
-	ROM_LOAD("11-k3", 0x0000, 0x1000, CRC(7659440a) SHA1(2efd27c82913513dd03e799f1ed3c10b0863677d)) // why are there 2 copies of the this BG rom?
-	ROM_LOAD("12-jh3", 0x0000, 0x1000, CRC(7659440a) SHA1(2efd27c82913513dd03e799f1ed3c10b0863677d))
+	/* all the background roms just contain stars, looks like it wants 2x128 px high images, instead of 3x64, arrangement unclear */
+	ROM_REGION(0x2000, "bg0", ROMREGION_ERASEFF)
+	ROM_LOAD("11-k3",  0x0000, 0x1000, CRC(7659440a) SHA1(2efd27c82913513dd03e799f1ed3c10b0863677d)) // rom is duplicated
+	ROM_LOAD("12-jh3", 0x1000, 0x1000, CRC(7659440a) SHA1(2efd27c82913513dd03e799f1ed3c10b0863677d))
 
-	ROM_REGION(0x1000, "bg1", 0)
-	ROM_LOAD("9-n3", 0x0000, 0x1000, CRC(0fdb7d13) SHA1(e828254a4f94df633d338b5772719276d41c6b7f))
+	ROM_REGION(0x2000, "bg1", ROMREGION_ERASEFF)
+	ROM_LOAD("9-n3",   0x0000, 0x1000, CRC(0fdb7d13) SHA1(e828254a4f94df633d338b5772719276d41c6b7f))
+	ROM_LOAD("10-lm3", 0x1000, 0x1000, CRC(9dde3a75) SHA1(293d093485be19bfb20685d76a08ac78e24062bf))
 
-	ROM_REGION(0x1000, "bg2", 0)
-	ROM_LOAD("10-lm3", 0x0000, 0x1000, CRC(9dde3a75) SHA1(293d093485be19bfb20685d76a08ac78e24062bf))
+	ROM_REGION(0x2000, "bg2", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x0200, "tx_pal", 0)
 	ROM_LOAD("63s481-a2", 0x0000, 0x0200, CRC(58678ea8) SHA1(b13a78a5bca8ad5bdec1293512b53654768a7a7a))
