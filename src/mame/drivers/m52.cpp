@@ -473,15 +473,15 @@ ROM_START(mpatrol)
 	ROM_LOAD("mp-s1.1a", 0x7000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80))
 
 	ROM_REGION(0x2000, "tx", 0)
-	ROM_LOAD("mpe-5.3e", 0x0000, 0x1000, CRC(e3ee7f75) SHA1(b03d0d56150d3e9da4a4c871338097b4f450b649))       /* chars */
+	ROM_LOAD("mpe-5.3e", 0x0000, 0x1000, CRC(e3ee7f75) SHA1(b03d0d56150d3e9da4a4c871338097b4f450b649))
 	ROM_LOAD("mpe-4.3f", 0x1000, 0x1000, CRC(cca6d023) SHA1(fecb3059fb09897a096add9452b50aec55c07545))
 
 	ROM_REGION(0x2000, "sp", 0)
-	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))       /* sprites */
+	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))
 	ROM_LOAD("mpb-1.3n", 0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2))
 
 	ROM_REGION(0x1000, "bg0", 0)
-	ROM_LOAD("mpe-1.3l", 0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84))       /* background graphics */
+	ROM_LOAD("mpe-1.3l", 0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84))
 
 	ROM_REGION(0x1000, "bg1", 0)
 	ROM_LOAD("mpe-2.3k", 0x0000, 0x1000, CRC(c7aa1fb0) SHA1(14c6c76e1d0db2c0745e5d6d33ea6945fac8e9ee))
@@ -493,13 +493,13 @@ ROM_START(mpatrol)
 	ROM_LOAD("mpc-4.2a", 0x0000, 0x0200, CRC(07f99284) SHA1(dfc52958f2520e1ce4446dd4c84c91413bbacf76))
 
 	ROM_REGION(0x0020, "bg_pal", 0)
-	ROM_LOAD("mpc-3.1m", 0x0000, 0x0020, CRC(6a57eff2) SHA1(2d1c12dab5915da2ccd466e39436c88be434d634)) /* background palette */
+	ROM_LOAD("mpc-3.1m", 0x0000, 0x0020, CRC(6a57eff2) SHA1(2d1c12dab5915da2ccd466e39436c88be434d634))
 
 	ROM_REGION(0x0020, "spr_pal", 0)
-	ROM_LOAD("mpc-1.1f", 0x0000, 0x0020, CRC(26979b13) SHA1(8c41a8cce4f3384c392a9f7a223a50d7be0e14a5)) /* sprite palette */
+	ROM_LOAD("mpc-1.1f", 0x0000, 0x0020, CRC(26979b13) SHA1(8c41a8cce4f3384c392a9f7a223a50d7be0e14a5))
 
 	ROM_REGION(0x0100, "spr_clut", 0)
-	ROM_LOAD("mpc-2.2h", 0x0000, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b)) /* sprite lookup table */
+	ROM_LOAD("mpc-2.2h", 0x0000, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b))
 ROM_END
 
 ROM_START(mpatrolw)
@@ -513,15 +513,15 @@ ROM_START(mpatrolw)
 	ROM_LOAD("mp-s1.1a", 0x7000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80))
 
 	ROM_REGION(0x2000, "tx", 0)
-	ROM_LOAD("mpe-5w.3e", 0x0000, 0x1000, CRC(f56e01fe) SHA1(93f582d63b9cd5c6dca207aa57b213c939cdda1d))       /* chars */
+	ROM_LOAD("mpe-5w.3e", 0x0000, 0x1000, CRC(f56e01fe) SHA1(93f582d63b9cd5c6dca207aa57b213c939cdda1d))
 	ROM_LOAD("mpe-4w.3f", 0x1000, 0x1000, CRC(caaba2d9) SHA1(7016a26c2d01e3209749598e993cd8ce91f12c88))
 
 	ROM_REGION(0x2000, "sp", 0)
-	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))       /* sprites */
+	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))
 	ROM_LOAD("mpb-1.3n", 0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2))
 
 	ROM_REGION(0x1000, "bg0", 0)
-	ROM_LOAD("mpe-1.3l", 0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84))       /* background graphics */
+	ROM_LOAD("mpe-1.3l", 0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84))
 
 	ROM_REGION(0x1000, "bg1", 0)
 	ROM_LOAD("mpe-2.3k", 0x0000, 0x1000, CRC(c7aa1fb0) SHA1(14c6c76e1d0db2c0745e5d6d33ea6945fac8e9ee))
@@ -533,13 +533,13 @@ ROM_START(mpatrolw)
 	ROM_LOAD("mpc-4a.2a", 0x0000, 0x0200, CRC(cb0a5ff3) SHA1(d3f88b4e0c4858abac8b52105656ecece0cf4df9))
 
 	ROM_REGION(0x0020, "bg_pal", 0)
-	ROM_LOAD("mpc-3.1m", 0x0000, 0x0020, CRC(6a57eff2) SHA1(2d1c12dab5915da2ccd466e39436c88be434d634)) /* background palette */
+	ROM_LOAD("mpc-3.1m", 0x0000, 0x0020, CRC(6a57eff2) SHA1(2d1c12dab5915da2ccd466e39436c88be434d634))
 
 	ROM_REGION(0x0020, "spr_pal", 0)
-	ROM_LOAD("mpc-1.1f", 0x0000, 0x0020, CRC(26979b13) SHA1(8c41a8cce4f3384c392a9f7a223a50d7be0e14a5)) /* sprite palette */
+	ROM_LOAD("mpc-1.1f", 0x0000, 0x0020, CRC(26979b13) SHA1(8c41a8cce4f3384c392a9f7a223a50d7be0e14a5))
 
 	ROM_REGION(0x0100, "spr_clut", 0)
-	ROM_LOAD("mpc-2.2h", 0x0000, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b)) /* sprite lookup table */
+	ROM_LOAD("mpc-2.2h", 0x0000, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b))
 ROM_END
 
 ROM_START(mranger)
@@ -553,15 +553,15 @@ ROM_START(mranger)
 	ROM_LOAD("mp-s1.1a", 0x7000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80))
 
 	ROM_REGION(0x2000, "tx", 0)
-	ROM_LOAD("mpe-5.3e", 0x0000, 0x1000, CRC(e3ee7f75) SHA1(b03d0d56150d3e9da4a4c871338097b4f450b649))       /* chars */
+	ROM_LOAD("mpe-5.3e", 0x0000, 0x1000, CRC(e3ee7f75) SHA1(b03d0d56150d3e9da4a4c871338097b4f450b649))
 	ROM_LOAD("mpe-4.3f", 0x1000, 0x1000, CRC(cca6d023) SHA1(fecb3059fb09897a096add9452b50aec55c07545))
 
 	ROM_REGION(0x2000, "sp", 0)
-	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))       /* sprites */
+	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))
 	ROM_LOAD("mpb-1.3n", 0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2))
 
 	ROM_REGION(0x1000, "bg0", 0)
-	ROM_LOAD("mpe-1.3l", 0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84))       /* background graphics */
+	ROM_LOAD("mpe-1.3l", 0x0000, 0x1000, CRC(c46a7f72) SHA1(8bb7c9acaf6833fb6c0575b015991b873a305a84))
 
 	ROM_REGION(0x1000, "bg1", 0)
 	ROM_LOAD("mpe-2.3k", 0x0000, 0x1000, CRC(c7aa1fb0) SHA1(14c6c76e1d0db2c0745e5d6d33ea6945fac8e9ee))
@@ -573,13 +573,13 @@ ROM_START(mranger)
 	ROM_LOAD("mpc-4.2a", 0x0000, 0x0200, CRC(07f99284) SHA1(dfc52958f2520e1ce4446dd4c84c91413bbacf76))
 
 	ROM_REGION(0x0020, "bg_pal", 0)
-	ROM_LOAD("mpc-3.1m", 0x0000, 0x0020, CRC(6a57eff2) SHA1(2d1c12dab5915da2ccd466e39436c88be434d634)) /* background palette */
+	ROM_LOAD("mpc-3.1m", 0x0000, 0x0020, CRC(6a57eff2) SHA1(2d1c12dab5915da2ccd466e39436c88be434d634))
 
 	ROM_REGION(0x0020, "spr_pal", 0)
-	ROM_LOAD("mpc-1.1f", 0x0000, 0x0020, CRC(26979b13) SHA1(8c41a8cce4f3384c392a9f7a223a50d7be0e14a5)) /* sprite palette */
+	ROM_LOAD("mpc-1.1f", 0x0000, 0x0020, CRC(26979b13) SHA1(8c41a8cce4f3384c392a9f7a223a50d7be0e14a5))
 
 	ROM_REGION(0x0100, "spr_clut", 0)
-	ROM_LOAD("mpc-2.2h", 0x0000, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b)) /* sprite lookup table */
+	ROM_LOAD("mpc-2.2h", 0x0000, 0x0100, CRC(7ae4cd97) SHA1(bc0662fac82ffe65f02092d912b2c2b0c7a8ac2b))
 ROM_END
 
 
@@ -597,7 +597,7 @@ ROM_START(alpha1v)
 	ROM_LOAD("1-a1", 0x7000, 0x1000, CRC(9e07fdd5) SHA1(ed4f462fcfe91fa8e88bfeaaba0a0c11fa0b4601))
 
 	ROM_REGION(0x2000, "tx", 0)
-	ROM_LOAD("14-e3", 0x0000, 0x1000, CRC(cf00c737) SHA1(415e90289039cac4d04cb1d559f1378ca6a32132))       /* chars */
+	ROM_LOAD("14-e3", 0x0000, 0x1000, CRC(cf00c737) SHA1(415e90289039cac4d04cb1d559f1378ca6a32132))
 	ROM_LOAD("13-f3", 0x1000, 0x1000, CRC(4b799229) SHA1(42cbdcf787b08b041d30504d699a12c378224933))
 
 	ROM_REGION(0x3000, "sp", 0) // 3bpp (mpatrol is 2bpp)
@@ -621,13 +621,13 @@ ROM_START(alpha1v)
 	ROM_LOAD("63s481-a2", 0x0000, 0x0200, CRC(58678ea8) SHA1(b13a78a5bca8ad5bdec1293512b53654768a7a7a))
 
 	ROM_REGION(0x0020, "bg_pal", 0)
-	ROM_LOAD("18s030-m1", 0x0000, 0x0020, CRC(6a57eff2) SHA1(2d1c12dab5915da2ccd466e39436c88be434d634)) /* background palette */
+	ROM_LOAD("18s030-m1", 0x0000, 0x0020, CRC(6a57eff2) SHA1(2d1c12dab5915da2ccd466e39436c88be434d634))
 
 	ROM_REGION(0x0020, "spr_pal", 0)
-	ROM_LOAD("mb7051-f1", 0x0000, 0x0020, CRC(d8bdd0df) SHA1(ca522428927911808214d319af314f601497ded4)) /* sprite palette */
+	ROM_LOAD("mb7051-f1", 0x0000, 0x0020, CRC(d8bdd0df) SHA1(ca522428927911808214d319af314f601497ded4))
 
 	ROM_REGION(0x0100, "spr_clut", 0)
-	ROM_LOAD("mb7052-h2", 0x0000, 0x0100, CRC(ce9f0ef9) SHA1(3afb94ed033f272983bbed22a59856df7824ef8a)) /* sprite lookup table */
+	ROM_LOAD("mb7052-h2", 0x0000, 0x0100, CRC(ce9f0ef9) SHA1(3afb94ed033f272983bbed22a59856df7824ef8a))
 ROM_END
 
 
