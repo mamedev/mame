@@ -212,6 +212,8 @@ WRITE8_MEMBER(m52_alpha1v_state::m52_scroll_w)
 /*
    alpha1v must have some board mod to invert scroll register use, as it expects only the first block to remain static
    the scrolling powerups are part of the tx layer!
+
+   TODO: check if this configuration works with Moon Patrol, maybe the schematics were read incorrectly?
 */
 	m_tx_tilemap->set_scrollx(0,  255);
 	m_tx_tilemap->set_scrollx(1, -(data + 1));
