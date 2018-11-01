@@ -19,13 +19,12 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(m52_state, m52)
+void m52_state::init_palette()
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	const uint8_t *char_pal = color_prom + 0x000;
-	const uint8_t *back_pal = color_prom + 0x200;
-	const uint8_t *sprite_pal = color_prom + 0x220;
-	const uint8_t *sprite_table = color_prom + 0x240;
+	const uint8_t *char_pal = memregion("tx_pal")->base();
+	const uint8_t *back_pal = memregion("bg_pal")->base();
+	const uint8_t *sprite_pal = memregion("spr_pal")->base();
+	const uint8_t *sprite_table = memregion("spr_clut")->base();
 	static const int resistances_3[3] = { 1000, 470, 220 };
 	static const int resistances_2[2]  = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[3], scale;
@@ -45,7 +44,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		palette.set_indirect_color(i, rgb_t(r,g,b));
+		m_tx_palette->set_pen_color(i, rgb_t(r,g,b));
 	}
 
 	/* background palette */
@@ -56,8 +55,27 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		palette.set_indirect_color(512+i, rgb_t(r,g,b));
+		m_bg_palette->set_indirect_color(i, rgb_t(r,g,b));
 	}
+
+	/* background */
+	/* the palette is a 32x8 PROM with many colors repeated. The address of */
+	/* the colors to pick is as follows: */
+	/* xbb00: mountains */
+	/* 0xxbb: hills */
+	/* 1xxbb: city */
+	m_bg_palette->set_pen_indirect(0*4+0, 0); // 512
+	m_bg_palette->set_pen_indirect(0*4+1, 4);
+	m_bg_palette->set_pen_indirect(0*4+2, 8);
+	m_bg_palette->set_pen_indirect(0*4+3, 12);
+	m_bg_palette->set_pen_indirect(1*4+0, 0); // 512
+	m_bg_palette->set_pen_indirect(1*4+1, 1);
+	m_bg_palette->set_pen_indirect(1*4+2, 2);
+	m_bg_palette->set_pen_indirect(1*4+3, 3);
+	m_bg_palette->set_pen_indirect(2*4+0, 0); // 512
+	m_bg_palette->set_pen_indirect(2*4+1, 16+1);
+	m_bg_palette->set_pen_indirect(2*4+2, 16+2);
+	m_bg_palette->set_pen_indirect(2*4+3, 16+3);
 
 	/* compute palette information for sprites */
 	compute_resistor_weights(0, 255, scale,
@@ -73,38 +91,15 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		palette.set_indirect_color(512 + 32 + i, rgb_t(r,g,b));
+		m_sp_palette->set_indirect_color( i, rgb_t(r,g,b));
 	}
-
-	/* character lookup table */
-	for (i = 0; i < 512; i++)
-		palette.set_pen_indirect(i, i);
 
 	/* sprite lookup table */
 	for (i = 0; i < 16 * 4; i++)
 	{
 		uint8_t promval = sprite_table[(i & 3) | ((i & ~3) << 1)];
-		palette.set_pen_indirect(512 + i, 512 + 32 + promval);
+		m_sp_palette->set_pen_indirect( i,  promval);
 	}
-
-	/* background */
-	/* the palette is a 32x8 PROM with many colors repeated. The address of */
-	/* the colors to pick is as follows: */
-	/* xbb00: mountains */
-	/* 0xxbb: hills */
-	/* 1xxbb: city */
-	palette.set_pen_indirect(512+16*4+0*4+0, 512);
-	palette.set_pen_indirect(512+16*4+0*4+1, 512+4);
-	palette.set_pen_indirect(512+16*4+0*4+2, 512+8);
-	palette.set_pen_indirect(512+16*4+0*4+3, 512+12);
-	palette.set_pen_indirect(512+16*4+1*4+0, 512);
-	palette.set_pen_indirect(512+16*4+1*4+1, 512+1);
-	palette.set_pen_indirect(512+16*4+1*4+2, 512+2);
-	palette.set_pen_indirect(512+16*4+1*4+3, 512+3);
-	palette.set_pen_indirect(512+16*4+2*4+0, 512);
-	palette.set_pen_indirect(512+16*4+2*4+1, 512+16+1);
-	palette.set_pen_indirect(512+16*4+2*4+2, 512+16+2);
-	palette.set_pen_indirect(512+16*4+2*4+3, 512+16+3);
 }
 
 
@@ -135,7 +130,7 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 		flag |= TILE_FORCE_LAYER0; /* lines 0 to 6 are opaqe? */
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color & 0x3f, flag);
+	SET_TILE_INFO_MEMBER(0, code, color & 0x7f, flag);
 }
 
 
@@ -148,12 +143,14 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 
 void m52_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_tx_gfxdecode, tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
-	m_bg_tilemap->set_transparent_pen(0);
-	m_bg_tilemap->set_scrolldx(127, 127);
-	m_bg_tilemap->set_scrolldy(16, 16);
-	m_bg_tilemap->set_scroll_rows(4); /* only lines 192-256 scroll */
+	m_tx_tilemap->set_transparent_pen(0);
+	m_tx_tilemap->set_scrolldx(127, 127);
+	m_tx_tilemap->set_scrolldy(16, 16);
+	m_tx_tilemap->set_scroll_rows(4); /* only lines 192-256 scroll */
+
+	init_palette();
 
 	save_item(NAME(m_bg1xpos));
 	save_item(NAME(m_bg1ypos));
@@ -179,10 +176,10 @@ WRITE8_MEMBER(m52_state::m52_scroll_w)
 
     So we set the first 3 quarters to 255 and the last to the scroll value
 */
-	m_bg_tilemap->set_scrollx(0, 255);
-	m_bg_tilemap->set_scrollx(1, 255);
-	m_bg_tilemap->set_scrollx(2, 255);
-	m_bg_tilemap->set_scrollx(3, -(data + 1));
+	m_tx_tilemap->set_scrollx(0, 255);
+	m_tx_tilemap->set_scrollx(1, 255);
+	m_tx_tilemap->set_scrollx(2, 255);
+	m_tx_tilemap->set_scrollx(3, -(data + 1));
 }
 
 
@@ -196,14 +193,14 @@ WRITE8_MEMBER(m52_state::m52_scroll_w)
 WRITE8_MEMBER(m52_state::m52_videoram_w)
 {
 	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
 WRITE8_MEMBER(m52_state::m52_colorram_w)
 {
 	m_colorram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -290,10 +287,11 @@ WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
  *
  *************************************/
 
-void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
+void m52_state::draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
 	const rectangle &visarea = m_screen->visible_area();
+	const pen_t *paldata = m_bg_palette->pens();
 
 
 	if (flip_screen())
@@ -308,7 +306,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	ypos += 16;
 
 
-	m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
+	m_bg_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -316,7 +314,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		ypos, 0);
 
 
-	m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
+	m_bg_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -337,7 +335,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	bitmap.fill(m_gfxdecode->gfx(image)->colorbase() + 3, rect);
+	bitmap.fill(paldata[m_bg_gfxdecode->gfx(image)->colorbase() + 3], rect);
 }
 
 
@@ -348,7 +346,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
  *
  *************************************/
 
-void m52_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int initoffs)
+void m52_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int initoffs)
 {
 	int offs;
 
@@ -392,9 +390,9 @@ void m52_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		clip = cliprect;
 #endif
 
-		m_gfxdecode->gfx(1)->transmask(bitmap,clip,
+		m_sp_gfxdecode->gfx(0)->transmask(bitmap,clip,
 			code, color, flipx, flipy, sx, sy,
-			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512 + 32));
+			m_sp_palette->transpen_mask(*m_sp_gfxdecode->gfx(0), color,  0));
 	}
 }
 
@@ -406,27 +404,28 @@ void m52_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, in
  *
  *************************************/
 
-uint32_t m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m52_state::screen_update_m52(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int offs;
+	const pen_t *paldata = m_sp_palette->pens();
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(paldata[0], cliprect);
 
 	if (!(m_bgcontrol & 0x20))
 	{
 		if (!(m_bgcontrol & 0x10))
-			draw_background(bitmap, cliprect, m_bg2xpos, m_bg2ypos, 2); /* distant mountains */
+			draw_background(bitmap, cliprect, m_bg2xpos, m_bg2ypos, 0); /* distant mountains */
 
 		if (!(m_bgcontrol & 0x02))
-			draw_background(bitmap, cliprect, m_bg1xpos, m_bg1ypos, 3); /* hills */
+			draw_background(bitmap, cliprect, m_bg1xpos, m_bg1ypos, 1); /* hills */
 
 		if (!(m_bgcontrol & 0x04))
-			draw_background(bitmap, cliprect, m_bg1xpos, m_bg1ypos, 4); /* cityscape */
+			draw_background(bitmap, cliprect, m_bg1xpos, m_bg1ypos, 2); /* cityscape */
 	}
 
-	m_bg_tilemap->set_flip(flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tx_tilemap->set_flip(flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0x3c; offs <= 0xfc; offs += 0x40)
