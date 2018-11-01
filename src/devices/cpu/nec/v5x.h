@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_CPU_NEC_V53_H
-#define MAME_CPU_NEC_V53_H
+#ifndef MAME_CPU_NEC_V5X_H
+#define MAME_CPU_NEC_V5X_H
 
 #pragma once
 
@@ -170,4 +170,4 @@ DECLARE_DEVICE_TYPE(V50,  v50_device)
 DECLARE_DEVICE_TYPE(V53,  v53_device)
 DECLARE_DEVICE_TYPE(V53A, v53a_device)
 
-#endif // MAME_CPU_NEC_V53_H
+#endif // MAME_CPU_NEC_V5X_H

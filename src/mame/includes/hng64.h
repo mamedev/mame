@@ -4,7 +4,7 @@
 #include "machine/msm6242.h"
 #include "machine/timer.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/nec/v53.h"
+#include "cpu/nec/v5x.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/poly.h"
 #include "cpu/tlcs870/tlcs870.h"

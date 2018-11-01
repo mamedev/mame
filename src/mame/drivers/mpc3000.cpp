@@ -61,7 +61,7 @@ MPCs on other hardware:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/v53.h"
+#include "cpu/nec/v5x.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/hd61830.h"
 #include "bus/midi/midi.h"

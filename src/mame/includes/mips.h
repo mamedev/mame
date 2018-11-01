@@ -8,7 +8,7 @@
 
 // processors and memory
 #include "cpu/mips/r3000.h"
-#include "cpu/nec/v53.h"
+#include "cpu/nec/v5x.h"
 #include "machine/ram.h"
 
 // i/o devices

@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Patrick Mackinlay
 
 /*
  * NEC V5x devices consist of a V3x CPU core plus integrated peripherals. The
  * CPU cores within each device are as follows:
  *
- *   Device          CPU
- *   V50/µPD70216    V30/µPD70116
- *   V53/µPD70236    V33/µPD70136
- *   V53A/µPD70236A  V33A//µPD70136A
+ *   Device            CPU
+ *   V50 (µPD70216)    V30 (µPD70116)
+ *   V53 (µPD70236)    V33 (µPD70136)
+ *   V53A (µPD70236A)  V33A (µPD70136A)
  *
  * The peripherals are nearly identical between all three devices:
  *
@@ -27,7 +27,7 @@
  *
  */
 #include "emu.h"
-#include "v53.h"
+#include "v5x.h"
 
 #include "necpriv.h"
 
@@ -112,32 +112,6 @@ WRITE8_MEMBER(v50_device::OPCN_w)
 	install_peripheral_io();
 }
 
-/*
-m_WCY0 = 0x07;
-m_WCY1 = 0x77;
-m_WCY2 = 0x77;
-m_WCY3 = 0x77;
-m_WCY4 = 0x77;
-m_WMB0 = 0x77;
-m_WMB1 = 0x77;
-m_WAC =  0x00;
-m_TCKS = 0x00;
-m_RFC =  0x80;
-m_SBCR = 0x00;
-m_BRC =  0x00;
-// SCU
-m_SMD =  0x4b;
-m_SCM =  0x00;
-m_SIMK = 0x03;
-m_SST = 0x04;
-// DMA
-m_DCH = 0x01;
-m_DMD = 0x00;
-m_DCC = 0x0000;
-m_DST = 0x00;
-m_DMK = 0x0f;
-*/
-
 void v5x_base_device::device_reset()
 {
 	v33_base_device::device_reset();
@@ -202,7 +176,7 @@ void v5x_base_device::device_post_load()
 void v53_device::install_peripheral_io()
 {
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
-	space(AS_IO).unmap_readwrite(0x1000, 0xfeff); // todo, we need to have a way to NOT unmap things defined in the drivers, but instead have this act as an overlay mapping / unampping only!!
+	space(AS_IO).unmap_readwrite(0x1000, 0xfeff);
 
 	// IOAG determines if the handlers used 8-bit or 16-bit access
 	// the hng64.c games first set everything up in 8-bit mode, then
@@ -283,7 +257,7 @@ WRITE_LINE_MEMBER(v53_device::hack_w)
 void v50_device::install_peripheral_io()
 {
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
-	space(AS_IO).unmap_readwrite(0x1000, 0xfeff); // todo, we need to have a way to NOT unmap things defined in the drivers, but instead have this act as an overlay mapping / unampping only!!
+	space(AS_IO).unmap_readwrite(0x1000, 0xfeff);
 
 	if (m_OPSEL & OPSEL_DS)
 	{
