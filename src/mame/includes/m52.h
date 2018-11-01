@@ -23,7 +23,21 @@ public:
 	{ }
 
 	void m52(machine_config &config);
-	void alpha1v(machine_config &config);
+
+	DECLARE_WRITE8_MEMBER(m52_videoram_w);
+	DECLARE_WRITE8_MEMBER(m52_colorram_w);
+	DECLARE_READ8_MEMBER(m52_protection_r);
+
+protected:
+	virtual void video_start() override;
+	virtual DECLARE_WRITE8_MEMBER(m52_scroll_w);
+
+	/* board mod changes? */
+	int m_spritelimit;
+	bool m_sprites_3bpp;
+	bool m_do_bg_fills;
+
+	tilemap_t*             m_tx_tilemap;
 
 private:
 	/* memory pointers */
@@ -32,27 +46,21 @@ private:
 	optional_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
-	tilemap_t*             m_tx_tilemap;
 	uint8_t                m_bg1xpos;
 	uint8_t                m_bg1ypos;
 	uint8_t                m_bg2xpos;
 	uint8_t                m_bg2ypos;
 	uint8_t                m_bgcontrol;
-	DECLARE_WRITE8_MEMBER(m52_scroll_w);
-	DECLARE_WRITE8_MEMBER(m52_videoram_w);
-	DECLARE_WRITE8_MEMBER(m52_colorram_w);
-	DECLARE_READ8_MEMBER(m52_protection_r);
 	DECLARE_WRITE8_MEMBER(m52_bg1ypos_w);
 	DECLARE_WRITE8_MEMBER(m52_bg1xpos_w);
 	DECLARE_WRITE8_MEMBER(m52_bg2xpos_w);
 	DECLARE_WRITE8_MEMBER(m52_bg2ypos_w);
 	DECLARE_WRITE8_MEMBER(m52_bgcontrol_w);
 	DECLARE_WRITE8_MEMBER(m52_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(alpha1v_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void init_palette();
+	void init_sprite_palette(const int *resistances_3, const int *resistances_2, double *weights_r, double *weights_g, double *weights_b, double scale);
 	uint32_t screen_update_m52(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int initoffs);
@@ -64,7 +72,24 @@ private:
 	required_device<palette_device> m_sp_palette;
 	required_device<palette_device> m_tx_palette;
 	required_device<palette_device> m_bg_palette;
-	void alpha1v_map(address_map &map);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
+};
+
+class m52_alpha1v_state : public m52_state
+{
+public:
+	m52_alpha1v_state(const machine_config &mconfig, device_type type, const char *tag)
+		: m52_state(mconfig, type, tag)
+	{ }
+
+	void alpha1v(machine_config &config);
+
+	void alpha1v_map(address_map &map);
+
+protected:
+	virtual void video_start() override;
+	virtual DECLARE_WRITE8_MEMBER(m52_scroll_w) override;
+	DECLARE_WRITE8_MEMBER(alpha1v_flipscreen_w);
+
 };

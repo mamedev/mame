@@ -21,87 +21,96 @@
 
 void m52_state::init_palette()
 {
-	const uint8_t *char_pal = memregion("tx_pal")->base();
-	const uint8_t *back_pal = memregion("bg_pal")->base();
-	const uint8_t *sprite_pal = memregion("spr_pal")->base();
-	const uint8_t *sprite_table = memregion("spr_clut")->base();
-	static const int resistances_3[3] = { 1000, 470, 220 };
-	static const int resistances_2[2]  = { 470, 220 };
+	const int resistances_3[3] = { 1000, 470, 220 };
+	const int resistances_2[2] = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[3], scale;
-	int i;
 
 	/* compute palette information for characters/backgrounds */
 	scale = compute_resistor_weights(0, 255, -1.0,
-			3, resistances_3, weights_r, 0, 0,
-			3, resistances_3, weights_g, 0, 0,
-			2, resistances_2, weights_b, 0, 0);
+		3, resistances_3, weights_r, 0, 0,
+		3, resistances_3, weights_g, 0, 0,
+		2, resistances_2, weights_b, 0, 0);
 
 	/* character palette */
-	for (i = 0; i < 512; i++)
+	const uint8_t *char_pal = memregion("tx_pal")->base();
+	for (int i = 0; i < 512; i++)
 	{
 		uint8_t promval = char_pal[i];
-		int r = combine_3_weights(weights_r, BIT(promval,0), BIT(promval,1), BIT(promval,2));
-		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
-		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
+		int r = combine_3_weights(weights_r, BIT(promval, 0), BIT(promval, 1), BIT(promval, 2));
+		int g = combine_3_weights(weights_g, BIT(promval, 3), BIT(promval, 4), BIT(promval, 5));
+		int b = combine_2_weights(weights_b, BIT(promval, 6), BIT(promval, 7));
 
-		m_tx_palette->set_pen_color(i, rgb_t(r,g,b));
+		m_tx_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	/* background palette */
-	for (i = 0; i < 32; i++)
+	const uint8_t *back_pal = memregion("bg_pal")->base();
+	for (int i = 0; i < 32; i++)
 	{
 		uint8_t promval = back_pal[i];
-		int r = combine_3_weights(weights_r, BIT(promval,0), BIT(promval,1), BIT(promval,2));
-		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
-		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
+		int r = combine_3_weights(weights_r, BIT(promval, 0), BIT(promval, 1), BIT(promval, 2));
+		int g = combine_3_weights(weights_g, BIT(promval, 3), BIT(promval, 4), BIT(promval, 5));
+		int b = combine_2_weights(weights_b, BIT(promval, 6), BIT(promval, 7));
 
-		m_bg_palette->set_indirect_color(i, rgb_t(r,g,b));
+		m_bg_palette->set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* background */
-	/* the palette is a 32x8 PROM with many colors repeated. The address of */
-	/* the colors to pick is as follows: */
-	/* xbb00: mountains */
-	/* 0xxbb: hills */
-	/* 1xxbb: city */
-	m_bg_palette->set_pen_indirect(0*4+0, 0); // 512
-	m_bg_palette->set_pen_indirect(0*4+1, 4);
-	m_bg_palette->set_pen_indirect(0*4+2, 8);
-	m_bg_palette->set_pen_indirect(0*4+3, 12);
-	m_bg_palette->set_pen_indirect(1*4+0, 0); // 512
-	m_bg_palette->set_pen_indirect(1*4+1, 1);
-	m_bg_palette->set_pen_indirect(1*4+2, 2);
-	m_bg_palette->set_pen_indirect(1*4+3, 3);
-	m_bg_palette->set_pen_indirect(2*4+0, 0); // 512
-	m_bg_palette->set_pen_indirect(2*4+1, 16+1);
-	m_bg_palette->set_pen_indirect(2*4+2, 16+2);
-	m_bg_palette->set_pen_indirect(2*4+3, 16+3);
+	/* background
+	 the palette is a 32x8 PROM with many colors repeated. The address of
+	 the colors to pick is as follows:
+	 xbb00: mountains
+	 0xxbb: hills
+	 1xxbb: city
+
+	 this seems hacky, surely all bytes in the PROM should be used, not just picking the ones that give the colours we want?
+
+	 */
+	m_bg_palette->set_pen_indirect(0 * 4 + 0, 0);
+	m_bg_palette->set_pen_indirect(0 * 4 + 1, 4);
+	m_bg_palette->set_pen_indirect(0 * 4 + 2, 8);
+	m_bg_palette->set_pen_indirect(0 * 4 + 3, 12);
+	m_bg_palette->set_pen_indirect(1 * 4 + 0, 0);
+	m_bg_palette->set_pen_indirect(1 * 4 + 1, 1);
+	m_bg_palette->set_pen_indirect(1 * 4 + 2, 2);
+	m_bg_palette->set_pen_indirect(1 * 4 + 3, 3);
+	m_bg_palette->set_pen_indirect(2 * 4 + 0, 0);
+	m_bg_palette->set_pen_indirect(2 * 4 + 1, 16 + 1);
+	m_bg_palette->set_pen_indirect(2 * 4 + 2, 16 + 2);
+	m_bg_palette->set_pen_indirect(2 * 4 + 3, 16 + 3);
+
+	init_sprite_palette(resistances_3, resistances_2, weights_r, weights_g, weights_b, scale);
+}
+
+// this might need to differ for alpha1v due to 3bpp sprites
+void m52_state::init_sprite_palette(const int *resistances_3, const int *resistances_2, double *weights_r, double *weights_g, double *weights_b, double scale)
+{
+	const uint8_t *sprite_pal = memregion("spr_pal")->base();
+	const uint8_t *sprite_table = memregion("spr_clut")->base();
 
 	/* compute palette information for sprites */
 	compute_resistor_weights(0, 255, scale,
-			2, resistances_2, weights_r, 470, 0,
-			3, resistances_3, weights_g, 470, 0,
-			3, resistances_3, weights_b, 470, 0);
+		2, resistances_2, weights_r, 470, 0,
+		3, resistances_3, weights_g, 470, 0,
+		3, resistances_3, weights_b, 470, 0);
 
 	/* sprite palette */
-	for (i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		uint8_t promval = sprite_pal[i];
-		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
-		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
-		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
+		int r = combine_2_weights(weights_r, BIT(promval, 6), BIT(promval, 7));
+		int g = combine_3_weights(weights_g, BIT(promval, 3), BIT(promval, 4), BIT(promval, 5));
+		int b = combine_3_weights(weights_b, BIT(promval, 0), BIT(promval, 1), BIT(promval, 2));
 
-		m_sp_palette->set_indirect_color( i, rgb_t(r,g,b));
+		m_sp_palette->set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* sprite lookup table */
-	for (i = 0; i < 16 * 4; i++)
+	for (int i = 0; i < 16 * 4; i++)
 	{
 		uint8_t promval = sprite_table[(i & 3) | ((i & ~3) << 1)];
-		m_sp_palette->set_pen_indirect( i,  promval);
+		m_sp_palette->set_pen_indirect(i, promval);
 	}
 }
-
 
 
 /*************************************
@@ -157,6 +166,25 @@ void m52_state::video_start()
 	save_item(NAME(m_bg2xpos));
 	save_item(NAME(m_bg2ypos));
 	save_item(NAME(m_bgcontrol));
+
+	m_spritelimit = 0x100-4;
+	m_sprites_3bpp = false;
+	m_do_bg_fills = true;
+}
+
+void m52_alpha1v_state::video_start()
+{
+	m52_state::video_start();
+
+	// is the limit really just higher anyway or is this a board mod?
+	m_spritelimit = 0x200-4;
+	m_sprites_3bpp = true;
+	m_do_bg_fills = false; // or you get solid green areas below the stars bg image.  does the doubled up tilemap ROM maybe mean double height instead?
+
+	// the scrolling powerups are a single tile in the tilemap, your ship is huge, it is unclear where the hitboxes are meant to be
+	// using the same value as mpatrol puts the collision at the very back of your ship, and causes draw-in issues on the tilemap
+	// maybe the sprite positioning is incorrect instead?
+	//m_tx_tilemap->set_scrolldx(127+8, 127-8);
 }
 
 
@@ -182,6 +210,17 @@ WRITE8_MEMBER(m52_state::m52_scroll_w)
 	m_tx_tilemap->set_scrollx(3, -(data + 1));
 }
 
+WRITE8_MEMBER(m52_alpha1v_state::m52_scroll_w)
+{
+/*
+   alpha1v must have some board mod to invert scroll register use, as it expects only the first block to remain static
+   the scrolling powerups are part of the tx layer!
+*/
+	m_tx_tilemap->set_scrollx(0,  255);
+	m_tx_tilemap->set_scrollx(1, -(data + 1));
+	m_tx_tilemap->set_scrollx(2, -(data + 1));
+	m_tx_tilemap->set_scrollx(3, -(data + 1));
+}
 
 
 /*************************************
@@ -274,7 +313,7 @@ WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
 
-WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
+WRITE8_MEMBER(m52_alpha1v_state::alpha1v_flipscreen_w)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -321,21 +360,25 @@ void m52_state::draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		xpos - 256,
 		ypos, 0);
 
-	rect.min_x = visarea.min_x;
-	rect.max_x = visarea.max_x;
-
-	if (flip_screen())
+	// create a solid fill below the 64 pixel high bg images
+	if (m_do_bg_fills)
 	{
-		rect.min_y = ypos - BGHEIGHT;
-		rect.max_y = ypos - 1;
-	}
-	else
-	{
-		rect.min_y = ypos + BGHEIGHT;
-		rect.max_y = ypos + 2 * BGHEIGHT - 1;
-	}
+		rect.min_x = visarea.min_x;
+		rect.max_x = visarea.max_x;
 
-	bitmap.fill(paldata[m_bg_gfxdecode->gfx(image)->colorbase() + 3], rect);
+		if (flip_screen())
+		{
+			rect.min_y = ypos - BGHEIGHT;
+			rect.max_y = ypos - 1;
+		}
+		else
+		{
+			rect.min_y = ypos + BGHEIGHT;
+			rect.max_y = ypos + 2 * BGHEIGHT - 1;
+		}
+
+		bitmap.fill(paldata[m_bg_gfxdecode->gfx(image)->colorbase() + 3], rect);
+	}
 }
 
 
@@ -359,11 +402,14 @@ void m52_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 		int flipy = m_spriteram[offs + 1] & 0x80;
 		int code = m_spriteram[offs + 2];
 		int sx = m_spriteram[offs + 3];
-		rectangle clip;
+
+		// hack until we work out the proper decoding for the 3bpp sprites, might need palette shift after that
+		if (m_sprites_3bpp)
+			color = 1;
 
 		/* sprites from offsets $00-$7F are processed in the upper half of the frame */
 		/* sprites from offsets $80-$FF are processed in the lower half of the frame */
-		clip = cliprect;
+		rectangle clip = cliprect;
 		if (!(offs & 0x80))
 			clip.min_y = 0, clip.max_y = 127;
 		else
@@ -428,7 +474,7 @@ uint32_t m52_state::screen_update_m52(screen_device &screen, bitmap_rgb32 &bitma
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
-	for (offs = 0x3c; offs <= 0xfc; offs += 0x40)
+	for (offs = 0x3c; offs <= m_spritelimit; offs += 0x40)
 		draw_sprites(bitmap, cliprect, offs);
 
 	return 0;
