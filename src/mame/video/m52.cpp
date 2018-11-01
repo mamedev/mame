@@ -181,7 +181,7 @@ void m52_alpha1v_state::video_start()
 	m_sprites_3bpp = true;
 	m_do_bg_fills = false; // or you get solid green areas below the stars bg image.  does the doubled up tilemap ROM maybe mean double height instead?
 
-	// the scrolling powerups are a single tile in the tilemap, your ship is huge, it is unclear where the hitboxes are meant to be
+	// the scrolling orange powerups 'orbs' are a single tile in the tilemap, your ship is huge, it is unclear where the hitboxes are meant to be
 	// using the same value as mpatrol puts the collision at the very back of your ship, and causes draw-in issues on the tilemap
 	// maybe the sprite positioning is incorrect instead?
 	//m_tx_tilemap->set_scrolldx(127+8, 127-8);
