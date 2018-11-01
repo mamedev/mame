@@ -41,11 +41,11 @@
 
     -- loop point 1
     01BC3E: A3          ldal0 a   // read byte 0 of 32-bit 'long' register into accumulator
-    01BC3F: 73          adcpa     // adc ($Address PA), y
+    01BC3F: 73          adcpa     // adc ($Address PA)
     01BC40: 83          stal0 a   // store accumulator back in byte 0 of 32-bit 'long' register (even byte checksum?)
     01BC41: FB          incpa     // increase 'address' register PA
     01BC42: A7          ldal1 a   // read byte 1 of 32-bit 'long' register into accumulator
-    01BC43: 73          adcpa     // adc ($Address PA), y
+    01BC43: 73          adcpa     // adc ($Address PA)
     01BC44: 87          stal1 a   // store accumulator back in byte 0 of 32-bit 'long' register (odd byte checksum?)
     01BC45: FB          incpa     // increase 'address' register PA
     01BC46: D0 F6       bne $1bc3e // (branch based on PA increase, so PA must set flags?, probably overflows after 0xffff if upper byte is 'bank'? or at 0xff if this really is a mirror of the function below

@@ -180,10 +180,17 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(sound_75fe_w);
 	DECLARE_WRITE8_MEMBER(sound_75ff_w);
 
+	DECLARE_READ8_MEMBER(timer_status_r);
 	DECLARE_WRITE8_MEMBER(timer_control_w);
 	DECLARE_READ8_MEMBER(timer_baseval_r);
 	DECLARE_WRITE8_MEMBER(timer_baseval_w);
+	DECLARE_READ8_MEMBER(timer_freq_r);
 	DECLARE_WRITE8_MEMBER(timer_freq_w);
+	uint8_t m_timer_control;
+	uint8_t m_timer_freq;
+	TIMER_CALLBACK_MEMBER(freq_timer_done);
+	emu_timer *m_freq_timer;
+
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
@@ -205,6 +212,9 @@ void superxavix_lowbus_map(address_map &map);
 
 	required_device<xavix_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	
+	void update_irqs();
+	uint8_t m_irqsource;
 
 	uint8_t m_vectorenable;
 	uint8_t m_nmi_vector_lo_data;
