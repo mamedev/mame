@@ -276,8 +276,8 @@ void fantland_state::wheelrun_map(address_map &map)
 void fantland_state::fantland_sound_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram();
-	map(0x80000, 0x9ffff).rom();
-	map(0xc0000, 0xfffff).rom().region("maincpu", 0xc0000);
+	map(0x80000, 0x9ffff).rom().region("audiocpu", 0x80000);
+	map(0xc0000, 0xfffff).rom().region("audiocpu", 0xc0000);
 }
 
 void fantland_state::fantland_sound_iomap(address_map &map)
@@ -383,7 +383,7 @@ void borntofi_state::sound_map(address_map &map)
 
 void fantland_state::wheelrun_sound_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
+	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 
