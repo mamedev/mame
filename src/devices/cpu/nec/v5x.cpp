@@ -398,8 +398,8 @@ void v50_device::device_add_mconfig(machine_config &config)
 	m_tcu->out_handler<0>().set(m_icu, FUNC(pic8259_device::ir0_w));
 }
 
-v5x_base_device::v5x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: v33_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(v5x_base_device::internal_port_map), this))
+v5x_base_device::v5x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor port_map)
+	: v33_base_device(mconfig, type, tag, owner, clock, port_map)
 	, m_tcu(*this, "tcu")
 	, m_dmau(*this, "dmau")
 	, m_icu(*this, "icu")
@@ -408,17 +408,17 @@ v5x_base_device::v5x_base_device(const machine_config &mconfig, device_type type
 }
 
 v50_device::v50_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: v5x_base_device(mconfig, V50, tag, owner, clock)
-{
-}
-
-v53_device::v53_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: v5x_base_device(mconfig, V53, tag, owner, clock)
+	: v5x_base_device(mconfig, V50, tag, owner, clock, address_map_constructor(FUNC(v50_device::internal_port_map), this))
 {
 }
 
 v53_device::v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: v5x_base_device(mconfig, type, tag, owner, clock)
+	: v5x_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(v53_device::internal_port_map), this))
+{
+}
+
+v53_device::v53_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: v53_device(mconfig, V53, tag, owner, clock)
 {
 }
 

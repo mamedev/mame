@@ -44,7 +44,7 @@ public:
 	auto syndet_handler_cb() { return subdevice<v5x_scu_device>("scu")->syndet_handler(); }
 
 protected:
-	v5x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	v5x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor port_map);
 
 	// device_interface overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -55,7 +55,6 @@ protected:
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual void internal_port_map(address_map &map) = 0;
 	virtual void install_peripheral_io() = 0;
 
 	DECLARE_WRITE8_MEMBER(BSEL_w) {}
@@ -116,7 +115,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void internal_port_map(address_map &map) override;
+	void internal_port_map(address_map &map);
 	virtual void install_peripheral_io() override;
 
 	DECLARE_WRITE8_MEMBER(OPCN_w);
@@ -151,7 +150,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void internal_port_map(address_map &map) override;
+	void internal_port_map(address_map &map);
 	virtual void install_peripheral_io() override;
 
 	DECLARE_WRITE8_MEMBER(SCTL_w);
