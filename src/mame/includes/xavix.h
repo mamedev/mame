@@ -11,6 +11,8 @@
 #include "speaker.h"
 #include "machine/bankdev.h"
 #include "machine/i2cmem.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 
 class xavix_state : public driver_device
@@ -312,6 +314,22 @@ void superxavix_lowbus_map(address_map &map);
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
 	optional_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_ekara_state : public xavix_state
+{
+public:
+	xavix_ekara_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+	{ }
+
+	void xavix_ekara(machine_config &config);
+
+protected:
+	required_device<generic_slot_device> m_cart;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ekara_cart);
+	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
 };
 
 #endif // MAME_INCLUDES_XAVIX_H
