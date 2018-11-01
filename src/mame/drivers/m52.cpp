@@ -606,7 +606,6 @@ ROM_START(alpha1v)
 	ROM_LOAD("17-k3", 0x2000, 0x1000, CRC(cfd90773) SHA1(052e126888b6de636db9c521a090699c282b620b))
 
 	/* all the background roms just contain stars.. */
-	/* all the background roms just contain stars.. */
 	ROM_REGION(0x1000, "bg0", 0)
 	ROM_LOAD("11-k3", 0x0000, 0x1000, CRC(7659440a) SHA1(2efd27c82913513dd03e799f1ed3c10b0863677d)) // why are there 2 copies of the this BG rom?
 	ROM_LOAD("12-jh3", 0x0000, 0x1000, CRC(7659440a) SHA1(2efd27c82913513dd03e799f1ed3c10b0863677d))
