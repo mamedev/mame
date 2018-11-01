@@ -34,7 +34,6 @@ protected:
 
 	/* board mod changes? */
 	int m_spritelimit;
-	bool m_sprites_3bpp;
 	bool m_do_bg_fills;
 
 	tilemap_t*             m_tx_tilemap;

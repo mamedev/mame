@@ -319,9 +319,9 @@ static const gfx_layout charlayout =
 static const gfx_layout spritelayout =
 {
 	16,16,
-	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(0,3), RGN_FRAC(1,3) },
 	{ STEP8(0,1), STEP8(16 * 8,1) },
 	{ STEP16(0,8) },
 	32 * 8
@@ -380,20 +380,8 @@ static GFXDECODE_START(gfx_m52_bg)
 	GFXDECODE_ENTRY("bg2", 0x0000, bgcharlayout, 2 * 4, 1)
 GFXDECODE_END
 
-static const gfx_layout spritelayout3bpp =
-{
-	16,16,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ STEP8(0,1), STEP8(16 * 8,1) },
-	{ STEP16(0,8) },
-	32 * 8
-};
 
-static GFXDECODE_START(gfx_m52_alpha1v_sp)
-	GFXDECODE_ENTRY("sp", 0x0000, spritelayout3bpp, 0, 16)
-GFXDECODE_END
+
 
 /*************************************
 *
@@ -419,7 +407,7 @@ MACHINE_CONFIG_START(m52_state::m52)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m52_state, irq0_line_hold)
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("sp_palette", 16 * 4)
+	MCFG_PALETTE_ADD("sp_palette", 256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_DEVICE_ADD("sp_gfxdecode", GFXDECODE, "sp_palette", gfx_m52_sp)
 
@@ -450,8 +438,6 @@ MACHINE_CONFIG_START(m52_alpha1v_state::alpha1v)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 3, 384, 136, 376, 282, 16, 272)
 
-	MCFG_DEVICE_REPLACE("sp_gfxdecode", GFXDECODE, "sp_palette", gfx_m52_alpha1v_sp)
-
 MACHINE_CONFIG_END
 
 
@@ -476,7 +462,8 @@ ROM_START(mpatrol)
 	ROM_LOAD("mpe-5.3e", 0x0000, 0x1000, CRC(e3ee7f75) SHA1(b03d0d56150d3e9da4a4c871338097b4f450b649))
 	ROM_LOAD("mpe-4.3f", 0x1000, 0x1000, CRC(cca6d023) SHA1(fecb3059fb09897a096add9452b50aec55c07545))
 
-	ROM_REGION(0x2000, "sp", 0)
+	/* 0x2000-0x2fff is intentionally left as 0x00 fill, unused bitplane */
+	ROM_REGION(0x3000, "sp", ROMREGION_ERASE00)
 	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))
 	ROM_LOAD("mpb-1.3n", 0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2))
 
@@ -517,7 +504,8 @@ ROM_START(mpatrolw)
 	ROM_LOAD("mpe-5w.3e", 0x0000, 0x1000, CRC(f56e01fe) SHA1(93f582d63b9cd5c6dca207aa57b213c939cdda1d))
 	ROM_LOAD("mpe-4w.3f", 0x1000, 0x1000, CRC(caaba2d9) SHA1(7016a26c2d01e3209749598e993cd8ce91f12c88))
 
-	ROM_REGION(0x2000, "sp", 0)
+	/* 0x2000-0x2fff is intentionally left as 0x00 fill, unused bitplane */
+	ROM_REGION(0x3000, "sp", ROMREGION_ERASE00)
 	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))
 	ROM_LOAD("mpb-1.3n", 0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2))
 
@@ -558,7 +546,8 @@ ROM_START(mranger)
 	ROM_LOAD("mpe-5.3e", 0x0000, 0x1000, CRC(e3ee7f75) SHA1(b03d0d56150d3e9da4a4c871338097b4f450b649))
 	ROM_LOAD("mpe-4.3f", 0x1000, 0x1000, CRC(cca6d023) SHA1(fecb3059fb09897a096add9452b50aec55c07545))
 
-	ROM_REGION(0x2000, "sp", 0)
+	/* 0x2000-0x2fff is intentionally left as 0x00 fill, unused bitplane */
+	ROM_REGION(0x3000, "sp", ROMREGION_ERASE00)
 	ROM_LOAD("mpb-2.3m", 0x0000, 0x1000, CRC(707ace5e) SHA1(93c682e13e74bce29ced3a87bffb29569c114c3b))
 	ROM_LOAD("mpb-1.3n", 0x1000, 0x1000, CRC(9b72133a) SHA1(1393ef92ae1ad58a4b62ca1660c0793d30a8b5e2))
 
@@ -618,6 +607,7 @@ ROM_START(alpha1v)
 	ROM_LOAD("10-lm3", 0x1000, 0x1000, CRC(9dde3a75) SHA1(293d093485be19bfb20685d76a08ac78e24062bf))
 
 	ROM_REGION(0x2000, "bg2", ROMREGION_ERASEFF)
+	// unused layer
 
 	ROM_REGION(0x0200, "tx_pal", 0)
 	ROM_LOAD("63s481-a2", 0x0000, 0x0200, CRC(58678ea8) SHA1(b13a78a5bca8ad5bdec1293512b53654768a7a7a))

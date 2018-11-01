@@ -81,7 +81,6 @@ void m52_state::init_palette()
 	init_sprite_palette(resistances_3, resistances_2, weights_r, weights_g, weights_b, scale);
 }
 
-// this might need to differ for alpha1v due to 3bpp sprites
 void m52_state::init_sprite_palette(const int *resistances_3, const int *resistances_2, double *weights_r, double *weights_g, double *weights_b, double scale)
 {
 	const uint8_t *sprite_pal = memregion("spr_pal")->base();
@@ -105,9 +104,9 @@ void m52_state::init_sprite_palette(const int *resistances_3, const int *resista
 	}
 
 	/* sprite lookup table */
-	for (int i = 0; i < 16 * 4; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		uint8_t promval = sprite_table[(i & 3) | ((i & ~3) << 1)];
+		uint8_t promval = sprite_table[i];
 		m_sp_palette->set_pen_indirect(i, promval);
 	}
 }
@@ -168,7 +167,6 @@ void m52_state::video_start()
 	save_item(NAME(m_bgcontrol));
 
 	m_spritelimit = 0x100-4;
-	m_sprites_3bpp = false;
 	m_do_bg_fills = true;
 }
 
@@ -178,7 +176,6 @@ void m52_alpha1v_state::video_start()
 
 	// is the limit really just higher anyway or is this a board mod?
 	m_spritelimit = 0x200-4;
-	m_sprites_3bpp = true;
 	m_do_bg_fills = false; // or you get solid green areas below the stars bg image.  does the doubled up tilemap ROM maybe mean double height instead?
 
 	// the scrolling orange powerups 'orbs' are a single tile in the tilemap, your ship is huge, it is unclear where the hitboxes are meant to be
@@ -402,10 +399,6 @@ void m52_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 		int flipy = m_spriteram[offs + 1] & 0x80;
 		int code = m_spriteram[offs + 2];
 		int sx = m_spriteram[offs + 3];
-
-		// hack until we work out the proper decoding for the 3bpp sprites, might need palette shift after that
-		if (m_sprites_3bpp)
-			color = 1;
 
 		/* sprites from offsets $00-$7F are processed in the upper half of the frame */
 		/* sprites from offsets $80-$FF are processed in the lower half of the frame */
