@@ -86,14 +86,20 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 		//if (h_raw > 24)
 		//  LOG("hraw >24 (%02x)\n", h_raw);
 
-		//if (l_raw > 17)
-		//  LOG("lraw >17 (%02x)\n", l_raw);
+		//if (l_raw > 24)
+		//  LOG("lraw >24 (%02x)\n", l_raw);
 
 		//if (s_raw > 7)
 		//  LOG("s_raw >5 (%02x)\n", s_raw);
 
-		double l = (double)l_raw / 17.0f;
+		double l = (double)l_raw / 24.0f; // ekara and drgqst go up to 23 during fades, expect that to be brightest
+		l = l * (std::atan(1)*2); // does not appear to be a linear curve
+		l = std::sin(l);
+
 		double s = (double)s_raw / 7.0f;
+		s = s * (std::atan(1)*2); // does not appear to be a linear curve
+		s = std::sin(s);
+
 		double h = (double)h_raw / 24.0f; // hue values 24-31 render as transparent
 
 		double r, g, b;

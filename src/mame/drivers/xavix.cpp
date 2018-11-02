@@ -612,6 +612,14 @@ static INPUT_PORTS_START( rad_bass )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ekara )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( rad_bassp )
 	PORT_INCLUDE(rad_bass)
 
@@ -860,6 +868,39 @@ MACHINE_CONFIG_START(xavix_state::xavix2000_i2c_24c02)
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02
 MACHINE_CONFIG_END
 
+
+
+DEVICE_IMAGE_LOAD_MEMBER( xavix_ekara_state, ekara_cart )
+{
+	uint32_t size = m_cart->common_get_size("rom");
+	std::vector<uint8_t> temp;
+	temp.resize(size);
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(&temp[0], size, "rom");
+
+	memcpy(memregion("bios")->base(), &temp[0], size);
+
+	return image_init_result::PASS;
+}
+
+
+MACHINE_CONFIG_START(xavix_ekara_state::xavix_ekara)
+	xavix(config);
+
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ekara_cart")
+	MCFG_GENERIC_EXTENSIONS("bin")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM8_WIDTH)
+	MCFG_GENERIC_LOAD(xavix_ekara_state, ekara_cart)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","ekara")
+
+MACHINE_CONFIG_END
+
+
+
+
+
 void xavix_state::init_xavix()
 {
 	m_rgnlen = memregion("bios")->bytes();
@@ -979,32 +1020,10 @@ ROM_END
     it etc.
 */
 
-#define EKARA_BASE_ROM \
+ROM_START( ekara )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekara.bin", 0x600000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
-
-
-ROM_START( eka_base )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
-	EKARA_BASE_ROM
 	ROM_RELOAD(0x000000, 0x100000)
-ROM_END
-
-ROM_START( eka_strt )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
-	EKARA_BASE_ROM
-	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
-ROM_END
-
-ROM_START( eka_vol1 )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
-	EKARA_BASE_ROM
-	ROM_LOAD( "ekaravol1.bin", 0x000000, 0x100000, CRC(29df4aea) SHA1(b95835aaf8630b61b47e5da0968cd4a1dd3bc517) )
-ROM_END
-
-ROM_START( eka_vol2 )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
-	EKARA_BASE_ROM
-	ROM_LOAD( "ekaravol2.bin", 0x000000, 0x100000, CRC(6c66772e) SHA1(e1e719df1e51caaafd9b3af187059334f7abbba3) )
 ROM_END
 
 ROM_START( has_wamg )
@@ -1052,13 +1071,7 @@ CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  xavix,    xavix_state, 
 
 CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, eka_base,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT)
-
-CONS( 200?, eka_strt,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
-
-CONS( 200?, eka_vol1,  eka_base,   0,   xavix,  xavix,   xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // insert calls it 'HIT MIX Vol 1'
-
-CONS( 200?, eka_vol2,  eka_base,   0,   xavix,  xavix  , xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // insert calls it 'HIT MIX Vol 2'
+CONS( 200?, ekara,    0,          0,  xavix_ekara,  ekara,    xavix_ekara_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",   "e-kara (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT)
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
