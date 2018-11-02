@@ -568,11 +568,11 @@ READ8_MEMBER(xavix_state::irq_source_r)
 	 monster truck does most extensive checking
 
 	  0x80 - Sound Irq
-	  0x40 - Picture / Arena Irq?
+	  0x40 - Picture / Arena Irq? (including raster interrupt)
 	  0x20 - DMA Irq  (most routines check this as first priority, and ignore other requests if it is set?)
 	  0x10 - Timer / Counter IRQ
-	  0x08 - IO Irq (ADC? - used for analog control on Monster Truck) (uses 7a80 top bit to determine direction, and 7a81 0x08 as an output, presumably to clock)
-	  0x04 - ADC IRQ - loads/stores 7b81
+	  0x08 - IO Event Irq (uses 7a00 top bit to determine direction, enabled with 0x08 on 7a80, IRQ acked / cleared with 0x08 written to 7a81, 4 possible sources with different bits in 7a80 / 7a81 ? )
+	  0x04 - ADC IRQ - loads/stores 7b81 (to ack interrupt)
 	*/
 
 	LOG("%s: irq_source_r\n", machine().describe_context());

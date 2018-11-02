@@ -869,6 +869,20 @@ MACHINE_CONFIG_START(xavix_state::xavix2000_i2c_24c02)
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrk)
+	xavix(config);
+
+	XAVIX_MTRK_WHEEL(config, m_wheel, 0);
+
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrkp)
+	xavix_mtrk(config);
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
+MACHINE_CONFIG_END
+
 
 DEVICE_IMAGE_LOAD_MEMBER( xavix_ekara_state, ekara_cart )
 {
@@ -1043,8 +1057,8 @@ CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state,
 
 CONS( 2000, rad_ping,  0,          0,  xavix,  rad_ping, xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 
-CONS( 2003, rad_mtrk,  0,          0,  xavix,  rad_mtrk, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavixp, rad_mtrkp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2003, rad_mtrk,  0,          0,  xavix_mtrk,  rad_mtrk, xavix_mtrk_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavix_mtrkp, rad_mtrkp,xavix_mtrk_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

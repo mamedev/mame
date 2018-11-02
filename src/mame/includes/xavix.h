@@ -14,6 +14,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "machine/xavix_mtrk_wheel.h"
 
 class xavix_state : public driver_device
 {
@@ -314,6 +315,21 @@ void superxavix_lowbus_map(address_map &map);
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
 	optional_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_mtrk_state : public xavix_state
+{
+public:
+	xavix_mtrk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_wheel(*this, "wheel")
+	{ }
+
+	void xavix_mtrk(machine_config &config);
+	void xavix_mtrkp(machine_config &config);
+
+protected:
+	required_device<xavix_mtrk_wheel_device> m_wheel;
 };
 
 class xavix_ekara_state : public xavix_state
