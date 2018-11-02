@@ -1055,6 +1055,12 @@ The following views will be automatically generated:
   play games that don't automatically rotate the display for the second player.
   The screen will be displayed at its physical aspect ratio, with rotation
   applied.
+* If the system has exactly two emulated screens, MAME will generate a view
+  showing the second screen above the first screen with a small gap between
+  them.  The second screen will be rotated by 180 degrees.  This view can be
+  used to play a dual-screen two-player game on a "cocktail table" cabinet with
+  a single screen.  The screens will be displayed at their physical aspect
+  ratios, with rotation applied.
 * If the system has exactly two emulated screens and no view in the internal or
   external layouts shows all screens, or if the system has more than two
   emulated screens, MAME will generate views with the screens arranged

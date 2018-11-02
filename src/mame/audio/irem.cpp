@@ -383,12 +383,6 @@ void irem_audio_device::m62_sound_map(address_map &map)
 }
 
 
-void irem_audio_device::irem_sound_portmap(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(irem_audio_device::m6803_port1_r), FUNC(irem_audio_device::m6803_port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(irem_audio_device::m6803_port2_r), FUNC(irem_audio_device::m6803_port2_w));
-}
-
 /*
  * Original recordings:
  *
@@ -407,9 +401,12 @@ void irem_audio_device::irem_sound_portmap(address_map &map)
 MACHINE_CONFIG_START(m62_audio_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("iremsound", M6803, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(m62_sound_map)
-	MCFG_DEVICE_IO_MAP(irem_sound_portmap)
+	m6803_cpu_device &cpu(M6803(config, m_cpu, XTAL(3'579'545))); /* verified on pcb */
+	cpu.set_addrmap(AS_PROGRAM, &m62_audio_device::m62_sound_map);
+	cpu.in_p1_cb().set(FUNC(m62_audio_device::m6803_port1_r));
+	cpu.out_p1_cb().set(FUNC(m62_audio_device::m6803_port1_w));
+	cpu.in_p2_cb().set(FUNC(m62_audio_device::m6803_port2_r));
+	cpu.out_p2_cb().set(FUNC(m62_audio_device::m6803_port2_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -477,9 +474,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(m52_soundc_audio_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("iremsound", M6803, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_IO_MAP(irem_sound_portmap)
-	MCFG_DEVICE_PROGRAM_MAP(m52_small_sound_map)
+	m6803_cpu_device &cpu(M6803(config, m_cpu, XTAL(3'579'545))); /* verified on pcb */
+	cpu.set_addrmap(AS_PROGRAM, &m52_soundc_audio_device::m52_small_sound_map);
+	cpu.in_p1_cb().set(FUNC(m52_soundc_audio_device::m6803_port1_r));
+	cpu.out_p1_cb().set(FUNC(m52_soundc_audio_device::m6803_port1_w));
+	cpu.in_p2_cb().set(FUNC(m52_soundc_audio_device::m6803_port2_r));
+	cpu.out_p2_cb().set(FUNC(m52_soundc_audio_device::m6803_port2_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -510,9 +510,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(m52_large_audio_device::device_add_mconfig)  /* 10 yard fight */
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("iremsound", M6803, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(m52_large_sound_map)
-	MCFG_DEVICE_IO_MAP(irem_sound_portmap)
+	m6803_cpu_device &cpu(M6803(config, m_cpu, XTAL(3'579'545))); /* verified on pcb */
+	cpu.set_addrmap(AS_PROGRAM, &m52_large_audio_device::m52_large_sound_map);
+	cpu.in_p1_cb().set(FUNC(m52_large_audio_device::m6803_port1_r));
+	cpu.out_p1_cb().set(FUNC(m52_large_audio_device::m6803_port1_w));
+	cpu.in_p2_cb().set(FUNC(m52_large_audio_device::m6803_port2_r));
+	cpu.out_p2_cb().set(FUNC(m52_large_audio_device::m6803_port2_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

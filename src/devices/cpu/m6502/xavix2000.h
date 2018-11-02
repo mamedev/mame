@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-    xavix2000.h
+    xavix2000.h (Super XaviX)
 
 ***************************************************************************/
 #ifndef MAME_CPU_M6502_XAVIX2000_H
@@ -23,28 +23,137 @@ public:
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
+	virtual void device_start() override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 #define O(o) void o ## _full(); void o ## _partial()
 
-	// xaviv opcodes
-	O(phx_imp);
-	O(phy_imp);
-	O(plx_imp);
-	O(ply_imp);
-	O(unk1b_imp);
-	O(unk5b_imp);
-	O(unk9b_imp);
-	O(unka3_imp);
-	O(unka7_imp);
-	O(unkb2_imp);
-	O(unk07_imp);
-	O(unk73_imp);
+	// Super XaviX opcodes
 
-	O(unk83_imm);
-	O(unk87_imm);
+	O(phx_imp); // 12
+	O(phy_imp); // 52
+	O(plx_imp); // 32
+	O(ply_imp); // 72
 
+	O(clr_acc); // b2
+	O(dec_acc); // c2
+	O(not_acc); // d2
+	O(inc_acc); // e2
+	O(neg_acc); // f2
+
+	O(oral0_acc);
+	O(oral1_acc);
+	O(oral2_acc);
+	O(oral3_acc);
+
+	O(andl0_acc);
+	O(andl1_acc);
+	O(andl2_acc);
+	O(andl3_acc);
+
+	O(eorl0_acc);
+	O(eorl1_acc);
+	O(eorl2_acc);
+	O(eorl3_acc);
+
+	O(adcl0_acc);
+	O(adcl1_acc);
+	O(adcl2_acc);
+	O(adcl3_acc);
+
+	O(stal0_acc);
+	O(stal1_acc);
+	O(stal2_acc);
+	O(stal3_acc);
+
+	O(ldal0_acc);
+	O(ldal1_acc);
+	O(ldal2_acc);
+	O(ldal3_acc);
+
+	O(cmpl0_acc);
+	O(cmpl1_acc);
+	O(cmpl2_acc);
+	O(cmpl3_acc);
+
+	O(sbcl0_acc);
+	O(sbcl1_acc);
+	O(sbcl2_acc);
+	O(sbcl3_acc);
+
+	O(spa2_acc); // Store accumulator in 24-bit address register PA MSB (Bank bit)
+	O(lpa2_acc); // Load accumulator from 24-bit address register PA MSB (Bank bit)
+	O(spa0_acc); // Store accumulator in 24-bit address register PA LSB (Low 8 bits of address)
+	O(lpa0_acc); // Load accumulator from 24-bit address register PA LSB (Low 8 bits of address)
+	O(spa1_acc); // Store accumulator in 24-bit address register PA MID (High 8 bits of address)
+	O(lpa1_acc); // Load accumulator from 24-bit address register PA MID (High 8 bits of address)
+
+	O(spb2_acc); // Store accumulator in 24-bit address register PB MSB (Bank bit)
+	O(lpb2_acc); // Load accumulator from 24-bit address register PB MSB (Bank bit)
+	O(spb0_acc); // Store accumulator in 24-bit address register PB LSB (Low 8 bits of address)
+	O(lpb0_acc); // Load accumulator from 24-bit address register PB LSB (Low 8 bits of address)
+	O(spb1_acc); // Store accumulator in 24-bit address register PB MID (High 8 bits of address)
+	O(lpb1_acc); // Load accumulator from 24-bit address register PB MID (High 8 bits of address)
+
+	O(incpa_imp);
+	O(decpa_imp);
+
+	O(incpb_imp);
+	O(decpb_imp);
+
+	O(orapa_imp); // (ora ($PA), y) ?
+	O(andpa_imp); // (and ($PA), y) ?
+	O(eorpa_imp); // (eor ($PA), y) ?
+	O(adcpa_imp); // (adc ($PA), y) ?
+	O(stapa_imp); // (sta ($PA), y) ?
+	O(ldapa_imp); // (lda ($PA), y) ?
+	O(cmppa_imp); // (cmp ($PA), y) ?
+	O(sbcpa_imp); // (sbc ($PA), y) ?
+
+	O(orapb_imp); // (ora ($PB), y) ?
+	O(andpb_imp); // (and ($PB), y) ?
+	O(eorpb_imp); // (eor ($PB), y) ?
+	O(adcpb_imp); // (adc ($PB), y) ?
+	O(stapb_imp); // (sta ($PB), y) ?
+	O(ldapb_imp); // (lda ($PB), y) ?
+	O(cmppb_imp); // (cmp ($PB), y) ?
+	O(sbcpb_imp); // (sbc ($PB), y) ?
+
+	O(stx_aby);
+	O(sty_abx);
+
+	O(stz_aba);
+	O(stz_zpg);
+
+	O(bit_zpx);
+	O(bit_abx);
+	O(bit_imm);
+
+	O(asr_zpg);
+	O(asr_aba);
+	O(asr_zpx);
+	O(asr_acc);
+	O(asr_abx);
+
+	O(cmc_imp);
+	O(sev_imp);
+
+	O(callf_aba);
+	O(jmpf_ind);
 
 #undef O
 
+	uint32_t m_l; // 32-bit register?
+	uint32_t m_pa; // 24-bit address register?
+	uint32_t m_pb; // ^
+
+};
+
+enum {
+	SXAVIX_L = XAVIX_CODEBANK+1,
+	SXAVIX_PA,
+	SXAVIX_PB
 };
 
 DECLARE_DEVICE_TYPE(XAVIX2000, xavix2000_device)

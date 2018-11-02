@@ -397,15 +397,15 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 	MCFG_DEVICE_ADD("lk201", LK201, 0)
 	MCFG_LK201_TX_HANDLER(WRITELINE("scc1", z80scc_device, rxb_w))
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc0", z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("scc0", z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc0", z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc0, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc0, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc0, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc0", z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("scc0", z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc0", z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc0, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc0, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc0, FUNC(z80scc_device::ctsb_w));
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", dec_scsi_devices, "harddisk", false)

@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara" description="Takara e-kara cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
+	
+	<!-- Each region has it's own set of cartridges (at least US, UK/EU and Japan)
+	     The Japanese ones appear to have a number of different genres each with their own numbering -->
+	
+	<!--
+	1. "Stronger"                  Britney Spears
+	2. "Bye Bye Bye"               *N Sync
+	3. "Independent Woman Part 1"  Destiny's Child
+	4. "I Want It That Way"        Backstreet Boys
+	5. "Yellow Submarine"          The Beatles
+	-->
+	<software name="us_strt">
+		<description>e-kara US 5-Songs Starter (US-M001)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="ekara_starter.bin" size="0x080000" crc="8c12c0c2" sha1="8cc1b098894af25a4bfccada884125b66f5fe8b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<!--
+	1.  "Oops!...I Did It Again"       Britney Spears
+	2.  "...Baby One More Time"        Britney Spears
+	3.  "Bye Bye Bye"                  *N Sync
+	4.  "It's Gonna Be Me"             *N Sync
+	5.  "Take On Me"                   a1
+	6.  "Aaron's Party (Come Get It)"  Aaron Carter
+	7.  "If Only"                      Hanson
+	8.  "He Loves U Not"               Dream
+	9.  "The First Night"              Monica
+	10. "I Need You"                   LeAnn Rimes	
+	-->
+	<software name="us_vol1">
+		<description>e-kara US Volume 1 (US-E001)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaravol1.bin" size="0x100000" crc="29df4aea" sha1="b95835aaf8630b61b47e5da0968cd4a1dd3bc517" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	1.  "Larger Than Life"          Backstreet Boys
+	2.  "I'll Be There For You"     Backstreet Boys
+	3.  "My Everything"             98 Degrees
+	4.  "Dizzy"                     98 Degrees
+	5.  "Independent Woman Part 1"  Destiny's Child
+	6.  "Waiting For Tonight"       Jennifer Lopez
+	7.  "Let Me Let Go"             Faith Hill
+	8.  "There's Your Trouble"      Dixie Chicks
+	9.  "5678"                      Steps
+	10. "Stomp"                     Steps
+	-->
+	<software name="us_vol2">
+		<description>e-kara US Volume 2 (US-E002)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaravol2.bin" size="0x100000" crc="6c66772e" sha1="e1e719df1e51caaafd9b3af187059334f7abbba3" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+</softwarelist>

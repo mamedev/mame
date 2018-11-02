@@ -20,15 +20,14 @@
 #include "tms9914.h"
 
 // Debugging
-#include "logmacro.h"
 #define LOG_NOISY_MASK  (LOG_GENERAL << 1)
 #define LOG_NOISY(...)  LOGMASKED(LOG_NOISY_MASK, __VA_ARGS__)
 #define LOG_REG_MASK    (LOG_NOISY_MASK << 1)
 #define LOG_REG(...)    LOGMASKED(LOG_REG_MASK, __VA_ARGS__)
 #define LOG_INT_MASK    (LOG_REG_MASK << 1)
 #define LOG_INT(...)    LOGMASKED(LOG_INT_MASK, __VA_ARGS__)
-#undef VERBOSE
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 // Bit manipulation
 namespace {
@@ -285,6 +284,19 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 
 	case REG_W_DO:
 		m_reg_do = data;
+
+		if (m_next_eoi) {
+			m_next_eoi = false;
+			if (!m_swrst) {
+				if (m_t_eoi_state == FSM_T_ENIS) {
+					m_t_eoi_state = FSM_T_ENRS;
+				} else if (m_t_eoi_state == FSM_T_ENAS) {
+					m_t_eoi_state = FSM_T_ERAS;
+				}
+			}
+
+		}
+
 		set_accrq(false);
 		if (!m_swrst) {
 			BIT_CLR(m_reg_int0_status , REG_INT0_BO_BIT);
@@ -418,6 +430,55 @@ READ_LINE_MEMBER(tms9914_device::cont_r)
 // device-level overrides
 void tms9914_device::device_start()
 {
+	save_item(NAME(m_int_line));
+	save_item(NAME(m_accrq_line));
+	save_item(NAME(m_dio));
+	save_item(NAME(m_signals));
+	save_item(NAME(m_ext_signals));
+	save_item(NAME(m_no_reflection));
+	save_item(NAME(m_ext_state_change));
+	save_item(NAME(m_reg_int0_status));
+	save_item(NAME(m_reg_int0_mask));
+	save_item(NAME(m_reg_int1_status));
+	save_item(NAME(m_reg_int1_mask));
+	save_item(NAME(m_reg_address));
+	save_item(NAME(m_reg_serial_p));
+	save_item(NAME(m_reg_parallel_p));
+	save_item(NAME(m_reg_2nd_parallel_p));
+	save_item(NAME(m_reg_di));
+	save_item(NAME(m_reg_do));
+	save_item(NAME(m_reg_ulpa));
+	save_item(NAME(m_swrst));
+	save_item(NAME(m_hdfa));
+	save_item(NAME(m_hdfe));
+	save_item(NAME(m_rtl));
+	save_item(NAME(m_gts));
+	save_item(NAME(m_rpp));
+	save_item(NAME(m_sic));
+	save_item(NAME(m_sre));
+	save_item(NAME(m_dai));
+	save_item(NAME(m_pts));
+	save_item(NAME(m_stdl));
+	save_item(NAME(m_shdw));
+	save_item(NAME(m_vstdl));
+	save_item(NAME(m_ah_state));
+	save_item(NAME(m_ah_adhs));
+	save_item(NAME(m_ah_anhs));
+	save_item(NAME(m_sh_state));
+	save_item(NAME(m_sh_shfs));
+	save_item(NAME(m_sh_vsts));
+	save_item(NAME(m_t_state));
+	save_item(NAME(m_t_tpas));
+	save_item(NAME(m_t_spms));
+	save_item(NAME(m_t_eoi_state));
+	save_item(NAME(m_l_state));
+	save_item(NAME(m_l_lpas));
+	save_item(NAME(m_sr_state));
+	save_item(NAME(m_rl_state));
+	save_item(NAME(m_pp_ppas));
+	save_item(NAME(m_c_state));
+	save_item(NAME(m_next_eoi));
+
 	m_dio_read_func.resolve_safe(0xff);
 	m_dio_write_func.resolve_safe();
 	for (auto& f : m_signal_wr_fns) {
@@ -654,7 +715,20 @@ void tms9914_device::update_fsm()
 					m_sh_vsts = true;
 				}
 				if (!get_signal(IEEE_488_NDAC)) {
-					LOG("%.6f TX %02x/%d\n" , machine().time().as_double() , m_dio , m_signals[ IEEE_488_EOI ]);
+					if (VERBOSE & LOG_GENERAL) {
+						bool const iscmd = m_signals[IEEE_488_ATN];
+						char cmd[16] = "";
+						if (iscmd) {
+							uint8_t tmp = m_dio & 0x7f;
+							if (tmp >= 0x20 && tmp <= 0x3f)
+								snprintf(cmd, 16, "MLA%d", tmp & 0x1f);
+							else if (tmp >= 0x40 && tmp <= 0x5f)
+								snprintf(cmd, 16, "MTA%d", tmp & 0x1f);
+							else if (tmp >= 0x60 && tmp <= 0x7f)
+								snprintf(cmd, 16, "MSA%d", tmp & 0x1f);
+						}
+						LOG("%.6f TX %s %02X/%d %s\n" , machine().time().as_double() , m_signals[IEEE_488_ATN] ? "C" : "D", m_dio , m_signals[ IEEE_488_EOI ], cmd);
+					}
 					m_sh_state = FSM_SH_SGNS;
 				}
 				break;
@@ -1131,6 +1205,7 @@ void tms9914_device::if_cmd_received(uint8_t if_cmd)
 void tms9914_device::dab_received(uint8_t dab , bool eoi)
 {
 	LOG("%.6f RX DAB:%02x/%d\n" , machine().time().as_double() , dab , eoi);
+	m_reg_di = dab;
 	if (!m_shdw) {
 		m_ah_anhs = true;
 		set_int0_bit(REG_INT0_BI_BIT);
@@ -1141,7 +1216,6 @@ void tms9914_device::dab_received(uint8_t dab , bool eoi)
 	if (m_hdfe && eoi) {
 		m_ah_aehs = true;
 	}
-	m_reg_di = dab;
 }
 
 void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
@@ -1219,13 +1293,7 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_FEOI:
-		if (!m_swrst) {
-			if (m_t_eoi_state == FSM_T_ENIS) {
-				m_t_eoi_state = FSM_T_ENRS;
-			} else if (m_t_eoi_state == FSM_T_ENAS) {
-				m_t_eoi_state = FSM_T_ERAS;
-			}
-		}
+		m_next_eoi = true;
 		break;
 
 	case AUXCMD_LON:

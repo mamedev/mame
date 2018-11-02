@@ -115,6 +115,10 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
+DEFINE_DEVICE_TYPE(R2000,       r2000_device,     "r2000",   "MIPS R2000")
+DEFINE_DEVICE_TYPE(R2000A,      r2000a_device,    "r2000a",  "MIPS R2000A")
+DEFINE_DEVICE_TYPE(R3000,       r3000_device,     "r3000",   "MIPS R3000")
+DEFINE_DEVICE_TYPE(R3000A,      r3000a_device,    "r3000a",  "MIPS R3000A")
 DEFINE_DEVICE_TYPE(R3041,       r3041_device,     "r3041",   "MIPS R3041")
 DEFINE_DEVICE_TYPE(R3051,       r3051_device,     "r3051",   "MIPS R3051")
 DEFINE_DEVICE_TYPE(R3052,       r3052_device,     "r3052",   "MIPS R3052")
@@ -124,16 +128,17 @@ DEFINE_DEVICE_TYPE(SONYPS2_IOP, iop_device,       "sonyiop", "Sony Playstation 2
 
 
 //-------------------------------------------------
-//  r3000_device - constructor
+//  r3000_device_base - constructor
 //-------------------------------------------------
 
-r3000_device::r3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype)
+r3000_device_base::r3000_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t cpurev, size_t icache_size, size_t dcache_size)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config_be("program", ENDIANNESS_BIG, 32, 29),
 		m_program_config_le("program", ENDIANNESS_LITTLE, 32, 29),
 		m_program(nullptr),
-		m_chip_type(chiptype),
+		m_cpurev(cpurev),
 		m_hasfpu(false),
+		m_fpurev(0),
 		m_endianness(ENDIANNESS_BIG),
 		m_pc(0),
 		m_nextpc(0),
@@ -143,6 +148,8 @@ r3000_device::r3000_device(const machine_config &mconfig, device_type type, cons
 		m_op(0),
 		m_icount(0),
 		m_interrupt_cycles(0),
+		m_icache_size(icache_size),
+		m_dcache_size(dcache_size),
 		m_in_brcond0(*this),
 		m_in_brcond1(*this),
 		m_in_brcond2(*this),
@@ -159,12 +166,41 @@ r3000_device::r3000_device(const machine_config &mconfig, device_type type, cons
 
 
 //-------------------------------------------------
-//  ~r3000_device - destructor
+//  ~r3000_device_base - destructor
 //-------------------------------------------------
 
-r3000_device::~r3000_device()
+r3000_device_base::~r3000_device_base()
 {
 }
+
+//-------------------------------------------------
+//  r2000_device - constructor
+//-------------------------------------------------
+
+r2000_device::r2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size, size_t dcache_size)
+	: r3000_device_base(mconfig, R2000, tag, owner, clock, 0x0100, icache_size, dcache_size) { }
+
+//-------------------------------------------------
+//  r2000a_device - constructor
+//-------------------------------------------------
+
+r2000a_device::r2000a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size, size_t dcache_size)
+	: r3000_device_base(mconfig, R2000A, tag, owner, clock, 0x0216, icache_size, dcache_size) { }
+
+
+//-------------------------------------------------
+//  r3000_device - constructor
+//-------------------------------------------------
+
+r3000_device::r3000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size, size_t dcache_size)
+	: r3000_device_base(mconfig, R3000, tag, owner, clock, 0x0220, icache_size, dcache_size) { }
+
+//-------------------------------------------------
+//  r3000a_device - constructor
+//-------------------------------------------------
+
+r3000a_device::r3000a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size, size_t dcache_size)
+	: r3000_device_base(mconfig, R3000A, tag, owner, clock, 0x0230, icache_size, dcache_size) { }
 
 
 //-------------------------------------------------
@@ -172,7 +208,7 @@ r3000_device::~r3000_device()
 //-------------------------------------------------
 
 r3041_device::r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3041, tag, owner, clock, CHIP_TYPE_R3041) { }
+	: r3000_device_base(mconfig, R3041, tag, owner, clock, 0x0700, 2048, 512) { }
 
 
 //-------------------------------------------------
@@ -180,7 +216,7 @@ r3041_device::r3041_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3051_device::r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3051, tag, owner, clock, CHIP_TYPE_R3051) { }
+	: r3000_device_base(mconfig, R3051, tag, owner, clock, 0x0200, 4096, 2048) { }
 
 
 //-------------------------------------------------
@@ -188,23 +224,26 @@ r3051_device::r3051_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3052_device::r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3052, tag, owner, clock, CHIP_TYPE_R3052) { }
+	: r3000_device_base(mconfig, R3052, tag, owner, clock, 0x0200, 8192, 2048) { }
 
 
 //-------------------------------------------------
 //  r3071_device - constructor
 //-------------------------------------------------
 
-r3071_device::r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3071, tag, owner, clock, CHIP_TYPE_R3071) { }
+r3071_device::r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size, size_t dcache_size)
+	: r3000_device_base(mconfig, R3071, tag, owner, clock, 0x0200, icache_size, dcache_size) { }
 
 
 //-------------------------------------------------
 //  r3081_device - constructor
 //-------------------------------------------------
 
-r3081_device::r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3081, tag, owner, clock, CHIP_TYPE_R3081) { }
+r3081_device::r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size, size_t dcache_size)
+	: r3000_device_base(mconfig, R3081, tag, owner, clock, 0x0200, icache_size, dcache_size)
+{
+	set_fpurev(0x0300);
+}
 
 
 //-------------------------------------------------
@@ -212,7 +251,7 @@ r3081_device::r3081_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 iop_device::iop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, SONYPS2_IOP, tag, owner, clock, CHIP_TYPE_IOP)
+	: r3000_device_base(mconfig, SONYPS2_IOP, tag, owner, clock, 0x001f, 4096, 1024)
 {
 	m_endianness = ENDIANNESS_LITTLE;
 }
@@ -222,7 +261,7 @@ iop_device::iop_device(const machine_config &mconfig, const char *tag, device_t 
 //  device_start - start up the device
 //-------------------------------------------------
 
-void r3000_device::device_start()
+void r3000_device_base::device_start()
 {
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
@@ -239,50 +278,6 @@ void r3000_device::device_start()
 		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
 	}
 
-	// determine the cache sizes
-	switch (m_chip_type)
-	{
-		case CHIP_TYPE_R3041:
-		{
-			m_icache_size = 2048;
-			m_dcache_size = 512;
-			break;
-		}
-		case CHIP_TYPE_R3051:
-		{
-			m_icache_size = 4096;
-			m_dcache_size = 2048;
-			break;
-		}
-		case CHIP_TYPE_R3052:
-		{
-			m_icache_size = 8192;
-			m_dcache_size = 2048;
-			break;
-		}
-
-		// TODO: R3071 and R3081 have configurable cache sizes
-		case CHIP_TYPE_R3071:
-		{
-			m_icache_size = 16384;  // or 8kB
-			m_dcache_size = 4096;   // or 8kB
-			break;
-		}
-		case CHIP_TYPE_R3081:
-		{
-			m_icache_size = 16384;  // or 8kB
-			m_dcache_size = 4096;   // or 8kB
-			m_hasfpu = true;
-			break;
-		}
-		case CHIP_TYPE_IOP:
-		{
-			m_icache_size = 4096;
-			m_dcache_size = 1024;
-			break;
-		}
-	}
-
 	// allocate cache memory
 	m_icache.resize(m_icache_size/4);
 	m_dcache.resize(m_dcache_size/4);
@@ -291,40 +286,40 @@ void r3000_device::device_start()
 	m_cache_size = m_dcache_size;
 
 	// set up memory handlers
-	m_memory_hand.m_read_byte = &r3000_device::readmem;
-	m_memory_hand.m_read_word = &r3000_device::readmem_word;
-	m_memory_hand.m_read_dword = &r3000_device::readmem_dword;
-	m_memory_hand.m_write_byte = &r3000_device::writemem;
-	m_memory_hand.m_write_word = &r3000_device::writemem_word;
-	m_memory_hand.m_write_dword = &r3000_device::writemem_dword;
+	m_memory_hand.m_read_byte = &r3000_device_base::readmem;
+	m_memory_hand.m_read_word = &r3000_device_base::readmem_word;
+	m_memory_hand.m_read_dword = &r3000_device_base::readmem_dword;
+	m_memory_hand.m_write_byte = &r3000_device_base::writemem;
+	m_memory_hand.m_write_word = &r3000_device_base::writemem_word;
+	m_memory_hand.m_write_dword = &r3000_device_base::writemem_dword;
 
 	if (m_endianness == ENDIANNESS_BIG)
 	{
-		m_lwl = &r3000_device::lwl_be;
-		m_lwr = &r3000_device::lwr_be;
-		m_swl = &r3000_device::swl_be;
-		m_swr = &r3000_device::swr_be;
+		m_lwl = &r3000_device_base::lwl_be;
+		m_lwr = &r3000_device_base::lwr_be;
+		m_swl = &r3000_device_base::swl_be;
+		m_swr = &r3000_device_base::swr_be;
 
-		m_cache_hand.m_read_byte = &r3000_device::readcache_be;
-		m_cache_hand.m_read_word = &r3000_device::readcache_be_word;
-		m_cache_hand.m_read_dword = &r3000_device::readcache_be_dword;
-		m_cache_hand.m_write_byte = &r3000_device::writecache_be;
-		m_cache_hand.m_write_word = &r3000_device::writecache_be_word;
-		m_cache_hand.m_write_dword = &r3000_device::writecache_be_dword;
+		m_cache_hand.m_read_byte = &r3000_device_base::readcache_be;
+		m_cache_hand.m_read_word = &r3000_device_base::readcache_be_word;
+		m_cache_hand.m_read_dword = &r3000_device_base::readcache_be_dword;
+		m_cache_hand.m_write_byte = &r3000_device_base::writecache_be;
+		m_cache_hand.m_write_word = &r3000_device_base::writecache_be_word;
+		m_cache_hand.m_write_dword = &r3000_device_base::writecache_be_dword;
 	}
 	else
 	{
-		m_lwl = &r3000_device::lwl_le;
-		m_lwr = &r3000_device::lwr_le;
-		m_swl = &r3000_device::swl_le;
-		m_swr = &r3000_device::swr_le;
+		m_lwl = &r3000_device_base::lwl_le;
+		m_lwr = &r3000_device_base::lwr_le;
+		m_swl = &r3000_device_base::swl_le;
+		m_swr = &r3000_device_base::swr_le;
 
-		m_cache_hand.m_read_byte = &r3000_device::readcache_le;
-		m_cache_hand.m_read_word = &r3000_device::readcache_le_word;
-		m_cache_hand.m_read_dword = &r3000_device::readcache_le_dword;
-		m_cache_hand.m_write_byte = &r3000_device::writecache_le;
-		m_cache_hand.m_write_word = &r3000_device::writecache_le_word;
-		m_cache_hand.m_write_dword = &r3000_device::writecache_le_dword;
+		m_cache_hand.m_read_byte = &r3000_device_base::readcache_le;
+		m_cache_hand.m_read_word = &r3000_device_base::readcache_le_word;
+		m_cache_hand.m_read_dword = &r3000_device_base::readcache_le_dword;
+		m_cache_hand.m_write_byte = &r3000_device_base::writecache_le;
+		m_cache_hand.m_write_word = &r3000_device_base::writecache_le_word;
+		m_cache_hand.m_write_dword = &r3000_device_base::writecache_le_dword;
 	}
 
 	// resolve conditional branch input handlers
@@ -386,12 +381,16 @@ void r3000_device::device_start()
 	save_item(NAME(m_interrupt_cycles));
 	save_item(NAME(m_icache));
 	save_item(NAME(m_dcache));
+
+	// initialise cpu and fpu id registers
+	m_cpr[0][COP0_PRId] = m_cpurev;
+	m_ccr[1][0] = m_fpurev;
 }
 
 //-------------------------------------------------
 //  device_post_load -
 //-------------------------------------------------
-void r3000_device::device_post_load()
+void r3000_device_base::device_post_load()
 {
 	if (m_cpr[0][COP0_Status] & SR_IsC)
 		m_cur = &m_cache_hand;
@@ -404,7 +403,7 @@ void r3000_device::device_post_load()
 //  device_reset - reset the device
 //-------------------------------------------------
 
-void r3000_device::device_reset()
+void r3000_device_base::device_reset()
 {
 	// initialize the rest of the config
 	m_cur = &m_memory_hand;
@@ -412,14 +411,7 @@ void r3000_device::device_reset()
 	// initialize the state
 	m_pc = 0xbfc00000;
 	m_nextpc = ~0;
-	m_cpr[0][COP0_PRId] = 0x0200;
 	m_cpr[0][COP0_Status] = 0x0000;
-}
-
-void iop_device::device_reset()
-{
-	r3000_device::device_reset();
-	m_cpr[0][COP0_PRId] = 0x1f;
 }
 
 
@@ -429,7 +421,7 @@ void iop_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-device_memory_interface::space_config_vector r3000_device::memory_space_config() const
+device_memory_interface::space_config_vector r3000_device_base::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, (m_endianness == ENDIANNESS_BIG) ? &m_program_config_be : &m_program_config_le)
@@ -442,7 +434,7 @@ device_memory_interface::space_config_vector r3000_device::memory_space_config()
 //  after it has been set
 //-------------------------------------------------
 
-void r3000_device::state_import(const device_state_entry &entry)
+void r3000_device_base::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
@@ -450,7 +442,7 @@ void r3000_device::state_import(const device_state_entry &entry)
 			break;
 
 		default:
-			fatalerror("r3000_device::state_import called for unexpected value\n");
+			fatalerror("r3000_device_base::state_import called for unexpected value\n");
 	}
 }
 
@@ -459,7 +451,7 @@ void r3000_device::state_import(const device_state_entry &entry)
 //  state_export - export state out of the device
 //-------------------------------------------------
 
-void r3000_device::state_export(const device_state_entry &entry)
+void r3000_device_base::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
@@ -467,7 +459,7 @@ void r3000_device::state_export(const device_state_entry &entry)
 			break;
 
 		default:
-			fatalerror("r3000_device::state_export called for unexpected value\n");
+			fatalerror("r3000_device_base::state_export called for unexpected value\n");
 	}
 }
 
@@ -477,7 +469,7 @@ void r3000_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void r3000_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void r3000_device_base::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -492,7 +484,7 @@ void r3000_device::state_string_export(const device_state_entry &entry, std::str
 //  helper function
 //-------------------------------------------------
 
-std::unique_ptr<util::disasm_interface> r3000_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> r3000_device_base::create_disassembler()
 {
 	return std::make_unique<r3000_disassembler>();
 }
@@ -502,47 +494,47 @@ std::unique_ptr<util::disasm_interface> r3000_device::create_disassembler()
     MEMORY ACCESSORS
 ***************************************************************************/
 
-inline uint32_t r3000_device::readop(offs_t pc)
+inline uint32_t r3000_device_base::readop(offs_t pc)
 {
 	return m_pr32(pc);
 }
 
-uint8_t r3000_device::readmem(offs_t offset)
+uint8_t r3000_device_base::readmem(offs_t offset)
 {
 	if (SR & SR_IsC)
 		return 0;
 	return m_program->read_byte(offset);
 }
 
-uint16_t r3000_device::readmem_word(offs_t offset)
+uint16_t r3000_device_base::readmem_word(offs_t offset)
 {
 	if (SR & SR_IsC)
 		return 0;
 	return m_program->read_word(offset);
 }
 
-uint32_t r3000_device::readmem_dword(offs_t offset)
+uint32_t r3000_device_base::readmem_dword(offs_t offset)
 {
 	if (SR & SR_IsC)
 		return 0;
 	return m_program->read_dword(offset);
 }
 
-void r3000_device::writemem(offs_t offset, uint8_t data)
+void r3000_device_base::writemem(offs_t offset, uint8_t data)
 {
 	if (SR & SR_IsC)
 		return;
 	m_program->write_byte(offset, data);
 }
 
-void r3000_device::writemem_word(offs_t offset, uint16_t data)
+void r3000_device_base::writemem_word(offs_t offset, uint16_t data)
 {
 	if (SR & SR_IsC)
 		return;
 	m_program->write_word(offset, data);
 }
 
-void r3000_device::writemem_dword(offs_t offset, uint32_t data)
+void r3000_device_base::writemem_dword(offs_t offset, uint32_t data)
 {
 	if (SR & SR_IsC)
 		return;
@@ -554,43 +546,43 @@ void r3000_device::writemem_dword(offs_t offset, uint32_t data)
     BIG ENDIAN CACHE I/O
 ***************************************************************************/
 
-uint8_t r3000_device::readcache_be(offs_t offset)
+uint8_t r3000_device_base::readcache_be(offs_t offset)
 {
 	offset &= 0x1fffffff;
 	return (offset * 4 < m_cache_size) ? m_cache[BYTE4_XOR_BE(offset)] : 0xff;
 }
 
-uint16_t r3000_device::readcache_be_word(offs_t offset)
+uint16_t r3000_device_base::readcache_be_word(offs_t offset)
 {
 	offset &= 0x1fffffff;
 	return (offset * 4 < m_cache_size) ? *(uint16_t *)&m_cache[WORD_XOR_BE(offset)] : 0xffff;
 }
 
-uint32_t r3000_device::readcache_be_dword(offs_t offset)
+uint32_t r3000_device_base::readcache_be_dword(offs_t offset)
 {
 	offset &= 0x1fffffff;
 	return (offset * 4 < m_cache_size) ? *(uint32_t *)&m_cache[offset] : 0xffffffff;
 }
 
-void r3000_device::writecache_be(offs_t offset, uint8_t data)
+void r3000_device_base::writecache_be(offs_t offset, uint8_t data)
 {
 	offset &= 0x1fffffff;
 	if (offset * 4 < m_cache_size) m_cache[BYTE4_XOR_BE(offset)] = data;
 }
 
-void r3000_device::writecache_be_word(offs_t offset, uint16_t data)
+void r3000_device_base::writecache_be_word(offs_t offset, uint16_t data)
 {
 	offset &= 0x1fffffff;
 	if (offset * 4 < m_cache_size) *(uint16_t *)&m_cache[WORD_XOR_BE(offset)] = data;
 }
 
-void r3000_device::writecache_be_dword(offs_t offset, uint32_t data)
+void r3000_device_base::writecache_be_dword(offs_t offset, uint32_t data)
 {
 	offset &= 0x1fffffff;
 	if (offset * 4 < m_cache_size) *(uint32_t *)&m_cache[offset] = data;
 }
 
-uint8_t r3000_device::readcache_le(offs_t offset)
+uint8_t r3000_device_base::readcache_le(offs_t offset)
 {
 	offset &= 0x1fffffff;
 	return (offset * 4 < m_cache_size) ? m_cache[BYTE4_XOR_LE(offset)] : 0xff;
@@ -601,31 +593,31 @@ uint8_t r3000_device::readcache_le(offs_t offset)
     LITTLE ENDIAN CACHE I/O
 ***************************************************************************/
 
-uint16_t r3000_device::readcache_le_word(offs_t offset)
+uint16_t r3000_device_base::readcache_le_word(offs_t offset)
 {
 	offset &= 0x1fffffff;
 	return (offset * 4 < m_cache_size) ? *(uint16_t *)&m_cache[WORD_XOR_LE(offset)] : 0xffff;
 }
 
-uint32_t r3000_device::readcache_le_dword(offs_t offset)
+uint32_t r3000_device_base::readcache_le_dword(offs_t offset)
 {
 	offset &= 0x1fffffff;
 	return (offset * 4 < m_cache_size) ? *(uint32_t *)&m_cache[offset] : 0xffffffff;
 }
 
-void r3000_device::writecache_le(offs_t offset, uint8_t data)
+void r3000_device_base::writecache_le(offs_t offset, uint8_t data)
 {
 	offset &= 0x1fffffff;
 	if (offset * 4 < m_cache_size) m_cache[BYTE4_XOR_LE(offset)] = data;
 }
 
-void r3000_device::writecache_le_word(offs_t offset, uint16_t data)
+void r3000_device_base::writecache_le_word(offs_t offset, uint16_t data)
 {
 	offset &= 0x1fffffff;
 	if (offset * 4 < m_cache_size) *(uint16_t *)&m_cache[WORD_XOR_LE(offset)] = data;
 }
 
-void r3000_device::writecache_le_dword(offs_t offset, uint32_t data)
+void r3000_device_base::writecache_le_dword(offs_t offset, uint32_t data)
 {
 	offset &= 0x1fffffff;
 	if (offset * 4 < m_cache_size) *(uint32_t *)&m_cache[offset] = data;
@@ -636,7 +628,7 @@ void r3000_device::writecache_le_dword(offs_t offset, uint32_t data)
     EXECEPTION HANDLING
 ***************************************************************************/
 
-inline void r3000_device::generate_exception(int exception, bool backup)
+inline void r3000_device_base::generate_exception(int exception, bool backup)
 {
 	// set the exception PC
 	m_cpr[0][COP0_EPC] = backup ? m_ppc : m_pc;
@@ -667,7 +659,7 @@ inline void r3000_device::generate_exception(int exception, bool backup)
 }
 
 
-inline void r3000_device::invalid_instruction()
+inline void r3000_device_base::invalid_instruction()
 {
 	generate_exception(EXCEPTION_INVALIDOP, true);
 }
@@ -677,14 +669,14 @@ inline void r3000_device::invalid_instruction()
     IRQ HANDLING
 ***************************************************************************/
 
-void r3000_device::check_irqs()
+void r3000_device_base::check_irqs()
 {
 	if ((CAUSE & SR & 0xff00) && (SR & SR_IEc))
 		generate_exception(EXCEPTION_INTERRUPT, false);
 }
 
 
-void r3000_device::set_irq_line(int irqline, int state)
+void r3000_device_base::set_irq_line(int irqline, int state)
 {
 	if (state != CLEAR_LINE)
 		CAUSE |= 0x400 << irqline;
@@ -699,12 +691,12 @@ void r3000_device::set_irq_line(int irqline, int state)
     COP0 (SYSTEM) EXECUTION HANDLING
 ***************************************************************************/
 
-inline uint32_t r3000_device::get_cop0_reg(int idx)
+inline uint32_t r3000_device_base::get_cop0_reg(int idx)
 {
 	return m_cpr[0][idx];
 }
 
-inline void r3000_device::set_cop0_reg(int idx, uint32_t val)
+inline void r3000_device_base::set_cop0_reg(int idx, uint32_t val)
 {
 	if (idx == COP0_Cause)
 	{
@@ -740,21 +732,21 @@ inline void r3000_device::set_cop0_reg(int idx, uint32_t val)
 		// update interrupts
 		check_irqs();
 	}
-	else
+	else if (idx != COP0_PRId)
 		m_cpr[0][idx] = val;
 }
 
-inline uint32_t r3000_device::get_cop0_creg(int idx)
+inline uint32_t r3000_device_base::get_cop0_creg(int idx)
 {
 	return m_ccr[0][idx];
 }
 
-inline void r3000_device::set_cop0_creg(int idx, uint32_t val)
+inline void r3000_device_base::set_cop0_creg(int idx, uint32_t val)
 {
 	m_ccr[0][idx] = val;
 }
 
-inline void r3000_device::handle_cop0()
+inline void r3000_device_base::handle_cop0()
 {
 	if (!(SR & SR_COP0) && (SR & SR_KUc))
 		generate_exception(EXCEPTION_BADCOP, true);
@@ -811,27 +803,28 @@ inline void r3000_device::handle_cop0()
     COP1 (FPU) EXECUTION HANDLING
 ***************************************************************************/
 
-inline uint32_t r3000_device::get_cop1_reg(int idx)
+inline uint32_t r3000_device_base::get_cop1_reg(int idx)
 {
 	return m_cpr[1][idx];
 }
 
-inline void r3000_device::set_cop1_reg(int idx, uint32_t val)
+inline void r3000_device_base::set_cop1_reg(int idx, uint32_t val)
 {
 	m_cpr[1][idx] = val;
 }
 
-inline uint32_t r3000_device::get_cop1_creg(int idx)
+inline uint32_t r3000_device_base::get_cop1_creg(int idx)
 {
 	return m_ccr[1][idx];
 }
 
-inline void r3000_device::set_cop1_creg(int idx, uint32_t val)
+inline void r3000_device_base::set_cop1_creg(int idx, uint32_t val)
 {
-	m_ccr[1][idx] = val;
+	if (idx)
+		m_ccr[1][idx] = val;
 }
 
-inline void r3000_device::handle_cop1()
+inline void r3000_device_base::handle_cop1()
 {
 	if (!(SR & SR_COP1))
 		generate_exception(EXCEPTION_BADCOP, true);
@@ -879,27 +872,27 @@ inline void r3000_device::handle_cop1()
     COP2 (CUSTOM) EXECUTION HANDLING
 ***************************************************************************/
 
-inline uint32_t r3000_device::get_cop2_reg(int idx)
+inline uint32_t r3000_device_base::get_cop2_reg(int idx)
 {
 	return m_cpr[2][idx];
 }
 
-inline void r3000_device::set_cop2_reg(int idx, uint32_t val)
+inline void r3000_device_base::set_cop2_reg(int idx, uint32_t val)
 {
 	m_cpr[2][idx] = val;
 }
 
-inline uint32_t r3000_device::get_cop2_creg(int idx)
+inline uint32_t r3000_device_base::get_cop2_creg(int idx)
 {
 	return m_ccr[2][idx];
 }
 
-inline void r3000_device::set_cop2_creg(int idx, uint32_t val)
+inline void r3000_device_base::set_cop2_creg(int idx, uint32_t val)
 {
 	m_ccr[2][idx] = val;
 }
 
-inline void r3000_device::handle_cop2()
+inline void r3000_device_base::handle_cop2()
 {
 	if (!(SR & SR_COP2))
 		generate_exception(EXCEPTION_BADCOP, true);
@@ -945,27 +938,27 @@ inline void r3000_device::handle_cop2()
     COP3 (CUSTOM) EXECUTION HANDLING
 ***************************************************************************/
 
-inline uint32_t r3000_device::get_cop3_reg(int idx)
+inline uint32_t r3000_device_base::get_cop3_reg(int idx)
 {
 	return m_cpr[3][idx];
 }
 
-inline void r3000_device::set_cop3_reg(int idx, uint32_t val)
+inline void r3000_device_base::set_cop3_reg(int idx, uint32_t val)
 {
 	m_cpr[3][idx] = val;
 }
 
-inline uint32_t r3000_device::get_cop3_creg(int idx)
+inline uint32_t r3000_device_base::get_cop3_creg(int idx)
 {
 	return m_ccr[3][idx];
 }
 
-inline void r3000_device::set_cop3_creg(int idx, uint32_t val)
+inline void r3000_device_base::set_cop3_creg(int idx, uint32_t val)
 {
 	m_ccr[3][idx] = val;
 }
 
-inline void r3000_device::handle_cop3()
+inline void r3000_device_base::handle_cop3()
 {
 	if (!(SR & SR_COP3))
 		generate_exception(EXCEPTION_BADCOP, true);
@@ -1016,7 +1009,7 @@ inline void r3000_device::handle_cop3()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t r3000_device::execute_min_cycles() const
+uint32_t r3000_device_base::execute_min_cycles() const
 {
 	return 1;
 }
@@ -1027,7 +1020,7 @@ uint32_t r3000_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t r3000_device::execute_max_cycles() const
+uint32_t r3000_device_base::execute_max_cycles() const
 {
 	return 40;
 }
@@ -1038,7 +1031,7 @@ uint32_t r3000_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t r3000_device::execute_input_lines() const
+uint32_t r3000_device_base::execute_input_lines() const
 {
 	return 6;
 }
@@ -1048,7 +1041,7 @@ uint32_t r3000_device::execute_input_lines() const
 //  execute_set_input
 //-------------------------------------------------
 
-void r3000_device::execute_set_input(int inputnum, int state)
+void r3000_device_base::execute_set_input(int inputnum, int state)
 {
 	set_irq_line(inputnum, state);
 }
@@ -1058,7 +1051,7 @@ void r3000_device::execute_set_input(int inputnum, int state)
 //  execute_run
 //-------------------------------------------------
 
-void r3000_device::execute_run()
+void r3000_device_base::execute_run()
 {
 	// count cycles and interrupt cycles
 	m_icount -= m_interrupt_cycles;
@@ -1271,7 +1264,7 @@ void r3000_device::execute_run()
     COMPLEX OPCODE IMPLEMENTATIONS
 ***************************************************************************/
 
-void r3000_device::lwl_be()
+void r3000_device_base::lwl_be()
 {
 	offs_t offs = SIMMVAL + RSVAL;
 	uint32_t temp = RLONG(offs & ~3);
@@ -1286,7 +1279,7 @@ void r3000_device::lwl_be()
 	}
 }
 
-void r3000_device::lwr_be()
+void r3000_device_base::lwr_be()
 {
 	offs_t offs = SIMMVAL + RSVAL;
 	uint32_t temp = RLONG(offs & ~3);
@@ -1301,7 +1294,7 @@ void r3000_device::lwr_be()
 	}
 }
 
-void r3000_device::swl_be()
+void r3000_device_base::swl_be()
 {
 	offs_t offs = SIMMVAL + RSVAL;
 	if (!(offs & 3)) WLONG(offs, RTVAL);
@@ -1314,7 +1307,7 @@ void r3000_device::swl_be()
 }
 
 
-void r3000_device::swr_be()
+void r3000_device_base::swr_be()
 {
 	offs_t offs = SIMMVAL + RSVAL;
 	if ((offs & 3) == 3) WLONG(offs & ~3, RTVAL);
@@ -1328,7 +1321,7 @@ void r3000_device::swr_be()
 
 
 
-void r3000_device::lwl_le()
+void r3000_device_base::lwl_le()
 {
 	offs_t offs = SIMMVAL + RSVAL;
 	uint32_t temp = RLONG(offs & ~3);
@@ -1343,7 +1336,7 @@ void r3000_device::lwl_le()
 	}
 }
 
-void r3000_device::lwr_le()
+void r3000_device_base::lwr_le()
 {
 	offs_t offs = SIMMVAL + RSVAL;
 	uint32_t temp = RLONG(offs & ~3);
@@ -1358,7 +1351,7 @@ void r3000_device::lwr_le()
 	}
 }
 
-void r3000_device::swl_le()
+void r3000_device_base::swl_le()
 {
 	offs_t offs = SIMMVAL + RSVAL;
 	if (!(offs & 3)) WLONG(offs, RTVAL);
@@ -1370,7 +1363,7 @@ void r3000_device::swl_le()
 	}
 }
 
-void r3000_device::swr_le()
+void r3000_device_base::swr_le()
 {
 	offs_t offs = SIMMVAL + RSVAL;
 	if ((offs & 3) == 3) WLONG(offs & ~3, RTVAL);

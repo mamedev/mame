@@ -372,10 +372,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
-	MCFG_DEVICE_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
-	MCFG_DEVICE_PROGRAM_MAP(i8086_mem)
-	MCFG_DEVICE_IO_MAP(i8086_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, 8000000); /* VERIFIED clock, unknown divider */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tsispch_state::i8086_mem);
+	m_maincpu->set_addrmap(AS_IO, &tsispch_state::i8086_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
@@ -387,8 +387,8 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	MCFG_NECDSP_OUT_P1_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p1_w))
 
 	/* PIC 8259 */
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* uarts */
 	i8251_device &u15(I8251(config, "i8251a_u15", 0));

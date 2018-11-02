@@ -987,11 +987,11 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	config.set_default_layout(layout_hp2640);
 
 	// RS232
-	MCFG_DEVICE_ADD("rs232" , RS232_PORT, default_rs232_devices , nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices , nullptr);
 
 	// UART (TR1602B)
 	AY51013(config, m_uart);
-	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set(FUNC(hp2645_state::async_txd_w));
 	m_uart->write_dav_callback().set(FUNC(hp2645_state::async_dav_w));
 	m_uart->set_auto_rdav(true);

@@ -560,7 +560,7 @@ void deco16ic_device::pf12_set_gfxbank( int small, int big )
 	m_pf12_8x8_gfx_bank = small;
 }
 
-/* stoneage has broken scroll registers */
+/* stoneage has broken scroll registers, original tumble pop expects a 1 pixel offset */
 void deco16ic_device::set_scrolldx( int tmap, int size, int dx, int dx_if_flipped )
 {
 	switch (tmap)

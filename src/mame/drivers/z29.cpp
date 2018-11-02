@@ -50,31 +50,39 @@ private:
 	required_shared_ptr<u8> m_attrmem;
 	required_region_ptr<u8> m_chargen;
 
-	bool m_t0;
+	bool m_dmatype;
 };
 
 void z29_state::machine_start()
 {
-	save_item(NAME(m_t0));
+	save_item(NAME(m_dmatype));
 }
 
 void z29_state::p3_w(u8 data)
 {
-	m_t0 = BIT(data, 4);
+	m_dmatype = BIT(data, 4);
 }
 
 READ8_MEMBER(z29_state::bs_24k_r)
 {
 	if (!machine().side_effects_disabled())
 	{
-		u8 chardata = m_charmem[offset];
-		u8 attrdata = m_attrmem[offset] & 0xf;
+		if (m_dmatype)
+		{
+			u8 chardata = m_charmem[offset];
+			u8 attrdata = m_attrmem[offset] & 0xf;
 
-		m_crtc[0]->dack_w(space, 0, chardata & 0x7f);
-		m_crtc[1]->dack_w(space, 0, (chardata & 0x60) | (BIT(chardata, 7) ? 0x10 : 0) | attrdata);
+			m_crtc[0]->dack_w(space, 0, chardata & 0x7f);
+			m_crtc[1]->dack_w(space, 0, (chardata & 0x60) | (BIT(chardata, 7) ? 0x10 : 0) | attrdata);
+		}
+		else
+		{
+			m_charmem[offset] = 0x20;
+			m_attrmem[offset] = 0;
+		}
 	}
 
-	return m_t0 ? 0x24 : 0x20;
+	return m_dmatype ? 0x24 : 0x20;
 }
 
 WRITE8_MEMBER(z29_state::crtc_w)

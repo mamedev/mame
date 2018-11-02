@@ -544,8 +544,8 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
-	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
+	TC0091LVC(config, m_vdp, 0);
+	m_vdp->set_gfxdecode_tag("gfxdecode");
 
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 

@@ -137,7 +137,7 @@ MACHINE_CONFIG_START(nexus3d_state::nexus3d)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_SERFLASH_ADD("flash")
+	SERFLASH(config, m_serflash, 0);
 
 MACHINE_CONFIG_END
 

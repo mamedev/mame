@@ -54,12 +54,12 @@ MACHINE_CONFIG_START(at_mb_device::at_softlists)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
-	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(4772720/4) /* dram refresh */
-	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, at_mb_device, pit8254_out2_changed))
+	PIT8254(config, m_pit8254, 0);
+	m_pit8254->set_clk<0>(4772720/4); /* heartbeat IRQ */
+	m_pit8254->out_handler<0>().set("pic8259_master", FUNC(pic8259_device::ir0_w));
+	m_pit8254->set_clk<1>(4772720/4); /* dram refresh */
+	m_pit8254->set_clk<2>(4772720/4); /* pio port c pin 4, and speaker polling enough */
+	m_pit8254->out_handler<2>().set(FUNC(at_mb_device::pit8254_out2_changed));
 
 	AM9517A(config, m_dma8237_1, 14.318181_MHz_XTAL / 3);
 	m_dma8237_1->out_hreq_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq0_w));
@@ -151,7 +151,7 @@ void at_mb_device::map(address_map &map)
 {
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xffff);
 	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
-	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0xffff);
+	map(0x0040, 0x005f).rw(m_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0xffff);
 	map(0x0061, 0x0061).rw(FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
 	map(0x0060, 0x0060).rw("keybc", FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w));
 	map(0x0064, 0x0064).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));

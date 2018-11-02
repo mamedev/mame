@@ -44,6 +44,10 @@ class dp835x_device : public device_t, public device_video_interface
 {
 public:
 	// device configuration
+	auto lrc_callback() { return m_lrc_callback.bind(); }
+	auto clc_callback() { return m_clc_callback.bind(); }
+	auto lc_callback() { return m_lc_callback.bind(); }
+	auto lbre_callback() { return m_lbre_callback.bind(); }
 	auto hsync_callback() { return m_hsync_callback.bind(); }
 	auto vsync_callback() { return m_vsync_callback.bind(); }
 	auto vblank_callback() { return m_vblank_callback.bind(); }
@@ -51,22 +55,31 @@ public:
 
 	// write handlers
 	DECLARE_WRITE_LINE_MEMBER(refresh_control);
+	DECLARE_WRITE_LINE_MEMBER(character_generator_program);
 	void register_load(u8 rs, u16 addr);
 
 	// read handlers
+	DECLARE_READ_LINE_MEMBER(lrc_r);
+	u8 lc_r() { return m_lc; }
+	DECLARE_READ_LINE_MEMBER(lbre_r);
 	DECLARE_READ_LINE_MEMBER(hsync_r);
 	DECLARE_READ_LINE_MEMBER(vsync_r);
 	DECLARE_READ_LINE_MEMBER(vblank_r);
 
+	// address getters (TODO: accurate character-by-character emulation)
+	u16 top_of_page() const { return m_topr; }
+	u16 row_start() const { return m_row_start; }
+	u16 cursor_address() const { return m_cr; }
+
 protected:
 	// base type constructor
 	dp835x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
-                      int char_width, int char_height, int chars_per_row, int rows_per_frame,
-                      int vsync_delay_f1, int vsync_width_f1, int vblank_interval_f1,
-                      int vsync_delay_f0, int vsync_width_f0, int vblank_interval_f0,
-                      int chars_per_line, int hsync_delay, int hsync_width, int vblank_stop,
-                      bool cursor_on_all_lines, int lbc_0_width, int hsync_serration,
-                      bool hsync_active, bool vsync_active, bool vblank_active);
+					  int char_width, int char_height, int chars_per_row, int rows_per_frame,
+					  int vsync_delay_f1, int vsync_width_f1, int vblank_interval_f1,
+					  int vsync_delay_f0, int vsync_width_f0, int vblank_interval_f0,
+					  int chars_per_line, int hsync_delay, int hsync_width, int vblank_stop,
+					  bool cursor_on_all_lines, int lbc_0_width, int hsync_serration,
+					  bool hsync_active, bool vsync_active, bool vblank_active);
 
 	// device-specific overrides
 	virtual void device_config_complete() override;
@@ -80,9 +93,9 @@ private:
 	void reconfigure_screen();
 
 	// timer callbacks
+	TIMER_CALLBACK_MEMBER(hblank_start);
+	TIMER_CALLBACK_MEMBER(hblank_near_end);
 	TIMER_CALLBACK_MEMBER(hsync_update);
-	TIMER_CALLBACK_MEMBER(vsync_update);
-	TIMER_CALLBACK_MEMBER(vblank_update);
 
 	// mask parameters
 	const int m_char_width;                 // character field cell size (width in dots)
@@ -103,24 +116,40 @@ private:
 	const bool m_vsync_active;              // active level of vertical sync pulse
 	const bool m_vblank_active;             // active level of vertical blanking pulse
 
+	// derived parameters
+	const int m_dots_per_line;              // number of dots per scan line
+	const int m_dots_per_row;               // number of dots displayed in each scan line
+	const int m_video_scan_lines;           // number of active scan lines between VBLANK periods
+
 	// misc. configuration
 	bool m_half_shift;                      // adjust screen parameters to allow half-dot shifting
 
 	// device callbacks
+	devcb_write_line m_lrc_callback;        // line rate clock output (active high)
+	devcb_write_line m_clc_callback;        // clear line counter output (active low during blanking)
+	devcb_write8 m_lc_callback;             // line counter output
+	devcb_write_line m_lbre_callback;       // line buffer recirculate enable output (active high)
 	devcb_write_line m_hsync_callback;      // horizontal sync output (polarity may vary by type)
 	devcb_write_line m_vsync_callback;      // vertical sync output (polarity may vary by type)
 	devcb_write_line m_vblank_callback;     // vertical blanking output (polarity may vary by type)
 
 	// internal registers and control parameters
 	bool m_60hz_refresh;                    // refresh rate selector (true = f1, false = f0)
+	bool m_cgpi;                            // character generator program/address mode input
+	u16 m_topr;                             // top-of-page register
+	u16 m_rsr;                              // row start register (to be loaded during next row)
+	u16 m_cr;                               // cursor register
+	u16 m_row_start;                        // start of current row
+	u16 m_line;                             // current scan line (starting at HBLANK)
+
+	// output state
+	u8 m_lc;                                // 4-bit line counter
 
 	// timers
+	emu_timer *m_hblank_start_timer;
+	emu_timer *m_hblank_near_end_timer;
 	emu_timer *m_hsync_on_timer;
 	emu_timer *m_hsync_off_timer;
-	emu_timer *m_vsync_on_timer;
-	emu_timer *m_vsync_off_timer;
-	emu_timer *m_vblank_on_timer;
-	emu_timer *m_vblank_off_timer;
 };
 
 // ======================> dp8350_device

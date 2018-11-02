@@ -558,18 +558,18 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	m_aciahost->txd_handler().set("rs232host", FUNC(rs232_port_device::write_txd));
 	m_aciahost->rts_handler().set("rs232host", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232host", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("aciahost", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("aciahost", acia6850_device, write_cts))
+	rs232_port_device &rs232host(RS232_PORT(config, "rs232host", default_rs232_devices, "null_modem"));
+	rs232host.rxd_handler().set(m_aciahost, FUNC(acia6850_device::write_rxd));
+	rs232host.cts_handler().set(m_aciahost, FUNC(acia6850_device::write_cts));
 
 	/* P4/Terminal Port config */
 	ACIA6850(config, m_aciaterm, 0);
 	m_aciaterm->txd_handler().set("rs232trm", FUNC(rs232_port_device::write_txd));
 	m_aciaterm->rts_handler().set("rs232trm", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("aciaterm", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("aciaterm", acia6850_device, write_cts))
+	rs232_port_device &rs232trm(RS232_PORT(config, "rs232trm", default_rs232_devices, "terminal"));
+	rs232trm.rxd_handler().set(m_aciaterm, FUNC(acia6850_device::write_rxd));
+	rs232trm.cts_handler().set(m_aciaterm, FUNC(acia6850_device::write_cts));
 
 	/* P5/Remote Port config */
 	ACIA6850(config, m_aciaremt, 0);

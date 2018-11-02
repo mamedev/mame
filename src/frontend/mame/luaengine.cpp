@@ -24,6 +24,7 @@
 #include "natkeyboard.h"
 #include "uiinput.h"
 #include "pluginopts.h"
+#include "softlist.h"
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
@@ -924,7 +925,7 @@ void lua_engine::initialize()
  * thread.result() - get thread result as string
  * thread.busy - check if thread is running
  * thread.yield - check if thread is yielded
-*/
+ */
 
 	emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>(),
 			"start", [](context &ctx, const char *scr) {
@@ -980,6 +981,15 @@ void lua_engine::initialize()
 			"busy", sol::readonly(&context::busy),
 			"yield", sol::readonly(&context::yield));
 
+/*
+ * emu.item(item_index)
+ * item.size - size of the raw data type
+ * item.count - number of entries
+ * item:read(offset) - read entry value by index
+ * item:read_block(offset, count) - read a block of entry values as a string (byte addressing)
+ * item:write(offset, value) - write entry value by index
+ */
+ 
 	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
 					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
 					{
@@ -1016,7 +1026,7 @@ void lua_engine::initialize()
 					if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
 						buff->set_len(0);
 					else
-						memcpy(buff->get_ptr(), item.base, buff->get_len());
+						memcpy(buff->get_ptr(), (uint8_t *)item.base + offset, buff->get_len());
 					return buff;
 				},
 			"write", [](save_item &item, int offset, uint64_t value) {
@@ -1339,7 +1349,7 @@ void lua_engine::initialize()
  * device:debug() - debug interface, cpus only
  * device.spaces[] - device address spaces table
  * device.state[] - device state entries table
- * device.items[] - device save state items table
+ * device.items[] - device save state items table (item name is key, item index is value)
  */
 
 	sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor,
@@ -1701,20 +1711,20 @@ void lua_engine::initialize()
  * render:max_update_rate() -
  * render:ui_target() - target for ui drawing
  * render:ui_container() - container for ui drawing
- * render.target[] - render_target table
+ * render.targets[] - render_target table
  */
 
 	sol().registry().new_usertype<render_manager>("render", "new", sol::no_constructor,
 			"max_update_rate", &render_manager::max_update_rate,
 			"ui_target", &render_manager::ui_target,
 			"ui_container", &render_manager::ui_container,
-			"targets", [this](render_manager &r) {
+			"targets", sol::property([this](render_manager &r) {
 					sol::table target_table = sol().create_table();
 					int tc = 0;
 					for(render_target &curr_rt : r.targets())
 						target_table[tc++] = &curr_rt;
 					return target_table;
-				});
+				}));
 
 /* machine.screens[screen_tag]
  * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol
@@ -1986,6 +1996,7 @@ void lua_engine::initialize()
 			"manufacturer", &device_image_interface::manufacturer,
 			"year", &device_image_interface::year,
 			"software_list_name", &device_image_interface::software_list_name,
+			"software_parent", sol::property([](device_image_interface &di) { const software_info *si = di.software_entry(); return si ? si->parentname() : ""; }),
 			"image_type_name", &device_image_interface::image_type_name,
 			"load", &device_image_interface::load,
 			"unload", &device_image_interface::unload,

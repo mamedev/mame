@@ -77,7 +77,6 @@ private:
 	DECLARE_PALETTE_INIT(d110);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void d110_io(address_map &map);
 	void d110_map(address_map &map);
 
 	uint8_t  m_lcd_data_buffer[256];
@@ -231,16 +230,11 @@ void d110_state::d110_map(address_map &map)
 	map(0xc000, 0xffff).bankrw("fixed");
 }
 
-void d110_state::d110_io(address_map &map)
-{
-	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(FUNC(d110_state::midi_w));
-	map(i8x9x_device::P0, i8x9x_device::P0).r(FUNC(d110_state::port0_r));
-}
-
 MACHINE_CONFIG_START(d110_state::d110)
-	MCFG_DEVICE_ADD( m_maincpu, P8098, XTAL(12'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP( d110_map )
-	MCFG_DEVICE_IO_MAP( d110_io )
+	P8098(config, m_maincpu, 12_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &d110_state::d110_map);
+	m_maincpu->serial_tx_cb().set(FUNC(d110_state::midi_w));
+	m_maincpu->in_p0_cb().set(FUNC(d110_state::port0_r));
 
 // Battery-backed main ram
 	RAM( config, "ram" ).set_default_size( "32K" );

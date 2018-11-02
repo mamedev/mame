@@ -757,17 +757,17 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	NS16550(config, m_uart, XTAL(1'843'200));
-	m_uart->out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
-	m_uart->out_dtr_callback().set("serport", FUNC(rs232_port_device::write_dtr));
-	m_uart->out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
+	m_uart->out_tx_callback().set(m_serport, FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set(m_serport, FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set(m_serport, FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set(FUNC(avigo_state::com_interrupt));
 
-	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
+	RS232_PORT(config, m_serport, default_rs232_devices, nullptr);
+	m_serport->rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	m_serport->dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	m_serport->dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	m_serport->ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	m_serport->cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -790,8 +790,8 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, avigo_state, tc8521_alarm_int))
+	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
+	rtc.out_alarm_callback().set(FUNC(avigo_state::tc8521_alarm_int));
 
 	/* flash ROMs */
 	AMD_29F080(config, "flash0");

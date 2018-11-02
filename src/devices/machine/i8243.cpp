@@ -117,7 +117,8 @@ WRITE_LINE_MEMBER(i8243_device::prog_w)
 		switch (m_opcode >> 2)
 		{
 			case mcs48_cpu_device::EXPANDER_OP_READ:
-				break; // handled above
+				m_p2out = 0x0f; // release expander bus
+				break;
 
 			case mcs48_cpu_device::EXPANDER_OP_WRITE:
 				m_p[m_opcode & 3] = m_p2 & 0x0f;

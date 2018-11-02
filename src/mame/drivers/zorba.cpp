@@ -237,10 +237,10 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 
 	// J2 EIA RS232/internal modem
 	// TODO: this has additional lines compared to a regular RS232 port (TxC in, RxC in, RxC out, speaker in, power)
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart0, i8251_device, write_rxd)) // TODO: this line has a LED attached
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart0, i8251_device, write_cts)) // TODO: this line has a LED attached
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart0, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart0, FUNC(i8251_device::write_rxd)); // TODO: this line has a LED attached
+	rs232.cts_handler().set(m_uart0, FUNC(i8251_device::write_cts)); // TODO: this line has a LED attached
+	rs232.dsr_handler().set(m_uart0, FUNC(i8251_device::write_dsr));
 
 	// J3 Parallel printer
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("parprndata", "parprn")
@@ -251,8 +251,8 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	parprn.select_handler().set(FUNC(zorba_state::printer_select_w));
 
 	// J3 Serial printer
-	MCFG_DEVICE_ADD("serprn", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart1, i8251_device, write_rxd)) // TODO: this line has a LED attached
+	rs232_port_device &serprn(RS232_PORT(config, "serprn", default_rs232_devices, nullptr));
+	serprn.rxd_handler().set(m_uart1, FUNC(i8251_device::write_rxd)); // TODO: this line has a LED attached
 
 	// J6 TTL-level serial keyboard
 	ZORBA_KEYBOARD(config, "keyboard").rxd_cb().set(m_uart2, FUNC(i8251_device::write_rxd));

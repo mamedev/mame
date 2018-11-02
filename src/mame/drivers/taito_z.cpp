@@ -3230,9 +3230,9 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
-	SPEAKER(config, "front",     0.0, 0.0,  1.0);
-	SPEAKER(config, "rear",      0.0, 0.0, -0.5);
-	SPEAKER(config, "subwoofer", 0.0, 0.0,  1.0);
+	SPEAKER(config, "front").front_center();
+	SPEAKER(config, "rear").rear_center();
+	SPEAKER(config, "subwoofer").subwoofer();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3304,9 +3304,9 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
-	SPEAKER(config, "front",     0.0, 0.0,  1.0);
-	SPEAKER(config, "rear",      0.0, 0.0, -0.5);
-	SPEAKER(config, "subwoofer", 0.0, 0.0,  0.5);
+	SPEAKER(config, "front").front_center();
+	SPEAKER(config, "rear").rear_center();
+	SPEAKER(config, "subwoofer").subwoofer();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3620,9 +3620,9 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_DEVICE_ADD("tc0110pcr", TC0110PCR, 0, "palette")
 
 	/* sound hardware */
-	SPEAKER(config, "front",     0.0, 0.0,  1.0);
-	SPEAKER(config, "rear",      0.0, 0.0, -0.5);
-	SPEAKER(config, "subwoofer", 0.0, 0.0,  0.5);
+	SPEAKER(config, "front").front_center();
+	SPEAKER(config, "rear").rear_center();
+	SPEAKER(config, "subwoofer").subwoofer();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

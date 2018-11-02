@@ -8870,9 +8870,9 @@ MACHINE_CONFIG_START(seta_state::kamenrid)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9044,9 +9044,9 @@ MACHINE_CONFIG_START(seta_state::madshark)
 	MCFG_DEVICE_PROGRAM_MAP(madshark_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9096,9 +9096,9 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state, magspeed)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9139,9 +9139,9 @@ MACHINE_CONFIG_START(seta_state::msgundam)
 	MCFG_DEVICE_PROGRAM_MAP(msgundam_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9256,13 +9256,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::kiwame)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kiwame_map)
 	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta_state, kiwame_row_select_w))
+	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
+	tmp68301.set_cputag(m_maincpu);
+	tmp68301.out_parallel_callback().set(FUNC(seta_state::kiwame_row_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

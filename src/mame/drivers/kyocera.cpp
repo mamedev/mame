@@ -1374,8 +1374,8 @@ MACHINE_CONFIG_START(kc85_state::kc85)
 	IM6402(config, m_uart, 0, 0);
 	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, im6402_device, write_rri))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
@@ -1424,8 +1424,8 @@ MACHINE_CONFIG_START(pc8201_state::pc8201)
 	IM6402(config, m_uart, 0, 0);
 	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, im6402_device, write_rri))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
@@ -1484,8 +1484,8 @@ MACHINE_CONFIG_START(trsm100_state::trsm100)
 	IM6402(config, m_uart, 0, 0);
 	m_uart->tro_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, im6402_device, write_rri))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CASSETTE_ADD("cassette")
@@ -1537,16 +1537,16 @@ MACHINE_CONFIG_START(tandy200_state::tandy200)
 	i8155.in_pc_callback().set(FUNC(tandy200_state::i8155_pc_r));
 	i8155.out_to_callback().set(FUNC(tandy200_state::i8155_to_w));
 
-	MCFG_DEVICE_ADD(RP5C01A_TAG, RP5C01, XTAL(32'768))
+	RP5C01(config, m_rtc, XTAL(32'768));
 
 	i8251_device &i8251(I8251(config, I8251_TAG, 0)); /*XTAL(4'915'200)/2,*/
 	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
 
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL(1'000'000))
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")

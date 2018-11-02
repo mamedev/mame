@@ -260,7 +260,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL(32'768))
+	RP5C15(config, m_rtc, XTAL(32'768));
 MACHINE_CONFIG_END
 
 /* ROM definition */

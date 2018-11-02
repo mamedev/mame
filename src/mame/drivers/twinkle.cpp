@@ -1109,19 +1109,19 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	m_ata->irq_handler().set(FUNC(twinkle_state::spu_ata_irq));
 	m_ata->dmarq_handler().set(FUNC(twinkle_state::spu_ata_dmarq));
 
-	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
+	RTC65271(config, "rtc", 0);
 
-	MCFG_DEVICE_ADD("fdc37c665gt", FDC37C665GT, XTAL(24'000'000))
+	FDC37C665GT(config, "fdc37c665gt", XTAL(24'000'000));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, 0)
-	MCFG_SLOT_OPTION_ADD("xvd701", JVC_XVD701)
-//  MCFG_SLOT_OPTION_ADD("xvs1100", JVC_XVS1100) // 8th mix only
-	MCFG_SLOT_DEFAULT_OPTION("xvd701")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("fdc37c665gt:uart2", ins8250_uart_device, cts_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", 0));
+	rs232.option_add("xvd701", JVC_XVD701);
+//  rs232.option_add("xvs1100", JVC_XVS1100); // 8th mix only
+	rs232.set_default_option("xvd701");
+	rs232.rxd_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::rx_w));
+	rs232.dcd_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::dcd_w));
+	rs232.dsr_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::dsr_w));
+	rs232.ri_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::ri_w));
+	rs232.cts_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::cts_w));
 
 	ns16550_device &uart(*subdevice<ns16550_device>("fdc37c665gt:uart2"));
 	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));

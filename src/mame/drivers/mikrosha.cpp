@@ -225,11 +225,11 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma8257,i8257_device, dreq2_w))
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mikrosha_state, mikrosha_pit_out2))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(0);
+	pit8253.set_clk<1>(0);
+	pit8253.set_clk<2>(2000000);
+	pit8253.out_handler<2>().set(FUNC(mikrosha_state::mikrosha_pit_out2));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

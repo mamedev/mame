@@ -7,17 +7,14 @@
 #pragma once
 
 #include "screen.h"
-#include "emupal.h"
 
-class namco_c123tmap_device : public device_t
+class namco_c123tmap_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
 	namco_c123tmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_maskregion_tag(T &&tag) { m_maskregion.set_tag(std::forward<T>(tag)); }
-	void set_gfxregion(int region) { m_tilemapinfo.gfxbank = region; }
+	void set_color_base(int color) { m_color_base = color; }
 
 	typedef delegate<void(uint16_t, int*, int*)> c123_tilemap_delegate;
 	void set_tile_callback(c123_tilemap_delegate tilemap_cb) { m_tilemapinfo.cb = tilemap_cb; }
@@ -56,15 +53,14 @@ private:
 		 */
 		tilemap_t *tmap[6];
 		std::unique_ptr<uint16_t[]> videoram;
-		int gfxbank;
-		uint8_t *maskBaseAddr;
 		c123_tilemap_delegate cb;
 	};
 
 	info m_tilemapinfo;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_memory_region m_maskregion;
+	int m_color_base;
+	required_region_ptr<uint8_t> m_mask;
 };
 
 // device type definition

@@ -303,7 +303,7 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	//MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
+	//JRC6355E(config, m_rtc, XTAL(32'768));
 
 	MCFG_DEVICE_ADD("usart1", I8251, 0)
 	MCFG_DEVICE_ADD("usart2", I8251, 0)

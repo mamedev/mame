@@ -68,9 +68,10 @@ void abc1600_mac_device::program_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(abc1600_mac_device::device_add_mconfig)
+void abc1600_mac_device::device_add_mconfig(machine_config &config)
+{
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1600)); // XTAL(64'000'000)/8/10/20000/8/8
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
@@ -113,6 +114,7 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_segment_ram(*this, "segment_ram"),
 	m_page_ram(*this, "page_ram"),
 	m_watchdog(*this, "watchdog"),
+	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_task(0)
 {
 }
@@ -124,10 +126,6 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 
 void abc1600_mac_device::device_start()
 {
-	// get the CPU device
-	m_cpu = machine().device<m68000_base_device>(m_cpu_tag);
-	assert(m_cpu != nullptr);
-
 	// allocate memory
 	m_segment_ram.allocate(0x400);
 	m_page_ram.allocate(0x400);

@@ -298,20 +298,20 @@ MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 	mpcc3.out_int_cb().set("bim", FUNC(bim68153_device::int3_w));
 
 	// MPCC - RS232
-	MCFG_DEVICE_ADD(RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc", mpcc68561_device, write_rx))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc", mpcc68561_device, cts_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
+	rs232p1.rxd_handler().set(m_mpcc, FUNC(mpcc68561_device::write_rx));
+	rs232p1.cts_handler().set(m_mpcc, FUNC(mpcc68561_device::cts_w));
+	rs232p1.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	// MPCC2 - RS232
-	MCFG_DEVICE_ADD(RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc2", mpcc68561_device, write_rx))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc2", mpcc68561_device, cts_w))
+	rs232_port_device &rs232p2(RS232_PORT(config, RS232P2_TAG, default_rs232_devices, nullptr));
+	rs232p2.rxd_handler().set(m_mpcc2, FUNC(mpcc68561_device::write_rx));
+	rs232p2.cts_handler().set(m_mpcc2, FUNC(mpcc68561_device::cts_w));
 
 	// MPCC3 - RS232
-	MCFG_DEVICE_ADD(RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc3", mpcc68561_device, write_rx))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc3", mpcc68561_device, cts_w))
+	rs232_port_device &rs232p3(RS232_PORT(config, RS232P3_TAG, default_rs232_devices, nullptr));
+	rs232p3.rxd_handler().set(m_mpcc3, FUNC(mpcc68561_device::write_rx));
+	rs232p3.cts_handler().set(m_mpcc3, FUNC(mpcc68561_device::cts_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vme_fccpu20_card_device::device_add_mconfig)

@@ -1851,12 +1851,12 @@ MACHINE_CONFIG_START(taitosj_state::mcu)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL(3'000'000))   /* xtal is 3MHz, divided by 4 internally */
-	MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(LATCH)
-	MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(READ8(*this, taitosj_state, mcu_mem_r))
-	MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(WRITE8(*this, taitosj_state, mcu_mem_w))
-	MCFG_TAITO_SJ_SECURITY_MCU_68INTRQ_CB(WRITELINE(*this, taitosj_state, mcu_intrq_w))
-	MCFG_TAITO_SJ_SECURITY_MCU_BUSRQ_CB(WRITELINE(*this, taitosj_state, mcu_busrq_w))
+	TAITO_SJ_SECURITY_MCU(config, m_mcu, XTAL(3'000'000));   /* xtal is 3MHz, divided by 4 internally */
+	m_mcu->set_int_mode(taito_sj_security_mcu_device::int_mode::LATCH);
+	m_mcu->m68read_cb().set(FUNC(taitosj_state::mcu_mem_r));
+	m_mcu->m68write_cb().set(FUNC(taitosj_state::mcu_mem_w));
+	m_mcu->m68intrq_cb().set(FUNC(taitosj_state::mcu_intrq_w));
+	m_mcu->busrq_cb().set(FUNC(taitosj_state::mcu_busrq_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END

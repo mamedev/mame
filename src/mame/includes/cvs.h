@@ -38,9 +38,7 @@ public:
 		, m_dac2(*this, "dac2")
 		, m_dac3(*this, "dac3")
 		, m_tms5110(*this, "tms")
-		, m_s2636_0(*this, "s2636_0")
-		, m_s2636_1(*this, "s2636_1")
-		, m_s2636_2(*this, "s2636_2")
+		, m_s2636(*this, "s2636%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -141,9 +139,7 @@ protected:
 	optional_device<dac_byte_interface> m_dac2;
 	optional_device<dac_bit_interface> m_dac3;
 	optional_device<tms5110_device> m_tms5110;
-	optional_device<s2636_device> m_s2636_0;
-	optional_device<s2636_device> m_s2636_1;
-	optional_device<s2636_device> m_s2636_2;
+	optional_device_array<s2636_device, 3> m_s2636;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

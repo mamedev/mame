@@ -1608,12 +1608,12 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// rs232
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, amiga_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, amiga_state, rs232_dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, amiga_state, rs232_dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(*this, amiga_state, rs232_ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, amiga_state, rs232_cts_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(FUNC(amiga_state::rs232_rx_w));
+	rs232.dcd_handler().set(FUNC(amiga_state::rs232_dcd_w));
+	rs232.dsr_handler().set(FUNC(amiga_state::rs232_dsr_w));
+	rs232.ri_handler().set(FUNC(amiga_state::rs232_ri_w));
+	rs232.cts_handler().set(FUNC(amiga_state::rs232_cts_w));
 
 	// centronics
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
@@ -1855,7 +1855,7 @@ MACHINE_CONFIG_START(a3000_state::a3000)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	// real-time clock
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	RP5C01(config, "rtc", XTAL(32'768));
 
 	// todo: zorro3 slots, super dmac, scsi
 
@@ -2056,7 +2056,7 @@ MACHINE_CONFIG_START(a4000_state::a4000)
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
 	// real-time clock
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	RP5C01(config, "rtc", XTAL(32'768));
 
 	// ide
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));

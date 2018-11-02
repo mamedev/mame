@@ -278,11 +278,11 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 	i8255_device &subppi(I8255(config, "subppi", 0));
 	subppi.in_pa_callback().set("mainppi", FUNC(i8255_device::pa_r));
 	subppi.out_pc_callback().set("mainppi", FUNC(i8255_device::pc6_w)).bit(5); // IBFA -> ACKA
-	subppi.out_pc_callback().append("pic", FUNC(pic8259_device::ir0_w)).bit(3); // INTRA
+	subppi.out_pc_callback().append(m_pic, FUNC(pic8259_device::ir0_w)).bit(3); // INTRA
 	subppi.out_pc_callback().append("mainppi", FUNC(i8255_device::pc2_w)).bit(1); // OBFB -> STBB
 
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("subcpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_subcpu, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

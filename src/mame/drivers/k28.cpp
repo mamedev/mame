@@ -459,7 +459,7 @@ MACHINE_CONFIG_START(k28_state::k28)
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, k28_state, mcu_prog_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE("speech", votrax_sc01_device, request)) // SC-01 A/R pin
 
-	MCFG_DEVICE_ADD("tms6100", TMS6100, 3.579545_MHz_XTAL) // CLK tied to 8021 ALE pin
+	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL); // CLK tied to 8021 ALE pin
 
 	MCFG_TIMER_ADD_NONE("on_button")
 

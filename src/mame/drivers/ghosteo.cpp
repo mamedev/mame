@@ -45,7 +45,7 @@ Coin Counter Available
 Gun Shooting Effect Available (Option)
 Hopper, Ticket Counter, Prize System (Option)
 
-6. Develoment
+6. Development
 - On-chip ICEbreaker debug support with JTAG-based debugging solution
 - MultiICE, OPENICE etc.
 - Compiler : ADS, SDT
@@ -615,24 +615,23 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
+	S3C2410(config, m_s3c2410, 12000000);
+	m_s3c2410->set_palette_tag("palette");
+	m_s3c2410->set_screen_tag("screen");
+	m_s3c2410->core_pin_r_callback().set(FUNC(ghosteo_state::s3c2410_core_pin_r));
+	m_s3c2410->gpio_port_r_callback().set(FUNC(ghosteo_state::s3c2410_gpio_port_r));
+	m_s3c2410->gpio_port_w_callback().set(FUNC(ghosteo_state::s3c2410_gpio_port_w));
+	m_s3c2410->i2c_scl_w_callback().set(FUNC(ghosteo_state::s3c2410_i2c_scl_w));
+	m_s3c2410->i2c_sda_r_callback().set(FUNC(ghosteo_state::s3c2410_i2c_sda_r));
+	m_s3c2410->i2c_sda_w_callback().set(FUNC(ghosteo_state::s3c2410_i2c_sda_w));
+	m_s3c2410->nand_command_w_callback().set(FUNC(ghosteo_state::s3c2410_nand_command_w));
+	m_s3c2410->nand_address_w_callback().set(FUNC(ghosteo_state::s3c2410_nand_address_w));
+	m_s3c2410->nand_data_r_callback().set(FUNC(ghosteo_state::s3c2410_nand_data_r));
+	m_s3c2410->nand_data_w_callback().set(FUNC(ghosteo_state::s3c2410_nand_data_w));
 
-	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
-	MCFG_S3C2410_PALETTE("palette")
-	MCFG_S3C2410_SCREEN("screen")
-	MCFG_S3C2410_CORE_PIN_R_CB(READ32(*this, ghosteo_state, s3c2410_core_pin_r))
-	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(*this, ghosteo_state, s3c2410_gpio_port_r))
-	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(*this, ghosteo_state, s3c2410_gpio_port_w))
-	MCFG_S3C2410_I2C_SCL_W_CB(WRITELINE(*this, ghosteo_state, s3c2410_i2c_scl_w))
-	MCFG_S3C2410_I2C_SDA_R_CB(READLINE(*this, ghosteo_state, s3c2410_i2c_sda_r))
-	MCFG_S3C2410_I2C_SDA_W_CB(WRITELINE(*this, ghosteo_state, s3c2410_i2c_sda_w))
-	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_command_w))
-	MCFG_S3C2410_NAND_ADDRESS_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_address_w))
-	MCFG_S3C2410_NAND_DATA_R_CB(READ8(*this, ghosteo_state, s3c2410_nand_data_r))
-	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_data_w))
-
-//  MCFG_DEVICE_ADD("nand", NAND, 0)
-//  MCFG_NAND_TYPE(NAND_CHIP_K9F5608U0D)    // or another variant with ID 0xEC 0x75 ?
-//  MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2410", s3c2410_device, s3c24xx_pin_frnb_w))
+//  nand_device &nand(NAND(config, "nand", 0));
+//  nand.set_nand_type(nand_device::chip::K9F5608U0D);    // or another variant with ID 0xEC 0x75 ?
+//  nand.rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::s3c24xx_pin_frnb_w));
 
 //  I2CMEM(config, "i2cmem", 0, 0xA0, 0, 0x100, nullptr);
 

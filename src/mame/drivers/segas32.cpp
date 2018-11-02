@@ -3729,6 +3729,9 @@ ROM_END
  **************************************************************************************************************************
     F1 Super Lap (Export)
     protected via FD1149 317-0210
+     GAME BD NO. 833-9407-02 F1 SUPER LAP
+         ROM BD. 834-9408-02
+      A/D BD NO. 837-7536
 */
 ROM_START( f1lap )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */

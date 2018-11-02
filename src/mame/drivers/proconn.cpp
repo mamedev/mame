@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(proconn_state::proconn)
 	m_maincpu->set_addrmap(AS_PROGRAM, &proconn_state::proconn_map);
 	m_maincpu->set_addrmap(AS_IO, &proconn_state::proconn_portmap);
 
-	MCFG_S16LF01_ADD("vfd",0)
+	S16LF01(config, m_vfd);
 
 	Z80PIO(config, m_z80pio[0], 4000000); /* ?? Mhz */
 	m_z80pio[0]->out_int_callback().set(FUNC(proconn_state::pio_1_m_out_int_w));

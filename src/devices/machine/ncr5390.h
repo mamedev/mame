@@ -35,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fifo_w);
 	DECLARE_READ8_MEMBER(command_r);
 	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_READ8_MEMBER(status_r);
+	virtual DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(bus_id_w);
 	DECLARE_READ8_MEMBER(istatus_r);
 	DECLARE_WRITE8_MEMBER(timeout_w);
@@ -236,7 +236,7 @@ protected:
 	void check_irq();
 
 protected:
-	void reset_soft();
+	virtual void reset_soft();
 
 private:
 	void reset_disconnect();
@@ -262,19 +262,19 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_READ8_MEMBER(status_r);
+	virtual DECLARE_READ8_MEMBER(status_r) override;
 
 	DECLARE_READ8_MEMBER(conf2_r) { return config2; };
 	DECLARE_WRITE8_MEMBER(conf2_w) { config2 = data; };
 
-	DECLARE_READ8_MEMBER(read) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	void reset_soft();
+	virtual void reset_soft() override;
 
 	virtual bool check_valid_command(uint8_t cmd) override;
 
@@ -298,12 +298,12 @@ public:
 	DECLARE_WRITE8_MEMBER(conf3_w) { config3 = data; };
 	DECLARE_WRITE8_MEMBER(fifo_align_w) { fifo_align = data; };
 
-	DECLARE_READ8_MEMBER(read) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	virtual void device_start() override;
-	void reset_soft();
+	virtual void reset_soft() override;
 
 private:
 	u8 config3;

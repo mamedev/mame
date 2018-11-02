@@ -12,21 +12,21 @@
 
 DEFINE_DEVICE_TYPE(SUN4C_MMU, sun4c_mmu_device, "sun4c_mmu", "Sun 4C MMU")
 
-#define LOG_PAGE_MAP		(1U << 0)
-#define LOG_SEGMENT_MAP		(1U << 1)
-#define LOG_INVALID_PTE		(1U << 2)
-#define LOG_SYSTEM			(1U << 3)
-#define LOG_CONTEXT			(1U << 4)
-#define LOG_SYSTEM_ENABLE	(1U << 5)
-#define LOG_BUSERROR		(1U << 6)
-#define LOG_CACHE_TAGS		(1U << 7)
-#define LOG_CACHE_DATA		(1U << 8)
-#define LOG_UNKNOWN_SYSTEM	(1U << 9)
-#define LOG_UNKNOWN_SEGMENT	(1U << 10)
-#define LOG_TYPE0_TIMEOUT	(1U << 11)
-#define LOG_UNKNOWN_SPACE	(1U << 12)
-#define LOG_WRITE_PROTECT	(1U << 13)
-#define LOG_ALL_ASI			(1U << 14) // WARNING: Heavy!
+#define LOG_PAGE_MAP        (1U << 0)
+#define LOG_SEGMENT_MAP     (1U << 1)
+#define LOG_INVALID_PTE     (1U << 2)
+#define LOG_SYSTEM          (1U << 3)
+#define LOG_CONTEXT         (1U << 4)
+#define LOG_SYSTEM_ENABLE   (1U << 5)
+#define LOG_BUSERROR        (1U << 6)
+#define LOG_CACHE_TAGS      (1U << 7)
+#define LOG_CACHE_DATA      (1U << 8)
+#define LOG_UNKNOWN_SYSTEM  (1U << 9)
+#define LOG_UNKNOWN_SEGMENT (1U << 10)
+#define LOG_TYPE0_TIMEOUT   (1U << 11)
+#define LOG_UNKNOWN_SPACE   (1U << 12)
+#define LOG_WRITE_PROTECT   (1U << 13)
+#define LOG_ALL_ASI         (1U << 14) // WARNING: Heavy!
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -447,11 +447,11 @@ template uint32_t sun4c_mmu_device::insn_data_r<sun4c_mmu_device::SUPER_DATA>(co
 template <sun4c_mmu_device::insn_data_mode MODE>
 uint32_t sun4c_mmu_device::insn_data_r(const uint32_t offset, const uint32_t mem_mask)
 {
-    // supervisor program fetches in boot state are special
-    if (MODE == SUPER_INSN && m_fetch_bootrom)
-    {
-        return m_rom_ptr[offset & 0x1ffff];
-    }
+	// supervisor program fetches in boot state are special
+	if (MODE == SUPER_INSN && m_fetch_bootrom)
+	{
+		return m_rom_ptr[offset & 0x1ffff];
+	}
 
 	// it's translation time
 	const uint32_t pmeg = m_curr_segmap_masked[(offset >> 16) & 0xfff];// & m_pmeg_mask;

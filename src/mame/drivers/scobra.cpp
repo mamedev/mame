@@ -1265,6 +1265,30 @@ ROM_START( tazmani3 )
 	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // sldh
 ROM_END
 
+ROM_START( tazmaniet )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "13200.bin",      0x0000, 0x1000, CRC(cea9df87) SHA1(e4ecaee74134580978c0fbb209a704151ea013b2) )
+	ROM_LOAD( "13201.bin",      0x1000, 0x1000, CRC(21cfe0b3) SHA1(fb5a8b239c06c93483112558a0e1f6269a5d14b2) )
+	ROM_LOAD( "13202.bin",      0x2000, 0x1000, CRC(d204732e) SHA1(069dc57e35a653fec65d1fdc19f716e7adea9911) )
+	ROM_LOAD( "13203.bin",      0x3000, 0x1000, CRC(5d0651bd) SHA1(436f5f00619a2a05db1b33ba0775367af0c637b3) )
+	ROM_LOAD( "13204.bin",      0x4000, 0x1000, CRC(9082ac06) SHA1(cfedfac8a1172ffc2c44e8a87aa527148d24befc) )
+	ROM_LOAD( "13205.bin",      0x5000, 0x1000, CRC(9c2a08a2) SHA1(65cbea5db287863ced20c75b3133647ed4b83894) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "13208.bin",     0x0000, 0x0800, CRC(b8d741f1) SHA1(a1bb8a1e0d6b34111f05c539c8e92fffacf5aa5c) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "13206.bin",       0x0000, 0x0800, CRC(2c5b612b) SHA1(32e3a41a9a4a8b1285b6a195213ff0d98012360a) )
+	ROM_LOAD( "13207.bin",       0x0800, 0x0800, CRC(3f5ff3ac) SHA1(bc70eef54a45b52c14e35464e5f06b5eec554eb6) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.bin",   0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) ) // same as hustler?! Gives wrong colors
+
+	ROM_REGION( 0x200, "unused_proms", 0) // TODO: are these the correct color PROMs?
+	ROM_LOAD( "13209.prom", 0x0000, 0x0100, CRC(da1708c9) SHA1(b2633eba050866c6f555ed0fd9be369d69f13683) )
+	ROM_LOAD( "13210.prom", 0x0100, 0x0100, CRC(e54d042a) SHA1(e3259b5c178fc5ab43eda27f07107b65555512d3) )
+ROM_END
+
 /*
     Rescue
 
@@ -1749,6 +1773,7 @@ GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  scobra_state,  init_darkp
 
 GAME( 1982, tazmani2,  tazmania, type2,     tazmani2,  scobra_state,  init_tazmani2, ROT90,  "Stern Electronics",                  "Tazz-Mania (set 2, alt hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tazmani3,  tazmania, tazmani3,  tazmani3,  scobra_state,  empty_init,    ROT90,  "bootleg (Arfyc / Rodmar)",           "Tazz-Mania (Arfyc / Rodmar bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tazmaniet, tazmania, tazmani3,  tazmani3,  scobra_state,  init_tazmaniet,ROT90,  "bootleg (U.R.V. BBCPE)",             "Tazz-Mania - El Trompa (U.R.V. BBCPE bootleg)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, rescue,    0,        rescue,    rescue,    scobra_state,  init_rescue,   ROT90,  "Stern Electronics",                  "Rescue", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, rescueb,   rescue,   rescueb,   rescue,    scobra_state,  init_rescue,   ROT90,  "bootleg (Videl Games)",              "Tuono Blu (bootleg of Rescue)", MACHINE_SUPPORTS_SAVE )

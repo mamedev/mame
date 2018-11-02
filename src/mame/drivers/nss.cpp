@@ -850,8 +850,8 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_DEVICE_IO_MAP(bios_io_map)
 
 	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
-	MCFG_S3520CF_ADD("s3520cf") /* RTC */
-	MCFG_RP5H01_ADD("rp5h01")
+	S3520CF(config, m_s3520cf); /* RTC */
+	RP5H01(config, m_rp5h01, 0);
 	M6M80011AP(config, "m6m80011ap");
 
 	/* sound hardware */

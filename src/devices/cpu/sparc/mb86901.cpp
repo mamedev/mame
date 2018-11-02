@@ -954,10 +954,10 @@ next;
 if (rd != 0) then r[rd] <- result;
 
 if (ANDcccc or ANDNcc or ORcc or ORNcc or XORcc or XNORcc) then (
-	N <- result<31>;
-	Z <- if (result = 0) then 1 else 0;
-	V <- 0
-	C <- 0
+    N <- result<31>;
+    Z <- if (result = 0) then 1 else 0;
+    V <- 0
+    C <- 0
 );
 */
 
@@ -2178,100 +2178,100 @@ void mb86901_device::execute_store(uint32_t op)
 /* The SPARC Instruction Manual: Version 8, page 163, "Appendix C - ISP Descriptions - C.9. Instruction Defintions - Load Instructions" (SPARCv8.pdf, pg. 160)
 
 if (LDD or LD or LDSH or LDUH or LDSB or LDUB or LDDF or LDF or LDFSR or LDDC or LDC or LDCSR) then (
-	address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
-	addr_space <- (if (S = 0) then 10 else 11)
+    address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
+    addr_space <- (if (S = 0) then 10 else 11)
 ) else if (LDDA or LDA or LDSHA or LDUHA or LDSBA or LDUBA) then (
-	if (S = 0) then (
-		trap <- 1;
-		privileged_instruction <- 1
-	) else if (i = 1) then (
-		trap <- 1;
-		illegal_instruction <- 1
-	) else (
-		address <- r[rs1] + r[rs2];
-		addr_space <- asi
-	)
+    if (S = 0) then (
+        trap <- 1;
+        privileged_instruction <- 1
+    ) else if (i = 1) then (
+        trap <- 1;
+        illegal_instruction <- 1
+    ) else (
+        address <- r[rs1] + r[rs2];
+        addr_space <- asi
+    )
 )
 next;
 if (trap = 0) then (
-	if ( (LDF or LDDF or LDFSR) and ((EF = 0) or (bp_FPU_present = 0)) then (
-		trap <- 1;
-		fp_disabled <- 1
-	) else if ( (LDC or LDDC or LDCSR) and ((EC = 0) or (bp_CP_present = 0)) then (
-		trap <- 1;
-		cp_disabled <- 1
-	) else if ( ( (LDD or LDDA or LDDF or LDDC) and (address<2:0> != 0)) or
-		((LD or LDA or LDF or LDFSR or LDC or LDCSR) and (address<1:0> != 0)) or
-		((LDSH or LDSHA or LDUH or LDUHA) and address<0> != 0) ) then (
-		trap <- 1;
-		mem_address_not_aligned <- 1
-	) else if (LDDF and (rd<0> != 0)) then (
-		trap <- 1;
-		fp_exception <- 1;
-		ftt <- invalid_fpr_register
-	) else if ((LDF or LDDF or LDFSR) and (an FPU sequence error is detected)) then (
-		trap <- 1;
-		fp_exception <- 1;
-		ftt <- sequence_error
-	) else if ((LDC or LDDC or LDCSR) and (a CP sequence error is detected)) then (
-		trap <- 1;
-		cp_exception <- 1;
-		{ possibly additional implementation-dependent actions }
-	)
+    if ( (LDF or LDDF or LDFSR) and ((EF = 0) or (bp_FPU_present = 0)) then (
+        trap <- 1;
+        fp_disabled <- 1
+    ) else if ( (LDC or LDDC or LDCSR) and ((EC = 0) or (bp_CP_present = 0)) then (
+        trap <- 1;
+        cp_disabled <- 1
+    ) else if ( ( (LDD or LDDA or LDDF or LDDC) and (address<2:0> != 0)) or
+        ((LD or LDA or LDF or LDFSR or LDC or LDCSR) and (address<1:0> != 0)) or
+        ((LDSH or LDSHA or LDUH or LDUHA) and address<0> != 0) ) then (
+        trap <- 1;
+        mem_address_not_aligned <- 1
+    ) else if (LDDF and (rd<0> != 0)) then (
+        trap <- 1;
+        fp_exception <- 1;
+        ftt <- invalid_fpr_register
+    ) else if ((LDF or LDDF or LDFSR) and (an FPU sequence error is detected)) then (
+        trap <- 1;
+        fp_exception <- 1;
+        ftt <- sequence_error
+    ) else if ((LDC or LDDC or LDCSR) and (a CP sequence error is detected)) then (
+        trap <- 1;
+        cp_exception <- 1;
+        { possibly additional implementation-dependent actions }
+    )
 );
 next;
 if (trap = 0) then {
-	(data, MAE) <- memory_read(addr_space, address);
-	next;
-	if (MAE = 1) then (
-		trap <- 1;
-		data_access_exception <- 1;
-	) else (
-		if (LDSB or LDSBA or LDUB or LDUBA) then (
-			if      (address<1:0> = 0) then byte <- data<31:24>
-			else if (address<1:0> = 1) then byte <- data<23:16>
-			else if (address<1:0> = 2) then byte <- data<15: 8>
-			else if (address<1:0> = 3) then byte <- data< 7: 0>
-			next;
-			if (LDSB or LDSBA) then
-				word0 <- sign_extend_byte(byte)
-			else
-				word0 <- zero_extend_byte(byte)
-		) else if (LDSH or LDSHA or LDUH or LDUHA) then (
-			if      (address<1:0> = 0) then halfword <- data<31:16>
-			else if (address<1:0> = 2) then halfword <- data<15: 0>
-			next;
-			if (LDSH or LDSHA) then
-				word0 <- sign_extend_halfword(halfword)
-			else
-				word0 <- zero_extend_halfword(halfword)
-		) else
-			word0 <- data
-	)
+    (data, MAE) <- memory_read(addr_space, address);
+    next;
+    if (MAE = 1) then (
+        trap <- 1;
+        data_access_exception <- 1;
+    ) else (
+        if (LDSB or LDSBA or LDUB or LDUBA) then (
+            if      (address<1:0> = 0) then byte <- data<31:24>
+            else if (address<1:0> = 1) then byte <- data<23:16>
+            else if (address<1:0> = 2) then byte <- data<15: 8>
+            else if (address<1:0> = 3) then byte <- data< 7: 0>
+            next;
+            if (LDSB or LDSBA) then
+                word0 <- sign_extend_byte(byte)
+            else
+                word0 <- zero_extend_byte(byte)
+        ) else if (LDSH or LDSHA or LDUH or LDUHA) then (
+            if      (address<1:0> = 0) then halfword <- data<31:16>
+            else if (address<1:0> = 2) then halfword <- data<15: 0>
+            next;
+            if (LDSH or LDSHA) then
+                word0 <- sign_extend_halfword(halfword)
+            else
+                word0 <- zero_extend_halfword(halfword)
+        ) else
+            word0 <- data
+    )
 );
 next;
 if (trap = 0) then (
-	if ( (rd != 0) and (LD or LDA or LDSH or LDSHA
-		or LDUHA or LDUH or LDSB or LDSBA or LDUB or LDUBA) ) then
-			r[rd] <- word0
-	else if (LDF) then f[rd] <- word0
-	else if (LDC) then { implementation-dependent actions }
-	else if (LDFSR) then FSR <- word0
-	else if (LDCSR) then CSR <- word0
-	else if (LDD or LDDA) then r[rd and 11110] <- word0
-	else if (LDDF) then f[rd and 11110] <- word0
-	else if (LDDC) then { implementation-dependent actions }
+    if ( (rd != 0) and (LD or LDA or LDSH or LDSHA
+        or LDUHA or LDUH or LDSB or LDSBA or LDUB or LDUBA) ) then
+            r[rd] <- word0
+    else if (LDF) then f[rd] <- word0
+    else if (LDC) then { implementation-dependent actions }
+    else if (LDFSR) then FSR <- word0
+    else if (LDCSR) then CSR <- word0
+    else if (LDD or LDDA) then r[rd and 11110] <- word0
+    else if (LDDF) then f[rd and 11110] <- word0
+    else if (LDDC) then { implementation-dependent actions }
 );
 next;
 if (((trap = 0) and (LDD or LDDA or LDDF or LDDC)) then (
-	(word1, MAE) <- memory_read(addr_space, address + 4);
-	next;
-	if (MAE = 1) then ( { MAE = 1 only due to a "non-resumable machine-check error" }
-		trap <- 1;
-		data_access_exception <- 1 )
-	else if (LDD or LDDA) then r[rd or 1] <- word1
-	else if (LDDF) then f[rd or 1] <- word1
-	else if (LDDC) then { implementation-dependent actions }
+    (word1, MAE) <- memory_read(addr_space, address + 4);
+    next;
+    if (MAE = 1) then ( { MAE = 1 only due to a "non-resumable machine-check error" }
+        trap <- 1;
+        data_access_exception <- 1 )
+    else if (LDD or LDDA) then r[rd or 1] <- word1
+    else if (LDDF) then f[rd or 1] <- word1
+    else if (LDDC) then { implementation-dependent actions }
 );
 */
 
@@ -3389,16 +3389,16 @@ inline void mb86901_device::execute_group3(uint32_t op)
 
 bool mb86901_device::evaluate_condition(uint32_t op)
 {
-	// COND 	& 8
-	// 0		8
-	// bn		ba
-	// bz		bne
-	// ble		bg
-	// bl		bge
-	// bleu		bgu
-	// bcs		bcc
-	// bneg		bpos
-	// bvs		bvc
+	// COND     & 8
+	// 0        8
+	// bn       ba
+	// bz       bne
+	// ble      bg
+	// bl       bge
+	// bleu     bgu
+	// bcs      bcc
+	// bneg     bpos
+	// bvs      bvc
 
 	switch(COND)
 	{

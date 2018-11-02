@@ -177,11 +177,11 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	dart1.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	dart1.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart1", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("dart1", z80dart_device, dcda_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("dart1", z80dart_device, ria_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("dart1", z80dart_device, ctsa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("dart1", FUNC(z80dart_device::rxa_w));
+	rs232.dcd_handler().set("dart1", FUNC(z80dart_device::dcda_w));
+	rs232.ri_handler().set("dart1", FUNC(z80dart_device::ria_w));
+	rs232.cts_handler().set("dart1", FUNC(z80dart_device::ctsa_w));
 
 	Z80DART(config, "dart2", 4'000'000); // RS232 ports
 

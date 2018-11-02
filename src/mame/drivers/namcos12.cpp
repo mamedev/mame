@@ -1733,8 +1733,8 @@ MACHINE_CONFIG_START(namcos12_state::namcos12_mobo)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD(m_rtc, XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("sub:sci1", h8_sci_device, rx_w))
+	RTC4543(config, m_rtc, XTAL(32'768));
+	m_rtc->data_cb().set("sub:sci1", FUNC(h8_sci_device::rx_w));
 
 	// FIXME: need better syntax for configuring H8 onboard devices
 	h8_sci_device &sub_sci1(*m_sub->subdevice<h8_sci_device>("sci1"));

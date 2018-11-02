@@ -49,9 +49,11 @@ public:
 
 	void init_dsb46();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(port1a_w);
-	DECLARE_MACHINE_RESET(dsb46);
 	void dsb46_io(address_map &map);
 	void dsb46_mem(address_map &map);
 	required_device<z80_device> m_maincpu;
@@ -88,7 +90,7 @@ void dsb46_state::init_dsb46()
 	membank("write")->configure_entry(0, &RAM[0x00000]);
 }
 
-MACHINE_RESET_MEMBER( dsb46_state,dsb46 )
+void dsb46_state::machine_reset()
 {
 	membank("read")->set_entry(0);
 	membank("write")->set_entry(0);
@@ -108,14 +110,13 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_START(dsb46_state::dsb46)
+void dsb46_state::dsb46(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(24'000'000) / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dsb46_state::dsb46_mem);
 	m_maincpu->set_addrmap(AS_IO, &dsb46_state::dsb46_io);
 	m_maincpu->set_daisy_config(daisy_chain);
-
-	MCFG_MACHINE_RESET_OVERRIDE(dsb46_state, dsb46)
 
 	/* video hardware */
 	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1.8432_MHz_XTAL));
@@ -129,9 +130,9 @@ MACHINE_CONFIG_START(dsb46_state::dsb46)
 	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
 
 	z80ctc_device &ctc1(Z80CTC(config, "ctc1", 24_MHz_XTAL / 6));
 	ctc1.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -139,7 +140,7 @@ MACHINE_CONFIG_START(dsb46_state::dsb46)
 	ctc1.zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
 	ctc1.zc_callback<2>().set("sio", FUNC(z80sio_device::rxcb_w));
 	ctc1.zc_callback<2>().append("sio", FUNC(z80sio_device::txcb_w));
-MACHINE_CONFIG_END
+}
 
 ROM_START( dsb46 )
 	ROM_REGION( 0x10800, "maincpu", 0 )

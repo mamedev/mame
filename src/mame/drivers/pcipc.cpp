@@ -544,18 +544,18 @@ MACHINE_CONFIG_START(pcipc_state::pcipc)
 	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("serport0", RS232_PORT, isa_com, "logitech_mouse")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, rxd1_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndcd1_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndsr1_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, nri1_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ncts1_w))
-	MCFG_DEVICE_ADD("serport1", RS232_PORT, isa_com, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, rxd2_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndcd2_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ndsr2_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, nri2_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("board4:fdc37c93x", fdc37c93x_device, ncts2_w))
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
+	serport0.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd1_w));
+	serport0.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr1_w));
+	serport0.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri1_w));
+	serport0.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts1_w));
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::rxd2_w));
+	serport1.dcd_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ndsr2_w));
+	serport1.ri_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::nri2_w));
+	serport1.cts_handler().set("board4:fdc37c93x", FUNC(fdc37c93x_device::ncts2_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcipc_state::pcipctx)

@@ -2,8 +2,9 @@
 // copyright-holders:Samuele Zannoli
 
 #include "emu.h"
-#include "includes/xbox.h"
+#include "machine/pci.h"
 #include "includes/xbox_pci.h"
+#include "includes/xbox.h"
 
 #include <functional>
 
@@ -153,6 +154,36 @@ void mcpx_smbus_device::device_start()
 	add_map(0x00000020, M_IO, FUNC(mcpx_smbus_device::smbus_io2));
 	bank_infos[2].adr = 0xc200;
 	memset(&smbusst, 0, sizeof(smbusst));
+	for (int n = 0; n < 128; n++)
+		smbusst.devices[n] = nullptr;
+	for (device_t &d : subdevices())
+	{
+		const char *t = d.tag();
+		int l = strlen(t);
+
+		while (l > 0)
+		{
+			l--;
+			if (t[l] == ':')
+			{
+				l++;
+				int address = strtol(t + l, nullptr, 16);
+				if ((address > 0) && (address < 128))
+				{
+					if (smbusst.devices[address] == nullptr)
+					{
+						smbus_interface *i = dynamic_cast<smbus_interface *>(&d);
+						smbusst.devices[address] = i;
+					}
+					else
+						logerror("Duplicate address for SMBus device with tag %s\n", t);
+				}
+				else
+					logerror("Invalid address for SMBus device with tag %s\n", t);
+				break;
+			}
+		}
+	}
 }
 
 void mcpx_smbus_device::device_reset()
@@ -190,9 +221,9 @@ WRITE32_MEMBER(mcpx_smbus_device::smbus_w)
 			{
 				if (smbusst.devices[smbusst.address])
 					if (smbusst.rw == 0)
-						smbusst.devices[smbusst.address](smbusst.command, smbusst.rw, smbusst.data);
+						smbusst.devices[smbusst.address]->execute_command(smbusst.command, smbusst.rw, smbusst.data);
 					else
-						smbusst.data = smbusst.devices[smbusst.address](smbusst.command, smbusst.rw, smbusst.data);
+						smbusst.data = smbusst.devices[smbusst.address]->execute_command(smbusst.command, smbusst.rw, smbusst.data);
 				else
 					logerror("SMBUS: access to missing device at address %d\n", smbusst.address);
 				smbusst.status |= 0x10;
