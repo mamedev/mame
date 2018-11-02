@@ -2121,32 +2121,32 @@ ROM_END
 
 // The dumps of ROMs 1, 2, 3 were bad, but the dumper observed that using the defenderb ROMs the emulation behaves identically to the PCB.
 // A redump is definitely needed:
-// 1.bin        [1/2]      wb01.bin     [1/2]      IDENTICAL
-// 2.bin        [1/2]      defeng02.bin [1/2]      IDENTICAL
-// 1.bin        [2/2]      wb01.bin     [1/2]      IDENTICAL
-// 2.bin        [2/2]      defeng02.bin [1/2]      IDENTICAL
-// 3ojo.bin     [2/2]      wb03.bin     [1/2]      IDENTICAL
-// 3ojo.bin     [1/2]      defend.11               2.197266%
+// 002-1.ic1   [1/2]      wb01.bin     [1/2]      IDENTICAL
+// 002-2.ic2   [1/2]      defeng02.bin [1/2]      IDENTICAL
+// 002-1.ic1   [2/2]      wb01.bin     [1/2]      IDENTICAL
+// 002-2.ic2   [2/2]      defeng02.bin [1/2]      IDENTICAL
+// 002-3.ic3   [2/2]      wb03.bin     [1/2]      IDENTICAL
+// 002-3.ic3   [1/2]      defend.11               2.197266%
 // For now we use the defenderb ones.
 // PCBs: FAMARESA 590-001, 590-002, 590-003, 590-004
 ROM_START( attackf )
 	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "1.bin",    0x0d000, 0x1000, BAD_DUMP CRC(0ee1019d) SHA1(a76247e825b8267abfd195c12f96348fe10d4cbc) )
-	ROM_LOAD( "2.bin",    0x0e000, 0x1000, BAD_DUMP CRC(d184ab6b) SHA1(ed61a95b04f6162aedba8a72bc46005b77283955) )
-	ROM_LOAD( "3ojo.bin", 0x0f000, 0x1000, BAD_DUMP CRC(a732d649) SHA1(b681882c02c5870ad613edc77255969a5f796422) )
-	ROM_LOAD( "9.bin",    0x10000, 0x0800, CRC(f57caa62) SHA1(c8c91b96fd3bc98eddcc1503159050dae5755001) )
-	ROM_LOAD( "12.bin",   0x10800, 0x0800, CRC(eb73d8a1) SHA1(f26007839a9eff6c7f77768da150fa26b8c96643) )
-	ROM_LOAD( "8.bin",    0x11000, 0x0800, CRC(17f7abde) SHA1(6959ed471687174a3fdc3f980ca7bd993b23d54f) )
-	ROM_LOAD( "11.bin",   0x11800, 0x0800, CRC(5ca4e860) SHA1(031188c009b8fca92703a0cc0c2bb44976212ae9) )
-	ROM_LOAD( "7.bin",    0x12000, 0x0800, CRC(545c3326) SHA1(98199df5206c261061b0108c68ab9128fa0779eb) )
-	ROM_LOAD( "10.bin",   0x12800, 0x0800, CRC(3940d731) SHA1(c867efa48e3ed6a6c3ddcd519aba1fe0a1712400) )
-	ROM_LOAD( "6.bin",    0x16000, 0x0800, CRC(3af34c05) SHA1(71f3ced06a373fa4805c856bd9fc97760787a920) )
+	ROM_LOAD( "002-1.ic1",   0x0d000, 0x1000, BAD_DUMP CRC(0ee1019d) SHA1(a76247e825b8267abfd195c12f96348fe10d4cbc) )
+	ROM_LOAD( "002-2.ic2",   0x0e000, 0x1000, BAD_DUMP CRC(d184ab6b) SHA1(ed61a95b04f6162aedba8a72bc46005b77283955) )
+	ROM_LOAD( "002-3.ic3",   0x0f000, 0x1000, BAD_DUMP CRC(a732d649) SHA1(b681882c02c5870ad613edc77255969a5f796422) )
+	ROM_LOAD( "002-9.ic12",  0x10000, 0x0800, CRC(f57caa62) SHA1(c8c91b96fd3bc98eddcc1503159050dae5755001) )
+	ROM_LOAD( "002-12.ic9",  0x10800, 0x0800, CRC(eb73d8a1) SHA1(f26007839a9eff6c7f77768da150fa26b8c96643) )
+	ROM_LOAD( "002-8.ic11",  0x11000, 0x0800, CRC(17f7abde) SHA1(6959ed471687174a3fdc3f980ca7bd993b23d54f) )
+	ROM_LOAD( "002-11.ic8",  0x11800, 0x0800, CRC(5ca4e860) SHA1(031188c009b8fca92703a0cc0c2bb44976212ae9) )
+	ROM_LOAD( "002-7.ic10",  0x12000, 0x0800, CRC(545c3326) SHA1(98199df5206c261061b0108c68ab9128fa0779eb) )
+	ROM_LOAD( "002-10.ic7",  0x12800, 0x0800, CRC(3940d731) SHA1(c867efa48e3ed6a6c3ddcd519aba1fe0a1712400) )
+	ROM_LOAD( "002-6.ic6",   0x16000, 0x0800, CRC(3af34c05) SHA1(71f3ced06a373fa4805c856bd9fc97760787a920) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "13.bin",   0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+	ROM_LOAD( "003-13.ic12", 0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) ) // not dumped from this PCB, believed to match
+	ROM_LOAD( "001-14.g1",   0x0000, 0x0200, BAD_DUMP CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) ) // not dumped from this PCB, believed to match
 ROM_END
 
 ROM_START( galwars2 ) // 2 board stack: CPU and ROM boards
