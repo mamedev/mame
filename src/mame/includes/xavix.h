@@ -95,7 +95,12 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(extintrf_7901_w);
 	DECLARE_WRITE8_MEMBER(extintrf_7902_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_7a80_w);
+	DECLARE_READ8_MEMBER(ioevent_enable_r);
+	DECLARE_WRITE8_MEMBER(ioevent_enable_w);
+	DECLARE_READ8_MEMBER(ioevent_irqstate_r);
+	DECLARE_WRITE8_MEMBER(ioevent_irqack_w);
+	uint8_t m_ioevent_enable;
+
 	DECLARE_WRITE8_MEMBER(adc_7b00_w);
 	DECLARE_READ8_MEMBER(adc_7b80_r);
 	DECLARE_WRITE8_MEMBER(adc_7b80_w);

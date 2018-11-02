@@ -400,8 +400,9 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io0_direction_r), FUNC(xavix_state::io0_direction_w));
 	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io1_direction_r), FUNC(xavix_state::io1_direction_w));
 
-	// Interrupt control registers
-	map(0x7a80, 0x7a80).w(FUNC(xavix_state::xavix_7a80_w)); // still IO? ADC related?
+	// IO Event Interrupt control
+	map(0x7a80, 0x7a80).rw(FUNC(xavix_state::ioevent_enable_r), FUNC(xavix_state::ioevent_enable_w));
+	map(0x7a81, 0x7a81).rw(FUNC(xavix_state::ioevent_irqstate_r), FUNC(xavix_state::ioevent_irqack_w));
 
 	// Mouse?
 	map(0x7b00, 0x7b00).w(FUNC(xavix_state::adc_7b00_w)); // rad_snow (not often, why?)
@@ -414,7 +415,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7b81, 0x7b81).rw(FUNC(xavix_state::adc_7b81_r), FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
 
 	// Sleep control
-	//map(7b82, 7b83)
+	//map(0x7b82, 0x7b83)
 
 	// Timer control
 	map(0x7c00, 0x7c00).rw(FUNC(xavix_state::timer_status_r), FUNC(xavix_state::timer_control_w));

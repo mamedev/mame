@@ -129,10 +129,32 @@ WRITE8_MEMBER(xavix_state::extintrf_7902_w)
 	LOG("%s: extintrf_7902_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7a80_w)
+
+
+READ8_MEMBER(xavix_state::ioevent_enable_r)
 {
-	LOG("%s: xavix_7a80_w %02x\n", machine().describe_context(), data);
+	LOG("%s: ioevent_enable_r\n", machine().describe_context());
+	return m_ioevent_enable;
 }
+
+READ8_MEMBER(xavix_state::ioevent_irqstate_r)
+{
+	LOG("%s: ioevent_irqstate_r\n", machine().describe_context());
+	return 0x00;
+}
+
+WRITE8_MEMBER(xavix_state::ioevent_enable_w)
+{
+	LOG("%s: ioevent_enable_w %02x\n", machine().describe_context(), data);
+	m_ioevent_enable = data;
+}
+
+WRITE8_MEMBER(xavix_state::ioevent_irqack_w)
+{
+	LOG("%s: ioevent_irqack_w %02x\n", machine().describe_context(), data);
+}
+
+
 
 WRITE8_MEMBER(xavix_state::adc_7b00_w)
 {
@@ -651,6 +673,8 @@ void xavix_state::machine_reset()
 	m_irqsource = 0x00;
 
 	m_timer_control = 0x00;
+
+	m_ioevent_enable = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
