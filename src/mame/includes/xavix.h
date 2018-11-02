@@ -340,6 +340,8 @@ public:
 	void xavix_mtrk(machine_config &config);
 	void xavix_mtrkp(machine_config &config);
 
+	CUSTOM_INPUT_MEMBER( mtrk_wheel_r );
+
 protected:
 	required_device<xavix_mtrk_wheel_device> m_wheel;
 };

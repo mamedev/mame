@@ -530,6 +530,12 @@ INPUT_PORTS_END
 
 */
 
+CUSTOM_INPUT_MEMBER( xavix_mtrk_state::mtrk_wheel_r )
+{
+	return m_wheel->read_direction();
+}
+
+
 static INPUT_PORTS_START( rad_mtrk )
 	PORT_INCLUDE(xavix)
 
@@ -538,6 +544,8 @@ static INPUT_PORTS_START( rad_mtrk )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Throttle High")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Throttle Low")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Reverse / Back")
+
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_mtrk_state,mtrk_wheel_r, (void *)0)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn")

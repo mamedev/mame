@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "machine/timer.h"
+
 DECLARE_DEVICE_TYPE(XAVIX_MTRK_WHEEL, xavix_mtrk_wheel_device)
 
 
@@ -18,6 +20,7 @@ public:
 	auto event_out_cb() { return m_event_out_cb.bind(); }
 
 	int read_direction();
+	DECLARE_INPUT_CHANGED_MEMBER( changed );
 
 protected:
 	virtual void device_start() override;
@@ -27,6 +30,11 @@ protected:
 private:
 	devcb_write_line m_event_out_cb;
 	required_ioport m_in;
+	TIMER_CALLBACK_MEMBER(event_timer);
+	emu_timer *m_event_timer;
+	int m_direction;
+	void check_wheel();
+	int m_is_running;
 };
 
 #endif // MAME_MACHINE_XAVIX_MTRK_WHEEL_H
