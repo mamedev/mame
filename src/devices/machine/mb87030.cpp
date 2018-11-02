@@ -420,9 +420,9 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferDeassertACK:
-		scsi_set_ctrl(0, S_ACK);
-		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 		update_state(State::TransferWaitReq, 10);
+		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+		scsi_set_ctrl(0, S_ACK);
 		break;
 
 		}
