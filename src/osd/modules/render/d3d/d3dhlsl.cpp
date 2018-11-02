@@ -1255,6 +1255,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == nullptr ? nullptr : shadow_texture->get_finaltex());	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
+	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
 	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index]);
 	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
