@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Hans Ostermeyer, Sven Schnelle
-/*
-    m68kmmu.h - PMMU implementation for 68851/68030/68040
-            HMMU implementation for 68020 (II and LC variants)
 
-    By R. Belmont and Hans Ostermeyer
-*/
+//    m68kmmu.h - PMMU implementation for 68851/68030/68040
+//            HMMU implementation for 68020 (II and LC variants)
+
+//    By R. Belmont and Hans Ostermeyer
+//
 
 // MMU status register bit definitions
 
@@ -15,6 +15,7 @@
 #define MMULOG(...)
 #endif
 
+// MMU SR register fields
 static constexpr uint16_t M68K_MMU_SR_BUS_ERROR       = 0x8000;
 static constexpr uint16_t M68K_MMU_SR_SUPERVISOR_ONLY = 0x2000;
 static constexpr uint16_t M68K_MMU_SR_WRITE_PROTECT   = 0x0800;
@@ -23,7 +24,6 @@ static constexpr uint16_t M68K_MMU_SR_MODIFIED        = 0x0200;
 static constexpr uint16_t M68K_MMU_SR_TRANSPARENT     = 0x0040;
 
 // MMU translation table descriptor field definitions
-
 static constexpr uint32_t M68K_MMU_DF_DT              = 0x00000003;
 static constexpr uint32_t M68K_MMU_DF_DT_INVALID      = 0x00000000;
 static constexpr uint32_t M68K_MMU_DF_DT_PAGE         = 0x00000001;
@@ -36,8 +36,8 @@ static constexpr uint32_t M68K_MMU_DF_CI              = 0x00000040;
 static constexpr uint32_t M68K_MMU_DF_SUPERVISOR      = 0000000100;
 static constexpr uint32_t M68K_MMU_DF_ADDR_MASK       = 0xfffffff0;
 static constexpr uint32_t M68K_MMU_DF_IND_ADDR_MASK   = 0xfffffffc;
-// MMU ATC Fields
 
+// MMU ATC Fields
 static constexpr uint32_t M68K_MMU_ATC_BUSERROR       = 0x08000000;
 static constexpr uint32_t M68K_MMU_ATC_CACHE_IN       = 0x04000000;
 static constexpr uint32_t M68K_MMU_ATC_WRITE_PR       = 0x02000000;
@@ -120,9 +120,8 @@ void pmmu_set_buserror(uint32_t addr_in)
 	}
 }
 
-/*
-    pmmu_atc_add: adds this address to the ATC
-*/
+
+// pmmu_atc_add: adds this address to the ATC
 void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc, const int rw)
 {
 	// get page size (i.e. # of bits to ignore); is 10 for Apollo
@@ -189,11 +188,9 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc, const int rw)
 	m_mmu_atc_data[found] = atc_data;
 }
 
-/*
-    pmmu_atc_flush: flush entire ATC
 
-    7fff0003 001ffd10 80f05750 is what should load
-*/
+// pmmu_atc_flush: flush entire ATC
+// 7fff0003 001ffd10 80f05750 is what should load
 void pmmu_atc_flush()
 {
 	MMULOG("ATC flush: pc=%08x\n", m_ppc);
@@ -221,12 +218,11 @@ bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const bool rw,
 
 		if (!ptest && !rw)
 		{
-			/* According to MC86030UM:
-			 * "If the M bit is clear and a write access to this logical
-				address is attempted, the MC68030 aborts the access and initiates a table
-				search, setting the M bit in the page descriptor, invalidating the old ATC
-				entry, and creating a new entry with the M bit set."
-			 */
+			// According to MC86030UM:
+			// "If the M bit is clear and a write access to this logical
+			// address is attempted, the MC68030 aborts the access and initiates a table
+			// search, setting the M bit in the page descriptor, invalidating the old ATC
+			// entry, and creating a new entry with the M bit set.
 			if (!(atc_data & M68K_MMU_ATC_MODIFIED))
 			{
 				m_mmu_atc_tag[i] = 0;
@@ -389,7 +385,6 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 				break;
 
 			case M68K_MMU_DF_DT_PAGE:   // page descriptor, will cause direct mapping
-
 				if (!ptest)
 				{
 					table &= ~0 << pagesize;
@@ -423,7 +418,6 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 				break;
 
 			case M68K_MMU_DF_DT_TABLE_8BYTE:   // valid 8 byte descriptors
-
 				level++;
 				addr_out = table + (table_index << 3);
 				tbl_entry = m_program->read_dword(addr_out);
@@ -483,9 +477,8 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 	m_mmu_tablewalk = false;
 	return resolved;
 }
-/*
-    pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
-*/
+
+// pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
 template<bool ptest, bool pload>
 uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, const int limit = 7)
 {
@@ -815,9 +808,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 	return addr_out;
 }
 
-/*
-    pmmu_translate_addr: perform 68851/68030-style PMMU address translation
-*/
+// pmmu_translate_addr: perform 68851/68030-style PMMU address translation
 uint32_t pmmu_translate_addr(uint32_t addr_in, const bool rw)
 {
 	uint32_t addr_out;
@@ -833,10 +824,7 @@ uint32_t pmmu_translate_addr(uint32_t addr_in, const bool rw)
 	return addr_out;
 }
 
-/*
-    m68851_mmu_ops: COP 0 MMU opcode handling
-*/
-
+// m68851_mmu_ops: COP 0 MMU opcode handling
 
 int fc_from_modes(const uint16_t modes)
 {
@@ -1183,7 +1171,9 @@ void m68851_mmu_ops()
 				else if ((modes & 0xe200) == 0x2000)    // PFLUSH
 				{
 					if (((modes >> 10) & 7) != 1)
+					{
 						logerror("PFLUSH by fc/ea not supported\n");
+					}
 					pmmu_atc_flush();
 					return;
 				}
