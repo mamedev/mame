@@ -532,7 +532,7 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, cons
 		type = m_mmu_crp_limit & M68K_MMU_DF_DT;
 	}
 
-	if (!pmmu_walk_tables<false>(addr_in, type, tbl_addr, fc, limit, rw, addr_out))
+	if (!pmmu_walk_tables<ptest>(addr_in, type, tbl_addr, fc, limit, rw, addr_out))
 	{
 		fatalerror("Table walk did not resolve\n");
 	}
