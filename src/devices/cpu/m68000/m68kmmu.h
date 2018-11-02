@@ -482,7 +482,7 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 template<bool ptest, bool pload>
 uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, const int limit = 7)
 {
-	uint32_t addr_out;
+	uint32_t addr_out = 0;
 
 
 	MMULOG("%s: addr_in=%08x, fc=%d, ptest=%d, rw=%d, limit=%d\n",
