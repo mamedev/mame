@@ -1249,11 +1249,13 @@ inline uint32_t hmmu_translate_addr(uint32_t addr_in)
 }
 
 public:
-void m68851_buserror()
+int m68851_buserror()
 {
-	if (m_mmu_tablewalk)
+	if (!m_mmu_tablewalk)
 	{
-		MMULOG("buserror during table walk\n");
-		m_mmu_tmp_sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
+		return false;
 	}
+	MMULOG("buserror during table walk\n");
+	m_mmu_tmp_sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
+	return true;
 }
