@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ready_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
 
+	template <unsigned C> DECLARE_WRITE_LINE_MEMBER( dreq_w ) { dma_request(C, state); }
 	DECLARE_WRITE_LINE_MEMBER( dreq0_w );
 	DECLARE_WRITE_LINE_MEMBER( dreq1_w );
 	DECLARE_WRITE_LINE_MEMBER( dreq2_w );
@@ -82,6 +83,11 @@ protected:
 	virtual void execute_run() override;
 
 	virtual void end_of_process();
+
+	virtual void dma_read();
+	virtual void dma_write();
+
+	virtual int transfer_size(int const channel) const { return 1; }
 
 	int m_icount;
 	uint32_t m_address_mask;
@@ -110,15 +116,13 @@ protected:
 	uint8_t m_request;
 
 private:
-	inline void dma_request(int channel, int state);
+	void dma_request(int channel, int state);
 	inline bool is_request_active(int channel);
 	inline bool is_software_request_active(int channel);
 	inline void set_hreq(int state);
 	inline void set_dack();
 	inline void set_eop(int state);
 	inline int get_state1(bool msb_changed);
-	inline void dma_read();
-	inline void dma_write();
 	inline void dma_advance();
 
 	devcb_write_line   m_out_hreq_cb;
@@ -133,11 +137,17 @@ private:
 };
 
 
-class upd71071_v53_device :  public am9517a_device
+class v5x_dmau_device : public am9517a_device
 {
 public:
 	// construction/destruction
-	upd71071_v53_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+	v5x_dmau_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+
+	auto in_mem16r_callback() { return m_in_mem16r_cb.bind(); }
+	auto out_mem16w_callback() { return m_out_mem16w_cb.bind(); }
+
+	template <unsigned C> auto in_io16r_callback() { return m_in_io16r_cb[C].bind(); }
+	template <unsigned C> auto out_io16w_callback() { return m_out_io16w_cb[C].bind(); }
 
 	virtual DECLARE_READ8_MEMBER( read ) override;
 	virtual DECLARE_WRITE8_MEMBER( write ) override;
@@ -147,10 +157,20 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void dma_read() override;
+	virtual void dma_write() override;
+
+	virtual int transfer_size(int const channel) const override { return (m_channel[channel].m_mode & 0x1) ? 2 : 1; }
+
+	// 16 bit transfer callbacks
+	devcb_read16 m_in_mem16r_cb;
+	devcb_write16 m_out_mem16w_cb;
+	devcb_read16 m_in_io16r_cb[4];
+	devcb_write16 m_out_io16w_cb[4];
+
 	int m_selected_channel;
 	int m_base;
 	uint8_t m_command_high;
-
 };
 
 
@@ -170,7 +190,7 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(AM9517A,      am9517a_device)
-DECLARE_DEVICE_TYPE(V53_DMAU,     upd71071_v53_device)
+DECLARE_DEVICE_TYPE(V5X_DMAU,     v5x_dmau_device)
 DECLARE_DEVICE_TYPE(PCXPORT_DMAC, pcxport_dmac_device)
 
 #endif // MAME_MACHINE_AM9517_H

@@ -838,8 +838,8 @@ MACHINE_CONFIG_START(m20_state::m20)
 	pit8253.set_clk<2>(1230782);
 	pit8253.out_handler<2>().set(FUNC(m20_state::timer_tick_w));
 
-	MCFG_DEVICE_ADD(m_i8259, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, m20_state, int_w))
+	PIC8259(config, m_i8259, 0);
+	m_i8259->out_int_callback().set(FUNC(m20_state::int_w));
 
 	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard, "m20"));
 	kbd.rxd_handler().set(m_kbdi8251, FUNC(i8251_device::write_rxd));

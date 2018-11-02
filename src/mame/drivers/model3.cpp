@@ -6148,7 +6148,15 @@ void model3_state::init_swtrilga()
 	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	//rom[(0xf6dd0^4)/4] = 0x60000000;
+	//rom[(0xf6dd0^4)/4] = 0x60000000; // skip force feedback check
+}
+
+void model3_state::init_swtrilgp()
+{
+	uint32_t *rom = (uint32_t*)memregion("user1")->base();
+	init_model3_20();
+
+	rom[(0x87db8^4)/4] = 0x60000000; // skip force feedback check
 }
 
 void model3_state::init_von2()
@@ -6314,7 +6322,7 @@ GAME( 1998, dirtdvlsa, dirtdvls, model3_21_5881, scud,     model3_state, init_di
 GAME( 1998, dirtdvlsj, dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, swtrilgy,         0, model3_21_5881, swtrilgy, model3_state, init_swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, swtrilgya, swtrilgy, model3_21_5881, swtrilgy, model3_state, init_swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, swtrilgyp, swtrilgy, model3_21,      swtrilgy, model3_state, init_swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (prototype, 16.09.98)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, swtrilgyp, swtrilgy, model3_21,      swtrilgy, model3_state, init_swtrilgp, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (location test, 16.09.98)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, spikeout,         0, model3_21_5881, model3,   model3_state, init_spikeout, ROT0, "Sega", "Spikeout (Revision C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, spikeofe,         0, model3_21_5881, model3,   model3_state, init_spikeofe, ROT0, "Sega", "Spikeout Final Edition", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, magtruck,         0, model3_21_5881, eca,      model3_state, init_magtruck, ROT0, "Sega", "Magical Truck Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

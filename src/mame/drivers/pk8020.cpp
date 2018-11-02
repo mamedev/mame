@@ -230,13 +230,13 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	m_pit8253->set_clk<2>((20_MHz_XTAL / 8) / 164);
 	m_pit8253->out_handler<2>().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	I8251(config, m_rs232, 0);
 	m_rs232->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_rs232->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
-	m_rs232->txrdy_handler().set("pic8259", FUNC(pic8259_device::ir2_w));
+	m_rs232->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir1_w));
+	m_rs232->txrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_rs232, FUNC(i8251_device::write_rxd));

@@ -477,11 +477,11 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000)/2));
 	i8087.set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
 	i8087.set_data_width(16);
-	i8087.irq().set("pic8259", FUNC(pic8259_device::ir0_w));
+	i8087.irq().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// IFSP port on processor card
 	i8255_device &ppi(I8255(config, "ppi8255"));

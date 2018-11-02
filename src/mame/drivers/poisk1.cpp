@@ -647,10 +647,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(p1_state::poisk1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 5000000)
-	MCFG_DEVICE_PROGRAM_MAP(poisk1_map)
-	MCFG_DEVICE_IO_MAP(poisk1_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, 5000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &p1_state::poisk1_map);
+	m_maincpu->set_addrmap(AS_IO, &p1_state::poisk1_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
 	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
@@ -663,8 +663,8 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	m_pit8253->set_clk<2>(XTAL(15'000'000)/12); /* pio port c pin 4, and speaker polling enough */
 	m_pit8253->out_handler<2>().set(FUNC(p1_state::p1_pit8253_out2_changed));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	I8255A(config, m_ppi8255n1);
 	m_ppi8255n1->in_pa_callback().set(FUNC(p1_state::p1_ppi_porta_r)); /*60H*/
@@ -680,11 +680,11 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(m_pic8259, pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(m_pic8259, pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(m_pic8259, pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(m_pic8259, pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(m_pic8259, pic8259_device, ir7_w))
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", p1_isa8_cards, "fdc", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)

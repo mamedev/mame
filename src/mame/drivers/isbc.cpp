@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	m_uart8274->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 //  m_uart8274->out_int_callback().set(FUNC(isbc_state::isbc_uart8274_irq));
-	m_uart8274->out_int_callback().set("pic_0", FUNC(pic8259_device::ir6_w));
+	m_uart8274->out_int_callback().set(m_pic_0, FUNC(pic8259_device::ir6_w));
 #endif
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));

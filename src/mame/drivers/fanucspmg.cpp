@@ -985,14 +985,14 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	m_dmac->in_ior_cb<0>().set(FUNC(fanucspmg_state::fdcdma_r));
 	m_dmac->out_iow_cb<0>().set(FUNC(fanucspmg_state::fdcdma_w));
 
-	MCFG_DEVICE_ADD(m_pic[0], PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, fanucspmg_state, get_slave_ack))
+	PIC8259(config, m_pic[0], 0);
+	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic[0]->in_sp_callback().set_constant(1);
+	m_pic[0]->read_slave_ack_callback().set(FUNC(fanucspmg_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD(m_pic[1], PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(m_pic[0], pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pic[1], 0);
+	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir7_w));
+	m_pic[1]->in_sp_callback().set_constant(0);
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->intrq_wr_callback().set(m_pic[0], FUNC(pic8259_device::ir3_w));

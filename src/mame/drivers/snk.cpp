@@ -2644,6 +2644,11 @@ static INPUT_PORTS_START( ikarijpb )
 	// this is accomplished by hooking the joystick input to the rotary input, plus
 	// of course the code is patched to handle that.
 
+	// According to a SNK 40th Anniversary Collection screenshot, this bootleg
+	// came from Korea:
+	// "The idea for Guevara's use of tanks with a human torso poking out of the top
+	// came from a poorly-programmed Korean bootleg of Ikari."
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x21, 0x01, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x42, 0x02, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)

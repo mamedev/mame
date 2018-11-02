@@ -28,31 +28,11 @@
 #define MAME_MACHINE_PIC8259_H
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-// Interrupt request output to CPU or master 8259 (active high)
-#define MCFG_PIC8259_OUT_INT_CB(_devcb) \
-	downcast<pic8259_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-// Slave program select (VCC = master; GND = slave; pin becomes EN output in buffered mode)
-#define MCFG_PIC8259_IN_SP_CB(_devcb) \
-	downcast<pic8259_device &>(*device).set_in_sp_callback(DEVCB_##_devcb);
-
-// Cascaded interrupt acknowledge request for slave 8259 to place vector on data bus
-#define MCFG_PIC8259_CASCADE_ACK_CB(_devcb) \
-	downcast<pic8259_device &>(*device).set_read_slave_ack_callback(DEVCB_##_devcb);
-
-
 class pic8259_device : public device_t
 {
 public:
 	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_sp_callback(Object &&cb) { return m_in_sp_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_slave_ack_callback(Object &&cb) { return m_read_slave_ack_func.set_callback(std::forward<Object>(cb)); }
 	auto out_int_callback() { return m_out_int_func.bind(); }
 	auto in_sp_callback() { return m_in_sp_func.bind(); }
 	auto read_slave_ack_callback() { return m_read_slave_ack_func.bind(); }

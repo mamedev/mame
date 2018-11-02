@@ -118,6 +118,7 @@ public:
 	void init_scud();
 	void init_harley();
 	void init_swtrilga();
+	void init_swtrilgp();
 	void init_vs29815();
 	void init_model3_10();
 	void init_vs215();

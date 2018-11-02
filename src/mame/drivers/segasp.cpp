@@ -40,6 +40,7 @@ Battle Police                               ???-?????                 no        
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Bingo Galaxy (main)                         834-14788    C            ROM  JP     253-5508-0513J  AAFE-01A37754716, AAFE-01E10924916, AAFE-01D67304905, Medal
 Bingo Galaxy (satellite)                    837-14481    C            ROM  JP     not used        AAFE-01A36474716, Medal
+Bingo Galaxy (satellite)                    837-14789    F*           ROM  JP     not used        AAFE-xxxxxxxxxxx, game is same as above
 Bingo Parade                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Brick People / Block People                 834-14881                 ROM  ANY    253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
 Dinosaur King                               834-14493-01 D            ROM  US     253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
@@ -72,6 +73,7 @@ REV PCB       IC6s      Flash       AU1500
 C  171-8278C  315-6370  8x 128Mbit  AMD
 D  171-8278D  315-6370  8x 128Mbit  AMD
 F  171-8278F  315-6416  8x 512Mbit  AMD
+F* 171-8278F  315-6416  2x 512Mbit  RMI
 G  171-8278G  315-6416  2x 512Mbit  RMI
 
 */
@@ -333,15 +335,17 @@ void segasp_state::init_segasp()
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
 	ROM_LOAD16_WORD( "mb_serial.ic57", 0x0000, 0x0080, CRC(e1e3c009) SHA1(66bc636c527389c3338f631d78c788b4bd4e93be) )
 
-// net_firm_119.ic72 - Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
-// fpr-24208a.ic72 - version 1.23
-// fpr-24407.ic72  - version 1.25
+// net_firm_119.ic72  - Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
+// fpr-24208a.ic72    - version 1.23, 1st half - 1.10
+// fpr-24407_123.ic72 - version 1.23, 1st half - 1.20
+// fpr-24407.ic72     - version 1.25, 1st half - 1.20
 #define SEGASP_NETFIRM \
 	ROM_REGION( 0x200000, "netcpu", 0) \
 	ROM_LOAD( "net_eeprom.ic74s",  0x00000000,    0x200, CRC(77cc5a6c) SHA1(cbfba546256b70bce6c6fd0030d7e2e410a25526) ) \
 	ROM_LOAD( "net_firm_119.ic72", 0x00000000, 0x200000, CRC(a738ea1c) SHA1(d25187a973a7e166e70334f964363adf2be87257) ) \
 	ROM_LOAD( "fpr-24208a.ic72",   0x00000000, 0x200000, CRC(a738ea1c) SHA1(3c32ddfb3c40be66b9fb2ba35fbfd5b534bb3da0) ) \
-	ROM_LOAD( "fpr-24407.ic72",    0x00000000, 0x200000, CRC(a738ea1c) SHA1(fbcc3d119b47a6da4d194e3fe4a98126c7049edf) )
+	ROM_LOAD( "fpr-24407.ic72",    0x00000000, 0x200000, CRC(a738ea1c) SHA1(fbcc3d119b47a6da4d194e3fe4a98126c7049edf) ) \
+	ROM_LOAD( "fpr-24407_123.ic72",0x00000000, 0x200000, CRC(a738ea1c) SHA1(3f5a2fb03bbb1bd9af9fe32ad76a224c97aa9b7a) )
 
 // keep M4 board code happy for now
 #define SEGASP_MISC \
@@ -416,6 +420,7 @@ ROM_START( bingogal )
 	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
 ROM_END
 
+// Also was dumped 837-14789 PCB, which uses 2x 512Mbit Flash ROMs. Game contents is the same as joined IC 62-64 dumps below.
 ROM_START( bingogals )
 	SEGASP_BIOS
 	SEGASP_JP

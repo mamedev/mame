@@ -57,7 +57,6 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_out_int_func(0);
 }
 
-
 void pic8259_device::set_irq_line(int irq, int state)
 {
 	uint8_t mask = (1 << irq);
@@ -65,7 +64,7 @@ void pic8259_device::set_irq_line(int irq, int state)
 	if (state)
 	{
 		/* setting IRQ line */
-		LOG("pic8259_set_irq_line(): PIC set IRQ line #%d\n", irq);
+		LOG("set_irq_line(): PIC set IRQ line #%d\n", irq);
 
 		if(m_level_trig_mode || (!m_level_trig_mode && !(m_irq_lines & mask)))
 		{
@@ -76,7 +75,7 @@ void pic8259_device::set_irq_line(int irq, int state)
 	else
 	{
 		/* clearing IRQ line */
-		LOG("pic8259_device::set_irq_line(): PIC cleared IRQ line #%d\n", irq);
+		LOG("set_irq_line(): PIC cleared IRQ line #%d\n", irq);
 
 		m_irq_lines &= ~mask;
 		m_irr &= ~mask;

@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(irisha_state::irisha)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(16_MHz_XTAL / 9);
@@ -406,8 +406,8 @@ MACHINE_CONFIG_START(irisha_state::irisha)
 	ppi.in_pc_callback().set(FUNC(irisha_state::irisha_8255_portc_r));
 	ppi.out_pc_callback().set(FUNC(irisha_state::irisha_8255_portc_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259.out_int_callback().set_inputline(m_maincpu, 0);
 MACHINE_CONFIG_END
 
 /* ROM definition */

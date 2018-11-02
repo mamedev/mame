@@ -10,6 +10,16 @@
 // general DMA to/from entire main map (not dedicated sprite DMA)
 WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 {
+	// 0x80 is set in the IRQ routine, presumably to ack it
+	if (data & 0x80)
+	{
+		if (m_irqsource & 0x20)
+		{
+			m_irqsource &= ~0x20;
+			update_irqs();
+		}
+	}
+
 	if (data & 0x01) // namcons2 writes 0x81, most of the time things write 0x01
 	{
 		LOG("%s: rom_dmatrg_w (do DMA?) %02x\n", machine().describe_context(), data);
@@ -30,6 +40,13 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 			uint8_t dat = m_maincpu->read_full_data_sp(m_tmpaddress);
 			m_maincpu->write_full_data(dest+i, dat);
 		}
+
+		if (data & 0x40) // or merely the absense of 0x80 being set? (ttv_lotr and drgqst are the only games needing the IRQ and both set 0x40 tho)
+		{
+			m_irqsource |= 0x20;
+			update_irqs();
+		}
+
 	}
 	else // the interrupt routine writes 0x80 to the trigger, maybe 'clear IRQ?'
 	{
@@ -189,8 +206,6 @@ READ8_MEMBER(xavix_state::dispctrl_6ff8_r)
 
 WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 {
-	// I think this is something to do with IRQ ack / enable
-
 	// 0x80 = main IRQ ack?
 	// 0x40 = raster IRQ ack?
 	// 0x20 = main IRQ enable
@@ -198,7 +213,8 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 
 	if (data & 0x40)
 	{
-		m_maincpu->set_input_line(0, CLEAR_LINE);
+		m_irqsource &= ~0x40;
+		update_irqs();
 	}
 
 	if (data & 0x80)
@@ -210,14 +226,27 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 	//  printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
 }
 
+void xavix_state::update_irqs()
+{
+	if (m_irqsource != 0x00)
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+	}
+}
 
 TIMER_CALLBACK_MEMBER(xavix_state::interrupt_gen)
 {
 	if (m_video_ctrl & 0x10)
 	{
 		//printf("callback on scanline %d %d with IRQ enabled\n", m_screen->vpos(), m_screen->hpos());
-		m_maincpu->set_input_line(0, ASSERT_LINE);
 		m_video_ctrl |= 0x40;
+		m_irqsource |= 0x40;
+		update_irqs();
+
 		m_screen->update_partial(m_screen->vpos());
 	}
 	m_interrupt_timer->adjust(attotime::never, 0);
@@ -362,9 +391,48 @@ READ8_MEMBER(xavix_state::timer_baseval_r)
 	return m_timer_baseval;
 }
 
+READ8_MEMBER(xavix_state::timer_status_r)
+{
+	uint8_t ret = m_timer_control;
+	LOG("%s: timer_status_r\n", machine().describe_context());
+	return ret;
+}
+
 WRITE8_MEMBER(xavix_state::timer_control_w)
 {
-	LOG("%s: timer_control_w %02x\n", machine().describe_context(), data);
+	/* timer is actively used by
+	   ttv_lotr, ttv_sw, drgqst, has_wamg, rad_rh, eka_*, epo_efdx, rad_bass, rad_bb2
+	   
+	   gets turned on briefly during the bootup of rad_crdn, but then off again
+
+	   runs during rad_fb / rad_madf, but with IRQs turned off
+
+	   disabled for rad_snow, rad_ping, rad_mtrk, rad_box, *nostalgia, ttv_mx, xavtenni
+	   */
+
+	//LOG("%s: timer_control_w %02x\n", machine().describe_context(), data);
+	m_timer_control = data;
+
+	if (data & 0x80) // tends to read+write address to ack interrupts, assume it's similar to other things and top bit will clear IRQ (usually gets written all the time when starting timer)
+	{
+		if (m_irqsource & 0x10)
+		{
+			m_irqsource &= ~0x10;
+			update_irqs();
+		}
+	}
+
+	// has_wamg, ttv_sw, eka_*, rad_bass set bit 0x02 too (maybe reload related?)
+
+	// rad_fb / rad_madf don't set bit 0x40 (and doesn't seem to have a valid interrupt handler for timer, so probably means it generates no IRQ?)
+	if (data & 0x01) // timer start?
+	{
+		m_freq_timer->adjust(attotime::from_usec(50000));
+	}
+	else
+	{
+		m_freq_timer->adjust(attotime::never, 0);
+	}
 }
 
 WRITE8_MEMBER(xavix_state::timer_baseval_w)
@@ -374,11 +442,56 @@ WRITE8_MEMBER(xavix_state::timer_baseval_w)
 	LOG("%s: timer_baseval_w %02x\n", machine().describe_context(), data);
 }
 
+READ8_MEMBER(xavix_state::timer_freq_r)
+{
+	LOG("%s: timer_freq_r\n", machine().describe_context());
+	return m_timer_freq;
+}
+
 WRITE8_MEMBER(xavix_state::timer_freq_w)
 {
 	// 4-bit prescale
 	LOG("%s: timer_freq_w %02x\n", machine().describe_context(), data);
+
+	/* if master clock (MC) is XTAL(21'477'272) (NTSC master)
+
+	   0x0 = MC / 2      = 10.738636 MHz
+	   0x1 = MC / 4      = 5.369318 MHz
+	   0x2 = MC / 8      = 2.684659 MHz
+	   0x3 = MC / 16     = 1.3423295 MHz
+	   0x4 = MC / 32     = 671.16475 kHz
+	   0x5 = MC / 64     = 335.582375 kHz
+	   0x6 = MC / 128    = 167.7911875 kHz
+	   0x7 = MC / 256    = 83.89559375 kHz
+	   0x8 = MC / 512    = 41.947796875 kHz
+	   0x9 = MC / 1024   = 20.9738984375 kHz
+	   0xa = MC / 2048   = 10.48694921875 kHz
+	   0xb = MC / 4096   = 5.243474609375 kHz
+	   0xc = MC / 8192   = 2.6217373046875 kHz
+	   0xd = MC / 16384  = 1.31086865234375 kHz
+	   0xe = MC / 32768  = 655.434326171875 Hz
+	   0xf = MC / 65536  = 327.7171630859375 Hz
+	*/
+	m_timer_freq = data & 0x0f;
+
+	if (data & 0xf0)
+		LOG("%s: unexpected upper bits in timer freq %02x\n", machine().describe_context(), data & 0xf0);
 }
+
+TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
+{
+	if (m_timer_control & 0x40) // Timer IRQ enable?
+	{
+		m_irqsource |= 0x10;
+		m_timer_control |= 0x80;
+		update_irqs();
+	}
+	
+	//logerror("freq_timer_done\n");
+	// reload
+	//m_freq_timer->adjust(attotime::from_usec(50000));
+}
+
 
 
 READ8_MEMBER(xavix_state::mult_r)
@@ -463,7 +576,7 @@ READ8_MEMBER(xavix_state::irq_source_r)
 	*/
 
 	LOG("%s: irq_source_r\n", machine().describe_context());
-	return 0x40;
+	return m_irqsource;
 }
 
 WRITE8_MEMBER(xavix_state::irq_source_w)
@@ -480,6 +593,7 @@ void xavix_state::machine_start()
 	std::fill_n(&m_mainram[0], 0x4000, 0xff);
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
+	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
 }
 
 void xavix_state::machine_reset()
@@ -534,6 +648,9 @@ void xavix_state::machine_reset()
 	m_io0_direction = 0x00;
 	m_io1_direction = 0x00;
 
+	m_irqsource = 0x00;
+
+	m_timer_control = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;

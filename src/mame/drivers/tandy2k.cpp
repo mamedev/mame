@@ -845,11 +845,11 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	//m_pit->set_clk<2>(16_MHz_XTAL / 8);
 	//m_pit->out_handler<2>().set(FUNC(tandy2k_state::rfrqpulse_w));
 
-	MCFG_DEVICE_ADD(I8259A_0_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
+	PIC8259(config, m_pic0, 0);
+	m_pic0->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
-	MCFG_DEVICE_ADD(I8259A_1_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
+	PIC8259(config, m_pic1, 0);
+	m_pic1->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
 	I8272A(config, m_fdc, true);
 	m_fdc->set_select_lines_connected(true);

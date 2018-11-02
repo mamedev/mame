@@ -229,8 +229,8 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	ppi3.out_pb_callback().set(FUNC(b2m_state::b2m_romdisk_portb_w));
 	ppi3.out_pc_callback().set(FUNC(b2m_state::b2m_romdisk_portc_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();

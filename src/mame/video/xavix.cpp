@@ -86,14 +86,20 @@ void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, co
 		//if (h_raw > 24)
 		//  LOG("hraw >24 (%02x)\n", h_raw);
 
-		//if (l_raw > 17)
-		//  LOG("lraw >17 (%02x)\n", l_raw);
+		//if (l_raw > 24)
+		//  LOG("lraw >24 (%02x)\n", l_raw);
 
 		//if (s_raw > 7)
 		//  LOG("s_raw >5 (%02x)\n", s_raw);
 
-		double l = (double)l_raw / 17.0f;
+		double l = (double)l_raw / 24.0f; // ekara and drgqst go up to 23 during fades, expect that to be brightest
+		l = l * (std::atan(1)*2); // does not appear to be a linear curve
+		l = std::sin(l);
+
 		double s = (double)s_raw / 7.0f;
+		s = s * (std::atan(1)*2); // does not appear to be a linear curve
+		s = std::sin(s);
+
 		double h = (double)h_raw / 24.0f; // hue values 24-31 render as transparent
 
 		double r, g, b;
@@ -603,6 +609,11 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
 	{
+		// if bpp>4 then ignore unaligned palette selects bits based on bpp
+		// ttv_lotr uses 5bpp graphics (so 32 colour alignment) but sets palette 0xf (a 16 colour boundary) when it expects palette 0xe
+		if (bpp>4)
+			pal &= (0xf<<(bpp-4));
+
 		int bits_per_tileline = drawwidth * bpp;
 
 		// set the address here so we can increment in bits in the draw function
@@ -744,7 +755,8 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						dat |= (get_next_bit() << i);
 					}
 
-					yposptr[x] = dat + 0x100;
+					if (x < cliprect.max_x)
+						yposptr[x] = dat + 0x100;
 				}
 			}
 
