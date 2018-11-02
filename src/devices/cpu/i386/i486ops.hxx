@@ -34,7 +34,8 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 
 			default:
 			{
-				logerror("CPUID called with unsupported EAX=%08x at %08x!\n", REG32(EAX), m_eip);
+				// call the model specific implementation
+				opcode_cpuid();
 				break;
 			}
 		}
