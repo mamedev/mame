@@ -874,6 +874,7 @@ MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrk)
 	xavix(config);
 
 	XAVIX_MTRK_WHEEL(config, m_wheel, 0);
+	m_wheel->event_out_cb().set(FUNC(xavix_state::ioevent_trg08));
 
 MACHINE_CONFIG_END
 

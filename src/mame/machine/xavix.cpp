@@ -158,22 +158,22 @@ void xavix_state::process_ioevent(uint8_t bits)
 	}
 }
 
-void xavix_state::ioevent_trg01()
+WRITE_LINE_MEMBER(xavix_state::ioevent_trg01)
 {
 	process_ioevent(0x01);
 }
 
-void xavix_state::ioevent_trg02()
+WRITE_LINE_MEMBER(xavix_state::ioevent_trg02)
 {
 	process_ioevent(0x02);
 }
 
-void xavix_state::ioevent_trg04()
+WRITE_LINE_MEMBER(xavix_state::ioevent_trg04)
 {
 	process_ioevent(0x04);
 }
 
-void xavix_state::ioevent_trg08()
+WRITE_LINE_MEMBER(xavix_state::ioevent_trg08)
 {
 	process_ioevent(0x08);
 }
@@ -648,7 +648,7 @@ READ8_MEMBER(xavix_state::irq_source_r)
 {
 	/* the 2nd IRQ routine (regular IRQ) reads here before deciding what to do
 
-	 the following bits have been seen to be checked (active low?)
+	 the following bits have been seen to be checked (active high)
 	 monster truck does most extensive checking
 
 	  0x80 - Sound Irq
@@ -656,7 +656,8 @@ READ8_MEMBER(xavix_state::irq_source_r)
 	  0x20 - DMA Irq  (most routines check this as first priority, and ignore other requests if it is set?)
 	  0x10 - Timer / Counter IRQ
 	  0x08 - IO Event Irq (uses 7a00 top bit to determine direction, enabled with 0x08 on 7a80, IRQ acked / cleared with 0x08 written to 7a81, 4 possible sources with different bits in 7a80 / 7a81 ? )
-	  0x04 - ADC IRQ - loads/stores 7b81 (to ack interrupt)
+	         (this is the type of interrupt where the irq frequency adds a counter which determines analog value)
+	  0x04 - ADC Conversion IRQ - loads/stores 7b81 (to ack interrupt)
 	*/
 
 	LOG("%s: irq_source_r\n", machine().describe_context());

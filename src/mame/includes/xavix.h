@@ -62,10 +62,10 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(rad_rh_in1_08_r);
 
-	void ioevent_trg01();
-	void ioevent_trg02();
-	void ioevent_trg04();
-	void ioevent_trg08();
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
 
 private:
 	// screen updates
