@@ -935,7 +935,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	I8088(config, m_maincpu, XTAL(14'318'181) / 3); /* 14.3182 main crystal divided by three through a 8284A */
 	m_maincpu->set_addrmap(AS_PROGRAM, &myb3k_state::myb3k_map);
 	m_maincpu->set_addrmap(AS_IO, &myb3k_state::myb3k_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
 
 	/* RAM options */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 256K");
