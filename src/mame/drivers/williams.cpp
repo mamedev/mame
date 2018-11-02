@@ -3336,8 +3336,8 @@ GAME( 1980, zero2,      defender, defender,       defender, williams_state, init
 GAME( 1980, defcmnd,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg", "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Outer Limits)", "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, attackf,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Famare SA)", "Attack (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, galwars2,   defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Sonic)", "Galaxy Wars II (Defender bootleg)", MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega Sa, only displays Sonic on title screen
+GAME( 1980, attackf,    defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (FAMARE S.A.)", "Attack (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galwars2,   defender, defender,       defender, williams_state, init_defender, ROT0,   "bootleg (Sonic)", "Galaxy Wars II (Defender bootleg)", MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega S.A., only displays Sonic on title screen
 
 GAME( 1980, mayday,     0,        defender,       mayday,   williams_state, init_mayday,   ROT0,   "Hoei", "Mayday (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // \  original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
 GAME( 1980, maydaya,    mayday,   defender,       mayday,   williams_state, init_mayday,   ROT0,   "Hoei", "Mayday (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) //  > these games have an unemulated protection chip of some sort which is hacked around in /machine/williams.cpp "mayday_protection_r" function
