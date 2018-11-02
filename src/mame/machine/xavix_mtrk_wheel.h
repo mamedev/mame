@@ -22,9 +22,11 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	devcb_write_line m_event_out_cb;
+	required_ioport m_in;
 };
 
 #endif // MAME_MACHINE_XAVIX_MTRK_WHEEL_H
