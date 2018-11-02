@@ -62,6 +62,11 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(rad_rh_in1_08_r);
 
+	void ioevent_trg01();
+	void ioevent_trg02();
+	void ioevent_trg04();
+	void ioevent_trg08();
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -100,6 +105,8 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_READ8_MEMBER(ioevent_irqstate_r);
 	DECLARE_WRITE8_MEMBER(ioevent_irqack_w);
 	uint8_t m_ioevent_enable;
+	uint8_t m_ioevent_active;
+	void process_ioevent(uint8_t bits);
 
 	DECLARE_WRITE8_MEMBER(adc_7b00_w);
 	DECLARE_READ8_MEMBER(adc_7b80_r);

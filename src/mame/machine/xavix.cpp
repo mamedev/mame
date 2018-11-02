@@ -137,21 +137,83 @@ READ8_MEMBER(xavix_state::ioevent_enable_r)
 	return m_ioevent_enable;
 }
 
-READ8_MEMBER(xavix_state::ioevent_irqstate_r)
-{
-	LOG("%s: ioevent_irqstate_r\n", machine().describe_context());
-	return 0x00;
-}
-
 WRITE8_MEMBER(xavix_state::ioevent_enable_w)
 {
 	LOG("%s: ioevent_enable_w %02x\n", machine().describe_context(), data);
 	m_ioevent_enable = data;
 }
 
+void xavix_state::process_ioevent(uint8_t bits)
+{
+	if (m_ioevent_enable & bits)
+	{
+		m_ioevent_active |= bits;
+
+		if (m_ioevent_active & 0x0f)
+		{
+			m_irqsource |= 0x08;
+		}
+
+		update_irqs();
+	}
+}
+
+void xavix_state::ioevent_trg01()
+{
+	process_ioevent(0x01);
+}
+
+void xavix_state::ioevent_trg02()
+{
+	process_ioevent(0x02);
+}
+
+void xavix_state::ioevent_trg04()
+{
+	process_ioevent(0x04);
+}
+
+void xavix_state::ioevent_trg08()
+{
+	process_ioevent(0x08);
+}
+
+READ8_MEMBER(xavix_state::ioevent_irqstate_r)
+{
+	LOG("%s: ioevent_irqstate_r\n", machine().describe_context());
+	return m_ioevent_active;
+}
+
 WRITE8_MEMBER(xavix_state::ioevent_irqack_w)
 {
 	LOG("%s: ioevent_irqack_w %02x\n", machine().describe_context(), data);
+
+	if (data & 0x01)
+	{
+		m_ioevent_active &= ~0x01;
+	}
+
+	if (data & 0x02)
+	{
+		m_ioevent_active &= ~0x02;
+	}
+
+	if (data & 0x04)
+	{
+		m_ioevent_active &= ~0x04;
+	}
+
+	if (data & 0x08)
+	{
+		m_ioevent_active &= ~0x08;
+	}
+
+	if (!(m_ioevent_active & 0x0f))
+	{
+		m_irqsource &= ~0x08;
+	}
+
+	update_irqs();
 }
 
 
@@ -675,6 +737,7 @@ void xavix_state::machine_reset()
 	m_timer_control = 0x00;
 
 	m_ioevent_enable = 0x00;
+	m_ioevent_active = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
