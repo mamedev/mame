@@ -1519,12 +1519,12 @@ void m68000_base_device::set_reset_callback(write_line_delegate callback)
 }
 
 // fault_addr = address to indicate fault at
-// rw = 0 for read, 1 for write
+// rw = 1 for read, 0 for write
 // fc = 3-bit function code of access (usually you'd just put what m68k_get_fc() returns here)
 void m68000_base_device::set_buserror_details(uint32_t fault_addr, uint8_t rw, uint8_t fc)
 {
 	m_aerr_address = fault_addr;
-	m_aerr_write_mode = rw;
+	m_aerr_write_mode = (rw << 4);
 	m_aerr_fc = fc;
 	m_mmu_tmp_buserror_address = fault_addr; // Hack for x68030
 }

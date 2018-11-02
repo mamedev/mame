@@ -283,13 +283,13 @@ void hp9k3xx_state::add_dio32_bus(machine_config &config)
 	dio32.irq7_out_cb().set(FUNC(hp9k3xx_state::dio_irq7_w));
 }
 
-void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
+void hp9k3xx_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
 	if (m_bus_error)
 		return;
 
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
+	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
@@ -297,14 +297,14 @@ void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mas
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
 	if (!machine().side_effects_disabled())
-		set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
+		set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
 	return 0xffff;
 }
 
 WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 {
 	if (!machine().side_effects_disabled())
-		set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
+		set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
 }
 
 READ32_MEMBER(hp9k3xx_state::buserror_r)
