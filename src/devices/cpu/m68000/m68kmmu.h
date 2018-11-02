@@ -1,14 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Hans Ostermeyer
-/*
-    m68kmmu.h - PMMU implementation for 68851/68030/68040
-            HMMU implementation for 68020 (II and LC variants)
+// copyright-holders:R. Belmont, Hans Ostermeyer, Sven Schnelle
 
-    By R. Belmont and Hans Ostermeyer
-*/
+//    m68kmmu.h - PMMU implementation for 68851/68030/68040
+//            HMMU implementation for 68020 (II and LC variants)
+
+//    By R. Belmont and Hans Ostermeyer
+//
 
 // MMU status register bit definitions
-
 
 #if 0
 #define MMULOG logerror
@@ -16,42 +15,43 @@
 #define MMULOG(...)
 #endif
 
-static constexpr int M68K_MMU_SR_BUS_ERROR = 0x8000;
-static constexpr int M68K_MMU_SR_SUPERVISOR_ONLY = 0x2000;
-static constexpr int M68K_MMU_SR_WRITE_PROTECT = 0x0800;
-static constexpr int M68K_MMU_SR_INVALID = 0x0400;
-static constexpr int M68K_MMU_SR_MODIFIED = 0x0200;
-static constexpr int M68K_MMU_SR_LEVEL_0 = 0x0000;
-static constexpr int M68K_MMU_SR_LEVEL_1 = 0x0001;
-static constexpr int M68K_MMU_SR_LEVEL_2 = 0x0002;
-static constexpr int M68K_MMU_SR_LEVEL_3 = 0x0003;
+// MMU SR register fields
+static constexpr uint16_t M68K_MMU_SR_BUS_ERROR       = 0x8000;
+static constexpr uint16_t M68K_MMU_SR_SUPERVISOR_ONLY = 0x2000;
+static constexpr uint16_t M68K_MMU_SR_WRITE_PROTECT   = 0x0800;
+static constexpr uint16_t M68K_MMU_SR_INVALID         = 0x0400;
+static constexpr uint16_t M68K_MMU_SR_MODIFIED        = 0x0200;
+static constexpr uint16_t M68K_MMU_SR_TRANSPARENT     = 0x0040;
 
 // MMU translation table descriptor field definitions
-
-static constexpr int M68K_MMU_DF_DT         = 0x0003;
-static constexpr int M68K_MMU_DF_DT0        = 0x0000;
-static constexpr int M68K_MMU_DF_DT1        = 0x0001;
-static constexpr int M68K_MMU_DF_DT2        = 0x0002;
-static constexpr int M68K_MMU_DF_DT3        = 0x0003;
-static constexpr int M68K_MMU_DF_WP         = 0x0004;
-static constexpr int M68K_MMU_DF_USED       = 0x0008;
-static constexpr int M68K_MMU_DF_MODIFIED   = 0x0010;
-static constexpr int M68K_MMU_DF_CI         = 0x0040;
-static constexpr int M68K_MMU_DF_SUPERVISOR = 0x0100;
+static constexpr uint32_t M68K_MMU_DF_DT              = 0x00000003;
+static constexpr uint32_t M68K_MMU_DF_DT_INVALID      = 0x00000000;
+static constexpr uint32_t M68K_MMU_DF_DT_PAGE         = 0x00000001;
+static constexpr uint32_t M68K_MMU_DF_DT_TABLE_4BYTE  = 0x00000002;
+static constexpr uint32_t M68K_MMU_DF_DT_TABLE_8BYTE  = 0x00000003;
+static constexpr uint32_t M68K_MMU_DF_WP              = 0x00000004;
+static constexpr uint32_t M68K_MMU_DF_USED            = 0x00000008;
+static constexpr uint32_t M68K_MMU_DF_MODIFIED        = 0x00000010;
+static constexpr uint32_t M68K_MMU_DF_CI              = 0x00000040;
+static constexpr uint32_t M68K_MMU_DF_SUPERVISOR      = 0000000100;
+static constexpr uint32_t M68K_MMU_DF_ADDR_MASK       = 0xfffffff0;
+static constexpr uint32_t M68K_MMU_DF_IND_ADDR_MASK   = 0xfffffffc;
 
 // MMU ATC Fields
-
-static constexpr int M68K_MMU_ATC_BUSERROR  = 0x08000000;
-static constexpr int M68K_MMU_ATC_CACHE_IN  = 0x04000000;
-static constexpr int M68K_MMU_ATC_WRITE_PR  = 0x02000000;
-static constexpr int M68K_MMU_ATC_MODIFIED  = 0x01000000;
-static constexpr int M68K_MMU_ATC_MASK      = 0x00ffffff;
-static constexpr int M68K_MMU_ATC_SHIFT     = 8;
-static constexpr int M68K_MMU_ATC_VALID     = 0x08000000;
+static constexpr uint32_t M68K_MMU_ATC_BUSERROR       = 0x08000000;
+static constexpr uint32_t M68K_MMU_ATC_CACHE_IN       = 0x04000000;
+static constexpr uint32_t M68K_MMU_ATC_WRITE_PR       = 0x02000000;
+static constexpr uint32_t M68K_MMU_ATC_MODIFIED       = 0x01000000;
+static constexpr uint32_t M68K_MMU_ATC_MASK           = 0x00ffffff;
+static constexpr uint32_t M68K_MMU_ATC_SHIFT          = 8;
+static constexpr uint32_t M68K_MMU_ATC_VALID          = 0x08000000;
 
 // MMU Translation Control register
-static constexpr int M68K_MMU_TC_SRE        = 0x02000000;
+static constexpr uint32_t M68K_MMU_TC_SRE             = 0x02000000;
+static constexpr uint32_t M68K_MMU_TC_FCL             = 0x01000000;
 
+// TT register
+static constexpr uint16_t M68K_MMU_TT_ENABLE          = 0x8000;
 /* decodes the effective address */
 uint32_t DECODE_EA_32(int ea)
 {
@@ -120,15 +120,32 @@ void pmmu_set_buserror(uint32_t addr_in)
 	}
 }
 
-/*
-    pmmu_atc_add: adds this address to the ATC
-*/
-void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc)
+
+// pmmu_atc_add: adds this address to the ATC
+void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc, const int rw)
 {
 	// get page size (i.e. # of bits to ignore); is 10 for Apollo
 	int ps = (m_mmu_tc >> 20) & 0xf;
 	// Note: exact emulation would use (logical >> ps) << (ps-8)
-	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24)| logical >> ps;
+
+	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | logical >> ps;
+	uint32_t atc_data = (physical >> ps) << (ps - 8);
+
+
+	if (m_mmu_tmp_sr & (M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID|M68K_MMU_SR_SUPERVISOR_ONLY))
+	{
+		atc_data |= M68K_MMU_ATC_BUSERROR;
+	}
+
+	if (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT)
+	{
+		atc_data |= M68K_MMU_ATC_WRITE_PR;
+	}
+
+	if (!rw && !(m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
+	{
+		atc_data |= M68K_MMU_ATC_MODIFIED;
+	}
 
 	// first see if this is already in the cache
 	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
@@ -136,6 +153,8 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc)
 		// if tag bits and function code match, don't add
 		if (m_mmu_atc_tag[i] == atc_tag)
 		{
+			MMULOG("%s: hit, old %08x new %08x\n", __func__, m_mmu_atc_data[i], atc_data);
+			m_mmu_atc_data[i] = atc_data;
 			return;
 		}
 	}
@@ -163,256 +182,383 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc)
 	}
 
 	// add the entry
-	MMULOG("ATC[%2d] add: log %08x -> phys %08x (fc=%d)\n", found, (logical >> ps) << ps, (physical >> ps) << ps, fc);
+	MMULOG("ATC[%2d] add: log %08x -> phys %08x (fc=%d) data=%08x\n",
+			found, (logical >> ps) << ps, (physical >> ps) << ps, fc, atc_data);
 	m_mmu_atc_tag[found] = atc_tag;
-	m_mmu_atc_data[found] = (physical >> ps) << (ps - 8);
-
-	if (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT)
-	{
-		m_mmu_atc_data[found] |= M68K_MMU_ATC_WRITE_PR;
-	}
+	m_mmu_atc_data[found] = atc_data;
 }
 
-/*
-    pmmu_atc_flush: flush entire ATC
 
-    7fff0003 001ffd10 80f05750 is what should load
-*/
+// pmmu_atc_flush: flush entire ATC
+// 7fff0003 001ffd10 80f05750 is what should load
 void pmmu_atc_flush()
 {
 	MMULOG("ATC flush: pc=%08x\n", m_ppc);
-
-	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
-	{
-		m_mmu_atc_tag[i] = 0;
-	}
-
+	std::fill(std::begin(m_mmu_atc_tag), std::end(m_mmu_atc_tag), 0);
 	m_mmu_atc_rr = 0;
 }
 
-
-inline uint32_t get_dt2_table_entry(uint32_t tptr, uint8_t ptest, bool indirect)
+template<bool ptest>
+bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const bool rw,
+					 uint32_t& addr_out)
 {
-	uint32_t tbl_entry = m_program->read_dword(tptr);
-	uint32_t dt = tbl_entry & M68K_MMU_DF_DT;
-
-	if (!indirect)
-		m_mmu_tmp_sr |= tbl_entry & 0x0004 ? M68K_MMU_SR_WRITE_PROTECT : 0;
-
-	if (!ptest && !indirect && dt != M68K_MMU_DF_DT0)
-	{
-		if (dt == M68K_MMU_DF_DT1 && !m_mmu_tmp_rw && !(m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
-		{
-			// set used and modified
-			m_program->write_dword( tptr, tbl_entry | M68K_MMU_DF_USED | M68K_MMU_DF_MODIFIED);
-		}
-		else if (!(tbl_entry & M68K_MMU_DF_USED))
-		{
-			m_program->write_dword( tptr, tbl_entry | M68K_MMU_DF_USED);
-		}
-	}
-	return tbl_entry;
-}
-
-inline uint32_t get_dt3_table_entry(uint32_t tptr, uint8_t fc, uint8_t ptest)
-{
-	uint32_t tbl_entry2 = m_program->read_dword(tptr);
-	uint32_t tbl_entry = m_program->read_dword(tptr + 4);
-	uint32_t dt = tbl_entry2 & M68K_MMU_DF_DT;
-
-	m_mmu_tmp_sr |= ((tbl_entry2 & 0x0100) && !(fc & 4)) ? M68K_MMU_SR_SUPERVISOR_ONLY : 0;
-	m_mmu_tmp_sr |= tbl_entry2 & 0x0004 ? M68K_MMU_SR_WRITE_PROTECT : 0;
-
-	if (!ptest && dt != M68K_MMU_DF_DT0)
-	{
-		if (dt == M68K_MMU_DF_DT1 && !m_mmu_tmp_rw && !(m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
-		{
-			// set modified
-			m_program->write_dword( tptr, tbl_entry2 | M68K_MMU_DF_USED | M68K_MMU_DF_MODIFIED);
-		}
-		else if (!(tbl_entry2 & M68K_MMU_DF_USED))
-		{
-			m_program->write_dword( tptr, tbl_entry2 | M68K_MMU_DF_USED);
-		}
-	}
-
-	return (tbl_entry & ~M68K_MMU_DF_DT) | dt;
-}
-
-bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const int ptest, uint32_t& addr_out)
-{
+	MMULOG("%s: LOOKUP addr_in=%08x, fc=%d, ptest=%d\n", __func__, addr_in, fc, ptest);
 	const int ps = (m_mmu_tc >> 20) & 0xf;
 	const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | (addr_in >> ps);
 
 	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
+
 		if (m_mmu_atc_tag[i] != atc_tag)
-			continue;
-
-		if (!m_mmu_tmp_rw && (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR))
-			continue;
-		if (!m_mmu_tmp_rw && !(m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED))
-			continue;
-
-		// read access or write access and not write protected
-		if (!ptest)
 		{
-			// FIXME: must set modified in PMMU tables as well
-			m_mmu_atc_data[i] |= (!m_mmu_tmp_rw ? M68K_MMU_ATC_MODIFIED : 0);
+			continue;
 		}
-		else
+
+		const uint32_t atc_data = m_mmu_atc_data[i];
+
+		if (!ptest && !rw)
 		{
-			uint16_t sr = 0;
-
-			if (m_mmu_atc_data[i] & M68K_MMU_ATC_MODIFIED)
-				sr = M68K_MMU_SR_MODIFIED;
-
-			if (m_mmu_atc_data[i] & M68K_MMU_ATC_WRITE_PR)
-				sr |= M68K_MMU_SR_WRITE_PROTECT;
-
-			if (m_mmu_atc_data[i] & M68K_MMU_ATC_BUSERROR)
-				sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
-			m_mmu_tmp_sr = sr;
+			// According to MC86030UM:
+			// "If the M bit is clear and a write access to this logical
+			// address is attempted, the MC68030 aborts the access and initiates a table
+			// search, setting the M bit in the page descriptor, invalidating the old ATC
+			// entry, and creating a new entry with the M bit set.
+			if (!(atc_data & M68K_MMU_ATC_MODIFIED))
+			{
+				m_mmu_atc_tag[i] = 0;
+				continue;
+			}
 		}
-		addr_out = (m_mmu_atc_data[i] << 8) | (addr_in & ~(~0 << ps));
+
+		m_mmu_tmp_sr = 0;
+		if (atc_data & M68K_MMU_ATC_MODIFIED)
+		{
+			m_mmu_tmp_sr |= M68K_MMU_SR_MODIFIED;
+		}
+
+		if (atc_data & M68K_MMU_ATC_WRITE_PR)
+		{
+			m_mmu_tmp_sr |= M68K_MMU_SR_WRITE_PROTECT;
+		}
+
+		if (atc_data & M68K_MMU_ATC_BUSERROR)
+		{
+			m_mmu_tmp_sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
+		}
+		addr_out = (atc_data << 8) | (addr_in & ~(~0 << ps));
+		MMULOG("%s: addr_in=%08x, addr_out=%08x, MMU SR %04x\n",
+				__func__, addr_in, addr_out, m_mmu_tmp_sr);
 		return true;
 	}
+	MMULOG("%s: lookup failed\n", __func__);
 	if (ptest)
+	{
 		m_mmu_tmp_sr = M68K_MMU_SR_INVALID;
+	}
 	return false;
 }
 
-bool pmmu_match_tt(uint32_t addr_in, int fc, uint32_t tt)
+bool pmmu_match_tt(const uint32_t addr_in, const int fc, const uint32_t tt, const bool rw)
 {
-	if (!(tt & 0x8000))
+	if (!(tt & M68K_MMU_TT_ENABLE))
+	{
 		return false;
+	}
 
 	// transparent translation enabled
-	uint32_t address_base = tt & 0xff000000;
-	uint32_t address_mask = ((tt << 8) & 0xff000000) ^ 0xff000000;
-	return (addr_in & address_mask) == address_base && (fc & ~tt) == ((tt >> 4) & 7);
-}
+	const uint32_t address_base = tt & 0xff000000;
+	const uint32_t address_mask = ((tt << 8) & 0xff000000) ^ 0xff000000;
+	const uint32_t fcmask = (~tt) & 7;
+	const uint32_t fcbits = (tt >> 4) & 7;
+	const bool rwmask = (~tt & 0x100);
+	const bool rwbit = (tt & 0x200);
 
-bool pmmu_walk_table(uint32_t& tbl_entry, uint32_t addr_in, int shift, int bits, int nextbits, bool ptest, int fc, int level, uint32_t &addr_out)
-{
-	// get table offset
-	uint32_t tofs;
-	uint32_t tptr = tbl_entry & 0xfffffff0;
-	int ps = (m_mmu_tc >> 20) & 0xf;
-	// get initial shift (# of top bits to ignore)
-	int is = (m_mmu_tc >> 16) & 0xf;
-
-	shift += is;
-	tofs = (addr_in << shift) >> (32 - bits);
-
-	MMULOG("walk_table: addr_in %08x, tbl_entry %08x, tofs %08x shift %d, bits %d, nextbits %d\n", addr_in, tbl_entry, tofs, shift, bits, nextbits);
-
-	switch (tbl_entry & M68K_MMU_DF_DT)
+	if ((addr_in & address_mask) != (address_base & address_mask))
 	{
-		case M68K_MMU_DF_DT0:   // invalid, will cause MMU exception
-			m_mmu_tmp_sr &= 0xfffffff0;
-			m_mmu_tmp_sr |= M68K_MMU_SR_INVALID | level;
-			addr_out = tbl_entry;
-			MMULOG("PMMU: DT0 PC=%x (addr_in %08x -> %08x)\n", m_ppc, addr_in, addr_out);
-			return true;
-
-		case M68K_MMU_DF_DT1:   // page descriptor, will cause direct mapping
-			tbl_entry &= (~0 << ps);
-			addr_out = ((addr_in << shift) >> shift) + tbl_entry;
-			MMULOG("PMMU: DT1 PC=%x (addr_in %08x -> %08x)\n", m_ppc, addr_in, addr_out);
-			return true;
-
-		case M68K_MMU_DF_DT2:   // valid 4 byte descriptors
-			tofs *= 4;
-
-			if (bits)
-			{
-				tbl_entry = get_dt2_table_entry(tptr + tofs,  ptest, !nextbits);
-				return false;
-			} else
-			{
-				tptr = tbl_entry & 0xfffffffc;
-				tbl_entry = get_dt2_table_entry(tptr, ptest, 0);
-				return false;
-			}
-			MMULOG("PMMU: %sDT2 read table entry at %08x: %08x\n", bits ? "" : "indirect ", tofs + tptr, tbl_entry);
-			return false;
-
-		case M68K_MMU_DF_DT3: // valid 8 byte descriptors
-			tofs *= 8;
-			tbl_entry = get_dt3_table_entry(tofs + tptr, fc,  ptest);
-			MMULOG("PMMU: DT3 read table A entries at %08x\n", tofs + tptr, tbl_entry);
-			return false;
+		return false;
 	}
+
+	if ((fc & fcmask) != (fcbits & fcmask))
+	{
+		return false;
+	}
+
+	if ((rw & rwmask) != (rwbit & rwmask))
+	{
+		return false;
+	}
+
+	m_mmu_tmp_sr |= M68K_MMU_SR_TRANSPARENT;
 	return true;
 }
 
-/*
-    pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
-*/
-uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, uint8_t ptest)
+void update_descriptor(const uint32_t tptr, const int type, const uint32_t entry, const bool rw)
 {
-	uint32_t addr_out, tbl_entry;
-	uint32_t abits, bbits, cbits, dbits;
+	if (type == M68K_MMU_DF_DT_PAGE && !rw &&
+			!(entry & M68K_MMU_DF_MODIFIED) &&
+			!(entry & M68K_MMU_DF_WP))
+	{
+		MMULOG("%s: set M+U at %08x\n", __func__, tptr);
+		m_program->write_dword(tptr, entry | M68K_MMU_DF_USED | M68K_MMU_DF_MODIFIED);
+	}
+	else if (type != M68K_MMU_DF_DT_INVALID && !(entry & M68K_MMU_DF_USED))
+	{
+		MMULOG("%s: set U at %08x\n", __func__, tptr);
+		m_program->write_dword(tptr, entry | M68K_MMU_DF_USED);
+	}
+}
 
+template<bool _long>
+void update_sr(const int type, const uint32_t tbl_entry)
+{
+	switch(type)
+	{
+	case M68K_MMU_DF_DT_INVALID:
+		// Invalid has no flags
+		break;
+
+	case M68K_MMU_DF_DT_PAGE:
+		if (tbl_entry & M68K_MMU_DF_MODIFIED)
+		{
+			m_mmu_tmp_sr |= M68K_MMU_SR_MODIFIED;
+		}
+		// fall through
+
+	case M68K_MMU_DF_DT_TABLE_4BYTE:
+		// fall through
+
+	case M68K_MMU_DF_DT_TABLE_8BYTE:
+
+		if (tbl_entry & M68K_MMU_DF_WP)
+		{
+			m_mmu_tmp_sr |= M68K_MMU_SR_WRITE_PROTECT;
+		}
+
+		if (_long && (tbl_entry & M68K_MMU_DF_SUPERVISOR))
+		{
+			m_mmu_tmp_sr |= M68K_MMU_SR_SUPERVISOR_ONLY;
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+template<bool ptest>
+bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
+						const int limit, const bool rw, uint32_t &addr_out)
+{
+	int level = 0;
+	const uint32_t bits = m_mmu_tc & 0xffff;
+	const int pagesize = (m_mmu_tc >> 20) & 0xf;
+	const int is = (m_mmu_tc >> 16) & 0xf;
+	int bitpos = 12;
+	int resolved = 0;
+	int pageshift = is;
+
+	addr_in <<= is;
+
+	m_mmu_tablewalk = true;
+
+	if (m_mmu_tc & M68K_MMU_TC_FCL)
+	{
+		bitpos = 16;
+	}
+
+	do
+	{
+		const int indexbits = (bits >> bitpos) & 0xf;
+		const int table_index  = (bitpos == 16) ? fc : (addr_in >> (32 - indexbits));
+		bitpos -= 4;
+		const bool indirect = (!bitpos || !(bits >> bitpos)) && indexbits;
+		uint32_t tbl_entry, tbl_entry2;
+
+		MMULOG("%s: type %d, table %08x, addr_in %08x, indexbits %d, pageshift %d, indirect %d table_index %08x, rw=%d fc=%d\n",
+				__func__, type, table, addr_in, indexbits, pageshift, indirect, table_index, rw, fc);
+
+		switch(type)
+		{
+			case M68K_MMU_DF_DT_INVALID:   // invalid, will cause MMU exception
+				m_mmu_tmp_sr = M68K_MMU_SR_INVALID;
+				MMULOG("PMMU: DT0 PC=%x (addr_in %08x -> %08x)\n", m_ppc, addr_in, addr_out);
+				resolved = 1;
+				break;
+
+			case M68K_MMU_DF_DT_PAGE:   // page descriptor, will cause direct mapping
+				if (!ptest)
+				{
+					table &= ~0 << pagesize;
+					addr_out = table + (addr_in >> pageshift);
+				}
+				resolved = 1;
+				break;
+
+			case M68K_MMU_DF_DT_TABLE_4BYTE:   // valid 4 byte descriptors
+				level++;
+				addr_out = table + (table_index << 2);
+				tbl_entry = m_program->read_dword(addr_out);
+				type = tbl_entry & M68K_MMU_DF_DT;
+
+				if (indirect && (type == 2 || type == 3))
+				{
+					level++;
+					MMULOG("SHORT INDIRECT DESC: %08x\n", tbl_entry);
+					addr_out = tbl_entry & M68K_MMU_DF_IND_ADDR_MASK;
+					tbl_entry = m_program->read_dword(addr_out);
+					type = tbl_entry & M68K_MMU_DF_DT;
+				}
+
+				MMULOG("SHORT DESC: %08x\n", tbl_entry);
+				table = tbl_entry & M68K_MMU_DF_ADDR_MASK;
+				update_sr<0>(type, tbl_entry);
+				if (!ptest)
+				{
+					update_descriptor(addr_out, type, tbl_entry, rw);
+				}
+				break;
+
+			case M68K_MMU_DF_DT_TABLE_8BYTE:   // valid 8 byte descriptors
+				level++;
+				addr_out = table + (table_index << 3);
+				tbl_entry = m_program->read_dword(addr_out);
+				tbl_entry2 = m_program->read_dword(addr_out + 4);
+				type = tbl_entry & M68K_MMU_DF_DT;
+
+				if (indirect && (type == 2 || type == 3))
+				{
+					level++;
+					MMULOG("LONG INDIRECT DESC: %08x%08x\n", tbl_entry, tbl_entry2);
+					addr_out = tbl_entry2 & M68K_MMU_DF_IND_ADDR_MASK;
+					tbl_entry = m_program->read_dword(addr_out);
+					tbl_entry2 = m_program->read_dword(addr_out);
+					type = tbl_entry & M68K_MMU_DF_DT;
+				}
+
+				MMULOG("LONG DESC: %08x %08x\n", tbl_entry, tbl_entry2);
+				table = tbl_entry2 & M68K_MMU_DF_ADDR_MASK;
+				update_sr<1>(type, tbl_entry);
+				if (!ptest)
+				{
+					update_descriptor(addr_out, type, tbl_entry, rw);
+				}
+				break;
+		}
+
+		if (m_mmu_tmp_sr & M68K_MMU_SR_BUS_ERROR)
+		{
+			// Bus erorr during page table walking is always fatal
+			resolved = 1;
+			break;
+		}
+
+		if (!ptest)
+		{
+			if (!rw && (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
+			{
+				resolved = 1;
+				break;
+			}
+
+			if (!(fc & 4) && (m_mmu_tmp_sr & M68K_MMU_SR_SUPERVISOR_ONLY))
+			{
+				resolved = 1;
+				break;
+			}
+
+		}
+		addr_in <<= indexbits;
+		pageshift += indexbits;
+	} while(level < limit && !resolved);
+
+
+	m_mmu_tmp_sr &= 0xfff0;
+	m_mmu_tmp_sr |= level;
+	MMULOG("MMU SR after walk: %04X\n", m_mmu_tmp_sr);
+	m_mmu_tablewalk = false;
+	return resolved;
+}
+
+// pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
+template<bool ptest, bool pload>
+uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, const int limit = 7)
+{
+	uint32_t addr_out = 0;
+
+
+	MMULOG("%s: addr_in=%08x, fc=%d, ptest=%d, rw=%d, limit=%d\n",
+			__func__, addr_in, fc, ptest, rw, limit);
 	m_mmu_tmp_sr = 0;
 
-	if (fc == 7 ||
-		pmmu_match_tt(addr_in, fc, m_mmu_tt0) ||
-		pmmu_match_tt(addr_in, fc, m_mmu_tt1))
+	if (pmmu_match_tt(addr_in, fc, m_mmu_tt0, rw) ||
+		pmmu_match_tt(addr_in, fc, m_mmu_tt1, rw) ||
+		fc == 7)
 	{
 		return addr_in;
 	}
 
-	if (pmmu_atc_lookup(addr_in, fc, ptest, addr_out))
+	if (ptest && limit == 0)
 	{
+		pmmu_atc_lookup<true>(addr_in, fc, rw, addr_out);
 		return addr_out;
 	}
 
+	if (!ptest && pmmu_atc_lookup<false>(addr_in, fc, rw, addr_out))
+	{
+		if (pload)
+		{
+			return addr_out;
+		}
+
+		if ((m_mmu_tmp_sr & M68K_MMU_SR_BUS_ERROR) || (!rw && (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT)))
+		{
+			MMULOG("set atc hit buserror: addr_in=%08x, addr_out=%x, rw=%x, fc=%d, sz=%d\n",
+					addr_in, addr_out, m_mmu_tmp_rw, m_mmu_tmp_fc, m_mmu_tmp_sz);
+			pmmu_set_buserror(addr_in);
+		}
+		return addr_out;
+	}
+
+	int type;
+	uint32_t tbl_addr;
 	// if SRP is enabled and we're in supervisor mode, use it
 	if ((m_mmu_tc & M68K_MMU_TC_SRE) && (fc & 4))
 	{
-		tbl_entry = (m_mmu_srp_aptr & 0xfffffff0) | (m_mmu_srp_limit & M68K_MMU_DF_DT);
+		tbl_addr = m_mmu_srp_aptr & M68K_MMU_DF_ADDR_MASK;
+		type = m_mmu_srp_limit & M68K_MMU_DF_DT;
 	}
 	else    // else use the CRP
 	{
-		tbl_entry = (m_mmu_crp_aptr & 0xfffffff0) | (m_mmu_crp_limit & M68K_MMU_DF_DT);
+		tbl_addr = m_mmu_crp_aptr & M68K_MMU_DF_ADDR_MASK;
+		type = m_mmu_crp_limit & M68K_MMU_DF_DT;
 	}
 
-	m_mmu_tmp_sr = 0;
-	abits = (m_mmu_tc >> 12) & 0xf;
-	bbits = (m_mmu_tc >> 8) & 0xf;
-	cbits = (m_mmu_tc >> 4) & 0xf;
-	dbits = m_mmu_tc & 0x0f;
-
-
-	if (!pmmu_walk_table(tbl_entry, addr_in, 0                            , abits, bbits, ptest, fc, 0, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits                        , bbits, cbits, ptest, fc, 2, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits                , cbits, dbits, ptest, fc, 3, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits + cbits        , dbits,     0, ptest, fc, 4, addr_out) &&
-		!pmmu_walk_table(tbl_entry, addr_in, abits + bbits + cbits + dbits,     0,     0, ptest, fc, 5, addr_out))
+	if (!pmmu_walk_tables<ptest>(addr_in, type, tbl_addr, fc, limit, rw, addr_out))
 	{
 		fatalerror("Table walk did not resolve\n");
 	}
 
-	if (!ptest)
+	if (ptest)
 	{
-		if ((m_mmu_tmp_sr & (M68K_MMU_SR_INVALID|M68K_MMU_SR_SUPERVISOR_ONLY)) ||
-				((m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !m_mmu_tmp_rw))
+		return addr_out;
+	}
+
+	if ((m_mmu_tmp_sr & (M68K_MMU_SR_INVALID|M68K_MMU_SR_SUPERVISOR_ONLY)) ||
+			((m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT) && !rw))
+	{
+
+		if (!pload)
 		{
+			MMULOG("%s: set buserror (SR %04X)\n", __func__, m_mmu_tmp_sr);
 			pmmu_set_buserror(addr_in);
-
-		}
-
-		if (!m_mmu_tmp_buserror_occurred)
-		{
-			// we add only valid entries
-			pmmu_atc_add(addr_in, addr_out, fc);
 		}
 	}
 
-	MMULOG("PMMU: [%08x] => [%08x]\n", addr_in, addr_out);
+	// it seems like at least the 68030 sets the M bit in the MMU SR
+	// if the root descriptor is of PAGE type, so do a logical and
+	// between RW and the root type
+	pmmu_atc_add(addr_in, addr_out, fc, rw && type != 1);
 
+	MMULOG("PMMU: [%08x] => [%08x] (SR %04x)\n", addr_in, addr_out, m_mmu_tmp_sr);
 	return addr_out;
 }
 
@@ -444,7 +590,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 		fatalerror("68040: function code %d is neither data nor program!\n", fc & 7);
 	}
 
-	if (tt0 & 0x8000)
+	if (tt0 & M68K_MMU_TT_ENABLE)
 	{
 		static constexpr int fcmask[4] = { 4, 4, 0, 0 };
 		static constexpr int fcmatch[4] = { 0, 4, 0, 0 };
@@ -464,7 +610,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 		}
 	}
 
-	if (tt1 & 0x8000)
+	if (tt1 & M68K_MMU_TT_ENABLE)
 	{
 		static int fcmask[4] = { 4, 4, 0, 0 };
 		static int fcmatch[4] = { 0, 4, 0, 0 };
@@ -662,10 +808,8 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 	return addr_out;
 }
 
-/*
-    pmmu_translate_addr: perform 68851/68030-style PMMU address translation
-*/
-uint32_t pmmu_translate_addr(uint32_t addr_in)
+// pmmu_translate_addr: perform 68851/68030-style PMMU address translation
+uint32_t pmmu_translate_addr(uint32_t addr_in, const bool rw)
 {
 	uint32_t addr_out;
 
@@ -675,62 +819,96 @@ uint32_t pmmu_translate_addr(uint32_t addr_in)
 	}
 	else
 	{
-		addr_out = pmmu_translate_addr_with_fc(addr_in, m_mmu_tmp_fc, 0);
+		addr_out = pmmu_translate_addr_with_fc<false, false>(addr_in, m_mmu_tmp_fc, rw);
 	}
-
-//  if (m_mmu_tmp_buserror_occurred > 0)
-//  {
-//      MMULOG("PMMU: pc=%08x sp=%08x va=%08x pa=%08x - invalid Table mode for level=%d (buserror %d)\n",
-//              m_ppc, REG_A()[7], addr_in, addr_out, m_mmu_tmp_sr & M68K_MMU_SR_LEVEL_3,
-//              m_mmu_tmp_buserror_occurred);
-//  }
-
 	return addr_out;
 }
 
-/*
-    m68851_mmu_ops: COP 0 MMU opcode handling
-*/
+// m68851_mmu_ops: COP 0 MMU opcode handling
+
+int fc_from_modes(const uint16_t modes)
+{
+	if ((modes & 0x1f) == 0)
+	{
+		return m_sfc;
+	}
+
+	if ((modes & 0x1f) == 1)
+	{
+		return m_dfc;
+	}
+
+	if (m_cpu_type & CPU_TYPE_030)
+	{
+		// 68030 has 3 bits fc, but 68851 4 bits
+		if (((modes >> 3) & 3) == 1)
+		{
+			return REG_D()[modes & 7] & 0x7;
+		}
+
+		if (((modes >> 3) & 3) == 2)
+		{
+			return modes & 7;
+		}
+	}
+	else
+	{
+		if (((modes >> 3) & 3) == 1)
+		{
+			return REG_D()[modes & 7] & 0xf;
+		}
+
+		if (modes & 0x10)
+		{
+			return modes & 0xf;
+		}
+	}
+
+
+	fatalerror("%s: unknown fc mode: 0x%02xn", __func__, modes & 0x1f);
+	return 0;
+}
 
 void m68851_pload(const uint32_t ea, const uint16_t modes)
 {
 	uint32_t ltmp = DECODE_EA_32(ea);
-	uint32_t ptmp;
+	const int fc = fc_from_modes(modes);
+	bool rw = (modes & 0x200);
 
-	ptmp = ltmp;
-	if (m_pmmu_enabled)
+	MMULOG("%s: PLOAD%c addr=%08x, fc=%d\n", __func__, rw ? 'R' : 'W', ltmp, fc);
+
+	// MC68851 traps if MMU is not enabled, 030 not
+	if (m_pmmu_enabled || (m_cpu_type & CPU_TYPE_030))
 	{
 		if (CPU_TYPE_IS_040_PLUS())
 		{
-			ptmp = pmmu_translate_addr_with_fc_040(ltmp, modes & 0x07, 0);
+			pmmu_translate_addr_with_fc_040(ltmp, fc, 0);
 		}
 		else
 		{
-			ptmp = pmmu_translate_addr_with_fc(ltmp, modes & 0x07, 0);
+			pmmu_translate_addr_with_fc<false,true>(ltmp, fc, rw);
 		}
 	}
-
-	MMULOG("680x0: PLOADing ATC with logical %08x => phys %08x\n", ltmp, ptmp);
-	// FIXME: rw bit?
-	pmmu_atc_add(ltmp, ptmp,  modes & 0x07);
+	else
+	{
+		MMULOG("PLOAD with MMU disabled on MC68851\n");
+		m68ki_exception_trap(57);
+		return;
+	}
 }
 
 void m68851_ptest(const uint32_t ea, const uint16_t modes)
 {
 	uint32_t v_addr = DECODE_EA_32(ea);
 	uint32_t p_addr;
-	uint32_t fc = modes & 0x1f;
-	switch (fc >> 3) {
-	case 0:
-		fc = fc == 0 ? m_sfc :  m_dfc;
-		break;
-	case 1:
-		fc = REG_D()[fc &7] &7;
-		break;
-	case 2:
-		fc &=7;
-		break;
-	}
+
+	const int level = (modes >> 10) & 7;
+	const bool rw = (modes & 0x200);
+	const int fc = fc_from_modes(modes);
+
+	MMULOG("PMMU: PTEST%c (%04X) pc=%08x sp=%08x va=%08x fc=%x level=%x a=%d, areg=%d\n",
+			rw ? 'R' : 'W', modes, m_ppc, REG_A()[7], v_addr, fc, level,
+					(modes & 0x100) ? 1 : 0, (modes >> 5) & 7);
 
 	if (CPU_TYPE_IS_040_PLUS())
 	{
@@ -738,13 +916,12 @@ void m68851_ptest(const uint32_t ea, const uint16_t modes)
 	}
 	else
 	{
-		p_addr = pmmu_translate_addr_with_fc(v_addr, fc, 1);
+		p_addr = pmmu_translate_addr_with_fc<true, false>(v_addr, fc, rw, level);
 	}
+
 	m_mmu_sr = m_mmu_tmp_sr;
 
-	MMULOG("PMMU: pc=%08x sp=%08x va=%08x pa=%08x PTEST fc=%x level=%x mmu_sr=%04x\n",
-			m_ppc, REG_A()[7], v_addr, p_addr, fc, (modes >> 10) & 0x07, m_mmu_sr);
-
+	MMULOG("PMMU: PTEST result: %04x pa=%08x\n", m_mmu_sr, p_addr);
 	if (modes & 0x100)
 	{
 		int areg = (modes >> 5) & 7;
@@ -781,8 +958,14 @@ void m68851_pmove_get(uint32_t ea, uint16_t modes)
 
 	default:
 		logerror("680x0: PMOVE from unknown MMU register %x, PC %x\n", (modes>>10) & 7, m_pc);
-		break;
+		return;
 	}
+
+	if (!(modes & 0x100))   // flush ATC on moves to TC, SRP, CRP, TT with FD bit clear
+	{
+		pmmu_atc_flush();
+	}
+
 }
 
 void m68851_pmove_put(uint32_t ea, uint16_t modes)
@@ -794,24 +977,29 @@ void m68851_pmove_put(uint32_t ea, uint16_t modes)
 	{
 		uint32_t temp = READ_EA_32(ea);
 
-		if (((modes>>10) & 7) == 2)
+		if (((modes >> 10) & 7) == 2)
 		{
 			MMULOG("WRITE TT0 = 0x%08x\n", m_mmu_tt0);
 			m_mmu_tt0 = temp;
 		}
-		else if (((modes>>10) & 7) == 3)
+		else if (((modes >> 10) & 7) == 3)
 		{
 			MMULOG("WRITE TT1 = 0x%08x\n", m_mmu_tt1);
 			m_mmu_tt1 = temp;
 		}
 		break;
+
+		if (!(modes & 0x100))
+		{
+			pmmu_atc_flush();
+		}
 	}
 	case 1:
 		logerror("680x0: unknown PMOVE case 1, PC %x\n", m_pc);
 		break;
 
 	case 2:
-		switch ((modes>>10) & 7)
+		switch ((modes >> 10) & 7)
 		{
 		case 0: // translation control register
 			m_mmu_tc = READ_EA_32(ea);
@@ -820,11 +1008,13 @@ void m68851_pmove_put(uint32_t ea, uint16_t modes)
 			if (m_mmu_tc & 0x80000000)
 			{
 				int bits = 0;
-				for(int shift = 20; shift >= 0; shift -= 4) {
+				for (int shift = 20; shift >= 0; shift -= 4)
+				{
 					bits += (m_mmu_tc >> shift) & 0x0f;
 				}
 
-				if (bits != 32 || !((m_mmu_tc >> 23) & 1)) {
+				if (bits != 32 || !((m_mmu_tc >> 23) & 1))
+				{
 					logerror("MMU: TC invalid!\n");
 					m_mmu_tc &= ~0x80000000;
 					m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
@@ -847,11 +1037,12 @@ void m68851_pmove_put(uint32_t ea, uint16_t modes)
 
 		case 2: // supervisor root pointer
 			temp64 = READ_EA_64(ea);
-			m_mmu_srp_limit = (temp64>>32) & 0xffffffff;
+			m_mmu_srp_limit = (temp64 >> 32) & 0xffffffff;
 			m_mmu_srp_aptr = temp64 & 0xffffffff;
 			MMULOG("PMMU: SRP limit = %08x aptr = %08x\n", m_mmu_srp_limit, m_mmu_srp_aptr);
 			// SRP type 0 is not allowed
-			if ((m_mmu_srp_limit & 3) == 0) {
+			if ((m_mmu_srp_limit & 3) == 0)
+			{
 				m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
 				return;
 			}
@@ -864,15 +1055,15 @@ void m68851_pmove_put(uint32_t ea, uint16_t modes)
 
 		case 3: // CPU root pointer
 			temp64 = READ_EA_64(ea);
-			m_mmu_crp_limit = (temp64>>32) & 0xffffffff;
+			m_mmu_crp_limit = (temp64 >> 32) & 0xffffffff;
 			m_mmu_crp_aptr = temp64 & 0xffffffff;
 			MMULOG("PMMU: CRP limit = %08x aptr = %08x\n", m_mmu_crp_limit, m_mmu_crp_aptr);
 			// CRP type 0 is not allowed
-			if ((m_mmu_crp_limit & 3) == 0) {
+			if ((m_mmu_crp_limit & 3) == 0)
+			{
 				m68ki_exception_trap(EXCEPTION_MMU_CONFIGURATION);
 				return;
 			}
-
 
 			if (!(modes & 0x100))
 			{
@@ -926,11 +1117,13 @@ void m68851_pmove(uint32_t ea, uint16_t modes)
 	case 3: // MC68030 to/from status reg
 		if (modes & 0x200)
 		{
+			MMULOG("%s: read SR = %04x\n", __func__, m_mmu_sr);
 			WRITE_EA_16(ea, m_mmu_sr);
 		}
 		else
 		{
 			m_mmu_sr = READ_EA_16(ea);
+			MMULOG("%s: write SR = %04X\n", __func__, m_mmu_sr);
 		}
 		break;
 
@@ -977,6 +1170,10 @@ void m68851_mmu_ops()
 				}
 				else if ((modes & 0xe200) == 0x2000)    // PFLUSH
 				{
+					if (((modes >> 10) & 7) != 1)
+					{
+						logerror("PFLUSH by fc/ea not supported\n");
+					}
 					pmmu_atc_flush();
 					return;
 				}
@@ -1049,4 +1246,16 @@ inline uint32_t hmmu_translate_addr(uint32_t addr_in)
 	}
 
 	return addr_out;
+}
+
+public:
+int m68851_buserror()
+{
+	if (!m_mmu_tablewalk)
+	{
+		return false;
+	}
+	MMULOG("buserror during table walk\n");
+	m_mmu_tmp_sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
+	return true;
 }
