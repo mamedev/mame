@@ -14,6 +14,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "machine/xavix_mtrk_wheel.h"
 
 class xavix_state : public driver_device
 {
@@ -61,6 +62,11 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(rad_rh_in1_08_r);
 
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -94,7 +100,14 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(extintrf_7901_w);
 	DECLARE_WRITE8_MEMBER(extintrf_7902_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_7a80_w);
+	DECLARE_READ8_MEMBER(ioevent_enable_r);
+	DECLARE_WRITE8_MEMBER(ioevent_enable_w);
+	DECLARE_READ8_MEMBER(ioevent_irqstate_r);
+	DECLARE_WRITE8_MEMBER(ioevent_irqack_w);
+	uint8_t m_ioevent_enable;
+	uint8_t m_ioevent_active;
+	void process_ioevent(uint8_t bits);
+
 	DECLARE_WRITE8_MEMBER(adc_7b00_w);
 	DECLARE_READ8_MEMBER(adc_7b80_r);
 	DECLARE_WRITE8_MEMBER(adc_7b80_w);
@@ -314,6 +327,23 @@ void superxavix_lowbus_map(address_map &map);
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
 	optional_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_mtrk_state : public xavix_state
+{
+public:
+	xavix_mtrk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_wheel(*this, "wheel")
+	{ }
+
+	void xavix_mtrk(machine_config &config);
+	void xavix_mtrkp(machine_config &config);
+
+	CUSTOM_INPUT_MEMBER( mtrk_wheel_r );
+
+protected:
+	required_device<xavix_mtrk_wheel_device> m_wheel;
 };
 
 class xavix_ekara_state : public xavix_state

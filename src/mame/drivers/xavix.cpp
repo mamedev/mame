@@ -400,8 +400,9 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io0_direction_r), FUNC(xavix_state::io0_direction_w));
 	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io1_direction_r), FUNC(xavix_state::io1_direction_w));
 
-	// Interrupt control registers
-	map(0x7a80, 0x7a80).w(FUNC(xavix_state::xavix_7a80_w)); // still IO? ADC related?
+	// IO Event Interrupt control
+	map(0x7a80, 0x7a80).rw(FUNC(xavix_state::ioevent_enable_r), FUNC(xavix_state::ioevent_enable_w));
+	map(0x7a81, 0x7a81).rw(FUNC(xavix_state::ioevent_irqstate_r), FUNC(xavix_state::ioevent_irqack_w));
 
 	// Mouse?
 	map(0x7b00, 0x7b00).w(FUNC(xavix_state::adc_7b00_w)); // rad_snow (not often, why?)
@@ -414,7 +415,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7b81, 0x7b81).rw(FUNC(xavix_state::adc_7b81_r), FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
 
 	// Sleep control
-	//map(7b82, 7b83)
+	//map(0x7b82, 0x7b83)
 
 	// Timer control
 	map(0x7c00, 0x7c00).rw(FUNC(xavix_state::timer_status_r), FUNC(xavix_state::timer_control_w));
@@ -529,6 +530,12 @@ INPUT_PORTS_END
 
 */
 
+CUSTOM_INPUT_MEMBER( xavix_mtrk_state::mtrk_wheel_r )
+{
+	return m_wheel->read_direction();
+}
+
+
 static INPUT_PORTS_START( rad_mtrk )
 	PORT_INCLUDE(xavix)
 
@@ -537,6 +544,8 @@ static INPUT_PORTS_START( rad_mtrk )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Throttle High")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Throttle Low")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Reverse / Back")
+
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_mtrk_state,mtrk_wheel_r, (void *)0)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn")
@@ -869,6 +878,21 @@ MACHINE_CONFIG_START(xavix_state::xavix2000_i2c_24c02)
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrk)
+	xavix(config);
+
+	XAVIX_MTRK_WHEEL(config, m_wheel, 0);
+	m_wheel->event_out_cb().set(FUNC(xavix_state::ioevent_trg08));
+
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrkp)
+	xavix_mtrk(config);
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
+MACHINE_CONFIG_END
+
 
 DEVICE_IMAGE_LOAD_MEMBER( xavix_ekara_state, ekara_cart )
 {
@@ -1043,8 +1067,8 @@ CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state,
 
 CONS( 2000, rad_ping,  0,          0,  xavix,  rad_ping, xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 
-CONS( 2003, rad_mtrk,  0,          0,  xavix,  rad_mtrk, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavixp, rad_mtrkp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2003, rad_mtrk,  0,          0,  xavix_mtrk,  rad_mtrk, xavix_mtrk_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavix_mtrkp, rad_mtrkp,xavix_mtrk_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

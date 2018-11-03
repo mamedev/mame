@@ -129,10 +129,94 @@ WRITE8_MEMBER(xavix_state::extintrf_7902_w)
 	LOG("%s: extintrf_7902_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(xavix_state::xavix_7a80_w)
+
+
+READ8_MEMBER(xavix_state::ioevent_enable_r)
 {
-	LOG("%s: xavix_7a80_w %02x\n", machine().describe_context(), data);
+	LOG("%s: ioevent_enable_r\n", machine().describe_context());
+	return m_ioevent_enable;
 }
+
+WRITE8_MEMBER(xavix_state::ioevent_enable_w)
+{
+	LOG("%s: ioevent_enable_w %02x\n", machine().describe_context(), data);
+	m_ioevent_enable = data;
+}
+
+void xavix_state::process_ioevent(uint8_t bits)
+{
+	if (m_ioevent_enable & bits)
+	{
+		m_ioevent_active |= bits;
+
+		if (m_ioevent_active & 0x0f)
+		{
+			m_irqsource |= 0x08;
+		}
+
+		update_irqs();
+	}
+}
+
+WRITE_LINE_MEMBER(xavix_state::ioevent_trg01)
+{
+	process_ioevent(0x01);
+}
+
+WRITE_LINE_MEMBER(xavix_state::ioevent_trg02)
+{
+	process_ioevent(0x02);
+}
+
+WRITE_LINE_MEMBER(xavix_state::ioevent_trg04)
+{
+	process_ioevent(0x04);
+}
+
+WRITE_LINE_MEMBER(xavix_state::ioevent_trg08)
+{
+	process_ioevent(0x08);
+}
+
+READ8_MEMBER(xavix_state::ioevent_irqstate_r)
+{
+	LOG("%s: ioevent_irqstate_r\n", machine().describe_context());
+	return m_ioevent_active;
+}
+
+WRITE8_MEMBER(xavix_state::ioevent_irqack_w)
+{
+	LOG("%s: ioevent_irqack_w %02x\n", machine().describe_context(), data);
+
+	if (data & 0x01)
+	{
+		m_ioevent_active &= ~0x01;
+	}
+
+	if (data & 0x02)
+	{
+		m_ioevent_active &= ~0x02;
+	}
+
+	if (data & 0x04)
+	{
+		m_ioevent_active &= ~0x04;
+	}
+
+	if (data & 0x08)
+	{
+		m_ioevent_active &= ~0x08;
+	}
+
+	if (!(m_ioevent_active & 0x0f))
+	{
+		m_irqsource &= ~0x08;
+	}
+
+	update_irqs();
+}
+
+
 
 WRITE8_MEMBER(xavix_state::adc_7b00_w)
 {
@@ -564,15 +648,16 @@ READ8_MEMBER(xavix_state::irq_source_r)
 {
 	/* the 2nd IRQ routine (regular IRQ) reads here before deciding what to do
 
-	 the following bits have been seen to be checked (active low?)
+	 the following bits have been seen to be checked (active high)
 	 monster truck does most extensive checking
 
 	  0x80 - Sound Irq
-	  0x40 - Picture / Arena Irq?
+	  0x40 - Picture / Arena Irq? (including raster interrupt)
 	  0x20 - DMA Irq  (most routines check this as first priority, and ignore other requests if it is set?)
 	  0x10 - Timer / Counter IRQ
-	  0x08 - IO Irq (ADC? - used for analog control on Monster Truck) (uses 7a80 top bit to determine direction, and 7a81 0x08 as an output, presumably to clock)
-	  0x04 - ADC IRQ - loads/stores 7b81
+	  0x08 - IO Event Irq (uses 7a00 top bit to determine direction, enabled with 0x08 on 7a80, IRQ acked / cleared with 0x08 written to 7a81, 4 possible sources with different bits in 7a80 / 7a81 ? )
+	         (this is the type of interrupt where the irq frequency adds a counter which determines analog value)
+	  0x04 - ADC Conversion IRQ - loads/stores 7b81 (to ack interrupt)
 	*/
 
 	LOG("%s: irq_source_r\n", machine().describe_context());
@@ -651,6 +736,9 @@ void xavix_state::machine_reset()
 	m_irqsource = 0x00;
 
 	m_timer_control = 0x00;
+
+	m_ioevent_enable = 0x00;
+	m_ioevent_active = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
