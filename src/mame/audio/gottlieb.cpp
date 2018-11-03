@@ -182,7 +182,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(
 //  write - handle an external command write
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r1_device::write )
+void gottlieb_sound_r1_device::write(u8 data)
 {
 	// write the command data to the low 6 bits, and the trigger to the upper bit
 	uint8_t pa7 = (data & 0x0f) != 0xf;
@@ -416,7 +416,7 @@ gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r2_device::write )
+void gottlieb_sound_r2_device::write(u8 data)
 {
 	// when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested
 	if (data != 0xff)
