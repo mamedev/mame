@@ -15,6 +15,7 @@
 #include "bus/generic/carts.h"
 
 #include "machine/xavix_mtrk_wheel.h"
+#include "machine/xavix_madfb_ball.h"
 
 class xavix_state : public driver_device
 {
@@ -86,12 +87,8 @@ void superxavix_lowbus_map(address_map &map);
 
 	virtual void video_start() override;
 
-	DECLARE_READ8_MEMBER(main_r);
-	DECLARE_WRITE8_MEMBER(main_w);
-	DECLARE_READ8_MEMBER(main2_r);
-	DECLARE_WRITE8_MEMBER(main2_w);
-	DECLARE_READ8_MEMBER(main3_r);
-	DECLARE_WRITE8_MEMBER(main3_w);
+	DECLARE_READ8_MEMBER(opcodes_000000_r);
+	DECLARE_READ8_MEMBER(opcodes_800000_r);
 
 	DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
 	DECLARE_WRITE8_MEMBER(extbus_w) { logerror("write to external bus %06x %02x\n", offset, data); }
@@ -201,10 +198,18 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(timer_baseval_w);
 	DECLARE_READ8_MEMBER(timer_freq_r);
 	DECLARE_WRITE8_MEMBER(timer_freq_w);
+	DECLARE_READ8_MEMBER(timer_curval_r);
 	uint8_t m_timer_control;
 	uint8_t m_timer_freq;
 	TIMER_CALLBACK_MEMBER(freq_timer_done);
 	emu_timer *m_freq_timer;
+
+	DECLARE_WRITE8_MEMBER(palram_sh_w);
+	DECLARE_WRITE8_MEMBER(palram_l_w);
+	DECLARE_WRITE8_MEMBER(colmix_sh_w);
+	DECLARE_WRITE8_MEMBER(colmix_l_w);
+	DECLARE_WRITE8_MEMBER(bmp_palram_sh_w);
+	DECLARE_WRITE8_MEMBER(bmp_palram_l_w);
 
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
@@ -300,7 +305,7 @@ void superxavix_lowbus_map(address_map &map);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* ramsh, uint8_t* raml, int size, int basecol);
+	void update_pen(int pen, uint8_t shval, uint8_t lval);
 	double hue2rgb(double p, double q, double t);
 	void draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
 	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
@@ -345,6 +350,21 @@ public:
 protected:
 	required_device<xavix_mtrk_wheel_device> m_wheel;
 };
+
+class xavix_madfb_state : public xavix_state
+{
+public:
+	xavix_madfb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_ball(*this, "ball")
+	{ }
+
+	void xavix_madfb(machine_config &config);
+
+protected:
+	required_device<xavix_madfb_ball_device> m_ball;
+};
+
 
 class xavix_ekara_state : public xavix_state
 {

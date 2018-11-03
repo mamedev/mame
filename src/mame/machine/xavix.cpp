@@ -268,7 +268,15 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 }
 
 
+WRITE8_MEMBER(xavix_state::colmix_sh_w)
+{
+	m_colmix_sh[offset] = data;
+}
 
+WRITE8_MEMBER(xavix_state::colmix_l_w)
+{
+	m_colmix_l[offset] = data;
+}
 
 WRITE8_MEMBER(xavix_state::colmix_6ff2_w)
 {
@@ -531,6 +539,14 @@ READ8_MEMBER(xavix_state::timer_freq_r)
 	LOG("%s: timer_freq_r\n", machine().describe_context());
 	return m_timer_freq;
 }
+
+READ8_MEMBER(xavix_state::timer_curval_r)
+{
+	// TODO implement properly with timers etc. as rad_fb / rad_madfb rely on these values to calculate throw strength!
+	LOG("%s: timer_curval_r\n", machine().describe_context());
+	return machine().rand();
+}
+
 
 WRITE8_MEMBER(xavix_state::timer_freq_w)
 {

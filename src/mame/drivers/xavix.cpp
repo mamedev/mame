@@ -209,30 +209,6 @@
 // NTSC clock for regular XaviX?
 #define MAIN_CLOCK XTAL(21'477'272)
 
-READ8_MEMBER(xavix_state::main_r)
-{
-	if (offset & 0x8000)
-	{
-		return m_rgn[(offset) & (m_rgnlen - 1)];
-	}
-	else
-	{
-		return m_lowbus->read8(space, offset & 0x7fff);
-	}
-}
-
-WRITE8_MEMBER(xavix_state::main_w)
-{
-	if (offset & 0x8000)
-	{
-		logerror("write to ROM area?\n");
-	}
-	else
-	{
-		m_lowbus->write8(space, offset & 0x7fff, data);
-	}
-}
-
 /* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably
    the CPU 0 page memory and stack are still at 0 but ROM must be in the 3xxx range (game hasn't got far enough to call this yet to help either)
 
@@ -259,7 +235,8 @@ WRITE8_MEMBER(xavix_state::main_w)
 
 
 */
-READ8_MEMBER(xavix_state::main2_r)
+
+READ8_MEMBER(xavix_state::opcodes_000000_r)
 {
 	if (offset & 0x8000)
 	{
@@ -267,35 +244,21 @@ READ8_MEMBER(xavix_state::main2_r)
 	}
 	else
 	{
-		if ((offset & 0xffff) >= 0x200)
-		{
-			return m_rgn[(offset) & (m_rgnlen - 1)];
-		}
-		else
-			return m_lowbus->read8(space, offset & 0x7fff);
+		return m_lowbus->read8(space, offset & 0x7fff);
 	}
 }
 
-WRITE8_MEMBER(xavix_state::main2_w)
+READ8_MEMBER(xavix_state::opcodes_800000_r)
 {
-	if (offset & 0x8000)
-	{
-		logerror("write to ROM area?\n");
-	}
-	else
-	{
-		if ((offset & 0xffff) >= 0x200)
-			logerror("write to ROM area?\n");
-		else
-			m_lowbus->write8(space, offset & 0x7fff, data);
-	}
+	// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
+	return m_rgn[(offset) & (m_rgnlen - 1)];
 }
 
 // this is only used for opcode / oprand reads, data memory addressing is handled in core, doing the opcode / oprand addressing in core causes disassembly issues when running from lowbus space (ram, interrupts on most games)
 void xavix_state::xavix_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
-	map(0x800000, 0xffffff).rw(FUNC(xavix_state::main2_r), FUNC(xavix_state::main2_w));
+	map(0x000000, 0x7fffff).r(FUNC(xavix_state::opcodes_000000_r));
+	map(0x800000, 0xffffff).r(FUNC(xavix_state::opcodes_800000_r));
 }
 
 // this is used by data reads / writes after some processing in the core to decide if data reads can see lowbus, zeropage, stack, bank registers etc. and only falls through to here on a true external bus access
@@ -316,8 +279,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6000, 0x67ff).ram().share("fragment_sprite");
 
 	// Palette RAM
-	map(0x6800, 0x68ff).ram().share("palram_sh");
-	map(0x6900, 0x69ff).ram().share("palram_l");
+	map(0x6800, 0x68ff).ram().w(FUNC(xavix_state::palram_sh_w)).share("palram_sh");
+	map(0x6900, 0x69ff).ram().w(FUNC(xavix_state::palram_l_w)).share("palram_l");
 
 	// Segment RAM
 	map(0x6a00, 0x6a1f).ram().share("segment_regs"); // test mode, pass flag 0x20
@@ -342,8 +305,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fea, 0x6fea).rw(FUNC(xavix_state::arena_control_r), FUNC(xavix_state::arena_control_w));
 
 	// Colour Mixing / Enabling Registers
-	map(0x6ff0, 0x6ff0).ram().share("colmix_sh"); // a single colour (for effects?) not bgpen
-	map(0x6ff1, 0x6ff1).ram().share("colmix_l");
+	map(0x6ff0, 0x6ff0).ram().w(FUNC(xavix_state::colmix_sh_w)).share("colmix_sh"); // effect colour?
+	map(0x6ff1, 0x6ff1).ram().w(FUNC(xavix_state::colmix_l_w)).share("colmix_l");
 	map(0x6ff2, 0x6ff2).ram().w(FUNC(xavix_state::colmix_6ff2_w)).share("colmix_ctrl"); // set to 07 after clearing above things in interrupt 0
 
 	// Display Control Register / Status Flags
@@ -421,6 +384,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7c00, 0x7c00).rw(FUNC(xavix_state::timer_status_r), FUNC(xavix_state::timer_control_w));
 	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::timer_baseval_r), FUNC(xavix_state::timer_baseval_w)); // r/w tested
 	map(0x7c02, 0x7c02).rw(FUNC(xavix_state::timer_freq_r), FUNC(xavix_state::timer_freq_w));
+	map(0x7c03, 0x7c03).r(FUNC(xavix_state::timer_curval_r));
 
 	// Barrel Shifter registers
 	// map(0x7ff0, 0x7ff1)
@@ -444,8 +408,8 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 	xavix_lowbus_map(map);
 
 	// bitmap layer palette
-	map(0x6c00, 0x6cff).ram().share("bmp_palram_sh");
-	map(0x6d00, 0x6dff).ram().share("bmp_palram_l");
+	map(0x6c00, 0x6cff).ram().w(FUNC(xavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
+	map(0x6d00, 0x6dff).ram().w(FUNC(xavix_state::bmp_palram_l_w)).share("bmp_palram_l");
 
 	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 }
@@ -720,6 +684,21 @@ static INPUT_PORTS_START( ttv_mx )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( rad_fb )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
 CUSTOM_INPUT_MEMBER( xavix_state::rad_rh_in1_08_r )
 {
 	// it's unclear what rad_rh wants here
@@ -819,7 +798,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
 
-	MCFG_PALETTE_ADD("palette", 256 + 1)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -861,7 +840,7 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 512+1)
+	MCFG_PALETTE_ADD("palette", 512)
 
 MACHINE_CONFIG_END
 
@@ -893,6 +872,13 @@ MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrkp)
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(xavix_madfb_state::xavix_madfb)
+	xavix(config);
+
+	XAVIX_MADFB_BALL(config, m_ball, 0);
+	m_ball->event_out_cb().set(FUNC(xavix_state::ioevent_trg01));
+
+MACHINE_CONFIG_END
 
 DEVICE_IMAGE_LOAD_MEMBER( xavix_ekara_state, ekara_cart )
 {
@@ -907,7 +893,6 @@ DEVICE_IMAGE_LOAD_MEMBER( xavix_ekara_state, ekara_cart )
 	return image_init_result::PASS;
 }
 
-
 MACHINE_CONFIG_START(xavix_ekara_state::xavix_ekara)
 	xavix(config);
 
@@ -920,10 +905,6 @@ MACHINE_CONFIG_START(xavix_ekara_state::xavix_ekara)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ekara")
 
 MACHINE_CONFIG_END
-
-
-
-
 
 void xavix_state::init_xavix()
 {
@@ -1055,7 +1036,7 @@ ROM_START( has_wamg )
 	ROM_LOAD( "minigolf.bin", 0x000000, 0x400000, CRC(35cee2ad) SHA1(c7344e8ba336bc329638485ea571cd731ebf7649) )
 ROM_END
 
-/* Standalone TV Games */
+/* XaviX hardware titles */
 
 CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
@@ -1085,9 +1066,9 @@ CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_xavix
 CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // no Play TV branding, USA only release?
+CONS( 2003, rad_madf,  0,          0,  xavix_madfb,  rad_fb,    xavix_madfb_state, init_xavix,    "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // no Play TV branding, USA only release?
 
-CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // USA only release? doesn't change logo for PAL
+CONS( 200?, rad_fb,    0,          0,  xavix_madfb,  rad_fb,    xavix_madfb_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // USA only release? doesn't change logo for PAL.
 
 CONS( 200?, rad_rh,    0,          0,  xavix,  rad_rh,   xavix_state, init_xavix,    "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
@@ -1097,6 +1078,8 @@ CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix
 
 CONS( 200?, ekara,    0,          0,  xavix_ekara,  ekara,    xavix_ekara_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",   "e-kara (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT)
 
+/* SuperXaviX hardware titles */
+
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
 */
@@ -1105,9 +1088,6 @@ ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
 ROM_END
-
-/* Tiger games have extended opcodes too */
-
 
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
