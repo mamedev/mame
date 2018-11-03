@@ -15,6 +15,7 @@
 #include "bus/generic/carts.h"
 
 #include "machine/xavix_mtrk_wheel.h"
+#include "machine/xavix_madfb_ball.h"
 
 class xavix_state : public driver_device
 {
@@ -341,6 +342,21 @@ public:
 protected:
 	required_device<xavix_mtrk_wheel_device> m_wheel;
 };
+
+class xavix_madfb_state : public xavix_state
+{
+public:
+	xavix_madfb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_ball(*this, "ball")
+	{ }
+
+	void xavix_madfb(machine_config &config);
+
+protected:
+	required_device<xavix_madfb_ball_device> m_ball;
+};
+
 
 class xavix_ekara_state : public xavix_state
 {
