@@ -1727,9 +1727,9 @@ void lua_engine::initialize()
 				}));
 
 /* machine.screens[screen_tag]
- * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol
+ * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol, color is 32bit argb
  * screen:draw_line(x1, y1, x2, y2, linecol) - draw line from (x1, y1)-(x2, y2) colored linecol
- * screen:draw_text(x || justify, y, message, [opt] color) - draw message at (x, y) or at line y with left, right, center justification
+ * screen:draw_text(x || justify, y, message, [opt] fgcolor, [opt] bgcolor) - draw message at (x, y) or at line y with left, right, center justification
  * screen:height() - screen height
  * screen:width() - screen width
  * screen:orientation() - screen angle, flipx, flipy
@@ -1763,7 +1763,7 @@ void lua_engine::initialize()
 					y2 = std::min(std::max(0.0f, y2), float(sc_height-1)) / float(sc_height);
 					sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				},
-			"draw_text", [this](screen_device &sdev, sol::object xobj, float y, const char *msg, sol::object color) {
+			"draw_text", [this](screen_device &sdev, sol::object xobj, float y, const char *msg, sol::object color, sol::object bcolor) {
 					int sc_width = sdev.visible_area().width();
 					int sc_height = sdev.visible_area().height();
 					auto justify = ui::text_layout::LEFT;
@@ -1787,12 +1787,13 @@ void lua_engine::initialize()
 						return;
 					}
 					rgb_t textcolor = UI_TEXT_COLOR;
-					rgb_t bgcolor = UI_TEXT_BG_COLOR;
+					rgb_t bgcolor = 0;
 					if(color.is<uint32_t>())
 						textcolor = rgb_t(color.as<uint32_t>());
+					if(bcolor.is<uint32_t>())
+						bgcolor = rgb_t(bcolor.as<uint32_t>());
 					mame_machine_manager::instance()->ui().draw_text_full(sdev.container(), msg, x, y, (1.0f - x),
-										justify, ui::text_layout::WORD, mame_ui_manager::NORMAL, textcolor,
-										bgcolor, nullptr, nullptr);
+										justify, ui::text_layout::WORD, mame_ui_manager::OPAQUE_, textcolor, bgcolor);
 				},
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
 			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },
