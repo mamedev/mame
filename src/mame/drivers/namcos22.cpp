@@ -3056,7 +3056,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 		const int base = 750;
 		const int range = 100000;
 
-		attotime freq = attotime::from_usec(base + range * (1.0 / fabs(pedal)));
+		attotime freq = attotime::from_usec(base + range * (1.0 / abs(pedal)));
 		m_pc_pedal_interrupt->adjust(std::min(freq, m_pc_pedal_interrupt->time_left()), pedal < 0, freq);
 	}
 	else
