@@ -60,25 +60,25 @@ void xavix_state::video_start()
 WRITE8_MEMBER(xavix_state::palram_sh_w)
 {
 	m_palram_sh[offset] = data;
-	update_pen(offset, m_palram_sh, m_palram_l);
+	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
 }
 
 WRITE8_MEMBER(xavix_state::palram_l_w)
 {
 	m_palram_l[offset] = data;
-	update_pen(offset, m_palram_sh, m_palram_l);
+	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
 }
 
 WRITE8_MEMBER(xavix_state::bmp_palram_sh_w)
 {
 	m_bmp_palram_sh[offset] = data;
-	update_pen(offset+256, m_bmp_palram_sh, m_bmp_palram_l);
+	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
 }
 
 WRITE8_MEMBER(xavix_state::bmp_palram_l_w)
 {
 	m_bmp_palram_l[offset] = data;
-	update_pen(offset+256, m_bmp_palram_sh, m_bmp_palram_l);
+	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
 }
 
 
@@ -92,11 +92,11 @@ double xavix_state::hue2rgb(double p, double q, double t)
 	return p;
 }
 
-void xavix_state::update_pen(int pen, uint8_t* ramsh, uint8_t* raml)
+void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 {
 	uint16_t dat;
-	dat = ramsh[pen];
-	dat |= raml[pen] << 8;
+	dat = shval;
+	dat |= lval << 8;
 
 	int l_raw = (dat & 0x1f00) >> 8;
 	int s_raw = (dat & 0x00e0) >> 5;
