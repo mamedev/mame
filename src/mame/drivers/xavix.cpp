@@ -384,6 +384,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7c00, 0x7c00).rw(FUNC(xavix_state::timer_status_r), FUNC(xavix_state::timer_control_w));
 	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::timer_baseval_r), FUNC(xavix_state::timer_baseval_w)); // r/w tested
 	map(0x7c02, 0x7c02).rw(FUNC(xavix_state::timer_freq_r), FUNC(xavix_state::timer_freq_w));
+	map(0x7c03, 0x7c03).r(FUNC(xavix_state::timer_curval_r));
 
 	// Barrel Shifter registers
 	// map(0x7ff0, 0x7ff1)
@@ -683,6 +684,21 @@ static INPUT_PORTS_START( ttv_mx )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( rad_fb )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
 CUSTOM_INPUT_MEMBER( xavix_state::rad_rh_in1_08_r )
 {
 	// it's unclear what rad_rh wants here
@@ -877,7 +893,6 @@ DEVICE_IMAGE_LOAD_MEMBER( xavix_ekara_state, ekara_cart )
 	return image_init_result::PASS;
 }
 
-
 MACHINE_CONFIG_START(xavix_ekara_state::xavix_ekara)
 	xavix(config);
 
@@ -890,10 +905,6 @@ MACHINE_CONFIG_START(xavix_ekara_state::xavix_ekara)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ekara")
 
 MACHINE_CONFIG_END
-
-
-
-
 
 void xavix_state::init_xavix()
 {
@@ -1025,7 +1036,7 @@ ROM_START( has_wamg )
 	ROM_LOAD( "minigolf.bin", 0x000000, 0x400000, CRC(35cee2ad) SHA1(c7344e8ba336bc329638485ea571cd731ebf7649) )
 ROM_END
 
-/* Standalone TV Games */
+/* XaviX hardware titles */
 
 CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
@@ -1055,9 +1066,9 @@ CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_xavix
 CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 2003, rad_madf,  0,          0,  xavix_madfb,  xavix,    xavix_madfb_state, init_xavix,    "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // no Play TV branding, USA only release?
+CONS( 2003, rad_madf,  0,          0,  xavix_madfb,  rad_fb,    xavix_madfb_state, init_xavix,    "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // no Play TV branding, USA only release?
 
-CONS( 200?, rad_fb,    0,          0,  xavix_madfb,  xavix,    xavix_madfb_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // USA only release? doesn't change logo for PAL
+CONS( 200?, rad_fb,    0,          0,  xavix_madfb,  rad_fb,    xavix_madfb_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // USA only release? doesn't change logo for PAL.
 
 CONS( 200?, rad_rh,    0,          0,  xavix,  rad_rh,   xavix_state, init_xavix,    "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
@@ -1067,6 +1078,8 @@ CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix
 
 CONS( 200?, ekara,    0,          0,  xavix_ekara,  ekara,    xavix_ekara_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",   "e-kara (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT)
 
+/* SuperXaviX hardware titles */
+
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
 */
@@ -1075,9 +1088,6 @@ ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
 ROM_END
-
-/* Tiger games have extended opcodes too */
-
 
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )

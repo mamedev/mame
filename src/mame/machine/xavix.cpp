@@ -532,6 +532,14 @@ READ8_MEMBER(xavix_state::timer_freq_r)
 	return m_timer_freq;
 }
 
+READ8_MEMBER(xavix_state::timer_curval_r)
+{
+	// TODO implement properly with timers etc. as rad_fb / rad_madfb rely on these values to calculate throw strength!
+	LOG("%s: timer_curval_r\n", machine().describe_context());
+	return machine().rand();
+}
+
+
 WRITE8_MEMBER(xavix_state::timer_freq_w)
 {
 	// 4-bit prescale

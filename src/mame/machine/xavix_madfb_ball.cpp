@@ -9,6 +9,8 @@
 	seems to register a pulse when you move it, and another when it stops moving
 	game uses current timer register (without interrupt) to measure time between pulses 
 	to get 'throw' value
+
+	need to verify with code and work out how best to handle this
 */
 
 #include "emu.h"
@@ -34,7 +36,7 @@ void xavix_madfb_ball_device::check_ball()
 {
 	uint8_t ballval = m_in->read();
 
-	if (ballval == 0x80)
+	if (ballval == 0x00)
 	{
 		m_event_timer->adjust(attotime::never, 0);
 		m_is_running = 0;
@@ -42,7 +44,7 @@ void xavix_madfb_ball_device::check_ball()
 	else
 	{
 		// TODO: set frequency based on value
-		m_event_timer->adjust(attotime::from_hz(20), 0);
+		m_event_timer->adjust(attotime::from_hz(800), 0);
 		m_is_running = 1;
 	}
 }
@@ -62,7 +64,7 @@ INPUT_CHANGED_MEMBER( xavix_madfb_ball_device::changed )
 
 static INPUT_PORTS_START( ball )
 	PORT_START("BALL")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CHANGED_MEMBER(DEVICE_SELF, xavix_madfb_ball_device, changed, nullptr)
 INPUT_PORTS_END
 
 
