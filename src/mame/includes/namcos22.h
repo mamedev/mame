@@ -12,7 +12,9 @@
 #pragma once
 
 #include "machine/eeprompar.h"
+#include "machine/mb87078.h"
 #include "machine/timer.h"
+#include "sound/c352.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
 #include "emupal.h"
@@ -193,8 +195,10 @@ public:
 		m_slave(*this, "slave"),
 		m_mcu(*this, "mcu"),
 		m_iomcu(*this, "iomcu"),
-		m_shareram(*this, "shareram"),
 		m_eeprom(*this, "eeprom"),
+		m_mb87078(*this, "mb87078"),
+		m_c352(*this, "c352"),
+		m_shareram(*this, "shareram"),
 		m_slave_extram(*this, "slaveextram"),
 		m_master_extram(*this, "masterextram"),
 		m_paletteram(*this, "paletteram"),
@@ -212,11 +216,7 @@ public:
 		m_dsw(*this, "DSW"),
 		m_inputs(*this, "INPUTS"),
 		m_custom(*this, "CUSTOM.%u", 0),
-		m_pedal(*this, "PEDAL"),
-		m_trackx(*this, "TRACKX"),
-		m_tracky(*this, "TRACKY"),
-		m_lightx(*this, "LIGHTX"),
-		m_lighty(*this, "LIGHTY"),
+		m_opt(*this, "OPT.%u", 0),
 		m_mcuout(*this, "mcuout%u", 0U),
 		m_cpuled(*this, "cpuled%u", 0U)
 	{ }
@@ -355,6 +355,8 @@ private:
 	DECLARE_READ32_MEMBER(alpinesa_prot_r);
 	DECLARE_WRITE32_MEMBER(alpinesa_prot_w);
 	DECLARE_WRITE32_MEMBER(namcos22s_chipselect_w);
+	DECLARE_WRITE8_MEMBER(ss22_volume_w);
+	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 	DECLARE_WRITE8_MEMBER(mcu_port4_w);
 	DECLARE_READ8_MEMBER(mcu_port4_r);
 	DECLARE_WRITE8_MEMBER(mcu_port5_w);
@@ -473,8 +475,10 @@ private:
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_mcu;
 	optional_device<cpu_device> m_iomcu;
-	required_shared_ptr<u16> m_shareram;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
+	optional_device<mb87078_device> m_mb87078;
+	required_device<c352_device> m_c352;
+	required_shared_ptr<u16> m_shareram;
 	required_shared_ptr<u16> m_slave_extram;
 	required_shared_ptr<u16> m_master_extram;
 	required_shared_ptr<u32> m_paletteram;
@@ -492,11 +496,7 @@ private:
 	required_ioport m_dsw;
 	required_ioport m_inputs;
 	optional_ioport_array<2> m_custom;
-	optional_ioport m_pedal;
-	optional_ioport m_trackx;
-	optional_ioport m_tracky;
-	optional_ioport m_lightx;
-	optional_ioport m_lighty;
+	optional_ioport_array<2> m_opt;
 	output_finder<16> m_mcuout;
 	output_finder<8> m_cpuled;
 

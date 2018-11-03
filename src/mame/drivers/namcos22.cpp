@@ -12,7 +12,7 @@
  *
  * TODO:
  * - finish slave DSP emulation
- * - emulate System22 I/O board C74
+ * - emulate System22 I/O board C74 instead of HLE (inputs, outputs, volume control - HLE only handles the inputs)
  * - alpinesa doesn't work, protection related?
  * - C139 for linked cabinets, as well as in RR fullscale
  * - confirm DSP and MCU clocks and their IRQ timing
@@ -1196,7 +1196,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "machine/namcomcu.h"
-#include "sound/c352.h"
 #include "speaker.h"
 
 // 51.2MHz XTAL on video board, pixel clock of 12.8MHz (doubled in MAME because of unemulated interlacing)
@@ -1992,16 +1991,16 @@ void namcos22_state::namcos22s_am(address_map &map)
 // Time Crisis gun
 READ16_MEMBER(namcos22_state::namcos22_gun_r)
 {
-	u16 xpos = m_lightx->read();
-	u16 ypos = m_lighty->read();
+	u16 xpos = m_opt[0]->read();
+	u16 ypos = m_opt[1]->read();
 	// ypos is not completely understood yet, there should be a difference between case 1 and 2
 	// game determines real y = 430004 + 430008
 
 	// use screen edges for off-screen
-	const u16 xmin = m_lightx->field(0xffff)->minval();
-	const u16 xmax = m_lightx->field(0xffff)->maxval();
-	const u16 ymin = m_lighty->field(0xffff)->minval();
-	const u16 ymax = m_lighty->field(0xffff)->maxval();
+	const u16 xmin = m_opt[0]->field(0xffff)->minval();
+	const u16 xmax = m_opt[0]->field(0xffff)->maxval();
+	const u16 ymin = m_opt[1]->field(0xffff)->minval();
+	const u16 ymax = m_opt[1]->field(0xffff)->maxval();
 	if (xpos == xmin || xpos == xmax || ypos == ymin || ypos == ymax)
 		xpos = ypos = 0;
 
@@ -2743,6 +2742,29 @@ void namcos22_state::iomcu_s22_io(address_map &map)
 
 // System Super22 M37710
 
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
+{
+	int scanline = param;
+
+	/* TODO: real sources of these */
+	if (scanline == 480)
+		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+	else if (scanline == 0)
+		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+	else if (scanline == 240)
+		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
+}
+
+WRITE8_MEMBER(namcos22_state::ss22_volume_w)
+{
+	m_mb87078->data_w(data, offset);
+}
+
+WRITE8_MEMBER(namcos22_state::mb87078_gain_changed)
+{
+	m_c352->set_output_gain(offset ^ 3, data / 100.0);
+}
+
 /*
   SS22 MCU outputs
   ----------------
@@ -2862,9 +2884,9 @@ void namcos22_state::mcu_program(address_map &map)
 	map(0x004000, 0x00bfff).ram().share("shareram");
 	map(0x00c000, 0x00ffff).rom().region("mcu", 0xc000);
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
-	map(0x300000, 0x300001).nopr(); // ? (cybrcycc, alpinesa)
+	map(0x300000, 0x300001).nopr(); // ? (cybrcycc, alpinesa - writes data to RAM, but then never reads from there)
 	map(0x301000, 0x301001).nopw(); // watchdog? LEDs?
-	map(0x308000, 0x308003).nopw(); // volume control IC?
+	map(0x308000, 0x308003).w(FUNC(namcos22_state::ss22_volume_w)).umask16(0x00ff);
 }
 
 void namcos22_state::mcu_io(address_map &map)
@@ -2875,18 +2897,6 @@ void namcos22_state::mcu_io(address_map &map)
 	map(M37710_ADC0_L, M37710_ADC7_H).r(FUNC(namcos22_state::namcos22s_mcu_adc_r));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
-{
-	int scanline = param;
-
-	/* TODO: real sources of these */
-	if (scanline == 480)
-		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
-	else if (scanline == 0)
-		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-	else if (scanline == 240)
-		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
-}
 
 /*********************************************************************************************/
 
@@ -3025,15 +3035,16 @@ void namcos22_state::alpine_io_map(address_map &map)
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
 {
+	m_mcu->set_input_line(M37710_LINE_TIMERA3OUT, param ? ASSERT_LINE : CLEAR_LINE);
 	m_mcu->pulse_input_line(M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 {
 	// arbitrary timer for reading optical pedal
-	u8 i = m_pedal->read();
+	int pedal = m_opt[0]->read() - 0x80;
 
-	if (i != 0)
+	if (pedal != 0)
 	{
 		// the pedal has a simple 1-bit "light interrupted" sensor. the faster you pedal,
 		// the faster it pulses.  this is connected to the clock input for timer A3,
@@ -3045,8 +3056,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 		const int base = 750;
 		const int range = 100000;
 
-		attotime freq = attotime::from_usec(base + range * (1.0 / (double)i));
-		m_pc_pedal_interrupt->adjust(std::min(freq, m_pc_pedal_interrupt->time_left()), 0, freq);
+		attotime freq = attotime::from_usec(base + range * (1.0 / fabs(pedal)));
+		m_pc_pedal_interrupt->adjust(std::min(freq, m_pc_pedal_interrupt->time_left()), pedal < 0, freq);
 	}
 	else
 	{
@@ -3060,63 +3071,43 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 
 TIMER_CALLBACK_MEMBER(namcos22_state::adillor_trackball_interrupt)
 {
-	m_mcu->pulse_input_line(param ? M37710_LINE_TIMERA2IN : M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
+	m_mcu->set_input_line((param & 1) ? M37710_LINE_TIMERA2OUT : M37710_LINE_TIMERA3OUT, (param & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_mcu->pulse_input_line((param & 1) ? M37710_LINE_TIMERA2IN : M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 {
 	// arbitrary timer for reading optical trackball
-	u8 ix = m_trackx->read();
-	u8 iy = m_tracky->read();
+	// -1.0 .. 1.0
+	double x = (double)(int)(m_opt[0]->read() - 0x80) / 127.0;
+	double y = (double)(int)(m_opt[1]->read() - 0x80) / 127.0;
 
-	if (ix != 0x80 || iy < 0x80)
+	// note that it is rotated by 45 degrees, so instead of axes like (+), they are like (x)
+	double ox = x, oy = y;
+	double a = M_PI / 4.0;
+	x = ox*cos(a) - oy*sin(a);
+	y = ox*sin(a) + oy*cos(a);
+
+	// tied to mcu A2/A3 timer (speed determines frequency)
+	double t[2];
+	t[0] = fabs(y); // y -> A2
+	t[1] = fabs(x); // x -> A3
+	int params[2] = { (y >= 0.0) ? 2 : 0, (x <= 0.0) ? 3 : 1 };
+
+	// these values(in hz) may need tweaking:
+	const double base = 20;
+	const double range = 1250;
+
+	for (int axis = 0; axis < 2; axis++)
 	{
-		if (iy >= 0x80)
-			iy = 0x7f;
-		double x = (double)(ix - 0x80) / 127.0;
-		double y = (double)(0x80 - iy) / 127.0;
-
-		// normalize
-		double a = atan(x/y);
-		double p = sqrt(x*x + y*y);
-		double v = (fabs(a) < (M_PI / 4.0)) ? p*cos(a) : p*sin(a);
-		v = fabs(v);
-
-		// note that it is rotated by 45 degrees, so instead of axes like (+), they are like (x)
-		a += (M_PI / 4.0);
-		if (a < 0)
-			a = 0;
-		else if (a > (M_PI / 2.0))
-			a = M_PI / 2.0;
-
-		// tied to mcu A2/A3 timer (speed determines frequency)
-		// these values(in hz) may need tweaking:
-		const double base = 20;
-		const double range = 1250;
-
-		double t[2];
-		t[0] = v*sin(a); // y -> A2
-		t[1] = v*cos(a); // x -> A3
-
-		for (int axis = 0; axis < 2; axis++)
+		if (t[axis] > (1.0 / range))
 		{
-			if (t[axis] > (1.0 / range))
-			{
-				attotime freq = attotime::from_hz(base + range * t[axis]);
-				m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->remaining()), axis, freq);
-			}
-			else
-			{
-				// not moving
-				m_ar_tb_interrupt[axis]->adjust(attotime::never, axis, attotime::never);
-			}
+			attotime freq = attotime::from_hz(base + range * t[axis]);
+			m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->remaining()), params[axis], freq);
 		}
-	}
-	else
-	{
-		// both axes not moving
-		for (int axis = 0; axis < 2; axis++)
+		else
 		{
+			// not moving
 			m_ar_tb_interrupt[axis]->adjust(attotime::never, axis, attotime::never);
 		}
 	}
@@ -3192,9 +3183,7 @@ static INPUT_PORTS_START( ridgeracf )
 	// DIP3-1 to DIP3-3 are for setting up the viewing angle (game used one board per screen?)
 	// Some of the other dipswitches are for debugging, like with Ridge Racer 2.
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0001, 0x0000, "Unknown" ) PORT_DIPLOCATION("SW2:1") // always on?
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )
 	PORT_DIPNAME( 0x0002, 0x0000, "Unknown" ) PORT_DIPLOCATION("SW2:2") // always on?
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -3435,7 +3424,7 @@ static INPUT_PORTS_START( airco22 )
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x100, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(12)
 
 	PORT_START("ADC.2") // throttle stick auto-centers
-	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x100, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(12) PORT_PLAYER(2) PORT_NAME("Throttle Stick")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Z ) PORT_MINMAX(0x100, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(12) PORT_NAME("Throttle Stick")
 
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
@@ -3606,11 +3595,11 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TRACKX")
+	PORT_START("OPT.0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Trackball X")
 
-	PORT_START("TRACKY")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Trackball Y")
+	PORT_START("OPT.1")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Trackball Y") PORT_REVERSE
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
@@ -3660,8 +3649,8 @@ static INPUT_PORTS_START( propcycl )
 	PORT_START("ADC.1")
 	PORT_BIT( 0x3ff, 0x1ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x0bf, 0x33f) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
-	PORT_START("PEDAL")
-	PORT_BIT( 0x7f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_START("OPT.0")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Cycle Pedal")
 
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
@@ -3687,10 +3676,10 @@ static INPUT_PORTS_START( timecris )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START( "LIGHTX" ) // tuned for CRT
+	PORT_START("OPT.0") // tuned for CRT
 	PORT_BIT( 0xffff, 68+626/2, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(68, 68+626) PORT_SENSITIVITY(48) PORT_KEYDELTA(10)
 
-	PORT_START( "LIGHTY" ) // tuned for CRT - can't shoot below the statusbar?
+	PORT_START("OPT.1") // tuned for CRT - can't shoot below the statusbar?
 	PORT_BIT( 0xffff, 43+241/2, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(43, 43+241) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
 
 	PORT_START("DSW")
@@ -3979,6 +3968,9 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000)) // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	MCFG_DEVICE_REMOVE("iomcu")
+
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(namcos22_state::mb87078_gain_changed));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -4836,7 +4828,6 @@ ROM_START( victlapj )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 ROM_END
 
-/*********************************************************************************************/
 
 ROM_START( propcycl )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
@@ -5723,7 +5714,6 @@ void namcos22_state::init_cybrcomm()
 	m_gametype = NAMCOS22_CYBER_COMMANDO;
 	install_c74_speedup();
 }
-
 
 void namcos22_state::init_alpiner()
 {
