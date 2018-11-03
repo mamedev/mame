@@ -36,9 +36,9 @@ DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX
 DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
 DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
 DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
+DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
 DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
 DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentium Pro")
-DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
 DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
 DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
 DEFINE_DEVICE_TYPE(ATHLONXP,    athlonxp_device,    "athlonxp",    "Amd Athlon XP")
@@ -111,7 +111,7 @@ pentium_pro_device::pentium_pro_device(const machine_config &mconfig, device_typ
 }
 
 pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_pro_device(mconfig, PENTIUM_MMX, tag, owner, clock)
+	: pentium_device(mconfig, PENTIUM_MMX, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);

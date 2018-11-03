@@ -1547,6 +1547,18 @@ protected:
 };
 
 
+class pentium_mmx_device : public pentium_device
+{
+public:
+	// construction/destruction
+	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+
 class mediagx_device : public i386_device
 {
 public:
@@ -1570,18 +1582,6 @@ protected:
 
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
-
-class pentium_mmx_device : public pentium_pro_device
-{
-public:
-	// construction/destruction
-	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -1642,9 +1642,9 @@ DECLARE_DEVICE_TYPE(I386SX,      i386sx_device)
 DECLARE_DEVICE_TYPE(I486,        i486_device)
 DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
 DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)
+DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(MEDIAGX,     mediagx_device)
 DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
-DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
 DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)
 DECLARE_DEVICE_TYPE(ATHLONXP,    athlonxp_device)
