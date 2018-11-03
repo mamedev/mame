@@ -86,12 +86,8 @@ void superxavix_lowbus_map(address_map &map);
 
 	virtual void video_start() override;
 
-	DECLARE_READ8_MEMBER(main_r);
-	DECLARE_WRITE8_MEMBER(main_w);
-	DECLARE_READ8_MEMBER(main2_r);
-	DECLARE_WRITE8_MEMBER(main2_w);
-	DECLARE_READ8_MEMBER(main3_r);
-	DECLARE_WRITE8_MEMBER(main3_w);
+	DECLARE_READ8_MEMBER(opcodes_000000_r);
+	DECLARE_READ8_MEMBER(opcodes_800000_r);
 
 	DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
 	DECLARE_WRITE8_MEMBER(extbus_w) { logerror("write to external bus %06x %02x\n", offset, data); }

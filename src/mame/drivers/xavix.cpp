@@ -209,30 +209,6 @@
 // NTSC clock for regular XaviX?
 #define MAIN_CLOCK XTAL(21'477'272)
 
-READ8_MEMBER(xavix_state::main_r)
-{
-	if (offset & 0x8000)
-	{
-		return m_rgn[(offset) & (m_rgnlen - 1)];
-	}
-	else
-	{
-		return m_lowbus->read8(space, offset & 0x7fff);
-	}
-}
-
-WRITE8_MEMBER(xavix_state::main_w)
-{
-	if (offset & 0x8000)
-	{
-		logerror("write to ROM area?\n");
-	}
-	else
-	{
-		m_lowbus->write8(space, offset & 0x7fff, data);
-	}
-}
-
 /* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably
    the CPU 0 page memory and stack are still at 0 but ROM must be in the 3xxx range (game hasn't got far enough to call this yet to help either)
 
@@ -259,7 +235,8 @@ WRITE8_MEMBER(xavix_state::main_w)
 
 
 */
-READ8_MEMBER(xavix_state::main2_r)
+
+READ8_MEMBER(xavix_state::opcodes_000000_r)
 {
 	if (offset & 0x8000)
 	{
@@ -267,35 +244,21 @@ READ8_MEMBER(xavix_state::main2_r)
 	}
 	else
 	{
-		if ((offset & 0xffff) >= 0x200)
-		{
-			return m_rgn[(offset) & (m_rgnlen - 1)];
-		}
-		else
-			return m_lowbus->read8(space, offset & 0x7fff);
+		return m_lowbus->read8(space, offset & 0x7fff);
 	}
 }
 
-WRITE8_MEMBER(xavix_state::main2_w)
+READ8_MEMBER(xavix_state::opcodes_800000_r)
 {
-	if (offset & 0x8000)
-	{
-		logerror("write to ROM area?\n");
-	}
-	else
-	{
-		if ((offset & 0xffff) >= 0x200)
-			logerror("write to ROM area?\n");
-		else
-			m_lowbus->write8(space, offset & 0x7fff, data);
-	}
+	// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
+	return m_rgn[(offset) & (m_rgnlen - 1)];
 }
 
 // this is only used for opcode / oprand reads, data memory addressing is handled in core, doing the opcode / oprand addressing in core causes disassembly issues when running from lowbus space (ram, interrupts on most games)
 void xavix_state::xavix_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
-	map(0x800000, 0xffffff).rw(FUNC(xavix_state::main2_r), FUNC(xavix_state::main2_w));
+	map(0x000000, 0x7fffff).r(FUNC(xavix_state::opcodes_000000_r));
+	map(0x800000, 0xffffff).r(FUNC(xavix_state::opcodes_800000_r));
 }
 
 // this is used by data reads / writes after some processing in the core to decide if data reads can see lowbus, zeropage, stack, bank registers etc. and only falls through to here on a true external bus access
