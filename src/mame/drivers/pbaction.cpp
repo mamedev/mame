@@ -97,6 +97,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "emu.h"
 #include "includes/pbaction.h"
 
+#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "machine/segacrpt_device.h"
 #include "screen.h"
@@ -187,22 +188,22 @@ void pbaction_state::pbaction_sound_io_map(address_map &map)
 	map(0x30, 0x31).w("ay3", FUNC(ay8910_device::address_data_w));
 }
 
-WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8000_w)
+WRITE_LINE_MEMBER(pbaction_tecfri_state::sub8000_w)
 {
-	m_outlatch = (data & 0x01)>>0;
+	m_outlatch = state;
 
 }
 
-WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8001_w)
+WRITE_LINE_MEMBER(pbaction_tecfri_state::sub8001_w)
 {
 	// writes 01 , 00 to clock after writing data to 8000
-	if (data & 0x01)
+	if (state)
 	{
 		m_outdata = (m_outdata << 1) | m_outlatch;
 	}
 }
 
-WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8008_w)
+WRITE8_MEMBER(pbaction_tecfri_state::sub8008_w)
 {
 	if (data != 0x00)
 	{
@@ -232,12 +233,12 @@ WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_sub8008_w)
 	}
 }
 
-WRITE8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_subtomain_w)
+WRITE8_MEMBER(pbaction_tecfri_state::subtomain_w)
 {
 	//m_subtomainlatch->write(space, offset, data); // where does this go if it can't go to maincpu?
 }
 
-READ8_MEMBER(pbaction_tecfri_state::pbaction_tecfri_maintosub_r)
+READ8_MEMBER(pbaction_tecfri_state::maintosub_r)
 {
 	return m_maintosublatch->read(space, offset);
 }
@@ -254,27 +255,25 @@ WRITE8_MEMBER(pbaction_tecfri_state::subcpu_w)
 	m_subcommand_timer->adjust(attotime::zero, 0);
 }
 
-void pbaction_tecfri_state::pbaction_tecfri_sub_map(address_map &map)
+void pbaction_tecfri_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x03ff).rom();
 	map(0x4000, 0x47ff).ram();
 
-	map(0x8000, 0x8000).w(FUNC(pbaction_tecfri_state::pbaction_tecfri_sub8000_w));
-	map(0x8001, 0x8001).w(FUNC(pbaction_tecfri_state::pbaction_tecfri_sub8001_w));
-	//map(0x8002, 0x8007).nopw(); // startup only
-	map(0x8008, 0x8008).w(FUNC(pbaction_tecfri_state::pbaction_tecfri_sub8008_w));
+	map(0x8000, 0x8007).w("suboutlatch", FUNC(hct259_device::write_d0));
+	map(0x8008, 0x8008).w(FUNC(pbaction_tecfri_state::sub8008_w));
 
-	map(0x8010, 0x8010).r(FUNC(pbaction_tecfri_state::pbaction_tecfri_maintosub_r));
-	map(0x8018, 0x8018).w(FUNC(pbaction_tecfri_state::pbaction_tecfri_subtomain_w));	
+	map(0x8010, 0x8010).r(FUNC(pbaction_tecfri_state::maintosub_r));
+	map(0x8018, 0x8018).w(FUNC(pbaction_tecfri_state::subtomain_w));	
 }
 
-void pbaction_tecfri_state::pbaction_tecfri_sub_io_map(address_map &map)
+void pbaction_tecfri_state::sub_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_ctc2, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
-void pbaction_tecfri_state::pbaction_tecfri_main_io_map(address_map &map)
+void pbaction_tecfri_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(FUNC(pbaction_tecfri_state::subcpu_r), FUNC(pbaction_tecfri_state::subcpu_w));
@@ -452,8 +451,8 @@ static const z80_daisy_config daisy_chain[] =
 MACHINE_CONFIG_START(pbaction_state::pbaction)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(pbaction_map)
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_map);
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_sound_map);
@@ -492,17 +491,18 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pbaction_state::pbactionx)
+void pbaction_state::pbactionx(machine_config &config)
+{
 	pbaction(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5128, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(pbaction_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	SEGA_315_5128(config.replace(), m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &pbaction_state::decrypted_opcodes_map);
+	downcast<sega_315_5128_device &>(*m_maincpu).set_decrypted_tag(":decrypted_opcodes");
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_alt_sound_map);
 	m_audiocpu->irqack_cb().set(FUNC(pbaction_state::sound_irq_clear));
-MACHINE_CONFIG_END
+}
 
 static const z80_daisy_config daisy_chain2[] =
 {
@@ -518,26 +518,31 @@ void pbaction_tecfri_state::machine_start()
 	m_digits.resolve();
 }
 
-MACHINE_CONFIG_START(pbaction_tecfri_state::pbactiont)
+void pbaction_tecfri_state::pbactiont(machine_config &config)
+{
 	pbaction(config);
 	
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(pbaction_tecfri_main_io_map)
+	m_maincpu->set_addrmap(AS_IO, &pbaction_tecfri_state::main_io_map);
 
 	Z80(config, m_subcpu, 4_MHz_XTAL);
-	m_subcpu->set_addrmap(AS_PROGRAM, &pbaction_tecfri_state::pbaction_tecfri_sub_map);
-	m_subcpu->set_addrmap(AS_IO, &pbaction_tecfri_state::pbaction_tecfri_sub_io_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &pbaction_tecfri_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &pbaction_tecfri_state::sub_io_map);
 	m_subcpu->set_daisy_config(daisy_chain2);
 
-	MCFG_GENERIC_LATCH_8_ADD("maintosublatch")
-	//MCFG_GENERIC_LATCH_8_ADD("subtomainlatch")
+	GENERIC_LATCH_8(config, "maintosublatch");
+	//GENERIC_LATCH_8(config, "subtomainlatch");
+
+	hct259_device &suboutlatch(HCT259(config, "suboutlatch"));
+	suboutlatch.q_out_cb<0>().set(FUNC(pbaction_tecfri_state::sub8000_w));
+	suboutlatch.q_out_cb<1>().set(FUNC(pbaction_tecfri_state::sub8001_w));
+	// Q2-7 set on startup only
 
 	Z80CTC(config, m_ctc2, 12_MHz_XTAL/4);
 	m_ctc2->intr_callback().set_inputline(m_subcpu, 0);
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pbaction_state::pbaction_alt_sound_map);
 	m_audiocpu->irqack_cb().set(FUNC(pbaction_state::sound_irq_clear));
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

@@ -103,9 +103,9 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	void pbaction_tecfri_sub_map(address_map &map);
-	void pbaction_tecfri_sub_io_map(address_map &map);
-	void pbaction_tecfri_main_io_map(address_map &map);
+	void sub_map(address_map &map);
+	void sub_io_map(address_map &map);
+	void main_io_map(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(sub_trigger);
 	emu_timer *m_subcommand_timer;
@@ -113,12 +113,12 @@ private:
 	DECLARE_READ8_MEMBER(subcpu_r);
 	DECLARE_WRITE8_MEMBER(subcpu_w);
 	
-	DECLARE_WRITE8_MEMBER(pbaction_tecfri_sub8000_w);
-	DECLARE_WRITE8_MEMBER(pbaction_tecfri_sub8001_w);
-	DECLARE_WRITE8_MEMBER(pbaction_tecfri_sub8008_w);
+	DECLARE_WRITE_LINE_MEMBER(sub8000_w);
+	DECLARE_WRITE_LINE_MEMBER(sub8001_w);
+	DECLARE_WRITE8_MEMBER(sub8008_w);
 
-	DECLARE_WRITE8_MEMBER(pbaction_tecfri_subtomain_w);
-	DECLARE_READ8_MEMBER(pbaction_tecfri_maintosub_r);
+	DECLARE_WRITE8_MEMBER(subtomain_w);
+	DECLARE_READ8_MEMBER(maintosub_r);
 
 	required_device<z80_device> m_subcpu;
 	required_device<z80ctc_device> m_ctc2;
