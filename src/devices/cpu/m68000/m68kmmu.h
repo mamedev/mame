@@ -111,7 +111,7 @@ uint32_t DECODE_EA_32(int ea)
 
 void pmmu_set_buserror(uint32_t addr_in)
 {
-	if (++m_mmu_tmp_buserror_occurred == 1)
+	if (!machine().side_effects_disabled() && ++m_mmu_tmp_buserror_occurred == 1)
 	{
 		m_mmu_tmp_buserror_address = addr_in;
 		m_mmu_tmp_buserror_rw = m_mmu_tmp_rw;
@@ -311,6 +311,11 @@ void update_descriptor(const uint32_t tptr, const int type, const uint32_t entry
 template<bool _long>
 void update_sr(const int type, const uint32_t tbl_entry, const int fc)
 {
+	if (machine().side_effects_disabled())
+	{
+		return;
+	}
+
 	switch(type)
 	{
 	case M68K_MMU_DF_DT_INVALID:
@@ -410,10 +415,13 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 
 				MMULOG("SHORT DESC: %08x\n", tbl_entry);
 				table = tbl_entry & M68K_MMU_DF_ADDR_MASK;
-				update_sr<0>(type, tbl_entry, fc);
-				if (!ptest)
+				if (!machine().side_effects_disabled())
 				{
-					update_descriptor(addr_out, type, tbl_entry, rw);
+					update_sr<0>(type, tbl_entry, fc);
+					if (!ptest)
+					{
+						update_descriptor(addr_out, type, tbl_entry, rw);
+					}
 				}
 				break;
 
@@ -436,10 +444,13 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 
 				MMULOG("LONG DESC: %08x %08x\n", tbl_entry, tbl_entry2);
 				table = tbl_entry2 & M68K_MMU_DF_ADDR_MASK;
-				update_sr<1>(type, tbl_entry, fc);
-				if (!ptest)
+				if (!machine().side_effects_disabled())
 				{
-					update_descriptor(addr_out, type, tbl_entry, rw);
+					update_sr<1>(type, tbl_entry, fc);
+					if (!ptest)
+					{
+						update_descriptor(addr_out, type, tbl_entry, rw);
+					}
 				}
 				break;
 		}
@@ -451,7 +462,7 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 			break;
 		}
 
-		if (!ptest)
+		if (!ptest && !machine().side_effects_disabled())
 		{
 			if (!rw && (m_mmu_tmp_sr & M68K_MMU_SR_WRITE_PROTECT))
 			{
@@ -556,8 +567,10 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, cons
 	// it seems like at least the 68030 sets the M bit in the MMU SR
 	// if the root descriptor is of PAGE type, so do a logical and
 	// between RW and the root type
-	pmmu_atc_add(addr_in, addr_out, fc, rw && type != 1);
-
+	if (!machine().side_effects_disabled())
+	{
+		pmmu_atc_add(addr_in, addr_out, fc, rw && type != 1);
+	}
 	MMULOG("PMMU: [%08x] => [%08x] (SR %04x)\n", addr_in, addr_out, m_mmu_tmp_sr);
 	return addr_out;
 }
@@ -655,7 +668,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 		if (root_entry & 2)
 		{
 			// we're accessing through this root entry, so set the U bit
-			if ((!(root_entry & 0x8)) && (!ptest))
+			if ((!(root_entry & 0x8)) && (!ptest) && !machine().side_effects_disabled())
 			{
 				root_entry |= 0x8;
 				m_program->write_dword(root_ptr, root_entry);
@@ -677,7 +690,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 			}
 
 			// update U bit on this pointer entry too
-			if ((!(pointer_entry & 0x8)) && (!ptest))
+			if ((!(pointer_entry & 0x8)) && (!ptest) && !machine().side_effects_disabled())
 			{
 				pointer_entry |= 0x8;
 				m_program->write_dword(pointer_ptr, pointer_entry);
@@ -784,7 +797,7 @@ uint32_t pmmu_translate_addr_with_fc_040(uint32_t addr_in, uint8_t fc, uint8_t p
 					}
 
 					// if these updates resulted in a change, write the entry back where we found it
-					if (page_entry != m_mmu_last_page_entry)
+					if (page_entry != m_mmu_last_page_entry && !machine().side_effects_disabled())
 					{
 						m_mmu_last_page_entry = page_entry;
 						m_program->write_dword(m_mmu_last_page_entry_addr, m_mmu_last_page_entry);
