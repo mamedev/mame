@@ -1810,10 +1810,10 @@ ROM_START( timekill ) /* Version 1.32 (3-tier board set: P/N 1050 Rev 1, P/N 105
 	ROM_CONTINUE(                     0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1051 REV0 */
-	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_1.rom1",   0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_2.rom2",   0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_3.rom3",   0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) ) /* 42 pin MASK ROM */
+	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_1.rom1",   0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_2.rom2",   0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_3.rom3",   0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) ) /* 42 pin mask ROM */
 
 	/* NOTE: Rom boards are known to exist and have been verified to list (silkscreen) the above locations as ROM1, ROM2, ROM3 & ROM4 */
 
@@ -1838,10 +1838,10 @@ ROM_START( timekill132i ) /* Version 1.32I (3-tier board set: P/N 1050 Rev 1, P/
 	ROM_CONTINUE(                     0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1051 REV0 */
-	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_1.rom1",   0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_2.rom2",   0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_3.rom3",   0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) ) /* 42 pin MASK ROM */
+	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_1.rom1",   0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_2.rom2",   0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_3.rom3",   0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) ) /* 42 pin mask ROM */
 
 	/* NOTE: Rom boards are known to exist and have been verified to list (silkscreen) the above locations as ROM1, ROM2, ROM3 & ROM4 */
 
@@ -1866,10 +1866,10 @@ ROM_START( timekill131 ) /* Version 1.31 (3-tier board set: P/N 1050 Rev 1, P/N 
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1051 REV0 */
-	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_1.rom1",   0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_2.rom2",   0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_3.rom3",   0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) ) /* 42 pin MASK ROM */
+	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_1.rom1",   0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_2.rom2",   0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_3.rom3",   0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) ) /* 42 pin mask ROM */
 
 	/* NOTE: Rom boards are known to exist and have been verified to list (silkscreen) the above locations as ROM1, ROM2, ROM3 & ROM4 */
 
@@ -1894,10 +1894,10 @@ ROM_START( timekill121 ) /* Version 1.21 (3-tier board set: P/N 1050 Rev 1, P/N 
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1051 REV0 */
-	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_1.rom1",   0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_2.rom2",   0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) ) /* 42 pin MASK ROM */
-	ROM_LOAD32_BYTE( "time_killers_3.rom3",   0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) ) /* 42 pin MASK ROM */
+	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_1.rom1",   0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_2.rom2",   0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) ) /* 42 pin mask ROM */
+	ROM_LOAD32_BYTE( "time_killers_3.rom3",   0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) ) /* 42 pin mask ROM */
 
 	/* NOTE: Rom boards are known to exist and have been verified to list (silkscreen) the above locations as ROM1, ROM2, ROM3 & ROM4 */
 
@@ -2149,14 +2149,14 @@ ROM_START( hardyard ) /* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 106
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "footbal_0.grom0.itfb0",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) ) /* MASK ROM, socket silkscreened GROM0/ITFB0 */
-	ROM_LOAD32_BYTE( "footbal_1.grom5.itfb1",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) ) /* MASK ROM, socket silkscreened GROM5/ITFB1 */
-	ROM_LOAD32_BYTE( "footbal_2.grom10.itfb2", 0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) ) /* MASK ROM, socket silkscreened GROM10/ITFB2 */
-	ROM_LOAD32_BYTE( "footbal_3.grom15.itfb3", 0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) ) /* MASK ROM, socket silkscreened GROM15/ITFB3 */
-	ROM_LOAD32_BYTE( "footbal_4.grom1.itfb4",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) ) /* MASK ROM, socket silkscreened GROM1/ITFB4 */
-	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* MASK ROM, socket silkscreened GROM6/ITFB5 */
-	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* MASK ROM, socket silkscreened GROM11/ITFB6 */
-	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* MASK ROM, socket silkscreened GROM16/ITFB7 */
+	ROM_LOAD32_BYTE( "footbal_0.grom0.itfb0",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) ) /* mask ROM, socket silkscreened GROM0/ITFB0 */
+	ROM_LOAD32_BYTE( "footbal_1.grom5.itfb1",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) ) /* mask ROM, socket silkscreened GROM5/ITFB1 */
+	ROM_LOAD32_BYTE( "footbal_2.grom10.itfb2", 0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) ) /* mask ROM, socket silkscreened GROM10/ITFB2 */
+	ROM_LOAD32_BYTE( "footbal_3.grom15.itfb3", 0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) ) /* mask ROM, socket silkscreened GROM15/ITFB3 */
+	ROM_LOAD32_BYTE( "footbal_4.grom1.itfb4",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) ) /* mask ROM, socket silkscreened GROM1/ITFB4 */
+	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* mask ROM, socket silkscreened GROM6/ITFB5 */
+	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* mask ROM, socket silkscreened GROM11/ITFB6 */
+	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* mask ROM, socket silkscreened GROM16/ITFB7 */
 	ROM_LOAD32_BYTE( "itfb-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
 	ROM_LOAD32_BYTE( "itfb-9.grom7.itfb9",     0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) ) /* EPROM, socket silkscreened GROM7/ITFB9 */
 	ROM_LOAD32_BYTE( "itfb-10.grom12.itfb10",  0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) ) /* EPROM, socket silkscreened GROM12/ITFB10 */
@@ -2181,14 +2181,14 @@ ROM_START( hardyard11 ) /* Version 1.1 (3-tier board set: P/N 1059 Rev 3,  P/N 1
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "footbal_0.grom0.itfb0",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) ) /* MASK ROM, socket silkscreened GROM0/ITFB0 */
-	ROM_LOAD32_BYTE( "footbal_1.grom5.itfb1",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) ) /* MASK ROM, socket silkscreened GROM5/ITFB1 */
-	ROM_LOAD32_BYTE( "footbal_2.grom10.itfb2", 0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) ) /* MASK ROM, socket silkscreened GROM10/ITFB2 */
-	ROM_LOAD32_BYTE( "footbal_3.grom15.itfb3", 0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) ) /* MASK ROM, socket silkscreened GROM15/ITFB3 */
-	ROM_LOAD32_BYTE( "footbal_4.grom1.itfb4",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) ) /* MASK ROM, socket silkscreened GROM1/ITFB4 */
-	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* MASK ROM, socket silkscreened GROM6/ITFB5 */
-	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* MASK ROM, socket silkscreened GROM11/ITFB6 */
-	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* MASK ROM, socket silkscreened GROM16/ITFB7 */
+	ROM_LOAD32_BYTE( "footbal_0.grom0.itfb0",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) ) /* mask ROM, socket silkscreened GROM0/ITFB0 */
+	ROM_LOAD32_BYTE( "footbal_1.grom5.itfb1",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) ) /* mask ROM, socket silkscreened GROM5/ITFB1 */
+	ROM_LOAD32_BYTE( "footbal_2.grom10.itfb2", 0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) ) /* mask ROM, socket silkscreened GROM10/ITFB2 */
+	ROM_LOAD32_BYTE( "footbal_3.grom15.itfb3", 0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) ) /* mask ROM, socket silkscreened GROM15/ITFB3 */
+	ROM_LOAD32_BYTE( "footbal_4.grom1.itfb4",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) ) /* mask ROM, socket silkscreened GROM1/ITFB4 */
+	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* mask ROM, socket silkscreened GROM6/ITFB5 */
+	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* mask ROM, socket silkscreened GROM11/ITFB6 */
+	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* mask ROM, socket silkscreened GROM16/ITFB7 */
 	ROM_LOAD32_BYTE( "itfb-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
 	ROM_LOAD32_BYTE( "itfb-9.grom7.itfb9",     0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) ) /* EPROM, socket silkscreened GROM7/ITFB9 */
 	ROM_LOAD32_BYTE( "itfb-10.grom12.itfb10",  0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) ) /* EPROM, socket silkscreened GROM12/ITFB10 */
@@ -2213,14 +2213,14 @@ ROM_START( hardyard10 ) /* Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "footbal_0.grom0.itfb0",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) ) /* MASK ROM, socket silkscreened GROM0/ITFB0 */
-	ROM_LOAD32_BYTE( "footbal_1.grom5.itfb1",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) ) /* MASK ROM, socket silkscreened GROM5/ITFB1 */
-	ROM_LOAD32_BYTE( "footbal_2.grom10.itfb2", 0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) ) /* MASK ROM, socket silkscreened GROM10/ITFB2 */
-	ROM_LOAD32_BYTE( "footbal_3.grom15.itfb3", 0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) ) /* MASK ROM, socket silkscreened GROM15/ITFB3 */
-	ROM_LOAD32_BYTE( "footbal_4.grom1.itfb4",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) ) /* MASK ROM, socket silkscreened GROM1/ITFB4 */
-	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* MASK ROM, socket silkscreened GROM6/ITFB5 */
-	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* MASK ROM, socket silkscreened GROM11/ITFB6 */
-	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* MASK ROM, socket silkscreened GROM16/ITFB7 */
+	ROM_LOAD32_BYTE( "footbal_0.grom0.itfb0",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) ) /* mask ROM, socket silkscreened GROM0/ITFB0 */
+	ROM_LOAD32_BYTE( "footbal_1.grom5.itfb1",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) ) /* mask ROM, socket silkscreened GROM5/ITFB1 */
+	ROM_LOAD32_BYTE( "footbal_2.grom10.itfb2", 0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) ) /* mask ROM, socket silkscreened GROM10/ITFB2 */
+	ROM_LOAD32_BYTE( "footbal_3.grom15.itfb3", 0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) ) /* mask ROM, socket silkscreened GROM15/ITFB3 */
+	ROM_LOAD32_BYTE( "footbal_4.grom1.itfb4",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) ) /* mask ROM, socket silkscreened GROM1/ITFB4 */
+	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* mask ROM, socket silkscreened GROM6/ITFB5 */
+	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* mask ROM, socket silkscreened GROM11/ITFB6 */
+	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* mask ROM, socket silkscreened GROM16/ITFB7 */
 	ROM_LOAD32_BYTE( "itfb-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
 	ROM_LOAD32_BYTE( "itfb-9.grom7.itfb9",     0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) ) /* EPROM, socket silkscreened GROM7/ITFB9 */
 	ROM_LOAD32_BYTE( "itfb-10.grom12.itfb10",  0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) ) /* EPROM, socket silkscreened GROM12/ITFB10 */
@@ -2862,7 +2862,7 @@ ROM_START( sftm )   /* Version 1.12, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 Ro
 	ROM_CONTINUE(               0x08000, 0x08000 )
 
 	ROM_REGION( 0x2080000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 MASK roms */
+	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 mask ROMs */
 	ROM_LOAD32_BYTE( "rm0-1.grm0_1", 0x0000001, 0x400000, CRC(6f5910fa) SHA1(1979d19dd36a9118dfaf021e05302982be5dbe69) )
 	ROM_LOAD32_BYTE( "rm0-2.grm0_2", 0x0000002, 0x400000, CRC(b8a2add5) SHA1(62e5bef936f014ac836c0cd5322eaba7018496b4) )
 	ROM_LOAD32_BYTE( "rm0-3.grm0_3", 0x0000003, 0x400000, CRC(6b6ff867) SHA1(72bc95ef361f9238602f0e03aed0adac8b59d227) )
@@ -2871,7 +2871,7 @@ ROM_START( sftm )   /* Version 1.12, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 Ro
 	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
 	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
 
-	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 MASK roms locations */
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROMs locations */
 
 	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
 	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )
@@ -2879,7 +2879,7 @@ ROM_START( sftm )   /* Version 1.12, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 Ro
 	ROM_LOAD32_BYTE( "sfm_grm3_3.grm3_3", 0x2000003, 0x020000, CRC(cd38d1d6) SHA1(0cea60d6897b34eeb13997030f6ee7e1dfb3c833) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin MASK rom sample set */
+	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin mask ROM sample set */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )
@@ -2898,7 +2898,7 @@ ROM_START( sftm111 )    /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 	ROM_CONTINUE(               0x08000, 0x08000 )
 
 	ROM_REGION( 0x2080000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 MASK roms */
+	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 mask ROMs */
 	ROM_LOAD32_BYTE( "rm0-1.grm0_1", 0x0000001, 0x400000, CRC(6f5910fa) SHA1(1979d19dd36a9118dfaf021e05302982be5dbe69) )
 	ROM_LOAD32_BYTE( "rm0-2.grm0_2", 0x0000002, 0x400000, CRC(b8a2add5) SHA1(62e5bef936f014ac836c0cd5322eaba7018496b4) )
 	ROM_LOAD32_BYTE( "rm0-3.grm0_3", 0x0000003, 0x400000, CRC(6b6ff867) SHA1(72bc95ef361f9238602f0e03aed0adac8b59d227) )
@@ -2907,7 +2907,7 @@ ROM_START( sftm111 )    /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
 	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
 
-	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 MASK roms locations */
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROMs locations */
 
 	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
 	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )
@@ -2915,7 +2915,7 @@ ROM_START( sftm111 )    /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 	ROM_LOAD32_BYTE( "sfm_grm3_3.grm3_3", 0x2000003, 0x020000, CRC(cd38d1d6) SHA1(0cea60d6897b34eeb13997030f6ee7e1dfb3c833) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin MASK rom sample set */
+	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin mask ROM sample set */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )
@@ -2934,7 +2934,7 @@ ROM_START( sftm110 )    /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 	ROM_CONTINUE(               0x08000, 0x08000 )
 
 	ROM_REGION( 0x2080000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 MASK roms */
+	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 mask ROMs */
 	ROM_LOAD32_BYTE( "rm0-1.grm0_1", 0x0000001, 0x400000, CRC(6f5910fa) SHA1(1979d19dd36a9118dfaf021e05302982be5dbe69) )
 	ROM_LOAD32_BYTE( "rm0-2.grm0_2", 0x0000002, 0x400000, CRC(b8a2add5) SHA1(62e5bef936f014ac836c0cd5322eaba7018496b4) )
 	ROM_LOAD32_BYTE( "rm0-3.grm0_3", 0x0000003, 0x400000, CRC(6b6ff867) SHA1(72bc95ef361f9238602f0e03aed0adac8b59d227) )
@@ -2943,7 +2943,7 @@ ROM_START( sftm110 )    /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
 	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
 
-	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 MASK roms locations */
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROMs locations */
 
 	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
 	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )
@@ -2951,7 +2951,7 @@ ROM_START( sftm110 )    /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 	ROM_LOAD32_BYTE( "sfm_grm3_3.grm3_3", 0x2000003, 0x020000, CRC(cd38d1d6) SHA1(0cea60d6897b34eeb13997030f6ee7e1dfb3c833) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin MASK rom sample set */
+	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin mask ROM sample set */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )
@@ -2970,7 +2970,7 @@ ROM_START( sftmj )  /* Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073
 	ROM_CONTINUE(                  0x08000, 0x08000 )
 
 	ROM_REGION( 0x2080000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 MASK roms */
+	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 mask ROMs */
 	ROM_LOAD32_BYTE( "rm0-1.grm0_1", 0x0000001, 0x400000, CRC(6f5910fa) SHA1(1979d19dd36a9118dfaf021e05302982be5dbe69) )
 	ROM_LOAD32_BYTE( "rm0-2.grm0_2", 0x0000002, 0x400000, CRC(b8a2add5) SHA1(62e5bef936f014ac836c0cd5322eaba7018496b4) )
 	ROM_LOAD32_BYTE( "rm0-3.grm0_3", 0x0000003, 0x400000, CRC(6b6ff867) SHA1(72bc95ef361f9238602f0e03aed0adac8b59d227) )
@@ -2979,7 +2979,7 @@ ROM_START( sftmj )  /* Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073
 	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
 	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
 
-	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 MASK roms locations */
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROMs locations */
 
 	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
 	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )
@@ -2987,7 +2987,7 @@ ROM_START( sftmj )  /* Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073
 	ROM_LOAD32_BYTE( "sfm_grm3_3.grm3_3", 0x2000003, 0x020000, CRC(cd38d1d6) SHA1(0cea60d6897b34eeb13997030f6ee7e1dfb3c833) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin MASK rom sample set */
+	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin mask ROM sample set */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )

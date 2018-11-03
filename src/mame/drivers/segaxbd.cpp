@@ -3564,9 +3564,9 @@ ROM_END
 //         IC63 : epr-12562A.63 (27C010 EPROM)
 //         IC62 : not populated
 //
-//         IC11 : mpr-12437.11  (831000 MASKROM)
-//         IC12 : mpr-12438.12  (831000 MASKROM)
-//         IC13 : mpr-12439.13  (831000 MASKROM)
+//         IC11 : mpr-12437.11  (Fujitsu MB831000 mask ROM)
+//         IC12 : mpr-12438.12  (Fujitsu MB831000 mask ROM)
+//         IC13 : mpr-12439.13  (Fujitsu MB831000 mask ROM)
 //         IC17 : epr-12436.17  (27C512 EPROM)
 //
 //         IC21 : not populated
@@ -3576,24 +3576,24 @@ ROM_END
 //
 //         IC40 : not populated
 //
-//         IC90 : mpr-12425.90  (831000 MASKROM)
-//         IC91 : mpr-12421.91  (831000 MASKROM)
-//         IC92 : mpr-12417.92  (831000 MASKROM)
+//         IC90 : mpr-12425.90  (Fujitsu MB831000 mask ROM)
+//         IC91 : mpr-12421.91  (Fujitsu MB831000 mask ROM)
+//         IC92 : mpr-12417.92  (Fujitsu MB831000 mask ROM)
 //         IC93 : epr-12609.93  (27C010 EPROM)
 //
-//         IC94 : mpr-12426.94  (831000 MASKROM)
-//         IC95 : mpr-12422.95  (831000 MASKROM)
-//         IC96 : mpr-12418.96  (831000 MASKROM)
+//         IC94 : mpr-12426.94  (Fujitsu MB831000 mask ROM)
+//         IC95 : mpr-12422.95  (Fujitsu MB831000 mask ROM)
+//         IC96 : mpr-12418.96  (Fujitsu MB831000 mask ROM)
 //         IC97 : epr-12610.97  (27C010 EPROM)
 //
-//         IC98 : mpr-12427.98  (831000 MASKROM)
-//         IC99 : mpr-12423.99  (831000 MASKROM)
-//         IC100: mpr-12419.100 (831000 MASKROM)
+//         IC98 : mpr-12427.98  (Fujitsu MB831000 mask ROM)
+//         IC99 : mpr-12423.99  (Fujitsu MB831000 mask ROM)
+//         IC100: mpr-12419.100 (Fujitsu MB831000 mask ROM)
 //         IC101: epr-12611.101 (27C010 EPROM)
 //
-//         IC102: mpr-12428.102 (831000 MASKROM)
-//         IC103: mpr-12424.103 (831000 MASKROM)
-//         IC104: mpr-12420.104 (831000 MASKROM)
+//         IC102: mpr-12428.102 (Fujitsu MB831000 mask ROM)
+//         IC103: mpr-12424.103 (Fujitsu MB831000 mask ROM)
+//         IC104: mpr-12420.104 (Fujitsu MB831000 mask ROM)
 //         IC105: epr-12612.105 (27C010 EPROM)
 //
 //         IC154: epr-12429.154 (27C512 EPROM)

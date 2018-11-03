@@ -3008,7 +3008,7 @@ SW4  - Single position slider switch
 
 U3  - Is a 27C4002 EPROM
 U49 - Is a 27C1001 EPROM
-U42, U43 & U47 are MASK ROMs read as 27C322
+U42, U43 & U47 are mask ROMs read as 27C322
 
 The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 
@@ -4470,7 +4470,7 @@ ROM_START( wschampb ) /* Wing Shooting Championship V1.00, dumps match listed ch
 	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
-ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all MASK ROMs */
+ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all mask ROMs */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "as1106e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) ) /* also commonly labeled as: Trophy U6 Ver. 1.00 D8DA */
 	ROM_LOAD16_BYTE( "as1107e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) ) /* also commonly labeled as: Trophy U7 Ver. 1.00 CEEF */
@@ -4513,7 +4513,7 @@ ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9
 	ROM_LOAD( "as1104m01.u41",   0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) ) /* Load these in until the flash ROMs are dumped */
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 MASK rom */
+	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 mask ROM */
 ROM_END
 
 /***************************************************************************
