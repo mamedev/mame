@@ -309,7 +309,7 @@ void update_descriptor(const uint32_t tptr, const int type, const uint32_t entry
 }
 
 template<bool _long>
-void update_sr(const int type, const uint32_t tbl_entry)
+void update_sr(const int type, const uint32_t tbl_entry, const int fc)
 {
 	switch(type)
 	{
@@ -334,7 +334,7 @@ void update_sr(const int type, const uint32_t tbl_entry)
 			m_mmu_tmp_sr |= M68K_MMU_SR_WRITE_PROTECT;
 		}
 
-		if (_long && (tbl_entry & M68K_MMU_DF_SUPERVISOR))
+		if (_long && !(fc & 4) && (tbl_entry & M68K_MMU_DF_SUPERVISOR))
 		{
 			m_mmu_tmp_sr |= M68K_MMU_SR_SUPERVISOR_ONLY;
 		}
@@ -410,7 +410,7 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 
 				MMULOG("SHORT DESC: %08x\n", tbl_entry);
 				table = tbl_entry & M68K_MMU_DF_ADDR_MASK;
-				update_sr<0>(type, tbl_entry);
+				update_sr<0>(type, tbl_entry, fc);
 				if (!ptest)
 				{
 					update_descriptor(addr_out, type, tbl_entry, rw);
@@ -436,7 +436,7 @@ bool pmmu_walk_tables(uint32_t addr_in, int type, uint32_t table, const int fc,
 
 				MMULOG("LONG DESC: %08x %08x\n", tbl_entry, tbl_entry2);
 				table = tbl_entry2 & M68K_MMU_DF_ADDR_MASK;
-				update_sr<1>(type, tbl_entry);
+				update_sr<1>(type, tbl_entry, fc);
 				if (!ptest)
 				{
 					update_descriptor(addr_out, type, tbl_entry, rw);
