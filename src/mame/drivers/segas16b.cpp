@@ -1333,8 +1333,8 @@ void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoff
 	// set tile banks
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int bank = m_workram[0x3094 / 2] & 0x00ff;
-	// alt_bank is used for the alt rom loading (where there are space between the ROMs)
-	// alternatively the rom loading could be changed, but the loading is correct for the non-mcu .b14/.a14 type
+	// alt_bank is used for the alt ROM loading (where there are space between the ROMs)
+	// alternatively the ROM loading could be changed, but the loading is correct for the non-mcu .b14/.a14 type
 	// board so presumably our MCU simulation should act accordingly.
 	if (alt_bank) bank = (bank & 0x1) | ((bank & 0xfe) << 1);
 
@@ -4086,7 +4086,7 @@ ROM_END
 //  ROM Board type: 171-5358
 //  Sega game ID: 833-6308-03
 //    Main board: 837-6312
-//     Rom board: 834-6311-03
+//     ROM board: 834-6311-03
 //
 ROM_START( aliensyn3 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -4129,7 +4129,7 @@ ROM_END
 //  ROM Board type: 171-5358
 //  Sega game ID: 833-6308-05
 //    Main board: 837-6312-02
-//     Rom board: 834-6311-04
+//     ROM board: 834-6311-04
 //
 ROM_START( aliensyn7 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -4172,7 +4172,7 @@ ROM_END
 //  ROM Board type: 171-5358
 //  Sega game ID: 833-6308
 //    Main board: 837-6312
-//     Rom board: 834-6311
+//     ROM board: 834-6311
 //
 ROM_START( aliensynj )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -5218,7 +5218,7 @@ ROM_END
 //  (c)1987 Sega
 //  System 16B
 //  CPU Custom No. 317-0041
-//  Rom Board No. 171-5358
+//  ROM Board No. 171-5358
 //
 //  J1 - -
 //  J2 ---
@@ -5679,7 +5679,7 @@ ROM_START( dunkshot )
 	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
 ROM_END
 
-ROM_START( dunkshota ) // several roms had replacement? (different style to others) labels with 'T' markings, content identical.
+ROM_START( dunkshota ) // several ROMs had replacement? (different style to others) labels with 'T' markings, content identical.
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10520a.a1", 0x000001, 0x8000, CRC(16e213ba) SHA1(efddff17d1802ccbea9eac69cedef62fa6b9a640) )
 	ROM_LOAD16_BYTE( "epr-10523a.a4", 0x000000, 0x8000, CRC(22e3f074) SHA1(acdb6952308957244355bedb9cc627314a0139ef) )
@@ -5843,7 +5843,7 @@ ROM_END
 //  ROM Board type: 171-5521
 //
 //   Game Number 837-6768-01
-//   Rom Number  834-6767-01
+//   ROM Number  834-6767-01
 //
 ROM_START( dduxj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -5896,9 +5896,9 @@ ROM_END
 // Dynamite Dux (8751 version), Sega System 16B
 //
 //   Game Number 837-6768-09
-//   Rom Number  834-6767-09
+//   ROM Number  834-6767-09
 //
-//   Rom Board Type 171-5704
+//   ROM Board Type 171-5704
 //
 ROM_START( ddux1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -6600,7 +6600,7 @@ ROM_END
 //
 ROM_START( goldnaxej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	// fails rom test on 8 & 6 ?! roms verfied from two separate sources
+	// fails ROM test on 8 & 6 ?! ROMs verfied from two separate sources
 	ROM_LOAD16_BYTE( "epr-12540.a7", 0x00000, 0x20000, CRC(0c7ccc6d) SHA1(25bc29eee731befc665472c2c1998cac8447cc21) )
 	ROM_LOAD16_BYTE( "epr-12539.a5", 0x00001, 0x20000, CRC(1f24f7d0) SHA1(a09cdf394c03069707f7ed400b8fbdc13674fa74) )
 	ROM_LOAD16_BYTE( "epr-12521.a8", 0x40000, 0x20000, CRC(5001d713) SHA1(68cf3f48d6e440e5b800503a211adda02107d956) )
@@ -6672,7 +6672,7 @@ ROM_END
 //
 ROM_START( goldnaxe3 )
 	ROM_REGION( 0x80000, "maincpu", 0) // 68000 code
-	// fails rom test on 8 & 6 ?! roms verfied from two separate sources
+	// fails ROM test on 8 & 6 ?! ROMs verfied from two separate sources
 	ROM_LOAD16_BYTE( "epr-12525.a7", 0x00000, 0x20000, CRC(48332c76) SHA1(4cdf7dc2f504a030ae63b4854bb76a3f2cc1d96b) )
 	ROM_LOAD16_BYTE( "epr-12524.a5", 0x00001, 0x20000, CRC(8e58f342) SHA1(a972b05f7d5d7228067f97724191fce1aeb0371d) )
 	ROM_LOAD16_BYTE( "epr-12521.a8", 0x40000, 0x20000, CRC(5001d713) SHA1(68cf3f48d6e440e5b800503a211adda02107d956) )
@@ -7338,7 +7338,7 @@ ROM_END
 //  Center Court (World, 4 Players - Prototype / Location Test), Sega System 16B
 //  CPU: 68000 + MC8123 (handwritten label "CENTER COURT 7/13 - '88")
 //  ROM Board No. 171-5358 (with a Sega ID sticker 834-6618-01, conversion or actual Sega ID# ???)
-//  Note: prototype; checksums handwritten on prg roms, EPR stickers present on other roms, but handwritten locations instead of numbers
+//  Note: prototype; checksums handwritten on prg ROMs, EPR stickers present on other ROMs, but handwritten locations instead of numbers
 //        The PCB was found in a 4 player cocktail cabinet with full Center Court artwork & instruction cards - Likely a location test unit.
 //
 //  The following bugs are confirmed to happen on real hardware (due to game being a prototype)
@@ -7928,7 +7928,7 @@ ROM_END
 //  ROM Board type: 171-5358
 //  Sega game ID: 833-6531-01 SONIC BOOM
 //    Main board: 837-6533
-//     Rom board: 834-6532-01
+//     ROM board: 834-6532-01
 //
 //  Pos.   Silk        Type        Part                Pos.   Silk        Type        Part
 //
@@ -8102,7 +8102,7 @@ ROM_END
 //  Tetris, Sega System 16B
 //  CPU: FD1094 (317-0092)
 //  ROM Board type: 171-5704
-//       Rom board: 834-6891-02
+//       ROM board: 834-6891-02
 //
 ROM_START( tetris2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -8208,7 +8208,7 @@ ROM_END
 //  ROM Board type: 171-5358
 //  Sega game ID: 833-6207-01 TIME SCANNER
 //    Main board: 837-6224-01
-//     Rom board: 834-6223-01
+//     ROM board: 834-6223-01
 //
 ROM_START( timescan )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
@@ -8325,12 +8325,12 @@ ROM_START( tturf )
 	ROM_LOAD16_BYTE( "epr-12326.a5",  0x00001, 0x20000, CRC(f998862b) SHA1(69902ab0162eb42e1d6a9792651a5d41cb77477d) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "opr-12268.a14", 0x00000, 0x10000, CRC(e0dac07f) SHA1(c7f6de42eb93a8f34afdc300628735b5f40a34c2) ) // ROMS are Toshiba TMM24512AF one time programmable roms
+	ROM_LOAD( "opr-12268.a14", 0x00000, 0x10000, CRC(e0dac07f) SHA1(c7f6de42eb93a8f34afdc300628735b5f40a34c2) ) // ROMS are Toshiba TMM24512AF one time programmable ROMs
 	ROM_LOAD( "opr-12269.a15", 0x10000, 0x10000, CRC(457a8790) SHA1(b701e1a1745cefb31083c8a3daa3b23181f89576) ) // Some ROM boards might have standard EPR numbers with
 	ROM_LOAD( "opr-12270.a16", 0x20000, 0x10000, CRC(69fc025b) SHA1(20be1242de27f1b997d43890051cc5d5ac8a127a) ) //  standard EPROM chips instead
 
 	ROM_REGION16_BE( 0x100000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "opr-12279.b1", 0x00001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )   // ROMS are Toshiba TMM24512AF one time programmable roms
+	ROM_LOAD16_BYTE( "opr-12279.b1", 0x00001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )   // ROMS are Toshiba TMM24512AF one time programmable ROMs
 	ROM_LOAD16_BYTE( "opr-12283.b5", 0x00000, 0x10000, CRC(ae0fa085) SHA1(ae9af92d4dd0c8a0f064d24e647522b588fbd7f7) )   // Some ROM boards might have standard EPR numbers with
 	ROM_LOAD16_BYTE( "opr-12278.b2", 0x40001, 0x10000, CRC(961d06b7) SHA1(b1a9dea63785bfa2c0e7b931387b91dfcd27d79b) )   //  standard EPROM chips instead
 	ROM_LOAD16_BYTE( "opr-12282.b6", 0x40000, 0x10000, CRC(e8671ee1) SHA1(a3732938c370f1936d867aae9c3d1e9bbfb57ede) )
@@ -9356,7 +9356,7 @@ and the external casing of the unit is near identical)  The system does NOT howe
 fit, and the hardware is basically a bootleg of Sega System 16 instead of PGM!  So far only one cartridge has been seen.
 
 There are various levels of 'protection' on the system
- - Address XOR + 16-bit bitswap on the BIOS rom and Cartridge ROMs
+ - Address XOR + 16-bit bitswap on the BIOS ROM and Cartridge ROMs
  - A device which performs a 32-bit bitswap, used to produce decryption keys for the data compressed on the cartridges
  - An alternate way of reading the cartridge data through a port, which causes an additional 8-bit data xor to be applied
  - A simple hardware RLE decompression device used to decrypt data for the BIOS (the games use a stronger software
