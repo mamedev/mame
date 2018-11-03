@@ -268,7 +268,15 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 }
 
 
+WRITE8_MEMBER(xavix_state::colmix_sh_w)
+{
+	m_colmix_sh[offset] = data;
+}
 
+WRITE8_MEMBER(xavix_state::colmix_l_w)
+{
+	m_colmix_l[offset] = data;
+}
 
 WRITE8_MEMBER(xavix_state::colmix_6ff2_w)
 {

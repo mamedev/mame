@@ -279,8 +279,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6000, 0x67ff).ram().share("fragment_sprite");
 
 	// Palette RAM
-	map(0x6800, 0x68ff).ram().share("palram_sh");
-	map(0x6900, 0x69ff).ram().share("palram_l");
+	map(0x6800, 0x68ff).ram().w(FUNC(xavix_state::palram_sh_w)).share("palram_sh");
+	map(0x6900, 0x69ff).ram().w(FUNC(xavix_state::palram_l_w)).share("palram_l");
 
 	// Segment RAM
 	map(0x6a00, 0x6a1f).ram().share("segment_regs"); // test mode, pass flag 0x20
@@ -305,8 +305,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fea, 0x6fea).rw(FUNC(xavix_state::arena_control_r), FUNC(xavix_state::arena_control_w));
 
 	// Colour Mixing / Enabling Registers
-	map(0x6ff0, 0x6ff0).ram().share("colmix_sh"); // a single colour (for effects?) not bgpen
-	map(0x6ff1, 0x6ff1).ram().share("colmix_l");
+	map(0x6ff0, 0x6ff0).ram().w(FUNC(xavix_state::colmix_sh_w)).share("colmix_sh"); // effect colour?
+	map(0x6ff1, 0x6ff1).ram().w(FUNC(xavix_state::colmix_l_w)).share("colmix_l");
 	map(0x6ff2, 0x6ff2).ram().w(FUNC(xavix_state::colmix_6ff2_w)).share("colmix_ctrl"); // set to 07 after clearing above things in interrupt 0
 
 	// Display Control Register / Status Flags
@@ -408,8 +408,8 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 	xavix_lowbus_map(map);
 
 	// bitmap layer palette
-	map(0x6c00, 0x6cff).ram().share("bmp_palram_sh");
-	map(0x6d00, 0x6dff).ram().share("bmp_palram_l");
+	map(0x6c00, 0x6cff).ram().w(FUNC(xavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
+	map(0x6d00, 0x6dff).ram().w(FUNC(xavix_state::bmp_palram_l_w)).share("bmp_palram_l");
 
 	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 }
@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
 
-	MCFG_PALETTE_ADD("palette", 256 + 1)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -840,7 +840,7 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 512+1)
+	MCFG_PALETTE_ADD("palette", 512)
 
 MACHINE_CONFIG_END
 

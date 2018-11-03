@@ -204,6 +204,13 @@ void superxavix_lowbus_map(address_map &map);
 	TIMER_CALLBACK_MEMBER(freq_timer_done);
 	emu_timer *m_freq_timer;
 
+	DECLARE_WRITE8_MEMBER(palram_sh_w);
+	DECLARE_WRITE8_MEMBER(palram_l_w);
+	DECLARE_WRITE8_MEMBER(colmix_sh_w);
+	DECLARE_WRITE8_MEMBER(colmix_l_w);
+	DECLARE_WRITE8_MEMBER(bmp_palram_sh_w);
+	DECLARE_WRITE8_MEMBER(bmp_palram_l_w);
+
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
@@ -298,7 +305,7 @@ void superxavix_lowbus_map(address_map &map);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* ramsh, uint8_t* raml, int size, int basecol);
+	void update_pen(int pen, uint8_t* ramsh, uint8_t* raml);
 	double hue2rgb(double p, double q, double t);
 	void draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
 	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
