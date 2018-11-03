@@ -20,10 +20,12 @@
 
 #include "emu.h"
 #include "i386.h"
+#include "i386priv.h"
+#include "x87priv.h"
+#include "cycles.h"
+#include "i386ops.h"
 
 #include "debugger.h"
-#include "i386priv.h"
-
 #include "debug/debugcpu.h"
 
 /* seems to be defined on mingw-gcc */
@@ -154,10 +156,166 @@ device_memory_interface::space_config_vector i386_device::memory_space_config() 
 int i386_parity_table[256];
 MODRM_TABLE i386_MODRM_table[256];
 
-#define FAULT(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,0,error); return;}
-#define FAULT_EXP(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,trap_level+1,error); return;}
-
 /*************************************************************************/
+
+uint32_t i386_device::i386_translate(int segment, uint32_t ip, int rwn)
+{
+	// TODO: segment limit access size, execution permission, handle exception thrown from exception handler
+	if (PROTECTED_MODE && !V8086_MODE && (rwn != -1))
+	{
+		if (!(m_sreg[segment].valid))
+			FAULT_THROW((segment == SS) ? FAULT_SS : FAULT_GP, 0);
+		if (i386_limit_check(segment, ip))
+			FAULT_THROW((segment == SS) ? FAULT_SS : FAULT_GP, 0);
+		if ((rwn == 0) && ((m_sreg[segment].flags & 8) && !(m_sreg[segment].flags & 2)))
+			FAULT_THROW(FAULT_GP, 0);
+		if ((rwn == 1) && ((m_sreg[segment].flags & 8) || !(m_sreg[segment].flags & 2)))
+			FAULT_THROW(FAULT_GP, 0);
+	}
+	return m_sreg[segment].base + ip;
+}
+
+vtlb_entry i386_device::get_permissions(uint32_t pte, int wp)
+{
+	vtlb_entry ret = VTLB_READ_ALLOWED | ((pte & 4) ? VTLB_USER_READ_ALLOWED : 0);
+	if (!wp)
+		ret |= VTLB_WRITE_ALLOWED;
+	if (pte & 2)
+		ret |= VTLB_WRITE_ALLOWED | ((pte & 4) ? VTLB_USER_WRITE_ALLOWED : 0);
+	return ret;
+}
+
+bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_entry *entry)
+{
+	uint32_t a = *address;
+	uint32_t pdbr = m_cr[3] & 0xfffff000;
+	uint32_t directory = (a >> 22) & 0x3ff;
+	uint32_t table = (a >> 12) & 0x3ff;
+	vtlb_entry perm = 0;
+	bool ret;
+	bool user = (intention & TRANSLATE_USER_MASK) ? true : false;
+	bool write = (intention & TRANSLATE_WRITE) ? true : false;
+	bool debug = (intention & TRANSLATE_DEBUG_MASK) ? true : false;
+
+	if (!(m_cr[0] & 0x80000000))
+	{
+		if (entry)
+			*entry = 0x77;
+		return true;
+	}
+
+	uint32_t page_dir = m_program->read_dword(pdbr + directory * 4);
+	if (page_dir & 1)
+	{
+		if ((page_dir & 0x80) && (m_cr[4] & 0x10))
+		{
+			a = (page_dir & 0xffc00000) | (a & 0x003fffff);
+			if (debug)
+			{
+				*address = a;
+				return true;
+			}
+			perm = get_permissions(page_dir, WP);
+			if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+				ret = false;
+			else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+				ret = false;
+			else
+			{
+				if (write)
+					perm |= VTLB_FLAG_DIRTY;
+				if (!(page_dir & 0x40) && write)
+					m_program->write_dword(pdbr + directory * 4, page_dir | 0x60);
+				else if (!(page_dir & 0x20))
+					m_program->write_dword(pdbr + directory * 4, page_dir | 0x20);
+				ret = true;
+			}
+		}
+		else
+		{
+			uint32_t page_entry = m_program->read_dword((page_dir & 0xfffff000) + (table * 4));
+			if (!(page_entry & 1))
+				ret = false;
+			else
+			{
+				a = (page_entry & 0xfffff000) | (a & 0xfff);
+				if (debug)
+				{
+					*address = a;
+					return true;
+				}
+				perm = get_permissions(page_entry, WP);
+				if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+					ret = false;
+				else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+					ret = false;
+				else
+				{
+					if (write)
+						perm |= VTLB_FLAG_DIRTY;
+					if (!(page_dir & 0x20))
+						m_program->write_dword(pdbr + directory * 4, page_dir | 0x20);
+					if (!(page_entry & 0x40) && write)
+						m_program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x60);
+					else if (!(page_entry & 0x20))
+						m_program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x20);
+					ret = true;
+				}
+			}
+		}
+	}
+	else
+		ret = false;
+	if (entry)
+		*entry = perm;
+	if (ret)
+		*address = a;
+	return ret;
+}
+
+//#define TEST_TLB
+
+bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
+{
+	if (!(m_cr[0] & 0x80000000)) // Some (very few) old OS's won't work with this
+		return true;
+
+	const vtlb_entry *table = vtlb_table();
+	uint32_t index = *address >> 12;
+	vtlb_entry entry = table[index];
+	if (type == TRANSLATE_FETCH)
+		type = TRANSLATE_READ;
+	if (pl == 3)
+		type |= TRANSLATE_USER_MASK;
+#ifdef TEST_TLB
+	uint32_t test_addr = *address;
+#endif
+
+	if (!(entry & VTLB_FLAG_VALID) || ((type & TRANSLATE_WRITE) && !(entry & VTLB_FLAG_DIRTY)))
+	{
+		if (!i386_translate_address(type, address, &entry))
+		{
+			*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
+			if (entry)
+				*error |= 1;
+			return false;
+		}
+		vtlb_dynload(index, *address, entry);
+		return true;
+	}
+	if (!(entry & (1 << type)))
+	{
+		*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0) | 1;
+		return false;
+	}
+	*address = (entry & 0xfffff000) | (*address & 0xfff);
+#ifdef TEST_TLB
+	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
+	if (!test_ret || (test_addr != *address))
+		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
+#endif
+	return true;
+}
 
 uint32_t i386_device::i386_load_protected_mode_segment(I386_SREG *seg, uint64_t *desc )
 {
@@ -2824,48 +2982,6 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	CHANGE_PC(m_eip);
 }
 
-#include "cycles.h"
-
-#define CYCLES_NUM(x)   (m_cycles -= (x))
-
-void i386_device::CYCLES(int x)
-{
-	if (PROTECTED_MODE)
-	{
-		m_cycles -= m_cycle_table_pm[x];
-	}
-	else
-	{
-		m_cycles -= m_cycle_table_rm[x];
-	}
-}
-
-void i386_device::CYCLES_RM(int modrm, int r, int m)
-{
-	if (modrm >= 0xc0)
-	{
-		if (PROTECTED_MODE)
-		{
-			m_cycles -= m_cycle_table_pm[r];
-		}
-		else
-		{
-			m_cycles -= m_cycle_table_rm[r];
-		}
-	}
-	else
-	{
-		if (PROTECTED_MODE)
-		{
-			m_cycles -= m_cycle_table_pm[m];
-		}
-		else
-		{
-			m_cycles -= m_cycle_table_rm[m];
-		}
-	}
-}
-
 void i386_device::build_cycle_table()
 {
 	int i, j;
@@ -2915,7 +3031,6 @@ void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 #include "i486ops.hxx"
 #include "pentops.hxx"
 #include "x87ops.hxx"
-#include "i386ops.h"
 
 void i386_device::i386_decode_opcode()
 {

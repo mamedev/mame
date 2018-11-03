@@ -1072,6 +1072,7 @@ if (CPUS["I386"]~=null) then
 		MAME_DIR .. "src/devices/cpu/i386/i486ops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/pentops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87ops.hxx",
+		MAME_DIR .. "src/devices/cpu/i386/x87priv.h",
 	}
 end
 
