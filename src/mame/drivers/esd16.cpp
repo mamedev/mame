@@ -1573,10 +1573,10 @@ Notes:
               Filename      Type                                      Use
               ---------------------------------------------------------------------------
               68K_PRG.BIN   Hitachi HN27C4096 256K x16 EPROM          68000 Program
-              Z80_PRG.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Z80 Program
-              SAMPLES.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Oki M6295 Samples
-              BG0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Background Graphics
-              SP0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Sprite Graphics
+              Z80_PRG.BIN   Atmel AT27C020 256K x8 OTP mask ROM       Z80 Program
+              SAMPLES.BIN   Atmel AT27C020 256K x8 OTP mask ROM       Oki M6295 Samples
+              BG0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 Flash ROM  Background Graphics
+              SP0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 Flash ROM  Sprite Graphics
 
               Note there are no IC locations on the PCB, so the extension of the ROMs is just 'BIN'
 

@@ -1610,11 +1610,11 @@ Notes:
       HA1388   - Hitachi HA1388 Sound Amp
       2058D    - JRC 2058 Op Amp
       U61, U34,\
-      U20, U21,- 16M MASKROM (SOP44)
+      U20, U21,- 16M mask ROM (SOP44)
       U22, U23 /
-      U1       - 4M MASKROM (SOP44)
+      U1       - 4M mask ROM (SOP44)
       VOL      - Master Volume Potentiometer
-      *        - Unpopulated position for 16M SOP44 MASKROM
+      *        - Unpopulated position for 16M SOP44 mask ROM
 
 
 CPU:    MC68EC020FG16

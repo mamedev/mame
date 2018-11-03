@@ -96,7 +96,7 @@ Notes:
 
       - CXD2922 and CXD2925 are SPU's.
 
-      - The BIOS on ZV610 and GV999 is identical. It's a 4M MASK ROM, compatible with 27C040.
+      - The BIOS on ZV610 and GV999 is identical. It's a 4M mask ROM, compatible with 27C040.
 
       - The CD contains one MODE 1 data track and several Redbook audio tracks which are streamed to the speaker via CN8.
 
@@ -705,13 +705,13 @@ INPUT_PORTS_END
 ROM_START( konamigv )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", ROMREGION_ERASE00 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", ROMREGION_ERASE00 ) /* default EEPROM */
 ROM_END
 
 ROM_START( lacrazyc )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "lacrazyc.25c",   0x000000, 0x000080, CRC(e20e5730) SHA1(066b49236c658a4ef2930f7bacc4b2354dd7f240) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -721,7 +721,7 @@ ROM_END
 ROM_START( susume )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "susume.25c",   0x000000, 0x000080, CRC(52f17df7) SHA1(b8ad7787b0692713439d7d9bebfa0c801c806006) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -731,7 +731,7 @@ ROM_END
 ROM_START( hyperath )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "hyperath.25c", 0x000000, 0x000080, CRC(20a8c435) SHA1(a0f203a999757fba68b391c525ac4b9684a57ba9) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -741,7 +741,7 @@ ROM_END
 ROM_START( powyak96 )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "powyak96.25c", 0x000000, 0x000080, CRC(405a7fc9) SHA1(e2d978f49748ba3c4a425188abcd3d272ec23907) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -751,7 +751,7 @@ ROM_END
 ROM_START( weddingr )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "weddingr.25c", 0x000000, 0x000080, CRC(b90509a0) SHA1(41510a0ceded81dcb26a70eba97636d38d3742c3) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -761,7 +761,7 @@ ROM_END
 ROM_START( simpbowl )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "simpbowl.25c", 0x000000, 0x000080, CRC(2c61050c) SHA1(16ae7f81cbe841c429c5c7326cf83e87db1782bf) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -771,7 +771,7 @@ ROM_END
 ROM_START( btchamp )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "btchmp.25c", 0x000000, 0x000080, CRC(6d02ea54) SHA1(d3babf481fd89db3aec17f589d0d3d999a2aa6e1) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -781,7 +781,7 @@ ROM_END
 ROM_START( kdeadeye )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "kdeadeye.25c", 0x000000, 0x000080, CRC(3935d2df) SHA1(cbb855c475269077803c380dbc3621e522efe51e) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -791,7 +791,7 @@ ROM_END
 ROM_START( nagano98 )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "nagano98.25c",  0x000000, 0x000080, CRC(b64b7451) SHA1(a77a37e0cc580934d1e7e05d523bae0acd2c1480) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -801,7 +801,7 @@ ROM_END
 ROM_START( naganoj )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "720ja.25c",  0x000000, 0x000080, CRC(34c473ba) SHA1(768225b04a293bdbc114a092d14dee28d52044e9) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -811,7 +811,7 @@ ROM_END
 ROM_START( tmosh )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "tmosh.25c", 0x000000, 0x000080, NO_DUMP )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -821,7 +821,7 @@ ROM_END
 ROM_START( tmoshs )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "tmoshs.25c", 0x000000, 0x000080, CRC(e57b833f) SHA1(f18a0974a6be69dc179706643aab837ff61c2738) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -831,7 +831,7 @@ ROM_END
 ROM_START( tmoshsp )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "tmoshsp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -841,7 +841,7 @@ ROM_END
 ROM_START( tmoshspa )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "tmoshsp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )

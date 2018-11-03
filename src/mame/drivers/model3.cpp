@@ -191,7 +191,7 @@ ROM Board
 Notes:
       CN1/2/3/4 - Connectors joining ROM board to CPU board (below)
       Jumpers   - These jumper settings match Scud Race and VF3TB. Jumpers may be different for other games, but
-                  if different, it's likely only for the games that use 64MBit MASKROMs.
+                  if different, it's likely only for the games that use 64MBit mask ROMs.
       ROMs      - Not all sockets are populated. See MAME src for exact ROM usage.
 
 (For dumping reference)
@@ -215,8 +215,8 @@ Jumper pos. 3 is +5V
 -------------------------------
 JP10: 1-2  pin32 of ic 26 to ic 41
 
-All CROM ROMs are 32M MASK
-ALL VROM ROMs are 16M MASK
+All CROM ROMs are 32M mask
+ALL VROM ROMs are 16M mask
 
 
 CPU Board
@@ -440,7 +440,7 @@ VROM03.28 mpr-20379 |
 VROM04.31 mpr-20382 |
 VROM05.30 mpr-20381 |
 VROM06.33 mpr-20384 |
-VROM07.32 mpr-20383  \ 32MBit DIP42 MASK ROM
+VROM07.32 mpr-20383  \ 32MBit DIP42 mask ROM
 VROM10.35 mpr-20386  /
 VROM11.34 mpr-20385 |
 VROM12.37 mpr-20388 |
@@ -453,7 +453,7 @@ VROM17.40 mpr-20391 /
 CROM00.4  mpr-20364 \
 CROM01.3  mpr-20363 |
 CROM02.2  mpr-20362 |
-CROM03.1  mpr-20361  \ 32MBit DIP42 MASK ROM
+CROM03.1  mpr-20361  \ 32MBit DIP42 mask ROM
 CROM10.8  mpr-20368  /
 CROM11.7  mpr-20367 |
 CROM12.6  mpr-20366 |
@@ -474,7 +474,7 @@ CROM3.17  epr-20393A /
 
 SROM0.21  epr-20397    4MBit DIP40 EPROM (27C4096)
 SROM1.22  mpr-20373 \
-SROM2.23  mpr-20374 |  32MBit DIP42 MASK ROM
+SROM2.23  mpr-20374 |  32MBit DIP42 mask ROM
 SROM3.24  mpr-20375 |
 SROM4.25  mpr-20376 /
 
@@ -532,10 +532,10 @@ ROM Board
 |---------------------------------------------------------------------------------------------------|
 
 As used for Spikeout FE. The main difference is the revised 315-6090B GAL and JP2 setting.
-CROMs at IC1 through IC12 are 64Mbit mask roms all other mask roms are 32Mbit.
-64Mbit mask roms read as 27C322 with pin11 +5v & 27C322 with pin11 GND
+CROMs at IC1 through IC12 are 64Mbit mask ROMs all other mask ROMs are 32Mbit.
+64Mbit mask ROMs read as 27C322 with pin11 +5v & 27C322 with pin11 GND
 
-Model 3 games with 64Mbit mask roms are Daytona 2, Spikeout & Spikeout FE
+Model 3 games with 64Mbit mask ROMs are Daytona 2, Spikeout & Spikeout FE
 
 CPU Board
 ---------
@@ -2205,7 +2205,7 @@ ROM_START( lemans24 )   /* step 1.5, Sega game ID# is 833-13159, ROM board ID# 8
 ROM_END
 
 ROM_START( scud )   /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-13072 SPG COMM AUS */
-	/* There is known to be a ROM board ID# 834-13034 SPG DX AUS with program roms EPR-19634 to EPR-19637 */
+	/* There is known to be a ROM board ID# 834-13034 SPG DX AUS with program ROMs EPR-19634 to EPR-19637 */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-19731.17",  0x0600006,  0x80000,  CRC(3ee6447e) SHA1(124697791d90c1b352dd6e33bd3b45535aa92bb5) )
@@ -2966,27 +2966,27 @@ ROM_END
 
 /*
 In Mame getbass is marked as GET BASS STD, while my pcb came from a DLX cab.
-Rom board 833-13317
-834-13318 sticker is on rom board too.
-On cage the follow sticker are present
+ROM board 833-13317
+834-13318 sticker is on ROM board too.
+On the cage the following stickers are present:
 BSS-4500-CVT2
 833-13317 GAME BD BSS-CVT2
 
 I/O board 837-13283 (GET BASS MEC CONT BD in manual)  171-7558c
 
-epr20690.ic11 is controller board prg
-cpu is kl5c80a16cf
-this board have 4 switch (sw3 to sw6)
-a reset switch
+epr20690.ic11 is controller board program ROM
+CPU is KL5C80A16CF
+This board has 4 switches (sw3 to sw6)
+A reset switch
 2 bank of 8 dip switch
 SW1 all off
 SW2 all off
-lh52256cn-70 ram (super cap backup)
-sega 315-5296
-sega 315-5649 both seem I/O chip
-gal16v8d (sega 315-6126)
-32 Mhz xtal
-93c45 eeprom
+LH52256CN-70 RAM (super cap backup)
+Sega 315-5296
+Sega 315-5649 (both seem to be I/O chips)
+GAL16V8D (Sega 315-6126)
+32 Mhz crystal
+93C45 EEPROM
 */
 
 ROM_START( getbass )    /* step 1.0, Sega game ID# is 833-13416 GET BASS STD, ROM board ID# 834-13417 */

@@ -64,8 +64,8 @@ MOTHER PCB- This is the main PCB. It holds all sound circuitry, sound ROMs, prog
             for some minor component shuffling. The 2nd revision is used only by Kosodate Quiz My Angel 3 and Star Sweep.
 CPU PCB   - There are two known revisions of this PCB. Any game can use either PCB. Contains main CPU/RAM and GPU/Video RAM
             The differences are only in the RAM type, one uses 4x 16MBit chips compared to the other that uses 2x 32MBit chips.
-ROM PCB   - There are two known revisions of this PCB. They're mostly identical except one uses all 32MBit SOP44 MASKROMs and the other
-            uses 64MBit SOP44 MASKROMs. The 64MBit ROM board also has space for a PAL and a KEYCUS.
+ROM PCB   - There are two known revisions of this PCB. They're mostly identical except one uses all 32MBit SOP44 mask ROMs and the other
+            uses 64MBit SOP44 mask ROMs. The 64MBit ROM board also has space for a PAL and a KEYCUS.
 
 Each game has a multi-letter code assigned to it which is printed on a small sticker and placed on the bottom side of the MOTHER PCB.
 This code is then proceeded by a number (1, 2, 3 & 4 seen so far), then 'Ver.' then A/B/C/D/E which denotes the software
@@ -112,7 +112,7 @@ Notes:
                    * Pin 9 VCLKOUT - 40.0264MHz (==2x MCLKOUT). Tied to C195
                    * Pin 7 XTALOUT - 16.93426MHz. This is tied to the clock input of the C76
       S11MOT*  - Standard System 11 PALs (DIP20)
-      WAVE.8K  - Sound samples, 42 pin DIP MASKROM, either 16MBit or 32MBit. If 32MBit, it is programmed in Byte Mode.
+      WAVE.8K  - Sound samples, 42 pin DIP mask ROM, either 16MBit or 32MBit. If 32MBit, it is programmed in Byte Mode.
       SPROG.6D - Sound program, Intel PA28F200BX 2MBit Flash ROM (SOP44)
       PRG.2*   - Main program, Intel E28F008SA 8MBit Flash ROM (TSOP40)
       CONN1    - for connection of the ROM Board
@@ -164,7 +164,7 @@ SYSTEM11 ROM8 PCB 8645960202 (8645970202)
 |                                        |
 |----------------------------------------|
 Notes:
-      This ROM board is wired to accept a maximum of 8x 8Bit 32MBit SOP44 MASK ROMs.
+      This ROM board is wired to accept a maximum of 8x 8Bit 32MBit SOP44 mask ROMs.
 
 
 SYSTEM11 ROM8(64) PCB 8645960500 (8645970500)
@@ -177,7 +177,7 @@ SYSTEM11 ROM8(64) PCB 8645960500 (8645970500)
 |                 *PRG3L.IC9             |
 |----------------------------------------|
 Notes:
-      This ROM board is wired to accept a maximum of 8x 8Bit 64MBit SOP44 MASK ROMs.
+      This ROM board is wired to accept a maximum of 8x 8Bit 64MBit SOP44 mask ROMs.
       There is room for a PLCC44 KEYCUS IC (usually a CPLD, but not populated) and a PLCC20
       IC type PAL16V8H (populated and labelled 'ROM8 DEC0')
       * - These ROMs are on the other side of the PCB.
@@ -474,9 +474,9 @@ WRITE16_MEMBER( namcos11_state::c76_shared_w )
 
 void namcos11_state::namcos11_map(address_map &map)
 {
-	map(0x1fa04000, 0x1fa0ffff).rw(FUNC(namcos11_state::c76_shared_r), FUNC(namcos11_state::c76_shared_w)); /* shared ram with C76 */
+	map(0x1fa04000, 0x1fa0ffff).rw(FUNC(namcos11_state::c76_shared_r), FUNC(namcos11_state::c76_shared_w)); /* shared RAM with C76 */
 	map(0x1fa20000, 0x1fa2001f).rw("keycus", FUNC(ns11_keycus_device::read), FUNC(ns11_keycus_device::write));
-	map(0x1fa30000, 0x1fa30fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x00ff00ff); /* eeprom */
+	map(0x1fa30000, 0x1fa30fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x00ff00ff); /* EEPROM */
 	map(0x1fb00000, 0x1fb00003).nopw(); /* ?? */
 	map(0x1fbf6000, 0x1fbf6003).nopw(); /* ?? */
 }

@@ -198,13 +198,13 @@ Earthjkr: Wrong screen size? Left edge of green blueprints in
 attract looks like it's incorrectly off screen.
 
 Cadash: Hooks for twin arcade machine setup: will involve emulating an extra
-microcontroller, the 07 rom might be the program for it. Cadash background
+microcontroller, the 07 ROM might be the program for it. Cadash background
 colors don't reinitialize properly with save states.
 
 Galmedes: Test mode has select1/2 stuck at on.
 
 Eto: $76d0 might be a protection check? It reads to and writes from
-the prog rom. Doesn't seem to cause problems though.
+the program ROM. Doesn't seem to cause problems though.
 
 DIP locations verified for:
     - bonzeadv (manual)
@@ -1337,7 +1337,7 @@ ROM_START( asuka ) /* Taito PCB: ASKA&ASKA - K1100388A / J1100169A */
 	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
-ROM_START( asukaj ) /* Known to exist but not dumped: revision 1 with B68 08-1 & B68 09-1 program roms */
+ROM_START( asukaj ) /* Known to exist but not dumped: revision 1 with B68 08-1 & B68 09-1 program ROMs */
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "b68-09.ic23", 0x00000, 0x20000, CRC(1eaa1bbb) SHA1(01ca6a5f3c47dab49654b84601119714eb329cc5) )
 	ROM_LOAD16_BYTE( "b68-08.ic8",  0x00001, 0x20000, CRC(8cc96e60) SHA1(dc94f3fd48c0407ec72e8330bc688e9e16d39213) )
@@ -1421,7 +1421,7 @@ ROM_START( cadashp )
 	ROM_REGION( 0x08000, "subcpu", 0 )  /* HD64180RP8 code (link) */
 	ROM_LOAD( "com.ic57",   0x00000, 0x08000, CRC(bae1a92f) SHA1(dbe10a02a294dfa7d6052a692c3a49aad85d6ffd) )
 
-	// all other roms are under some kind of epoxy, assuming to be the same..
+	// all other ROMs are under some kind of epoxy, assuming to be the same..
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) /* SCR tiles (8 x 8) */
 
@@ -1678,10 +1678,10 @@ ROM_START( earthjkr ) /* Taito PCB: K1100388A / J1100169A */
 	ROM_LOAD16_WORD( "ej_30e.ic30", 0x80000, 0x80000, CRC(49d1f77f) SHA1(f6c9b2fc88b77cc9baa5be48da5c3eb72310e471) ) /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - MASK ROM */
+	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - mask ROM */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - MASK ROM */
+	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - mask ROM */
 	ROM_LOAD16_BYTE( "ej_1.ic5",     0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
 	ROM_LOAD16_BYTE( "ej_0.ic4",     0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
 
@@ -1698,9 +1698,9 @@ ROM_END
 
 // Known to exist (not dumped) a Japanese version with ROMs 3 & 4 also stamped "A" same as above or different version??
 // Also known to exist (not dumped) a US version of Earth Joker, title screen shows "DISTRIBUTED BY ROMSTAR, INC."  ROMs were numbered
-// from 0 through 4 and the fix rom at IC30 is labeled 1 even though IC5 is also labled as 1 similar to the below set:
+// from 0 through 4 and the fix ROM at IC30 is labeled 1 even though IC5 is also labled as 1 similar to the below set:
 
-ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just be an early revision, not proto
+ROM_START( earthjkrp ) // was production PCB complete with mask ROM, could just be an early revision, not proto
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "3.ic23", 0x00001, 0x20000, CRC(26c33225) SHA1(b039c47d0776c90813ab52c867e95989cab2c567) )
 	ROM_LOAD16_BYTE( "4.ic8",  0x00000, 0x20000, CRC(e9b1ef0c) SHA1(5e104146d37922a8c7e93696c2c156223653025b) )
@@ -1708,10 +1708,10 @@ ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just 
 	ROM_LOAD16_WORD( "5.ic30", 0x80000, 0x80000, CRC(bf760b2d) SHA1(4aff36623e5a31ab86c77461fa93e40e77f08edd) ) /* Fix ROM */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - MASK ROM */
+	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - mask ROM */
 
 	ROM_REGION( 0xa0000, "gfx2", 0 )
-	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - MASK ROM */
+	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - mask ROM */
 	ROM_LOAD16_BYTE( "1.ic5",        0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
 	ROM_LOAD16_BYTE( "0.ic4",        0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
 

@@ -113,7 +113,7 @@ CG24143/CG24173 - Fujitsu custom graphics generators
           VSync - 59.6010Hz
           HSync - 15.55610kHz
 
-Eproms:
+EPROMs:
 Location    Rom Type    PCB Label
 ---------------------------------
 U164        27C2001     SPA-7A
@@ -648,7 +648,7 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-/* rom loading */
+/* ROM loading */
 
 ROM_START( jchan )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
@@ -690,7 +690,7 @@ ROM_START( jchan )
 ROM_END
 
 
-ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed to be the same */
+ROM_START( jchan2 ) /* Some kind of semi-sequel? Mask ROMs dumped and confirmed to be the same */
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "j2p1x1.u67", 0x000001, 0x080000, CRC(5448c4bc) SHA1(447835275d5454f86a51879490a6b22b06a23e81) )
 	ROM_LOAD16_BYTE( "j2p1x2.u68", 0x000000, 0x080000, CRC(52104ab9) SHA1(d6647e628662bdb832270540ece18b265b7ce62d) )

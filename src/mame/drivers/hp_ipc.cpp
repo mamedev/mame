@@ -210,7 +210,7 @@ ROM board (Operating System ROM PCA. Assembly# HP82991A or HP82995A)
 Notes:
       J1/J2 - 20 pin connector joining to 'Option ROM PCA'
       J3/J4 - 20 pin connector joining to 'LOGIC A PCA'
-      U1-U4 - 28 pin EPROM/MASKROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
+      U1-U4 - 28 pin EPROM/mask ROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
 
 
 ROM board (Option ROM PCA)
@@ -229,7 +229,7 @@ Note this PCB plugs in upside-down on top of the Operating System ROM PCB
 Notes:
       J1/J2 - 20 pin connector joining to 'Operating System ROM PCA'
       J3/J4 - 20 pin connector joining to 'LOGIC A PCA'
-      U1-U4 - 28 pin EPROM/MASKROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
+      U1-U4 - 28 pin EPROM/mask ROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
 
 
 Physical Memory Map

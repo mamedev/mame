@@ -6797,8 +6797,8 @@ Notes:
       ROMs          - Filename           Device
                       ----------------------------------------------------
                       TAICOM-00.2C     - ST M27C2001 256K x8 EPROM (DIP32)
-                      TAICOM-01.15B    - 4MBit MASKROM (DIP32)
-                      TAICOM-02.11B    - 4MBit MASKROM (DIP32)
+                      TAICOM-01.15B    - 4MBit mask ROM (DIP32)
+                      TAICOM-02.11B    - 4MBit mask ROM (DIP32)
                       TAICOM-03.13B    - AMD AM27C040 512K x8 EPROM (DIP32)
                       TMP91P640N-10.5B - Internal 16K ROM from MCU
 

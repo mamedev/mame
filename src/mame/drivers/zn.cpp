@@ -370,7 +370,7 @@ void zn_state::zn_map(address_map &map)
 	map(0x1fa30000, 0x1fa30003).noprw(); /* ?? */
 	map(0x1fa40000, 0x1fa40003).nopr(); /* ?? */
 	map(0x1fa60000, 0x1fa60003).nopr(); /* ?? */
-	map(0x1faf0000, 0x1faf07ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)); /* eeprom */
+	map(0x1faf0000, 0x1faf07ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)); /* EEPROM */
 	map(0x1fb20000, 0x1fb20007).r(FUNC(zn_state::unknown_r));
 }
 
@@ -625,8 +625,8 @@ void zn_state::coh1000c_map(address_map &map)
 
 MACHINE_START_MEMBER(zn_state,coh1000c)
 {
-	m_rombank[0]->configure_entries( 0, 16, m_bankedroms->base() + 0x400000, 0x400000 ); /* banked game rom */
-	m_soundbank->configure_entries( 0, 16, memregion("audiocpu")->base() + 0x8000, 0x4000 ); /* banked audio rom */
+	m_rombank[0]->configure_entries( 0, 16, m_bankedroms->base() + 0x400000, 0x400000 ); /* banked game ROM */
+	m_soundbank->configure_entries( 0, 16, memregion("audiocpu")->base() + 0x8000, 0x4000 ); /* banked audio ROM */
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000c)
@@ -637,7 +637,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1000c)
 
 MACHINE_RESET_MEMBER(zn_state,glpracr)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // glpracr qsound rom sockets are empty
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // glpracr QSound ROM sockets are empty
 	MACHINE_RESET_CALL_MEMBER(coh1000c);
 }
 
@@ -1112,7 +1112,7 @@ void zn_state::coh1000ta_map(address_map &map)
 
 MACHINE_START_MEMBER(zn_state,coh1000ta)
 {
-	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
+	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game ROM */
 	if (m_soundbank.found())
 	{
 		m_soundbank->configure_entry( 0, memregion( "audiocpu" )->base() + 0x20000 ); /* TODO : Bank 0 is addressing First 16 KB of ROM? */
@@ -1580,7 +1580,7 @@ RA9701 SUB
 |--------------------------------------|
 Notes:
       CAT702              - protection chip labelled 'ET02' (DIP20)
-      ROMs 217, 216 & 326 - surface mounted 32MBit MASK ROM (SOP44)
+      ROMs 217, 216 & 326 - surface mounted 32MBit mask ROM (SOP44)
       ROMs 042 & 046      - 27C2001 EPROM
       ROMs 212 to 215     - 27C4001 EPROM
       MAIN_IF2 & SUB_IF2  - AMD Mach211 CPLD (PLCC44)
@@ -1624,7 +1624,7 @@ PS9805
 Notes:
       *                   - Unpopulated ROM positions.
       CAT702              - protection chip labelled 'MG11' (DIP20)
-      ROM-x               - surface mounted 32MBit MASK ROM (SOP44)
+      ROM-x               - surface mounted 32MBit mask ROM (SOP44)
       ROMs 412 & 049      - 27C040 EPROM
       MASK4A              - smt solder pads (unpopulated)
       MASK4B              - DIP42 socket (unpopulated)
@@ -1661,7 +1661,7 @@ void zn_state::coh1002e_map(address_map &map)
 
 MACHINE_START_MEMBER(zn_state,coh1002e)
 {
-	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
+	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game ROM */
 	if (m_okibank.found())
 		m_okibank->configure_entries( 0, memregion( "oki" )->bytes()/0x10000, memregion( "oki" )->base(), 0x10000 ); /* not verified */
 }
@@ -1844,7 +1844,7 @@ void zn_state::init_bam2()
 
 MACHINE_START_MEMBER(zn_state,bam2)
 {
-	m_rombank[0]->configure_entries( 0, 16, m_bankedroms->base(), 0x400000 ); /* banked game rom */
+	m_rombank[0]->configure_entries( 0, 16, m_bankedroms->base(), 0x400000 ); /* banked game ROM */
 }
 
 MACHINE_RESET_MEMBER(zn_state,bam2)
@@ -1871,7 +1871,7 @@ light-gun type shooting game
 Uses the Sony ZN-1 hardware with Rom board and
 Hard disk Drive
 
-U35 and U36 eproms are 27c1001 are believed to be the bios
+U35 and U36 EPROMs are 27c1001 are believed to be the BIOS
 data.
 
 Disk Drive is a Quantum ????2.1 GB??
@@ -2339,10 +2339,10 @@ Notes:
       ATHG-03.22    - Sound program (27C010 EPROM)
       ATHG-04.21    /
 
-      ATHG-05.4136  - Sound data (16MBit DIP42 MASKROM)
+      ATHG-05.4136  - Sound data (16MBit DIP42 mask ROM)
       ATHG-06.4134  /
 
-      ATHG-07.027   - Graphics data (32MBit DIP42 MASKROM)
+      ATHG-07.027   - Graphics data (32MBit DIP42 mask ROM)
       ATHG-08.028   /
       ATHG-09.210   /
       ATHG-10.029   /
@@ -2375,7 +2375,7 @@ void zn_state::coh1001l_map(address_map &map)
 
 MACHINE_START_MEMBER(zn_state,coh1001l)
 {
-	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
+	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game ROM */
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1001l)
@@ -2441,7 +2441,7 @@ void zn_state::coh1002v_map(address_map &map)
 
 MACHINE_START_MEMBER(zn_state,coh1002v)
 {
-	m_rombank[0]->configure_entries( 0, 24, m_bankedroms->base(), 0x100000 ); /* banked game rom */
+	m_rombank[0]->configure_entries( 0, 24, m_bankedroms->base(), 0x100000 ); /* banked game ROM */
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1002v)
@@ -2550,7 +2550,7 @@ Tecmo TPS1-7
 |--------------------------------------|
 Notes:
       There are a few unpopulated positions on this game board, including
-      4 unpopulated positions for 4x 32MBit smt SOP44 MASKROMs
+      4 unpopulated positions for 4x 32MBit smt SOP44 mask ROMs
       1 unpopulated position for uPD72103AG near the D43001 RAM
       2 unpopulated positions for 2 connectors near the Z80 ROM possibly for a network link?
       1 unpopulated position for a PAL16V8 near ROM 'CBAJ2'
@@ -2566,8 +2566,8 @@ Notes:
       3 logic chips near main program ROMs.
       2x 4MBit EPROMs labelled 'CBAJ1' and 'CBAJ2'
       1x 2MBit EPROM labelled 'CBAJZ80'
-      9x 32MBit smt SOP44 MASKROMs labelled 'CB-00' through 'CB-08' (Graphics)
-      2x 32MBit smt SOP44 MASKROMs labelled 'CB-SE' and 'CB-V0' (connected to the YMZ280B)
+      9x 32MBit smt SOP44 mask ROMs labelled 'CB-00' through 'CB-08' (Graphics)
+      2x 32MBit smt SOP44 mask ROMs labelled 'CB-SE' and 'CB-V0' (connected to the YMZ280B)
       LH540202 - CMOS 1024 x 9 Asyncronous FIFO (PLCC32)
       D43001   - 32K x8 SRAM, equivalent to 62256 SRAM
 
@@ -2613,8 +2613,8 @@ Notes:
       CAT702 Protection chip labelled 'MG04' (DIP20)
       3 logic chips
       2x 4MBit EPROMs labelled 'SHMJ-B' and 'SHMJ-A'
-      4x 32MBit smt SOP44 MASKROMs labelled 'SH03, 'SH02', 'SH01' & 'SH00'. There is space
-      for 11 more 32MBit smt SOP44 MASKROMs.
+      4x 32MBit smt SOP44 mask ROMs labelled 'SH03, 'SH02', 'SH01' & 'SH00'. There is space
+      for 11 more 32MBit smt SOP44 mask ROMs.
 */
 
 WRITE8_MEMBER(zn_state::coh1002m_bank_w)
@@ -2632,7 +2632,7 @@ void zn_state::coh1002m_map(address_map &map)
 
 MACHINE_START_MEMBER(zn_state,coh1002m)
 {
-	m_rombank[0]->configure_entries( 0, 8, m_bankedroms->base(), 0x800000 ); /* banked game rom */
+	m_rombank[0]->configure_entries( 0, 8, m_bankedroms->base(), 0x800000 ); /* banked game ROM */
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1002m)
@@ -4901,7 +4901,7 @@ ROM_START( beastrzr )
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
-	ROM_LOAD16_BYTE( "b.roar_u0213",   0x000001, 0x080000, CRC(2c586534) SHA1(a38dfc3a45446d24a1caac89b0f560989d46ded5) ) /* For U0212 & U0213, 8ing used indentical rom labels */
+	ROM_LOAD16_BYTE( "b.roar_u0213",   0x000001, 0x080000, CRC(2c586534) SHA1(a38dfc3a45446d24a1caac89b0f560989d46ded5) ) /* For U0212 & U0213, 8ing used indentical ROM labels */
 	ROM_LOAD16_BYTE( "b.roar_u0212",   0x000000, 0x080000, CRC(1c85d7fb) SHA1(aa406a42c424cc16a9e5330c68dda9acf8760088) ) /* even though the content changes between versions   */
 	ROM_LOAD16_BYTE( "b.roar-u0215",   0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
 	ROM_LOAD16_BYTE( "b.roar-u0214",   0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )
@@ -4923,7 +4923,7 @@ ROM_START( bldyroar )
 	PSARC95_BIOS
 
 	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
-	ROM_LOAD16_BYTE( "b.roar-u0213",   0x000001, 0x080000, CRC(63769342) SHA1(7231188073b997b039467db85ce7c85383daf591) ) /* For U0212 & U0213, 8ing used indentical rom labels */
+	ROM_LOAD16_BYTE( "b.roar-u0213",   0x000001, 0x080000, CRC(63769342) SHA1(7231188073b997b039467db85ce7c85383daf591) ) /* For U0212 & U0213, 8ing used indentical ROM labels */
 	ROM_LOAD16_BYTE( "b.roar-u0212",   0x000000, 0x080000, CRC(966b7169) SHA1(63e025cacb84e89d30b40ed6cfa5c63d84c298c4) ) /* even though the content changes between versions   */
 	ROM_LOAD16_BYTE( "b.roar-u0215",   0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
 	ROM_LOAD16_BYTE( "b.roar-u0214",   0x100000, 0x080000, CRC(1cdc450a) SHA1(9215e5fec52f7c5c0070feb621eb9c77f98e2362) )

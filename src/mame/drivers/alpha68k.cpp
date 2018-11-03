@@ -3155,7 +3155,7 @@ ROM_START( sbasebalj )
 	ROM_LOAD( "kcb-chr0.h16", 0x1e0000, 0x80000, CRC(b8a1a088) SHA1(cb21a04387431b1810130abd86a2ebf78cf09a3b) )
 ROM_END
 
-ROM_START( tnextspc ) /* MASKROM for gfx */
+ROM_START( tnextspc ) /* mask ROM for gfx */
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ns_4.bin", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) )
 	ROM_LOAD16_BYTE( "ns_3.bin", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) )

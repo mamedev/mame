@@ -2871,7 +2871,7 @@ ROM_START( sftm )   /* Version 1.12, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 Ro
 	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
 	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
 
-	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROMs locations */
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROM locations */
 
 	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
 	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )
@@ -2907,7 +2907,7 @@ ROM_START( sftm111 )    /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
 	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
 
-	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROMs locations */
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROM locations */
 
 	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
 	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )
@@ -2943,7 +2943,7 @@ ROM_START( sftm110 )    /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
 	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
 
-	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROMs locations */
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROM locations */
 
 	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
 	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )
@@ -2979,7 +2979,7 @@ ROM_START( sftmj )  /* Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073
 	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
 	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
 
-	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROMs locations */
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROM locations */
 
 	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
 	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )

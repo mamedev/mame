@@ -283,8 +283,8 @@ Notes:
 
       ROMs -
             Note, the ROM names shown on the above layout are generic. Each EPROM on every game has
-            a unique sticker attached to it. All of the MASKROMs are also stamped with unique names
-            for each game. The amount of EPROMs/MASKROMs used also differs per game, depending on
+            a unique sticker attached to it. All of the mask ROMs are also stamped with unique names
+            for each game. The amount of EPROMs/mask ROMs used also differs per game, depending on
             requirements. The PCB is wired for certain sized ROMs by default, but via jumpers they
             can be reconfigured to allow accepting other sized devices.
 
@@ -449,7 +449,7 @@ Notes:
                         So far, the data held on the SIMMs is equal to or less than the ROM capacity of
                         the sockets on the B-Board, so the use of SIMMs is a mystery.
                         Some possible explanations are their use is a cost-cutting measure, or they're
-                        more easily sourced from the supplier rather than using older 42-pin MASKROMs.
+                        more easily sourced from the supplier rather than using older 42-pin mask ROMs.
                         Another possibility is they are being re-used from left-over CPS3 boards, since
                         they're identical and are easily re-programmable. In comparision, the GFX SIMMs
                         are the same type as used in CPS3 boards for the main program and the QSound

@@ -8,7 +8,7 @@ Quiz Bisyoujo Senshi Sailor Moon    (c)1997 Banpresto
 Driver by David Haywood
 
 TODO:
- - what is the 'bios' rom for? it appears to be data tables and is very different between games but we don't map it anywhere
+ - what is the 'BIOS' ROM for? it appears to be data tables and is very different between games but we don't map it anywhere
  - convert tilemaps to devices?
 
  68020 interrupts

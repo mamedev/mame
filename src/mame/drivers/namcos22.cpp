@@ -275,7 +275,7 @@
  *
  *Notes:
  *      J6           : Custom Namco connector for plug-in program ROM PCB
- *      J11          : Custom Namco connector for optional plug-in WAVE ROM PCB (holds some SOP44 MASKROMs)
+ *      J11          : Custom Namco connector for optional plug-in WAVE ROM PCB (holds some SOP44 mask ROMs)
  *      JC410        : Custom Namco connector for Optional plug-in Auxiliary PCB (e.g. Gun Control PCB used in Time Crisis
  *                     etc)
  *                     The connector is populated only on the 2nd revision CPU (B) PCB 8646962600 (8646972600)
@@ -340,20 +340,20 @@
  *                     Tokyo Wars         'TW1 DATA'
  *
  *     WAVEA.2L   \
- *     WAVEB.1L   /  : 16M/32M WAVE MASKROMs. If 32MBit DIP42, they're programmed in BYTE mode (DIP42/SOP44)
+ *     WAVEB.1L   /  : 16M/32M WAVE mask ROMs. If 32MBit DIP42, they're programmed in BYTE mode (DIP42/SOP44)
  *                     Game                Wave A        Wave B        Type
  *                     ----------------------------------------------------------------------------
- *                     Air Combat 22      'ACS1 WAVE0', 'ACS1 WAVE1' , both SOP44 32M MASKROMs
- *                     Alpine Racer 1     'AR1 WAVEA' ,              , DIP42 16M MASKROM
- *                     Alpine Racer 2     'ARS1 WAVEA', 'ARS2 WAVE B', both DIP42 32M MASKROMs
- *                     Alpine Surfer      'AF1 WAVEA' ,              , DIP42 32M MASKROM
- *                     Aqua Jet           'AJ1 WAVEA' , 'AJ1 WAVEB'  , both DIP42 32M MASKROMs
- *                     Armadillo Racing   'AM1 WAVEA' , 'AM1 WAVEB'  , both DIP42 32M MASKROMs. Prototype version uses TSOP56, mounted on a DIP48 adapter board
- *                     Cyber Cycles       'CB1 WAVEA' , 'CB1 WAVEB'  , WAVE A DIP42 32M MASKROM, WAVE B DIP42 16M MASKROM
- *                     Dirt Dash          'DT1 WAVEA' , 'DT1 WAVEB'  , both DIP42 32M MASKROMs
- *                     Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M MASKROM
- *                     Time Crisis        'TS1 WAVE A', 'TS1 WAVE B' , WAVE A DIP42 32M MASKROM, WAVE B DIP42 16M MASKROM
- *                     Tokyo Wars         'TW1 WAVE A',              , DIP42 32M MASKROM
+ *                     Air Combat 22      'ACS1 WAVE0', 'ACS1 WAVE1' , both SOP44 32M mask ROMs
+ *                     Alpine Racer 1     'AR1 WAVEA' ,              , DIP42 16M mask ROM
+ *                     Alpine Racer 2     'ARS1 WAVEA', 'ARS2 WAVE B', both DIP42 32M mask ROMs
+ *                     Alpine Surfer      'AF1 WAVEA' ,              , DIP42 32M mask ROM
+ *                     Aqua Jet           'AJ1 WAVEA' , 'AJ1 WAVEB'  , both DIP42 32M mask ROMs
+ *                     Armadillo Racing   'AM1 WAVEA' , 'AM1 WAVEB'  , both DIP42 32M mask ROMs. Prototype version uses TSOP56, mounted on a DIP48 adapter board
+ *                     Cyber Cycles       'CB1 WAVEA' , 'CB1 WAVEB'  , WAVE A DIP42 32M mask ROM, WAVE B DIP42 16M mask ROM
+ *                     Dirt Dash          'DT1 WAVEA' , 'DT1 WAVEB'  , both DIP42 32M mask ROMs
+ *                     Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M mask ROM
+ *                     Time Crisis        'TS1 WAVE A', 'TS1 WAVE B' , WAVE A DIP42 32M mask ROM, WAVE B DIP42 16M mask ROM
+ *                     Tokyo Wars         'TW1 WAVE A',              , DIP42 32M mask ROM
  *
  *
  *PROGRAM ROM Daughterboard PCB

@@ -121,9 +121,9 @@ ROMs -
        1.U23 - Main Program, ST 27C4002 EPROM (DIP40)
        2.U22 /
 
-       The remaining ROMs are surface mounted TSOP48 Type II MASKROMs,
+       The remaining ROMs are surface mounted TSOP48 Type II mask ROMs,
        either OKI MSM27C3252 (32MBit) or OKI MSM27C1652 (16MBit).
-       These MASKROMs are non-standard and require a custom adapter
+       These mask ROMs are non-standard and require a custom adapter
        to read them. Not all positions are populated for each game. See
        the source below for specifics.
 

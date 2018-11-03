@@ -1868,7 +1868,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hachamfp )
 	PORT_INCLUDE(hachamfb)
-	
+
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -5108,7 +5108,7 @@ void nmk16_state::init_ssmissin()
 
 void nmk16_state::init_bjtwin()
 {
-	/* Patch rom to enable test mode */
+	/* Patch ROM to enable test mode */
 
 /*  008F54: 33F9 0008 0000 000F FFFC move.w  $80000.l, $ffffc.l
  *  008F5E: 3639 0008 0002           move.w  $80002.l, D3
@@ -5207,7 +5207,7 @@ void nmk16_state::afega_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::nmk16_mainram_strange_w)).share("mainram");
 }
 
-// firehawk has 0x100000 bytes of program rom (at least the switchable version) so the above can't work.
+// firehawk has 0x100000 bytes of program ROM (at least the switchable version) so the above can't work.
 void nmk16_state::firehawk_map(address_map &map)
 {
 	map.global_mask(0x3fffff);
@@ -5900,7 +5900,7 @@ ROM_END
 
 /*
 
-S.B.S. Gomorrah (and Bio-ship Paladin with correct roms in place)
+S.B.S. Gomorrah (and Bio-ship Paladin with correct ROMs in place)
 UPL, 1993
 
 PCB Layout
@@ -6449,7 +6449,7 @@ ROM_START( hachamfb ) /* Thunder Dragon conversion - unprotected prototype or bo
 	/* 0x20000 - 0x80000 banked */
 ROM_END
 
-ROM_START( hachamfp ) /* Protoype Location Test Release; Hand-written labels with various dates. 68K program rom has 19th Sep. 1991 string.*/
+ROM_START( hachamfp ) /* Protoype Location Test Release; Hand-written labels with various dates. 68K program ROM has 19th Sep. 1991 string.*/
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_BYTE( "kf-68-pe-b.ic7",  0x00000, 0x20000, CRC(b98a525e) SHA1(161c3b3360068e606e4d4104cc172b9736a52eeb) ) /* Label says "KF 9/25 II 68 PE B" */
 	ROM_LOAD16_BYTE( "kf-68-po-b.ic6",  0x00001, 0x20000, CRC(b62ad179) SHA1(60a66fb9eb3fc792d172e1f4507a806ac2ad4217) ) /* Label says "KF 9/25 II 68 PO B" */
@@ -6634,13 +6634,13 @@ ROM_END
 
 ROM_START( macross2k ) /* Title screen only shows Macross II, no Kanji.  Suspected Korean version - Language dip still used for Stage info screens */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "1.3",      0x00000, 0x80000, CRC(1506fcfc) SHA1(638ccc90effde3be20ab9b4da3a0d75af2577e51) ) /* non descript rom label "1" */
+	ROM_LOAD16_WORD_SWAP( "1.3",      0x00000, 0x80000, CRC(1506fcfc) SHA1(638ccc90effde3be20ab9b4da3a0d75af2577e51) ) /* non descript ROM label "1" */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
 	ROM_LOAD( "mcrs2j.2",    0x00000, 0x20000, CRC(b4aa8ac7) SHA1(73a6de56cbfb468450d9b39fcbae0362f242f37b) ) /* banked */
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
-	ROM_LOAD( "2.1",    0x000000, 0x020000, CRC(e8ab17f9) SHA1(9396e29a134698db59b7faae19dd8fb947cde752) ) /* 8x8 tiles - non descript rom label "2" */
+	ROM_LOAD( "2.1",    0x000000, 0x020000, CRC(e8ab17f9) SHA1(9396e29a134698db59b7faae19dd8fb947cde752) ) /* 8x8 tiles - non descript ROM label "2" */
 
 	ROM_REGION( 0x200000, "bgtile", 0 )
 	ROM_LOAD( "bp932an.a04", 0x000000, 0x200000, CRC(c4d77ff0) SHA1(aca60a3f5f89265e7e3799e5d80ea8196fb11ff3) ) /* 16x16 tiles */
@@ -6728,7 +6728,7 @@ ROM_START( tdragon3h )
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "12.27c1000",    0x000000, 0x020000, CRC(f809d616) SHA1(c6a4d776fee770ec197204b855b85bcc719469a5) )    /* 8x8 tiles */
 
-	// all other roms are MASK parts marked 'CONNY' but weren't dumped from this PCB so content is only assumed to be the same
+	// all other ROMs are mask parts marked 'CONNY' but weren't dumped from this PCB so content is only assumed to be the same
 
 	ROM_REGION( 0x200000, "bgtile", 0 )
 	ROM_LOAD( "ww930914.2", 0x000000, 0x200000, CRC(f968c65d) SHA1(fd6d21bba53f945b1597d7d0735bc62dd44d5498) )  /* 16x16 tiles */
@@ -6812,7 +6812,7 @@ NMK, 1994
 
 The main board has no ROMs at all except 3 PROMs. There is a plug-in daughter
 board that holds all the ROMs. It has the capacity for 3 socketed EPROMS and 7x
-16M MASK ROMs total.
+16M mask ROMs total.
 
 
 PCB Layout (Main board)
@@ -7551,8 +7551,8 @@ AFEGA4.U112  27C020 + M68000 program code
 AFEGA5.U107  27C020 |
 
 AFEGA3.UC13  ST M27C160  - Sprites
-AF1-B2.UC8   MASK ROM read as 27C160  - Backgrounds
-AF1-B1.UC3   MASK ROM read as 27C160  - Backgrounds
+AF1-B2.UC8   mask ROM read as 27C160  - Backgrounds
+AF1-B1.UC3   mask ROM read as 27C160  - Backgrounds
 
 ROMS for Sen Jin:
 
@@ -7564,9 +7564,9 @@ GST-03.U4    27C512  - Graphics / text Layer
 GST-04.U112  27C2000 + M68000 program code
 GST-05.U107  27C2000 |
 
-AF1-SP.UC13  MASK ROM read as 27C160  - Sprites
-AF1-B2.UC8   MASK ROM read as 27C160  - Backgrounds
-AF1-B1.UC3   MASK ROM read as 27C160  - Backgrounds
+AF1-SP.UC13  mask ROM read as 27C160  - Sprites
+AF1-B2.UC8   mask ROM read as 27C160  - Backgrounds
+AF1-B1.UC3   mask ROM read as 27C160  - Backgrounds
 
 ***************************************************************************/
 
@@ -7581,14 +7581,14 @@ ROM_START( grdnstrm )
 	ROM_LOAD16_BYTE( "afega5.u107", 0x000001, 0x040000, CRC(5815c806) SHA1(f6b7809b2e3b29b89289ecc994909434fe34e10d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
-	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) /* MASK ROM (read as 27C020) */
+	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) /* mask ROM (read as 27C020) */
 
 	ROM_REGION( 0x200000, "sprites", 0 )   /* Sprites, 16x16x4 */
 	ROM_LOAD( "afega3.uc13", 0x000000, 0x200000, CRC(0218017c) SHA1(5a8a4f07cd3f9dcf62455ddaceaec0cfba8c2de9) ) /* ST M27C160 EPROM */
 
 	ROM_REGION( 0x400000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
-	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* MASK ROM (read as 27C160) */
-	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* mask ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* mask ROM (read as 27C160) */
 
 	ROM_REGION( 0x10000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
 	ROM_LOAD( "afega1.u4",  0x00000, 0x10000, CRC(9e7ef086) SHA1(db086bb2ceb11f3e24548aa131cc74fe79a2b516) )
@@ -7606,11 +7606,11 @@ ROM_START( grdnstrmk )
 	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )   /* Sprites, 16x16x4 */
-	ROM_LOAD( "afega_af1-sp.uc13", 0x000000, 0x200000, CRC(7d4d4985) SHA1(15c6c1aecd3f12050c1db2376f929f1a26a1d1cf) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-sp.uc13", 0x000000, 0x200000, CRC(7d4d4985) SHA1(15c6c1aecd3f12050c1db2376f929f1a26a1d1cf) ) /* mask ROM (read as 27C160) */
 
 	ROM_REGION( 0x400000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
-	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* MASK ROM (read as 27C160) */
-	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* mask ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* mask ROM (read as 27C160) */
 
 	ROM_REGION( 0x10000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
 	ROM_LOAD( "gst-03.u4",  0x00000, 0x10000, CRC(a1347297) SHA1(583f4da991eeedeb523cf4fa3b6900d40e342063) )
@@ -7628,11 +7628,11 @@ ROM_START( grdnstrmj )
 	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )   /* Sprites, 16x16x4 */
-	ROM_LOAD( "afega_af1-sp.uc13", 0x000000, 0x200000, CRC(7d4d4985) SHA1(15c6c1aecd3f12050c1db2376f929f1a26a1d1cf) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-sp.uc13", 0x000000, 0x200000, CRC(7d4d4985) SHA1(15c6c1aecd3f12050c1db2376f929f1a26a1d1cf) ) /* mask ROM (read as 27C160) */
 
 	ROM_REGION( 0x400000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
-	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* MASK ROM (read as 27C160) */
-	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* mask ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* mask ROM (read as 27C160) */
 
 	ROM_REGION( 0x10000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
 	ROM_LOAD( "gst-03.u4",  0x00000, 0x10000, CRC(a1347297) SHA1(583f4da991eeedeb523cf4fa3b6900d40e342063) )
@@ -7647,14 +7647,14 @@ ROM_START( grdnstrmv ) /* Apples Industries license - Vertical version */
 	ROM_LOAD16_BYTE( "afega3.u107", 0x000001, 0x040000, CRC(05920a99) SHA1(ee77da303d6b766c529c426a836777827ac31676) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
-	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) /* MASK ROM (read as 27C020) */
+	ROM_LOAD( "afega7.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) /* mask ROM (read as 27C020) */
 
 	ROM_REGION( 0x200000, "sprites", 0 )   /* Sprites, 16x16x4 */
 	ROM_LOAD( "afega6.uc13", 0x000000, 0x200000, CRC(9b54ff84) SHA1(9e120d85cf2fa899e6426dcb4302c8051746facc) ) /* ST M27C160 EPROM */
 
 	ROM_REGION( 0x400000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
-	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* MASK ROM (read as 27C160) */
-	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* mask ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* mask ROM (read as 27C160) */
 
 	ROM_REGION( 0x10000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
 	ROM_LOAD( "afega1.u4",  0x00000, 0x10000, CRC(9e7ef086) SHA1(db086bb2ceb11f3e24548aa131cc74fe79a2b516) )
@@ -7687,7 +7687,7 @@ ROM_START( grdnstrmg ) /* Germany */
 	ROM_LOAD16_BYTE( "gs10_br4.uc11",0x100001, 0x080000, CRC(1d3b57e1) SHA1(a2da598d6cbe257de5b66905a5ad9de90711ccc7) )
 	ROM_LOAD16_BYTE( "gs9_br2.uc4",  0x100000, 0x080000, CRC(4d2c220b) SHA1(066067f7e80973ba0483559ac04f99292cc82dce) )
 
-	// the other sets have larger regions here because they contain 2 sets of tiles in the roms, one for each orientation.
+	// the other sets have larger regions here because they contain 2 sets of tiles in the ROMs, one for each orientation.
 	// this set only contains the tile data for the required orientation.
 	ROM_REGION( 0x200000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
 	ROM_LOAD( "gs10_cr5.uc15", 0x000000, 0x080000, CRC(2c8c23e3) SHA1(4c1a460dfc250f9aea77e2ddd82278ee816365be) )
@@ -7712,11 +7712,11 @@ ROM_START( redfoxwp2 )
 	ROM_LOAD( "u92", 0x00000, 0x10000, CRC(864b55c2) SHA1(43475b05e35549ad301c3d4a25d4f4f0bcbe3f2c) ) /* Winbond W27E512-12 with no label */
 
 	ROM_REGION( 0x200000, "sprites", 0 )   /* Sprites, 16x16x4 */
-	ROM_LOAD( "afega_af1-sp.uc13", 0x000000, 0x200000, CRC(7d4d4985) SHA1(15c6c1aecd3f12050c1db2376f929f1a26a1d1cf) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-sp.uc13", 0x000000, 0x200000, CRC(7d4d4985) SHA1(15c6c1aecd3f12050c1db2376f929f1a26a1d1cf) ) /* mask ROM (read as 27C160) */
 
 	ROM_REGION( 0x400000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
-	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* MASK ROM (read as 27C160) */
-	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* MASK ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) ) /* mask ROM (read as 27C160) */
+	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) ) /* mask ROM (read as 27C160) */
 
 	ROM_REGION( 0x10000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
 	ROM_LOAD( "u4",  0x00000, 0x10000, CRC(19239401) SHA1(7876335dd97418bd9130dc894a517f3ceca20135) ) /* Winbond W27E512-12 with no label */
@@ -7760,7 +7760,7 @@ ROM_END
 
 Pop's Pop's by Afega (1999)
 
-The pcb might be missing an eprom in a socket
+The pcb might be missing an EPROM in a socket
   --- i just think it uses a generic PCB but no sprites in this case,.
 
 1x 68k
@@ -7784,7 +7784,7 @@ ROM_START( popspops )
 	ROM_LOAD( "afega1.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )   /* Sprites, 16x16x4 */
-	/* no sprite roms? */
+	/* no sprite ROMs? */
 
 	ROM_REGION( 0x400000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
 	ROM_LOAD( "afega6.uc8", 0x000000, 0x200000, CRC(6d506c97) SHA1(4909c0b530f9526c8bf76e502c914ef10a50d1fc) )
@@ -7846,18 +7846,18 @@ CPU   : TMP68HC000P-10 (68000)
 SOUND : Z840006 (Z80, 44 pin QFP), YM2151, OKI M6295
 OSC   : 4.000MHZ, 12.000MHz
 DIPSW : 8 position (x2)
-RAM   : 6116 (x5, gfx related?) 6116 (x1, sound program ram), 6116 (x1, near rom3)
+RAM   : 6116 (x5, gfx related?) 6116 (x1, sound program ram), 6116 (x1, near ROM 3)
         64256 (x4, gfx related?), 62256 (x2, main program ram), 6264 (x2, gfx related?)
 PALs/PROMs: None
 Custom: Unknown 208 pin QFP labelled LTC2 (Graphics generator)
-        Unknown 68 pin PLCC labelled LTC1 (?, near rom 2 and rom 3)
+        Unknown 68 pin PLCC labelled LTC1 (?, near ROM 2 and ROM 3)
 ROMs  :
 
 Filename    Type        Possible Use
 ----------------------------------------------
 rom01.92    27C512      Sound Program
 rom02.95    27C020      Oki Samples
-rom03.4     27C512      ? (located near rom 1 and 2 and near LTC1)
+rom03.4     27C512      ? (located near ROM 1 and 2 and near LTC1)
 rom04.1     27C040   \
 rom05.3     27C040    |
 rom06.6     27C040    |
@@ -8197,7 +8197,7 @@ YONATech3 is a MX27C4000
 YONATech2 & YONATech4 are TMS27C010A
 YONATech5 & YONATech6 are TMS27C020
 
-UC1, UC2 & UC3 are all Micronix MX29F1610ML 16Mb Flash roms
+UC1, UC2 & UC3 are all Micronix MX29F1610ML 16Mb Flash ROMs
 
 UC1, UC2 & UC3 have solder pads for both MX29F1610 Flash & 27C160 EPROMs
 
@@ -8364,7 +8364,7 @@ GAME( 1996, tdragon3h,  tdragon2, tdragon3h,    tdragon2,     nmk16_state, init_
 
 GAME( 1994, arcadian,   0,        raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Arcadia (NMK)", 0 ) // 23rd July 1993 in test mode, (c)1994 on title screen
 GAME( 1994, raphero,    arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK",                          "Rapid Hero (NMK)", 0 )           // ^^
-GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all romsets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
+GAME( 1994, rapheroa,   arcadian, raphero,      raphero,      nmk16_state, init_banked_audiocpu, ROT270, "NMK (Media Trading license)",  "Rapid Hero (Media Trading)", 0 ) // ^^ - note that all ROM sets have Media Trading(aka Media Shoji) in the tile graphics, but this is the only set that shows it on the titlescreen
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
 GAME( 1992, sabotenb,   0,        bjtwin,       sabotenb,     nmk16_state, init_nmk,             ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", MACHINE_NO_COCKTAIL )
@@ -8384,7 +8384,7 @@ GAME( 1995, nouryokup,  nouryoku, bjtwin,       nouryoku,     nmk16_state, empty
 
 // these use the seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
 GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg)", 0 )
-GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and roms have TAB Austria stickers
+GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and ROMs have TAB Austria stickers
 GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg)", 0 )
 
 // these are from Comad, based on the Thunder Dragon code?

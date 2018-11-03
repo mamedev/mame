@@ -89,8 +89,8 @@ deerhunt,wschamp:
   in to the deer. In wschamp intro the GPS unit should zoom to the high scores.
 
 wschampb:
-- dumps of the program roms matched the hand written checksum for each chip, but
-  the boot screen reports NG for both roms. - Is this correct and a bug from the
+- dumps of the program ROMs matched the hand written checksum for each chip, but
+  the boot screen reports NG for both ROMs. - Is this correct and a bug from the
   original release? Is that why the next bug fix release is v1.01? IE: such a
   a minor increase in the version number.
 

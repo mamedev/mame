@@ -1143,11 +1143,11 @@ ROM_END
 //   ASSY ROM BD 834-5669
 //   ASSY SOUND BD 834-5670-01 (stickered 834-5706-01 HANG ON)
 //
-//   ROM & SOUND boards were missing, but Manual No. 420-5244 2nd Printing confirms they are the same with the same data / roms.
+//   ROM & SOUND boards were missing, but Manual No. 420-5244 2nd Printing confirms they are the same with the same data / ROMs.
 //
-//  No labels on the main CPU roms just a black sticker, likely the result of repair job in 1995
+//  No labels on the main CPU ROMs just a black sticker, likely the result of repair job in 1995
 //  A second PCB has been seen with hand written labels with matching sum16 values listed, though not labelled as "A" revision
-//  Although the both PCBs were stickered 834-5667-01 REV.A, it's not likely correct for this rom set
+//  Although the both PCBs were stickered 834-5667-01 REV.A, it's not likely correct for this ROM set
 //
 ROM_START( hangon2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -1948,7 +1948,7 @@ ROM_START( endurobl )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "7.13j", 0x030000, 0x08000, CRC(f1d6b4b7) SHA1(32bd966191cbb36d1e60ed1a06d4caa023dd6b88) )
 	ROM_CONTINUE(             0x000000, 0x08000 )
-	ROM_LOAD16_BYTE( "4.13h", 0x030001, 0x08000, CRC(43bff873) SHA1(04e906c1965a6211fb8e13987db52f1f99cc0203) ) // rom de-coded
+	ROM_LOAD16_BYTE( "4.13h", 0x030001, 0x08000, CRC(43bff873) SHA1(04e906c1965a6211fb8e13987db52f1f99cc0203) ) // ROM decoded
 	ROM_CONTINUE(             0x000001, 0x08000 )       // data de-coded
 	ROM_LOAD16_BYTE( "8.14j", 0x010000, 0x08000, CRC(2153154a) SHA1(145d8ed59812d26ca412a01ae77cd7872adaba5a) )
 	ROM_LOAD16_BYTE( "5.14h", 0x010001, 0x08000, CRC(0a97992c) SHA1(7a6fc8c575637107ed07a30f6f0f8cb8877cbb43) )
@@ -2020,7 +2020,7 @@ ROM_END
 //
 ROM_START( endurob2 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) // 68000 code
-	// the program roms should be twice the size
+	// the program ROMs should be twice the size
 	ROM_LOAD16_BYTE( "enduro.a07", 0x000000, 0x08000, BAD_DUMP CRC(259069bc) SHA1(42fa47ce4a29294f9eff3eddbba6c305d750aaa5) )
 //  ROM_CONTINUE(                  0x030000, 0x08000 )
 	ROM_LOAD16_BYTE( "enduro.a04", 0x000001, 0x08000, BAD_DUMP CRC(f584fbd9) SHA1(6c9ddcd1d9cf95c6250b705b27865644da45d197) )
