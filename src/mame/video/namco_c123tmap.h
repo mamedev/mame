@@ -25,11 +25,13 @@ public:
 	typedef delegate<void(uint16_t, int*, int*)> c123_tilemap_delegate;
 	void set_tile_callback(c123_tilemap_delegate tilemap_cb) { m_tilemapinfo.cb = tilemap_cb; }
 
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_READ16_MEMBER(videoram_r);
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_READ16_MEMBER(control_r);
+	// 16 bit handlers
+	DECLARE_WRITE16_MEMBER(videoram16_w);
+	DECLARE_READ16_MEMBER(videoram16_r);
+	DECLARE_WRITE16_MEMBER(control16_w);
+	DECLARE_READ16_MEMBER(control16_r);
 
+	// 8 bit handlers
 	DECLARE_WRITE8_MEMBER(videoram8_w);
 	DECLARE_READ8_MEMBER(videoram8_r);
 	DECLARE_WRITE8_MEMBER(control8_w);

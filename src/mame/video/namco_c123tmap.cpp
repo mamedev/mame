@@ -82,6 +82,7 @@ void namco_c123tmap_device::device_start()
 			m_tilemapinfo.tmap[i]->set_scrolldx(m_xoffs, m_xoffs);
 			m_tilemapinfo.tmap[i]->set_scrolldy(m_yoffs, m_yoffs);
 		}
+		m_tilemapinfo.tmap[i]->set_palette_offset(m_color_base);
 	}
 
 	save_item(NAME(m_tilemapinfo.control));
@@ -131,8 +132,6 @@ void namco_c123tmap_device::draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		// bit 3 : disable layer
 		if ((m_tilemapinfo.control[0x20 / 2 + i] & 0x7) == pri)
 		{
-			int color = m_tilemapinfo.control[0x30 / 2 + i] & 0x07;
-			m_tilemapinfo.tmap[i]->set_palette_offset(color * 256 + m_color_base);
 			m_tilemapinfo.tmap[i]->draw(screen, bitmap, cliprect, 0, prival);
 		}
 	}
@@ -154,19 +153,19 @@ void namco_c123tmap_device::set_tilemap_videoram(int offset, uint16_t newword)
 } /* set_tilemap_videoram */
 
 // 16 bit handlers
-WRITE16_MEMBER(namco_c123tmap_device::videoram_w)
+WRITE16_MEMBER(namco_c123tmap_device::videoram16_w)
 {
 	uint16_t newword = m_tilemapinfo.videoram[offset];
 	COMBINE_DATA(&newword);
 	set_tilemap_videoram(offset, newword);
 }
 
-READ16_MEMBER(namco_c123tmap_device::videoram_r)
+READ16_MEMBER(namco_c123tmap_device::videoram16_r)
 {
 	return m_tilemapinfo.videoram[offset];
 }
 
-WRITE16_MEMBER(namco_c123tmap_device::control_w)
+WRITE16_MEMBER(namco_c123tmap_device::control16_w)
 {
 	uint16_t old = m_tilemapinfo.control[offset];
 	data = COMBINE_DATA(&m_tilemapinfo.control[offset]);
@@ -177,34 +176,36 @@ WRITE16_MEMBER(namco_c123tmap_device::control_w)
 	{
 		m_tilemapinfo.tmap[offset & 7]->enable(BIT(~data, 3));
 	}
-	else if (offset < 0x20 / 2)
+	else if ((offset >= 0x30 / 2) && (offset <= 0x3a / 2))
 	{
-		if (offset & 1)
+		m_tilemapinfo.tmap[offset & 7]->set_palette_offset(((data & 7) << 8) + m_color_base);
+	}
+	else if ((offset < 0x20 / 2) && (offset & 1))
+	{
+		if (offset == 0x02 / 2)
 		{
-			if (offset == 0x02 / 2)
+			/* all planes are flipped X+Y from D15 of this word */
+			int attrs = (data & 0x8000) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+			int i;
+			for (i = 0; i <= 5; i++)
 			{
-				/* all planes are flipped X+Y from D15 of this word */
-				int attrs = (data & 0x8000) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-				int i;
-				for (i = 0; i <= 5; i++)
-				{
-					m_tilemapinfo.tmap[i]->set_flip(attrs);
-				}
+				m_tilemapinfo.tmap[i]->set_flip(attrs);
 			}
-			data &= 0x1ff;
-			if (m_tilemapinfo.control[0x02 / 2] & 0x8000)
-			{
-				data = -data;
-			}
-			if (offset & 2)
-				m_tilemapinfo.tmap[offset >> 2]->set_scrolly(0, data);
-			else
-				m_tilemapinfo.tmap[offset >> 2]->set_scrollx(0, data);
 		}
+		data &= 0x1ff;
+		if (m_tilemapinfo.control[0x02 / 2] & 0x8000)
+		{
+			data = -data;
+		}
+		if (offset & 2)
+			m_tilemapinfo.tmap[offset >> 2]->set_scrolly(0, data);
+		else
+			m_tilemapinfo.tmap[offset >> 2]->set_scrollx(0, data);
+
 	}
 }
 
-READ16_MEMBER(namco_c123tmap_device::control_r)
+READ16_MEMBER(namco_c123tmap_device::control16_r)
 {
 	return m_tilemapinfo.control[offset];
 }
@@ -235,6 +236,10 @@ WRITE8_MEMBER(namco_c123tmap_device::control8_w)
 	if ((offset >= 0x10) && (offset <= 0x15))
 	{
 		m_tilemapinfo.tmap[offset & 7]->enable(BIT(~data, 3));
+	}
+	else if ((offset >= 0x18) && (offset <= 0x1d))
+	{
+		m_tilemapinfo.tmap[offset & 7]->set_palette_offset(((data & 7) << 8) + m_color_base);
 	}
 }
 
