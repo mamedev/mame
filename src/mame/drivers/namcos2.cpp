@@ -686,10 +686,10 @@ WRITE8_MEMBER(namcos2_state::dpram_byte_w)
 void namcos2_state::namcos2_68k_default_cpu_board_am(address_map &map)
 {
 	map(0x200000, 0x3fffff).rom().region("data_rom", 0);
-	map(0x400000, 0x41ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
+	map(0x400000, 0x40ffff).mirror(0x010000)rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
 	map(0x420000, 0x42003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
 	map(0x440000, 0x44ffff).r(FUNC(namcos2_state::c116_r)).w(m_c116, FUNC(namco_c116_device::write)).umask16(0x00ff).cswidth(16);
-	map(0x460000, 0x460fff).mirror(0xf000).rw(FUNC(namcos2_state::dpram_word_r), FUNC(namcos2_state::dpram_word_w));
+	map(0x460000, 0x460fff).mirror(0x00f000).rw(FUNC(namcos2_state::dpram_word_r), FUNC(namcos2_state::dpram_word_w));
 	map(0x480000, 0x483fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0x4a0000, 0x4a000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
