@@ -106,6 +106,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(siob_tx_w);
 
 	void psi98(machine_config &config);
+	void psi98_io(address_map &map);
+	void psi98_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -148,7 +150,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( psi98_mem, AS_PROGRAM, 8, kdt6_state )
+ADDRESS_MAP_START(kdt6_state::psi98_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("page0_r") AM_WRITE_BANK("page0_w")
 	AM_RANGE(0x1000, 0x1fff) AM_READ_BANK("page1_r") AM_WRITE_BANK("page1_w")
 	AM_RANGE(0x2000, 0x2fff) AM_READ_BANK("page2_r") AM_WRITE_BANK("page2_w")
@@ -167,7 +169,7 @@ static ADDRESS_MAP_START( psi98_mem, AS_PROGRAM, 8, kdt6_state )
 	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("pagef_r") AM_WRITE_BANK("pagef_w")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psi98_io, AS_IO, 8, kdt6_state )
+ADDRESS_MAP_START(kdt6_state::psi98_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("dma", z80dma_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)

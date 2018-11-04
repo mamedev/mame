@@ -162,6 +162,8 @@ public:
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t *sprram_top, size_t sprram_size);
 	void bnstars(machine_config &config);
+	void bnstars_map(address_map &map);
+	void bnstars_sound_map(address_map &map);
 };
 
 
@@ -741,7 +743,7 @@ WRITE32_MEMBER(bnstars_state::bnstars1_mahjong_select_w)
 }
 
 
-static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
+ADDRESS_MAP_START(bnstars_state::bnstars_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w)
@@ -786,7 +788,7 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bnstars_sound_map, AS_PROGRAM, 8, bnstars_state )
+ADDRESS_MAP_START(bnstars_state::bnstars_sound_map)
 	AM_RANGE(0x0000, 0x3eff) AM_ROM
 	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf2", ymf271_device, read, write)
 	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)

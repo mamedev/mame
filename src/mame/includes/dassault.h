@@ -74,4 +74,7 @@ public:
 	void mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask, uint16_t penbase, uint8_t alpha);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	void dassault(machine_config &config);
+	void dassault_map(address_map &map);
+	void dassault_sub_map(address_map &map);
+	void sound_map(address_map &map);
 };

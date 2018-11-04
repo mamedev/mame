@@ -362,7 +362,7 @@ WRITE8_MEMBER(dc_cons_state::dc_flash_w)
 }
 #endif
 
-static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
+ADDRESS_MAP_START(dc_cons_state::dc_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP             // BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("dcflash",0)//AM_READWRITE8(dc_flash_r,dc_flash_w, 0xffffffffffffffffU)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
@@ -409,11 +409,11 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_port, AS_IO, 64, dc_cons_state )
+ADDRESS_MAP_START(dc_cons_state::dc_port)
 	AM_RANGE(0x00000000, 0x00000007) AM_READWRITE(dc_pdtra_r, dc_pdtra_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_cons_state )
+ADDRESS_MAP_START(dc_cons_state::dc_audio_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("dc_sound_ram")        /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)

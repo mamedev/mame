@@ -24,6 +24,8 @@ public:
 	void timeplt_sound(machine_config &config);
 	void locomotn_sound(machine_config &config);
 
+	void locomotn_sound_map(address_map &map);
+	void timeplt_sound_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

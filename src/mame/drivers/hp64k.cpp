@@ -233,6 +233,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
 	void hp64k(machine_config &config);
+	void cpu_io_map(address_map &map);
+	void cpu_mem_map(address_map &map);
 private:
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;
@@ -314,14 +316,14 @@ private:
 	bool m_rts_state;
 };
 
-static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 16 , hp64k_state)
+ADDRESS_MAP_START(hp64k_state::cpu_mem_map)
 	AM_RANGE(0x0000 , 0x3fff) AM_ROM
 	AM_RANGE(0x4000 , 0x7fff) AM_READWRITE(hp64k_slot_r , hp64k_slot_w)
 	AM_RANGE(0x8000 , 0x8001) AM_WRITE(hp64k_crtc_w)
 	AM_RANGE(0x8002 , 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cpu_io_map , AS_IO , 16 , hp64k_state)
+ADDRESS_MAP_START(hp64k_state::cpu_io_map)
 	// PA = 0, IC = [0..3]
 	// Keyboard input
 	AM_RANGE(HP_MAKE_IOADDR(0 , 0) , HP_MAKE_IOADDR(0 , 3))   AM_READ(hp64k_kb_r)

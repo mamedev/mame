@@ -212,7 +212,7 @@ TI-86 ports:
 
 /* port i/o functions */
 
-static ADDRESS_MAP_START( ti81_io, AS_IO, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti81_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti85_port_0000_r, ti85_port_0000_w )
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( ti81_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0007, 0x0007) AM_WRITE(ti81_port_0007_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti85_io, AS_IO, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti85_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti85_port_0000_r, ti85_port_0000_w )
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( ti85_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE(ti8x_serial_r, ti8x_serial_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti82_io, AS_IO, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti82_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti8x_serial_r, ti8x_serial_w )
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( ti82_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti81v2_io, AS_IO, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti81v2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ti82_port_0002_r, ti82_port_0002_w )
@@ -256,7 +256,7 @@ static ADDRESS_MAP_START( ti81v2_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti83_io, AS_IO, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti83_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti83_port_0000_r, ti83_port_0000_w )  //TODO
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( ti83_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0014, 0x0014) AM_READ_PORT( "BATTERY" )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti83p_io, AS_IO, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti83p_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti8x_plus_serial_r, ti8x_plus_serial_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
@@ -279,10 +279,10 @@ static ADDRESS_MAP_START( ti83p_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE(ti86_port_0006_r, ti83p_port_0007_w )
 	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE("t6a04", t6a04_device, control_read, control_write)
 	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
-//	AM_RANGE(0x0014, 0x0014) AM_WRITE(ti83p_port_0014_w )
+//  AM_RANGE(0x0014, 0x0014) AM_WRITE(ti83p_port_0014_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti83pse_io, AS_IO, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti83pse_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti8x_plus_serial_r, ti8x_plus_serial_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
@@ -316,7 +316,7 @@ static ADDRESS_MAP_START( ti83pse_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0056, 0x0056) AM_READ(ti84pse_port_0056_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti86_io, AS_IO, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti86_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(ti85_port_0000_r, ti85_port_0000_w )
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(ti8x_keypad_r, ti8x_keypad_w )
@@ -330,36 +330,36 @@ ADDRESS_MAP_END
 
 /* memory w/r functions */
 
-static ADDRESS_MAP_START( ti81_mem , AS_PROGRAM, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti81_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti86_mem , AS_PROGRAM, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti86_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti83pse_banked_mem , AS_PROGRAM, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti83pse_banked_mem)
 	AM_RANGE(0x0000, 0x1fffff) AM_DEVREADWRITE("flash", intelfsh8_device, read, write)
 	AM_RANGE(0x200000, 0x21BFFF) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ti84p_banked_mem , AS_PROGRAM, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti84p_banked_mem)
 	AM_RANGE(0x0000, 0xfffff) AM_DEVREADWRITE("flash", intelfsh8_device, read, write)
 	AM_RANGE(0x200000, 0x21BFFF) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti83p_banked_mem , AS_PROGRAM, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti83p_banked_mem)
 	AM_RANGE(0x00000, 0x7ffff) AM_DEVREADWRITE("flash", intelfsh8_device, read, write)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti83p_asic_mem , AS_PROGRAM, 8, ti85_state )
+ADDRESS_MAP_START(ti85_state::ti83p_asic_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("membank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("membank2", address_map_bank_device, read8, write8)
 	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("membank3", address_map_bank_device, read8, write8)
@@ -587,7 +587,8 @@ MACHINE_CONFIG_START(ti85_state::ti81)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti85, ti81)
+MACHINE_CONFIG_START(ti85_state::ti85)
+	ti81(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
 	MCFG_CPU_IO_MAP(ti85_io)
@@ -602,13 +603,15 @@ MACHINE_CONFIG_DERIVED(ti85_state::ti85, ti81)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti85d, ti85)
+MACHINE_CONFIG_START(ti85_state::ti85d)
+	ti85(config);
 	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
 	//MCFG_TI85SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti82, ti81)
+MACHINE_CONFIG_START(ti85_state::ti82)
+	ti81(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
 	MCFG_CPU_IO_MAP(ti82_io)
@@ -628,14 +631,16 @@ MACHINE_CONFIG_DERIVED(ti85_state::ti82, ti81)
 	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti81v2, ti82)
+MACHINE_CONFIG_START(ti85_state::ti81v2)
+	ti82(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(ti81v2_io)
 
 	MCFG_DEVICE_REMOVE("linkport")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti83, ti81)
+MACHINE_CONFIG_START(ti85_state::ti83)
+	ti81(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
 	MCFG_CPU_IO_MAP(ti83_io)
@@ -653,7 +658,8 @@ MACHINE_CONFIG_DERIVED(ti85_state::ti83, ti81)
 	MCFG_T6A04_SIZE(96, 64)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti86, ti85)
+MACHINE_CONFIG_START(ti85_state::ti86)
+	ti85(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ti86_mem)
 	MCFG_CPU_IO_MAP(ti86_io)
@@ -664,7 +670,8 @@ MACHINE_CONFIG_DERIVED(ti85_state::ti86, ti85)
 	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti83p, ti81)
+MACHINE_CONFIG_START(ti85_state::ti83p)
+	ti81(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)        /* 8 MHz running at 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(ti83p_asic_mem)
@@ -712,7 +719,8 @@ MACHINE_CONFIG_DERIVED(ti85_state::ti83p, ti81)
 	MCFG_AMD_29F400T_ADD("flash")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti83pse, ti83p)
+MACHINE_CONFIG_START(ti85_state::ti83pse)
+	ti83p(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( 15000000)
 	MCFG_CPU_IO_MAP(ti83pse_io)
@@ -733,7 +741,8 @@ MACHINE_CONFIG_DERIVED(ti85_state::ti83pse, ti83p)
 	MCFG_DEVICE_REPLACE("flash", FUJITSU_29F160T, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti84p, ti83pse)
+MACHINE_CONFIG_START(ti85_state::ti84p)
+	ti83pse(config);
 	MCFG_DEVICE_MODIFY("membank1")
 	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
 
@@ -750,11 +759,13 @@ MACHINE_CONFIG_DERIVED(ti85_state::ti84p, ti83pse)
 	MCFG_DEVICE_REPLACE("flash", AMD_29F800T , 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti84pse, ti83pse)
+MACHINE_CONFIG_START(ti85_state::ti84pse)
+	ti83pse(config);
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pse )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ti85_state::ti73, ti83p)
+MACHINE_CONFIG_START(ti85_state::ti73)
+	ti83p(config);
 	MCFG_DEVICE_REMOVE("linkport")
 	//MCFG_TI73SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END

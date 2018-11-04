@@ -57,7 +57,7 @@ WRITE8_MEMBER(tbowl_state::boardc_bankswitch_w)
 
 /* Board B */
 
-static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
+ADDRESS_MAP_START(tbowl_state::_6206B_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram")
@@ -98,7 +98,7 @@ WRITE8_MEMBER(tbowl_state::trigger_nmi)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )
+ADDRESS_MAP_START(tbowl_state::_6206C_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READONLY
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
@@ -162,7 +162,7 @@ WRITE_LINE_MEMBER(tbowl_state::adpcm_int_2)
 	adpcm_int(m_msm2, 1);
 }
 
-static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
+ADDRESS_MAP_START(tbowl_state::_6206A_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ym1", ym3812_device, write)
@@ -431,17 +431,17 @@ MACHINE_CONFIG_START(tbowl_state::tbowl)
 
 	/* CPU on Board '6206B' */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_CPU_PROGRAM_MAP(6206B_map)
+	MCFG_CPU_PROGRAM_MAP(_6206B_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
 
 	/* CPU on Board '6206C' */
 	MCFG_CPU_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_CPU_PROGRAM_MAP(6206C_map)
+	MCFG_CPU_PROGRAM_MAP(_6206C_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
 
 	/* CPU on Board '6206A' */
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
-	MCFG_CPU_PROGRAM_MAP(6206A_map)
+	MCFG_CPU_PROGRAM_MAP(_6206A_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

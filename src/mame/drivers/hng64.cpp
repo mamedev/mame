@@ -947,7 +947,7 @@ WRITE16_MEMBER(hng64_state::main_sound_comms_w)
 }
 
 
-static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_map)
 
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("gameprg", 0) AM_SHARE("cart")
@@ -1553,8 +1553,8 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_FRAGMENT_ADD( hng64_audio )
-	MCFG_FRAGMENT_ADD( hng64_network )
+	hng64_audio(config);
+	hng64_network(config);
 
 	MCFG_CPU_ADD("iomcu", TMP87PH40AN, 8000000)
 	MCFG_DEVICE_DISABLE() // work in progress

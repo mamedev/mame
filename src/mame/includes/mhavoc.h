@@ -77,4 +77,7 @@ public:
 	void alphaone(machine_config &config);
 	void mhavoc(machine_config &config);
 	void mhavocrv(machine_config &config);
+	void alpha_map(address_map &map);
+	void alphaone_map(address_map &map);
+	void gamma_map(address_map &map);
 };

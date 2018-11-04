@@ -21,7 +21,7 @@ public:
 	// construction/destruction
 	m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(m3_map, 32);
+	void m3_map(address_map &map);
 
 	DECLARE_READ16_MEMBER(ctrl_r);
 	DECLARE_WRITE16_MEMBER(ctrl_w);
@@ -39,6 +39,7 @@ public:
 	DECLARE_READ16_MEMBER(naomi_r);
 	DECLARE_WRITE16_MEMBER(naomi_w);
 
+	void m3comm_mem(address_map &map);
 protected:
 	enum { TIMER_IRQ5 = 1 };
 

@@ -109,7 +109,7 @@ const tiny_rom_entry *interpod_device::device_rom_region() const
 //  ADDRESS_MAP( interpod_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( interpod_mem, AS_PROGRAM, 8, interpod_device )
+ADDRESS_MAP_START(interpod_device::interpod_mem)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x3b80) AM_DEVICE(R6532_TAG, mos6532_new_device, ram_map)
 	AM_RANGE(0x0400, 0x041f) AM_MIRROR(0x3be0) AM_DEVICE(R6532_TAG, mos6532_new_device, io_map)
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x9ffe) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, read, write)

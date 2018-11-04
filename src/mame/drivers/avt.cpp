@@ -461,6 +461,8 @@ public:
 
 	void avtnfl(machine_config &config);
 	void avt(machine_config &config);
+	void avt_map(address_map &map);
+	void avt_portmap(address_map &map);
 private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
@@ -644,7 +646,7 @@ READ8_MEMBER( avt_state::avt_6845_data_r )
 *********************************************/
 
 /* avtnfl, avtbingo */
-static ADDRESS_MAP_START( avt_map, AS_PROGRAM, 8, avt_state )
+ADDRESS_MAP_START(avt_state::avt_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
@@ -652,7 +654,7 @@ static ADDRESS_MAP_START( avt_map, AS_PROGRAM, 8, avt_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( avt_portmap, AS_IO, 8, avt_state )
+ADDRESS_MAP_START(avt_state::avt_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pio0", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt)
@@ -1011,7 +1013,8 @@ WRITE_LINE_MEMBER( avt_state::avtnfl_w )
 	m_pio1->port_b_write((m_pio1->port_b_read() & 0xbf) | (state ? 0x40 : 0));
 }
 
-MACHINE_CONFIG_DERIVED(avt_state::avtnfl, avt)
+MACHINE_CONFIG_START(avt_state::avtnfl)
+	avt(config);
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

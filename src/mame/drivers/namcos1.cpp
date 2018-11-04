@@ -394,15 +394,15 @@ WRITE8_MEMBER(namcos1_state::dac_gain_w)
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, namcos1_state )
+ADDRESS_MAP_START(namcos1_state::main_map)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("c117", namco_c117_device, main_r, main_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, namcos1_state )
+ADDRESS_MAP_START(namcos1_state::sub_map)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("c117", namco_c117_device, sub_r, sub_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( virtual_map, AS_PROGRAM, 8, namcos1_state )
+ADDRESS_MAP_START(namcos1_state::virtual_map)
 	AM_RANGE(0x2c0000, 0x2c1fff) AM_WRITE(_3dcs_w)
 	AM_RANGE(0x2e0000, 0x2e7fff) AM_DEVREADWRITE("c116", namco_c116_device, read, write)
 	AM_RANGE(0x2f0000, 0x2f7fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( virtual_map, AS_PROGRAM, 8, namcos1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
+ADDRESS_MAP_START(namcos1_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("soundbank")   /* Banked ROMs */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_device, status_r, write)
 	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
+ADDRESS_MAP_START(namcos1_state::mcu_map)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM /* built in RAM */
 	AM_RANGE(0x1000, 0x1003) AM_READ(dsw_r)
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("mcu", 0) /* internal ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos1_state )
+ADDRESS_MAP_START(namcos1_state::mcu_port_map)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("COIN") AM_WRITE(coin_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READNOP AM_WRITE(dac_gain_w)
 ADDRESS_MAP_END

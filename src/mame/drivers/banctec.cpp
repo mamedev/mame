@@ -39,6 +39,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	void banctec(machine_config &config);
+	void banctec_mcu_mem(address_map &map);
+	void banctec_mem(address_map &map);
 private:
 	u8 m_video_address;
 	virtual void machine_reset() override;
@@ -47,12 +49,12 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( banctec_mem , AS_PROGRAM, 8, banctec_state )
+ADDRESS_MAP_START(banctec_state::banctec_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0xffff) AM_RAM /* Probably wrong. Must be verified on pcb! */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( banctec_mcu_mem , AS_PROGRAM, 8, banctec_state )
+ADDRESS_MAP_START(banctec_state::banctec_mcu_mem)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM /* Probably wrong. Must be verified on pcb! */
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x2001, 0x2001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)

@@ -36,6 +36,8 @@ public:
 	void kbd_put(u8 data);
 
 	void evmbug(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
@@ -46,12 +48,12 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, evmbug_state )
+ADDRESS_MAP_START(evmbug_state::mem_map)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0xec00, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, evmbug_state )
+ADDRESS_MAP_START(evmbug_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x0000, 0x0003) AM_DEVREAD("uart1", tms9902_device, cruread)
 	//AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("uart1", tms9902_device, cruwrite)

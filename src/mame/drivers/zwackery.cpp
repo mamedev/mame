@@ -72,6 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(ptm_r);
 
 	void zwackery(machine_config &config);
+	void zwackery_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -101,7 +102,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( zwackery_map, AS_PROGRAM, 16, zwackery_state )
+ADDRESS_MAP_START(zwackery_state::zwackery_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM

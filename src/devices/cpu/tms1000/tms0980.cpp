@@ -31,11 +31,11 @@ DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "TMS1980") // 28-pin 
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
+ADDRESS_MAP_START(tms0980_cpu_device::program_11bit_9)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_144x4, AS_DATA, 8, tms1k_base_device)
+ADDRESS_MAP_START(tms0980_cpu_device::data_144x4)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x70) // DAM
 ADDRESS_MAP_END
@@ -43,7 +43,7 @@ ADDRESS_MAP_END
 
 // device definitions
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4))
+	: tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, address_map_constructor(FUNC(tms0980_cpu_device::program_11bit_9), this), 8 /* data width */, address_map_constructor(FUNC(tms0980_cpu_device::data_144x4), this))
 {
 }
 
@@ -53,7 +53,7 @@ tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_typ
 }
 
 tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS1980, tag, owner, clock, 7, 10, 7, 9, 4, 11, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_144x4))
+	: tms0980_cpu_device(mconfig, TMS1980, tag, owner, clock, 7, 10, 7, 9, 4, 11, address_map_constructor(FUNC(tms1980_cpu_device::program_11bit_9), this), 8, address_map_constructor(FUNC(tms1980_cpu_device::data_144x4), this))
 {
 }
 

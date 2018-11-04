@@ -70,4 +70,9 @@ public:
 	void chainrec(machine_config &config);
 	void mitchell156(machine_config &config);
 	void magdropp(machine_config &config);
+	void chainrec_map(address_map &map);
+	void joemacr_map(address_map &map);
+	void magdrop_map(address_map &map);
+	void magdropp_map(address_map &map);
+	void mitchell156_map(address_map &map);
 };

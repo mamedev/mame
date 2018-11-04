@@ -338,7 +338,7 @@ protected:
 	struct subunit_info
 	{
 		offs_t              m_addrmask;             // addrmask for this subunit
-		u32                 m_mask;                 // mask (ff, ffff or ffffffff)
+		u32                 m_csmask;               // chip select mask for this subunit
 		s32                 m_offset;               // offset to add to the address
 		u32                 m_multiplier;           // multiplier to the pre-split address
 		u8                  m_size;                 // size (8, 16 or 32)
@@ -346,7 +346,7 @@ protected:
 	};
 
 	// internal helpers
-	void configure_subunits(u64 handlermask, int handlerbits, int &start_slot, int &end_slot);
+	void configure_subunits(u64 handlermask, int handlerbits, int cswidth, int &start_slot, int &end_slot);
 	virtual void remove_subunit(int entry) = 0;
 
 	// internal state
@@ -393,10 +393,10 @@ public:
 	virtual const char *subunit_name(int entry) const override;
 
 	// configure delegate callbacks
-	void set_delegate(read8_delegate delegate, u64 mask = 0);
-	void set_delegate(read16_delegate delegate, u64 mask = 0);
-	void set_delegate(read32_delegate delegate, u64 mask = 0);
-	void set_delegate(read64_delegate delegate, u64 mask = 0);
+	void set_delegate(read8_delegate delegate, u64 umask = 0, int cswidth = 8);
+	void set_delegate(read16_delegate delegate, u64 umask = 0, int cswidth = 16);
+	void set_delegate(read32_delegate delegate, u64 umask = 0, int cswidth = 32);
+	void set_delegate(read64_delegate delegate, u64 umask = 0, int cswidth = 64);
 
 	// configure I/O port access
 	void set_ioport(ioport_port &ioport);
@@ -456,10 +456,10 @@ public:
 	virtual const char *subunit_name(int entry) const override;
 
 	// configure delegate callbacks
-	void set_delegate(write8_delegate delegate, u64 mask = 0);
-	void set_delegate(write16_delegate delegate, u64 mask = 0);
-	void set_delegate(write32_delegate delegate, u64 mask = 0);
-	void set_delegate(write64_delegate delegate, u64 mask = 0);
+	void set_delegate(write8_delegate delegate, u64 umask = 0, int cswidth = 8);
+	void set_delegate(write16_delegate delegate, u64 umask = 0, int cswidth = 16);
+	void set_delegate(write32_delegate delegate, u64 umask = 0, int cswidth = 32);
+	void set_delegate(write64_delegate delegate, u64 umask = 0, int cswidth = 64);
 
 	// configure I/O port access
 	void set_ioport(ioport_port &ioport);
@@ -508,7 +508,7 @@ public:
 	void setoffset(address_space &space, offs_t offset) const { if (m_setoffset.has_object()) m_setoffset(space, offset); }
 
 	// configure delegate callbacks
-	void set_delegate(setoffset_delegate delegate, u64 mask = 0) { m_setoffset = delegate; }
+	void set_delegate(setoffset_delegate delegate, u64 umask = 0, int cswidth = 0) { m_setoffset = delegate; }
 
 private:
 	setoffset_delegate         m_setoffset;
@@ -525,13 +525,13 @@ template<typename HandlerEntry>
 class handler_entry_proxy
 {
 public:
-	handler_entry_proxy(std::list<HandlerEntry *> _handlers, u64 _mask) : handlers(std::move(_handlers)), mask(_mask) {}
-	handler_entry_proxy(const handler_entry_proxy<HandlerEntry> &hep) : handlers(hep.handlers), mask(hep.mask) {}
+	handler_entry_proxy(std::list<HandlerEntry *> _handlers, u64 _umask, int _cswidth) : handlers(std::move(_handlers)), umask(_umask), cswidth(_cswidth) {}
+	handler_entry_proxy(const handler_entry_proxy<HandlerEntry> &hep) : handlers(hep.handlers), umask(hep.umask), cswidth(hep.cswidth) {}
 
 	// forward delegate callbacks configuration
 	template<typename Delegate> void set_delegate(Delegate delegate) const {
 		for (const auto & elem : handlers)
-			(elem)->set_delegate(delegate, mask);
+			(elem)->set_delegate(delegate, umask, cswidth);
 	}
 
 	// forward I/O port access configuration
@@ -542,7 +542,8 @@ public:
 
 private:
 	std::list<HandlerEntry *> handlers;
-	u64 mask;
+	u64 umask;
+	int cswidth;
 };
 
 
@@ -606,7 +607,7 @@ public:
 
 	// table mapping helpers
 	void map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u16 staticentry);
-	void setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 mask, std::list<u32> &entries);
+	void setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask, std::list<u32> &entries);
 	u16 derive_range(offs_t address, offs_t &addrstart, offs_t &addrend) const;
 
 	// misc helpers
@@ -665,7 +666,7 @@ private:
 	u16 get_free_handler();
 	void verify_reference_counts();
 	void setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<u32> &entries);
-	void setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 mask, std::list<u32> &entries);
+	void setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask, std::list<u32> &entries);
 
 	void handler_ref(u16 entry, int count)
 	{
@@ -703,13 +704,13 @@ public:
 	handler_entry_read &handler_read(u32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
 
 	// range getter
-	handler_entry_proxy<handler_entry_read> handler_map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 mask = 0) {
+	handler_entry_proxy<handler_entry_read> handler_map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask = 0, int cswidth = 0) {
 		std::list<u32> entries;
-		setup_range(addrstart, addrend, addrmask, addrmirror, mask, entries);
+		setup_range(addrstart, addrend, addrmask, addrmirror, umask, entries);
 		std::list<handler_entry_read *> handlers;
 		for (std::list<u32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_read(*i));
-		return handler_entry_proxy<handler_entry_read>(handlers, mask);
+		return handler_entry_proxy<handler_entry_read>(handlers, umask, cswidth);
 	}
 
 private:
@@ -776,13 +777,13 @@ public:
 	handler_entry_write &handler_write(u32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
 
 	// range getter
-	handler_entry_proxy<handler_entry_write> handler_map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 mask = 0) {
+	handler_entry_proxy<handler_entry_write> handler_map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask = 0, int cswidth = 0) {
 		std::list<u32> entries;
-		setup_range(addrstart, addrend, addrmask, addrmirror, mask, entries);
+		setup_range(addrstart, addrend, addrmask, addrmirror, umask, entries);
 		std::list<handler_entry_write *> handlers;
 		for (std::list<u32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_write(*i));
-		return handler_entry_proxy<handler_entry_write>(handlers, mask);
+		return handler_entry_proxy<handler_entry_write>(handlers, umask, cswidth);
 	}
 
 private:
@@ -854,13 +855,13 @@ public:
 	handler_entry_setoffset &handler_setoffset(u32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
 
 	// range getter
-	handler_entry_proxy<handler_entry_setoffset> handler_map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 mask = 0) {
+	handler_entry_proxy<handler_entry_setoffset> handler_map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask = 0, int cswidth = 0) {
 		std::list<u32> entries;
-		setup_range(addrstart, addrend, addrmask, addrmirror, mask, entries);
+		setup_range(addrstart, addrend, addrmask, addrmirror, umask, entries);
 		std::list<handler_entry_setoffset *> handlers;
 		for (std::list<u32>::const_iterator i = entries.begin(); i != entries.end(); ++i)
 			handlers.push_back(&handler_setoffset(*i));
-		return handler_entry_proxy<handler_entry_setoffset>(handlers, mask);
+		return handler_entry_proxy<handler_entry_setoffset>(handlers, umask, cswidth);
 	}
 
 private:
@@ -2008,7 +2009,7 @@ inline void address_space::adjust_addresses(offs_t &start, offs_t &end, offs_t &
 	end &= ~mirror & m_addrmask;
 }
 
-void address_space::check_optimize_all(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror)
+void address_space::check_optimize_all(const char *function, int width, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror, u64 &nunitmask, int &ncswidth)
 {
 	if (addrstart > addrend)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address is after the end address.\n", function, addrstart, addrend, addrmask, addrmirror, addrselect);
@@ -2017,11 +2018,20 @@ void address_space::check_optimize_all(const char *function, offs_t addrstart, o
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	// Check the relative data widths
+	if (width > m_config.data_width())
+		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, cannot install a %d-bits wide handler in a %d-bits wide address space.\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, width, m_config.data_width());
+
+	// Check the validity of the addresses given their intrinsic width
+	// We assume that busses with non-zero address shift have a data width matching the shift (reality says yes)
+	offs_t default_lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	offs_t lowbits_mask = width && !m_config.m_addr_shift ? (width >> 3) - 1 : default_lowbits_mask;
+
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, end address has low bits unset, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrend | lowbits_mask);
+
 
 	offs_t set_bits = addrstart | addrend;
 	offs_t changing_bits = addrstart ^ addrend;
@@ -2050,6 +2060,49 @@ void address_space::check_optimize_all(const char *function, offs_t addrstart, o
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, select touches a set address bit, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrselect & ~set_bits);
 	if (addrmirror & addrselect)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, mirror touches a select bit, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrmirror & ~addrselect);
+
+	// Check the cswidth, if provided
+	if (cswidth > m_config.data_width())
+		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, the cswidth of %d is too large for a %d-bit space.\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, cswidth, m_config.data_width());
+	if (width && (cswidth % width) != 0)
+		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, the cswidth of %d is not a multiple of handler size %d.\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, cswidth, width);
+	ncswidth = cswidth ? cswidth : width;
+
+	// Check if the unitmask is structurally correct for the width
+	// Not sure what we can actually handle regularity-wise, so don't check that yet
+	if (width) {
+		// Check if the 1-blocks are of appropriate size
+		u64 block_mask = 0xffffffffffffffffU >> (64 - width);
+		u64 cs_mask = 0xffffffffffffffffU >> (64 - ncswidth);
+		for(int pos = 0; pos != 64; pos += ncswidth) {
+			u64 cmask = (unitmask >> pos) & cs_mask;
+			while (cmask != 0 && (cmask & block_mask) == 0)
+				cmask >>= width;
+			if (cmask != 0 && cmask != block_mask)
+				fatalerror("%s: In range %x-%x mask %x mirror %x select %x, the unitmask of %s has incorrect granularity for %d-bit chip selection.\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, core_i64_hex_format(unitmask, 16), cswidth);
+		}
+	}
+
+	// Check if we have to adjust the unitmask and addresses
+	nunitmask = 0xffffffffffffffffU >> (64 - m_config.data_width());
+	if (unitmask)
+		nunitmask &= unitmask;
+	if ((addrstart & default_lowbits_mask) || ((~addrend) & default_lowbits_mask)) {
+		if ((addrstart ^ addrend) & ~default_lowbits_mask)
+			fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start or end is unaligned while the range spans more than one slot (granularity = %d).\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, default_lowbits_mask + 1);
+		offs_t lowbyte = m_config.addr2byte(addrstart & default_lowbits_mask);
+		offs_t highbyte = m_config.addr2byte((addrend & default_lowbits_mask) + 1);
+		if (m_config.endianness() == ENDIANNESS_LITTLE) {
+			u64 hmask = 0xffffffffffffffffU >> (64 - 8*highbyte);
+			nunitmask = (nunitmask << (8*lowbyte)) & hmask;
+		} else {
+			u64 hmask = 0xffffffffffffffffU >> ((64 - m_config.data_width()) + 8*lowbyte);
+			nunitmask = (nunitmask << (m_config.data_width() - 8*highbyte)) & hmask;
+		}
+
+		addrstart &= ~default_lowbits_mask;
+		addrend |= default_lowbits_mask;
+	}
 
 	nstart = addrstart;
 	nend = addrend;
@@ -2151,7 +2204,7 @@ void address_space::prepare_map()
 	m_map = std::make_unique<address_map>(m_device, m_spacenum);
 
 	// merge in the submaps
-	m_map->uplift_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, endianness());
+	m_map->import_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, data_width(), endianness());
 
 	// extract global parameters specified by the map
 	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;
@@ -2172,7 +2225,7 @@ void address_space::prepare_map()
 			if (m_manager.m_sharelist.find(fulltag.c_str()) == m_manager.m_sharelist.end())
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.c_str(), entry.m_addrend + 1 - entry.m_addrstart));
-				m_manager.m_sharelist.emplace(fulltag.c_str(), std::make_unique<memory_share>(m_map->m_databits, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness()));
+				m_manager.m_sharelist.emplace(fulltag.c_str(), std::make_unique<memory_share>(m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness()));
 			}
 		}
 
@@ -2237,18 +2290,12 @@ void address_space::populate_from_map(address_map *map)
 		return;
 
 	// install the handlers, using the original, unadjusted memory map
-	const address_map_entry *last_entry = nullptr;
-	while (last_entry != map->m_entrylist.first())
+	for (const address_map_entry &entry : map->m_entrylist)
 	{
-		// find the entry before the last one we processed
-		const address_map_entry *entry;
-		for (entry = map->m_entrylist.first(); entry->next() != last_entry; entry = entry->next()) { };
-		last_entry = entry;
-
 		// map both read and write halves
-		populate_map_entry(*entry, read_or_write::READ);
-		populate_map_entry(*entry, read_or_write::WRITE);
-		populate_map_entry_setoffset(*entry);
+		populate_map_entry(entry, read_or_write::READ);
+		populate_map_entry(entry, read_or_write::WRITE);
+		populate_map_entry_setoffset(entry);
 	}
 }
 
@@ -2290,18 +2337,18 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			if (readorwrite == read_or_write::READ)
 				switch (data.m_bits)
 				{
-					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8_delegate(entry.m_rproto8, entry.m_devbase), data.m_mask); break;
-					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read16_delegate(entry.m_rproto16, entry.m_devbase), data.m_mask); break;
-					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read32_delegate(entry.m_rproto32, entry.m_devbase), data.m_mask); break;
-					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read64_delegate(entry.m_rproto64, entry.m_devbase), data.m_mask); break;
+					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8_delegate(entry.m_rproto8, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read16_delegate(entry.m_rproto16, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read32_delegate(entry.m_rproto32, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read64_delegate(entry.m_rproto64, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write8_delegate(entry.m_wproto8, entry.m_devbase), data.m_mask); break;
-					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write16_delegate(entry.m_wproto16, entry.m_devbase), data.m_mask); break;
-					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write32_delegate(entry.m_wproto32, entry.m_devbase), data.m_mask); break;
-					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write64_delegate(entry.m_wproto64, entry.m_devbase), data.m_mask); break;
+					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write8_delegate(entry.m_wproto8, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write16_delegate(entry.m_wproto16, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write32_delegate(entry.m_wproto32, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
+					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write64_delegate(entry.m_wproto64, entry.m_devbase), entry.m_mask, entry.m_cswidth); break;
 				}
 			break;
 
@@ -2329,7 +2376,7 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 void address_space::populate_map_entry_setoffset(const address_map_entry &entry)
 {
 	install_setoffset_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask,
-		entry.m_addrmirror, entry.m_addrselect, setoffset_delegate(entry.m_soproto, entry.m_devbase), entry.m_setoffsethd.m_mask);
+		entry.m_addrmirror, entry.m_addrselect, setoffset_delegate(entry.m_soproto, entry.m_devbase), entry.m_mask);
 }
 
 //-------------------------------------------------
@@ -2344,10 +2391,11 @@ void address_space::allocate_memory()
 
 	// make a first pass over the memory map and track blocks with hardcoded pointers
 	// we do this to make sure they are found by space_find_backing_memory first
+	// do it back-to-front so that overrides work correctly
 	int tail = blocklist.size();
 	for (address_map_entry &entry : m_map->m_entrylist)
 		if (entry.m_memory != nullptr)
-			blocklist.push_back(std::make_unique<memory_block>(*this, entry.m_addrstart, entry.m_addrend, entry.m_memory));
+			blocklist.insert(blocklist.begin() + tail, std::make_unique<memory_block>(*this, entry.m_addrstart, entry.m_addrend, entry.m_memory));
 
 	// loop over all blocks just allocated and assign pointers from them
 	address_map_entry *unassigned = nullptr;
@@ -2564,11 +2612,11 @@ void address_space::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrm
 //  of a live device into this address space
 //-------------------------------------------------
 
-void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &delegate, int bits, u64 unitmask)
+void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &delegate, u64 unitmask, int cswidth)
 {
 	check_address("install_device_delegate", addrstart, addrend);
-	address_map map(*this, addrstart, addrend, bits, unitmask, m_device, delegate);
-	map.uplift_submaps(m_manager.machine(), device, endianness());
+	address_map map(*this, addrstart, addrend, unitmask, cswidth, m_device, delegate);
+	map.import_submaps(m_manager.machine(), device, data_width(), endianness());
 	populate_from_map(&map);
 }
 
@@ -2763,7 +2811,7 @@ void address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate handler, u64 unitmask)
+void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate handler, u64 unitmask, int cswidth)
 {
 	VPRINTF(("address_space::install_read_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2771,13 +2819,15 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 				handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
+	u64 nunitmask;
+	int ncswidth;
+	check_optimize_all("install_read_handler", 8, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-	read().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	read().handler_map_range(nstart, nend, nmask, nmirror, nunitmask, ncswidth).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate handler, u64 unitmask)
+void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate handler, u64 unitmask, int cswidth)
 {
 	VPRINTF(("address_space::install_write_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2785,16 +2835,18 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 				handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
+	u64 nunitmask;
+	int ncswidth;
+	check_optimize_all("install_write_handler", 8, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
-	write().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	write().handler_map_range(nstart, nend, nmask, nmirror, nunitmask, ncswidth).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, u64 unitmask)
+void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, u64 unitmask, int cswidth)
 {
-	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
-	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
+	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask, cswidth);
+	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask, cswidth);
 }
 
 
@@ -2803,26 +2855,30 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate handler, u64 unitmask)
+void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate handler, u64 unitmask, int cswidth)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	read().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	int ncswidth;
+	check_optimize_all("install_read_handler", 16, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+	read().handler_map_range(nstart, nend, nmask, nmirror, nunitmask, ncswidth).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate handler, u64 unitmask)
+void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate handler, u64 unitmask, int cswidth)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	write().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	int ncswidth;
+	check_optimize_all("install_write_handler", 16, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+	write().handler_map_range(nstart, nend, nmask, nmirror, nunitmask, ncswidth).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, u64 unitmask)
+void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, u64 unitmask, int cswidth)
 {
-	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
-	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
+	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask, cswidth);
+	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask, cswidth);
 }
 
 
@@ -2831,26 +2887,30 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate handler, u64 unitmask)
+void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate handler, u64 unitmask, int cswidth)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	read().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	int ncswidth;
+	check_optimize_all("install_read_handler", 32, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+	read().handler_map_range(nstart, nend, nmask, nmirror, nunitmask, ncswidth).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate handler, u64 unitmask)
+void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate handler, u64 unitmask, int cswidth)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	write().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	int ncswidth;
+	check_optimize_all("install_write_handler", 32, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+	write().handler_map_range(nstart, nend, nmask, nmirror, nunitmask, ncswidth).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, u64 unitmask)
+void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, u64 unitmask, int cswidth)
 {
-	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
-	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
+	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask, cswidth);
+	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask, cswidth);
 }
 
 
@@ -2859,26 +2919,30 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  delegate handlers for the space
 //-------------------------------------------------
 
-void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate handler, u64 unitmask)
+void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate handler, u64 unitmask, int cswidth)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	read().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	int ncswidth;
+	check_optimize_all("install_read_handler", 64, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+	read().handler_map_range(nstart, nend, nmask, nmirror, nunitmask, ncswidth).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
-void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate handler, u64 unitmask)
+void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate handler, u64 unitmask, int cswidth)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	write().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	int ncswidth;
+	check_optimize_all("install_write_handler", 64, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+	write().handler_map_range(nstart, nend, nmask, nmirror, nunitmask, ncswidth).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
-void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, u64 unitmask)
+void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, u64 unitmask, int cswidth)
 {
-	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask);
-	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask);
+	install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, rhandler, unitmask, cswidth);
+	install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, whandler, unitmask, cswidth);
 }
 
 
@@ -2886,7 +2950,7 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 //  install_setoffset_handler - install set_offset delegate handlers for the space
 //-----------------------------------------------------------------------
 
-void address_space::install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate handler, u64 unitmask)
+void address_space::install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate handler, u64 unitmask, int cswidth)
 {
 	VPRINTF(("address_space::install_setoffset_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2894,8 +2958,10 @@ void address_space::install_setoffset_handler(offs_t addrstart, offs_t addrend, 
 				handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_setoffset_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	setoffset().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	int ncswidth;
+	check_optimize_all("install_setoffset_handler", 8, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+	setoffset().handler_map_range(nstart, nend, nmask, nmirror, nunitmask, ncswidth).set_delegate(handler);
 }
 
 //**************************************************************************
@@ -2915,15 +2981,18 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 	if (m_map == nullptr)
 		return nullptr;
 
-	// look in the address map first
+	// look in the address map first, last winning for overrides
+	void *result = nullptr;
 	for (address_map_entry &entry : m_map->m_entrylist)
 	{
 		if (entry.m_memory != nullptr && addrstart >= entry.m_addrstart && addrend <= entry.m_addrend)
 		{
 			VPRINTF(("found in entry %08X-%08X [%p]\n", entry.m_addrstart, entry.m_addrend, (u8 *)entry.m_memory + address_to_byte(addrstart - entry.m_addrstart)));
-			return (u8 *)entry.m_memory + address_to_byte(addrstart - entry.m_addrstart);
+			result = (u8 *)entry.m_memory + address_to_byte(addrstart - entry.m_addrstart);
 		}
 	}
+	if (result)
+		return result;
 
 	// if not found there, look in the allocated blocks
 	for (auto &block : m_manager.m_blocklist)
@@ -3175,15 +3244,15 @@ u16 address_table::get_free_handler()
 //  it
 //-------------------------------------------------
 
-void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 mask, std::list<u32> &entries)
+void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask, std::list<u32> &entries)
 {
 	// Careful, you can't shift by 64 or more
 	u64 testmask = (1ULL << (m_space.data_width()-1) << 1) - 1;
 
-	if((mask & testmask) == 0 || (mask & testmask) == testmask)
+	if ((umask & testmask) == 0 || (umask & testmask) == testmask)
 		setup_range_solid(addrstart, addrend, addrmask, addrmirror, entries);
 	else
-		setup_range_masked(addrstart, addrend, addrmask, addrmirror, mask, entries);
+		setup_range_masked(addrstart, addrend, addrmask, addrmirror, umask, entries);
 }
 
 //-------------------------------------------------
@@ -3217,7 +3286,7 @@ namespace {
 	};
 }
 
-void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 mask, std::list<u32> &entries)
+void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, u64 umask, std::list<u32> &entries)
 {
 	// convert addresses to bytes
 	m_space.adjust_addresses(addrstart, addrend, addrmask, addrmirror);
@@ -3245,7 +3314,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 			u16 entry = derive_range(base_address, range_start, range_end);
 			u32 stop_address = range_end > end_address ? end_address : range_end;
 
-			if (entry < STATIC_COUNT || handler(entry).overriden_by_mask(mask))
+			if (entry < STATIC_COUNT || handler(entry).overriden_by_mask(umask))
 				range_override.push_back(subrange(base_address, stop_address));
 			else
 				range_partial[entry].push_back(subrange(base_address, stop_address));
@@ -3304,7 +3373,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 			curentry.copy(base_entry);
 
 			// Clear the colliding entries
-			curentry.clear_conflicting_subunits(mask);
+			curentry.clear_conflicting_subunits(umask);
 
 			// Reconfigure the base addresses
 			curentry.configure(addrstart, addrend, addrmask, bytemask);
@@ -4537,34 +4606,37 @@ void handler_entry::reconfigure_subunits(offs_t addrstart)
 //  mask
 //-------------------------------------------------
 
-void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &start_slot, int &end_slot)
+void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int cswidth, int &start_slot, int &end_slot)
 {
-	u64 unitmask = ((u64)1 << handlerbits) - 1;
+	u64 unitmask = (u64(1) << handlerbits) - 1;
+	u64 selectmask = (u64(1) << cswidth) - 1;
 	assert(handlermask != 0);
+	assert(m_datawidth == 64 || (handlermask >> m_datawidth) == 0);
 
 	// compute the maximum possible subunits
 	int maxunits = m_datawidth / handlerbits;
 	assert(maxunits > 1);
 	assert(maxunits <= ARRAY_LENGTH(m_subunit_infos));
 
+	int granularity = cswidth / handlerbits;
+	assert(granularity > 0);
+
 	int shift_xor_mask = m_endianness == ENDIANNESS_LITTLE ? 0 : maxunits - 1;
 
 	// walk the handlermask to find out how many we have
 	int count = 0;
-	for (int unitnum = 0; unitnum < maxunits; unitnum++)
+	for (u64 scanmask = handlermask; scanmask != 0; scanmask >>= handlerbits)
 	{
-		u32 shift = unitnum * handlerbits;
-		u32 scanmask = handlermask >> shift;
 		assert((scanmask & unitmask) == 0 || (scanmask & unitmask) == unitmask);
 		if ((scanmask & unitmask) != 0)
 			count++;
 	}
 	if (count == 0 || count > maxunits)
-		throw emu_fatalerror("Invalid subunit mask %s for %d-bit space", core_i64_hex_format(handlermask, m_datawidth / 4), m_datawidth);
+		throw emu_fatalerror("Invalid subunit mask %s for %d-bit handler in %d-bit space", core_i64_hex_format(handlermask, m_datawidth / 4), handlerbits, m_datawidth);
 
 	// make sure that the multiplier is a power of 2
 	int multiplier = count;
-	while (maxunits % multiplier != 0)
+	while ((multiplier & (multiplier-1)) != 0)
 		multiplier++;
 
 	// fill in the shifts
@@ -4576,12 +4648,11 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 		if (((handlermask >> shift) & unitmask) != 0)
 		{
 			m_subunit_infos[m_subunits].m_addrmask = m_bytemask / (maxunits / multiplier);
-			m_subunit_infos[m_subunits].m_mask = unitmask;
+			m_subunit_infos[m_subunits].m_csmask = selectmask << (((unitnum^shift_xor_mask) & ~(granularity-1)) * handlerbits);
 			m_subunit_infos[m_subunits].m_offset = cur_offset++;
 			m_subunit_infos[m_subunits].m_size = handlerbits;
 			m_subunit_infos[m_subunits].m_shift = shift;
 			m_subunit_infos[m_subunits].m_multiplier = multiplier;
-
 			m_subunits++;
 		}
 	}
@@ -4590,7 +4661,7 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 	// compute the inverse mask
 	m_invsubmask = 0;
 	for (int i = 0; i < m_subunits; i++)
-		m_invsubmask |= u64(m_subunit_infos[i].m_mask) << m_subunit_infos[i].m_shift;
+		m_invsubmask |= unitmask << m_subunit_infos[i].m_shift;
 	m_invsubmask = ~m_invsubmask;
 }
 
@@ -4611,17 +4682,17 @@ void handler_entry::clear_conflicting_subunits(u64 handlermask)
 
 	// Start by the end to avoid unnecessary memmoves
 	for (int i=m_subunits-1; i>=0; i--)
-		if (((handlermask >> m_subunit_infos[i].m_shift) & m_subunit_infos[i].m_mask) != 0)
+		if (((handlermask >> m_subunit_infos[i].m_shift) & ((u64(1) << m_subunit_infos[m_subunits].m_size) - 1)) != 0)
 		{
 			if (i != m_subunits-1)
 				memmove (m_subunit_infos+i, m_subunit_infos+i+1, (m_subunits-i-1)*sizeof(m_subunit_infos[0]));
 			remove_subunit(i);
 		}
 
-	// compute the inverse mask
+	// Recompute the inverse mask
 	m_invsubmask = 0;
 	for (int i = 0; i < m_subunits; i++)
-		m_invsubmask |= u64(m_subunit_infos[i].m_mask) << m_subunit_infos[i].m_shift;
+		m_invsubmask |= ((u64(1) << m_subunit_infos[m_subunits].m_size) - 1) << m_subunit_infos[i].m_shift;
 	m_invsubmask = ~m_invsubmask;
 }
 
@@ -4644,7 +4715,7 @@ bool handler_entry::overriden_by_mask(u64 handlermask)
 
 	// Check whether a subunit would be left
 	for (int i=0; i != m_subunits; i++)
-		if (((handlermask >> m_subunit_infos[i].m_shift) & m_subunit_infos[i].m_mask) == 0)
+		if (((handlermask >> m_subunit_infos[i].m_shift) & ((u64(1) << m_subunit_infos[i].m_size) - 1)) == 0)
 			return false;
 
 	return true;
@@ -4664,12 +4735,13 @@ void handler_entry::description(char *buffer) const
 		{
 			if (i)
 				*buffer++ = ' ';
-			buffer += sprintf (buffer, "%d:%d:%x:%d:%x:%s",
+			buffer += sprintf (buffer, "%d:%d:%x:%d:%x:%x:%s",
 								m_subunit_infos[i].m_size,
 								m_subunit_infos[i].m_shift,
 								m_subunit_infos[i].m_offset,
 								m_subunit_infos[i].m_multiplier,
 								m_subunit_infos[i].m_addrmask,
+								m_subunit_infos[i].m_csmask,
 								subunit_name(i));
 		}
 	}
@@ -4765,7 +4837,7 @@ void handler_entry_read::remove_subunit(int entry)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read8_delegate delegate, u64 mask)
+void handler_entry_read::set_delegate(read8_delegate delegate, u64 umask, int cswidth)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4778,7 +4850,7 @@ void handler_entry_read::set_delegate(read8_delegate delegate, u64 mask)
 	if (m_datawidth != 8)
 	{
 		int start_slot, end_slot;
-		configure_subunits(mask, 8, start_slot, end_slot);
+		configure_subunits(umask, 8, cswidth, start_slot, end_slot);
 		for (int i=start_slot; i != end_slot; i++)
 		{
 			m_subread[i].r8 = delegate;
@@ -4802,7 +4874,7 @@ void handler_entry_read::set_delegate(read8_delegate delegate, u64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read16_delegate delegate, u64 mask)
+void handler_entry_read::set_delegate(read16_delegate delegate, u64 umask, int cswidth)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4815,7 +4887,7 @@ void handler_entry_read::set_delegate(read16_delegate delegate, u64 mask)
 	if (m_datawidth != 16)
 	{
 		int start_slot, end_slot;
-		configure_subunits(mask, 16, start_slot, end_slot);
+		configure_subunits(umask, 16, cswidth, start_slot, end_slot);
 		for (int i=start_slot; i != end_slot; i++)
 		{
 			m_subread[i].r16 = delegate;
@@ -4837,7 +4909,7 @@ void handler_entry_read::set_delegate(read16_delegate delegate, u64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read32_delegate delegate, u64 mask)
+void handler_entry_read::set_delegate(read32_delegate delegate, u64 umask, int cswidth)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4850,7 +4922,7 @@ void handler_entry_read::set_delegate(read32_delegate delegate, u64 mask)
 	if (m_datawidth != 32)
 	{
 		int start_slot, end_slot;
-		configure_subunits(mask, 32, start_slot, end_slot);
+		configure_subunits(umask, 32, cswidth, start_slot, end_slot);
 		for (int i=start_slot; i != end_slot; i++)
 		{
 			m_subread[i].r32 = delegate;
@@ -4869,7 +4941,7 @@ void handler_entry_read::set_delegate(read32_delegate delegate, u64 mask)
 //  set_delegate - set a 64-bit delegate
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read64_delegate delegate, u64 mask)
+void handler_entry_read::set_delegate(read64_delegate delegate, u64 umask, int cswidth)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4911,12 +4983,11 @@ u16 handler_entry_read::read_stub_16(address_space &space, offs_t offset, u16 ma
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		u32 submask = (mask >> si.m_shift) & si.m_mask;
-		if (submask)
+		if (mask & si.m_csmask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			u8 val;
-			val = m_subread[index].r8(space, aoffset & si.m_addrmask, submask);
+			val = m_subread[index].r8(space, aoffset & si.m_addrmask, mask >> si.m_shift);
 			result |= val << si.m_shift;
 		}
 	}
@@ -4935,18 +5006,17 @@ u32 handler_entry_read::read_stub_32(address_space &space, offs_t offset, u32 ma
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		u32 submask = (mask >> si.m_shift) & si.m_mask;
-		if (submask)
+		if (mask & si.m_csmask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			u16 val = 0;
 			switch (si.m_size)
 			{
 			case 8:
-				val = m_subread[index].r8(space, aoffset & si.m_addrmask, submask);
+				val = m_subread[index].r8(space, aoffset & si.m_addrmask, mask >> si.m_shift);
 				break;
 			case 16:
-				val = m_subread[index].r16(space, aoffset & si.m_addrmask, submask);
+				val = m_subread[index].r16(space, aoffset & si.m_addrmask, mask >> si.m_shift);
 				break;
 			}
 			result |= val << si.m_shift;
@@ -4967,21 +5037,20 @@ u64 handler_entry_read::read_stub_64(address_space &space, offs_t offset, u64 ma
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		u32 submask = (mask >> si.m_shift) & si.m_mask;
-		if (submask)
+		if (mask & si.m_csmask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			u32 val = 0;
 			switch (si.m_size)
 			{
 			case 8:
-				val = m_subread[index].r8(space, aoffset & si.m_addrmask, submask);
+				val = m_subread[index].r8(space, aoffset & si.m_addrmask, mask >> si.m_shift);
 				break;
 			case 16:
-				val = m_subread[index].r16(space, aoffset & si.m_addrmask, submask);
+				val = m_subread[index].r16(space, aoffset & si.m_addrmask, mask >> si.m_shift);
 				break;
 			case 32:
-				val = m_subread[index].r32(space, aoffset & si.m_addrmask, submask);
+				val = m_subread[index].r32(space, aoffset & si.m_addrmask, mask >> si.m_shift);
 				break;
 			}
 			result |=  u64(val) << si.m_shift;
@@ -5079,7 +5148,7 @@ void handler_entry_write::remove_subunit(int entry)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write8_delegate delegate, u64 mask)
+void handler_entry_write::set_delegate(write8_delegate delegate, u64 umask, int cswidth)
 {
 	assert(m_datawidth >= 8);
 
@@ -5087,7 +5156,7 @@ void handler_entry_write::set_delegate(write8_delegate delegate, u64 mask)
 	if (m_datawidth != 8)
 	{
 		int start_slot, end_slot;
-		configure_subunits(mask, 8, start_slot, end_slot);
+		configure_subunits(umask, 8, cswidth, start_slot, end_slot);
 		for (int i=start_slot; i != end_slot; i++)
 		{
 			m_subwrite[i].w8 = delegate;
@@ -5111,7 +5180,7 @@ void handler_entry_write::set_delegate(write8_delegate delegate, u64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write16_delegate delegate, u64 mask)
+void handler_entry_write::set_delegate(write16_delegate delegate, u64 umask, int cswidth)
 {
 	assert(m_datawidth >= 16);
 
@@ -5119,7 +5188,7 @@ void handler_entry_write::set_delegate(write16_delegate delegate, u64 mask)
 	if (m_datawidth != 16)
 	{
 		int start_slot, end_slot;
-		configure_subunits(mask, 16, start_slot, end_slot);
+		configure_subunits(umask, 16, cswidth, start_slot, end_slot);
 		for (int i=start_slot; i != end_slot; i++)
 		{
 			m_subwrite[i].w16 = delegate;
@@ -5141,7 +5210,7 @@ void handler_entry_write::set_delegate(write16_delegate delegate, u64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write32_delegate delegate, u64 mask)
+void handler_entry_write::set_delegate(write32_delegate delegate, u64 umask, int cswidth)
 {
 	assert(m_datawidth >= 32);
 
@@ -5149,7 +5218,7 @@ void handler_entry_write::set_delegate(write32_delegate delegate, u64 mask)
 	if (m_datawidth != 32)
 	{
 		int start_slot, end_slot;
-		configure_subunits(mask, 32, start_slot, end_slot);
+		configure_subunits(umask, 32, cswidth, start_slot, end_slot);
 		for (int i=start_slot; i != end_slot; i++)
 		{
 			m_subwrite[i].w32 = delegate;
@@ -5168,7 +5237,7 @@ void handler_entry_write::set_delegate(write32_delegate delegate, u64 mask)
 //  set_delegate - set a 64-bit delegate
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write64_delegate delegate, u64 mask)
+void handler_entry_write::set_delegate(write64_delegate delegate, u64 mask, int cswidth)
 {
 	assert(m_datawidth >= 64);
 	m_write.w64 = delegate;
@@ -5204,12 +5273,12 @@ void handler_entry_write::write_stub_16(address_space &space, offs_t offset, u16
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		u32 submask = (mask >> si.m_shift) & si.m_mask;
-		if (submask)
+		if (mask & si.m_csmask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			u8 adata = data >> si.m_shift;
-			m_subwrite[index].w8(space, aoffset & si.m_addrmask, adata, submask);
+			u8 amask = mask >> si.m_shift;
+			m_subwrite[index].w8(space, aoffset & si.m_addrmask, adata, amask);
 		}
 	}
 }
@@ -5225,18 +5294,18 @@ void handler_entry_write::write_stub_32(address_space &space, offs_t offset, u32
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		u32 submask = (mask >> si.m_shift) & si.m_mask;
-		if (submask)
+		if (mask & si.m_csmask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			u16 adata = data >> si.m_shift;
+			u16 amask = mask >> si.m_shift;
 			switch (si.m_size)
 			{
 			case 8:
-				m_subwrite[index].w8(space, aoffset & si.m_addrmask, adata, submask);
+				m_subwrite[index].w8(space, aoffset & si.m_addrmask, adata, amask);
 				break;
 			case 16:
-				m_subwrite[index].w16(space, aoffset & si.m_addrmask, adata, submask);
+				m_subwrite[index].w16(space, aoffset & si.m_addrmask, adata, amask);
 				break;
 			}
 		}
@@ -5254,21 +5323,21 @@ void handler_entry_write::write_stub_64(address_space &space, offs_t offset, u64
 	for (int index = 0; index < m_subunits; index++)
 	{
 		const subunit_info &si = m_subunit_infos[index];
-		u32 submask = (mask >> si.m_shift) & si.m_mask;
-		if (submask)
+		if (mask & si.m_csmask)
 		{
 			offs_t aoffset = offset * si.m_multiplier + si.m_offset;
 			u32 adata = data >> si.m_shift;
+			u32 amask = mask >> si.m_shift;
 			switch (si.m_size)
 			{
 			case 8:
-				m_subwrite[index].w8(space, aoffset & si.m_addrmask, adata, submask);
+				m_subwrite[index].w8(space, aoffset & si.m_addrmask, adata, amask);
 				break;
 			case 16:
-				m_subwrite[index].w16(space, aoffset & si.m_addrmask, adata, submask);
+				m_subwrite[index].w16(space, aoffset & si.m_addrmask, adata, amask);
 				break;
 			case 32:
-				m_subwrite[index].w32(space, aoffset & si.m_addrmask, adata, submask);
+				m_subwrite[index].w32(space, aoffset & si.m_addrmask, adata, amask);
 				break;
 			}
 		}

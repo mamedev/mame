@@ -136,10 +136,11 @@ miniforce_state(const machine_config &mconfig, device_type type, const char *tag
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 	void miniforce(machine_config &config);
+	void miniforce_mem(address_map &map);
 };
 
 #if 0
-static ADDRESS_MAP_START (miniforce_mem, AS_PROGRAM, 32, miniforce_state)
+ADDRESS_MAP_START(miniforce_state::miniforce_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 /* The ROMs contains an OS9 bootloader. It is position independent but reset vector suggests that it sits flat on adress 0 (zero) */
 //  AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */

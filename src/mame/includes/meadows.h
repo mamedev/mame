@@ -74,4 +74,9 @@ public:
 	void bowl3d(machine_config &config);
 	void meadows(machine_config &config);
 	void minferno(machine_config &config);
+	void audio_map(address_map &map);
+	void bowl3d_main_map(address_map &map);
+	void meadows_main_map(address_map &map);
+	void minferno_data_map(address_map &map);
+	void minferno_main_map(address_map &map);
 };

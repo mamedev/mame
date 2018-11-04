@@ -77,7 +77,7 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, device_typ
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_read_ram(*this)
-	, m_write_clear_video_interrupt(*this)
+	, m_write_vert_freq_intr(*this)
 	, m_write_lba7(*this)
 	, m_char_rom(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, "palette")
@@ -105,12 +105,14 @@ void vt100_video_device::device_start()
 {
 	/* resolve callbacks */
 	m_read_ram.resolve_safe(0);
-	m_write_clear_video_interrupt.resolve_safe();
+	m_write_vert_freq_intr.resolve_safe();
 	m_write_lba7.resolve_safe();
 
 	// LBA7 is scan line frequency update
 	m_lba7_change_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
 	m_lba7_change_timer->adjust(clocks_to_attotime(765), 0, clocks_to_attotime(765));
+
+	screen().register_vblank_callback(vblank_state_delegate(&vt100_video_device::vblank_callback, this));
 
 	save_item(NAME(m_lba7));
 	save_item(NAME(m_scroll_latch));
@@ -220,10 +222,18 @@ void vt100_video_device::recompute_parameters()
 		LOG("(RECOMPUTE) * LINEDOUBLER *\n");
 }
 
-
 READ_LINE_MEMBER(vt100_video_device::lba7_r)
 {
 	return m_lba7;
+}
+
+void vt100_video_device::vblank_callback(screen_device &screen, bool state)
+{
+	if (state)
+	{
+		m_write_vert_freq_intr(ASSERT_LINE);
+		notify_vblank(true);
+	}
 }
 
 // Also used by Rainbow-100 ************
@@ -268,7 +278,8 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 			break;
 		case 0x09:
 			// clear vertical frequency interrupt;
-			m_write_clear_video_interrupt(0);
+			m_write_vert_freq_intr(CLEAR_LINE);
+			notify_vblank(false);
 			break;
 		case 0x0a:
 			// PDF: reverse field ON

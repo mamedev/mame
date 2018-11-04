@@ -266,7 +266,7 @@ WRITE8_MEMBER(jedi_state::nvram_enable_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jedi_state )
+ADDRESS_MAP_START(jedi_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_RAM_WRITE(nvram_data_w) AM_SHARE("nvram")
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03fe) AM_READ_PORT("0c00") AM_WRITENOP
@@ -357,10 +357,10 @@ MACHINE_CONFIG_START(jedi_state::jedi)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(jedi_video)
+	jedi_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(jedi_audio)
+	jedi_audio(config);
 MACHINE_CONFIG_END
 
 

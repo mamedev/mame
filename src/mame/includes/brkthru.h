@@ -60,4 +60,7 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int prio );
 	void brkthru(machine_config &config);
 	void darwin(machine_config &config);
+	void brkthru_map(address_map &map);
+	void darwin_map(address_map &map);
+	void sound_map(address_map &map);
 };

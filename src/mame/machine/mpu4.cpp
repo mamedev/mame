@@ -2606,7 +2606,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu4_state::gen_50hz)
 	update_meters();//run at 100Hz to sync with PIAs
 }
 
-static ADDRESS_MAP_START( mpu4_memmap, AS_PROGRAM, 8, mpu4_state )
+ADDRESS_MAP_START(mpu4_state::mpu4_memmap)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)    /* write bank (rom page select) */
@@ -3090,7 +3090,7 @@ MACHINE_CONFIG_START(mpu4_state::mpu4base)
 	MCFG_CPU_ADD("maincpu", MC6809, MPU4_MASTER_CLOCK) // MC68B09P
 	MCFG_CPU_PROGRAM_MAP(mpu4_memmap)
 
-	MCFG_FRAGMENT_ADD(mpu4_common)
+	mpu4_common(config);
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -3100,80 +3100,88 @@ MACHINE_CONFIG_START(mpu4_state::mpu4base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mpu4_state::mod2, mpu4base)
+MACHINE_CONFIG_START(mpu4_state::mod2)
+	mpu4base(config);
 	MCFG_SOUND_ADD("ay8913", AY8913, MPU4_MASTER_CLOCK/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(820, 0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FRAGMENT_ADD(mpu4_std_6reel)
+	mpu4_std_6reel(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4_state::mod2_alt, mpu4base)
+MACHINE_CONFIG_START(mpu4_state::mod2_alt)
+	mpu4base(config);
 	MCFG_SOUND_ADD("ay8913", AY8913, MPU4_MASTER_CLOCK/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(820, 0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FRAGMENT_ADD(mpu4_type2_6reel)
+	mpu4_type2_6reel(config);
 MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(mpu4_state::mod4yam, mpu4base)
+MACHINE_CONFIG_START(mpu4_state::mod4yam)
+	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
 
-	MCFG_FRAGMENT_ADD(mpu4_std_6reel)
+	mpu4_std_6reel(config);
 
 	MCFG_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4_state::mod4oki, mpu4base)
+MACHINE_CONFIG_START(mpu4_state::mod4oki)
+	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
-	MCFG_FRAGMENT_ADD(mpu4_common2)
-	MCFG_FRAGMENT_ADD(mpu4_std_6reel)
+	mpu4_common2(config);
+	mpu4_std_6reel(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000)     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4_state::mod4oki_alt, mpu4base)
+MACHINE_CONFIG_START(mpu4_state::mod4oki_alt)
+	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
-	MCFG_FRAGMENT_ADD(mpu4_common2)
-	MCFG_FRAGMENT_ADD(mpu4_type2_6reel)
+	mpu4_common2(config);
+	mpu4_type2_6reel(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000)     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4_state::mod4oki_5r, mpu4base)
+MACHINE_CONFIG_START(mpu4_state::mod4oki_5r)
+	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
 
-	MCFG_FRAGMENT_ADD(mpu4_common2)
-	MCFG_FRAGMENT_ADD(mpu4_std_5reel)
+	mpu4_common2(config);
+	mpu4_std_5reel(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000)     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4_state::bwboki, mpu4base)
+MACHINE_CONFIG_START(mpu4_state::bwboki)
+	mpu4base(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4bwb)
-	MCFG_FRAGMENT_ADD(mpu4_common2)
-	MCFG_FRAGMENT_ADD(mpu4_bwb_5reel)
+	mpu4_common2(config);
+	mpu4_bwb_5reel(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000)     //16KHz sample Can also be 85430 at 10.5KHz and 64000 at 8KHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4_state::mpu4crys, mod2)
+MACHINE_CONFIG_START(mpu4_state::mpu4crys)
+	mod2(config);
 	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4cry)
 
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)

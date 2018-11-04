@@ -75,6 +75,7 @@ public:
 	DECLARE_READ8_MEMBER(mirage_adc_read);
 
 	void mirage(machine_config &config);
+	void mirage_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -122,7 +123,7 @@ void enmirage_state::machine_reset()
 	membank("sndbank")->set_base(memregion("es5503")->base() );
 }
 
-static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, enmirage_state )
+ADDRESS_MAP_START(enmirage_state::mirage_map)
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("sndbank")  // 32k window on 128k of wave RAM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM         // main RAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM         // expansion RAM

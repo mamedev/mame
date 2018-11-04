@@ -103,4 +103,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	void quizmoon(machine_config &config);
 	void macrossp(machine_config &config);
+	void macrossp_map(address_map &map);
+	void macrossp_sound_map(address_map &map);
 };

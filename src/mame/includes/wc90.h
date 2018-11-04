@@ -82,4 +82,7 @@ public:
 	void wc90t(machine_config &config);
 	void wc90(machine_config &config);
 	void pac90(machine_config &config);
+	void sound_map(address_map &map);
+	void wc90_map_1(address_map &map);
+	void wc90_map_2(address_map &map);
 };

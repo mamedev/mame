@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(MB8795, mb8795_device, "mb8795", "Fujitsu MB8795")
 
-DEVICE_ADDRESS_MAP_START(map, 8, mb8795_device)
+ADDRESS_MAP_START(mb8795_device::map)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(txstat_r, txstat_w)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(txmask_r, txmask_w)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(rxstat_r, rxstat_w)

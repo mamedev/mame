@@ -81,4 +81,10 @@ public:
 	void sidearms(machine_config &config);
 	void turtship(machine_config &config);
 	void whizz(machine_config &config);
+	void sidearms_map(address_map &map);
+	void sidearms_sound_map(address_map &map);
+	void turtship_map(address_map &map);
+	void whizz_io_map(address_map &map);
+	void whizz_map(address_map &map);
+	void whizz_sound_map(address_map &map);
 };

@@ -75,6 +75,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
 	void quantum(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -141,7 +142,7 @@ WRITE16_MEMBER(quantum_state::led_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, quantum_state )
+ADDRESS_MAP_START(quantum_state::main_map)
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x01cfff) AM_RAM
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_SHARE("vectorram")

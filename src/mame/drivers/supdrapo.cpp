@@ -110,6 +110,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void supdrapo(machine_config &config);
+	void sdpoker_mem(address_map &map);
 };
 
 
@@ -276,7 +277,7 @@ void supdrapo_state::machine_reset()
                               Memory Map
 **********************************************************************/
 
-static ADDRESS_MAP_START( sdpoker_mem, AS_PROGRAM, 8, supdrapo_state )
+ADDRESS_MAP_START(supdrapo_state::sdpoker_mem)
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE("col_line")
 	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE("col_line")

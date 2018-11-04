@@ -105,6 +105,9 @@ public:
 
 	void ccs2810(machine_config &config);
 	void ccs2422(machine_config &config);
+	void ccs2422_io(address_map &map);
+	void ccs2810_io(address_map &map);
+	void ccs2810_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -175,20 +178,20 @@ WRITE8_MEMBER(ccs_state::io_write)
 		m_ins8250->ins8250_w(space, offset & 7, data);
 }
 
-static ADDRESS_MAP_START(ccs2810_mem, AS_PROGRAM, 8, ccs_state)
+ADDRESS_MAP_START(ccs_state::ccs2810_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(memory_read, memory_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ccs2810_io, AS_IO, 8, ccs_state)
+ADDRESS_MAP_START(ccs_state::ccs2810_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ccs2422_io, AS_IO, 8, ccs_state)
+ADDRESS_MAP_START(ccs_state::ccs2422_io)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READWRITE(port04_r,port04_w)
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", mb8877_device, read, write)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_READWRITE(port34_r,port34_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE(port40_w)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 ADDRESS_MAP_END
 
 /* Input ports */

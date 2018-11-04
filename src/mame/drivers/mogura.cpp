@@ -42,6 +42,8 @@ public:
 	DECLARE_PALETTE_INIT(mogura);
 	uint32_t screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mogura(machine_config &config);
+	void mogura_io_map(address_map &map);
+	void mogura_map(address_map &map);
 };
 
 
@@ -135,14 +137,14 @@ WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
 }
 
 
-static ADDRESS_MAP_START( mogura_map, AS_PROGRAM, 8, mogura_state )
+ADDRESS_MAP_START(mogura_state::mogura_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // main ram
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_SHARE("gfxram") // ram based characters
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_SHARE("tileram") // tilemap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mogura_io_map, AS_IO, 8, mogura_state )
+ADDRESS_MAP_START(mogura_state::mogura_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP    // ??
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")

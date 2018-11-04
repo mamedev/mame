@@ -21,14 +21,6 @@ public:
 	// construction/destruction
 	isa8_finalchs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(finalchs_r);
-	DECLARE_WRITE8_MEMBER(finalchs_w);
-
-	DECLARE_WRITE8_MEMBER( io7ff8_write );
-	DECLARE_READ8_MEMBER( io7ff8_read );
-	DECLARE_READ8_MEMBER( io6000_read );
-	DECLARE_WRITE8_MEMBER( io6000_write );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -41,6 +33,16 @@ protected:
 private:
 	// internal state
 	uint8_t m_FCH_latch_data;
+
+	DECLARE_READ8_MEMBER(finalchs_r);
+	DECLARE_WRITE8_MEMBER(finalchs_w);
+
+	DECLARE_WRITE8_MEMBER( io7ff8_write );
+	DECLARE_READ8_MEMBER( io7ff8_read );
+	DECLARE_READ8_MEMBER( io6000_read );
+	DECLARE_WRITE8_MEMBER( io6000_write );
+
+	void finalchs_mem(address_map &map);
 };
 
 

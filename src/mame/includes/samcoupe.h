@@ -197,6 +197,8 @@ public:
 	int m_lpt1_busy;
 	int m_lpt2_busy;
 	void samcoupe(machine_config &config);
+	void samcoupe_io(address_map &map);
+	void samcoupe_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -16,17 +16,17 @@
 #define M6809_TAG   "soundcpu"
 #define BSMT_TAG    "bsmt"
 
-static ADDRESS_MAP_START( decobsmt_map, AS_PROGRAM, 8, decobsmt_device )
+ADDRESS_MAP_START(decobsmt_device::decobsmt_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0xffff) AM_ROM AM_REGION(":soundcpu", 0x2000)
 	AM_RANGE(0x2000, 0x2001) AM_WRITE(bsmt_reset_w)
 	AM_RANGE(0x2002, 0x2003) AM_READ(bsmt_comms_r)
 	AM_RANGE(0x2006, 0x2007) AM_READ(bsmt_status_r)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(bsmt0_w)
 	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(bsmt1_w)
-	AM_RANGE(0x2000, 0xffff) AM_ROM AM_REGION(":soundcpu", 0x2000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bsmt_map, 0, 8, decobsmt_device )
+ADDRESS_MAP_START(decobsmt_device::bsmt_map)
 	AM_RANGE(0x000000, 0xffffff) AM_ROM AM_REGION(":bsmt", 0)
 ADDRESS_MAP_END
 

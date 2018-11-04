@@ -69,6 +69,8 @@ public:
 	DECLARE_READ32_MEMBER( ram_address_r );
 	DECLARE_WRITE32_MEMBER( ram_address_w );
 
+	void data_map(address_map &map);
+	void program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

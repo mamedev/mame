@@ -75,6 +75,9 @@ public:
 
 	void undrfire(machine_config &config);
 	void cbombers(machine_config &config);
+	void cbombers_cpua_map(address_map &map);
+	void cbombers_cpub_map(address_map &map);
+	void undrfire_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

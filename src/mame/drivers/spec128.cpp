@@ -233,7 +233,7 @@ READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
 	return vpos<193 ? m_screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }
 
-static ADDRESS_MAP_START (spectrum_128_io, AS_IO, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::spectrum_128_io)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(spectrum_128_port_7ffd_w) AM_MIRROR(0x7ffc)   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START (spectrum_128_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x0001, 0x0001) AM_READ(spectrum_128_ula_r) AM_MIRROR(0xfffe)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (spectrum_128_mem, AS_PROGRAM, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::spectrum_128_mem)
 	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE(spectrum_128_bank1_r, spectrum_128_bank1_w)
 	AM_RANGE( 0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE( 0x8000, 0xbfff) AM_RAMBANK("bank3")
@@ -288,7 +288,8 @@ static GFXDECODE_START( spec128 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_DERIVED(spectrum_state::spectrum_128, spectrum)
+MACHINE_CONFIG_START(spectrum_state::spectrum_128)
+	spectrum(config);
 
 	MCFG_DEVICE_REMOVE("maincpu")
 

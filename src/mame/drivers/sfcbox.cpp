@@ -155,6 +155,10 @@ public:
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 	void sfcbox(machine_config &config);
+	void sfcbox_io(address_map &map);
+	void sfcbox_map(address_map &map);
+	void snes_map(address_map &map);
+	void spc_mem(address_map &map);
 };
 
 uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -163,7 +167,7 @@ uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, sfcbox_state )
+ADDRESS_MAP_START(sfcbox_state::snes_map)
 	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)
 	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
@@ -179,13 +183,13 @@ WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
 	m_spc700->spc_ram_w(space, offset + 0x100, data);
 }
 
-static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, sfcbox_state )
+ADDRESS_MAP_START(sfcbox_state::spc_mem)
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", snes_sound_device, spc_ram_r, spc_ram_w) /* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", snes_sound_device, spc_io_r, spc_io_w)   /* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfcbox_map, AS_PROGRAM, 8, sfcbox_state )
+ADDRESS_MAP_START(sfcbox_state::sfcbox_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("krom", 0)
 	AM_RANGE(0x20000, 0x27fff) AM_RAM
 	AM_RANGE(0x40000, 0x47fff) AM_ROM AM_REGION("grom1", 0)
@@ -279,9 +283,9 @@ WRITE8_MEMBER( sfcbox_state::snes_map_1_w )
 	printf("%s SRAM Size\n",sram_size[((data & 0xc0) >> 6)]);
 }
 
-static ADDRESS_MAP_START( sfcbox_io, AS_IO, 8, sfcbox_state )
-	AM_RANGE(0x0b, 0x0b) AM_DEVWRITE("mb90082",mb90082_device,write)
+ADDRESS_MAP_START(sfcbox_state::sfcbox_io)
 	AM_RANGE(0x00, 0x3f) AM_RAM // internal i/o
+	AM_RANGE(0x0b, 0x0b) AM_DEVWRITE("mb90082",mb90082_device,write)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("KEY") AM_WRITE(port_80_w) // Keyswitch and Button Inputs / SNES Transfer and Misc Output
 	AM_RANGE(0x81, 0x81) AM_READWRITE(port_81_r,port_81_w) // SNES Transfer and Misc Input / Misc Output
 //  AM_RANGE(0x82, 0x82) // Unknown/unused

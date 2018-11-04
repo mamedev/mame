@@ -22,11 +22,11 @@
 // device type definition
 DEFINE_DEVICE_TYPE(HUC6272, huc6272_device, "huc6272", "Hudson HuC6272 \"King\"")
 
-static ADDRESS_MAP_START( microprg_map, AS_PROGRAM, 16, huc6272_device )
+ADDRESS_MAP_START(huc6272_device::microprg_map)
 	AM_RANGE(0x00, 0x0f) AM_RAM AM_SHARE("microprg_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kram_map, AS_DATA, 32, huc6272_device )
+ADDRESS_MAP_START(huc6272_device::kram_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("kram_page0")
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM AM_SHARE("kram_page1")
 ADDRESS_MAP_END
@@ -43,8 +43,8 @@ ADDRESS_MAP_END
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HUC6272, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, nullptr, *ADDRESS_MAP_NAME(microprg_map)),
-		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, nullptr, *ADDRESS_MAP_NAME(kram_map)),
+		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::microprg_map), this)),
+		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::kram_map), this)),
 		m_microprg_ram(*this, "microprg_ram"),
 		m_kram_page0(*this, "kram_page0"),
 		m_kram_page1(*this, "kram_page1"),

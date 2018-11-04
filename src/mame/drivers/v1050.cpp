@@ -466,7 +466,7 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 
 // Memory Maps
 
-static ADDRESS_MAP_START( v1050_mem, AS_PROGRAM, 8, v1050_state )
+ADDRESS_MAP_START(v1050_state::v1050_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START( v1050_mem, AS_PROGRAM, 8, v1050_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
+ADDRESS_MAP_START(v1050_state::v1050_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(I8255A_DISP_TAG, i8255_device, read, write)
@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0xe1, 0xe1) AM_DEVREAD("scsi_ctrl_in", input_buffer_device, read) AM_WRITE(sasi_ctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( v1050_crt_mem, AS_PROGRAM, 8, v1050_state )
+ADDRESS_MAP_START(v1050_state::v1050_crt_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(videoram_r, videoram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(H46505_TAG, mc6845_device, address_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE(H46505_TAG, mc6845_device, register_r, register_w)
@@ -1037,7 +1037,7 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", v1050_state, v1050_keyboard_tick, attotime::from_hz(60))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(v1050_video)
+	v1050_video(config);
 
 	// devices
 	MCFG_DEVICE_ADD(UPB8214_TAG, I8214, 16_MHz_XTAL/4)

@@ -244,7 +244,7 @@ public:
 	// construction/destruction
 	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(slot_map, 16);
+	void slot_map(address_map &map);
 
 	DECLARE_READ16_MEMBER(read)     { return m_space->read_word(offset * 2, mem_mask); }
 	DECLARE_WRITE16_MEMBER(write)   { m_space->write_word(offset * 2, data, mem_mask); }
@@ -559,17 +559,17 @@ WRITE_LINE_MEMBER(galgames_cart_device::eeprom_cs_write)
 
 // SLOT implementation
 
-DEVICE_ADDRESS_MAP_START( slot_map, 16, galgames_slot_device )
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(rom0_or_ram_r, ram_w) AM_SHARE("ram")
+ADDRESS_MAP_START(galgames_slot_device::slot_map)
 	AM_RANGE( 0x000000, 0x1fffff ) AM_READ(rom0_r)
-	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(rom_or_ram_r, ram_w)
+	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(rom0_or_ram_r, ram_w) AM_SHARE("ram")
 	AM_RANGE( 0x200000, 0x3fffff ) AM_READ(rom_r)
+	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(rom_or_ram_r, ram_w)
 ADDRESS_MAP_END
 
 galgames_slot_device::galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GALGAMES_SLOT, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("slot_space", ENDIANNESS_BIG, 16,22, 0, address_map_delegate(FUNC(galgames_slot_device::slot_map), this)),
+	m_space_config("slot_space", ENDIANNESS_BIG, 16,22, 0, address_map_constructor(FUNC(galgames_slot_device::slot_map), this)),
 	m_ram(*this, "ram"),
 	m_cart0(*this, "^cart0"),
 	m_cart1(*this, "^cart1"),
@@ -752,6 +752,8 @@ public:
 	void galgbios(machine_config &config);
 	void galgame2(machine_config &config);
 	void galgame3(machine_config &config);
+	void blitter_map(address_map &map);
+	void galgames_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -857,7 +859,7 @@ READ16_MEMBER(galgames_state::fpga_status_r)
 	return 0x3; // Pass the check at PC = 0xfae & a later one
 }
 
-static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, galgames_state )
+ADDRESS_MAP_START(galgames_state::galgames_map)
 	AM_RANGE( 0x000000, 0x3fffff ) AM_DEVREADWRITE("slot", galgames_slot_device, read, write )
 
 	AM_RANGE( 0x400000, 0x400011 ) AM_DEVWRITE("blitter", cesblit_device, regs_w )
@@ -891,7 +893,7 @@ static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, galgames_state )
 	AM_RANGE( 0xd00014, 0xd00015 ) AM_DEVREADWRITE8("slot", galgames_slot_device, pic_status_r, ram_sel_w,  0x00ff )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blitter_map, AS_PROGRAM, 16, galgames_state )
+ADDRESS_MAP_START(galgames_state::blitter_map)
 	AM_RANGE( 0x000000, 0x1fffff ) AM_DEVREAD(":slot", galgames_slot_device, rom_r)
 ADDRESS_MAP_END
 
@@ -1003,21 +1005,24 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galgames_state::galgbios, galgames_base)
+MACHINE_CONFIG_START(galgames_state::galgbios)
+	galgames_base(config);
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart1", 1)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart2", 2)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart3", 3)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart4", 4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galgames_state::galgame2, galgames_base)
+MACHINE_CONFIG_START(galgames_state::galgame2)
+	galgames_base(config);
 	MCFG_GALGAMES_STARPAK2_CART_ADD("cart1", 1)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart2", 2)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart3", 3)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart4", 4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galgames_state::galgame3, galgames_base)
+MACHINE_CONFIG_START(galgames_state::galgame3)
+	galgames_base(config);
 	MCFG_GALGAMES_STARPAK3_CART_ADD("cart1", 1)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart2", 2)
 	MCFG_GALGAMES_EMPTY_CART_ADD("cart3", 3)

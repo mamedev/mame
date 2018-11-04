@@ -105,6 +105,7 @@ public:
 	required_ioport m_io_in3;
 	required_device<palette_device> m_palette;
 	void backfire(machine_config &config);
+	void backfire_map(address_map &map);
 };
 
 //uint32_t *backfire_180010, *backfire_188010;
@@ -135,8 +136,8 @@ void backfire_state::video_start()
 
 uint32_t backfire_state::screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(1);
+	// sprites are flipped relative to tilemaps
+	m_sprgen->set_flip_screen(true);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -166,8 +167,8 @@ uint32_t backfire_state::screen_update_backfire_left(screen_device &screen, bitm
 
 uint32_t backfire_state::screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(1);
+	// sprites are flipped relative to tilemaps
+	m_sprgen2->set_flip_screen(true);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -291,7 +292,7 @@ WRITE32_MEMBER(backfire_state::backfire_spriteram2_w)
 
 
 
-static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
+ADDRESS_MAP_START(backfire_state::backfire_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)

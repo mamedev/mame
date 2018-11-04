@@ -22,32 +22,32 @@ DEFINE_DEVICE_TYPE(WD37C65C,       wd37c65c_device,       "wd37c65c",       "Wes
 DEFINE_DEVICE_TYPE(MCS3201,        mcs3201_device,        "mcs3201",        "Motorola MCS3201 FDC")
 DEFINE_DEVICE_TYPE(TC8566AF,       tc8566af_device,       "tc8566af",       "Toshiba TC8566AF FDC")
 
-DEVICE_ADDRESS_MAP_START(map, 8, upd765a_device)
+ADDRESS_MAP_START(upd765a_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, upd765b_device)
+ADDRESS_MAP_START(upd765b_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, i8272a_device)
+ADDRESS_MAP_START(i8272a_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, upd72065_device)
+ADDRESS_MAP_START(upd72065_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, i82072_device)
+ADDRESS_MAP_START(i82072_device::map)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(msr_r, dsr_w)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, smc37c78_device)
+ADDRESS_MAP_START(smc37c78_device::map)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
 	AM_RANGE(0x3, 0x3) AM_READWRITE(tdr_r, tdr_w)
 	AM_RANGE(0x4, 0x4) AM_READWRITE(msr_r, dsr_w)
@@ -55,7 +55,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, smc37c78_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, n82077aa_device)
+ADDRESS_MAP_START(n82077aa_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(sra_r)
 	AM_RANGE(0x1, 0x1) AM_READ(srb_r)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
@@ -65,7 +65,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, n82077aa_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_superio_device)
+ADDRESS_MAP_START(pc_fdc_superio_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(sra_r)
 	AM_RANGE(0x1, 0x1) AM_READ(srb_r)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
@@ -75,7 +75,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_superio_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, dp8473_device)
+ADDRESS_MAP_START(dp8473_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(sra_r)
 	AM_RANGE(0x1, 0x1) AM_READ(srb_r)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
@@ -85,7 +85,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, dp8473_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, pc8477a_device)
+ADDRESS_MAP_START(pc8477a_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(sra_r)
 	AM_RANGE(0x1, 0x1) AM_READ(srb_r)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
@@ -95,12 +95,12 @@ DEVICE_ADDRESS_MAP_START(map, 8, pc8477a_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, wd37c65c_device)
+ADDRESS_MAP_START(wd37c65c_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( map, 8, mcs3201_device )
+ADDRESS_MAP_START(mcs3201_device::map)
 	AM_RANGE(0x0, 0x0) AM_READ(input_r)
 	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
 	AM_RANGE(0x4, 0x4) AM_READ(msr_r)
@@ -108,7 +108,7 @@ DEVICE_ADDRESS_MAP_START( map, 8, mcs3201_device )
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( map, 8, tc8566af_device )
+ADDRESS_MAP_START(tc8566af_device::map)
 	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
 	AM_RANGE(0x3, 0x3) AM_WRITE(cr1_w)
 	AM_RANGE(0x4, 0x4) AM_READ(msr_r)

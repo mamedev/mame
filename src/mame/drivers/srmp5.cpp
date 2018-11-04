@@ -124,6 +124,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
 	void srmp5(machine_config &config);
+	void srmp5_mem(address_map &map);
+	void st0016_io(address_map &map);
+	void st0016_mem(address_map &map);
 };
 
 
@@ -355,7 +358,7 @@ READ32_MEMBER(srmp5_state::irq_ack_clear)
 	return 0;
 }
 
-static ADDRESS_MAP_START( srmp5_mem, AS_PROGRAM, 32, srmp5_state )
+ADDRESS_MAP_START(srmp5_state::srmp5_mem)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM //maybe 0 - 2fffff ?
 	AM_RANGE(0x002f0000, 0x002f7fff) AM_RAM
 	AM_RANGE(0x01000000, 0x01000003) AM_WRITEONLY  // 0xaa .. watchdog ?
@@ -376,8 +379,8 @@ static ADDRESS_MAP_START( srmp5_mem, AS_PROGRAM, 32, srmp5_state )
 	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE(spr_r, spr_w)
 	AM_RANGE(0x0a100000, 0x0a17ffff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	//0?N???A?????????i??????????
-	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
 	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE(srmp5_vidregs_r, srmp5_vidregs_w)
+	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
 	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE(tileram_r, tileram_w)
 	AM_RANGE(0x0fc00000, 0x0fdfffff) AM_MIRROR(0x10000000) AM_ROM AM_REGION("sub", 0)
 
@@ -385,7 +388,7 @@ static ADDRESS_MAP_START( srmp5_mem, AS_PROGRAM, 32, srmp5_state )
 	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, srmp5_state )
+ADDRESS_MAP_START(srmp5_state::st0016_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
@@ -416,7 +419,7 @@ WRITE8_MEMBER(srmp5_state::st0016_rom_bank_w)
 }
 
 
-static ADDRESS_MAP_START( st0016_io, AS_IO, 8, srmp5_state )
+ADDRESS_MAP_START(srmp5_state::st0016_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(cmd1_r)

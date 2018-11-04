@@ -218,12 +218,12 @@ WRITE8_MEMBER( micronic_state::rtc_data_w )
     Machine
 ***************************************************************************/
 
-static ADDRESS_MAP_START(micronic_mem, AS_PROGRAM, 8, micronic_state)
+ADDRESS_MAP_START(micronic_state::micronic_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAM  AM_SHARE("ram_base")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(micronic_io, AS_IO, 8, micronic_state)
+ADDRESS_MAP_START(micronic_state::micronic_io)
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 
 	/* keypad */

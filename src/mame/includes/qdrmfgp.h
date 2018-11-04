@@ -74,4 +74,7 @@ public:
 	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
 	void qdrmfgp(machine_config &config);
 	void qdrmfgp2(machine_config &config);
+	void qdrmfgp2_map(address_map &map);
+	void qdrmfgp_k054539_map(address_map &map);
+	void qdrmfgp_map(address_map &map);
 };

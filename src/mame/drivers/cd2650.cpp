@@ -81,6 +81,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cd2650(machine_config &config);
+	void cd2650_data(address_map &map);
+	void cd2650_io(address_map &map);
+	void cd2650_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -114,18 +117,18 @@ READ8_MEMBER(cd2650_state::keyin_r)
 	return ret;
 }
 
-static ADDRESS_MAP_START(cd2650_mem, AS_PROGRAM, 8, cd2650_state)
+ADDRESS_MAP_START(cd2650_state::cd2650_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1000, 0x7fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cd2650_io, AS_IO, 8, cd2650_state)
+ADDRESS_MAP_START(cd2650_state::cd2650_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x80, 0x84) disk i/o
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cd2650_data, AS_DATA, 8, cd2650_state)
+ADDRESS_MAP_START(cd2650_state::cd2650_data)
 	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READ(keyin_r) AM_DEVWRITE("outlatch", f9334_device, write_nibble_d3)
 ADDRESS_MAP_END
 

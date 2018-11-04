@@ -54,6 +54,8 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 
 	void othunder(machine_config &config);
+	void othunder_map(address_map &map);
+	void z80_sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

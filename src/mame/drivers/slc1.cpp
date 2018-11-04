@@ -68,6 +68,8 @@ public:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 	void slc1(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_digit;
 	bool m_kbd_type;
@@ -182,14 +184,14 @@ void slc1_state::machine_reset()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, slc1_state )
+ADDRESS_MAP_START(slc1_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x4fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_MIRROR(0xc00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, slc1_state )
+ADDRESS_MAP_START(slc1_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r,io_w)
 ADDRESS_MAP_END

@@ -78,6 +78,20 @@ public:
 	void tazmani3(machine_config &config);
 	void hustlerb(machine_config &config);
 	void rescuefe(machine_config &config);
+	void hustler_map(address_map &map);
+	void hustler_sound_io_map(address_map &map);
+	void hustler_sound_map(address_map &map);
+	void hustlerb_map(address_map &map);
+	void hustlerb_sound_io_map(address_map &map);
+	void hustlerb_sound_map(address_map &map);
+	void mimonkey_map(address_map &map);
+	void minefldfe_map(address_map &map);
+	void rescuefe_map(address_map &map);
+	void scobra_sound_io_map(address_map &map);
+	void scobra_sound_map(address_map &map);
+	void tazmani3_map(address_map &map);
+	void type1_map(address_map &map);
+	void type2_map(address_map &map);
 private:
 	optional_shared_ptr<uint8_t> m_soundram;
 };
@@ -124,7 +138,7 @@ READ8_MEMBER(scobra_state::hustler_ppi8255_1_r){ return m_ppi8255_1->read(space,
 WRITE8_MEMBER(scobra_state::hustler_ppi8255_0_w){ m_ppi8255_0->write(space, offset >> 3, data); }
 WRITE8_MEMBER(scobra_state::hustler_ppi8255_1_w){ m_ppi8255_1->write(space, offset >> 3, data); }
 
-static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::type1_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x0400)
@@ -142,7 +156,7 @@ static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::type2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x883f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
@@ -161,7 +175,7 @@ static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xb00e, 0xb00e) AM_WRITE(galaxold_flip_screen_x_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tazmani3_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::tazmani3_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x883f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
@@ -180,7 +194,7 @@ static ADDRESS_MAP_START( tazmani3_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xb00e, 0xb00e) AM_WRITE(galaxold_flip_screen_x_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::hustler_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -197,7 +211,7 @@ static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xe000, 0xe01f) AM_READWRITE(hustler_ppi8255_1_r, hustler_ppi8255_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::hustlerb_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -215,7 +229,7 @@ static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::mimonkey_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x0400)
@@ -225,8 +239,8 @@ static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x9080, 0x90ff) AM_RAM
 	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa800, 0xa802) AM_WRITE(galaxold_gfxbank_w)
+	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
@@ -234,7 +248,7 @@ static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 ADDRESS_MAP_END
 
 // weird address map like anteateruk in galaxian.c (also a free enterprise set)
-static ADDRESS_MAP_START( rescuefe_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::rescuefe_map)
 	AM_RANGE(0x0000, 0x05ff) AM_ROM
 	AM_RANGE(0x0600, 0x0fff) AM_RAM // sets stack here
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
@@ -269,7 +283,7 @@ static ADDRESS_MAP_START( rescuefe_map, AS_PROGRAM, 8, scobra_state )
 //  AM_RANGE(0xf000, 0xf000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::minefldfe_map)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM // ok
 	AM_RANGE(0x0c00, 0x0c3f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram") // ok
 	AM_RANGE(0x0c40, 0x0c5f) AM_RAM AM_SHARE("spriteram") // ok
@@ -312,15 +326,14 @@ WRITE8_MEMBER(scobra_state::scobra_soundram_w)
 	m_soundram[offset & 0x03ff] = data;
 }
 
-static ADDRESS_MAP_START( scobra_sound_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::scobra_sound_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scobra_soundram_r, scobra_soundram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_SHARE("soundram")  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scobra_soundram_r, scobra_soundram_w) AM_SHARE("soundram")
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scobra_sound_io_map, AS_IO, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::scobra_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
@@ -328,26 +341,26 @@ static ADDRESS_MAP_START( scobra_sound_io_map, AS_IO, 8, scobra_state )
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustler_sound_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::hustler_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustler_sound_io_map, AS_IO, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::hustler_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hustlerb_sound_map, AS_PROGRAM, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::hustlerb_sound_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ(scobra_soundram_r) AM_SHARE("soundram")  /* only here to initialize pointer */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustlerb_sound_io_map, AS_IO, 8, scobra_state )
+ADDRESS_MAP_START(scobra_state::hustlerb_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
@@ -903,7 +916,8 @@ MACHINE_CONFIG_END
 
 /* Rescue, Minefield and Strategy X have extra colors, and custom video initialise */
 /* routines to set up the graduated color backgound they use */
-MACHINE_CONFIG_DERIVED(scobra_state::rescue, type1)
+MACHINE_CONFIG_START(scobra_state::rescue)
+	type1(config);
 
 	/* basic machine hardware */
 
@@ -916,19 +930,22 @@ MACHINE_CONFIG_DERIVED(scobra_state::rescue, type1)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,rescue)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::rescuefe, rescue)
+MACHINE_CONFIG_START(scobra_state::rescuefe)
+	rescue(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rescuefe_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::rescueb, rescue)
+MACHINE_CONFIG_START(scobra_state::rescueb)
+	rescue(config);
 	MCFG_DEVICE_MODIFY("ppi8255_1")
 	MCFG_I8255_IN_PORTC_CB(READ8(scobra_state, rescueb_a002_r)) // protection? must return 0xfc or the game jumps to 0x00
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::minefld, type1)
+MACHINE_CONFIG_START(scobra_state::minefld)
+	type1(config);
 
 	/* basic machine hardware */
 
@@ -941,13 +958,15 @@ MACHINE_CONFIG_DERIVED(scobra_state::minefld, type1)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,minefld)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::minefldfe, minefld)
+MACHINE_CONFIG_START(scobra_state::minefldfe)
+	minefld(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(minefldfe_map)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::mimonkey, type1)
+MACHINE_CONFIG_START(scobra_state::mimonkey)
+	type1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -958,14 +977,16 @@ MACHINE_CONFIG_DERIVED(scobra_state::mimonkey, type1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::type2, type1)
+MACHINE_CONFIG_START(scobra_state::type2)
+	type1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(type2_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::tazmani3, type2)
+MACHINE_CONFIG_START(scobra_state::tazmani3)
+	type2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -973,7 +994,8 @@ MACHINE_CONFIG_DERIVED(scobra_state::tazmani3, type2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::stratgyx, type2)
+MACHINE_CONFIG_START(scobra_state::stratgyx)
+	type2(config);
 
 	/* basic machine hardware */
 
@@ -992,7 +1014,8 @@ MACHINE_CONFIG_DERIVED(scobra_state::stratgyx, type2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scobra_state::darkplnt, type2)
+MACHINE_CONFIG_START(scobra_state::darkplnt)
+	type2(config);
 
 	/* basic machine hardware */
 
@@ -1064,7 +1087,8 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::hustlerb, hustler)
+MACHINE_CONFIG_START(scobra_state::hustlerb)
+	hustler(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1075,7 +1099,8 @@ MACHINE_CONFIG_DERIVED(scobra_state::hustlerb, hustler)
 	MCFG_CPU_IO_MAP(hustlerb_sound_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scobra_state::hustlerb4, hustler)
+MACHINE_CONFIG_START(scobra_state::hustlerb4)
+	hustler(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

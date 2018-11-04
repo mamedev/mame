@@ -37,6 +37,7 @@ public:
 	{ }
 
 	void sleic(machine_config &config);
+	void sleic_map(address_map &map);
 protected:
 
 	// devices
@@ -49,7 +50,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( sleic_map, AS_PROGRAM, 8, sleic_state )
+ADDRESS_MAP_START(sleic_state::sleic_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END

@@ -79,6 +79,7 @@ public:
 
 	virtual void set_sega315_5124_compatibility_mode(bool sega315_5124_compatibility_mode) { }
 
+	void sega315_5124(address_map &map);
 protected:
 	static constexpr unsigned SEGA315_5378_CRAM_SIZE        = 0x40; /* 32 colors x 2 bytes per color = 64 bytes */
 	static constexpr unsigned SEGA315_5124_CRAM_SIZE        = 0x20; /* 32 colors x 1 bytes per color = 32 bytes */

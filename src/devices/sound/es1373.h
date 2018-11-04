@@ -70,7 +70,7 @@ private:
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 	uint16_t m_ac97_regs[0x80];
 	uint32_t m_es_regs[0x10];
 	uint32_t m_sound_cache[0x40];

@@ -58,6 +58,7 @@ protected:
 	required_device<ay8910_device>  m_melodypsg2;
 
 	u8  m_melody_command;
+	void zac1b111xx_melody_base_map(address_map &map);
 };
 
 
@@ -70,6 +71,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
+	void zac1b11107_melody_map(address_map &map);
 protected:
 	// PSG output handlers
 	DECLARE_WRITE8_MEMBER(melodypsg1_porta_w);
@@ -97,6 +99,8 @@ public:
 	DECLARE_WRITE8_MEMBER(melody_command_w);
 	DECLARE_INPUT_CHANGED_MEMBER(p1_changed);
 
+	void zac1b11142_audio_map(address_map &map);
+	void zac1b11142_melody_map(address_map &map);
 protected:
 	// melody section handlers
 	DECLARE_WRITE8_MEMBER(ay_4g_porta_w);

@@ -246,7 +246,7 @@ WRITE8_MEMBER(naughtyb_state::popflame_protection_w)
 
 
 
-static ADDRESS_MAP_START( naughtyb_map, AS_PROGRAM, 8, naughtyb_state )
+ADDRESS_MAP_START(naughtyb_state::naughtyb_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( naughtyb_map, AS_PROGRAM, 8, naughtyb_state )
 	AM_RANGE(0xb800, 0xbfff) AM_READ(dsw0_port_r)   // DSW0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popflame_map, AS_PROGRAM, 8, naughtyb_state )
+ADDRESS_MAP_START(naughtyb_state::popflame_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")

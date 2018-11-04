@@ -32,7 +32,7 @@
 READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237_2->read(space, offset / 2); }
 WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { m_dma8237_2->write(space, offset / 2, data); }
 
-static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
+ADDRESS_MAP_START(bebox_state::bebox_mem)
 	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE(bebox_cpu0_imask_r, bebox_cpu0_imask_w )
 	AM_RANGE(0x7FFFF1F0, 0x7FFFF1F7) AM_READWRITE(bebox_cpu1_imask_r, bebox_cpu1_imask_w )
 	AM_RANGE(0x7FFFF2F0, 0x7FFFF2F7) AM_READ(bebox_interrupt_sources_r )
@@ -82,10 +82,10 @@ READ64_MEMBER(bebox_state::bb_slave_64be_r)
 	return m_pcibus->read_64be(space, offset, mem_mask);
 }
 
-static ADDRESS_MAP_START( bebox_slave_mem, AS_PROGRAM, 64, bebox_state )
+ADDRESS_MAP_START(bebox_state::bebox_slave_mem)
+	AM_IMPORT_FROM(bebox_mem)
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_READ(bb_slave_64be_r)
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_DEVWRITE("pcibus", pci_bus_device, write_64be )
-	AM_IMPORT_FROM(bebox_mem)
 ADDRESS_MAP_END
 
 #define BYTE_REVERSE32(x)       (((x >> 24) & 0xff) | \
@@ -240,7 +240,8 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bebox_state::bebox2, bebox)
+MACHINE_CONFIG_START(bebox_state::bebox2)
+	bebox(config);
 	MCFG_CPU_REPLACE("ppc1", PPC603E, 133000000)    /* 133 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
 

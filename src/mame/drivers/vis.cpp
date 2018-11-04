@@ -718,6 +718,8 @@ public:
 	DECLARE_WRITE8_MEMBER(unk1_w);
 	DECLARE_INPUT_CHANGED_MEMBER(update);
 	void vis(machine_config &config);
+	void at16_io(address_map &map);
+	void at16_map(address_map &map);
 protected:
 	void machine_reset() override;
 private:
@@ -830,7 +832,7 @@ WRITE8_MEMBER(vis_state::sysctl_w)
 	m_sysctl = data;
 }
 
-static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, vis_state )
+ADDRESS_MAP_START(vis_state::at16_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x09ffff) AM_RAM
 	AM_RANGE(0x0d8000, 0x0fffff) AM_ROM AM_REGION("bios", 0xd8000)
@@ -839,16 +841,16 @@ static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, vis_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("bios", 0xf0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at16_io, AS_IO, 16, vis_state )
+ADDRESS_MAP_START(vis_state::at16_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("mb:dma8237_1", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0026, 0x0027) AM_READWRITE8(unk_r, unk_w, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("mb:pic8259_master", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0x0026, 0x0027) AM_READWRITE8(unk_r, unk_w, 0xffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("mb:pit8254", pit8254_device, read, write, 0xffff)
 	AM_RANGE(0x0060, 0x0065) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffff)
 	AM_RANGE(0x006a, 0x006b) AM_READ8(unk2_r, 0x00ff)
-	AM_RANGE(0x0092, 0x0093) AM_READWRITE8(sysctl_r, sysctl_w, 0x00ff)
 	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("mb", at_mb_device, page8_r, page8_w, 0xffff)
+	AM_RANGE(0x0092, 0x0093) AM_READWRITE8(sysctl_r, sysctl_w, 0x00ff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("mb:dma8237_2", am9517a_device, read, write, 0x00ff)
 	AM_RANGE(0x00e0, 0x00e1) AM_NOP

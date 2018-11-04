@@ -106,6 +106,11 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void alphatro(machine_config &config);
+	void alphatro_io(address_map &map);
+	void alphatro_map(address_map &map);
+	void cartbank_map(address_map &map);
+	void monbank_map(address_map &map);
+	void rombank_map(address_map &map);
 private:
 	uint8_t *m_ram_ptr;
 	required_device<ram_device> m_ram;
@@ -383,7 +388,7 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::alphatro_map)
 	AM_RANGE(0x0000, 0x5fff) AM_DEVICE("lowbank", address_map_bank_device, amap8)
 	AM_RANGE(0x6000, 0x9fff) AM_READWRITE(ram6000_r, ram6000_w)
 	AM_RANGE(0xa000, 0xdfff) AM_DEVICE("cartbank", address_map_bank_device, amap8)
@@ -392,23 +397,23 @@ static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rombank_map, AS_PROGRAM, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::rombank_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("roms", 0x0000) AM_WRITE(ram0000_w)
 	AM_RANGE(0x6000, 0xbfff) AM_READWRITE(ram0000_r, ram0000_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cartbank_map, AS_PROGRAM, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::cartbank_map)
 	AM_RANGE(0x0000, 0x3fff) AM_DEVREAD("cartslot", generic_slot_device, read_rom) AM_WRITE(rama000_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(rama000_r, rama000_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( monbank_map, AS_PROGRAM, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::monbank_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0x8000)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_REGION("roms", 0x9000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
+ADDRESS_MAP_START(alphatro_state::alphatro_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_READWRITE(port10_r, port10_w)

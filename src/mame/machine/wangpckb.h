@@ -59,6 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
 	DECLARE_WRITE8_MEMBER( kb_p3_w );
 
+	void wangpc_keyboard_io(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

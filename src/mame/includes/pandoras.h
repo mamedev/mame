@@ -69,4 +69,9 @@ public:
 	INTERRUPT_GEN_MEMBER(pandoras_slave_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* sr );
 	void pandoras(machine_config &config);
+	void pandoras_i8039_io_map(address_map &map);
+	void pandoras_i8039_map(address_map &map);
+	void pandoras_master_map(address_map &map);
+	void pandoras_slave_map(address_map &map);
+	void pandoras_sound_map(address_map &map);
 };

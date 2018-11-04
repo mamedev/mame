@@ -63,6 +63,8 @@ public:
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_PALETTE_INIT(lcmate2);
 	void lcmate2(machine_config &config);
+	void lcmate2_io(address_map &map);
+	void lcmate2_mem(address_map &map);
 };
 
 WRITE8_MEMBER( lcmate2_state::speaker_w )
@@ -93,14 +95,14 @@ WRITE8_MEMBER( lcmate2_state::bankswitch_w )
 	membank("rombank")->set_entry(data&0x0f);
 }
 
-static ADDRESS_MAP_START(lcmate2_mem, AS_PROGRAM, 8, lcmate2_state)
+ADDRESS_MAP_START(lcmate2_state::lcmate2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("rombank")
 	AM_RANGE( 0x8000, 0x9fff ) AM_RAM   AM_MIRROR(0x6000) AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lcmate2_io, AS_IO, 8, lcmate2_state)
+ADDRESS_MAP_START(lcmate2_state::lcmate2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c15_device, read, write)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(speaker_w)

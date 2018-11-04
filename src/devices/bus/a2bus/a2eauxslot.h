@@ -107,7 +107,6 @@ protected:
 
 
 // device type definition
-extern const device_type A2EAUXSLOT;
 DECLARE_DEVICE_TYPE(A2EAUXSLOT, a2eauxslot_device)
 
 // ======================> device_a2eauxslot_card_interface

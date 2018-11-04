@@ -107,6 +107,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void progolfa(machine_config &config);
 	void progolf(machine_config &config);
+	void main_cpu(address_map &map);
+	void sound_cpu(address_map &map);
 };
 
 
@@ -259,7 +261,7 @@ WRITE8_MEMBER(progolf_state::videoram_w)
 	m_videoram[offset] = data;
 }
 
-static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, progolf_state )
+ADDRESS_MAP_START(progolf_state::main_cpu)
 	AM_RANGE(0x0000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(charram_w) AM_SHARE("fbram")
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(videoram_r, videoram_w) AM_SHARE("videoram")
@@ -275,7 +277,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, progolf_state )
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, progolf_state )
+ADDRESS_MAP_START(progolf_state::sound_cpu)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x4000, 0x4fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
@@ -452,7 +454,8 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(progolf_state::progolfa, progolf)
+MACHINE_CONFIG_START(progolf_state::progolfa)
+	progolf(config);
 	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
 	MCFG_CPU_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)

@@ -429,6 +429,7 @@ public:
 	uint32_t m_mpc8240_regs[256/4];
 
 	void viper(machine_config &config);
+	void viper_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -2073,7 +2074,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
+ADDRESS_MAP_START(viper_state::viper_map)
 //  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,0xffffffffffffffffU)

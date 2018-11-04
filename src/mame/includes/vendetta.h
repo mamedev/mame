@@ -78,6 +78,11 @@ public:
 
 	void esckids(machine_config &config);
 	void vendetta(machine_config &config);
+	void esckids_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void videobank0_map(address_map &map);
+	void videobank1_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -69,7 +69,7 @@ WRITE8_MEMBER( sns_rom_superfx_device::superfx_w_bank3 )
 	sfx_ram[offset & 0xfffff] = data;
 }
 
-static ADDRESS_MAP_START( sfx_map, AS_PROGRAM, 8, sns_rom_superfx_device )
+ADDRESS_MAP_START(sns_rom_superfx_device::sfx_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(superfx_r_bank1, superfx_w_bank1)
 	AM_RANGE(0x400000, 0x5fffff) AM_READWRITE(superfx_r_bank2, superfx_w_bank2)
 	AM_RANGE(0x600000, 0x7dffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)

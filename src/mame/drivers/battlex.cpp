@@ -115,7 +115,7 @@ CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( battlex_map, AS_PROGRAM, 8, battlex_state )
+ADDRESS_MAP_START(battlex_state::battlex_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(battlex_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_SHARE("spriteram")
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( battlex_map, AS_PROGRAM, 8, battlex_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, battlex_state )
+ADDRESS_MAP_START(battlex_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM")
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, battlex_state )
 	AM_RANGE(0x33, 0x33) AM_WRITE(battlex_scroll_x_msb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dodgeman_io_map, AS_IO, 8, battlex_state )
+ADDRESS_MAP_START(battlex_state::dodgeman_io_map)
 	AM_IMPORT_FROM(io_map)
 	AM_RANGE(0x26, 0x27) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 ADDRESS_MAP_END
@@ -315,7 +315,8 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(battlex_state::dodgeman, battlex)
+MACHINE_CONFIG_START(battlex_state::dodgeman)
+	battlex(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(dodgeman_io_map)

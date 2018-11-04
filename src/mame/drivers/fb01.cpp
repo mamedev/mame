@@ -50,6 +50,8 @@ public:
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
 	void fb01(machine_config &config);
+	void fb01_io(address_map &map);
+	void fb01_mem(address_map &map);
 private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
@@ -62,13 +64,13 @@ private:
 };
 
 
-static ADDRESS_MAP_START(fb01_mem, AS_PROGRAM, 8, fb01_state)
+ADDRESS_MAP_START(fb01_state::fb01_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("nvram")  // 2 * 8KB S-RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(fb01_io, AS_IO, 8, fb01_state)
+ADDRESS_MAP_START(fb01_state::fb01_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// 00-01  YM2164

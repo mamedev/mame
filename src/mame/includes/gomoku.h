@@ -40,6 +40,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	void gomoku(machine_config &config);
+	void gomoku_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_GOMOKU_H

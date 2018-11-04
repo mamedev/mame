@@ -100,6 +100,9 @@ public:
 protected:
 	sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
+	void program_1x128x4(address_map &map);
+	void data_16x2x4(address_map &map);
+
 	virtual void device_reset() override;
 	virtual util::disasm_interface *create_disassembler() override;
 	virtual bool wake_me_up() override;

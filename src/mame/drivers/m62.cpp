@@ -173,7 +173,7 @@ WRITE8_MEMBER(m62_state::youjyudn_bankswitch_w)
 }
 
 
-static ADDRESS_MAP_START( kungfum_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::kungfum_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(m62_hscroll_low_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(m62_hscroll_high_w)
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( kungfum_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kungfum_io_map, AS_IO, 8, m62_state )
+ADDRESS_MAP_START(m62_state::kungfum_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( kungfum_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battroad_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::battroad_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( battroad_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battroad_io_map, AS_IO, 8, m62_state )
+ADDRESS_MAP_START(m62_state::battroad_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
@@ -215,14 +215,14 @@ static ADDRESS_MAP_START( battroad_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x83, 0x83) AM_WRITE(battroad_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ldrun_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::ldrun_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ldrun2_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::ldrun2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( ldrun2_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ldrun2_io_map, AS_IO, 8, m62_state )
+ADDRESS_MAP_START(m62_state::ldrun2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
@@ -241,17 +241,17 @@ static ADDRESS_MAP_START( ldrun2_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x80, 0x81) AM_WRITE(ldrun2_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ldrun3_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::ldrun3_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xc800) AM_READ(ldrun3_prot_5_r)
 	AM_RANGE(0xcc00, 0xcc00) AM_READ(ldrun3_prot_7_r)
 	AM_RANGE(0xcfff, 0xcfff) AM_READ(ldrun3_prot_7_r)
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
 	AM_RANGE(0xd000, 0xefff) AM_RAM
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ldrun3_io_map, AS_IO, 8, m62_state )
+ADDRESS_MAP_START(m62_state::ldrun3_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( ldrun3_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x81, 0x81) AM_WRITE(ldrun3_topbottom_mask_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ldrun4_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::ldrun4_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( ldrun4_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ldrun4_io_map, AS_IO, 8, m62_state )
+ADDRESS_MAP_START(m62_state::ldrun4_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
@@ -282,7 +282,7 @@ static ADDRESS_MAP_START( ldrun4_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x83, 0x83) AM_WRITE(m62_hscroll_low_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lotlot_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::lotlot_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(m62_textram_w) AM_SHARE("m62_textram")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( lotlot_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kidniki_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::kidniki_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( kidniki_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kidniki_io_map, AS_IO, 8, m62_state )
+ADDRESS_MAP_START(m62_state::kidniki_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( kidniki_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x85, 0x85) AM_WRITE(kidniki_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spelunkr_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::spelunkr_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( spelunkr_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spelunk2_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::spelunk2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( spelunk2_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( youjyudn_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::youjyudn_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( youjyudn_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( youjyudn_io_map, AS_IO, 8, m62_state )
+ADDRESS_MAP_START(m62_state::youjyudn_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( youjyudn_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x83, 0x83) AM_WRITE(youjyudn_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( horizon_map, AS_PROGRAM, 8, m62_state )
+ADDRESS_MAP_START(m62_state::horizon_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc800, 0xc83f) AM_RAM_WRITE(horizon_scrollram_w) AM_SHARE("scrollram")
@@ -973,13 +973,14 @@ MACHINE_CONFIG_START(m62_state::ldrun)
 	MCFG_PALETTE_INIT_OWNER(m62_state,m62_spr)
 
 	/* sound hardware */
-	//MCFG_FRAGMENT_ADD(m62_audio)
+	//m62_audio(config);
 	MCFG_DEVICE_ADD("irem_audio", IREM_M62_AUDIO, 0)
 
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::kungfum, ldrun)
+MACHINE_CONFIG_START(m62_state::kungfum)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -996,7 +997,8 @@ MACHINE_CONFIG_DERIVED(m62_state::kungfum, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::battroad, ldrun)
+MACHINE_CONFIG_START(m62_state::battroad)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1020,7 +1022,8 @@ MACHINE_CONFIG_DERIVED(m62_state::battroad, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::ldrun2, ldrun)
+MACHINE_CONFIG_START(m62_state::ldrun2)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1033,7 +1036,8 @@ MACHINE_CONFIG_DERIVED(m62_state::ldrun2, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::ldrun3, ldrun)
+MACHINE_CONFIG_START(m62_state::ldrun3)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1047,7 +1051,8 @@ MACHINE_CONFIG_DERIVED(m62_state::ldrun3, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::ldrun4, ldrun)
+MACHINE_CONFIG_START(m62_state::ldrun4)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1061,7 +1066,8 @@ MACHINE_CONFIG_DERIVED(m62_state::ldrun4, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::lotlot, ldrun)
+MACHINE_CONFIG_START(m62_state::lotlot)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1082,7 +1088,8 @@ MACHINE_CONFIG_DERIVED(m62_state::lotlot, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::kidniki, ldrun)
+MACHINE_CONFIG_START(m62_state::kidniki)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1098,7 +1105,8 @@ MACHINE_CONFIG_DERIVED(m62_state::kidniki, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::spelunkr, ldrun)
+MACHINE_CONFIG_START(m62_state::spelunkr)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1113,7 +1121,8 @@ MACHINE_CONFIG_DERIVED(m62_state::spelunkr, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::spelunk2, ldrun)
+MACHINE_CONFIG_START(m62_state::spelunk2)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1134,7 +1143,8 @@ MACHINE_CONFIG_DERIVED(m62_state::spelunk2, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::youjyudn, ldrun)
+MACHINE_CONFIG_START(m62_state::youjyudn)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1154,7 +1164,8 @@ MACHINE_CONFIG_DERIVED(m62_state::youjyudn, ldrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m62_state::horizon, ldrun)
+MACHINE_CONFIG_START(m62_state::horizon)
+	ldrun(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

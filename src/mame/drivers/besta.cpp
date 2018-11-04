@@ -45,6 +45,7 @@ public:
 	void kbd_put(u8 data);
 
 	void besta(machine_config &config);
+	void besta_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -101,7 +102,7 @@ void besta_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-static ADDRESS_MAP_START(besta_mem, AS_PROGRAM, 32, besta_state)
+ADDRESS_MAP_START(besta_state::besta_mem)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("p_ram")       // local bus DRAM, 4MB
 //  AM_RANGE(0x08010000, 0x08011fff) AM_RAM                         // unknown -- accessed by cp31dssp
 //  AM_RANGE(0xfca03500, 0xfca0350f) AM_READWRITE8(iscsi_reg_r, iscsi_reg_w, 0xffffffff)

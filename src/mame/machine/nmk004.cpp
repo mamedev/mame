@@ -63,7 +63,7 @@ void nmk004_device::ym2203_irq_handler(int irq)
 	m_cpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( nmk004_sound_mem_map, AS_PROGRAM, 8, nmk004_device )
+ADDRESS_MAP_START(nmk004_device::nmk004_sound_mem_map)
 	//AM_RANGE(0x0000, 0x1fff) AM_ROM /* 0x0000 - 0x1fff = internal ROM */
 	AM_RANGE(0x2000, 0xefff) AM_ROM AM_REGION(":audiocpu", 0x2000 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM

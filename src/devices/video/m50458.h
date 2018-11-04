@@ -52,6 +52,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	void m50458_vram(address_map &map);
 protected:
 	enum m50458_state_t
 	{

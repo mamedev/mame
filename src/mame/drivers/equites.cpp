@@ -364,7 +364,6 @@ D                                                                               
 #include "cpu/alph8201/alph8201.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/74259.h"
 #include "machine/i8155.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -641,38 +640,38 @@ WRITE_LINE_MEMBER(equites_state::mcu_switch_w)
 /******************************************************************************/
 // CPU Memory Maps
 
-static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
+ADDRESS_MAP_START(equites_state::equites_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM // ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE8(equites_fg_videoram_r, equites_fg_videoram_w, 0x00ff)
 	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
-	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x180000, 0x180001) AM_SELECT(0x03c000) AM_DEVWRITE8_MOD("mainlatch", ls259_device, write_a3, rshift<13>, 0xff00)
+	;map(0x180000, 0x180001).select(0x03c000).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_a3(space, offset >> 13, data, mem_mask); }).umask16(0xff00);
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE8(equites_bgcolor_w, 0xff00)
 	AM_RANGE(0x780000, 0x780001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekisou_map, AS_PROGRAM, 16, equites_state )
+ADDRESS_MAP_START(equites_state::gekisou_map)
+	AM_IMPORT_FROM( equites_map )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram") // mainram is battery-backed
 	AM_RANGE(0x580000, 0x580001) AM_SELECT(0x020000) AM_WRITE(gekisou_unknown_bit_w)
-	AM_IMPORT_FROM( equites_map )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
+ADDRESS_MAP_START(equites_state::splndrbt_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x03c000) AM_DEVWRITE8_MOD("mainlatch", ls259_device, write_a3, rshift<13>, 0x00ff)
+	;map(0x0c0000, 0x0c0001).select(0x03c000).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_a3(space, offset >> 13, data, mem_mask); }).umask16(0x00ff);
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
@@ -685,7 +684,7 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
+ADDRESS_MAP_START(equites_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE("msm", msm5232_device, write)
@@ -698,12 +697,12 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("audio8155", i8155_device, memory_r, memory_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, equites_state )
+ADDRESS_MAP_START(equites_state::sound_portmap)
 	AM_RANGE(0x00e0, 0x00e7) AM_DEVREADWRITE("audio8155", i8155_device, io_r, io_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, equites_state )
+ADDRESS_MAP_START(equites_state::mcu_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("mcuram") /* main CPU shared RAM */
 ADDRESS_MAP_END
 
@@ -1139,7 +1138,7 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_start_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
 
-	MCFG_FRAGMENT_ADD(common_sound)
+	common_sound(config);
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
@@ -1162,7 +1161,8 @@ MACHINE_CONFIG_START(equites_state::equites)
 	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(equites_state::gekisou, equites)
+MACHINE_CONFIG_START(equites_state::gekisou)
+	equites(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1190,7 +1190,7 @@ MACHINE_CONFIG_START(equites_state::splndrbt)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, splndrbt_selchar_w))
 
-	MCFG_FRAGMENT_ADD(common_sound)
+	common_sound(config);
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, 4000000/8) // 8303 or 8304 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
@@ -1211,7 +1211,8 @@ MACHINE_CONFIG_START(equites_state::splndrbt)
 	MCFG_VIDEO_START_OVERRIDE(equites_state,splndrbt)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(equites_state::hvoltage, splndrbt)
+MACHINE_CONFIG_START(equites_state::hvoltage)
+	splndrbt(config);
 
 	// mcu not dumped, so add simulated mcu
 	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)

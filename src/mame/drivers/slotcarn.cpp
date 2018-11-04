@@ -60,6 +60,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	void slotcarn(machine_config &config);
+	void slotcarn_map(address_map &map);
+	void spielbud_io_map(address_map &map);
 };
 
 
@@ -170,7 +172,7 @@ WRITE_LINE_MEMBER(slotcarn_state::hsync_changed)
 *          Memory Map          *
 *******************************/
 
-static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8, slotcarn_state )
+ADDRESS_MAP_START(slotcarn_state::slotcarn_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("backup_ram")
 	AM_RANGE(0x6800, 0x6fff) AM_RAM // spielbud
@@ -198,7 +200,7 @@ static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8, slotcarn_state )
 ADDRESS_MAP_END
 
 // spielbud - is the ay mirrored, or are there now 2?
-static ADDRESS_MAP_START( spielbud_io_map, AS_IO, 8, slotcarn_state )
+ADDRESS_MAP_START(slotcarn_state::spielbud_io_map)
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0xb100, 0xb100) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 ADDRESS_MAP_END

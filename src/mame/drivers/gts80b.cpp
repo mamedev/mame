@@ -47,6 +47,7 @@ public:
 	void gts80b_s1(machine_config &config);
 	void gts80b_s(machine_config &config);
 	void gts80b(machine_config &config);
+	void gts80b_map(address_map &map);
 private:
 	uint8_t m_dispcmd;
 	uint8_t m_port2a;
@@ -61,7 +62,7 @@ private:
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 };
 
-static ADDRESS_MAP_START( gts80b_map, AS_PROGRAM, 8, gts80b_state )
+ADDRESS_MAP_START(gts80b_state::gts80b_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x017f) AM_RAM
 	AM_RANGE(0x0200, 0x027f) AM_DEVREADWRITE("riot1", riot6532_device, read, write)
@@ -411,40 +412,46 @@ MACHINE_CONFIG_START(gts80b_state::gts80b)
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80b_state::gts80b_s, gts80b)
+MACHINE_CONFIG_START(gts80b_state::gts80b_s)
+	gts80b(config);
 	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-//static MACHINE_CONFIG_DERIVED( gts80b_ss, gts80b )
+//static MACHINE_CONFIG_START( gts80b_ss )
+//static 	gts80b(config);
 //  MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
 //  //MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 //MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80b_state::gts80b_s1, gts80b)
+MACHINE_CONFIG_START(gts80b_state::gts80b_s1)
+	gts80b(config);
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80b_state::gts80b_s2, gts80b)
+MACHINE_CONFIG_START(gts80b_state::gts80b_s2)
+	gts80b(config);
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80b_state::gts80b_s3, gts80b)
+MACHINE_CONFIG_START(gts80b_state::gts80b_s3)
+	gts80b(config);
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gts80b_state::bonebstr, gts80b)
+MACHINE_CONFIG_START(gts80b_state::bonebstr)
+	gts80b(config);
 
 	/* related to src/mame/audio/gottlieb.c? */
 //  MCFG_IMPORT_FROM(gts80s_b3a)

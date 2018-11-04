@@ -127,7 +127,7 @@ WRITE8_MEMBER(tutankhm_state::sound_on_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
+ADDRESS_MAP_START(tutankhm_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_SHARE("scroll")

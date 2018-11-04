@@ -594,7 +594,7 @@ READ8_MEMBER(namcos2_state::ack_mcu_vbl_r)
     0xc00000 ONWARDS are unverified memory locations on the video board
 */
 
-static ADDRESS_MAP_START( namcos2_68k_default_cpu_board_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::namcos2_68k_default_cpu_board_am)
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM AM_REGION("data_rom", 0)
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(c123_tilemap_videoram_r,c123_tilemap_videoram_w)
 	AM_RANGE(0x420000, 0x42003f) AM_READWRITE(c123_tilemap_control_r,c123_tilemap_control_w)
@@ -606,109 +606,110 @@ ADDRESS_MAP_END
 
 /*************************************************************/
 
-static ADDRESS_MAP_START( common_default_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::common_default_am)
+	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE(gfx_ctrl_r, gfx_ctrl_w)
 	AM_RANGE(0xc80000, 0xc9ffff) AM_RAM_WRITE(rozram_word_w) AM_SHARE("rozram")
 	AM_RANGE(0xcc0000, 0xcc000f) AM_RAM AM_SHARE("rozctrl")
 	AM_RANGE(0xd00000, 0xd0000f) AM_READWRITE(namcos2_68k_key_r,namcos2_68k_key_w)
-	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_default_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::master_default_am)
+	AM_IMPORT_FROM( common_default_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAMBANK(NAMCOS2_68K_MASTER_RAM)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("master_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_default_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_default_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::slave_default_am)
+	AM_IMPORT_FROM( common_default_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAMBANK(NAMCOS2_68K_SLAVE_RAM)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_default_am )
 ADDRESS_MAP_END
 
 
 /*************************************************************/
 
-static ADDRESS_MAP_START( common_finallap_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::common_finallap_am)
+	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 	AM_RANGE(0x300000, 0x33ffff) AM_READ(namcos2_finallap_prot_r)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x840000, 0x840001) AM_READWRITE(gfx_ctrl_r, gfx_ctrl_w)
 	AM_RANGE(0x880000, 0x89ffff) AM_DEVREADWRITE("c45_road", namco_c45_road_device, read, write)
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP
-	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_finallap_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::master_finallap_am)
+	AM_IMPORT_FROM( common_finallap_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAMBANK(NAMCOS2_68K_MASTER_RAM)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("master_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_finallap_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_finallap_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::slave_finallap_am)
+	AM_IMPORT_FROM( common_finallap_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAMBANK(NAMCOS2_68K_SLAVE_RAM)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_finallap_am )
 ADDRESS_MAP_END
 
 /*************************************************************/
 
-static ADDRESS_MAP_START( common_sgunner_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::common_sgunner_am)
+	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w)
 	AM_RANGE(0x818000, 0x818001) AM_WRITENOP
 	AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(namcos2_68k_key_r,namcos2_68k_key_w)
-	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_sgunner_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::master_sgunner_am)
+	AM_IMPORT_FROM( common_sgunner_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAMBANK(NAMCOS2_68K_MASTER_RAM)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("master_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_sgunner_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_sgunner_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::slave_sgunner_am)
+	AM_IMPORT_FROM( common_sgunner_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAMBANK(NAMCOS2_68K_SLAVE_RAM)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_sgunner_am )
 ADDRESS_MAP_END
 
 /*************************************************************/
 
-static ADDRESS_MAP_START( common_metlhawk_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::common_metlhawk_am)
+	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc40000, 0xc4ffff) AM_READWRITE(c169_roz_videoram_r,c169_roz_videoram_w) AM_SHARE("rozvideoram")
 	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(c169_roz_control_r,c169_roz_control_w)
 	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(gfx_ctrl_r, gfx_ctrl_w) /* ??? */
-	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_metlhawk_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::master_metlhawk_am)
+	AM_IMPORT_FROM( common_metlhawk_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAMBANK(NAMCOS2_68K_MASTER_RAM)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("master_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_metlhawk_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_metlhawk_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::slave_metlhawk_am)
+	AM_IMPORT_FROM( common_metlhawk_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAMBANK(NAMCOS2_68K_SLAVE_RAM)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_metlhawk_am )
 ADDRESS_MAP_END
 
 /*************************************************************/
 
-static ADDRESS_MAP_START( common_luckywld_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::common_luckywld_am)
+	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 	AM_RANGE(0x800000, 0x8141ff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w)
 	AM_RANGE(0x818000, 0x818001) AM_NOP /* enable? */
 	AM_RANGE(0x81a000, 0x81a001) AM_WRITENOP /* enable? */
@@ -718,29 +719,28 @@ static ADDRESS_MAP_START( common_luckywld_am, AS_PROGRAM, 16, namcos2_state )
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(c169_roz_videoram_r,c169_roz_videoram_w) AM_SHARE("rozvideoram")
 	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(c169_roz_control_r,c169_roz_control_w)
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(namcos2_68k_key_r,namcos2_68k_key_w)
-	AM_IMPORT_FROM( namcos2_68k_default_cpu_board_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_luckywld_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::master_luckywld_am)
+	AM_IMPORT_FROM( common_luckywld_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAMBANK(NAMCOS2_68K_MASTER_RAM)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("master_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_luckywld_am )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_luckywld_am, AS_PROGRAM, 16, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::slave_luckywld_am)
+	AM_IMPORT_FROM( common_luckywld_am )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAMBANK(NAMCOS2_68K_SLAVE_RAM)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( common_luckywld_am )
 ADDRESS_MAP_END
 
 /*************************************************************/
 /* 6809 SOUND CPU Memory declarations                        */
 /*************************************************************/
 
-static ADDRESS_MAP_START( sound_default_am, AS_PROGRAM, 8, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::sound_default_am)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank6") /* banked */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x5000, 0x6fff) AM_DEVREADWRITE("c140", c140_device, c140_r,c140_w)
@@ -759,8 +759,9 @@ ADDRESS_MAP_END
 /* 68705 IO CPU Memory declarations                          */
 /*************************************************************/
 
-static ADDRESS_MAP_START( mcu_default_am, AS_PROGRAM, 8, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::mcu_default_am)
 	/* input ports and dips are mapped here */
+	AM_RANGE(0x0000, 0x003f) AM_RAM /* Fill in register to stop logging */
 	AM_RANGE(0x0000, 0x0000) AM_READNOP /* Keep logging quiet */
 	AM_RANGE(0x0001, 0x0001) AM_READ_PORT("MCUB")
 	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("MCUC")
@@ -768,7 +769,6 @@ static ADDRESS_MAP_START( mcu_default_am, AS_PROGRAM, 8, namcos2_state )
 	AM_RANGE(0x0007, 0x0007) AM_READ_PORT("MCUH")
 	AM_RANGE(0x0010, 0x0010) AM_READWRITE(namcos2_mcu_analog_ctrl_r,namcos2_mcu_analog_ctrl_w)
 	AM_RANGE(0x0011, 0x0011) AM_READWRITE(namcos2_mcu_analog_port_r,namcos2_mcu_analog_port_w)
-	AM_RANGE(0x0000, 0x003f) AM_RAM /* Fill in register to stop logging */
 	AM_RANGE(0x0040, 0x01bf) AM_RAM
 	AM_RANGE(0x01c0, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
@@ -795,7 +795,7 @@ WRITE8_MEMBER(namcos2_state::c68_p3_w)
 	m_player_mux = (data & 0x80) ? 1 : 0;
 }
 
-static ADDRESS_MAP_START( c68_default_am, AS_PROGRAM, 8, namcos2_state )
+ADDRESS_MAP_START(namcos2_state::c68_default_am)
 	/* input ports and dips are mapped here */
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("MCUDI0")
@@ -1736,7 +1736,7 @@ MACHINE_CONFIG_START(namcos2_state::base)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1764,7 +1764,8 @@ MACHINE_CONFIG_START(namcos2_state::base)
 MACHINE_CONFIG_END
 
 /* adjusted machine driver start */
-MACHINE_CONFIG_DERIVED(namcos2_state::base2, base)
+MACHINE_CONFIG_START(namcos2_state::base2)
+	base(config);
 
 	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_C140_BANK_TYPE(SYSTEM2)
@@ -1773,12 +1774,14 @@ MACHINE_CONFIG_DERIVED(namcos2_state::base2, base)
 MACHINE_CONFIG_END
 /* end */
 
-MACHINE_CONFIG_DERIVED(namcos2_state::assaultp, base2)
+MACHINE_CONFIG_START(namcos2_state::assaultp)
+	base2(config);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000*8)) /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos2_state::base3, base)
+MACHINE_CONFIG_START(namcos2_state::base3)
+	base(config);
 
 	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_C140_BANK_TYPE(SYSTEM2)
@@ -1813,7 +1816,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1863,7 +1866,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1918,7 +1921,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1975,7 +1978,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2027,7 +2030,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2082,7 +2085,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)

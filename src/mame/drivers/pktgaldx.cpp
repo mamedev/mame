@@ -100,7 +100,7 @@ WRITE16_MEMBER( pktgaldx_state::vblank_ack_w )
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
+ADDRESS_MAP_START(pktgaldx_state::pktgaldx_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, pktgaldx_state )
+ADDRESS_MAP_START(pktgaldx_state::decrypted_opcodes_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -155,7 +155,7 @@ cpu #0 (PC=0000923C): unmapped program memory word read from 00167DB2 & 00FF
 /* do the 300000 addresses somehow interact with the protection addresses on this bootleg? */
 /* or maybe protection writes go to sound ... */
 
-static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
+ADDRESS_MAP_START(pktgaldx_state::pktgaldb_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("pktgaldb_fgram") // fgram on original?
 	AM_RANGE(0x102000, 0x102fff) AM_RAM // bgram on original?
@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
 	MCFG_CPU_PROGRAM_MAP(pktgaldx_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

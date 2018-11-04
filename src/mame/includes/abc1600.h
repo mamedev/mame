@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __ABC1600__
-#define __ABC1600__
+#ifndef MAME_INCLUDES_ABC1600_H
+#define MAME_INCLUDES_ABC1600_H
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
@@ -139,6 +139,8 @@ public:
 	int m_partst;               // parity test
 
 	void abc1600(machine_config &config);
+	void abc1600_mem(address_map &map);
+	void mac_mem(address_map &map);
 	// peripherals
 	int m_cs7;                  // card select address bit 7
 	int m_bus0;                 // BUS 0 selected

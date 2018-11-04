@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __ETI660__
-#define __ETI660__
+#ifndef MAME_INCLUDES_ETI660_H
+#define MAME_INCLUDES_ETI660_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
@@ -55,6 +55,8 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 
 	void eti660(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;

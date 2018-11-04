@@ -178,7 +178,7 @@ DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE 
 
 // TODO: use DEVICE_ADDRESS_MAP once this fatalerror is fixed:
 // "uplift_submaps unhandled case: range straddling slots."
-static ADDRESS_MAP_START( smpc_regs, 0, 8, smpc_hle_device )
+ADDRESS_MAP_START(smpc_hle_device::smpc_regs)
 //  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0d) AM_WRITE(ireg_w)
 	AM_RANGE(0x1f, 0x1f) AM_WRITE(command_register_w)
@@ -204,7 +204,7 @@ ADDRESS_MAP_END
 smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SMPC_HLE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, nullptr, *ADDRESS_MAP_NAME(smpc_regs)),
+	  m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(), address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this)),
 	m_mini_nvram(*this, "smem"),
 	m_mshres(*this),
 	m_mshnmi(*this),

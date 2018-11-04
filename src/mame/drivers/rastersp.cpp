@@ -146,6 +146,9 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	static void ncr53c700(device_t *device);
 	void rastersp(machine_config &config);
+	void cpu_map(address_map &map);
+	void dsp_map(address_map &map);
+	void io_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -670,18 +673,18 @@ READ32_MEMBER( rastersp_state::dsp_speedup_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, rastersp_state )
+ADDRESS_MAP_START(rastersp_state::cpu_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("dram")
 	AM_RANGE(0x01000000, 0x010bffff) AM_NOP // External ROM
 	AM_RANGE(0x010c0000, 0x010cffff) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0x02200000, 0x022fffff) AM_READWRITE8(nvram_r, nvram_w, 0x000000ff)
 	AM_RANGE(0x02200800, 0x02200803) AM_WRITENOP // ?
 	AM_RANGE(0x02208000, 0x02208fff) AM_DEVREADWRITE("scsibus:7:ncr53c700", ncr53c7xx_device, read, write)
 	AM_RANGE(0x0220e000, 0x0220e003) AM_WRITE(dpylist_w)
-	AM_RANGE(0x02200000, 0x022fffff) AM_READWRITE8(nvram_r, nvram_w, 0x000000ff)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 32, rastersp_state )
+ADDRESS_MAP_START(rastersp_state::io_map)
 	AM_RANGE(0x0020, 0x0023) AM_WRITE(cyrix_cache_w)
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("P1") AM_WRITE(port1_w)
 	AM_RANGE(0x1004, 0x1007) AM_READ_PORT("P2") AM_WRITE(port2_w)
@@ -694,7 +697,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 32, rastersp_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 32, rastersp_state )
+ADDRESS_MAP_START(rastersp_state::dsp_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK("bank1")
 	AM_RANGE(0x400000, 0x40ffff) AM_ROM AM_REGION("dspboot", 0)
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w)

@@ -414,14 +414,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(redalert_state::redalert_video)
 
 	MCFG_VIDEO_START_OVERRIDE(redalert_state,redalert)
-	MCFG_FRAGMENT_ADD( redalert_video_common )
+	redalert_video_common(config);
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::ww3_video)
 
 	MCFG_VIDEO_START_OVERRIDE(redalert_state, ww3 )
-	MCFG_FRAGMENT_ADD( redalert_video_common )
+	redalert_video_common(config);
 
 MACHINE_CONFIG_END
 

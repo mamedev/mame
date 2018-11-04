@@ -156,7 +156,7 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_spr_w)
 	tx_tilemap->mark_all_dirty();
 }
 
-static ADDRESS_MAP_START( tc0091lvc_map8, 0, 8, tc0091lvc_device )
+ADDRESS_MAP_START(tc0091lvc_device::tc0091lvc_map8)
 	AM_RANGE(0x014000, 0x017fff) AM_READWRITE(tc0091lvc_pcg1_r, tc0091lvc_pcg1_w)
 	AM_RANGE(0x018000, 0x018fff) AM_READWRITE(tc0091lvc_vram0_r, tc0091lvc_vram0_w)
 	AM_RANGE(0x019000, 0x019fff) AM_READWRITE(tc0091lvc_vram1_r, tc0091lvc_vram1_w)
@@ -170,7 +170,7 @@ ADDRESS_MAP_END
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC0091LVC, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8))
+	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, address_map_constructor(), address_map_constructor(FUNC(tc0091lvc_device::tc0091lvc_map8), this))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }

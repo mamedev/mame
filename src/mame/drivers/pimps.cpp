@@ -83,19 +83,21 @@ public:
 	{ }
 
 	void pimps(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, pimps_state)
+ADDRESS_MAP_START(pimps_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, pimps_state)
+ADDRESS_MAP_START(pimps_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
 	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)

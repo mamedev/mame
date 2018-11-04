@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef CHANNELF_H_
-#define CHANNELF_H_
+#ifndef MAME_INCLUDES_CHANNELF_H
+#define MAME_INCLUDES_CHANNELF_H
 
 #include "cpu/f8/f8.h"
 #include "audio/channelf.h"
@@ -53,6 +53,8 @@ public:
 	void sabavpl2(machine_config &config);
 	void sabavdpl(machine_config &config);
 	void channlf2(machine_config &config);
+	void channelf_io(address_map &map);
+	void channelf_map(address_map &map);
 };
 
-#endif /* CHANNELF_H_ */
+#endif // MAME_INCLUDES_CHANNELF_H

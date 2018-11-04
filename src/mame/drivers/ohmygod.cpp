@@ -41,7 +41,7 @@ WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)
 	}
 }
 
-static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
+ADDRESS_MAP_START(ohmygod_state::ohmygod_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
 	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE(ohmygod_videoram_w) AM_SHARE("videoram")
@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(ohmygod_spritebank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, 0, 8, ohmygod_state )
+ADDRESS_MAP_START(ohmygod_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

@@ -25,16 +25,18 @@ public:
 	uint32_t screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void dms5000(machine_config &config);
+	void dms5000_io(address_map &map);
+	void dms5000_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( dms5000_mem, AS_PROGRAM, 16, dms5000_state )
+ADDRESS_MAP_START(dms5000_state::dms5000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dms5000_io, AS_IO, 16, dms5000_state )
+ADDRESS_MAP_START(dms5000_state::dms5000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

@@ -129,6 +129,8 @@ public:
 	DECLARE_PALETTE_INIT(amusco);
 	void amusco(machine_config &config);
 	void draw88pkr(machine_config &config);
+	void amusco_io_map(address_map &map);
+	void amusco_mem_map(address_map &map);
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -197,7 +199,7 @@ void amusco_state::machine_start()
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 8, amusco_state )
+ADDRESS_MAP_START(amusco_state::amusco_mem_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -356,7 +358,7 @@ WRITE8_MEMBER(amusco_state::rtc_control_w)
 	m_rtc->read_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( amusco_io_map, AS_IO, 8, amusco_state )
+ADDRESS_MAP_START(amusco_state::amusco_io_map)
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(mc6845_r, mc6845_w)
 	AM_RANGE(0x0010, 0x0011) AM_DEVWRITE("pic8259", pic8259_device, write)
 	AM_RANGE(0x0020, 0x0023) AM_DEVWRITE("pit8253", pit8253_device, write)
@@ -589,7 +591,8 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(amusco_state::draw88pkr, amusco)
+MACHINE_CONFIG_START(amusco_state::draw88pkr)
+	amusco(config);
 	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
 MACHINE_CONFIG_END
 

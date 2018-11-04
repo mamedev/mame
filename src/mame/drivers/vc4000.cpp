@@ -184,7 +184,7 @@ READ8_MEMBER( vc4000_state::elektor_cass_r )
 	return (m_cassette->input() > 0.03) ? 0xff : 0x7f;
 }
 
-static ADDRESS_MAP_START( vc4000_mem, AS_PROGRAM, 8, vc4000_state )
+ADDRESS_MAP_START(vc4000_state::vc4000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( vc4000_mem, AS_PROGRAM, 8, vc4000_state )
 	AM_RANGE(0x1700, 0x17ff) AM_READWRITE(vc4000_video_r, vc4000_video_w) AM_MIRROR(0x0800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(elektor_mem, AS_PROGRAM, 8, vc4000_state)
+ADDRESS_MAP_START(vc4000_state::elektor_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
@@ -557,27 +557,32 @@ MACHINE_CONFIG_START(vc4000_state::vc4000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vc4000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::cx3000tc, vc4000)
+MACHINE_CONFIG_START(vc4000_state::cx3000tc)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cx3000tc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::mpu1000, vc4000)
+MACHINE_CONFIG_START(vc4000_state::mpu1000)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "mpu1000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::database, vc4000)
+MACHINE_CONFIG_START(vc4000_state::database)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "database")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::rwtrntcs, vc4000)
+MACHINE_CONFIG_START(vc4000_state::rwtrntcs)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "rwtrntcs")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::h21, vc4000)
+MACHINE_CONFIG_START(vc4000_state::h21)
+	vc4000(config);
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_H21_CARTRIDGE_ADD("cartslot", vc4000_cart, nullptr)
 
@@ -585,7 +590,8 @@ MACHINE_CONFIG_DERIVED(vc4000_state::h21, vc4000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "h21")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vc4000_state::elektor, vc4000)
+MACHINE_CONFIG_START(vc4000_state::elektor)
+	vc4000(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(elektor_mem)
 	MCFG_CASSETTE_ADD( "cassette" )

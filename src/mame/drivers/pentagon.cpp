@@ -43,6 +43,9 @@ public:
 	TIMER_CALLBACK_MEMBER(irq_off);
 	void pent1024(machine_config &config);
 	void pentagon(machine_config &config);
+	void pentagon_io(address_map &map);
+	void pentagon_mem(address_map &map);
+	void pentagon_switch(address_map &map);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -177,14 +180,14 @@ READ8_MEMBER(pentagon_state::beta_disable_r)
 	return m_program->read_byte(offset + 0x4000);
 }
 
-static ADDRESS_MAP_START(pentagon_mem, AS_PROGRAM, 8, pentagon_state)
+ADDRESS_MAP_START(pentagon_state::pentagon_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
+ADDRESS_MAP_START(pentagon_state::pentagon_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x7ffd)  // (A15 | A1) == 0
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
@@ -197,9 +200,9 @@ static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (pentagon_switch, AS_OPCODES, 8, pentagon_state)
+ADDRESS_MAP_START(pentagon_state::pentagon_switch)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with next because we want real addresses on the 3e00-3fff range
 	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
 	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
 ADDRESS_MAP_END
 
@@ -250,12 +253,13 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_DERIVED(pentagon_state::pentagon, spectrum_128)
+MACHINE_CONFIG_START(pentagon_state::pentagon)
+	spectrum_128(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(14'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(pentagon_mem)
 	MCFG_CPU_IO_MAP(pentagon_io)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(pentagon_switch)
+	MCFG_CPU_OPCODES_MAP(pentagon_switch)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
@@ -279,7 +283,8 @@ MACHINE_CONFIG_DERIVED(pentagon_state::pentagon, spectrum_128)
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pentagon_state::pent1024, pentagon)
+MACHINE_CONFIG_START(pentagon_state::pent1024)
+	pentagon(config);
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1024K")

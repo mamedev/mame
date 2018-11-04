@@ -124,4 +124,11 @@ public:
 	void fromanc2(machine_config &config);
 	void fromancr(machine_config &config);
 	void fromanc4(machine_config &config);
+	void fromanc2_main_map(address_map &map);
+	void fromanc2_sound_io_map(address_map &map);
+	void fromanc2_sound_map(address_map &map);
+	void fromanc2_sub_io_map(address_map &map);
+	void fromanc2_sub_map(address_map &map);
+	void fromanc4_main_map(address_map &map);
+	void fromancr_main_map(address_map &map);
 };

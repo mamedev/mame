@@ -22,7 +22,10 @@
 
 uint32_t stadhero_state::screen_update_stadhero(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	flip_screen_set(m_tilegen1->get_flip_state());
+	bool flip = m_tilegen1->get_flip_state();
+	m_tilegen1->set_flip_screen(flip);
+	m_spritegen->set_flip_screen(flip);
+	m_pf1_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	m_tilegen1->set_bppmultmask(0x8, 0x7);
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);

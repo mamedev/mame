@@ -53,7 +53,7 @@ DEFINE_DEVICE_TYPE(PHILLIPS_22VP931, phillips_22vp931_device, "22vp931", "Philli
 //  22VP931 ROM AND MACHINE INTERFACES
 //**************************************************************************
 
-static ADDRESS_MAP_START( vp931_portmap, AS_IO, 8, phillips_22vp931_device )
+ADDRESS_MAP_START(phillips_22vp931_device::vp931_portmap)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xcf) AM_READWRITE(i8049_keypad_r, i8049_output0_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0xcf) AM_READWRITE(i8049_unknown_r, i8049_output1_w)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xcf) AM_READWRITE(i8049_datic_r, i8049_lcd_w)

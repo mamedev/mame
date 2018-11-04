@@ -142,6 +142,8 @@ public:
 
 	void vp50(machine_config &config);
 	void vp101(machine_config &config);
+	void main_map(address_map &map);
+	void vp50_map(address_map &map);
 protected:
 
 	// devices
@@ -309,7 +311,7 @@ WRITE32_MEMBER(vp10x_state::tty_w)  // set breakpoint at bfc01430 to catch when 
 //  printf("%c", data);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, vp10x_state )
+ADDRESS_MAP_START(vp10x_state::main_map)
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x14000000, 0x14000003) AM_READ(test_r)
 	AM_RANGE(0x1c000000, 0x1c000003) AM_WRITE(tty_w)        // RSS OS code uses this one
@@ -327,7 +329,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, vp10x_state )
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vp50_map, AS_PROGRAM, 32, vp10x_state )
+ADDRESS_MAP_START(vp10x_state::vp50_map)
 	AM_RANGE(0x00000000, 0x03ffffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x1f000010, 0x1f00001f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff)
 	AM_RANGE(0x1f000020, 0x1f00002f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)

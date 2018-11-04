@@ -29,10 +29,6 @@ public:
 	// construction/destruction
 	newbrain_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( fdc_auxiliary_w );
-	DECLARE_READ8_MEMBER( fdc_control_r );
-	DECLARE_WRITE8_MEMBER( io_dec_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -50,6 +46,13 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
+
+	DECLARE_WRITE8_MEMBER( fdc_auxiliary_w );
+	DECLARE_READ8_MEMBER( fdc_control_r );
+	DECLARE_WRITE8_MEMBER( io_dec_w );
+
+	void newbrain_fdc_io(address_map &map);
+	void newbrain_fdc_mem(address_map &map);
 
 	required_device<z80_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;

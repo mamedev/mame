@@ -85,6 +85,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void cb2001(machine_config &config);
+	void cb2001_io(address_map &map);
+	void cb2001_map(address_map &map);
 };
 
 
@@ -567,20 +569,21 @@ WRITE16_MEMBER(cb2001_state::cb2001_bg_w)
 
 }
 
-static ADDRESS_MAP_START( cb2001_map, AS_PROGRAM, 16, cb2001_state )
+ADDRESS_MAP_START(cb2001_state::cb2001_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_SHARE("vrafg")
 	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(cb2001_bg_w) AM_SHARE("vrabg")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cb2001_io, AS_IO, 16, cb2001_state )
+ADDRESS_MAP_START(cb2001_state::cb2001_io)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0xffff)   /* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0xffff)   /* DIP switches */
 	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0xff00)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_device, data_address_w, 0xffff)
 
-	AM_RANGE(0x30, 0x31) AM_READ8(irq_ack_r, 0x00ff) AM_WRITE(cb2001_vidctrl_w)
+	AM_RANGE(0x30, 0x31) AM_READ8(irq_ack_r, 0x00ff)
+	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
 	AM_RANGE(0x32, 0x33) AM_WRITE(cb2001_vidctrl2_w)
 ADDRESS_MAP_END
 

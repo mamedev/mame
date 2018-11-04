@@ -85,6 +85,9 @@ public:
 	void playchnv(machine_config &config);
 	void playch10_hboard(machine_config &config);
 
+	void bios_io_map(address_map &map);
+	void bios_map(address_map &map);
+	void cart_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

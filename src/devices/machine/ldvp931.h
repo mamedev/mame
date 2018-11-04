@@ -84,7 +84,7 @@ protected:
 	virtual int32_t player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 
-public:
+private:
 	// internal read/write handlers
 	DECLARE_WRITE8_MEMBER( i8049_output0_w );
 	DECLARE_WRITE8_MEMBER( i8049_output1_w );
@@ -94,15 +94,14 @@ public:
 	DECLARE_READ8_MEMBER( i8049_datic_r );
 	DECLARE_READ8_MEMBER( i8049_from_controller_r );
 	DECLARE_WRITE8_MEMBER( i8049_to_controller_w );
-
-private:
-	// internal read/write handlers
 	DECLARE_READ8_MEMBER( i8049_port1_r );
 	DECLARE_WRITE8_MEMBER( i8049_port1_w );
 	DECLARE_READ8_MEMBER( i8049_port2_r );
 	DECLARE_WRITE8_MEMBER( i8049_port2_w );
 	DECLARE_READ_LINE_MEMBER( i8049_t0_r );
 	DECLARE_READ_LINE_MEMBER( i8049_t1_r );
+
+	void vp931_portmap(address_map &map);
 
 	// internal state
 	required_device<i8049_device> m_i8049_cpu;      // CPU index of the 8049

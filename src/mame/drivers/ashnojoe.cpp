@@ -91,7 +91,7 @@ READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
+ADDRESS_MAP_START(ashnojoe_state::ashnojoe_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE(ashnojoe_tileram3_w) AM_SHARE("tileram_3")
 	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE(ashnojoe_tileram4_w) AM_SHARE("tileram_4")
@@ -124,13 +124,13 @@ READ8_MEMBER(ashnojoe_state::sound_latch_status_r)
 	return m_soundlatch->pending_r();
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ashnojoe_state )
+ADDRESS_MAP_START(ashnojoe_state::sound_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, ashnojoe_state )
+ADDRESS_MAP_START(ashnojoe_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)

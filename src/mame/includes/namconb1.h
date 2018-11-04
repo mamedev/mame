@@ -31,8 +31,6 @@ class namconb1_state : public namcos2_shared_state
 public:
 	namconb1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos2_shared_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
 		m_c116(*this, "c116"),
 		m_eeprom(*this, "eeprom"),
 		m_p1(*this, "P1"),
@@ -48,8 +46,6 @@ public:
 		m_tilebank32(*this, "tilebank32"),
 		m_namconb_shareram(*this, "namconb_share") { }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
 	required_ioport m_p1;
@@ -124,4 +120,8 @@ public:
 	void NB2TilemapCB(uint16_t code, int *tile, int *mask);
 	void namconb1(machine_config &config);
 	void namconb2(machine_config &config);
+	void namcoc75_am(address_map &map);
+	void namcoc75_io(address_map &map);
+	void namconb1_am(address_map &map);
+	void namconb2_am(address_map &map);
 };

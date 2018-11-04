@@ -39,7 +39,6 @@ protected:
 
 
 // device type definition
-extern const device_type VIC10_STD;
 DECLARE_DEVICE_TYPE(VIC10_STD, vic10_standard_cartridge_device)
 
 #endif // MAME_BUS_VIC10_STD_H

@@ -5,6 +5,7 @@
     Asuka & Asuka  (+ Taito/Visco games on similar hardware)
 
 *************************************************************************/
+
 #ifndef MAME_INCLUDES_ASUKA_H
 #define MAME_INCLUDES_ASUKA_H
 
@@ -108,6 +109,15 @@ public:
 	void eto(machine_config &config);
 	void galmedes(machine_config &config);
 	void bonzeadv(machine_config &config);
+	void asuka_map(address_map &map);
+	void bonzeadv_map(address_map &map);
+	void bonzeadv_z80_map(address_map &map);
+	void cadash_map(address_map &map);
+	void cadash_sub_io(address_map &map);
+	void cadash_sub_map(address_map &map);
+	void cadash_z80_map(address_map &map);
+	void eto_map(address_map &map);
+	void z80_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

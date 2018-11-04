@@ -5,13 +5,13 @@
 
 DEFINE_DEVICE_TYPE(GEFORCE_7600GS, geforce_7600gs_device, "geforce_7600gs", "NVIDIA GeForce 7600GS")
 
-DEVICE_ADDRESS_MAP_START(map1, 32, geforce_7600gs_device)
+ADDRESS_MAP_START(geforce_7600gs_device::map1)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map2, 32, geforce_7600gs_device)
+ADDRESS_MAP_START(geforce_7600gs_device::map2)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map3, 32, geforce_7600gs_device)
+ADDRESS_MAP_START(geforce_7600gs_device::map3)
 ADDRESS_MAP_END
 
 geforce_7600gs_device::geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

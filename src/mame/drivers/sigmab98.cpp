@@ -302,6 +302,22 @@ public:
 	void animalc(machine_config &config);
 	void sammymdl(machine_config &config);
 	void itazuram(machine_config &config);
+	void animalc_io(address_map &map);
+	void animalc_map(address_map &map);
+	void dashhero_io_map(address_map &map);
+	void dodghero_io_map(address_map &map);
+	void dodghero_mem_map(address_map &map);
+	void gegege_io_map(address_map &map);
+	void gegege_mem_map(address_map &map);
+	void gocowboy_io(address_map &map);
+	void gocowboy_map(address_map &map);
+	void haekaka_io(address_map &map);
+	void haekaka_map(address_map &map);
+	void itazuram_io(address_map &map);
+	void itazuram_map(address_map &map);
+	void pyenaget_io(address_map &map);
+	void tdoboon_io(address_map &map);
+	void tdoboon_map(address_map &map);
 };
 
 
@@ -337,6 +353,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_irq);
 
 	void lufykzku(machine_config &config);
+	void lufykzku_io_map(address_map &map);
+	void lufykzku_mem_map(address_map &map);
 };
 
 
@@ -782,7 +800,7 @@ READ8_MEMBER(sigmab98_state::dodghero_regs2_r)
 	}
 }
 
-static ADDRESS_MAP_START( dodghero_mem_map, AS_PROGRAM, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::dodghero_mem_map)
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xa7ff ) AM_ROMBANK("rombank")
 
@@ -792,17 +810,18 @@ static ADDRESS_MAP_START( dodghero_mem_map, AS_PROGRAM, 8, sigmab98_state )
 
 	AM_RANGE( 0xd001, 0xd07f ) AM_RAM AM_SHARE("vtable")
 
+	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")    // not used, where is it mapped?
+
+	AM_RANGE( 0xd800, 0xd821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xd813, 0xd813 ) AM_READ(d013_r)
 	AM_RANGE( 0xd821, 0xd821 ) AM_READ(d021_r)
-	AM_RANGE( 0xd800, 0xd821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
-	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")    // not used, where is it mapped?
 
 	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_SHARE("nvram") // battery backed RAM
 
 	AM_RANGE( 0xf000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dodghero_io_map, AS_IO, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::dodghero_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE( 0x00, 0x01 ) AM_DEVREADWRITE("ymz", ymz280b_device, read, write )
@@ -977,7 +996,7 @@ WRITE8_MEMBER(sigmab98_state::c8_w)
 	show_outputs();
 }
 
-static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::gegege_mem_map)
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("rombank")
 
@@ -987,9 +1006,9 @@ static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8, sigmab98_state )
 
 	AM_RANGE( 0xc800, 0xc87f ) AM_RAM AM_SHARE("vtable")
 
+	AM_RANGE( 0xd000, 0xd021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xd013, 0xd013 ) AM_READ(d013_r)
 	AM_RANGE( 0xd021, 0xd021 ) AM_READ(d021_r)
-	AM_RANGE( 0xd000, 0xd021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 
 	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")
 
@@ -998,7 +1017,7 @@ static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0xf000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gegege_io_map, AS_IO, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::gegege_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE( 0x00, 0x01 ) AM_DEVREADWRITE("ymz", ymz280b_device, read, write )
@@ -1076,7 +1095,7 @@ READ8_MEMBER(sigmab98_state::dashhero_regs2_r)
 	}
 }
 
-static ADDRESS_MAP_START( dashhero_io_map, AS_IO, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::dashhero_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE( 0x00, 0x01 ) AM_DEVREADWRITE("ymz", ymz280b_device, read, write )
@@ -1208,7 +1227,7 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_c8_w)
 	show_outputs();
 }
 
-static ADDRESS_MAP_START( lufykzku_mem_map, AS_PROGRAM, 8, lufykzku_state )
+ADDRESS_MAP_START(lufykzku_state::lufykzku_mem_map)
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAMBANK("romrambank") AM_SHARE("nvram") // ROM | NVRAM
 
@@ -1216,16 +1235,16 @@ static ADDRESS_MAP_START( lufykzku_mem_map, AS_PROGRAM, 8, lufykzku_state )
 
 	AM_RANGE( 0xd000, 0xefff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // more palette entries
 
+	AM_RANGE( 0xf000, 0xf021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xf013, 0xf013 ) AM_READ(d013_r)
 	AM_RANGE( 0xf021, 0xf021 ) AM_READ(d021_r)
-	AM_RANGE( 0xf000, 0xf021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 
 	AM_RANGE( 0xf400, 0xf47f ) AM_RAM AM_SHARE("vtable")
 
 	AM_RANGE( 0xfc00, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lufykzku_io_map, AS_IO, 8, lufykzku_state )
+ADDRESS_MAP_START(lufykzku_state::lufykzku_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE("oki", okim9810_device, write )
 	AM_RANGE( 0x01, 0x01 ) AM_DEVWRITE("oki", okim9810_device, write_tmp_register )
@@ -1447,7 +1466,7 @@ READ8_MEMBER(sigmab98_state::sammymdl_coin_hopper_r)
 	return ret;
 }
 
-static ADDRESS_MAP_START( animalc_map, AS_PROGRAM, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::animalc_map)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK( "rombank" )
 	AM_RANGE( 0x8000, 0x8fff ) AM_RAMBANK( "rambank" ) AM_SHARE( "nvram" )
@@ -1459,14 +1478,14 @@ static ADDRESS_MAP_START( animalc_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE( 0xd800, 0xd87f ) AM_RAM AM_SHARE("vtable")
 
+	AM_RANGE( 0xe000, 0xe021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xe011, 0xe011 ) AM_WRITENOP  // IRQ Enable? Screen disable?
 	AM_RANGE( 0xe013, 0xe013 ) AM_READWRITE(vblank_r, vblank_w )    // IRQ Ack?
-	AM_RANGE( 0xe000, 0xe021 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( animalc_io, AS_IO, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::animalc_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(animalc_rombank_r, animalc_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(animalc_rambank_r, animalc_rambank_w )
@@ -1736,7 +1755,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_dc00_w)
 	logerror("%s: unknown write to %02x = %02x with rambank = %02x\n", machine().describe_context(), offset + 0xdc00, data, m_rambank);
 }
 
-static ADDRESS_MAP_START( gocowboy_map, AS_PROGRAM, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::gocowboy_map)
 	AM_RANGE(0x0000, 0x43ff) AM_ROM
 
 	AM_RANGE( 0x4400, 0xdbff ) AM_READWRITE(gocowboy_4400_r, gocowboy_4400_w )    // SPRITERAM + PALETTERAM + VTABLE + VREGS | NVRAM
@@ -1763,7 +1782,7 @@ WRITE8_MEMBER(sigmab98_state::gocowboy_leds_w)
 	show_3_outputs();
 }
 
-static ADDRESS_MAP_START( gocowboy_io, AS_IO, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::gocowboy_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(gocowboy_rombank_r, gocowboy_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(gocowboy_rambank_r, gocowboy_rambank_w )
@@ -2000,14 +2019,14 @@ WRITE8_MEMBER(sigmab98_state::haekaka_coin_counter_w)
 	show_3_outputs();
 }
 
-static ADDRESS_MAP_START( haekaka_map, AS_PROGRAM, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::haekaka_map)
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0xb000, 0xcfff ) AM_READWRITE(haekaka_b000_r, haekaka_b000_w )
 	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( haekaka_io, AS_IO, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::haekaka_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(haekaka_rombank_r, haekaka_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(haekaka_rambank_r, haekaka_rambank_w )
@@ -2238,7 +2257,7 @@ READ8_MEMBER(sigmab98_state::itazuram_palette_r)
 	return m_paletteram[offset];
 }
 
-static ADDRESS_MAP_START( itazuram_map, AS_PROGRAM, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::itazuram_map)
 	AM_RANGE( 0x0000, 0x37ff ) AM_ROM
 	AM_RANGE( 0x3800, 0x47ff ) AM_READ_BANK( "rombank0" ) AM_WRITE_BANK( "sprbank0" )
 	AM_RANGE( 0x4800, 0x57ff ) AM_READ_BANK( "rombank1" ) AM_WRITE_BANK( "sprbank1" )
@@ -2246,15 +2265,15 @@ static ADDRESS_MAP_START( itazuram_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x5800, 0x59ff ) AM_READWRITE(itazuram_palette_r, itazuram_palette_w )
 	AM_RANGE( 0x6000, 0x607f ) AM_RAM AM_SHARE("vtable")
 
+	AM_RANGE( 0x6800, 0x6821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0x6811, 0x6811 ) AM_WRITENOP  // IRQ Enable? Screen disable?
 	AM_RANGE( 0x6813, 0x6813 ) AM_WRITENOP  // IRQ Ack?
-	AM_RANGE( 0x6800, 0x6821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
 	AM_RANGE( 0xdc00, 0xfdff ) AM_READ_BANK( "palbank" ) AM_WRITE(itazuram_nvram_palette_w ) AM_SHARE( "nvram" )    // nvram | paletteram
 
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( itazuram_io, AS_IO, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::itazuram_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(itazuram_rombank_r, itazuram_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(itazuram_rambank_r, itazuram_rambank_w )
@@ -2275,9 +2294,9 @@ ADDRESS_MAP_END
                              Pye-nage Taikai
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pyenaget_io, AS_IO, 8, sigmab98_state )
-	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
+ADDRESS_MAP_START(sigmab98_state::pyenaget_io)
 	AM_IMPORT_FROM( haekaka_io )
+	AM_RANGE( 0x31, 0x31 ) AM_READWRITE(sammymdl_coin_counter_r, sammymdl_coin_counter_w )
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -2476,14 +2495,14 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", machine().describe_context(), offset+0xc000, data, m_rombank);
 }
 
-static ADDRESS_MAP_START( tdoboon_map, AS_PROGRAM, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::tdoboon_map)
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
 	AM_RANGE( 0xc000, 0xcfff ) AM_READWRITE(tdoboon_c000_r, tdoboon_c000_w )
 	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM   // High speed internal RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tdoboon_io, AS_IO, 8, sigmab98_state )
+ADDRESS_MAP_START(sigmab98_state::tdoboon_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x02, 0x03 ) AM_READWRITE(tdoboon_rombank_r, tdoboon_rombank_w )
 	AM_RANGE( 0x04, 0x05 ) AM_READWRITE(tdoboon_rambank_r, tdoboon_rambank_w )
@@ -2833,19 +2852,22 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::dodghero, sigmab98)
+MACHINE_CONFIG_START(sigmab98_state::dodghero)
+	sigmab98(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( dodghero_mem_map )
 	MCFG_CPU_IO_MAP( dodghero_io_map )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::gegege, sigmab98)
+MACHINE_CONFIG_START(sigmab98_state::gegege)
+	sigmab98(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gegege_mem_map )
 	MCFG_CPU_IO_MAP( gegege_io_map )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::dashhero, sigmab98)
+MACHINE_CONFIG_START(sigmab98_state::dashhero)
+	sigmab98(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gegege_mem_map )
 	MCFG_CPU_IO_MAP( dashhero_io_map )
@@ -2986,13 +3008,15 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::animalc, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::animalc)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::gocowboy, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::gocowboy)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gocowboy_map )
 	MCFG_CPU_IO_MAP( gocowboy_io )
@@ -3002,25 +3026,29 @@ MACHINE_CONFIG_DERIVED(sigmab98_state::gocowboy, sammymdl)
 	MCFG_TICKET_DISPENSER_ADD("hopper_large", attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::haekaka, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::haekaka)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( haekaka_io )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::itazuram, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::itazuram)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( itazuram_map )
 	MCFG_CPU_IO_MAP( itazuram_io )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::pyenaget, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::pyenaget)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( haekaka_map )
 	MCFG_CPU_IO_MAP( pyenaget_io )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sigmab98_state::tdoboon, sammymdl)
+MACHINE_CONFIG_START(sigmab98_state::tdoboon)
+	sammymdl(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tdoboon_map )
 	MCFG_CPU_IO_MAP( tdoboon_io )

@@ -133,13 +133,13 @@ READ8_MEMBER( thief_state::thief_io_r )
 	return data;
 }
 
-static ADDRESS_MAP_START( sharkatt_main_map, AS_PROGRAM, 8, thief_state )
+ADDRESS_MAP_START(thief_state::sharkatt_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM     /* 2114 */
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(thief_videoram_r, thief_videoram_w)   /* 4116 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thief_main_map, AS_PROGRAM, 8, thief_state )
+ADDRESS_MAP_START(thief_state::thief_main_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(thief_blit_w)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM     /* 2114 */
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( thief_main_map, AS_PROGRAM, 8, thief_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, thief_state )
+ADDRESS_MAP_START(thief_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x10, 0x10) AM_WRITE(thief_video_control_w)
@@ -427,7 +427,8 @@ MACHINE_CONFIG_START(thief_state::thief)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thief_state::sharkatt, thief)
+MACHINE_CONFIG_START(thief_state::sharkatt)
+	thief(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sharkatt_main_map)
 
@@ -438,7 +439,8 @@ MACHINE_CONFIG_DERIVED(thief_state::sharkatt, thief)
 	MCFG_SAMPLES_NAMES(sharkatt_sample_names)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(thief_state::natodef, thief)
+MACHINE_CONFIG_START(thief_state::natodef)
+	thief(config);
 	MCFG_DEVICE_MODIFY("samples")
 	MCFG_SAMPLES_NAMES(natodef_sample_names)
 MACHINE_CONFIG_END

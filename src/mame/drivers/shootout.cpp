@@ -103,7 +103,7 @@ WRITE8_MEMBER(shootout_state::coincounter_w)
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8, shootout_state )
+ADDRESS_MAP_START(shootout_state::shootout_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE(bankswitch_w)
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE(flipscreen_w)
@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8, shootout_state )
+ADDRESS_MAP_START(shootout_state::shootouj_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
@@ -136,7 +136,7 @@ ADDRESS_MAP_END
 /*******************************************************************************/
 
 /* same as Tryout */
-static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8, shootout_state )
+ADDRESS_MAP_START(shootout_state::shootout_sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(sound_cpu_command_r)
@@ -337,7 +337,8 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(shootout_state::shootouk, shootouj)
+MACHINE_CONFIG_START(shootout_state::shootouk)
+	shootouj(config);
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)

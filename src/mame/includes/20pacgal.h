@@ -72,6 +72,8 @@ public:
 	void common_save_state();
 	void _20pacgal(machine_config &config);
 	void _20pacgal_video(machine_config &config);
+	void _20pacgal_io_map(address_map &map);
+	void _20pacgal_map(address_map &map);
 };
 
 
@@ -85,4 +87,6 @@ public:
 	DECLARE_READ8_MEMBER( _25pacman_io_87_r );
 	virtual void machine_start() override;
 	void _25pacman(machine_config &config);
+	void _25pacman_io_map(address_map &map);
+	void _25pacman_map(address_map &map);
 };

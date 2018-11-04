@@ -335,23 +335,6 @@ void driver_device::flip_screen_set(u32 on)
 
 
 //-------------------------------------------------
-//  flip_screen_set_no_update - set global flip
-//  do not call updateflip.
-//-------------------------------------------------
-
-void driver_device::flip_screen_set_no_update(u32 on)
-{
-	// flip_screen_y is not updated on purpose
-	// this function is for drivers which
-	// were writing to flip_screen_x to
-	// bypass updateflip
-	if (on)
-		on = ~0;
-	m_flip_screen_x = on;
-}
-
-
-//-------------------------------------------------
 //  flip_screen_x_set - set global horizontal flip
 //-------------------------------------------------
 

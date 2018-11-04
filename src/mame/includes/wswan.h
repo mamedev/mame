@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef WSWAN_H_
-#define WSWAN_H_
+#ifndef MAME_INCLUDES_WSWAN_H
+#define MAME_INCLUDES_WSWAN_H
 
 #define WSWAN_TYPE_MONO 0
 #define WSWAN_TYPE_COLOR 1
@@ -71,6 +71,9 @@ public:
 
 	void wscolor(machine_config &config);
 	void wswan(machine_config &config);
+	void wscolor_mem(address_map &map);
+	void wswan_io(address_map &map);
+	void wswan_mem(address_map &map);
 protected:
 	/* Interrupt flags */
 	static const uint8_t WSWAN_IFLAG_STX    = 0x01;
@@ -102,4 +105,4 @@ protected:
 };
 
 
-#endif /* WSWAN_H_ */
+#endif // MAME_INCLUDES_WSWAN_H

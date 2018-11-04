@@ -44,4 +44,6 @@ public:
 	DECLARE_READ16_MEMBER( funkyjet_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( funkyjet_protection_region_0_146_w );
 	void funkyjet(machine_config &config);
+	void funkyjet_map(address_map &map);
+	void sound_map(address_map &map);
 };

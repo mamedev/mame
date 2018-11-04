@@ -547,17 +547,24 @@ public:
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
 	DECLARE_MACHINE_START(vcc);
+	void cc10_map(address_map &map);
+	void vcc_io(address_map &map);
+	void vcc_map(address_map &map);
 	void cc10(machine_config &config);
 	void vcc(machine_config &config);
 
 	// BCC
 	DECLARE_READ8_MEMBER(bcc_input_r);
 	DECLARE_WRITE8_MEMBER(bcc_control_w);
+	void bcc_io(address_map &map);
+	void bcc_map(address_map &map);
 	void bcc(machine_config &config);
 
 	// SCC
 	DECLARE_READ8_MEMBER(scc_input_r);
 	DECLARE_WRITE8_MEMBER(scc_control_w);
+	void scc_io(address_map &map);
+	void scc_map(address_map &map);
 	void scc(machine_config &config);
 
 	// VSC
@@ -570,6 +577,8 @@ public:
 	DECLARE_READ8_MEMBER(vsc_pio_porta_r);
 	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
+	void vsc_io(address_map &map);
+	void vsc_map(address_map &map);
 	void vsc(machine_config &config);
 
 	// VBRC
@@ -580,6 +589,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t1_r);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
 	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
+	void vbrc_main_io(address_map &map);
+	void vbrc_main_map(address_map &map);
 	void vbrc(machine_config &config);
 
 	// DSC
@@ -588,6 +599,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dsc_select_w);
 	DECLARE_READ8_MEMBER(dsc_input_r);
 	void dsc(machine_config &config);
+	void dsc_map(address_map &map);
 };
 
 
@@ -1114,7 +1126,7 @@ READ8_MEMBER(fidelz80_state::dsc_input_r)
 
 // CC10 and VCC/UVC
 
-static ADDRESS_MAP_START( cc10_map, AS_PROGRAM, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::cc10_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
@@ -1122,13 +1134,13 @@ static ADDRESS_MAP_START( cc10_map, AS_PROGRAM, 8, fidelz80_state )
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0f00) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vcc_map, AS_PROGRAM, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::vcc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vcc_io, AS_IO, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::vcc_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x03)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
@@ -1136,14 +1148,14 @@ ADDRESS_MAP_END
 
 // BCC
 
-static ADDRESS_MAP_START( bcc_map, AS_PROGRAM, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::bcc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0f00) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bcc_io, AS_IO, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::bcc_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(bcc_input_r, bcc_control_w)
 ADDRESS_MAP_END
@@ -1151,12 +1163,12 @@ ADDRESS_MAP_END
 
 // SCC
 
-static ADDRESS_MAP_START( scc_map, AS_PROGRAM, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::scc_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x5000, 0x50ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scc_io, AS_IO, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::scc_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(scc_input_r, scc_control_w)
 ADDRESS_MAP_END
@@ -1164,7 +1176,7 @@ ADDRESS_MAP_END
 
 // VSC
 
-static ADDRESS_MAP_START( vsc_map, AS_PROGRAM, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::vsc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM
@@ -1191,7 +1203,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
 		m_z80pio->write(space, offset & 3, data);
 }
 
-static ADDRESS_MAP_START( vsc_io, AS_IO, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::vsc_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(vsc_io_trampoline_r, vsc_io_trampoline_w)
 ADDRESS_MAP_END
@@ -1199,14 +1211,14 @@ ADDRESS_MAP_END
 
 // VBRC
 
-static ADDRESS_MAP_START( vbrc_main_map, AS_PROGRAM, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::vbrc_main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_WRITE(vbrc_speech_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vbrc_main_io, AS_IO, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::vbrc_main_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("mcu", i8041_device, upi41_master_r, upi41_master_w)
 ADDRESS_MAP_END
@@ -1214,7 +1226,7 @@ ADDRESS_MAP_END
 
 // DSC
 
-static ADDRESS_MAP_START( dsc_map, AS_PROGRAM, 8, fidelz80_state )
+ADDRESS_MAP_START(fidelz80_state::dsc_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x1fff) AM_WRITE(dsc_control_w)

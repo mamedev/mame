@@ -56,6 +56,7 @@ public:
 	DECLARE_READ8_MEMBER(minicom_io_r);
 	DECLARE_DRIVER_INIT(minicom);
 	void minicom(machine_config &config);
+	void i87c52_io(address_map &map);
 private:
 	uint8_t m_p[4];
 	uint16_t m_display_data;
@@ -65,7 +66,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(i87c52_io, AS_IO, 8, minicom_state)
+ADDRESS_MAP_START(minicom_state::i87c52_io)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(minicom_io_r, minicom_io_w)
 ADDRESS_MAP_END
 

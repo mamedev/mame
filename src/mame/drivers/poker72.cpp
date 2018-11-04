@@ -51,6 +51,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void poker72(machine_config &config);
+	void poker72_map(address_map &map);
 };
 
 
@@ -114,7 +115,7 @@ WRITE8_MEMBER(poker72_state::tile_bank_w)
 	m_tile_bank = (data & 4) >> 2;
 }
 
-static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
+ADDRESS_MAP_START(poker72_state::poker72_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("vram")

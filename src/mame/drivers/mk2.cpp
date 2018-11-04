@@ -81,11 +81,12 @@ public:
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
 	void mk2(machine_config &config);
+	void mk2_mem(address_map &map);
 };
 
 
 // only lower 12 address bits on bus!
-static ADDRESS_MAP_START(mk2_mem , AS_PROGRAM, 8, mk2_state)
+ADDRESS_MAP_START(mk2_state::mk2_mem)
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
 	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", mos6530_device, read, write)
 	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram

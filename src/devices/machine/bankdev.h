@@ -32,10 +32,10 @@ public:
 	static void set_addr_width(device_t &device, uint8_t addr_width) { downcast<address_map_bank_device &>(device).m_addr_width = addr_width; }
 	static void set_stride(device_t &device, uint32_t stride) { downcast<address_map_bank_device &>(device).m_stride = stride; }
 
-	DECLARE_ADDRESS_MAP(amap8, 8);
-	DECLARE_ADDRESS_MAP(amap16, 16);
-	DECLARE_ADDRESS_MAP(amap32, 32);
-	DECLARE_ADDRESS_MAP(amap64, 64);
+	void amap8(address_map &map);
+	void amap16(address_map &map);
+	void amap32(address_map &map);
+	void amap64(address_map &map);
 
 	DECLARE_WRITE8_MEMBER(write8);
 	DECLARE_WRITE16_MEMBER(write16);

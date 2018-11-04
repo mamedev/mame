@@ -64,7 +64,7 @@ constexpr XTAL cdp1869_device::CPU_CLK_PAL;
 DEFINE_DEVICE_TYPE(CDP1869, cdp1869_device, "cdp1869", "RCA CDP1869 VIS")
 
 // I/O map
-DEVICE_ADDRESS_MAP_START( io_map, 8, cdp1869_device )
+ADDRESS_MAP_START(cdp1869_device::io_map)
 	AM_RANGE(0x03, 0x03) AM_WRITE(out3_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(out4_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(out5_w)
@@ -73,17 +73,17 @@ DEVICE_ADDRESS_MAP_START( io_map, 8, cdp1869_device )
 ADDRESS_MAP_END
 
 // character RAM map
-DEVICE_ADDRESS_MAP_START( char_map, 8, cdp1869_device )
+ADDRESS_MAP_START(cdp1869_device::char_map)
 	AM_RANGE(0x000, 0x3ff) AM_READWRITE(char_ram_r, char_ram_w)
 ADDRESS_MAP_END
 
 // page RAM map
-DEVICE_ADDRESS_MAP_START( page_map, 8, cdp1869_device )
+ADDRESS_MAP_START(cdp1869_device::page_map)
 	AM_RANGE(0x000, 0x7ff) AM_READWRITE(page_ram_r, page_ram_w)
 ADDRESS_MAP_END
 
 // default address map
-static ADDRESS_MAP_START( cdp1869, 0, 8, cdp1869_device )
+ADDRESS_MAP_START(cdp1869_device::cdp1869)
 	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -355,7 +355,7 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 	m_color_clock(0),
 	m_stream(nullptr),
 	m_palette(*this, "palette"),
-	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, nullptr, *ADDRESS_MAP_NAME(cdp1869))
+	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, address_map_constructor(), address_map_constructor(FUNC(cdp1869_device::cdp1869), this))
 {
 }
 

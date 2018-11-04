@@ -47,6 +47,8 @@ public:
 	// static configuration helpers
 	template <class Object> static devcb_base & set_bio_in_cb(device_t &device, Object &&cb) { return downcast<tms32010_device &>(device).m_bio_in.set_callback(std::forward<Object>(cb)); }
 
+	void tms32010_ram(address_map &map);
+	void tms32015_ram(address_map &map);
 protected:
 	tms32010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map, int addr_mask);
 

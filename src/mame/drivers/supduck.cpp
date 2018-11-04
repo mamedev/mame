@@ -82,6 +82,9 @@ public:
 	DECLARE_WRITE8_MEMBER(okibank_w);
 
 	void supduck(machine_config &config);
+	void main_map(address_map &map);
+	void oki_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 
 	// driver_device overrides
@@ -243,7 +246,7 @@ WRITE16_MEMBER(supduck_state::supduck_scroll_w)
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
+ADDRESS_MAP_START(supduck_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xfe0000, 0xfe1fff) AM_RAM AM_SHARE("spriteram")
 
@@ -261,7 +264,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supduck_state )
+ADDRESS_MAP_START(supduck_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
@@ -269,7 +272,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supduck_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, 0, 8, supduck_state )
+ADDRESS_MAP_START(supduck_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

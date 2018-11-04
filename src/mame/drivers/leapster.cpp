@@ -242,6 +242,8 @@ public:
 	}
 
 	void leapster(machine_config &config);
+	void leapster_aux(address_map &map);
+	void leapster_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -290,15 +292,15 @@ void leapster_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x40000000) // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
+ADDRESS_MAP_START(leapster_state::leapster_map)
+	AM_RANGE(0x00000000, 0x007fffff) AM_ROM AM_MIRROR(0x40000000) // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
 	AM_RANGE(0x0180D800, 0x0180D803) AM_READ(leapster_random_r)
 	AM_RANGE(0x03000000, 0x030007ff) AM_RAM // puts stack here, writes a pointer @ 0x03000000 on startup
 	AM_RANGE(0x3c000000, 0x3c1fffff) AM_RAM // really ram, or has our code execution gone wrong?
 //  AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( leapster_aux, AS_IO, 32, leapster_state )
+ADDRESS_MAP_START(leapster_state::leapster_aux)
 	AM_RANGE(0x00000004b, 0x00000004b) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 ADDRESS_MAP_END
 
@@ -325,19 +327,34 @@ MACHINE_CONFIG_START(leapster_state::leapster)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "leapster")
 MACHINE_CONFIG_END
 
+#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+
+/* There are various build dates and revisions for different parts of the code, the date listed is the newest on in each rom.
+   This is always in the same place relative to the rest of the data
+
+   V2.1 sets (except TV) are apparently larger because "Learning with Leap" was built in
+*/
+
 ROM_START(leapster)
-	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "155-10072-a.bin", 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS( 0,  "uni15",   "Universal 1.5" )    /* 152-10346 Leapster BaseROM Universal v1.5      - Sep 04 2003 10:46:47 */
+	ROM_LOAD_BIOS( 0, "155-10072-a.bin"   , 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
+	ROM_SYSTEM_BIOS( 1,  "uk21",    "UK 2.1" )           /* 152-11452 Leapster BaseROM UK v2.1             - Aug 30 2005 16:01:46 */
+	ROM_LOAD_BIOS( 1, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) ) 
+	ROM_SYSTEM_BIOS( 2,  "ger21",   "German 2.1" )       /* 152-11435 Leapster BaseROM German v2.1         - Oct 21 2005 18:53:59 */
+	ROM_LOAD_BIOS( 2, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) ) 
 ROM_END
 
 ROM_START(leapstertv)
-	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, CRC(194cc724) SHA1(000a79d75c19f2e43532ce0b31f0dca0bed49eab) )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS( 0,  "uni2111", "Universal 2.1.11" ) /* 152-11594 LeapsterTv Baserom Universal.v2.1.11 - Apr 13 2006 16:36:08 */ \
+	ROM_LOAD_BIOS( 0, "am29pl160cb-90sf.bin", 0x00000, 0x200000, CRC(194cc724) SHA1(000a79d75c19f2e43532ce0b31f0dca0bed49eab) )
 ROM_END
 
 DRIVER_INIT_MEMBER(leapster_state,leapster)
 {
 }
 
-CONS( 2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster (Germany)",    MACHINE_IS_SKELETON )
-CONS( 2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV (Germany)", MACHINE_IS_SKELETON )
+CONS( 2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster",    MACHINE_IS_SKELETON )
+CONS( 2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV", MACHINE_IS_SKELETON )

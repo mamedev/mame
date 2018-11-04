@@ -108,7 +108,7 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 
 	void set_port_bits(std::array<u8, PORT_COUNT> const &bits);
 	void set_port_interrupt(std::array<u8, PORT_COUNT> const &interrupt);
@@ -208,7 +208,7 @@ protected:
 			device_t *owner,
 			u32 clock,
 			device_type type,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 };
 
 
@@ -220,7 +220,7 @@ public:
 	m68hc05c4_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	DECLARE_ADDRESS_MAP(c4_map, 8);
+	void c4_map(address_map &map);
 
 	virtual void device_start() override;
 
@@ -236,7 +236,7 @@ public:
 	m68hc05c8_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	DECLARE_ADDRESS_MAP(c8_map, 8);
+	void c8_map(address_map &map);
 
 	virtual void device_start() override;
 
@@ -252,7 +252,7 @@ public:
 	m68hc705c8a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	DECLARE_ADDRESS_MAP(c8a_map, 8);
+	void c8a_map(address_map &map);
 
 	virtual tiny_rom_entry const *device_rom_region() const override;
 

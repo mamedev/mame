@@ -251,7 +251,7 @@ WRITE8_MEMBER(nemesis_state::city_sound_bank_w)
 }
 
 
-static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::nemesis_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
 	AM_RANGE(0x050000, 0x051fff) AM_RAM
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x060000, 0x067fff) AM_RAM         /* WORK RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::gx400_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM     /* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::konamigt_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
 	AM_RANGE(0x050000, 0x051fff) AM_RAM
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::rf2_gx400_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM     /* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
@@ -369,7 +369,7 @@ static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("k005289", k005289_device, ld1_w)
@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xe405, 0xe405) AM_DEVWRITE("ay2", ay8910_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::gx400_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("gx400_shared")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("voiceram")
@@ -407,14 +407,14 @@ static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8, nemesis_state )
 ADDRESS_MAP_END
 
 // gx400 voice data is not in a ROM but in sound RAM at $8000
-static ADDRESS_MAP_START( gx400_vlm_map, 0, 8, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::gx400_vlm_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x000, 0x7ff) AM_RAM AM_SHARE("voiceram")
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( salamand_map, AS_PROGRAM, 16, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::salamand_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x090000, 0x091fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
@@ -439,7 +439,7 @@ static ADDRESS_MAP_START( salamand_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x190f80, 0x190fff) AM_SHARE("yscroll2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::blkpnthr_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x081fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x090000, 0x097fff) AM_RAM
@@ -464,7 +464,7 @@ static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x190000, 0x190fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::citybomb_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x0e0000, 0x0e1fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
@@ -491,7 +491,7 @@ static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x310000, 0x310fff) AM_RAM AM_SHARE("spriteram")       /* more sprite ram ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::nyanpani_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM
 	AM_RANGE(0x060000, 0x061fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
@@ -523,7 +523,7 @@ READ8_MEMBER(nemesis_state::wd_r)
 	return m_frame_counter;
 }
 
-static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::sal_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -534,12 +534,12 @@ static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(salamand_speech_start_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( salamand_vlm_map, 0, 8, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::salamand_vlm_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blkpnthr_sound_map, AS_PROGRAM, 8, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::blkpnthr_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -548,7 +548,7 @@ static ADDRESS_MAP_START( blkpnthr_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( city_sound_map, AS_PROGRAM, 8, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::city_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
@@ -564,7 +564,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( hcrash_map, AS_PROGRAM, 16, nemesis_state )
+ADDRESS_MAP_START(nemesis_state::hcrash_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM

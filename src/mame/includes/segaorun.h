@@ -100,6 +100,11 @@ public:
 	void outrun_fd1089a(machine_config &config);
 	void outrun(machine_config &config);
 	void outrun_base(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void outrun_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	// timer IDs
 	enum

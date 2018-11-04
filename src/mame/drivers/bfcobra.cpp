@@ -299,6 +299,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
 	void bfcobra(machine_config &config);
+	void m6809_prog_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void z80_io_map(address_map &map);
+	void z80_prog_map(address_map &map);
 };
 
 
@@ -1253,14 +1257,14 @@ void bfcobra_state::machine_reset()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( z80_prog_map, AS_PROGRAM, 8, bfcobra_state )
+ADDRESS_MAP_START(bfcobra_state::z80_prog_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank4")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io_map, AS_IO, 8, bfcobra_state )
+ADDRESS_MAP_START(bfcobra_state::z80_io_map)
 ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x23) AM_READWRITE(chipset_r, chipset_w)
 	AM_RANGE(0x24, 0x25) AM_DEVWRITE("acia6850_0", acia6850_device, write)
@@ -1275,7 +1279,7 @@ ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, bfcobra_state )
+ADDRESS_MAP_START(bfcobra_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -1389,7 +1393,7 @@ WRITE8_MEMBER(bfcobra_state::upd_w)
 	m_upd7759->start_w(data & 0x40 ? 0 : 1);
 }
 
-static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )
+ADDRESS_MAP_START(bfcobra_state::m6809_prog_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_RAM     // W 'B', 6F
 	AM_RANGE(0x2200, 0x2200) AM_RAM     // W 'F'

@@ -444,7 +444,7 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_io_write )
 
 
 
-static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
+ADDRESS_MAP_START(md_base_state::megadriv_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
@@ -467,9 +467,9 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( dcat16_megadriv_map, AS_PROGRAM, 16, md_base_state )
-	AM_RANGE(0x000000, 0x7fffff) AM_ROM
+ADDRESS_MAP_START(md_base_state::dcat16_megadriv_map)
 	AM_IMPORT_FROM(megadriv_map)
+	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -723,7 +723,7 @@ READ8_MEMBER(md_base_state::megadriv_z80_unmapped_read )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( megadriv_z80_map, AS_PROGRAM, 8, md_base_state )
+ADDRESS_MAP_START(md_base_state::megadriv_z80_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1") AM_MIRROR(0x2000) // RAM can be accessed by the 68k
 	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2612_device, read, write)
 
@@ -737,7 +737,7 @@ static ADDRESS_MAP_START( megadriv_z80_map, AS_PROGRAM, 8, md_base_state )
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megadriv_z80_io_map, AS_IO, 8, md_base_state )
+ADDRESS_MAP_START(md_base_state::megadriv_z80_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0xff) AM_NOP
 ADDRESS_MAP_END
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
-	MCFG_FRAGMENT_ADD(megadriv_timers)
+	megadriv_timers(config);
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(false)
@@ -926,7 +926,7 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv_base)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dcat16_megadriv_map)
@@ -949,7 +949,7 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
-	MCFG_FRAGMENT_ADD(megadriv_timers)
+	megadriv_timers(config);
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(true)

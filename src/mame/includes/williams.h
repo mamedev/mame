@@ -131,6 +131,12 @@ public:
 	void williams(machine_config &config);
 	void williams_muxed(machine_config &config);
 	void jin(machine_config &config);
+	void defender_bankc000_map(address_map &map);
+	void defender_map(address_map &map);
+	void defender_sound_map(address_map &map);
+	void sinistar_map(address_map &map);
+	void sound_map(address_map &map);
+	void williams_map(address_map &map);
 };
 
 
@@ -171,6 +177,8 @@ public:
 	inline void update_blaster_banking();
 	void blastkit(machine_config &config);
 	void blaster(machine_config &config);
+	void blaster_map(address_map &map);
+	void sound_map_b(address_map &map);
 };
 
 
@@ -221,6 +229,11 @@ public:
 	void williams2(machine_config &config);
 	void mysticm(machine_config &config);
 	void inferno(machine_config &config);
+	void williams2_bank8000_map(address_map &map);
+	void williams2_common_map(address_map &map);
+	void williams2_d000_ram_map(address_map &map);
+	void williams2_d000_rom_map(address_map &map);
+	void williams2_sound_map(address_map &map);
 };
 
 

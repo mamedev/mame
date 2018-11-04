@@ -402,6 +402,9 @@ public:
 	void coh3002t_cf(machine_config &config);
 	void coh3002t_t2(machine_config &config);
 	void coh3002t_t1(machine_config &config);
+	void flashbank_map(address_map &map);
+	void taitogn_map(address_map &map);
+	void taitogn_mp_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -632,7 +635,7 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t_nz)
 	m_has_zoom = false;
 }
 
-static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
+ADDRESS_MAP_START(taitogn_state::taitogn_map)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_DEVICE16("flashbank", address_map_bank_device, amap16, 0xffffffff)
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
@@ -658,7 +661,7 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comms with the MN10200
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, taitogn_state )
+ADDRESS_MAP_START(taitogn_state::flashbank_map)
 	// Bank 0 has access to the sub-bios, the mn102 flash and the rf5c296 mem zone
 	AM_RANGE(0x00000000, 0x001fffff) AM_DEVREADWRITE("biosflash", intelfsh16_device, read, write)
 	AM_RANGE(0x00200000, 0x002fffff) AM_DEVREADWRITE("rf5c296", rf5c296_device, mem_r, mem_w )
@@ -675,14 +678,9 @@ static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, taitogn_state )
 	AM_RANGE(0x10200000, 0x103fffff) AM_DEVREADWRITE("biosflash", intelfsh16_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( taitogn_mp_map, AS_PROGRAM, 32, taitogn_state )
-	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ8(gnet_mahjong_panel_r, 0x000000ff)
+ADDRESS_MAP_START(taitogn_state::taitogn_mp_map)
 	AM_IMPORT_FROM(taitogn_map)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( taitogn_mn_map, AS_PROGRAM, 16, taitogn_state )
-	AM_RANGE(0x080000, 0x0fffff) AM_DEVREAD(":pgmflash", intelfsh16_device, read)
-	AM_IMPORT_FROM( taitozoom_mn_map )
+	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ8(gnet_mahjong_panel_r, 0x000000ff)
 ADDRESS_MAP_END
 
 SLOT_INTERFACE_START(slot_ataflash)
@@ -753,38 +751,42 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
 	MCFG_TAITO_ZOOM_ADD("taito_zoom")
-	MCFG_CPU_MODIFY("taito_zoom:mn10200")
-	MCFG_CPU_PROGRAM_MAP(taitogn_mn_map)
+	MCFG_TAITO_ZOOM_USE_FLASH
 
 	MCFG_DEVICE_MODIFY("taito_zoom:zsg2")
 	MCFG_ZSG2_EXT_READ_HANDLER(DEVREAD32(DEVICE_SELF_OWNER, taitogn_state, zsg2_ext_r))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t1, coh3002t)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_t1)
+	coh3002t(config);
 	MCFG_DEVICE_MODIFY("pccard")
 	MCFG_SLOT_DEFAULT_OPTION("taitopccard1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t2, coh3002t)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_t2)
+	coh3002t(config);
 	MCFG_DEVICE_MODIFY("pccard")
 	MCFG_SLOT_DEFAULT_OPTION("taitopccard2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t1_mp, coh3002t_t1)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_t1_mp)
+	coh3002t_t1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(taitogn_mp_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t2_mp, coh3002t_t2)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_t2_mp)
+	coh3002t_t2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(taitogn_mp_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_cf, coh3002t)
+MACHINE_CONFIG_START(taitogn_state::coh3002t_cf)
+	coh3002t(config);
 	MCFG_DEVICE_MODIFY("pccard")
 	MCFG_SLOT_DEFAULT_OPTION("taitocf")
 MACHINE_CONFIG_END

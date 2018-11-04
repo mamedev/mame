@@ -264,7 +264,7 @@ connector, but of course, I can be wrong.
 /************************************ Megadrive Bootlegs *************************************/
 
 // smaller ROM region because some bootlegs check for RAM there (used by topshoot and hshavoc)
-static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
+ADDRESS_MAP_START(md_boot_state::md_bootleg_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(md_boot_state::md_bootleg)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(md_bootleg_map)
@@ -679,7 +679,7 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(md_boot_state::megadrvb)
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 MACHINE_CONFIG_END
 
@@ -698,7 +698,7 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 }
 
 MACHINE_CONFIG_START(md_boot_state::megadrvb_6b)
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_6button)
 MACHINE_CONFIG_END
 

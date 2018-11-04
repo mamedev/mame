@@ -60,6 +60,7 @@ public:
 	uint32_t screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void tcl(machine_config &config);
+	void tcl_map(address_map &map);
 };
 
 
@@ -71,7 +72,7 @@ uint32_t tcl_state::screen_update_tcl(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START( tcl_map, AS_PROGRAM, 8, tcl_state )
+ADDRESS_MAP_START(tcl_state::tcl_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM  /* bfff ? */
 ADDRESS_MAP_END
 

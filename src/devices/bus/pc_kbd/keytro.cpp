@@ -344,11 +344,11 @@ DEFINE_DEVICE_TYPE(PC_KBD_KEYTRONIC_PC3270_AT, pc_kbd_keytronic_pc3270_at_device
     ADDRESS MAPS
 *****************************************************************************/
 
-static ADDRESS_MAP_START( keytronic_pc3270_program, AS_PROGRAM, 8, pc_kbd_keytronic_pc3270_device )
+ADDRESS_MAP_START(pc_kbd_keytronic_pc3270_device::keytronic_pc3270_program)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("kb_keytr", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keytronic_pc3270_io, AS_IO, 8, pc_kbd_keytronic_pc3270_device )
+ADDRESS_MAP_START(pc_kbd_keytronic_pc3270_device::keytronic_pc3270_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(internal_data_read, internal_data_write)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_read, p1_write)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(p2_read, p2_write)

@@ -142,6 +142,9 @@ public:
 	void bg_motherboard(machine_config &config);
 	void bitgrpha(machine_config &config);
 	void bitgrphb(machine_config &config);
+	void bitgrapha_mem(address_map &map);
+	void bitgraphb_mem(address_map &map);
+	void ppu_io(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -167,7 +170,7 @@ private:
 	uint8_t m_ppu[4];
 };
 
-static ADDRESS_MAP_START(bitgrapha_mem, AS_PROGRAM, 16, bitgraph_state)
+ADDRESS_MAP_START(bitgraph_state::bitgrapha_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
 	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)   // HOST
@@ -184,7 +187,7 @@ static ADDRESS_MAP_START(bitgrapha_mem, AS_PROGRAM, 16, bitgraph_state)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bitgraphb_mem, AS_PROGRAM, 16, bitgraph_state)
+ADDRESS_MAP_START(bitgraph_state::bitgraphb_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
 	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)   // HOST
@@ -427,7 +430,7 @@ WRITE8_MEMBER(bitgraph_state::ppu_write)
 }
 
 #ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START(ppu_io, AS_IO, 8, bitgraph_state)
+ADDRESS_MAP_START(bitgraph_state::ppu_io)
 //  AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
 ADDRESS_MAP_END
 #endif
@@ -577,7 +580,7 @@ MACHINE_CONFIG_START(bitgraph_state::bitgrpha)
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(6'900'000))
 	MCFG_CPU_PROGRAM_MAP(bitgrapha_mem)
 
-	MCFG_FRAGMENT_ADD(bg_motherboard)
+	bg_motherboard(config);
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 40)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))
@@ -600,8 +603,8 @@ MACHINE_CONFIG_START(bitgraph_state::bitgrphb)
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL(6'900'000))
 	MCFG_CPU_PROGRAM_MAP(bitgraphb_mem)
 
-	MCFG_FRAGMENT_ADD(bg_motherboard)
-//  MCFG_FRAGMENT_ADD(bg_ppu)
+	bg_motherboard(config);
+//  bg_ppu(config);
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))

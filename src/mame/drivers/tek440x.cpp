@@ -74,6 +74,8 @@ public:
 	required_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_vram;
 	void tek4404(machine_config &config);
+	void fdccpu_map(address_map &map);
+	void maincpu_map(address_map &map);
 };
 
 /*************************************
@@ -145,7 +147,7 @@ uint32_t tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
  *
  *************************************/
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 16, tek440x_state )
+ADDRESS_MAP_START(tek440x_state::maincpu_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x740000, 0x747fff) AM_ROM AM_REGION("maincpu", 0)
@@ -166,7 +168,7 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 16, tek440x_state )
 	// 7be000-7bffff: SCSI (NCR 5385)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fdccpu_map, AS_PROGRAM, 8, tek440x_state )
+ADDRESS_MAP_START(tek440x_state::fdccpu_map)
 	AM_RANGE(0x0000, 0x1000) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("fdccpu", 0)
 ADDRESS_MAP_END

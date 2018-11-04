@@ -333,13 +333,13 @@ void namcos86_state::machine_start()
 }
 
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::cpu1_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_WRITE(videoram1_w) AM_SHARE("videoram1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_WRITE(videoram2_w) AM_SHARE("videoram2")
 
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
-
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(spriteram_w) AM_SHARE("spriteram")
+
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -365,13 +365,13 @@ ADDRESS_MAP_END
 
 // skykiddx and hopmappy cpu2 programs do nothing but sit in a loop resetting the watchdog
 // shared RAM is presumably mapped somewhere, but it's impossible to infer from program behaviour
-static ADDRESS_MAP_START( hopmappy_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::hopmappy_cpu2_map)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(watchdog2_w)
 	AM_RANGE(0x9400, 0x9400) AM_WRITE(int_ack2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roishtar_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::roishtar_cpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( roishtar_cpu2_map, AS_PROGRAM, 8, namcos86_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(int_ack2_w)   // IRQ acknowledge
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( genpeitd_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::genpeitd_cpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spriteram_w) AM_SHARE("spriteram")
@@ -389,7 +389,7 @@ static ADDRESS_MAP_START( genpeitd_cpu2_map, AS_PROGRAM, 8, namcos86_state )
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(int_ack2_w)   // IRQ acknowledge
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rthunder_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::rthunder_cpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( rthunder_cpu2_map, AS_PROGRAM, 8, namcos86_state )
 //  { 0xd804, 0xd806 } layer 3 scroll registers would be here
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wndrmomo_cpu2_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::wndrmomo_cpu2_map)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
@@ -412,7 +412,7 @@ static ADDRESS_MAP_START( wndrmomo_cpu2_map, AS_PROGRAM, 8, namcos86_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( common_mcu_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::common_mcu_map)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r,m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w)
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( common_mcu_map, AS_PROGRAM, 8, namcos86_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM // internal ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hopmappy_mcu_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::hopmappy_mcu_map)
 	AM_IMPORT_FROM(common_mcu_map)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("IN0")
@@ -432,7 +432,7 @@ static ADDRESS_MAP_START( hopmappy_mcu_map, AS_PROGRAM, 8, namcos86_state )
 	AM_RANGE(0x8800, 0x8800) AM_WRITENOP // ??? written (not always) at end of interrupt
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roishtar_mcu_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::roishtar_mcu_map)
 	AM_IMPORT_FROM(common_mcu_map)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( roishtar_mcu_map, AS_PROGRAM, 8, namcos86_state )
 ADDRESS_MAP_END
 
 // are these three actually different, or are the I/O ports simply mirrored from 0x2000-0x3fff?
-static ADDRESS_MAP_START( genpeitd_mcu_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::genpeitd_mcu_map)
 	AM_IMPORT_FROM(common_mcu_map)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2820, 0x2820) AM_READ_PORT("IN0")
@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( genpeitd_mcu_map, AS_PROGRAM, 8, namcos86_state )
 	AM_RANGE(0xa800, 0xa800) AM_WRITENOP // ??? written (not always) at end of interrupt
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rthunder_mcu_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::rthunder_mcu_map)
 	AM_IMPORT_FROM(common_mcu_map)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("IN0")
@@ -469,7 +469,7 @@ static ADDRESS_MAP_START( rthunder_mcu_map, AS_PROGRAM, 8, namcos86_state )
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP // ??? written (not always) at end of interrupt
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wndrmomo_mcu_map, AS_PROGRAM, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::wndrmomo_mcu_map)
 	AM_IMPORT_FROM(common_mcu_map)
 	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("IN0")
@@ -487,7 +487,7 @@ READ8_MEMBER(namcos86_state::readFF)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos86_state )
+ADDRESS_MAP_START(namcos86_state::mcu_port_map)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("IN2")
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)  /* leds won't work otherwise */
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(coin_w)
@@ -1091,7 +1091,8 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(namcos86_state::roishtar, hopmappy)
+MACHINE_CONFIG_START(namcos86_state::roishtar)
+	hopmappy(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -1102,7 +1103,8 @@ MACHINE_CONFIG_DERIVED(namcos86_state::roishtar, hopmappy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(namcos86_state::genpeitd, hopmappy)
+MACHINE_CONFIG_START(namcos86_state::genpeitd)
+	hopmappy(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -1117,7 +1119,8 @@ MACHINE_CONFIG_DERIVED(namcos86_state::genpeitd, hopmappy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(namcos86_state::rthunder, hopmappy)
+MACHINE_CONFIG_START(namcos86_state::rthunder)
+	hopmappy(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -1132,7 +1135,8 @@ MACHINE_CONFIG_DERIVED(namcos86_state::rthunder, hopmappy)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(namcos86_state::wndrmomo, hopmappy)
+MACHINE_CONFIG_START(namcos86_state::wndrmomo)
+	hopmappy(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")

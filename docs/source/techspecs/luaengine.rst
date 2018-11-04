@@ -48,18 +48,25 @@ Let's first run MAME in a terminal to reach the LUA console:
 ::
 
     $ mame -console YOUR_ROM
-    M.A.M.E. v0.158 (Feb  5 2015) - Multiple Arcade Machine Emulator
-    Copyright Nicola Salmoria and the MAME team
-    Lua 5.3.0  Copyright (C) 1994-2015 Lua.org, PUC-Rio
+         _/      _/    _/_/    _/      _/  _/_/_/_/
+       _/_/  _/_/  _/    _/  _/_/  _/_/  _/
+      _/  _/  _/  _/_/_/_/  _/  _/  _/  _/_/_/
+     _/      _/  _/    _/  _/      _/  _/
+    _/      _/  _/    _/  _/      _/  _/_/_/_/
+    mame v0.195
+    Copyright (C) Nicola Salmoria and the MAME team
+    
+    Lua 5.3
+    Copyright (C) Lua.org, PUC-Rio
 
-    > 
+    [MAME]> 
 
 At this point, your game is probably running in demo mode, let's pause it:
 
 ::
 
-    > emu.pause()
-    >
+    [MAME]> emu.pause()
+    [MAME]>
 
 Even without textual feedback on the console, you'll notice the game is
 now paused. In general, commands are quiet and only print back error
@@ -69,14 +76,14 @@ You can check at runtime which version of MAME you are running, with:
 
 ::
 
-    > print(emu.app_name() .. " " .. emu.app_version())
-    mame 0.158
+    [MAME]> print(emu.app_name() .. " " .. emu.app_version())
+    mame 0.195
 
 We now start exploring screen related methods. First, let's enumerate available screens:
 
 ::
 
-    > for i,v in pairs(manager:machine().screens) do print(i) end
+    [MAME]> for i,v in pairs(manager:machine().screens) do print(i) end
     :screen
 
 **manager:machine()** is the root object of your currently running machine: we will be using this often. **screens** is a table with all
@@ -84,28 +91,28 @@ available screens; most machines only have one main screen. In our case, the mai
 
 ::
 
-    > -- let's define a shorthand for the main screen
-    > s = manager:machine().screens[":screen"]
-    > print(s:width() .. "x" .. s:height())
+    [MAME]> -- let's define a shorthand for the main screen
+    [MAME]> s = manager:machine().screens[":screen"]
+    [MAME]> print(s:width() .. "x" .. s:height())
     320x224
 
 We have several methods to draw on the screen a HUD composed of lines, boxes and text:
 
 ::
 
-    > -- we define a HUD-drawing function, and then call it
-    > function draw_hud()
-    >> s:draw_text(40, 40, "foo"); -- (x0, y0, msg)
-    >> s:draw_box(20, 20, 80, 80, 0, 0xff00ffff); -- (x0, y0, x1, y1, fill-color, line-color)
-    >> s:draw_line(20, 20, 80, 80, 0xff00ffff); -- (x0, y0, x1, y1, line-color)
-    >> end
-    > draw_hud();
+    [MAME]> -- we define a HUD-drawing function, and then call it
+    [MAME]> function draw_hud()
+    [MAME]>> s:draw_text(40, 40, "foo"); -- (x0, y0, msg)
+    [MAME]>> s:draw_box(20, 20, 80, 80, 0, 0xff00ffff); -- (x0, y0, x1, y1, fill-color, line-color)
+    [MAME]>> s:draw_line(20, 20, 80, 80, 0xff00ffff); -- (x0, y0, x1, y1, line-color)
+    [MAME]>> end
+    [MAME]> draw_hud();
 
 This will draw some useless art on the screen. However, when unpausing the game, your HUD needs to be refreshed otherwise it will just disappear. In order to do this, you have to register your hook to be called on every frame repaint:
 
 ::
 
-    > emu.register_frame_done(draw_hud, "frame")
+    [MAME]> emu.register_frame_done(draw_hud, "frame")
 
 All colors are expected in ARGB format (32b unsigned), while screen origin (0,0) normally corresponds to the top-left corner.
 
@@ -113,7 +120,7 @@ Similarly to screens, you can inspect all the devices attached to a machine:
 
 ::
 
-    > for k,v in pairs(manager:machine().devices) do print(k) end
+    [MAME]> for k,v in pairs(manager:machine().devices) do print(k) end
     :audiocpu
     :maincpu
     :saveram
@@ -125,9 +132,9 @@ On some of them, you can also inspect and manipulate memory and state:
 
 ::
 
-    > cpu = manager:machine().devices[":maincpu"]
-    > -- enumerate, read and write state registers
-    > for k,v in pairs(cpu.state) do print(k) end
+    [MAME]> cpu = manager:machine().devices[":maincpu"]
+    [MAME]> -- enumerate, read and write state registers
+    [MAME]> for k,v in pairs(cpu.state) do print(k) end
     D5
     SP
     A4
@@ -135,17 +142,17 @@ On some of them, you can also inspect and manipulate memory and state:
     D0
     PC
     [...]
-    > print(cpu.state["D0"].value)
+    [MAME]> print(cpu.state["D0"].value)
     303
-    > cpu.state["D0"].value = 255
-    > print(cpu.state["D0"].value)
+    [MAME]> cpu.state["D0"].value = 255
+    [MAME]> print(cpu.state["D0"].value)
     255
 
 ::
 
-    > -- inspect memory
-    > for k,v in pairs(cpu.spaces) do print(k) end
+    [MAME]> -- inspect memory
+    [MAME]> for k,v in pairs(cpu.spaces) do print(k) end
     program
-    > mem = cpu.spaces["program"] 
-    > print(mem:read_i8(0xC000))
+    [MAME]> mem = cpu.spaces["program"] 
+    [MAME]> print(mem:read_i8(0xC000))
     41

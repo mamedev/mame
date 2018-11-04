@@ -37,6 +37,7 @@ SOUNDS["YMF271"] = true
 SOUNDS["YMZ280B"] = true
 SOUNDS["C6280"] = true
 SOUNDS["SN76496"] = true
+SOUNDS["K051649"] = true
 SOUNDS["K053260"] = true
 SOUNDS["K054539"] = true
 SOUNDS["SEGAPCM"] = true

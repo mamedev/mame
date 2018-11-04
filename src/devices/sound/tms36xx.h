@@ -134,7 +134,6 @@ private:
 	int m_tune_max;       // end of tune
 };
 
-extern const device_type TMS36XX;
 DECLARE_DEVICE_TYPE(TMS36XX, tms36xx_device)
 
 

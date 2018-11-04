@@ -159,7 +159,7 @@ WRITE16_MEMBER(seta2_state::grdians_lockout_w)
 //  popmessage("%04X", data & 0xffff);
 }
 
-static ADDRESS_MAP_START( grdians_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::grdians_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x304000, 0x30ffff) AM_RAM                             // ? seems tile data
@@ -195,7 +195,7 @@ WRITE16_MEMBER(seta2_state::gundamex_eeprom_w)
 	m_eeprom->cs_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::gundamex_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x500000, 0x57ffff) AM_ROM                             // ROM
@@ -259,7 +259,7 @@ WRITE16_MEMBER(seta2_state::mj4simai_keyboard_w)
 		m_keyboard_row = data & 0xff;
 }
 
-static ADDRESS_MAP_START( mj4simai_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::mj4simai_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x600000, 0x600001) AM_READ(mj4simai_p1_r)             // P1
@@ -283,7 +283,7 @@ ADDRESS_MAP_END
                             Kosodate Quiz My Angel
 ***************************************************************************/
 
-static ADDRESS_MAP_START( myangel_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::myangel_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")                 // P1
@@ -306,7 +306,7 @@ ADDRESS_MAP_END
                             Kosodate Quiz My Angel 2
 ***************************************************************************/
 
-static ADDRESS_MAP_START( myangel2_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::myangel2_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")                 // P1
@@ -351,7 +351,7 @@ WRITE16_MEMBER(seta2_state::pzlbowl_coin_counter_w)
 	}
 }
 
-static ADDRESS_MAP_START( pzlbowl_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::pzlbowl_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                 // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                                 // RAM
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")                   // DSW 1
@@ -374,7 +374,7 @@ ADDRESS_MAP_END
                             Penguin Bros
 ***************************************************************************/
 
-static ADDRESS_MAP_START( penbros_base_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::penbros_base_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM // zeroed at startup, then never written again on originals, used on the bootleg
@@ -390,7 +390,7 @@ static ADDRESS_MAP_START( penbros_base_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::penbros_map)
 	AM_IMPORT_FROM(penbros_base_map)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x500300, 0x500301) AM_READ_PORT("DSW1")
@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ablastb_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::ablastb_map)
 	AM_IMPORT_FROM(penbros_base_map)
 	AM_RANGE(0x508300, 0x508301) AM_READ_PORT("DSW1")
 	AM_RANGE(0x508302, 0x508303) AM_READ_PORT("DSW2")
@@ -446,7 +446,7 @@ WRITE16_MEMBER(seta2_state::reelquak_coin_w)
 //  popmessage("COIN %04X", data & 0xffff);
 }
 
-static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::reelquak_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("nvram")           // NVRAM (Battery Backed)
@@ -471,7 +471,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 // To be done:
-static ADDRESS_MAP_START( namcostr_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::namcostr_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
@@ -497,7 +497,7 @@ WRITE16_MEMBER(seta2_state::samshoot_coin_w)
 //  popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::samshoot_map)
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM
 	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_SHARE("nvram")
@@ -592,7 +592,7 @@ WRITE16_MEMBER(staraudi_state::staraudi_tileram_w)
 		m_gfxdecode->gfx(i)->mark_dirty(tile);
 }
 
-static ADDRESS_MAP_START( staraudi_map, AS_PROGRAM, 16, staraudi_state )
+ADDRESS_MAP_START(staraudi_state::staraudi_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM                             // RAM
 
@@ -676,7 +676,7 @@ WRITE16_MEMBER(seta2_state::telpacfl_lockout_w)
 //  popmessage("LOCK %04X", data);
 }
 
-static ADDRESS_MAP_START( telpacfl_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::telpacfl_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                              // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                              // RAM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("nvram")            // NVRAM (Battery Backed)
@@ -880,7 +880,7 @@ WRITE32_MEMBER(seta2_state::oki_write)
 	}
 }
 
-static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
+ADDRESS_MAP_START(seta2_state::funcube_map)
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
@@ -899,7 +899,7 @@ static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
 	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM    // SRAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( funcube2_map, AS_PROGRAM, 32, seta2_state )
+ADDRESS_MAP_START(seta2_state::funcube2_map)
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
@@ -920,7 +920,7 @@ ADDRESS_MAP_END
 
 // Sub CPU
 
-static ADDRESS_MAP_START( funcube_sub_map, AS_PROGRAM, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::funcube_sub_map)
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -1014,14 +1014,14 @@ READ16_MEMBER(seta2_state::funcube_battery_r)
 }
 
 // cabinet linking on sci0
-static ADDRESS_MAP_START( funcube_sub_io, AS_IO, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::funcube_sub_io)
 	AM_RANGE( h8_device::PORT_7,   h8_device::PORT_7   )    AM_READ(funcube_coins_r )
 	AM_RANGE( h8_device::PORT_4,   h8_device::PORT_4   )    AM_READ(funcube_battery_r )
 	AM_RANGE( h8_device::PORT_A,   h8_device::PORT_A   )    AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
 	AM_RANGE( h8_device::PORT_B,   h8_device::PORT_B   )    AM_WRITE(funcube_leds_w )                           AM_SHARE("funcube_leds")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( funcube2_sub_io, AS_IO, 16, seta2_state )
+ADDRESS_MAP_START(seta2_state::funcube2_sub_io)
 	AM_RANGE( h8_device::PORT_7,   h8_device::PORT_7   )    AM_READ(funcube_coins_r )
 	AM_RANGE( h8_device::PORT_4,   h8_device::PORT_4   )    AM_NOP  // unused
 	AM_RANGE( h8_device::PORT_A,   h8_device::PORT_A   )    AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
@@ -2536,13 +2536,15 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::mj4simai, seta2)
+MACHINE_CONFIG_START(seta2_state::mj4simai)
+	seta2(config);
 	MCFG_MACHINE_START_OVERRIDE(seta2_state, mj4simai)
 
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::gundamex, seta2)
+MACHINE_CONFIG_START(seta2_state::gundamex)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gundamex_map)
 
@@ -2558,7 +2560,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::gundamex, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::grdians, seta2)
+MACHINE_CONFIG_START(seta2_state::grdians)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(grdians_map)
 
@@ -2568,7 +2571,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::grdians, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::myangel, seta2)
+MACHINE_CONFIG_START(seta2_state::myangel)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(myangel_map)
 
@@ -2580,7 +2584,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::myangel, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::myangel2, seta2)
+MACHINE_CONFIG_START(seta2_state::myangel2)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(myangel2_map)
 
@@ -2592,7 +2597,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::myangel2, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::pzlbowl, seta2)
+MACHINE_CONFIG_START(seta2_state::pzlbowl)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pzlbowl_map)
 
@@ -2602,7 +2608,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::pzlbowl, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::penbros, seta2)
+MACHINE_CONFIG_START(seta2_state::penbros)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(penbros_map)
 
@@ -2611,7 +2618,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::penbros, seta2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seta2_state::ablastb, penbros)
+MACHINE_CONFIG_START(seta2_state::ablastb)
+	penbros(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000P-16
 	MCFG_CPU_PROGRAM_MAP(ablastb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
@@ -2619,7 +2627,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::ablastb, penbros)
 	MCFG_DEVICE_REMOVE("tmp68301")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seta2_state::reelquak, seta2)
+MACHINE_CONFIG_START(seta2_state::reelquak)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(reelquak_map)
 
@@ -2637,7 +2646,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::reelquak, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::samshoot, seta2)
+MACHINE_CONFIG_START(seta2_state::samshoot)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(samshoot_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
@@ -2653,7 +2663,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::samshoot, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(staraudi_state::staraudi, seta2)
+MACHINE_CONFIG_START(staraudi_state::staraudi)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(staraudi_map)
 
@@ -2669,7 +2680,8 @@ MACHINE_CONFIG_DERIVED(staraudi_state::staraudi, seta2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::telpacfl, seta2)
+MACHINE_CONFIG_START(seta2_state::telpacfl)
+	seta2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(telpacfl_map)
 
@@ -2760,7 +2772,8 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::funcube2, funcube)
+MACHINE_CONFIG_START(seta2_state::funcube2)
+	funcube(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funcube2_map)
 
@@ -2773,7 +2786,8 @@ MACHINE_CONFIG_DERIVED(seta2_state::funcube2, funcube)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seta2_state::funcube3, funcube2)
+MACHINE_CONFIG_START(seta2_state::funcube3)
+	funcube2(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80-0x40, 0x170-1-0x40)

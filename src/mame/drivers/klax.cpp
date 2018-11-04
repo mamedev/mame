@@ -79,7 +79,7 @@ MACHINE_RESET_MEMBER(klax_state,klax)
  *
  *************************************/
 
-static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
+ADDRESS_MAP_START(klax_state::klax_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
 	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( klax2bl_map, AS_PROGRAM, 16, klax_state )
+ADDRESS_MAP_START(klax_state::klax2bl_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
@@ -232,11 +232,12 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( bootleg_sound_map, AS_PROGRAM, 8, klax_state )
+ADDRESS_MAP_START(klax_state::bootleg_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED(klax_state::klax2bl, klax)
+MACHINE_CONFIG_START(klax_state::klax2bl)
+	klax(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(klax2bl_map)
 

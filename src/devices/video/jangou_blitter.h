@@ -28,8 +28,8 @@ public:
 	jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_ADDRESS_MAP(blit_v1_regs, 8);
-	DECLARE_ADDRESS_MAP(blit_v2_regs, 8);
+	void blit_v1_regs(address_map &map);
+	void blit_v2_regs(address_map &map);
 
 	DECLARE_WRITE8_MEMBER( vregs_w );
 	DECLARE_WRITE8_MEMBER( bltflip_w );

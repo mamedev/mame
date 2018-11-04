@@ -34,10 +34,60 @@ class sis85c496_host_device : public pci_host_device {
 public:
 	sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
+	void map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr);
+
+	virtual void reset_all_mappings() override;
+
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	virtual void config_map(address_map &map) override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<pic8259_device> m_pic8259_master;
+	required_device<pic8259_device> m_pic8259_slave;
+	required_device<am9517a_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_2;
+	required_device<pit8254_device> m_pit8254;
+	required_device<at_keyboard_controller_device> m_keybc;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<ds12885_device> m_ds12885;
+	required_device<pc_kbdc_device> m_pc_kbdc;
+
+	uint8_t m_at_spkrdata;
+	uint8_t m_pit_out2;
+	int m_dma_channel;
+	bool m_cur_eop;
+	uint8_t m_dma_offset[2][4];
+	uint8_t m_at_pages[0x10];
+	uint16_t m_dma_high_byte;
+	uint8_t m_at_speaker;
+	bool m_refresh;
+	void pc_select_dma_channel(int channel, bool state);
+	void at_speaker_set_spkrdata(uint8_t data);
+	uint8_t m_channel_check;
+	uint8_t m_nmi_enabled;
+
+	const char *cpu_tag;
+	int ram_size;
+	cpu_device *cpu;
+	std::vector<uint32_t> ram;
+	uint32_t m_mailbox;
+	uint8_t m_bios_config, m_dram_config, m_isa_decoder;
+	uint16_t m_shadctrl;
+	uint8_t m_smramctrl;
+
+	void internal_io_map(address_map &map);
 
 	DECLARE_READ8_MEMBER (dram_config_r) { return m_dram_config; }
 	DECLARE_WRITE8_MEMBER(dram_config_w) { m_dram_config = data; remap_cb(); }
@@ -51,14 +101,6 @@ public:
 	DECLARE_WRITE16_MEMBER(shadow_config_w) { COMBINE_DATA(&m_shadctrl); logerror("SiS496: %04x to shadow control\n", m_shadctrl); remap_cb(); }
 	DECLARE_READ8_MEMBER (smram_ctrl_r) { return m_smramctrl; }
 	DECLARE_WRITE8_MEMBER(smram_ctrl_w) { m_smramctrl = data; remap_cb(); }
-
-	virtual void reset_all_mappings() override;
-
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
-	DECLARE_ADDRESS_MAP(internal_io_map, 32);
 
 	// southbridge
 	DECLARE_READ8_MEMBER(at_page8_r);
@@ -106,49 +148,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(pc_dma_read_word);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_word);
-
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
-	void map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr);
-
-private:
-	required_device<cpu_device> m_maincpu;
-	required_device<pic8259_device> m_pic8259_master;
-	required_device<pic8259_device> m_pic8259_slave;
-	required_device<am9517a_device> m_dma8237_1;
-	required_device<am9517a_device> m_dma8237_2;
-	required_device<pit8254_device> m_pit8254;
-	required_device<at_keyboard_controller_device> m_keybc;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<ds12885_device> m_ds12885;
-	required_device<pc_kbdc_device> m_pc_kbdc;
-
-	uint8_t m_at_spkrdata;
-	uint8_t m_pit_out2;
-	int m_dma_channel;
-	bool m_cur_eop;
-	uint8_t m_dma_offset[2][4];
-	uint8_t m_at_pages[0x10];
-	uint16_t m_dma_high_byte;
-	uint8_t m_at_speaker;
-	bool m_refresh;
-	void pc_select_dma_channel(int channel, bool state);
-	void at_speaker_set_spkrdata(uint8_t data);
-	uint8_t m_channel_check;
-	uint8_t m_nmi_enabled;
-
-	const char *cpu_tag;
-	int ram_size;
-	cpu_device *cpu;
-	std::vector<uint32_t> ram;
-	uint32_t m_mailbox;
-	uint8_t m_bios_config, m_dram_config, m_isa_decoder;
-	uint16_t m_shadctrl;
-	uint8_t m_smramctrl;
 };
 
 DECLARE_DEVICE_TYPE(SIS85C496, sis85c496_host_device)

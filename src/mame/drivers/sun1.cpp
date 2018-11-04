@@ -76,6 +76,7 @@ public:
 	}
 
 	void sun1(machine_config &config);
+	void sun1_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -85,7 +86,7 @@ protected:
 };
 
 
-static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16, sun1_state)
+ADDRESS_MAP_START(sun1_state::sun1_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)

@@ -260,6 +260,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(bingoman);
 	void bingoman(machine_config &config);
+	void bingoman_io_map(address_map &map);
+	void bingoman_prg_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -277,11 +279,11 @@ uint32_t bingoman_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static ADDRESS_MAP_START( bingoman_prg_map, AS_PROGRAM, 16, bingoman_state )
+ADDRESS_MAP_START(bingoman_state::bingoman_prg_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bingoman_io_map, AS_IO, 8, bingoman_state )
+ADDRESS_MAP_START(bingoman_state::bingoman_io_map)
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

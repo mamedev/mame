@@ -50,6 +50,8 @@ public:
 	DECLARE_DRIVER_INIT(argo);
 
 	void argo(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -142,7 +144,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, argo_state)
+ADDRESS_MAP_START(argo_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xf7af) AM_RAM
@@ -150,7 +152,7 @@ static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, argo_state)
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(argo_videoram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, argo_state)
+ADDRESS_MAP_START(argo_state::io_map)
 	AM_RANGE(0x0000, 0xFFFF) AM_READWRITE(argo_io_r,argo_io_w)
 ADDRESS_MAP_END
 

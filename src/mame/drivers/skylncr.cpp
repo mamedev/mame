@@ -219,6 +219,12 @@ public:
 	void bdream97(machine_config &config);
 	void skylncr(machine_config &config);
 	void mbutrfly(machine_config &config);
+	void bdream97_opcode_map(address_map &map);
+	void io_map_mbutrfly(address_map &map);
+	void io_map_skylncr(address_map &map);
+	void mem_map_skylncr(address_map &map);
+	void ramdac2_map(address_map &map);
+	void ramdac_map(address_map &map);
 };
 
 
@@ -449,7 +455,7 @@ READ8_MEMBER(skylncr_state::bdream97_opcode_r)
 *             Memory Map              *
 **************************************/
 
-static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8, skylncr_state )
+ADDRESS_MAP_START(skylncr_state::mem_map_skylncr)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 
@@ -507,7 +513,7 @@ static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8, skylncr_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8, skylncr_state )
+ADDRESS_MAP_START(skylncr_state::io_map_skylncr)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
@@ -530,24 +536,24 @@ static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8, skylncr_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map_mbutrfly, AS_IO, 8, skylncr_state )
+ADDRESS_MAP_START(skylncr_state::io_map_mbutrfly)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x60) AM_WRITE(mbutrfly_prot_w)
 	AM_IMPORT_FROM(io_map_skylncr)
+	AM_RANGE(0x60, 0x60) AM_WRITE(mbutrfly_prot_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bdream97_opcode_map, AS_OPCODES, 8, skylncr_state )
+ADDRESS_MAP_START(skylncr_state::bdream97_opcode_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(bdream97_opcode_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, skylncr_state )
+ADDRESS_MAP_START(skylncr_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ramdac2_map, 0, 8, skylncr_state )
+ADDRESS_MAP_START(skylncr_state::ramdac2_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac2", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -1672,14 +1678,16 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(skylncr_state::mbutrfly, skylncr)
+MACHINE_CONFIG_START(skylncr_state::mbutrfly)
+	skylncr(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(io_map_mbutrfly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(skylncr_state::neraidou, skylncr)
+MACHINE_CONFIG_START(skylncr_state::neraidou)
+	skylncr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1687,7 +1695,8 @@ MACHINE_CONFIG_DERIVED(skylncr_state::neraidou, skylncr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(skylncr_state::sstar97, skylncr)
+MACHINE_CONFIG_START(skylncr_state::sstar97)
+	skylncr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1695,11 +1704,12 @@ MACHINE_CONFIG_DERIVED(skylncr_state::sstar97, skylncr)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(skylncr_state::bdream97, skylncr)
+MACHINE_CONFIG_START(skylncr_state::bdream97)
+	skylncr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(bdream97_opcode_map)
+	MCFG_CPU_OPCODES_MAP(bdream97_opcode_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bdream97)
 MACHINE_CONFIG_END

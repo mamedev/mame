@@ -64,6 +64,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
 
 	void uzebox(machine_config &config);
+	void uzebox_data_map(address_map &map);
+	void uzebox_io_map(address_map &map);
+	void uzebox_prg_map(address_map &map);
 private:
 	int             m_vpos;
 	uint64_t          m_line_start_cycles;
@@ -194,15 +197,15 @@ READ8_MEMBER(uzebox_state::port_d_r)
 * Address maps                                       *
 \****************************************************/
 
-static ADDRESS_MAP_START( uzebox_prg_map, AS_PROGRAM, 8, uzebox_state )
+ADDRESS_MAP_START(uzebox_state::uzebox_prg_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM // 64 KB internal eprom  ATmega644
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uzebox_data_map, AS_DATA, 8, uzebox_state )
+ADDRESS_MAP_START(uzebox_state::uzebox_data_map)
 	AM_RANGE(0x0100, 0x10ff) AM_RAM //  4KB RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uzebox_io_map, AS_IO, 8, uzebox_state )
+ADDRESS_MAP_START(uzebox_state::uzebox_io_map)
 	AM_RANGE(AVR8_REG_A, AVR8_REG_A) AM_READWRITE( port_a_r, port_a_w )
 	AM_RANGE(AVR8_REG_B, AVR8_REG_B) AM_READWRITE( port_b_r, port_b_w )
 	AM_RANGE(AVR8_REG_C, AVR8_REG_C) AM_READWRITE( port_c_r, port_c_w )

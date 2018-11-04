@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(DECOCPU2,  decocpu_type2_device,  "decocpu2",  "Data East Pin
 DEFINE_DEVICE_TYPE(DECOCPU3,  decocpu_type3_device,  "decocpu3",  "Data East Pinball CPU Board Type 3")
 DEFINE_DEVICE_TYPE(DECOCPU3B, decocpu_type3b_device, "decocpu3b", "Data East Pinball CPU Board Type 3B")
 
-static ADDRESS_MAP_START( decocpu1_map, AS_PROGRAM, 8, decocpu_type1_device )
+ADDRESS_MAP_START(decocpu_type1_device::decocpu1_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(solenoid2_w) // solenoids
@@ -33,7 +33,7 @@ static ADDRESS_MAP_START( decocpu1_map, AS_PROGRAM, 8, decocpu_type1_device )
 	//AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocpu2_map, AS_PROGRAM, 8, decocpu_type2_device )
+ADDRESS_MAP_START(decocpu_type2_device::decocpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(solenoid2_w) // solenoids

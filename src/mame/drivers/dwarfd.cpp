@@ -347,6 +347,11 @@ public:
 	void dwarfd(machine_config &config);
 	void pokeresp(machine_config &config);
 	void qc(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	void pokeresp_map(address_map &map);
+	void qc_io_map(address_map &map);
+	void qc_map(address_map &map);
 };
 
 
@@ -404,17 +409,17 @@ READ8_MEMBER(dwarfd_state::qc_b8_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, dwarfd_state )
+ADDRESS_MAP_START(dwarfd_state::mem_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pokeresp_map, AS_PROGRAM, 8, dwarfd_state )
+ADDRESS_MAP_START(dwarfd_state::pokeresp_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, dwarfd_state )
+ADDRESS_MAP_START(dwarfd_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -427,12 +432,12 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, dwarfd_state )
 	AM_RANGE(0xc1, 0xc1) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qc_map, AS_PROGRAM, 8, dwarfd_state )
+ADDRESS_MAP_START(dwarfd_state::qc_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qc_io_map, AS_IO, 8, dwarfd_state )
+ADDRESS_MAP_START(dwarfd_state::qc_io_map)
 	AM_IMPORT_FROM( io_map )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xb8, 0xb8) AM_READ(qc_b8_r)
@@ -475,7 +480,7 @@ static INPUT_PORTS_START( dwarfd )
 	PORT_DIPNAME( 0x02, 0x00, "Dwarf's Den Gfx" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Large Character Gfx" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x04, 0x04, "Large Character Gfx" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "Full Card Gfx" ) PORT_DIPLOCATION("SW1:8")
@@ -504,6 +509,14 @@ static INPUT_PORTS_START( dwarfd )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_DEAL ) //PORT_NAME("Replace") PORT_CODE(KEYCODE_F) //rp replace (draw)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) //tk take (stand)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_CANCEL ) PORT_NAME("Unzap") //uz unzap (cancel)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dwarfda )
+	PORT_INCLUDE( dwarfd )
+	PORT_MODIFY ("DSW2" )
+	PORT_DIPNAME( 0x04, 0x00, "Large Character Gfx" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( quarterh )
@@ -607,7 +620,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 {
 	int i;
-	int bank = ((gpa & 2) ? 0 : 4) + (gpa & 1) + ((m_dsw2->read() & 4) >> 1);
+	int bank = ((gpa & 2) ? 0 : 4) + (gpa & 1) + (m_dsw2->read() & 2);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
 	if(!x)
@@ -744,7 +757,8 @@ MACHINE_CONFIG_START(dwarfd_state::dwarfd)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dwarfd_state::pokeresp, dwarfd)
+MACHINE_CONFIG_START(dwarfd_state::pokeresp)
+	dwarfd(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pokeresp_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -753,7 +767,8 @@ MACHINE_CONFIG_DERIVED(dwarfd_state::pokeresp, dwarfd)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, pesp_display_pixels)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dwarfd_state::qc, dwarfd)
+MACHINE_CONFIG_START(dwarfd_state::qc)
+	dwarfd(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(qc_map)
@@ -978,7 +993,7 @@ DRIVER_INIT_MEMBER(dwarfd_state,qc)
 //    YEAR  NAME      PARENT     MACHINE   INPUT     STATE         INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS
 GAME( 1979, pokeresp, 0,         pokeresp, dwarfd,   dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Poker (Electro-Sport)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, dwarfd,   0,         dwarfd,   dwarfd,   dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dwarfda,   dwarfd,   dwarfd,   dwarfd,   dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dwarfda,   dwarfd,   dwarfd,   dwarfda,  dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, quarterh, 0,         dwarfd,   quarterh, dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1983, quarterha, quarterh, dwarfd,   quarterh, dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1983, quarterhb, quarterh, dwarfd,   quarterh, dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

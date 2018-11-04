@@ -119,14 +119,14 @@ WRITE_LINE_MEMBER( phc25_state::write_centronics_busy )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( phc25_mem, AS_PROGRAM, 8, phc25_state )
+ADDRESS_MAP_START(phc25_state::phc25_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x6000, 0x77ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phc25_io, AS_IO, 8, phc25_state )
+ADDRESS_MAP_START(phc25_state::phc25_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("cent_data_out", output_latch_device, write)
@@ -340,7 +340,8 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(phc25_state::pal, phc25)
+MACHINE_CONFIG_START(phc25_state::pal)
+	phc25(config);
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
@@ -352,7 +353,8 @@ MACHINE_CONFIG_DERIVED(phc25_state::pal, phc25)
 	// other lines not connected
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(phc25_state::ntsc, phc25)
+MACHINE_CONFIG_START(phc25_state::ntsc)
+	phc25(config);
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
 

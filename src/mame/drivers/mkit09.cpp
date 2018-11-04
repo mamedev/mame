@@ -59,6 +59,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 	void mkit09a(machine_config &config);
 	void mkit09(machine_config &config);
+	void mkit09_io(address_map &map);
+	void mkit09_mem(address_map &map);
+	void mkit09a_mem(address_map &map);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
@@ -68,14 +71,14 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mkit09_mem, AS_PROGRAM, 8, mkit09_state)
+ADDRESS_MAP_START(mkit09_state::mkit09_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa004,0xa007) AM_MIRROR(0x1ff8) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xe000,0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mkit09a_mem, AS_PROGRAM, 8, mkit09_state)
+ADDRESS_MAP_START(mkit09_state::mkit09a_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x07ff) AM_RAM
 	AM_RANGE(0xe600,0xe603) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -83,7 +86,7 @@ static ADDRESS_MAP_START(mkit09a_mem, AS_PROGRAM, 8, mkit09_state)
 	AM_RANGE(0xf000,0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mkit09_io, AS_IO, 8, mkit09_state)
+ADDRESS_MAP_START(mkit09_state::mkit09_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

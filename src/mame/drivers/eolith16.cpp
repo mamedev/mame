@@ -41,6 +41,7 @@ public:
 
 	uint32_t screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void eolith16(machine_config &config);
+	void eolith16_map(address_map &map);
 };
 
 
@@ -73,7 +74,7 @@ READ16_MEMBER(eolith16_state::vram_r)
 	return m_vram[offset + (0x10000/2) * m_vbuffer];
 }
 
-static ADDRESS_MAP_START( eolith16_map, AS_PROGRAM, 16, eolith16_state )
+ADDRESS_MAP_START(eolith16_state::eolith16_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x50000000, 0x5000ffff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0x90000000, 0x9000002f) AM_WRITENOP //?

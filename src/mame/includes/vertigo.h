@@ -131,4 +131,7 @@ public:
 	void vertigo_vproc(int cycles, int irq4);
 	void update_irq_encoder(int line, int state);
 	void vertigo(machine_config &config);
+	void vertigo_map(address_map &map);
+	void vertigo_motor(address_map &map);
+	void exidy440_audio_map(address_map &map);
 };

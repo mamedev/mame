@@ -67,6 +67,13 @@ public:
 	DECLARE_WRITE8_MEMBER(ics_attn_w);
 	IRQ_CALLBACK_MEMBER(inta);
 	void altos8600(machine_config &config);
+	void code_mem(address_map &map);
+	void cpu_io(address_map &map);
+	void cpu_mem(address_map &map);
+	void dmac_io(address_map &map);
+	void dmac_mem(address_map &map);
+	void extra_mem(address_map &map);
+	void stack_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -626,31 +633,32 @@ IRQ_CALLBACK_MEMBER(altos8600_state::inta)
 	return m_pic1->acknowledge();
 }
 
-static ADDRESS_MAP_START(cpu_mem, AS_PROGRAM, 16, altos8600_state)
+ADDRESS_MAP_START(altos8600_state::cpu_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(cpuram_r, cpuram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(stack_mem, i8086_cpu_device::AS_STACK, 16, altos8600_state)
+ADDRESS_MAP_START(altos8600_state::stack_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(stkram_r, stkram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(code_mem, i8086_cpu_device::AS_CODE, 16, altos8600_state)
+ADDRESS_MAP_START(altos8600_state::code_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(coderam_r, coderam_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(extra_mem, i8086_cpu_device::AS_EXTRA, 16, altos8600_state)
+ADDRESS_MAP_START(altos8600_state::extra_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(xtraram_r, xtraram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cpu_io, AS_IO, 16, altos8600_state)
+ADDRESS_MAP_START(altos8600_state::cpu_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(cpuio_r, cpuio_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dmac_mem, AS_PROGRAM, 16, altos8600_state)
+ADDRESS_MAP_START(altos8600_state::dmac_mem)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(dmacram_r, dmacram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dmac_io, AS_IO, 16, altos8600_state)
+ADDRESS_MAP_START(altos8600_state::dmac_io)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmi_r, nmi_w)
 	AM_RANGE(0x0000, 0x0007) AM_READ(fault_r)
 	AM_RANGE(0x0008, 0x000f) AM_WRITE(clear_w)
 	AM_RANGE(0x0010, 0x0017) AM_READ(errlo_r)
@@ -671,7 +679,6 @@ static ADDRESS_MAP_START(dmac_io, AS_IO, 16, altos8600_state)
 	AM_RANGE(0x0078, 0x0079) AM_WRITE8(ics_attn_w, 0xffff)
 	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(mmuflags_r, mmuflags_w)
 	AM_RANGE(0x0400, 0x05ff) AM_READWRITE(mmuaddr_r, mmuaddr_w)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmi_r, nmi_w)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START(altos8600_floppies)
@@ -682,7 +689,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_CPU_ADD("maincpu", I8086, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(code_mem)
+	MCFG_CPU_OPCODES_MAP(code_mem)
 	MCFG_I8086_STACK_MAP(stack_mem)
 	MCFG_I8086_CODE_MAP(code_mem)
 	MCFG_I8086_EXTRA_MAP(extra_mem)

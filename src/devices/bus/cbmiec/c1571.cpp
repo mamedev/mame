@@ -144,7 +144,7 @@ const tiny_rom_entry *mini_chief_device::device_rom_region() const
 //  ADDRESS_MAP( c1571_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c1571_mem, AS_PROGRAM, 8, c1571_device )
+ADDRESS_MAP_START(c1571_device::c1571_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_READWRITE(via1_r, via1_w)
@@ -158,7 +158,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( mini_chief_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mini_chief_mem, AS_PROGRAM, 8, mini_chief_device )
+ADDRESS_MAP_START(mini_chief_device::mini_chief_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_READWRITE(via1_r, via1_w)

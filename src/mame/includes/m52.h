@@ -50,4 +50,7 @@ public:
 	required_device<palette_device> m_palette;
 	void m52(machine_config &config);
 	void alpha1v(machine_config &config);
+	void alpha1v_map(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
 };

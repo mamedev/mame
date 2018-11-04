@@ -222,7 +222,7 @@ const int STATUS_LIGHT_PEN_UPDATE       = 0x20;
 //**************************************************************************
 
 // default address map
-static ADDRESS_MAP_START( crt9007, 0, 8, crt9007_device )
+ADDRESS_MAP_START(crt9007_device::crt9007)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -453,7 +453,7 @@ crt9007_device::crt9007_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, CRT9007, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(crt9007)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(crt9007_device::crt9007), this)),
 	m_write_int(*this),
 	m_write_dmar(*this),
 	m_write_hs(*this),

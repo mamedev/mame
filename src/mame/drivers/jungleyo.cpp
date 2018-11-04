@@ -60,6 +60,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void jungleyo(machine_config &config);
+	void jungleyo_map(address_map &map);
 };
 
 void jungleyo_state::video_start()
@@ -72,7 +73,7 @@ uint32_t jungleyo_state::screen_update_jungleyo(screen_device &screen, bitmap_in
 }
 
 
-static ADDRESS_MAP_START( jungleyo_map, AS_PROGRAM, 16, jungleyo_state )
+ADDRESS_MAP_START(jungleyo_state::jungleyo_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -463,6 +463,7 @@ public:
 	required_device<ppc_device> m_maincpu;
 	void triforcegd(machine_config &config);
 	void triforce_base(machine_config &config);
+	void gc_map(address_map &map);
 };
 
 READ64_MEMBER(triforce_state::gc_pi_r)
@@ -483,7 +484,7 @@ WRITE64_MEMBER(triforce_state::gc_exi_w)
 {
 }
 
-static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 64, triforce_state )
+ADDRESS_MAP_START(triforce_state::gc_map)
 	AM_RANGE(0x00000000, 0x017fffff) AM_RAM
 	AM_RANGE(0x0c003000, 0x0c003fff) AM_READWRITE(gc_pi_r, gc_pi_w)
 	AM_RANGE(0x0c006800, 0x0c0068ff) AM_READWRITE(gc_exi_r, gc_exi_w)
@@ -586,7 +587,8 @@ MACHINE_CONFIG_START(triforce_state::triforce_base)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(triforce_state::triforcegd, triforce_base)
+MACHINE_CONFIG_START(triforce_state::triforcegd)
+	triforce_base(config);
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", nullptr, NOOP)
 MACHINE_CONFIG_END
 

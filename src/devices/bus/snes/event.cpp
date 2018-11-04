@@ -201,7 +201,7 @@ READ16_MEMBER( sns_pfest94_device::necdsp_data_r )
 //  ADDRESS_MAP( dsp_prg_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( dsp_prg_map_lorom, AS_PROGRAM, 32, sns_pfest94_device )
+ADDRESS_MAP_START(sns_pfest94_device::dsp_prg_map_lorom)
 	AM_RANGE(0x0000, 0x07ff) AM_READ(necdsp_prg_r)
 ADDRESS_MAP_END
 
@@ -210,7 +210,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( dsp_data_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( dsp_data_map_lorom, AS_DATA, 16, sns_pfest94_device )
+ADDRESS_MAP_START(sns_pfest94_device::dsp_data_map_lorom)
 	AM_RANGE(0x0000, 0x03ff) AM_READ(necdsp_data_r)
 ADDRESS_MAP_END
 

@@ -122,7 +122,7 @@ MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 	}
 }
 
-static ADDRESS_MAP_START( decodmd3_map, AS_PROGRAM, 16, decodmd_type3_device )
+ADDRESS_MAP_START(decodmd_type3_device::decodmd3_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROMBANK("dmdrom")
 	AM_RANGE(0x00800000, 0x0080ffff) AM_RAMBANK("dmdram")
 	AM_RANGE(0x00c00010, 0x00c00011) AM_READWRITE(crtc_status_r,crtc_address_w)

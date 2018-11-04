@@ -124,6 +124,7 @@ class m50740_device : public m5074x_device
 public:
 	m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void m50740_map(address_map &map);
 protected:
 	m50740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
@@ -133,6 +134,7 @@ class m50741_device : public m5074x_device
 public:
 	m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void m50741_map(address_map &map);
 protected:
 	m50741_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };

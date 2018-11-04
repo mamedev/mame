@@ -127,7 +127,7 @@ WRITE16_MEMBER(cyberbal_state::p2_reset_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cyberbal_state )
+ADDRESS_MAP_START(cyberbal_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xfc8000, 0xfcffff) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff00)
@@ -160,7 +160,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, cyberbal_state )
+ADDRESS_MAP_START(cyberbal_state::extra_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfdffff) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ_PORT("IN0")
@@ -187,7 +187,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cyberbal_state )
+ADDRESS_MAP_START(cyberbal_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2801) AM_WRITE(sound_68k_6502_w)
@@ -210,7 +210,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_68k_map, AS_PROGRAM, 16, cyberbal_state )
+ADDRESS_MAP_START(cyberbal_state::sound_68k_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xff87ff) AM_READ(sound_68k_r)
 	AM_RANGE(0xff8800, 0xff8fff) AM_WRITE(sound_68k_w)
@@ -227,7 +227,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cyberbal2p_map, AS_PROGRAM, 16, cyberbal_state )
+ADDRESS_MAP_START(cyberbal_state::cyberbal2p_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc0003) AM_READ_PORT("IN0")
 	AM_RANGE(0xfc2000, 0xfc2003) AM_READ_PORT("IN1")
@@ -476,7 +476,8 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cyberbal_state::cyberbalt, cyberbal)
+MACHINE_CONFIG_START(cyberbal_state::cyberbalt)
+	cyberbal(config);
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)

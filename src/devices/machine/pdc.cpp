@@ -137,7 +137,7 @@ const tiny_rom_entry *pdc_device::device_rom_region() const
 //  ADDRESS_MAP( pdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( pdc_mem, AS_PROGRAM, 8, pdc_device )
+ADDRESS_MAP_START(pdc_device::pdc_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("rom", 0)
 	AM_RANGE(0x8000, 0x9FFF) AM_RAM AM_SHARE("pdc_ram") // HM6264ALP-12 SRAM 8KB
 	AM_RANGE(0xC000, 0xC7FF) AM_RAM // HM6116P-2 SRAM 2KB
@@ -147,7 +147,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( pdc_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
+ADDRESS_MAP_START(pdc_device::pdc_io)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(p0_7_r,p0_7_w) AM_MIRROR(0xFF00)
 	AM_RANGE(0x21, 0x2F) AM_READWRITE(fdd_68k_r,fdd_68k_w) AM_MIRROR(0xFF00)
 	AM_RANGE(0x38, 0x38) AM_READ(p38_r) AM_MIRROR(0xFF00) // Possibly UPD765 interrupt

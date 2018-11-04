@@ -243,6 +243,13 @@ public:
 	void sms1_br(machine_config &config);
 	void sms2_ntsc(machine_config &config);
 	void sms1_kr(machine_config &config);
+	void gg_io(address_map &map);
+	void sg1000m3_io(address_map &map);
+	void sms1_mem(address_map &map);
+	void sms_io(address_map &map);
+	void sms_mem(address_map &map);
+	void smsj_io(address_map &map);
+	void smskr_io(address_map &map);
 protected:
 	uint8_t read_bus(address_space &space, unsigned int bank, uint16_t base_addr, uint16_t offset);
 	void setup_bios();
@@ -272,6 +279,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 	void sms_sdisp(machine_config &config);
+	void sms_store_mem(address_map &map);
 };
 
 

@@ -55,13 +55,13 @@ DEFINE_DEVICE_TYPE(TMS32053, tms32053_device, "tms32053", "TMS32053")
  * TMS32051 Internal memory map
  **************************************************************************/
 
-static ADDRESS_MAP_START( tms32051_internal_pgm, AS_PROGRAM, 16, tms32051_device )
+ADDRESS_MAP_START(tms32051_device::tms32051_internal_pgm)
 //  AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms32051_internal_data, AS_DATA, 16, tms32051_device )
+ADDRESS_MAP_START(tms32051_device::tms32051_internal_data)
 	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
 	AM_RANGE(0x0060, 0x007f) AM_RAM                         // DARAM B2
 	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is unconnected if CNF = 1
@@ -79,7 +79,7 @@ tms32051_device::tms32051_device(const machine_config &mconfig, device_type type
 }
 
 tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32051_device(mconfig, TMS32051, tag, owner, clock, ADDRESS_MAP_NAME(tms32051_internal_pgm), ADDRESS_MAP_NAME(tms32051_internal_data))
+	: tms32051_device(mconfig, TMS32051, tag, owner, clock, address_map_constructor(FUNC(tms32051_device::tms32051_internal_pgm), this), address_map_constructor(FUNC(tms32051_device::tms32051_internal_data), this))
 {
 }
 
@@ -97,13 +97,13 @@ device_memory_interface::space_config_vector tms32051_device::memory_space_confi
  * TMS32053 Internal memory map
  **************************************************************************/
 
-static ADDRESS_MAP_START( tms32053_internal_pgm, AS_PROGRAM, 16, tms32053_device )
+ADDRESS_MAP_START(tms32053_device::tms32053_internal_pgm)
 //  AM_RANGE(0x0000, 0x3fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
 	AM_RANGE(0x4000, 0x4bff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms32053_internal_data, AS_DATA, 16, tms32053_device )
+ADDRESS_MAP_START(tms32053_device::tms32053_internal_data)
 	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
 	AM_RANGE(0x0060, 0x007f) AM_RAM                         // DARAM B2
 	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is unconnected if CNF = 1
@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 
 
 tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32051_device(mconfig, TMS32053, tag, owner, clock, ADDRESS_MAP_NAME(tms32053_internal_pgm), ADDRESS_MAP_NAME(tms32053_internal_data))
+	: tms32051_device(mconfig, TMS32053, tag, owner, clock, address_map_constructor(FUNC(tms32053_device::tms32053_internal_pgm), this), address_map_constructor(FUNC(tms32053_device::tms32053_internal_data), this))
 {
 }
 

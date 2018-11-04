@@ -79,4 +79,6 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void toucheme(machine_config &config);
 	void ladyfrog(machine_config &config);
+	void ladyfrog_map(address_map &map);
+	void ladyfrog_sound_map(address_map &map);
 };

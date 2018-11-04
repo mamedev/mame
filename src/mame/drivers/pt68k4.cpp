@@ -126,6 +126,8 @@ public:
 
 	void pt68k2(machine_config &config);
 	void pt68k4(machine_config &config);
+	void pt68k2_mem(address_map &map);
+	void pt68k4_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -248,7 +250,7 @@ WRITE8_MEMBER(pt68k4_state::fdc_select_w)
 	}
 }
 
-static ADDRESS_MAP_START(pt68k2_mem, AS_PROGRAM, 16, pt68k4_state)
+ADDRESS_MAP_START(pt68k4_state::pt68k2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("rambase") // 1MB RAM
 	AM_RANGE(0xf80000, 0xf8ffff) AM_ROM AM_REGION("roms", 0)
@@ -264,7 +266,7 @@ static ADDRESS_MAP_START(pt68k2_mem, AS_PROGRAM, 16, pt68k4_state)
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pt68k4_mem, AS_PROGRAM, 16, pt68k4_state)
+ADDRESS_MAP_START(pt68k4_state::pt68k4_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("rambase") // 1MB RAM (OS9 needs more)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_ROM AM_REGION("roms", 0)

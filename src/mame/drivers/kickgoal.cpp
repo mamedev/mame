@@ -473,7 +473,7 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_eeprom_w)
 
 /* Memory Maps *****************************************************************/
 
-static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16, kickgoal_state )
+ADDRESS_MAP_START(kickgoal_state::kickgoal_program_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 /// AM_RANGE(0x30001e, 0x30001f) AM_WRITE(kickgoal_snd_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
@@ -626,7 +626,7 @@ void kickgoal_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8, kickgoal_state )
+ADDRESS_MAP_START(kickgoal_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

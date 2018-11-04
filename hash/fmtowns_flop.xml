@@ -22,7 +22,6 @@ ADPCM Kaihatsu Shien Library V2.1                             Fujitsu           
 AgentNet V1.0 (V1.1)                                          CSK Research Institute (CRI)      1990/12    FD
 Ai Shimai                                                     Silky's                           1994/9     FD×04
 ASM-386 Tool Kit V2.2                                         Fujitsu                           1995/3     FD
-Cameltry                                                      Dempa Shinbunsha                  1994/11    FD
 Cannon Sight                                                  Nikkonren Kikaku                  1993/?     FD×02
 CB Trainer Jikkou System V1.1                                 Fujitsu                           1993/5     FD
 CD Graphics Player V1.1                                       Fujitsu                           1990/5     FD
@@ -55,7 +54,6 @@ Dennou Sakka DX (Cyber Writer Deluxe)                         Nikkonren Kikaku  
 Dennou Seito (Cyber Pupil)                                    Nikkonren Kikaku                  1993/?     FD
 Dor                                                           D.O.                              1992/5     FD×04
 Dor Part 3                                                    D.O.                              1992/11    FD×04
-Dragon Slayer                                                 Nihon Falcom                      1990/6     FD×03
 Dragon Slayer: Eiyuu Densetsu 2                               Brother Kougyou (Takeru)          1993/2     FD×05
 D-Return                                                      Nikkonren Kikaku                  1990/11    FD×02
 Elle                                                          Elf                               1991/11    FD×05
@@ -458,7 +456,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 
 <!-- GAME DISCS -->
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
+	<!-- Controller input issues -->
 	<software name="abunaten" supported="no">
 		<description>Abunai Tengu Densetsu</description>
 		<year>1990</year>
@@ -510,15 +508,15 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Hangs after the intro -->
+	<!-- Recreated protection on disk 1 by hand -->
 	<software name="brandish" supported="no">
 		<description>Brandish</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="199112xx" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="brandish (disk 1).hdm" size="1261568" crc="d41db5b4" sha1="c64aa555bd2beb0b32458cab8d38803acaf982dd" offset="0" />
+			<dataarea name="flop" size="1283840">
+				<rom name="brandish (disk 1).d88" size="1283840" crc="1e8181ed" sha1="237d354338d44e199a2f89f15157bafb5c1b31fa" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -533,20 +531,33 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Triggers copy protection -->
-	<software name="columns" supported="no">
+	<software name="cameltry">
+		<description>Cameltry</description>
+		<year>1994</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="release" value="199411xx" />
+		<info name="alt_title" value="キャメルトライ" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3599768">
+				<rom name="cameltry.mfm" size="3599768" crc="cc2a33a3" sha1="7cdcc7cc20f3ceeaad14e4b56c285c8d2657f95a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Recreated protection by hand -->
+	<software name="columns">
 		<description>Columns</description>
 		<year>1990</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="release" value="199012xx" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="columns.hdm" size="1261568" crc="4ad9c624" sha1="8fc4fc56767c94864e8aceb2ae77a23cf5781e74" offset="0" />
+			<dataarea name="flop" size="1282512">
+				<rom name="columns.d88" size="1282512" crc="ee75f23b" sha1="a6f5593b2ad2b763455784d403fa50ec4f8f64c5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
+	<!-- Controller input issues -->
 	<software name="dps" supported="no">
 		<description>D.P.S - Dream Program System</description>
 		<year>1990</year>
@@ -564,8 +575,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
-	<software name="dpssg" supported="no">
+	<!-- Runs too fast -->
+	<software name="dpssg" supported="partial">
 		<description>D.P.S SG - Dream Program System SG</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -596,8 +607,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
-	<software name="dpssg2" supported="no">
+	<!-- Runs too fast -->
+	<software name="dpssg2" supported="partial">
 		<description>D.P.S SG 2 - Dream Program System SG Set 2</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -628,8 +639,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
-	<software name="dpssg3" supported="no">
+	<!-- Runs too fast -->
+	<software name="dpssg3" supported="partial">
 		<description>D.P.S SG 3 - Dream Program System SG Set 3</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -660,30 +671,64 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Reboots the machine - copy protection? -->
-	<software name="dinosaur" supported="no">
+	<software name="dinosaur">
 		<description>Dinosaur</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1261568">
 				<rom name="dinosaur (disk 1 - program).hdm" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 1" />
 			<dataarea name="flop" size="1261568">
 				<rom name="dinosaur (disk 2 - scenario 1).hdm" size="1261568" crc="e230629d" sha1="a2d0f382a49bb8b9c71d0cd23c7ec9f7b13f823b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 2" />
 			<dataarea name="flop" size="1261568">
 				<rom name="dinosaur (disk 3 - scenario 2).hdm" size="1261568" crc="6a449cdc" sha1="792c40cd43ab723b4832995e55ef1367a6e462ae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
-	<software name="drstop" supported="no">
+	<!-- 
+	The program disk backup option (needed in order to actually be able to save the game) seems to require a destination disk with 78 writable tracks,
+	instead of the usual 77. Creating an empty MFI image and using it as the target works, and the saves persist between MAME sessions.
+	
+	The game is playable, but some locations (e.g. the caves after the starting area) should probably have a smaller visible area.
+	Something wrong with the layer drawing code, perhaps?
+	-->
+	<software name="dsloh" supported="partial">
+		<description>Dragon Slayer - The Legend of Heroes</description>
+		<year>1990</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="release" value="199006xx" />
+		<info name="alt_title" value="ドラゴンスレイヤー 英雄伝説" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Event Disk" />
+			<dataarea name="flop" size="3577270">
+				<rom name="loh_eventdisk.mfm" size="3577270" crc="3b377ff0" sha1="c1f79ecebc72ed4d477347561b6425168964c952" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size="3576115">
+				<rom name="loh_programdisk.mfm" size="3576115" crc="558d1a77" sha1="cc4a851c777ca72cb6ae9205a0716a76c1d4f243" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk" />
+			<dataarea name="flop" size="3576598">
+				<rom name="loh_scenariodisk.mfm" size="3576598" crc="f47f814f" sha1="9b350ab36a8fe7255cdebb2e03ac25fb7f62e6a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drstop">
 		<description>Dr. Stop!</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -1040,7 +1085,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="image" supported="no">
+	<software name="image">
 		<description>Image</description>
 		<year>1992</year>
 		<publisher>Software House Parsley</publisher>
@@ -1057,8 +1102,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="irium" supported="no">
+	<software name="irium">
 		<description>Irium</description>
 		<year>1993</year>
 		<publisher>オレンジハウス (Orange House)</publisher>
@@ -1214,8 +1258,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
-	<software name="premium2" supported="no">
+	<software name="premium2">
 		<description>Premium 2</description>
 		<year>1993</year>
 		<publisher>シルキーズ (Silky's)</publisher>
@@ -1242,7 +1285,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
+	<!-- Controller input issues -->
 	<software name="rance" supported="no">
 		<description>Rance - Hikari o Motomete</description>
 		<year>1990</year>
@@ -1270,8 +1313,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
-	<software name="rance2" supported="no">
+	<!-- Controller input issues; can be played with the numpad -->
+	<software name="rance2" supported="partial">
 		<description>Rance 2 - Hangyaku no Shoujotachi</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -1510,8 +1553,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
-	<software name="toshinto" supported="no">
+	<!-- Runs too fast -->
+	<software name="toshinto" supported="partial">
 		<description>Toushin Toshi</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -1552,8 +1595,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Doesn't boot; probably related to floppy motor control -->
-	<software name="toshintoa" cloneof="toshinto" supported="no">
+	<!-- Runs too fast -->
+	<software name="toshintoa" cloneof="toshinto" supported="partial">
 		<description>Toushin Toshi (Alt Disk 2)</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -2213,8 +2256,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Hangs on boot -->
-	<software name="vzedit" supported="no">
+	<software name="vzedit">
 		<description>VZ Editor 1.6 with ATOK 7</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>

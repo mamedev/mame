@@ -149,6 +149,8 @@ public:
 	DECLARE_WRITE16_MEMBER(vctl_w);
 
 	void invqix(machine_config &config);
+	void invqix_io_map(address_map &map);
+	void invqix_prg_map(address_map &map);
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -275,7 +277,7 @@ WRITE16_MEMBER(invqix_state::vctl_w)
 	m_vctl = data;
 }
 
-static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 16, invqix_state)
+ADDRESS_MAP_START(invqix_state::invqix_prg_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write_tmp_register, 0x00ff)
@@ -285,7 +287,7 @@ static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 16, invqix_state)
 	AM_RANGE(0x620004, 0x620005) AM_WRITE(vctl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(invqix_io_map, AS_IO, 16, invqix_state)
+ADDRESS_MAP_START(invqix_state::invqix_io_map)
 	AM_RANGE(h8_device::PORT_1, h8_device::PORT_1) AM_READ_PORT("P1")
 	AM_RANGE(h8_device::PORT_2, h8_device::PORT_2) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READWRITE(port3_r, port3_w)

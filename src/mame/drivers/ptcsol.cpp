@@ -164,8 +164,6 @@ public:
 		, m_iop_s2(*this, "S2")
 		, m_iop_s3(*this, "S3")
 		, m_iop_s4(*this, "S4")
-		, m_cassette1(*this, "cassette")
-		, m_cassette2(*this, "cassette2")
 	{ }
 
 	DECLARE_READ8_MEMBER( sol20_f8_r );
@@ -187,6 +185,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void sol20(machine_config &config);
+	void sol20_io(address_map &map);
+	void sol20_mem(address_map &map);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_sol20_fa;
@@ -211,8 +211,6 @@ private:
 	required_ioport m_iop_s2;
 	required_ioport m_iop_s3;
 	required_ioport m_iop_s4;
-	required_device<cassette_image_device> m_cassette1;
-	required_device<cassette_image_device> m_cassette2;
 };
 
 
@@ -222,9 +220,9 @@ private:
 cassette_image_device *sol20_state::cassette_device_image()
 {
 	if (m_sol20_fa & 0x40)
-		return m_cassette2;
+		return m_cass2;
 	else
-		return m_cassette1;
+		return m_cass1;
 }
 
 
@@ -450,7 +448,7 @@ WRITE8_MEMBER( sol20_state::sol20_fe_w )
 	m_sol20_fe = data;
 }
 
-static ADDRESS_MAP_START( sol20_mem, AS_PROGRAM, 8, sol20_state)
+ADDRESS_MAP_START(sol20_state::sol20_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xbfff) AM_RAM // optional s100 ram
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -459,7 +457,7 @@ static ADDRESS_MAP_START( sol20_mem, AS_PROGRAM, 8, sol20_state)
 	AM_RANGE(0xd000, 0xffff) AM_RAM // optional s100 ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sol20_io, AS_IO, 8, sol20_state)
+ADDRESS_MAP_START(sol20_state::sol20_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(sol20_f8_r,sol20_f8_w)

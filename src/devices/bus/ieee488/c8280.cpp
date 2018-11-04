@@ -73,7 +73,7 @@ const tiny_rom_entry *c8280_device::device_rom_region() const
 //  ADDRESS_MAP( c8280_main_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c8280_main_mem, AS_PROGRAM, 8, c8280_device )
+ADDRESS_MAP_START(c8280_device::c8280_main_mem)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x100) AM_DEVICE(M6532_0_TAG, mos6532_new_device, ram_map)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x100) AM_DEVICE(M6532_1_TAG, mos6532_new_device, ram_map)
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0xd60) AM_DEVICE(M6532_0_TAG, mos6532_new_device, io_map)
@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c8280_fdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c8280_fdc_mem, AS_PROGRAM, 8, c8280_device )
+ADDRESS_MAP_START(c8280_device::c8280_fdc_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x37c) AM_DEVREADWRITE(WD1797_TAG, fd1797_device, read, write)

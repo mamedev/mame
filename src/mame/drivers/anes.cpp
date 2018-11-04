@@ -42,6 +42,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void anes(machine_config &config);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -74,12 +76,12 @@ WRITE8_MEMBER(anes_state::blit_trigger_w)
 	//printf("%02x%02x%02x\n",m_vram_offset[0],m_vram_offset[1],m_vram_offset[2]);
 }
 
-static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, anes_state )
+ADDRESS_MAP_START(anes_state::prg_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, anes_state )
+ADDRESS_MAP_START(anes_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 

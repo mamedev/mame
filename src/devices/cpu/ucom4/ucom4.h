@@ -139,6 +139,12 @@ protected:
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
+	// memorymaps
+	void program_1k(address_map &map);
+	void program_2k(address_map &map);
+	void data_64x4(address_map &map);
+	void data_96x4(address_map &map);
+
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space *m_program;

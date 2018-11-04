@@ -54,4 +54,7 @@ public:
 	void atetrisb2(machine_config &config);
 	void atetrisb3(machine_config &config);
 	void atetris(machine_config &config);
+	void atetrisb2_map(address_map &map);
+	void atetrisb3_map(address_map &map);
+	void main_map(address_map &map);
 };

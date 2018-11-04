@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef BEBOX_H_
-#define BEBOX_H_
+#ifndef MAME_INCLUDES_BEBOX_H
+#define MAME_INCLUDES_BEBOX_H
 
 #include "machine/53c810.h"
 #include "machine/am9517a.h"
@@ -123,6 +123,8 @@ public:
 	static void mpc105_config(device_t *device);
 	void bebox(machine_config &config);
 	void bebox2(machine_config &config);
+	void bebox_mem(address_map &map);
+	void bebox_slave_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -133,4 +135,4 @@ protected:
 uint32_t scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, uint32_t mem_mask);
 void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, uint32_t data, uint32_t mem_mask);
 
-#endif /* BEBOX_H_ */
+#endif // MAME_INCLUDES_BEBOX_H

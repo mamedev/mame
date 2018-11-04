@@ -80,6 +80,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 	void by17(machine_config &config);
+	void by17_map(address_map &map);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -112,7 +113,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( by17_map, AS_PROGRAM, 8, by17_state )
+ADDRESS_MAP_START(by17_state::by17_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
@@ -988,7 +989,7 @@ MACHINE_CONFIG_START(by17_state::by17)
 	MCFG_DEFAULT_LAYOUT(layout_by17)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)

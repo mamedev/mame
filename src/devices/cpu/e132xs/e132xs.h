@@ -138,6 +138,12 @@ public:
 	void compute_tr();
 	void adjust_timer_interrupt();
 
+	void e116_16k_iram_map(address_map &map);
+	void e116_4k_iram_map(address_map &map);
+	void e116_8k_iram_map(address_map &map);
+	void e132_16k_iram_map(address_map &map);
+	void e132_4k_iram_map(address_map &map);
+	void e132_8k_iram_map(address_map &map);
 protected:
 	struct internal_hyperstone_state
 	{

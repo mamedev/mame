@@ -128,6 +128,7 @@ public:
 	}
 
 	void bfm_swp(machine_config &config);
+	void bfm_swp_map(address_map &map);
 protected:
 
 	// devices
@@ -181,9 +182,9 @@ WRITE32_MEMBER(bfm_swp_state::bfm_swp_mem_w)
 
 
 
-static ADDRESS_MAP_START( bfm_swp_map, AS_PROGRAM, 32, bfm_swp_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
+ADDRESS_MAP_START(bfm_swp_state::bfm_swp_map)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(bfm_swp_mem_r, bfm_swp_mem_w)
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 ADDRESS_MAP_END
 
 

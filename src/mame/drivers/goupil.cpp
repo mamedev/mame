@@ -87,6 +87,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(goupil_scanline);
 
 	void goupil_g1(machine_config &config);
+	void goupil_io(address_map &map);
+	void goupil_mem(address_map &map);
 private:
 	required_device<acia6850_device> m_acia;
 	optional_device<ef9364_device> m_ef9364;
@@ -119,6 +121,8 @@ public:
 	DECLARE_WRITE8_MEMBER(visu24x80_ram_w);
 
 	void goupil_g2(machine_config &config);
+	void goupil_g2_io(address_map &map);
+	void goupil_g2_mem(address_map &map);
 protected:
 
 	required_device<palette_device> m_palette;
@@ -140,7 +144,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( goupil_g1_state::goupil_scanline )
 	m_ef9364->update_scanline((uint16_t)param);
 }
 
-static ADDRESS_MAP_START(goupil_mem, AS_PROGRAM, 8, goupil_g1_state)
+ADDRESS_MAP_START(goupil_g1_state::goupil_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x3FFF) AM_RAM
 	AM_RANGE(0x4000,0x7FFF) AM_RAM
@@ -167,11 +171,11 @@ static ADDRESS_MAP_START(goupil_mem, AS_PROGRAM, 8, goupil_g1_state)
 	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 1 + MON 2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( goupil_io, AS_IO, 8, goupil_g1_state)
+ADDRESS_MAP_START(goupil_g1_state::goupil_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(goupil_g2_mem, AS_PROGRAM, 8, goupil_g2_state)
+ADDRESS_MAP_START(goupil_g2_state::goupil_g2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x3FFF) AM_RAM
 	AM_RANGE(0x4000,0x7FFF) AM_RAM
@@ -201,7 +205,7 @@ static ADDRESS_MAP_START(goupil_g2_mem, AS_PROGRAM, 8, goupil_g2_state)
 	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( goupil_g2_io, AS_IO, 8, goupil_g2_state)
+ADDRESS_MAP_START(goupil_g2_state::goupil_g2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

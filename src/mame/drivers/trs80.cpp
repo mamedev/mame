@@ -145,20 +145,20 @@ There don't seem to be any JV1 boot disks for Model III/4.
 #include "formats/dmk_dsk.h"
 
 
-static ADDRESS_MAP_START( trs80_map, AS_PROGRAM, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::trs80_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trs80_io, AS_IO, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::trs80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_map, AS_PROGRAM, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::model1_map)
 	AM_RANGE(0x0000, 0x377f) AM_ROM // sys80,ht1080 needs up to 375F
 	AM_RANGE(0x37de, 0x37de) AM_READWRITE(sys80_f9_r, sys80_f8_w)
 	AM_RANGE(0x37df, 0x37df) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
@@ -175,13 +175,13 @@ static ADDRESS_MAP_START( model1_map, AS_PROGRAM, 8, trs80_state )
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model1_io, AS_IO, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::model1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys80_io, AS_IO, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::sys80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(trs80m4_eb_r, sys80_f8_w)
@@ -191,11 +191,11 @@ static ADDRESS_MAP_START( sys80_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lnw80_map, AS_PROGRAM, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::lnw80_map)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lnw80_io, AS_IO, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::lnw80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
@@ -206,10 +206,10 @@ static ADDRESS_MAP_START( lnw80_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model3_map, AS_PROGRAM, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::model3_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model3_io, AS_IO, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::model3_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( model3_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model4_io, AS_IO, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::model4_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( model4_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model4p_io, AS_IO, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::model4p_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
@@ -276,14 +276,14 @@ static ADDRESS_MAP_START( model4p_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritum_map, AS_PROGRAM, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::meritum_map)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
 	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritum_io, AS_IO, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::meritum_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	// There are specific writes to ports 03, F3, F7, F8, FA, FB, FD
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( meritum_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cp500_io, AS_IO, 8, trs80_state )
+ADDRESS_MAP_START(trs80_state::cp500_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
@@ -621,7 +621,8 @@ MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I,
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::model1, trs80)      // model I, level II
+MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
+	trs80(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( model1_map)
 	MCFG_CPU_IO_MAP( model1_io)
@@ -659,7 +660,8 @@ MACHINE_CONFIG_DERIVED(trs80_state::model1, trs80)      // model I, level II
 	MCFG_AY31015_TX_CLOCK(0.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::model3, model1)
+MACHINE_CONFIG_START(trs80_state::model3)
+	model1(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( model3_map)
 	MCFG_CPU_IO_MAP( model3_io)
@@ -675,28 +677,33 @@ MACHINE_CONFIG_DERIVED(trs80_state::model3, model1)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,239)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::model4, model3)
+MACHINE_CONFIG_START(trs80_state::model4)
+	model3(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( model4_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::model4p, model3)
+MACHINE_CONFIG_START(trs80_state::model4p)
+	model3(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( model4p_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::sys80, model1)
+MACHINE_CONFIG_START(trs80_state::sys80)
+	model1(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( sys80_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::ht1080z, sys80)
+MACHINE_CONFIG_START(trs80_state::ht1080z)
+	sys80(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ht1080z)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::lnw80, model1)
+MACHINE_CONFIG_START(trs80_state::lnw80)
+	model1(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( lnw80_map)
 	MCFG_CPU_IO_MAP( lnw80_io)
@@ -713,7 +720,8 @@ MACHINE_CONFIG_DERIVED(trs80_state::lnw80, model1)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_lnw80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::radionic, model1)
+MACHINE_CONFIG_START(trs80_state::radionic)
+	model1(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0,64*8-1,0,16*16-1)
@@ -721,7 +729,8 @@ MACHINE_CONFIG_DERIVED(trs80_state::radionic, model1)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", radionic)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::meritum, sys80)
+MACHINE_CONFIG_START(trs80_state::meritum)
+	sys80(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( meritum_map)
 	MCFG_CPU_IO_MAP( meritum_io)
@@ -730,7 +739,8 @@ MACHINE_CONFIG_DERIVED(trs80_state::meritum, sys80)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", meritum)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trs80_state::cp500, model3)
+MACHINE_CONFIG_START(trs80_state::cp500)
+	model3(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP( cp500_io)
 

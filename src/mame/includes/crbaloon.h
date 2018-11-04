@@ -65,4 +65,6 @@ public:
 	void crbaloon_audio_set_appear_enable(int enabled);
 	void crbaloon(machine_config &config);
 	void crbaloon_audio(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
 };

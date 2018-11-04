@@ -69,6 +69,7 @@ public:
 	void set_collision(int n);
 	void sprint8(machine_config &config);
 	void sprint8_audio(machine_config &config);
+	void sprint8_map(address_map &map);
 };
 
 /*----------- defined in audio/sprint8.c -----------*/

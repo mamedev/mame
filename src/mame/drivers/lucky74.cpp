@@ -926,7 +926,7 @@ INTERRUPT_GEN_MEMBER(lucky74_state::nmi_interrupt)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
+ADDRESS_MAP_START(lucky74_state::lucky74_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")   /* NVRAM */
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_SHARE("fg_videoram")    /* VRAM1-1 */
@@ -946,7 +946,7 @@ static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
 	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)                   /* SM7831 Co-Processor */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lucky74_portmap, AS_IO, 8, lucky74_state )
+ADDRESS_MAP_START(lucky74_state::lucky74_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x05) AM_READWRITE(custom_09R81P_port_r, custom_09R81P_port_w)           /* custom 09R81P (samples system) */
 	AM_RANGE(0xff, 0xff) AM_RAM // presumably HS satellite control port (check patched in Lucky 74)

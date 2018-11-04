@@ -128,7 +128,7 @@ WRITE32_MEMBER(pgm_arm_type3_state::svg_latch_arm_w )
 /* 55857G? */
 /* Demon Front, The Gladiator, Happy 6-in-1, Spectral Vs. Generation, Killing Blade EX */
 /*  the ones with an EXECUTE ONLY region of ARM space? */
-static ADDRESS_MAP_START( svg_68k_mem, AS_PROGRAM, 16, pgm_arm_type3_state )
+ADDRESS_MAP_START(pgm_arm_type3_state::svg_68k_mem)
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")  /* Game ROM */
 
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( svg_68k_mem, AS_PROGRAM, 16, pgm_arm_type3_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32, pgm_arm_type3_state )
+ADDRESS_MAP_START(pgm_arm_type3_state::_55857G_arm7_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_SHARE("arm_ram2")
@@ -189,7 +189,7 @@ MACHINE_START_MEMBER(pgm_arm_type3_state,pgm_arm_type3)
 /******* ARM 55857G *******/
 
 MACHINE_CONFIG_START(pgm_arm_type3_state::pgm_arm_type3)
-	MCFG_FRAGMENT_ADD(pgmbase)
+	pgmbase(config);
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3 )
 
@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(pgm_arm_type3_state::pgm_arm_type3)
 
 	/* protection CPU */
 	MCFG_CPU_ADD("prot", ARM7, XTAL(33'000'000))    // 55857G - 33Mhz Xtal, at least on SVG
-	MCFG_CPU_PROGRAM_MAP(55857G_arm7_map)
+	MCFG_CPU_PROGRAM_MAP(_55857G_arm7_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3_reset)
 MACHINE_CONFIG_END

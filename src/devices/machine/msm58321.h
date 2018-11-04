@@ -155,6 +155,6 @@ private:
 
 
 // device type definition
-extern const device_type MSM58321;
+DECLARE_DEVICE_TYPE(MSM58321, msm58321_device)
 
 #endif

@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port00_w);
 
 	void cm1800(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -77,13 +79,13 @@ READ8_MEMBER( cm1800_state::port00_r )
 	return result;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cm1800_state )
+ADDRESS_MAP_START(cm1800_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x0800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, cm1800_state )
+ADDRESS_MAP_START(cm1800_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_READWRITE(port00_r,port00_w)
 	AM_RANGE(0x01, 0x01) AM_READ(port01_r)

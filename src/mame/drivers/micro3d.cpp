@@ -204,7 +204,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( hostmem, AS_PROGRAM, 16, micro3d_state )
+ADDRESS_MAP_START(micro3d_state::hostmem)
 	AM_RANGE(0x000000, 0x143fff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("shared_ram")
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( vgbmem, AS_PROGRAM, 16, micro3d_state )
+ADDRESS_MAP_START(micro3d_state::vgbmem)
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("sprite_vram")
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ_PORT("VGB_SW")
@@ -250,11 +250,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( drmath_prg, AS_PROGRAM, 32, micro3d_state )
+ADDRESS_MAP_START(micro3d_state::drmath_prg)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drmath_data, AS_DATA, 32, micro3d_state )
+ADDRESS_MAP_START(micro3d_state::drmath_data)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("drmath", 0)
 	AM_RANGE(0x00800000, 0x0083ffff) AM_READWRITE(micro3d_shared_r, micro3d_shared_w)
 	AM_RANGE(0x00400000, 0x004fffff) AM_RAM
@@ -275,11 +275,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( soundmem_prg, AS_PROGRAM, 8, micro3d_state )
+ADDRESS_MAP_START(micro3d_state::soundmem_prg)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, micro3d_state )
+ADDRESS_MAP_START(micro3d_state::soundmem_io)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0xfd00, 0xfd01) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(micro3d_upd7759_w)
@@ -388,7 +388,8 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(micro3d_state::botss11, micro3d)
+MACHINE_CONFIG_START(micro3d_state::botss11)
+	micro3d(config);
 	MCFG_DEVICE_MODIFY("adc")
 	MCFG_ADC0844_CH1_CB(NOOP)
 MACHINE_CONFIG_END

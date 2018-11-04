@@ -51,14 +51,14 @@
 DEFINE_DEVICE_TYPE(ISA8_MYB3K_FDC4710, isa8_myb3k_fdc4710_device, "isa8_myb3k_fdc4710", "FDC4710 SSDD Floppy Disk Controller")
 DEFINE_DEVICE_TYPE(ISA8_MYB3K_FDC4711, isa8_myb3k_fdc4711_device, "isa8_myb3k_fdc4711", "FDC4711 DSDD Floppy Disk Controller")
 
-DEVICE_ADDRESS_MAP_START(map, 8, isa8_myb3k_fdc4710_device)
+ADDRESS_MAP_START(isa8_myb3k_fdc4710_device::map)
 //  AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", mb8876_device, read, write) AM_MIRROR(0x500)
 	AM_RANGE(0x00, 0x03) AM_READ(myb3k_inv_fdc_data_r) AM_WRITE(myb3k_inv_fdc_data_w) AM_MIRROR(0x500)
 	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_fdc_command) AM_MIRROR(0x500)
 	AM_RANGE(0x05, 0x05) AM_READ(myb3k_fdc_status) AM_MIRROR(0x500)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, isa8_myb3k_fdc4711_device)
+ADDRESS_MAP_START(isa8_myb3k_fdc4711_device::map)
 //  AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", fd1791_device, read, write) AM_MIRROR(0x500)
 	AM_RANGE(0x00, 0x03) AM_READ(myb3k_inv_fdc_data_r) AM_WRITE(myb3k_inv_fdc_data_w) AM_MIRROR(0x500)
 	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_fdc_command) AM_MIRROR(0x500)
@@ -161,7 +161,7 @@ void isa8_myb3k_fdc4710_device::device_start()
 
 	set_isa_device();
 	m_isa->set_dma_channel(2, this, true);
-	m_isa->install_device(0x020, 0x027, *this, &isa8_myb3k_fdc4710_device::map, 8);
+	m_isa->install_device(0x020, 0x027, *this, &isa8_myb3k_fdc4710_device::map);
 }
 
 void isa8_myb3k_fdc4711_device::device_start()
@@ -169,7 +169,7 @@ void isa8_myb3k_fdc4711_device::device_start()
 	LOG("%s\n", FUNCNAME);
 
 	set_isa_device();
-	m_isa->install_device(0x020, 0x027, *this, &isa8_myb3k_fdc4711_device::map, 8);
+	m_isa->install_device(0x020, 0x027, *this, &isa8_myb3k_fdc4711_device::map);
 	m_isa->set_dma_channel(2, this, true);
 }
 

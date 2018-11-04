@@ -66,6 +66,7 @@ public:
 	double calc_plunger_pos();
 
 	void mgolf(machine_config &config);
+	void cpu_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -226,7 +227,7 @@ WRITE8_MEMBER(mgolf_state::wram_w)
 
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, mgolf_state )
+ADDRESS_MAP_START(mgolf_state::cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0040, 0x0040) AM_READ_PORT("40")

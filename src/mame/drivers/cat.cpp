@@ -353,6 +353,7 @@ public:
 	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
 	void cat(machine_config &config);
+	void cat_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -751,7 +752,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 */
 
 
-static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
+ADDRESS_MAP_START(cat_state::cat_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x180000) // 256 KB ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("svram") AM_MIRROR(0x18C000)// SRAM powered by battery

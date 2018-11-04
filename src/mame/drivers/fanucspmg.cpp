@@ -638,6 +638,9 @@ public:
 
 	void fanucspmgm(machine_config &config);
 	void fanucspmg(machine_config &config);
+	void maincpu_io(address_map &map);
+	void maincpu_mem(address_map &map);
+	void subcpu_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	int32_t m_vram_bank;
@@ -713,7 +716,7 @@ READ16_MEMBER(fanucspmg_state::magic_r)
 	return 0x0041;  // 31 = memory error
 }
 
-static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
+ADDRESS_MAP_START(fanucspmg_state::maincpu_mem)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM   // main RAM
 
 	AM_RANGE(0x80000, 0x81fff) AM_RAM   // believed to be shared RAM with a CPU inside the Program File
@@ -740,7 +743,7 @@ static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(MAINCPU_TAG, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maincpu_io, AS_IO, 16, fanucspmg_state)
+ADDRESS_MAP_START(fanucspmg_state::maincpu_io)
 ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
@@ -814,7 +817,7 @@ WRITE8_MEMBER(fanucspmg_state::video_ctrl_w)
 	m_video_ctrl = data;
 }
 
-static ADDRESS_MAP_START(subcpu_mem, AS_PROGRAM, 8, fanucspmg_state)
+ADDRESS_MAP_START(fanucspmg_state::subcpu_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(SUBCPU_TAG, 0)
 
 	AM_RANGE(0x4000, 0x45ff) AM_READWRITE(vram1_r, vram1_w)
@@ -1023,7 +1026,8 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(fanucspmg_state::fanucspmgm, fanucspmg)
+MACHINE_CONFIG_START(fanucspmg_state::fanucspmgm)
+	fanucspmg(config);
 	MCFG_DEVICE_REMOVE( CRTC_TAG )
 
 	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL(8'000'000)/2)

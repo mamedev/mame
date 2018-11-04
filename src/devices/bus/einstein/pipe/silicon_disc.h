@@ -28,24 +28,24 @@ public:
 	// construction/destruction
 	einstein_silicon_disc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(sector_low_w);
-	DECLARE_WRITE8_MEMBER(sector_high_w);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	required_memory_region m_rom;
 	required_memory_region m_bios;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 	uint16_t m_sector;
+
+	DECLARE_READ8_MEMBER(ram_r);
+	DECLARE_WRITE8_MEMBER(ram_w);
+	DECLARE_WRITE8_MEMBER(sector_low_w);
+	DECLARE_WRITE8_MEMBER(sector_high_w);
 };
 
 // device type definition

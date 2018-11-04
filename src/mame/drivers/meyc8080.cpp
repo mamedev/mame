@@ -95,6 +95,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
 	void meyc8080(machine_config &config);
+	void meyc8080_map(address_map &map);
 };
 
 
@@ -310,7 +311,7 @@ WRITE8_MEMBER(meyc8080_state::meyc8080_dac_4_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( meyc8080_map, AS_PROGRAM, 8, meyc8080_state )
+ADDRESS_MAP_START(meyc8080_state::meyc8080_map)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("vram0")

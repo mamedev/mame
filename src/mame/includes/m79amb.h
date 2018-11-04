@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER(m79amb_8003_w);
 	required_device<cpu_device> m_maincpu;
 	void m79amb(machine_config &config);
+	void main_map(address_map &map);
 };
 
 /*----------- defined in audio/m79amb.c -----------*/

@@ -82,6 +82,8 @@ public:
 	required_ioport m_dsw;
 
 	void monzagp(machine_config &config);
+	void monzagp_io(address_map &map);
+	void monzagp_map(address_map &map);
 private:
 	uint8_t m_p1;
 	uint8_t m_p2;
@@ -260,7 +262,7 @@ uint32_t monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static ADDRESS_MAP_START( monzagp_map, AS_PROGRAM, 8, monzagp_state )
+ADDRESS_MAP_START(monzagp_state::monzagp_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -403,7 +405,7 @@ WRITE8_MEMBER(monzagp_state::port2_w)
 }
 
 
-static ADDRESS_MAP_START( monzagp_io, AS_IO, 8, monzagp_state )
+ADDRESS_MAP_START(monzagp_state::monzagp_io)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(port_r, port_w)
 ADDRESS_MAP_END
 

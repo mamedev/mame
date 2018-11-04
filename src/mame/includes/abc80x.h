@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __ABC800__
-#define __ABC800__
+#ifndef MAME_INCLUDES_ABC800_H
+#define MAME_INCLUDES_ABC800_H
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
@@ -150,6 +150,9 @@ public:
 	// timers
 	emu_timer *m_ctc_timer;
 	emu_timer *m_cassette_timer;
+	void abc800c_io(address_map &map);
+	void abc800m_io(address_map &map);
+	void abc800m_mem(address_map &map);
 };
 
 
@@ -206,6 +209,7 @@ public:
 	DECLARE_PALETTE_INIT( abc800c );
 	void abc800c(machine_config &config);
 	void abc800c_video(machine_config &config);
+	void abc800c_mem(address_map &map);
 };
 
 
@@ -251,6 +255,8 @@ public:
 
 	void abc802(machine_config &config);
 	void abc802_video(machine_config &config);
+	void abc802_io(address_map &map);
+	void abc802_mem(address_map &map);
 };
 
 
@@ -326,6 +332,8 @@ public:
 
 	void abc806(machine_config &config);
 	void abc806_video(machine_config &config);
+	void abc806_io(address_map &map);
+	void abc806_mem(address_map &map);
 };
 
 #endif

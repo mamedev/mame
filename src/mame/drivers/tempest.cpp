@@ -340,6 +340,7 @@ public:
 
 	virtual void machine_start() override;
 	void tempest(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -440,7 +441,7 @@ READ8_MEMBER(tempest_state::rom_ae1f_r)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
+ADDRESS_MAP_START(tempest_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_SHARE("colorram")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")
@@ -461,8 +462,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
-	AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
 	AM_RANGE(0x9000, 0xdfff) AM_ROM
+	AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 

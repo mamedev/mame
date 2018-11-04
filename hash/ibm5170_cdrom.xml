@@ -1249,7 +1249,7 @@
 
 	<!-- DOS / Windows 3.1 -->
 	<software name="castledb">
-		<description>Castle of Dr. Brain </description>
+		<description>Castle of Dr. Brain</description>
 		<year>1996</year>
 		<publisher>Sierra</publisher>
 
@@ -2355,7 +2355,7 @@
 	<!-- Windows 3.x -->
 	<!-- TODO: 256 colors shifting issue, sound is too slow? -->
 	<software name="plumber" supported="partial">
-		<description>Plumber don't Wear Ties</description>
+		<description>Plumbers don't Wear Ties</description>
 		<year>1993</year>
 		<publisher>Kirin Entertainment</publisher>
 

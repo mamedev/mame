@@ -107,6 +107,18 @@ public:
 	void sweetgal(machine_config &config);
 	void sgaltrop(machine_config &config);
 	void royalqn(machine_config &config);
+	void common_nsc_map(address_map &map);
+	void common_sexygal_io(address_map &map);
+	void royalqn_io(address_map &map);
+	void royalqn_map(address_map &map);
+	void royalqn_nsc_map(address_map &map);
+	void sexygal_audio_map(address_map &map);
+	void sexygal_io(address_map &map);
+	void sexygal_map(address_map &map);
+	void sexygal_nsc_map(address_map &map);
+	void sgaltrop_io(address_map &map);
+	void sgaltrop_nsc_map(address_map &map);
+	void sweetgal_map(address_map &map);
 protected:
 	required_ioport m_io_cr_clear;
 	required_ioport m_io_coins;
@@ -352,7 +364,7 @@ WRITE8_MEMBER(nightgal_state::output_w)
 * Common
 ********************************/
 
-static ADDRESS_MAP_START( common_nsc_map, AS_PROGRAM, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::common_nsc_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0080) AM_READ_PORT("BLIT_PORT")
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
@@ -386,19 +398,19 @@ WRITE8_MEMBER(nightgal_state::sexygal_audionmi_w)
 }
 
 
-static ADDRESS_MAP_START( sweetgal_map, AS_PROGRAM, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::sweetgal_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x807f) AM_RAM AM_SHARE("sound_ram")
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sexygal_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sexygal_audioff_w)
+ADDRESS_MAP_START(nightgal_state::sexygal_map)
 	AM_IMPORT_FROM(sweetgal_map)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sexygal_audioff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( common_sexygal_io, AS_IO, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::common_sexygal_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWA") AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSTEM") AM_WRITE(mux_w)
@@ -407,27 +419,27 @@ static ADDRESS_MAP_START( common_sexygal_io, AS_IO, 8, nightgal_state )
 	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE(royalqn_blitter_2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sexygal_io, AS_IO, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::sexygal_io)
 	AM_IMPORT_FROM( common_sexygal_io )
 
 	AM_RANGE(0x00,0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgaltrop_io, AS_IO, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::sgaltrop_io)
 	AM_IMPORT_FROM( common_sexygal_io )
 
 	AM_RANGE(0x01,0x01) AM_DEVREAD("ymsnd", ym2203_device, data_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("ymsnd", ym2203_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::sexygal_nsc_map)
 	AM_IMPORT_FROM( common_nsc_map )
 	AM_RANGE(0x0080, 0x0086) AM_DEVICE("blitter",jangou_blitter_device, blit_v2_regs)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION("subrom", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgaltrop_nsc_map, AS_PROGRAM, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::sgaltrop_nsc_map)
 	AM_IMPORT_FROM( common_nsc_map )
 
 	AM_RANGE(0x0080, 0x0086) AM_DEVICE("blitter",jangou_blitter_device, blit_v2_regs)
@@ -437,7 +449,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( sexygal_audio_map, AS_PROGRAM, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::sexygal_audio_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 
 	AM_RANGE(0x2000, 0x207f) AM_RAM AM_SHARE("sound_ram")
@@ -450,14 +462,14 @@ ADDRESS_MAP_END
 ********************************/
 
 
-static ADDRESS_MAP_START( royalqn_map, AS_PROGRAM, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::royalqn_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_SHARE("comms_ram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::royalqn_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_MIRROR(0xec) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02,0x03) AM_MIRROR(0xec) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
@@ -471,7 +483,7 @@ static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 	AM_RANGE(0x17,0x17) AM_MIRROR(0xe8) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
+ADDRESS_MAP_START(nightgal_state::royalqn_nsc_map)
 	AM_IMPORT_FROM( common_nsc_map )
 
 	AM_RANGE(0x0080, 0x0086) AM_DEVICE("blitter",jangou_blitter_device, blit_v1_regs)
@@ -773,7 +785,8 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nightgal_state::sexygal, royalqn)
+MACHINE_CONFIG_START(nightgal_state::sexygal)
+	royalqn(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -796,7 +809,8 @@ MACHINE_CONFIG_DERIVED(nightgal_state::sexygal, royalqn)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nightgal_state::sweetgal, sexygal)
+MACHINE_CONFIG_START(nightgal_state::sweetgal)
+	sexygal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sweetgal_map)
 
@@ -804,14 +818,16 @@ MACHINE_CONFIG_DERIVED(nightgal_state::sweetgal, sexygal)
 	MCFG_DEVICE_REMOVE("audiocpu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nightgal_state::ngalsumr, royalqn)
+MACHINE_CONFIG_START(nightgal_state::ngalsumr)
+	royalqn(config);
 	MCFG_CPU_MODIFY("maincpu")
 	// TODO: happens from protection device
 	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nightgal_state::sgaltrop, sexygal)
+MACHINE_CONFIG_START(nightgal_state::sgaltrop)
+	sexygal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sgaltrop_io)
 

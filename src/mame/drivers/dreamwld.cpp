@@ -158,6 +158,10 @@ public:
 	required_device<palette_device> m_palette;
 	void baryon(machine_config &config);
 	void dreamwld(machine_config &config);
+	void baryon_map(address_map &map);
+	void dreamwld_map(address_map &map);
+	void oki1_map(address_map &map);
+	void oki2_map(address_map &map);
 };
 
 
@@ -427,12 +431,12 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 	return dat << 24;
 }
 
-static ADDRESS_MAP_START( oki1_map, 0, 8, dreamwld_state )
+ADDRESS_MAP_START(dreamwld_state::oki1_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki1bank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, 0, 8, dreamwld_state )
+ADDRESS_MAP_START(dreamwld_state::oki2_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki2bank")
 ADDRESS_MAP_END
@@ -454,7 +458,7 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
 }
 
 
-static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
+ADDRESS_MAP_START(dreamwld_state::baryon_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM  AM_WRITENOP
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")
@@ -475,7 +479,7 @@ static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_SHARE("workram") // work ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dreamwld_map, AS_PROGRAM, 32, dreamwld_state )
+ADDRESS_MAP_START(dreamwld_state::dreamwld_map)
 	AM_IMPORT_FROM( baryon_map )
 
 	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE(dreamwld_6295_1_bank_w) // sfx
@@ -825,7 +829,8 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dreamwld_state::dreamwld, baryon)
+MACHINE_CONFIG_START(dreamwld_state::dreamwld)
+	baryon(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

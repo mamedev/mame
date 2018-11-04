@@ -95,6 +95,9 @@ public:
 	void svi318(machine_config &config);
 	void svi318n(machine_config &config);
 	void svi328(machine_config &config);
+	void svi3x8_io(address_map &map);
+	void svi3x8_io_bank(address_map &map);
+	void svi3x8_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -130,17 +133,17 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( svi3x8_mem, AS_PROGRAM, 8, svi3x8_state )
+ADDRESS_MAP_START(svi3x8_state::svi3x8_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( svi3x8_io, AS_IO, 8, svi3x8_state )
+ADDRESS_MAP_START(svi3x8_state::svi3x8_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_DEVICE("io", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( svi3x8_io_bank, AS_PROGRAM, 8, svi3x8_state )
+ADDRESS_MAP_START(svi3x8_state::svi3x8_io_bank)
 	AM_RANGE(0x000, 0x0ff) AM_DEVREADWRITE("exp", svi_expander_device, iorq_r, iorq_w)
 	AM_RANGE(0x100, 0x17f) AM_DEVREADWRITE("exp", svi_expander_device, iorq_r, iorq_w)
 	AM_RANGE(0x180, 0x180) AM_MIRROR(0x22) AM_DEVWRITE("vdp", tms9928a_device, vram_write)
@@ -583,7 +586,8 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(svi3x8_state, excs_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(svi3x8_state::svi318n, svi318)
+MACHINE_CONFIG_START(svi3x8_state::svi318n)
+	svi318(config);
 	MCFG_DEVICE_REMOVE("vdp")
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_DEVICE_ADD("vdp", TMS9928A, XTAL(10'738'635) / 2)
@@ -593,13 +597,15 @@ MACHINE_CONFIG_DERIVED(svi3x8_state::svi318n, svi318)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(svi3x8_state::svi328, svi318)
+MACHINE_CONFIG_START(svi3x8_state::svi328)
+	svi318(config);
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(svi3x8_state::svi328n, svi318n)
+MACHINE_CONFIG_START(svi3x8_state::svi328n)
+	svi318n(config);
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

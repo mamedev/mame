@@ -131,4 +131,11 @@ public:
 	void drgnbowl(machine_config &config);
 	void mastninj(machine_config &config);
 	void shadoww(machine_config &config);
+	void drgnbowl_map(address_map &map);
+	void drgnbowl_sound_map(address_map &map);
+	void drgnbowl_sound_port_map(address_map &map);
+	void gaiden_map(address_map &map);
+	void mastninj_map(address_map &map);
+	void mastninj_sound_map(address_map &map);
+	void sound_map(address_map &map);
 };

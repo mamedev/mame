@@ -50,6 +50,9 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void rowamet(machine_config &config);
+	void rowamet_map(address_map &map);
+	void rowamet_sub_io(address_map &map);
+	void rowamet_sub_map(address_map &map);
 private:
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
@@ -61,7 +64,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( rowamet_map, AS_PROGRAM, 8, rowamet_state )
+ADDRESS_MAP_START(rowamet_state::rowamet_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("X0")
 	AM_RANGE(0x2801, 0x2801) AM_READ_PORT("X1")
@@ -78,12 +81,12 @@ static ADDRESS_MAP_START( rowamet_map, AS_PROGRAM, 8, rowamet_state )
 	AM_RANGE(0x40a0, 0x40ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rowamet_sub_map, AS_PROGRAM, 8, rowamet_state )
+ADDRESS_MAP_START(rowamet_state::rowamet_sub_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0x2000)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rowamet_sub_io, AS_IO, 8, rowamet_state )
+ADDRESS_MAP_START(rowamet_state::rowamet_sub_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(sound_r,mute_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("dac", dac_byte_interface, write)

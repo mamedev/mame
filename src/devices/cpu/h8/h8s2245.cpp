@@ -10,7 +10,7 @@ DEFINE_DEVICE_TYPE(H8S2246, h8s2246_device, "h8s2246", "H8S/2246")
 
 
 h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
-	h8s2000_device(mconfig, type, tag, owner, clock, address_map_delegate(FUNC(h8s2245_device::map), this)),
+	h8s2000_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2245_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
 	dtc(*this, "dtc"),
@@ -61,7 +61,7 @@ h8s2246_device::h8s2246_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, h8s2245_device)
+ADDRESS_MAP_START(h8s2245_device::map)
 	AM_RANGE(ram_start, 0xfffbff) AM_RAM
 
 	AM_RANGE(0xfffeb0, 0xfffeb1) AM_DEVWRITE8(    "port1",     h8_port_device,                      ddr_w,    0xff00)

@@ -94,7 +94,7 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_coinctrl_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
+ADDRESS_MAP_START(cbasebal_state::cbasebal_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("palette")  /* palette + vram + scrollram */
@@ -102,12 +102,12 @@ static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, cbasebal_state )
+ADDRESS_MAP_START(cbasebal_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8, cbasebal_state )
+ADDRESS_MAP_START(cbasebal_state::cbasebal_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cbasebal_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE_PORT("IO_01")
@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */
 	MCFG_CPU_PROGRAM_MAP(cbasebal_map)
 	MCFG_CPU_IO_MAP(cbasebal_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

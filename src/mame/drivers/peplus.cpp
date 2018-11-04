@@ -338,6 +338,8 @@ public:
 	void handle_lightpen();
 
 	void peplus(machine_config &config);
+	void peplus_iomap(address_map &map);
+	void peplus_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -997,11 +999,11 @@ GFXDECODE_END
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( peplus_map, AS_PROGRAM, 8, peplus_state )
+ADDRESS_MAP_START(peplus_state::peplus_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
+ADDRESS_MAP_START(peplus_state::peplus_iomap)
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(peplus_cmos_w) AM_SHARE("cmos")
 
@@ -8322,6 +8324,20 @@ ROM_START( peps0239 ) /* Normal board : Jackpot Jewels Slots (PS0239) - Payout 9
 	ROM_LOAD( "cap1151.u50", 0x0000, 0x0100, CRC(f8079ea2) SHA1(92dc104a76b3e5fa272f2f769a328b238c1702ed) )
 ROM_END
 
+ROM_START( peps0280 ) /* Normal board : 4th of July Slots (PS0280) - Payout 90.04% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps0280_560-957.u68",   0x00000, 0x10000, CRC(91bd2522) SHA1(9449802726e12fa462656a41a1acea455319f5cd) ) /* 3 Coins Max / 1 Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1225.u72",   0x00000, 0x8000, CRC(49fe4fff) SHA1(f886791668427f9d7d42da07cea94c024413a983) )
+	ROM_LOAD( "mgo-cg1225.u73",   0x08000, 0x8000, CRC(b6982a78) SHA1(d3853f14d4a4fad9633f482bdd24756d4416d9eb) )
+	ROM_LOAD( "mbo-cg1225.u74",   0x10000, 0x8000, CRC(1363c0bd) SHA1(70d11a201b228b8d51d8a0b16e0ef8d799f8e346) )
+	ROM_LOAD( "mxo-cg1225.u75",   0x18000, 0x8000, CRC(a3ba92d9) SHA1(43285157ed30a93dd2e96468fa1086eab069a58b) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1225.u50", 0x0000, 0x0100, CRC(3fa46756) SHA1(a7f3fd6aaa64f3c3ed5e83068b42b39a6dc7f00d) )
+ROM_END
+
 ROM_START( peps0296 ) /* Normal board : Haywire Slots (PS0296) - Payout 90.00% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0296_561-959.u68",   0x00000, 0x10000, CRC(da871550) SHA1(99e7a4fc77731b185751622ba2e08a44ad8eb7f9) ) /* 3 Coins Max / 1 Line */
@@ -14440,6 +14456,7 @@ GAMEL(1996, peps0092, peps0047, peplus, peplus_slots,   peplus_state, peplus,   
 GAMEL(1996, peps0206, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0206) Red White & Blue Slots",           0, layout_pe_slots )
 GAMEL(1996, peps0207, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0207) Red White & Blue Slots",           0, layout_pe_slots )
 GAMEL(1996, peps0239, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0239) Jackpot Jewels Slots",             0, layout_pe_slots )
+GAMEL(1996, peps0280, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0280) 4th of July Slots",                0, layout_pe_slots )
 GAMEL(1996, peps0296, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0296) Haywire Slots",                    0, layout_pe_slots )
 GAMEL(1996, peps0298, peps0042, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0298) Double Diamond Slots",             0, layout_pe_slots )
 GAMEL(1996, peps0308, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",             0, layout_pe_slots )

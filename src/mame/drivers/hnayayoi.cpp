@@ -105,13 +105,13 @@ WRITE_LINE_MEMBER(hnayayoi_state::nmi_clock_w)
 }
 
 
-static ADDRESS_MAP_START( hnayayoi_map, AS_PROGRAM, 8, hnayayoi_state )
+ADDRESS_MAP_START(hnayayoi_state::hnayayoi_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hnayayoi_io_map, AS_IO, 8, hnayayoi_state )
+ADDRESS_MAP_START(hnayayoi_state::hnayayoi_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0x02, 0x03) AM_DEVREAD("ymsnd", ym2203_device, read)
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( hnayayoi_io_map, AS_IO, 8, hnayayoi_state )
 	AM_RANGE(0x62, 0x67) AM_WRITE(dynax_blitter_rev1_param_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hnfubuki_map, AS_PROGRAM, 8, hnayayoi_state )
+ADDRESS_MAP_START(hnayayoi_state::hnfubuki_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xfeff) AM_ROM
@@ -151,13 +151,13 @@ static ADDRESS_MAP_START( hnfubuki_map, AS_PROGRAM, 8, hnayayoi_state )
 	AM_RANGE(0xff62, 0xff67) AM_WRITE(dynax_blitter_rev1_param_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( untoucha_map, AS_PROGRAM, 8, hnayayoi_state )
+ADDRESS_MAP_START(hnayayoi_state::untoucha_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( untoucha_io_map, AS_IO, 8, hnayayoi_state )
+ADDRESS_MAP_START(hnayayoi_state::untoucha_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ymsnd", ym2203_device, control_port_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREAD("ymsnd", ym2203_device, status_port_r)
@@ -584,7 +584,8 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hnayayoi_state::hnfubuki, hnayayoi)
+MACHINE_CONFIG_START(hnayayoi_state::hnfubuki)
+	hnayayoi(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hnfubuki_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
@@ -593,7 +594,8 @@ MACHINE_CONFIG_DERIVED(hnayayoi_state::hnfubuki, hnayayoi)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hnayayoi_state::untoucha, hnayayoi)
+MACHINE_CONFIG_START(hnayayoi_state::untoucha)
+	hnayayoi(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(untoucha_map)
 	MCFG_CPU_IO_MAP(untoucha_io_map)

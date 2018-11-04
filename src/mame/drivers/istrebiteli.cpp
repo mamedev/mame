@@ -169,6 +169,8 @@ public:
 	uint8_t m_spr_xy[8];
 	uint8_t m_tileram[16];
 	void istreb(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 };
 
 void istrebiteli_state::machine_start()
@@ -298,12 +300,12 @@ WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
 	m_spr_xy[offset ^ 7] = data;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, istrebiteli_state)
+ADDRESS_MAP_START(istrebiteli_state::mem_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, istrebiteli_state)
+ADDRESS_MAP_START(istrebiteli_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xb0, 0xbf) AM_WRITE(tileram_w)

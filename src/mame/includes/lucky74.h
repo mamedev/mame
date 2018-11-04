@@ -55,4 +55,6 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void lucky74(machine_config &config);
+	void lucky74_map(address_map &map);
+	void lucky74_portmap(address_map &map);
 };

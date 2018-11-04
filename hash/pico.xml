@@ -29,8 +29,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * おりょうりだいすき! キッチンピコ - Oryouri Daisuki! Kitchen Pico (Sega Toys - 20030718 - HPC-6132)
 * それいけ!アンパンマン はじめてあそぶピコソフト アンパンマンのいろ･かず･かたち ぬりえもできちゃうぞ! - Soreike! Anpanman Hajimete Asobu Pico Soft - Anpanman Noiro-Kazu-Katachi Nuriemo Dekichauzo! (Sega Toys - ???? - HPC-????)
 * ディズニープリンセス 白雪姫 ～しらゆきひめ～ <Best> - Disney Princesses - Shirayukihime Best Selection (Sega Toys - 20040426 - HPC-6139)
-* 七田 眞 監修 右脳イメージトレーニング さんすう・えいごでモジャーズに挑戦 THE ARITHMETIC & ABC FIGHT VS MOJARS <Best Selection> - Shichida Makoto Kanshuu Unou Image Training Sansuu - Eigo de Mojaazu ni Chousen THE ARITHMETIC & ABC FIGHT VS MOJARS Best Selection (Sega Toys - 2004xxxx - HPC-????)
-* 七田 眞 監修 右脳イメージトレーニング ひらがな・カタカナ カジノでモジャベガスドリーム <Best Selection> - Shichida Makoto Kanshuu Unou Image Training Hiragana - Katakana Kajino de Moja Vegas Dream Best Selection (Sega Toys - 2004xxxx - HPC-????)
 
 to be verified
 * アンパンマンのもしもしピコ セット それいけ!アンパンマン アンパンマンとでんわであそぼう!<同梱> - Anpanman no Moshimoshi Pico Set with Soreike! Anpanman - Anpanman to Denwa de Asobou! (Sega - 199712xx - HPC-6050) [is the serial correct, or is it 6051 like reported for the single cart?]
@@ -40,7 +38,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 七田 眞 監修 右脳イメージトレーニング さんすう・えいごでモジャーズに挑戦 THE ARITHMETIC & ABC FIGHT VS MOJARS - Shichida Makoto Kanshuu Unou Image Training Sansuu - Eigo de Mojaazu ni Chousen THE ARITHMETIC & ABC FIGHT VS MOJARS (Pony Canyon - ???? - T-75010)
 * 忍者戦隊カクレンジャー - Ninja Sentai Kakuranger (Bandai - ???? - T-133???)
 * 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
-* それいけ!アンパンマンのみんなできょうそうアンパンマン! - Soreike! Anpanman no Minna de Kyousou Anpanman! (Bandai - 1996xxxx - T-133250)
 * ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
 * いっしょにはしろうきかんしゃトーマス <Best Selection> - Issho ni Hashirou Kikansha Thomas Best Selection (Bandai - 20040713 - T-133490) [reprint T-133140]
 * 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
@@ -2264,6 +2261,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+<!-- This Best Selection re-release is identical to the original, save that the ROM is double size, with the second half 0xff-filled -->
+	<software name="kanshunobs" cloneof="kanshuno">
+		<description>Kanshuu Unou Image Training - Hiragana - Katakana (Best Selection, Jpn)</description>
+		<year>2005</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="serial" value="HPC-6149"/>
+		<info name="alt_title" value="七田 眞 監修 右脳イメージトレーニング ひらがな・カタカナ カジノでモジャベガスドリーム (Shichida Makoto Kanshuu Unou Image Training Hiragana - Katakana Kajino de Moja Vegas Dream)"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shichida makoto kanshuu unou image training hiragana katakana casino de moja vegas dream! best selection (j).bin" size="2097152" crc="f7dc86dc" sha1="d3ff8969d9262688a92ee51c8cd3fc9d48f027c9" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kawai3s">
 		<description>Kawaii Nakama wo Sodate you! 3-tsu no Shippo (Jpn)</description>
 		<year>1998</year>
@@ -4011,6 +4024,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+<!-- This Best Selection re-release is identical to the original -->
+	<software name="imagtrnbs" cloneof="imagtrn">
+		<description>Image Training for the Right Side of the Brain - The Arithmetic &amp; ABC Fight vs Mojars (Best Selection, Jpn)</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6149"/>
+		<info name="alt_title" value="七田 眞 監修 右脳イメージトレーニング さんすう・えいごでモジャーズに挑戦 THE ARITHMETIC &amp; ABC FIGHT VS MOJARS (Shichida Makoto Kanshuu Unou Image Training Sansuu - Eigo de Mojaazu ni Chousen THE ARITHMETIC &amp; ABC FIGHT VS MOJARS)"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shichida makoto kanshuu unou image training sansuu eigo de mojars ni chousen best selection (j).bin" size="2097152" crc="42a578a8" sha1="5ca5f0ef8741acb5d58ce0f61e6789ec2adb00ea" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="origami">
 		<description>Satonaka Machiko no Tanoshii Origami (Jpn)</description>
 		<year>1995</year>
@@ -4446,6 +4475,21 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="soreike! anpanman no medalympic world 2 (j).bin" size="524288" crc="3c57e47d" sha1="4335e65d238c46a286e2d0ce8d821d35799ab76a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanmdk">
+		<description>Soreike! Anpanman no Minna de Kyousou Anpanman! (Jpn)</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133250"/>
+		<info name="alt_title" value="それいけ!アンパンマンのみんなできょうそうアンパンマン!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-20107-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="soreike! anpanman no minna de kyousou anpanman! (j).bin" size="524288" crc="3822c958" sha1="23cc8f96fe41b45a666e87959297eee7d6e26ddb" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

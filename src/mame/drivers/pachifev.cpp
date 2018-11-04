@@ -114,6 +114,8 @@ public:
 	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
 	required_device<cpu_device> m_maincpu;
 	void pachifev(machine_config &config);
+	void pachifev_cru(address_map &map);
+	void pachifev_map(address_map &map);
 };
 
 WRITE8_MEMBER(pachifev_state::controls_w)
@@ -138,7 +140,7 @@ READ8_MEMBER(pachifev_state::controls_r)
 	return output_bit;
 }
 
-static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8, pachifev_state )
+ADDRESS_MAP_START(pachifev_state::pachifev_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
@@ -158,7 +160,7 @@ static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8, pachifev_state )
 	AM_RANGE(0xfffc, 0xffff) AM_NOP /* nmi */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pachifev_cru, AS_IO, 8, pachifev_state )
+ADDRESS_MAP_START(pachifev_state::pachifev_cru)
 	AM_RANGE(0x000, 0x000) AM_READ(controls_r)
 ADDRESS_MAP_END
 

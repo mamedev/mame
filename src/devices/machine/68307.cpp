@@ -34,7 +34,7 @@ WRITE8_MEMBER(m68307_cpu_device::m68307_internal_serial_w)
 
 
 
-static ADDRESS_MAP_START( m68307_internal_map, AS_PROGRAM, 16, m68307_cpu_device )
+ADDRESS_MAP_START(m68307_cpu_device::m68307_internal_map)
 	AM_RANGE(0x000000f0, 0x000000ff) AM_READWRITE(m68307_internal_base_r, m68307_internal_base_w)
 ADDRESS_MAP_END
 
@@ -50,7 +50,7 @@ MACHINE_CONFIG_END
 
 
 m68307_cpu_device::m68307_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_device(mconfig, tag, owner, clock, M68307, 16, 24, ADDRESS_MAP_NAME(m68307_internal_map)),
+	: m68000_device(mconfig, tag, owner, clock, M68307, 16, 24, address_map_constructor(FUNC(m68307_cpu_device::m68307_internal_map), this)),
 	m_write_irq(*this),
 	m_write_a_tx(*this),
 	m_write_b_tx(*this),

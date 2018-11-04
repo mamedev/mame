@@ -162,4 +162,11 @@ public:
 	void system24_floppy_dcclub(machine_config &config);
 	void system24_floppy_hotrod(machine_config &config);
 	void system24(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void hotrod_cpu1_map(address_map &map);
+	void hotrod_cpu2_map(address_map &map);
+	void roughrac_cpu1_map(address_map &map);
+	void roughrac_cpu2_map(address_map &map);
+	void system24_cpu1_map(address_map &map);
+	void system24_cpu2_map(address_map &map);
 };

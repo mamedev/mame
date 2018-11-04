@@ -32,4 +32,8 @@ public:
 	void lvpoker(machine_config &config);
 	void lvcards(machine_config &config);
 	void ponttehk(machine_config &config);
+	void lvcards_io_map(address_map &map);
+	void lvcards_map(address_map &map);
+	void lvpoker_map(address_map &map);
+	void ponttehk_map(address_map &map);
 };

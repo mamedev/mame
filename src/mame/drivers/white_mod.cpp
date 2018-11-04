@@ -17,6 +17,7 @@ public:
 	{ }
 
 	void whitestar_mod(machine_config &config);
+	void whitestar_mod_map(address_map &map);
 protected:
 
 	// devices
@@ -29,7 +30,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( whitestar_mod_map, AS_PROGRAM, 8, whitestar_mod_state )
+ADDRESS_MAP_START(whitestar_mod_state::whitestar_mod_map)
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 

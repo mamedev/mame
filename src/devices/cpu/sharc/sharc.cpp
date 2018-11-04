@@ -56,14 +56,14 @@ enum
 
 DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "ADSP21062")
 
-static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64, adsp21062_device )
+ADDRESS_MAP_START(adsp21062_device::internal_pgm)
 	AM_RANGE(0x20000, 0x24fff) AM_READWRITE(pm0_r, pm0_w)
 	AM_RANGE(0x28000, 0x2cfff) AM_READWRITE(pm1_r, pm1_w)
 	AM_RANGE(0x30000, 0x34fff) AM_READWRITE(pm1_r, pm1_w)
 	AM_RANGE(0x38000, 0x3cfff) AM_READWRITE(pm1_r, pm1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( internal_data, AS_DATA, 32, adsp21062_device )
+ADDRESS_MAP_START(adsp21062_device::internal_data)
 	AM_RANGE(0x00000, 0x000ff) AM_READWRITE(iop_r, iop_w)
 	AM_RANGE(0x20000, 0x27fff) AM_RAM AM_SHARE("block0")
 	AM_RANGE(0x28000, 0x2ffff) AM_RAM AM_SHARE("block1")
@@ -77,8 +77,8 @@ ADDRESS_MAP_END
 
 adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, ADSP21062, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, ADDRESS_MAP_NAME(internal_pgm))
-	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, ADDRESS_MAP_NAME(internal_data))
+	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, address_map_constructor(FUNC(adsp21062_device::internal_pgm), this))
+	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, address_map_constructor(FUNC(adsp21062_device::internal_data), this))
 	, m_boot_mode(BOOT_MODE_HOST)
 	, m_cache(CACHE_SIZE + sizeof(sharc_internal_state))
 	, m_drcuml(nullptr)

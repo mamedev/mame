@@ -31,27 +31,10 @@ public:
 	template <class Object> static devcb_base &set_tx_drq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).drq_tx_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_rx_drq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).drq_rx_cb.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_ADDRESS_MAP(map, 8);
-
-	DECLARE_READ8_MEMBER(txstat_r);
-	DECLARE_WRITE8_MEMBER(txstat_w);
-	DECLARE_READ8_MEMBER(txmask_r);
-	DECLARE_WRITE8_MEMBER(txmask_w);
-	DECLARE_READ8_MEMBER(rxstat_r);
-	DECLARE_WRITE8_MEMBER(rxstat_w);
-	DECLARE_READ8_MEMBER(rxmask_r);
-	DECLARE_WRITE8_MEMBER(rxmask_w);
-	DECLARE_READ8_MEMBER(txmode_r);
-	DECLARE_WRITE8_MEMBER(txmode_w);
-	DECLARE_READ8_MEMBER(rxmode_r);
-	DECLARE_WRITE8_MEMBER(rxmode_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
-	DECLARE_READ8_MEMBER(tdc_lsb_r);
-	DECLARE_READ8_MEMBER(mac_r);
-	DECLARE_WRITE8_MEMBER(mac_w);
-
 	void tx_dma_w(uint8_t data, bool eof);
 	void rx_dma_r(uint8_t &data, bool &eof);
+
+	void map(address_map &map);
 
 protected:
 	virtual void device_start() override;
@@ -117,9 +100,25 @@ private:
 	bool recv_is_me();
 	bool recv_is_multicast();
 	bool recv_is_local_multicast();
+
+	DECLARE_READ8_MEMBER(txstat_r);
+	DECLARE_WRITE8_MEMBER(txstat_w);
+	DECLARE_READ8_MEMBER(txmask_r);
+	DECLARE_WRITE8_MEMBER(txmask_w);
+	DECLARE_READ8_MEMBER(rxstat_r);
+	DECLARE_WRITE8_MEMBER(rxstat_w);
+	DECLARE_READ8_MEMBER(rxmask_r);
+	DECLARE_WRITE8_MEMBER(rxmask_w);
+	DECLARE_READ8_MEMBER(txmode_r);
+	DECLARE_WRITE8_MEMBER(txmode_w);
+	DECLARE_READ8_MEMBER(rxmode_r);
+	DECLARE_WRITE8_MEMBER(rxmode_w);
+	DECLARE_WRITE8_MEMBER(reset_w);
+	DECLARE_READ8_MEMBER(tdc_lsb_r);
+	DECLARE_READ8_MEMBER(mac_r);
+	DECLARE_WRITE8_MEMBER(mac_w);
 };
 
-extern const device_type MB8795;
 DECLARE_DEVICE_TYPE(MB8795, mb8795_device)
 
 #endif // MAME_MACHINE_MB8795_H

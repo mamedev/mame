@@ -62,6 +62,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 	void destiny(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -169,7 +170,7 @@ WRITE8_MEMBER(destiny_state::sound_w)
 	m_beeper->set_state(~offset & 1);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
+ADDRESS_MAP_START(destiny_state::main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(printer_status_r, firq_ack_w)

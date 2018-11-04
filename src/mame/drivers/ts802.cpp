@@ -55,6 +55,8 @@ public:
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	void kbd_put(u8 data);
 	void ts802(machine_config &config);
+	void ts802_io(address_map &map);
+	void ts802_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	address_space *m_mem;
@@ -63,13 +65,13 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-static ADDRESS_MAP_START(ts802_mem, AS_PROGRAM, 8, ts802_state)
+ADDRESS_MAP_START(ts802_state::ts802_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x1000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ts802_io, AS_IO, 8, ts802_state)
+ADDRESS_MAP_START(ts802_state::ts802_io)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_READ(port00_r)  // DIP switches

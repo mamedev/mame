@@ -65,6 +65,12 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
 	void paranoia(machine_config &config);
+	void paranoia_8085_io_map(address_map &map);
+	void paranoia_8085_map(address_map &map);
+	void paranoia_z80_io_map(address_map &map);
+	void paranoia_z80_map(address_map &map);
+	void pce_io(address_map &map);
+	void pce_mem(address_map &map);
 };
 
 
@@ -72,7 +78,7 @@ static INPUT_PORTS_START( paranoia )
 	PCE_STANDARD_INPUT_PORT_P1
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, paranoia_state )
+ADDRESS_MAP_START(paranoia_state::pce_mem)
 	AM_RANGE( 0x000000, 0x03FFFF) AM_ROM
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
 	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
@@ -83,7 +89,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io , AS_IO, 8, paranoia_state )
+ADDRESS_MAP_START(paranoia_state::pce_io)
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
@@ -92,7 +98,7 @@ WRITE8_MEMBER(paranoia_state::i8085_d000_w)
 	//logerror( "D000 (8085) write %02x\n", data );
 }
 
-static ADDRESS_MAP_START(paranoia_8085_map, AS_PROGRAM, 8, paranoia_state )
+ADDRESS_MAP_START(paranoia_state::paranoia_8085_map)
 	AM_RANGE( 0x0000, 0x7fff) AM_ROM
 	AM_RANGE( 0x8000, 0x80ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE( 0x8100, 0x8107) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
@@ -100,10 +106,10 @@ static ADDRESS_MAP_START(paranoia_8085_map, AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0xe000, 0xe1ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(paranoia_8085_io_map, AS_IO, 8, paranoia_state )
+ADDRESS_MAP_START(paranoia_state::paranoia_8085_io_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(paranoia_z80_map, AS_PROGRAM, 8, paranoia_state )
+ADDRESS_MAP_START(paranoia_state::paranoia_z80_map)
 	AM_RANGE( 0x0000, 0x3fff) AM_ROM
 	AM_RANGE( 0x6000, 0x67ff) AM_RAM
 	AM_RANGE( 0x7000, 0x73ff) AM_RAM
@@ -127,7 +133,7 @@ WRITE8_MEMBER(paranoia_state::z80_io_37_w)
 {
 }
 
-static ADDRESS_MAP_START(paranoia_z80_io_map, AS_IO, 8, paranoia_state )
+ADDRESS_MAP_START(paranoia_state::paranoia_z80_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ(z80_io_01_r )
 	AM_RANGE( 0x02, 0x02 ) AM_READ(z80_io_02_r )

@@ -144,6 +144,20 @@ public:
 	void trvwhziv(machine_config &config);
 	void bigappg(machine_config &config);
 	void pitboss(machine_config &config);
+	void bigappg_map(address_map &map);
+	void casino5_map(address_map &map);
+	void couple_map(address_map &map);
+	void dodge_map(address_map &map);
+	void dtrvwz5_map(address_map &map);
+	void misdraw_map(address_map &map);
+	void phrcraze_io_map(address_map &map);
+	void phrcraze_map(address_map &map);
+	void pitboss_map(address_map &map);
+	void tictac_io_map(address_map &map);
+	void tictac_map(address_map &map);
+	void trvwhiz_io_map(address_map &map);
+	void trvwhiz_map(address_map &map);
+	void trvwhziv_map(address_map &map);
 };
 
 
@@ -389,7 +403,7 @@ CUSTOM_INPUT_MEMBER(merit_state::rndbit_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( pitboss_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::pitboss_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -401,7 +415,7 @@ static ADDRESS_MAP_START( pitboss_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( casino5_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::casino5_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank2")
@@ -417,7 +431,7 @@ static ADDRESS_MAP_START( casino5_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigappg_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::bigappg_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -429,10 +443,10 @@ static ADDRESS_MAP_START( bigappg_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( misdraw_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::misdraw_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("cpunvram") // overlays other NVRAM? or is it banked?
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("cpunvram") // overlays other NVRAM? or is it banked?
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) // swapped compared to other set?
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -442,7 +456,7 @@ static ADDRESS_MAP_START( misdraw_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dodge_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::dodge_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -459,7 +473,7 @@ ADDRESS_MAP_END
  * ==> mirror 1DF3 & ~effective_addr_lines
  * */
 
-static ADDRESS_MAP_START( trvwhiz_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::trvwhiz_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4c00, 0x4cff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0x5400, 0x54ff) AM_WRITE(low_offset_w)
@@ -474,13 +488,13 @@ static ADDRESS_MAP_START( trvwhiz_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trvwhiz_io_map, AS_IO, 8, merit_state )
+ADDRESS_MAP_START(merit_state::trvwhiz_io_map)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("aysnd", ay8912_device, address_w)
 	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( phrcraze_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::phrcraze_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -495,13 +509,13 @@ static ADDRESS_MAP_START( phrcraze_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phrcraze_io_map, AS_IO, 8, merit_state )
+ADDRESS_MAP_START(merit_state::phrcraze_io_map)
 	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, address_w)
 	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tictac_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::tictac_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -516,13 +530,13 @@ static ADDRESS_MAP_START( tictac_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tictac_io_map, AS_IO, 8, merit_state )
+ADDRESS_MAP_START(merit_state::tictac_io_map)
 	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, address_w)
 	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( trvwhziv_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::trvwhziv_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -537,7 +551,7 @@ static ADDRESS_MAP_START( trvwhziv_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dtrvwz5_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::dtrvwz5_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xb000, 0xb0ff) AM_ROM /* protection? code jumps here */
@@ -553,7 +567,7 @@ static ADDRESS_MAP_START( dtrvwz5_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( couple_map, AS_PROGRAM, 8, merit_state )
+ADDRESS_MAP_START(merit_state::couple_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("backup_ram")
@@ -1404,7 +1418,8 @@ MACHINE_CONFIG_START(merit_state::pitboss)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::casino5, pitboss)
+MACHINE_CONFIG_START(merit_state::casino5)
+	pitboss(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(casino5_map)
@@ -1414,7 +1429,8 @@ MACHINE_CONFIG_DERIVED(merit_state::casino5, pitboss)
 	MCFG_MACHINE_START_OVERRIDE(merit_state,casino5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::bigappg, pitboss)
+MACHINE_CONFIG_START(merit_state::bigappg)
+	pitboss(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bigappg_map)
@@ -1423,7 +1439,8 @@ MACHINE_CONFIG_DERIVED(merit_state::bigappg, pitboss)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::misdraw, bigappg)
+MACHINE_CONFIG_START(merit_state::misdraw)
+	bigappg(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(misdraw_map)
@@ -1431,7 +1448,8 @@ MACHINE_CONFIG_DERIVED(merit_state::misdraw, bigappg)
 	MCFG_NVRAM_ADD_0FILL("cpunvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::dodge, pitboss)
+MACHINE_CONFIG_START(merit_state::dodge)
+	pitboss(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dodge_map)
@@ -1440,42 +1458,48 @@ MACHINE_CONFIG_DERIVED(merit_state::dodge, pitboss)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", merit_state, dodge_nvram_init)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::tictac, pitboss)
+MACHINE_CONFIG_START(merit_state::tictac)
+	pitboss(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tictac_map)
 	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::trvwhiz, pitboss)
+MACHINE_CONFIG_START(merit_state::trvwhiz)
+	pitboss(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trvwhiz_map)
 	MCFG_CPU_IO_MAP(trvwhiz_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::dtrvwz5, pitboss)
+MACHINE_CONFIG_START(merit_state::dtrvwz5)
+	pitboss(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dtrvwz5_map)
 	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::phrcraze, pitboss)
+MACHINE_CONFIG_START(merit_state::phrcraze)
+	pitboss(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(phrcraze_map)
 	MCFG_CPU_IO_MAP(phrcraze_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::trvwhziv, pitboss)
+MACHINE_CONFIG_START(merit_state::trvwhziv)
+	pitboss(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trvwhziv_map)
 	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(merit_state::couple, pitboss)
+MACHINE_CONFIG_START(merit_state::couple)
+	pitboss(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(couple_map)

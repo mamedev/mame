@@ -83,7 +83,7 @@ WRITE8_MEMBER( fuuki16_state::sound_command_w )
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 }
 
-static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
+ADDRESS_MAP_START(fuuki16_state::fuuki16_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                                                                     // RAM
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram.0")                  // Layers
@@ -128,13 +128,13 @@ WRITE8_MEMBER(fuuki16_state::oki_banking_w)
 	m_oki->set_rom_bank((data & 6) >> 1);
 }
 
-static ADDRESS_MAP_START( fuuki16_sound_map, AS_PROGRAM, 8, fuuki16_state )
+ADDRESS_MAP_START(fuuki16_state::fuuki16_sound_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM         // ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM         // RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")    // Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8, fuuki16_state )
+ADDRESS_MAP_START(fuuki16_state::fuuki16_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_rombank_w)  // ROM Bank
 	AM_RANGE(0x11, 0x11) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP // From Main CPU / ? To Main CPU ?

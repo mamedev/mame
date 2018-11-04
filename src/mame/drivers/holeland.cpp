@@ -30,7 +30,7 @@ WRITE_LINE_MEMBER(holeland_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )
+ADDRESS_MAP_START(holeland_state::holeland_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( holeland_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crzrally_map, AS_PROGRAM, 8, holeland_state )
+ADDRESS_MAP_START(holeland_state::crzrally_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
@@ -51,7 +51,7 @@ static ADDRESS_MAP_START( crzrally_map, AS_PROGRAM, 8, holeland_state )
 	AM_RANGE(0xf800, 0xf807) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, holeland_state )
+ADDRESS_MAP_START(holeland_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  /* ? */
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("ay1", ay8910_device, data_r)

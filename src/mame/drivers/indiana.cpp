@@ -39,10 +39,11 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	void indiana(machine_config &config);
+	void indiana_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(indiana_mem, AS_PROGRAM, 32, indiana_state)
+ADDRESS_MAP_START(indiana_state::indiana_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_MIRROR(0x7f800000) AM_ROM AM_REGION("user1", 0) // 64Kb of EPROM
 	AM_RANGE(0x00100000, 0x00107fff) AM_MIRROR(0x7f8f8000) AM_RAM // SRAM 32Kb of SRAM

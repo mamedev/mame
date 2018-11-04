@@ -109,6 +109,10 @@ public:
 	void mightybj(machine_config &config);
 	void vsnes_bootleg(machine_config &config);
 	void jajamaru(machine_config &config);
+	void vsnes_bootleg_z80_map(address_map &map);
+	void vsnes_cpu1_bootleg_map(address_map &map);
+	void vsnes_cpu1_map(address_map &map);
+	void vsnes_cpu2_map(address_map &map);
 private:
 	int m_coin;
 	int m_do_vrom_bank;

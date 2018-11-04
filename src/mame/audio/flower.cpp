@@ -24,7 +24,7 @@
 DEFINE_DEVICE_TYPE(FLOWER_CUSTOM, flower_sound_device, "flower_sound", "Flower Custom Sound")
 
 // TODO: AM_SELECT unsupported by DEVICE_ADDRESS_MAP, so we need a trampoline here
-static ADDRESS_MAP_START( regs_map, AS_IO, 8, flower_sound_device )
+ADDRESS_MAP_START(flower_sound_device::regs_map)
 	AM_RANGE(0x00, 0x03) AM_SELECT(0x38) AM_WRITE(frequency_w)
 	AM_RANGE(0x04, 0x04) AM_SELECT(0x38) AM_WRITE(repeat_w)
 	AM_RANGE(0x05, 0x05) AM_SELECT(0x38) AM_WRITE(unk_w)
@@ -45,7 +45,7 @@ flower_sound_device::flower_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, FLOWER_CUSTOM, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_memory_interface(mconfig, *this),
-	  m_io_space_config("io", ENDIANNESS_LITTLE, 8, 7, 0, *ADDRESS_MAP_NAME(regs_map)),
+	  m_io_space_config("io", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(flower_sound_device::regs_map), this)),
 	  m_stream(nullptr),
 	  m_mixer_table(nullptr),
 	  m_mixer_lookup(nullptr),

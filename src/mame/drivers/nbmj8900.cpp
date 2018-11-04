@@ -93,21 +93,21 @@ DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 }
 
 
-static ADDRESS_MAP_START( ohpaipee_map, AS_PROGRAM, 8, nbmj8900_state )
+ADDRESS_MAP_START(nbmj8900_state::ohpaipee_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type1_r, palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( togenkyo_map, AS_PROGRAM, 8, nbmj8900_state )
+ADDRESS_MAP_START(nbmj8900_state::togenkyo_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(clut_r, clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(palette_type1_r, palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8, nbmj8900_state )
+ADDRESS_MAP_START(nbmj8900_state::ohpaipee_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_DEVREAD("nb1413m3", nb1413m3_device, sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("nb1413m3", nb1413m3_device, nmi_clock_w)
@@ -335,7 +335,8 @@ MACHINE_CONFIG_START(nbmj8900_state::ohpaipee)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj8900_state::togenkyo, ohpaipee)
+MACHINE_CONFIG_START(nbmj8900_state::togenkyo)
+	ohpaipee(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

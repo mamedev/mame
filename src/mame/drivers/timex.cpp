@@ -525,7 +525,7 @@ void spectrum_state::ts2068_update_memory()
 	}
 }
 
-static ADDRESS_MAP_START(ts2068_io, AS_IO, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::ts2068_io)
 	AM_RANGE(0xf4, 0xf4) AM_READWRITE(ts2068_port_f4_r,ts2068_port_f4_w ) AM_MIRROR(0xff00)
 	AM_RANGE(0xf5, 0xf5) AM_DEVWRITE("ay8912", ay8910_device, address_w ) AM_MIRROR(0xff00)
 	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, data_w ) AM_MIRROR(0xff00)
@@ -533,7 +533,7 @@ static ADDRESS_MAP_START(ts2068_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,ts2068_port_ff_w ) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ts2068_mem, AS_PROGRAM, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::ts2068_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
 	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
@@ -569,12 +569,12 @@ WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
 	logerror("Port %04x write %02x\n", offset, data);
 }
 
-static ADDRESS_MAP_START(tc2048_io, AS_IO, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::tc2048_io)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,tc2048_port_ff_w)  AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tc2048_mem, AS_PROGRAM, 8, spectrum_state )
+ADDRESS_MAP_START(spectrum_state::tc2048_mem)
 	AM_RANGE( 0x0000, 0x3fff) AM_ROM
 	AM_RANGE( 0x4000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 ADDRESS_MAP_END
@@ -682,7 +682,8 @@ static GFXDECODE_START( ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_DERIVED(spectrum_state::ts2068, spectrum_128)
+MACHINE_CONFIG_START(spectrum_state::ts2068)
+	spectrum_128(config);
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
 	MCFG_CPU_PROGRAM_MAP(ts2068_mem)
 	MCFG_CPU_IO_MAP(ts2068_io)
@@ -721,13 +722,15 @@ MACHINE_CONFIG_DERIVED(spectrum_state::ts2068, spectrum_128)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(spectrum_state::uk2086, ts2068)
+MACHINE_CONFIG_START(spectrum_state::uk2086)
+	ts2068(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(spectrum_state::tc2048, spectrum)
+MACHINE_CONFIG_START(spectrum_state::tc2048)
+	spectrum(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tc2048_mem)
 	MCFG_CPU_IO_MAP(tc2048_io)

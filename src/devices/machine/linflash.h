@@ -39,6 +39,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void linear_flash_pccard_16mb(address_map &map);
 };
 
 
@@ -50,6 +53,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void linear_flash_pccard_32mb(address_map &map);
 };
 
 
@@ -61,6 +67,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void linear_flash_pccard_64mb(address_map &map);
 };
 
 

@@ -105,6 +105,10 @@ public:
 	bool m_screen_enable;
 	uint8_t m_bg_scrollx, m_bg_scrolly;
 	void sprcros2(machine_config &config);
+	void master_io(address_map &map);
+	void master_map(address_map &map);
+	void slave_io(address_map &map);
+	void slave_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -239,7 +243,7 @@ WRITE8_MEMBER(sprcros2_state::bg_scrolly_w)
 	m_bg_scrolly = data;
 }
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, sprcros2_state )
+ADDRESS_MAP_START(sprcros2_state::master_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("master", 0)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("master_rombank")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("fgvram")
@@ -249,7 +253,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io, AS_IO, 8, sprcros2_state )
+ADDRESS_MAP_START(sprcros2_state::master_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76489_device, write)
@@ -259,7 +263,7 @@ static ADDRESS_MAP_START( master_io, AS_IO, 8, sprcros2_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(master_output_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, sprcros2_state )
+ADDRESS_MAP_START(sprcros2_state::slave_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("slave", 0)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("slave_rombank")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("bgvram")
@@ -268,7 +272,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io, AS_IO, 8, sprcros2_state )
+ADDRESS_MAP_START(sprcros2_state::slave_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(bg_scrollx_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(bg_scrolly_w)

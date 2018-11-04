@@ -110,7 +110,7 @@ Notes:
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midwunit_state )
+ADDRESS_MAP_START(midwunit_state::main_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_r, midtunit_vram_w)
 	AM_RANGE(0x01000000, 0x013fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x01400000, 0x0145ffff) AM_READWRITE(midwunit_cmos_r, midwunit_cmos_w) AM_SHARE("nvram")
@@ -650,13 +650,15 @@ MACHINE_CONFIG_START(midwunit_state::wunit)
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midwunit_state::wunit_picsim, wunit)
+MACHINE_CONFIG_START(midwunit_state::wunit_picsim)
+	wunit(config);
 	MCFG_DEVICE_ADD("serial_security_sim", MIDWAY_SERIAL_PIC, 0)
 	MCFG_MIDWAY_SERIAL_PIC_UPPER(528); // this is actually a generic code all games check for in addition to their own game specific code!
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midwunit_state::wunit_picemu, wunit)
+MACHINE_CONFIG_START(midwunit_state::wunit_picemu)
+	wunit(config);
 	MCFG_DEVICE_ADD("serial_security", MIDWAY_SERIAL_PIC_EMU, 0)
 
 	// todo, REMOVE once the emulated PIC above works!

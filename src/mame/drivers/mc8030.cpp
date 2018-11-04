@@ -51,13 +51,15 @@ public:
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mc8030(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_region_ptr<u8> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, mc8030_state )
+ADDRESS_MAP_START(mc8030_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	//  ZRE 4 * 2KB
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // ZRE ROM's 4 * 2716
@@ -67,7 +69,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, mc8030_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM // ZRE RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, mc8030_state )
+ADDRESS_MAP_START(mc8030_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x30, 0x3f) AM_MIRROR(0xff00) AM_NOP //"mass storage"
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_ctc", z80ctc_device, read, write) // user CTC

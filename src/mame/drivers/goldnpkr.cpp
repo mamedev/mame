@@ -1365,6 +1365,18 @@ public:
 	void pottnpkr(machine_config &config);
 	void goldnpkr(machine_config &config);
 	void wcrdxtnd(machine_config &config);
+	void bchancep_map(address_map &map);
+	void genie_map(address_map &map);
+	void goldnpkr_map(address_map &map);
+	void mondial_map(address_map &map);
+	void pottnpkr_map(address_map &map);
+	void wcrdxtnd_map(address_map &map);
+	void wildcard_map(address_map &map);
+	void wildcrdb_map(address_map &map);
+	void wildcrdb_mcu_io_map(address_map &map);
+	void wildcrdb_mcu_map(address_map &map);
+	void witchcrd_falcon_map(address_map &map);
+	void witchcrd_map(address_map &map);
 protected:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -1404,6 +1416,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_portb_w);
 	DECLARE_WRITE8_MEMBER(mcu_portc_w);
 	void megadpkr(machine_config &config);
+	void megadpkr_banked_map(address_map &map);
+	void megadpkr_map(address_map &map);
 };
 
 
@@ -1818,7 +1832,7 @@ READ8_MEMBER(goldnpkr_state::pia1_b_r)
 *           Memory Map Information           *
 *********************************************/
 
-static ADDRESS_MAP_START( goldnpkr_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::goldnpkr_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -1830,7 +1844,7 @@ static ADDRESS_MAP_START( goldnpkr_map, AS_PROGRAM, 8, goldnpkr_state )
 	AM_RANGE(0x2000, 0x7fff) AM_ROM /* superdbl uses 0x2000..0x3fff address space */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pottnpkr_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::pottnpkr_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -1842,7 +1856,7 @@ static ADDRESS_MAP_START( pottnpkr_map, AS_PROGRAM, 8, goldnpkr_state )
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( witchcrd_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::witchcrd_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -1869,7 +1883,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( witchcrd_falcon_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::witchcrd_falcon_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
@@ -1882,7 +1896,7 @@ static ADDRESS_MAP_START( witchcrd_falcon_map, AS_PROGRAM, 8, goldnpkr_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wildcard_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::wildcard_map)
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -1904,7 +1918,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( wcrdxtnd_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::wcrdxtnd_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram") /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -1924,7 +1938,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( wildcrdb_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::wildcrdb_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
@@ -1938,13 +1952,13 @@ static ADDRESS_MAP_START( wildcrdb_map, AS_PROGRAM, 8, goldnpkr_state )
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wildcrdb_mcu_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::wildcrdb_mcu_map)
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x2fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wildcrdb_mcu_io_map, AS_IO, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::wildcrdb_mcu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -1957,7 +1971,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( genie_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::genie_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -1970,7 +1984,7 @@ static ADDRESS_MAP_START( genie_map, AS_PROGRAM, 8, goldnpkr_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mondial_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::mondial_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -1982,7 +1996,7 @@ static ADDRESS_MAP_START( mondial_map, AS_PROGRAM, 8, goldnpkr_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bchancep_map, AS_PROGRAM, 8, goldnpkr_state )
+ADDRESS_MAP_START(goldnpkr_state::bchancep_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -4303,7 +4317,8 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::goldnpkr, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::goldnpkr)
+	goldnpkr_base(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4313,7 +4328,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::goldnpkr, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::pottnpkr, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::pottnpkr)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4331,7 +4347,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::pottnpkr, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::witchcrd, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::witchcrd)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4353,7 +4370,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::witchcrd, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::wcfalcon, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::wcfalcon)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4376,7 +4394,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::wcfalcon, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcard, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::wildcard)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4400,7 +4419,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcard, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::wcrdxtnd, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::wcrdxtnd)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4424,7 +4444,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::wcrdxtnd, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcrdb, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::wildcrdb)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4453,7 +4474,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::wildcrdb, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::genie, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::genie)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4475,7 +4497,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::genie, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::geniea, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::geniea)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4497,7 +4520,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::geniea, goldnpkr_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::mondial, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::mondial)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4513,7 +4537,8 @@ MACHINE_CONFIG_DERIVED(goldnpkr_state::mondial, goldnpkr_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(goldnpkr_state::bchancep, goldnpkr_base)
+MACHINE_CONFIG_START(goldnpkr_state::bchancep)
+	goldnpkr_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4578,7 +4603,7 @@ WRITE8_MEMBER(blitz_state::mcu_portc_w)
 }
 
 
-static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
+ADDRESS_MAP_START(blitz_state::megadpkr_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram")   /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -4599,7 +4624,7 @@ static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megadpkr_banked_map, AS_PROGRAM, 8, blitz_state )
+ADDRESS_MAP_START(blitz_state::megadpkr_banked_map)
 	AM_RANGE(0x00000, 0x07fff) AM_READ(cpubank_decrypt_r)
 	AM_RANGE(0x08000, 0x087ff) AM_DEVREADWRITE("timekpr", m48t02_device, read, write)
 ADDRESS_MAP_END

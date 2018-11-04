@@ -240,6 +240,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void tmspoker(machine_config &config);
+	void tmspoker_cru_map(address_map &map);
+	void tmspoker_map(address_map &map);
 };
 
 
@@ -324,7 +326,7 @@ void tmspoker_state::machine_reset()
 * Memory Map Information *
 *************************/
 //59a
-static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8, tmspoker_state )
+ADDRESS_MAP_START(tmspoker_state::tmspoker_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2800, 0x2800) AM_READNOP AM_DEVWRITE("crtc", mc6845_device, address_w)
@@ -341,7 +343,7 @@ READ8_MEMBER(tmspoker_state::unk_r)
 	return 0;//0xff;//mame_rand(machine);
 }
 
-static ADDRESS_MAP_START( tmspoker_cru_map, AS_IO, 8, tmspoker_state )
+ADDRESS_MAP_START(tmspoker_state::tmspoker_cru_map)
 	AM_RANGE(0x0000, 0x07ff) AM_READ(unk_r)
 ADDRESS_MAP_END
 

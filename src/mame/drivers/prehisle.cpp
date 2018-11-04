@@ -30,7 +30,7 @@ WRITE16_MEMBER(prehisle_state::soundcmd_w)
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( prehisle_map, AS_PROGRAM, 16, prehisle_state )
+ADDRESS_MAP_START(prehisle_state::prehisle_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x070000, 0x073fff) AM_RAM
 	AM_RANGE(0x090000, 0x0907ff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("tx_vram")
@@ -38,8 +38,8 @@ static ADDRESS_MAP_START( prehisle_map, AS_PROGRAM, 16, prehisle_state )
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(fg_vram_w) AM_SHARE("fg_vram")
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e00ff) AM_READ(control_r)
-	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(soundcmd_w)
 	AM_RANGE(0x0f0000, 0x0ff0ff) AM_WRITE(control_w)
+	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(soundcmd_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -56,14 +56,14 @@ WRITE8_MEMBER(prehisle_state::D7759_upd_reset_w)
 	m_upd7759->reset_w(data & 0x80);
 }
 
-static ADDRESS_MAP_START( prehisle_sound_map, AS_PROGRAM, 8, prehisle_state )
+ADDRESS_MAP_START(prehisle_state::prehisle_sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP    // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prehisle_sound_io_map, AS_IO, 8, prehisle_state )
+ADDRESS_MAP_START(prehisle_state::prehisle_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)

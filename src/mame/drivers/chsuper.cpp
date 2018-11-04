@@ -56,6 +56,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void chsuper(machine_config &config);
+	void chsuper_portmap(address_map &map);
+	void chsuper_prg_map(address_map &map);
+	void ramdac_map(address_map &map);
 protected:
 	// driver_device overrides
 	//virtual void machine_start();
@@ -203,7 +206,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 *   Memory Map handlers    *
 ***************************/
 
-static ADDRESS_MAP_START( chsuper_prg_map, AS_PROGRAM, 8, chsuper_state )
+ADDRESS_MAP_START(chsuper_state::chsuper_prg_map)
 	AM_RANGE(0x00000, 0x0efff) AM_ROM
 	AM_RANGE(0x00000, 0x01fff) AM_WRITE( chsuper_vram_w )
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_REGION("maincpu", 0xf000)
@@ -212,7 +215,7 @@ ADDRESS_MAP_END
 
 //  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
-static ADDRESS_MAP_START( chsuper_portmap, AS_IO, 8, chsuper_state )
+ADDRESS_MAP_START(chsuper_state::chsuper_portmap)
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 	AM_RANGE( 0x00e8, 0x00e8 ) AM_READ_PORT("IN0")
 	AM_RANGE( 0x00e9, 0x00e9 ) AM_READ_PORT("IN1")
@@ -343,7 +346,7 @@ static GFXDECODE_START( chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, chsuper_state )
+ADDRESS_MAP_START(chsuper_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

@@ -3716,7 +3716,7 @@ MACHINE_CONFIG_END
     - all LPU RAM is dynamically mapped at machine start according to -ramsize option
 */
 
-static ADDRESS_MAP_START(global_mem_map , AS_PROGRAM , 16 , hp9845_base_state)
+ADDRESS_MAP_START(hp9845_base_state::global_mem_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3f7fff)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x014000 , 0x017fff) AM_RAM AM_SHARE("ppu_ram")
@@ -3724,7 +3724,7 @@ static ADDRESS_MAP_START(global_mem_map , AS_PROGRAM , 16 , hp9845_base_state)
 	AM_RANGE(0x050000 , 0x057fff) AM_ROM AM_REGION("ppu" , 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ppu_io_map , AS_IO , 16 , hp9845_base_state)
+ADDRESS_MAP_START(hp9845_base_state::ppu_io_map)
 	ADDRESS_MAP_UNMAP_LOW
 	// PA = 0, IC = 0..1
 	// Internal printer
@@ -3834,7 +3834,7 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845b_state::hp9845b)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
@@ -3852,7 +3852,7 @@ MACHINE_CONFIG_START(hp9845b_state::hp9845b)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845c_state::hp9845c)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845c_state, screen_update)
@@ -3866,7 +3866,7 @@ MACHINE_CONFIG_START(hp9845c_state::hp9845c)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845t_state::hp9845t)
-	MCFG_FRAGMENT_ADD(hp9845_base)
+	hp9845_base(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845t_state, screen_update)

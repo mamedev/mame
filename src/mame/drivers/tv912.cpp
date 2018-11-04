@@ -108,6 +108,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(uart_settings_changed);
 
 	void tv912(machine_config &config);
+	void bank_map(address_map &map);
+	void io_map(address_map &map);
+	void prog_map(address_map &map);
 private:
 	enum
 	{
@@ -370,15 +373,15 @@ void tv912_state::machine_reset()
 	m_uart->set_input_pin(AY31015_CS, 1);
 }
 
-static ADDRESS_MAP_START( prog_map, AS_PROGRAM, 8, tv912_state )
+ADDRESS_MAP_START(tv912_state::prog_map)
 	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, tv912_state )
+ADDRESS_MAP_START(tv912_state::io_map)
 	AM_RANGE(0x00, 0xff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank_map, 0, 8, tv912_state )
+ADDRESS_MAP_START(tv912_state::bank_map)
 	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
 	AM_RANGE(0x404, 0x404) AM_MIRROR(0x3f3) AM_READ(uart_data_r)

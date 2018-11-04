@@ -144,6 +144,9 @@ public:
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
 	void stuntair(machine_config &config);
+	void stuntair_map(address_map &map);
+	void stuntair_sound_map(address_map &map);
+	void stuntair_sound_portmap(address_map &map);
 };
 
 
@@ -317,7 +320,7 @@ WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
 }
 
 // main Z80
-static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
+ADDRESS_MAP_START(stuntair_state::stuntair_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(stuntair_bgattrram_w) AM_SHARE("bgattrram")
@@ -334,12 +337,12 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 ADDRESS_MAP_END
 
 // sound Z80
-static ADDRESS_MAP_START( stuntair_sound_map, AS_PROGRAM, 8, stuntair_state )
+ADDRESS_MAP_START(stuntair_state::stuntair_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stuntair_sound_portmap, AS_IO, 8, stuntair_state )
+ADDRESS_MAP_START(stuntair_state::stuntair_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE("ay2", ay8910_device, data_w)

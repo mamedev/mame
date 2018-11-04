@@ -213,6 +213,8 @@ public:
 
 	uint16_t get_peripheral_memory(uint16_t addr);
 
+	void dsp56156_program_map(address_map &map);
+	void dsp56156_x_data_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

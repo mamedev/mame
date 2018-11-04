@@ -168,6 +168,8 @@ public:
 	void jb3000(machine_config &config);
 	void myb3k(machine_config &config);
 
+	void myb3k_io(address_map &map);
+	void myb3k_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -561,7 +563,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
  *       OFF ON  - ?
  *       ON  ON  - ?
  **********************************************************/
-static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
+ADDRESS_MAP_START(myb3k_state::myb3k_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM installed by machine_start()
 	AM_RANGE(0x40000,0x7ffff) AM_NOP
@@ -570,7 +572,7 @@ static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
 	AM_RANGE(0xf0000,0xfffff) AM_ROM AM_REGION("ipl", 0) // Area 7, 8 x 8Kb
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
+ADDRESS_MAP_START(myb3k_state::myb3k_io)
 	ADDRESS_MAP_UNMAP_LOW
 	/* Main Unit 0-0x7ff */
 	// 0-3 8255A PPI parallel port
@@ -1021,15 +1023,17 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(myb3k_state::jb3000, myb3k)
+MACHINE_CONFIG_START(myb3k_state::jb3000)
+	myb3k(config);
 	/* Keyboard */
 	MCFG_DEVICE_REPLACE("myb3k_keyboard", JB3000_KEYBOARD, 0)
 	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(myb3k_state::stepone, myb3k)
-  /* Keyboard */
+MACHINE_CONFIG_START(myb3k_state::stepone)
+	myb3k(config);
+	/* Keyboard */
 	MCFG_DEVICE_REPLACE("myb3k_keyboard", STEPONE_KEYBOARD, 0)
 	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
 
@@ -1046,8 +1050,8 @@ ROM_END
 
 ROM_START( jb3000 )
 	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "jb3000chrg-v2.07.bin", 0xc000, 0x2000, NO_DUMP)
-	ROM_LOAD( "jb3000bios-v2.07.bin", 0xe000, 0x2000, NO_DUMP)
+	ROM_LOAD( "jb3000chrg-v2.07.bin", 0xc000, 0x2000, CRC(efffe4cb) SHA1(1305d1fb0bc39b6464f4e2f000a584f9e67f784a))
+	ROM_LOAD( "jb3000bios-v2.07.bin", 0xe000, 0x2000, CRC(c4c46cc5) SHA1(a3e186513fbe9ad0e369b481999393a3506db39e))
 ROM_END
 
 ROM_START( stepone )
@@ -1058,5 +1062,5 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  STATE           INIT   COMPANY        FULLNAME        FLAGS
 COMP( 1982, myb3k,   0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Matsushita",  "MyBrain 3000", 0)
-COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      MACHINE_NOT_WORKING) // No rom dump available
+COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      0)
 COMP( 1984, stepone, myb3k,  0,       stepone,   myb3k, myb3k_state,    0,     "Ericsson",    "Step/One",     0)

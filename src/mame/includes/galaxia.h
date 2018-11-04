@@ -35,4 +35,8 @@ public:
 	void init_common();
 	void astrowar(machine_config &config);
 	void galaxia(machine_config &config);
+	void astrowar_mem_map(address_map &map);
+	void galaxia_data_map(address_map &map);
+	void galaxia_io_map(address_map &map);
+	void galaxia_mem_map(address_map &map);
 };

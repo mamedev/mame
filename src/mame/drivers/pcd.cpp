@@ -82,6 +82,9 @@ public:
 
 	void pcx(machine_config &config);
 	void pcd(machine_config &config);
+	void pcd_io(address_map &map);
+	void pcd_map(address_map &map);
+	void pcx_io(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -434,13 +437,13 @@ READ16_MEMBER(pcd_state::mem_r)
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( pcd_map, AS_PROGRAM, 16, pcd_state )
+ADDRESS_MAP_START(pcd_state::pcd_map)
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(mem_r, mem_w)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
+ADDRESS_MAP_START(pcd_state::pcd_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
@@ -461,11 +464,11 @@ static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	AM_RANGE(0xfb02, 0xffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcx_io, AS_IO, 16, pcd_state )
+ADDRESS_MAP_START(pcd_state::pcx_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_IMPORT_FROM(pcd_io)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(mmu_r, mmu_w)
 	AM_RANGE(0xfb00, 0xfb01) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xff00)
-	AM_IMPORT_FROM(pcd_io)
 ADDRESS_MAP_END
 
 //**************************************************************************
@@ -570,7 +573,8 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_SCSIDEV_ADD("scsi:1", "harddisk", OMTI5100, SCSI_ID_0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pcd_state::pcx, pcd)
+MACHINE_CONFIG_START(pcd_state::pcx)
+	pcd(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pcx_io)
 

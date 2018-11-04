@@ -73,6 +73,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	void czk80(machine_config &config);
+	void czk80_io(address_map &map);
+	void czk80_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -103,13 +105,13 @@ READ8_MEMBER( czk80_state::port81_r )
 	return (m_term_data) ? 3 : 1;
 }
 
-static ADDRESS_MAP_START(czk80_mem, AS_PROGRAM, 8, czk80_state)
+ADDRESS_MAP_START(czk80_state::czk80_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x2000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(czk80_io, AS_IO, 8, czk80_state)
+ADDRESS_MAP_START(czk80_state::czk80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)
 	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("pio", z80pio_device, read, write)

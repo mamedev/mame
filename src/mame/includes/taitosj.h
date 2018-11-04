@@ -156,4 +156,8 @@ public:
 	void mcu(machine_config &config);
 	void nomcu(machine_config &config);
 	void kikstart(machine_config &config);
+	void kikstart_main_map(address_map &map);
+	void taitosj_audio_map(address_map &map);
+	void taitosj_main_mcu_map(address_map &map);
+	void taitosj_main_nomcu_map(address_map &map);
 };

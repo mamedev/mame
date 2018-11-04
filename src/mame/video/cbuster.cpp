@@ -69,6 +69,7 @@ uint32_t cbuster_state::screen_update_twocrude(screen_device &screen, bitmap_rgb
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(!BIT(flip, 7));
+	m_sprgen->set_flip_screen(!BIT(flip, 7));
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram16_buffer, 0x400);
 

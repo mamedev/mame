@@ -81,6 +81,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
 
 	void pk8020(machine_config &config);
+	void pk8020_io(address_map &map);
+	void pk8020_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255_1;

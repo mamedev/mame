@@ -136,7 +136,7 @@ READ8_MEMBER(tecmo_state::dswb_h_r)
 }
 
 
-static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::rygar_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::gemini_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::silkworm_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITENOP    /* ? if mapped to watchdog like in the others, causes reset */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::rygar_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3526_device, write)
@@ -231,10 +231,10 @@ static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
+ADDRESS_MAP_START(tecmo_state::tecmo_sound_map)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x2000, 0x207f) AM_RAM             /* Silkworm set #2 has a custom CPU which */
 												/* writes code to this area */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
@@ -666,7 +666,8 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tecmo_state::gemini, rygar)
+MACHINE_CONFIG_START(tecmo_state::gemini)
+	rygar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -682,13 +683,15 @@ MACHINE_CONFIG_DERIVED(tecmo_state::gemini, rygar)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tecmo_state::geminib, gemini)
+MACHINE_CONFIG_START(tecmo_state::geminib)
+	gemini(config);
 	// 24.18 MHz OSC / 59.62 Hz, bootleg only?
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(24180000/4, 384,0,256,264,16,240)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tecmo_state::silkworm, gemini)
+MACHINE_CONFIG_START(tecmo_state::silkworm)
+	gemini(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -696,7 +699,8 @@ MACHINE_CONFIG_DERIVED(tecmo_state::silkworm, gemini)
 	MCFG_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tecmo_state::backfirt, gemini)
+MACHINE_CONFIG_START(tecmo_state::backfirt)
+	gemini(config);
 
 	/* this pcb has no MSM5205 */
 	MCFG_DEVICE_REMOVE("msm")

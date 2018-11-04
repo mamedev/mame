@@ -84,7 +84,6 @@ private:
 
 
 // device type definition
-extern const device_type I5000_SND;
 DECLARE_DEVICE_TYPE(I5000_SND, i5000snd_device)
 
 #endif // MAME_SOUND_I5000_H

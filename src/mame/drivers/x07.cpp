@@ -1220,7 +1220,7 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 	}
 }
 
-static ADDRESS_MAP_START(x07_mem, AS_PROGRAM, 8, x07_state)
+ADDRESS_MAP_START(x07_state::x07_mem)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x1fff) AM_NOP     //RAM installed at runtime
 	AM_RANGE(0x2000, 0x7fff) AM_NOP     //Memory Card RAM/ROM
@@ -1230,7 +1230,7 @@ static ADDRESS_MAP_START(x07_mem, AS_PROGRAM, 8, x07_state)
 	AM_RANGE(0xb000, 0xffff) AM_ROM     AM_REGION("basic", 0)       //BASIC ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x07_io , AS_IO, 8, x07_state)
+ADDRESS_MAP_START(x07_state::x07_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(x07_io_r, x07_io_w)

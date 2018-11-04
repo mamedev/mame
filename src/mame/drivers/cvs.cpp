@@ -445,7 +445,7 @@ WRITE8_MEMBER(cvs_state::audio_command_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( cvs_main_cpu_map, AS_PROGRAM, 8, cvs_state )
+ADDRESS_MAP_START(cvs_state::cvs_main_cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, cvs_bullet_ram_or_palette_w) AM_SHARE("bullet_ram")
@@ -459,11 +459,11 @@ static ADDRESS_MAP_START( cvs_main_cpu_map, AS_PROGRAM, 8, cvs_state )
 	AM_RANGE(0x6000, 0x73ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cvs_main_cpu_io_map, AS_IO, 8, cvs_state )
+ADDRESS_MAP_START(cvs_state::cvs_main_cpu_io_map)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(cvs_input_r, cvs_scroll_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cvs_main_cpu_data_map, AS_DATA, 8, cvs_state )
+ADDRESS_MAP_START(cvs_state::cvs_main_cpu_data_map)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(cvs_collision_r, audio_command_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
 ADDRESS_MAP_END
@@ -474,7 +474,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8, cvs_state )
+ADDRESS_MAP_START(cvs_state::cvs_dac_cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
@@ -492,7 +492,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cvs_speech_cpu_map, AS_PROGRAM, 8, cvs_state )
+ADDRESS_MAP_START(cvs_state::cvs_speech_cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(cvs_speech_rom_address_lo_w)

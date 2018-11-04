@@ -60,7 +60,7 @@ const tiny_rom_entry *superpet_device::device_rom_region() const
 //  ADDRESS_MAP( superpet_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( superpet_mem, AS_PROGRAM, 8, superpet_device )
+ADDRESS_MAP_START(superpet_device::superpet_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 

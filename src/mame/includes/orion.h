@@ -89,6 +89,12 @@ public:
 	void orion128(machine_config &config);
 	void orionpro(machine_config &config);
 	void orionz80ms(machine_config &config);
+	void orion128_io(address_map &map);
+	void orion128_mem(address_map &map);
+	void orionpro_io(address_map &map);
+	void orionpro_mem(address_map &map);
+	void orionz80_io(address_map &map);
+	void orionz80_mem(address_map &map);
 protected:
 	uint8_t m_orion128_video_mode;
 	uint8_t m_orion128_video_page;

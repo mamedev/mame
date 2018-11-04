@@ -167,6 +167,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	void chewheel(machine_config &config);
 	void mil4000(machine_config &config);
+	void chewheel_map(address_map &map);
+	void mil4000_map(address_map &map);
 };
 
 
@@ -423,7 +425,7 @@ WRITE16_MEMBER(mil4000_state::unk_w)
 }
 
 
-static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
+ADDRESS_MAP_START(mil4000_state::mil4000_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")  // CY62256L-70, U77
 	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_SHARE("sc1_vram")  // CY62256L-70, U77
@@ -442,7 +444,7 @@ static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chewheel_map, AS_PROGRAM, 16, mil4000_state )
+ADDRESS_MAP_START(mil4000_state::chewheel_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")  // V62C518256L-35P (U7).
 	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_SHARE("sc1_vram")  // V62C518256L-35P (U7).
@@ -566,7 +568,8 @@ MACHINE_CONFIG_START(mil4000_state::mil4000)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mil4000_state::chewheel, mil4000)
+MACHINE_CONFIG_START(mil4000_state::chewheel)
+	mil4000(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chewheel_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)

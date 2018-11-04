@@ -30,6 +30,8 @@ public:
 	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void unistar(machine_config &config);
+	void unistar_io(address_map &map);
+	void unistar_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -37,13 +39,13 @@ private:
 };
 
 
-static ADDRESS_MAP_START(unistar_mem, AS_PROGRAM, 8, unistar_state)
+ADDRESS_MAP_START(unistar_state::unistar_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(unistar_io, AS_IO, 8, unistar_state)
+ADDRESS_MAP_START(unistar_state::unistar_io)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("stc", am9513_device, read8, write8)

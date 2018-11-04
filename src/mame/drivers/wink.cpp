@@ -63,6 +63,10 @@ public:
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
 	void wink(machine_config &config);
+	void wink_io(address_map &map);
+	void wink_map(address_map &map);
+	void wink_sound_io(address_map &map);
+	void wink_sound_map(address_map &map);
 };
 
 
@@ -133,7 +137,7 @@ WRITE8_MEMBER(wink_state::sound_irq_w)
 	//machine().scheduler().synchronize();
 }
 
-static ADDRESS_MAP_START( wink_map, AS_PROGRAM, 8, wink_state )
+ADDRESS_MAP_START(wink_state::wink_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("nvram")
@@ -166,7 +170,7 @@ WRITE8_MEMBER(wink_state::prot_w)
 	//take a9-a15 and stuff them in a variable for later use.
 }
 
-static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
+ADDRESS_MAP_START(wink_state::wink_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") //0x10-0x1f is likely to be something else
 //  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
@@ -189,13 +193,13 @@ static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
 	AM_RANGE(0xe0, 0xff) AM_READ(prot_r)        //load math unit from buffer & lower address-bus
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wink_sound_map, AS_PROGRAM, 8, wink_state )
+ADDRESS_MAP_START(wink_state::wink_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wink_sound_io, AS_IO, 8, wink_state )
+ADDRESS_MAP_START(wink_state::wink_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_device, address_w)

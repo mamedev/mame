@@ -68,6 +68,9 @@ public:
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<dac_byte_interface> m_dac;
 	void craft(machine_config &config);
+	void craft_data_map(address_map &map);
+	void craft_io_map(address_map &map);
+	void craft_prg_map(address_map &map);
 };
 
 inline void craft_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -182,15 +185,15 @@ void craft_state::video_update()
 * Address maps                                       *
 \****************************************************/
 
-static ADDRESS_MAP_START( craft_prg_map, AS_PROGRAM, 8, craft_state )
+ADDRESS_MAP_START(craft_state::craft_prg_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( craft_data_map, AS_DATA, 8, craft_state )
+ADDRESS_MAP_START(craft_state::craft_data_map)
 	AM_RANGE(0x0100, 0x04ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( craft_io_map, AS_IO, 8, craft_state )
+ADDRESS_MAP_START(craft_state::craft_io_map)
 	AM_RANGE(AVR8_IO_PORTA, AVR8_IO_PORTD) AM_READWRITE( port_r, port_w )
 ADDRESS_MAP_END
 

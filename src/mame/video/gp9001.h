@@ -33,7 +33,7 @@ public:
 
 	bitmap_ind8 *custom_priority_bitmap;
 
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
 	// game-specific hack stuff
 	void disable_sprite_buffer() { sp.use_sprite_buffer = 0; }

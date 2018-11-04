@@ -75,7 +75,7 @@ namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *
 }
 
 // (*) denotes master CPU only
-DEVICE_ADDRESS_MAP_START( map, 16, namco_c148_device )
+ADDRESS_MAP_START(namco_c148_device::map)
 	AM_RANGE(0x04000, 0x05fff) AM_READWRITE8(bus_ctrl_r, bus_ctrl_w, 0x00ff)
 	AM_RANGE(0x06000, 0x07fff) AM_READWRITE8(cpu_irq_level_r,cpu_irq_level_w,0x00ff) // CPUIRQ lv
 	AM_RANGE(0x08000, 0x09fff) AM_READWRITE8(ex_irq_level_r,ex_irq_level_w,0x00ff) // EXIRQ lv

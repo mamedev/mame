@@ -469,6 +469,10 @@ public:
 	void amaticmg2(machine_config &config);
 	void amaticmg(machine_config &config);
 	void amaticmg4(machine_config &config);
+	void amaticmg2_portmap(address_map &map);
+	void amaticmg4_portmap(address_map &map);
+	void amaticmg_map(address_map &map);
+	void amaticmg_portmap(address_map &map);
 };
 
 
@@ -641,7 +645,7 @@ WRITE8_MEMBER( amaticmg_state::unk80_w )
 *      Memory Map Information       *
 ************************************/
 
-static ADDRESS_MAP_START( amaticmg_map, AS_PROGRAM, 8, amaticmg_state )
+ADDRESS_MAP_START(amaticmg_state::amaticmg_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("vram")
@@ -649,7 +653,7 @@ static ADDRESS_MAP_START( amaticmg_map, AS_PROGRAM, 8, amaticmg_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
+ADDRESS_MAP_START(amaticmg_state::amaticmg_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -662,7 +666,7 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 //  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amaticmg2_portmap, AS_IO, 8, amaticmg_state )
+ADDRESS_MAP_START(amaticmg_state::amaticmg2_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -675,7 +679,7 @@ static ADDRESS_MAP_START( amaticmg2_portmap, AS_IO, 8, amaticmg_state )
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amaticmg4_portmap, AS_IO, 8, amaticmg_state )
+ADDRESS_MAP_START(amaticmg_state::amaticmg4_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -877,7 +881,8 @@ INTERRUPT_GEN_MEMBER(amaticmg_state::amaticmg2_irq)
 }
 
 
-MACHINE_CONFIG_DERIVED(amaticmg_state::amaticmg2, amaticmg)
+MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
+	amaticmg(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg2_portmap)
@@ -895,7 +900,8 @@ MACHINE_CONFIG_DERIVED(amaticmg_state::amaticmg2, amaticmg)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(amaticmg_state::amaticmg4, amaticmg)
+MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
+	amaticmg(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg4_portmap)

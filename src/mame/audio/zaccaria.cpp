@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device, "zac1b11142", "Zac
     base melody/SFX generator CPU map
     1B11107 and 1B11142 both have a 6802 with internal RAM and a PIA accessed at 0x500c
 */
-static ADDRESS_MAP_START(zac1b111xx_melody_base_map, AS_PROGRAM, 8, zac1b111xx_melody_base)
+ADDRESS_MAP_START(zac1b111xx_melody_base::zac1b111xx_melody_base_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 6802 internal RAM
 	AM_RANGE(0x400c, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("melodypia", pia6821_device, read, write)
@@ -60,7 +60,7 @@ ADDRESS_MAP_END
     * PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 1H
     * PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 1I
 */
-static ADDRESS_MAP_START(zac1b11107_melody_map, AS_PROGRAM, 8, zac1b11107_audio_device)
+ADDRESS_MAP_START(zac1b11107_audio_device::zac1b11107_melody_map)
 	AM_IMPORT_FROM(zac1b111xx_melody_base_map)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM // ROM @ 1F
 	AM_RANGE(0xe000, 0xffff) AM_ROM // ROM @ 1D, 1E
@@ -95,7 +95,7 @@ ADDRESS_MAP_END
     * PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 4G
     * PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 4H
 */
-static ADDRESS_MAP_START(zac1b11142_melody_map, AS_PROGRAM, 8, zac1b11142_audio_device)
+ADDRESS_MAP_START(zac1b11142_audio_device::zac1b11142_melody_map)
 	AM_IMPORT_FROM(zac1b111xx_melody_base_map)
 	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x2000) AM_ROM // ROM 13
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM // ROM 9
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
    CA1 and CB2 are not connected, though the test mode assumes there's something connected to CB2 (possibly another LED like the one connected to PB4)
    PB3 connects to 'ACS' which goes to the Z80
 */
-static ADDRESS_MAP_START(zac1b11142_audio_map, AS_PROGRAM, 8, zac1b11142_audio_device)
+ADDRESS_MAP_START(zac1b11142_audio_device::zac1b11142_audio_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 6802 internal RAM
 	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x8f6c) AM_DEVREADWRITE("pia_1i", pia6821_device, read, write)

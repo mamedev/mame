@@ -528,7 +528,7 @@ WRITE8_MEMBER(homedata_state::bankswitch_w)
 /********************************************************************************/
 
 
-static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::mrokumei_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
@@ -549,7 +549,7 @@ static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrokumei_sound_map, AS_PROGRAM, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::mrokumei_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// TODO: might be that the entire area is sound_bank_w
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP    /* stack writes happen here, but there's no RAM */
@@ -557,7 +557,7 @@ static ADDRESS_MAP_START( mrokumei_sound_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0xffbf, 0xffbf) AM_WRITE(mrokumei_sound_bank_w) // hourouki mirror
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrokumei_sound_io_map, AS_IO, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::mrokumei_sound_io_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(mrokumei_sound_io_r) /* read address is 16-bit */
 	AM_RANGE(0x0040, 0x0040) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write) /* write address is only 8-bit */
 	// hourouki mirror...
@@ -566,7 +566,7 @@ ADDRESS_MAP_END
 
 /********************************************************************************/
 
-static ADDRESS_MAP_START( reikaids_map, AS_PROGRAM, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::reikaids_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work RAM */
@@ -585,14 +585,14 @@ static ADDRESS_MAP_START( reikaids_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( reikaids_upd7807_map, AS_PROGRAM, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::reikaids_upd7807_map)
 	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
 ADDRESS_MAP_END
 
 /**************************************************************************/
 
 
-static ADDRESS_MAP_START( pteacher_map, AS_PROGRAM, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::pteacher_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5eff) AM_RAM
 	AM_RANGE(0x5f00, 0x5fff) AM_RAM
@@ -611,7 +611,7 @@ static ADDRESS_MAP_START( pteacher_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pteacher_upd7807_map, AS_PROGRAM, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::pteacher_upd7807_map)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pteacher_snd_answer_w)
 	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
 ADDRESS_MAP_END
@@ -1364,13 +1364,15 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(homedata_state::mjkinjas, pteacher)
+MACHINE_CONFIG_START(homedata_state::mjkinjas)
+	pteacher(config);
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_CLOCK(11000000)    /* 11MHz ? */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(homedata_state::lemnangl, pteacher)
+MACHINE_CONFIG_START(homedata_state::lemnangl)
+	pteacher(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", lemnangl)
@@ -1382,11 +1384,11 @@ static INPUT_PORTS_START( mirderby )
 INPUT_PORTS_END
 
 
-static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::cpu0_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::cpu1_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM // videoram
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
@@ -1409,7 +1411,7 @@ WRITE8_MEMBER(homedata_state::mirderby_prot_w)
 }
 
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, homedata_state )
+ADDRESS_MAP_START(homedata_state::cpu2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */

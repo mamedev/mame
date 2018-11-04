@@ -61,4 +61,6 @@ public:
 	uint32_t screen_update_ginganin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	void ginganin(machine_config &config);
+	void ginganin_map(address_map &map);
+	void sound_map(address_map &map);
 };

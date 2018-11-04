@@ -62,4 +62,6 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	void bottom9(machine_config &config);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
 };

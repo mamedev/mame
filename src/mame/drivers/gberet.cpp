@@ -154,7 +154,7 @@ WRITE8_MEMBER(gberet_state::gberet_sound_w)
 	m_sn->write(space, 0, *m_soundlatch);
 }
 
-static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8, gberet_state )
+ADDRESS_MAP_START(gberet_state::gberet_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_SHARE("videoram")
@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8, gberet_state )
+ADDRESS_MAP_START(gberet_state::mrgoemon_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_SHARE("videoram")
@@ -212,7 +212,7 @@ WRITE8_MEMBER(gberet_state::gberetb_nmi_ack_w)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8, gberet_state )
+ADDRESS_MAP_START(gberet_state::gberetb_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_SHARE("videoram")
@@ -438,7 +438,8 @@ MACHINE_CONFIG_START(gberet_state::gberet)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gberet_state::mrgoemon, gberet)
+MACHINE_CONFIG_START(gberet_state::mrgoemon)
+	gberet(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

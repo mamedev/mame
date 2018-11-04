@@ -73,4 +73,7 @@ public:
 	required_device<palette_device> m_palette;
 	void bbprot(machine_config &config);
 	void fitfight(machine_config &config);
+	void bbprot_main_map(address_map &map);
+	void fitfight_main_map(address_map &map);
+	void snd_mem(address_map &map);
 };

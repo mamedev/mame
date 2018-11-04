@@ -126,6 +126,8 @@ public:
 	required_device<dac_byte_interface> m_dac5;
 	required_device<dac_byte_interface> m_dac6;
 	void laserbas(machine_config &config);
+	void laserbas_io(address_map &map);
+	void laserbas_memory(address_map &map);
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(  laserbas_state::laserbas_scanline )
@@ -328,7 +330,7 @@ WRITE_LINE_MEMBER(laserbas_state::pit_out_5_w)
 	write_pit_out(5,state);
 }
 
-static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8, laserbas_state )
+ADDRESS_MAP_START(laserbas_state::laserbas_memory)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xc000, 0xf7ff) AM_ROM AM_WRITENOP
@@ -336,7 +338,7 @@ static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8, laserbas_state )
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
+ADDRESS_MAP_START(laserbas_state::laserbas_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_device, register_w)

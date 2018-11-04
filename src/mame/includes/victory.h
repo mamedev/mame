@@ -94,4 +94,7 @@ public:
 	void update_foreground();
 	void victory(machine_config &config);
 	void victory_audio(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
+	void victory_audio_map(address_map &map);
 };

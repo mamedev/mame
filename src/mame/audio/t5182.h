@@ -42,6 +42,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ym2151_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cpu_irq_ack_w);
 
+	void t5182_io(address_map &map);
+	void t5182_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

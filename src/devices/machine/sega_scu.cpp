@@ -116,7 +116,7 @@ DEFINE_DEVICE_TYPE(SEGA_SCU, sega_scu_device, "sega_scu", "Sega System Control U
 //AM_RANGE(0x0010, 0x0013) DMA enable
 //AM_RANGE(0x0014, 0x0017) DMA start factor
 
-DEVICE_ADDRESS_MAP_START( regs_map, 32, sega_scu_device )
+ADDRESS_MAP_START(sega_scu_device::regs_map)
 	AM_RANGE(0x0000, 0x0017) AM_READWRITE(dma_lv0_r,dma_lv0_w)
 	AM_RANGE(0x0020, 0x0037) AM_READWRITE(dma_lv1_r,dma_lv1_w)
 	AM_RANGE(0x0040, 0x0057) AM_READWRITE(dma_lv2_r,dma_lv2_w)

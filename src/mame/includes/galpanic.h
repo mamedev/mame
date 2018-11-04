@@ -43,4 +43,7 @@ public:
 	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void galpanica(machine_config &config);
 	void galpanic(machine_config &config);
+	void galpanic_map(address_map &map);
+	void galpanic_oki_map(address_map &map);
+	void galpanica_map(address_map &map);
 };

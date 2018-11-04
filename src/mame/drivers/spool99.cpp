@@ -138,6 +138,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void vcarn(machine_config &config);
 	void spool99(machine_config &config);
+	void spool99_map(address_map &map);
+	void vcarn_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
@@ -227,7 +229,7 @@ WRITE8_MEMBER(spool99_state::eeprom_dataline_w)
 	m_eeprom->di_write(data & 0x01);
 }
 
-static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
+ADDRESS_MAP_START(spool99_state::spool99_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
@@ -273,7 +275,7 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 	return ROM[0xa700+offset];
 }
 
-static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
+ADDRESS_MAP_START(spool99_state::vcarn_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
@@ -386,7 +388,8 @@ MACHINE_CONFIG_START(spool99_state::spool99)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spool99_state::vcarn, spool99)
+MACHINE_CONFIG_START(spool99_state::vcarn)
+	spool99(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vcarn_map)
 

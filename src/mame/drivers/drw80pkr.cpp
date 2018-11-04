@@ -76,6 +76,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void drw80pkr(machine_config &config);
+	void drw80pkr_io_map(address_map &map);
+	void drw80pkr_map(address_map &map);
 };
 
 
@@ -399,11 +401,11 @@ DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( drw80pkr_map, AS_PROGRAM, 8, drw80pkr_state )
+ADDRESS_MAP_START(drw80pkr_state::drw80pkr_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drw80pkr_io_map, AS_IO, 8, drw80pkr_state )
+ADDRESS_MAP_START(drw80pkr_state::drw80pkr_io_map)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_io_r, drw80pkr_io_w)
 ADDRESS_MAP_END
 

@@ -97,6 +97,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( busrq_w );
 
 	void tiki100(machine_config &config);
+	void tiki100_io(address_map &map);
+	void tiki100_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

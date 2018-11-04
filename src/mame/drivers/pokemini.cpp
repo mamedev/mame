@@ -78,6 +78,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
 	void pokemini(machine_config &config);
+	void pokemini_mem_map(address_map &map);
 protected:
 	enum
 	{
@@ -122,7 +123,7 @@ READ8_MEMBER( pokemini_state::rom_r )
 	return m_cart->read_rom(space, offset & 0x1fffff);
 }
 
-static ADDRESS_MAP_START( pokemini_mem_map, AS_PROGRAM, 8, pokemini_state )
+ADDRESS_MAP_START(pokemini_state::pokemini_mem_map)
 	AM_RANGE( 0x000000, 0x000fff )  AM_ROM                            /* bios */
 	AM_RANGE( 0x001000, 0x001fff )  AM_RAM AM_SHARE("p_ram")          /* VRAM/RAM */
 	AM_RANGE( 0x002000, 0x0020ff )  AM_READWRITE(hwreg_r, hwreg_w)    /* hardware registers */

@@ -48,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
 	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
 
+	void williams_cvsd_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -95,6 +96,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
 	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
 
+	void williams_narc_master_map(address_map &map);
+	void williams_narc_slave_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -145,6 +148,8 @@ public:
 	DECLARE_READ8_MEMBER(command_r);
 	DECLARE_WRITE8_MEMBER(talkback_w);
 
+	void williams_adpcm_map(address_map &map);
+	void williams_adpcm_oki_map(address_map &map);
 protected:
 	// timer IDs
 	enum

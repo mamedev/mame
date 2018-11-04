@@ -101,7 +101,7 @@ READ8_MEMBER(poolshrk_state::irq_reset_r)
 }
 
 
-static ADDRESS_MAP_START( poolshrk_cpu_map, AS_PROGRAM, 8, poolshrk_state )
+ADDRESS_MAP_START(poolshrk_state::poolshrk_cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x2300) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x2000) AM_WRITEONLY AM_SHARE("playfield_ram")

@@ -442,6 +442,11 @@ public:
 	void hornet_2board(machine_config &config);
 	void hornet_2board_v2(machine_config &config);
 	void hornet(machine_config &config);
+	void gn680_memmap(address_map &map);
+	void hornet_map(address_map &map);
+	void sharc0_map(address_map &map);
+	void sharc1_map(address_map &map);
+	void sound_memmap(address_map &map);
 };
 
 
@@ -740,7 +745,7 @@ WRITE16_MEMBER(hornet_state::soundtimer_count_w)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
+ADDRESS_MAP_START(hornet_state::hornet_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("workram")     /* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(hornet_k037122_reg_r, hornet_k037122_reg_w)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(hornet_k037122_sram_r, hornet_k037122_sram_w)
@@ -765,7 +770,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, hornet_state )
+ADDRESS_MAP_START(hornet_state::sound_memmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     /* Work RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
@@ -806,7 +811,7 @@ WRITE16_MEMBER(hornet_state::gn680_latch_w)
 // WORD at 30000e: IRQ 4 tests bits 6 and 7, IRQ5 tests bits 4 and 5
 // (vsync and hsync status for each of the two screens?)
 
-static ADDRESS_MAP_START( gn680_memmap, AS_PROGRAM, 16, hornet_state )
+ADDRESS_MAP_START(hornet_state::gn680_memmap)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(gn680_sysctrl)
@@ -837,7 +842,7 @@ WRITE32_MEMBER(hornet_state::dsp_dataram1_w)
 	m_sharc_dataram1[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, hornet_state )
+ADDRESS_MAP_START(hornet_state::sharc0_map)
 	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_SHARE("sharc_dataram0")
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -847,7 +852,7 @@ static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, hornet_state )
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sharc1_map, AS_DATA, 32, hornet_state )
+ADDRESS_MAP_START(hornet_state::sharc1_map)
 	AM_RANGE(0x0400000, 0x041ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_SHARE("sharc_dataram1")
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -1071,7 +1076,8 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board, hornet)
+MACHINE_CONFIG_START(hornet_state::hornet_2board)
+	hornet(config);
 
 	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
@@ -1128,13 +1134,15 @@ MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board, hornet)
 	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hornet_state::terabrst, hornet)
+MACHINE_CONFIG_START(hornet_state::terabrst)
+	hornet(config);
 
 	MCFG_CPU_ADD("gn680", M68000, XTAL(32'000'000)/2)   /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(gn680_memmap)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board_v2, hornet_2board)
+MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
+	hornet_2board(config);
 	MCFG_DEVICE_REMOVE("voodoo0")
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_2, STD_VOODOO_2_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
@@ -1152,7 +1160,8 @@ MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board_v2, hornet_2board)
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_1))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hornet_state::sscope2, hornet_2board_v2)
+MACHINE_CONFIG_START(hornet_state::sscope2)
+	hornet_2board_v2(config);
 
 	MCFG_DS2401_ADD("lan_serial_id")
 	MCFG_EEPROM_SERIAL_93C46_ADD("lan_eeprom")

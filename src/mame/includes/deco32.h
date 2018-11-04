@@ -111,6 +111,10 @@ public:
 	DECLARE_WRITE32_MEMBER(buffered_palette_w);
 	DECLARE_WRITE32_MEMBER(palette_dma_w);
 
+	void h6280_sound_custom_latch_map(address_map &map);
+	void h6280_sound_map(address_map &map);
+	void z80_sound_io(address_map &map);
+	void z80_sound_mem(address_map &map);
 protected:
 	virtual void video_start() override;
 
@@ -138,6 +142,7 @@ public:
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 
 	void captaven(machine_config &config);
+	void captaven_map(address_map &map);
 private:
 };
 
@@ -163,6 +168,8 @@ public:
 	void fghthist(machine_config &config);
 	void fghthistu(machine_config &config);
 	void fghthsta(machine_config &config);
+	void fghthist_map(address_map &map);
+	void fghthsta_memmap(address_map &map);
 private:
 };
 
@@ -195,6 +202,8 @@ public:
 	void nslasheru(machine_config &config);
 	void tattass(machine_config &config);
 	void nslasher(machine_config &config);
+	void nslasher_map(address_map &map);
+	void tattass_map(address_map &map);
 private:
 	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
@@ -270,6 +279,9 @@ public:
 	void dragngun(machine_config &config);
 	void lockload(machine_config &config);
 	void lockloadu(machine_config &config);
+	void dragngun_map(address_map &map);
+	void lockload_map(address_map &map);
+	void lockloadu_map(address_map &map);
 private:
 	bool m_gun_speaker_disabled;
 };

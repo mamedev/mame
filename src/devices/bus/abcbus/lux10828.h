@@ -55,11 +55,6 @@ public:
 	// construction/destruction
 	luxor_55_10828_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( ctrl_w );
-	DECLARE_WRITE8_MEMBER( status_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -87,7 +82,15 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
+	DECLARE_WRITE8_MEMBER( ctrl_w );
+	DECLARE_WRITE8_MEMBER( status_w );
+	DECLARE_READ8_MEMBER( fdc_r );
+	DECLARE_WRITE8_MEMBER( fdc_w );
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	void luxor_55_10828_io(address_map &map);
+	void luxor_55_10828_mem(address_map &map);
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;

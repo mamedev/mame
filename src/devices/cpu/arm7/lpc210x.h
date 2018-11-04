@@ -71,6 +71,7 @@ public:
 	// todo, use an appropriate flash type instead
 	uint8_t m_flash[0x8000]; // needs to be public because the harmony/melody device injects contents with memcpy, yuck
 
+	void lpc2103_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

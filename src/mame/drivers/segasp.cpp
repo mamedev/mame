@@ -178,7 +178,7 @@ READ64_MEMBER(segasp_state::sp_io_r)
 }
 
 // todo, base DC / Naomi stuff should be in it's own map, differences only here, same for Naomi 2 etc.
-static ADDRESS_MAP_START( segasp_map, AS_PROGRAM, 64, segasp_state )
+ADDRESS_MAP_START(segasp_state::segasp_map)
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
 
@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( segasp_map, AS_PROGRAM, 64, segasp_state )
 	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( onchip_port, AS_IO, 64, segasp_state )
+ADDRESS_MAP_START(segasp_state::onchip_port)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(sn_93c46a_r, sn_93c46a_w)
 ADDRESS_MAP_END
 
@@ -296,7 +296,8 @@ INPUT_PORTS_START( segasp )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_DERIVED(segasp_state::segasp, naomi_aw_base)
+MACHINE_CONFIG_START(segasp_state::segasp)
+	naomi_aw_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(segasp_map)
 	MCFG_CPU_IO_MAP(onchip_port)

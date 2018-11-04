@@ -558,6 +558,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mkbd_acia_clock );
 
 	void cmi2x(machine_config &config);
+	void alphakeys_map(address_map &map);
+	void cmi07cpu_map(address_map &map);
+	void maincpu1_map(address_map &map);
+	void maincpu2_map(address_map &map);
+	void midicpu_map(address_map &map);
+	void muskeys_map(address_map &map);
 protected:
 
 	required_device<mc6809e_device> m_maincpu1;
@@ -1063,15 +1069,15 @@ READ16_MEMBER( cmi_state::midi_dma_r )
 }
 
 /* The maps are dynamically populated */
-static ADDRESS_MAP_START( maincpu1_map, AS_PROGRAM, 8, cmi_state )
+ADDRESS_MAP_START(cmi_state::maincpu1_map)
 	AM_RANGE(0xfffe, 0xffff) AM_READ(vector_r<0>)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maincpu2_map, AS_PROGRAM, 8, cmi_state )
+ADDRESS_MAP_START(cmi_state::maincpu2_map)
 	AM_RANGE(0xfffe, 0xffff) AM_READ(vector_r<1>)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( muskeys_map, AS_PROGRAM, 8, cmi_state)
+ADDRESS_MAP_START(cmi_state::muskeys_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("cmi10_pia_u21", pia6821_device, read, write)
@@ -1083,7 +1089,7 @@ static ADDRESS_MAP_START( muskeys_map, AS_PROGRAM, 8, cmi_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphakeys_map, AS_PROGRAM, 8, cmi_state )
+ADDRESS_MAP_START(cmi_state::alphakeys_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_READ_PORT("ANK_OPTIONS")
@@ -1091,7 +1097,7 @@ static ADDRESS_MAP_START( alphakeys_map, AS_PROGRAM, 8, cmi_state )
 	AM_RANGE(0xc000, 0xc3ff) AM_ROM AM_MIRROR(0x3c00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( midicpu_map, AS_PROGRAM, 16, cmi_state )
+ADDRESS_MAP_START(cmi_state::midicpu_map)
 	AM_RANGE(0x000000, 0x003fff) AM_ROM
 	AM_RANGE(0x040000, 0x05ffff) AM_READWRITE(midi_dma_r, midi_dma_w)
 //  AM_RANGE(0x060000, 0x06001f) TIMERS
@@ -1100,7 +1106,7 @@ static ADDRESS_MAP_START( midicpu_map, AS_PROGRAM, 16, cmi_state )
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cmi07cpu_map, AS_PROGRAM, 8, cmi_state )
+ADDRESS_MAP_START(cmi_state::cmi07cpu_map)
 	AM_RANGE(0x0000, 0x3fff) AM_NOP // TODO
 	AM_RANGE(0x4000, 0x4fff) AM_NOP // TODO
 	AM_RANGE(0x8000, 0x8fff) AM_DEVREADWRITE("cmi07_ptm", ptm6840_device, read, write)

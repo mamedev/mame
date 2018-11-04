@@ -30,9 +30,6 @@ public:
 	// construction/destruction
 	c64_final_chesscard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( nvram_r );
-	DECLARE_WRITE8_MEMBER( nvram_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -57,6 +54,11 @@ private:
 
 	uint8_t m_bank;
 	int m_ramen;
+
+	DECLARE_READ8_MEMBER( nvram_r );
+	DECLARE_WRITE8_MEMBER( nvram_w );
+
+	void c64_fcc_map(address_map &map);
 };
 
 

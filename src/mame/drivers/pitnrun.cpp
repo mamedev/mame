@@ -105,7 +105,7 @@ WRITE_LINE_MEMBER(pitnrun_state::vflip_w)
 	flip_screen_y_set(state);
 }
 
-static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
+ADDRESS_MAP_START(pitnrun_state::pitnrun_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -127,19 +127,19 @@ static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pitnrun_map_mcu, AS_PROGRAM, 8, pitnrun_state )
+ADDRESS_MAP_START(pitnrun_state::pitnrun_map_mcu)
 	AM_IMPORT_FROM(pitnrun_map)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
 	AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pitnrun_sound_map, AS_PROGRAM, 8, pitnrun_state )
+ADDRESS_MAP_START(pitnrun_state::pitnrun_sound_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pitnrun_sound_io_map, AS_IO, 8, pitnrun_state )
+ADDRESS_MAP_START(pitnrun_state::pitnrun_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -327,7 +327,8 @@ MACHINE_CONFIG_START(pitnrun_state::pitnrun)
 	MCFG_DEVICE_ADD("noiselatch", LS259, 0) // 1J
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pitnrun_state::pitnrun_mcu, pitnrun)
+MACHINE_CONFIG_START(pitnrun_state::pitnrun_mcu)
+	pitnrun(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map_mcu)
 

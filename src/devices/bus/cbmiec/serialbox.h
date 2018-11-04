@@ -52,6 +52,8 @@ protected:
 
 private:
 	required_device<m65c02_device> m_maincpu;
+
+	void serial_box_mem(address_map &map);
 };
 
 

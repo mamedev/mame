@@ -92,4 +92,12 @@ public:
 	void hangzo(machine_config &config);
 	void schmeisr(machine_config &config);
 	void rohga(machine_config &config);
+	void hangzo_map(address_map &map);
+	void hotb_base_map(address_map &map);
+	void nitrobal_map(address_map &map);
+	void nitrobal_sound_map(address_map &map);
+	void rohga_map(address_map &map);
+	void rohga_sound_map(address_map &map);
+	void schmeisr_map(address_map &map);
+	void wizdfire_map(address_map &map);
 };

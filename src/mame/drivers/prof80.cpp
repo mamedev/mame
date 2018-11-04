@@ -271,7 +271,7 @@ WRITE8_MEMBER( prof80_state::unio_ctrl_w )
 //  ADDRESS_MAP( prof80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( prof80_mem, AS_PROGRAM, 8, prof80_state )
+ADDRESS_MAP_START(prof80_state::prof80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_DEVICE(MMU_TAG, prof80_mmu_device, z80_program_map)
 ADDRESS_MAP_END
 
@@ -280,7 +280,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( prof80_mmu )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( prof80_mmu, AS_PROGRAM, 8, prof80_state )
+ADDRESS_MAP_START(prof80_state::prof80_mmu)
 	AM_RANGE(0x40000, 0x5ffff) AM_RAM
 	AM_RANGE(0xc0000, 0xdffff) AM_RAM
 	AM_RANGE(0xf0000, 0xf1fff) AM_MIRROR(0xe000) AM_ROM AM_REGION(Z80_TAG, 0)
@@ -291,7 +291,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( prof80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( prof80_io, AS_IO, 8, prof80_state )
+ADDRESS_MAP_START(prof80_state::prof80_io)
 	AM_RANGE(0x00, 0xd7) AM_MIRROR(0xff00) AM_DEVREADWRITE(ECBBUS_TAG, ecbbus_device, io_r, io_w)
 //  AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_device, read, write)
 //  AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)

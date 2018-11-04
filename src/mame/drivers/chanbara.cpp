@@ -105,6 +105,7 @@ public:
 	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void chanbara(machine_config &config);
+	void chanbara_map(address_map &map);
 };
 
 
@@ -227,7 +228,7 @@ uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_in
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( chanbara_map, AS_PROGRAM, 8, chanbara_state )
+ADDRESS_MAP_START(chanbara_state::chanbara_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_SHARE("colorram")

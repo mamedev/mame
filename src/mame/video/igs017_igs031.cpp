@@ -28,7 +28,7 @@ all the known IGS017 / IGS031 games use the following memory map, is the IGS017 
 
 
 
-DEVICE_ADDRESS_MAP_START( map, 8, igs017_igs031_device )
+ADDRESS_MAP_START(igs017_igs031_device::map)
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
 //  AM_RANGE( 0x1800, 0x1bff ) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(palram_w) AM_SHARE("palram")
@@ -80,7 +80,7 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_video_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_delegate(FUNC(igs017_igs031_device::map), this)),
+		m_space_config("igs017_igs031", ENDIANNESS_BIG, 8,15, 0, address_map_constructor(FUNC(igs017_igs031_device::map), this)),
 		m_spriteram(*this, "spriteram", 0),
 		m_fg_videoram(*this, "fg_videoram", 0),
 		m_bg_videoram(*this, "bg_videoram", 0),

@@ -34,6 +34,8 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+
+	void p72_mem(address_map &map);
 };
 
 // device type definition

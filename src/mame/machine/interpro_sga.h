@@ -16,9 +16,9 @@ public:
 
 	template<class _Object> static devcb_base &static_set_out_berr_callback(device_t &device, _Object object) { return downcast<interpro_sga_device &>(device).out_berr_func.set_callback(object); }
 
-	virtual DECLARE_ADDRESS_MAP(map, 32);
+	virtual void map(address_map &map);
 
-	DECLARE_READ32_MEMBER(gcsr_r) const { return m_gcsr; }
+	DECLARE_READ32_MEMBER(gcsr_r) { return m_gcsr; }
 	DECLARE_WRITE32_MEMBER(gcsr_w) { m_gcsr = data; }
 	enum ipoll_mask
 	{
@@ -31,7 +31,7 @@ public:
 		IPOLL_INTBERR    = 0x00010000,
 		IPOLL_INTMMBE    = 0x00020000
 	};
-	DECLARE_READ32_MEMBER(ipoll_r) const { return m_ipoll; }
+	DECLARE_READ32_MEMBER(ipoll_r) { return m_ipoll; }
 	DECLARE_WRITE32_MEMBER(ipoll_w) { m_ipoll = data; }
 
 	enum imask_mask
@@ -44,11 +44,11 @@ public:
 		IMASK_INTBERR    = 0x00010000,
 		IMASK_INTMMBE    = 0x00020000
 	};
-	DECLARE_READ32_MEMBER(imask_r) const { return m_imask; }
+	DECLARE_READ32_MEMBER(imask_r) { return m_imask; }
 	DECLARE_WRITE32_MEMBER(imask_w) { m_imask = data; }
-	DECLARE_READ32_MEMBER(range_base_r) const { return m_range_base; }
+	DECLARE_READ32_MEMBER(range_base_r) { return m_range_base; }
 	DECLARE_WRITE32_MEMBER(range_base_w) { m_range_base = data; }
-	DECLARE_READ32_MEMBER(range_end_r) const { return m_range_end; }
+	DECLARE_READ32_MEMBER(range_end_r) { return m_range_end; }
 	DECLARE_WRITE32_MEMBER(range_end_w) { m_range_end = data; }
 
 	enum cttag_mask
@@ -58,84 +58,84 @@ public:
 		CTTAG_MAXBCLK  = 0x0003fe00,
 		CTTAG_MAXRETRY = 0x3ffc0000
 	};
-	DECLARE_READ32_MEMBER(cttag_r) const { return m_cttag; }
+	DECLARE_READ32_MEMBER(cttag_r) { return m_cttag; }
 	DECLARE_WRITE32_MEMBER(cttag_w) { m_cttag = data; }
-	DECLARE_READ32_MEMBER(address_r) const { return m_address; }
+	DECLARE_READ32_MEMBER(address_r) { return m_address; }
 	DECLARE_WRITE32_MEMBER(address_w) { m_address = data; }
 
 	enum dmacsr_mask
 	{
 		DMACSR_CH1ENABLE = 0x00000080
 	};
-	DECLARE_READ32_MEMBER(dmacsr_r) const { return m_dmacsr; }
+	DECLARE_READ32_MEMBER(dmacsr_r) { return m_dmacsr; }
 	DECLARE_WRITE32_MEMBER(dmacsr_w) { m_dmacsr = data; }
 
 	enum edmacsr_mask
 	{
 		EDMACSR_CH1RDONLY = 0x00000010
 	};
-	DECLARE_READ32_MEMBER(edmacsr_r) const { return m_edmacsr; }
+	DECLARE_READ32_MEMBER(edmacsr_r) { return m_edmacsr; }
 	DECLARE_WRITE32_MEMBER(edmacsr_w) { m_edmacsr = data; }
-	DECLARE_READ32_MEMBER(reg6_range_r) const { return m_reg6_range; }
+	DECLARE_READ32_MEMBER(reg6_range_r) { return m_reg6_range; }
 	DECLARE_WRITE32_MEMBER(reg6_range_w) { m_reg6_range = data; }
 
-	DECLARE_READ32_MEMBER(ddpta0_r) const { return m_ddpta0; }
+	DECLARE_READ32_MEMBER(ddpta0_r) { return m_ddpta0; }
 	DECLARE_WRITE32_MEMBER(ddpta0_w) { m_ddpta0 = data; }
-	DECLARE_READ32_MEMBER(ddpad0_r) const { return m_ddpad0; }
+	DECLARE_READ32_MEMBER(ddpad0_r) { return m_ddpad0; }
 	DECLARE_WRITE32_MEMBER(ddpad0_w) { m_ddpad0 = data; }
-	DECLARE_READ32_MEMBER(ddoff0_r) const { return m_ddoff0; }
+	DECLARE_READ32_MEMBER(ddoff0_r) { return m_ddoff0; }
 	DECLARE_WRITE32_MEMBER(ddoff0_w) { m_ddoff0 = data; }
-	DECLARE_READ32_MEMBER(ddtc0_r) const { return m_ddtc0; }
+	DECLARE_READ32_MEMBER(ddtc0_r) { return m_ddtc0; }
 	DECLARE_WRITE32_MEMBER(ddtc0_w) { m_ddtc0 = data; }
 
-	DECLARE_READ32_MEMBER(dspta0_r) const { return m_dspta0; }
+	DECLARE_READ32_MEMBER(dspta0_r) { return m_dspta0; }
 	DECLARE_WRITE32_MEMBER(dspta0_w) { m_dspta0 = data; }
-	DECLARE_READ32_MEMBER(dspad0_r) const { return m_dspad0; }
+	DECLARE_READ32_MEMBER(dspad0_r) { return m_dspad0; }
 	DECLARE_WRITE32_MEMBER(dspad0_w) { m_dspad0 = data; }
-	DECLARE_READ32_MEMBER(dsoff0_r) const { return m_dsoff0; }
+	DECLARE_READ32_MEMBER(dsoff0_r) { return m_dsoff0; }
 	DECLARE_WRITE32_MEMBER(dsoff0_w) { m_dsoff0 = data; }
-	DECLARE_READ32_MEMBER(dstc0_r) const { return m_dstc0; }
+	DECLARE_READ32_MEMBER(dstc0_r) { return m_dstc0; }
 	DECLARE_WRITE32_MEMBER(dstc0_w) { m_dstc0 = data; }
 
-	DECLARE_READ32_MEMBER(dspad1_r) const { return m_dspad1; }
+	DECLARE_READ32_MEMBER(dspad1_r) { return m_dspad1; }
 	DECLARE_WRITE32_MEMBER(dspad1_w) { m_dspad1 = data; }
-	DECLARE_READ32_MEMBER(dsoff1_r) const { return m_dsoff1; }
+	DECLARE_READ32_MEMBER(dsoff1_r) { return m_dsoff1; }
 	DECLARE_WRITE32_MEMBER(dsoff1_w) { m_dsoff1 = data; }
-	DECLARE_READ32_MEMBER(dstc1_r) const { return m_dstc1; }
+	DECLARE_READ32_MEMBER(dstc1_r) { return m_dstc1; }
 	DECLARE_WRITE32_MEMBER(dstc1_w) { m_dstc1 = data; }
 
-	DECLARE_READ32_MEMBER(ddpad1_r) const { return m_ddpad1; }
+	DECLARE_READ32_MEMBER(ddpad1_r) { return m_ddpad1; }
 	DECLARE_WRITE32_MEMBER(ddpad1_w) { m_ddpad1 = data; }
-	DECLARE_READ32_MEMBER(ddoff1_r) const { return m_ddoff1; }
+	DECLARE_READ32_MEMBER(ddoff1_r) { return m_ddoff1; }
 	DECLARE_WRITE32_MEMBER(ddoff1_w) { m_ddoff1 = data; }
-	DECLARE_READ32_MEMBER(ddtc1_r) const { return m_ddtc1; }
+	DECLARE_READ32_MEMBER(ddtc1_r) { return m_ddtc1; }
 	DECLARE_WRITE32_MEMBER(ddtc1_w);
 
-	DECLARE_READ32_MEMBER(ddpta2_r) const { return m_ddpta2; }
+	DECLARE_READ32_MEMBER(ddpta2_r) { return m_ddpta2; }
 	DECLARE_WRITE32_MEMBER(ddpta2_w) { m_ddpta2 = data; }
-	DECLARE_READ32_MEMBER(ddpad2_r) const { return m_ddpad2; }
+	DECLARE_READ32_MEMBER(ddpad2_r) { return m_ddpad2; }
 	DECLARE_WRITE32_MEMBER(ddpad2_w) { m_ddpad2 = data; }
-	DECLARE_READ32_MEMBER(ddoff2_r) const { return m_ddoff2; }
+	DECLARE_READ32_MEMBER(ddoff2_r) { return m_ddoff2; }
 	DECLARE_WRITE32_MEMBER(ddoff2_w) { m_ddoff2 = data; }
-	DECLARE_READ32_MEMBER(ddtc2_r) const { return m_ddtc2; }
+	DECLARE_READ32_MEMBER(ddtc2_r) { return m_ddtc2; }
 	DECLARE_WRITE32_MEMBER(ddtc2_w) { m_ddtc2 = data; }
 
-	DECLARE_READ32_MEMBER(dspta2_r) const { return m_dspta2; }
+	DECLARE_READ32_MEMBER(dspta2_r) { return m_dspta2; }
 	DECLARE_WRITE32_MEMBER(dspta2_w) { m_dspta2 = data; }
-	DECLARE_READ32_MEMBER(dspad2_r) const { return m_dspad2; }
+	DECLARE_READ32_MEMBER(dspad2_r) { return m_dspad2; }
 	DECLARE_WRITE32_MEMBER(dspad2_w) { m_dspad2 = data; }
-	DECLARE_READ32_MEMBER(dsoff2_r) const { return m_dsoff2; }
+	DECLARE_READ32_MEMBER(dsoff2_r) { return m_dsoff2; }
 	DECLARE_WRITE32_MEMBER(dsoff2_w) { m_dsoff2 = data; }
-	DECLARE_READ32_MEMBER(dstc2_r) const { return m_dstc2; }
+	DECLARE_READ32_MEMBER(dstc2_r) { return m_dstc2; }
 	DECLARE_WRITE32_MEMBER(dstc2_w) { m_dstc2 = data; }
 
-	DECLARE_READ32_MEMBER(ddrd2_r) const { return m_ddrd2; }
+	DECLARE_READ32_MEMBER(ddrd2_r) { return m_ddrd2; }
 	DECLARE_WRITE32_MEMBER(ddrd2_w) { m_ddrd2 = data; }
-	DECLARE_READ32_MEMBER(dsrd2_r) const { return m_dsrd2; }
+	DECLARE_READ32_MEMBER(dsrd2_r) { return m_dsrd2; }
 	DECLARE_WRITE32_MEMBER(dsrd2_w) { m_dsrd2 = data; }
-	DECLARE_READ32_MEMBER(dcksum0_r) const { return m_dcksum0; }
+	DECLARE_READ32_MEMBER(dcksum0_r) { return m_dcksum0; }
 	DECLARE_WRITE32_MEMBER(dcksum0_w) { m_dcksum0 = data; }
-	DECLARE_READ32_MEMBER(dcksum1_r) const { return m_dcksum1; }
+	DECLARE_READ32_MEMBER(dcksum1_r) { return m_dcksum1; }
 	DECLARE_WRITE32_MEMBER(dcksum1_w) { m_dcksum1 = data; }
 
 protected:

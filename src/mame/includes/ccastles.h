@@ -83,4 +83,5 @@ public:
 	inline void bitmode_autoinc(  );
 	inline void schedule_next_irq( int curscanline );
 	void ccastles(machine_config &config);
+	void main_map(address_map &map);
 };

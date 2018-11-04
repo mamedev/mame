@@ -32,11 +32,8 @@ public:
 		: mw8080bw_state(mconfig, type, tag),
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
 		m_claybust_gun_on(*this, "claybust_gun"),
-		m_discrete(*this, "discrete"),
 		m_speaker(*this, "speaker"),
 		m_eeprom(*this, "eeprom"),
-		m_sn(*this, "snsnd"),
-		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gunx(*this, "GUNX"),
 		m_guny(*this, "GUNY")
@@ -45,11 +42,8 @@ public:
 	/* devices/memory pointers */
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
-	optional_device<discrete_device> m_discrete;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<sn76477_device> m_sn;
-	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
 	/* misc game specific */
@@ -205,6 +199,43 @@ public:
 	void spacerng(machine_config &config);
 	void steelwkr(machine_config &config);
 	void schaser(machine_config &config);
+	void astropal_io_map(address_map &map);
+	void attackfc_io_map(address_map &map);
+	void ballbomb_io_map(address_map &map);
+	void claybust_io_map(address_map &map);
+	void cosmicmo_io_map(address_map &map);
+	void cosmo_io_map(address_map &map);
+	void cosmo_map(address_map &map);
+	void darthvdr_io_map(address_map &map);
+	void darthvdr_map(address_map &map);
+	void escmars_map(address_map &map);
+	void indianbt_io_map(address_map &map);
+	void indianbtbr_io_map(address_map &map);
+	void invadpt2_io_map(address_map &map);
+	void invmulti_map(address_map &map);
+	void invrvnge_io_map(address_map &map);
+	void invrvnge_sound_map(address_map &map);
+	void lrescue_io_map(address_map &map);
+	void lupin3_io_map(address_map &map);
+	void polaris_io_map(address_map &map);
+	void rollingc_io_map(address_map &map);
+	void rollingc_map(address_map &map);
+	void schaser_io_map(address_map &map);
+	void schaser_map(address_map &map);
+	void schasercv_io_map(address_map &map);
+	void sflush_map(address_map &map);
+	void shuttlei_io_map(address_map &map);
+	void shuttlei_map(address_map &map);
+	void spacecom_io_map(address_map &map);
+	void spacecom_map(address_map &map);
+	void spacerng_io_map(address_map &map);
+	void spcewarla_io_map(address_map &map);
+	void spcewars_io_map(address_map &map);
+	void starw1_io_map(address_map &map);
+	void steelwkr_io_map(address_map &map);
+	void vortex_io_map(address_map &map);
+	void yosakdon_io_map(address_map &map);
+	void yosakdon_map(address_map &map);
 };
 
 

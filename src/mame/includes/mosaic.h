@@ -48,4 +48,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mosaic(machine_config &config);
 	void gfire2(machine_config &config);
+	void gfire2_io_map(address_map &map);
+	void gfire2_map(address_map &map);
+	void mosaic_io_map(address_map &map);
+	void mosaic_map(address_map &map);
 };

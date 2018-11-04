@@ -27,6 +27,7 @@ public:
 	{ }
 
 	void pm68k(machine_config &config);
+	void pm68k_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
@@ -34,7 +35,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(pm68k_mem, AS_PROGRAM, 16, pm68k_state)
+ADDRESS_MAP_START(pm68k_state::pm68k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")

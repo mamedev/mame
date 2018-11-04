@@ -49,7 +49,7 @@
 
 // memory and address spaces
 #include "emumem.h"
-#include "addrmap.h"
+class address_map; // Forward declaration
 #include "memarray.h"
 
 // machine-wide utilities
@@ -64,6 +64,7 @@
 // devices and callbacks
 #include "device.h"
 #include "devfind.h"
+#include "addrmap.h" // Needs optional_device<> and required_device<>
 #include "distate.h"
 #include "dimemory.h"
 #include "dirom.h"

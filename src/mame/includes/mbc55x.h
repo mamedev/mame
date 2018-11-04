@@ -160,6 +160,8 @@ public:
 	uint32_t      m_debug_machine;
 
 	void mbc55x(machine_config &config);
+	void mbc55x_io(address_map &map);
+	void mbc55x_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

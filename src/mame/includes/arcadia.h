@@ -104,6 +104,7 @@ public:
 	INTERRUPT_GEN_MEMBER(video_line);
 
 	void arcadia(machine_config &config);
+	void arcadia_mem(address_map &map);
 protected:
 	required_device<arcadia_sound_device> m_custom;
 	required_ioport m_panel;

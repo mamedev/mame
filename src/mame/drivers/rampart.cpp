@@ -127,7 +127,7 @@ WRITE16_MEMBER(rampart_state::latch_w)
  *************************************/
 
 /* full memory map deduced from schematics and GALs */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rampart_state )
+ADDRESS_MAP_START(rampart_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fffff)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x140000, 0x147fff) AM_MIRROR(0x438000) AM_ROM /* slapstic goes here */

@@ -175,6 +175,26 @@ public:
 	void hypreact(machine_config &config);
 	void keithlcy(machine_config &config);
 	void cairblad(machine_config &config);
+	void drifto94_map(address_map &map);
+	void dsp_data_map(address_map &map);
+	void dsp_prg_map(address_map &map);
+	void eaglshot_map(address_map &map);
+	void gdfs_map(address_map &map);
+	void hypreac2_map(address_map &map);
+	void hypreact_map(address_map &map);
+	void janjans1_map(address_map &map);
+	void jsk_map(address_map &map);
+	void jsk_v810_mem(address_map &map);
+	void keithlcy_map(address_map &map);
+	void meosism_map(address_map &map);
+	void mslider_map(address_map &map);
+	void ryorioh_map(address_map &map);
+	void srmp4_map(address_map &map);
+	void srmp7_map(address_map &map);
+	void survarts_map(address_map &map);
+	void sxyreact_map(address_map &map);
+	void twineag2_map(address_map &map);
+	void ultrax_map(address_map &map);
 protected:
 	optional_ioport_array<4> m_io_gun;
 	optional_ioport m_io_key0;

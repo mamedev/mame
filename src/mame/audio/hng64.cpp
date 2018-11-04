@@ -175,7 +175,7 @@ void hng64_state::reset_sound()
 // ----------------------------------------------
 
 
-static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_sound_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("bank0")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAMBANK("bank1")
 	AM_RANGE(0x20000, 0x2ffff) AM_RAMBANK("bank2")
@@ -301,7 +301,7 @@ READ16_MEMBER(hng64_state::sound_comms_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_sound_io)
 	AM_RANGE(0x0000, 0x0007) AM_DEVREADWRITE("l7a1045", l7a1045_sound_device, l7a1045_sound_r, l7a1045_sound_w )
 
 	AM_RANGE(0x0008, 0x0009) AM_READWRITE( hng64_sound_port_0008_r, hng64_sound_port_0008_w )

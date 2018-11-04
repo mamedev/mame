@@ -37,4 +37,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	void sigma2k(machine_config &config);
 	void ampoker2(machine_config &config);
+	void ampoker2_io_map(address_map &map);
+	void ampoker2_map(address_map &map);
 };

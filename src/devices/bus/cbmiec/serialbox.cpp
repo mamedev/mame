@@ -59,7 +59,7 @@ const tiny_rom_entry *serial_box_device::device_rom_region() const
 //  ADDRESS_MAP( serial_box_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( serial_box_mem, AS_PROGRAM, 8, serial_box_device )
+ADDRESS_MAP_START(serial_box_device::serial_box_mem)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 

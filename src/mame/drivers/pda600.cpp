@@ -79,10 +79,12 @@ public:
 
 	uint8_t *     m_video_ram;
 	void pda600(machine_config &config);
+	void pda600_io(address_map &map);
+	void pda600_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8, pda600_state)
+ADDRESS_MAP_START(pda600_state::pda600_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	//AM_RANGE(0x20000, 0x9ffff) AM_RAM // PCMCIA Card
@@ -90,7 +92,7 @@ static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8, pda600_state)
 	AM_RANGE(0xe0000, 0xfffff) AM_RAM   AM_REGION("mainram", 0)     AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pda600_io, AS_IO, 8, pda600_state)
+ADDRESS_MAP_START(pda600_state::pda600_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */

@@ -47,6 +47,9 @@ public:
 
 	void a1000(machine_config &config);
 	void a1000n(machine_config &config);
+	void a1000_bootrom_map(address_map &map);
+	void a1000_mem(address_map &map);
+	void a1000_overlay_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -79,6 +82,7 @@ public:
 
 	void a2000(machine_config &config);
 	void a2000n(machine_config &config);
+	void a2000_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -114,6 +118,7 @@ public:
 
 	void a500n(machine_config &config);
 	void a500(machine_config &config);
+	void a500_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -160,6 +165,8 @@ public:
 
 	void cdtv(machine_config &config);
 	void cdtvn(machine_config &config);
+	void cdtv_mem(address_map &map);
+	void cdtv_rc_mem(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -197,6 +204,7 @@ public:
 
 	void a3000(machine_config &config);
 	void a3000n(machine_config &config);
+	void a3000_mem(address_map &map);
 protected:
 
 private:
@@ -221,6 +229,7 @@ public:
 
 	void a500pn(machine_config &config);
 	void a500p(machine_config &config);
+	void a500p_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -255,6 +264,7 @@ public:
 
 	void a600n(machine_config &config);
 	void a600(machine_config &config);
+	void a600_mem(address_map &map);
 protected:
 	virtual bool int2_pending() override;
 
@@ -279,6 +289,7 @@ public:
 
 	void a1200(machine_config &config);
 	void a1200n(machine_config &config);
+	void a1200_mem(address_map &map);
 protected:
 	virtual bool int2_pending() override;
 
@@ -316,6 +327,9 @@ public:
 	void a4000n(machine_config &config);
 	void a4000(machine_config &config);
 	void a400030(machine_config &config);
+	void a400030_mem(address_map &map);
+	void a4000_mem(address_map &map);
+	void a4000t_mem(address_map &map);
 protected:
 
 private:
@@ -357,6 +371,7 @@ public:
 
 	void cd32n(machine_config &config);
 	void cd32(machine_config &config);
+	void cd32_mem(address_map &map);
 protected:
 	// amiga_state overrides
 	virtual void potgo_w(uint16_t data) override;
@@ -965,7 +980,7 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 // Akiko custom chip.
 
 #if 0
-static ADDRESS_MAP_START( a1000_overlay_map, AS_PROGRAM, 16, a1000_state )
+ADDRESS_MAP_START(a1000_state::a1000_overlay_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x1c0000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x280000, 0x2bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("chip_ram")
@@ -974,7 +989,7 @@ static ADDRESS_MAP_START( a1000_overlay_map, AS_PROGRAM, 16, a1000_state )
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( a1000_overlay_map, AS_PROGRAM, 16, a1000_state )
+ADDRESS_MAP_START(a1000_state::a1000_overlay_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("chip_ram")
@@ -982,12 +997,12 @@ static ADDRESS_MAP_START( a1000_overlay_map, AS_PROGRAM, 16, a1000_state )
 	AM_RANGE(0x380000, 0x38ffff) AM_MIRROR(0x030000) AM_ROM AM_REGION("bootrom", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a1000_bootrom_map, AS_PROGRAM, 16, a1000_state )
+ADDRESS_MAP_START(a1000_state::a1000_bootrom_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_MIRROR(0x30000) AM_ROM AM_REGION("bootrom", 0) AM_WRITE(write_protect_w)
 	AM_RANGE(0x040000, 0x07ffff) AM_ROMBANK("wom")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a1000_mem, AS_PROGRAM, 16, a1000_state )
+ADDRESS_MAP_START(a1000_state::a1000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
@@ -999,42 +1014,42 @@ static ADDRESS_MAP_START( a1000_mem, AS_PROGRAM, 16, a1000_state )
 ADDRESS_MAP_END
 
 // Gary/Super Gary/Gayle with 512KB chip RAM
-static ADDRESS_MAP_START( overlay_512kb_map, AS_PROGRAM, 16, amiga_state )
+ADDRESS_MAP_START(amiga_state::overlay_512kb_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
 // Gary/Super Gary/Gayle with 1MB chip RAM
-static ADDRESS_MAP_START( overlay_1mb_map, AS_PROGRAM, 16, amiga_state )
+ADDRESS_MAP_START(amiga_state::overlay_1mb_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
 // Gary/Super Gary/Gayle with 1MB chip RAM (32 bit system)
-static ADDRESS_MAP_START( overlay_1mb_map32, AS_PROGRAM, 32, amiga_state )
+ADDRESS_MAP_START(amiga_state::overlay_1mb_map32)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
 // Gary/Super Gary/Gayle with 2MB chip RAM (32 bit system)
-static ADDRESS_MAP_START( overlay_2mb_map16, AS_PROGRAM, 16, amiga_state )
+ADDRESS_MAP_START(amiga_state::overlay_2mb_map16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
 // Gary/Super Gary/Gayle with 2MB chip RAM (32 bit system)
-static ADDRESS_MAP_START( overlay_2mb_map32, AS_PROGRAM, 32, amiga_state )
+ADDRESS_MAP_START(amiga_state::overlay_2mb_map32)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
 // 512KB chip RAM, 512KB slow RAM, RTC
-static ADDRESS_MAP_START( a2000_mem, AS_PROGRAM, 16, a2000_state )
+ADDRESS_MAP_START(a2000_state::a2000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
@@ -1042,7 +1057,7 @@ static ADDRESS_MAP_START( a2000_mem, AS_PROGRAM, 16, a2000_state )
 	AM_RANGE(0xc80000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xd80000, 0xdbffff) AM_NOP
 	AM_RANGE(0xdc0000, 0xdc7fff) AM_READWRITE(clock_r, clock_w)
-	AM_RANGE(0xd80000, 0xddffff) AM_NOP
+	AM_RANGE(0xdc8000, 0xddffff) AM_NOP
 	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
@@ -1052,7 +1067,7 @@ static ADDRESS_MAP_START( a2000_mem, AS_PROGRAM, 16, a2000_state )
 ADDRESS_MAP_END
 
 // 512KB chip RAM and no clock
-static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, a500_state )
+ADDRESS_MAP_START(a500_state::a500_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
@@ -1067,7 +1082,7 @@ static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, a500_state )
 ADDRESS_MAP_END
 
 // 1MB chip RAM, RTC and CDTV specific hardware
-static ADDRESS_MAP_START( cdtv_mem, AS_PROGRAM, 16, cdtv_state )
+ADDRESS_MAP_START(cdtv_state::cdtv_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
@@ -1084,11 +1099,11 @@ static ADDRESS_MAP_START( cdtv_mem, AS_PROGRAM, 16, cdtv_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cdtv_rc_mem, AS_PROGRAM, 8, cdtv_state )
+ADDRESS_MAP_START(cdtv_state::cdtv_rc_mem)
 	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("rcmcu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a3000_mem, AS_PROGRAM, 32, a3000_state )
+ADDRESS_MAP_START(a3000_state::a3000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
 	AM_RANGE(0x00b80000, 0x00bfffff) AM_READWRITE16(cia_r, cia_w, 0xffffffff)
@@ -1105,7 +1120,7 @@ static ADDRESS_MAP_START( a3000_mem, AS_PROGRAM, 32, a3000_state )
 ADDRESS_MAP_END
 
 // 1MB chip RAM and RTC
-static ADDRESS_MAP_START( a500p_mem, AS_PROGRAM, 16, a500p_state )
+ADDRESS_MAP_START(a500p_state::a500p_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
@@ -1113,7 +1128,7 @@ static ADDRESS_MAP_START( a500p_mem, AS_PROGRAM, 16, a500p_state )
 	AM_RANGE(0xc80000, 0xd7ffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xd80000, 0xdbffff) AM_NOP
 	AM_RANGE(0xdc0000, 0xdc7fff) AM_READWRITE(clock_r, clock_w)
-	AM_RANGE(0xd80000, 0xddffff) AM_NOP
+	AM_RANGE(0xdc8000, 0xddffff) AM_NOP
 	AM_RANGE(0xde0000, 0xdeffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(custom_chip_r, custom_chip_w)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_WRITENOP AM_READ(rom_mirror_r)
@@ -1122,7 +1137,7 @@ static ADDRESS_MAP_START( a500p_mem, AS_PROGRAM, 16, a500p_state )
 ADDRESS_MAP_END
 
 // 1MB chip RAM, IDE and PCMCIA
-static ADDRESS_MAP_START( a600_mem, AS_PROGRAM, 16, a600_state )
+ADDRESS_MAP_START(a600_state::a600_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0x200000, 0xa7ffff) AM_NOP
@@ -1146,7 +1161,7 @@ static ADDRESS_MAP_START( a600_mem, AS_PROGRAM, 16, a600_state )
 ADDRESS_MAP_END
 
 // 2MB chip RAM, IDE and PCMCIA
-static ADDRESS_MAP_START( a1200_mem, AS_PROGRAM, 32, a1200_state )
+ADDRESS_MAP_START(a1200_state::a1200_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
 	AM_RANGE(0x200000, 0xa7ffff) AM_NOP
@@ -1170,7 +1185,7 @@ static ADDRESS_MAP_START( a1200_mem, AS_PROGRAM, 32, a1200_state )
 ADDRESS_MAP_END
 
 // 2MB chip RAM, 4 MB fast RAM, RTC and IDE
-static ADDRESS_MAP_START( a4000_mem, AS_PROGRAM, 32, a4000_state )
+ADDRESS_MAP_START(a4000_state::a4000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x001fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
 	AM_RANGE(0x00200000, 0x009fffff) AM_NOP // zorro2 expansion
@@ -1197,7 +1212,7 @@ static ADDRESS_MAP_START( a4000_mem, AS_PROGRAM, 32, a4000_state )
 ADDRESS_MAP_END
 
 // 2MB chip RAM, 2 MB fast RAM, RTC and IDE
-static ADDRESS_MAP_START( a400030_mem, AS_PROGRAM, 32, a4000_state )
+ADDRESS_MAP_START(a4000_state::a400030_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(a4000_mem)
 	AM_RANGE(0x07000000, 0x07dfffff) AM_NOP // motherboard ram
@@ -1205,19 +1220,19 @@ static ADDRESS_MAP_START( a400030_mem, AS_PROGRAM, 32, a4000_state )
 ADDRESS_MAP_END
 
 // 2MB chip RAM and CD-ROM
-static ADDRESS_MAP_START( cd32_mem, AS_PROGRAM, 32, cd32_state )
+ADDRESS_MAP_START(cd32_state::cd32_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
 	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE("akiko", akiko_device, read, write)
 	AM_RANGE(0xbf0000, 0xbfffff) AM_READWRITE16(cia_r, gayle_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("kickstart", 0x80000)
-	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
+	AM_RANGE(0xe80000, 0xf7ffff) AM_NOP
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
 // 2 MB chip RAM, IDE, RTC and SCSI
-static ADDRESS_MAP_START( a4000t_mem, AS_PROGRAM, 32, a4000_state )
+ADDRESS_MAP_START(a4000_state::a4000t_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(a4000_mem)
 	AM_RANGE(0x00dd0000, 0x00dd0fff) AM_READWRITE(scsi_r, scsi_w)
@@ -1336,7 +1351,7 @@ SLOT_INTERFACE_END
 // basic elements common to all amigas
 MACHINE_CONFIG_START(amiga_state::amiga_base)
 	// video
-	MCFG_FRAGMENT_ADD(pal_video)
+	pal_video(config);
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amiga_state, amiga)
@@ -1413,7 +1428,8 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	MCFG_SOFTWARE_LIST_ADD("ocs_list", "amigaocs_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a1000_state::a1000, amiga_base)
+MACHINE_CONFIG_START(a1000_state::a1000)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a1000_mem)
@@ -1435,11 +1451,12 @@ MACHINE_CONFIG_DERIVED(a1000_state::a1000, amiga_base)
 	MCFG_SOFTWARE_LIST_ADD("a1000_list", "amiga_a1000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a1000_state::a1000n, a1000)
+MACHINE_CONFIG_START(a1000_state::a1000n)
+	a1000(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1450,7 +1467,8 @@ MACHINE_CONFIG_DERIVED(a1000_state::a1000n, a1000)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a2000_state::a2000, amiga_base)
+MACHINE_CONFIG_START(a2000_state::a2000)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a2000_mem)
@@ -1479,11 +1497,12 @@ MACHINE_CONFIG_DERIVED(a2000_state::a2000, amiga_base)
 	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a2000_state::a2000n, a2000)
+MACHINE_CONFIG_START(a2000_state::a2000n)
+	a2000(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1494,7 +1513,8 @@ MACHINE_CONFIG_DERIVED(a2000_state::a2000n, a2000)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a500_state::a500, amiga_base)
+MACHINE_CONFIG_START(a500_state::a500)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a500_mem)
@@ -1513,11 +1533,12 @@ MACHINE_CONFIG_DERIVED(a500_state::a500, amiga_base)
 	MCFG_EXPANSION_SLOT_INT6_HANDLER(WRITELINE(a500_state, side_int6_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a500_state::a500n, a500)
+MACHINE_CONFIG_START(a500_state::a500n)
+	a500(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1528,7 +1549,8 @@ MACHINE_CONFIG_DERIVED(a500_state::a500n, a500)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cdtv_state::cdtv, amiga_base)
+MACHINE_CONFIG_START(cdtv_state::cdtv)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(cdtv_mem)
@@ -1585,11 +1607,12 @@ MACHINE_CONFIG_DERIVED(cdtv_state::cdtv, amiga_base)
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cdtv_state::cdtvn, cdtv)
+MACHINE_CONFIG_START(cdtv_state::cdtvn)
+	cdtv(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1602,7 +1625,8 @@ MACHINE_CONFIG_DERIVED(cdtv_state::cdtvn, cdtv)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a3000_state::a3000, amiga_base)
+MACHINE_CONFIG_START(a3000_state::a3000)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68030, XTAL(32'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(a3000_mem)
@@ -1624,9 +1648,10 @@ MACHINE_CONFIG_DERIVED(a3000_state::a3000, amiga_base)
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a3000_state::a3000n, a3000)
+MACHINE_CONFIG_START(a3000_state::a3000n)
+	a3000(config);
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("cia_0")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_E_NTSC)
 	MCFG_DEVICE_MODIFY("cia_1")
@@ -1635,7 +1660,8 @@ MACHINE_CONFIG_DERIVED(a3000_state::a3000n, a3000)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a500p_state::a500p, amiga_base)
+MACHINE_CONFIG_START(a500p_state::a500p)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a500p_mem)
@@ -1657,11 +1683,12 @@ MACHINE_CONFIG_DERIVED(a500p_state::a500p, amiga_base)
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a500p_state::a500pn, a500p)
+MACHINE_CONFIG_START(a500p_state::a500pn)
+	a500p(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1672,7 +1699,8 @@ MACHINE_CONFIG_DERIVED(a500p_state::a500pn, a500p)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a600_state::a600, amiga_base)
+MACHINE_CONFIG_START(a600_state::a600)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(a600_mem)
@@ -1700,13 +1728,14 @@ MACHINE_CONFIG_DERIVED(a600_state::a600, amiga_base)
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a600_state::a600n, a600)
+MACHINE_CONFIG_START(a600_state::a600n)
+	a600(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_MODIFY("gayle")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("amiga")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_C1_NTSC)
 	MCFG_DEVICE_MODIFY("cia_0")
@@ -1717,7 +1746,8 @@ MACHINE_CONFIG_DERIVED(a600_state::a600n, a600)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a1200_state::a1200, amiga_base)
+MACHINE_CONFIG_START(a1200_state::a1200)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
 	MCFG_CPU_PROGRAM_MAP(a1200_mem)
@@ -1760,13 +1790,14 @@ MACHINE_CONFIG_DERIVED(a1200_state::a1200, amiga_base)
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a1200_state::a1200n, a1200)
+MACHINE_CONFIG_START(a1200_state::a1200n)
+	a1200(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
 	MCFG_DEVICE_MODIFY("gayle")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
@@ -1780,7 +1811,8 @@ MACHINE_CONFIG_DERIVED(a1200_state::a1200n, a1200)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a4000_state::a4000, amiga_base)
+MACHINE_CONFIG_START(a4000_state::a4000)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(a4000_mem)
@@ -1814,9 +1846,10 @@ MACHINE_CONFIG_DERIVED(a4000_state::a4000, amiga_base)
 	MCFG_SOFTWARE_LIST_ADD("ecs_list", "amigaecs_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a4000_state::a4000n, a4000)
+MACHINE_CONFIG_START(a4000_state::a4000n)
+	a4000(config);
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
@@ -1830,7 +1863,8 @@ MACHINE_CONFIG_DERIVED(a4000_state::a4000n, a4000)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a4000_state::a400030, a4000)
+MACHINE_CONFIG_START(a4000_state::a400030)
+	a4000(config);
 	// main cpu
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", M68EC030, XTAL(50'000'000) / 2)
@@ -1839,9 +1873,10 @@ MACHINE_CONFIG_DERIVED(a4000_state::a400030, a4000)
 	// todo: ide
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a4000_state::a400030n, a400030)
+MACHINE_CONFIG_START(a4000_state::a400030n)
+	a400030(config);
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
@@ -1855,7 +1890,8 @@ MACHINE_CONFIG_DERIVED(a4000_state::a400030n, a400030)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cd32_state::cd32, amiga_base)
+MACHINE_CONFIG_START(cd32_state::cd32)
+	amiga_base(config);
 	// main cpu
 	MCFG_CPU_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
 	MCFG_CPU_PROGRAM_MAP(cd32_mem)
@@ -1901,11 +1937,12 @@ MACHINE_CONFIG_DERIVED(cd32_state::cd32, amiga_base)
 	MCFG_DEVICE_REMOVE("kbd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cd32_state::cd32n, cd32)
+MACHINE_CONFIG_START(cd32_state::cd32n)
+	cd32(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_28M_NTSC / 2)
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
@@ -1919,7 +1956,8 @@ MACHINE_CONFIG_DERIVED(cd32_state::cd32n, cd32)
 	MCFG_DEVICE_CLOCK(amiga_state::CLK_7M_NTSC)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a4000_state::a4000t, a4000)
+MACHINE_CONFIG_START(a4000_state::a4000t)
+	a4000(config);
 	// main cpu
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
@@ -1928,9 +1966,10 @@ MACHINE_CONFIG_DERIVED(a4000_state::a4000t, a4000)
 	// todo: ide, zorro3, scsi, super dmac
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a4000_state::a4000tn, a4000)
+MACHINE_CONFIG_START(a4000_state::a4000tn)
+	a4000(config);
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE

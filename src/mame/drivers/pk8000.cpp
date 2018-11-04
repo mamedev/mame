@@ -30,7 +30,6 @@ class pk8000_state : public pk8000_base_state
 public:
 	pk8000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pk8000_base_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
 		, m_speaker(*this, "speaker")
@@ -66,8 +65,9 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	void pk8000(machine_config &config);
+	void pk8000_io(address_map &map);
+	void pk8000_mem(address_map &map);
 protected:
-	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
@@ -184,7 +184,7 @@ READ8_MEMBER(pk8000_state::joy_2_r)
 	return retVal;
 }
 
-static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8, pk8000_state )
+ADDRESS_MAP_START(pk8000_state::pk8000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE( 0x4000, 0x7fff ) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8, pk8000_state )
 	AM_RANGE( 0xc000, 0xffff ) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pk8000_io , AS_IO, 8, pk8000_state )
+ADDRESS_MAP_START(pk8000_state::pk8000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)

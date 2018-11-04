@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(de_3b_state::de_3b)
 	MCFG_DECOCPU_LAMP(WRITE8(de_3b_state,lamps_w))
 	MCFG_DECOCPU_DMDSTATUS(READ8(de_3b_state,dmd_status_r))
 
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* sound hardware */
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(de_3b_state::detest)
 	/* basic machine hardware */
 	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
 
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------

@@ -52,6 +52,7 @@ public:
 	uint32_t screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void minivadr(machine_config &config);
+	void minivadr_map(address_map &map);
 };
 
 /*************************************
@@ -86,7 +87,7 @@ uint32_t minivadr_state::screen_update_minivadr(screen_device &screen, bitmap_rg
 }
 
 
-static ADDRESS_MAP_START( minivadr_map, AS_PROGRAM, 8, minivadr_state )
+ADDRESS_MAP_START(minivadr_state::minivadr_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("INPUTS") AM_WRITENOP     // W - ???

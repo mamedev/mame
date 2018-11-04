@@ -120,6 +120,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gp98(machine_config &config);
 	void jingbell(machine_config &config);
+	void gp98_portmap(address_map &map);
+	void jingbell_map(address_map &map);
+	void jingbell_portmap(address_map &map);
 };
 
 
@@ -472,12 +475,12 @@ READ8_MEMBER(igs009_state::magic_r)
 }
 
 
-static ADDRESS_MAP_START( jingbell_map, AS_PROGRAM, 8, igs009_state )
+ADDRESS_MAP_START(igs009_state::jingbell_map)
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
 	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8, igs009_state )
+ADDRESS_MAP_START(igs009_state::jingbell_portmap)
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
 	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
@@ -511,7 +514,7 @@ static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8, igs009_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gp98_portmap, AS_IO, 8, igs009_state )
+ADDRESS_MAP_START(igs009_state::gp98_portmap)
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
 	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
@@ -852,7 +855,8 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(igs009_state::gp98, jingbell)
+MACHINE_CONFIG_START(igs009_state::gp98)
+	jingbell(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(gp98_portmap)

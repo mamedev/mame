@@ -3,8 +3,8 @@
 
 #pragma once
 
-#ifndef __PC9801__
-#define __PC9801__
+#ifndef MAME_INCLUDES_PC9801_H
+#define MAME_INCLUDES_PC9801_H
 
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"
@@ -304,6 +304,19 @@ public:
 	void pc9821ap2(machine_config &config);
 	void pc9821(machine_config &config);
 	void pc9801rs(machine_config &config);
+	void ipl_bank(address_map &map);
+	void pc9801_common_io(address_map &map);
+	void pc9801_io(address_map &map);
+	void pc9801_map(address_map &map);
+	void pc9801rs_io(address_map &map);
+	void pc9801rs_map(address_map &map);
+	void pc9801ux_io(address_map &map);
+	void pc9801ux_map(address_map &map);
+	void pc9821_io(address_map &map);
+	void pc9821_map(address_map &map);
+	void upd7220_1_map(address_map &map);
+	void upd7220_2_map(address_map &map);
+	void upd7220_grcg_2_map(address_map &map);
 protected:
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

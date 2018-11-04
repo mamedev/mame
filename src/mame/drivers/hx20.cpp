@@ -548,7 +548,7 @@ WRITE8_MEMBER( hx20_state::slave_p4_w )
 //  ADDRESS_MAP( hx20_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hx20_mem, AS_PROGRAM, 8, hx20_state )
+ADDRESS_MAP_START(hx20_state::hx20_mem)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_MAIN_TAG, hd63701_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0020, 0x0020) AM_WRITE(ksc_w)
 	AM_RANGE(0x0022, 0x0022) AM_READ(krtn07_r)
@@ -568,7 +568,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( hx20_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hx20_io, AS_IO, 8, hx20_state )
+ADDRESS_MAP_START(hx20_state::hx20_io)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(main_p1_r, main_p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(main_p2_r, main_p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_NOP // A0-A7, D0-D7
@@ -580,7 +580,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( hx20_sub_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hx20_sub_mem, AS_PROGRAM, 8, hx20_state )
+ADDRESS_MAP_START(hx20_state::hx20_sub_mem)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_SLAVE_TAG, hd63701_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6301V1_SLAVE_TAG, 0)
@@ -591,7 +591,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( hx20_sub_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hx20_sub_io, AS_IO, 8, hx20_state )
+ADDRESS_MAP_START(hx20_state::hx20_sub_io)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(slave_p1_r, slave_p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(slave_p2_r, slave_p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_READWRITE(slave_p3_r, slave_p3_w)
@@ -603,7 +603,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( cm6000_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cm6000_mem, AS_PROGRAM, 8, hx20_state )
+ADDRESS_MAP_START(hx20_state::cm6000_mem)
 	AM_IMPORT_FROM(hx20_mem)
 	AM_RANGE(0x4000, 0xffff) AM_ROM AM_REGION(HD6301V1_MAIN_TAG, 0)
 ADDRESS_MAP_END
@@ -953,7 +953,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(hx20_state::cm6000, hx20)
+MACHINE_CONFIG_START(hx20_state::cm6000)
+	hx20(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY(HD6301V1_MAIN_TAG)
 	MCFG_CPU_PROGRAM_MAP(cm6000_mem)

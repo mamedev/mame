@@ -34,9 +34,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void ice_bozo(machine_config &config);
+	void ice_bozo_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( ice_bozo_map, AS_PROGRAM, 8, ice_bozopail_state )
+ADDRESS_MAP_START(ice_bozopail_state::ice_bozo_map)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x1fe000)
 ADDRESS_MAP_END
 

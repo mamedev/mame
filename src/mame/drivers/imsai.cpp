@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER(control_w);
 
 	void imsai(machine_config &config);
+	void imsai_io(address_map &map);
+	void imsai_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -49,7 +51,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(imsai_mem, AS_PROGRAM, 8, imsai_state)
+ADDRESS_MAP_START(imsai_state::imsai_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("prom", 0)
 	AM_RANGE(0xd000, 0xd0ff) AM_RAM
@@ -57,7 +59,7 @@ static ADDRESS_MAP_START(imsai_mem, AS_PROGRAM, 8, imsai_state)
 	AM_RANGE(0xd800, 0xdfff) AM_ROM AM_REGION("prom", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(imsai_io, AS_IO, 8, imsai_state)
+ADDRESS_MAP_START(imsai_state::imsai_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(keyin_r) AM_DEVWRITE("terminal", generic_terminal_device, write)

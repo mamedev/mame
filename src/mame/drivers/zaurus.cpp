@@ -1446,6 +1446,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void zaurus(machine_config &config);
+	void zaurus_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -1711,7 +1712,7 @@ WRITE32_MEMBER(zaurus_state::pxa255_rtc_w)
 
 }
 
-static ADDRESS_MAP_START( zaurus_map, AS_PROGRAM, 32, zaurus_state )
+ADDRESS_MAP_START(zaurus_state::zaurus_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_REGION("firmware", 0)
 	AM_RANGE(0x40900000, 0x4090000f) AM_READWRITE(pxa255_rtc_r,pxa255_rtc_w)
 	AM_RANGE(0x40a00000, 0x40a0001f) AM_READWRITE(pxa255_ostimer_r, pxa255_ostimer_w )

@@ -74,4 +74,6 @@ public:
 
 								void dorodon(machine_config &config);
 								void ladybug(machine_config &config);
+								void decrypted_opcodes_map(address_map &map);
+								void ladybug_map(address_map &map);
 };

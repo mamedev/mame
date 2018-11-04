@@ -192,7 +192,7 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crbaloon_state )
+ADDRESS_MAP_START(crbaloon_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 is not decoded */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM     /* not fully populated */
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
@@ -209,7 +209,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, crbaloon_state )
+ADDRESS_MAP_START(crbaloon_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xf)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("DSW0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(crbaloon_state::crbaloon)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(crbaloon_audio)
+	crbaloon_audio(config);
 
 MACHINE_CONFIG_END
 

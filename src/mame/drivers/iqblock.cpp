@@ -111,13 +111,13 @@ WRITE8_MEMBER(iqblock_state::port_C_w)
 	/* bit 7 could be a second coin counter, but coin 2 doesn't seem to work... */
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, iqblock_state )
+ADDRESS_MAP_START(iqblock_state::main_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("rambase")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, iqblock_state )
+ADDRESS_MAP_START(iqblock_state::main_portmap)
 	AM_RANGE(0x2000, 0x23ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2800, 0x2bff) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x5080, 0x5083) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)

@@ -339,12 +339,12 @@ ROM_START(hp98034)
 	ROM_LOAD("1816-1242.bin" , 0 , 0x400 , CRC(301a9f5f) SHA1(3d7c1ace38c4d3178fdbf764c044535d9f6ac94f))
 ROM_END
 
-static ADDRESS_MAP_START(np_program_map , AS_PROGRAM , 8 , hp98034_io_card_device)
+ADDRESS_MAP_START(hp98034_io_card_device::np_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000 , 0x3ff) AM_ROM AM_REGION("np" , 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(np_io_map , AS_IO , 8 , hp98034_io_card_device)
+ADDRESS_MAP_START(hp98034_io_card_device::np_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0 , 0) AM_WRITE(hpib_data_w)
 	AM_RANGE(1 , 1) AM_WRITE(hpib_ctrl_w)

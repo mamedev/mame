@@ -104,7 +104,7 @@ WRITE8_MEMBER(kchamp_state::sound_control_w)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
+ADDRESS_MAP_START(kchamp_state::kchampvs_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_SHARE("videoram")
@@ -114,11 +114,11 @@ static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, kchamp_state )
+ADDRESS_MAP_START(kchamp_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8, kchamp_state )
+ADDRESS_MAP_START(kchamp_state::kchampvs_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
@@ -127,12 +127,12 @@ static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchampvs_sound_map, AS_PROGRAM, 8, kchamp_state )
+ADDRESS_MAP_START(kchamp_state::kchampvs_sound_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchampvs_sound_io_map, AS_IO, 8, kchamp_state )
+ADDRESS_MAP_START(kchamp_state::kchampvs_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -163,7 +163,7 @@ WRITE8_MEMBER(kchamp_state::kc_sound_control_w)
 		m_dac->set_output_gain(0, BIT(data,0) ? 1.0 : 0);
 }
 
-static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8, kchamp_state )
+ADDRESS_MAP_START(kchamp_state::kchamp_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_SHARE("videoram")
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0xeb00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8, kchamp_state )
+ADDRESS_MAP_START(kchamp_state::kchamp_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW")
 	AM_RANGE(0x80, 0x87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
@@ -182,12 +182,12 @@ static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0xa8, 0xa8) AM_READ(sound_reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchamp_sound_map, AS_PROGRAM, 8, kchamp_state )
+ADDRESS_MAP_START(kchamp_state::kchamp_sound_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchamp_sound_io_map, AS_IO, 8, kchamp_state )
+ADDRESS_MAP_START(kchamp_state::kchamp_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_map)
 	MCFG_CPU_IO_MAP(kchampvs_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */

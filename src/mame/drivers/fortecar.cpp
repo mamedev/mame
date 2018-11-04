@@ -358,6 +358,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void fortecar(machine_config &config);
+	void fortecar_map(address_map &map);
+	void fortecar_ports(address_map &map);
 };
 
 
@@ -533,14 +535,14 @@ Seems to work properly, but must be checked closely...
 *      Memory Map Information      *
 ***********************************/
 
-static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8, fortecar_state )
+ADDRESS_MAP_START(fortecar_state::fortecar_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd800, 0xffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8, fortecar_state )
+ADDRESS_MAP_START(fortecar_state::fortecar_ports)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)  // pc=444
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)

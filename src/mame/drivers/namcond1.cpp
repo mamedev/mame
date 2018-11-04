@@ -196,7 +196,7 @@ Some logic, resistors/caps/transistors, some connectors etc.
 
 /*************************************************************/
 
-static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
+ADDRESS_MAP_START(namcond1_state::namcond1_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x800000, 0x80000f) AM_DEVICE8("ygv608", ygv608_device, port_map, 0xff00)
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(cuskey_r,cuskey_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( abcheck_map, AS_PROGRAM, 16, namcond1_state )
+ADDRESS_MAP_START(namcond1_state::abcheck_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("zpr1")
@@ -298,7 +298,7 @@ WRITE16_MEMBER(namcond1_state::mcu_pa_write)
 }
 
 /* H8/3002 MCU stuff */
-static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
+ADDRESS_MAP_START(namcond1_state::nd1h8rwmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE("c352", c352_device, read, write)
@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0xffff1e, 0xffff1f) AM_NOP     // ^
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 16, namcond1_state )
+ADDRESS_MAP_START(namcond1_state::nd1h8iomap)
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(mcu_p7_read )
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_read, mcu_pa_write )
 	AM_RANGE(h8_device::ADC_0,  h8_device::ADC_3)  AM_NOP // MCU reads these, but the games have no analog controls
@@ -389,7 +389,8 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcond1_state::abcheck, namcond1)
+MACHINE_CONFIG_START(namcond1_state::abcheck)
+	namcond1(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
 	MCFG_CPU_PROGRAM_MAP(abcheck_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)

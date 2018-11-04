@@ -80,4 +80,11 @@ public:
 	void _9ballsht(machine_config &config);
 	void coolpool(machine_config &config);
 	void amerdart(machine_config &config);
+	void amerdart_dsp_io_map(address_map &map);
+	void amerdart_dsp_pgm_map(address_map &map);
+	void amerdart_map(address_map &map);
+	void coolpool_dsp_io_map(address_map &map);
+	void coolpool_dsp_pgm_map(address_map &map);
+	void coolpool_map(address_map &map);
+	void nballsht_map(address_map &map);
 };

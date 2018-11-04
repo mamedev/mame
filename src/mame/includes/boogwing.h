@@ -74,4 +74,7 @@ public:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_callback2);
 	void boogwing(machine_config &config);
+	void audio_map(address_map &map);
+	void boogwing_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };

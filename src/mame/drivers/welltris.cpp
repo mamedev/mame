@@ -332,7 +332,7 @@ WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
+ADDRESS_MAP_START(welltris_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_SHARE("pixelram")    /* Graph_1 & 2*/
@@ -355,13 +355,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0xfff00c, 0xfff00f) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, welltris_state )
+ADDRESS_MAP_START(welltris_state::sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
+ADDRESS_MAP_START(welltris_state::sound_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
@@ -712,7 +712,8 @@ MACHINE_CONFIG_START(welltris_state::welltris)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(welltris_state::quiz18k, welltris)
+MACHINE_CONFIG_START(welltris_state::quiz18k)
+	welltris(config);
 
 	/* basic machine hardware */
 

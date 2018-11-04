@@ -33,7 +33,7 @@ public:
 	DECLARE_WRITE32_MEMBER(sb_msys_w);
 	DECLARE_WRITE32_MEMBER(sb_mdapro_w); // 5f6c8c
 
-	DECLARE_ADDRESS_MAP(amap, 32);
+	void amap(address_map &map);
 
 	void end_of_reply();
 	void register_port(int port, maple_device *device);

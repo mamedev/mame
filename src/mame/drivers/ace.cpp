@@ -83,6 +83,7 @@ public:
 	uint32_t screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ace_postload();
 	void ace(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -144,7 +145,7 @@ READ8_MEMBER(aceal_state::unk_r)
 /* 3x3106 - SRAM 256x1 */
 /* 1x3622 - ROM 512x4  - doesn't seem to be used ????????????*/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aceal_state )
+ADDRESS_MAP_START(aceal_state::main_map)
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_SHARE("scoreram")  /* 2x2101 */

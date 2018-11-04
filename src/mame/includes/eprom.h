@@ -19,8 +19,7 @@ public:
 			m_alpha_tilemap(*this, "alpha"),
 			m_mob(*this, "mob"),
 			m_jsa(*this, "jsa"),
-			m_extra(*this, "extra"),
-			m_palette(*this, "palette") { }
+			m_extra(*this, "extra") { }
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -51,10 +50,12 @@ public:
 	uint32_t screen_update_guts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_palette();
 	optional_device<cpu_device> m_extra;
-	required_device<palette_device> m_palette;
 	static const atari_motion_objects_config s_mob_config;
 	static const atari_motion_objects_config s_guts_mob_config;
 	void guts(machine_config &config);
 	void eprom(machine_config &config);
 	void klaxp(machine_config &config);
+	void extra_map(address_map &map);
+	void guts_map(address_map &map);
+	void main_map(address_map &map);
 };

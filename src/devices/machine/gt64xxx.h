@@ -36,7 +36,7 @@
 	downcast<gt64xxx_device *>(device)->set_irq_info(_irq_num);
 
 #define MCFG_GT64XXX_SET_CS(_cs_num, _map) \
-	downcast<gt64xxx_device *>(device)->set_map(_cs_num, address_map_delegate(ADDRESS_MAP_NAME(_map), #_map), this);
+	downcast<gt64xxx_device *>(device)->set_map(_cs_num, address_map_constructor(&_map, #_map, this), this);
 
 #define MCFG_GT64XX_SET_SIMM(_index, _size) \
 	downcast<gt64xxx_device *>(device)->set_simm_size(_index, _size);
@@ -63,7 +63,7 @@ public:
 	void set_be(const int be) {m_be = be;}
 	void set_autoconfig(const int autoconfig) {m_autoconfig = autoconfig;}
 	void set_irq_num(const int irq_num) {m_irq_num = irq_num;}
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 	void set_simm_size(const int index, const int size) { m_simm_size[index] = size; };
 	void set_simm0_size(const int size) { m_simm_size[0] = size; };
 	void set_simm1_size(const int size) { m_simm_size[1] = size; };
@@ -102,7 +102,7 @@ public:
 	// Enums
 	enum proc_addr_bank {ADDR_RAS1_0, ADDR_RAS3_2, ADDR_CS2_0, ADDR_CS3_BCS, ADDR_PCI_IO, ADDR_PCI_MEM0, ADDR_PCI_MEM1, ADDR_NUM};
 
-	void set_map(int id, const address_map_delegate &map, device_t *device);
+	void set_map(int id, const address_map_constructor &map, device_t *device);
 	void postload();
 
 protected:
@@ -154,8 +154,7 @@ private:
 	required_memory_region m_romRegion;
 	optional_memory_region m_updateRegion;
 
-	DECLARE_ADDRESS_MAP(cpu_map, 32);
-	DECLARE_ADDRESS_MAP(empty, 32);
+	void cpu_map(address_map &map);
 
 	void map_cpu_space();
 
@@ -175,7 +174,7 @@ private:
 
 	// Chip Select
 	device_t *m_cs_devices[4];
-	address_map_delegate m_cs_maps[4];
+	address_map_constructor m_cs_maps[4];
 
 	void update_irqs();
 

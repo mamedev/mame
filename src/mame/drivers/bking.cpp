@@ -81,13 +81,13 @@ READ8_MEMBER(bking_state::bking3_mcu_status_r)
 		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
 }
 
-static ADDRESS_MAP_START( bking_map, AS_PROGRAM, 8, bking_state )
+ADDRESS_MAP_START(bking_state::bking_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(bking_playfield_w) AM_SHARE("playfield_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bking_io_map, AS_IO, 8, bking_state )
+ADDRESS_MAP_START(bking_state::bking_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(bking_xld1_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(bking_yld1_w)
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( bking_io_map, AS_IO, 8, bking_state )
 	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
+ADDRESS_MAP_START(bking_state::bking3_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(bking_xld1_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(bking_yld1_w)
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(bking3_addr_l_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bking_audio_map, AS_PROGRAM, 8, bking_state )
+ADDRESS_MAP_START(bking_state::bking_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM //only bking3
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
@@ -439,7 +439,8 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bking_state::bking3, bking)
+MACHINE_CONFIG_START(bking_state::bking3)
+	bking(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("main_cpu")

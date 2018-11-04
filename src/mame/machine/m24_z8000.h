@@ -36,6 +36,9 @@ public:
 
 	bool halted() const { return m_z8000_halt; }
 
+	void z8000_data(address_map &map);
+	void z8000_io(address_map &map);
+	void z8000_prog(address_map &map);
 protected:
 	void device_start() override;
 	void device_reset() override;
@@ -57,7 +60,6 @@ private:
 	IRQ_CALLBACK_MEMBER(int_cb);
 };
 
-extern const device_type M24_Z8000;
 DECLARE_DEVICE_TYPE(M24_Z8000, m24_z8000_device)
 
 #endif // MAME_MACHINE_M24_Z8000_H

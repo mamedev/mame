@@ -121,6 +121,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_circles(bitmap_ind16 &bitmap);
 	void warpspeed(machine_config &config);
+	void warpspeed_io_map(address_map &map);
+	void warpspeed_map(address_map &map);
 };
 
 WRITE8_MEMBER(warpspeed_state::hardware_w)
@@ -231,13 +233,13 @@ uint32_t warpspeed_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static ADDRESS_MAP_START( warpspeed_map, AS_PROGRAM, 8, warpspeed_state )
+ADDRESS_MAP_START(warpspeed_state::warpspeed_map)
 	AM_RANGE(0x0000, 0x0dff) AM_ROM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(vidram_w ) AM_SHARE("videoram")
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START ( warpspeed_io_map, AS_IO, 8, warpspeed_state )
+ADDRESS_MAP_START(warpspeed_state::warpspeed_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

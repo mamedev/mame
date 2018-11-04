@@ -50,6 +50,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(cesclassic);
 	void cesclassic(machine_config &config);
+	void cesclassic_map(address_map &map);
 protected:
 
 	// devices
@@ -124,7 +125,7 @@ WRITE16_MEMBER( cesclassic_state::outputs_w )
 	logerror("Output: %02x\n",data);
 }
 
-static ADDRESS_MAP_START( cesclassic_map, AS_PROGRAM, 16, cesclassic_state )
+ADDRESS_MAP_START(cesclassic_state::cesclassic_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40cfff) AM_RAM
 	AM_RANGE(0x40d000, 0x40ffff) AM_RAM AM_SHARE("vram")

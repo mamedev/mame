@@ -101,6 +101,8 @@ public:
 
 	required_device<palette_device> m_palette;
 	void mjsenpu(machine_config &config);
+	void mjsenpu_32bit_map(address_map &map);
+	void mjsenpu_io(address_map &map);
 };
 
 
@@ -212,7 +214,7 @@ READ32_MEMBER(mjsenpu_state::muxed_inputs_r)
 	return 0x00000000;// 0xffffffff;
 }
 
-static ADDRESS_MAP_START( mjsenpu_32bit_map, AS_PROGRAM, 32, mjsenpu_state )
+ADDRESS_MAP_START(mjsenpu_state::mjsenpu_32bit_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("user2",0) // main game rom
 
@@ -227,7 +229,7 @@ static ADDRESS_MAP_START( mjsenpu_32bit_map, AS_PROGRAM, 32, mjsenpu_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mjsenpu_io, AS_IO, 32, mjsenpu_state )
+ADDRESS_MAP_START(mjsenpu_state::mjsenpu_io)
 	AM_RANGE(0x4000, 0x4003)  AM_READ(muxed_inputs_r)
 	AM_RANGE(0x4010, 0x4013)  AM_READ_PORT("IN1")
 

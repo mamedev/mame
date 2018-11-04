@@ -62,6 +62,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void multi8(machine_config &config);
+	void multi8_io(address_map &map);
+	void multi8_mem(address_map &map);
 private:
 	uint8_t *m_p_vram;
 	uint8_t *m_p_wram;
@@ -286,14 +288,14 @@ WRITE8_MEMBER( multi8_state::kanji_w )
 	m_knj_addr = (offset == 0) ? (m_knj_addr & 0xff00) | (data & 0xff) : (m_knj_addr & 0x00ff) | (data << 8);
 }
 
-static ADDRESS_MAP_START(multi8_mem, AS_PROGRAM, 8, multi8_state)
+ADDRESS_MAP_START(multi8_state::multi8_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(multi8_io, AS_IO, 8, multi8_state)
+ADDRESS_MAP_START(multi8_state::multi8_io)
 //  ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) //keyboard

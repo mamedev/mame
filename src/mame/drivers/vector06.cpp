@@ -27,26 +27,25 @@ TODO:
 #include "includes/vector06.h"
 
 #include "formats/vector06_dsk.h"
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
 #include "sound/wave.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(vector06_mem, AS_PROGRAM, 8, vector06_state)
+ADDRESS_MAP_START(vector06_state::vector06_mem)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE_BANK("bank1")
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank2")
 	AM_RANGE(0xa000, 0xdfff) AM_READWRITE_BANK("bank3")
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_BANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vector06_io, AS_IO, 8, vector06_state)
+ADDRESS_MAP_START(vector06_state::vector06_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_MOD("ppi8255", i8255_device, read, write, xor<3>)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_MOD("ppi8255_2", i8255_device, read, write, xor<3>)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_MOD("pit8253", pit8253_device, read, write, xor<3>)
+    ;
+	map(0x00, 0x03).lrw8("ppi8255_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255->write(space, offset^3, data, mem_mask); });
+	map(0x04, 0x07).lrw8("ppi8255_2_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_ppi8255_2->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ppi8255_2->write(space, offset^3, data, mem_mask); });
+	map(0x08, 0x0b).lrw8("pit8253_rw", [this](address_space &space, offs_t offset, u8 mem_mask) -> u8 { return m_pit8253->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_pit8253->write(space, offset^3, data, mem_mask); });
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(vector06_color_set)
 	AM_RANGE(0x10, 0x10) AM_WRITE(vector06_ramdisk_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_address_w)

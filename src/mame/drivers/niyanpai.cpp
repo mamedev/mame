@@ -123,7 +123,7 @@ WRITE16_MEMBER(niyanpai_state::musobana_inputport_w)
 	m_musobana_inputport = data;
 }
 
-static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
+ADDRESS_MAP_START(niyanpai_state::niyanpai_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")
 
@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
+ADDRESS_MAP_START(niyanpai_state::musobana_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
+ADDRESS_MAP_START(niyanpai_state::mhhonban_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
+ADDRESS_MAP_START(niyanpai_state::zokumahj_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM
 
@@ -717,7 +717,8 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	MCFG_NICHISND_ADD("nichisnd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(niyanpai_state::musobana, niyanpai)
+MACHINE_CONFIG_START(niyanpai_state::musobana)
+	niyanpai(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -726,14 +727,16 @@ MACHINE_CONFIG_DERIVED(niyanpai_state::musobana, niyanpai)
 	MCFG_MACHINE_START_OVERRIDE(niyanpai_state, musobana)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(niyanpai_state::mhhonban, musobana)
+MACHINE_CONFIG_START(niyanpai_state::mhhonban)
+	musobana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mhhonban_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(niyanpai_state::zokumahj, musobana)
+MACHINE_CONFIG_START(niyanpai_state::zokumahj)
+	musobana(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

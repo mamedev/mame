@@ -93,4 +93,10 @@ public:
 	void madball(machine_config &config);
 	void torus(machine_config &config);
 	void penky(machine_config &config);
+	void base_map(address_map &map);
+	void paradise_io_map(address_map &map);
+	void paradise_map(address_map &map);
+	void tgtball_map(address_map &map);
+	void torus_io_map(address_map &map);
+	void torus_map(address_map &map);
 };

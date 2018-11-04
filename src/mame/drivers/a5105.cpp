@@ -72,6 +72,9 @@ public:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
 	void a5105(machine_config &config);
+	void a5105_io(address_map &map);
+	void a5105_mem(address_map &map);
+	void upd7220_map(address_map &map);
 private:
 	uint8_t *m_ram_base;
 	uint8_t *m_rom_base;
@@ -154,7 +157,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 	}
 }
 
-static ADDRESS_MAP_START(a5105_mem, AS_PROGRAM, 8, a5105_state)
+ADDRESS_MAP_START(a5105_state::a5105_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2")
@@ -347,7 +350,7 @@ WRITE8_MEMBER( a5105_state::a5105_upd765_w )
 	m_fdc->tc_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
+ADDRESS_MAP_START(a5105_state::a5105_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x41) AM_DEVICE("upd765a", upd765a_device, map)
@@ -537,7 +540,7 @@ void a5105_state::video_start()
 	m_char_ram = memregion("pcg")->base();
 }
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, a5105_state)
+ADDRESS_MAP_START(a5105_state::upd7220_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END

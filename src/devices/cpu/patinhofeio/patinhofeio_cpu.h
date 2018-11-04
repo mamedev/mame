@@ -62,6 +62,7 @@ public:
 	void transfer_byte_from_external_device(uint8_t channel, uint8_t data);
 	void set_iodev_status(uint8_t channel, bool status) { m_iodev_status[channel] = status; }
 
+	void prog_8bit(address_map &map);
 protected:
 
 	virtual void execute_run() override;

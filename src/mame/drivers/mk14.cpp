@@ -62,6 +62,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	void mk14(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -106,7 +107,7 @@ WRITE8_MEMBER( mk14_state::display_w )
 	}
 }
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, mk14_state)
+ADDRESS_MAP_START(mk14_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x000, 0x1ff) AM_MIRROR(0x600) AM_ROM // ROM

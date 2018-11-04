@@ -75,7 +75,7 @@
 
 DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "TMP87PH40AN")
 
-static ADDRESS_MAP_START(tmp87ph40an_mem, AS_PROGRAM, 8, tlcs870_device)
+ADDRESS_MAP_START(tlcs870_device::tmp87ph40an_mem)
 #if 0
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port0_r,port0_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port1_r,port1_w)
@@ -166,7 +166,7 @@ tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, 
 
 
 tmp87ph40an_device::tmp87ph40an_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs870_device(mconfig, TMP87PH40AN, tag, owner, clock, ADDRESS_MAP_NAME(tmp87ph40an_mem))
+	: tlcs870_device(mconfig, TMP87PH40AN, tag, owner, clock, address_map_constructor(FUNC(tmp87ph40an_device::tmp87ph40an_mem), this))
 {
 }
 

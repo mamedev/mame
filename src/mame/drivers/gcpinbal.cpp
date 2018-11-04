@@ -250,7 +250,7 @@ WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
                      MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16, gcpinbal_state )
+ADDRESS_MAP_START(gcpinbal_state::gcpinbal_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_SHARE("tilemapram")
 	AM_RANGE(0xc80000, 0xc81fff) AM_DEVREADWRITE8("spritegen", excellent_spr_device, read, write, 0x00ff)

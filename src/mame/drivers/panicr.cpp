@@ -125,6 +125,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void panicr(machine_config &config);
+	void panicr_map(address_map &map);
 };
 
 
@@ -427,7 +428,7 @@ WRITE8_MEMBER(panicr_state::t5182shared_w)
 }
 
 
-static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
+ADDRESS_MAP_START(panicr_state::panicr_map)
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x02000, 0x03cff) AM_RAM AM_SHARE("spriteram") // how big is sprite ram, some places definitely have sprites at 3000+
 	AM_RANGE(0x03d00, 0x03fff) AM_RAM

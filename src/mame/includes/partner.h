@@ -39,6 +39,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void partner(machine_config &config);
+	void partner_mem(address_map &map);
 protected:
 	void partner_window_1(uint8_t bank_num, uint16_t offset,uint8_t *rom);
 	void partner_window_2(uint8_t bank_num, uint16_t offset,uint8_t *rom);

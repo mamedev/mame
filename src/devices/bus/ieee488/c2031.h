@@ -58,6 +58,8 @@ private:
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 
+	void c2031_mem(address_map &map);
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	required_device<cpu_device> m_maincpu;

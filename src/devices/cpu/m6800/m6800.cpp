@@ -26,7 +26,7 @@ History
 
 990319  HJB
     Fixed wrong LSB/MSB order for push/pull word.
-    Subtract .extra_cycles at the beginning/end of the exectuion loops.
+    Subtract .extra_cycles at the beginning/end of the exectution loops.
 
 990316  HJB
     Renamed to 6800, since that's the basic CPU.
@@ -329,7 +329,7 @@ DEFINE_DEVICE_TYPE(NSC8105, nsc8105_cpu_device, "nsc8105", "NSC8105")
 
 
 m6800_cpu_device::m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6800_cpu_device(mconfig, M6800, tag, owner, clock, m6800_insn, cycles_6800, nullptr)
+	: m6800_cpu_device(mconfig, M6800, tag, owner, clock, m6800_insn, cycles_6800, address_map_constructor())
 {
 }
 
@@ -348,7 +348,7 @@ m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *ta
 }
 
 m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles)
-	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, nullptr)
+	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, address_map_constructor())
 {
 }
 

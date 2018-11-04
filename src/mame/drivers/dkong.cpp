@@ -527,6 +527,11 @@ MACHINE_RESET_MEMBER(dkong_state,dkong)
 	/* nothing */
 }
 
+MACHINE_RESET_MEMBER(dkong_state,ddk)
+{
+	dk_braze_a15(!membank("bank1")->entry());
+}
+
 MACHINE_RESET_MEMBER(dkong_state,strtheat)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -616,6 +621,10 @@ WRITE8_MEMBER(dkong_state::p8257_drq_w)
 
 READ8_MEMBER(dkong_state::dkong_in2_r)
 {
+	// 2 board DK and all DKjr has a watchdog
+	if (m_watchdog)
+		m_watchdog->reset_w(space, 0, 0);
+
 	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
 	uint8_t mcustatus = m_dev_vp2->bit4_q_r();
 	uint8_t r;
@@ -629,6 +638,10 @@ READ8_MEMBER(dkong_state::dkong_in2_r)
 
 READ8_MEMBER(dkong_state::dkongjr_in2_r)
 {
+	// 2 board DK and all DKjr has a watchdog
+	if (m_watchdog)
+		m_watchdog->reset_w(space, 0, 0);
+
 	/* dkongjr does not have the mcu line connected */
 
 	uint8_t r;
@@ -805,7 +818,7 @@ WRITE8_MEMBER(dkong_state::nmi_mask_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( dkong_map, AS_PROGRAM, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::dkong_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("sprite_ram") /* sprite set 1 */
@@ -826,7 +839,7 @@ static ADDRESS_MAP_START( dkong_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkongjr_map, AS_PROGRAM, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::dkongjr_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x6c00, 0x6fff) AM_RAM                                              /* DK3 bootleg only */
@@ -836,26 +849,26 @@ static ADDRESS_MAP_START( dkongjr_map, AS_PROGRAM, 8, dkong_state )
 
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_DEVWRITE("ls174.3d", latch8_device, write)    /* IN0, sound interface */
 
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
 	AM_RANGE(0x7c80, 0x7c87) AM_DEVWRITE("ls259.4h", latch8_device, bit0_w)     /* latch for sound and signals above */
+	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
 
 	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkongjr_in2_r)                             /* IN2 */
 	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE("ls259.6h", latch8_device, bit0_w)      /* Sound addrs */
 
+	AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE("ls259.5h", latch8_device, bit0_w)     /* latch for sound and signals above*/
 	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
 	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
 	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)        /* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE("ls259.5h", latch8_device, bit0_w)     /* latch for sound and signals above*/
 
 	AM_RANGE(0x8000, 0x9fff) AM_ROM                                             /* bootleg DKjr only */
 	AM_RANGE(0xb000, 0xbfff) AM_ROM                                             /* pestplce only */
 	AM_RANGE(0xd000, 0xdfff) AM_ROM                                             /* DK3 bootleg only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_map, AS_PROGRAM, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::dkong3_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x6800, 0x6fff) AM_RAM
@@ -875,21 +888,21 @@ static ADDRESS_MAP_START( dkong3_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROM                                       /* DK3 and bootleg DKjr only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_io_map, AS_IO, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::dkong3_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)  /* dma controller */
 ADDRESS_MAP_END
 
 /* Epos conversions */
 
-static ADDRESS_MAP_START( epos_readport, AS_IO, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::epos_readport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READ(epos_decrypt_rom)  /* Switch protection logic */
 ADDRESS_MAP_END
 
 /* S2650 conversions */
 
-static ADDRESS_MAP_START( s2650_map, AS_PROGRAM, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::s2650_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("sprite_ram")  /* 0x7000 */
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x007f) AM_READ_PORT("IN0") AM_DEVWRITE("ls175.3d", latch8_device, write)
@@ -915,12 +928,12 @@ static ADDRESS_MAP_START( s2650_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s2650_io_map, AS_IO, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::s2650_io_map)
 	AM_RANGE(0x00, 0x00) AM_READ(s2650_port0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(s2650_port1_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s2650_data_map, AS_DATA, 8, dkong_state )
+ADDRESS_MAP_START(dkong_state::s2650_data_map)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(s2650_data_w)
 ADDRESS_MAP_END
 
@@ -1094,6 +1107,15 @@ static INPUT_PORTS_START( dkongx )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:!5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW1:!6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW1:!7" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dkongike )
+	PORT_INCLUDE( dkongx )
+
+	PORT_START("GAME")
+	PORT_CONFNAME(0x01, 0x00, "Game") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, dkong_state, dk_braze_a15)
+	PORT_CONFSETTING(0x00, "1")
+	PORT_CONFSETTING(0x01, "2")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radarscp )
@@ -1629,10 +1651,15 @@ READ8_MEMBER(dkong_state::braze_eeprom_r)
 	return m_eeprom->do_read();
 }
 
-WRITE8_MEMBER(dkong_state::braze_a15_w)
+WRITE_LINE_MEMBER(dkong_state::dk_braze_a15)
 {
-	membank("bank1")->set_entry(data & 0x01);
-	membank("bank2")->set_entry(data & 0x01);
+	membank("bank1")->set_entry(state & 0x01);
+	membank("bank2")->set_entry(state & 0x01);
+}
+
+WRITE8_MEMBER(dkong_state::dk_braze_a15_w)
+{
+	dk_braze_a15(data);
 }
 
 WRITE8_MEMBER(dkong_state::braze_eeprom_w)
@@ -1716,7 +1743,8 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp, dkong_base)
+MACHINE_CONFIG_START(dkong_state::radarscp)
+	dkong_base(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp)
@@ -1725,10 +1753,11 @@ MACHINE_CONFIG_DERIVED(dkong_state::radarscp, dkong_base)
 	MCFG_PALETTE_INIT_OWNER(dkong_state,radarscp)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(radarscp_audio)
+	radarscp_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp1, dkong_base)
+MACHINE_CONFIG_START(dkong_state::radarscp1)
+	dkong_base(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp1)
@@ -1737,11 +1766,12 @@ MACHINE_CONFIG_DERIVED(dkong_state::radarscp1, dkong_base)
 	MCFG_PALETTE_INIT_OWNER(dkong_state,radarscp1)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(radarscp1_audio)
+	radarscp1_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dkong_state::dkong2b, dkong_base)
+MACHINE_CONFIG_START(dkong_state::dkong2b)
+	dkong_base(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
@@ -1749,10 +1779,31 @@ MACHINE_CONFIG_DERIVED(dkong_state::dkong2b, dkong_base)
 	MCFG_PALETTE_ENTRIES(DK2B_PALETTE_LENGTH)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dkong2b_audio)
+	dkong2b_audio(config);
+
+	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::braze, dkong2b)
+MACHINE_CONFIG_START(dkong_state::dk_braze)
+	dkong2b(config);
+
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(dkong_state::dkj_braze)
+	dkongjr(config);
+
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(dkong_state::ddk_braze)
+	dkj_braze(config);
+
+	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,ddk)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(dkong_state::dk3_braze)
+	dkong3(config);
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
@@ -1785,19 +1836,23 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dkong3_audio)
+	dkong3_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::dkongjr, dkong_base)
+MACHINE_CONFIG_START(dkong_state::dkongjr)
+	dkong_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dkongjr_map)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(dkongjr_audio)
+	dkongjr_audio(config);
+
+	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::pestplce, dkongjr)
+MACHINE_CONFIG_START(dkong_state::pestplce)
+	dkongjr(config);
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pestplce)
@@ -1808,7 +1863,8 @@ MACHINE_CONFIG_DERIVED(dkong_state::pestplce, dkongjr)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_pestplce)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::dkong3b, dkongjr)
+MACHINE_CONFIG_START(dkong_state::dkong3b)
+	dkongjr(config);
 
 	/* basic machine hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1821,7 +1877,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_DERIVED(dkong_state::s2650, dkong2b)
+MACHINE_CONFIG_START(dkong_state::s2650)
+	dkong2b(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
@@ -1839,12 +1896,14 @@ MACHINE_CONFIG_DERIVED(dkong_state::s2650, dkong2b)
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::herbiedk, s2650)
+MACHINE_CONFIG_START(dkong_state::herbiedk)
+	s2650(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::spclforc, herbiedk)
+MACHINE_CONFIG_START(dkong_state::spclforc)
+	herbiedk(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("soundcpu")
@@ -1860,7 +1919,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_DERIVED(dkong_state::strtheat, dkong2b)
+MACHINE_CONFIG_START(dkong_state::strtheat)
+	dkong2b(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1869,7 +1929,8 @@ MACHINE_CONFIG_DERIVED(dkong_state::strtheat, dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,strtheat)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::drakton, dkong2b)
+MACHINE_CONFIG_START(dkong_state::drakton)
+	dkong2b(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1878,7 +1939,8 @@ MACHINE_CONFIG_DERIVED(dkong_state::drakton, dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::drktnjr, dkongjr)
+MACHINE_CONFIG_START(dkong_state::drktnjr)
+	dkongjr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2197,6 +2259,103 @@ ROM_START( dkongf ) /* Donkey Kong Foundry (hack) from Jeff's Romhack */
 	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
 ROM_END
 
+ROM_START( dkonghs )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c_5et_g.bin",  0x0000, 0x1000, CRC(ba70b88b) SHA1(d76ebecfea1af098d843ee7e578e480cd658ac1a) )
+	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
+	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
+	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
+	/* space for diagnostic ROM */
+
+	ROM_REGION( 0x10000, "braze", 0 )
+	ROM_LOAD( "dk_12.bin",    0x0000, 0x8000, CRC(2dd82c1d) SHA1(d5e28962a784b1f9169d248f0f416748ab7b5315) ) /* Version 1.2 */
+	ROM_RELOAD( 0x8000, 0x8000 )
+
+	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
+	ROM_RELOAD(               0x0800, 0x0800 )
+	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "v_5h_b.bin",   0x0000, 0x0800, CRC(12c8c95d) SHA1(a57ff5a231c45252a63b354137c920a1379b70a3) )
+	ROM_LOAD( "v_3pt.bin",    0x0800, 0x0800, CRC(15e9c5e9) SHA1(976eb1e18c74018193a35aa86cff482ebfc5cc4e) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "l_4m_b.bin",   0x0000, 0x0800, CRC(59f8054d) SHA1(793dba9bf5a5fe76328acdfb90815c243d2a65f1) )
+	ROM_LOAD( "l_4n_b.bin",   0x0800, 0x0800, CRC(672e4714) SHA1(92e5d379f4838ac1fa44d448ce7d142dae42102f) )
+	ROM_LOAD( "l_4r_b.bin",   0x1000, 0x0800, CRC(feaa59ee) SHA1(ecf95db5a20098804fc8bd59232c66e2e0ed3db4) )
+	ROM_LOAD( "l_4s_b.bin",   0x1800, 0x0800, CRC(20f2ef7e) SHA1(3bc482a38bf579033f50082748ee95205b0f673d) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "c-2k.bpr",     0x0000, 0x0100, CRC(e273ede5) SHA1(b50ec9e1837c00c20fb2a4369ec7dd0358321127) ) /* palette low 4 bits (inverted) */
+	ROM_LOAD( "c-2j.bpr",     0x0100, 0x0100, CRC(d6412358) SHA1(f9c872da2fe8e800574ae3bf483fb3ccacc92eb3) ) /* palette high 4 bits (inverted) */
+	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
+ROM_END
+
+ROM_START( dkongike )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c_5et_g.bin",  0x0000, 0x1000, CRC(ba70b88b) SHA1(d76ebecfea1af098d843ee7e578e480cd658ac1a) )
+	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
+	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
+	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
+	/* space for diagnostic ROM */
+
+	ROM_REGION( 0x10000, "braze", 0 )
+	ROM_LOAD( "kong_ike.bin", 0x0000, 0x10000, CRC(f924bd05) SHA1(3a52678018ddebaeff29e9c6c1cd7cee066a3390) ) /* Version 1.1 IKE */
+
+	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
+	ROM_RELOAD(               0x0800, 0x0800 )
+	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "v_5h_b.bin",   0x0000, 0x0800, CRC(12c8c95d) SHA1(a57ff5a231c45252a63b354137c920a1379b70a3) )
+	ROM_LOAD( "v_3pt.bin",    0x0800, 0x0800, CRC(15e9c5e9) SHA1(976eb1e18c74018193a35aa86cff482ebfc5cc4e) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "l_4m_b.bin",   0x0000, 0x0800, CRC(59f8054d) SHA1(793dba9bf5a5fe76328acdfb90815c243d2a65f1) )
+	ROM_LOAD( "l_4n_b.bin",   0x0800, 0x0800, CRC(672e4714) SHA1(92e5d379f4838ac1fa44d448ce7d142dae42102f) )
+	ROM_LOAD( "l_4r_b.bin",   0x1000, 0x0800, CRC(feaa59ee) SHA1(ecf95db5a20098804fc8bd59232c66e2e0ed3db4) )
+	ROM_LOAD( "l_4s_b.bin",   0x1800, 0x0800, CRC(20f2ef7e) SHA1(3bc482a38bf579033f50082748ee95205b0f673d) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "c-2k.bpr",     0x0000, 0x0100, CRC(e273ede5) SHA1(b50ec9e1837c00c20fb2a4369ec7dd0358321127) ) /* palette low 4 bits (inverted) */
+	ROM_LOAD( "c-2j.bpr",     0x0100, 0x0100, CRC(d6412358) SHA1(f9c872da2fe8e800574ae3bf483fb3ccacc92eb3) ) /* palette high 4 bits (inverted) */
+	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
+ROM_END
+
+ROM_START( dkongjrc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "c_5et_g.bin",  0x0000, 0x1000, CRC(ba70b88b) SHA1(d76ebecfea1af098d843ee7e578e480cd658ac1a) )
+	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
+	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
+	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
+	/* space for diagnostic ROM */
+
+	ROM_REGION( 0x10000, "braze", 0 )
+	ROM_LOAD( "kong_12.bin", 0x0000, 0x10000, CRC(4d82dc5b) SHA1(59479a0312155fc0d5fa7ae5e46c4f003e04d068) ) /* Version 1.2 */
+
+	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
+	ROM_RELOAD(               0x0800, 0x0800 )
+	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "v_5h_b.bin",   0x0000, 0x0800, CRC(12c8c95d) SHA1(a57ff5a231c45252a63b354137c920a1379b70a3) )
+	ROM_LOAD( "v_3pt.bin",    0x0800, 0x0800, CRC(15e9c5e9) SHA1(976eb1e18c74018193a35aa86cff482ebfc5cc4e) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "l_4m_b.bin",   0x0000, 0x0800, CRC(59f8054d) SHA1(793dba9bf5a5fe76328acdfb90815c243d2a65f1) )
+	ROM_LOAD( "l_4n_b.bin",   0x0800, 0x0800, CRC(672e4714) SHA1(92e5d379f4838ac1fa44d448ce7d142dae42102f) )
+	ROM_LOAD( "l_4r_b.bin",   0x1000, 0x0800, CRC(feaa59ee) SHA1(ecf95db5a20098804fc8bd59232c66e2e0ed3db4) )
+	ROM_LOAD( "l_4s_b.bin",   0x1800, 0x0800, CRC(20f2ef7e) SHA1(3bc482a38bf579033f50082748ee95205b0f673d) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "c-2k.bpr",     0x0000, 0x0100, CRC(e273ede5) SHA1(b50ec9e1837c00c20fb2a4369ec7dd0358321127) ) /* palette low 4 bits (inverted) */
+	ROM_LOAD( "c-2j.bpr",     0x0100, 0x0100, CRC(d6412358) SHA1(f9c872da2fe8e800574ae3bf483fb3ccacc92eb3) ) /* palette high 4 bits (inverted) */
+	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
+ROM_END
+
 ROM_START( dkongx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c_5et_g.bin",  0x0000, 0x1000, CRC(ba70b88b) SHA1(d76ebecfea1af098d843ee7e578e480cd658ac1a) )
@@ -2452,6 +2611,77 @@ ROM_START( dkongjrb )
 	ROM_LOAD( "c-2e.bpr",  0x0000, 0x0100, CRC(463dc7ad) SHA1(b2c9f22facc8885be2d953b056eb8dcddd4f34cb) )   /* palette low 4 bits (inverted) */
 	ROM_LOAD( "c-2f.bpr",  0x0100, 0x0100, CRC(47ba0042) SHA1(dbec3f4b8013628c5b8f83162e5f8b1f82f6ee5f) )   /* palette high 4 bits (inverted) */
 	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
+ROM_END
+
+ROM_START( dkongjrhs )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "djr1-c_5b_f-2.5b", 0x0000, 0x1000, CRC(dea28158) SHA1(08baf84ae6f9b40a2c743fe1d8c158c74a40e95a) )
+	ROM_CONTINUE(                 0x3000, 0x1000 )
+	ROM_LOAD( "djr1-c_5c_f-2.5c", 0x2000, 0x0800, CRC(6fb5faf6) SHA1(ce1cfde71a9e2a8b5896a6301d386f72869a1d2e) )
+	ROM_CONTINUE(                 0x4800, 0x0800 )
+	ROM_CONTINUE(                 0x1000, 0x0800 )
+	ROM_CONTINUE(                 0x5800, 0x0800 )
+	ROM_LOAD( "djr1-c_5e_f-2.5e", 0x4000, 0x0800, CRC(d042b6a8) SHA1(57ac237d273496b44220b4437118115ef11dbd9f) )
+	ROM_CONTINUE(                 0x2800, 0x0800 )
+	ROM_CONTINUE(                 0x5000, 0x0800 )
+	ROM_CONTINUE(                 0x1800, 0x0800 )
+
+	ROM_REGION( 0x10000, "braze", 0 )
+	ROM_LOAD( "dkj_12.bin",       0x0000, 0x8000, CRC(e341b337) SHA1(7cba8305d9618769ba3afb52a60984e16a0dd266) ) /* Version 1.2 */
+	ROM_RELOAD( 0x8000, 0x8000 )
+
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "djr1-c_3h.3h",     0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "djr1-v.3n",        0x0000, 0x1000, CRC(8d51aca9) SHA1(64887564b079d98e98aafa53835e398f34fe4e3f) )
+	ROM_LOAD( "djr1-v.3p",        0x1000, 0x1000, CRC(4ef64ba5) SHA1(41a7a4005087951f57f62c9751d62a8c495e6bb3) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "djr1-v_7c.7c",     0x0000, 0x0800, CRC(dc7f4164) SHA1(07a6242e95b5c3b8dfdcd4b4950f463dba16dd77) )
+	ROM_LOAD( "djr1-v_7d.7d",     0x0800, 0x0800, CRC(0ce7dcf6) SHA1(0654b77526c49f0dfa077ac4f1f69cf5cb2e2f64) )
+	ROM_LOAD( "djr1-v_7e.7e",     0x1000, 0x0800, CRC(24d1ff17) SHA1(696854bf3dc5447d33b4815db357e6ce3834d867) )
+	ROM_LOAD( "djr1-v_7f.7f",     0x1800, 0x0800, CRC(0f8c083f) SHA1(0b688ae9da296b2447fffa5e135fd6a56ec3e790) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "djr1-c-2e.2e",     0x0000, 0x0100, CRC(463dc7ad) SHA1(b2c9f22facc8885be2d953b056eb8dcddd4f34cb) )   /* palette low 4 bits (inverted) */
+	ROM_LOAD( "djr1-c-2f.2f",     0x0100, 0x0100, CRC(47ba0042) SHA1(dbec3f4b8013628c5b8f83162e5f8b1f82f6ee5f) )   /* palette high 4 bits (inverted) */
+	ROM_LOAD( "djr1-v-2n.2n",     0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
+ROM_END
+
+ROM_START( dkongddk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "djr1-c_5b_f-2.5b", 0x0000, 0x1000, CRC(dea28158) SHA1(08baf84ae6f9b40a2c743fe1d8c158c74a40e95a) )
+	ROM_CONTINUE(                 0x3000, 0x1000 )
+	ROM_LOAD( "djr1-c_5c_f-2.5c", 0x2000, 0x0800, CRC(6fb5faf6) SHA1(ce1cfde71a9e2a8b5896a6301d386f72869a1d2e) )
+	ROM_CONTINUE(                 0x4800, 0x0800 )
+	ROM_CONTINUE(                 0x1000, 0x0800 )
+	ROM_CONTINUE(                 0x5800, 0x0800 )
+	ROM_LOAD( "djr1-c_5e_f-2.5e", 0x4000, 0x0800, CRC(d042b6a8) SHA1(57ac237d273496b44220b4437118115ef11dbd9f) )
+	ROM_CONTINUE(                 0x2800, 0x0800 )
+	ROM_CONTINUE(                 0x5000, 0x0800 )
+	ROM_CONTINUE(                 0x1800, 0x0800 )
+
+	ROM_REGION( 0x10000, "braze", 0 )
+	ROM_LOAD( "ddk_12.bin",  0x0000, 0x10000, CRC(26caaf8a) SHA1(8abd5855326a6653f12ae1bdc8f18ef45861c344) ) /* Version 1.2 */
+
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "djr1-c_3h.3h",     0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "djr1-v.3n",        0x0000, 0x1000, CRC(8d51aca9) SHA1(64887564b079d98e98aafa53835e398f34fe4e3f) )
+	ROM_LOAD( "djr1-v.3p",        0x1000, 0x1000, CRC(4ef64ba5) SHA1(41a7a4005087951f57f62c9751d62a8c495e6bb3) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "djr1-v_7c.7c",     0x0000, 0x0800, CRC(dc7f4164) SHA1(07a6242e95b5c3b8dfdcd4b4950f463dba16dd77) )
+	ROM_LOAD( "djr1-v_7d.7d",     0x0800, 0x0800, CRC(0ce7dcf6) SHA1(0654b77526c49f0dfa077ac4f1f69cf5cb2e2f64) )
+	ROM_LOAD( "djr1-v_7e.7e",     0x1000, 0x0800, CRC(24d1ff17) SHA1(696854bf3dc5447d33b4815db357e6ce3834d867) )
+	ROM_LOAD( "djr1-v_7f.7f",     0x1800, 0x0800, CRC(0f8c083f) SHA1(0b688ae9da296b2447fffa5e135fd6a56ec3e790) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "djr1-c-2e.2e",     0x0000, 0x0100, CRC(463dc7ad) SHA1(b2c9f22facc8885be2d953b056eb8dcddd4f34cb) )   /* palette low 4 bits (inverted) */
+	ROM_LOAD( "djr1-c-2f.2f",     0x0100, 0x0100, CRC(47ba0042) SHA1(dbec3f4b8013628c5b8f83162e5f8b1f82f6ee5f) )   /* palette high 4 bits (inverted) */
+	ROM_LOAD( "djr1-v-2n.2n",     0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
 ROM_END
 
 /* only the graphic roms differ from dkongjrb but it's a common bootleg */
@@ -2735,6 +2965,42 @@ ROM_START( dkong3b )
 	ROM_LOAD( "dk3b-c.1d",    0x0000, 0x0200, CRC(df54befc) SHA1(7912dbf0a0c8ef68f4ae0f95e55ab164da80e4a1) ) /* palette red & green component */
 	ROM_LOAD( "dk3b-c.1c",    0x0200, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
 	ROM_LOAD( "dk3b-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) ) /* character color codes on a per-column basis */
+ROM_END
+
+ROM_START( dkong3hs )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dk3c.7b",      0x0000, 0x2000, CRC(38d5f38e) SHA1(5a6bb0e5070211515e3d56bd7d4c2d1655ac1621) )
+	ROM_LOAD( "dk3c.7c",      0x2000, 0x2000, CRC(c9134379) SHA1(ecddb3694b93cb3dc98c3b1aeeee928e27529aba) )
+	ROM_LOAD( "dk3c.7d",      0x4000, 0x2000, CRC(d22e2921) SHA1(59a4a1a36aaca19ee0a7255d832df9d042ba34fb) )
+	ROM_LOAD( "dk3c.7e",      0x8000, 0x2000, CRC(615f14b7) SHA1(145674073e95d97c9131b6f2b03303eadb57ca78) )
+
+	ROM_REGION( 0x10000, "braze", 0 )
+	ROM_LOAD( "dk3_10a.bin", 0x0000, 0x10000, CRC(0008652b) SHA1(f1d90bb18373a6f24634b6d2cd766a28d07ab9f4) ) /* Version 1.0a */
+
+	ROM_REGION( 0x10000, "n2a03a", 0 )  /* sound #1 */
+	ROM_LOAD( "dk3c.5l",      0xe000, 0x2000, CRC(7ff88885) SHA1(d530581778aab260e21f04c38e57ba34edea7c64) )
+
+	ROM_REGION( 0x10000, "n2a03b", 0 )  /* sound #2 */
+	ROM_LOAD( "dk3c.6h",      0xe000, 0x2000, CRC(36d7200c) SHA1(7965fcb9bc1c0fdcae8a8e79df9c7b7439c506d8) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "dk3v.3n",      0x0000, 0x1000, CRC(415a99c7) SHA1(e0855b03bb1dc0d8ae46da9fe33ca30ecf6a2e96) )
+	ROM_LOAD( "dk3v.3p",      0x1000, 0x1000, CRC(25744ea0) SHA1(4866e43e80b010ccf2c8cc94c232786521f9e26e) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "dk3v.7c",      0x0000, 0x1000, CRC(8ffa1737) SHA1(fa5896124227d412fbdf83f129ddffa32cf2053b) )
+	ROM_LOAD( "dk3v.7d",      0x1000, 0x1000, CRC(9ac84686) SHA1(a089376b9c23094490703152ad98ed27f519402d) )
+	ROM_LOAD( "dk3v.7e",      0x2000, 0x1000, CRC(0c0af3fb) SHA1(03e0c3f51bc3c20f95cb02f76f2d80188d5dbe36) )
+	ROM_LOAD( "dk3v.7f",      0x3000, 0x1000, CRC(55c58662) SHA1(7f3d5a1b386cc37d466e42392ffefc928666a8dc) )
+
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "dkc1-c.1d",    0x0000, 0x0200, CRC(df54befc) SHA1(7912dbf0a0c8ef68f4ae0f95e55ab164da80e4a1) ) /* palette red & green component */
+	ROM_LOAD( "dkc1-c.1c",    0x0200, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
+	ROM_LOAD( "dkc1-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) ) /* character color codes on a per-column basis */
+
+	ROM_REGION( 0x0020, "adrdecode", 0 )
+	/* address decode prom 18s030 - this has inverted outputs. The dump does not reflect this. */
+	ROM_LOAD( "dkc1-v.5e",    0x0000, 0x0020, CRC(d3e2eaf8) SHA1(87bb298137c26570dafb4ac495c87e82441e70e5) )
 ROM_END
 
 ROM_START( hunchbkd )
@@ -3325,20 +3591,12 @@ DRIVER_INIT_MEMBER(dkong_state,strtheat)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),this));
 }
 
-
-DRIVER_INIT_MEMBER(dkong_state,dkongx)
+void dkong_state::dk_braze_decrypt()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, "bank1" );
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, "bank2" );
-
-	space.install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::braze_a15_w),this));
-
-	space.install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
-	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x5fff, "bank1");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xffff, "bank2");
 
 	braze_decrypt_rom(m_decrypted.get());
 
@@ -3346,6 +3604,40 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 	membank("bank1")->set_entry(0);
 	membank("bank2")->configure_entries(0, 2, m_decrypted.get(), 0x8000);
 	membank("bank2")->set_entry(0);
+}
+
+DRIVER_INIT_MEMBER(dkong_state, dkonghs)
+{
+	dk_braze_decrypt();
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
+	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
+}
+
+DRIVER_INIT_MEMBER(dkong_state,dkongx)
+{
+	dk_braze_decrypt();
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::dk_braze_a15_w),this));
+
+	space.install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
+	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
+}
+
+DRIVER_INIT_MEMBER(dkong_state, dkong3hs)
+{
+	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
+
+	braze_decrypt_rom(m_decrypted.get());
+
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x5fff, m_decrypted.get());
+	m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0xffff, m_decrypted.get() + 0x8000);
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
+	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
 }
 
 DRIVER_INIT_MEMBER(dkong_state,dkingjr)
@@ -3377,8 +3669,13 @@ GAME( 1981, dkongjo,   dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT
 GAME( 1981, dkongjo1,  dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong (Japan set 3)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2004, dkongf,    dkong,    dkong2b,   dkongf,   dkong_state, 0,        ROT90,  "hack (Jeff Kulczycki)",             "Donkey Kong Foundry (hack)",                      MACHINE_SUPPORTS_SAVE ) /* from Jeff's Romhack */
-GAME( 2006, dkongx,    dkong,    braze,     dkongx,   dkong_state, dkongx,   ROT90,  "hack (Braze Technologies)",         "Donkey Kong II: Jumpman Returns (hack, V1.2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2006, dkongx11,  dkong,    braze,     dkongx,   dkong_state, dkongx,   ROT90,  "hack (Braze Technologies)",         "Donkey Kong II: Jumpman Returns (hack, V1.1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dkonghs,   dkong,    dk_braze,  dkongx,   dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Donkey Kong High Score Kit (hack,V1.2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dkongike,  dkong,    dk_braze,  dkongike, dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Donkey Kong/DK (Japan) (hack,V1.1 IKE)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dkongjrhs, dkongjr,  dkj_braze, dkongx,   dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Donkey Junior High Score Kit (hack,V1.2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dkongjrc,  dkong,    dkj_braze, dkongike, dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Donkey Kong/JR (combo) (hack,V1.2)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) /* Graphic roms not switched */
+GAME( 2001, dkongddk,  dkongjr,  ddk_braze, dkongx,   dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Double Donkey Kong (hack,V1.2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) /* Graphic roms not switched */
+GAME( 2006, dkongx,    dkong,    dk_braze,  dkongx,   dkong_state, dkongx,   ROT90,  "hack (Braze Technologies)",         "Donkey Kong II: Jumpman Returns (hack, V1.2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2006, dkongx11,  dkong,    dk_braze,  dkongx,   dkong_state, dkongx,   ROT90,  "hack (Braze Technologies)",         "Donkey Kong II: Jumpman Returns (hack, V1.1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 2013, dkongpe,   dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT90,  "hack (Clay Cowgill and Mike Mika)", "Donkey Kong: Pauline Edition Rev 5 (2013-04-22)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, dkongjr,   0,        dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (US set F-2)",              MACHINE_SUPPORTS_SAVE )
@@ -3394,6 +3691,7 @@ GAME( 1982, maguila,   dkongjr,  dkongjr,   dkongjr,  dkong_state, dkingjr,  ROT
 GAME( 1983, dkong3,    0,        dkong3,    dkong3,   dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong 3 (US)",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1983, dkong3j,   dkong3,   dkong3,    dkong3,   dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong 3 (Japan)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  dkong_state, 0,        ROT90,  "bootleg",             "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3hs,  dkong3,   dk3_braze, dkong3,   dkong_state, dkong3hs, ROT90,  "hack (Braze Technologies)", "Donkey Kong High Score Kit (hack,V1.0a)",        MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, pestplce,  mario,    pestplce,  pestplce, dkong_state, 0,        ROT180, "bootleg", "Pest Place", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 

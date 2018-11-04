@@ -166,6 +166,8 @@ public:
 	NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
 	void hazl1500(machine_config &config);
+	void hazl1500_io(address_map &map);
+	void hazl1500_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<netlist_mame_device> m_video_board;
@@ -473,14 +475,14 @@ WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 	m_cpu_db7->write((data >> 7) & 1);
 }
 
-static ADDRESS_MAP_START(hazl1500_mem, AS_PROGRAM, 8, hazl1500_state)
+ADDRESS_MAP_START(hazl1500_state::hazl1500_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x3000, 0x377f) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x3780, 0x37ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(hazl1500_io, AS_IO, 8, hazl1500_state)
+ADDRESS_MAP_START(hazl1500_state::hazl1500_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_READWRITE(status_reg_2_r, status_reg_3_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(uart_r, uart_w)

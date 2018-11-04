@@ -50,6 +50,8 @@ public:
 
 	void kickgoal(machine_config &config);
 	void actionhw(machine_config &config);
+	void kickgoal_program_map(address_map &map);
+	void oki_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

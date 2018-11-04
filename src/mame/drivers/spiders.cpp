@@ -415,7 +415,7 @@ READ8_MEMBER(spiders_state::gfx_rom_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8, spiders_state )
+ADDRESS_MAP_START(spiders_state::spiders_main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -430,7 +430,7 @@ static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8, spiders_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spiders_audio_map, AS_PROGRAM, 8, spiders_state )
+ADDRESS_MAP_START(spiders_state::spiders_audio_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("pia4", pia6821_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -597,7 +597,7 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(spiders_state, ic60_74123_output_changed))
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spiders_audio)
+	spiders_audio(config);
 
 MACHINE_CONFIG_END
 

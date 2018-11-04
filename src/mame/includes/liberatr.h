@@ -54,6 +54,8 @@ public:
 
 	void liberat2(machine_config &config);
 	void liberatr(machine_config &config);
+	void liberat2_map(address_map &map);
+	void liberatr_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

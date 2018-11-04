@@ -399,7 +399,7 @@ WRITE8_MEMBER(undrfire_state::cbombers_adc_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( undrfire_map, AS_PROGRAM, 32, undrfire_state )
+ADDRESS_MAP_START(undrfire_state::undrfire_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram")
@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( undrfire_map, AS_PROGRAM, 32, undrfire_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32, undrfire_state )
+ADDRESS_MAP_START(undrfire_state::cbombers_cpua_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram")
@@ -439,7 +439,7 @@ static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cbombers_cpub_map, AS_PROGRAM, 16, undrfire_state )
+ADDRESS_MAP_START(undrfire_state::cbombers_cpub_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM /* local ram */
 //  AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */

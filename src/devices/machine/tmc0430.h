@@ -15,7 +15,7 @@
 
 #pragma once
 
-extern const device_type TMC0430;
+DECLARE_DEVICE_TYPE(TMC0430, tmc0430_device)
 
 #ifndef READ8Z_MEMBER
 #define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask = 0xff)

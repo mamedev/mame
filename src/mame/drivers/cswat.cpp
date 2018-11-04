@@ -63,6 +63,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	void cswat(machine_config &config);
+	void cswat_map(address_map &map);
 };
 
 
@@ -136,7 +137,7 @@ READ8_MEMBER(cswat_state::sensors_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( cswat_map, AS_PROGRAM, 8, cswat_state )
+ADDRESS_MAP_START(cswat_state::cswat_map)
 	AM_RANGE(0x0000, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 //  AM_RANGE(0x1800, 0x1800) AM_READNOP // ? reads here after writing to $4000

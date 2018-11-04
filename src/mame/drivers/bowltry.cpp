@@ -53,6 +53,7 @@ public:
 #endif
 
 void bowltry(machine_config &config);
+void bowltry_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 public:
@@ -74,14 +75,14 @@ WRITE16_MEMBER(bowltry_state::hack_w)
 }
 #endif
 
-static ADDRESS_MAP_START( bowltry_map, AS_PROGRAM, 16, bowltry_state )
+ADDRESS_MAP_START(bowltry_state::bowltry_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x080000, 0x083fff ) AM_RAM
+	AM_RANGE( 0x600000, 0x60ffff ) AM_RAM
 #if HACK_ENABLED
 	AM_RANGE( 0x60e090, 0x60e093 ) AM_READWRITE(hack_r,hack_w)
 #endif
-	AM_RANGE( 0x600000, 0x60ffff ) AM_RAM
 
 ADDRESS_MAP_END
 

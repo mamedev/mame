@@ -958,7 +958,7 @@ WRITE16_MEMBER( segaxbd_state::paletteram_w )
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -989,7 +989,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x3fc000, 0x3fffff) AM_RAM AM_SHARE("backup2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::decrypted_opcodes_map)
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -997,7 +997,7 @@ ADDRESS_MAP_END
 //  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::sub_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -1017,14 +1017,14 @@ ADDRESS_MAP_END
 //  Z80 SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -1040,14 +1040,14 @@ ADDRESS_MAP_END
 // Sound Board
 // The extra sound is used when the cabinet is Deluxe(Air Drive), or Cockpit. The soundlatch is
 // shared with the main board sound.
-static ADDRESS_MAP_START( smgp_sound2_map, AS_PROGRAM, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::smgp_sound2_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm2", segapcm_device, sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smgp_sound2_portmap, AS_IO, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::smgp_sound2_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
@@ -1060,13 +1060,13 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Motor Board, not yet emulated
-static ADDRESS_MAP_START( smgp_airdrive_map, AS_PROGRAM, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::smgp_airdrive_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smgp_airdrive_portmap, AS_IO, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::smgp_airdrive_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READNOP
@@ -1080,14 +1080,14 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Link Board, not yet emulated
-static ADDRESS_MAP_START( smgp_comm_map, AS_PROGRAM, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::smgp_comm_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM // MB8421 Dual-Port SRAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smgp_comm_portmap, AS_IO, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::smgp_comm_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -1099,13 +1099,13 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Z80, unknown function
-static ADDRESS_MAP_START( rascot_z80_map, AS_PROGRAM, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::rascot_z80_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rascot_z80_portmap, AS_IO, 8, segaxbd_state )
+ADDRESS_MAP_START(segaxbd_state::rascot_z80_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -1793,7 +1793,7 @@ MACHINE_CONFIG_START(segaxbd_fd1094_state::device_add_mconfig)
 
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -1847,7 +1847,7 @@ MACHINE_CONFIG_START(segaxbd_lastsurv_fd1094_state::device_add_mconfig)
 
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	// basic machine hardware
 	// TODO: network board
@@ -1914,7 +1914,7 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu2", Z80, SOUND_CLOCK/4)

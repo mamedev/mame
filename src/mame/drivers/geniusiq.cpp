@@ -213,6 +213,7 @@ public:
 
 	void iqtv512(machine_config &config);
 	void iq128(machine_config &config);
+	void geniusiq_mem(address_map &map);
 private:
 	uint16_t      m_gfx_y;
 	uint16_t      m_gfx_x;
@@ -414,7 +415,7 @@ INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
 }
 
 
-static ADDRESS_MAP_START(geniusiq_mem, AS_PROGRAM, 16, geniusiq_state)
+ADDRESS_MAP_START(geniusiq_state::geniusiq_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1FFFFF) AM_ROM
 	AM_RANGE(0x200000, 0x23FFFF) AM_RAM
@@ -721,7 +722,8 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq128")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(geniusiq_state::iqtv512, iq128)
+MACHINE_CONFIG_START(geniusiq_state::iqtv512)
+	iq128(config);
 	/* internal flash */
 	MCFG_DEVICE_REMOVE("flash")
 	MCFG_AMD_29F040_ADD("flash")

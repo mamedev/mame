@@ -31,7 +31,7 @@
 
 DEFINE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device, "gamate_vid", "Gamate Video Hardware")
 
-DEVICE_ADDRESS_MAP_START( regs_map, 8, gamate_video_device )
+ADDRESS_MAP_START(gamate_video_device::regs_map)
 	AM_RANGE(0x01,0x01) AM_WRITE(lcdcon_w)
 	AM_RANGE(0x02,0x02) AM_WRITE(xscroll_w)
 	AM_RANGE(0x03,0x03) AM_WRITE(yscroll_w)
@@ -41,14 +41,14 @@ DEVICE_ADDRESS_MAP_START( regs_map, 8, gamate_video_device )
 	AM_RANGE(0x07,0x07) AM_WRITE(vram_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( vram_map, 8, gamate_video_device )
+ADDRESS_MAP_START(gamate_video_device::vram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("vram") // 2x 8KB SRAMs
 ADDRESS_MAP_END
 
 gamate_video_device::gamate_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GAMATE_VIDEO, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_vram_space_config("vramspace", ENDIANNESS_BIG, 8, 14, 0, address_map_delegate(FUNC(gamate_video_device::vram_map), this)),
+	m_vram_space_config("vramspace", ENDIANNESS_BIG, 8, 14, 0, address_map_constructor(FUNC(gamate_video_device::vram_map), this)),
 	m_vram(*this, "vram"),
 	m_vramaddress(0),
 	m_bitplaneselect(0),

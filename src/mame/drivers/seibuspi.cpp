@@ -996,7 +996,8 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 }
 
 
-static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::base_map)
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00000400, 0x0000043f) AM_DEVREADWRITE16("crtc", seibu_crtc_device, read, write, 0xffffffff)
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
@@ -1007,12 +1008,11 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ_PORT("EXCH")
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sei252_map, AS_PROGRAM, 32, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::sei252_map)
 	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", sei252_device, read_xor, write_xor, 0xffffffff)
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 	AM_RANGE(0x00000524, 0x00000527) AM_WRITENOP // SEI252 sprite decryption key, see machine/spisprit.c
@@ -1022,13 +1022,14 @@ static ADDRESS_MAP_START( sei252_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x0000053c, 0x0000053f) AM_WRITENOP // SEI252 sprite decryption table index, see machine/spisprit.c
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rise_map, AS_PROGRAM, 32, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::rise_map)
 	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", seibu_encrypted_sprite_device, read, write, 0xffffffff)
 	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
 	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::spi_map)
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( sei252_map )
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
@@ -1043,10 +1044,10 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rdft2_map, AS_PROGRAM, 32, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::rdft2_map)
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
@@ -1061,10 +1062,10 @@ static ADDRESS_MAP_START( rdft2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::sxx2e_map)
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( sei252_map )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
@@ -1076,10 +1077,10 @@ static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::sxx2f_map)
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
@@ -1087,19 +1088,19 @@ static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000688, 0x0000068b) AM_NOP // ?
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x00000690, 0x00000693) AM_WRITENOP // ?
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys386i_map, AS_PROGRAM, 32, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::sys386i_map)
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(oki_bank_w, 0xff000000)
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys386f_map, AS_PROGRAM, 32, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::sys386f_map)
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000010, 0x00000013) AM_READ8(spi_status_r, 0x000000ff)
 	AM_RANGE(0x00000400, 0x00000403) AM_READ_PORT("SYSTEM") AM_WRITE(ejsakura_input_select_w)
@@ -1110,7 +1111,6 @@ static ADDRESS_MAP_START( sys386f_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(ejsakura_keyboard_r)
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
@@ -1154,7 +1154,7 @@ WRITE8_MEMBER(seibuspi_state::spi_coin_w)
 }
 
 
-static ADDRESS_MAP_START( sxx2e_soundmap, AS_PROGRAM, 8, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::sxx2e_soundmap)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4002, 0x4002) AM_WRITENOP // ?
@@ -1170,10 +1170,10 @@ static ADDRESS_MAP_START( sxx2e_soundmap, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spi_soundmap, AS_PROGRAM, 8, seibuspi_state )
+ADDRESS_MAP_START(seibuspi_state::spi_soundmap)
+	AM_IMPORT_FROM( sxx2e_soundmap )
 	AM_RANGE(0x4008, 0x4008) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
 	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JUMPERS") // TO DO: get these to actually work
-	AM_IMPORT_FROM( sxx2e_soundmap )
 ADDRESS_MAP_END
 
 
@@ -1913,13 +1913,15 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::ejanhs, spi)
+MACHINE_CONFIG_START(seibuspi_state::ejanhs)
+	spi(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::rdft2, spi)
+MACHINE_CONFIG_START(seibuspi_state::rdft2)
+	spi(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rdft2_map)
 MACHINE_CONFIG_END
@@ -1934,7 +1936,8 @@ MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 	m_sb_coin_latch = 0;
 }
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2e, spi)
+MACHINE_CONFIG_START(seibuspi_state::sxx2e)
+	spi(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1958,7 +1961,8 @@ MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2e, spi)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2f, sxx2e)
+MACHINE_CONFIG_START(seibuspi_state::sxx2f)
+	sxx2e(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1972,7 +1976,8 @@ MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2f, sxx2e)
 	// clock is unknown, possibly slower than 7.159MHz
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2g, sxx2f) // clocks differ, but otherwise same hw as sxx2f
+MACHINE_CONFIG_START(seibuspi_state::sxx2g) // clocks differ, but otherwise same hw as sxx2f
+	sxx2f(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz

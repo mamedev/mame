@@ -64,6 +64,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ichibanjyan(machine_config &config);
+	void ichibanjyan_io(address_map &map);
+	void ichibanjyan_map(address_map &map);
 };
 
 void ichibanjyan_state::video_start()
@@ -76,11 +78,11 @@ uint32_t ichibanjyan_state::screen_update( screen_device &screen, bitmap_ind16 &
 }
 
 
-static ADDRESS_MAP_START( ichibanjyan_map, AS_PROGRAM, 8, ichibanjyan_state )
+ADDRESS_MAP_START(ichibanjyan_state::ichibanjyan_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ichibanjyan_io, AS_IO, 8, ichibanjyan_state )
+ADDRESS_MAP_START(ichibanjyan_state::ichibanjyan_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

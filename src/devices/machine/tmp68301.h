@@ -49,6 +49,9 @@ public:
 	void external_interrupt_1();
 	void external_interrupt_2();
 
+	IRQ_CALLBACK_MEMBER(irq_callback);
+
+private:
 	DECLARE_READ16_MEMBER(imr_r);
 	DECLARE_WRITE16_MEMBER(imr_w);
 	DECLARE_READ16_MEMBER(iisr_r);
@@ -62,7 +65,7 @@ public:
 	DECLARE_READ8_MEMBER(icr_r);
 	DECLARE_WRITE8_MEMBER(icr_w);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	void tmp68301_regs(address_map &map);
 
 protected:
 	// device-level overrides

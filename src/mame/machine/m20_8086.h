@@ -20,6 +20,8 @@ public:
 	void halt() { m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); }
 	bool halted() const { return m_8086_halt; }
 
+	void i86_io(address_map &map);
+	void i86_prog(address_map &map);
 protected:
 	void device_start() override;
 	void device_reset() override;

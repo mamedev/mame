@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(SCN2674, scn2674_device, "scn2674", "Signetics SCN2674 AVDC")
 
 
 // default address map
-static ADDRESS_MAP_START( scn2674_vram, 0, 8, scn2674_device )
+ADDRESS_MAP_START(scn2674_device::scn2674_vram)
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
@@ -53,7 +53,7 @@ scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, d
 	, m_spl1(0), m_spl2(0), m_dbl1(0)
 	, m_buffer(0), m_linecounter(0), m_address(0), m_start1change(0), m_irq_state(0)
 	, m_scanline_timer(nullptr)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(scn2674_vram))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
 {
 }
 

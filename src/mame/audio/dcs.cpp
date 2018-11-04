@@ -267,14 +267,14 @@ enum
  *************************************/
 
 /* DCS 2k memory map */
-static ADDRESS_MAP_START( dcs_2k_program_map, AS_PROGRAM, 32, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs_2k_program_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("dcsext")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("dcsext")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("dcsext")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs_2k_data_map, AS_DATA, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs_2k_data_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
 	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
@@ -285,7 +285,7 @@ ADDRESS_MAP_END
 
 
 /* DCS 2k with UART memory map */
-static ADDRESS_MAP_START( dcs_2k_uart_data_map, AS_DATA, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs_2k_uart_data_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
 	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
@@ -298,13 +298,13 @@ ADDRESS_MAP_END
 
 
 /* DCS 8k memory map */
-static ADDRESS_MAP_START( dcs_8k_program_map, AS_PROGRAM, 32, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs_8k_program_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("dcsext")
 	AM_RANGE(0x3000, 0x3003) AM_READWRITE(input_latch32_r, output_latch32_w) // why?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs_8k_data_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
@@ -315,12 +315,12 @@ static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16, dcs_audio_device )
 ADDRESS_MAP_END
 
 /* Williams WPC DCS/Security Pinball */
-static ADDRESS_MAP_START( dcs_wpc_program_map, AS_PROGRAM, 32, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs_wpc_program_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 	AM_RANGE(0x1000, 0x3fff) AM_RAM AM_SHARE("dcsext")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs_wpc_data_map, AS_DATA, 16, dcs_audio_wpc_device )
+ADDRESS_MAP_START(dcs_audio_wpc_device::dcs_wpc_data_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("databank")
 	AM_RANGE(0x1000, 0x2fff) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(dcs_data_bank_select_w)
@@ -336,18 +336,18 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dcs2_2115_program_map, AS_PROGRAM, 32, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs2_2115_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs2_2104_program_map, AS_PROGRAM, 32, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs2_2104_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dcs2_2115_data_map, AS_DATA, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs2_2115_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( dcs2_2115_data_map, AS_DATA, 16, dcs_audio_device )
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs2_2104_data_map, AS_DATA, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dcs2_2104_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
@@ -379,25 +379,25 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsio_program_map, AS_PROGRAM, 32, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dsio_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dsio_data_map, AS_DATA, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dsio_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_DEVICE("data_map_bank", address_map_bank_device, amap16)
 	AM_RANGE(0x2000, 0x3fdf) AM_RAM AM_SHARE("dcsint_data")
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsio_rambank_map, AS_PROGRAM, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dsio_rambank_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("databank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsio_io_map, AS_IO, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::dsio_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
@@ -415,26 +415,26 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( denver_program_map, AS_PROGRAM, 32, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::denver_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( denver_data_map, AS_DATA, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::denver_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_DEVICE("data_map_bank", address_map_bank_device, amap16)
 	AM_RANGE(0x2000, 0x3fdf) AM_RAM AM_SHARE("dcsint_data")
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(denver_rambank_map, AS_PROGRAM, 16, dcs_audio_device)
+ADDRESS_MAP_START(dcs_audio_device::denver_rambank_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("databank")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( denver_io_map, AS_IO, 16, dcs_audio_device )
+ADDRESS_MAP_START(dcs_audio_device::denver_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)

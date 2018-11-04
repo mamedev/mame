@@ -42,6 +42,8 @@ public:
 		TIMER_M68K_ASIC65_DEFERRED_W
 	};
 
+	void asic65_io_map(address_map &map);
+	void asic65_program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

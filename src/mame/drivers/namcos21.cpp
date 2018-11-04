@@ -978,17 +978,17 @@ WRITE16_MEMBER(namcos21_state::dsp_xf_w)
 	if (ENABLE_LOGGING) logerror("xf(%d)\n",data);
 }
 
-static ADDRESS_MAP_START( master_dsp_program, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::master_dsp_program)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM /* BIOS */
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("master_dsp_code")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_dsp_data, AS_DATA, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::master_dsp_data)
 	AM_RANGE(0x2000, 0x200f) AM_READWRITE(dspcuskey_r,dspcuskey_w)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram16_r,dspram16_w<false>) /* 0x8000 words */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::master_dsp_io)
 	AM_RANGE(0x00,0x00) AM_READWRITE(dsp_port0_r,dsp_port0_w)
 	AM_RANGE(0x01,0x01) AM_READWRITE(dsp_port1_r,dsp_port1_w)
 	AM_RANGE(0x02,0x02) AM_READWRITE(dsp_port2_r,dsp_port2_w)
@@ -1101,16 +1101,16 @@ READ16_MEMBER(namcos21_state::slave_portf_r)
 	return 1;
 }
 
-static ADDRESS_MAP_START( slave_dsp_program, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::slave_dsp_program)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM /* BIOS */
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_dsp_data, AS_DATA, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::slave_dsp_data)
 	/* no external data memory */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_dsp_io, AS_IO, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::slave_dsp_io)
 	AM_RANGE(0x00,0x00) AM_READWRITE(slave_port0_r,slave_port0_w)
 	AM_RANGE(0x02,0x02) AM_READ(slave_port2_r)
 	AM_RANGE(0x03,0x03) AM_READWRITE(slave_port3_r,slave_port3_w)
@@ -1235,7 +1235,7 @@ WRITE8_MEMBER(namcos21_state::namcos2_dualportram_byte_w)
 /* MASTER 68000 CPU Memory declarations                      */
 /*************************************************************/
 
-static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::common_map)
 	AM_RANGE(0x280000, 0x280001) AM_WRITENOP /* written once on startup */
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w)
 	AM_RANGE(0x440000, 0x440001) AM_READWRITE(pointram_data_r,pointram_data_w)
@@ -1254,21 +1254,21 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0xc00000, 0xcfffff) AM_ROM AM_MIRROR(0x100000) AM_REGION("edata", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::master_map)
+	AM_IMPORT_FROM( common_map )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("master_intc", namco_c148_device, map)
 	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(dspram16_r,dspram16_w<true>) AM_SHARE("dspram16")
-	AM_IMPORT_FROM( common_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::slave_map)
+	AM_IMPORT_FROM( common_map )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM /* private work RAM */
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
 	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(dspram16_r,dspram16_w<false>) AM_SHARE("dspram16")
-	AM_IMPORT_FROM( common_map )
 ADDRESS_MAP_END
 
 
@@ -1407,17 +1407,17 @@ READ16_MEMBER(namcos21_state::winrun_table_r)
 	return m_winrun_polydata[offset];
 }
 
-static ADDRESS_MAP_START( winrun_dsp_program, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::winrun_dsp_program)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winrun_dsp_data, AS_DATA, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::winrun_dsp_data)
 	AM_RANGE( 0x2000, 0x200f ) AM_READWRITE(winrun_cuskey_r,winrun_cuskey_w)
 	AM_RANGE( 0x4000, 0x4fff ) AM_READWRITE(winrun_dspcomram_r,winrun_dspcomram_w)
 	AM_RANGE( 0x8000, 0xffff ) AM_READ(winrun_table_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winrun_dsp_io, AS_IO, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::winrun_dsp_io)
 	AM_RANGE(0x08,0x09) AM_READWRITE(winrun_dsp_pointrom_data_r,winrun_dsp_pointrom_addr_w)
 	AM_RANGE(0x0a,0x0a) AM_WRITE(winrun_dsp_render_w)
 	AM_RANGE(0x0b,0x0b) AM_WRITENOP
@@ -1464,7 +1464,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dspcomram_control_w)
 	COMBINE_DATA( &m_winrun_dspcomram_control[offset] );
 }
 
-static ADDRESS_MAP_START( winrun_master_map, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::winrun_master_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
@@ -1484,7 +1484,7 @@ static ADDRESS_MAP_START( winrun_master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winrun_slave_map, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::winrun_slave_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
@@ -1497,7 +1497,7 @@ static ADDRESS_MAP_START( winrun_slave_map, AS_PROGRAM, 16, namcos21_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( winrun_gpu_map, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::winrun_gpu_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(winrun_gpu_color_r,winrun_gpu_color_w) /* ? */
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM /* work RAM */
@@ -1516,7 +1516,7 @@ ADDRESS_MAP_END
 /* SOUND 6809 CPU Memory declarations                        */
 /*************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank6") /* banked */
 	AM_RANGE(0x3000, 0x3003) AM_WRITENOP /* ? */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
@@ -1525,10 +1525,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos21_state )
 	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(namcos2_dualportram_byte_r,namcos2_dualportram_byte_w) /* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_WRITENOP /* amplifier enable on 1st write */
+	AM_RANGE(0xc000, 0xffff) AM_WRITENOP /* avoid debug log noise; games write frequently to 0xe000 */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos2_sound_bankselect_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP /* watchdog */
 	AM_RANGE(0xd000, 0xffff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_WRITENOP /* avoid debug log noise; games write frequently to 0xe000 */
 ADDRESS_MAP_END
 
 
@@ -1536,7 +1536,8 @@ ADDRESS_MAP_END
 /* I/O HD63705 MCU Memory declarations                       */
 /*************************************************************/
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::mcu_map)
+	AM_RANGE(0x0000, 0x003f) AM_RAM
 	AM_RANGE(0x0000, 0x0000) AM_READNOP
 	AM_RANGE(0x0001, 0x0001) AM_READ_PORT("PORTB")          /* p1,p2 start */
 	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("PORTC")          /* coins */
@@ -1544,7 +1545,6 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos21_state )
 	AM_RANGE(0x0007, 0x0007) AM_READ_PORT("PORTH")          /* fire buttons */
 	AM_RANGE(0x0010, 0x0010) AM_READWRITE(namcos2_mcu_analog_ctrl_r,namcos2_mcu_analog_ctrl_w)
 	AM_RANGE(0x0011, 0x0011) AM_READWRITE(namcos2_mcu_analog_port_r,namcos2_mcu_analog_port_w)
-	AM_RANGE(0x0000, 0x003f) AM_RAM
 	AM_RANGE(0x0040, 0x01bf) AM_RAM
 	AM_RANGE(0x01c0, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
@@ -1563,7 +1563,7 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 
-static ADDRESS_MAP_START( driveyes_common_map, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::driveyes_common_map)
 	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w)
 	AM_RANGE(0x720000, 0x720007) AM_READWRITE(c355_obj_position_r,c355_obj_position_w)
 	AM_RANGE(0x740000, 0x74ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -1576,7 +1576,8 @@ static ADDRESS_MAP_START( driveyes_common_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( driveyes_master_map, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::driveyes_master_map)
+	AM_IMPORT_FROM( driveyes_common_map )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
@@ -1587,14 +1588,13 @@ static ADDRESS_MAP_START( driveyes_master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x3c0000, 0x3c1fff) AM_READWRITE(winrun_68k_dspcomram_r,winrun_68k_dspcomram_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w)
 	AM_RANGE(0x440000, 0x440001) AM_READWRITE(pointram_data_r,pointram_data_w)
-	AM_IMPORT_FROM( driveyes_common_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( driveyes_slave_map, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_START(namcos21_state::driveyes_slave_map)
+	AM_IMPORT_FROM( driveyes_common_map )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
-	AM_IMPORT_FROM( driveyes_common_map )
 ADDRESS_MAP_END
 
 /*************************************************************/
@@ -1927,7 +1927,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
@@ -1983,7 +1983,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 
 	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2038,7 +2038,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
 	MCFG_CPU_PROGRAM_MAP(winrun_gpu_map)
 
-	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	configure_c148_standard(config);
 	MCFG_NAMCO_C148_ADD("gpu_intc","gpu",false)
 	MCFG_NAMCO_C139_ADD("sci")
 

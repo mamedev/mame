@@ -91,6 +91,8 @@ public:
 
 	void apricot(machine_config &config);
 	void apricotxi(machine_config &config);
+	void apricot_io(address_map &map);
+	void apricot_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -322,13 +324,13 @@ WRITE_LINE_MEMBER( apricot_state::i8086_lock_w )
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16, apricot_state )
+ADDRESS_MAP_START(apricot_state::apricot_mem)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("ram")
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_SHARE("screen_buffer")
 	AM_RANGE(0xf8000, 0xfbfff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )
+ADDRESS_MAP_START(apricot_state::apricot_io)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ic31", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE8("ic68", wd2797_device, read, write, 0x00ff)
 	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255_device, read, write, 0x00ff)
@@ -469,7 +471,8 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apricot_state::apricotxi, apricot)
+MACHINE_CONFIG_START(apricot_state::apricotxi)
+	apricot(config);
 MACHINE_CONFIG_END
 
 

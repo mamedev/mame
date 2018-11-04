@@ -60,4 +60,7 @@ public:
 	void bcruzm12(machine_config &config);
 	void hoccer(machine_config &config);
 	void changes(machine_config &config);
+	void marineb_io_map(address_map &map);
+	void marineb_map(address_map &map);
+	void wanted_io_map(address_map &map);
 };

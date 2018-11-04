@@ -23,11 +23,12 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void sansa_fuze(machine_config &config);
+	void sansa_fuze_map(address_map &map);
 };
 
 
 
-static ADDRESS_MAP_START( sansa_fuze_map, AS_PROGRAM, 32, sansa_fuze_state )
+ADDRESS_MAP_START(sansa_fuze_state::sansa_fuze_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 
 	AM_RANGE(0x80000000, 0x8001ffff) AM_ROM  AM_REGION("maincpu", 0x00000)

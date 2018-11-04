@@ -71,6 +71,10 @@ public:
 	uint32_t screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void polyplay_zre(machine_config &config);
 	void polyplay_zrepp(machine_config &config);
+	void polyplay_io_zre(address_map &map);
+	void polyplay_io_zrepp(address_map &map);
+	void polyplay_mem_zre(address_map &map);
+	void polyplay_mem_zrepp(address_map &map);
 };
 
 #endif // MAME_INCLUDES_POLYPLAY_H

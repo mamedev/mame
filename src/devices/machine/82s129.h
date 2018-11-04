@@ -162,8 +162,6 @@ public:
 };
 
 // device type definition
-extern const device_type PROM82S126;
-extern const device_type PROM82S129;
 DECLARE_DEVICE_TYPE(PROM82S126, prom82s126_device)
 DECLARE_DEVICE_TYPE(PROM82S129, prom82s129_device)
 

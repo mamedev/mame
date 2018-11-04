@@ -29,11 +29,11 @@ DEFINE_DEVICE_TYPE(A2BUS_APPLICARD, a2bus_applicard_device, "a2aplcrd", "PCPI Ap
 #define Z80_TAG         "z80"
 #define Z80_ROM_REGION  "z80_rom"
 
-static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, a2bus_applicard_device )
+ADDRESS_MAP_START(a2bus_applicard_device::z80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8, a2bus_applicard_device )
+ADDRESS_MAP_START(a2bus_applicard_device::z80_io)
 	AM_RANGE(0x00, 0x60) AM_MIRROR(0xff00) AM_READWRITE(z80_io_r, z80_io_w)
 ADDRESS_MAP_END
 

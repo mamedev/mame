@@ -1694,15 +1694,15 @@ WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
  * Naomi 1 address map
  */
 
-static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
+ADDRESS_MAP_START(naomi_state::naomi_map)
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, 0xffffffffffffffffU )
-	AM_RANGE(0x005f7018, 0x005f702f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16( "comm_board", m3comm_device, naomi_r, naomi_w, 0x0000ffff0000ffffU )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, 0x0000ffff0000ffffU )
+	AM_RANGE(0x005f7018, 0x005f702f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16( "comm_board", m3comm_device, naomi_r, naomi_w, 0x0000ffff0000ffffU )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, 0xffffffffffffffffU )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
@@ -1754,7 +1754,7 @@ WRITE32_MEMBER(naomi2_state::both_pvr2_ta_w)
 	space.write_dword(0x025f8000|offset*4,data,mem_mask);
 }
 
-static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
+ADDRESS_MAP_START(naomi2_state::naomi2_map)
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
 
@@ -1815,7 +1815,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( naomi_port, AS_IO, 64, naomi_state )
+ADDRESS_MAP_START(naomi_state::naomi_port)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
@@ -1929,7 +1929,7 @@ WRITE64_MEMBER(atomiswave_state::aw_modem_w )
 	osd_printf_verbose("%s",string_format("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask).c_str());
 }
 
-static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, atomiswave_state )
+ADDRESS_MAP_START(atomiswave_state::aw_map)
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
 	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
@@ -1984,11 +1984,11 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, atomiswave_state )
 	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aw_port, AS_IO, 64, atomiswave_state )
+ADDRESS_MAP_START(atomiswave_state::aw_port)
 //  ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
+ADDRESS_MAP_START(dc_state::dc_audio_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("dc_sound_ram")                /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
@@ -2698,8 +2698,6 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(naomi_map)
-	MCFG_CPU_IO_MAP(naomi_port)
 	MCFG_CPU_FORCE_NO_DRC()
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
@@ -2729,7 +2727,11 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomi_base)
-	MCFG_FRAGMENT_ADD( naomi_aw_base )
+	naomi_aw_base(config);
+
+    MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(naomi_map)
+	MCFG_CPU_IO_MAP(naomi_port)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -2753,7 +2755,8 @@ MACHINE_CONFIG_END
  * Naomi 1, unprotected ROM sub-board
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomi, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomi)
+	naomi_base(config);
 	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2761,7 +2764,8 @@ MACHINE_CONFIG_END
  * Naomi 1 GD-Rom
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomigd, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomigd)
+	naomi_base(config);
 	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2769,7 +2773,8 @@ MACHINE_CONFIG_END
  * Naomi 1, M1 sub-board
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomim1, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomim1)
+	naomi_base(config);
 	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2777,7 +2782,8 @@ MACHINE_CONFIG_END
  * Naomi 1, M2/3 sub-board
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomim2, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomim2)
+	naomi_base(config);
 	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2785,7 +2791,8 @@ MACHINE_CONFIG_END
  * Naomi 1, M4 sub-board
  */
 
-MACHINE_CONFIG_DERIVED(naomi_state::naomim4, naomi_base)
+MACHINE_CONFIG_START(naomi_state::naomim4)
+	naomi_base(config);
 	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -2793,9 +2800,11 @@ MACHINE_CONFIG_END
  * Naomi 2
  */
 /*
-MACHINE_CONFIG_DERIVED((naomi2_state::naomi2, naomi)
+MACHINE_CONFIG_START((naomi2_state::naomi2)
+	naomi(config);
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_PROGRAM_MAP(naomi2_map)
+	MCFG_CPU_IO_MAP(naomi_port)
 MACHINE_CONFIG_END
 */
 /*
@@ -2809,8 +2818,8 @@ MACHINE_CONFIG_START(naomi2_state::naomi2_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi2_state::naomi2gd)
-	MCFG_FRAGMENT_ADD( naomigd )
-	MCFG_FRAGMENT_ADD( naomi2_base )
+	naomigd(config);
+	naomi2_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi2_map)
@@ -2821,8 +2830,8 @@ MACHINE_CONFIG_END
  */
 
 MACHINE_CONFIG_START(naomi2_state::naomi2m1)
-	MCFG_FRAGMENT_ADD( naomim1 )
-	MCFG_FRAGMENT_ADD( naomi2_base )
+	naomim1(config);
+	naomi2_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi2_map)
@@ -2833,8 +2842,8 @@ MACHINE_CONFIG_END
  */
 
 MACHINE_CONFIG_START(naomi2_state::naomi2m2)
-	MCFG_FRAGMENT_ADD( naomim2 )
-	MCFG_FRAGMENT_ADD( naomi2_base )
+	naomim2(config);
+	naomi2_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(naomi2_map)
@@ -2845,7 +2854,7 @@ MACHINE_CONFIG_END
  */
 
 MACHINE_CONFIG_START(atomiswave_state::aw_base)
-	MCFG_FRAGMENT_ADD( naomi_aw_base )
+	naomi_aw_base(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aw_map)
@@ -2859,13 +2868,15 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atomiswave_state::aw1c, aw_base)
+MACHINE_CONFIG_START(atomiswave_state::aw1c)
+	aw_base(config);
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
 	// TODO: isn't it supposed to be just one controller?
 	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atomiswave_state::aw2c, aw_base)
+MACHINE_CONFIG_START(atomiswave_state::aw2c)
+	aw_base(config);
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
 	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
 MACHINE_CONFIG_END

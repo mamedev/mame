@@ -64,6 +64,7 @@ public:
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_base_w);
 
+	void seibu_crtc_vregs(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;

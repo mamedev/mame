@@ -40,6 +40,8 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 
+	void c2040_fdc_mem(address_map &map);
+	void c2040_main_mem(address_map &map);
 protected:
 	c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

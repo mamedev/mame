@@ -62,4 +62,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void sidepcktb(machine_config &config);
 	void sidepckt(machine_config &config);
+	void sidepckt_map(address_map &map);
+	void sidepcktb_map(address_map &map);
+	void sound_map(address_map &map);
 };

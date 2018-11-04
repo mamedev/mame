@@ -53,7 +53,6 @@
 #include "audio/timeplt.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 
@@ -130,7 +129,7 @@ CUSTOM_INPUT_MEMBER(timeplt_state::chkun_hopper_status_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( timeplt_main_map, AS_PROGRAM, 8, timeplt_state )
+ADDRESS_MAP_START(timeplt_state::timeplt_main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
@@ -141,18 +140,18 @@ static ADDRESS_MAP_START( timeplt_main_map, AS_PROGRAM, 8, timeplt_state )
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ(scanline_r) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sound_data_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
-	AM_RANGE(0xc300, 0xc30f) AM_MIRROR(0x0cf0) AM_DEVWRITE_MOD("mainlatch", ls259_device, write_d0, rshift<1>)
+	;map(0xc300, 0xc30f).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_d0(space, offset >> 1, data, mem_mask); });
 	AM_RANGE(0xc320, 0xc320) AM_MIRROR(0x0c9f) AM_READ_PORT("IN1")
 	AM_RANGE(0xc340, 0xc340) AM_MIRROR(0x0c9f) AM_READ_PORT("IN2")
 	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psurge_main_map, AS_PROGRAM, 8, timeplt_state )
+ADDRESS_MAP_START(timeplt_state::psurge_main_map)
 	AM_IMPORT_FROM(timeplt_main_map)
 	AM_RANGE(0x6004, 0x6004) AM_READ(psurge_protection_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chkun_main_map, AS_PROGRAM, 8, timeplt_state )
+ADDRESS_MAP_START(timeplt_state::chkun_main_map)
 	AM_IMPORT_FROM(timeplt_main_map)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 ADDRESS_MAP_END
@@ -459,7 +458,8 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(timeplt_state::psurge, timeplt)
+MACHINE_CONFIG_START(timeplt_state::psurge)
+	timeplt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -475,7 +475,8 @@ MACHINE_CONFIG_DERIVED(timeplt_state::psurge, timeplt)
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,psurge)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(timeplt_state::bikkuric, timeplt)
+MACHINE_CONFIG_START(timeplt_state::bikkuric)
+	timeplt(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 
@@ -486,7 +487,8 @@ MACHINE_CONFIG_DERIVED(timeplt_state::bikkuric, timeplt)
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,chkun)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(timeplt_state::chkun, bikkuric)
+MACHINE_CONFIG_START(timeplt_state::chkun)
+	bikkuric(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 

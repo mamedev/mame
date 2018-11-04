@@ -313,14 +313,12 @@ public:
 		m_m50458(*this,"m50458"),
 		m_s3520cf(*this, "s3520cf"),
 		m_rp5h01(*this,"rp5h01"),
-		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
 
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
 	required_device<rp5h01_device> m_rp5h01;
-	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
 	uint8_t m_wram_wp_flag;
@@ -351,6 +349,10 @@ public:
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 	void nss(machine_config &config);
+	void bios_io_map(address_map &map);
+	void bios_map(address_map &map);
+	void snes_map(address_map &map);
+	void spc_mem(address_map &map);
 };
 
 
@@ -363,7 +365,7 @@ uint32_t nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, 
 
 
 
-static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, nss_state )
+ADDRESS_MAP_START(nss_state::snes_map)
 	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)
 	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
@@ -379,7 +381,7 @@ WRITE8_MEMBER(nss_state::spc_ram_100_w)
 	m_spc700->spc_ram_w(space, offset + 0x100, data);
 }
 
-static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, nss_state )
+ADDRESS_MAP_START(nss_state::spc_mem)
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", snes_sound_device, spc_ram_r, spc_ram_w) /* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", snes_sound_device, spc_io_r, spc_io_w)   /* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
@@ -502,7 +504,7 @@ WRITE8_MEMBER(nss_state::nss_prot_w)
 }
 
 
-static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
+ADDRESS_MAP_START(nss_state::bios_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(ram_wp_r,ram_wp_w)
@@ -619,7 +621,7 @@ WRITE8_MEMBER(nss_state::port_07_w)
 	m_joy_flag = 1;
 }
 
-static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
+ADDRESS_MAP_START(nss_state::bios_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_READ(port_00_r) AM_WRITE(port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("FP")  AM_WRITE(port_01_w)

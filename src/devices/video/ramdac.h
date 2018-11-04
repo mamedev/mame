@@ -62,6 +62,7 @@ public:
 
 	virtual space_config_vector memory_space_config() const override;
 
+	void ramdac_palram(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;

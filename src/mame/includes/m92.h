@@ -122,6 +122,11 @@ public:
 	void gunforce(machine_config &config);
 	void majtitl2(machine_config &config);
 	void mysticri(machine_config &config);
+	void lethalth_map(address_map &map);
+	void m92_map(address_map &map);
+	void m92_portmap(address_map &map);
+	void ppan_portmap(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

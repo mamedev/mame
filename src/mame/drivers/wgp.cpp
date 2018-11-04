@@ -609,7 +609,7 @@ WRITE8_MEMBER(wgp_state::sound_bankswitch_w)
                          MEMORY STRUCTURES
 *****************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
+ADDRESS_MAP_START(wgp_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     /* main CPUA ram */
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("sharedram")
@@ -628,7 +628,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 16  /* LAN areas not mapped... */, wgp_state )
+ADDRESS_MAP_START(wgp_state::cpu2_map) /* LAN areas not mapped... */
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("sharedram")
@@ -644,7 +644,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, wgp_state )
+ADDRESS_MAP_START(wgp_state::z80_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -962,7 +962,8 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(wgp_state::wgp2, wgp)
+MACHINE_CONFIG_START(wgp_state::wgp2)
+	wgp(config);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 	/* video hardware */

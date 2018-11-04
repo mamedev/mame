@@ -117,6 +117,11 @@ public:
 	void pgm_basic_init( bool set_bank = true);
 	void pgm(machine_config &config);
 	void pgmbase(machine_config &config);
+	void pgm_base_mem(address_map &map);
+	void pgm_basic_mem(address_map &map);
+	void pgm_mem(address_map &map);
+	void pgm_z80_io(address_map &map);
+	void pgm_z80_mem(address_map &map);
 };
 
 
@@ -126,12 +131,5 @@ public:
 INPUT_PORTS_EXTERN( pgm );
 
 GFXDECODE_EXTERN( pgm );
-
-ADDRESS_MAP_EXTERN( pgm_z80_mem, 8 );
-ADDRESS_MAP_EXTERN( pgm_z80_io, 8 );
-
-ADDRESS_MAP_EXTERN( pgm_mem, 16 );
-ADDRESS_MAP_EXTERN( pgm_basic_mem, 16 );
-ADDRESS_MAP_EXTERN( pgm_base_mem, 16 );
 
 #endif // MAME_INCLUDES_PGM_H

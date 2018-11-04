@@ -81,4 +81,11 @@ public:
 	void dorunrun(machine_config &config);
 	void idsoccer(machine_config &config);
 	void docastle(machine_config &config);
+	void docastle_io_map(address_map &map);
+	void docastle_map(address_map &map);
+	void docastle_map2(address_map &map);
+	void docastle_map3(address_map &map);
+	void dorunrun_map(address_map &map);
+	void dorunrun_map2(address_map &map);
+	void idsoccer_map(address_map &map);
 };

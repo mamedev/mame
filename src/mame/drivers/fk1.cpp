@@ -63,6 +63,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
 	IRQ_CALLBACK_MEMBER(fk1_irq_callback);
 	void fk1(machine_config &config);
+	void fk1_io(address_map &map);
+	void fk1_mem(address_map &map);
 };
 
 
@@ -307,14 +309,14 @@ WRITE8_MEMBER( fk1_state::fk1_reset_int_w )
 	logerror("fk1_reset_int_w\n");
 }
 
-static ADDRESS_MAP_START(fk1_mem, AS_PROGRAM, 8, fk1_state)
+ADDRESS_MAP_START(fk1_state::fk1_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(fk1_io, AS_IO, 8, fk1_state)
+ADDRESS_MAP_START(fk1_state::fk1_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)

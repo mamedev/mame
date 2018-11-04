@@ -159,7 +159,7 @@ ROM board internal layouts:
 
 DEFINE_DEVICE_TYPE(AW_ROM_BOARD, aw_rom_board, "aw_rom_board", "Sammy Atomiswave ROM Board")
 
-DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
+ADDRESS_MAP_START(aw_rom_board::submap)
 	AM_RANGE(0x00, 0x01) AM_WRITE(epr_offsetl_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(epr_offseth_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(mpr_record_index_w)

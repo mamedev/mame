@@ -202,7 +202,7 @@ WRITE8_MEMBER( bw2_state::write )
 //  ADDRESS_MAP( bw2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( bw2_mem, AS_PROGRAM, 8, bw2_state )
+ADDRESS_MAP_START(bw2_state::bw2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
@@ -212,7 +212,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( bw2_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
+ADDRESS_MAP_START(bw2_state::bw2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( lcdc_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lcdc_map, 0, 8, bw2_state )
+ADDRESS_MAP_START(bw2_state::lcdc_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END

@@ -58,16 +58,22 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_picu(*this, "picu")
+		, m_ioppi(*this, "ioppi")
+		, m_iopit(*this, "iopit")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(picu_b_w);
 	DECLARE_WRITE_LINE_MEMBER(picu_r3_w);
 
 	void konin(machine_config &config);
+	void konin_io(address_map &map);
+	void konin_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8214_device> m_picu;
+	required_device<i8255_device> m_ioppi;
+	required_device<pit8253_device> m_iopit;
 };
 
 WRITE8_MEMBER(konin_state::picu_b_w)
@@ -80,7 +86,7 @@ WRITE_LINE_MEMBER(konin_state::picu_r3_w)
 	m_picu->r_w(3, !state);
 }
 
-static ADDRESS_MAP_START( konin_mem, AS_PROGRAM, 8, konin_state )
+ADDRESS_MAP_START(konin_state::konin_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x7fff) AM_RAM
@@ -91,14 +97,15 @@ static ADDRESS_MAP_START( konin_mem, AS_PROGRAM, 8, konin_state )
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( konin_io, AS_IO, 8, konin_state )
+ADDRESS_MAP_START(konin_state::konin_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x24, 0x24) AM_WRITE(picu_b_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_MOD("ioppi", i8255_device, read, write, xor<3>)
+	
+	;map(0x80, 0x83).lrw8("ioppi_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_ioppi->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_ioppi->write(space, offset^3, data, mem_mask); });
 	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xf7, 0xf7) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE_MOD("iopit", pit8253_device, read, write, xor<3>)
+	;map(0xf8, 0xfb).lrw8("iopit_rw", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_iopit->read(space, offset^3, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_iopit->write(space, offset^3, data, mem_mask); });
 ADDRESS_MAP_END
 
 /* Input ports */

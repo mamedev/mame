@@ -192,7 +192,7 @@ WRITE16_MEMBER(darius_state::coin_w)
                      MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
+ADDRESS_MAP_START(darius_state::darius_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM                                             /* main RAM */
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0xe10000, 0xe10fff) AM_RAM                                             /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darius_cpub_map, AS_PROGRAM, 16, darius_state )
+ADDRESS_MAP_START(darius_state::darius_cpub_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM             /* local RAM */
 	AM_RANGE(0xc00050, 0xc00051) AM_NOP // unknown, written by both cpus - always 0?
@@ -418,7 +418,7 @@ WRITE8_MEMBER(darius_state::darius_write_portB1)
            Sound memory structures / ADPCM
 *****************************************************/
 
-static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8, darius_state )
+ADDRESS_MAP_START(darius_state::darius_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8, darius_state )
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darius_sound2_map, AS_PROGRAM, 8, darius_state )
+ADDRESS_MAP_START(darius_state::darius_sound2_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 	/* yes, no RAM */
 ADDRESS_MAP_END
@@ -482,7 +482,7 @@ WRITE8_MEMBER(darius_state::adpcm_data_w)
 	m_msm->reset_w(!(data & 0x20));    /* my best guess, but it could be output enable as well */
 }
 
-static ADDRESS_MAP_START( darius_sound2_io_map, AS_IO, 8, darius_state )
+ADDRESS_MAP_START(darius_state::darius_sound2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(adpcm_command_read, adpcm_nmi_disable)
 	AM_RANGE(0x01, 0x01) AM_WRITE(adpcm_nmi_enable)

@@ -41,7 +41,7 @@ class nv2a_ram_device : public pci_device {
 public:
 	nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 
 protected:
 	DECLARE_READ32_MEMBER(config_register_r);
@@ -66,7 +66,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(lpc_io, 32);
+	void lpc_io(address_map &map);
 };
 
 extern const device_type MCPX_LPC;
@@ -101,9 +101,9 @@ private:
 		std::function<int(int command, int rw, int data)> devices[128];
 		uint32_t words[256 / 4];
 	} smbusst;
-	DECLARE_ADDRESS_MAP(smbus_io0, 32);
-	DECLARE_ADDRESS_MAP(smbus_io1, 32);
-	DECLARE_ADDRESS_MAP(smbus_io2, 32);
+	void smbus_io0(address_map &map);
+	void smbus_io1(address_map &map);
+	void smbus_io2(address_map &map);
 };
 
 extern const device_type MCPX_SMBUS;
@@ -137,7 +137,7 @@ private:
 	devcb_write_line m_interrupt_handler;
 	emu_timer *timer;
 	std::function<void(void)> hack_callback;
-	DECLARE_ADDRESS_MAP(ohci_mmio, 32);
+	void ohci_mmio(address_map &map);
 	struct dev_t {
 		ohci_function *dev;
 		int port;
@@ -168,8 +168,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(eth_mmio, 32);
-	DECLARE_ADDRESS_MAP(eth_io, 32);
+	void eth_mmio(address_map &map);
+	void eth_io(address_map &map);
 };
 
 extern const device_type MCPX_ETH;
@@ -216,7 +216,7 @@ private:
 		emu_timer *timer;
 		address_space *space;
 	} apust;
-	DECLARE_ADDRESS_MAP(apu_mmio, 32);
+	void apu_mmio(address_map &map);
 };
 
 extern const device_type MCPX_APU;
@@ -248,9 +248,9 @@ private:
 		uint32_t mixer_regs[0x84 / 4];
 		uint32_t controller_regs[0x40 / 4];
 	} ac97st;
-	DECLARE_ADDRESS_MAP(ac97_mmio, 32);
-	DECLARE_ADDRESS_MAP(ac97_io0, 32);
-	DECLARE_ADDRESS_MAP(ac97_io1, 32);
+	void ac97_mmio(address_map &map);
+	void ac97_io0(address_map &map);
+	void ac97_io1(address_map &map);
 };
 
 extern const device_type MCPX_AC97_AUDIO;
@@ -283,7 +283,7 @@ protected:
 
 private:
 	devcb_write_line m_interrupt_handler;
-	DECLARE_ADDRESS_MAP(mcpx_ide_io, 32);
+	void mcpx_ide_io(address_map &map);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 };
 
@@ -333,8 +333,8 @@ private:
 	const char *cpu_tag;
 	devcb_write_line m_interrupt_handler;
 	address_space *m_program;
-	DECLARE_ADDRESS_MAP(nv2a_mmio, 32);
-	DECLARE_ADDRESS_MAP(nv2a_mirror, 32);
+	void nv2a_mmio(address_map &map);
+	void nv2a_mirror(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(NV2A_GPU, nv2a_gpu_device)

@@ -226,6 +226,10 @@ public:
 	int m_centronics_busy;
 	void tandy2k_hd(machine_config &config);
 	void tandy2k(machine_config &config);
+	void tandy2k_hd_io(address_map &map);
+	void tandy2k_io(address_map &map);
+	void tandy2k_mem(address_map &map);
+	void vpac_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_TANDY2K_H

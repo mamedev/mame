@@ -100,7 +100,7 @@ protected:
 			uint32_t clock,
 			device_type const type,
 			configuration_params const &params,
-			address_map_delegate internal_map);
+			address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start() override;

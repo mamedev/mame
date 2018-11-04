@@ -373,7 +373,7 @@ WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
  *
  *************************************/
 
-static ADDRESS_MAP_START( maincpu_djmain, AS_PROGRAM, 32, djmain_state )
+ADDRESS_MAP_START(djmain_state::maincpu_djmain)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                         // PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                         // WORK RAM
 	AM_RANGE(0x480000, 0x48443f) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")       // COLOR RAM
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( maincpu_djmain, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x803800, 0x803fff) AM_READ(obj_rom_r)                     // OBJECT ROM readthrough (for POST)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maincpu_djmainj, AS_PROGRAM, 32, djmain_state)
+ADDRESS_MAP_START(djmain_state::maincpu_djmainj)
 	AM_IMPORT_FROM(maincpu_djmain)
 
 	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (beatmania)
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START(maincpu_djmainj, AS_PROGRAM, 32, djmain_state)
 	AM_RANGE(0xf40000, 0xf4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (beatmania)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maincpu_djmainu, AS_PROGRAM, 32, djmain_state)
+ADDRESS_MAP_START(djmain_state::maincpu_djmainu)
 	AM_IMPORT_FROM(maincpu_djmain)
 
 	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (hiphopmania)
@@ -414,7 +414,7 @@ static ADDRESS_MAP_START(maincpu_djmainu, AS_PROGRAM, 32, djmain_state)
 	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (hiphopmania)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maincpu_djmaina, AS_PROGRAM, 32, djmain_state)
+ADDRESS_MAP_START(djmain_state::maincpu_djmaina)
 	AM_IMPORT_FROM(maincpu_djmain)
 
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START(maincpu_djmaina, AS_PROGRAM, 32, djmain_state)
 	AM_RANGE(0xf00000, 0xf01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(k054539_map, 0, 8, djmain_state)
+ADDRESS_MAP_START(djmain_state::k054539_map)
 	AM_RANGE(0x000000, 0xffffff) AM_RAM AM_SHARE("sndram")
 ADDRESS_MAP_END
 
@@ -1417,12 +1417,14 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(djmain_state::djmainu, djmainj)
+MACHINE_CONFIG_START(djmain_state::djmainu)
+	djmainj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmainu)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(djmain_state::djmaina, djmainj)
+MACHINE_CONFIG_START(djmain_state::djmaina)
+	djmainj(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmaina)
 MACHINE_CONFIG_END

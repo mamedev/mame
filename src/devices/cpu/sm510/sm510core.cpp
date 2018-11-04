@@ -20,14 +20,14 @@ DEFINE_DEVICE_TYPE(SM510, sm510_device, "sm510", "SM510") // 2.7Kx8 ROM, 128x4 R
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_2_7k, AS_PROGRAM, 8, sm510_base_device)
+ADDRESS_MAP_START(sm510_device::program_2_7k)
 	AM_RANGE(0x0000, 0x02bf) AM_ROM
 	AM_RANGE(0x0400, 0x06bf) AM_ROM
 	AM_RANGE(0x0800, 0x0abf) AM_ROM
 	AM_RANGE(0x0c00, 0x0ebf) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_96_32x4, AS_DATA, 8, sm510_base_device)
+ADDRESS_MAP_START(sm510_device::data_96_32x4)
 	AM_RANGE(0x00, 0x5f) AM_RAM
 	AM_RANGE(0x60, 0x6f) AM_RAM AM_SHARE("lcd_ram_a")
 	AM_RANGE(0x70, 0x7f) AM_RAM AM_SHARE("lcd_ram_b")
@@ -36,7 +36,7 @@ ADDRESS_MAP_END
 
 // device definitions
 sm510_device::sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm510_base_device(mconfig, SM510, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_2_7k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4))
+	: sm510_base_device(mconfig, SM510, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm510_device::program_2_7k), this), 7 /* data width */, address_map_constructor(FUNC(sm510_device::data_96_32x4), this))
 {
 }
 

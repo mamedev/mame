@@ -50,4 +50,8 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mrflea(machine_config &config);
+	void mrflea_master_io_map(address_map &map);
+	void mrflea_master_map(address_map &map);
+	void mrflea_slave_io_map(address_map &map);
+	void mrflea_slave_map(address_map &map);
 };

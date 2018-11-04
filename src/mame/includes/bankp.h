@@ -49,4 +49,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void bankp(machine_config &config);
+	void bankp_io_map(address_map &map);
+	void bankp_map(address_map &map);
 };

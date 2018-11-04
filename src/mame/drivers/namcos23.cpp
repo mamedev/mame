@@ -1604,6 +1604,15 @@ public:
 	void s23(machine_config &config);
 	void gmen(machine_config &config);
 	void timecrs2(machine_config &config);
+	void gmen_mips_map(address_map &map);
+	void gmen_sh2_map(address_map &map);
+	void gorgon_map(address_map &map);
+	void s23_map(address_map &map);
+	void s23h8iomap(address_map &map);
+	void s23h8rwmap(address_map &map);
+	void s23iobrdiomap(address_map &map);
+	void s23iobrdmap(address_map &map);
+	void timecrs2iobrdmap(address_map &map);
 };
 
 
@@ -2881,7 +2890,7 @@ WRITE16_MEMBER(namcos23_state::sub_comm_w)
 
 
 // System Gorgon
-static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
+ADDRESS_MAP_START(namcos23_state::gorgon_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(c435_r, c435_w)
@@ -2906,7 +2915,7 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 ADDRESS_MAP_END
 
 // (Super) System 23
-static ADDRESS_MAP_START( s23_map, AS_PROGRAM, 32, namcos23_state )
+ADDRESS_MAP_START(namcos23_state::s23_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(c435_r, c435_w)
@@ -2954,7 +2963,7 @@ WRITE32_MEMBER(namcos23_state::sh2_shared_w)
 	COMBINE_DATA(&m_gmen_sh2_shared[offset]);
 }
 
-static ADDRESS_MAP_START( gmen_mips_map, AS_PROGRAM, 32, namcos23_state )
+ADDRESS_MAP_START(namcos23_state::gmen_mips_map)
 	AM_IMPORT_FROM(s23_map)
 	AM_RANGE(0x0e400000, 0x0e400003) AM_READ(gmen_trigger_sh2)
 	AM_RANGE(0x0e700000, 0x0e70ffff) AM_READWRITE(sh2_shared_r, sh2_shared_w)
@@ -2963,7 +2972,7 @@ ADDRESS_MAP_END
 
 // SH2 memmap
 /* TODO: of course, I believe that area 0x008***** is actually a bank of some sort ... */
-static ADDRESS_MAP_START( gmen_sh2_map, AS_PROGRAM, 32, namcos23_state )
+ADDRESS_MAP_START(namcos23_state::gmen_sh2_map)
 	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("gmen_sh2_shared")
 	AM_RANGE(0x00800000, 0x008fffff) AM_ROM AM_REGION("data", 0xc00000) //c00000 "data" for final furlong 2. 0x1b6bc0 "user1" for gunmen wars
 	AM_RANGE(0x01800000, 0x0183ffff) AM_RAM // ???
@@ -3076,7 +3085,7 @@ WRITE16_MEMBER(namcos23_state::mcu_pb_w)
 }
 
 
-static ADDRESS_MAP_START( s23h8rwmap, AS_PROGRAM, 16, namcos23_state )
+ADDRESS_MAP_START(namcos23_state::s23h8rwmap)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
@@ -3087,7 +3096,7 @@ static ADDRESS_MAP_START( s23h8rwmap, AS_PROGRAM, 16, namcos23_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( s23h8iomap, AS_IO, 16, namcos23_state )
+ADDRESS_MAP_START(namcos23_state::s23h8iomap)
 	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READWRITE(mcu_p6_r, mcu_p6_w )
 	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READWRITE(mcu_p8_r, mcu_p8_w )
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_r, mcu_pa_w )
@@ -3150,7 +3159,7 @@ READ16_MEMBER(namcos23_state::iob_analog_r)
 }
 
 
-static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 16, namcos23_state )
+ADDRESS_MAP_START(namcos23_state::s23iobrdmap)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
 	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
@@ -3159,7 +3168,7 @@ static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 16, namcos23_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 16, namcos23_state )
+ADDRESS_MAP_START(namcos23_state::s23iobrdiomap)
 	AM_RANGE(h8_device::PORT_4,  h8_device::PORT_4)  AM_READWRITE(iob_p4_r, iob_p4_w)
 	AM_RANGE(h8_device::PORT_5,  h8_device::PORT_5)  AM_NOP   // bit 2 = status LED to indicate transmitting packet to main
 	AM_RANGE(h8_device::PORT_6,  h8_device::PORT_6)  AM_READWRITE(iob_p6_r, iob_p6_w)
@@ -3189,9 +3198,9 @@ READ8_MEMBER(namcos23_state::iob_gun_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 16, namcos23_state )
-	AM_RANGE(0x7000, 0x700f) AM_READ8(iob_gun_r, 0xffff)
+ADDRESS_MAP_START(namcos23_state::timecrs2iobrdmap)
 	AM_IMPORT_FROM( s23iobrdmap )
+	AM_RANGE(0x7000, 0x700f) AM_READ8(iob_gun_r, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -3674,14 +3683,16 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2, s23)
+MACHINE_CONFIG_START(namcos23_state::timecrs2)
+	s23(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::gmen, s23)
+MACHINE_CONFIG_START(namcos23_state::gmen)
+	s23(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3751,7 +3762,8 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2v4a, ss23)
+MACHINE_CONFIG_START(namcos23_state::timecrs2v4a)
+	ss23(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
@@ -3763,7 +3775,8 @@ MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2v4a, ss23)
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(namcos23_state::ss23e2, ss23)
+MACHINE_CONFIG_START(namcos23_state::ss23e2)
+	ss23(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

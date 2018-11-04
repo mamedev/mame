@@ -116,4 +116,8 @@ public:
 	void bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit );
 	void combatscb(machine_config &config);
 	void combatsc(machine_config &config);
+	void combatsc_map(address_map &map);
+	void combatsc_sound_map(address_map &map);
+	void combatscb_map(address_map &map);
+	void combatscb_sound_map(address_map &map);
 };

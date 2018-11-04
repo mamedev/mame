@@ -92,6 +92,7 @@ public:
 	DECLARE_WRITE8_MEMBER(supercon_control_w);
 	DECLARE_READ8_MEMBER(supercon_input1_r);
 	DECLARE_READ8_MEMBER(supercon_input2_r);
+	void supercon_map(address_map &map);
 	void supercon(machine_config &config);
 
 	// Constellation Forte
@@ -99,6 +100,7 @@ public:
 	DECLARE_WRITE64_MEMBER(cforte_lcd_output_w);
 	DECLARE_WRITE8_MEMBER(cforte_mux_w);
 	DECLARE_WRITE8_MEMBER(cforte_control_w);
+	void cforte_map(address_map &map);
 	void cforte(machine_config &config);
 
 	// Super Expert
@@ -111,12 +113,14 @@ public:
 	DECLARE_MACHINE_RESET(sexpert);
 	DECLARE_DRIVER_INIT(sexpert);
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
+	void sexpert_map(address_map &map);
 	void sexpert_set_cpu_freq();
 	void sexpert(machine_config &config);
 
 	// Super Forte
 	DECLARE_WRITE8_MEMBER(sforte_lcd_control_w);
 	DECLARE_WRITE8_MEMBER(sforte_lcd_data_w);
+	void sforte_map(address_map &map);
 	void sforte(machine_config &config);
 };
 
@@ -502,7 +506,7 @@ WRITE8_MEMBER(novag6502_state::sforte_lcd_data_w)
 
 // Super Constellation / Constellation Forte
 
-static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
+ADDRESS_MAP_START(novag6502_state::supercon_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITENOP // printer/clock?
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITENOP // printer/clock?
@@ -511,16 +515,16 @@ static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cforte_map, AS_PROGRAM, 8, novag6502_state )
+ADDRESS_MAP_START(novag6502_state::cforte_map)
+	AM_IMPORT_FROM( supercon_map )
 	AM_RANGE(0x1e00, 0x1e00) AM_READWRITE(supercon_input2_r, cforte_mux_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_READWRITE(supercon_input1_r, cforte_control_w)
-	AM_IMPORT_FROM( supercon_map )
 ADDRESS_MAP_END
 
 
 // Super Expert / Super Forte
 
-static ADDRESS_MAP_START( sforte_map, AS_PROGRAM, 8, novag6502_state )
+ADDRESS_MAP_START(novag6502_state::sforte_map)
 	AM_RANGE(0x0000, 0x1fef) AM_RAM AM_SHARE("nvram") // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
 	AM_RANGE(0x1ff0, 0x1ff0) AM_READ(sexpert_input1_r)
 	AM_RANGE(0x1ff1, 0x1ff1) AM_READ(sexpert_input2_r)
@@ -533,12 +537,12 @@ static ADDRESS_MAP_START( sforte_map, AS_PROGRAM, 8, novag6502_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sexpert_map, AS_PROGRAM, 8, novag6502_state )
+ADDRESS_MAP_START(novag6502_state::sexpert_map)
+	AM_IMPORT_FROM( sforte_map )
 	AM_RANGE(0x1ff4, 0x1ff4) AM_WRITE(sexpert_leds_w)
 	AM_RANGE(0x1ff5, 0x1ff5) AM_WRITE(sexpert_mux_w)
 	AM_RANGE(0x1ff6, 0x1ff6) AM_WRITE(sexpert_lcd_control_w)
 	AM_RANGE(0x1ff7, 0x1ff7) AM_WRITE(sexpert_lcd_data_w)
-	AM_IMPORT_FROM( sforte_map )
 ADDRESS_MAP_END
 
 
@@ -943,7 +947,8 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(novag6502_state::sforte, sexpert)
+MACHINE_CONFIG_START(novag6502_state::sforte)
+	sexpert(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

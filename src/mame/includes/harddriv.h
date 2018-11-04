@@ -264,6 +264,23 @@ public:
 	void ds3(machine_config &config);
 	void multisync2(machine_config &config);
 	void adsp(machine_config &config);
+	void adsp_data_map(address_map &map);
+	void adsp_program_map(address_map &map);
+	void driver_68k_map(address_map &map);
+	void driver_gsp_map(address_map &map);
+	void driver_msp_map(address_map &map);
+	void ds3_data_map(address_map &map);
+	void ds3_program_map(address_map &map);
+	void ds3sdsp_data_map(address_map &map);
+	void ds3sdsp_program_map(address_map &map);
+	void ds3xdsp_data_map(address_map &map);
+	void ds3xdsp_program_map(address_map &map);
+	void dsk2_dsp32_map(address_map &map);
+	void dsk_dsp32_map(address_map &map);
+	void multisync2_68k_map(address_map &map);
+	void multisync2_gsp_map(address_map &map);
+	void multisync_68k_map(address_map &map);
+	void multisync_gsp_map(address_map &map);
 protected:
 	harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -521,6 +538,9 @@ public:
 	DECLARE_READ16_MEMBER(hdsnddsp_comram_r);
 	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
 
+	void driversnd_68k_map(address_map &map);
+	void driversnd_dsp_io_map(address_map &map);
+	void driversnd_dsp_program_map(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

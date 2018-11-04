@@ -119,6 +119,9 @@ public:
 	void headoni(machine_config &config);
 	void m10(machine_config &config);
 	void m11(machine_config &config);
+	void m10_main(address_map &map);
+	void m11_main(address_map &map);
+	void m15_main(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

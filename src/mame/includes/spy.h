@@ -61,4 +61,6 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	void spy(machine_config &config);
+	void spy_map(address_map &map);
+	void spy_sound_map(address_map &map);
 };

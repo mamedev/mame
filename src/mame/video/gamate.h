@@ -26,8 +26,8 @@ public:
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 
-	DECLARE_ADDRESS_MAP(regs_map, 8);
-	DECLARE_ADDRESS_MAP(vram_map, 8);
+	void regs_map(address_map &map);
+	void vram_map(address_map &map);
 
 	DECLARE_PALETTE_INIT(gamate);
 

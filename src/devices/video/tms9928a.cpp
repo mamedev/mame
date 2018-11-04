@@ -49,7 +49,7 @@ DEFINE_DEVICE_TYPE(TMS9129,  tms9129_device,  "tms9129",  "TMS9129 VDP")
 /*
     The TMS9928 has an own address space.
 */
-static ADDRESS_MAP_START(memmap, AS_DATA, 8, tms9928a_device)
+ADDRESS_MAP_START(tms9928a_device::memmap)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
@@ -64,9 +64,8 @@ tms9928a_device::tms9928a_device(const machine_config &mconfig, device_type type
 	, m_50hz(is_50hz)
 	, m_reva(is_reva)
 	, m_99(is_99)
-	, m_space_config("vram", ENDIANNESS_BIG, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(memmap))
+	, m_space_config("vram", ENDIANNESS_BIG, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(tms9928a_device::memmap), this))
 {
-//  static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 

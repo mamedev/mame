@@ -31,15 +31,7 @@ public:
 	// construction/destruction
 	abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// abc_keyboard_interface overrides
-	virtual void txd_w(int state) override;
-
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
-
-	DECLARE_WRITE8_MEMBER( z2_led_w );
-	DECLARE_READ8_MEMBER( z5_p1_r );
-	DECLARE_WRITE8_MEMBER( z5_p2_w );
-	DECLARE_READ8_MEMBER( z5_t1_r );
 
 protected:
 	// device-level overrides
@@ -51,6 +43,9 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	// abc_keyboard_interface overrides
+	virtual void txd_w(int state) override;
 
 private:
 	enum
@@ -84,6 +79,15 @@ private:
 	DECLARE_READ8_MEMBER( z2_p2_r );
 	DECLARE_READ_LINE_MEMBER( z2_t0_r );
 	DECLARE_READ_LINE_MEMBER( z2_t1_r );
+
+	DECLARE_WRITE8_MEMBER( z2_led_w );
+	DECLARE_READ8_MEMBER( z5_p1_r );
+	DECLARE_WRITE8_MEMBER( z5_p2_w );
+	DECLARE_READ8_MEMBER( z5_t1_r );
+
+	void abc99_z2_io(address_map &map);
+	void abc99_z2_mem(address_map &map);
+	void abc99_z5_mem(address_map &map);
 
 	emu_timer *m_serial_timer;
 	emu_timer *m_mouse_timer;

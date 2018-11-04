@@ -98,6 +98,10 @@ public:
 	void chinatwn(machine_config &config);
 	void supbtime(machine_config &config);
 	void tumblep(machine_config &config);
+	void chinatwn_map(address_map &map);
+	void sound_map(address_map &map);
+	void supbtime_map(address_map &map);
+	void tumblep_map(address_map &map);
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;
@@ -112,7 +116,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
+ADDRESS_MAP_START(supbtime_state::supbtime_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x11ffff) AM_WRITENOP // Nothing there
@@ -132,7 +136,7 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
+ADDRESS_MAP_START(supbtime_state::chinatwn_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
@@ -150,7 +154,7 @@ static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll") // unused
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tumblep_map, AS_PROGRAM, 16, supbtime_state )
+ADDRESS_MAP_START(supbtime_state::tumblep_map)
 #if TUMBLEP_HACK
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY   // To write levels modifications
 #endif
@@ -172,7 +176,7 @@ static ADDRESS_MAP_START( tumblep_map, AS_PROGRAM, 16, supbtime_state )
 ADDRESS_MAP_END
 
 // Physical memory map (21 bits)
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supbtime_state )
+ADDRESS_MAP_START(supbtime_state::sound_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP // YM2203 - this board doesn't have one
@@ -209,6 +213,7 @@ uint32_t supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_in
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(768, cliprect);
@@ -228,6 +233,7 @@ uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(256+512, cliprect); // not verified
@@ -481,12 +487,14 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(supbtime_state::chinatwn, supbtime)
+MACHINE_CONFIG_START(supbtime_state::chinatwn)
+	supbtime(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chinatwn_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(supbtime_state::tumblep, supbtime)
+MACHINE_CONFIG_START(supbtime_state::tumblep)
+	supbtime(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tumblep_map)
 

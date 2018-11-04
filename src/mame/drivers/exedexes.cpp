@@ -34,7 +34,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::exedexes_scanline)
 }
 
 
-static ADDRESS_MAP_START( exedexes_map, AS_PROGRAM, 8, exedexes_state )
+ADDRESS_MAP_START(exedexes_state::exedexes_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
@@ -56,7 +56,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, exedexes_state )
+ADDRESS_MAP_START(exedexes_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

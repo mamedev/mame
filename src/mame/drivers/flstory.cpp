@@ -32,7 +32,7 @@ WRITE8_MEMBER(flstory_state::snd_reset_w)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, flstory_state )
+ADDRESS_MAP_START(flstory_state::base_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	// rumba lumber reads area 0xc800-0xcfff
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
+ADDRESS_MAP_START(flstory_state::flstory_map)
 	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 
@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
+ADDRESS_MAP_START(flstory_state::onna34ro_map)
 	AM_IMPORT_FROM(base_map)
 //  AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 //  AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( onna34ro_mcu_map, AS_PROGRAM, 8, flstory_state )
+ADDRESS_MAP_START(flstory_state::onna34ro_mcu_map)
 	AM_IMPORT_FROM(onna34ro_map)
 	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
@@ -95,7 +95,7 @@ CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
 	return (victnine_mcu_status_r(space, 0) & 3);
 }
 
-static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
+ADDRESS_MAP_START(flstory_state::victnine_map)
 	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
 
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
+ADDRESS_MAP_START(flstory_state::rumba_map)
 	AM_IMPORT_FROM(base_map)
 	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 
@@ -162,7 +162,7 @@ WRITE8_MEMBER(flstory_state::sound_control_3_w)
 }
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
+ADDRESS_MAP_START(flstory_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)
@@ -866,7 +866,8 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(flstory_state::onna34ro_mcu, onna34ro)
+MACHINE_CONFIG_START(flstory_state::onna34ro_mcu)
+	onna34ro(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(onna34ro_mcu_map)
 

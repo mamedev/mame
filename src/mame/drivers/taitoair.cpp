@@ -379,7 +379,7 @@ WRITE8_MEMBER(taitoair_state::coin_control_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
+ADDRESS_MAP_START(taitoair_state::airsys_map)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w) /* Pause the TMS32025 */
@@ -400,7 +400,7 @@ ADDRESS_MAP_END
 
 /************************** Z80 ****************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitoair_state )
+ADDRESS_MAP_START(taitoair_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -512,11 +512,11 @@ READ16_MEMBER(taitoair_state::dsp_muldiv_2_r)
 }
 
 
-static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16, taitoair_state )
+ADDRESS_MAP_START(taitoair_state::DSP_map_program)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16, taitoair_state )
+ADDRESS_MAP_START(taitoair_state::DSP_map_data)
 	AM_RANGE(0x2003, 0x2003) AM_READNOP //bit 0 DMA status flag or vblank
 	AM_RANGE(0x3000, 0x3002) AM_WRITE(dsp_flags_w)
 	AM_RANGE(0x3404, 0x3404) AM_WRITE(dsp_muldiv_a_1_w)

@@ -148,7 +148,7 @@ READ8_MEMBER(lvcards_state::payout_r)
 	return m_result;
 }
 
-static ADDRESS_MAP_START( ponttehk_map, AS_PROGRAM, 8, lvcards_state )
+ADDRESS_MAP_START(lvcards_state::ponttehk_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(lvcards_videoram_w) AM_SHARE("videoram")
@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( ponttehk_map, AS_PROGRAM, 8, lvcards_state )
 	AM_RANGE(0xa002, 0xa002) AM_READ(payout_r) AM_WRITE(control_port_2a_w)//AM_WRITENOP // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lvcards_map, AS_PROGRAM, 8, lvcards_state )
+ADDRESS_MAP_START(lvcards_state::lvcards_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_SHARE("videoram")
@@ -169,13 +169,13 @@ static ADDRESS_MAP_START( lvcards_map, AS_PROGRAM, 8, lvcards_state )
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lvcards_io_map, AS_IO, 8, lvcards_state )
+ADDRESS_MAP_START(lvcards_state::lvcards_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lvpoker_map, AS_PROGRAM, 8, lvcards_state )
+ADDRESS_MAP_START(lvcards_state::lvpoker_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_SHARE("videoram")
@@ -480,7 +480,8 @@ MACHINE_CONFIG_START(lvcards_state::lvcards)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lvcards_state::lvpoker, lvcards)
+MACHINE_CONFIG_START(lvcards_state::lvpoker)
+	lvcards(config);
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -490,7 +491,8 @@ MACHINE_CONFIG_DERIVED(lvcards_state::lvpoker, lvcards)
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lvcards_state::ponttehk, lvcards)
+MACHINE_CONFIG_START(lvcards_state::ponttehk)
+	lvcards(config);
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")

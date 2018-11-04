@@ -49,7 +49,7 @@ const tiny_rom_entry *c64_supercpu_device::device_rom_region() const
 //  ADDRESS_MAP( c64_supercpu_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c64_supercpu_map, AS_PROGRAM, 8, c64_supercpu_device )
+ADDRESS_MAP_START(c64_supercpu_device::c64_supercpu_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("sram")
 	AM_RANGE(0x020000, 0xf7ffff) AM_RAM AM_SHARE("dimm")
 	AM_RANGE(0xf80000, 0xf9ffff) AM_MIRROR(0x60000) AM_ROM AM_REGION(G65816_TAG, 0)

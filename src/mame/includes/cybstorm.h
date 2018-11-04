@@ -16,13 +16,11 @@ class cybstorm_state : public atarigen_state
 public:
 	cybstorm_state(const machine_config &mconfig, device_type type, const char *tag)
 	: atarigen_state(mconfig, type, tag)
-	, m_maincpu(*this, "maincpu")
 	, m_jsa(*this, "jsa")
 	, m_vad(*this, "vad")
 	, m_vadbank(*this, "vadbank")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	optional_device<atari_jsa_iiis_device> m_jsa;
 	required_device<atari_vad_device> m_vad;
 	required_device<address_map_bank_device> m_vadbank;
@@ -50,4 +48,6 @@ public:
 	static const atari_motion_objects_config s_mob_config;
 	void cybstorm(machine_config &config);
 	void round2(machine_config &config);
+	void main_map(address_map &map);
+	void vadbank_map(address_map &map);
 };

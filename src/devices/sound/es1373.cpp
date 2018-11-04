@@ -77,7 +77,7 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(ES1373, es1373_device, "es1373", "Creative Labs Ensoniq AudioPCI97 ES1373")
 
-DEVICE_ADDRESS_MAP_START(map, 32, es1373_device)
+ADDRESS_MAP_START(es1373_device::map)
 	AM_RANGE(0x00, 0x3f) AM_READWRITE  (reg_r,  reg_w)
 ADDRESS_MAP_END
 

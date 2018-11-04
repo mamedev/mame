@@ -114,4 +114,6 @@ public:
 	void roadrunn(machine_config &config);
 	void roadb109(machine_config &config);
 	void marble(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

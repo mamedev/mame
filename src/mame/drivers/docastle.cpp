@@ -220,7 +220,7 @@ WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
 }
 
 /* Memory Maps */
-static ADDRESS_MAP_START( docastle_map, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::docastle_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM
 	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_SHARE("spriteram")
@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( docastle_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( docastle_map2, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::docastle_map2)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( docastle_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( docastle_map3, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::docastle_map3)
 	AM_RANGE(0x0000, 0x00ff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8008) AM_READ(docastle_shared1_r)    // ???
@@ -250,14 +250,14 @@ static ADDRESS_MAP_START( docastle_map3, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xc432, 0xc435) AM_NOP // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( docastle_io_map, AS_IO, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::docastle_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dorunrun_map, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::dorunrun_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram")
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( dorunrun_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dorunrun_map2, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::dorunrun_map2)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn1", sn76489a_device, write)
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( dorunrun_map2, AS_PROGRAM, 8, docastle_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( idsoccer_map, AS_PROGRAM, 8, docastle_state )
+ADDRESS_MAP_START(docastle_state::idsoccer_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_SHARE("spriteram")
@@ -640,7 +640,8 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(docastle_state::dorunrun, docastle)
+MACHINE_CONFIG_START(docastle_state::dorunrun)
+	docastle(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -653,7 +654,8 @@ MACHINE_CONFIG_DERIVED(docastle_state::dorunrun, docastle)
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(docastle_state::idsoccer, docastle)
+MACHINE_CONFIG_START(docastle_state::idsoccer)
+	docastle(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -321,6 +321,8 @@ public:
 	void f3_224b(machine_config &config);
 	void f3_224c(machine_config &config);
 	void f3_224b_eeprom(machine_config &config);
+	void bubsympb_map(address_map &map);
+	void f3_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load(void) override;

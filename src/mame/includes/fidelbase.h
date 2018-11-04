@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef DRIVERS_FIDELBASE_H
-#define DRIVERS_FIDELBASE_H
+#ifndef MAME_INCLUDES_FIDELBASE_H
+#define MAME_INCLUDES_FIDELBASE_H
 
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -85,4 +85,4 @@ protected:
 INPUT_PORTS_EXTERN( fidel_cb_buttons );
 INPUT_PORTS_EXTERN( fidel_cb_magnets );
 
-#endif // DRIVERS_FIDELBASE_H
+#endif // MAME_INCLUDES_FIDELBASE_H

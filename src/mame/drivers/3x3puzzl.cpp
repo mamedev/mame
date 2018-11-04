@@ -97,6 +97,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
 
 	void _3x3puzzle(machine_config &config);
+	void _3x3puzzle_map(address_map &map);
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -208,7 +209,7 @@ uint32_t _3x3puzzle_state::screen_update( screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-static ADDRESS_MAP_START( _3x3puzzle_map, AS_PROGRAM, 16, _3x3puzzle_state )
+ADDRESS_MAP_START(_3x3puzzle_state::_3x3puzzle_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("videoram1")

@@ -337,6 +337,16 @@ public:
 	void victor21(machine_config &config);
 	void sharkpy(machine_config &config);
 	void victor5(machine_config &config);
+	void crsbingo_map(address_map &map);
+	void mtrainnv_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void sharkpy_map(address_map &map);
+	void srider_map(address_map &map);
+	void stbsub_map(address_map &map);
+	void subsino_iomap(address_map &map);
+	void tisub_map(address_map &map);
+	void victor21_map(address_map &map);
+	void victor5_map(address_map &map);
 };
 
 void subsino_state::machine_start()
@@ -833,7 +843,7 @@ WRITE8_MEMBER(subsino_state::subsino_out_b_w)
 *                              Memory Maps                                 *
 ***************************************************************************/
 
-static ADDRESS_MAP_START( srider_map, AS_PROGRAM, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::srider_map)
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
@@ -857,7 +867,8 @@ static ADDRESS_MAP_START( srider_map, AS_PROGRAM, 8, subsino_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sharkpy_map, AS_PROGRAM, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::sharkpy_map)
+	AM_RANGE( 0x00000, 0x13fff ) AM_ROM //overlap unmapped regions
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09000, 0x09002 ) AM_DEVREAD("ppi1", i8255_device, read)
@@ -877,8 +888,6 @@ static ADDRESS_MAP_START( sharkpy_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
 	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
-
-	AM_RANGE( 0x00000, 0x13fff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
 
 /*
@@ -887,7 +896,9 @@ that announces to the player that the card deck changes. If the protection check
 this event makes the game to reset without any money in the bank.
 */
 
-static ADDRESS_MAP_START( victor21_map, AS_PROGRAM, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::victor21_map)
+	AM_RANGE( 0x00000, 0x08fff ) AM_ROM //overlap unmapped regions
+
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09000, 0x09003 ) AM_DEVREADWRITE("ppi", i8255_device, read, write)
@@ -909,7 +920,6 @@ static ADDRESS_MAP_START( victor21_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
 	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
 
-	AM_RANGE( 0x00000, 0x08fff ) AM_ROM //overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -965,7 +975,7 @@ WRITE8_MEMBER(subsino_state::flash_w)
 	}
 }
 
-static ADDRESS_MAP_START( victor5_map, AS_PROGRAM, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::victor5_map)
 	AM_IMPORT_FROM( victor21_map )
 	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE(flash_r, flash_w )
 	AM_RANGE( 0x0900b, 0x0900b ) AM_READNOP //"flash" status, bit 0
@@ -978,7 +988,9 @@ READ8_MEMBER(subsino_state::hwcheck_r)
 	return 0x55;
 }
 
-static ADDRESS_MAP_START( crsbingo_map, AS_PROGRAM, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::crsbingo_map)
+	AM_RANGE( 0x00000, 0x8fff ) AM_ROM //overlap unmapped regions
+
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "SW1" )
@@ -1005,8 +1017,6 @@ static ADDRESS_MAP_START( crsbingo_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
 	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
 
-	AM_RANGE( 0x00000, 0x8fff ) AM_ROM //overlap unmapped regions
-
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM //overlap unmapped regions
 
 ADDRESS_MAP_END
@@ -1026,7 +1036,8 @@ WRITE8_MEMBER(subsino_state::subsino_out_c_w)
 //  popmessage("data %02x\n",data);
 }
 
-static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::tisub_map)
+	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM // overlap unmapped regions
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09000, 0x09002 ) AM_DEVREAD("ppi1", i8255_device, read)
@@ -1049,7 +1060,6 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_videoram_w ) AM_SHARE("videoram")
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_SHARE("colorram")
 
-	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM // overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
 	AM_RANGE( 0x14000, 0x14fff ) AM_ROM // reads the card face data here (see rom copy in rom loading)
 
@@ -1062,7 +1072,7 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_SHARE("reel3_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -1117,7 +1127,7 @@ READ8_MEMBER(subsino_state::reel_scrollattr_r)
 	return m_reel1_attr[offset];
 }
 
-static ADDRESS_MAP_START( stbsub_map, AS_PROGRAM, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::stbsub_map)
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
@@ -1155,7 +1165,7 @@ ADDRESS_MAP_END
                         Magic Train (Clear NVRAM ROM?)
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::mtrainnv_map)
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
@@ -1190,7 +1200,7 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( subsino_iomap, AS_IO, 8, subsino_state )
+ADDRESS_MAP_START(subsino_state::subsino_iomap)
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 ADDRESS_MAP_END
 
@@ -2798,7 +2808,8 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 MACHINE_CONFIG_END
 
 /* same but with an additional protection. */
-MACHINE_CONFIG_DERIVED(subsino_state::victor5, victor21)
+MACHINE_CONFIG_START(subsino_state::victor5)
+	victor21(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2883,7 +2894,8 @@ MACHINE_CONFIG_START(subsino_state::srider)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(subsino_state::sharkpy, srider)
+MACHINE_CONFIG_START(subsino_state::sharkpy)
+	srider(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2974,7 +2986,8 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(subsino_state::mtrainnv, stbsub)
+MACHINE_CONFIG_START(subsino_state::mtrainnv)
+	stbsub(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -52,13 +52,15 @@ public:
 
 	void basic52(machine_config &config);
 	void basic31(machine_config &config);
+	void basic52_io(address_map &map);
+	void basic52_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(basic52_mem, AS_PROGRAM, 8, basic52_state)
+ADDRESS_MAP_START(basic52_state::basic52_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM
@@ -67,7 +69,7 @@ static ADDRESS_MAP_START(basic52_mem, AS_PROGRAM, 8, basic52_state)
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(basic52_io, AS_IO, 8, basic52_state)
+ADDRESS_MAP_START(basic52_state::basic52_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
@@ -115,7 +117,8 @@ MACHINE_CONFIG_START(basic52_state::basic31)
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(basic52_state::basic52, basic31)
+MACHINE_CONFIG_START(basic52_state::basic52)
+	basic31(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8052, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)

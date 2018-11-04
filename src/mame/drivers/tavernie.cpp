@@ -99,6 +99,8 @@ public:
 
 	void ivg09(machine_config &config);
 	void cpu09(machine_config &config);
+	void cpu09_mem(address_map &map);
+	void ivg09_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	uint8_t m_pa;
@@ -114,7 +116,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(cpu09_mem, AS_PROGRAM, 8, tavernie_state)
+ADDRESS_MAP_START(tavernie_state::cpu09_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1fff) AM_NOP
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -124,7 +126,7 @@ static ADDRESS_MAP_START(cpu09_mem, AS_PROGRAM, 8, tavernie_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ivg09_mem, AS_PROGRAM, 8, tavernie_state)
+ADDRESS_MAP_START(tavernie_state::ivg09_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia_ivg", pia6821_device, read, write)
@@ -329,7 +331,8 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tavernie_state::ivg09, cpu09)
+MACHINE_CONFIG_START(tavernie_state::ivg09)
+	cpu09(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ivg09_mem)

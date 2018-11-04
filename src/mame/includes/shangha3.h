@@ -63,4 +63,9 @@ public:
 	void shangha3(machine_config &config);
 	void heberpop(machine_config &config);
 	void blocken(machine_config &config);
+	void blocken_map(address_map &map);
+	void heberpop_map(address_map &map);
+	void heberpop_sound_io_map(address_map &map);
+	void heberpop_sound_map(address_map &map);
+	void shangha3_map(address_map &map);
 };

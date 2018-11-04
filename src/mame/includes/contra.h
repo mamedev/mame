@@ -77,4 +77,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	void contra(machine_config &config);
+	void contra_map(address_map &map);
+	void sound_map(address_map &map);
 };

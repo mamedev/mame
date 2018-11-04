@@ -202,7 +202,7 @@ CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
 }
 
 
-static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
+ADDRESS_MAP_START(taitosj_state::taitosj_main_nomcu_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -243,9 +243,9 @@ ADDRESS_MAP_END
 
 
 /* only difference is taitosj_fake_ replaced with taitosj_mcu_ */
-static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
-	AM_RANGE(0x8800, 0x8801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
+ADDRESS_MAP_START(taitosj_state::taitosj_main_mcu_map)
 	AM_IMPORT_FROM( taitosj_main_nomcu_map )
+	AM_RANGE(0x8800, 0x8801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 
@@ -272,7 +272,7 @@ CUSTOM_INPUT_MEMBER(taitosj_state::kikstart_gear_r)
 }
 
 // TODO: merge with above
-static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
+ADDRESS_MAP_START(taitosj_state::kikstart_main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -368,7 +368,7 @@ WRITE8_MEMBER(taitosj_state::sound_semaphore2_clear_w)
 }
 
 
-static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
+ADDRESS_MAP_START(taitosj_state::taitosj_audio_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_MIRROR(0x07f8) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
@@ -1827,7 +1827,8 @@ MACHINE_CONFIG_END
 
 
 /* same as above, but with additional 68705 MCU */
-MACHINE_CONFIG_DERIVED(taitosj_state::mcu, nomcu)
+MACHINE_CONFIG_START(taitosj_state::mcu)
+	nomcu(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1844,7 +1845,8 @@ MACHINE_CONFIG_DERIVED(taitosj_state::mcu, nomcu)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitosj_state::kikstart, mcu)
+MACHINE_CONFIG_START(taitosj_state::kikstart)
+	mcu(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

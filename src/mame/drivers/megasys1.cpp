@@ -201,7 +201,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( megasys1Z_map, AS_PROGRAM, 16, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1Z_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
@@ -219,15 +219,15 @@ static ADDRESS_MAP_START( megasys1Z_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(ram_w) AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1A_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_IMPORT_FROM(megasys1Z_map)
 	AM_RANGE(0x080008, 0x080009) AM_DEVREAD("soundlatch2", generic_latch_16_device, read)    /* from sound cpu */
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(active_layers_w)
 	AM_RANGE(0x084008, 0x08400d) AM_DEVWRITE("scroll2", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x084100, 0x084101) AM_READWRITE(sprite_flag_r, sprite_flag_w)
 	AM_RANGE(0x084308, 0x084309) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")
-	AM_IMPORT_FROM(megasys1Z_map)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -299,7 +299,7 @@ WRITE16_MEMBER(megasys1_state::ip_select_w) // TO MCU
 }
 
 
-static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1B_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044000, 0x044001) AM_WRITE(active_layers_w)
@@ -319,19 +319,20 @@ static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE(ip_select_r,ip_select_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megasys1B_edfbl_map, AS_PROGRAM, 16, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1B_edfbl_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_IMPORT_FROM(megasys1B_map)
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("P1")
 	AM_RANGE(0x0e0006, 0x0e0007) AM_READ_PORT("P2")
 	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("DSW2")
 	//AM_RANGE(0x0e000e, 0x0e000f) AM_WRITE(soundlatch_w)
-	AM_IMPORT_FROM(megasys1B_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megasys1B_monkelf_map, AS_PROGRAM, 16, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1B_monkelf_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_IMPORT_FROM(megasys1B_map)
 	AM_RANGE(0x044200, 0x044205) AM_WRITE(monkelf_scroll0_w)
 	AM_RANGE(0x044208, 0x04420d) AM_WRITE(monkelf_scroll1_w)
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("P1")
@@ -339,7 +340,6 @@ static ADDRESS_MAP_START( megasys1B_monkelf_map, AS_PROGRAM, 16, megasys1_state 
 	AM_RANGE(0x0e0006, 0x0e0007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("SYSTEM")
-	AM_IMPORT_FROM(megasys1B_map)
 ADDRESS_MAP_END
 
 
@@ -364,7 +364,7 @@ WRITE16_MEMBER(megasys1_state::ram_w )
 
 }
 
-static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1C_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c2000, 0x0c2005) AM_DEVWRITE("scroll0", megasys1_tilemap_device, scroll_w)
@@ -395,7 +395,7 @@ INTERRUPT_GEN_MEMBER(megasys1_state::megasys1D_irq)
 	device.execute().set_input_line(2, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1D_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0c2000, 0x0c2005) AM_DEVWRITE("scroll0", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x0c2008, 0x0c200d) AM_DEVWRITE("scroll1", megasys1_tilemap_device, scroll_w)
@@ -414,7 +414,7 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM /*_WRITE(ram_w)*/ AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megasys1D_oki_map, 0, 8, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1D_oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -503,7 +503,7 @@ READ8_MEMBER(megasys1_state::oki_status_2_r)
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1A_sound_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_DEVREAD("soundlatch", generic_latch_16_device, read)
 	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write)   // to main cpu
@@ -515,7 +515,7 @@ static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kickoffb_sound_map, AS_PROGRAM, 16, megasys1_state ) // TODO: wrong, needs to be checked range for range
+ADDRESS_MAP_START(megasys1_state::kickoffb_sound_map) // TODO: wrong, needs to be checked range for range
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_DEVREAD("soundlatch", generic_latch_16_device, read)
 	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write)   // to main cpu
@@ -531,7 +531,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( megasys1B_sound_map, AS_PROGRAM, 16, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::megasys1B_sound_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write) /* from/to main cpu */
 	AM_RANGE(0x060000, 0x060001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_DEVWRITE("soundlatch2", generic_latch_16_device, write) /* from/to main cpu */
@@ -550,14 +550,14 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::z80_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch_z", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_sound_io_map, AS_IO, 8, megasys1_state )
+ADDRESS_MAP_START(megasys1_state::z80_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END
@@ -1722,22 +1722,26 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(megasys1_state::system_A_hachoo, system_A)
+MACHINE_CONFIG_START(megasys1_state::system_A_hachoo)
+	system_A(config);
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1_hachoo)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(megasys1_state::system_A_iganinju, system_A)
+MACHINE_CONFIG_START(megasys1_state::system_A_iganinju)
+	system_A(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE("scantimer")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_iganinju_scanline, "screen", 0, 1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(megasys1_state::system_A_soldam, system_A)
+MACHINE_CONFIG_START(megasys1_state::system_A_soldam)
+	system_A(config);
 	MCFG_DEVICE_MODIFY("scroll1")
 	MCFG_MEGASYS1_TILEMAP_8X8_SCROLL_FACTOR(4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(megasys1_state::kickoffb, system_A)
+MACHINE_CONFIG_START(megasys1_state::kickoffb)
+	system_A(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(kickoffb_sound_map)
 
@@ -1750,7 +1754,8 @@ MACHINE_CONFIG_DERIVED(megasys1_state::kickoffb, system_A)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(megasys1_state::system_B, system_A)
+MACHINE_CONFIG_START(megasys1_state::system_B)
+	system_A(config);
 
 	/* basic machine hardware */
 
@@ -1765,7 +1770,8 @@ MACHINE_CONFIG_DERIVED(megasys1_state::system_B, system_A)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(megasys1_state::system_B_monkelf, system_B)
+MACHINE_CONFIG_START(megasys1_state::system_B_monkelf)
+	system_B(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_monkelf_map)
 MACHINE_CONFIG_END
@@ -1809,7 +1815,8 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(megasys1_state::system_B_hayaosi1, system_B)
+MACHINE_CONFIG_START(megasys1_state::system_B_hayaosi1)
+	system_B(config);
 
 	/* basic machine hardware */
 
@@ -1823,7 +1830,8 @@ MACHINE_CONFIG_DERIVED(megasys1_state::system_B_hayaosi1, system_B)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(megasys1_state::system_C, system_A)
+MACHINE_CONFIG_START(megasys1_state::system_C)
+	system_A(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

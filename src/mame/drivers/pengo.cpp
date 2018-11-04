@@ -89,6 +89,9 @@ public:
 	void pengoe(machine_config &config);
 	void pengou(machine_config &config);
 	void pengo(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void jrpacmbl_map(address_map &map);
+	void pengo_map(address_map &map);
 };
 
 
@@ -136,7 +139,7 @@ WRITE_LINE_MEMBER(pengo_state::irq_mask_w)
 	m_irq_mask = state;
 }
 
-static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
+ADDRESS_MAP_START(pengo_state::pengo_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram") /* video and color RAM, scratchpad RAM, sprite codes */
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
@@ -153,14 +156,14 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, pengo_state )
+ADDRESS_MAP_START(pengo_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8, pengo_state )
+ADDRESS_MAP_START(pengo_state::jrpacmbl_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
@@ -375,7 +378,7 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // U27
@@ -411,21 +414,24 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pengo_state::pengou, pengo)
+MACHINE_CONFIG_START(pengo_state::pengou)
+	pengo(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pengo_state::pengoe, pengo)
+MACHINE_CONFIG_START(pengo_state::pengoe)
+	pengo(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5010, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pengo_state::jrpacmbl, pengo)
+MACHINE_CONFIG_START(pengo_state::jrpacmbl)
+	pengo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

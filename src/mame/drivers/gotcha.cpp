@@ -101,7 +101,7 @@ WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
 }
 
 
-static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
+ADDRESS_MAP_START(gotcha_state::gotcha_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gotcha_state )
+ADDRESS_MAP_START(gotcha_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)

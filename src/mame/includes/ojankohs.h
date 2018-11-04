@@ -110,4 +110,11 @@ public:
 	void ccasino(machine_config &config);
 	void ojankoc(machine_config &config);
 	void ojankoy(machine_config &config);
+	void ccasino_io_map(address_map &map);
+	void ojankoc_io_map(address_map &map);
+	void ojankoc_map(address_map &map);
+	void ojankohs_io_map(address_map &map);
+	void ojankohs_map(address_map &map);
+	void ojankoy_io_map(address_map &map);
+	void ojankoy_map(address_map &map);
 };

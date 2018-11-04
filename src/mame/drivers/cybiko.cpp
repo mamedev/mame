@@ -61,7 +61,7 @@ ToDo:
 ///////////////////////////
 
 // 512 kbyte ram + no memory mapped flash
-static ADDRESS_MAP_START( cybikov1_mem, AS_PROGRAM, 16, cybiko_state )
+ADDRESS_MAP_START(cybiko_state::cybikov1_mem)
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 //  AM_RANGE( 0xe00000, 0xe07fff ) AM_READ( cybikov1_key_r )
@@ -101,7 +101,7 @@ ptr: 243150=24297a
 //  +-------------------------------------+
 
 // 256 kbyte ram + 256 kbyte memory mapped flash
-static ADDRESS_MAP_START( cybikov2_mem, AS_PROGRAM, 16, cybiko_state )
+ADDRESS_MAP_START(cybiko_state::cybikov2_mem)
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 	AM_RANGE( 0x100000, 0x13ffff ) AM_DEVREAD8("flash2", sst_39vf020_device, read, 0xffff) AM_MIRROR( 0x0c0000 )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w ) AM_MIRROR( 0x1ffffe )
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( cybikov2_mem, AS_PROGRAM, 16, cybiko_state )
 ADDRESS_MAP_END
 
 // 2048 kbyte ram + 512 kbyte memory mapped flash
-static ADDRESS_MAP_START( cybikoxt_mem, AS_PROGRAM, 16, cybiko_state )
+ADDRESS_MAP_START(cybiko_state::cybikoxt_mem)
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM AM_MIRROR( 0x038000 )
 	AM_RANGE( 0x100000, 0x100001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 	AM_RANGE( 0x200000, 0x200003 ) AM_WRITE( cybiko_usb_w )
@@ -182,14 +182,14 @@ READ16_MEMBER(cybiko_state::port0_r)
 // ADDRESS MAP - IO //
 //////////////////////
 
-static ADDRESS_MAP_START( cybikov1_io, AS_IO, 16, cybiko_state )
+ADDRESS_MAP_START(cybiko_state::cybikov1_io)
 	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_WRITE(serflash_w)
 	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READWRITE(clock_r, clock_w)
 	AM_RANGE(h8_device::ADC_1,  h8_device::ADC_1)  AM_READ(adc1_r)
 	AM_RANGE(h8_device::ADC_2,  h8_device::ADC_2)  AM_READ(adc2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cybikov2_io, AS_IO, 16, cybiko_state )
+ADDRESS_MAP_START(cybiko_state::cybikov2_io)
 	AM_RANGE(h8_device::PORT_1, h8_device::PORT_1) AM_READ(port0_r)
 	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_WRITE(serflash_w)
 	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READWRITE(clock_r, clock_w)
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( cybikov2_io, AS_IO, 16, cybiko_state )
 	AM_RANGE(h8_device::ADC_2,  h8_device::ADC_2)  AM_READ(adc2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 16, cybiko_state )
+ADDRESS_MAP_START(cybiko_state::cybikoxt_io)
 	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READ(xtpower_r)
 	AM_RANGE(h8_device::PORT_F, h8_device::PORT_F) AM_READWRITE(xtclock_r, xtclock_w)
 ADDRESS_MAP_END
@@ -436,7 +436,8 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybiko, "bin,nv", 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cybiko_state::cybikov2, cybikov1)
+MACHINE_CONFIG_START(cybiko_state::cybikov2)
+	cybikov1(config);
 	// cpu
 	MCFG_CPU_REPLACE("maincpu", H8S2246, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(cybikov2_mem)
@@ -461,7 +462,8 @@ MACHINE_CONFIG_DERIVED(cybiko_state::cybikov2, cybikov1)
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cybiko_state::cybikoxt, cybikov1)
+MACHINE_CONFIG_START(cybiko_state::cybikoxt)
+	cybikov1(config);
 	// cpu
 	MCFG_CPU_REPLACE("maincpu", H8S2323, XTAL(18'432'000))
 	MCFG_CPU_PROGRAM_MAP(cybikoxt_mem )

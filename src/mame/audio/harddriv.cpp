@@ -391,7 +391,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnddsp_compare_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( driversnd_68k_map, AS_PROGRAM, 16, harddriv_sound_board_device )
+ADDRESS_MAP_START(harddriv_sound_board_device::driversnd_68k_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE(hdsnd68k_data_r, hdsnd68k_data_w)
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( driversnd_68k_map, AS_PROGRAM, 16, harddriv_sound_boar
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( driversnd_dsp_program_map, AS_PROGRAM, 16, harddriv_sound_board_device )
+ADDRESS_MAP_START(harddriv_sound_board_device::driversnd_dsp_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_RAM AM_SHARE("sounddsp_ram")
 ADDRESS_MAP_END
@@ -413,7 +413,7 @@ ADDRESS_MAP_END
 
 /* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_sound_board_device )
+ADDRESS_MAP_START(harddriv_sound_board_device::driversnd_dsp_io_map)
 	AM_RANGE(0, 0) AM_READ(hdsnddsp_rom_r) AM_WRITE(hdsnddsp_dac_w)
 	AM_RANGE(1, 1) AM_READ(hdsnddsp_comram_r)
 	AM_RANGE(2, 2) AM_READ(hdsnddsp_compare_r)

@@ -35,7 +35,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(de_w);
 

@@ -86,6 +86,8 @@ public:
 	uint16_t m_start_address;
 	uint16_t m_cursor_address;
 	void a6809(machine_config &config);
+	void a6809_io(address_map &map);
+	void a6809_mem(address_map &map);
 private:
 	uint8_t m_cass_data[4];
 	bool m_cass_state;
@@ -98,7 +100,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(a6809_mem, AS_PROGRAM, 8, a6809_state)
+ADDRESS_MAP_START(a6809_state::a6809_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x03ff) AM_RAM
 	AM_RANGE(0x0400,0x07ff) AM_RAM AM_SHARE("videoram")
@@ -109,7 +111,7 @@ static ADDRESS_MAP_START(a6809_mem, AS_PROGRAM, 8, a6809_state)
 	AM_RANGE(0xf800,0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a6809_io, AS_IO, 8, a6809_state)
+ADDRESS_MAP_START(a6809_state::a6809_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

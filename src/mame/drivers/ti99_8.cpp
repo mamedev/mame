@@ -264,6 +264,8 @@ public:
 	void ti99_8(machine_config &config);
 	void ti99_8_60hz(machine_config &config);
 	void ti99_8_50hz(machine_config &config);
+	void crumap(address_map &map);
+	void memmap(address_map &map);
 private:
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);
@@ -290,7 +292,7 @@ private:
     Memory map. We have a configurable mapper, so we need to delegate the
     job to the mapper completely.
 */
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, ti99_8_state)
+ADDRESS_MAP_START(ti99_8_state::memmap)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, read, write) AM_DEVSETOFFSET(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, setoffset)
 ADDRESS_MAP_END
 
@@ -301,12 +303,12 @@ ADDRESS_MAP_END
     (decoded by the "Vaquerro" chip, signal NNOICS*)
 */
 
-static ADDRESS_MAP_START(crumap, AS_IO, 8, ti99_8_state)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+ADDRESS_MAP_START(ti99_8_state::crumap)
 	AM_RANGE(0x0000, 0x02ff) AM_READ(cruread)
+	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 
-	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x17ff) AM_WRITE(cruwrite)
+	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 ADDRESS_MAP_END
 
 /* ti99/8 : 54-key keyboard */
@@ -827,7 +829,8 @@ MACHINE_CONFIG_END
 /*
     TI-99/8 US version (NTSC, 60 Hz)
 */
-MACHINE_CONFIG_DERIVED(ti99_8_state::ti99_8_60hz, ti99_8)
+MACHINE_CONFIG_START(ti99_8_state::ti99_8_60hz)
+	ti99_8(config);
 	// Video hardware
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9118, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -839,7 +842,8 @@ MACHINE_CONFIG_END
 /*
     TI-99/8 European version (PAL, 50 Hz)
 */
-MACHINE_CONFIG_DERIVED(ti99_8_state::ti99_8_50hz, ti99_8)
+MACHINE_CONFIG_START(ti99_8_state::ti99_8_50hz)
+	ti99_8(config);
 	// Video hardware
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9129, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)

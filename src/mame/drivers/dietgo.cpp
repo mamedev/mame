@@ -52,7 +52,7 @@ WRITE16_MEMBER( dietgo_state::dietgo_protection_region_0_104_w )
 }
 
 
-static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16, dietgo_state )
+ADDRESS_MAP_START(dietgo_state::dietgo_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x210000, 0x211fff) AM_DEVWRITE("tilegen1", deco16ic_device, pf1_data_w)
@@ -65,13 +65,13 @@ static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16, dietgo_state )
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, dietgo_state )
+ADDRESS_MAP_START(dietgo_state::decrypted_opcodes_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dietgo_state )
+ADDRESS_MAP_START(dietgo_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP     /* YM2203 - this board doesn't have one */
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2) /* DE102 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(dietgo_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dietgo_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */

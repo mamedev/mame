@@ -320,6 +320,9 @@ public:
 	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	void program_2_7k(address_map &map);
+	void data_96_32x4(address_map &map);
+
 	virtual util::disasm_interface *create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
@@ -338,6 +341,9 @@ public:
 protected:
 	sm511_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
+	void program_4k(address_map &map);
+	void data_96_32x4(address_map &map);
+
 	virtual void device_post_load() override { notify_clock_changed(); }
 	virtual void device_reset() override;
 
@@ -353,6 +359,9 @@ class sm512_device : public sm511_device
 {
 public:
 	sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	void data_80_48x4(address_map &map);
 };
 
 

@@ -50,6 +50,8 @@ public:
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 
+	void kram_map(address_map &map);
+	void microprg_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;

@@ -69,6 +69,7 @@ public:
 
 	void lethalj(machine_config &config);
 	void gameroom(machine_config &config);
+	void lethalj_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

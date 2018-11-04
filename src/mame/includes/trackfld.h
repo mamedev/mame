@@ -51,6 +51,16 @@ public:
 	DECLARE_DRIVER_INIT(mastkin);
 	DECLARE_DRIVER_INIT(trackfldnz);
 
+	void hyprolyb_sound_map(address_map &map);
+	void main_map(address_map &map);
+	void mastkin_map(address_map &map);
+	void reaktor_io_map(address_map &map);
+	void reaktor_map(address_map &map);
+	void sound_map(address_map &map);
+	void vlm_map(address_map &map);
+	void wizzquiz_map(address_map &map);
+	void yieartf_map(address_map &map);
+	void hyprolyb_adpcm_map(address_map &map);
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram2;

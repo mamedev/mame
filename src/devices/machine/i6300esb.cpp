@@ -6,7 +6,7 @@
 DEFINE_DEVICE_TYPE(I6300ESB_WATCHDOG, i6300esb_watchdog_device, "i6300esb_watchdog", "i6300ESB southbridge watchdog")
 DEFINE_DEVICE_TYPE(I6300ESB_LPC,      i6300esb_lpc_device,      "i6300esb_lpc",      "i6300ESB southbridge ISA/LPC bridge")
 
-DEVICE_ADDRESS_MAP_START(map, 32, i6300esb_watchdog_device)
+ADDRESS_MAP_START(i6300esb_watchdog_device::map)
 ADDRESS_MAP_END
 
 i6300esb_watchdog_device::i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -29,7 +29,8 @@ void i6300esb_watchdog_device::device_reset()
 }
 
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, i6300esb_lpc_device)
+ADDRESS_MAP_START(i6300esb_lpc_device::config_map)
+	AM_IMPORT_FROM(pci_device::config_map)
 	AM_RANGE(0x40, 0x43) AM_READWRITE  (pmbase_r,               pmbase_w)
 	AM_RANGE(0x44, 0x47) AM_READWRITE8 (acpi_cntl_r,            acpi_cntl_w,            0x000000ff)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE16(bios_cntl_r,            bios_cntl_w,            0xffff0000)
@@ -70,11 +71,9 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i6300esb_lpc_device)
 	AM_RANGE(0xf4, 0xf7) AM_READWRITE  (etr1_r,                 etr1_w)
 	AM_RANGE(0xf8, 0xfb) AM_READ       (mfid_r)
 	AM_RANGE(0xfc, 0xff) AM_READWRITE  (unk_fc_r,               unk_fc_w)
-
-	AM_INHERIT_FROM(pci_device::config_map)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i6300esb_lpc_device)
+ADDRESS_MAP_START(i6300esb_lpc_device::internal_io_map)
 	;
 	if(lpc_en & 0x2000) {
 		AM_RANGE(0x004c, 0x004f) AM_READWRITE8(siu_config_port_r, siu_config_port_w, 0x00ff0000)

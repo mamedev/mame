@@ -28,6 +28,10 @@ public:
 	DECLARE_WRITE8_MEMBER( ay8910_45M_portb_w );
 	DECLARE_WRITE8_MEMBER( ay8910_45L_porta_w );
 
+	void irem_sound_portmap(address_map &map);
+	void m52_large_sound_map(address_map &map);
+	void m52_small_sound_map(address_map &map);
+	void m62_sound_map(address_map &map);
 protected:
 	irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

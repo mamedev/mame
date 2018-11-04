@@ -45,6 +45,8 @@ public:
 	DECLARE_WRITE8_MEMBER(delta1_io1_w);
 	DECLARE_READ8_MEMBER(delta1_io0_r);
 	DECLARE_READ8_MEMBER(delta1_io1_r);
+	void delta1_io(address_map &map);
+	void delta1_map(address_map &map);
 	void delta1(machine_config &config);
 
 protected:
@@ -117,13 +119,13 @@ READ8_MEMBER(novagf8_state::delta1_io1_r)
 
 // Delta-1
 
-static ADDRESS_MAP_START( delta1_map, AS_PROGRAM, 8, novagf8_state )
+ADDRESS_MAP_START(novagf8_state::delta1_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM // _A13
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x1f00) AM_RAM // A13
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( delta1_io, AS_IO, 8, novagf8_state )
+ADDRESS_MAP_START(novagf8_state::delta1_io)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(delta1_io0_r, delta1_io0_w )
 	AM_RANGE(0x1, 0x1) AM_READWRITE(delta1_io1_r, delta1_io1_w )
 	AM_RANGE(0xc, 0xf) AM_DEVREADWRITE("f3853", f3853_device, read, write )

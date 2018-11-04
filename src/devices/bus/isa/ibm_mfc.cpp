@@ -113,7 +113,7 @@ void isa8_ibm_mfc_device::update_z80_interrupts(void)
 //  Z80 memory map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, isa8_ibm_mfc_device )
+ADDRESS_MAP_START(isa8_ibm_mfc_device::prg_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_RAM // Unknown - tested on startup
 	AM_RANGE(0xbfff, 0xbfff) AM_RAM // Unknown - tested on startup
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, isa8_ibm_mfc_device )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, isa8_ibm_mfc_device )
+ADDRESS_MAP_START(isa8_ibm_mfc_device::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)

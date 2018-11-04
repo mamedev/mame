@@ -178,7 +178,7 @@ CUSTOM_INPUT_MEMBER(midyunit_state::adpcm_irq_state_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midyunit_state )
+ADDRESS_MAP_START(midyunit_state::main_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_READWRITE(midyunit_vram_r, midyunit_vram_w)
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x01400000, 0x0140ffff) AM_READWRITE(midyunit_cmos_r, midyunit_cmos_w)
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midyunit_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( yawdim_sound_map, AS_PROGRAM, 8, midyunit_state )
+ADDRESS_MAP_START(midyunit_state::yawdim_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_WRITE(yawdim_oki_bank_w)
@@ -1170,7 +1170,8 @@ MACHINE_CONFIG_START(midyunit_state::yunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midyunit_state::yunit_cvsd_4bit_slow, yunit_core)
+MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_slow)
+	yunit_core(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
@@ -1183,7 +1184,8 @@ MACHINE_CONFIG_DERIVED(midyunit_state::yunit_cvsd_4bit_slow, yunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midyunit_state::yunit_cvsd_4bit_fast, yunit_core)
+MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_fast)
+	yunit_core(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1199,7 +1201,8 @@ MACHINE_CONFIG_DERIVED(midyunit_state::yunit_cvsd_4bit_fast, yunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midyunit_state::yunit_cvsd_6bit_slow, yunit_core)
+MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_6bit_slow)
+	yunit_core(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
@@ -1212,7 +1215,8 @@ MACHINE_CONFIG_DERIVED(midyunit_state::yunit_cvsd_6bit_slow, yunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midyunit_state::yunit_adpcm_6bit_fast, yunit_core)
+MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_fast)
+	yunit_core(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1228,7 +1232,8 @@ MACHINE_CONFIG_DERIVED(midyunit_state::yunit_adpcm_6bit_fast, yunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midyunit_state::yunit_adpcm_6bit_faster, yunit_core)
+MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_faster)
+	yunit_core(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1244,7 +1249,8 @@ MACHINE_CONFIG_DERIVED(midyunit_state::yunit_adpcm_6bit_faster, yunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midyunit_state::term2, yunit_adpcm_6bit_faster)
+MACHINE_CONFIG_START(midyunit_state::term2)
+	yunit_adpcm_6bit_faster(config);
 	MCFG_ADC0844_ADD("adc") // U2 on Coil Lamp Driver Board (A-14915)
 	MCFG_ADC0844_CH1_CB(IOPORT("STICK0_X"))
 	MCFG_ADC0844_CH2_CB(IOPORT("STICK0_Y"))
@@ -1253,7 +1259,8 @@ MACHINE_CONFIG_DERIVED(midyunit_state::term2, yunit_adpcm_6bit_faster)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(midyunit_state::mkyawdim, yunit_core)
+MACHINE_CONFIG_START(midyunit_state::mkyawdim)
+	yunit_core(config);
 
 	/* basic machine hardware */
 

@@ -58,6 +58,7 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
+private:
 	static const int SIZE_DATA = 0x40;
 
 	static const uint8_t CK  = 0x01;
@@ -75,6 +76,8 @@ protected:
 	uint8_t       m_control_state;
 	uint8_t       m_address;
 	uint8_t       m_data;
+
+	void er2055_map(address_map &map);
 };
 
 

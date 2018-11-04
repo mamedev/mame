@@ -2441,7 +2441,7 @@ msgstr "[erzeugen]"
 #: src/frontend/mame/ui/filesel.cpp:419
 #, c-format
 msgid "Error accessing %s"
-msgstr "Fehler beim Zugriff auf%s"
+msgstr "Fehler beim Zugriff auf %s"
 
 #: src/frontend/mame/ui/filesel.cpp:515
 msgid "Select access mode"
@@ -2534,7 +2534,7 @@ msgstr "Hotkeys einstellen"
 #: plugins/cheat/init.lua:720
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr "Aktiviert:%s =%s"
+msgstr "Aktiviert: %s =%s"
 
 #: plugins/cheat/init.lua:723 plugins/cheat/init.lua:781
 #, lua-format
@@ -2823,52 +2823,12 @@ msgstr "Datei mit Eingabenamen nach %s gespeichert"
 msgid "Input ports"
 msgstr "Eingaben"
 
-#~ msgid "Default name is "
-#~ msgstr "Standardname ist "
-
-#~ msgid "Roms Audit Pass\tOK\n"
-#~ msgstr "ROM-Überprüfung\tOK\n"
-
-#~ msgid "Roms Audit Pass\tBAD\n"
-#~ msgstr "ROM-Überprüfung\tFEHLERHAFT\n"
-
-#~ msgid "Samples Audit Pass\tNone Needed\n"
-#~ msgstr "Samples-Überprüfung\tNicht nötig\n"
-
-#~ msgid "Samples Audit Pass\tOK\n"
-#~ msgstr "Samples-Überprüfung\tOK\n"
-
-#~ msgid "Samples Audit Pass\tBAD\n"
-#~ msgstr "Samples-Überprüfung\tFEHLERHAFT\n"
-
 #~ msgid ""
 #~ "Roms Audit Pass\tDisabled\n"
 #~ "Samples Audit Pass\tDisabled\n"
 #~ msgstr ""
 #~ "ROM-Überprüfung\tDeaktiviert\n"
 #~ "Samples-Überprüfung\tDeaktiviert\n"
-
-#~ msgid "Imperfect"
-#~ msgstr "Unvollständig"
-
-#~ msgid "Activated"
-#~ msgstr "Aktiviert"
-
-#~ msgid " added"
-#~ msgstr " hinzugefügt"
-
-#~ msgid "Cheat written to "
-#~ msgstr "Cheat gespeichert nach "
-
-#~ msgid " and added to cheat.simple"
-#~ msgstr " und zu cheat.simple hinzugefügt"
-
-#~ msgid ""
-#~ "Unable to write file\n"
-#~ "Check cheatpath dir exists"
-#~ msgstr ""
-#~ "Kann Datei nicht schreiben\n"
-#~ "Überprüfen Sie ob das cheatpath Verezeichnis existiert"
 
 #~ msgid "Software History"
 #~ msgstr "Geschichte der Software"

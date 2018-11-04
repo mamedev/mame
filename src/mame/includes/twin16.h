@@ -84,6 +84,9 @@ public:
 	void devilw(machine_config &config);
 	void miaj(machine_config &config);
 	void twin16(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -110,6 +113,7 @@ public:
 	DECLARE_DRIVER_INIT(fround);
 
 	void fround(machine_config &config);
+	void fround_map(address_map &map);
 protected:
 	virtual void video_start() override;
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base) override;

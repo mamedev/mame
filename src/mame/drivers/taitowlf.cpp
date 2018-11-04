@@ -66,6 +66,8 @@ public:
 	uint32_t screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void intel82439tx_init();
 	void taitowlf(machine_config &config);
+	void taitowlf_io(address_map &map);
+	void taitowlf_map(address_map &map);
 };
 
 #if !ENABLE_VGA
@@ -269,7 +271,7 @@ WRITE32_MEMBER(taitowlf_state::bios_ram_w)
 }
 
 
-static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
+ADDRESS_MAP_START(taitowlf_state::taitowlf_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	#if ENABLE_VGA
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
@@ -289,7 +291,7 @@ static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)   /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
+ADDRESS_MAP_START(taitowlf_state::taitowlf_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
@@ -379,11 +381,11 @@ MACHINE_CONFIG_START(taitowlf_state::taitowlf)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	/* video hardware */
 	#if ENABLE_VGA
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 	#else
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

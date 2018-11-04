@@ -69,6 +69,8 @@ public:
 	DECLARE_READ8_MEMBER(ppi_pc_r);
 
 	void pulsar(machine_config &config);
+	void pulsar_io(address_map &map);
+	void pulsar_mem(address_map &map);
 private:
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
@@ -79,14 +81,14 @@ private:
 	required_device<msm5832_device> m_rtc;
 };
 
-static ADDRESS_MAP_START(pulsar_mem, AS_PROGRAM, 8, pulsar_state)
+ADDRESS_MAP_START(pulsar_state::pulsar_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x0800, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pulsar_io, AS_IO, 8, pulsar_state)
+ADDRESS_MAP_START(pulsar_state::pulsar_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x0c) AM_DEVREADWRITE("dart", z80dart_device, ba_cd_r, ba_cd_w)

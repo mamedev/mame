@@ -50,4 +50,8 @@ public:
 	INTERRUPT_GEN_MEMBER(mouser_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(mouser_sound_nmi_assert);
 	void mouser(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void mouser_map(address_map &map);
+	void mouser_sound_io_map(address_map &map);
+	void mouser_sound_map(address_map &map);
 };

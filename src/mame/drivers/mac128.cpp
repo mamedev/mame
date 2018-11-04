@@ -262,6 +262,8 @@ public:
 	void mac512ke(machine_config &config);
 	void mac128k(machine_config &config);
 	void macplus(machine_config &config);
+	void mac512ke_map(address_map &map);
+	void macplus_map(address_map &map);
 private:
 	// wait states for accessing the VIA
 	int m_via_cycles;
@@ -1276,7 +1278,7 @@ MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac128_state )
+ADDRESS_MAP_START(mac128_state::mac512ke_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x100000)
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ram_600000_r, ram_600000_w)
@@ -1287,7 +1289,7 @@ static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac128_state )
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(macplus_map, AS_PROGRAM, 16, mac128_state )
+ADDRESS_MAP_START(mac128_state::macplus_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
@@ -1379,7 +1381,8 @@ MACHINE_CONFIG_START(mac128_state::mac512ke)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac128_state::mac128k, mac512ke)
+MACHINE_CONFIG_START(mac128_state::mac128k)
+	mac512ke(config);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1387,7 +1390,8 @@ MACHINE_CONFIG_DERIVED(mac128_state::mac128k, mac512ke)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mac128_state::macplus, mac512ke)
+MACHINE_CONFIG_START(mac128_state::macplus)
+	mac512ke(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 

@@ -87,6 +87,10 @@ public:
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
 	TIMER_DEVICE_CALLBACK_MEMBER(lastbank_irq_scanline);
 	void lastbank(machine_config &config);
+	void lastbank_audio_io(address_map &map);
+	void lastbank_audio_map(address_map &map);
+	void lastbank_map(address_map &map);
+	void tc0091lvc_map(address_map &map);
 };
 
 void lastbank_state::video_start()
@@ -251,7 +255,7 @@ CUSTOM_INPUT_MEMBER(lastbank_state::sound_status_r)
 	return BIT(m_sound_flags, 0) << 1 | BIT(m_sound_flags, 1);
 }
 
-static ADDRESS_MAP_START( tc0091lvc_map, AS_PROGRAM, 8, lastbank_state )
+ADDRESS_MAP_START(lastbank_state::tc0091lvc_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(lastbank_rom_r)
 
@@ -269,7 +273,7 @@ static ADDRESS_MAP_START( tc0091lvc_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0xff08, 0xff08) AM_READWRITE(lastbank_rom_bank_r, lastbank_rom_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
+ADDRESS_MAP_START(lastbank_state::lastbank_map)
 	AM_IMPORT_FROM( tc0091lvc_map )
 	AM_RANGE(0xa000, 0xa00d) AM_NOP // MSM62X42B or equivalent probably read from here
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("COINS")
@@ -286,13 +290,13 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0xa81f, 0xa81f) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastbank_audio_map, AS_PROGRAM, 8, lastbank_state )
+ADDRESS_MAP_START(lastbank_state::lastbank_audio_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastbank_audio_io, AS_IO, 8, lastbank_state )
+ADDRESS_MAP_START(lastbank_state::lastbank_audio_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x06) AM_DEVREADWRITE("essnd", es8712_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)

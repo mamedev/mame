@@ -55,19 +55,21 @@ public:
 	{ }
 
 	void ipc(machine_config &config);
+	void ipc_io(address_map &map);
+	void ipc_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(ipc_mem, AS_PROGRAM, 8, ipc_state)
+ADDRESS_MAP_START(ipc_state::ipc_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_RAM
 	AM_RANGE(0xe800, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ipc_state)
+ADDRESS_MAP_START(ipc_state::ipc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("pit", pit8253_device, read, write)

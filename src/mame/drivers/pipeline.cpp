@@ -113,6 +113,9 @@ public:
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 
 	void pipeline(machine_config &config);
+	void cpu0_mem(address_map &map);
+	void cpu1_mem(address_map &map);
+	void sound_port(address_map &map);
 protected:
 	required_device<cpu_device>         m_maincpu;
 	required_device<m68705r_device>     m_mcu;
@@ -219,7 +222,7 @@ WRITE8_MEMBER(pipeline_state::protection_w)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
-static ADDRESS_MAP_START( cpu0_mem, AS_PROGRAM, 8, pipeline_state )
+ADDRESS_MAP_START(pipeline_state::cpu0_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM_WRITE(vram1_w) AM_SHARE("vram1")
@@ -230,13 +233,13 @@ static ADDRESS_MAP_START( cpu0_mem, AS_PROGRAM, 8, pipeline_state )
 	AM_RANGE(0xb840, 0xb840) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_mem, AS_PROGRAM, 8, pipeline_state )
+ADDRESS_MAP_START(pipeline_state::cpu1_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port, AS_IO, 8, pipeline_state )
+ADDRESS_MAP_START(pipeline_state::sound_port)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x06, 0x07) AM_NOP

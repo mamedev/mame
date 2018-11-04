@@ -416,6 +416,8 @@ public:
 	emu_timer *m_bus_error_timer;
 
 	void hp_ipc(machine_config &config);
+	void hp_ipc_mem_inner(address_map &map);
+	void hp_ipc_mem_outer(address_map &map);
 private:
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
@@ -462,11 +464,14 @@ void hp_ipc_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
 
-static ADDRESS_MAP_START(hp_ipc_mem_outer, AS_PROGRAM, 16, hp_ipc_state)
+ADDRESS_MAP_START(hp_ipc_state::hp_ipc_mem_outer)
 	AM_RANGE(0x000000, 0xFFFFFF) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(hp_ipc_mem_inner, AS_PROGRAM, 16, hp_ipc_state)
+ADDRESS_MAP_START(hp_ipc_state::hp_ipc_mem_inner)
+// bus error handler
+	AM_RANGE(0x0000000, 0x1FFFFFF) AM_READWRITE(trap_r, trap_w)
+
 // user mode
 	AM_RANGE(0x1000000, 0x17FFFFF) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x1800000, 0x187FFFF) AM_ROM AM_REGION("maincpu", 0)
@@ -490,8 +495,6 @@ static ADDRESS_MAP_START(hp_ipc_mem_inner, AS_PROGRAM, 16, hp_ipc_state)
 	AM_RANGE(0x0700000, 0x07FFFFF) AM_UNMAP     // External I/O
 	AM_RANGE(0x0800000, 0x0FFFFFF) AM_READWRITE(ram_r, ram_w)
 
-// bus error handler
-	AM_RANGE(0x0000000, 0x1FFFFFF) AM_READWRITE(trap_r, trap_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(hp_ipc)

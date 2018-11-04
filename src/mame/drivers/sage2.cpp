@@ -36,7 +36,7 @@
 //  ADDRESS_MAP( sage2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
+ADDRESS_MAP_START(sage2_state::sage2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xffc000, 0xffc007) AM_DEVREADWRITE8(I8253_1_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0xffc010, 0xffc01f) AM_NOP //AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)

@@ -60,4 +60,10 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void dynduke(machine_config &config);
 	void dbldyn(machine_config &config);
+	void master_map(address_map &map);
+	void masterj_map(address_map &map);
+	void sei80bu_encrypted_full_map(address_map &map);
+	void slave_map(address_map &map);
+	void sound_decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
 };

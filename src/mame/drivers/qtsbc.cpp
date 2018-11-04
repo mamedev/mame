@@ -53,6 +53,8 @@ public:
 	DECLARE_READ8_MEMBER( qtsbc_43_r );
 
 	void qtsbc(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -65,12 +67,12 @@ READ8_MEMBER( qtsbc_state::qtsbc_43_r )
 	return 0; // this controls where the new ram program gets built at. 0 = 0xE000.
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, qtsbc_state )
+ADDRESS_MAP_START(qtsbc_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram") AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, qtsbc_state )
+ADDRESS_MAP_START(qtsbc_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8253_device, read, write)

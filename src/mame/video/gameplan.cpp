@@ -332,7 +332,8 @@ MACHINE_CONFIG_START(gameplan_state::leprechn_video)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gameplan_state::trvquest_video, gameplan_video)
+MACHINE_CONFIG_START(gameplan_state::trvquest_video)
+	gameplan_video(config);
 	MCFG_VIDEO_START_OVERRIDE(gameplan_state,trvquest)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_gameplan)

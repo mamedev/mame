@@ -34,7 +34,7 @@ Game Status:
 #include "gamecom.lh"
 
 
-static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)
+ADDRESS_MAP_START(gamecom_state::gamecom_mem_map)
 	AM_RANGE( 0x0000, 0x0013 )  AM_RAM AM_REGION("maincpu", 0x00)
 	AM_RANGE( 0x0014, 0x0017 )  AM_READWRITE( gamecom_pio_r, gamecom_pio_w )        // buttons
 	AM_RANGE( 0x0018, 0x001F )  AM_RAM AM_REGION("maincpu", 0x18)

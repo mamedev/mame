@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(NEXTMO, nextmo_device, "nextmo", "NeXT Magneto-optical drive")
 
-DEVICE_ADDRESS_MAP_START(map, 8, nextmo_device)
+ADDRESS_MAP_START(nextmo_device::map)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(r4_r, r4_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(r5_r, r5_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(r6_r, r6_w)

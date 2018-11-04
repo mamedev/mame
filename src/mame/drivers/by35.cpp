@@ -142,6 +142,8 @@ public:
 	void nuovo(machine_config &config);
 	void as2888(machine_config &config);
 	void as2888_audio(machine_config &config);
+	void by35_map(address_map &map);
+	void nuovo_map(address_map &map);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -182,7 +184,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( by35_map, AS_PROGRAM, 8, by35_state )
+ADDRESS_MAP_START(by35_state::by35_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)     // A15 is not connected
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
@@ -191,11 +193,11 @@ static ADDRESS_MAP_START( by35_map, AS_PROGRAM, 8, by35_state )
 	AM_RANGE(0x1000, 0x7fff) AM_ROM // AM_REGION("roms", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nuovo_map, AS_PROGRAM, 8, by35_state )
+ADDRESS_MAP_START(by35_state::nuovo_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 //  AM_RANGE(0x0000, 0x007f) AM_RAM     // Schematics infer that the M6802 internal RAM is disabled.
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1092,7 +1094,7 @@ MACHINE_CONFIG_START(by35_state::by35)
 	MCFG_DEFAULT_LAYOUT(layout_by35)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
@@ -1141,13 +1143,15 @@ MACHINE_CONFIG_START(by35_state::as2888_audio)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(by35_state::as2888, by35)
+MACHINE_CONFIG_START(by35_state::as2888)
+	by35(config);
 
-	MCFG_FRAGMENT_ADD( as2888_audio  )
+	as2888_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(by35_state::nuovo, by35)
+MACHINE_CONFIG_START(by35_state::nuovo)
+	by35(config);
 
 	MCFG_CPU_REPLACE("maincpu", M6802, 2000000) // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
 	MCFG_CPU_PROGRAM_MAP(nuovo_map)

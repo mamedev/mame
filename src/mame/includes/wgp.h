@@ -58,6 +58,9 @@ public:
 
 	void wgp2(machine_config &config);
 	void wgp(machine_config &config);
+	void cpu2_map(address_map &map);
+	void main_map(address_map &map);
+	void z80_sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

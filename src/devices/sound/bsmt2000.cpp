@@ -26,14 +26,14 @@ DEFINE_DEVICE_TYPE(BSMT2000, bsmt2000_device, "bsmt2000", "BSMT2000")
 //**************************************************************************
 
 // program map for the DSP (points to internal ROM)
-static ADDRESS_MAP_START(tms_program_map, AS_PROGRAM, 16, bsmt2000_device)
+ADDRESS_MAP_START(bsmt2000_device::tms_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 
 // I/O map for the DSP
-static ADDRESS_MAP_START(tms_io_map, AS_IO, 16, bsmt2000_device)
+ADDRESS_MAP_START(bsmt2000_device::tms_io_map)
 	AM_RANGE(0, 0) AM_READWRITE(tms_register_r, tms_rom_addr_w)
 	AM_RANGE(1, 1) AM_READWRITE(tms_data_r, tms_rom_bank_w)
 	AM_RANGE(2, 2) AM_READ(tms_rom_r)

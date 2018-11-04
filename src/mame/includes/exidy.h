@@ -140,6 +140,17 @@ public:
 	void pepper2(machine_config &config);
 	void targ(machine_config &config);
 	void targ_audio(machine_config &config);
+	void exidy_map(address_map &map);
+	void fax_map(address_map &map);
+	void pepper2_map(address_map &map);
+	void rallys_map(address_map &map);
+	void sidetrac_map(address_map &map);
+	void spectar_map(address_map &map);
+	void targ_map(address_map &map);
+	void venture_map(address_map &map);
+	void venture_audio_map(address_map &map);
+	void cvsd_iomap(address_map &map);
+	void cvsd_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

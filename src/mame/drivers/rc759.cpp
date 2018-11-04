@@ -105,6 +105,8 @@ public:
 	DECLARE_READ8_MEMBER(irq_callback);
 
 	void rc759(machine_config &config);
+	void rc759_io(address_map &map);
+	void rc759_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -465,13 +467,13 @@ void rc759_state::machine_reset()
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( rc759_map, AS_PROGRAM, 16, rc759_state )
+ADDRESS_MAP_START(rc759_state::rc759_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xd0000, 0xd7fff) AM_MIRROR(0x08000) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xe8000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rc759_io, AS_IO, 16, rc759_state )
+ADDRESS_MAP_START(rc759_state::rc759_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0x003) AM_MIRROR(0x0c) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x020, 0x021) AM_READ8(keyboard_r, 0x00ff)

@@ -55,7 +55,7 @@
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( microtan_map, AS_PROGRAM, 8, microtan_state )
+ADDRESS_MAP_START(microtan_state::microtan_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM_WRITE(microtan_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xbc00, 0xbc00) AM_DEVWRITE("ay8910.1", ay8910_device, address_w)

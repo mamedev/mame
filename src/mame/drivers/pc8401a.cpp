@@ -331,7 +331,7 @@ WRITE8_MEMBER( pc8401a_state::port71_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pc8401a_mem, AS_PROGRAM, 8, pc8401a_state )
+ADDRESS_MAP_START(pc8401a_state::pc8401a_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
@@ -339,12 +339,12 @@ static ADDRESS_MAP_START( pc8401a_mem, AS_PROGRAM, 8, pc8401a_state )
 	AM_RANGE(0xe800, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8401a_io, AS_IO, 8, pc8401a_state )
+ADDRESS_MAP_START(pc8401a_state::pc8401a_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8500_io, AS_IO, 8, pc8401a_state )
+ADDRESS_MAP_START(pc8401a_state::pc8500_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("Y.0")
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(pc8401a_video)
+	pc8401a_video(config);
 
 	/* option ROM cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
@@ -636,7 +636,7 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(pc8500_video)
+	pc8500_video(config);
 
 	/* option ROM cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)

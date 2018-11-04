@@ -13,6 +13,7 @@ public:
 	taitol_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_main_cpu(*this, "maincpu")
+		, m_upd4701(*this, "upd4701")
 		, m_main_prg(*this, "maincpu")
 		, m_main_bnk(*this, "bank1")
 		, m_ram_bnks(*this, "bank%u", 2)
@@ -97,11 +98,13 @@ public:
 	void bank_w(address_space &space, offs_t offset, u8 data, int banknum);
 	void l_system_video(machine_config &config);
 
+	void common_banks_map(address_map &map);
 protected:
 	virtual void state_register();
 	virtual void taito_machine_reset();
 
 	required_device<cpu_device>         m_main_cpu;
+	optional_device<upd4701_device>     m_upd4701;
 	required_region_ptr<u8>             m_main_prg;
 	required_memory_bank                m_main_bnk;
 	required_memory_bank_array<4>       m_ram_bnks;
@@ -126,6 +129,13 @@ public:
 	void kurikint(machine_config &config);
 	void evilston(machine_config &config);
 	void raimais(machine_config &config);
+	void evilston_2_map(address_map &map);
+	void evilston_map(address_map &map);
+	void kurikint_2_map(address_map &map);
+	void kurikint_map(address_map &map);
+	void raimais_2_map(address_map &map);
+	void raimais_3_map(address_map &map);
+	void raimais_map(address_map &map);
 protected:
 	virtual void state_register() override;
 	virtual void taito_machine_reset() override;
@@ -154,6 +164,9 @@ public:
 	DECLARE_WRITE8_MEMBER(portA_w);
 
 	void fhawk(machine_config &config);
+	void fhawk_2_map(address_map &map);
+	void fhawk_3_map(address_map &map);
+	void fhawk_map(address_map &map);
 protected:
 	virtual void state_register() override;
 	virtual void taito_machine_reset() override;
@@ -188,6 +201,9 @@ public:
 	DECLARE_WRITE8_MEMBER(msm5205_volume_w);
 
 	void champwr(machine_config &config);
+	void champwr_2_map(address_map &map);
+	void champwr_3_map(address_map &map);
+	void champwr_map(address_map &map);
 protected:
 	virtual void state_register() override;
 	virtual void taito_machine_reset() override;
@@ -224,6 +240,11 @@ public:
 	void puzznici(machine_config &config);
 	void cachat(machine_config &config);
 	void puzznic(machine_config &config);
+	void cachat_map(address_map &map);
+	void palamed_map(address_map &map);
+	void plotting_map(address_map &map);
+	void puzznic_map(address_map &map);
+	void puzznici_map(address_map &map);
 protected:
 	virtual void state_register() override;
 	virtual void taito_machine_reset() override;
@@ -245,4 +266,5 @@ public:
 
 	DECLARE_MACHINE_RESET(horshoes);
 	void horshoes(machine_config &config);
+	void horshoes_map(address_map &map);
 };

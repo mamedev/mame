@@ -71,6 +71,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
 	void wico(machine_config &config);
+	void ccpu_map(address_map &map);
+	void hcpu_map(address_map &map);
 private:
 	bool m_zcen;
 	bool m_gten;
@@ -85,7 +87,7 @@ private:
 };
 
 // housekeeping cpu
-static ADDRESS_MAP_START( hcpu_map, AS_PROGRAM, 8, wico_state )
+ADDRESS_MAP_START(wico_state::hcpu_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w)
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w)
@@ -107,7 +109,7 @@ static ADDRESS_MAP_START( hcpu_map, AS_PROGRAM, 8, wico_state )
 ADDRESS_MAP_END
 
 // command cpu
-static ADDRESS_MAP_START( ccpu_map, AS_PROGRAM, 8, wico_state )
+ADDRESS_MAP_START(wico_state::ccpu_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram") // 2128  2k RAM
 	//AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w) // to display module
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w) // enable save to nvram
@@ -443,7 +445,7 @@ MACHINE_CONFIG_START(wico_state::wico)
 	MCFG_DEFAULT_LAYOUT(layout_wico)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76494", SN76494, XTAL(10'000'000) / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

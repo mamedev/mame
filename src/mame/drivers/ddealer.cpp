@@ -174,6 +174,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
 	void draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
 	void ddealer(machine_config &config);
+	void ddealer(address_map &map);
 };
 
 
@@ -471,7 +472,7 @@ WRITE16_MEMBER(ddealer_state::mcu_shared_w)
 	}
 }
 
-static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
+ADDRESS_MAP_START(ddealer_state::ddealer)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")

@@ -13,6 +13,7 @@
 #include "machine/latch8.h"
 #include "machine/z80dma.h"
 #include "machine/i8257.h"
+#include "machine/watchdog.h"
 #include "screen.h"
 
 
@@ -104,6 +105,7 @@ public:
 		, m_dev_vp2(*this, "virtual_p2")
 		, m_dev_6h(*this, "ls259.6h")
 		, m_discrete(*this, "discrete")
+		, m_watchdog(*this, "watchdog")
 		, m_video_ram(*this,"video_ram")
 		, m_sprite_ram(*this,"sprite_ram")
 		, m_snd_rom(*this, "soundcpu")
@@ -134,6 +136,7 @@ public:
 	optional_device<latch8_device> m_dev_vp2;   /* dkong2, virtual port 2 */
 	optional_device<latch8_device> m_dev_6h;    /* dkong2 */
 	optional_device<discrete_device> m_discrete;
+	optional_device<watchdog_timer_device> m_watchdog;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_video_ram;
@@ -227,7 +230,7 @@ public:
 	DECLARE_READ8_MEMBER(strtheat_inputport_0_r);
 	DECLARE_READ8_MEMBER(strtheat_inputport_1_r);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(braze_a15_w);
+	DECLARE_WRITE8_MEMBER(dk_braze_a15_w);
 	DECLARE_WRITE8_MEMBER(dkong_videoram_w);
 	DECLARE_WRITE8_MEMBER(dkongjr_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(dkong3_gfxbank_w);
@@ -244,15 +247,19 @@ public:
 	DECLARE_WRITE8_MEMBER(dkong_z80dma_rdy_w);
 	DECLARE_READ8_MEMBER(braze_eeprom_r);
 	DECLARE_WRITE8_MEMBER(braze_eeprom_w);
+	DECLARE_WRITE_LINE_MEMBER(dk_braze_a15);
 	DECLARE_DRIVER_INIT(strtheat);
 	DECLARE_DRIVER_INIT(herodk);
 	DECLARE_DRIVER_INIT(dkingjr);
 	DECLARE_DRIVER_INIT(drakton);
+	DECLARE_DRIVER_INIT(dkonghs);
 	DECLARE_DRIVER_INIT(dkongx);
+	DECLARE_DRIVER_INIT(dkong3hs);
 	TILE_GET_INFO_MEMBER(dkong_bg_tile_info);
 	TILE_GET_INFO_MEMBER(radarscp1_bg_tile_info);
 	DECLARE_MACHINE_START(dkong2b);
 	DECLARE_MACHINE_RESET(dkong);
+	DECLARE_MACHINE_RESET(ddk);
 	DECLARE_VIDEO_START(dkong);
 	DECLARE_VIDEO_START(dkong_base);
 	DECLARE_PALETTE_INIT(dkong2b);
@@ -280,13 +287,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 
 	void braze_decrypt_rom(uint8_t *dest);
+	void dk_braze_decrypt();
 	void drakton_decrypt_rom(uint8_t mod, int offs, int *bs);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	double CD4049(double x);
 
 	void dkong_base(machine_config &config);
-	void braze(machine_config &config);
+	void dk_braze(machine_config &config);
+	void dkj_braze(machine_config &config);
+	void ddk_braze(machine_config &config);
+	void dk3_braze(machine_config &config);
 	void strtheat(machine_config &config);
 	void spclforc(machine_config &config);
 	void s2650(machine_config &config);
@@ -305,6 +316,20 @@ public:
 	void dkongjr_audio(machine_config &config);
 	void dkong3_audio(machine_config &config);
 	void radarscp1_audio(machine_config &config);
+	void dkong3_io_map(address_map &map);
+	void dkong3_map(address_map &map);
+	void dkong3_sound1_map(address_map &map);
+	void dkong3_sound2_map(address_map &map);
+	void dkong_map(address_map &map);
+	void dkong_sound_io_map(address_map &map);
+	void dkong_sound_map(address_map &map);
+	void dkongjr_map(address_map &map);
+	void dkongjr_sound_io_map(address_map &map);
+	void epos_readport(address_map &map);
+	void radarscp1_sound_io_map(address_map &map);
+	void s2650_data_map(address_map &map);
+	void s2650_io_map(address_map &map);
+	void s2650_map(address_map &map);
 private:
 	// video/dkong.c
 	void radarscp_step(int line_cnt);

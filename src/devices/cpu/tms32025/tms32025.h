@@ -104,6 +104,8 @@ public:
 	DECLARE_READ16_MEMBER( greg_r);
 	DECLARE_WRITE16_MEMBER(greg_w);
 
+	void tms32025_data(address_map &map);
+	void tms32026_data(address_map &map);
 protected:
 	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map);
 

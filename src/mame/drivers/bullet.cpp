@@ -607,7 +607,7 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 //  ADDRESS_MAP( bullet_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( bullet_mem, AS_PROGRAM, 8, bullet_state )
+ADDRESS_MAP_START(bullet_state::bullet_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
 ADDRESS_MAP_END
 
@@ -616,7 +616,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( bullet_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( bullet_io, AS_IO, 8, bullet_state )
+ADDRESS_MAP_START(bullet_state::bullet_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
@@ -637,7 +637,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( bulletf_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( bulletf_mem, AS_PROGRAM, 8, bulletf_state )
+ADDRESS_MAP_START(bulletf_state::bulletf_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
 ADDRESS_MAP_END
 
@@ -646,7 +646,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( bulletf_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( bulletf_io, AS_IO, 8, bulletf_state )
+ADDRESS_MAP_START(bulletf_state::bulletf_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x3f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)

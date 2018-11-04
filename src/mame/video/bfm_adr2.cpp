@@ -519,7 +519,7 @@ void bfm_adder2_device::adder2_decode_char_roms()
 // adder2 board memorymap /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8, bfm_adder2_device )
+ADDRESS_MAP_START(bfm_adder2_device::adder2_memmap)
 
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(adder2_screen_page_w)      // screen access/display select
 	AM_RANGE(0x0000, 0x7FFF) AM_ROMBANK("bank2")                // 8k  paged ROM (4 pages)

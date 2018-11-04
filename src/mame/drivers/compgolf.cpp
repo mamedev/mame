@@ -60,7 +60,7 @@ WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( compgolf_map, AS_PROGRAM, 8, compgolf_state )
+ADDRESS_MAP_START(compgolf_state::compgolf_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(compgolf_video_w) AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(compgolf_back_w) AM_SHARE("bg_ram")

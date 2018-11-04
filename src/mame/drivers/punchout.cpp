@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER(punchout_state::nmi_mask_w)
 	m_nmi_mask = state;
 }
 
-static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
+ADDRESS_MAP_START(punchout_state::punchout_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8, punchout_state )
+ADDRESS_MAP_START(punchout_state::armwrest_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8, punchout_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
+ADDRESS_MAP_START(punchout_state::punchout_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( punchout_vlm_map, 0, 8, punchout_state )
+ADDRESS_MAP_START(punchout_state::punchout_vlm_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
@@ -235,16 +235,16 @@ WRITE8_MEMBER(punchout_state::spunchout_rp5h01_clock_w)
 	m_rp5h01->test_w(data & 1);
 }
 
-static ADDRESS_MAP_START( spnchout_io_map, AS_IO, 8, punchout_state )
+ADDRESS_MAP_START(punchout_state::spnchout_io_map)
+	AM_IMPORT_FROM( punchout_io_map )
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_reset_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_clock_w)
 	AM_RANGE(0x07, 0x07) AM_SELECT(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w) // protection ports
-	AM_IMPORT_FROM( punchout_io_map )
 ADDRESS_MAP_END
 
 // 2A03 (sound)
 
-static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
+ADDRESS_MAP_START(punchout_state::punchout_sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4017, 0x4017) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
@@ -671,7 +671,8 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(punchout_state::spnchout, punchout)
+MACHINE_CONFIG_START(punchout_state::spnchout)
+	punchout(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -685,7 +686,8 @@ MACHINE_CONFIG_DERIVED(punchout_state::spnchout, punchout)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(punchout_state::armwrest, punchout)
+MACHINE_CONFIG_START(punchout_state::armwrest)
+	punchout(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

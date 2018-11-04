@@ -75,7 +75,7 @@ WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( matmania_map, AS_PROGRAM, 8, matmania_state )
+ADDRESS_MAP_START(matmania_state::matmania_map)
 	AM_RANGE(0x0000, 0x077f) AM_RAM
 	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram2")
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( matmania_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8, matmania_state )
+ADDRESS_MAP_START(matmania_state::maniach_map)
 	AM_RANGE(0x0000, 0x077f) AM_RAM
 	AM_RANGE(0x0780, 0x07df) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram2")
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8, matmania_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8, matmania_state )
+ADDRESS_MAP_START(matmania_state::matmania_sound_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8, matmania_state )
+ADDRESS_MAP_START(matmania_state::maniach_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE("dac", dac_byte_interface, write)

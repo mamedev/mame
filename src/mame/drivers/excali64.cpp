@@ -96,6 +96,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	void excali64(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_hiresram;
@@ -118,7 +120,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 };
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, excali64_state)
+ADDRESS_MAP_START(excali64_state::mem_map)
 	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
 	AM_RANGE(0x2000, 0x2FFF) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
 	AM_RANGE(0x3000, 0x3FFF) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
@@ -126,7 +128,7 @@ static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, excali64_state)
 	AM_RANGE(0xC000, 0xFFFF) AM_RAM AM_REGION("rambank", 0xC000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, excali64_state)
+ADDRESS_MAP_START(excali64_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READ(port00_r)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)

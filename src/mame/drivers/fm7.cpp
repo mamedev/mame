@@ -1430,7 +1430,7 @@ WRITE_LINE_MEMBER(fm7_state::fm77av_fmirq)
    FFF0 - FFFF: Interrupt vector table
 */
 // The FM-7 has only 64kB RAM, so we'll worry about banking when we do the later models
-static ADDRESS_MAP_START( fm7_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm7_mem)
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
@@ -1458,7 +1458,7 @@ static ADDRESS_MAP_START( fm7_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm8_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm8_mem)
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
@@ -1495,7 +1495,7 @@ ADDRESS_MAP_END
    FFF0 - FFFF: Interrupt vector table
 */
 
-static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm7_sub_mem)
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
@@ -1512,7 +1512,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm11_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm11_mem)
 	AM_RANGE(0x0000,0x0fff) AM_DEVREADWRITE("av_bank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0x1000,0x1fff) AM_DEVREADWRITE("av_bank2", address_map_bank_device, read8, write8)
 	AM_RANGE(0x2000,0x2fff) AM_DEVREADWRITE("av_bank3", address_map_bank_device, read8, write8)
@@ -1563,7 +1563,7 @@ static ADDRESS_MAP_START( fm11_mem, AS_PROGRAM, 8, fm7_state )
 ADDRESS_MAP_END
 
 // Much of this is guesswork at the moment
-static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm11_sub_mem)
 	AM_RANGE(0x0000,0x7fff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0x8000,0x8fff) AM_RAM // Console RAM(?)
 	AM_RANGE(0x9000,0x9f7f) AM_RAM // Work RAM(?)
@@ -1575,13 +1575,13 @@ static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xc000,0xffff) AM_ROM // sybsystem ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm11_x86_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm11_x86_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xfefff) AM_RAM
 	AM_RANGE(0xff000,0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm11_x86_io, AS_IO, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm11_x86_io)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
 	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
 	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
@@ -1598,12 +1598,12 @@ static ADDRESS_MAP_START( fm11_x86_io, AS_IO, 8, fm7_state )
 	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm16_mem, AS_PROGRAM, 16, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm16_mem)
 	AM_RANGE(0x00000,0xfbfff) AM_RAM
 	AM_RANGE(0xfc000,0xfffff) AM_ROM // IPL
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm16_io, AS_IO, 16, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm16_io)
 	AM_RANGE(0xfd00,0xfd01) AM_READWRITE8(fm7_keyboard_r,fm7_cassette_printer_w,0xffff)
 	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_cassette_printer_r,fm7_irq_mask_w,0x00ff)  // IRQ mask
 	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_irq_cause_r,fm7_beeper_w,0xff00)  // IRQ flags
@@ -1620,12 +1620,12 @@ static ADDRESS_MAP_START( fm16_io, AS_IO, 16, fm7_state )
 //  AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm16_sub_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm16_sub_mem)
 	AM_RANGE(0x0000,0xafff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xb000,0xffff) AM_ROM // subsystem ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm77av_mem)
 	AM_RANGE(0x0000,0x0fff) AM_DEVREADWRITE("av_bank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0x1000,0x1fff) AM_DEVREADWRITE("av_bank2", address_map_bank_device, read8, write8)
 	AM_RANGE(0x2000,0x2fff) AM_DEVREADWRITE("av_bank3", address_map_bank_device, read8, write8)
@@ -1680,7 +1680,7 @@ static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8, fm7_state )
+ADDRESS_MAP_START(fm7_state::fm77av_sub_mem)
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
@@ -1702,7 +1702,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xe000,0xffff) AM_ROMBANK("bank21")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fm7_banked_mem, AS_PROGRAM, 8, fm7_state)
+ADDRESS_MAP_START(fm7_state::fm7_banked_mem)
 	// Extended RAM
 	AM_RANGE(0x00000,0x0ffff) AM_RAM AM_REGION("maincpu",0x00000)
 

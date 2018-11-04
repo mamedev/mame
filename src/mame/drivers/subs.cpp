@@ -51,8 +51,9 @@ PALETTE_INIT_MEMBER(subs_state, subs)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, subs_state )
+ADDRESS_MAP_START(subs_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(noise_reset_w)
 	AM_RANGE(0x0000, 0x0007) AM_READ(control_r)
 	AM_RANGE(0x0020, 0x0020) AM_WRITE(steer_reset_w)
@@ -61,7 +62,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, subs_state )
 	AM_RANGE(0x0060, 0x0063) AM_READ(options_r)
 	AM_RANGE(0x0060, 0x006f) AM_DEVWRITE("latch", ls259_device, write_a0)
 	AM_RANGE(0x0090, 0x009f) AM_SHARE("spriteram")
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END

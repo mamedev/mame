@@ -24,16 +24,6 @@ public:
 	// construction/destruction
 	pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
-
-	DECLARE_READ8_MEMBER(p0_read);
-	DECLARE_WRITE8_MEMBER(p0_write);
-	DECLARE_WRITE8_MEMBER(p1_write);
-	DECLARE_WRITE8_MEMBER(p2_write);
-	DECLARE_READ8_MEMBER(p3_read);
-	DECLARE_WRITE8_MEMBER(p3_write);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -44,6 +34,10 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
+
+private:
 	required_device<cpu_device> m_cpu;
 
 	required_ioport_array<8> m_p2_r;
@@ -53,6 +47,15 @@ protected:
 	uint8_t   m_p1;
 	uint8_t   m_p2;
 	uint8_t   m_p3;
+
+	DECLARE_READ8_MEMBER(p0_read);
+	DECLARE_WRITE8_MEMBER(p0_write);
+	DECLARE_WRITE8_MEMBER(p1_write);
+	DECLARE_WRITE8_MEMBER(p2_write);
+	DECLARE_READ8_MEMBER(p3_read);
+	DECLARE_WRITE8_MEMBER(p3_write);
+
+	void microsoft_natural_io(address_map &map);
 };
 
 

@@ -61,6 +61,9 @@ public:
 	required_device<upd7759_device> m_upd7759;
 	required_device<generic_latch_8_device> m_soundlatch;
 	void bingoc(machine_config &config);
+	void main_map(address_map &map);
+	void sound_io(address_map &map);
+	void sound_map(address_map &map);
 };
 
 
@@ -121,7 +124,7 @@ WRITE8_MEMBER(bingoc_state::sound_play_w)
 //  printf("%02x\n",data);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bingoc_state )
+ADDRESS_MAP_START(bingoc_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE8("uart1", i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("uart1", i8251_device, status_r, control_w, 0x00ff)
@@ -146,12 +149,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bingoc_state )
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bingoc_state )
+ADDRESS_MAP_START(bingoc_state::sound_map)
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, bingoc_state )
+ADDRESS_MAP_START(bingoc_state::sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITE(sound_play_w)

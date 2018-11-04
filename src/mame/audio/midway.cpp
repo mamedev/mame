@@ -354,7 +354,7 @@ void midway_ssio_device::update_volumes()
 //-------------------------------------------------
 
 // address map verified from schematics
-static ADDRESS_MAP_START( ssio_map, AS_PROGRAM, 8, midway_ssio_device )
+ADDRESS_MAP_START(midway_ssio_device::ssio_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
@@ -561,7 +561,7 @@ WRITE_LINE_MEMBER(midway_sounds_good_device::irq_w)
 //-------------------------------------------------
 
 // address map determined by PAL; not verified
-static ADDRESS_MAP_START( soundsgood_map, AS_PROGRAM, 16, midway_sounds_good_device )
+ADDRESS_MAP_START(midway_sounds_good_device::soundsgood_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -716,7 +716,7 @@ WRITE_LINE_MEMBER(midway_turbo_cheap_squeak_device::irq_w)
 //-------------------------------------------------
 
 // address map verified from schematics
-static ADDRESS_MAP_START( turbocs_map, AS_PROGRAM, 8, midway_turbo_cheap_squeak_device )
+ADDRESS_MAP_START(midway_turbo_cheap_squeak_device::turbocs_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
@@ -903,7 +903,7 @@ WRITE_LINE_MEMBER(midway_squawk_n_talk_device::irq_w)
 // address map verified from schematics
 // note that jumpers control the ROM sizes; if these are changed, use the alternate
 // address map below
-static ADDRESS_MAP_START( squawkntalk_map, AS_PROGRAM, 8, midway_squawk_n_talk_device )
+ADDRESS_MAP_START(midway_squawk_n_talk_device::squawkntalk_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
@@ -915,7 +915,7 @@ ADDRESS_MAP_END
 // alternate address map if the ROM jumpers are changed to support a smaller
 // ROM size of 2k
 #ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START( squawkntalk_alt_map, AS_PROGRAM, 8, midway_squawk_n_talk_device )
+ADDRESS_MAP_START(midway_squawk_n_talk_device::squawkntalk_alt_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)

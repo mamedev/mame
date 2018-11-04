@@ -48,7 +48,7 @@
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START(poly88_mem, AS_PROGRAM, 8, poly88_state )
+ADDRESS_MAP_START(poly88_state::poly88_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0400, 0x0bff) AM_ROM // ROM Expansion
@@ -59,7 +59,7 @@ static ADDRESS_MAP_START(poly88_mem, AS_PROGRAM, 8, poly88_state )
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("video_ram") // Video RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poly88_io, AS_IO, 8, poly88_state )
+ADDRESS_MAP_START(poly88_state::poly88_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( poly88_io, AS_IO, 8, poly88_state )
 	AM_RANGE(0xf8, 0xf8) AM_READ(poly88_keyboard_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(poly8813_mem, AS_PROGRAM, 8, poly88_state )
+ADDRESS_MAP_START(poly88_state::poly8813_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0400, 0x0bff) AM_ROM // Disk System ROM
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START(poly8813_mem, AS_PROGRAM, 8, poly88_state )
 	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poly8813_io, AS_IO, 8, poly88_state )
+ADDRESS_MAP_START(poly88_state::poly8813_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -231,7 +231,8 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(poly88_state::poly8813, poly88)
+MACHINE_CONFIG_START(poly88_state::poly8813)
+	poly88(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(poly8813_mem)
 	MCFG_CPU_IO_MAP(poly8813_io)

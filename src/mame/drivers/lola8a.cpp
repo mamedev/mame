@@ -57,6 +57,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void lola8a(machine_config &config);
+	void lola8a_io(address_map &map);
+	void lola8a_mem(address_map &map);
 private:
 	uint8_t m_portb;
 	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
@@ -66,7 +68,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
-static ADDRESS_MAP_START(lola8a_mem, AS_PROGRAM, 8, lola8a_state)
+ADDRESS_MAP_START(lola8a_state::lola8a_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM // 6264 at G45
 	AM_RANGE( 0x2000, 0x3fff ) AM_RAM // 6264 at F45
@@ -78,7 +80,7 @@ static ADDRESS_MAP_START(lola8a_mem, AS_PROGRAM, 8, lola8a_state)
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM AM_SHARE("videoram") // 6264 at G67
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lola8a_io, AS_IO, 8, lola8a_state)
+ADDRESS_MAP_START(lola8a_state::lola8a_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE(AY8910_TAG, ay8910_device, data_r, data_w)

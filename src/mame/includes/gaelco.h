@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/74259.h"
 
 class gaelco_state : public driver_device
 {
@@ -18,6 +19,7 @@ public:
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
+		m_outlatch(*this, "outlatch"),
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
@@ -29,6 +31,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<ls259_device> m_outlatch;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram;
@@ -64,4 +67,10 @@ public:
 	void thoop(machine_config &config);
 	void maniacsq(machine_config &config);
 	void squash(machine_config &config);
+	void bigkarnk_map(address_map &map);
+	void bigkarnk_snd_map(address_map &map);
+	void maniacsq_map(address_map &map);
+	void oki_map(address_map &map);
+	void squash_map(address_map &map);
+	void thoop_map(address_map &map);
 };

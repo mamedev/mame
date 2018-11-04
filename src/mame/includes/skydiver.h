@@ -78,6 +78,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void skydiver(machine_config &config);
+	void skydiver_map(address_map &map);
 };
 
 /*----------- defined in audio/skydiver.c -----------*/

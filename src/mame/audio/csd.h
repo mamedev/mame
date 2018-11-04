@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sirq_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
+	void csdeluxe_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -50,6 +50,8 @@ public:
 	DECLARE_READ8_MEMBER(pic_slave_ack);
 
 	void seattle(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pic8259_device, 2> m_pic;
@@ -65,13 +67,13 @@ READ8_MEMBER(seattle_comp_state::pic_slave_ack)
 }
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, seattle_comp_state)
+ADDRESS_MAP_START(seattle_comp_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xff7ff) AM_RAM
 	AM_RANGE(0xff800,0xfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 16, seattle_comp_state)
+ADDRESS_MAP_START(seattle_comp_state::io_map)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf1) AM_DEVREADWRITE8("pic1", pic8259_device, read, write, 0xffff)

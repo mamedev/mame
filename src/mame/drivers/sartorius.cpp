@@ -63,18 +63,21 @@ public:
 	}
 
 	void sart3733(machine_config &config);
+	void sart3733_memory(address_map &map);
+	void sart3733_rom(address_map &map);
+	void sart3733_status(address_map &map);
 };
 
 
-ADDRESS_MAP_START(sart3733_rom, i4040_cpu_device::AS_ROM, 8, sart3733_state)
+	ADDRESS_MAP_START(sart3733_state::sart3733_rom)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("maincpu", 0x0000)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(sart3733_memory, i4040_cpu_device::AS_RAM_MEMORY, 8, sart3733_state)
+	ADDRESS_MAP_START(sart3733_state::sart3733_memory)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 2 * 4002
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(sart3733_status, i4040_cpu_device::AS_RAM_STATUS, 8, sart3733_state)
+	ADDRESS_MAP_START(sart3733_state::sart3733_status)
 	AM_RANGE(0x0000, 0x001f) AM_RAM // 2 * 4002
 ADDRESS_MAP_END
 

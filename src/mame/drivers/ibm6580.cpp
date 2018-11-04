@@ -183,6 +183,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ibm6580(machine_config &config);
+	void ibm6580_io(address_map &map);
+	void ibm6580_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -678,14 +680,14 @@ READ8_MEMBER(ibm6580_state::floppy_r)
 }
 
 
-static ADDRESS_MAP_START(ibm6580_mem, AS_PROGRAM, 16, ibm6580_state)
+ADDRESS_MAP_START(ibm6580_state::ibm6580_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x90000, 0x90001) AM_WRITE(unk_latch_w)
 	AM_RANGE(0xef000, 0xeffff) AM_RAM AM_SHARE("videoram")  // 66-line vram starts at 0xec000
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ibm6580_io, AS_IO, 16, ibm6580_state)
+ADDRESS_MAP_START(ibm6580_state::ibm6580_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0007) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0008, 0x000f) AM_WRITE (pic_latch_w)

@@ -237,7 +237,7 @@ const m6800_cpu_device::op_func m6801_cpu_device::hd63701_insn[0x100] = {
 };
 
 
-static ADDRESS_MAP_START(m6803_mem, AS_PROGRAM, 8, m6801_cpu_device)
+ADDRESS_MAP_START(m6801_cpu_device::m6803_mem)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0020, 0x007f) AM_NOP        /* unused */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM        /* 6803 internal RAM */
@@ -252,7 +252,7 @@ DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6303r", "HD6303R")
 DEFINE_DEVICE_TYPE(HD6303Y, hd6303y_cpu_device, "hd6303y", "HD6303Y")
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6801_cpu_device(mconfig, M6801, tag, owner, clock, m6803_insn, cycles_6803, nullptr)
+	: m6801_cpu_device(mconfig, M6801, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor())
 {
 }
 
@@ -265,7 +265,7 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 }
 
 m6803_cpu_device::m6803_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6801_cpu_device(mconfig, M6803, tag, owner, clock, m6803_insn, cycles_6803, ADDRESS_MAP_NAME(m6803_mem))
+	: m6801_cpu_device(mconfig, M6803, tag, owner, clock, m6803_insn, cycles_6803, address_map_constructor(FUNC(m6803_cpu_device::m6803_mem), this))
 {
 }
 

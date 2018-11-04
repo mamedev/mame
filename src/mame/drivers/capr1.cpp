@@ -51,6 +51,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void cspin2(machine_config &config);
+	void cspin2_map(address_map &map);
 };
 
 WRITE8_MEMBER(capr1_state::output_w)
@@ -65,7 +66,7 @@ WRITE8_MEMBER(capr1_state::output_w)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( cspin2_map, AS_PROGRAM, 8, capr1_state )
+ADDRESS_MAP_START(capr1_state::cspin2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("te7750", te7750_device, read, write)

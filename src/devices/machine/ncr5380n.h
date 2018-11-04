@@ -30,29 +30,8 @@ public:
 	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ncr5380n_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<ncr5380n_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_ADDRESS_MAP(map, 8);
-
-	DECLARE_READ8_MEMBER(scsidata_r);
-	DECLARE_WRITE8_MEMBER(outdata_w);
-	DECLARE_READ8_MEMBER(icmd_r);
-	DECLARE_WRITE8_MEMBER(icmd_w);
-	DECLARE_READ8_MEMBER(mode_r);
-	DECLARE_WRITE8_MEMBER(mode_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(selenable_w);
-	DECLARE_READ8_MEMBER(busandstatus_r);
-	DECLARE_WRITE8_MEMBER(startdmasend_w);
-	DECLARE_READ8_MEMBER(indata_r);
-	DECLARE_WRITE8_MEMBER(startdmatargetrx_w);
-	DECLARE_READ8_MEMBER(resetparityirq_r);
-	DECLARE_WRITE8_MEMBER(startdmainitrx_w);
-
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
-
-	virtual void scsi_ctrl_changed() override;
 
 	uint8_t dma_r();
 	void dma_w(uint8_t val);
@@ -61,6 +40,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void scsi_ctrl_changed() override;
 
 private:
 	enum { MODE_D, MODE_T, MODE_I };
@@ -219,6 +200,25 @@ private:
 
 	void delay(int cycles);
 	void delay_cycles(int cycles);
+
+	void map(address_map &map);
+
+	DECLARE_READ8_MEMBER(scsidata_r);
+	DECLARE_WRITE8_MEMBER(outdata_w);
+	DECLARE_READ8_MEMBER(icmd_r);
+	DECLARE_WRITE8_MEMBER(icmd_w);
+	DECLARE_READ8_MEMBER(mode_r);
+	DECLARE_WRITE8_MEMBER(mode_w);
+	DECLARE_READ8_MEMBER(command_r);
+	DECLARE_WRITE8_MEMBER(command_w);
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_WRITE8_MEMBER(selenable_w);
+	DECLARE_READ8_MEMBER(busandstatus_r);
+	DECLARE_WRITE8_MEMBER(startdmasend_w);
+	DECLARE_READ8_MEMBER(indata_r);
+	DECLARE_WRITE8_MEMBER(startdmatargetrx_w);
+	DECLARE_READ8_MEMBER(resetparityirq_r);
+	DECLARE_WRITE8_MEMBER(startdmainitrx_w);
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;

@@ -44,16 +44,18 @@ public:
 	required_device<floppy_image_device> m_floppy2;
 	required_device<floppy_image_device> m_floppy3;
 	void tim011(machine_config &config);
+	void tim011_io(address_map &map);
+	void tim011_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(tim011_mem, AS_PROGRAM, 8, tim011_state)
+ADDRESS_MAP_START(tim011_state::tim011_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x01fff) AM_ROM AM_MIRROR(0x3e000)
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM // 256KB RAM  8 * 41256 DRAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tim011_io, AS_IO, 8, tim011_state)
+ADDRESS_MAP_START(tim011_state::tim011_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM /* Z180 internal registers */
 	AM_RANGE(0x0080, 0x009f) AM_DEVICE(FDC9266_TAG, upd765a_device, map)

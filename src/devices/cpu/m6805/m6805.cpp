@@ -251,7 +251,7 @@ m6805_base_device::m6805_base_device(
 		uint32_t clock,
 		device_type const type,
 		configuration_params const &params,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_params(params)
 	, m_program_config("program", ENDIANNESS_BIG, 8, params.m_addr_width, 0, internal_map)

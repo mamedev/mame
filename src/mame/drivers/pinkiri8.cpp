@@ -97,6 +97,8 @@ public:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pinkiri8(machine_config &config);
+	void pinkiri8_io(address_map &map);
+	void pinkiri8_map(address_map &map);
 };
 
 
@@ -107,7 +109,7 @@ class janshi_vdp_device : public device_t,
 {
 public:
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
@@ -117,7 +119,7 @@ protected:
 };
 
 
-DEVICE_ADDRESS_MAP_START( map, 8, janshi_vdp_device )
+ADDRESS_MAP_START(janshi_vdp_device::map)
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_SHARE("back_vram") // bg tilemap?
 	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_SHARE("vram1") // xpos, colour, tile number etc.
 
@@ -138,7 +140,7 @@ DEFINE_DEVICE_TYPE(JANSHIVDP, janshi_vdp_device, "janshi_vdp", "Janshi VDP")
 janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, JANSHIVDP, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, address_map_delegate(FUNC(janshi_vdp_device::map), this))
+	, m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, address_map_constructor(FUNC(janshi_vdp_device::map), this))
 {
 }
 
@@ -374,7 +376,7 @@ uint32_t pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static ADDRESS_MAP_START( pinkiri8_map, AS_PROGRAM, 8, pinkiri8_state )
+ADDRESS_MAP_START(pinkiri8_state::pinkiri8_map)
 	AM_RANGE(0x00000, 0x0bfff) AM_ROM
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM
 	AM_RANGE(0x0e000, 0x0ffff) AM_ROM
@@ -459,7 +461,7 @@ READ8_MEMBER(pinkiri8_state::mux_p1_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( pinkiri8_io, AS_IO, 8, pinkiri8_state )
+ADDRESS_MAP_START(pinkiri8_state::pinkiri8_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_RAM //Z180 internal I/O
 	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)

@@ -82,6 +82,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
 
 	void h8(machine_config &config);
+	void h8_io(address_map &map);
+	void h8_mem(address_map &map);
 private:
 	uint8_t m_digit;
 	uint8_t m_segment;
@@ -175,7 +177,7 @@ WRITE8_MEMBER( h8_state::portf1_w )
 	if (m_digit) output().set_digit_value(m_digit, m_segment);
 }
 
-static ADDRESS_MAP_START(h8_mem, AS_PROGRAM, 8, h8_state)
+ADDRESS_MAP_START(h8_state::h8_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM // main rom
 	AM_RANGE(0x1400, 0x17ff) AM_RAM // fdc ram
@@ -183,7 +185,7 @@ static ADDRESS_MAP_START(h8_mem, AS_PROGRAM, 8, h8_state)
 	AM_RANGE(0x2000, 0x9fff) AM_RAM // main ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( h8_io, AS_IO, 8, h8_state)
+ADDRESS_MAP_START(h8_state::h8_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_READWRITE(portf0_r,portf0_w)

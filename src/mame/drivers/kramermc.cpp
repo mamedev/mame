@@ -22,7 +22,7 @@ static GFXDECODE_START( kramermc )
 GFXDECODE_END
 
 /* Address maps */
-static ADDRESS_MAP_START(kramermc_mem, AS_PROGRAM, 8, kramermc_state )
+ADDRESS_MAP_START(kramermc_state::kramermc_mem)
 	AM_RANGE( 0x0000, 0x03ff ) AM_ROM  // Monitor
 	AM_RANGE( 0x0400, 0x07ff ) AM_ROM  // Debugger
 	AM_RANGE( 0x0800, 0x0bff ) AM_ROM  // Reassembler
@@ -34,7 +34,7 @@ static ADDRESS_MAP_START(kramermc_mem, AS_PROGRAM, 8, kramermc_state )
 	AM_RANGE( 0xfc00, 0xffff ) AM_RAM  // Video RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kramermc_io, AS_IO, 8, kramermc_state )
+ADDRESS_MAP_START(kramermc_state::kramermc_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfc, 0x0ff) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 ADDRESS_MAP_END

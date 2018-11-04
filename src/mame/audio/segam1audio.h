@@ -40,6 +40,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_txd);
 
+	void mpcm1_map(address_map &map);
+	void mpcm2_map(address_map &map);
+	void segam1audio_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

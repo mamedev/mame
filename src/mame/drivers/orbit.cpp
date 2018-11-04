@@ -91,7 +91,7 @@ WRITE_LINE_MEMBER(orbit_state::hyper_led_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( orbit_map, AS_PROGRAM, 8, orbit_state )
+ADDRESS_MAP_START(orbit_state::orbit_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x07ff) AM_READ_PORT("P1")

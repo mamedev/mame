@@ -154,7 +154,9 @@ WRITE8_MEMBER(mainevt_state::k052109_051960_w)
 }
 
 
-static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
+ADDRESS_MAP_START(mainevt_state::mainevt_map)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
+
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* probably */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)  /* probably */
@@ -170,8 +172,6 @@ static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x1f9a, 0x1f9a) AM_READ_PORT("P4")
 	AM_RANGE(0x1f9b, 0x1f9b) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
 	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
@@ -179,12 +179,13 @@ static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
+ADDRESS_MAP_START(mainevt_state::devstors_map)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
+
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* probably */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)  /* probably */
 	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(mainevt_coin_w)   /* coin counters + lamps */
-	AM_RANGE(0x1fb2, 0x1fb2) AM_WRITE(dv_nmienable_w)
 
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("P1")
@@ -193,8 +194,7 @@ static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x1f98, 0x1f98) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f9b, 0x1f9b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1fa0, 0x1fbf) AM_DEVREADWRITE("k051733", k051733_device, read, write)
-
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x1fb2, 0x1fb2) AM_WRITE(dv_nmienable_w)
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
 	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mainevt_sound_map, AS_PROGRAM, 8, mainevt_state )
+ADDRESS_MAP_START(mainevt_state::mainevt_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", upd7759_device, port_w)
@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( mainevt_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mainevt_sh_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( devstors_sound_map, AS_PROGRAM, 8, mainevt_state )
+ADDRESS_MAP_START(mainevt_state::devstors_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

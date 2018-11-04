@@ -312,6 +312,7 @@ public:
 	void preprocess_texture_data();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void rollext(machine_config &config);
+	void memmap(address_map &map);
 };
 
 void rollext_state::preprocess_texture_data()
@@ -508,7 +509,7 @@ WRITE32_MEMBER(rollext_state::cmd_callback)
 
 
 // Master Processor memory map
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 32, rollext_state)
+ADDRESS_MAP_START(rollext_state::memmap)
 	AM_RANGE(0x40000000, 0x40ffffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_SHARE("disp_ram")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM AM_SHARE("palette_ram")

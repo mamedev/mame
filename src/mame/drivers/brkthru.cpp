@@ -108,7 +108,7 @@ INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
  *
  *************************************/
 
-static ADDRESS_MAP_START( brkthru_map, AS_PROGRAM, 8, brkthru_state )
+ADDRESS_MAP_START(brkthru_state::brkthru_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_SHARE("videoram")
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( brkthru_map, AS_PROGRAM, 8, brkthru_state )
 ADDRESS_MAP_END
 
 /* same as brktrhu, but xor 0x1000 below 8k */
-static ADDRESS_MAP_START( darwin_map, AS_PROGRAM, 8, brkthru_state )
+ADDRESS_MAP_START(brkthru_state::darwin_map)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x1400, 0x1bff) AM_RAM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_SHARE("videoram")
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( darwin_map, AS_PROGRAM, 8, brkthru_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, brkthru_state )
+ADDRESS_MAP_START(brkthru_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

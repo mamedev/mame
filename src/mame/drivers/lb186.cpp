@@ -34,6 +34,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void lb186(machine_config &config);
 	static void ncr5380(device_t *device);
+	void lb186_io(address_map &map);
+	void lb186_map(address_map &map);
 };
 
 WRITE8_MEMBER(lb186_state::scsi_dack_w)
@@ -87,12 +89,12 @@ WRITE8_MEMBER(lb186_state::drive_sel_w)
 	floppy->ss_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( lb186_map, AS_PROGRAM, 16, lb186_state )
+ADDRESS_MAP_START(lb186_state::lb186_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lb186_io, AS_IO, 16, lb186_state )
+ADDRESS_MAP_START(lb186_state::lb186_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x101f) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0x00ff)
 	AM_RANGE(0x1080, 0x108f) AM_DEVREADWRITE8("scsibus:7:ncr5380", ncr5380n_device, read, write, 0x00ff)

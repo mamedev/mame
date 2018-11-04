@@ -69,7 +69,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m57_state )
+ADDRESS_MAP_START(m57_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(m57_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_SHARE("scrollram")
@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(m57_state::m57)
 	MCFG_PALETTE_INIT_OWNER(m57_state, m57)
 
 	/* sound hardware */
-	//MCFG_FRAGMENT_ADD(m52_sound_c_audio)
+	//m52_sound_c_audio(config);
 	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
 
 MACHINE_CONFIG_END

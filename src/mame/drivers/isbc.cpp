@@ -89,6 +89,15 @@ public:
 	void isbc8605(machine_config &config);
 	void isbc286(machine_config &config);
 	void isbc8630(machine_config &config);
+	void isbc2861_mem(address_map &map);
+	void isbc286_io(address_map &map);
+	void isbc286_mem(address_map &map);
+	void isbc8605_io(address_map &map);
+	void isbc8630_io(address_map &map);
+	void isbc86_mem(address_map &map);
+	void isbc_io(address_map &map);
+	void rpc86_io(address_map &map);
+	void rpc86_mem(address_map &map);
 protected:
 	void machine_reset() override;
 private:
@@ -112,13 +121,13 @@ void isbc_state::machine_reset()
 	m_megabyte_page = 0;
 }
 
-static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
+ADDRESS_MAP_START(isbc_state::rpc86_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xcffff) AM_RAM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rpc86_io, AS_IO, 16, isbc_state)
+ADDRESS_MAP_START(isbc_state::rpc86_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
 	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
@@ -134,25 +143,25 @@ static ADDRESS_MAP_START(rpc86_io, AS_IO, 16, isbc_state)
 	AM_RANGE(0x00de, 0x00df) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc8605_io, AS_IO, 16, isbc_state)
-	AM_RANGE(0x0000, 0x002f) AM_DEVICE8("isbc_208", isbc_208_device, map, 0xffff)
+ADDRESS_MAP_START(isbc_state::isbc8605_io)
 	AM_IMPORT_FROM(rpc86_io)
+	AM_RANGE(0x0000, 0x002f) AM_DEVICE8("isbc_208", isbc_208_device, map, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc8630_io, AS_IO, 16, isbc_state)
+ADDRESS_MAP_START(isbc_state::isbc8630_io)
+	AM_IMPORT_FROM(rpc86_io)
 	AM_RANGE(0x00c0, 0x00c7) AM_WRITE8(edge_intr_clear_w, 0xff00)
 	AM_RANGE(0x00c8, 0x00df) AM_WRITE8(status_register_w, 0xff00)
 	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
-	AM_IMPORT_FROM(rpc86_io)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc86_mem, AS_PROGRAM, 16, isbc_state)
+ADDRESS_MAP_START(isbc_state::isbc86_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xfbfff) AM_RAM
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc_io, AS_IO, 16, isbc_state)
+ADDRESS_MAP_START(isbc_state::isbc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
@@ -164,7 +173,7 @@ static ADDRESS_MAP_START(isbc_io, AS_IO, 16, isbc_state)
 	AM_RANGE(0x00de, 0x00df) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
+ADDRESS_MAP_START(isbc_state::isbc286_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
 	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0xff00)
@@ -183,14 +192,14 @@ static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
 	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc286_mem, AS_PROGRAM, 16, isbc_state)
+ADDRESS_MAP_START(isbc_state::isbc286_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc2861_mem, AS_PROGRAM, 16, isbc_state)
+ADDRESS_MAP_START(isbc_state::isbc2861_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_READWRITE(bioslo_r, bioslo_w) AM_SHARE("biosram")
@@ -406,7 +415,8 @@ MACHINE_CONFIG_START(isbc_state::rpc86)
 	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(isbc_state::isbc8605, rpc86)
+MACHINE_CONFIG_START(isbc_state::isbc8605)
+	rpc86(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(isbc8605_io)
 
@@ -415,7 +425,8 @@ MACHINE_CONFIG_DERIVED(isbc_state::isbc8605, rpc86)
 	MCFG_ISBC_208_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(isbc_state::isbc8630, rpc86)
+MACHINE_CONFIG_START(isbc_state::isbc8630)
+	rpc86(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(isbc8630_io)
 
@@ -528,7 +539,8 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(isbc_state::isbc2861, isbc286)
+MACHINE_CONFIG_START(isbc_state::isbc2861)
+	isbc286(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(isbc2861_mem)
 MACHINE_CONFIG_END

@@ -874,7 +874,7 @@ WRITE8_MEMBER( adam_state::m6801_p4_w )
 //  ADDRESS_MAP( adam_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_mem, AS_PROGRAM, 8, adam_state )
+ADDRESS_MAP_START(adam_state::adam_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
 ADDRESS_MAP_END
 
@@ -883,7 +883,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( adam_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_io, AS_IO, 8, adam_state )
+ADDRESS_MAP_START(adam_state::adam_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
 ADDRESS_MAP_END
 
@@ -892,7 +892,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( m6801_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m6801_mem, AS_PROGRAM, 8, adam_state )
+ADDRESS_MAP_START(adam_state::m6801_mem)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6801_TAG, 0)
@@ -903,7 +903,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( m6801_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m6801_io, AS_IO, 8, adam_state )
+ADDRESS_MAP_START(adam_state::m6801_io)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(m6801_p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6801_p2_r, m6801_p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_READWRITE(m6801_p3_r, m6801_p3_w)
@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL(7'159'090)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
+	MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
 
 	// devices
 	MCFG_ADAMNET_BUS_ADD()

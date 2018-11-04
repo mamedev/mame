@@ -121,7 +121,7 @@ public:
 		m_mdv1(*this, MDV_1),
 		m_mdv2(*this, MDV_2),
 		m_ser1(*this, RS232_A_TAG),
-		m_ser2(*this, RS232_A_TAG),
+		m_ser2(*this, RS232_B_TAG),
 		m_ram(*this, RAM_TAG),
 		m_exp(*this, "exp"),
 		m_cart(*this, "rom"),
@@ -197,6 +197,8 @@ public:
 	void ql_ntsc(machine_config &config);
 	void opd(machine_config &config);
 	void ql(machine_config &config);
+	void ipc_io(address_map &map);
+	void ql_mem(address_map &map);
 };
 
 
@@ -494,7 +496,7 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 //  ADDRESS_MAP( ql_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ql_mem, AS_PROGRAM, 8, ql_state )
+ADDRESS_MAP_START(ql_state::ql_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -503,7 +505,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ipc_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ipc_io, AS_IO, 8, ql_state )
+ADDRESS_MAP_START(ql_state::ipc_io)
 	AM_RANGE(0x00, 0x7f) AM_WRITE(ipc_w)
 	AM_RANGE(0x27, 0x28) AM_READNOP // IPC reads these to set P0 (bus) to Hi-Z mode
 ADDRESS_MAP_END
@@ -975,7 +977,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ql_ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(ql_state::ql_ntsc, ql)
+MACHINE_CONFIG_START(ql_state::ql_ntsc)
+	ql(config);
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -988,7 +991,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( opd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(ql_state::opd, ql)
+MACHINE_CONFIG_START(ql_state::opd)
+	ql(config);
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -1001,7 +1005,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megaopd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( megaopd, ql )
+static MACHINE_CONFIG_START( megaopd )
+static 	ql(config);
     // internal ram
     MCFG_RAM_MODIFY(RAM_TAG)
     MCFG_RAM_DEFAULT_SIZE("256K")

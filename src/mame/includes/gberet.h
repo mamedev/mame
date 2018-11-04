@@ -72,4 +72,7 @@ public:
 	void gberetb(machine_config &config);
 	void mrgoemon(machine_config &config);
 	void gberet(machine_config &config);
+	void gberet_map(address_map &map);
+	void gberetb_map(address_map &map);
+	void mrgoemon_map(address_map &map);
 };

@@ -134,7 +134,7 @@ public:
 		CTRL1_ETHRMOD    = 0x0040, // 0 = sytem configured for remote modems
 		CTRL1_FIFOACTIVE = 0x0080  // 0 = plotter fifos reset
 	};
-	DECLARE_READ16_MEMBER(sreg_ctrl1_r) const { return m_sreg_ctrl1; }
+	DECLARE_READ16_MEMBER(sreg_ctrl1_r) { return m_sreg_ctrl1; }
 	DECLARE_WRITE16_MEMBER(sreg_ctrl1_w);
 
 	enum sreg_ctrl2_mask
@@ -149,9 +149,9 @@ public:
 
 		CTRL2_MASK      = 0x004d
 	};
-	DECLARE_READ16_MEMBER(sreg_ctrl2_r) const { return m_sreg_ctrl2; }
+	DECLARE_READ16_MEMBER(sreg_ctrl2_r) { return m_sreg_ctrl2; }
 	virtual DECLARE_WRITE16_MEMBER(sreg_ctrl2_w);
-	DECLARE_READ16_MEMBER(sreg_ctrl3_r) const { return m_sreg_ctrl3; }
+	DECLARE_READ16_MEMBER(sreg_ctrl3_r) { return m_sreg_ctrl3; }
 	DECLARE_WRITE16_MEMBER(sreg_ctrl3_w) { m_sreg_ctrl3 = data; }
 
 	DECLARE_READ8_MEMBER(nodeid_r);
@@ -166,6 +166,12 @@ public:
 	void interpro_serial2(machine_config &config);
 	void interpro(machine_config &config);
 	static void interpro_scsi_adapter(device_t *device);
+	void c300_data_map(address_map &map);
+	void c300_insn_map(address_map &map);
+	void c400_data_map(address_map &map);
+	void c400_insn_map(address_map &map);
+	void interpro_boot_map(address_map &map);
+	void interpro_common_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -197,6 +203,10 @@ public:
 	required_device<cammu_c3_device> m_i_cammu;
 	void turquoise(machine_config &config);
 	void ip2000(machine_config &config);
+	void interpro_82586_map(address_map &map);
+	void turquoise_base_map(address_map &map);
+	void turquoise_main_map(address_map &map);
+	void turquoise_io_map(address_map &map);
 };
 
 class sapphire_state : public interpro_state
@@ -223,6 +233,10 @@ public:
 	void ip2400(machine_config &config);
 	void ip2800(machine_config &config);
 	void ip2700(machine_config &config);
+	void interpro_82596_map(address_map &map);
+	void sapphire_base_map(address_map &map);
+	void sapphire_main_map(address_map &map);
+	void sapphire_io_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_INTERPRO_H

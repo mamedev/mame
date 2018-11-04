@@ -54,6 +54,5 @@ public:
 	void pcvideo_cirrus_gd5428(machine_config &config);
 	void pcvideo_cirrus_gd5430(machine_config &config);
 
+	void pcat32_io_common(address_map &map);
 };
-
-ADDRESS_MAP_EXTERN(pcat32_io_common, 32);

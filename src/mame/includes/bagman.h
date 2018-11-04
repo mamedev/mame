@@ -86,6 +86,9 @@ public:
 	void bagman(machine_config &config);
 	void pickin(machine_config &config);
 	void sbagmani(machine_config &config);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void pickin_map(address_map &map);
 };
 
 /*----------- timings -----------*/

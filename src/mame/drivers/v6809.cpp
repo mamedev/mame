@@ -94,6 +94,7 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
 	void v6809(machine_config &config);
+	void v6809_mem(address_map &map);
 private:
 	uint16_t m_video_address;
 	bool m_speaker_en;
@@ -112,7 +113,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
+ADDRESS_MAP_START(v6809_state::v6809_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(v6809_address_w)

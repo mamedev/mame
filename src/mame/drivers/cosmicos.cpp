@@ -179,11 +179,11 @@ WRITE8_MEMBER( cosmicos_state::display_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( cosmicos_mem, AS_PROGRAM, 8, cosmicos_state )
+ADDRESS_MAP_START(cosmicos_state::cosmicos_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cosmicos_io, AS_IO, 8, cosmicos_state )
+ADDRESS_MAP_START(cosmicos_state::cosmicos_io)
 //  AM_RANGE(0x00, 0x00)
 	AM_RANGE(0x01, 0x01) AM_READ(video_on_r)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(video_off_r, audio_latch_w)

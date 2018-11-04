@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef UT88_H_
-#define UT88_H_
+#ifndef MAME_INCLUDES_UT88_H
+#define MAME_INCLUDES_UT88_H
 
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
@@ -66,6 +66,10 @@ public:
 
 	void ut88(machine_config &config);
 	void ut88mini(machine_config &config);
+	void ut88_io(address_map &map);
+	void ut88_mem(address_map &map);
+	void ut88mini_io(address_map &map);
+	void ut88mini_mem(address_map &map);
 private:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<i8255_device> m_ppi;
@@ -96,4 +100,4 @@ private:
 extern const gfx_layout ut88_charlayout;
 
 
-#endif /* UT88_H_ */
+#endif // MAME_INCLUDES_UT88_H

@@ -57,6 +57,9 @@ public:
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 	static void cfg_m20_format(device_t *device);
 	void olivetti(machine_config &config);
+	void kbc_map(address_map &map);
+	void m24_io(address_map &map);
+	void m24_map(address_map &map);
 };
 
 void m24_state::machine_reset()
@@ -172,21 +175,21 @@ WRITE_LINE_MEMBER(m24_state::halt_i86_w)
 	m_i86_halt = state ? true : false;
 }
 
-static ADDRESS_MAP_START( m24_map, AS_PROGRAM, 16, m24_state )
+ADDRESS_MAP_START(m24_state::m24_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(m24_io, AS_IO, 16, m24_state )
+ADDRESS_MAP_START(m24_state::m24_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(keyboard_r, keyboard_w, 0xffff)
 	AM_RANGE(0x0066, 0x0067) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("mm58174an", mm58274c_device, read, write, 0xffff)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", pc_noppi_mb_device, map, 0xffff)
 	AM_RANGE(0x80c0, 0x80c1) AM_DEVREADWRITE8("z8000_apb", m24_z8000_device, handshake_r, handshake_w, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kbc_map, AS_PROGRAM, 8, m24_state)
+ADDRESS_MAP_START(m24_state::kbc_map)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(kbcdata_r)
 	AM_RANGE(0xa000, 0xafff) AM_WRITE(kbcdata_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("kbc", 0)

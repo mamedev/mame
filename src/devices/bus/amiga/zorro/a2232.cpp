@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(A2232, a2232_device, "a2232", "CBM A2232 Serial Card")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( iocpu_map, AS_PROGRAM, 8, a2232_device)
+ADDRESS_MAP_START(a2232_device::iocpu_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("shared")
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(acia_0_r, acia_0_w)
 	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(acia_1_r, acia_1_w)
@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( iocpu_map, AS_PROGRAM, 8, a2232_device)
 	AM_RANGE(0x7000, 0x73ff) AM_WRITE(int2_w)
 	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(acia_6_r, acia_6_w)
 	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(cia_r, cia_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(irq_ack8_w)
 	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("shared")
 ADDRESS_MAP_END
 
@@ -222,7 +222,7 @@ WRITE8_MEMBER( a2232_device::int2_w )
 	m_slot->int2_w(1);
 }
 
-WRITE8_MEMBER( a2232_device::irq_ack_w )
+WRITE8_MEMBER( a2232_device::irq_ack8_w )
 {
 	if (VERBOSE)
 		logerror("%s('%s'): irq_ack_w %04x\n", shortname(), basetag(), data);

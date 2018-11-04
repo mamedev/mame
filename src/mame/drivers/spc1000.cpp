@@ -179,6 +179,8 @@ public:
 	}
 
 	void spc1000(machine_config &config);
+	void spc1000_io(address_map &map);
+	void spc1000_mem(address_map &map);
 private:
 	uint8_t m_IPLK;
 	uint8_t m_GMODE;
@@ -198,7 +200,7 @@ private:
 	required_device<centronics_device> m_centronics;
 };
 
-static ADDRESS_MAP_START(spc1000_mem, AS_PROGRAM, 8, spc1000_state )
+ADDRESS_MAP_START(spc1000_state::spc1000_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
@@ -262,7 +264,7 @@ READ8_MEMBER( spc1000_state::keyboard_r )
 }
 
 
-static ADDRESS_MAP_START( spc1000_io , AS_IO, 8, spc1000_state )
+ADDRESS_MAP_START(spc1000_state::spc1000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(gmode_r, gmode_w)

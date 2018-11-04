@@ -722,7 +722,7 @@ WRITE32_MEMBER(skns_state::v3t_w)
 	m_btiles[offset*4+3] = (data & 0x000000ff) >> 0;
 }
 
-static ADDRESS_MAP_START( skns_map, AS_PROGRAM, 32, skns_state )
+ADDRESS_MAP_START(skns_state::skns_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM /* BIOS ROM */
 	AM_RANGE(0x00400000, 0x0040000f) AM_WRITE(io_w) /* I/O Write */
 	AM_RANGE(0x00400000, 0x00400003) AM_READ_PORT("400000")
@@ -855,23 +855,28 @@ MACHINE_RESET_MEMBER(skns_state,sknsk)
 }
 
 
-MACHINE_CONFIG_DERIVED(skns_state::sknsa, skns)
+MACHINE_CONFIG_START(skns_state::sknsa)
+	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsa)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(skns_state::sknsj, skns)
+MACHINE_CONFIG_START(skns_state::sknsj)
+	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsj)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(skns_state::sknsu, skns)
+MACHINE_CONFIG_START(skns_state::sknsu)
+	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsu)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(skns_state::sknse, skns)
+MACHINE_CONFIG_START(skns_state::sknse)
+	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknse)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(skns_state::sknsk, skns)
+MACHINE_CONFIG_START(skns_state::sknsk)
+	skns(config);
 	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsk)
 MACHINE_CONFIG_END
 

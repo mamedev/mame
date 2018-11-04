@@ -70,13 +70,13 @@ WRITE8_MEMBER(epos_state::dealer_decrypt_rom)
  *
  *************************************/
 
-static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8, epos_state )
+ADDRESS_MAP_START(epos_state::epos_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dealer_map, AS_PROGRAM, 8, epos_state )
+ADDRESS_MAP_START(epos_state::dealer_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("nvram")
@@ -89,7 +89,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( epos_io_map, AS_IO, 8, epos_state )
+ADDRESS_MAP_START(epos_state::epos_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(port_1_w)
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( epos_io_map, AS_IO, 8, epos_state )
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
+ADDRESS_MAP_START(epos_state::dealer_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_WRITE(dealer_pal_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)

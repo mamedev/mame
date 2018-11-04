@@ -57,6 +57,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void tms3556(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -117,7 +118,6 @@ private:
 
 
 // device type definition
-extern const device_type TMS3556;
 DECLARE_DEVICE_TYPE(TMS3556, tms3556_device)
 
 #endif // MAME_VIDEO_TMS3556_H

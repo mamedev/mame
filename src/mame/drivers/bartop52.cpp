@@ -41,10 +41,11 @@ public:
 
 	virtual void machine_reset() override;
 	void a5200(machine_config &config);
+	void a5200_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, bartop52_state )
+ADDRESS_MAP_START(bartop52_state::a5200_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)

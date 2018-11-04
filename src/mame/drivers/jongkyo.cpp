@@ -67,6 +67,9 @@ public:
 	uint32_t screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void jongkyo(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void jongkyo_memmap(address_map &map);
+	void jongkyo_portmap(address_map &map);
 };
 
 
@@ -239,7 +242,7 @@ WRITE8_MEMBER(jongkyo_state::unknown_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
+ADDRESS_MAP_START(jongkyo_state::jongkyo_memmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(videoram2_w) // wrong, this doesn't seem to be video ram on write..
 	AM_RANGE(0x4000, 0x6bff) AM_ROM // fixed rom
 	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")    // banked (8 banks)
@@ -247,13 +250,13 @@ static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, jongkyo_state )
+ADDRESS_MAP_START(jongkyo_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x6bff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jongkyo_portmap, AS_IO, 8, jongkyo_state )
+ADDRESS_MAP_START(jongkyo_state::jongkyo_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// R 01 keyboard
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -497,7 +500,7 @@ MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 	MCFG_CPU_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(jongkyo_memmap)
 	MCFG_CPU_IO_MAP(jongkyo_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jongkyo_state,  irq0_line_hold)
 	MCFG_SEGACRPT_SET_SIZE(0x6c00)
 	MCFG_SEGACRPT_SET_NUMBANKS(8)

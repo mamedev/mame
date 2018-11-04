@@ -136,7 +136,7 @@ from Brett Selwood and Andrew Davies.
 ********************************************************************************/
 
 
-static ADDRESS_MAP_START(mbee_mem, AS_PROGRAM, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbee_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xefff) AM_ROM
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START(mbee_mem, AS_PROGRAM, 8, mbee_state)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbeeic_mem, AS_PROGRAM, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbeeic_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START(mbeeic_mem, AS_PROGRAM, 8, mbee_state)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbeepc_mem, AS_PROGRAM, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbeepc_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START(mbeepc_mem, AS_PROGRAM, 8, mbee_state)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbeeppc_mem, AS_PROGRAM, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbeeppc_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("basic")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
@@ -172,14 +172,14 @@ static ADDRESS_MAP_START(mbeeppc_mem, AS_PROGRAM, 8, mbee_state)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbee56_mem, AS_PROGRAM, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbee56_mem)
 	AM_RANGE(0x0000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbee256_mem, AS_PROGRAM, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbee256_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x1000, 0x1fff) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
 	AM_RANGE(0x2000, 0x2fff) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START(mbee256_mem, AS_PROGRAM, 8, mbee_state)
 	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bankr15") AM_WRITE_BANK("bankw15")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbeett_mem, AS_PROGRAM, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbeett_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START(mbeett_mem, AS_PROGRAM, 8, mbee_state)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbee_io, AS_IO, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbee_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
@@ -217,7 +217,7 @@ static ADDRESS_MAP_START(mbee_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbeeic_io, AS_IO, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbeeic_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START(mbeeic_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbeepc_io, AS_IO, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbeepc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(port08_r, port08_w)
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START(mbeepc_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_high_r, port0a_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbeeppc_io, AS_IO, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbeeppc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(port08_r, port08_w)
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START(mbeeppc_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_high_r, port0a_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbeett_io, AS_IO, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbeett_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff00) AM_WRITE(port04_w)
@@ -273,7 +273,7 @@ static ADDRESS_MAP_START(mbeett_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0068, 0x006f) AM_MIRROR(0xff00) AM_DEVREADWRITE("scc", scc8530_t, reg_r, reg_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbee56_io, AS_IO, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbee56_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START(mbee56_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbee128_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x50, 0x57) AM_WRITE(mbee128_50_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mbee256_io, AS_IO, 8, mbee_state)
+ADDRESS_MAP_START(mbee_state::mbee256_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff00) AM_WRITE(port04_w)
@@ -746,13 +746,15 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbeepc, mbeeic)
+MACHINE_CONFIG_START(mbee_state::mbeepc)
+	mbeeic(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeepc_mem)
 	MCFG_CPU_IO_MAP(mbeepc_io)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbeeppc, mbeeic)
+MACHINE_CONFIG_START(mbee_state::mbeeppc)
+	mbeeic(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeeppc_mem)
 	MCFG_CPU_IO_MAP(mbeeppc_io)
@@ -764,7 +766,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbeeppc, mbeeic)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbee56, mbeeic)
+MACHINE_CONFIG_START(mbee_state::mbee56)
+	mbeeic(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee56_mem)
 	MCFG_CPU_IO_MAP(mbee56_io)
@@ -779,7 +782,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbee56, mbeeic)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbee128, mbee56)
+MACHINE_CONFIG_START(mbee_state::mbee128)
+	mbee56(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
@@ -788,7 +792,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbee128, mbee56)
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbee128p, mbeeppc)
+MACHINE_CONFIG_START(mbee_state::mbee128p)
+	mbeeppc(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
@@ -803,7 +808,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbee128p, mbeeppc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbee256, mbee128p)
+MACHINE_CONFIG_START(mbee_state::mbee256)
+	mbee128p(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee256_io)
@@ -817,7 +823,8 @@ MACHINE_CONFIG_DERIVED(mbee_state::mbee256, mbee128p)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mbee_state::mbeett, mbeeppc)
+MACHINE_CONFIG_START(mbee_state::mbeett)
+	mbeeppc(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeett_mem)
 	MCFG_CPU_IO_MAP(mbeett_io)

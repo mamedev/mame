@@ -25,20 +25,20 @@ DEFINE_DEVICE_TYPE(TMP95C061, tmp95c061_device, "tmp95c061", "TMP95C061")
 DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "TMP95C063")
 
 
-static ADDRESS_MAP_START( tmp95c061_mem8, AS_PROGRAM, 8, tmp95c061_device )
+ADDRESS_MAP_START(tmp95c061_device::tmp95c061_mem8)
 	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE( internal_r, internal_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmp95c061_mem16, AS_PROGRAM, 16, tmp95c061_device )
+ADDRESS_MAP_START(tmp95c061_device::tmp95c061_mem16)
 	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE8( internal_r, internal_w, 0xffff )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tmp95c063_mem8, AS_PROGRAM, 8, tmp95c063_device )
+ADDRESS_MAP_START(tmp95c063_device::tmp95c063_mem8)
 	AM_RANGE( 0x000000, 0x00009f ) AM_READWRITE( internal_r, internal_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tmp95c063_mem16, AS_PROGRAM, 16, tmp95c063_device )
+ADDRESS_MAP_START(tmp95c063_device::tmp95c063_mem16)
 	AM_RANGE( 0x000000, 0x00009f ) AM_READWRITE8( internal_r, internal_w, 0xffff )
 ADDRESS_MAP_END
 
@@ -87,11 +87,11 @@ void tmp95c061_device::device_config_complete()
 {
 	if (m_am8_16 == 0)
 	{
-		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(tmp95c061_mem16));
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor(FUNC(tmp95c061_device::tmp95c061_mem16), this));
 	}
 	else
 	{
-		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, ADDRESS_MAP_NAME(tmp95c061_mem8));
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor(FUNC(tmp95c061_device::tmp95c061_mem8), this));
 	}
 }
 
@@ -140,11 +140,11 @@ void tmp95c063_device::device_config_complete()
 {
 	if (m_am8_16 == 0)
 	{
-		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(tmp95c063_mem16));
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor(FUNC(tmp95c063_device::tmp95c063_mem16), this));
 	}
 	else
 	{
-		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, ADDRESS_MAP_NAME(tmp95c063_mem8));
+		m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor(FUNC(tmp95c063_device::tmp95c063_mem8), this));
 	}
 }
 

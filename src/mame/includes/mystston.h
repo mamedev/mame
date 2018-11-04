@@ -65,4 +65,5 @@ public:
 	required_device<palette_device> m_palette;
 	void mystston(machine_config &config);
 	void mystston_video(machine_config &config);
+	void main_map(address_map &map);
 };

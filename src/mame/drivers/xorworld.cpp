@@ -61,7 +61,7 @@ WRITE16_MEMBER(xorworld_state::irq6_ack_w)
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
+ADDRESS_MAP_START(xorworld_state::xorworld_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")

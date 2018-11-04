@@ -176,16 +176,16 @@ private:
 	unsigned                    m_output_column = 0U;
 	unsigned                    m_indent;
 	unsigned                    m_tab_limit     = std::numeric_limits<unsigned>::max();
-	std::vector<char32_t>   m_whitespace;
+	std::vector<char32_t>       m_whitespace;
 
 	// input state management
-	char32_t    m_buffer[1024];
+	char32_t        m_buffer[1024];
 	bool            m_stream_start      = true;
 	std::size_t     m_position          = 0U;
-	char32_t    m_surrogate         = 0U;
+	char32_t        m_surrogate         = 0U;
 	unsigned        m_code_length       = 0U;
 	unsigned        m_required_bytes    = 0U;
-	char32_t    m_newline_lead      = 0U;
+	char32_t        m_newline_lead      = 0U;
 
 	// statistics
 	std::uint64_t   m_overlong              = 0U;
@@ -931,13 +931,13 @@ private:
 				((DIGIT_HEX_LOWER_FIRST <= ch) && (DIGIT_HEX_LOWER_LAST >= ch));
 	}
 
-	parse_state                 m_parse_state;
-	std::uint64_t               m_input_line;
-	bool                        m_escape;
-	std::deque<char32_t>    m_tail;
-	std::uint64_t               m_comment_line;
-	char32_t                m_lead_digit;
-	unsigned                    m_radix;
+	parse_state                 m_parse_state   = parse_state::DEFAULT;
+	std::uint64_t               m_input_line    = 1U;
+	bool                        m_escape        = false;
+	std::deque<char32_t>        m_tail;
+	std::uint64_t               m_comment_line  = 0U;
+	char32_t                    m_lead_digit    = 0U;
+	unsigned                    m_radix         = 0U;
 
 	std::uint64_t   m_tabs_escaped                  = 0U;
 	std::uint64_t   m_line_comment_continuations    = 0U;
@@ -953,13 +953,7 @@ cpp_cleaner::cpp_cleaner(
 		newline newline_mode,
 		unsigned tab_width)
 	: cleaner_base(std::forward<OutputIt>(output), newline_mode, tab_width)
-	, m_parse_state(parse_state::DEFAULT)
-	, m_input_line(1U)
-	, m_escape(false)
 	, m_tail()
-	, m_comment_line(0U)
-	, m_lead_digit(0U)
-	, m_radix(0U)
 {
 }
 
@@ -1364,14 +1358,14 @@ private:
 	void process_string_constant(char32_t ch);
 	void process_long_string_constant(char32_t ch);
 
-	parse_state     m_parse_state;
-	std::uint64_t   m_input_line;
-	int             m_long_bracket_level;
-	bool            m_escape;
-	std::uint32_t   m_block_line;
-	int             m_block_level;
-	bool            m_comment_start;
-	char32_t    m_string_quote;
+	parse_state     m_parse_state           = parse_state::DEFAULT;
+	std::uint64_t   m_input_line            = 1U;
+	int             m_long_bracket_level    = -1;
+	bool            m_escape                = false;
+	std::uint32_t   m_block_line            = 0U;
+	int             m_block_level           = 0;
+	bool            m_comment_start         = false;
+	char32_t        m_string_quote          = 0U;
 
 	std::uint64_t   m_tabs_escaped      = 0U;
 	std::uint64_t   m_newlines_escaped  = 0U;
@@ -1385,14 +1379,6 @@ lua_cleaner::lua_cleaner(
 		newline newline_mode,
 		unsigned tab_width)
 	: cleaner_base(std::forward<OutputIt>(output), newline_mode, tab_width)
-	, m_parse_state(parse_state::DEFAULT)
-	, m_input_line(1U)
-	, m_long_bracket_level(-1)
-	, m_escape(false)
-	, m_block_line(0U)
-	, m_block_level(0)
-	, m_comment_start(false)
-	, m_string_quote(0U)
 {
 }
 
@@ -1670,10 +1656,10 @@ private:
 	void process_default(char32_t ch);
 	void process_comment(char32_t ch);
 
-	parse_state     m_parse_state;
-	std::uint64_t   m_input_line;
-	unsigned        m_escape;
-	std::uint64_t   m_comment_line;
+	parse_state     m_parse_state   = parse_state::DEFAULT;
+	std::uint64_t   m_input_line    = 1U;
+	unsigned        m_escape        = 0U;
+	std::uint64_t   m_comment_line  = 0U;
 };
 
 
@@ -1683,10 +1669,6 @@ xml_cleaner::xml_cleaner(
 		newline newline_mode,
 		unsigned tab_width)
 	: cleaner_base(std::forward<OutputIt>(output), newline_mode, tab_width)
-	, m_parse_state(parse_state::DEFAULT)
-	, m_input_line(1U)
-	, m_escape(0U)
-	, m_comment_line(0U)
 {
 }
 
@@ -1804,8 +1786,9 @@ bool is_lua_source_extension(char const *ext)
 bool is_xml_extension(char const *ext)
 {
 	return
-		!core_stricmp(ext, ".lay") ||
-		!core_stricmp(ext, ".xml");
+			!core_stricmp(ext, ".hsi") ||
+			!core_stricmp(ext, ".lay") ||
+			!core_stricmp(ext, ".xml");
 }
 
 } // anonymous namespace

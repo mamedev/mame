@@ -170,6 +170,7 @@ public:
 
 	void update_kback();
 	void victor9k(machine_config &config);
+	void victor9k_mem(address_map &map);
 };
 
 
@@ -190,7 +191,7 @@ public:
 //  ADDRESS_MAP( victor9k_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
+ADDRESS_MAP_START(victor9k_state::victor9k_mem)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x20000, 0xdffff) AM_NOP
 	AM_RANGE(0xe0000, 0xe0001) AM_MIRROR(0x7f00) AM_DEVREADWRITE(I8259A_TAG, pic8259_device, read, write)

@@ -83,8 +83,11 @@ public:
 
 	void set_colmask(int data) { m_gfxcolmask = data; }
 	void set_bppmultmask( int mult, int mask ) { m_bppmult = mult; m_bppmask = mask; } // stadium hero has 3bpp tiles
+	void set_flip_screen(bool flip);
+
 	uint8_t m_gfxcolmask;
 	int m_rambank; // external connection?
+	bool m_flip_screen;
 
 	/* 16-bit accessors */
 

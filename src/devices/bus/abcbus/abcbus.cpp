@@ -80,6 +80,7 @@ void abcbus_slot_device::device_start()
 
 // slot devices
 #include "abc890.h"
+#include "cadmouse.h"
 #include "db411223.h"
 #include "fd2.h"
 #include "hdc.h"
@@ -109,6 +110,7 @@ SLOT_INTERFACE_START( abc80_cards )
 	SLOT_INTERFACE("abc830", ABC830)
 	SLOT_INTERFACE("db411223", DATABOARD_4112_23)
 	SLOT_INTERFACE("unidisk", UNIDISK)
+	SLOT_INTERFACE("cadabc", ABC_CADMOUSE)
 SLOT_INTERFACE_END
 
 

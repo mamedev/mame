@@ -71,19 +71,19 @@ DEFINE_DEVICE_TYPE(PIC16C622A, pic16c622a_device, "pic16c622a",  "PIC16C622A")
  *  Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( pic16c62x_rom_9, AS_PROGRAM, 16, pic16c62x_device )
+ADDRESS_MAP_START(pic16c62x_device::pic16c62x_rom_9)
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c62x_rom_10, AS_PROGRAM, 16, pic16c62x_device )
+ADDRESS_MAP_START(pic16c62x_device::pic16c62x_rom_10)
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c62x_rom_11, AS_PROGRAM, 16, pic16c62x_device )
+ADDRESS_MAP_START(pic16c62x_device::pic16c62x_rom_11)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c620_ram, AS_DATA, 8, pic16c62x_device )
+ADDRESS_MAP_START(pic16c62x_device::pic16c620_ram)
 	AM_RANGE(0x00, 0x06) AM_RAM
 	AM_RANGE(0x0a, 0x0c) AM_RAM
 	AM_RANGE(0x1f, 0x6f) AM_RAM
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( pic16c620_ram, AS_DATA, 8, pic16c62x_device )
 	AM_RANGE(0x9f, 0x9f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c622_ram, AS_DATA, 8, pic16c62x_device )
+ADDRESS_MAP_START(pic16c62x_device::pic16c622_ram)
 	AM_RANGE(0x00, 0x06) AM_RAM
 	AM_RANGE(0x0a, 0x0c) AM_RAM
 	AM_RANGE(0x1f, 0x7f) AM_RAM
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( pic16c622_ram, AS_DATA, 8, pic16c62x_device )
 ADDRESS_MAP_END
 
 // pic16c620a, pic16c621a and pic16c622a
-static ADDRESS_MAP_START( pic16c62xa_ram, AS_DATA, 8, pic16c62x_device )
+ADDRESS_MAP_START(pic16c62x_device::pic16c62xa_ram)
 	AM_RANGE(0x00, 0x06) AM_RAM
 	AM_RANGE(0x0a, 0x0c) AM_RAM
 	AM_RANGE(0x1f, 0x6f) AM_RAM
@@ -117,9 +117,9 @@ ADDRESS_MAP_END
 pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int picmodel)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
-	, ( ( program_width == 9 ) ? ADDRESS_MAP_NAME(pic16c62x_rom_9) : ( ( program_width == 10 ) ? ADDRESS_MAP_NAME(pic16c62x_rom_10) : ADDRESS_MAP_NAME(pic16c62x_rom_11) )))
+					   , ( ( program_width == 9 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_9), this) : ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_10), this) : address_map_constructor(FUNC(pic16c62x_device::pic16c62x_rom_11), this) )))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 8, 0
-	, ( ( picmodel == 0x16C620 || picmodel == 0x16C621 ) ? ADDRESS_MAP_NAME(pic16c620_ram) : ( ( picmodel == 0x16C622 ) ? ADDRESS_MAP_NAME(pic16c622_ram) : ADDRESS_MAP_NAME(pic16c62xa_ram) ) ) )
+					, ( ( picmodel == 0x16C620 || picmodel == 0x16C621 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c620_ram), this) : ( ( picmodel == 0x16C622 ) ? address_map_constructor(FUNC(pic16c62x_device::pic16c622_ram), this) : address_map_constructor(FUNC(pic16c62x_device::pic16c62xa_ram), this) ) ) )
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 5, 0)
 	, m_reset_vector(0x0)
 	, m_picmodel(picmodel)

@@ -23,6 +23,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bntyhunt(machine_config &config);
+	void bntyhunt_map(address_map &map);
 protected:
 
 	// devices
@@ -42,7 +43,7 @@ uint32_t bntyhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START( bntyhunt_map, AS_PROGRAM, 32, bntyhunt_state )
+ADDRESS_MAP_START(bntyhunt_state::bntyhunt_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 ADDRESS_MAP_END
 

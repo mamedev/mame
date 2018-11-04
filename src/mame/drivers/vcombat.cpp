@@ -140,6 +140,10 @@ public:
 	required_device<dac_word_interface> m_dac;
 	void shadfgtr(machine_config &config);
 	void vcombat(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void vid_0_map(address_map &map);
+	void vid_1_map(address_map &map);
 };
 
 uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -351,7 +355,7 @@ WRITE16_MEMBER(vcombat_state::vcombat_dac_w)
 		fprintf(stderr, "dac overflow %04x\n", data & 0x801f);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vcombat_state )
+ADDRESS_MAP_START(vcombat_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(main_video_write)
@@ -386,7 +390,7 @@ ADDRESS_MAP_END
 
 
 /* The first i860 - middle board */
-static ADDRESS_MAP_START( vid_0_map, AS_PROGRAM, 64, vcombat_state )
+ADDRESS_MAP_START(vcombat_state::vid_0_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v0_fb_w)      /* Shared framebuffer - half of the bits lost to 32-bit bus */
 	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share6")      /* M0<-P0 com 1 (0x440000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
@@ -397,7 +401,7 @@ ADDRESS_MAP_END
 
 
 /* The second i860 - top board */
-static ADDRESS_MAP_START( vid_1_map, AS_PROGRAM, 64, vcombat_state )
+ADDRESS_MAP_START(vcombat_state::vid_1_map)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v1_fb_w)      /* Half of the bits lost to 32-bit bus */
 	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share8")      /* M0->P1 com 1 (0x540000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
@@ -408,7 +412,7 @@ ADDRESS_MAP_END
 
 
 /* Sound CPU */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, vcombat_state )
+ADDRESS_MAP_START(vcombat_state::sound_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(vcombat_dac_w)

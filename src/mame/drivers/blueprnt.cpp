@@ -101,7 +101,7 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_coin_counter_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
+ADDRESS_MAP_START(blueprnt_state::blueprnt_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // service mode checks for 8 chips = 64K
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(blueprnt_videoram_w) AM_MIRROR(0x400) AM_SHARE("videoram")
@@ -115,13 +115,13 @@ static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(blueprnt_colorram_w) AM_MIRROR(0x400) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grasspin_map, AS_PROGRAM, 8, blueprnt_state )
-	AM_RANGE(0xc003, 0xc003) AM_READ(grasspin_sh_dipsw_r)
+ADDRESS_MAP_START(blueprnt_state::grasspin_map)
 	AM_IMPORT_FROM( blueprnt_map )
+	AM_RANGE(0xc003, 0xc003) AM_READ(grasspin_sh_dipsw_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, blueprnt_state )
+ADDRESS_MAP_START(blueprnt_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_MIRROR(0x1000)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x1000)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0x8002, 0x8002) AM_DEVREAD("ay2", ay8910_device, data_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, blueprnt_state )
+ADDRESS_MAP_START(blueprnt_state::sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_NOP // nmi mask maybe? grasspin writes it 0/1
 ADDRESS_MAP_END
@@ -389,7 +389,8 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(blueprnt_state::grasspin, blueprnt)
+MACHINE_CONFIG_START(blueprnt_state::grasspin)
+	blueprnt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

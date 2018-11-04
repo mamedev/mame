@@ -167,27 +167,27 @@ DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
 ***************************************************************************/
 
 /* FIXME: the memory maps should probably support rom banking for EA */
-static ADDRESS_MAP_START(program_10bit, AS_PROGRAM, 8, mcs48_cpu_device)
+ADDRESS_MAP_START(mcs48_cpu_device::program_10bit)
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_11bit, AS_PROGRAM, 8, mcs48_cpu_device)
+ADDRESS_MAP_START(mcs48_cpu_device::program_11bit)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8, mcs48_cpu_device)
+ADDRESS_MAP_START(mcs48_cpu_device::program_12bit)
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_6bit, AS_DATA, 8, mcs48_cpu_device)
+ADDRESS_MAP_START(mcs48_cpu_device::data_6bit)
 	AM_RANGE(0x00, 0x3f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, mcs48_cpu_device)
+ADDRESS_MAP_START(mcs48_cpu_device::data_7bit)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs48_cpu_device)
+ADDRESS_MAP_START(mcs48_cpu_device::data_8bit)
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
@@ -195,9 +195,9 @@ ADDRESS_MAP_END
 mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, (feature_mask & MB_FEATURE) != 0 ? 12 : 11, 0
-		, (rom_size == 1024) ? ADDRESS_MAP_NAME(program_10bit) : (rom_size == 2048) ? ADDRESS_MAP_NAME(program_11bit) : (rom_size == 4096) ? ADDRESS_MAP_NAME(program_12bit) : nullptr)
+					   , (rom_size == 1024) ? address_map_constructor(FUNC(mcs48_cpu_device::program_10bit), this) : (rom_size == 2048) ? address_map_constructor(FUNC(mcs48_cpu_device::program_11bit), this) : (rom_size == 4096) ? address_map_constructor(FUNC(mcs48_cpu_device::program_12bit), this) : address_map_constructor())
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, ( ( ram_size == 64 ) ? 6 : ( ( ram_size == 128 ) ? 7 : 8 ) ), 0
-		, (ram_size == 64) ? ADDRESS_MAP_NAME(data_6bit) : (ram_size == 128) ? ADDRESS_MAP_NAME(data_7bit) : ADDRESS_MAP_NAME(data_8bit))
+					, (ram_size == 64) ? address_map_constructor(FUNC(mcs48_cpu_device::data_6bit), this) : (ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) : address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	, m_port_in_cb{{*this}, {*this}}
 	, m_port_out_cb{{*this}, {*this}}

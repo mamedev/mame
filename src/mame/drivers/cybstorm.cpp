@@ -93,7 +93,7 @@ WRITE32_MEMBER(cybstorm_state::latch_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, cybstorm_state )
+ADDRESS_MAP_START(cybstorm_state::main_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE16("vad", atari_vad_device, control_read, control_write, 0xffffffff)
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, cybstorm_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vadbank_map, AS_PROGRAM, 16, cybstorm_state )
+ADDRESS_MAP_START(cybstorm_state::vadbank_map)
 	AM_RANGE(0x000000, 0x001fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
 	AM_RANGE(0x002000, 0x003fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
 	AM_RANGE(0x004000, 0x005fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
@@ -275,7 +275,8 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cybstorm_state::cybstorm, round2)
+MACHINE_CONFIG_START(cybstorm_state::cybstorm)
+	round2(config);
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

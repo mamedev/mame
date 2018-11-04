@@ -178,7 +178,7 @@ WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( gameplan_main_map, AS_PROGRAM, 8, gameplan_state )
+ADDRESS_MAP_START(gameplan_state::gameplan_main_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)    /* VIA 1 */
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)    /* VIA 2 */
@@ -194,7 +194,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gameplan_audio_map, AS_PROGRAM, 8, gameplan_state )
+ADDRESS_MAP_START(gameplan_state::gameplan_audio_map)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -205,7 +205,7 @@ ADDRESS_MAP_END
 
 
 /* same as Gameplan, but larger ROM */
-static ADDRESS_MAP_START( leprechn_audio_map, AS_PROGRAM, 8, gameplan_state )
+ADDRESS_MAP_START(gameplan_state::leprechn_audio_map)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -973,7 +973,7 @@ MACHINE_CONFIG_START(gameplan_state::gameplan)
 	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,gameplan)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(gameplan_video)
+	gameplan_video(config);
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1005,7 +1005,8 @@ MACHINE_CONFIG_START(gameplan_state::gameplan)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(gameplan_state::leprechn, gameplan)
+MACHINE_CONFIG_START(gameplan_state::leprechn)
+	gameplan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(LEPRECHAUN_MAIN_CPU_CLOCK)
 
@@ -1014,7 +1015,7 @@ MACHINE_CONFIG_DERIVED(gameplan_state::leprechn, gameplan)
 	MCFG_CPU_PROGRAM_MAP(leprechn_audio_map)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(leprechn_video)
+	leprechn_video(config);
 
 	/* via */
 	MCFG_DEVICE_MODIFY("via6522_0")

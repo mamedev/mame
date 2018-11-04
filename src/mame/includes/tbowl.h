@@ -83,4 +83,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_2);
 	void tbowl(machine_config &config);
+	void _6206A_map(address_map &map);
+	void _6206B_map(address_map &map);
+	void _6206C_map(address_map &map);
 };

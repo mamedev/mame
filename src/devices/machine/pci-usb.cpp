@@ -7,7 +7,7 @@ DEFINE_DEVICE_TYPE(USB_OHCI, usb_ohci_device, "usb_ohci", "USB 1.1 OHCI interfac
 DEFINE_DEVICE_TYPE(USB_UHCI, usb_uhci_device, "usb_uhci", "USB 1.1 UHCI interface")
 DEFINE_DEVICE_TYPE(USB_EHCI, usb_ehci_device, "usb_ehci", "USB 2.0 EHCI interface")
 
-DEVICE_ADDRESS_MAP_START(map, 32, usb_ohci_device)
+ADDRESS_MAP_START(usb_ohci_device::map)
 ADDRESS_MAP_END
 
 usb_ohci_device::usb_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -26,7 +26,7 @@ void usb_ohci_device::device_reset()
 	pci_device::device_reset();
 }
 
-DEVICE_ADDRESS_MAP_START(map, 32, usb_uhci_device)
+ADDRESS_MAP_START(usb_uhci_device::map)
 ADDRESS_MAP_END
 
 usb_uhci_device::usb_uhci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -45,7 +45,7 @@ void usb_uhci_device::device_reset()
 	pci_device::device_reset();
 }
 
-DEVICE_ADDRESS_MAP_START(map, 32, usb_ehci_device)
+ADDRESS_MAP_START(usb_ehci_device::map)
 ADDRESS_MAP_END
 
 usb_ehci_device::usb_ehci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -17,12 +17,6 @@ class vme_fcisio1_card_device : public device_t, public device_vme_card_interfac
 public:
 	vme_fcisio1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER (bootvect_r);
-
-	/* Dummy driver routines */
-	DECLARE_READ8_MEMBER (not_implemented_r);
-	DECLARE_WRITE8_MEMBER (not_implemented_w);
-
 protected:
 	vme_fcisio1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -35,6 +29,14 @@ protected:
 
 private:
 	DECLARE_READ8_MEMBER (config_rd);
+
+	DECLARE_READ16_MEMBER (bootvect_r);
+
+	/* Dummy driver routines */
+	DECLARE_READ8_MEMBER (not_implemented_r);
+	DECLARE_WRITE8_MEMBER (not_implemented_w);
+
+	void fcisio1_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<duscc68562_device> m_duscc0;

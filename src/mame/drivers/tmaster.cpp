@@ -140,6 +140,7 @@ public:
 
 	void tm(machine_config &config);
 	void tmds1204(machine_config &config);
+	void tmaster_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -256,7 +257,7 @@ READ_LINE_MEMBER(tmaster_state::read_rand)
 	return machine().rand() & 1;
 }
 
-static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
+ADDRESS_MAP_START(tmaster_state::tmaster_map)
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x27ffff ) AM_RAM
 	AM_RANGE( 0x280000, 0x28ffef ) AM_RAM AM_SHARE("nvram")
@@ -397,7 +398,8 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tmaster_state::tmds1204, tm)
+MACHINE_CONFIG_START(tmaster_state::tmds1204)
+	tm(config);
 	MCFG_DS1204_ADD("ds1204")
 MACHINE_CONFIG_END
 

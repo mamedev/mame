@@ -2821,7 +2821,8 @@ static INPUT_PORTS_START( epacman2 )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_DERIVED(epacman2_state::epacman2, egalaxn2)
+MACHINE_CONFIG_START(epacman2_state::epacman2)
+	egalaxn2(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

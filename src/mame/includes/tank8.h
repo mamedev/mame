@@ -94,6 +94,7 @@ public:
 	void set_collision(int index);
 
 	void tank8(machine_config &config);
+	void tank8_cpu_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

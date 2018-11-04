@@ -9,7 +9,7 @@
 #include "audio/seibu.h"
 #include "video/bufsprite.h"
 
-class raiden_state : public driver_device
+class raiden_state : public driver_device, protected seibu_sound_common
 {
 public:
 	raiden_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -76,4 +76,12 @@ public:
 	void raidenb(machine_config &config);
 	void raiden(machine_config &config);
 	void raidenu(machine_config &config);
+	void main_map(address_map &map);
+	void raiden_sound_decrypted_opcodes_map(address_map &map);
+	void raiden_sound_map(address_map &map);
+	void raidenb_main_map(address_map &map);
+	void raidenu_main_map(address_map &map);
+	void raidenu_sub_map(address_map &map);
+	void sei80bu_encrypted_full_map(address_map &map);
+	void sub_map(address_map &map);
 };

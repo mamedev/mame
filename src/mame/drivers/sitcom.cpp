@@ -75,6 +75,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
 	void sitcom(machine_config &config);
+	void sitcom_bank(address_map &map);
+	void sitcom_io(address_map &map);
+	void sitcom_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -133,19 +136,19 @@ protected:
 };
 
 
-ADDRESS_MAP_START( sitcom_bank, AS_PROGRAM, 8, sitcom_state )
+ADDRESS_MAP_START(sitcom_state::sitcom_bank)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("bootstrap", 0)
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( sitcom_mem, AS_PROGRAM, 8, sitcom_state )
+ADDRESS_MAP_START(sitcom_state::sitcom_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_DEVICE("bank", address_map_bank_device, amap8)
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( sitcom_io, AS_IO, 8, sitcom_state )
+ADDRESS_MAP_START(sitcom_state::sitcom_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x1c) AM_DEVREADWRITE("pia", i8255_device, read, write)
@@ -369,7 +372,8 @@ MACHINE_CONFIG_START(sitcom_state::sitcom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sitcom_timer_state::sitcomtmr, sitcom)
+MACHINE_CONFIG_START(sitcom_timer_state::sitcomtmr)
+	sitcom(config);
 	MCFG_DEVICE_ADD("ds2", DL1414T, 0) // remote display
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_state, update_ds<2>))
 

@@ -155,6 +155,11 @@ public:
 	void magic10(machine_config &config);
 	void hotslot(machine_config &config);
 	void sgsafari(machine_config &config);
+	void hotslot_map(address_map &map);
+	void magic102_map(address_map &map);
+	void magic10_map(address_map &map);
+	void magic10a_map(address_map &map);
+	void sgsafari_map(address_map &map);
 };
 
 
@@ -311,7 +316,7 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 *       Memory Maps        *
 ***************************/
 
-static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::magic10_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
@@ -327,7 +332,7 @@ static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::magic10a_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
@@ -343,7 +348,7 @@ static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::magic102_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
@@ -355,14 +360,14 @@ static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x500006, 0x500007) AM_READNOP // gives credits
 	AM_RANGE(0x50001a, 0x50001b) AM_READ_PORT("IN0")
 	AM_RANGE(0x50001c, 0x50001d) AM_READ_PORT("IN1")
-	AM_RANGE(0x500002, 0x50001f) AM_READNOP
-	AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
+//	AM_RANGE(0x500002, 0x50001f) AM_READNOP
+//	AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x700080, 0x700087) AM_RAM AM_SHARE("vregs")   // video registers?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::hotslot_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
@@ -381,7 +386,7 @@ static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x700080, 0x700087) AM_RAM AM_SHARE("vregs")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgsafari_map, AS_PROGRAM, 16, magic10_state )
+ADDRESS_MAP_START(magic10_state::sgsafari_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
@@ -498,64 +503,6 @@ static INPUT_PORTS_START( magic102 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-/*
-    credits inputs
-
-    PORT_START("CRED1")
-    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x40, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( On ) )
-    PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-    PORT_START("CRED2")
-    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x40, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( On ) )
-    PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
-*/
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( musicsrt )
@@ -674,6 +621,7 @@ static INPUT_PORTS_START( sgsafari )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout / Super Game")
 
 	PORT_START("DSW1")
+	// TODO: defaults are hardwired with aforementioned startup code, is it intentional?
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x0300,   0x0000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(        0x0300, DEF_STR( Easy ) )
@@ -748,7 +696,8 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 	MCFG_CPU_PROGRAM_MAP(magic10_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state, irq1_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	// 1FILL is required by vanilla magic10 at least (otherwise gameplay won't work properly)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -770,7 +719,8 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::magic10a, magic10)
+MACHINE_CONFIG_START(magic10_state::magic10a)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -778,7 +728,8 @@ MACHINE_CONFIG_DERIVED(magic10_state::magic10a, magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::magic102, magic10)
+MACHINE_CONFIG_START(magic10_state::magic102)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -789,7 +740,8 @@ MACHINE_CONFIG_DERIVED(magic10_state::magic102, magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::hotslot, magic10)
+MACHINE_CONFIG_START(magic10_state::hotslot)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -800,13 +752,14 @@ MACHINE_CONFIG_DERIVED(magic10_state::hotslot, magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::sgsafari, magic10)
+MACHINE_CONFIG_START(magic10_state::sgsafari)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sgsafari_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state, irq2_line_hold)    /* L1 interrupts */
-
+	
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
 MACHINE_CONFIG_END

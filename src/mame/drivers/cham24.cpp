@@ -96,6 +96,7 @@ public:
 	void cham24_set_mirroring( int mirroring );
 	void ppu_irq(int *ppu_regs);
 	void cham24(machine_config &config);
+	void cham24_map(address_map &map);
 };
 
 
@@ -221,7 +222,7 @@ WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 	}
 }
 
-static ADDRESS_MAP_START( cham24_map, AS_PROGRAM, 8, cham24_state )
+ADDRESS_MAP_START(cham24_state::cham24_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)

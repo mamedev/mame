@@ -152,7 +152,7 @@ READ8_MEMBER(redalert_state::panther_unk_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( redalert_main_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::redalert_main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_SHARE("bitmap_videoram")
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("charram")
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( redalert_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ww3_main_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::ww3_main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_SHARE("bitmap_videoram")
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("charram")
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( ww3_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( panther_main_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::panther_main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_SHARE("bitmap_videoram")
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("charram")
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( panther_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( demoneye_main_map, AS_PROGRAM, 8, redalert_state )
+ADDRESS_MAP_START(redalert_state::demoneye_main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_SHARE("bitmap_videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("charram")
@@ -395,10 +395,10 @@ MACHINE_CONFIG_START(redalert_state::redalert)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(redalert_video)
+	redalert_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(redalert_audio)
+	redalert_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::ww3)
@@ -409,10 +409,10 @@ MACHINE_CONFIG_START(redalert_state::ww3)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(ww3_video)
+	ww3_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(ww3_audio)
+	ww3_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::panther)
@@ -423,10 +423,10 @@ MACHINE_CONFIG_START(redalert_state::panther)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(panther_video)
+	panther_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(ww3_audio)
+	ww3_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::demoneye)
@@ -437,10 +437,10 @@ MACHINE_CONFIG_START(redalert_state::demoneye)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(demoneye_video)
+	demoneye_video(config);
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(demoneye_audio)
+	demoneye_audio(config);
 MACHINE_CONFIG_END
 
 

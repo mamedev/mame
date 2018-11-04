@@ -57,6 +57,12 @@ public:
 	void ec1841(machine_config &config);
 	void ec1847(machine_config &config);
 	void ec1840(machine_config &config);
+	void ec1840_io(address_map &map);
+	void ec1840_map(address_map &map);
+	void ec1841_io(address_map &map);
+	void ec1841_map(address_map &map);
+	void ec1847_io(address_map &map);
+	void ec1847_map(address_map &map);
 };
 
 /*
@@ -177,33 +183,33 @@ MACHINE_RESET_MEMBER(ec184x_state, ec1841)
 }
 
 
-static ADDRESS_MAP_START( ec1840_map, AS_PROGRAM, 8, ec184x_state )
+ADDRESS_MAP_START(ec184x_state::ec1840_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ec1841_map, AS_PROGRAM, 16, ec184x_state )
+ADDRESS_MAP_START(ec184x_state::ec1841_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ec1847_map, AS_PROGRAM, 8, ec184x_state )
+ADDRESS_MAP_START(ec184x_state::ec1847_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ec1840_io, AS_IO, 8, ec184x_state )
+ADDRESS_MAP_START(ec184x_state::ec1840_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5150_mb_device, map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ec1841_io, AS_IO, 16, ec184x_state )
+ADDRESS_MAP_START(ec184x_state::ec1841_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ec1841_mb_device, map, 0xffff)
 	AM_RANGE(0x02b0, 0x02b3) AM_READWRITE8(memboard_r, memboard_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ec1847_io, AS_IO, 8, ec184x_state )
+ADDRESS_MAP_START(ec184x_state::ec1847_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
 //  AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender

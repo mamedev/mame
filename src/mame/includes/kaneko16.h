@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef __KANEKO16_H__
-#define __KANEKO16_H__
+#ifndef MAME_INCLUDES_KANEKO16_H
+#define MAME_INCLUDES_KANEKO16_H
 
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
@@ -94,6 +94,12 @@ public:
 	void wingforc(machine_config &config);
 	void blazeon(machine_config &config);
 	void mgcrystl(machine_config &config);
+	void bakubrkr(address_map &map);
+	void blazeon(address_map &map);
+	void blazeon_soundmem(address_map &map);
+	void blazeon_soundport(address_map &map);
+	void mgcrystl(address_map &map);
+	void wingforc_soundport(address_map &map);
 };
 
 class kaneko16_gtmr_state : public kaneko16_state
@@ -122,6 +128,10 @@ public:
 	void gtmr2(machine_config &config);
 	void gtmre(machine_config &config);
 	void bloodwar(machine_config &config);
+	void bloodwar(address_map &map);
+	void bonkadv(address_map &map);
+	void gtmr2_map(address_map &map);
+	void gtmr_map(address_map &map);
 private:
 	void kaneko16_expand_sample_banks(const char *region);
 
@@ -174,6 +184,7 @@ public:
 
 	void patch_protection(uint32_t bra_offset,uint16_t bra_value,uint16_t checksum);
 	void berlwall(machine_config &config);
+	void berlwall(address_map &map);
 };
 
 class kaneko16_shogwarr_state : public kaneko16_state
@@ -195,6 +206,10 @@ public:
 
 	void shogwarr(machine_config &config);
 	void brapboys(machine_config &config);
+	void brapboys_oki2_map(address_map &map);
+	void shogwarr(address_map &map);
+	void shogwarr_oki1_map(address_map &map);
+	void shogwarr_oki2_map(address_map &map);
 private:
 	void kaneko16_common_oki_bank_w(const char *bankname, const char *tag, int bank, size_t fixedsize, size_t bankedsize);
 

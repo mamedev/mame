@@ -38,13 +38,14 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	void zac_proto(machine_config &config);
+	void zac_proto_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START( zac_proto_map, AS_PROGRAM, 8, zac_proto_state )
+ADDRESS_MAP_START(zac_proto_state::zac_proto_map)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0d00, 0x0dff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("PL0")
@@ -244,7 +245,7 @@ MACHINE_CONFIG_START(zac_proto_state::zac_proto)
 	MCFG_DEFAULT_LAYOUT(layout_zac_proto)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 /*--------------------------------

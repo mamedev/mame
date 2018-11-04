@@ -55,25 +55,29 @@ public:
 	required_device<ram_device> m_ram;
 	void vt220(machine_config &config);
 	void vt220a(machine_config &config);
+	void vt220_io(address_map &map);
+	void vt220_mem(address_map &map);
+	void vt220a_io(address_map &map);
+	void vt220a_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(vt220_mem, AS_PROGRAM, 8, vt220_state)
+ADDRESS_MAP_START(vt220_state::vt220_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt220a_mem, AS_PROGRAM, 8, vt220_state)
+ADDRESS_MAP_START(vt220_state::vt220a_mem)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt220_io, AS_IO, 8, vt220_state)
+ADDRESS_MAP_START(vt220_state::vt220_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0xc000) AM_RAM
 	AM_RANGE(0x3800, 0x380f) AM_MIRROR(0xc7f0) AM_DEVREADWRITE("duart", scn2681_device, read, write)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt220a_io, AS_IO, 8, vt220_state)
+ADDRESS_MAP_START(vt220_state::vt220a_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
@@ -121,7 +125,8 @@ MACHINE_CONFIG_START(vt220_state::vt220)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vt220_state::vt220a, vt220)
+MACHINE_CONFIG_START(vt220_state::vt220a)
+	vt220(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vt220a_mem)
 	MCFG_CPU_IO_MAP(vt220a_io)

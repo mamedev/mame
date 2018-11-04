@@ -11,11 +11,11 @@
 #include "video/vector.h"
 #include "screen.h"
 
-class segag80v_state : public driver_device
+class segag80v_state : public segag80snd_common
 {
 public:
 	segag80v_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: segag80snd_common(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_vectorram(*this, "vectorram"),
 		m_maincpu(*this, "maincpu"),
@@ -82,5 +82,6 @@ public:
 	void startrek(machine_config &config);
 	void zektor(machine_config &config);
 	void spacfury(machine_config &config);
-	void sega_speech_board(machine_config &config);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
 };

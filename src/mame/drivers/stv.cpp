@@ -42,8 +42,8 @@
 #include "cpu/scudsp/scudsp.h"
 #include "cpu/sh/sh2.h"
 #include "imagedev/chd_cd.h"
-#include "machine/eepromser.h"
 #include "machine/smpc.h"
+#include "machine/stvcd.h"
 #include "machine/stvprot.h"
 #include "sound/cdda.h"
 #include "sound/scsp.h"
@@ -975,7 +975,7 @@ DRIVER_INIT_MEMBER(stv_state, hopper)
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
 }
 
-static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
+ADDRESS_MAP_START(stv_state::stv_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("bios", 0) // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
@@ -984,7 +984,6 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("abus", 0) // cartridge
-	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_device, read, write, 0xffffffff)
@@ -1001,7 +1000,12 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, stv_state )
+ADDRESS_MAP_START(stv_state::stvcd_mem)
+	AM_IMPORT_FROM(stv_mem)
+	AM_RANGE(0x05800000, 0x0589ffff) AM_DEVREADWRITE("stvcd", stvcd_device, stvcd_r, stvcd_w)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(stv_state::sound_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
 ADDRESS_MAP_END
@@ -1097,9 +1101,6 @@ MACHINE_CONFIG_START(stv_state::stv)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually AK93C45F */
 
-	MCFG_TIMER_DRIVER_ADD("sector_timer", stv_state, stv_sector_cb)
-	MCFG_TIMER_DRIVER_ADD("sh1_cmd", stv_state, stv_sh1_sim)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -1118,16 +1119,23 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_SCSP_MAIN_IRQ_CB(DEVWRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(stv_state::stv_5881, stv)
+MACHINE_CONFIG_START(stv_state::stv_5881)
+	stv(config);
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(stv_state, crypt_read_callback)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(stv_state::stvcd)
+	stv(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(stvcd_mem)
+	MCFG_DEVICE_MODIFY("slave")
+	MCFG_CPU_PROGRAM_MAP(stvcd_mem)
+	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
+	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1141,7 +1149,8 @@ uint16_t stv_state::crypt_read_callback_ch2(uint32_t addr)
 	return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
 }
 
-MACHINE_CONFIG_DERIVED(stv_state::stv_5838, stv)
+MACHINE_CONFIG_START(stv_state::stv_5838)
+	stv(config);
 	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
 	MCFG_SET_5838_READ_CALLBACK_CH1(stv_state, crypt_read_callback_ch1)
 	MCFG_SET_5838_READ_CALLBACK_CH2(stv_state, crypt_read_callback_ch2)
@@ -1163,7 +1172,8 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 }
 
 
-MACHINE_CONFIG_DERIVED(stv_state::batmanfr, stv)
+MACHINE_CONFIG_START(stv_state::batmanfr)
+	stv(config);
 	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
 
@@ -1182,12 +1192,14 @@ MACHINE_CONFIG_START(stv_state::stv_cartslot)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","stv")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(stv_state::stv_slot, stv)
-	MCFG_FRAGMENT_ADD( stv_cartslot )
+MACHINE_CONFIG_START(stv_state::stv_slot)
+	stv(config);
+	stv_cartslot(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(stv_state::hopper, stv)
-		MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+MACHINE_CONFIG_START(stv_state::hopper)
+	stv(config);
+	MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(stv_state,stv)
@@ -1223,8 +1235,6 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 
 	m_maincpu->set_unscaled_clock(MASTER_CLOCK_320/2);
 	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
-
-	stvcd_reset();
 
 	m_prev_gamebank_select = 0xff;
 
@@ -1279,8 +1289,6 @@ MACHINE_START_MEMBER(stv_state,stv)
 	save_item(NAME(m_vdp2.odd));
 
 	stv_register_protection_savestates(); // machine/stvprot.c
-
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&stv_state::stvcd_exit, this));
 
 	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(stv_state::m68k_reset_callback),this));
 }
@@ -2884,7 +2892,7 @@ ROM_START( sfish2 )
 	ROM_LOAD16_WORD_SWAP( "mpr-18274.ic3",    0x0800000, 0x0400000, CRC(a6d76d23) SHA1(eee8c824eff4485d1b3af93a4fd5b21262eec803) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr-18275.ic4",    0x0c00000, 0x0200000, CRC(7691deca) SHA1(aabb6b098963caf51f66aefa0a97aed7eb86c308) ) // good
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "stvcd" )
 	DISK_IMAGE_READONLY( "cdp-00428", 0, SHA1(166cb5518fa5e0ab15d40dade70fa8913089dcd2) )
 
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
@@ -2904,7 +2912,7 @@ ROM_START( sfish2j )
 	ROM_LOAD16_WORD_SWAP( "mpr-18273.ic2",    0x0400000, 0x0400000, CRC(6fec0193) SHA1(5bbda289a5ca58c5bf57307360b07f0bb98f7356) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr-18274.ic3",    0x0800000, 0x0400000, CRC(a6d76d23) SHA1(eee8c824eff4485d1b3af93a4fd5b21262eec803) ) // good
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "stvcd" )
 	DISK_IMAGE_READONLY( "cdp-00386b", 0, SHA1(2cb357a930bb7fa668949717ec6daaad2669d137) )
 
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
@@ -3572,6 +3580,27 @@ ROM_START( patocar )
 	ROM_LOAD( "patocar.nv", 0x0000, 0x0080, CRC(d9873ee8) SHA1(e74747816bba6745afd718b0beec67a884c6a31c) )
 ROM_END
 
+ROM_START( sackids )
+//	STV_BIOS
+
+	// wants it's own specific bios, marked "CKBP1.13J0001024" at 0x800
+	// PC=06004150 is where it compares this
+	// it also looks like it has a specific I/O board for the lightpen
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "epr-20091.ic8",   0x000000, 0x080000, BAD_DUMP CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) )
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+    ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(4d9d1870) SHA1(c702964af2767b0db4ca1d6c7d07356e675d5efd) )
+    ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(39fca3e5) SHA1(29be552f58b69f8f3f237ca14f13af3673559123) )
+    ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(f38c79b6) SHA1(a470a22ef3d735c9929f70ef5441547a07a480e8) )
+    ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(63d09f3c) SHA1(e470e5af52f9ee70bf160ff58a5cbafd7e674073) )
+    ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(f89811ba) SHA1(8fa8b4b09430456bce63e45686640c7bcdde90e9) )
+    ROM_LOAD16_WORD_SWAP( "ic32.bin",     0x0c00000, 0x200000, CRC(1db6c26b) SHA1(2e14b7b021bce145f989295fdc6effcd799f00a4) )
+    ROM_LOAD16_WORD_SWAP( "ic34.bin",     0x0e00000, 0x200000, CRC(0f3622c8) SHA1(69337114d6902675018371101f0fba01902de54a) )
+    ROM_LOAD16_WORD_SWAP( "ic36.bin",     0x1000000, 0x200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) // empty / FF filled
+	
+	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
+ROM_END
 
 
 GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   stv,        ROT0,   "Sega",                         "ST-V Bios", MACHINE_IS_BIOS_ROOT )
@@ -3639,7 +3668,7 @@ GAME( 1999, pclub2v3,  stvbios, stv,      stv,      stvpc_state, stv,        ROT
 GAME( 1999, pclubpok,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club Pokemon B (U 991126 V1.000)", MACHINE_NOT_WORKING )
 // Japan sets
 GAME( 1999, pclub2fc,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", MACHINE_NOT_WORKING )
-GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (Japan)", MACHINE_NOT_WORKING ) // version info is blank
+GAME( 1998, pclub2pf,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Puffy (J V1.100)", MACHINE_NOT_WORKING ) // version info is blank
 GAME( 1997, pclub2pe,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Pepsiman (J 970618 V1.100)", MACHINE_NOT_WORKING )
 GAME( 1997, pclub2wb,  stvbios, stv,      stv,      stvpc_state, stv,        ROT0,   "Atlus",                        "Print Club 2 Warner Bros (J 970228 V1.000)", MACHINE_NOT_WORKING )
 
@@ -3686,13 +3715,15 @@ GAME( 1996, decathlt,  stvbios, stv_5838, stv,      stv_state,   decathlt,   ROT
 GAME( 1996, decathlto, decathlt,stv_5838, stv,      stv_state,   decathlt,   ROT0,   "Sega",                         "Decathlete (JUET 960424 V1.000)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998, twcup98,   stvbios, stv_5881, stv,      stv_state,   twcup98,    ROT0,   "Tecmo",                        "Tecmo World Cup '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // some situations with the GK result in the game stalling, maybe CPU core bug??
 GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   twcup98,    ROT0,   "Tecmo",                        "Tecmo World Soccer '98 (JUET 980410 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^^ (check)
+
 /* Gives I/O errors */
 GAME( 1996, magzun,    stvbios, stv,      stv,      stv_state,   magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, sackids,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,    "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* CD games */
-GAME( 1995, sfish2,    0,       stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1995, sfish2j,   sfish2,  stv,      stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1995, sfish2,    0,       stvcd,    stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1995, sfish2j,   sfish2,  stvcd,    stv,      stv_state,   stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 /*
 This is the known list of undumped ST-V games:

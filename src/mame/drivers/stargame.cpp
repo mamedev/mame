@@ -33,18 +33,22 @@ public:
 	DECLARE_MACHINE_RESET(stargame);
 
 	void stargame(machine_config &config);
+	void audiocpu_io(address_map &map);
+	void audiocpu_map(address_map &map);
+	void maincpu_io(address_map &map);
+	void maincpu_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
 };
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, stargame_state )
+ADDRESS_MAP_START(stargame_state::maincpu_map)
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x7800) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maincpu_io, AS_IO, 8, stargame_state )
+ADDRESS_MAP_START(stargame_state::maincpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x09) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // CSON - command to the sound cpu - NMI to sound cpu
@@ -58,7 +62,7 @@ static ADDRESS_MAP_START( maincpu_io, AS_IO, 8, stargame_state )
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audiocpu_map, AS_PROGRAM, 8, stargame_state )
+ADDRESS_MAP_START(stargame_state::audiocpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x3ffe) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)
@@ -67,7 +71,7 @@ static ADDRESS_MAP_START( audiocpu_map, AS_PROGRAM, 8, stargame_state )
 	AM_RANGE(0xe000, 0xffff) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w) // COMAND - acknowledge NMI and read the sound command
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audiocpu_io, AS_IO, 8, stargame_state )
+ADDRESS_MAP_START(stargame_state::audiocpu_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x01)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("ay", ay8910_device, data_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay", ay8910_device, data_address_w)
@@ -114,7 +118,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	MCFG_Z80CTC_ZC0_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))    // SINT - turn on interrupt of the audiocpu
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("measnd")
 	MCFG_SOUND_ADD("mea8000", MEA8000, 15000000 / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "measnd", 1.0)

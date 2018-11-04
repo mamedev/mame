@@ -83,4 +83,11 @@ public:
 	void crgolf(machine_config &config);
 	void crgolf_video(machine_config &config);
 	void mastrglf(machine_config &config);
+	void main_map(address_map &map);
+	void mastrglf_io(address_map &map);
+	void mastrglf_map(address_map &map);
+	void mastrglf_subio(address_map &map);
+	void mastrglf_submap(address_map &map);
+	void sound_map(address_map &map);
+	void vrambank_map(address_map &map);
 };

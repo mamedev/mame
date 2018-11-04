@@ -238,6 +238,14 @@ public:
 	void bbcb_us(machine_config &config);
 	void econx25(machine_config &config);
 	void acw443(machine_config &config);
+	void bbc_base(address_map &map);
+	void bbca_mem(address_map &map);
+	void bbcb_mem(address_map &map);
+	void bbcb_nofdc_mem(address_map &map);
+	void bbcbp128_mem(address_map &map);
+	void bbcbp_mem(address_map &map);
+	void bbcm_mem(address_map &map);
+	void reutapm_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

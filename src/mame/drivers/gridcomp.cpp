@@ -139,6 +139,9 @@ public:
 	void grid1139(machine_config &config);
 	void grid1109(machine_config &config);
 	void grid1101(machine_config &config);
+	void grid1101_io(address_map &map);
+	void grid1101_map(address_map &map);
+	void grid1121_map(address_map &map);
 private:
 	bool m_kbd_ready;
 	uint16_t m_kbd_data;
@@ -312,7 +315,7 @@ IRQ_CALLBACK_MEMBER(gridcomp_state::irq_callback)
 }
 
 
-static ADDRESS_MAP_START( grid1101_map, AS_PROGRAM, 16, gridcomp_state )
+ADDRESS_MAP_START(gridcomp_state::grid1101_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xdfe80, 0xdfe83) AM_DEVREADWRITE8("i7220", i7220_device, read, write, 0x00ff)
 	AM_RANGE(0xdfea0, 0xdfeaf) AM_UNMAP // ??
@@ -323,7 +326,7 @@ static ADDRESS_MAP_START( grid1101_map, AS_PROGRAM, 16, gridcomp_state )
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grid1121_map, AS_PROGRAM, 16, gridcomp_state )
+ADDRESS_MAP_START(gridcomp_state::grid1121_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x90000, 0x97fff) AM_UNMAP // ?? ROM slot
 	AM_RANGE(0x9ff00, 0x9ff0f) AM_UNMAP // AM_READ(grid_9ff0_r) // ?? ROM?
@@ -339,7 +342,7 @@ static ADDRESS_MAP_START( grid1121_map, AS_PROGRAM, 16, gridcomp_state )
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grid1101_io, AS_IO, 16, gridcomp_state )
+ADDRESS_MAP_START(gridcomp_state::grid1101_io)
 	AM_RANGE(0x0000, 0x000f) AM_DEVICE(I80130_TAG, i80130_device, io_map)
 ADDRESS_MAP_END
 
@@ -398,29 +401,34 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gridcomp_state::grid1109, grid1101)
+MACHINE_CONFIG_START(gridcomp_state::grid1109)
+	grid1101(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gridcomp_state::grid1121, grid1101)
+MACHINE_CONFIG_START(gridcomp_state::grid1121)
+	grid1101(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(24'000'000) / 3) // XXX
 	MCFG_CPU_PROGRAM_MAP(grid1121_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gridcomp_state::grid1129, grid1121)
+MACHINE_CONFIG_START(gridcomp_state::grid1129)
+	grid1121(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gridcomp_state::grid1131, grid1121)
+MACHINE_CONFIG_START(gridcomp_state::grid1131)
+	grid1121(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(gridcomp_state, screen_update_113x)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 240) // XXX
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gridcomp_state::grid1139, grid1131)
+MACHINE_CONFIG_START(gridcomp_state::grid1139)
+	grid1131(config);
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END

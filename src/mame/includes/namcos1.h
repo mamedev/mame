@@ -141,6 +141,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void ns1(machine_config &config);
+	void main_map(address_map &map);
+	void mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
+	void virtual_map(address_map &map);
 private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram);
 };

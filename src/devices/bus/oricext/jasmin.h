@@ -17,13 +17,7 @@ public:
 	jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~jasmin_device();
 
-	DECLARE_ADDRESS_MAP(map, 8);
 	DECLARE_INPUT_CHANGED_MEMBER(boot_pressed);
-	DECLARE_WRITE8_MEMBER(side_sel_w);
-	DECLARE_WRITE8_MEMBER(fdc_reset_w);
-	DECLARE_WRITE8_MEMBER(ram_access_w);
-	DECLARE_WRITE8_MEMBER(rom_access_w);
-	DECLARE_WRITE8_MEMBER(select_w);
 
 protected:
 	virtual void device_start() override;
@@ -32,7 +26,16 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+private:
 	void remap();
+
+	DECLARE_WRITE8_MEMBER(side_sel_w);
+	DECLARE_WRITE8_MEMBER(fdc_reset_w);
+	DECLARE_WRITE8_MEMBER(ram_access_w);
+	DECLARE_WRITE8_MEMBER(rom_access_w);
+	DECLARE_WRITE8_MEMBER(select_w);
+
+	void map(address_map &map);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

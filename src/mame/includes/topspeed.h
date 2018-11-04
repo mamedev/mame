@@ -94,4 +94,8 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_topspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void topspeed(machine_config &config);
+	void cpua_map(address_map &map);
+	void cpub_map(address_map &map);
+	void z80_io(address_map &map);
+	void z80_prg(address_map &map);
 };

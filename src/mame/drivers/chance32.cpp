@@ -70,6 +70,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void chance32(machine_config &config);
+	void chance32_map(address_map &map);
+	void chance32_portmap(address_map &map);
 };
 
 
@@ -197,7 +199,7 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 }
 
 
-static ADDRESS_MAP_START( chance32_map, AS_PROGRAM, 8, chance32_state )
+ADDRESS_MAP_START(chance32_state::chance32_map)
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -205,7 +207,7 @@ static ADDRESS_MAP_START( chance32_map, AS_PROGRAM, 8, chance32_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(chance32_bgram_w) AM_SHARE("bgram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chance32_portmap, AS_IO, 8, chance32_state )
+ADDRESS_MAP_START(chance32_state::chance32_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITENOP        // writing bit3 constantly... watchdog?
 	AM_RANGE(0x13, 0x13) AM_WRITE(mux_w)

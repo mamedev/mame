@@ -347,7 +347,7 @@ WRITE8_MEMBER(firetrap_state::flip_screen_w)
 	flip_screen_set(data);
 }
 
-static ADDRESS_MAP_START( firetrap_base_map, AS_PROGRAM, 8, firetrap_state )
+ADDRESS_MAP_START(firetrap_state::firetrap_base_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -372,18 +372,18 @@ static ADDRESS_MAP_START( firetrap_base_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8, firetrap_state )
+ADDRESS_MAP_START(firetrap_state::firetrap_map)
 	AM_IMPORT_FROM( firetrap_base_map )
 	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( firetrap_bootleg_map, AS_PROGRAM, 8, firetrap_state )
+ADDRESS_MAP_START(firetrap_state::firetrap_bootleg_map)
 	AM_IMPORT_FROM( firetrap_base_map )
 	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_bootleg_r)
 	AM_RANGE(0xf800, 0xf8ff) AM_ROM /* extra ROM in the bootleg with unprotection code */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, firetrap_state )
+ADDRESS_MAP_START(firetrap_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_data_w)

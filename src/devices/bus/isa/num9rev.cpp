@@ -14,7 +14,7 @@
 
 DEFINE_DEVICE_TYPE(ISA8_NUM_9_REV, isa8_number_9_rev_device, "number_9_rev", "Number Nine Revolution 512x32/1024x8")
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, isa8_number_9_rev_device )
+ADDRESS_MAP_START(isa8_number_9_rev_device::upd7220_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_NOP
 ADDRESS_MAP_END
 

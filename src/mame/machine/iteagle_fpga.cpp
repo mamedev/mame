@@ -17,16 +17,16 @@
 
 DEFINE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device, "iteagle_fpga", "ITEagle FPGA")
 
-DEVICE_ADDRESS_MAP_START(fpga_map, 32, iteagle_fpga_device)
+ADDRESS_MAP_START(iteagle_fpga_device::fpga_map)
 	AM_RANGE(0x000, 0x01f) AM_READWRITE(fpga_r, fpga_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(rtc_map, 32, iteagle_fpga_device)
+ADDRESS_MAP_START(iteagle_fpga_device::rtc_map)
 	AM_RANGE(0x000, 0x7ff) AM_READWRITE(rtc_r, rtc_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(ram_map, 32, iteagle_fpga_device)
-	AM_RANGE(0x00000, 0x40) AM_READWRITE(e1_nvram_r, e1_nvram_w)
+ADDRESS_MAP_START(iteagle_fpga_device::ram_map)
+	AM_RANGE(0x00000, 0x3f) AM_READWRITE(e1_nvram_r, e1_nvram_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(e1_ram_r, e1_ram_w)
 ADDRESS_MAP_END
 
@@ -643,7 +643,7 @@ WRITE32_MEMBER( iteagle_fpga_device::e1_ram_w )
 
 DEFINE_DEVICE_TYPE(ITEAGLE_EEPROM, iteagle_eeprom_device, "iteagle_eeprom", "ITEagle EEPROM AT93C46")
 
-DEVICE_ADDRESS_MAP_START(eeprom_map, 32, iteagle_eeprom_device)
+ADDRESS_MAP_START(iteagle_eeprom_device::eeprom_map)
 	AM_RANGE(0x0000, 0x000F) AM_READWRITE(eeprom_r, eeprom_w)
 ADDRESS_MAP_END
 
@@ -767,7 +767,7 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device, "iteagle_periph", "ITEagle Peripheral Controller")
 
-DEVICE_ADDRESS_MAP_START(ctrl_map, 32, iteagle_periph_device)
+ADDRESS_MAP_START(iteagle_periph_device::ctrl_map)
 	AM_RANGE(0x000, 0x0cf) AM_READWRITE(ctrl_r, ctrl_w)
 ADDRESS_MAP_END
 

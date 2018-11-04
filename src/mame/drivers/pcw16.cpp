@@ -142,7 +142,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::pcw16_timer_callback)
 	}
 }
 
-static ADDRESS_MAP_START(pcw16_map, AS_PROGRAM, 8, pcw16_state )
+ADDRESS_MAP_START(pcw16_state::pcw16_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pcw16_mem_r, pcw16_mem_w)
 ADDRESS_MAP_END
 
@@ -934,7 +934,7 @@ static SLOT_INTERFACE_START( pcw16_floppies )
 SLOT_INTERFACE_END
 
 
-static ADDRESS_MAP_START(pcw16_io, AS_IO, 8, pcw16_state )
+ADDRESS_MAP_START(pcw16_state::pcw16_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* super i/o chip */
 	AM_RANGE(0x018, 0x01f) AM_DEVICE("fdc", pc_fdc_superio_device, map)

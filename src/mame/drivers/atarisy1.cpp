@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER(atarisy1_state::coin_counter_left_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
+ADDRESS_MAP_START(atarisy1_state::main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_ROM /* slapstic maps here */
 	AM_RANGE(0x2e0000, 0x2e0001) AM_READ(atarisy1_int3state_r)
@@ -479,7 +479,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy1_state )
+ADDRESS_MAP_START(atarisy1_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -802,27 +802,33 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(atarisy1_state, via_pb_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::marble, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::marble)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 103)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::peterpak, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::peterpak)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::indytemp, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::indytemp)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 105)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::roadrunn, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::roadrunn)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 108)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::roadb109, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::roadb109)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 109)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarisy1_state::roadb110, atarisy1)
+MACHINE_CONFIG_START(atarisy1_state::roadb110)
+	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 110)
 MACHINE_CONFIG_END
 

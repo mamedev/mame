@@ -154,6 +154,8 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( kc );
 	void kc85_3(machine_config &config);
+	void kc85_3_io(address_map &map);
+	void kc85_3_mem(address_map &map);
 };
 
 
@@ -187,6 +189,8 @@ public:
 	uint8_t *             m_display_video_ram;
 	void kc85_4(machine_config &config);
 	void kc85_5(machine_config &config);
+	void kc85_4_io(address_map &map);
+	void kc85_4_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_KC_H

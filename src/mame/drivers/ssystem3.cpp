@@ -219,7 +219,7 @@ DRIVER_INIT_MEMBER(ssystem3_state,ssystem3)
 	ssystem3_lcd_reset();
 }
 
-static ADDRESS_MAP_START( ssystem3_map , AS_PROGRAM, 8, ssystem3_state )
+ADDRESS_MAP_START(ssystem3_state::ssystem3_map)
 	AM_RANGE( 0x0000, 0x03ff) AM_RAM
 					/*
 67-de playfield ($40 means white, $80 black)
@@ -230,12 +230,8 @@ static ADDRESS_MAP_START( ssystem3_map , AS_PROGRAM, 8, ssystem3_state )
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
 	AM_RANGE( 0x6000, 0x600f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
-#if 1
 	AM_RANGE( 0xc000, 0xdfff) AM_ROM
 	AM_RANGE( 0xf000, 0xffff) AM_ROM
-#else
-	AM_RANGE( 0xc000, 0xffff) AM_ROM
-#endif
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssystem3 )

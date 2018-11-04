@@ -40,6 +40,7 @@ public:
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
 	void whitestar(machine_config &config);
+	void whitestar_map(address_map &map);
 };
 
 static INPUT_PORTS_START( whitestar )
@@ -66,7 +67,7 @@ static INPUT_PORTS_START( whitestar )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
+ADDRESS_MAP_START(whitestar_state::whitestar_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DEDICATED")
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW0")

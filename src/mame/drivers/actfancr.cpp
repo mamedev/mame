@@ -68,7 +68,7 @@ WRITE8_MEMBER(actfancr_state::actfancr_buffer_spriteram_w)
 	}
 }
 
-static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8, actfancr_state )
+ADDRESS_MAP_START(actfancr_state::actfan_map)
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control0_8bit_w)
 	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_swap_w)
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_SHARE("main_ram") /* Main ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
+ADDRESS_MAP_START(actfancr_state::triothep_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control0_8bit_w)
 	AM_RANGE(0x040010, 0x04001f) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control1_8bit_swap_w)
@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8, actfancr_state )
+ADDRESS_MAP_START(actfancr_state::dec0_s_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)

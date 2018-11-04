@@ -258,6 +258,8 @@ public:
 	void vram_write(uint8_t data);
 
 	void vk100(machine_config &config);
+	void vk100_io(address_map &map);
+	void vk100_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -685,7 +687,7 @@ READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 	return code;
 }
 
-static ADDRESS_MAP_START(vk100_mem, AS_PROGRAM, 8, vk100_state)
+ADDRESS_MAP_START(vk100_state::vk100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x700f ) AM_MIRROR(0x0ff0) AM_READ(vk100_keyboard_column_r)
@@ -733,7 +735,7 @@ ADDRESS_MAP_END
    x   1   1   1   1   0   x   x     W     unused
    x   1   1   1   1   1   x   x     W     unused
 */
-static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
+ADDRESS_MAP_START(vk100_state::vk100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // guess, probably correct
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xBE) AM_DEVWRITE("crtc", mc6845_device, address_w)

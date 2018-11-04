@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-28 14:01+1100\n"
-"PO-Revision-Date: 2017-10-26 15:00+0300\n"
+"PO-Revision-Date: 2018-01-29 16:00+0200\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -1746,7 +1746,7 @@ msgstr "Αυτόματη αποθήκευση/επαναφορά"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Rewind capacity"
-msgstr ""
+msgstr "Χωρητικότητα επαναφοράς"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Bilinear snapshot"
@@ -2193,6 +2193,8 @@ msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
+"Έλεγχος ROMs \tΑπενεργοποιημένος\n"
+"Έλεγχος Δειγμάτων Ήχου \tΑπενεργοποιημένος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 #, c-format
@@ -2437,7 +2439,7 @@ msgstr "[δημιουργία]"
 #: src/frontend/mame/ui/filesel.cpp:419
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "Σφάλμα πρόσβασης %s"
 
 #: src/frontend/mame/ui/filesel.cpp:515
 msgid "Select access mode"
@@ -2803,28 +2805,18 @@ msgstr "Εύρεση Cheat"
 
 #: plugins/portname/init.lua:89
 msgid "Save input names to file"
-msgstr ""
+msgstr "Αποθήκευση ονομάτων εισόδου στο αρχείο"
 
 #: plugins/portname/init.lua:115 plugins/portname/init.lua:120
 #: plugins/portname/init.lua:136
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "Σφάλμα αποθήκευσης ονόματος εισόδου στο αρχείο"
 
 #: plugins/portname/init.lua:153
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "Το όνομα της θύρας εισόδου αποθηκεύτηκε στο αρχείο %s"
 
 #: plugins/portname/init.lua:158
 msgid "Input ports"
-msgstr ""
-
-#~ msgid ""
-#~ "ROM Audit Disabled\t\n"
-#~ "Samples Audit Disabled\t\n"
-#~ msgstr ""
-#~ "Έλεγχος ROMs Απενεργοποιημένος\t\n"
-#~ "Έλεγχος Δειγμάτων Ήχου Απενεργοποιημένος\t\n"
-
-#~ msgid "Default name is "
-#~ msgstr "Το προεπιλεγμένο όνομα είναι "
+msgstr "Θύρες εισόδου"

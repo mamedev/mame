@@ -45,6 +45,9 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+
+	void abc_hdc_io(address_map &map);
+	void abc_hdc_mem(address_map &map);
 };
 
 

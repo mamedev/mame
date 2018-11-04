@@ -32,6 +32,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(bsmt_reset_line);
 
+	void bsmt_map(address_map &map);
+	void decobsmt_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,7 +55,6 @@ private:
 
 
 // device type definition
-extern const device_type DECOBSMT;
 DECLARE_DEVICE_TYPE(DECOBSMT, decobsmt_device)
 
 #endif  // MAME_AUDIO_DECOBSMT_H

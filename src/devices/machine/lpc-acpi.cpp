@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(LPC_ACPI, lpc_acpi_device, "lpc_acpi", "LPC ACPI")
 
-DEVICE_ADDRESS_MAP_START(map, 32, lpc_acpi_device)
+ADDRESS_MAP_START(lpc_acpi_device::map)
 	AM_RANGE(0x00, 0x03) AM_READWRITE16(pm1_sts_r,        pm1_sts_w,        0x0000ffff)
 	AM_RANGE(0x00, 0x03) AM_READWRITE16(pm1_en_r,         pm1_en_w,         0xffff0000)
 	AM_RANGE(0x04, 0x07) AM_READWRITE  (pm1_cnt_r,        pm1_cnt_w)

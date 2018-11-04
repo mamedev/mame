@@ -861,6 +861,8 @@ function createMAMEProjects(_target, _subtarget, _name)
 	}
 	includedirs {
 		ext_includedir("flac"),
+		ext_includedir("glm"),
+		ext_includedir("jpeg"),
 	}
 
 end
@@ -1023,7 +1025,9 @@ files {
 	MAME_DIR .. "src/mame/audio/avalnche.cpp",
 	MAME_DIR .. "src/mame/drivers/badlands.cpp",
 	MAME_DIR .. "src/mame/includes/badlands.h",
+	MAME_DIR .. "src/mame/machine/badlands.cpp",
 	MAME_DIR .. "src/mame/video/badlands.cpp",
+	MAME_DIR .. "src/mame/drivers/badlandsbl.cpp",
 	MAME_DIR .. "src/mame/drivers/bartop52.cpp",
 	MAME_DIR .. "src/mame/drivers/batman.cpp",
 	MAME_DIR .. "src/mame/includes/batman.h",
@@ -1597,8 +1601,6 @@ files {
 	MAME_DIR .. "src/mame/audio/madalien.cpp",
 	MAME_DIR .. "src/mame/video/madalien.cpp",
 	MAME_DIR .. "src/mame/drivers/madmotor.cpp",
-	MAME_DIR .. "src/mame/includes/madmotor.h",
-	MAME_DIR .. "src/mame/video/madmotor.cpp",
 	MAME_DIR .. "src/mame/drivers/metlclsh.cpp",
 	MAME_DIR .. "src/mame/includes/metlclsh.h",
 	MAME_DIR .. "src/mame/video/metlclsh.cpp",
@@ -2309,6 +2311,7 @@ files {
 	MAME_DIR .. "src/mame/video/konamigx.cpp",
 	MAME_DIR .. "src/mame/drivers/konamim2.cpp",
 	MAME_DIR .. "src/mame/drivers/konmedal.cpp",
+	MAME_DIR .. "src/mame/drivers/konmedal68k.cpp",
 	MAME_DIR .. "src/mame/drivers/kontest.cpp",
 	MAME_DIR .. "src/mame/drivers/konendev.cpp",
 	MAME_DIR .. "src/mame/drivers/ksys573.cpp",
@@ -4411,11 +4414,6 @@ files {
 --------------------------------------------------
 
 createMAMEProjects(_target, _subtarget, "misc")
-
-includedirs {
-	ext_includedir("jpeg"),
-}
-
 files {
 	MAME_DIR .. "src/mame/drivers/39in1.cpp",
 	MAME_DIR .. "src/mame/machine/pxa255.h",

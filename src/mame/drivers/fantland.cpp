@@ -124,7 +124,7 @@ WRITE16_MEMBER(fantland_state::spriteram2_16_w)
 		spriteram_2[2 * offset + 1] = data >> 8;
 }
 
-static ADDRESS_MAP_START( fantland_map, AS_PROGRAM, 16, fantland_state )
+ADDRESS_MAP_START(fantland_state::fantland_map)
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x7ffff ) AM_ROM
 
@@ -144,7 +144,7 @@ ADDRESS_MAP_END
                                 Galaxy Gunners
 ***************************************************************************/
 
-static ADDRESS_MAP_START( galaxygn_map, AS_PROGRAM, 8, fantland_state )
+ADDRESS_MAP_START(fantland_state::galaxygn_map)
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
@@ -236,7 +236,7 @@ READ8_MEMBER(fantland_state::borntofi_inputs_r)
 	return m_input_ret[offset];
 }
 
-static ADDRESS_MAP_START( borntofi_map, AS_PROGRAM, 8, fantland_state )
+ADDRESS_MAP_START(fantland_state::borntofi_map)
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
@@ -263,7 +263,7 @@ ADDRESS_MAP_END
                            Wheels Runner
 ***************************************************************************/
 
-static ADDRESS_MAP_START( wheelrun_map, AS_PROGRAM, 8, fantland_state )
+ADDRESS_MAP_START(fantland_state::wheelrun_map)
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
 
 	AM_RANGE(0x30000, 0x3ffff) AM_ROM
@@ -290,19 +290,19 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( fantland_sound_map, AS_PROGRAM, 8, fantland_state )
+ADDRESS_MAP_START(fantland_state::fantland_sound_map)
 	AM_RANGE( 0x00000, 0x01fff ) AM_RAM
 	AM_RANGE( 0x80000, 0x9ffff ) AM_ROM
 	AM_RANGE( 0xc0000, 0xfffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fantland_sound_iomap, AS_IO, 8, fantland_state )
+ADDRESS_MAP_START(fantland_state::fantland_sound_iomap)
 	AM_RANGE( 0x0080, 0x0080 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE("dac", dac_byte_interface, write )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galaxygn_sound_iomap, AS_IO, 8, fantland_state )
+ADDRESS_MAP_START(fantland_state::galaxygn_sound_iomap)
 	AM_RANGE( 0x0080, 0x0080 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 ADDRESS_MAP_END
@@ -400,7 +400,7 @@ WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_2) { borntofi_adpcm_int(m_m
 WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_3) { borntofi_adpcm_int(m_msm4, 3); }
 
 
-static ADDRESS_MAP_START( borntofi_sound_map, AS_PROGRAM, 8, fantland_state )
+ADDRESS_MAP_START(fantland_state::borntofi_sound_map)
 	AM_RANGE( 0x00000, 0x003ff ) AM_RAM
 	AM_RANGE( 0x04000, 0x04000 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE( 0x04000, 0x0401f ) AM_WRITE(borntofi_msm5205_w)
@@ -413,7 +413,7 @@ ADDRESS_MAP_END
                            Wheels Runner
 ***************************************************************************/
 
-static ADDRESS_MAP_START( wheelrun_sound_map, AS_PROGRAM, 8, fantland_state )
+ADDRESS_MAP_START(fantland_state::wheelrun_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)

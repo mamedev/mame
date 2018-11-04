@@ -15,7 +15,7 @@ wpc_shift_device::~wpc_shift_device()
 {
 }
 
-DEVICE_ADDRESS_MAP_START( registers, 8, wpc_shift_device )
+ADDRESS_MAP_START(wpc_shift_device::registers)
 	AM_RANGE(0, 0) AM_READWRITE(adrh_r, adrh_w)
 	AM_RANGE(1, 1) AM_READWRITE(adrl_r, adrl_w)
 	AM_RANGE(2, 2) AM_READWRITE(val1_r, val1_w)

@@ -30,6 +30,8 @@ public:
 	{ }
 
 	void ice_tbd(machine_config &config);
+	void ice_tbd_io_map(address_map &map);
+	void ice_tbd_map(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -38,12 +40,12 @@ private:
 
 
 
-static ADDRESS_MAP_START( ice_tbd_map, AS_PROGRAM, 8, ice_tbd_state )
+ADDRESS_MAP_START(ice_tbd_state::ice_tbd_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ice_tbd_io_map, AS_IO, 8, ice_tbd_state )
+ADDRESS_MAP_START(ice_tbd_state::ice_tbd_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 ADDRESS_MAP_END

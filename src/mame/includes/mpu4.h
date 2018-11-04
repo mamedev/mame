@@ -296,6 +296,8 @@ public:
 	void mpu4_bwb_7reel(machine_config &config);
 	void mpu4base(machine_config &config);
 
+	void mpu4_6809_map(address_map &map);
+	void mpu4_memmap(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

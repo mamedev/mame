@@ -71,8 +71,9 @@ public:
 
 	void m6801_clock_serial();
 
+	void m6803_mem(address_map &map);
 protected:
-	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = nullptr);
+	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = address_map_constructor());
 
 	// device-level overrides
 	virtual void device_start() override;

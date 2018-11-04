@@ -98,7 +98,7 @@ const tiny_rom_entry *wangpc_keyboard_device::device_rom_region() const
 //  ADDRESS_MAP( wangpc_keyboard_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( wangpc_keyboard_io, AS_IO, 8, wangpc_keyboard_device )
+ADDRESS_MAP_START(wangpc_keyboard_device::wangpc_keyboard_io)
 	//AM_RANGE(0x0000, 0xfeff) AM_READNOP
 	AM_RANGE(0x47, 0x58) AM_MIRROR(0xff00) AM_READNOP
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_DEVWRITE(SN76496_TAG, sn76496_device, write)

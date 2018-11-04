@@ -153,6 +153,8 @@ public:
 	void ti99_4a_60hz(machine_config &config);
 	void ti99_4a(machine_config &config);
 	void ti99_4_60hz(machine_config &config);
+	void cru_map(address_map &map);
+	void memmap(address_map &map);
 private:
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
@@ -214,7 +216,7 @@ enum
 /*
     Memory map. All of the work is done in the datamux (see datamux.c).
 */
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4x_state)
+ADDRESS_MAP_START(ti99_4x_state::memmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, read, write) AM_DEVSETOFFSET(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, setoffset)
 ADDRESS_MAP_END
@@ -239,12 +241,12 @@ ADDRESS_MAP_END
 
     Write:0000 - 01ff corresponds to bit 0 of base address 0000 - 03fe
 */
-static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4x_state)
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0x003c) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+ADDRESS_MAP_START(ti99_4x_state::cru_map)
 	AM_RANGE(0x0000, 0x01ff) AM_READ(cruread)
+	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0x003c) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x01e0) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(cruwrite)
+	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x01e0) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 ADDRESS_MAP_END
 
 
@@ -912,24 +914,26 @@ MACHINE_CONFIG_END
 /*
     US version: 60 Hz, NTSC
 */
-MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4_60hz, ti99_4)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918, XTAL(10'738'635) / 2 )                  \
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )                             \
+MACHINE_CONFIG_START(ti99_4x_state::ti99_4_60hz)
+	ti99_4(config);
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918, XTAL(10'738'635) / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
-MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4_50hz, ti99_4)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929, XTAL(10'738'635) / 2 ) \
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
-	MCFG_TMS9928A_SCREEN_ADD_PAL( TI_SCREEN_TAG )                              \
+MACHINE_CONFIG_START(ti99_4x_state::ti99_4_50hz)
+	ti99_4(config);
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929, XTAL(10'738'635) / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_SCREEN_ADD_PAL( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
@@ -1028,24 +1032,26 @@ MACHINE_CONFIG_END
 /*
     US version: 60 Hz, NTSC
 */
-MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4a_60hz, ti99_4a)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )                  \
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )                             \
+MACHINE_CONFIG_START(ti99_4x_state::ti99_4a_60hz)
+	ti99_4a(config);
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
-MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4a_50hz, ti99_4a)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929A, XTAL(10'738'635) / 2 ) \
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
-	MCFG_TMS9928A_SCREEN_ADD_PAL( TI_SCREEN_TAG )                              \
+MACHINE_CONFIG_START(ti99_4x_state::ti99_4a_50hz)
+	ti99_4a(config);
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929A, XTAL(10'738'635) / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_SCREEN_ADD_PAL( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
@@ -1065,7 +1071,8 @@ MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
 	register_save_state();
 }
 
-MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4qi, ti99_4a)
+MACHINE_CONFIG_START(ti99_4x_state::ti99_4qi)
+	ti99_4a(config);
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4qi )
 MACHINE_CONFIG_END
 
@@ -1073,12 +1080,13 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
     There were no European versions.
 */
-MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4qi_60hz, ti99_4qi)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )                  \
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )                             \
+MACHINE_CONFIG_START(ti99_4x_state::ti99_4qi_60hz)
+	ti99_4qi(config);
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 

@@ -338,7 +338,7 @@ WRITE16_MEMBER(macrossp_state::palette_fade_w)
 
 /*** MEMORY MAPS *************************************************************/
 
-static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
+ADDRESS_MAP_START(macrossp_state::macrossp_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_SHARE("spriteram")
 	/* SCR A Layer */
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 //  AM_RANGE(0xfe0000, 0xfe0003) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( macrossp_sound_map, AS_PROGRAM, 16, macrossp_state )
+ADDRESS_MAP_START(macrossp_state::macrossp_sound_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM
 	AM_RANGE(0x400000, 0x40007f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0x00ff)
@@ -580,7 +580,8 @@ MACHINE_CONFIG_START(macrossp_state::macrossp)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(macrossp_state::quizmoon, macrossp)
+MACHINE_CONFIG_START(macrossp_state::quizmoon)
+	macrossp(config);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 24*16-1, 0*8, 14*16-1)

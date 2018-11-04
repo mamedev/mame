@@ -71,6 +71,9 @@ public:
 	void kaypro484(machine_config &config);
 	void kaypro10(machine_config &config);
 	void kaypro284(machine_config &config);
+	void kaypro484_io(address_map &map);
+	void kaypro_map(address_map &map);
+	void kayproii_io(address_map &map);
 private:
 	uint8_t m_mc6845_cursor[16];
 	uint8_t m_mc6845_reg[32];

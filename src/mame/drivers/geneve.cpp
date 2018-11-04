@@ -286,13 +286,15 @@ public:
 	int m_ready_line;
 	int m_ready_line1;
 	void geneve_60hz(machine_config &config);
+	void crumap(address_map &map);
+	void memmap(address_map &map);
 };
 
 /*
     Memory map
 */
 
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, geneve_state)
+ADDRESS_MAP_START(geneve_state::memmap)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, readm, writem) AM_DEVSETOFFSET(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, setoffset)
 ADDRESS_MAP_END
 
@@ -304,12 +306,12 @@ ADDRESS_MAP_END
     TODO: Check whether A0-A2 are available for CRU addressing since those
     bits are usually routed through the mapper first.
 */
-static ADDRESS_MAP_START(crumap, AS_IO, 8, geneve_state)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+ADDRESS_MAP_START(geneve_state::crumap)
 	AM_RANGE(0x0000, 0x0fff) AM_READ( cruread )
+	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 
-	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE( cruwrite )
+	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 ADDRESS_MAP_END
 
 /* TI joysticks. The keyboard is implemented in genboard.c. */

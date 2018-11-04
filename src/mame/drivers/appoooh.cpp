@@ -213,29 +213,29 @@ WRITE8_MEMBER(appoooh_state::adpcm_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, appoooh_state )
+ADDRESS_MAP_START(appoooh_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM /* RAM ? */
 
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 	AM_RANGE(0xf000, 0xf01f) AM_SHARE("spriteram")
 	AM_RANGE(0xf020, 0xf3ff) AM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xf420, 0xf7ff) AM_WRITE(fg_colorram_w) AM_SHARE("fg_colorram")
 	AM_RANGE(0xf800, 0xf81f) AM_SHARE("spriteram_2")
 	AM_RANGE(0xf820, 0xfbff) AM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xfc20, 0xffff) AM_WRITE(bg_colorram_w) AM_SHARE("bg_colorram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, appoooh_state )
+ADDRESS_MAP_START(appoooh_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("maincpu", 0x8000)
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, appoooh_state )
+ADDRESS_MAP_START(appoooh_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76489_device, write)
@@ -444,7 +444,8 @@ MACHINE_CONFIG_START(appoooh_state::appoooh_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(appoooh_state::appoooh, appoooh_common)
+MACHINE_CONFIG_START(appoooh_state::appoooh)
+	appoooh_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -463,10 +464,11 @@ MACHINE_CONFIG_DERIVED(appoooh_state::appoooh, appoooh_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(appoooh_state::robowres, appoooh_common)
+MACHINE_CONFIG_START(appoooh_state::robowres)
+	appoooh_common(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -484,13 +486,14 @@ MACHINE_CONFIG_DERIVED(appoooh_state::robowres, appoooh_common)
 	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(appoooh_state::robowrese, robowres)
+MACHINE_CONFIG_START(appoooh_state::robowrese)
+	robowres(config);
 
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 

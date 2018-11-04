@@ -162,7 +162,8 @@ MACHINE_CONFIG_START(novagmcs48_state::presto)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(novagmcs48_state::octo, presto)
+MACHINE_CONFIG_START(novagmcs48_state::octo)
+	presto(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

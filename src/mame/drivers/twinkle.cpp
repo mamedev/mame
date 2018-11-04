@@ -291,6 +291,9 @@ public:
 	void twinklex(machine_config &config);
 	void twinklei(machine_config &config);
 	void twinkle(machine_config &config);
+	void main_map(address_map &map);
+	void rf5c400_map(address_map &map);
+	void sound_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -766,7 +769,7 @@ READ8_MEMBER(twinkle_state::shared_psx_r)
 	return result;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, twinkle_state )
+ADDRESS_MAP_START(twinkle_state::main_map)
 	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE8(shared_psx_r, shared_psx_w, 0x00ff00ff)
 	AM_RANGE(0x1f200000, 0x1f20001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
@@ -915,7 +918,7 @@ WRITE16_MEMBER(twinkle_state::spu_led_w)
 	output().set_indexed_value("spu_led", 7, (~data >> 7) & 1);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
+ADDRESS_MAP_START(twinkle_state::sound_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("SPU_DSW")
@@ -932,7 +935,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rf5c400_map, 0, 16, twinkle_state)
+ADDRESS_MAP_START(twinkle_state::rf5c400_map)
 	AM_RANGE(0x0000000, 0x1ffffff) AM_RAM AM_SHARE("rfsnd")
 ADDRESS_MAP_END
 
@@ -1088,11 +1091,13 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(twinkle_state::twinklex, twinkle)
+MACHINE_CONFIG_START(twinkle_state::twinklex)
+	twinkle(config);
 	MCFG_X76F041_ADD( "security" )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(twinkle_state::twinklei, twinkle)
+MACHINE_CONFIG_START(twinkle_state::twinklei)
+	twinkle(config);
 	MCFG_I2CMEM_ADD( "security" )
 	MCFG_I2CMEM_DATA_SIZE( 0x100 )
 MACHINE_CONFIG_END

@@ -81,6 +81,8 @@ public:
 	virtual void machine_reset() override;
 	void faceoffh(machine_config &config);
 	void chexx83(machine_config &config);
+	void chexx83_map(address_map &map);
+	void faceoffh_map(address_map &map);
 };
 
 
@@ -172,7 +174,7 @@ READ8_MEMBER(chexx_state::input_r)
 
 // Chexx Memory Map
 
-static ADDRESS_MAP_START( chexx83_map, AS_PROGRAM, 8, chexx_state )
+ADDRESS_MAP_START(chexx_state::chexx83_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM AM_MIRROR(0x100) // 6810 - 128 x 8 static RAM
 	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
 	AM_RANGE(0x8000, 0x8000) AM_READ(input_r)
@@ -209,7 +211,7 @@ WRITE8_MEMBER(chexx_state::ay_w)
 	m_ay_cmd = data;
 }
 
-static ADDRESS_MAP_START( faceoffh_map, AS_PROGRAM, 8, chexx_state )
+ADDRESS_MAP_START(chexx_state::faceoffh_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM AM_MIRROR(0x100) // M58725P - 2KB
 	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
 	AM_RANGE(0x8000, 0x8000) AM_READ(input_r)
@@ -345,7 +347,8 @@ MACHINE_CONFIG_START(chexx_state::chexx83)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(chexx_state::faceoffh, chexx83)
+MACHINE_CONFIG_START(chexx_state::faceoffh)
+	chexx83(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(faceoffh_map)
 

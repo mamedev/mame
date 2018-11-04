@@ -179,6 +179,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
 	void e100(machine_config &config);
+	void e100_map(address_map &map);
 protected:
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
@@ -422,7 +423,7 @@ WRITE_LINE_MEMBER(e100_state::pia1_cb2_w)
 }
 
 // This map is derived from info in "TEMAL 100 - teknisk manual Esselte 100"
-static ADDRESS_MAP_START( e100_map, AS_PROGRAM, 8, e100_state )
+ADDRESS_MAP_START(e100_state::e100_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("videoram")

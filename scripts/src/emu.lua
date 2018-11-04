@@ -29,11 +29,12 @@ includedirs {
 }
 
 includedirs {
+	ext_includedir("asio"),
 	ext_includedir("expat"),
 	ext_includedir("zlib"),
 	ext_includedir("flac"),
 	ext_includedir("jpeg"),
-	MAME_DIR .. "3rdparty/asio/include",
+	ext_includedir("rapidjson"),
 }
 
 files {

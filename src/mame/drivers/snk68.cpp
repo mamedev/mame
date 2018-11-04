@@ -104,7 +104,7 @@ WRITE8_MEMBER(snk68_state::sound_w)
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
+ADDRESS_MAP_START(snk68_state::pow_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
+ADDRESS_MAP_START(snk68_state::searchar_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, snk68_state )
+ADDRESS_MAP_START(snk68_state::sound_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
@@ -163,7 +163,7 @@ WRITE8_MEMBER(snk68_state::D7759_upd_reset_w)
 	m_upd7759->reset_w(data & 0x80);
 }
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, snk68_state )
+ADDRESS_MAP_START(snk68_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
@@ -630,12 +630,14 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk68_state::streetsm, pow)
+MACHINE_CONFIG_START(snk68_state::streetsm)
+	pow(config);
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( snk68_state, tile_callback_notpow )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk68_state::searchar, streetsm)
+MACHINE_CONFIG_START(snk68_state::searchar)
+	streetsm(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(searchar_map)

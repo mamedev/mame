@@ -30,6 +30,9 @@ public:
 	DECLARE_WRITE16_MEMBER(terminal_w);
 
 	void dual68(machine_config &config);
+	void dual68_mem(address_map &map);
+	void sio4_io(address_map &map);
+	void sio4_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -45,7 +48,7 @@ WRITE16_MEMBER( dual68_state::terminal_w )
 	m_terminal->write(space, 0, data >> 8);
 }
 
-static ADDRESS_MAP_START(dual68_mem, AS_PROGRAM, 16, dual68_state)
+ADDRESS_MAP_START(dual68_state::dual68_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x00080000, 0x00081fff) AM_ROM AM_REGION("user1",0)
@@ -53,13 +56,13 @@ static ADDRESS_MAP_START(dual68_mem, AS_PROGRAM, 16, dual68_state)
 	AM_RANGE(0x00800000, 0x00801fff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sio4_mem, AS_PROGRAM, 8, dual68_state)
+ADDRESS_MAP_START(dual68_state::sio4_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sio4_io, AS_IO, 8, dual68_state)
+ADDRESS_MAP_START(dual68_state::sio4_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x22, 0x22) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
 	AM_RANGE(0x23, 0x23) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)

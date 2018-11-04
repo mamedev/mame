@@ -168,6 +168,21 @@ public:
 	void newmcard(machine_config &config);
 	void tv_tcf(machine_config &config);
 	void tv_vcf(machine_config &config);
+	void brasil_io(address_map &map);
+	void brasil_map(address_map &map);
+	void grancapi_io(address_map &map);
+	void magicbom_io(address_map &map);
+	void newmcard_io(address_map &map);
+	void newmcard_map(address_map &map);
+	void nyjoker_io(address_map &map);
+	void nyjoker_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void tv_ncf_io(address_map &map);
+	void tv_ncf_map(address_map &map);
+	void tv_tcf_io(address_map &map);
+	void tv_tcf_map(address_map &map);
+	void tv_vcf_io(address_map &map);
+	void tv_vcf_map(address_map &map);
 };
 
 
@@ -310,7 +325,7 @@ WRITE16_MEMBER(highvdeo_state::write1_w)
 //  popmessage("%04x %04x",t1,t3);
 }
 
-static ADDRESS_MAP_START( tv_vcf_map, AS_PROGRAM, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::tv_vcf_map)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
@@ -318,7 +333,7 @@ static ADDRESS_MAP_START( tv_vcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tv_vcf_io, AS_IO, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::tv_vcf_io)
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
 	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
 	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
@@ -359,7 +374,7 @@ WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_st_w)
 	}
 }
 
-static ADDRESS_MAP_START( tv_ncf_map, AS_PROGRAM, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::tv_ncf_map)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
@@ -367,7 +382,7 @@ static ADDRESS_MAP_START( tv_ncf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tv_ncf_io, AS_IO, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::tv_ncf_io)
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
 	AM_RANGE(0x0008, 0x0009) AM_WRITE(tv_ncf_oki6376_w )
 	AM_RANGE(0x000a, 0x000b) AM_WRITE(tv_ncf_oki6376_st_w )
@@ -380,7 +395,7 @@ static ADDRESS_MAP_START( tv_ncf_io, AS_IO, 16, highvdeo_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nyjoker_map, AS_PROGRAM, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::nyjoker_map)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
@@ -388,7 +403,7 @@ static ADDRESS_MAP_START( nyjoker_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nyjoker_io, AS_IO, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::nyjoker_io)
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w )    // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITENOP            // alternate coin counter (bits 0 and 2)
 	AM_RANGE(0x0004, 0x0005) AM_WRITE(nyj_write2_w ) // coin and note counter
@@ -432,7 +447,7 @@ WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
 	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
-static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::tv_tcf_map)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
@@ -441,7 +456,7 @@ static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tv_tcf_io, AS_IO, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::tv_tcf_io)
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
 	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
 	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
@@ -489,7 +504,7 @@ WRITE16_MEMBER(highvdeo_state::write2_w)
 	}
 }
 
-static ADDRESS_MAP_START( newmcard_map, AS_PROGRAM, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::newmcard_map)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
@@ -497,7 +512,7 @@ static ADDRESS_MAP_START( newmcard_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( newmcard_io, AS_IO, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::newmcard_io)
 	AM_RANGE(0x0030, 0x0033) AM_READ(newmcard_status_r )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE(tv_tcf_bankselect_w )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
@@ -609,7 +624,7 @@ READ16_MEMBER(highvdeo_state::magicbom_status_r)
 }
 
 
-static ADDRESS_MAP_START( brasil_map, AS_PROGRAM, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::brasil_map)
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
@@ -617,7 +632,7 @@ static ADDRESS_MAP_START( brasil_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( brasil_io, AS_IO, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::brasil_io)
 	AM_RANGE(0x0030, 0x0033) AM_READ(brasil_status_r )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE(brasil_status_w )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
@@ -630,7 +645,7 @@ static ADDRESS_MAP_START( brasil_io, AS_IO, 16, highvdeo_state )
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grancapi_io, AS_IO, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::grancapi_io)
 	AM_RANGE(0x0030, 0x0033) AM_READ(grancapi_status_r )
 	AM_RANGE(0x000e, 0x000f) AM_WRITE(grancapi_status_w )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
@@ -643,7 +658,7 @@ static ADDRESS_MAP_START( grancapi_io, AS_IO, 16, highvdeo_state )
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magicbom_io, AS_IO, 16, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::magicbom_io)
 	AM_RANGE(0x0030, 0x0033) AM_READ(magicbom_status_r )
 	AM_RANGE(0x000e, 0x000f) AM_WRITE(grancapi_status_w )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
@@ -1128,7 +1143,7 @@ INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq_80186)
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, highvdeo_state )
+ADDRESS_MAP_START(highvdeo_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -1162,7 +1177,8 @@ MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::tv_ncf, tv_vcf)
+MACHINE_CONFIG_START(highvdeo_state::tv_ncf)
+	tv_vcf(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tv_ncf_map)
@@ -1170,7 +1186,8 @@ MACHINE_CONFIG_DERIVED(highvdeo_state::tv_ncf, tv_vcf)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::nyjoker, tv_vcf)
+MACHINE_CONFIG_START(highvdeo_state::nyjoker)
+	tv_vcf(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nyjoker_map)
@@ -1178,7 +1195,8 @@ MACHINE_CONFIG_DERIVED(highvdeo_state::nyjoker, tv_vcf)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::tv_tcf, tv_vcf)
+MACHINE_CONFIG_START(highvdeo_state::tv_tcf)
+	tv_vcf(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tv_tcf_map)
@@ -1191,7 +1209,8 @@ MACHINE_CONFIG_DERIVED(highvdeo_state::tv_tcf, tv_vcf)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGGBBBBB)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::newmcard, tv_tcf)
+MACHINE_CONFIG_START(highvdeo_state::newmcard)
+	tv_tcf(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(newmcard_map)
@@ -1201,7 +1220,8 @@ MACHINE_CONFIG_DERIVED(highvdeo_state::newmcard, tv_tcf)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(highvdeo_state::ciclone, tv_tcf)
+MACHINE_CONFIG_START(highvdeo_state::ciclone)
+	tv_tcf(config);
 
 	MCFG_DEVICE_REMOVE("maincpu")
 

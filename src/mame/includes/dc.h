@@ -99,6 +99,7 @@ class dc_state : public driver_device
 	DECLARE_INPUT_CHANGED_MEMBER(mastercpu_cheat_r);
 
 	void naomi_aw_base(machine_config &config);
+	void dc_audio_map(address_map &map);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/

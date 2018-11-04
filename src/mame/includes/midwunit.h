@@ -65,4 +65,5 @@ public:
 	void wunit(machine_config &config);
 	void wunit_picemu(machine_config &config);
 	void wunit_picsim(machine_config &config);
+	void main_map(address_map &map);
 };

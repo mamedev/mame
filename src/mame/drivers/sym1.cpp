@@ -78,6 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(via3_a_w);
 
 	void sym1(machine_config &config);
+	void sym1_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -299,7 +300,7 @@ void sym1_state::machine_reset()
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sym1_map, AS_PROGRAM, 8, sym1_state )
+ADDRESS_MAP_START(sym1_state::sym1_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM // U12/U13 RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAMBANK("bank2") AM_SHARE("ram_1k")
 	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK("bank3") AM_SHARE("ram_2k")

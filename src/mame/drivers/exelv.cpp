@@ -117,6 +117,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
 	void exeltel(machine_config &config);
 	void exl100(machine_config &config);
+	void tms7020_mem(address_map &map);
+	void tms7040_mem(address_map &map);
 };
 
 
@@ -407,7 +409,7 @@ READ8_MEMBER(exelv_state::rom_r)
     @>f800-@>ffff: tms7020/tms7040 internal ROM
 */
 
-static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, exelv_state)
+ADDRESS_MAP_START(exelv_state::tms7020_mem)
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
 	AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
 	AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)
@@ -423,7 +425,7 @@ static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, exelv_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, exelv_state)
+ADDRESS_MAP_START(exelv_state::tms7040_mem)
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
 	AM_RANGE(0x0124, 0x0124) AM_DEVREAD("tms3556", tms3556_device, vram_r)
 	AM_RANGE(0x0125, 0x0125) AM_DEVREAD("tms3556", tms3556_device, reg_r)

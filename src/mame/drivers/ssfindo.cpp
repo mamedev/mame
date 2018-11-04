@@ -299,6 +299,9 @@ public:
 	void ssfindo(machine_config &config);
 	void ppcar(machine_config &config);
 	void tetfight(machine_config &config);
+	void ppcar_map(address_map &map);
+	void ssfindo_map(address_map &map);
+	void tetfight_map(address_map &map);
 };
 
 
@@ -598,7 +601,7 @@ READ32_MEMBER(ssfindo_state::randomized_r)
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( ssfindo_map, AS_PROGRAM, 32, ssfindo_state )
+ADDRESS_MAP_START(ssfindo_state::ssfindo_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
 	AM_RANGE(0x03012e60, 0x03012e67) AM_NOP
@@ -616,7 +619,7 @@ static ADDRESS_MAP_START( ssfindo_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x10000000, 0x11ffffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppcar_map, AS_PROGRAM, 32, ssfindo_state )
+ADDRESS_MAP_START(ssfindo_state::ppcar_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
 	AM_RANGE(0x03012b00, 0x03012bff) AM_READ(randomized_r) AM_WRITENOP
@@ -642,7 +645,7 @@ WRITE32_MEMBER(ssfindo_state::tetfight_unk_w)
 	//sound latch ?
 }
 
-static ADDRESS_MAP_START( tetfight_map, AS_PROGRAM, 32, ssfindo_state )
+ADDRESS_MAP_START(ssfindo_state::tetfight_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
 	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(FIFO_w)
@@ -806,7 +809,8 @@ MACHINE_CONFIG_START(ssfindo_state::ssfindo)
 	MCFG_PALETTE_ADD("palette", 256)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssfindo_state::ppcar, ssfindo)
+MACHINE_CONFIG_START(ssfindo_state::ppcar)
+	ssfindo(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -815,7 +819,8 @@ MACHINE_CONFIG_DERIVED(ssfindo_state::ppcar, ssfindo)
 	MCFG_DEVICE_REMOVE("i2cmem")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssfindo_state::tetfight, ppcar)
+MACHINE_CONFIG_START(ssfindo_state::tetfight)
+	ppcar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

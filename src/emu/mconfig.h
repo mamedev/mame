@@ -91,22 +91,6 @@ private:
 //*************************************************************************/
 
 /**
- @def MACHINE_CONFIG_DERIVED(_name, _base)
- Begins a machine_config that is derived from another machine_config.
- @param _name name of this config
- @param _base name of the parent config
- @hideinitializer
-*/
-#define MACHINE_CONFIG_DERIVED(_name, _base) \
-ATTR_COLD void _name(machine_config &config) \
-{ \
-	device_t *device = nullptr; \
-	devcb_base *devcb = nullptr; \
-	(void)device; \
-	(void)devcb; \
-	_base(config);
-
-/**
  @def MACHINE_CONFIG_START(_name)
  Begins a device machine configuration member
  @param _name name of this config
@@ -131,11 +115,6 @@ Ends a machine_config.
 //*************************************************************************/
 /** @name Core machine config options */
 //*************************************************************************/
-
-// importing data from other machine drivers
-#define MCFG_FRAGMENT_ADD(_name) \
-	_name(config);
-
 
 // scheduling parameters
 #define MCFG_QUANTUM_TIME(_time) \

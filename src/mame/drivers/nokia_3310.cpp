@@ -70,6 +70,7 @@ public:
 	void noki7110(machine_config &config);
 	void noki6210(machine_config &config);
 	void noki3310(machine_config &config);
+	void noki3310_map(address_map &map);
 private:
 	void assert_fiq(int num);
 	void assert_irq(int num);
@@ -630,7 +631,7 @@ WRITE8_MEMBER(noki3310_state::mad2_mcuif_w)
 }
 
 
-static ADDRESS_MAP_START( noki3310_map, AS_PROGRAM, 32, noki3310_state )
+ADDRESS_MAP_START(noki3310_state::noki3310_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)
 	AM_RANGE(0x00000000, 0x0000ffff) AM_MIRROR(0x80000) AM_READWRITE16(ram_r, ram_w, 0xffffffff)                // boot ROM / RAM
 	AM_RANGE(0x00010000, 0x00010fff) AM_MIRROR(0x8f000) AM_READWRITE16(dsp_ram_r, dsp_ram_w, 0xffffffff)        // DSP shared memory
@@ -717,28 +718,32 @@ MACHINE_CONFIG_START(noki3310_state::noki3310)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(noki3310_state::noki3330, noki3310)
+MACHINE_CONFIG_START(noki3310_state::noki3330)
+	noki3310(config);
 
 	MCFG_DEVICE_REMOVE("flash")
 	MCFG_INTEL_TE28F320_ADD("flash")
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(noki3310_state::noki3410, noki3330)
+MACHINE_CONFIG_START(noki3310_state::noki3410)
+	noki3330(config);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(96, 65)    // Philips OM6206
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(noki3310_state::noki7110, noki3330)
+MACHINE_CONFIG_START(noki3310_state::noki7110)
+	noki3330(config);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(96, 65)    // Epson SED1565
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(noki3310_state::noki6210, noki3330)
+MACHINE_CONFIG_START(noki3310_state::noki6210)
+	noki3330(config);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(96, 60)

@@ -32,6 +32,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	void c1526_mem(address_map &map);
 };
 
 

@@ -27,13 +27,14 @@ public:
 	{ }
 
 	void codata(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, codata_state)
+ADDRESS_MAP_START(codata_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x200000, 0x203fff) AM_ROM AM_REGION("user1", 0);

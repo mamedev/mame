@@ -261,7 +261,7 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 /***************************** 68000 Memory Maps ****************************/
 
-static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16, playmark_state )
+ADDRESS_MAP_START(playmark_state::bigtwin_main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x304000, 0x304001) AM_NOP             /* watchdog? irq ack? */
 	AM_RANGE(0x440000, 0x4403ff) AM_RAM AM_SHARE("spriteram")
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16, playmark_state )
+ADDRESS_MAP_START(playmark_state::bigtwinb_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16, playmark_state )
+ADDRESS_MAP_START(playmark_state::wbeachvl_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(wbeachvl_bgvideoram_w) AM_SHARE("videoram3")
@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16, playmark_state )
+ADDRESS_MAP_START(playmark_state::excelsr_main_map)
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP                /* watchdog? irq ack? */
 	AM_RANGE(0x440000, 0x440cff) AM_RAM AM_SHARE("spriteram")
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
+ADDRESS_MAP_START(playmark_state::hrdtimes_main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0x0c0000)
@@ -369,7 +369,7 @@ static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP        /* watchdog? irq ack? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16, playmark_state )
+ADDRESS_MAP_START(playmark_state::hotmind_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luckboomh_main_map, AS_PROGRAM, 16, playmark_state )
+ADDRESS_MAP_START(playmark_state::luckboomh_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
 	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( luckboomh_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, 0, 8, playmark_state )
+ADDRESS_MAP_START(playmark_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

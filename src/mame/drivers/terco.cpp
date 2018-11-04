@@ -266,6 +266,7 @@ public:
 	//,m_ay3600(*this, "ay3600")
 	{ }
 	void t4490(machine_config &config);
+	void t4490_map(address_map &map);
 private:
 	required_device<m6800_cpu_device> m_maincpu;
   //    virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
@@ -277,7 +278,7 @@ private:
 	//required_device<ay3600_device> m_ay3600;
 };
 
-static ADDRESS_MAP_START( t4490_map, AS_PROGRAM, 8, t4490_state )
+ADDRESS_MAP_START(t4490_state::t4490_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x3000)
 	AM_RANGE(0x9500, 0x95ff) AM_RAM

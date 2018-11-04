@@ -38,7 +38,7 @@ void st0016_state::machine_start()
 	membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
 }
 
-static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, st0016_state )
+ADDRESS_MAP_START(st0016_state::st0016_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
@@ -46,9 +46,9 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, st0016_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM /* work ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( renju_mem, AS_PROGRAM, 8, st0016_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x200000 )
+ADDRESS_MAP_START(st0016_state::renju_mem)
 	AM_IMPORT_FROM( st0016_mem )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x200000 )
 ADDRESS_MAP_END
 
 
@@ -87,7 +87,7 @@ WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
 	// st0016_rom_bank = data;
 }
 
-static ADDRESS_MAP_START( st0016_io, AS_IO, 8, st0016_state )
+ADDRESS_MAP_START(st0016_state::st0016_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P1") AM_WRITE(mux_select_w)
 	AM_RANGE(0xc1, 0xc1) AM_READ_PORT("P2") AM_WRITENOP
@@ -138,7 +138,7 @@ WRITE8_MEMBER(st0016_state::latch8_w)
 	machine().scheduler().synchronize();
 }
 
-static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32, st0016_state )
+ADDRESS_MAP_START(st0016_state::v810_mem)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
 	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32, st0016_state )
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( st0016_m2_io, AS_IO, 8, st0016_state )
+ADDRESS_MAP_START(st0016_state::st0016_m2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc0, 0xc3) AM_READ(latch8_r) AM_WRITE(latch8_w)
 	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("P1") AM_WRITE(mux_select_w)
@@ -483,7 +483,8 @@ MACHINE_CONFIG_START(st0016_state::st0016)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(st0016_state::mayjinsn, st0016)
+MACHINE_CONFIG_START(st0016_state::mayjinsn)
+	st0016(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(st0016_m2_io)
 	MCFG_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
@@ -491,7 +492,8 @@ MACHINE_CONFIG_DERIVED(st0016_state::mayjinsn, st0016)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(st0016_state::renju, st0016)
+MACHINE_CONFIG_START(st0016_state::renju)
+	st0016(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(renju_mem)
 MACHINE_CONFIG_END

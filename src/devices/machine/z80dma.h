@@ -160,7 +160,6 @@ private:
 
 
 // device type definition
-extern const device_type Z80DMA;
 DECLARE_DEVICE_TYPE(Z80DMA, z80dma_device)
 
 #endif // MAME_MACHINE_Z80DMA_H

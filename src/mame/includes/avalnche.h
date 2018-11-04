@@ -41,4 +41,6 @@ public:
 	void acatch_sound(machine_config &config);
 	void avalnche(machine_config &config);
 	void avalnche_sound(machine_config &config);
+	void catch_map(address_map &map);
+	void main_map(address_map &map);
 };

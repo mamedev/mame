@@ -22,7 +22,7 @@ public:
 	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ncr5390_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<ncr5390_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(map, 8);
+	virtual void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(tcounter_lo_r);
 	DECLARE_WRITE8_MEMBER(tcount_lo_w);
@@ -250,7 +250,7 @@ class ncr53c90a_device : public ncr5390_device
 public:
 	ncr53c90a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 
 	DECLARE_READ8_MEMBER(status_r);
 
@@ -277,7 +277,7 @@ class ncr53c94_device : public ncr53c90a_device
 public:
 	ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 
 	DECLARE_READ8_MEMBER(conf3_r) { return config3; };
 	DECLARE_WRITE8_MEMBER(conf3_w) { config3 = data; };

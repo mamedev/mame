@@ -539,6 +539,11 @@ public:
 	objcachemanager decode[2];
 	void aquastge(machine_config &config);
 	void coolridr(machine_config &config);
+	void aquastge_h1_map(address_map &map);
+	void aquastge_submap(address_map &map);
+	void coolridr_submap(address_map &map);
+	void system_h1_map(address_map &map);
+	void system_h1_sound_map(address_map &map);
 };
 
 #define PRINT_BLIT_STUFF \
@@ -2819,7 +2824,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 }
 
 
-static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
+ADDRESS_MAP_START(coolridr_state::system_h1_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
@@ -2839,12 +2844,12 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(aquastge_h1_map, AS_PROGRAM, 32, coolridr_state)
+ADDRESS_MAP_START(coolridr_state::aquastge_h1_map)
+	AM_IMPORT_FROM(system_h1_map)
 	AM_RANGE(0x03c00000, 0x03c0ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
 	AM_RANGE(0x03f50000, 0x03f5ffff) AM_RAM // video registers
 	AM_RANGE(0x03e10000, 0x03e1ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM  /*Communication area RAM*/
-	AM_IMPORT_FROM(system_h1_map)
 ADDRESS_MAP_END
 
 READ16_MEMBER( coolridr_state::h1_soundram_r)
@@ -2983,7 +2988,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 
 
 
-static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
+ADDRESS_MAP_START(coolridr_state::coolridr_submap)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM // note: SH7032 only supports 64KB
 
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM //communication RAM
@@ -3012,12 +3017,12 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x07ffe000, 0x07ffffff) AM_RAM // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aquastge_submap, AS_PROGRAM, 32, coolridr_state )
-	AM_RANGE(0x05210000, 0x0521ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
+ADDRESS_MAP_START(coolridr_state::aquastge_submap)
+	AM_IMPORT_FROM(coolridr_submap)
 	AM_RANGE(0x05200000, 0x0537ffff) AM_RAM
+	AM_RANGE(0x05210000, 0x0521ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x06000200, 0x06000207) AM_WRITENOP // program bug?
 	AM_RANGE(0x06100018, 0x0610001b) AM_READ_PORT("IN7")
-	AM_IMPORT_FROM(coolridr_submap)
 ADDRESS_MAP_END
 
 /* TODO: what is this for, volume mixing? MIDI? */
@@ -3026,7 +3031,7 @@ WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 	sound_fifo = data;
 }
 
-static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
+ADDRESS_MAP_START(coolridr_state::system_h1_sound_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1",0) AM_SHARE("soundram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_device, read, write)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0) AM_SHARE("soundram2")
@@ -3736,7 +3741,8 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coolridr_state::aquastge, coolridr)
+MACHINE_CONFIG_START(coolridr_state::aquastge)
+	coolridr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aquastge_h1_map)
 

@@ -70,4 +70,10 @@ public:
 	void sfjp(machine_config &config);
 	void sfus(machine_config &config);
 	void sfan(machine_config &config);
+	void sfan_map(address_map &map);
+	void sfjp_map(address_map &map);
+	void sfus_map(address_map &map);
+	void sound2_io_map(address_map &map);
+	void sound2_map(address_map &map);
+	void sound_map(address_map &map);
 };

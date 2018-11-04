@@ -187,6 +187,7 @@ class md6802_state : public didact_state
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	void md6802(machine_config &config);
+	void md6802_map(address_map &map);
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -284,7 +285,7 @@ void md6802_state::machine_reset()
 }
 
 // This address map is traced from schema
-static ADDRESS_MAP_START( md6802_map, AS_PROGRAM, 8, md6802_state )
+ADDRESS_MAP_START(md6802_state::md6802_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read, write) AM_MIRROR(0x1ffc)
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE(PIA2_TAG, pia6821_device, read, write) AM_MIRROR(0x1ffc)
@@ -369,6 +370,7 @@ class mp68a_state : public didact_state
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	void mp68a(machine_config &config);
+	void mp68a_map(address_map &map);
 protected:
 	required_device<pia6820_device> m_pia1;
 	required_device<pia6820_device> m_pia2;
@@ -475,7 +477,7 @@ void mp68a_state::machine_start()
 }
 
 // This address map is traced from pcb
-static ADDRESS_MAP_START( mp68a_map, AS_PROGRAM, 8, mp68a_state )
+ADDRESS_MAP_START(mp68a_state::mp68a_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0xf000)
 	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE(PIA1_TAG, pia6820_device, read, write) AM_MIRROR(0xf0fc)
 	AM_RANGE(0x0600, 0x0603) AM_DEVREADWRITE(PIA2_TAG, pia6820_device, read, write) AM_MIRROR(0xf0fc)

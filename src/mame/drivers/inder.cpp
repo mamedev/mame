@@ -86,6 +86,12 @@ public:
 	void brvteam(machine_config &config);
 	void canasta(machine_config &config);
 	void lapbylap(machine_config &config);
+	void brvteam_map(address_map &map);
+	void canasta_map(address_map &map);
+	void inder_map(address_map &map);
+	void inder_sub_map(address_map &map);
+	void lapbylap_map(address_map &map);
+	void lapbylap_sub_map(address_map &map);
 private:
 	void update_mus();
 	bool m_pc0;
@@ -109,7 +115,7 @@ private:
 	required_ioport_array<11> m_switches;
 };
 
-static ADDRESS_MAP_START( brvteam_map, AS_PROGRAM, 8, inder_state )
+ADDRESS_MAP_START(inder_state::brvteam_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_WRITE(disp_w)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM // pair of 2114
@@ -120,7 +126,7 @@ static ADDRESS_MAP_START( brvteam_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(sn_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( canasta_map, AS_PROGRAM, 8, inder_state )
+ADDRESS_MAP_START(inder_state::canasta_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_WRITE(disp_w)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM // pair of 2114
@@ -133,7 +139,7 @@ static ADDRESS_MAP_START( canasta_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x4b02, 0x4b02) AM_DEVWRITE("ay", ay8910_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lapbylap_map, AS_PROGRAM, 8, inder_state )
+ADDRESS_MAP_START(inder_state::lapbylap_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_WRITE(disp_w)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM // pair of 2114
@@ -144,7 +150,7 @@ static ADDRESS_MAP_START( lapbylap_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(sndcmd_lapbylap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lapbylap_sub_map, AS_PROGRAM, 8, inder_state )
+ADDRESS_MAP_START(inder_state::lapbylap_sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM // 6116
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("ay1", ay8910_device, address_w)
@@ -155,7 +161,7 @@ static ADDRESS_MAP_START( lapbylap_sub_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0xa002, 0xa002) AM_DEVWRITE("ay2", ay8910_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( inder_map, AS_PROGRAM, 8, inder_state )
+ADDRESS_MAP_START(inder_state::inder_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("nvram") // 6116, battery-backed
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi60", i8255_device, read, write)
@@ -167,7 +173,7 @@ static ADDRESS_MAP_START( inder_map, AS_PROGRAM, 8, inder_state )
 	AM_RANGE(0x6ce0, 0x6ce0) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( inder_sub_map, AS_PROGRAM, 8, inder_state )
+ADDRESS_MAP_START(inder_state::inder_sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x1800) AM_RAM // 6116
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppi", i8255_device, read, write)
@@ -1351,7 +1357,7 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 	MCFG_DEFAULT_LAYOUT(layout_inder)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("snvol")
 	MCFG_SOUND_ADD("sn", SN76489, XTAL(8'000'000) / 2) // jumper choice of 2 or 4 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
@@ -1369,7 +1375,7 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	MCFG_DEFAULT_LAYOUT(layout_inder)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay", AY8910, XTAL(4'000'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
@@ -1390,7 +1396,7 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	MCFG_DEFAULT_LAYOUT(layout_inder)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
@@ -1414,7 +1420,7 @@ MACHINE_CONFIG_START(inder_state::inder)
 	MCFG_DEFAULT_LAYOUT(layout_inder)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("9a", ttl7474_device, clock_w))

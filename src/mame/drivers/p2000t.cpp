@@ -36,7 +36,7 @@ Philips P2000 1 Memory map
 
 
 /* port i/o functions */
-static ADDRESS_MAP_START( p2000t_io, AS_IO, 8, p2000t_state )
+ADDRESS_MAP_START(p2000t_state::p2000t_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READ(p2000t_port_000f_r)
 	AM_RANGE(0x10, 0x1f) AM_WRITE(p2000t_port_101f_w)
@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( p2000t_io, AS_IO, 8, p2000t_state )
 ADDRESS_MAP_END
 
 /* Memory w/r functions */
-static ADDRESS_MAP_START( p2000t_mem, AS_PROGRAM, 8, p2000t_state )
+ADDRESS_MAP_START(p2000t_state::p2000t_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("videoram")
@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( p2000t_mem, AS_PROGRAM, 8, p2000t_state )
 	AM_RANGE(0xa000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( p2000m_mem, AS_PROGRAM, 8, p2000t_state )
+ADDRESS_MAP_START(p2000t_state::p2000m_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("videoram")

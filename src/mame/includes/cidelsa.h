@@ -89,6 +89,12 @@ public:
 	void destryer(machine_config &config);
 	void destryer_video(machine_config &config);
 	void altair_video(machine_config &config);
+	void altair_io_map(address_map &map);
+	void altair_map(address_map &map);
+	void cidelsa_page_ram(address_map &map);
+	void destryer_io_map(address_map &map);
+	void destryer_map(address_map &map);
+	void destryera_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -122,6 +128,10 @@ public:
 	int m_psg_latch;
 	void draco(machine_config &config);
 	void draco_video(machine_config &config);
+	void draco_io_map(address_map &map);
+	void draco_map(address_map &map);
+	void draco_page_ram(address_map &map);
+	void draco_sound_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_CIDELSA_H

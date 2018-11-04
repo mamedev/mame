@@ -40,6 +40,9 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
 	void n64(machine_config &config);
 	void n64dd(machine_config &config);
+	void n64_map(address_map &map);
+	void n64dd_map(address_map &map);
+	void rsp_map(address_map &map);
 };
 
 READ32_MEMBER(n64_mess_state::dd_null_r)
@@ -47,7 +50,7 @@ READ32_MEMBER(n64_mess_state::dd_null_r)
 	return 0xffffffff;
 }
 
-static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_mess_state )
+ADDRESS_MAP_START(n64_mess_state::n64_map)
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rdram")                   // RDRAM
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")                    // RSP DMEM
@@ -67,7 +70,7 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_mess_state )
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_mess_state )
+ADDRESS_MAP_START(n64_mess_state::n64dd_map)
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rdram")               // RDRAM
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")                    // RSP DMEM
@@ -88,7 +91,7 @@ static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_mess_state )
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, n64_mess_state )
+ADDRESS_MAP_START(n64_mess_state::rsp_map)
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("rsp_dmem")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("rsp_imem")
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")
@@ -475,7 +478,8 @@ MACHINE_CONFIG_START(n64_mess_state::n64)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "n64")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(n64_mess_state::n64dd, n64)
+MACHINE_CONFIG_START(n64_mess_state::n64dd)
+	n64(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(n64dd_map)
 

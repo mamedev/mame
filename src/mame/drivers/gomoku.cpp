@@ -45,7 +45,7 @@ READ8_MEMBER(gomoku_state::input_port_r)
 }
 
 
-static ADDRESS_MAP_START( gomoku_map, AS_PROGRAM, 8, gomoku_state )
+ADDRESS_MAP_START(gomoku_state::gomoku_map)
 	AM_RANGE(0x0000, 0x47ff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_SHARE("videoram")

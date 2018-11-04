@@ -110,7 +110,7 @@ void pcvideo_pcjr_device::device_start()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START(vram_map, 0, 8, pcvideo_t1000_device)
+ADDRESS_MAP_START(pc_t1t_device::vram_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x20000, 0x3ffff) AM_NOP
 ADDRESS_MAP_END

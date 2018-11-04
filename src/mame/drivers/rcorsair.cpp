@@ -73,6 +73,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void rcorsair(machine_config &config);
+	void rcorsair_main_map(address_map &map);
+	void rcorsair_sub_io_map(address_map &map);
+	void rcorsair_sub_map(address_map &map);
 protected:
 
 	// devices
@@ -84,16 +87,16 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( rcorsair_main_map, AS_PROGRAM, 8, rcorsair_state )
+ADDRESS_MAP_START(rcorsair_state::rcorsair_main_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xa000, 0xa03f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rcorsair_sub_map, AS_PROGRAM, 8, rcorsair_state )
+ADDRESS_MAP_START(rcorsair_state::rcorsair_sub_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rcorsair_sub_io_map, AS_IO, 8, rcorsair_state )
+ADDRESS_MAP_START(rcorsair_state::rcorsair_sub_io_map)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( inports )

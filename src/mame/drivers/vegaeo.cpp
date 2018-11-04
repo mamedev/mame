@@ -50,6 +50,7 @@ public:
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vega(machine_config &config);
+	void vega_map(address_map &map);
 };
 
 READ8_MEMBER( vegaeo_state::qs1000_p1_r )
@@ -135,7 +136,7 @@ WRITE32_MEMBER(vegaeo_state::soundlatch_w)
 }
 
 
-static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32, vegaeo_state )
+ADDRESS_MAP_START(vegaeo_state::vega_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
 	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x000000ff)

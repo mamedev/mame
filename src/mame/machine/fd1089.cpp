@@ -208,7 +208,7 @@ const fd1089_base_device::decrypt_parameters fd1089_base_device::s_data_params_a
 	{ 0xac, 1,6,3,5,0,7,4,2 },
 };
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, fd1094_device )
+ADDRESS_MAP_START(fd1089_base_device::decrypted_opcodes_map)
 	AM_RANGE(0x00000, 0xfffff) AM_ROM AM_SHARE(":fd1089_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -228,7 +228,7 @@ fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_typ
 		m_decrypted_opcodes(*this, ":fd1089_decrypted_opcodes")
 {
 	// add the decrypted opcodes map
-	set_addrmap(AS_OPCODES, ADDRESS_MAP_NAME(decrypted_opcodes_map));
+	set_addrmap(AS_OPCODES, address_map_constructor(FUNC(fd1089_base_device::decrypted_opcodes_map), this));
 }
 
 fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

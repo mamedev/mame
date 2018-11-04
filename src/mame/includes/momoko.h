@@ -55,4 +55,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void momoko(machine_config &config);
+	void momoko_map(address_map &map);
+	void momoko_sound_map(address_map &map);
 };

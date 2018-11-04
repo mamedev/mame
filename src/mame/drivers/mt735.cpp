@@ -21,6 +21,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void mt735(machine_config &config);
+	void mt735_map(address_map &map);
 };
 
 mt735_state::mt735_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -49,7 +50,7 @@ READ8_MEMBER(mt735_state::p5_r)
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( mt735_map, AS_PROGRAM, 16, mt735_state )
+ADDRESS_MAP_START(mt735_state::mt735_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x278000, 0x287fff) AM_RAM
 	AM_RANGE(0x400000, 0x4fffff) AM_RAM

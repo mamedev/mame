@@ -274,7 +274,7 @@ READ8_MEMBER(exprraid_state::vblank_r)
 }
 
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
+ADDRESS_MAP_START(exprraid_state::master_map)
 	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_SHARE("videoram")
@@ -296,11 +296,11 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io_map, AS_IO, 8, exprraid_state )
+ADDRESS_MAP_START(exprraid_state::master_io_map)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
+ADDRESS_MAP_START(exprraid_state::slave_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_device, read, write)
@@ -527,7 +527,8 @@ MACHINE_CONFIG_START(exprraid_state::exprraid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(exprraid_state::exprboot, exprraid)
+MACHINE_CONFIG_START(exprraid_state::exprboot)
+	exprraid(config);
 
 	MCFG_CPU_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(master_map)

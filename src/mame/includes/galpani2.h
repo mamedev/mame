@@ -72,4 +72,6 @@ public:
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
 	void galpani2(machine_config &config);
+	void galpani2_mem1(address_map &map);
+	void galpani2_mem2(address_map &map);
 };

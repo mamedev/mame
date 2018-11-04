@@ -13,6 +13,7 @@ public:
 	{ }
 
 	void bfm_ad5(machine_config &config);
+	void ad5_map(address_map &map);
 protected:
 
 	// devices

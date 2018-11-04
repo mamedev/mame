@@ -44,6 +44,8 @@ public:
 		return m_vbl;
 	}
 	void fontwriter(machine_config &config);
+	void io_map(address_map &map);
+	void main_map(address_map &map);
 protected:
 
 	// devices
@@ -72,7 +74,7 @@ uint32_t fontwriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, fontwriter_state )
+ADDRESS_MAP_START(fontwriter_state::main_map)
 	AM_RANGE(0x002000, 0x007fff) AM_RAM
 	AM_RANGE(0x008000, 0x00ffff) AM_ROM AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x020000, 0x04ffff) AM_RAM
@@ -80,7 +82,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, fontwriter_state )
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, fontwriter_state )
+ADDRESS_MAP_START(fontwriter_state::io_map)
 	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READ(vbl_r)
 ADDRESS_MAP_END
 

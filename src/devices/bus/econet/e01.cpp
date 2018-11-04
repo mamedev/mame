@@ -219,7 +219,7 @@ WRITE_LINE_MEMBER( econet_e01_device::scsi_req_w )
 //  ADDRESS_MAP( e01_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( e01_mem, AS_PROGRAM, 8, econet_e01_device )
+ADDRESS_MAP_START(econet_e01_device::e01_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x00c3) AM_READWRITE(rtc_address_r, rtc_address_w)
 	AM_RANGE(0xfc04, 0xfc04) AM_MIRROR(0x00c3) AM_READWRITE(rtc_data_r, rtc_data_w)

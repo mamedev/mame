@@ -172,4 +172,15 @@ public:
 	void sxx2g(machine_config &config);
 	void spi(machine_config &config);
 	void sxx2e(machine_config &config);
+	void base_map(address_map &map);
+	void rdft2_map(address_map &map);
+	void rise_map(address_map &map);
+	void sei252_map(address_map &map);
+	void spi_map(address_map &map);
+	void spi_soundmap(address_map &map);
+	void sxx2e_map(address_map &map);
+	void sxx2e_soundmap(address_map &map);
+	void sxx2f_map(address_map &map);
+	void sys386f_map(address_map &map);
+	void sys386i_map(address_map &map);
 };

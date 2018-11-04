@@ -24,6 +24,7 @@ public:
 	uint32_t screen_update_segapm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void segapm(machine_config &config);
+	void segapm_map(address_map &map);
 };
 
 
@@ -38,7 +39,7 @@ uint32_t segapm_state::screen_update_segapm(screen_device &screen, bitmap_ind16 
 
 
 
-static ADDRESS_MAP_START( segapm_map, AS_PROGRAM, 16, segapm_state )
+ADDRESS_MAP_START(segapm_state::segapm_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	// A15100

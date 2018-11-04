@@ -28,6 +28,7 @@ public:
 	virtual void machine_reset() override;
 
 	void age_candy(machine_config &config);
+	void age_candy_map(address_map &map);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 
@@ -46,7 +47,7 @@ void age_candy_state::machine_reset()
 
 
 #ifdef UNUSED_DEFINITION
-static ADDRESS_MAP_START(age_candy_map, AS_PROGRAM, 8, age_candy_state)
+ADDRESS_MAP_START(age_candy_state::age_candy_map)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x4000)
 ADDRESS_MAP_END
 #endif

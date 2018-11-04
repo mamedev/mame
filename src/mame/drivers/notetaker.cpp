@@ -224,6 +224,8 @@ public:
 	virtual void machine_reset() override;
 
 	void notetakr(machine_config &config);
+	void notetaker_iocpu_io(address_map &map);
+	void notetaker_iocpu_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -547,7 +549,7 @@ BootSeqDone is 1, DisableROM is 0,       mem map is 0x00000-0x00fff reading is t
 BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for both reading and writing.
 */
 
-static ADDRESS_MAP_START(notetaker_iocpu_mem, AS_PROGRAM, 16, notetaker_state)
+ADDRESS_MAP_START(notetaker_state::notetaker_iocpu_mem)
 	/*
 	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iocpu", 0xff000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
 	AM_RANGE(0x01000, 0x3ffff) AM_RAM AM_REGION("mainram", 0) // 256k of ram (less 4k), shared between both processors. rom goes here if bootseqdone is 0
@@ -595,7 +597,7 @@ x   x   x   x    0   x   x   x    x   x   x   1    1   0   1   x    1   1   1   
 x   x   x   x    0   x   x   x    x   x   x   1    1   1   0   x    x   x   x   .       R   SelADCHi
 x   x   x   x    0   x   x   x    x   x   x   1    1   1   1   x    x   x   x   .       W   CRTSwitch
 */
-static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
+ADDRESS_MAP_START(notetaker_state::notetaker_iocpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7E1C) AM_DEVREADWRITE8("iopic8259", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x7E1E) AM_WRITE(IPConReg_w) // I/O processor (rom mapping, etc) control register

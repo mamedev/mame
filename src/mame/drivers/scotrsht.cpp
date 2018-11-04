@@ -64,7 +64,7 @@ WRITE8_MEMBER(scotrsht_state::soundlatch_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
+ADDRESS_MAP_START(scotrsht_state::scotrsht_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram") /* sprites */
@@ -88,13 +88,13 @@ static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scotrsht_sound_map, AS_PROGRAM, 8, scotrsht_state )
+ADDRESS_MAP_START(scotrsht_state::scotrsht_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scotrsht_sound_port, AS_IO, 8, scotrsht_state )
+ADDRESS_MAP_START(scotrsht_state::scotrsht_sound_port)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END

@@ -223,6 +223,10 @@ public:
 	void vfxsd(machine_config &config);
 	void eps(machine_config &config);
 	void vfx32(machine_config &config);
+	void eps_map(address_map &map);
+	void sq1_map(address_map &map);
+	void vfx_map(address_map &map);
+	void vfxsd_map(address_map &map);
 private:
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
@@ -377,7 +381,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 	}
 }
 
-static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::vfx_map)
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
@@ -386,7 +390,7 @@ static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::vfxsd_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
@@ -397,7 +401,7 @@ static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::eps_map)
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)
@@ -408,7 +412,7 @@ static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
+ADDRESS_MAP_START(esq5505_state::sq1_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x0ff)
@@ -655,7 +659,8 @@ MACHINE_CONFIG_START(esq5505_state::vfx)
 	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq5505_state::eps, vfx)
+MACHINE_CONFIG_START(esq5505_state::eps)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(eps_map)
 
@@ -677,7 +682,8 @@ MACHINE_CONFIG_DERIVED(esq5505_state::eps, vfx)
 	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(esq5505_state, fdc_write_byte))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq5505_state::vfxsd, vfx)
+MACHINE_CONFIG_START(esq5505_state::vfxsd)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
@@ -735,7 +741,8 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq5505_state::sq1, vfx)
+MACHINE_CONFIG_START(esq5505_state::sq1)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 

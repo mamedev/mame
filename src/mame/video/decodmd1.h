@@ -47,6 +47,8 @@ public:
 
 	static void static_set_gfxregion(device_t &device, const char *tag);
 
+	void decodmd1_io_map(address_map &map);
+	void decodmd1_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

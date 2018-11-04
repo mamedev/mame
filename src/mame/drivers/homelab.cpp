@@ -79,6 +79,11 @@ public:
 	void homelab3(machine_config &config);
 	void brailab4(machine_config &config);
 	void homelab(machine_config &config);
+	void brailab4_io(address_map &map);
+	void brailab4_mem(address_map &map);
+	void homelab2_mem(address_map &map);
+	void homelab3_io(address_map &map);
+	void homelab3_mem(address_map &map);
 private:
 	const uint8_t *m_p_videoram;
 	bool m_nmi;
@@ -201,7 +206,7 @@ READ8_MEMBER( homelab_state::exxx_r )
 
 
 /* Address maps */
-static ADDRESS_MAP_START(homelab2_mem, AS_PROGRAM, 8, homelab_state)
+ADDRESS_MAP_START(homelab_state::homelab2_mem)
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM  // ROM 1
 	AM_RANGE( 0x0800, 0x0fff ) AM_ROM  // ROM 2
 	AM_RANGE( 0x1000, 0x17ff ) AM_ROM  // ROM 3
@@ -215,21 +220,21 @@ static ADDRESS_MAP_START(homelab2_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0xe000, 0xe0ff ) AM_READ(cass2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(homelab3_mem, AS_PROGRAM, 8, homelab_state)
+ADDRESS_MAP_START(homelab_state::homelab3_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
 	AM_RANGE( 0xe800, 0xefff ) AM_READ(exxx_r)
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_REGION("maincpu",0xf800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(homelab3_io, AS_IO, 8, homelab_state)
+ADDRESS_MAP_START(homelab_state::homelab3_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x7f, 0x7f ) AM_WRITE(port7f_w)
 	AM_RANGE( 0xff, 0xff ) AM_WRITE(portff_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(brailab4_mem, AS_PROGRAM, 8, homelab_state)
+ADDRESS_MAP_START(homelab_state::brailab4_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0xcfff ) AM_RAM
 	AM_RANGE( 0xd000, 0xdfff ) AM_ROM
@@ -237,7 +242,7 @@ static ADDRESS_MAP_START(brailab4_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(brailab4_io, AS_IO, 8, homelab_state)
+ADDRESS_MAP_START(homelab_state::brailab4_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0xf8, 0xf9 ) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)

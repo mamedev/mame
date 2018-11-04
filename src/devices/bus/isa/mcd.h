@@ -21,15 +21,10 @@ public:
 	// construction/destruction
 	mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_ADDRESS_MAP(map, 16);
-
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_READ8_MEMBER(flag_r);
-	DECLARE_WRITE8_MEMBER(cmd_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
 	virtual uint16_t dack16_r(int line) override;
 
 protected:
@@ -38,6 +33,13 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_READ8_MEMBER(flag_r);
+	DECLARE_WRITE8_MEMBER(cmd_w);
+	DECLARE_WRITE8_MEMBER(reset_w);
+
+	void map(address_map &map);
+
 	bool read_sector(bool first = false);
 
 	bool m_change;

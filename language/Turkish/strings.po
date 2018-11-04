@@ -54,19 +54,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:51
 msgid "Control Panels"
-msgstr "Kontrol Paneli"
+msgstr "Kontrol Panelleri"
 
 #: src/frontend/mame/ui/selmenu.cpp:52 src/frontend/mame/ui/dirmenu.cpp:50
 msgid "PCBs"
-msgstr ""
+msgstr "Anakartlar"
 
 #: src/frontend/mame/ui/selmenu.cpp:53 src/frontend/mame/ui/dirmenu.cpp:47
 msgid "Flyers"
-msgstr ""
+msgstr "Posterler"
 
 #: src/frontend/mame/ui/selmenu.cpp:54 src/frontend/mame/ui/dirmenu.cpp:48
 msgid "Titles"
-msgstr ""
+msgstr "Başlıklar"
 
 #: src/frontend/mame/ui/selmenu.cpp:55 src/frontend/mame/ui/dirmenu.cpp:49
 msgid "Ends"
@@ -74,19 +74,19 @@ msgstr "Sonlar"
 
 #: src/frontend/mame/ui/selmenu.cpp:56
 msgid "Artwork Preview"
-msgstr ""
+msgstr "Sanat Eseri Önizleme"
 
 #: src/frontend/mame/ui/selmenu.cpp:57 src/frontend/mame/ui/dirmenu.cpp:55
 msgid "Bosses"
-msgstr ""
+msgstr "Patronlar"
 
 #: src/frontend/mame/ui/selmenu.cpp:58 src/frontend/mame/ui/dirmenu.cpp:60
 msgid "Logos"
-msgstr ""
+msgstr "Logolar"
 
 #: src/frontend/mame/ui/selmenu.cpp:59 src/frontend/mame/ui/dirmenu.cpp:62
 msgid "Versus"
-msgstr ""
+msgstr "Karşılaşma"
 
 #: src/frontend/mame/ui/selmenu.cpp:60
 msgid "Game Over"
@@ -94,15 +94,15 @@ msgstr "Oyun Bitti"
 
 #: src/frontend/mame/ui/selmenu.cpp:61 src/frontend/mame/ui/dirmenu.cpp:59
 msgid "HowTo"
-msgstr ""
+msgstr "Nasıl"
 
 #: src/frontend/mame/ui/selmenu.cpp:62 src/frontend/mame/ui/dirmenu.cpp:61
 msgid "Scores"
-msgstr ""
+msgstr "Puanlar"
 
 #: src/frontend/mame/ui/selmenu.cpp:63 src/frontend/mame/ui/dirmenu.cpp:57
 msgid "Select"
-msgstr ""
+msgstr "Seç"
 
 #: src/frontend/mame/ui/selmenu.cpp:64 src/frontend/mame/ui/dirmenu.cpp:51
 #: src/frontend/mame/ui/videoopt.cpp:224
@@ -111,23 +111,23 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:65 src/frontend/mame/ui/dirmenu.cpp:63
 msgid "Covers"
-msgstr ""
+msgstr "Kapaklar"
 
 #: src/frontend/mame/ui/selmenu.cpp:69
 msgid "Add or remove favorites"
-msgstr ""
+msgstr "Beğenilenlere ekle veya kaldır"
 
 #: src/frontend/mame/ui/selmenu.cpp:70
 msgid "Export displayed list to file"
-msgstr ""
+msgstr "Gösterilen dosya listesini dışa aktar"
 
 #: src/frontend/mame/ui/selmenu.cpp:71
 msgid "Show DATs view"
-msgstr ""
+msgstr "DAT görünümünü göster"
 
 #: src/frontend/mame/ui/selmenu.cpp:237
 msgid "Software part selection:"
-msgstr ""
+msgstr "Yazılım parça seçimi:"
 
 #: src/frontend/mame/ui/selmenu.cpp:343
 msgid "BIOS selection:"
@@ -142,11 +142,11 @@ msgstr ""
 #: src/frontend/mame/ui/selmenu.cpp:574
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr ""
+msgstr "Yazılım şunun kopyasıdır: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:576
 msgid "Software is parent"
-msgstr ""
+msgstr "Yazılım esastır"
 
 #: src/frontend/mame/ui/selmenu.cpp:581
 msgid "Supported: No"
@@ -168,11 +168,11 @@ msgstr ""
 #: src/frontend/mame/ui/selmenu.cpp:612
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
-msgstr ""
+msgstr "Sürücü şunun kopyasıdır: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:614
 msgid "Driver is parent"
-msgstr ""
+msgstr "Sürücü esastır"
 
 #: src/frontend/mame/ui/selmenu.cpp:619
 #: src/frontend/mame/ui/simpleselgame.cpp:330
@@ -255,11 +255,11 @@ msgstr "ROMlar"
 
 #: src/frontend/mame/ui/dirmenu.cpp:36
 msgid "Software Media"
-msgstr ""
+msgstr "Yazılım Ortamı"
 
 #: src/frontend/mame/ui/dirmenu.cpp:37
 msgid "UI"
-msgstr ""
+msgstr "UI"
 
 #: src/frontend/mame/ui/dirmenu.cpp:38 src/frontend/mame/ui/custui.cpp:157
 msgid "Language"
@@ -267,7 +267,7 @@ msgstr "Dil"
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgid "Samples"
-msgstr ""
+msgstr "Örneklemeler"
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgid "DATs"
@@ -291,11 +291,11 @@ msgstr "Hileler"
 
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgid "Controls Panels"
-msgstr ""
+msgstr "Kontrol Panelleri"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgid "Crosshairs"
-msgstr ""
+msgstr "Nişan"
 
 #: src/frontend/mame/ui/dirmenu.cpp:54
 msgid "Artworks"
@@ -307,11 +307,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgid "GameOver"
-msgstr ""
+msgstr "OyunBitti"
 
 #: src/frontend/mame/ui/dirmenu.cpp:116
 msgid "Folders Setup"
-msgstr ""
+msgstr "Dizin Ayarı"
 
 #: src/frontend/mame/ui/dirmenu.cpp:167
 #, c-format
@@ -320,11 +320,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:179
 msgid "Change Folder"
-msgstr ""
+msgstr "Dizin Değiştir"
 
 #: src/frontend/mame/ui/dirmenu.cpp:179
 msgid "Add Folder"
-msgstr ""
+msgstr "Dizin Ekle"
 
 #: src/frontend/mame/ui/dirmenu.cpp:182
 msgid "Remove Folder"
@@ -342,89 +342,94 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:429
 msgid "Press TAB to set"
-msgstr ""
+msgstr "Ayarlamak için TAB'a basın"
 
 #: src/frontend/mame/ui/dirmenu.cpp:513
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr ""
+msgstr "%1$s dizini kaldır"
 
 #: src/frontend/mame/ui/info.cpp:30
 msgid "protection"
-msgstr ""
+msgstr "koruma"
 
 #: src/frontend/mame/ui/info.cpp:31
 msgid "color palette"
-msgstr ""
+msgstr "renk paleti"
 
 #: src/frontend/mame/ui/info.cpp:32
 msgid "graphics"
-msgstr ""
+msgstr "grafikler"
 
 #: src/frontend/mame/ui/info.cpp:33
 msgid "sound"
-msgstr ""
+msgstr "ses"
 
 #: src/frontend/mame/ui/info.cpp:34
 msgid "controls"
-msgstr ""
+msgstr "kontroller"
 
 #: src/frontend/mame/ui/info.cpp:35
 msgid "keyboard"
-msgstr ""
+msgstr "klavye"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "mouse"
-msgstr ""
+msgstr "fare"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "microphone"
-msgstr ""
+msgstr "mikrofon"
 
 #: src/frontend/mame/ui/info.cpp:38
 msgid "camera"
-msgstr ""
+msgstr "kamera"
 
 #: src/frontend/mame/ui/info.cpp:39
 msgid "disk"
-msgstr ""
+msgstr "disk"
 
 #: src/frontend/mame/ui/info.cpp:40
 msgid "printer"
-msgstr ""
+msgstr "yazıcı"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgid "LAN"
-msgstr ""
+msgstr "LAN"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgid "WAN"
-msgstr ""
+msgstr "WAN"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "timing"
-msgstr ""
+msgstr "zamanlama"
 
 #: src/frontend/mame/ui/info.cpp:180
 msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
+"Bu makinenin bir veya daha fazla ROM/CHD'si doğru değil. Makine düzgün "
+"çalışmayabilir.\n"
 
 #: src/frontend/mame/ui/info.cpp:190
 msgid ""
 "There are known problems with this machine\n"
 "\n"
 msgstr ""
+"Bu makinenin bilinen problemleri var\n"
+"\n"
 
 #: src/frontend/mame/ui/info.cpp:195
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
+"Bu makinenin bir veya daha fazla ROM/CHD'si düzgünce aktarılmadı.\n"
 
 #: src/frontend/mame/ui/info.cpp:200
 msgid "Completely unemulated features: "
-msgstr ""
+msgstr "Tamamen uyarlanmamış özellikler: "
 
 #: src/frontend/mame/ui/info.cpp:206 src/frontend/mame/ui/info.cpp:222
 #, c-format
@@ -439,7 +444,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:216
 msgid "Imperfectly emulated features: "
-msgstr ""
+msgstr "Mükemmel olmayan uyarlanmış özellikler: "
 
 #: src/frontend/mame/ui/info.cpp:231
 msgid "Screen flipping in cocktail mode is not supported.\n"

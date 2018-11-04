@@ -336,6 +336,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void st(machine_config &config);
+	void ikbd_io_map(address_map &map);
+	void ikbd_map(address_map &map);
+	void st_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -350,6 +353,7 @@ public:
 	DECLARE_READ16_MEMBER( fpu_r );
 	DECLARE_WRITE16_MEMBER( fpu_w );
 	void megast(machine_config &config);
+	void megast_map(address_map &map);
 };
 
 class ste_state : public st_state
@@ -433,6 +437,7 @@ public:
 	void tt030(machine_config &config);
 	void falcon(machine_config &config);
 	void ste(machine_config &config);
+	void ste_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -451,6 +456,7 @@ public:
 
 	uint16_t m_cache;
 	void megaste(machine_config &config);
+	void megaste_map(address_map &map);
 };
 
 class stbook_state : public ste_state
@@ -471,6 +477,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( psg_pa_w );
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
+	void stbook_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_ATARI_ST_H

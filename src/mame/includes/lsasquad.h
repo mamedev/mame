@@ -60,4 +60,9 @@ public:
 	void lsasquad(machine_config &config);
 	void daikaiju(machine_config &config);
 	void storming(machine_config &config);
+	void daikaiju_map(address_map &map);
+	void daikaiju_sound_map(address_map &map);
+	void lsasquad_map(address_map &map);
+	void lsasquad_sound_map(address_map &map);
+	void storming_map(address_map &map);
 };

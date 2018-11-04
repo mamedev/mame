@@ -17,6 +17,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( t0_w );
 
+	void pcd_keyboard_map(address_map &map);
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -36,7 +37,6 @@ private:
 	DECLARE_READ_LINE_MEMBER( t0_r );
 };
 
-extern const device_type PCD_KEYBOARD;
 DECLARE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device)
 
 #endif // MAME_INCLUDES_PCD_KBD_H

@@ -208,7 +208,7 @@ WRITE8_MEMBER(rastan_state::rastan_msm5205_stop_w)
 
 
 
-static ADDRESS_MAP_START( rastan_map, AS_PROGRAM, 16, rastan_state )
+ADDRESS_MAP_START(rastan_state::rastan_map)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( rastan_map, AS_PROGRAM, 16, rastan_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rastan_s_map, AS_PROGRAM, 8, rastan_state )
+ADDRESS_MAP_START(rastan_state::rastan_s_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM

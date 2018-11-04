@@ -68,6 +68,7 @@ public:
 	{ }
 
 	void globalvr(machine_config &config);
+	void globalvr_map(address_map &map);
 protected:
 
 	// devices
@@ -76,7 +77,7 @@ protected:
 
 
 
-static ADDRESS_MAP_START( globalvr_map, AS_PROGRAM, 32, globalvr_state )
+ADDRESS_MAP_START(globalvr_state::globalvr_map)
 	AM_RANGE(0x00000000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

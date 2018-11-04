@@ -60,6 +60,8 @@ public:
 
 	void sdk85(machine_config &config);
 
+	void sdk85_io(address_map &map);
+	void sdk85_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -75,7 +77,7 @@ void sdk85_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static ADDRESS_MAP_START(sdk85_mem, AS_PROGRAM, 8, sdk85_state)
+ADDRESS_MAP_START(sdk85_state::sdk85_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_DEVREAD("romio", i8355_device, memory_r)
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("expromio", i8355_device, memory_r)
@@ -85,7 +87,7 @@ static ADDRESS_MAP_START(sdk85_mem, AS_PROGRAM, 8, sdk85_state)
 	AM_RANGE(0x2800, 0x28ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("expramio", i8155_device, memory_r, memory_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sdk85_io, AS_IO, 8, sdk85_state)
+ADDRESS_MAP_START(sdk85_state::sdk85_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x04) AM_DEVREADWRITE("romio", i8355_device, io_r, io_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0x04) AM_DEVREADWRITE("expromio", i8355_device, io_r, io_w)

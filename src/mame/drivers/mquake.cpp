@@ -61,6 +61,10 @@ public:
 	DECLARE_WRITE16_MEMBER( coin_chip_w );
 
 	void mquake(machine_config &config);
+	void a500_mem(address_map &map);
+	void main_map(address_map &map);
+	void mquake_es5503_map(address_map &map);
+	void overlay_512kb_map(address_map &map);
 private:
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;
@@ -80,7 +84,7 @@ READ8_MEMBER( mquake_state::es5503_sample_r )
 	return m_es5503_rom[offset + (m_es5503->get_channel_strobe() * 0x10000)];
 }
 
-static ADDRESS_MAP_START( mquake_es5503_map, 0, 8, mquake_state )
+ADDRESS_MAP_START(mquake_state::mquake_es5503_map)
 	AM_RANGE(0x000000, 0x1ffff) AM_READ(es5503_sample_r)
 ADDRESS_MAP_END
 
@@ -118,13 +122,13 @@ WRITE16_MEMBER( mquake_state::coin_chip_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( overlay_512kb_map, AS_PROGRAM, 16, mquake_state )
+ADDRESS_MAP_START(mquake_state::overlay_512kb_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, mquake_state )
+ADDRESS_MAP_START(mquake_state::a500_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
@@ -137,7 +141,7 @@ static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, mquake_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mquake_state )
+ADDRESS_MAP_START(mquake_state::main_map)
 	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8("es5503", es5503_device, read, write, 0x00ff)
@@ -319,7 +323,7 @@ MACHINE_CONFIG_START(mquake_state::mquake)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(mquake_state,amiga)

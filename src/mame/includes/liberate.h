@@ -92,4 +92,13 @@ public:
 	void boomrang(machine_config &config);
 	void prosoccr(machine_config &config);
 	void prosport(machine_config &config);
+	void deco16_io_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void liberatb_map(address_map &map);
+	void liberate_map(address_map &map);
+	void liberate_sound_map(address_map &map);
+	void prosoccr_io_map(address_map &map);
+	void prosoccr_map(address_map &map);
+	void prosoccr_sound_map(address_map &map);
+	void prosport_map(address_map &map);
 };

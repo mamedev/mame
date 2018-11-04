@@ -235,7 +235,7 @@ READ16_MEMBER(offtwall_state::unknown_verify_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
+ADDRESS_MAP_START(offtwall_state::main_map)
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
 	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_SHARE("bankrom_base")
 	AM_RANGE(0x120000, 0x120fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)

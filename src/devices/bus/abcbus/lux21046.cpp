@@ -137,7 +137,7 @@ const tiny_rom_entry *luxor_55_21046_device::device_rom_region() const
 //  ADDRESS_MAP( luxor_55_21046_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_21046_mem, AS_PROGRAM, 8, luxor_55_21046_device )
+ADDRESS_MAP_START(luxor_55_21046_device::luxor_55_21046_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(Z80_TAG, 0x2000) // A13 pull-up
@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( luxor_55_21046_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_21046_io, AS_IO, 8, luxor_55_21046_device )
+ADDRESS_MAP_START(luxor_55_21046_device::luxor_55_21046_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_READ(out_r)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff03) AM_WRITE(inp_w)

@@ -1438,7 +1438,7 @@ device_memory_interface::space_config_vector mos8563_device::memory_space_config
 }
 
 // default address maps
-static ADDRESS_MAP_START( mos8563_videoram_map, 0, 8, mos8563_device )
+ADDRESS_MAP_START(mos8563_device::mos8563_videoram_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1505,7 +1505,7 @@ ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag,
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mos8563_device::mos8563_videoram_map), this)),
 		m_palette(*this, "palette")
 {
 	set_clock_scale(1.0/8);

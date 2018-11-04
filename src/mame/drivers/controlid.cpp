@@ -45,6 +45,8 @@ public:
 
 	required_device<nt7534_device> m_lcdc;
 	void controlidx628(machine_config &config);
+	void io_map(address_map &map);
+	void prog_map(address_map &map);
 private:
 	uint8_t p0_data;
 	uint8_t p1_data;
@@ -55,11 +57,11 @@ private:
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( prog_map, AS_PROGRAM, 8, controlidx628_state )
+ADDRESS_MAP_START(controlidx628_state::prog_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, controlidx628_state )
+ADDRESS_MAP_START(controlidx628_state::io_map)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 
 //  /* Ports start here */

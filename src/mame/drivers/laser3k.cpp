@@ -112,6 +112,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
 	void laser3k(machine_config &config);
+	void banks_map(address_map &map);
+	void laser3k_map(address_map &map);
 private:
 	uint8_t m_bank0val, m_bank1val, m_bank2val, m_bank3val;
 	int m_flash;
@@ -134,14 +136,14 @@ private:
     ADDRESS MAP
 ***************************************************************************/
 
-static ADDRESS_MAP_START( laser3k_map, AS_PROGRAM, 8, laser3k_state )
+ADDRESS_MAP_START(laser3k_state::laser3k_map)
 	AM_RANGE(0x0000, 0x3fff) AM_DEVICE("bank0", address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("bank1", address_map_bank_device, amap8)
 	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("bank2", address_map_bank_device, amap8)
 	AM_RANGE(0xc000, 0xffff) AM_DEVICE("bank3", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( banks_map, AS_PROGRAM, 8, laser3k_state )
+ADDRESS_MAP_START(laser3k_state::banks_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x38000, 0x3bfff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x3c000, 0x3c0ff) AM_READWRITE(io_r, io_w)

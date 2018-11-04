@@ -78,6 +78,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hotblock(machine_config &config);
+	void hotblock_io(address_map &map);
+	void hotblock_map(address_map &map);
 };
 
 
@@ -128,13 +130,13 @@ WRITE8_MEMBER(hotblock_state::video_write)
 	}
 }
 
-static ADDRESS_MAP_START( hotblock_map, AS_PROGRAM, 8, hotblock_state )
+ADDRESS_MAP_START(hotblock_state::hotblock_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(video_read, video_write) AM_SHARE("vram")
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotblock_io, AS_IO, 8, hotblock_state )
+ADDRESS_MAP_START(hotblock_state::hotblock_io)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(port0_w)
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE(port4_r, port4_w)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)

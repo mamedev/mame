@@ -40,4 +40,7 @@ public:
 	uint32_t screen_update_funybubl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void funybubl(machine_config &config);
+	void funybubl_map(address_map &map);
+	void io_map(address_map &map);
+	void sound_map(address_map &map);
 };

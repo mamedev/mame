@@ -50,7 +50,7 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 	}
 }
 
-static ADDRESS_MAP_START( skyfox_map, AS_PROGRAM, 8, skyfox_state )
+ADDRESS_MAP_START(skyfox_state::skyfox_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("spriteram")
@@ -69,7 +69,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( skyfox_sound_map, AS_PROGRAM, 8, skyfox_state )
+ADDRESS_MAP_START(skyfox_state::skyfox_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 //  AM_RANGE(0x9000, 0x9001) AM_WRITENOP // ??

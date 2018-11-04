@@ -106,6 +106,7 @@ public:
 
 	DECLARE_DRIVER_INIT(littlerb);
 	void littlerb(machine_config &config);
+	void littlerb_main(address_map &map);
 };
 
 
@@ -130,7 +131,7 @@ WRITE16_MEMBER(littlerb_state::littlerb_r_sound_w)
 	//popmessage("%04x %04x",m_sound_index_l,m_sound_index_r);
 }
 
-static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16, littlerb_state )
+ADDRESS_MAP_START(littlerb_state::littlerb_main)
 	AM_RANGE(0x000008, 0x000017) AM_WRITENOP
 	AM_RANGE(0x000020, 0x00002f) AM_WRITENOP
 	AM_RANGE(0x000070, 0x000073) AM_WRITENOP

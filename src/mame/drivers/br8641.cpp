@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port09_w);
 
 	void brandt8641(machine_config &config);
+	void brandt8641_io(address_map &map);
+	void brandt8641_mem(address_map &map);
 private:
 	uint8_t m_port08;
 	uint8_t m_port09;
@@ -61,13 +63,13 @@ private:
 	required_device<beep_device> m_beep;
 };
 
-static ADDRESS_MAP_START(brandt8641_mem, AS_PROGRAM, 8, brandt8641_state)
+ADDRESS_MAP_START(brandt8641_state::brandt8641_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // 27256 at U12
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // 8KB static ram 6264 at U12
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(brandt8641_io, AS_IO, 8, brandt8641_state)
+ADDRESS_MAP_START(brandt8641_state::brandt8641_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("pio1", z80pio_device, read, write)

@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont,Ryan Holtz
-#ifndef _GBA_H_
-#define _GBA_H_
+
+#ifndef MAME_INCLUDES_GBA_H
+#define MAME_INCLUDES_GBA_H
 
 #include "sound/gb.h"
 #include "machine/intelfsh.h"
@@ -79,6 +80,7 @@ public:
 	TIMER_CALLBACK_MEMBER(handle_irq);
 
 	void gbadv(machine_config &config);
+	void gba_map(address_map &map);
 protected:
 	required_region_ptr<uint32_t> m_region_maincpu;
 	required_ioport m_io_inputs;

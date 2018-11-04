@@ -194,6 +194,7 @@ public:
 
 	DECLARE_DRIVER_INIT(4roses);
 	void _4roses(machine_config &config);
+	void _4roses_map(address_map &map);
 };
 
 
@@ -207,7 +208,7 @@ public:
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( 4roses_map, AS_PROGRAM, 8, _4roses_state )
+ADDRESS_MAP_START(_4roses_state::_4roses_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM // AM_SHARE("nvram")
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
@@ -357,7 +358,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(_4roses_state::_4roses)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
-	MCFG_CPU_PROGRAM_MAP(4roses_map)
+	MCFG_CPU_PROGRAM_MAP(_4roses_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _4roses_state,  nmi_line_pulse)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")

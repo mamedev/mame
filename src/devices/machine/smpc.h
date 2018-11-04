@@ -75,24 +75,10 @@ public:
 	smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-//  DECLARE_ADDRESS_MAP( io_map, 8);
+//  void io_map(address_map &map);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_WRITE8_MEMBER( ireg_w );
-	DECLARE_WRITE8_MEMBER( command_register_w );
-	DECLARE_READ8_MEMBER( oreg_r );
-	DECLARE_READ8_MEMBER( status_register_r );
-	DECLARE_WRITE8_MEMBER( status_flag_w );
-	DECLARE_READ8_MEMBER( status_flag_r );
-	DECLARE_READ8_MEMBER( pdr1_r );
-	DECLARE_READ8_MEMBER( pdr2_r );
-	DECLARE_WRITE8_MEMBER( pdr1_w );
-	DECLARE_WRITE8_MEMBER( pdr2_w );
-	DECLARE_WRITE8_MEMBER( ddr1_w );
-	DECLARE_WRITE8_MEMBER( ddr2_w );
-	DECLARE_WRITE8_MEMBER( iosel_w );
-	DECLARE_WRITE8_MEMBER( exle_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi_r );
 
 	void m68k_reset_trigger();
@@ -217,6 +203,23 @@ private:
 	saturn_control_port_device *m_ctrl2;
 
 	screen_device *m_screen;
+
+	void smpc_regs(address_map &map);
+
+	DECLARE_WRITE8_MEMBER( ireg_w );
+	DECLARE_WRITE8_MEMBER( command_register_w );
+	DECLARE_READ8_MEMBER( oreg_r );
+	DECLARE_READ8_MEMBER( status_register_r );
+	DECLARE_WRITE8_MEMBER( status_flag_w );
+	DECLARE_READ8_MEMBER( status_flag_r );
+	DECLARE_READ8_MEMBER( pdr1_r );
+	DECLARE_READ8_MEMBER( pdr2_r );
+	DECLARE_WRITE8_MEMBER( pdr1_w );
+	DECLARE_WRITE8_MEMBER( pdr2_w );
+	DECLARE_WRITE8_MEMBER( ddr1_w );
+	DECLARE_WRITE8_MEMBER( ddr2_w );
+	DECLARE_WRITE8_MEMBER( iosel_w );
+	DECLARE_WRITE8_MEMBER( exle_w );
 };
 
 

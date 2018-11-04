@@ -192,6 +192,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cdsteljn_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
 	void decocass(machine_config &config);
+	void decocass_map(address_map &map);
+	void decocass_sound_map(address_map &map);
 private:
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);
 	void draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect);

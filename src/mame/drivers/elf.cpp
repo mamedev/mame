@@ -74,13 +74,13 @@ WRITE8_MEMBER( elf2_state::memory_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( elf2_mem, AS_PROGRAM, 8, elf2_state )
+ADDRESS_MAP_START(elf2_state::elf2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( elf2_io, AS_IO, 8, elf2_state )
+ADDRESS_MAP_START(elf2_state::elf2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01, 0x01) AM_READ(dispon_r)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(data_r, data_w)

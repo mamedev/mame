@@ -178,6 +178,9 @@ public:
 	uint64_t      m_hopper_start_cycles;
 	int         m_audiocpu_cmd_irq;
 	void jwildb52(machine_config &config);
+	void jwildb52_hd63484_map(address_map &map);
+	void jwildb52_map(address_map &map);
+	void sound_prog_map(address_map &map);
 };
 
 
@@ -306,7 +309,7 @@ WRITE8_MEMBER(sigmab52_state::palette_bank_w)
 *      Memory Maps       *
 *************************/
 
-static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
+ADDRESS_MAP_START(sigmab52_state::jwildb52_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 
@@ -357,7 +360,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( sound_prog_map, AS_PROGRAM, 8, sigmab52_state )
+ADDRESS_MAP_START(sigmab52_state::sound_prog_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x6020, 0x6027) AM_DEVREADWRITE("6840ptm_2", ptm6840_device, read, write)
 	AM_RANGE(0x6030, 0x6030) AM_WRITE(audiocpu_irq_ack_w)
@@ -371,7 +374,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( jwildb52_hd63484_map, 0, 16, sigmab52_state )
+ADDRESS_MAP_START(sigmab52_state::jwildb52_hd63484_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END

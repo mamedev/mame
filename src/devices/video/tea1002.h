@@ -60,7 +60,6 @@ private:
 };
 
 // device type definition
-extern const device_type TEA1002;
 DECLARE_DEVICE_TYPE(TEA1002, tea1002_device)
 
 #endif // MAME_VIDEO_TEA1002_H

@@ -30,9 +30,6 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::KEYBOARD; }
 
-	// from host
-	virtual void tx_w(int state) override;
-
 protected:
 	// device_t overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -41,7 +38,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// from host
+	virtual void tx_w(int state) override;
+
 private:
+	void kbd_io(address_map &map);
+	void kbd_mem(address_map &map);
 };
 
 

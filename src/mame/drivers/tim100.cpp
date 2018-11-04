@@ -39,6 +39,8 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
 	void tim100(machine_config &config);
+	void tim100_io(address_map &map);
+	void tim100_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	uint8_t *m_charmap;
@@ -49,7 +51,7 @@ private:
 	required_device<i8275_device> m_crtc;
 };
 
-static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
+ADDRESS_MAP_START(tim100_state::tim100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // 2764 at U16
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("videoram") // 2KB static ram CDM6116A at U15
@@ -61,7 +63,7 @@ static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("crtc", i8275_device, read, write) // i8276
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tim100_io, AS_IO, 8, tim100_state)
+ADDRESS_MAP_START(tim100_state::tim100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END

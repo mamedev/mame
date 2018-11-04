@@ -152,6 +152,8 @@ public:
 	void qbert_knocker(machine_config &config);
 	void gottlieb1(machine_config &config);
 	void gottlieb1_votrax(machine_config &config);
+	void gottlieb_map(address_map &map);
+	void reactor_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

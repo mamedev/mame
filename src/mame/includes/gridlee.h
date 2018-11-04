@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "sound/samples.h"
+#include "machine/74259.h"
 #include "screen.h"
 
 
@@ -31,12 +32,14 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_latch(*this, "latch"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_latch;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -73,6 +76,7 @@ public:
 	void expand_pixels();
 	void poly17_init();
 	void gridlee(machine_config &config);
+	void cpu1_map(address_map &map);
 };
 
 

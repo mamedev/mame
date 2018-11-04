@@ -158,6 +158,9 @@ public:
 	int m_tmr0;
 	void compis(machine_config &config);
 	void compis2(machine_config &config);
+	void compis2_mem(address_map &map);
+	void compis_io(address_map &map);
+	void compis_mem(address_map &map);
 };
 
 
@@ -390,7 +393,7 @@ WRITE16_MEMBER( compis_state::pcs6_14_15_w )
 //  ADDRESS_MAP( compis_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( compis_mem, AS_PROGRAM, 16, compis_state )
+ADDRESS_MAP_START(compis_state::compis_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x60000, 0x63fff) AM_MIRROR(0x1c000) AM_DEVICE(I80130_TAG, i80130_device, rom_map)
@@ -402,7 +405,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( compis2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( compis2_mem, AS_PROGRAM, 16, compis_state )
+ADDRESS_MAP_START(compis_state::compis2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xe0000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION(I80186_TAG, 0)
@@ -413,7 +416,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( compis_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
+ADDRESS_MAP_START(compis_state::compis_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0007) /* PCS0 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8255_TAG, i8255_device, read, write, 0xff00)
 	AM_RANGE(0x0080, 0x0087) /* PCS1 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
@@ -839,7 +842,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( compis2 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(compis_state::compis2, compis)
+MACHINE_CONFIG_START(compis_state::compis2)
+	compis(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY(I80186_TAG)
 	MCFG_CPU_PROGRAM_MAP(compis2_mem)

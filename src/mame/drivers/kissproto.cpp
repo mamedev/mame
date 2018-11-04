@@ -20,6 +20,7 @@ public:
 	{ }
 
 	void kissp(machine_config &config);
+	void kissp_map(address_map &map);
 protected:
 
 	// devices
@@ -32,7 +33,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( kissp_map, AS_PROGRAM, 8, kissp_state )
+ADDRESS_MAP_START(kissp_state::kissp_map)
 	AM_RANGE(0x0000, 0x0fff) AM_NOP
 ADDRESS_MAP_END
 

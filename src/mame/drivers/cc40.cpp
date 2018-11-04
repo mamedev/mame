@@ -148,6 +148,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
 	void cc40(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -362,7 +363,7 @@ WRITE8_MEMBER(cc40_state::keyboard_w)
 	m_key_select = data;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cc40_state )
+ADDRESS_MAP_START(cc40_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0110, 0x0110) AM_READWRITE(bus_control_r, bus_control_w)

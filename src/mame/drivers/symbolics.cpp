@@ -106,6 +106,8 @@ public:
 	virtual void machine_reset() override;
 
 	void symbolics(machine_config &config);
+	void m68k_io(address_map &map);
+	void m68k_mem(address_map &map);
 //protected:
 //  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -244,7 +246,7 @@ currently dies at context switch code loaded to ram around 38EE0, see patent 488
 
 */
 
-static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, symbolics_state )
+ADDRESS_MAP_START(symbolics_state::m68k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x000000, 0x01ffff) AM_ROM /* ROM lives here */
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM
@@ -266,7 +268,7 @@ static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, symbolics_state )
 	//FF018A is writable, gets 0x5555 written to it
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(m68k_io, AS_IO, 16, symbolics_state )
+ADDRESS_MAP_START(symbolics_state::m68k_io)
 ADDRESS_MAP_END
 
 /******************************************************************************

@@ -46,6 +46,9 @@ public:
 
 	void missb2(machine_config &config);
 	void bublpong(machine_config &config);
+	void maincpu_map(address_map &map);
+	void sound_map(address_map &map);
+	void subcpu_map(address_map &map);
 protected:
 	void configure_banks();
 
@@ -176,7 +179,7 @@ READ8_MEMBER(missb2_state::missb2_oki_r)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, missb2_state )
+ADDRESS_MAP_START(missb2_state::maincpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
@@ -200,7 +203,7 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xff98, 0xff98) AM_WRITENOP    // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, missb2_state )
+ADDRESS_MAP_START(missb2_state::subcpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")    // ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")    // ROM data for the background palette ram
@@ -216,7 +219,7 @@ ADDRESS_MAP_END
 // Looks like the original bublbobl code modified to support the OKI M6295.
 // due to some really wacky bugs in the way the oki6295 was hacked in place, writes will happen to
 // many addresses other than 9000: 9000-9001, 0000-0001, 3827-3828, 44a8-44a9
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, missb2_state )
+ADDRESS_MAP_START(missb2_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(missb2_oki_r, missb2_oki_w) //AM_MIRROR(0x0fff) ???
@@ -514,7 +517,8 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(missb2_state::bublpong, missb2)
+MACHINE_CONFIG_START(missb2_state::bublpong)
+	missb2(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bublpong)
 MACHINE_CONFIG_END
 

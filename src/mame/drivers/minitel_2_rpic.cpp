@@ -108,6 +108,8 @@ public:
 	DECLARE_WRITE8_MEMBER ( ts9347_io_w );
 
 	void minitel2(machine_config &config);
+	void mem_io(address_map &map);
+	void mem_prg(address_map &map);
 protected:
 	required_ioport_array<16> m_io_kbd;
 	virtual void machine_start() override;
@@ -294,11 +296,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(minitel_state::minitel_scanline)
 	m_ts9347->update_scanline((uint16_t)param);
 }
 
-static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, minitel_state )
+ADDRESS_MAP_START(minitel_state::mem_prg)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_io, AS_IO, 8, minitel_state )
+ADDRESS_MAP_START(minitel_state::mem_io)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dev_keyb_ser_r, dev_crtl_reg_w)
 	/* ts9347 */
 	AM_RANGE(0x4000, 0x5ffF) AM_READWRITE(ts9347_io_r, ts9347_io_w)

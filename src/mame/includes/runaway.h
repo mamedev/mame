@@ -41,4 +41,5 @@ public:
 	required_device<palette_device> m_palette;
 	void qwak(machine_config &config);
 	void runaway(machine_config &config);
+	void runaway_map(address_map &map);
 };

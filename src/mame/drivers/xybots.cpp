@@ -71,7 +71,7 @@ READ16_MEMBER(xybots_state::special_port1_r)
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
+ADDRESS_MAP_START(xybots_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x007fff) AM_MIRROR(0x7c0000) AM_ROM
 	AM_RANGE(0x008000, 0x00ffff) AM_MIRROR(0x7c0000) AM_ROM /* slapstic maps here */

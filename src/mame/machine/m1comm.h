@@ -54,6 +54,8 @@ public:
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
 
+	void m1comm_io(address_map &map);
+	void m1comm_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

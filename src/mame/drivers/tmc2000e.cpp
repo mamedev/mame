@@ -82,13 +82,13 @@ WRITE8_MEMBER( tmc2000e_state::keyboard_latch_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tmc2000e_map, AS_PROGRAM, 8, tmc2000e_state )
+ADDRESS_MAP_START(tmc2000e_state::tmc2000e_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xfc00, 0xffff) AM_WRITEONLY AM_SHARE("colorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tmc2000e_io_map, AS_IO, 8, tmc2000e_state )
+ADDRESS_MAP_START(tmc2000e_state::tmc2000e_io_map)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE(CDP1864_TAG, cdp1864_device, tone_latch_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE(CDP1864_TAG, cdp1864_device, step_bgcolor_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(ascii_keyboard_r, keyboard_latch_w)

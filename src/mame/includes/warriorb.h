@@ -72,4 +72,7 @@ public:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn);
 	void warriorb(machine_config &config);
 	void darius2d(machine_config &config);
+	void darius2d_map(address_map &map);
+	void warriorb_map(address_map &map);
+	void z80_sound_map(address_map &map);
 };

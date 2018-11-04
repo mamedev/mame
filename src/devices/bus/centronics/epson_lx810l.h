@@ -41,10 +41,6 @@ public:
 	// construction/destruction
 	epson_lx810l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	/* fake memory I/O to get past memory reset check */
-	DECLARE_READ8_MEMBER(fakemem_r);
-	DECLARE_WRITE8_MEMBER(fakemem_w);
-
 	/* Centronics stuff */
 	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override { if (m_e05a30) m_e05a30->centronics_input_strobe(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (m_e05a30) m_e05a30->centronics_input_data0(state); }
@@ -58,10 +54,6 @@ public:
 
 	/* Panel buttons */
 	DECLARE_INPUT_CHANGED_MEMBER(online_sw);
-
-	/* Video hardware (simulates paper) */
-#define uabs(x) ((x) > 0 ? (x) : -(x))
-	unsigned int bitmap_line(int i) { return ((uabs(m_pf_pos_abs) / 6) + i) % m_bitmap.height(); }
 
 protected:
 	epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -83,6 +75,10 @@ private:
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_READ8_MEMBER(portc_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
+
+	/* fake memory I/O to get past memory reset check */
+	DECLARE_READ8_MEMBER(fakemem_r);
+	DECLARE_WRITE8_MEMBER(fakemem_w);
 
 	/* Extended Timer Output */
 	DECLARE_WRITE_LINE_MEMBER(co0_w);
@@ -110,8 +106,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_fault) { output_fault(state); }
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_select) { output_select(state); }
 
+	void lx810l_mem(address_map &map);
+
 	/* Video hardware (simulates paper) */
 	uint32_t screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+#define uabs(x) ((x) > 0 ? (x) : -(x))
+	unsigned int bitmap_line(int i) { return ((uabs(m_pf_pos_abs) / 6) + i) % m_bitmap.height(); }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_pf_stepper;

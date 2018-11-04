@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Tim Schuerewegen
-#ifndef _GP32_H_
-#define _GP32_H_
+
+#ifndef MAME_INCLUDES_GP32_H
+#define MAME_INCLUDES_GP32_H
 
 #include "machine/smartmed.h"
 #include "sound/dac.h"
@@ -185,6 +186,7 @@ public:
 	TIMER_CALLBACK_MEMBER(s3c240x_iic_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_iis_timer_exp);
 	void gp32(machine_config &config);
+	void gp32_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<smartmedia_image_device> m_smartmedia;

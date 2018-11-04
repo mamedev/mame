@@ -62,6 +62,12 @@ public:
 	void maniacsq(machine_config &config);
 	void maniacsqs(machine_config &config);
 	void touchgo_d5002fp(machine_config &config);
+	void alighunt_map(address_map &map);
+	void maniacsq_map(address_map &map);
+	void mcu_hostmem_map(address_map &map);
+	void play2000_map(address_map &map);
+	void snowboar_map(address_map &map);
+	void touchgo_map(address_map &map);
 protected:
 	required_device<m68000_device> m_maincpu;
 
@@ -110,6 +116,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bang_irq);
 	DECLARE_DRIVER_INIT(bang);
 	void bang(machine_config &config);
+	void bang_map(address_map &map);
 };
 
 
@@ -131,4 +138,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(wrally2_adc_cs);
 	DECLARE_CUSTOM_INPUT_MEMBER(wrally2_analog_bit_r);
 	void wrally2(machine_config &config);
+	void wrally2_map(address_map &map);
 };

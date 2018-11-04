@@ -84,6 +84,9 @@ public:
 	required_device<cpu_device> m_dsp;
 	required_device<ls259_device> m_mainlatch;
 	void tomcat(machine_config &config);
+	void dsp_map(address_map &map);
+	void sound_map(address_map &map);
+	void tomcat_map(address_map &map);
 };
 
 
@@ -239,7 +242,7 @@ WRITE8_MEMBER(tomcat_state::tomcat_nvram_w)
 	m_nvram[offset] = data;
 }
 
-static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
+ADDRESS_MAP_START(tomcat_state::tomcat_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x402000, 0x402001) AM_READ(tomcat_adcread_r) AM_WRITE(tomcat_adcon_w)
 	AM_RANGE(0x404000, 0x404001) AM_READ(tomcat_inputs_r) AM_DEVWRITE("avg", avg_tomcat_device, go_word_w)
@@ -254,7 +257,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE8(tomcat_nvram_r, tomcat_nvram_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16, tomcat_state )
+ADDRESS_MAP_START(tomcat_state::dsp_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
@@ -273,7 +276,7 @@ WRITE8_MEMBER(tomcat_state::soundlatches_w)
 	}
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tomcat_state )
+ADDRESS_MAP_START(tomcat_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x3000, 0x30df) AM_WRITE(soundlatches_w)

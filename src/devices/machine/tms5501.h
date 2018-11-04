@@ -73,14 +73,14 @@ public:
 	template <class Object> static devcb_base &set_xi_rd_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_read_xi.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_xo_wr_callback(device_t &device, Object &&cb) { return downcast<tms5501_device &>(device).m_write_xo.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(io_map, 8);
-
 	DECLARE_WRITE_LINE_MEMBER( rcv_w );
 
 	DECLARE_WRITE_LINE_MEMBER( sens_w );
 	DECLARE_WRITE_LINE_MEMBER( xi7_w );
 
 	uint8_t get_vector();
+
+	virtual void io_map(address_map &map);
 
 protected:
 	// device-level overrides
@@ -92,17 +92,6 @@ protected:
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
-
-	DECLARE_READ8_MEMBER( rb_r );
-	DECLARE_READ8_MEMBER( xi_r );
-	DECLARE_READ8_MEMBER( rst_r );
-	DECLARE_READ8_MEMBER( sta_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_WRITE8_MEMBER( rr_w );
-	DECLARE_WRITE8_MEMBER( tb_w );
-	DECLARE_WRITE8_MEMBER( xo_w );
-	DECLARE_WRITE8_MEMBER( mr_w );
-	DECLARE_WRITE8_MEMBER( tmr_w );
 
 private:
 	enum
@@ -183,11 +172,21 @@ private:
 	int m_xi7;
 
 	emu_timer *m_timer[5];
+
+	DECLARE_READ8_MEMBER( rb_r );
+	DECLARE_READ8_MEMBER( xi_r );
+	DECLARE_READ8_MEMBER( rst_r );
+	DECLARE_READ8_MEMBER( sta_r );
+	DECLARE_WRITE8_MEMBER( cmd_w );
+	DECLARE_WRITE8_MEMBER( rr_w );
+	DECLARE_WRITE8_MEMBER( tb_w );
+	DECLARE_WRITE8_MEMBER( xo_w );
+	DECLARE_WRITE8_MEMBER( mr_w );
+	DECLARE_WRITE8_MEMBER( tmr_w );
 };
 
 
 // device type definition
-extern const device_type TMS5501;
 DECLARE_DEVICE_TYPE(TMS5501, tms5501_device)
 
 #endif // MAME_MACHINE_TMS5501_H

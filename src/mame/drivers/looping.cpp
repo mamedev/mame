@@ -168,6 +168,10 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<watchdog_timer_device> m_watchdog;
 	void looping(machine_config &config);
+	void looping_io_map(address_map &map);
+	void looping_map(address_map &map);
+	void looping_sound_io_map(address_map &map);
+	void looping_sound_map(address_map &map);
 };
 
 
@@ -539,7 +543,7 @@ READ8_MEMBER(looping_state::protection_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8, looping_state )
+ADDRESS_MAP_START(looping_state::looping_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(looping_videoram_w) AM_SHARE("videoram")
@@ -557,13 +561,13 @@ static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0xf803, 0xf803) AM_MIRROR(0x03fc) AM_READWRITE(adc_r, adc_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
+ADDRESS_MAP_START(looping_state::looping_io_map)
 	AM_RANGE(0x400, 0x407) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8, looping_state )
+ADDRESS_MAP_START(looping_state::looping_sound_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
@@ -575,7 +579,7 @@ static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREAD("tms", tms5220_device, status_r) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8, looping_state )
+ADDRESS_MAP_START(looping_state::looping_sound_io_map)
 	AM_RANGE(0x000, 0x007) AM_DEVWRITE("sen0", ls259_device, write_d0)
 	AM_RANGE(0x008, 0x00f) AM_DEVWRITE("sen1", ls259_device, write_d0)
 ADDRESS_MAP_END

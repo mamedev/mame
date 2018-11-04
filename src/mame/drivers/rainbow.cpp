@@ -534,7 +534,7 @@ public:
 	}
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
-	DECLARE_WRITE_LINE_MEMBER(clear_video_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
 
 	DECLARE_READ8_MEMBER(diagnostic_r);
 	DECLARE_WRITE8_MEMBER(diagnostic_w);
@@ -609,7 +609,6 @@ public:
 	DECLARE_READ8_MEMBER(GDC_EXTRA_REGISTER_r);
 
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -623,6 +622,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
 	void rainbow(machine_config &config);
+	void rainbow8088_io(address_map &map);
+	void rainbow8088_map(address_map &map);
+	void rainbowz80_io(address_map &map);
+	void rainbowz80_mem(address_map &map);
+	void upd7220_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -900,7 +904,7 @@ void rainbow_state::machine_start()
 #endif
 }
 
-static ADDRESS_MAP_START(rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::rainbow8088_map)
 ADDRESS_MAP_UNMAP_HIGH
 AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
 AM_RANGE(0x10000, END_OF_RAM) AM_RAM AM_SHARE("ext_ram") AM_WRITE(ext_ram_w)
@@ -922,7 +926,7 @@ AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
 AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rainbow8088_io, AS_IO, 8, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::rainbow8088_io)
 ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_GLOBAL_MASK(0x1ff)
 AM_RANGE(0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
@@ -1014,12 +1018,12 @@ AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
 // 0x10c -> (MHFU disable register handled by 0x0c + AM_SELECT)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rainbowz80_mem, AS_PROGRAM, 8, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::rainbowz80_mem)
 ADDRESS_MAP_UNMAP_HIGH
 AM_RANGE(0x0000, 0xffff) AM_READWRITE(share_z80_r, share_z80_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rainbowz80_io, AS_IO, 8, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::rainbowz80_io)
 ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_GLOBAL_MASK(0xff)
 AM_RANGE(0x00, 0x00) AM_READWRITE(z80_latch_r, z80_latch_w)
@@ -2626,12 +2630,14 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 } // 7220 vblank IRQ
 
 
-INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
+WRITE_LINE_MEMBER(rainbow_state::video_interrupt)
 {
-	raise_8088_irq(IRQ_8088_VBL);
-	m_crtc->notify_vblank(true);
+	if (state == ASSERT_LINE)
+		raise_8088_irq(IRQ_8088_VBL);
+	else
+		lower_8088_irq(IRQ_8088_VBL);
 
-	if (m_POWER_GOOD && m_crtc->MHFU(MHFU_IS_ENABLED)) // If enabled...
+	if (state == ASSERT_LINE && m_POWER_GOOD && m_crtc->MHFU(MHFU_IS_ENABLED)) // If enabled...
 	{
 		if (m_crtc->MHFU(MHFU_VALUE) > 10) // + more than (10 * 16.666) msecs gone (108 ms would be by the book)
 		{
@@ -2642,12 +2648,6 @@ INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 				cmd_timer->adjust(attotime::from_msec(RESET_DURATION_MS));
 		}
 	}
-}
-
-WRITE_LINE_MEMBER(rainbow_state::clear_video_interrupt)
-{
-	lower_8088_irq(IRQ_8088_VBL);
-	m_crtc->notify_vblank(false);
 }
 
 // Reflects bits from 'diagnostic_w' (1:1), except test jumpers
@@ -3179,7 +3179,7 @@ GFXDECODE_ENTRY("chargen", 0x0000, rainbow_charlayout, 0, 1)
 GFXDECODE_END
 
 // Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC-NEW):
-static ADDRESS_MAP_START( upd7220_map, 0, 16, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::upd7220_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
 ADDRESS_MAP_END
 
@@ -3194,7 +3194,6 @@ MCFG_CPU_IO_MAP(rainbow8088_io)
 MCFG_CPU_ADD("subcpu", Z80, XTAL(24'073'400) / 6)
 MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
 MCFG_CPU_IO_MAP(rainbowz80_io)
-MCFG_CPU_VBLANK_INT_DRIVER("screen", rainbow_state, vblank_irq)
 
 /* video hardware */
 MCFG_SCREEN_ADD("screen", RASTER)
@@ -3209,7 +3208,7 @@ MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, XTAL(24'073'400))
 MCFG_VT_SET_SCREEN("screen")
 MCFG_VT_CHARGEN("chargen")
 MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
-MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
+MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(rainbow_state, video_interrupt))
 
 // *************************** COLOR GRAPHICS (OPTION) **************************************
 // While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).

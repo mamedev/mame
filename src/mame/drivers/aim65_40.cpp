@@ -77,6 +77,7 @@ public:
 		{ }
 
 		void aim65_40(machine_config &config);
+		void aim65_40_mem(address_map &map);
 	// devices
 	//device_t *m_via0;
 	//device_t *m_via1;
@@ -90,7 +91,7 @@ private:
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( aim65_40_mem, AS_PROGRAM, 8, aim65_40_state )
+ADDRESS_MAP_START(aim65_40_state::aim65_40_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0xa000, 0xcfff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xf000, 0xff7f) AM_ROM AM_REGION("roms", 0x3000)

@@ -460,13 +460,13 @@ SOUND_RESET_MEMBER(n8080_state,helifire)
 }
 
 
-static ADDRESS_MAP_START( n8080_sound_cpu_map, AS_PROGRAM, 8, n8080_state )
+ADDRESS_MAP_START(n8080_state::n8080_sound_cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( helifire_sound_io_map, AS_IO, 8, n8080_state )
+ADDRESS_MAP_START(n8080_state::helifire_sound_io_map)
 	AM_RANGE(0x00, 0x7f) AM_READ(helifire_8035_external_ram_r)
 ADDRESS_MAP_END
 

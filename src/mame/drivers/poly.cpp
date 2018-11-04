@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(baud_rate_w);
 
 	void poly(machine_config &config);
+	void poly_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -81,7 +82,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
+ADDRESS_MAP_START(poly_state::poly_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x9fff) AM_RAM
 	AM_RANGE(0xa000,0xcfff) AM_ROM

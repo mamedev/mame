@@ -50,6 +50,8 @@ public:
 
 	sc55_state(const machine_config &mconfig, device_type type, const char *tag);
 	void sc55(machine_config &config);
+	void sc55_io(address_map &map);
+	void sc55_map(address_map &map);
 };
 
 sc55_state::sc55_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -58,11 +60,11 @@ sc55_state::sc55_state(const machine_config &mconfig, device_type type, const ch
 {
 }
 
-static ADDRESS_MAP_START( sc55_map, AS_PROGRAM, 8, sc55_state )
+ADDRESS_MAP_START(sc55_state::sc55_map)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x1000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sc55_io, AS_IO, 16, sc55_state )
+ADDRESS_MAP_START(sc55_state::sc55_io)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(sc55_state::sc55)

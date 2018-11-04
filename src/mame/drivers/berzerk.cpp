@@ -95,6 +95,9 @@ public:
 	void get_pens(rgb_t *pens);
 	void berzerk(machine_config &config);
 	void frenzy(machine_config &config);
+	void berzerk_io_map(address_map &map);
+	void berzerk_map(address_map &map);
+	void frenzy_map(address_map &map);
 };
 
 
@@ -601,7 +604,7 @@ void berzerk_state::sound_reset()
  *
  *************************************/
 
-static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8, berzerk_state )
+ADDRESS_MAP_START(berzerk_state::berzerk_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
@@ -612,7 +615,7 @@ static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8, berzerk_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( frenzy_map, AS_PROGRAM, 8, berzerk_state )
+ADDRESS_MAP_START(berzerk_state::frenzy_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("videoram")
@@ -629,7 +632,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( berzerk_io_map, AS_IO, 8, berzerk_state )
+ADDRESS_MAP_START(berzerk_state::berzerk_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP
 	AM_RANGE(0x40, 0x47) AM_READWRITE(audio_r, audio_w)
@@ -1132,7 +1135,8 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(berzerk_state::frenzy, berzerk)
+MACHINE_CONFIG_START(berzerk_state::frenzy)
+	berzerk(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -74,6 +74,7 @@ public:
 	void set_command_callback(write32_delegate callback);
 
 
+	void mp_internal_map(address_map &map);
 protected:
 	// device level overrides
 	virtual void device_start() override;
@@ -161,6 +162,7 @@ public:
 		PP_PC = 1
 	};
 
+	void pp_internal_map(address_map &map);
 protected:
 	// device level overrides
 	virtual void device_start() override;

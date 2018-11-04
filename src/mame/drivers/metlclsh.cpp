@@ -59,7 +59,7 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_ack_nmi)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8, metlclsh_state )
+ADDRESS_MAP_START(metlclsh_state::metlclsh_master_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
@@ -106,7 +106,7 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_flipscreen_w)
 	flip_screen_set(data & 1);
 }
 
-static ADDRESS_MAP_START( metlclsh_slave_map, AS_PROGRAM, 8, metlclsh_state )
+ADDRESS_MAP_START(metlclsh_state::metlclsh_slave_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0") AM_WRITE(metlclsh_gfxbank_w)   // bg tiles bank

@@ -63,7 +63,7 @@ Notes:
 /*************************************
  *  M1COMM Memory Map
  *************************************/
-static ADDRESS_MAP_START( m1comm_mem, AS_PROGRAM, 8, m1comm_device )
+ADDRESS_MAP_START(m1comm_device::m1comm_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(share_r, share_w)
@@ -72,7 +72,7 @@ ADDRESS_MAP_END
 /*************************************
  *  M1COMM I/O Map
  *************************************/
-static ADDRESS_MAP_START( m1comm_io, AS_IO, 8, m1comm_device )
+ADDRESS_MAP_START(m1comm_device::m1comm_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE(dlc_reg_r, dlc_reg_w)
 	AM_RANGE(0x20, 0x2f) AM_READWRITE(dma_reg_r, dma_reg_w)

@@ -81,7 +81,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "speaker.h"
 
 
-class goodejan_state : public driver_device
+class goodejan_state : public driver_device, protected seibu_sound_common
 {
 public:
 	goodejan_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -89,6 +89,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_crtc(*this, "crtc"),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
@@ -98,6 +99,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<seibu_crtc_device> m_crtc;
 
 	required_shared_ptr<uint16_t> m_sc0_vram;
 	required_shared_ptr<uint16_t> m_sc1_vram;
@@ -138,6 +140,10 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void totmejan(machine_config &config);
 	void goodejan(machine_config &config);
+	void common_io_map(address_map &map);
+	void goodejan_io_map(address_map &map);
+	void goodejan_map(address_map &map);
+	void totmejan_io_map(address_map &map);
 };
 
 /*******************************
@@ -431,7 +437,7 @@ WRITE16_MEMBER(goodejan_state::mahjong_panel_w)
 	m_mux_data = data;
 }
 
-static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16, goodejan_state )
+ADDRESS_MAP_START(goodejan_state::goodejan_map)
 	AM_RANGE(0x00000, 0x0afff) AM_RAM
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_SHARE("sc0_vram")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc3vram_w) AM_SHARE("sc3_vram")
@@ -444,7 +450,7 @@ static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16, goodejan_state )
 ADDRESS_MAP_END
 
 /* totmejan CRTC is at 8000-804f,goodejan is at 8000-807f */
-static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
+ADDRESS_MAP_START(goodejan_state::common_io_map)
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(gfxbank_w)
 	AM_RANGE(0xb000, 0xb003) AM_WRITENOP
 	AM_RANGE(0xb004, 0xb005) AM_WRITE(mahjong_panel_w)
@@ -455,14 +461,14 @@ static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
 	AM_RANGE(0xd000, 0xd00f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( totmejan_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x8000, 0x804f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+ADDRESS_MAP_START(goodejan_state::totmejan_io_map)
 	AM_IMPORT_FROM(common_io_map)
+	AM_RANGE(0x8000, 0x804f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( goodejan_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x8000, 0x807f) AM_DEVREADWRITE_MOD("crtc", seibu_crtc_device, read, write, xor<0x20>)
+ADDRESS_MAP_START(goodejan_state::goodejan_io_map)
 	AM_IMPORT_FROM(common_io_map)
+	;map(0x8000, 0x807f).lrw16("crtc_rw", [this](address_space &space, offs_t offset, u16 mem_mask){ return m_crtc->read(space, offset ^ 0x20, mem_mask); }, [this](address_space &space, offs_t offset, u16 data, u16 mem_mask){ m_crtc->write(space, offset ^ 0x20, data, mem_mask); });
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goodejan )
@@ -677,7 +683,8 @@ MACHINE_CONFIG_START(goodejan_state::goodejan)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(goodejan_state::totmejan, goodejan)
+MACHINE_CONFIG_START(goodejan_state::totmejan)
+	goodejan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(totmejan_io_map)
 MACHINE_CONFIG_END

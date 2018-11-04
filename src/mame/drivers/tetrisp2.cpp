@@ -60,6 +60,7 @@ stepstag:
 #include "screen.h"
 #include "speaker.h"
 
+#include "vjdash.lh"
 #include "rocknms.lh"
 #include "stepstag.lh"
 
@@ -300,7 +301,7 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_coincounter_w)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16, tetrisp2_state )
+ADDRESS_MAP_START(tetrisp2_state::tetrisp2_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         // ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")           // Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM                                                         // Spare Object RAM
@@ -323,8 +324,6 @@ static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                       // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(tetrisp2_systemregs_w)                                // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(tetrisp2_ip_1_word_r)                                  // Inputs & protection
@@ -357,7 +356,7 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_b20000_w)
 //  popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16, tetrisp2_state )
+ADDRESS_MAP_START(tetrisp2_state::nndmseal_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")   // Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM // Spare Object RAM
@@ -389,8 +388,6 @@ static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(nndmseal_sound_bank_w)
 
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w    )   // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP    // Lev 2 irq ack
 
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("BUTTONS"         )   // Inputs
@@ -402,7 +399,7 @@ static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16, tetrisp2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16, tetrisp2_state )
+ADDRESS_MAP_START(tetrisp2_state::rockn1_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         // ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")           // Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM                                                         // Spare Object RAM
@@ -426,8 +423,6 @@ static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                       // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)                                   // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")                                         // Inputs
@@ -436,7 +431,7 @@ static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16, tetrisp2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16, tetrisp2_state )
+ADDRESS_MAP_START(tetrisp2_state::rockn2_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         // ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")           // Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM                                                         // Spare Object RAM
@@ -460,8 +455,6 @@ static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                   // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)                                   // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")                                         // Inputs
@@ -470,7 +463,7 @@ static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16, tetrisp2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
+ADDRESS_MAP_START(tetrisp2_state::rocknms_main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         // ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")           // Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM                                                         // Spare Object RAM
@@ -495,8 +488,6 @@ static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                       // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)                                   // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")                                         // Inputs
@@ -505,7 +496,7 @@ static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16, tetrisp2_state )
+ADDRESS_MAP_START(tetrisp2_state::rocknms_sub_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                         // ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram2")      // Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM                                                         // Spare Object RAM
@@ -529,8 +520,6 @@ static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("sub_rotregs")                       // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rocknms_sub_systemregs_w)                             // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 //  AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READWRITE(rocknms_main2sub_r, rocknms_sub2main_w)           // MAIN <-> SUB Communication
 	AM_RANGE(0xbe000a, 0xbe000b) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)       // Watchdog
@@ -547,13 +536,32 @@ READ16_MEMBER(stepstag_state::stepstag_coins_r)
 {
 	// bits 8 & 9?
 	return  ( ioport("COINS")->read() &  0xfcff ) |
-			(                 machine().rand()  & ~0xfcff ) |
-			(      1 << (8 + (machine().rand()&1)) );
+			( vj_upload_fini ? 0x300 : 0x100  );
+}
+
+WRITE16_MEMBER( stepstag_state::stepstag_b20000_w )
+{
+	if (ACCESSING_BITS_0_7)
+		vj_upload_idx++;
+
+	if (vj_upload_idx >= 0xa1a8)  // 0x14350/2
+		vj_upload_fini = true;
+}
+
+WRITE16_MEMBER( stepstag_state::stepstag_b00000_w )
+{
+	vj_upload_idx = 0;
+	vj_upload_fini = false;
+}
+
+WRITE16_MEMBER( stepstag_state::stepstag_main2pc_w )
+{
+	popmessage("cmd @ pc: 0x%x\n", data);
 }
 
 READ16_MEMBER(stepstag_state::unknown_read_0xc00000)
 {
-	return machine().rand();
+	return machine().rand();	// 3
 }
 
 READ16_MEMBER(stepstag_state::unknown_read_0xffff00)
@@ -561,10 +569,10 @@ READ16_MEMBER(stepstag_state::unknown_read_0xffff00)
 	return machine().rand();
 }
 
-READ16_MEMBER(stepstag_state::unk_a42000_r)
-{
-	return 0x2000;
-}
+READ16_MEMBER(stepstag_state::stepstag_pc2main_r)
+ {
+	return ioport("DEBUG_DSW")->read();
+ }
 
 WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
 {
@@ -576,9 +584,30 @@ WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
 }
 
 
-WRITE16_MEMBER(stepstag_state::stepstag_leds_w)
+WRITE16_MEMBER(stepstag_state::stepstag_neon_w)
 {
-//  data = COMBINE_DATA()
+//  1f60, 1c60, 0790, 0490, 0b60, 0860, 1390, 1090, 1f60, 1c60, 1390, 1090, 0b60, 0860, 0790, 0490, ...
+	if (ACCESSING_BITS_0_7)
+	{
+		output().set_led_value(32,   data & 0x0000); // Spot Lights?
+		output().set_led_value(33,   data & 0x0010);
+		output().set_led_value(34,   data & 0x0020);
+		output().set_led_value(35,   data & 0x0040);
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		output().set_led_value(40,   data & 0x0100); //
+		output().set_led_value(41,   data & 0x0200);
+
+		output().set_led_value(42,   data & 0x0400);
+		output().set_led_value(43,   data & 0x0800);
+		output().set_led_value(44,   data & 0x1000);
+	}
+}
+
+WRITE16_MEMBER(stepstag_state::stepstag_step_leds_w)
+{
 	if (ACCESSING_BITS_0_7)
 	{
 		output().set_led_value( 0,   data & 0x0001); // P2 Front-Left
@@ -588,6 +617,7 @@ WRITE16_MEMBER(stepstag_state::stepstag_leds_w)
 		output().set_led_value( 4,   data & 0x0010); // P2 Back-Left
 		output().set_led_value( 5,   data & 0x0020); // P2 Back-Right
 	}
+
 	if (ACCESSING_BITS_8_15)
 	{
 		output().set_led_value( 6,   data & 0x0100); // P1 Front-Left
@@ -597,58 +627,68 @@ WRITE16_MEMBER(stepstag_state::stepstag_leds_w)
 		output().set_led_value(10,   data & 0x1000); // P1 Back-Left
 		output().set_led_value(11,   data & 0x2000); // P1 Back-Right
 	}
-
-//  popmessage("FEET %02x",data);
 }
 
+WRITE16_MEMBER(stepstag_state::stepstag_button_leds_w)
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		output().set_led_value(17,   data & 0x0100); // P2 Start
+		output().set_led_value(18,   data & 0x0200); // P2 Left
+		output().set_led_value(19,   data & 0x0400); // P2 Right
+		output().set_led_value(20,   data & 0x1000); // P1 Start
+		output().set_led_value(21,   data & 0x2000); // P1 Left
+		output().set_led_value(22,   data & 0x4000); // P1 Right
+	}
+}
+
+
 // Main CPU
-static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
+ADDRESS_MAP_START(stepstag_state::stepstag_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM                                                         // Object RAM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")                                   // Object RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM                                                         // Work RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE(tetrisp2_priority_r, tetrisp2_priority_w)
-	AM_RANGE(0x300000, 0x31ffff) AM_RAM                                                         // Palette
+	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_SHARE("paletteram")        // Palette
 	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_SHARE("vram_fg")           // Foreground
 	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_SHARE("vram_bg")           // Background
 //  AM_RANGE(0x408000, 0x409fff) AM_RAM                                                         // ???
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM                                                         // Line
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")     // Rotation
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_SHARE("nvram") // NVRAM
-	AM_RANGE(0x904000, 0x907fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w)               // NVRAM (mirror)
-
-	AM_RANGE(0xa10000, 0xa10001) AM_READ_PORT("FEET") AM_WRITE(stepstag_leds_w)                 // I/O
-//  AM_RANGE(0xa30000, 0xa30001) AM_NOP // PC?
-	AM_RANGE(0xa42000, 0xa42001) AM_READ( unk_a42000_r ) // visual ready flag + ???
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_SHARE("vram_rot")         // Rotation
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w) AM_SHARE("nvram") // NVRAM
+//  AM_RANGE(0x904000, 0x907fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w)                  // NVRAM (mirror)
+	AM_RANGE(0xa00000, 0xa00001) AM_READNOP	 AM_WRITE(stepstag_neon_w)	// Neon??
+	AM_RANGE(0xa10000, 0xa10001) AM_READ_PORT("RHYTHM") AM_WRITE(stepstag_step_leds_w)          // I/O
+	AM_RANGE(0xa20000, 0xa20001) AM_READNOP AM_WRITE(stepstag_button_leds_w)                 	// I/O
+	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
+	AM_RANGE(0xa42000, 0xa42001) AM_READ( stepstag_pc2main_r )
 	AM_RANGE(0xa44000, 0xa44001) AM_READNOP     // watchdog
-//  AM_RANGE(0xa48000, 0xa48001) AM_WRITENOP    // PC?
+	AM_RANGE(0xa48000, 0xa48001) AM_WRITE(stepstag_main2pc_w)                                   // PC Comm
 //  AM_RANGE(0xa4c000, 0xa4c001) AM_WRITENOP    // PC?
 	AM_RANGE(0xa50000, 0xa50001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_WRITE(stepstag_soundlatch_word_w)
 	AM_RANGE(0xa60000, 0xa60003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)             // Sound
 
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP                                                    // Coin Counter plus other things
-	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP                                                    // protection related?
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_SHARE("scroll_fg")                         // Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_SHARE("scroll_bg")                         // Background Scrolling
-	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(stepstag_b00000_w)                                    // init xilinx uploading??
+	AM_RANGE(0xb20000, 0xb20001) AM_WRITE(stepstag_b20000_w)                                    // 98343 interface board xilinx uploading?
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_SHARE("scroll_fg")                             // Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_SHARE("scroll_bg")                             // Background Scrolling
+	AM_RANGE(0xb4003e, 0xb4003f) AM_RAM                                                         // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                               // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)                                   // System param
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("BUTTONS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(stepstag_coins_r)                                      // Inputs & protection
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")                                            // Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READNOP                                                     // watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)       // Watchdog
 ADDRESS_MAP_END
 
-
 // Sub CPU (sprites)
-
-static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
+ADDRESS_MAP_START(stepstag_state::stepstag_sub_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
 	// scrambled palettes?
-	AM_RANGE(0x300000, 0x33ffff) AM_RAM/*_WRITE(stepstag_palette_w)*/ AM_SHARE("paletteram")
+	AM_RANGE(0x300000, 0x33ffff) AM_RAM/*_WRITE(stepstag_palette_w)*/ AM_SHARE("paletteram1")
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM/*_WRITE(stepstag_palette_w)*/ AM_SHARE("paletteram2")
 
@@ -661,20 +701,20 @@ static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // 0-3f (high bits?)
 
 	// left screen sprites
-	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_SHARE("spriteram")       // Object RAM
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM
+	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_SHARE("spriteram1")      // Object RAM
+	AM_RANGE(0x804000, 0x87ffff) AM_RAM
 	AM_RANGE(0x880000, 0x880001) AM_WRITENOP // cleared after writing this sprite list
 //  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP // cleared at boot
 
 	// middle screen sprites
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_SHARE("spriteram2")      // Object RAM
-	AM_RANGE(0x900000, 0x97ffff) AM_RAM
+	AM_RANGE(0x904000, 0x97ffff) AM_RAM
 	AM_RANGE(0x980000, 0x980001) AM_WRITENOP // cleared after writing this sprite list
 //  AM_RANGE(0x9c0000, 0x9c0001) AM_WRITENOP // cleared at boot
 
 	// right screen sprites
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM AM_SHARE("spriteram3")      // Object RAM
-	AM_RANGE(0xa00000, 0xa7ffff) AM_RAM
+	AM_RANGE(0xa04000, 0xa7ffff) AM_RAM
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITENOP // cleared after writing this sprite list
 //  AM_RANGE(0xac0000, 0xac0001) AM_WRITENOP // cleared at boot
 
@@ -684,6 +724,11 @@ static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_READNOP // watchdog
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP //??
 	AM_RANGE(0xffff00, 0xffff01) AM_READ(unknown_read_0xffff00)
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START(stepstag_state::vjdash_map)
+	AM_IMPORT_FROM(stepstag_map)
 ADDRESS_MAP_END
 
 
@@ -1120,17 +1165,17 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( stepstag )
 	PORT_START("BUTTONS") // $be0002.w
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)       // P2 start (middle)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)       // P2 start (left)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)       // P2 start (right)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )                           // P2 start (middle)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)    // P2 left
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)    // P2 right
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)       // P1 start (middle)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)       // P1 start (left)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)       // P1 start (right)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )                           // P1 start (middle)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)    // P1 left
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)    // P1 right
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1138,47 +1183,350 @@ static INPUT_PORTS_START( stepstag )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINS") // $be0004.w
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )           // service mode
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1    ) // coin
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN   )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN   )
+	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )               // service mode
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_SERVICE1 )    // service coin
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_COIN1    )    // coin
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_SPECIAL  )    // ?
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL  )    // ?
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+
+	PORT_START("RHYTHM") // $a10000.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Left")  PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Right") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Left")  PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Right") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Left")  PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Right") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SPECIAL )  // ?
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL )  // ?
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Top-Left")  PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Top-Right") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Mid-Left")  PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Mid-Right") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Btm-Left")  PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Btm-Right") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW") // $be0008.w
+	PORT_DIPNAME( 0x0001, 0x0001, "DIPSW 1-1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "DIPSW 1-2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "DIPSW 1-3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "DIPSW 1-4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "DIPSW 1-5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "DIPSW 1-6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "DIPSW 1-7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "DIPSW 1-8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0100, 0x0100, "DIPSW 2-1: >>2, &40")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "DIPSW 2-2: >>4, &20")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "DIPSW 2-3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "DIPSW 2-4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "DIPSW 2-5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "DIPSW 2-6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "DIPSW 2-7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "DIPSW 2-8: ?")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DEBUG_DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "DIPSW debug_2-0_DEBUG_A42000") // pour debug temperarement
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "DIPSW debug_2-1")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "DIPSW debug_2-2")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "DIPSW debug_2-3")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "DIPSW debug_2-4")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "DIPSW debug_2-5")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "DIPSW debug_2-6")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "DIPSW debug_2-7")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_DIPNAME(0x0100, 0x0100, "DIPSW debug_2_8")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(0x0200, 0x0200, "DIPSW debug_2_9")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x0400, 0x0400, "DIPSW debug_2_a")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x0800, 0x0800, "DIPSW debug_2_b")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x1000, 0x1000, "DIPSW debug_2_c")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x2000, 0x2000, "DIPSW debug_2_d")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x4000, 0x4000, "DIPSW debug_2_e")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x8000, 0x8000, "DIPSW debug_2_f")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vjdash )
+	PORT_START("BUTTONS") // $be0002.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)    // P2 up
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)    // P2 down
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)    // P2 left
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)    // P2 right
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)   	// P1 up
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)  	// P1 down
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)   	// P1 left
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)    // P1 right
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("FEET") // $a10000.w
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Left" ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Right") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Left" ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Right") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Left" ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Right") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+/*	PORT_DIPNAME( 0x0001, 0x0001, "DIPSW debug_2-0_INPUTS") // pour debug temperarement
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "DIPSW debug_2-1")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "DIPSW debug_2-2")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "DIPSW debug_2-3")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "DIPSW debug_2-4")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "DIPSW debug_2-5")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "DIPSW debug_2-6")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "DIPSW debug_2-7")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_DIPNAME(0x0100, 0x0100, "DIPSW debug_2_8")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(0x0200, 0x0200, "DIPSW debug_2_9")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x0400, 0x0400, "DIPSW debug_2_a")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x0800, 0x0800, "DIPSW debug_2_b")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x1000, 0x1000, "DIPSW debug_2_c")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x2000, 0x2000, "DIPSW debug_2_d")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x4000, 0x4000, "DIPSW debug_2_e")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x8000, 0x8000, "DIPSW debug_2_f")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+*/
+	PORT_START("COINS") // $be0004.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )			// service mode
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1    ) // coin
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SPECIAL  ) // ?
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL ) // ?
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("RHYTHM") // $a10000.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Left")      PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Right")     PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Left")      PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Right")     PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Left")      PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Right")     PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START2  )      // P2 start
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Top-Left" ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Top-Right") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Mid-Left" ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Mid-Right") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Btm-Left" ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 Btm-Right") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 SOUND KEY 1")   PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 SOUND KEY 2")   PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 SOUND KEY 3")   PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 MONITOR KEY 1") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 MONITOR KEY 2") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 MONITOR KEY 3") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1  )      // P1 start
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW") // $be0008.w
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE2 ) // ?
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE3 ) // ?
-	PORT_BIT( 0x7c00, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE4 ) // ?
+	PORT_DIPNAME( 0x0001, 0x0001, "DIPSW 1-1: 1 - 6 COIN CREDITS")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "DIPSW 1-2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "DIPSW 1-3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "DIPSW 1-4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "DIPSW 1-5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "DIPSW 1-6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "DIPSW 1-7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "DIPSW 1-8")		//Free Play
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0100, 0x0100, "DIPSW 2-1: LEVEL")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "DIPSW 2-2: >>4, &20")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "DIPSW 2-3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "DIPSW 2-4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "DIPSW 2-5")		//Volume
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "DIPSW 2-6")		//Volume
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "DIPSW 2-7")		//Volume
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "DIPSW 2-8: ?")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DEBUG_DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "DIPSW debug_2-0_DEBUG_A42000") // pour debug temperarement
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "DIPSW debug_2-1")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "DIPSW debug_2-2")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "DIPSW debug_2-3")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "DIPSW debug_2-4")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "DIPSW debug_2-5")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "DIPSW debug_2-6")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "DIPSW debug_2-7")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_DIPNAME(0x0100, 0x0100, "DIPSW debug_2_8")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(0x0200, 0x0200, "DIPSW debug_2_9")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x0400, 0x0400, "DIPSW debug_2_a")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x0800, 0x0800, "DIPSW debug_2_b")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x1000, 0x1000, "DIPSW debug_2_c")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x2000, 0x2000, "DIPSW debug_2_d")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x4000, 0x4000, "DIPSW debug_2_e")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x8000, 0x8000, "DIPSW debug_2_f")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1234,10 +1582,16 @@ static GFXDECODE_START( rocknms_sub )
 	GFXDECODE_ENTRY( "gfx8", 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( stepstag )
-	GFXDECODE_ENTRY( "sprites_horiz", 0, spritelayout, 0x2400, 0x10 ) // [0] Sprites (middle screen, horizontal)
-	GFXDECODE_ENTRY( "sprites_vert",  0, spritelayout, 0x6000, 0x10 ) // [1] Sprites (left and right screens, vertical)
-	GFXDECODE_ENTRY( "foreground",    0, layout_8x8x8, 0x6000, 0x10 ) // [2] Foreground (needs RAM->tile remapping though)
+static GFXDECODE_START( vj_lscreen )
+	GFXDECODE_ENTRY( "sprites_left", 0, spritelayout, 0x0000, 0x80 ) // [0] Sprites (left screen, vertical in stepping stage)
+GFXDECODE_END
+
+static GFXDECODE_START( vj_mscreen )
+	GFXDECODE_ENTRY( "sprites_mid", 0, spritelayout, 0x0000, 0x80 ) // [0] Sprites (mid screen, horizontal)
+GFXDECODE_END
+
+static GFXDECODE_START( vj_rscreen )
+	GFXDECODE_ENTRY( "sprites_right", 0, spritelayout, 0x0000, 0x80 ) // [0] Sprites (right screens, vertical in stepping stage)
 GFXDECODE_END
 
 /***************************************************************************
@@ -1516,47 +1870,130 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(stepstag_state::stepstag)
-	MCFG_CPU_ADD("maincpu", M68000, 16000000 ) //??
+	MCFG_CPU_ADD("maincpu", M68000, 12000000 )
 	MCFG_CPU_PROGRAM_MAP(stepstag_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("mscreen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
+
+	MCFG_CPU_ADD("sub", M68000, 16000000 ) //??
+	MCFG_CPU_PROGRAM_MAP(stepstag_sub_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
+
+	// video hardware
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+//  MCFG_SCREEN_RAW_PARAMS(12288000*2, 768, 0, 496, 264*2,0,480)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x160, 0xf0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_left)
+//  MCFG_SCREEN_PALETTE("lpalette")
+
+	MCFG_SCREEN_ADD("mscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x160, 0xf0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_mid)
+//  MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x160, 0xf0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_right)
+	MCFG_SCREEN_PALETTE("rpalette")
+
+	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_PALETTE_ADD("palette", 0x8000)
+
+	MCFG_GFXDECODE_ADD("gfxdecode_l", "lpalette", vj_lscreen)
+	MCFG_PALETTE_ADD("lpalette", 0x8000)
+
+	MCFG_GFXDECODE_ADD("gfxdecode_m", "mpalette", vj_mscreen)
+	MCFG_PALETTE_ADD("mpalette", 0x8000)
+
+	MCFG_GFXDECODE_ADD("gfxdecode_r", "rpalette", vj_rscreen)
+	MCFG_PALETTE_ADD("rpalette", 0x8000)
+
+	MCFG_DEFAULT_LAYOUT(layout_stepstag)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(stepstag_state::vjdash)   	// 4 Screens
+	MCFG_CPU_ADD("maincpu", M68000, 12000000 )
+	MCFG_CPU_PROGRAM_MAP(vjdash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
 
 	MCFG_CPU_ADD("sub", M68000, 16000000 ) //??
 	MCFG_CPU_PROGRAM_MAP(stepstag_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
+	MCFG_CPU_VBLANK_INT_DRIVER("mscreen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	// video hardware
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0x100)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_WATCHDOG_ADD("watchdog")
 
+	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0x100)
+	MCFG_SCREEN_SIZE(0x160, 0xf0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
+	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_main)
+//  MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x160, 0xf0)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_left)
+//  MCFG_SCREEN_PALETTE("lpalette")
+
+	MCFG_SCREEN_ADD("mscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x160, 0xf0)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_mid)
-	MCFG_SCREEN_PALETTE("palette")
+//  MCFG_SCREEN_PALETTE("mpalette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x160, 0x100)
+	MCFG_SCREEN_SIZE(0x160, 0xf0)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_right)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x8000) // 0x8000 * 3 needed I guess, but it hits an assert
+	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stepstag)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_DEFAULT_LAYOUT(layout_stepstag)
+	MCFG_GFXDECODE_ADD("gfxdecode_l", "lpalette", vj_lscreen)
+	MCFG_PALETTE_ADD("lpalette", 0x8000)
+
+	MCFG_GFXDECODE_ADD("gfxdecode_m", "mpalette", vj_mscreen)
+	MCFG_PALETTE_ADD("mpalette", 0x8000)
+
+	MCFG_GFXDECODE_ADD("gfxdecode_r", "rpalette", vj_rscreen)
+	MCFG_PALETTE_ADD("rpalette", 0x8000)
+
+	MCFG_DEFAULT_LAYOUT(layout_vjdash)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1634,11 +2071,11 @@ ROM_START( tetrisp2 ) /* Version 2.8 */
 
 	ROM_REGION( 0x800000, "gfx2", 0 )   /* 16x16x8 (Background) */
 	ROM_LOAD( "96019-06.13", 0x000000, 0x400000, CRC(16f7093c) SHA1(2be77c6a692c5d762f5553ae24e8c415ab194cc6) )
-	ROM_LOAD( "96019-04.6",  0x400000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
+	//ROM_LOAD( "96019-04.6",  0x400000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16x16x8 (Rotation) */
 	ROM_COPY( "gfx2",        0x400000, 0x000000, 0x100000 )
-	//ROM_LOAD( "96019-04.6",  0x000000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
+	ROM_LOAD( "96019-04.6",  0x000000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 )   /* 8x8x8 (Foreground) */
 	ROM_LOAD( "tetp2-10.ic27", 0x000000, 0x080000, CRC(34dd1bad) SHA1(9bdf1dde11f82839676400de5dd7acb06ea8cdb2) )   // 11111xxxxxxxxxxxxxx = 0xFF
@@ -2196,6 +2633,58 @@ ROM_END
 
 /***************************************************************************
 
+ VJ Visual & Music Slap
+
+ dump is incomplete, music and sub-cpu roms are missing at least
+***************************************************************************/
+
+ROM_START( vjdash )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000
+	ROM_LOAD16_BYTE( "vjdash4_ver1.2.ic59", 0x00000, 0x80000, CRC(f7cf8d62) SHA1(8a1bf3a4eb431b71262d9dda47caa0ba0a0127f6) )
+	ROM_LOAD16_BYTE( "vjdash1_ver1.2.ic65", 0x00001, 0x80000, CRC(6d01bef5) SHA1(1f27a82cd583451b32f14967d8db00448543f948) )
+
+	ROM_REGION( 0x100000, "sub", ROMREGION_ERASE ) // 68000
+	ROM_LOAD16_BYTE( "vjdash4_ver1.2.11", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "vjdash4_ver1.2.14", 0x00001, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x0c00000, "sprites_left", ROMREGION_ERASE )	// left screen sprites
+	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
+	ROM_LOAD( "vjdash-02", 0x400000, 0x400000, NO_DUMP )
+
+	ROM_REGION( 0x1800000, "sprites_mid", ROMREGION_ERASE )		// middle screen sprites
+	ROM_LOAD( "vjdash-03", 0x000000, 0x400000, NO_DUMP )
+	ROM_LOAD( "vjdash-04", 0x400000, 0x400000, NO_DUMP )
+
+	ROM_REGION( 0x0c00000, "sprites_right", ROMREGION_ERASE )	// right screen sprites
+	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
+	ROM_LOAD( "vjdash-02", 0x400000, 0x400000, NO_DUMP )
+
+	ROM_REGION( 0x080000, "gfx4", 0 )   /* 8x8x8 (Foreground) */
+	ROM_LOAD( "vjdash_ver1.0.ic27", 0x000000, 0x080000, CRC(f3cff858) SHA1(9277e5fb3494f7afb7f3911792d1c68b2b1b147e) )
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE )   /* 8x8x8 (Sprites) */
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* 16x16x8 (Background) */
+	ROM_LOAD16_WORD( "mr98053-03.ic14", 0x000000, 0x200000, CRC(0bd32084) SHA1(2fcac3019ebedc54b83b08f527aa968ce6d48617) )
+
+	ROM_REGION( 0x400000, "gfx3", 0 )   /* 16x16x8 (Rotation) */
+	ROM_LOAD( "mr98053-04.ic36", 0x000000, 0x200000, CRC(4c69de30) SHA1(5f758498abb87f86f428193413c8e06bb4024725) )
+
+	ROM_REGION( 0x001000, "gal", 0 )  // ICT GAL
+	ROM_LOAD( "98053-09.ic58", 0x000000, 3553, CRC(10a443a6) SHA1(fa0950d2b089a34d4b6a039e4a9e8c458dd8e157) )
+
+	ROM_REGION( 0x010000, "xilinx", 0 )  // XILINX CPLD
+	ROM_LOAD( "15c.ic49", 0x000000, 38807, CRC(60d50907) SHA1(c5a837b3105ba15fcec103154c8c4d00924974e1) )
+
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )  // Samples
+	ROM_LOAD( "vjdash-sound", 0x000000, 0x400000, NO_DUMP )
+
+	DISK_REGION( "disks" )
+	DISK_IMAGE("vjdash", 0, NO_DUMP)
+ROM_END
+
+/***************************************************************************
+
  Stepping Stage Special
 
  dump is incomplete, these are leftovers from an upgrade
@@ -2211,25 +2700,35 @@ ROM_START( stepstag )
 	ROM_LOAD16_BYTE( "vj98348ver11.11", 0x00000, 0x80000, CRC(29b7f848) SHA1(c4d89e5c9be622b2d9038c359a5f65ce0dd461b0) )
 	ROM_LOAD16_BYTE( "vj98348ver11.14", 0x00001, 0x80000, CRC(e3314c6c) SHA1(61b0e9f9d0126d9f475304866a03cfa21701d9aa) )
 
-	ROM_REGION( 0x2000000, "sprites_horiz", 0 ) // middle screen sprites (horizontal)
+	ROM_REGION( 0x1000000, "sprites_left", 0 )  // left screen sprites (vertical)
+	ROM_LOAD( "mr99001-01", 0x000000, 0x400000, CRC(aa92cebf) SHA1(2ccc0d2ef9bc92c27f0a625819154bbcf9cfde0c) )  // VERTICAL
+	ROM_LOAD( "mr99001-02", 0x400000, 0x400000, CRC(12c65d86) SHA1(7fe5853fa3ba086f8da15702b126eb13c6ea30a9) )  // VERTICAL
+	ROM_LOAD( "s.s.s._vj-98348_3_pr99021-01",  0x800000, 0x400000, CRC(e0fbc6f1) SHA1(7ca4507702f3f81bb9de3f9b5d270d379e439633) )  // VERTICAL
+
+	ROM_REGION( 0x1800000, "sprites_mid", 0 ) // middle screen sprites (horizontal)
 	ROM_LOAD( "mr99001-03", 0x0000000, 0x400000, CRC(40fee0df) SHA1(94c3567e82f8039b3169bf4dcb1fcd9e39c6eb27) ) // HORIZONTAL TRUSTED
 	ROM_LOAD( "mr99001-04", 0x0400000, 0x400000, CRC(d6837981) SHA1(56709d73304f0b186c70844ae96f73400b541609) ) // HORIZONTAL TRUSTED
 	ROM_LOAD( "mr99001-05", 0x0800000, 0x400000, CRC(3958473b) SHA1(12279a587263290945744b22aafb80460eea77f7) ) // HORIZONTAL TRUSTED
 	ROM_LOAD( "mr99001-06", 0x0c00000, 0x400000, CRC(cfa27c93) SHA1(a0837877736e8e898f3acc64bc87ee0cc4d9f243) ) // HORIZONTAL
 	ROM_LOAD( "s.s.s._vj-98348_19_pr99021-02", 0x1000000, 0x400000, CRC(2d98da1a) SHA1(b09375fa1b4b2e0794632d6e237459009f40310d) )  // HORIZONTAL TRUSTED
-	ROM_FILL(               0x1400000, 0x400000, 0x03 ) // debug
-	ROM_FILL(               0x1800000, 0x400000, 0x04 ) // debug
-	ROM_FILL(               0x1c00000, 0x400000, 0x05 ) // debug
 
-	ROM_REGION( 0x0c00000, "sprites_vert", 0 )  // left and right screens sprites (vertical)
+	ROM_REGION( 0x1000000, "sprites_right", 0 )  // right screen sprites (vertical)
 	ROM_LOAD( "mr99001-01", 0x000000, 0x400000, CRC(aa92cebf) SHA1(2ccc0d2ef9bc92c27f0a625819154bbcf9cfde0c) )  // VERTICAL
 	ROM_LOAD( "mr99001-02", 0x400000, 0x400000, CRC(12c65d86) SHA1(7fe5853fa3ba086f8da15702b126eb13c6ea30a9) )  // VERTICAL
 	// rom _26_ seems a bad dump of rom _3_, overwrite it:
 	ROM_LOAD( "s.s.s._vj-98348_26_pr99021-01", 0x800000, 0x400000, BAD_DUMP CRC(fefb3777) SHA1(df624e105ab1dea52317e318ad29caa02b900788) )  // VERTICAL
 	ROM_LOAD( "s.s.s._vj-98348_3_pr99021-01",  0x800000, 0x400000, CRC(e0fbc6f1) SHA1(7ca4507702f3f81bb9de3f9b5d270d379e439633) )           // VERTICAL
 
-	ROM_REGION( 0x400000, "foreground", 0 ) // foreground tiles
-	ROM_LOAD( "mr99001-05", 0x000000, 0x400000, CRC(3958473b) SHA1(12279a587263290945744b22aafb80460eea77f7) )  // HORIZONTAL Temporary hack
+	ROM_REGION( 0x400000, "gfx4", 0 ) // foreground tiles
+	ROM_LOAD( "vjdash_ver1.0.ic27", 0x000000, 0x080000, BAD_DUMP CRC(f3cff858) SHA1(9277e5fb3494f7afb7f3911792d1c68b2b1b147e) )
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE )   /* 8x8x8 (Sprites) */
+
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE )   /* 16x16x8 (Background) */
+	ROM_LOAD16_WORD( "stepstag_scroll", 0x000000, 0x400000, NO_DUMP )
+
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE )   /* 16x16x8 (Rotation) */
+	ROM_LOAD( "stepstag_rott", 0x000000, 0x400000, NO_DUMP )
 
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )  // Samples
 	ROM_LOAD( "stepstag-sound", 0x000000, 0x400000, NO_DUMP )
@@ -2255,25 +2754,32 @@ ROM_START( step3 )
 	ROM_LOAD16_BYTE( "vj98348_step3_11_v1.1", 0x00000, 0x80000, CRC(9c36aef5) SHA1(bbac48c2c7949a6f8a6ec83515e94a343c88d1b6) )
 	ROM_LOAD16_BYTE( "vj98348_step3_14_v1.1", 0x00001, 0x80000, CRC(b86be557) SHA1(49dbd6ef1c50adcf3386d5423da8ae7685649c46) )
 
-	ROM_REGION( 0xc00000, "sprites_horiz", 0 )   // middle screen sprites (horizontal)
+	ROM_REGION( 0x1800000, "sprites_left", 0 )  // left screen sprites (vertical)
+	ROM_LOAD( "mr9930-01.ic2",         0x0000000, 0x400000, CRC(9e3e054e) SHA1(06a4fa76cb83dbe9d565d5ccd0a5ecc5067887c9) )  // sprites VERTICAL
+	ROM_LOAD( "mr9930-02.ic3",         0x0400000, 0x400000, CRC(b23c29f4) SHA1(a7b10a3a9af43db319baf8633bb3728120960923) )  // 8x8 VERTICAL
+	ROM_LOAD( "mr9930-03.ic4",         0x0800000, 0x400000, CRC(9a5d070f) SHA1(b4668b4f299033140a2c56499cc2712ba111cb57) )  // 8x8 VERTICAL
+	ROM_LOAD( "vj98348_step3_4_v1.1",  0x0c00000, 0x400000, CRC(dec612df) SHA1(acb86bb90c1cc61c7db3e022c69a5ff0611ffbae) )  // 8x8 HORIZONTAL
+
+	ROM_REGION( 0x1800000, "sprites_mid", 0 )   // middle screen sprites (horizontal)
 	ROM_LOAD( "mr99030-04.ic17", 0x000000, 0x400000, CRC(3eac3591) SHA1(3b294e94af23fd92fdf51d2c9c43f60d2ebd1688) )  // 8x8 HORIZONTAL
 	ROM_LOAD( "mr99030-05.ic18", 0x400000, 0x400000, CRC(dea7b8d6) SHA1(d7d98675eb3998a8057929f90aa340c1e5f6a617) )  // 8x8 HORIZONTAL
 	ROM_LOAD( "mr99030-06.ic19", 0x800000, 0x400000, CRC(71489d79) SHA1(0398a354c2588e3974cb76a331e46165db6af06d) )  // 8x8 HORIZONTAL
+	ROM_LOAD( "vj98348_step3_18_v1.1", 0x0c00000, 0x400000, CRC(bc92f0a0) SHA1(49c08de7a898a27972d4209709ddf447c5dca36a) )  // 8x8 VERTICAL
 
-	ROM_REGION( 0x1800000, "sprites_vert", 0 )  // left and right screens sprites (vertical)
-	// these roms appear twice
-	ROM_LOAD( "mr9930-01.ic2",         0x0000000, 0x400000, CRC(9e3e054e) SHA1(06a4fa76cb83dbe9d565d5ccd0a5ecc5067887c9) )  // sprites? VERTICAL (2x)
-	ROM_LOAD( "mr9930-01.ic30",        0x0000000, 0x400000, CRC(9e3e054e) SHA1(06a4fa76cb83dbe9d565d5ccd0a5ecc5067887c9) )  // sprites? VERTICAL (2x)
-	ROM_LOAD( "mr9930-02.ic3",         0x0400000, 0x400000, CRC(b23c29f4) SHA1(a7b10a3a9af43db319baf8633bb3728120960923) )  // 8x8 VERTICAL (2x)
-	ROM_LOAD( "mr9930-02.ic29",        0x0400000, 0x400000, CRC(b23c29f4) SHA1(a7b10a3a9af43db319baf8633bb3728120960923) )  // 8x8 VERTICAL (2x)
-	ROM_LOAD( "mr9930-03.ic28",        0x0800000, 0x400000, CRC(9a5d070f) SHA1(b4668b4f299033140a2c56499cc2712ba111cb57) )  // 8x8 VERTICAL (2x)
-	ROM_LOAD( "mr9930-03.ic4",         0x0800000, 0x400000, CRC(9a5d070f) SHA1(b4668b4f299033140a2c56499cc2712ba111cb57) )  // 8x8 VERTICAL
-	ROM_LOAD( "vj98348_step3_4_v1.1",  0x0c00000, 0x400000, CRC(dec612df) SHA1(acb86bb90c1cc61c7db3e022c69a5ff0611ffbae) )  // 8x8 VERTICAL?
-	ROM_LOAD( "vj98348_step3_18_v1.1", 0x1000000, 0x400000, CRC(bc92f0a0) SHA1(49c08de7a898a27972d4209709ddf447c5dca36a) )  // 8x8 VERTICAL?
-	ROM_LOAD( "vj98348_step3_25_v1.1", 0x1400000, 0x400000, CRC(dec612df) SHA1(acb86bb90c1cc61c7db3e022c69a5ff0611ffbae) )  // 8x8 VERTICAL?
+	ROM_REGION( 0x1800000, "sprites_right", 0 )  // right screen sprites (vertical)
+	ROM_LOAD( "mr9930-01.ic30",        0x0000000, 0x400000, CRC(9e3e054e) SHA1(06a4fa76cb83dbe9d565d5ccd0a5ecc5067887c9) )  // sprites? VERTICAL
+	ROM_LOAD( "mr9930-02.ic29",        0x0400000, 0x400000, CRC(b23c29f4) SHA1(a7b10a3a9af43db319baf8633bb3728120960923) )  // 8x8 VERTICAL
+	ROM_LOAD( "mr9930-03.ic28",        0x0800000, 0x400000, CRC(9a5d070f) SHA1(b4668b4f299033140a2c56499cc2712ba111cb57) )  // 8x8 VERTICAL
+	ROM_LOAD( "vj98348_step3_25_v1.1", 0x0c00000, 0x400000, CRC(dec612df) SHA1(acb86bb90c1cc61c7db3e022c69a5ff0611ffbae) )  // 8x8 VERTICAL
 
-	ROM_REGION( 0x400000, "foreground", 0 ) // foreground tiles
-	ROM_LOAD( "mr99030-05.ic18", 0x000000, 0x400000, CRC(dea7b8d6) SHA1(d7d98675eb3998a8057929f90aa340c1e5f6a617) )  // 8x8 HORIZONTAL Temporary hack
+	ROM_REGION( 0x400000, "gfx4", 0 ) // foreground tiles
+	ROM_LOAD( "vjdash_ver1.0.ic27", 0x000000, 0x080000, BAD_DUMP CRC(f3cff858) SHA1(9277e5fb3494f7afb7f3911792d1c68b2b1b147e) )
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE )   /* 8x8x8 (Sprites) */
+
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE )   /* 16x16x8 (Background) */
+
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE )   /* 16x16x8 (Rotation) */
 
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )  /* Samples */
 	ROM_LOAD( "step3-sound", 0x000000, 0x400000, NO_DUMP )
@@ -2291,23 +2797,25 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,     ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",     MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     STATE,          INIT,     MONITOR, COMPANY,                       FULLNAME,                               FLAGS
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, 0,        ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,        ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,        ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, nndmseal, 0,        nndmseal, nndmseal, tetrisp2_state, rockn, ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseala,nndmseal, nndmseal, nndmseal, tetrisp2_state, rockn, ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver.)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, rockn,    ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, rockn,    ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver.)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-GAME( 1999, rockn,    0,        rockn,    rockn,   tetrisp2_state, rockn,    ROT270, "Jaleco",                      "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockna,   rockn,    rockn,    rockn,   tetrisp2_state, rockn1,   ROT270, "Jaleco",                      "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockn2,   0,        rockn2,   rockn,   tetrisp2_state, rockn2,   ROT270, "Jaleco",                      "Rock'n Tread 2 (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rocknms,  0,        rocknms,  rocknms, tetrisp2_state, rocknms,  ROT0,   "Jaleco",                      "Rock'n MegaSession (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, rockn3,   0,        rockn2,   rockn,   tetrisp2_state, rockn3,   ROT270, "Jaleco",                      "Rock'n 3 (Japan)",                MACHINE_SUPPORTS_SAVE )
-GAME( 2000, rockn4,   0,        rockn2,   rockn,   tetrisp2_state, rockn3,   ROT270, "Jaleco / PCCWJ",              "Rock'n 4 (Japan, prototype)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn,     0,        rockn,    rockn,     tetrisp2_state, rockn,    ROT270, "Jaleco",         "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockna,    rockn,    rockn,    rockn,     tetrisp2_state, rockn1,   ROT270, "Jaleco",         "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn2,    0,        rockn2,   rockn,     tetrisp2_state, rockn2,   ROT270, "Jaleco",         "Rock'n Tread 2 (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rocknms,   0,        rocknms,  rocknms,   tetrisp2_state, rocknms,  ROT0,   "Jaleco",         "Rock'n MegaSession (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, rockn3,    0,        rockn2,   rockn,     tetrisp2_state, rockn3,   ROT270, "Jaleco",         "Rock'n 3 (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, rockn4,    0,        rockn2,   rockn,     tetrisp2_state, rockn3,   ROT270, "Jaleco / PCCWJ", "Rock'n 4 (Japan, prototype)",     MACHINE_SUPPORTS_SAVE )
 
 // Undumped:
 // - Stepping Stage <- the original Game
 // - Stepping Stage 2 Supreme
 // Dumped (partly):
-GAME( 1999, stepstag, 0, stepstag, stepstag, stepstag_state, stepstag, ROT0, "Jaleco", "Stepping Stage Special", MACHINE_NO_SOUND| MACHINE_NOT_WORKING)
-GAME( 1999, step3,    0, stepstag, stepstag, stepstag_state, stepstag, ROT0, "Jaleco", "Stepping 3 Superior",    MACHINE_NO_SOUND| MACHINE_NOT_WORKING)
+GAME( 1999, vjdash,    0,        vjdash,   vjdash,    stepstag_state, stepstag, ROT0,   "Jaleco",         "VJ Visual & Music Slap",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, stepstag, ROT0,   "Jaleco",         "Stepping Stage Special",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, stepstag, ROT0,   "Jaleco",         "Stepping 3 Superior",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

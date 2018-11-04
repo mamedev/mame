@@ -80,6 +80,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
 	void quizshow(machine_config &config);
+	void mem_map(address_map &map);
 };
 
 
@@ -227,7 +228,7 @@ WRITE8_MEMBER(quizshow_state::main_ram_w)
 }
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, quizshow_state )
+ADDRESS_MAP_START(quizshow_state::mem_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(audio_w)

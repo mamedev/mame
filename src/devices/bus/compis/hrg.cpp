@@ -32,12 +32,12 @@ DEFINE_DEVICE_TYPE(COMPIS_UHRG, compis_uhrg_device, "compis_uhrg", "Compis UHRG"
 //  ADDRESS_MAP( upd7220_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hrg_map, 0, 16, compis_hrg_device )
+ADDRESS_MAP_START(compis_hrg_device::hrg_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x00000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uhrg_map, 0, 16, compis_uhrg_device )
+ADDRESS_MAP_START(compis_uhrg_device::uhrg_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END

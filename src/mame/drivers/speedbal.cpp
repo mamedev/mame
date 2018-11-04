@@ -54,7 +54,7 @@ WRITE8_MEMBER(speedbal_state::coincounter_w)
 	/* unknown: (data & 0x10) and (data & 4) */
 }
 
-static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
+ADDRESS_MAP_START(speedbal_state::main_cpu_map)
 	AM_RANGE(0x0000, 0xdbff) AM_ROM
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("bg_videoram")
@@ -69,7 +69,7 @@ WRITE8_MEMBER(speedbal_state::maincpu_50_w)
 	//logerror("%s: maincpu_50_w %02x\n", this->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
+ADDRESS_MAP_START(speedbal_state::main_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
 	AM_RANGE(0x50, 0x50) AM_WRITE(maincpu_50_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, speedbal_state )
+ADDRESS_MAP_START(speedbal_state::sound_cpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xd800, 0xdbff) AM_RAM
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with MAIN CPU
@@ -117,7 +117,7 @@ WRITE8_MEMBER(speedbal_state::leds_shift_bit)
 
 
 
-static ADDRESS_MAP_START( sound_cpu_io_map, AS_IO, 8, speedbal_state )
+ADDRESS_MAP_START(speedbal_state::sound_cpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITE(leds_output_block)

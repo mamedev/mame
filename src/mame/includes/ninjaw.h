@@ -79,4 +79,9 @@ public:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn);
 	void darius2(machine_config &config);
 	void ninjaw(machine_config &config);
+	void darius2_master_map(address_map &map);
+	void darius2_slave_map(address_map &map);
+	void ninjaw_master_map(address_map &map);
+	void ninjaw_slave_map(address_map &map);
+	void sound_map(address_map &map);
 };

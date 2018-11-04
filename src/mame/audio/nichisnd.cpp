@@ -41,13 +41,13 @@ nichisnd_device::nichisnd_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-static ADDRESS_MAP_START( nichisnd_map, AS_PROGRAM, 8, nichisnd_device )
+ADDRESS_MAP_START(nichisnd_device::nichisnd_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM AM_REGION("audiorom",0)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nichisnd_io_map, AS_IO, 8, nichisnd_device )
+ADDRESS_MAP_START(nichisnd_device::nichisnd_io_map)
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym3812_device, write)
 ADDRESS_MAP_END
 

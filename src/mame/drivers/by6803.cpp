@@ -65,6 +65,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
 	void by6803(machine_config &config);
+	void by6803_io(address_map &map);
+	void by6803_map(address_map &map);
 private:
 	uint8_t m_pia0_a;
 	uint8_t m_pia0_b;
@@ -88,14 +90,14 @@ private:
 };
 
 
-static ADDRESS_MAP_START( by6803_map, AS_PROGRAM, 8, by6803_state )
+ADDRESS_MAP_START(by6803_state::by6803_map)
 	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("nvram") // 6116 ram
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( by6803_io, AS_IO, 8, by6803_state )
+ADDRESS_MAP_START(by6803_state::by6803_io)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(port1_r, port1_w) // P10-P17
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w) // P20-P24
 ADDRESS_MAP_END
@@ -383,7 +385,7 @@ MACHINE_CONFIG_START(by6803_state::by6803)
 	//MCFG_DEFAULT_LAYOUT(layout_by6803)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)

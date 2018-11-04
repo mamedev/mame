@@ -61,6 +61,9 @@ public:
 	static void cdrom_config(device_t *device);
 	void indigo4k(machine_config &config);
 	void indigo3k(machine_config &config);
+	void indigo3k_map(address_map &map);
+	void indigo4k_map(address_map &map);
+	void indigo_map(address_map &map);
 private:
 	struct hpc_t
 	{
@@ -463,7 +466,7 @@ WRITE32_MEMBER(indigo_state::int_w)
 	osd_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 }
 
-static ADDRESS_MAP_START( indigo_map, AS_PROGRAM, 32, indigo_state )
+ADDRESS_MAP_START(indigo_state::indigo_map)
 	AM_RANGE( 0x00000000, 0x001fffff ) AM_RAM AM_SHARE("share10")
 	AM_RANGE( 0x08000000, 0x08ffffff ) AM_RAM AM_SHARE("share5")
 	AM_RANGE( 0x09000000, 0x097fffff ) AM_RAM AM_SHARE("share6")
@@ -475,12 +478,12 @@ static ADDRESS_MAP_START( indigo_map, AS_PROGRAM, 32, indigo_state )
 	AM_RANGE( 0x1fbd9000, 0x1fbd903f ) AM_READWRITE(int_r, int_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( indigo3k_map, AS_PROGRAM, 32, indigo_state )
+ADDRESS_MAP_START(indigo_state::indigo3k_map)
 	AM_IMPORT_FROM( indigo_map )
 	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( indigo4k_map, AS_PROGRAM, 32, indigo_state )
+ADDRESS_MAP_START(indigo_state::indigo4k_map)
 	AM_IMPORT_FROM( indigo_map )
 	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
 	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
@@ -608,7 +611,8 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(indigo_state::indigo4k, indigo3k)
+MACHINE_CONFIG_START(indigo_state::indigo4k)
+	indigo3k(config);
 	MCFG_CPU_REPLACE("maincpu", R4600BE, 150000000) // Should be R4400
 	MCFG_MIPS3_ICACHE_SIZE(32768)
 	MCFG_MIPS3_DCACHE_SIZE(32768)

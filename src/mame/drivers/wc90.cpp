@@ -75,7 +75,7 @@ WRITE8_MEMBER(wc90_state::bankswitch1_w)
 
 
 
-static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
+ADDRESS_MAP_START(wc90_state::wc90_map_1)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM     /* Main RAM */
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram") /* fg video ram */
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
+ADDRESS_MAP_START(wc90_state::wc90_map_2)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wc90_state )
+ADDRESS_MAP_START(wc90_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
@@ -389,11 +389,13 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wc90_state::wc90t, wc90)
+MACHINE_CONFIG_START(wc90_state::wc90t)
+	wc90(config);
 	MCFG_VIDEO_START_OVERRIDE(wc90_state, wc90t )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wc90_state::pac90, wc90)
+MACHINE_CONFIG_START(wc90_state::pac90)
+	wc90(config);
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_TECMO_SPRITE_YOFFSET(16) // sprites need shifting, why?
 MACHINE_CONFIG_END

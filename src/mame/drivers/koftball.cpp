@@ -74,6 +74,8 @@ public:
 	uint32_t screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bmc_interrupt);
 	void koftball(machine_config &config);
+	void koftball_mem(address_map &map);
+	void ramdac_map(address_map &map);
 };
 
 
@@ -147,7 +149,7 @@ WRITE16_MEMBER(koftball_state::bmc_2_videoram_w)
 	m_tilemap_2->mark_tile_dirty(offset);
 }
 
-static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
+ADDRESS_MAP_START(koftball_state::koftball_mem)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_SHARE("main_ram")
 
@@ -174,7 +176,7 @@ static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(prot_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, koftball_state )
+ADDRESS_MAP_START(koftball_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

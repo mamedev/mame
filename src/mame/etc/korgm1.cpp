@@ -35,6 +35,8 @@ public:
 
 	void korgm1(machine_config &config);
 
+	void korgm1_io(address_map &map);
+	void korgm1_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
@@ -52,13 +54,13 @@ uint32_t korgm1_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START( korgm1_map, AS_PROGRAM, 16, korgm1_state )
+ADDRESS_MAP_START(korgm1_state::korgm1_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM // 64 KB
 //  AM_RANGE(0x50000, 0x57fff) AM_RAM // memory card 32 KB
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( korgm1_io, AS_IO, 16, korgm1_state )
+ADDRESS_MAP_START(korgm1_state::korgm1_io)
 //  AM_RANGE(0x0000, 0x00ff) internal peripheral (?)
 //  AM_RANGE(0x0100, 0x01ff) VDF 1 (MB87404)
 //  AM_RANGE(0x0200, 0x02ff) VDF 2 (MB87404)

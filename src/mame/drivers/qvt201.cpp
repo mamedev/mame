@@ -28,6 +28,7 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void qvt201(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -42,7 +43,7 @@ u32 qvt201_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, qvt201_state )
+ADDRESS_MAP_START(qvt201_state::mem_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("nvram")
 	//AM_RANGE(0x9000, 0x9007) AM_DEVREADWRITE("crtc", scn2672_device, read, write)

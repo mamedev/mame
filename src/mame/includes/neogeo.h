@@ -180,6 +180,10 @@ public:
 	void irrmaze(machine_config &config);
 	void kf2k2mp(machine_config &config);
 	void bangbead(machine_config &config);
+	void audio_io_map(address_map &map);
+	void audio_map(address_map &map);
+	void main_map_slot(address_map &map);
+	void neogeo_main_map(address_map &map);
 protected:
 	void common_machine_start();
 
@@ -324,6 +328,7 @@ class aes_state : public neogeo_state
 	DECLARE_MACHINE_START(aes);
 
 	void aes(machine_config &config);
+	void aes_main_map(address_map &map);
 protected:
 	required_ioport m_io_in2;
 };

@@ -19,16 +19,16 @@ const xbox_base_state::debugger_constants xbox_base_state::debugp[] = {
 	{ 0x49d8055a, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} }
 };
 
-int xbox_base_state::find_bios_index(running_machine &mach)
+int xbox_base_state::find_bios_index()
 {
-	u8 sb = mach.driver_data()->system_bios();
+	u8 sb = system_bios();
 	return sb;
 }
 
-bool xbox_base_state::find_bios_hash(running_machine &mach, int bios, uint32_t &crc32)
+bool xbox_base_state::find_bios_hash(int bios, uint32_t &crc32)
 {
 	uint32_t crc = 0;
-	const std::vector<rom_entry> &rev = mach.root_device().rom_region_vector();
+	const std::vector<rom_entry> &rev = rom_region_vector();
 
 	for (rom_entry const &re : rev)
 	{
@@ -49,14 +49,14 @@ bool xbox_base_state::find_bios_hash(running_machine &mach, int bios, uint32_t &
 	return false;
 }
 
-void xbox_base_state::find_debug_params(running_machine &mach)
+void xbox_base_state::find_debug_params()
 {
 	uint32_t crc;
 	int sb;
 
-	sb = (int)find_bios_index(machine());
+	sb = (int)find_bios_index();
 	debugc_bios = debugp;
-	if (find_bios_hash(machine(), sb - 1, crc) == true)
+	if (find_bios_hash(sb - 1, crc) == true)
 	{
 		for (int n = 0; n < 2; n++)
 			if (debugp[n].id == crc)
@@ -773,8 +773,8 @@ WRITE8_MEMBER(xbox_base_state::superiors232_write)
 
 void xbox_base_state::machine_start()
 {
-	find_debug_params(machine());
-	nvidia_nv2a = machine().device<nv2a_gpu_device>(":pci:1e.0:00.0")->debug_get_renderer();
+	find_debug_params();
+	nvidia_nv2a = subdevice<nv2a_gpu_device>("pci:1e.0:00.0")->debug_get_renderer();
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
 	pic16lc_buffer[0] = 'B';
 	pic16lc_buffer[4] = 0; // A/V connector, 0=scart 2=vga 4=svideo 7=none
@@ -783,7 +783,7 @@ void xbox_base_state::machine_start()
 	pic16lc_buffer[0x1d] = 0x0d;
 	pic16lc_buffer[0x1e] = 0x0e;
 	pic16lc_buffer[0x1f] = 0x0f;
-	mcpx_smbus_device *smbus = machine().device<mcpx_smbus_device>(":pci:01.1");
+	mcpx_smbus_device *smbus = subdevice<mcpx_smbus_device>("pci:01.1");
 	smbus->register_device(0x10,
 		[&](int command, int rw, int data)
 	{
@@ -802,15 +802,15 @@ void xbox_base_state::machine_start()
 		return smbus_eeprom(command, rw, data);
 	}
 	);
-	xbox_base_devs.pic8259_1 = machine().device<pic8259_device>("pic8259_1");
-	xbox_base_devs.pic8259_2 = machine().device<pic8259_device>("pic8259_2");
-	xbox_base_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
+	xbox_base_devs.pic8259_1 = subdevice<pic8259_device>("pic8259_1");
+	xbox_base_devs.pic8259_2 = subdevice<pic8259_device>("pic8259_2");
+	xbox_base_devs.ide = subdevice<bus_master_ide_controller_device>("ide");
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("xbox", CMDFLAG_NONE, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2));
 	}
-	machine().device<mcpx_ohci_device>(":pci:02.0")->set_hack_callback(
+	subdevice<mcpx_ohci_device>("pci:02.0")->set_hack_callback(
 		[&](void)
 	{
 		hack_usb();
@@ -826,7 +826,7 @@ void xbox_base_state::machine_start()
 	save_item(NAME(pic16lc_buffer));
 }
 
-ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
+ADDRESS_MAP_START(xbox_base_state::xbox_base_map)
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM // 128 megabytes
 #if 0
 	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
@@ -839,7 +839,7 @@ ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
 #endif
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
+ADDRESS_MAP_START(xbox_base_state::xbox_base_map_io)
 	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x002c, 0x002f) AM_READWRITE8(superio_read, superio_write, 0xffff0000)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)

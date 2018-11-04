@@ -753,7 +753,7 @@ WRITE8_MEMBER(atarisy2_state::coincount_w)
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
+ADDRESS_MAP_START(atarisy2_state::main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w)
@@ -771,8 +771,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(videoram_r, videoram_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("rombank1")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank2")
-	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(slapstic_r, slapstic_w) AM_SHARE("slapstic_base")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(slapstic_r, slapstic_w) AM_SHARE("slapstic_base")
 ADDRESS_MAP_END
 
 
@@ -784,7 +784,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy2_state )
+ADDRESS_MAP_START(atarisy2_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
@@ -1244,12 +1244,14 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::paperboy, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::paperboy)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 105)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::_720, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::_720)
+	atarisy2(config);
 	/* without the default EEPROM, 720 hangs at startup due to communication
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
@@ -1258,7 +1260,8 @@ MACHINE_CONFIG_DERIVED(atarisy2_state::_720, atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::ssprint, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::ssprint)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 108)
 
 	/* sound hardware */
@@ -1266,7 +1269,8 @@ MACHINE_CONFIG_DERIVED(atarisy2_state::ssprint, atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::csprint, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::csprint)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 109)
 
 	/* sound hardware */
@@ -1274,7 +1278,8 @@ MACHINE_CONFIG_DERIVED(atarisy2_state::csprint, atarisy2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atarisy2_state::apb, atarisy2)
+MACHINE_CONFIG_START(atarisy2_state::apb)
+	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 110)
 MACHINE_CONFIG_END
 

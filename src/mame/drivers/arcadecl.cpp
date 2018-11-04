@@ -146,7 +146,7 @@ WRITE16_MEMBER(arcadecl_state::latch_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
+ADDRESS_MAP_START(arcadecl_state::main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("bitmap")
 	AM_RANGE(0x3c0000, 0x3c07ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
@@ -358,7 +358,8 @@ MACHINE_CONFIG_START(arcadecl_state::arcadecl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(arcadecl_state::sparkz, arcadecl)
+MACHINE_CONFIG_START(arcadecl_state::sparkz)
+	arcadecl(config);
 	MCFG_DEVICE_REMOVE("mob")
 MACHINE_CONFIG_END
 

@@ -100,8 +100,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sw_prgm_pwr);
 	DECLARE_INPUT_CHANGED_MEMBER(sw_do_enable);
 
-	void intellec4(machine_config &config);
-
 protected:
 	intellec4_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
@@ -128,6 +126,18 @@ protected:
 
 	virtual void driver_start() override;
 	virtual void driver_reset() override;
+
+	void intellec4_program_banks(address_map &map);
+	void intellec4_rom_port_banks(address_map &map);
+
+	void intellec4_rom(address_map &map);
+	void intellec4_ram_memory(address_map &map);
+	void intellec4_rom_ports(address_map &map);
+	void intellec4_ram_status(address_map &map);
+	void intellec4_ram_ports(address_map &map);
+	void intellec4_program_memory(address_map &map);
+
+	void intellec4(machine_config &config);
 
 	required_device<mcs40_cpu_device_base>              m_cpu;
 	required_device<bus::intellec4::univ_bus_device>    m_bus;
@@ -220,138 +230,6 @@ private:
 	bool    m_sw_prg_mode[3] = { false, false, false };
 	bool    m_sw_run = false;
 };
-
-
-/*----------------------------------
-  System address spaces
-----------------------------------*/
-
-ADDRESS_MAP_START(intellec4_program_banks, mcs40_cpu_device_base::AS_ROM, 8, intellec4_state)
-	ADDRESS_MAP_UNMAP_LOW
-
-	// 0x0000...0x0fff MON
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("monitor", 0x0000)
-
-	// 0x1000...0x1fff PROM
-
-	// 0x1000...0x1fff RAM
-	AM_RANGE(0x2000, 0x2fff) AM_READONLY AM_SHARE("ram")
-
-	// 0x3000...0x3fff unmapped in case someone presses two mode switches at once
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(intellec4_rom_port_banks, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_state)
-	ADDRESS_MAP_UNMAP_HIGH
-
-	// 0x0000...0x07ff MON
-	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x1f00) AM_READWRITE(rom0_in, rom0_out)
-	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x1f00) AM_WRITE(rom1_out)
-	AM_RANGE(0x0020, 0x002f) AM_MIRROR(0x1f00) AM_READWRITE(rom2_in, rom2_out)
-	AM_RANGE(0x0030, 0x003f) AM_MIRROR(0x1f00) AM_READWRITE(rom3_in, rom3_out)
-	AM_RANGE(0x00e0, 0x00ef) AM_MIRROR(0x1f00) AM_READWRITE(rome_in, rome_out)
-	AM_RANGE(0x00f0, 0x00ff) AM_MIRROR(0x1f00) AM_READWRITE(romf_in, romf_out)
-
-	// 0x0800...0x0fff PROM
-
-	// 0x1000...0x17ff neither
-
-	// 0x1800...0x1fff unused
-ADDRESS_MAP_END
-
-
-/*---------------------------------
-  CPU views of address spaces
----------------------------------*/
-
-ADDRESS_MAP_START(intellec4_rom, mcs40_cpu_device_base::AS_ROM, 8, intellec4_state)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("prgbank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(intellec4_ram_memory, mcs40_cpu_device_base::AS_RAM_MEMORY, 8, intellec4_state)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("memory") // 4 * 4002
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(intellec4_rom_ports, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("rpbank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(intellec4_ram_status, mcs40_cpu_device_base::AS_RAM_STATUS, 8, intellec4_state)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x003f) AM_RAM AM_SHARE("status") // 4 * 4002
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(intellec4_ram_ports, mcs40_cpu_device_base::AS_RAM_PORTS, 8, intellec4_state)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ram0_out)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ram1_out)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(intellec4_program_memory, mcs40_cpu_device_base::AS_PROGRAM_MEMORY, 8, intellec4_state)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(pm_read, pm_write)
-ADDRESS_MAP_END
-
-
-/*----------------------------------
-  Common machine configuration
-----------------------------------*/
-
-DEVICE_INPUT_DEFAULTS_START(tty)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD",    0x00ff, RS232_BAUD_110)
-	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD",    0x00ff, RS232_BAUD_110)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0x00ff, RS232_STARTBITS_1)
-	DEVICE_INPUT_DEFAULTS("RS232_DATABITS",  0x00ff, RS232_DATABITS_8)
-	DEVICE_INPUT_DEFAULTS("RS232_PARITY",    0x00ff, RS232_PARITY_NONE)
-	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS",  0x00ff, RS232_STOPBITS_2)
-	DEVICE_INPUT_DEFAULTS("TERM_CONF",       0x01c0, 0x0000)
-	DEVICE_INPUT_DEFAULTS("FLOW_CONTROL",    0x0001, 0x0000)
-DEVICE_INPUT_DEFAULTS_END
-
-MACHINE_CONFIG_START(intellec4_state::intellec4)
-	MCFG_DEVICE_ADD("prgbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(intellec4_program_banks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-
-	MCFG_DEVICE_ADD("rpbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(intellec4_rom_port_banks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
-
-	MCFG_DEVICE_ADD("promprg", INTEL_IMM6_76, 0)
-
-	MCFG_RS232_PORT_ADD("tty", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal",   tty)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", tty)
-
-	MCFG_DEVICE_ADD("bus", INTELLEC4_UNIV_BUS, 518000. / 7)
-	MCFG_INTELLEC4_UNIV_BUS_ROM_SPACE("prgbank", AS_PROGRAM)
-	MCFG_INTELLEC4_UNIV_BUS_ROM_PORTS_SPACE("rpbank", AS_PROGRAM)
-	MCFG_INTELLEC4_UNIV_BUS_MEMORY_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_MEMORY)
-	MCFG_INTELLEC4_UNIV_BUS_STATUS_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_STATUS)
-	MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_PORTS)
-	MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(WRITELINE(intellec4_state, bus_reset_4002))
-	MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(WRITELINE(intellec4_state, bus_user_reset))
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j7",  518000. / 7, intellec4_univ_cards, "imm4_90")
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j8",  518000. / 7, intellec4_univ_cards, "imm6_26")
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j9",  518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j10", 518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j11", 518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j12", 518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j13", 518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j14", 518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j15", 518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j16", 518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j17", 518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j18", 518000. / 7, intellec4_univ_cards, nullptr)
-	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j19", 518000. / 7, intellec4_univ_cards, nullptr)
-MACHINE_CONFIG_END
 
 
 /*----------------------------------
@@ -845,6 +723,138 @@ void intellec4_state::driver_reset()
 
 
 /*----------------------------------
+  System address spaces
+----------------------------------*/
+
+ADDRESS_MAP_START(intellec4_state::intellec4_program_banks)
+	ADDRESS_MAP_UNMAP_LOW
+
+	// 0x0000...0x0fff MON
+	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("monitor", 0x0000)
+
+	// 0x1000...0x1fff PROM
+
+	// 0x1000...0x1fff RAM
+	AM_RANGE(0x2000, 0x2fff) AM_READONLY AM_SHARE("ram")
+
+	// 0x3000...0x3fff unmapped in case someone presses two mode switches at once
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(intellec4_state::intellec4_rom_port_banks)
+	ADDRESS_MAP_UNMAP_HIGH
+
+	// 0x0000...0x07ff MON
+	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x1f00) AM_READWRITE(rom0_in, rom0_out)
+	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x1f00) AM_WRITE(rom1_out)
+	AM_RANGE(0x0020, 0x002f) AM_MIRROR(0x1f00) AM_READWRITE(rom2_in, rom2_out)
+	AM_RANGE(0x0030, 0x003f) AM_MIRROR(0x1f00) AM_READWRITE(rom3_in, rom3_out)
+	AM_RANGE(0x00e0, 0x00ef) AM_MIRROR(0x1f00) AM_READWRITE(rome_in, rome_out)
+	AM_RANGE(0x00f0, 0x00ff) AM_MIRROR(0x1f00) AM_READWRITE(romf_in, romf_out)
+
+	// 0x0800...0x0fff PROM
+
+	// 0x1000...0x17ff neither
+
+	// 0x1800...0x1fff unused
+ADDRESS_MAP_END
+
+
+/*---------------------------------
+  CPU views of address spaces
+---------------------------------*/
+
+ADDRESS_MAP_START(intellec4_state::intellec4_rom)
+	ADDRESS_MAP_UNMAP_LOW
+	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("prgbank", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(intellec4_state::intellec4_ram_memory)
+	ADDRESS_MAP_UNMAP_LOW
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("memory") // 4 * 4002
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(intellec4_state::intellec4_rom_ports)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("rpbank", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(intellec4_state::intellec4_ram_status)
+	ADDRESS_MAP_UNMAP_LOW
+	AM_RANGE(0x0000, 0x003f) AM_RAM AM_SHARE("status") // 4 * 4002
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(intellec4_state::intellec4_ram_ports)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ram0_out)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ram1_out)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(intellec4_state::intellec4_program_memory)
+	ADDRESS_MAP_UNMAP_LOW
+	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(pm_read, pm_write)
+ADDRESS_MAP_END
+
+
+/*----------------------------------
+  Common machine configuration
+----------------------------------*/
+
+DEVICE_INPUT_DEFAULTS_START(tty)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD",    0x00ff, RS232_BAUD_110)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD",    0x00ff, RS232_BAUD_110)
+	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0x00ff, RS232_STARTBITS_1)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS",  0x00ff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY",    0x00ff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS",  0x00ff, RS232_STOPBITS_2)
+	DEVICE_INPUT_DEFAULTS("TERM_CONF",       0x01c0, 0x0000)
+	DEVICE_INPUT_DEFAULTS("FLOW_CONTROL",    0x0001, 0x0000)
+DEVICE_INPUT_DEFAULTS_END
+
+MACHINE_CONFIG_START(intellec4_state::intellec4)
+	MCFG_DEVICE_ADD("prgbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(intellec4_program_banks)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+
+	MCFG_DEVICE_ADD("rpbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(intellec4_rom_port_banks)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+
+	MCFG_DEVICE_ADD("promprg", INTEL_IMM6_76, 0)
+
+	MCFG_RS232_PORT_ADD("tty", default_rs232_devices, "terminal")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal",   tty)
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", tty)
+
+	MCFG_DEVICE_ADD("bus", INTELLEC4_UNIV_BUS, 518000. / 7)
+	MCFG_INTELLEC4_UNIV_BUS_ROM_SPACE("prgbank", AS_PROGRAM)
+	MCFG_INTELLEC4_UNIV_BUS_ROM_PORTS_SPACE("rpbank", AS_PROGRAM)
+	MCFG_INTELLEC4_UNIV_BUS_MEMORY_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_MEMORY)
+	MCFG_INTELLEC4_UNIV_BUS_STATUS_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_STATUS)
+	MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE("maincpu", mcs40_cpu_device_base::AS_RAM_PORTS)
+	MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(WRITELINE(intellec4_state, bus_reset_4002))
+	MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(WRITELINE(intellec4_state, bus_user_reset))
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j7",  5.185_MHz_XTAL / 7, intellec4_univ_cards, "imm4_90")
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j8",  5.185_MHz_XTAL / 7, intellec4_univ_cards, "imm6_26")
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j9",  5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j10", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j11", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j12", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j13", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j14", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j15", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j16", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j17", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j18", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+	MCFG_INTELLEC4_UNIV_SLOT_ADD("bus", "j19", 5.185_MHz_XTAL / 7, intellec4_univ_cards, nullptr)
+MACHINE_CONFIG_END
+
+
+/*----------------------------------
   Timer handlers
 ----------------------------------*/
 
@@ -1010,6 +1020,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sw_one_shot);
 
 	void mod4(machine_config &config);
+
 protected:
 	virtual void driver_start() override;
 	virtual void driver_reset() override;
@@ -1034,28 +1045,6 @@ private:
 	// current state of front panel switches
 	bool    m_sw_hold = false;
 };
-
-
-/*----------------------------------
-  MOD 4-specific configuration
-----------------------------------*/
-
-MACHINE_CONFIG_DERIVED(mod4_state::mod4, intellec4)
-	MCFG_CPU_ADD("maincpu", I4004, 5.185_MHz_XTAL / 7)
-	MCFG_I4004_ROM_MAP(intellec4_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(intellec4_ram_memory)
-	MCFG_I4004_ROM_PORTS_MAP(intellec4_rom_ports)
-	MCFG_I4004_RAM_STATUS_MAP(intellec4_ram_status)
-	MCFG_I4004_RAM_PORTS_MAP(intellec4_ram_ports)
-	MCFG_I4004_PROGRAM_MEMORY_MAP(intellec4_program_memory)
-	MCFG_I4004_BUS_CYCLE_CB(BUSCYCLE(mod4_state, bus_cycle));
-	MCFG_I4004_SYNC_CB(DEVWRITELINE("bus", bus::intellec4::univ_bus_device, sync_in))
-
-	MCFG_DEVICE_MODIFY("bus")
-	MCFG_INTELLEC4_UNIV_BUS_TEST_CB(WRITELINE(mod4_state, bus_test))
-
-	MCFG_DEFAULT_LAYOUT(layout_intlc44)
-MACHINE_CONFIG_END
 
 
 /*----------------------------------
@@ -1118,6 +1107,29 @@ INPUT_CHANGED_MEMBER(mod4_state::sw_one_shot)
 		}
 	}
 }
+
+
+/*----------------------------------
+  MOD 4-specific configuration
+----------------------------------*/
+
+MACHINE_CONFIG_START(mod4_state::mod4)
+	intellec4(config);
+	MCFG_CPU_ADD("maincpu", I4004, 5.185_MHz_XTAL / 7)
+	MCFG_I4004_ROM_MAP(intellec4_rom)
+	MCFG_I4004_RAM_MEMORY_MAP(intellec4_ram_memory)
+	MCFG_I4004_ROM_PORTS_MAP(intellec4_rom_ports)
+	MCFG_I4004_RAM_STATUS_MAP(intellec4_ram_status)
+	MCFG_I4004_RAM_PORTS_MAP(intellec4_ram_ports)
+	MCFG_I4004_PROGRAM_MEMORY_MAP(intellec4_program_memory)
+	MCFG_I4004_BUS_CYCLE_CB(BUSCYCLE(mod4_state, bus_cycle));
+	MCFG_I4004_SYNC_CB(DEVWRITELINE("bus", bus::intellec4::univ_bus_device, sync_in))
+
+	MCFG_DEVICE_MODIFY("bus")
+	MCFG_INTELLEC4_UNIV_BUS_TEST_CB(WRITELINE(mod4_state, bus_test))
+
+	MCFG_DEFAULT_LAYOUT(layout_intlc44)
+MACHINE_CONFIG_END
 
 
 /*----------------------------------
@@ -1199,6 +1211,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sw_single_step);
 
 	void mod40(machine_config &config);
+
 protected:
 	virtual void driver_start() override;
 	virtual void driver_reset() override;
@@ -1225,30 +1238,6 @@ private:
 	// current state of front panel switches
 	bool    m_sw_stop = false;
 };
-
-
-/*----------------------------------
-  MOD 40-specific configuration
-----------------------------------*/
-
-MACHINE_CONFIG_DERIVED(mod40_state::mod40, intellec4)
-	MCFG_CPU_ADD("maincpu", I4040, 5.185_MHz_XTAL / 7)
-	MCFG_I4040_ROM_MAP(intellec4_rom)
-	MCFG_I4040_RAM_MEMORY_MAP(intellec4_ram_memory)
-	MCFG_I4040_ROM_PORTS_MAP(intellec4_rom_ports)
-	MCFG_I4040_RAM_STATUS_MAP(intellec4_ram_status)
-	MCFG_I4040_RAM_PORTS_MAP(intellec4_ram_ports)
-	MCFG_I4040_PROGRAM_MEMORY_MAP(intellec4_program_memory)
-	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(mod40_state, bus_cycle));
-	MCFG_I4040_SYNC_CB(DEVWRITELINE("bus", bus::intellec4::univ_bus_device, sync_in))
-	MCFG_I4040_STP_ACK_CB(WRITELINE(mod40_state, stp_ack))
-
-	MCFG_DEVICE_MODIFY("bus")
-	MCFG_INTELLEC4_UNIV_BUS_STOP_CB(WRITELINE(mod40_state, bus_stop))
-	MCFG_INTELLEC4_UNIV_BUS_TEST_CB(WRITELINE(mod40_state, bus_test))
-
-	MCFG_DEFAULT_LAYOUT(layout_intlc440)
-MACHINE_CONFIG_END
 
 
 /*----------------------------------
@@ -1343,6 +1332,31 @@ INPUT_CHANGED_MEMBER(mod40_state::sw_single_step)
 		}
 	}
 }
+
+
+/*----------------------------------
+  MOD 40-specific configuration
+----------------------------------*/
+
+MACHINE_CONFIG_START(mod40_state::mod40)
+	intellec4(config);
+	MCFG_CPU_ADD("maincpu", I4040, 5.185_MHz_XTAL / 7)
+	MCFG_I4040_ROM_MAP(intellec4_rom)
+	MCFG_I4040_RAM_MEMORY_MAP(intellec4_ram_memory)
+	MCFG_I4040_ROM_PORTS_MAP(intellec4_rom_ports)
+	MCFG_I4040_RAM_STATUS_MAP(intellec4_ram_status)
+	MCFG_I4040_RAM_PORTS_MAP(intellec4_ram_ports)
+	MCFG_I4040_PROGRAM_MEMORY_MAP(intellec4_program_memory)
+	MCFG_I4040_BUS_CYCLE_CB(BUSCYCLE(mod40_state, bus_cycle));
+	MCFG_I4040_SYNC_CB(DEVWRITELINE("bus", bus::intellec4::univ_bus_device, sync_in))
+	MCFG_I4040_STP_ACK_CB(WRITELINE(mod40_state, stp_ack))
+
+	MCFG_DEVICE_MODIFY("bus")
+	MCFG_INTELLEC4_UNIV_BUS_STOP_CB(WRITELINE(mod40_state, bus_stop))
+	MCFG_INTELLEC4_UNIV_BUS_TEST_CB(WRITELINE(mod40_state, bus_test))
+
+	MCFG_DEFAULT_LAYOUT(layout_intlc440)
+MACHINE_CONFIG_END
 
 
 /*----------------------------------

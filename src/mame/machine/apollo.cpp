@@ -1150,7 +1150,7 @@ MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head
 MACHINE_CONFIG_START(apollo_state::apollo)
-	MCFG_FRAGMENT_ADD(common)
+	common(config);
 	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL(3'686'400) )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
 	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
@@ -1172,7 +1172,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 // for headless machines using a serial console
 MACHINE_CONFIG_START(apollo_state::apollo_terminal)
-	MCFG_FRAGMENT_ADD(common)
+	common(config);
 	MCFG_APOLLO_SIO_ADD( APOLLO_SIO_TAG, XTAL(3'686'400) )
 	MCFG_APOLLO_SIO_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
 	MCFG_APOLLO_SIO_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))

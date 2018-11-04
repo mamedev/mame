@@ -86,4 +86,7 @@ public:
 	void esb_slapstic_tweak(address_space &space, offs_t offset);
 	void starwars(machine_config &config);
 	void esb(machine_config &config);
+	void esb_main_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

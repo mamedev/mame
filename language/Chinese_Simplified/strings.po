@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-28 14:01+1100\n"
-"PO-Revision-Date: 2017-10-03 22:56+0800\n"
+"PO-Revision-Date: 2018-01-28 17:35+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -59,7 +59,7 @@ msgstr "控制面板"
 
 #: src/frontend/mame/ui/selmenu.cpp:52 src/frontend/mame/ui/dirmenu.cpp:50
 msgid "PCBs"
-msgstr "PCB"
+msgstr "PCB 图"
 
 #: src/frontend/mame/ui/selmenu.cpp:53 src/frontend/mame/ui/dirmenu.cpp:47
 msgid "Flyers"
@@ -1727,7 +1727,7 @@ msgstr "自动储存/还原"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Rewind capacity"
-msgstr ""
+msgstr "倒转容量"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Bilinear snapshot"
@@ -2159,7 +2159,7 @@ msgstr "ROM 校验结果\t错误\n"
 
 #: src/frontend/mame/ui/selgame.cpp:975
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr "样本档校验结果\t不需要\n"
+msgstr "采样文件校验结果\t不需要\n"
 
 #: src/frontend/mame/ui/selgame.cpp:977
 msgid "Samples Audit Result\tOK\n"
@@ -2174,6 +2174,8 @@ msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
+"ROM 验证 \t停用\n"
+"采样文件验证 \t停用\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 #, c-format
@@ -2221,7 +2223,7 @@ msgstr "采样率"
 
 #: src/frontend/mame/ui/sndmenu.cpp:137
 msgid "Use External Samples"
-msgstr "使用外部采样率"
+msgstr "使用外部采样文件"
 
 #: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
 msgid "Unfiltered"
@@ -2414,7 +2416,7 @@ msgstr "[建立]"
 #: src/frontend/mame/ui/filesel.cpp:419
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "错误存取 %s"
 
 #: src/frontend/mame/ui/filesel.cpp:515
 msgid "Select access mode"
@@ -2776,21 +2778,21 @@ msgstr "作弊码搜寻器"
 
 #: plugins/portname/init.lua:89
 msgid "Save input names to file"
-msgstr ""
+msgstr "保存输入名称至档案"
 
 #: plugins/portname/init.lua:115 plugins/portname/init.lua:120
 #: plugins/portname/init.lua:136
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "保存输入名称档案时失败"
 
 #: plugins/portname/init.lua:153
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "输入埠名称档案保存至 %s"
 
 #: plugins/portname/init.lua:158
 msgid "Input ports"
-msgstr ""
+msgstr "输入埠"
 
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"
@@ -2798,13 +2800,6 @@ msgstr ""
 #~ msgstr ""
 #~ "ROM 校验已停用\t\n"
 #~ "样本档校验已停用\t\n"
-
-#~ msgid ""
-#~ "Roms Audit Pass\tDisabled\n"
-#~ "Samples Audit Pass\tDisabled\n"
-#~ msgstr ""
-#~ "ROM 校验通过\t已停用\n"
-#~ "样本档校验通过\t已停用\n"
 
 #~ msgid "Activated"
 #~ msgstr "已激活"

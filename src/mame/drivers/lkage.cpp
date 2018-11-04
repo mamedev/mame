@@ -116,7 +116,7 @@ READ8_MEMBER(lkage_state::sound_status_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
+ADDRESS_MAP_START(lkage_state::lkage_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -138,13 +138,13 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lkage_map_mcu, AS_PROGRAM, 8, lkage_state )
+ADDRESS_MAP_START(lkage_state::lkage_map_mcu)
 	AM_IMPORT_FROM(lkage_map)
 	AM_RANGE(0xf062, 0xf062) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0xf087, 0xf087) AM_READ(mcu_status_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lkage_map_boot, AS_PROGRAM, 8, lkage_state )
+ADDRESS_MAP_START(lkage_state::lkage_map_boot)
 	AM_IMPORT_FROM(lkage_map)
 	AM_RANGE(0xf062, 0xf062) AM_READWRITE(fake_mcu_r, fake_mcu_w)
 	AM_RANGE(0xf087, 0xf087) AM_READ(fake_status_r)
@@ -156,7 +156,7 @@ READ8_MEMBER(lkage_state::port_fetch_r)
 	return memregion("user1")->base()[offset];
 }
 
-static ADDRESS_MAP_START( lkage_io_map, AS_IO, 8, lkage_state )
+ADDRESS_MAP_START(lkage_state::lkage_io_map)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(port_fetch_r)
 ADDRESS_MAP_END
 
@@ -165,7 +165,7 @@ ADDRESS_MAP_END
 
 /* sound section is almost identical to Bubble Bobble, YM2203 instead of YM3526 */
 
-static ADDRESS_MAP_START( lkage_sound_map, AS_PROGRAM, 8, lkage_state )
+ADDRESS_MAP_START(lkage_state::lkage_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)

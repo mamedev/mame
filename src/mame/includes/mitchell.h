@@ -141,4 +141,14 @@ public:
 	void pangba(machine_config &config);
 	void pangnv(machine_config &config);
 	void spangbl(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void mgakuen_map(address_map &map);
+	void mitchell_io_map(address_map &map);
+	void mitchell_map(address_map &map);
+	void mstworld_io_map(address_map &map);
+	void mstworld_sound_map(address_map &map);
+	void pangba_sound_map(address_map &map);
+	void spangbl_io_map(address_map &map);
+	void spangbl_map(address_map &map);
+	void spangbl_sound_map(address_map &map);
 };

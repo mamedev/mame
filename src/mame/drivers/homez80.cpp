@@ -40,6 +40,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void homez80(machine_config &config);
+	void homez80_io(address_map &map);
+	void homez80_mem(address_map &map);
 private:
 	bool m_irq;
 	virtual void machine_reset() override;
@@ -56,7 +58,7 @@ READ8_MEMBER( homez80_state::homez80_keyboard_r )
 	return ioport(kbdrow)->read();
 }
 
-static ADDRESS_MAP_START(homez80_mem, AS_PROGRAM, 8, homez80_state)
+ADDRESS_MAP_START(homez80_state::homez80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
 	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_SHARE("videoram") // Video RAM
@@ -64,7 +66,7 @@ static ADDRESS_MAP_START(homez80_mem, AS_PROGRAM, 8, homez80_state)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( homez80_io, AS_IO, 8, homez80_state)
+ADDRESS_MAP_START(homez80_state::homez80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

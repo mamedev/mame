@@ -19,11 +19,11 @@
 DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
 DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
 
-DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_family_device)
+ADDRESS_MAP_START(pc_fdc_family_device::map)
 ADDRESS_MAP_END
 
 // The schematics show address decoding is minimal
-DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_xt_device)
+ADDRESS_MAP_START(pc_fdc_xt_device::map)
 	AM_RANGE(0x0, 0x0) AM_DEVREAD("upd765", upd765a_device, msr_r) AM_WRITE(dor_w)
 	AM_RANGE(0x1, 0x1) AM_DEVREAD("upd765", upd765a_device, fifo_r) AM_WRITE(dor_fifo_w)
 	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 
 
 // Decoding is through a PAL, so presumably complete
-DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_at_device)
+ADDRESS_MAP_START(pc_fdc_at_device::map)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
 	AM_RANGE(0x4, 0x5) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)

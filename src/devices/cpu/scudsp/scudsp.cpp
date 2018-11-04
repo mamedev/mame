@@ -1010,11 +1010,11 @@ void scudsp_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 32, scudsp_cpu_device )
+ADDRESS_MAP_START(scudsp_cpu_device::program_map)
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 32, scudsp_cpu_device )
+ADDRESS_MAP_START(scudsp_cpu_device::data_map)
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1023,8 +1023,8 @@ scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *
 	, m_out_irq_cb(*this)
 	, m_in_dma_cb(*this)
 	, m_out_dma_cb(*this)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 8, -2, ADDRESS_MAP_NAME(program_map))
-	, m_data_config("data", ENDIANNESS_BIG, 32, 8, -2, ADDRESS_MAP_NAME(data_map))
+	, m_program_config("program", ENDIANNESS_BIG, 32, 8, -2, address_map_constructor(FUNC(scudsp_cpu_device::program_map), this))
+	, m_data_config("data", ENDIANNESS_BIG, 32, 8, -2, address_map_constructor(FUNC(scudsp_cpu_device::data_map), this))
 {
 }
 

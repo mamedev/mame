@@ -140,7 +140,6 @@ private:
 };
 
 // device type definition
-extern const device_type COCOCART_SLOT;
 DECLARE_DEVICE_TYPE(COCOCART_SLOT, cococart_slot_device)
 
 

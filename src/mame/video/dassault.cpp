@@ -87,13 +87,16 @@ uint32_t dassault_state::screen_update_dassault(screen_device &screen, bitmap_rg
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	uint16_t priority = m_priority;
 
-	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, false);
+	flip_screen_set(BIT(flip, 7));
+	m_sprgen1->set_flip_screen(BIT(flip, 7));
+	m_sprgen2->set_flip_screen(BIT(flip, 7));
+
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 	bitmap_ind16* sprite_bitmap1 = &m_sprgen1->get_sprite_temp_bitmap();
 	bitmap_ind16* sprite_bitmap2 = &m_sprgen2->get_sprite_temp_bitmap();
 
 	/* Update tilemaps */
-	flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(nullptr, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(nullptr, m_pf4_rowscroll);
 

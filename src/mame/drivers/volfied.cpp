@@ -66,7 +66,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
                 MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, volfied_state )
+ADDRESS_MAP_START(volfied_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM     /* program */
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM     /* tiles   */
 	AM_RANGE(0x100000, 0x103fff) AM_RAM     /* main    */
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, volfied_state )
 	AM_RANGE(0xf00c00, 0xf00c01) AM_WRITE(cchip_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, volfied_state )
+ADDRESS_MAP_START(volfied_state::z80_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)

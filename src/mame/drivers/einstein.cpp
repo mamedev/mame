@@ -108,6 +108,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
 	void einstein(machine_config &config);
+	void einstein_io(address_map &map);
+	void einstein_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -411,13 +413,13 @@ void einstein_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( einstein_mem, AS_PROGRAM, 8, einstein_state )
+ADDRESS_MAP_START(einstein_state::einstein_mem)
 	AM_RANGE(0x0000, 0x07fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x8000, 0x0ffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
 // I/O ports are decoded into 8 blocks using address lines A3 to A7
-static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
+ADDRESS_MAP_START(einstein_state::einstein_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff04) AM_READWRITE(reset_r, reset_w)
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I030, ay8910_device, data_r, address_w)

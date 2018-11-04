@@ -113,6 +113,11 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_objects(int y, uint8_t *objdata);
 	void grchamp(machine_config &config);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
+	void sub_portmap(address_map &map);
 };
 
 /* Discrete Sound Input Nodes */

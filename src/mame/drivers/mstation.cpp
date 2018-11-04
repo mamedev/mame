@@ -98,6 +98,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
 	void mstation(machine_config &config);
+	void mstation_banked_map(address_map &map);
+	void mstation_io(address_map &map);
+	void mstation_mem(address_map &map);
 };
 
 
@@ -253,7 +256,7 @@ READ8_MEMBER( mstation_state::kb_r )
 }
 
 
-static ADDRESS_MAP_START(mstation_banked_map, AS_PROGRAM, 8, mstation_state)
+ADDRESS_MAP_START(mstation_state::mstation_banked_map)
 	AM_RANGE(0x0000000, 0x00fffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
 	AM_RANGE(0x0400000, 0x041ffff) AM_MIRROR(0x03e0000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0c00000, 0x0c7ffff) AM_MIRROR(0x0380000) AM_DEVREADWRITE("flash1", intelfsh8_device, read, write)
@@ -262,14 +265,14 @@ static ADDRESS_MAP_START(mstation_banked_map, AS_PROGRAM, 8, mstation_state)
 	AM_RANGE(0x1400000, 0x1403fff) AM_MIRROR(0x03fc000) AM_READWRITE(modem_r, modem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mstation_mem, AS_PROGRAM, 8, mstation_state)
+ADDRESS_MAP_START(mstation_state::mstation_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank0", address_map_bank_device, read8, write8)
 	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("sysram")    // system ram always first RAM bank
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mstation_io , AS_IO, 8, mstation_state)
+ADDRESS_MAP_START(mstation_state::mstation_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READWRITE(kb_r, kb_w)
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(port2_w)

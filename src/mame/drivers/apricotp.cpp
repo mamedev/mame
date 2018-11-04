@@ -155,6 +155,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
 	void fp(machine_config &config);
+	void fp_io(address_map &map);
+	void fp_mem(address_map &map);
+	void sound_io(address_map &map);
+	void sound_mem(address_map &map);
 };
 
 
@@ -421,7 +425,7 @@ WRITE16_MEMBER( fp_state::mem_w )
 //  ADDRESS_MAP( fp_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fp_mem, AS_PROGRAM, 16, fp_state )
+ADDRESS_MAP_START(fp_state::fp_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xf7fff) AM_READWRITE(mem_r, mem_w)
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
@@ -432,7 +436,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fp_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
+ADDRESS_MAP_START(fp_state::fp_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
 	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8(I8253A5_TAG, pit8253_device, read, write, 0x00ff)
@@ -455,7 +459,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( sound_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, fp_state )
+ADDRESS_MAP_START(fp_state::sound_mem)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD63B01V1_TAG, 0)
 ADDRESS_MAP_END
 
@@ -464,7 +468,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( sound_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, fp_state )
+ADDRESS_MAP_START(fp_state::sound_io)
 	AM_RANGE(M6801_PORT1, M6801_PORT1)
 	AM_RANGE(M6801_PORT2, M6801_PORT2)
 	AM_RANGE(M6801_PORT3, M6801_PORT3)

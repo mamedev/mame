@@ -104,6 +104,8 @@ public:
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
+	void bank_map(address_map &map);
+	void radica_eu3a14_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -157,7 +159,7 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 		uint16_t dat = m_palram[offs++] << 8;
 		dat |= m_palram[offs++];
 
-		// llll lsss ---h hhhh
+		// llll lsss ---h hhhh
 		int l_raw = (dat & 0xf800) >> 11;
 		int sl_raw = (dat & 0x0700) >> 8;
 		int h_raw = (dat & 0x001f) >> 0;
@@ -455,11 +457,11 @@ READ8_MEMBER(radica_eu3a14_state::radicasi_pal_ntsc_r)
 	//return 0x00; // PAL
 }
 
-static ADDRESS_MAP_START( bank_map, AS_PROGRAM, 8, radica_eu3a14_state )
+ADDRESS_MAP_START(radica_eu3a14_state::bank_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state )
+ADDRESS_MAP_START(radica_eu3a14_state::radica_eu3a14_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x1fff) AM_RAM AM_SHARE("mainram") // 200-9ff is sprites? a00 - ??? is tilemap?
 
@@ -516,9 +518,9 @@ static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state 
 
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
 
-	AM_RANGE(0xfffe, 0xffff) AM_READ(irq_vector_r)
-
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
+
+	AM_RANGE(0xfffe, 0xffff) AM_READ(irq_vector_r)
 ADDRESS_MAP_END
 
 READ8_MEMBER(radica_eu3a14_state::dma_trigger_r)

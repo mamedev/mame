@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
 
 	void savia84(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_kbd;
 	uint8_t m_segment;
@@ -59,14 +61,14 @@ private:
 	required_device<i8255_device> m_ppi8255;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, savia84_state )
+ADDRESS_MAP_START(savia84_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the CPU
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, savia84_state )
+ADDRESS_MAP_START(savia84_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // ports F8-FB

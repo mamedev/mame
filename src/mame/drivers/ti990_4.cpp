@@ -71,6 +71,9 @@ public:
 
 	void ti990_4v(machine_config &config);
 	void ti990_4(machine_config &config);
+	void cru_map(address_map &map);
+	void cru_map_v(address_map &map);
+	void memmap(address_map &map);
 private:
 	void        hold_load();
 	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -210,7 +213,7 @@ READ8_MEMBER( ti990_4_state::interrupt_level )
     Memory map - see description above
 */
 
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti990_4_state )
+ADDRESS_MAP_START(ti990_4_state::memmap)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM /* dynamic RAM */
 	AM_RANGE(0x8000, 0xf7ff) AM_NOP /* reserved for expansion */
 	AM_RANGE(0xf800, 0xfbff) AM_RAM /* static RAM? */
@@ -240,7 +243,7 @@ ADDRESS_MAP_END
     0x0a0-0x0bf: VDT3 (int ??? - wired to int 9, unused)
 */
 
-static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti990_4_state )
+ADDRESS_MAP_START(ti990_4_state::cru_map)
 	AM_RANGE(0x00, 0x01) AM_DEVREAD("asr733", asr733_device, cru_r)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("asr733", asr733_device, cru_w)
 
@@ -251,7 +254,7 @@ static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti990_4_state )
 	AM_RANGE(0xff0, 0xfff) AM_WRITE( panel_write )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cru_map_v, AS_IO, 8, ti990_4_state )
+ADDRESS_MAP_START(ti990_4_state::cru_map_v)
 	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_device, cru_r)
 	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_device, cru_w)
 

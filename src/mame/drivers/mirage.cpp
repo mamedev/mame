@@ -93,6 +93,7 @@ public:
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	void mirage(machine_config &config);
+	void mirage_map(address_map &map);
 };
 
 void miragemj_state::video_start()
@@ -106,6 +107,7 @@ uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb3
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 
@@ -156,7 +158,7 @@ WRITE16_MEMBER(miragemj_state::okim0_rombank_w)
 	m_oki_bgm->set_rom_bank(data & 0x7);
 }
 
-static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16, miragemj_state )
+ADDRESS_MAP_START(miragemj_state::mirage_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	/* tilemaps */
 	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w) // 0x100000 - 0x101fff tested

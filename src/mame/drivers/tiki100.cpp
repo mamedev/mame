@@ -293,12 +293,12 @@ WRITE8_MEMBER( tiki100_state::system_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tiki100_mem, AS_PROGRAM, 8, tiki100_state )
+ADDRESS_MAP_START(tiki100_state::tiki100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mrq_r, mrq_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
+ADDRESS_MAP_START(tiki100_state::tiki100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
 ADDRESS_MAP_END

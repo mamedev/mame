@@ -27,6 +27,8 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void qvt103(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -37,7 +39,7 @@ u32 qvt103_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, qvt103_state )
+ADDRESS_MAP_START(qvt103_state::mem_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("kbdmcu", i8741_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -45,7 +47,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, qvt103_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM // not entirely contiguous?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, qvt103_state )
+ADDRESS_MAP_START(qvt103_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("dart", z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)

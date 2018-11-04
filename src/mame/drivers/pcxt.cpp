@@ -95,6 +95,11 @@ public:
 	optional_device<address_map_bank_device> m_bank;
 	void tetriskr(machine_config &config);
 	void filetto(machine_config &config);
+	void bank_map(address_map &map);
+	void filetto_io(address_map &map);
+	void filetto_map(address_map &map);
+	void tetriskr_io(address_map &map);
+	void tetriskr_map(address_map &map);
 };
 
 
@@ -359,17 +364,17 @@ WRITE8_MEMBER(pcxt_state::fdc_dor_w)
 	m_mb->m_pic8259->ir6_w(1);
 }
 
-static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8, pcxt_state )
+ADDRESS_MAP_START(pcxt_state::filetto_map)
 	AM_RANGE(0xc0000, 0xcffff) AM_DEVICE("bank", address_map_bank_device, amap8)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
+ADDRESS_MAP_START(pcxt_state::filetto_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0060, 0x0060) AM_READ(port_a_r)  //not a real 8255
 	AM_RANGE(0x0061, 0x0061) AM_READWRITE(port_b_r, port_b_w)
 	AM_RANGE(0x0062, 0x0062) AM_READ(port_c_r)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
 	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
@@ -378,11 +383,11 @@ static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
 	AM_RANGE(0x03f5, 0x03f5) AM_READWRITE(fdc765_data_r,fdc765_data_w)//FDC Data
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tetriskr_map, AS_PROGRAM, 8, pcxt_state )
+ADDRESS_MAP_START(pcxt_state::tetriskr_map)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
+ADDRESS_MAP_START(pcxt_state::tetriskr_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
@@ -390,7 +395,7 @@ static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank_map, 0, 8, pcxt_state )
+ADDRESS_MAP_START(pcxt_state::bank_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("game_prg", 0)
 ADDRESS_MAP_END
 

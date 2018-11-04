@@ -178,22 +178,24 @@ class msx_cart_keyboard_master_device : public device_t, public msx_cart_interfa
 public:
 	msx_cart_keyboard_master_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void initialize_cartridge() override;
-
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-
-	DECLARE_READ8_MEMBER(read_vlm);
-	DECLARE_WRITE8_MEMBER(io_20_w);
-	DECLARE_READ8_MEMBER(io_00_r);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	virtual void initialize_cartridge() override;
+
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+
 private:
 	required_device<vlm5030_device> m_vlm5030;
+
+	DECLARE_READ8_MEMBER(read_vlm);
+	DECLARE_WRITE8_MEMBER(io_20_w);
+	DECLARE_READ8_MEMBER(io_00_r);
+
+	void vlm_map(address_map &map);
 };
 
 

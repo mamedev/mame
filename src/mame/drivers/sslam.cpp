@@ -375,7 +375,9 @@ WRITE16_MEMBER(sslam_state::powerbls_sound_w)
 
 /* these will need verifying .. the game writes all over the place ... */
 
-static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
+ADDRESS_MAP_START(sslam_state::sslam_program_map)
+	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
+
 	AM_RANGE(0x000400, 0x07ffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(sslam_bg_tileram_w) AM_SHARE("bg_tileram")
 	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(sslam_md_tileram_w) AM_SHARE("md_tileram")
@@ -394,11 +396,9 @@ static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001e, 0x30001f) AM_WRITE8(sslam_snd_w, 0x00ff)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM   /* Main RAM */
-
-	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerbls_map, AS_PROGRAM, 16, sslam_state )
+ADDRESS_MAP_START(sslam_state::powerbls_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(powerbls_bg_tileram_w) AM_SHARE("bg_tileram")
 	AM_RANGE(0x104000, 0x107fff) AM_RAM // not used
@@ -462,7 +462,7 @@ WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
 //   (data & 0x40) -> always set
 }
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, sslam_state )
+ADDRESS_MAP_START(sslam_state::sound_io_map)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(playmark_snd_control_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
 ADDRESS_MAP_END

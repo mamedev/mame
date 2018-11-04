@@ -135,6 +135,8 @@ public:
 	void ghosteo(machine_config &config);
 	void touryuu(machine_config &config);
 	void bballoon(machine_config &config);
+	void bballoon_map(address_map &map);
+	void touryuu_map(address_map &map);
 };
 
 
@@ -425,7 +427,7 @@ READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
 }
 
 
-static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32, ghosteo_state )
+ADDRESS_MAP_START(ghosteo_state::bballoon_map)
 	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
 	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
@@ -433,7 +435,7 @@ static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32, ghosteo_state )
 	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( touryuu_map, AS_PROGRAM, 32, ghosteo_state )
+ADDRESS_MAP_START(ghosteo_state::touryuu_map)
 	AM_RANGE(0x10000000, 0x10000003) AM_READ(touryuu_port_10000000_r)
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
 	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
@@ -663,14 +665,16 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ghosteo_state::bballoon, ghosteo)
+MACHINE_CONFIG_START(ghosteo_state::bballoon)
+	ghosteo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballoon_map)
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(256)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ghosteo_state::touryuu, ghosteo)
+MACHINE_CONFIG_START(ghosteo_state::touryuu)
+	ghosteo(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(touryuu_map)
 	MCFG_I2CMEM_ADD("i2cmem")

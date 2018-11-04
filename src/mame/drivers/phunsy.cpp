@@ -64,6 +64,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void phunsy(machine_config &config);
+	void phunsy_data(address_map &map);
+	void phunsy_io(address_map &map);
+	void phunsy_mem(address_map &map);
 private:
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
@@ -86,7 +89,7 @@ READ_LINE_MEMBER(phunsy_state::cass_r)
 	return (m_cass->input() > 0.03) ? 0 : 1;
 }
 
-static ADDRESS_MAP_START( phunsy_mem, AS_PROGRAM, 8, phunsy_state )
+ADDRESS_MAP_START(phunsy_state::phunsy_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram") // Video RAM
@@ -95,11 +98,11 @@ static ADDRESS_MAP_START( phunsy_mem, AS_PROGRAM, 8, phunsy_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bankq") // Banked RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phunsy_io, AS_IO, 8, phunsy_state )
+ADDRESS_MAP_START(phunsy_state::phunsy_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phunsy_data, AS_DATA, 8, phunsy_state )
+ADDRESS_MAP_START(phunsy_state::phunsy_data)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(phunsy_ctrl_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(phunsy_data_r, phunsy_data_w)

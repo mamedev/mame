@@ -120,8 +120,8 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 void psxgpu_device::DebugMeshInit()
 {
-	int width = screen().width();
-	int height = screen().height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_debug.b_mesh = 0;
 	m_debug.b_texture = 0;
@@ -136,8 +136,8 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 {
 	int n_coord;
 	int n_colour;
-	int width = screen().width();
-	int height = screen().height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	n_coordx += m_n_displaystartx;
 	n_coordy += n_displaystarty;
@@ -334,8 +334,8 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 
 	if( m_debug.b_texture )
 	{
-		int width = screen().width();
-		int height = screen().height();
+		int width = m_screen->width();
+		int height = m_screen->height();
 
 		for( n_y = 0; n_y < height; n_y++ )
 		{
@@ -363,7 +363,7 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 				}
 				p_n_interleave[ n_x ] = p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, screen().palette().pens() );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, m_screen->palette().pens() );
 		}
 	}
 	return m_debug.b_texture;

@@ -67,7 +67,7 @@
 
 DEFINE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device, "k573_dio", "Konami 573 digital I/O board")
 
-DEVICE_ADDRESS_MAP_START(amap, 16, k573dio_device)
+ADDRESS_MAP_START(k573dio_device::amap)
 	AM_RANGE(0x00, 0x01) AM_READ(a00_r)
 	AM_RANGE(0x02, 0x03) AM_READ(a02_r)
 	AM_RANGE(0x04, 0x05) AM_READ(a04_r)

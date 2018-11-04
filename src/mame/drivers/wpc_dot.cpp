@@ -9,7 +9,7 @@
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( wpc_dot_map, AS_PROGRAM, 8, wpc_dot_state )
+ADDRESS_MAP_START(wpc_dot_state::wpc_dot_map)
 	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(ram_r,ram_w)
 	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmdbank1")
 	AM_RANGE(0x3200, 0x33ff) AM_RAMBANK("dmdbank2")

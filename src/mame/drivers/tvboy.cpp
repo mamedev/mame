@@ -24,13 +24,14 @@ public:
 	tvboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: a2600_state(mconfig, type, tag)
 		, m_crom(*this, "crom")
-		, m_rom(*this, "mainrom") {};
+		, m_rom(*this, "mainrom") { }
 
 	DECLARE_WRITE8_MEMBER(bank_write);
 
 	void tvboyii(machine_config &config);
-	void supertvboy(machine_config &config);
 
+	void rom_map(address_map &map);
+	void tvboy_mem(address_map &map);
 private:
 	required_device<address_map_bank_device> m_crom;
 	required_region_ptr<uint8_t> m_rom;
@@ -49,7 +50,7 @@ WRITE8_MEMBER(tvboy_state::bank_write) {
 		m_crom->set_bank(data);
 }
 
-static ADDRESS_MAP_START(tvboy_mem, AS_PROGRAM, 8, tvboy_state ) // 6507 has 13-bit address space, 0x0000 - 0x1fff
+ADDRESS_MAP_START(tvboy_state::tvboy_mem) // 6507 has 13-bit address space, 0x0000 - 0x1fff
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
 #if USE_NEW_RIOT
@@ -61,7 +62,7 @@ static ADDRESS_MAP_START(tvboy_mem, AS_PROGRAM, 8, tvboy_state ) // 6507 has 13-
 	AM_RANGE(0x1000, 0x1fff) AM_DEVICE("crom", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rom_map, AS_PROGRAM, 8, tvboy_state )
+ADDRESS_MAP_START(tvboy_state::rom_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("mainrom", 0)
 ADDRESS_MAP_END
 
@@ -117,9 +118,6 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tvboy_state::supertvboy, tvboyii)
-MACHINE_CONFIG_END
-
 static INPUT_PORTS_START( tvboyii )
 	PORT_START("SWB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Game") PORT_CODE(KEYCODE_2)
@@ -154,6 +152,6 @@ ROM_START( stvboy )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
-CONS( 199?, tvboyii,    0,      0, tvboyii,     tvboyii, tvboy_state, 0, "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
-CONS( 1995, stvboy,     0,      0, supertvboy,  tvboyii, tvboy_state, 0, "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE        INIT  COMPANY    FULLNAME
+CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
+CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )

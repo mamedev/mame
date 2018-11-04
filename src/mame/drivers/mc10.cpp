@@ -52,6 +52,10 @@ public:
 	void alice90(machine_config &config);
 	void alice32(machine_config &config);
 	void mc10(machine_config &config);
+	void alice32_mem(address_map &map);
+	void alice90_mem(address_map &map);
+	void mc10_io(address_map &map);
+	void mc10_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void driver_start() override;
@@ -291,7 +295,7 @@ void mc10_state::driver_start()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START( mc10_mem, AS_PROGRAM, 8 , mc10_state)
+ADDRESS_MAP_START(mc10_state::mc10_mem)
 	AM_RANGE(0x0100, 0x3fff) AM_NOP /* unused */
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") /* 4k internal ram */
 	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
@@ -300,12 +304,12 @@ ADDRESS_MAP_START( mc10_mem, AS_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( mc10_io, AS_IO, 8 , mc10_state)
+ADDRESS_MAP_START(mc10_state::mc10_io)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(mc10_port1_r, mc10_port1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(mc10_port2_r, mc10_port2_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( alice32_mem, AS_PROGRAM, 8 , mc10_state)
+ADDRESS_MAP_START(mc10_state::alice32_mem)
 	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
 	AM_RANGE(0x3000, 0x4fff) AM_RAMBANK("bank1") /* 8k internal ram */
 	AM_RANGE(0x5000, 0x8fff) AM_RAMBANK("bank2") /* 16k memory expansion */
@@ -315,7 +319,7 @@ ADDRESS_MAP_START( alice32_mem, AS_PROGRAM, 8 , mc10_state)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000) /* ROM */
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( alice90_mem, AS_PROGRAM, 8 , mc10_state)
+ADDRESS_MAP_START(mc10_state::alice90_mem)
 	AM_RANGE(0x0100, 0x2fff) AM_NOP /* unused */
 	AM_RANGE(0x3000, 0xafff) AM_RAMBANK("bank1")    /* 32k internal ram */
 	AM_RANGE(0xbf20, 0xbf29) AM_DEVREADWRITE("ef9345", ef9345_device, data_r, data_w)
@@ -579,7 +583,8 @@ MACHINE_CONFIG_START(mc10_state::alice32)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mc10_cass", "mc10")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mc10_state::alice90, alice32)
+MACHINE_CONFIG_START(mc10_state::alice90)
+	alice32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alice90_mem)
 

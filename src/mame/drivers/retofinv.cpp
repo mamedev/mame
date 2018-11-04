@@ -177,7 +177,7 @@ READ8_MEMBER(retofinv_state::mcu_status_r)
    empty socket at IC73 from 6000-7fff) and if it finds a particular
    string there, it jumps to that area, presumably for diagnostic use */
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, retofinv_state )
+ADDRESS_MAP_START(retofinv_state::bootleg_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
@@ -197,14 +197,14 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xf800, 0xf800) AM_READ(cpu0_mf800_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
+ADDRESS_MAP_START(retofinv_state::main_map)
 	AM_IMPORT_FROM(bootleg_map)
 	AM_RANGE(0xc003, 0xc003) AM_READ(mcu_status_r)
 	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("68705", taito68705_mcu_device, data_r)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("68705", taito68705_mcu_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
+ADDRESS_MAP_START(retofinv_state::sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xc800, 0xc807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
+ADDRESS_MAP_START(retofinv_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM /* 6116 sram at IC28 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -465,13 +465,15 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 MACHINE_CONFIG_END
 
 /* bootleg which has different palette clut */
-MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb1, retofinv)
+MACHINE_CONFIG_START(retofinv_state::retofinvb1)
+	retofinv(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv_bl)
 MACHINE_CONFIG_END
 
 /* bootleg which has no mcu */
-MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb_nomcu, retofinv)
+MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
+	retofinv(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
@@ -482,7 +484,8 @@ MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb_nomcu, retofinv)
 MACHINE_CONFIG_END
 
 /* bootleg which has different pallete clut and also has no mcu */
-MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb1_nomcu, retofinvb1)
+MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
+	retofinvb1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

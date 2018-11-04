@@ -32,6 +32,7 @@ public:
 
 	required_device<nesapu_device> m_apu; // public for vgmplay
 
+	void n2a03_map(address_map &map);
 protected:
 	virtual void device_start() override;
 

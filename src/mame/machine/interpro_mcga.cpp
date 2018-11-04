@@ -21,7 +21,7 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEVICE_ADDRESS_MAP_START(map, 32, interpro_mcga_device)
+ADDRESS_MAP_START(interpro_mcga_device::map)
 	AM_RANGE(0x00, 0x03) AM_READWRITE16(reg00_r, reg00_w, 0xffff)
 	AM_RANGE(0x08, 0x0b) AM_READWRITE16(control_r, control_w, 0xffff)
 	AM_RANGE(0x10, 0x13) AM_READWRITE16(error_r, error_w, 0xffff)
@@ -32,7 +32,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_mcga_device)
 	AM_RANGE(0x38, 0x3b) AM_READWRITE16(memsize_r, memsize_w, 0xffff)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 32, interpro_fmcc_device)
+ADDRESS_MAP_START(interpro_fmcc_device::map)
 	AM_RANGE(0x00, 0x03) AM_READWRITE16(reg00_r, reg00_w, 0xffff)
 	AM_RANGE(0x08, 0x0b) AM_READWRITE16(control_r, control_w, 0xffff)
 	AM_RANGE(0x10, 0x13) AM_READWRITE16(error_r, error_w, 0xffff)

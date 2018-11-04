@@ -380,6 +380,7 @@ public:
 	uint8_t m_floppy_control;
 
 	void swyft(machine_config &config);
+	void swyft_mem(address_map &map);
 //protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
@@ -569,7 +570,7 @@ x   x   x   x   1   1  ?1? ?0?  ?   1   0   0   x   x   *   *   *   *   x   x   
 
 */
 
-static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 8, swyft_state)
+ADDRESS_MAP_START(swyft_state::swyft_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM // 64 KB ROM

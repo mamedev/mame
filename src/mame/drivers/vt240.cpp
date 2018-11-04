@@ -124,6 +124,11 @@ public:
 	uint16_t m_scrl;
 	void mc7105(machine_config &config);
 	void vt240(machine_config &config);
+	void bank_map(address_map &map);
+	void upd7220_map(address_map &map);
+	void vt240_char_io(address_map &map);
+	void vt240_char_mem(address_map &map);
+	void vt240_mem(address_map &map);
 };
 
 void vt240_state::irq_encoder(int irq, int state)
@@ -537,14 +542,14 @@ WRITE8_MEMBER(vt240_state::hbscrl_w)
 	m_scrl = (m_scrl & 0xff) | ((data & 0x3f) << 8);
 }
 
-static ADDRESS_MAP_START(bank_map, AS_PROGRAM, 16, vt240_state)
+ADDRESS_MAP_START(vt240_state::bank_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x80000, 0x87fff) AM_RAM
 ADDRESS_MAP_END
 
 // PDF page 78 (4-25)
-static ADDRESS_MAP_START( vt240_mem, AS_PROGRAM, 16, vt240_state )
+ADDRESS_MAP_START(vt240_state::vt240_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0000000, 0167777) AM_READWRITE(mem_r, mem_w)
 	AM_RANGE (0170000, 0170037) AM_READWRITE8(mem_map_cs_r, mem_map_cs_w, 0x00ff)
@@ -574,14 +579,14 @@ static ADDRESS_MAP_START( vt240_mem, AS_PROGRAM, 16, vt240_state )
 ADDRESS_MAP_END
 
 // PDF page 134 (6-9)
-static ADDRESS_MAP_START(vt240_char_mem, AS_PROGRAM, 8, vt240_state)
+ADDRESS_MAP_START(vt240_state::vt240_char_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("charcpu", 0)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("charcpu", 0x8000)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt240_char_io, AS_IO, 8, vt240_state)
+ADDRESS_MAP_START(vt240_state::vt240_char_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
@@ -598,7 +603,7 @@ static ADDRESS_MAP_START(vt240_char_io, AS_IO, 8, vt240_state)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(lbscrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, vt240_state)
+ADDRESS_MAP_START(vt240_state::upd7220_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
 ADDRESS_MAP_END
 
@@ -702,7 +707,8 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_X2212_ADD("x2212")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vt240_state::mc7105, vt240)
+MACHINE_CONFIG_START(vt240_state::mc7105)
+	vt240(config);
 
 	MCFG_DEVICE_REMOVE("lk201")
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)

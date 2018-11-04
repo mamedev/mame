@@ -32,7 +32,11 @@
 #include "cpu/z80/z80.h"
 #include "sound/okiadpcm.h"
 
-ADDRESS_MAP_EXTERN(seibu_sound_map, 8);
+class seibu_sound_common {
+public:
+	virtual ~seibu_sound_common() = default;
+	void seibu_sound_map(address_map &map);
+};
 
 class seibu_sound_device : public device_t
 {

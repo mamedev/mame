@@ -156,8 +156,6 @@ private:
 
 
 // device type definition
-extern const device_type ECONET;
-extern const device_type ECONET_SLOT;
 DECLARE_DEVICE_TYPE(ECONET,      econet_device)
 DECLARE_DEVICE_TYPE(ECONET_SLOT, econet_slot_device)
 

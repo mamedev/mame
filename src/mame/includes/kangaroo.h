@@ -41,4 +41,7 @@ public:
 	required_device<palette_device> m_palette;
 	void nomcu(machine_config &config);
 	void mcu(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };

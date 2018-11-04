@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(MIDWAY_CHEAP_SQUEAK_DELUXE, midway_cheap_squeak_deluxe_device
 //-------------------------------------------------
 
 // address map determined by PAL; verified
-static ADDRESS_MAP_START( csdeluxe_map, AS_PROGRAM, 16, midway_cheap_squeak_deluxe_device )
+ADDRESS_MAP_START(midway_cheap_squeak_deluxe_device::csdeluxe_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM

@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_6502, bbc_tube_6502_device, "bbc_tube_6502", "Acorn 
 //  ADDRESS_MAP( tube_6502_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(tube_6502_mem, AS_PROGRAM, 8, bbc_tube_6502_device)
+ADDRESS_MAP_START(bbc_tube_6502_device::tube_6502_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 

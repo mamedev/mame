@@ -180,7 +180,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::c1942_scanline)
 
 
 
-static ADDRESS_MAP_START( c1942_map, AS_PROGRAM, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::c1942_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
@@ -215,7 +215,7 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 	m_palette->set_indirect_color(offset, rgb_t(r<<5,g<<5,b<<6));
 }
 
-static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::c1942p_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 
@@ -244,13 +244,13 @@ static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(c1942p_sound_map, AS_PROGRAM, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::c1942p_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c1942p_sound_io, AS_IO, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::c1942p_sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
@@ -259,7 +259,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1942_state )
+ADDRESS_MAP_START(_1942_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

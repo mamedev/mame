@@ -45,6 +45,8 @@ public:
 	DECLARE_DRIVER_INIT(ts816);
 
 	void ts816(machine_config &config);
+	void ts816_io(address_map &map);
+	void ts816_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	uint8_t m_status;
@@ -56,14 +58,14 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-static ADDRESS_MAP_START(ts816_mem, AS_PROGRAM, 8, ts816_state)
+ADDRESS_MAP_START(ts816_state::ts816_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x4000, 0xdfff ) AM_RAMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff ) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ts816_io, AS_IO, 8, ts816_state)
+ADDRESS_MAP_START(ts816_state::ts816_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) // Tape status byte 1
 	AM_RANGE(0x01, 0x01) // Tape status byte 2 and diagnostics mode

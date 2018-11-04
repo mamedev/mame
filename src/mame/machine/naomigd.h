@@ -64,7 +64,6 @@ private:
 	void write_from_qword(uint8_t *region, uint64_t qword);
 };
 
-extern const device_type NAOMI_GDROM_BOARD;
 DECLARE_DEVICE_TYPE(NAOMI_GDROM_BOARD, naomi_gdrom_board)
 
 #endif // MAME_MACHINE_NAOMIGD_H

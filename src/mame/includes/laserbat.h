@@ -85,6 +85,8 @@ public:
 	uint32_t screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void laserbat_base(machine_config &config);
+	void laserbat_io_map(address_map &map);
+	void laserbat_map(address_map &map);
 protected:
 	enum { TIMER_SCANLINE };
 

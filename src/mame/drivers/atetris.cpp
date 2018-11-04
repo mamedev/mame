@@ -193,7 +193,7 @@ WRITE8_MEMBER(atetris_state::nvram_enable_w)
  *************************************/
 
 /* full address map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
+ADDRESS_MAP_START(atetris_state::main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
+ADDRESS_MAP_START(atetris_state::atetrisb2_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atetrisb3_map, AS_PROGRAM, 8, atetris_state )
+ADDRESS_MAP_START(atetris_state::atetrisb3_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -405,7 +405,8 @@ MACHINE_CONFIG_START(atetris_state::atetrisb2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(atetris_state::atetrisb3, atetrisb2)
+MACHINE_CONFIG_START(atetris_state::atetrisb3)
+	atetrisb2(config);
 
 	MCFG_CPU_REPLACE("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(atetrisb3_map)

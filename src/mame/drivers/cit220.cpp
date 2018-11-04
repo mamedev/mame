@@ -31,6 +31,9 @@ public:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void cit220p(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	void vram_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -43,14 +46,14 @@ WRITE_LINE_MEMBER(cit220_state::sod_w)
 	// probably asserts PBREQ on SCN2674 to access memory at Exxx
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cit220_state )
+ADDRESS_MAP_START(cit220_state::mem_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa1ff) AM_ROM AM_REGION("eeprom", 0x800)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, cit220_state )
+ADDRESS_MAP_START(cit220_state::io_map)
 	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
@@ -64,7 +67,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
 {
 }
 
-static ADDRESS_MAP_START( vram_map, 0, 8, cit220_state )
+ADDRESS_MAP_START(cit220_state::vram_map)
 	AM_RANGE(0x0000, 0x27ff) AM_NOP
 ADDRESS_MAP_END
 

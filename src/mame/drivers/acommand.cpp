@@ -82,12 +82,6 @@ public:
 		m_bgtmap(*this, "bgtmap"),
 		m_txtmap(*this, "txtmap") { }
 
-	required_shared_ptr<uint16_t> m_spriteram;
-	std::unique_ptr<uint16_t[]> m_ac_vregs;
-	uint16_t m_7seg0;
-	uint16_t m_7seg1;
-	uint16_t m_ufo_lane[5];
-	uint8_t m_boss_door;
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	DECLARE_WRITE16_MEMBER(output_7seg0_w);
 	DECLARE_WRITE16_MEMBER(output_7seg1_w);
@@ -101,10 +95,17 @@ public:
 
 	DECLARE_WRITE16_MEMBER(ac_unk2_w);
 	TILEMAP_MAPPER_MEMBER(bg_scan);
-	virtual void video_start() override;
 	uint32_t screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
+
+
+	void acommand(machine_config &config);	
+	void acommand_map(address_map &map);
+protected:
+//	virtual void video_start() override;
+
+private:
+	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;
@@ -112,7 +113,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<megasys1_tilemap_device> m_bgtmap;
 	required_device<megasys1_tilemap_device> m_txtmap;
-	void acommand(machine_config &config);
+
+	uint16_t m_7seg0;
+	uint16_t m_7seg1;
+	uint16_t m_ufo_lane[5];
+	uint8_t m_boss_door;
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
 };
 
 
@@ -176,12 +183,6 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			} while (--yy >= 0);
 		}
 	}
-}
-
-
-void acommand_state::video_start()
-{
-	m_ac_vregs = std::make_unique<uint16_t[]>(0x80/2);
 }
 
 
@@ -319,7 +320,7 @@ WRITE16_MEMBER(acommand_state::output_lamps_w)
 	// --xx --xx lamps
 }
 
-static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
+ADDRESS_MAP_START(acommand_state::acommand_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x082000, 0x082005) AM_DEVWRITE("bgtmap", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x082100, 0x082105) AM_DEVWRITE("txtmap", megasys1_tilemap_device, scroll_w)
@@ -343,7 +344,6 @@ static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x100050, 0x100051) AM_WRITE(output_7seg0_w)
 	AM_RANGE(0x100054, 0x100055) AM_WRITE(output_7seg1_w)
 	AM_RANGE(0x10005c, 0x10005d) AM_READ_PORT("DSW")
-
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acommand )

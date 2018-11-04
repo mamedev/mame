@@ -174,7 +174,7 @@ static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 4;
  Pretty Straightforward
 *******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
+ADDRESS_MAP_START(wwfsstar_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(fg0_videoram_w) AM_SHARE("fg0_videoram") /* FG0 Ram */
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram") /* BG0 Ram */
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM                             /* Work Ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wwfsstar_state )
+ADDRESS_MAP_START(wwfsstar_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)

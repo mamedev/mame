@@ -87,6 +87,10 @@ public:
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_DRIVER_INIT(pve500);
 	void pve500(machine_config &config);
+	void maincpu_io(address_map &map);
+	void maincpu_prg(address_map &map);
+	void subcpu_io(address_map &map);
+	void subcpu_prg(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -116,21 +120,21 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 };
 
 
-static ADDRESS_MAP_START(maincpu_io, AS_IO, 8, pve500_state)
+ADDRESS_MAP_START(pve500_state::maincpu_io)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_sio", z80sio0_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x08, 0x0B) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(maincpu_prg, AS_PROGRAM, 8, pve500_state)
+ADDRESS_MAP_START(pve500_state::maincpu_prg)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM // ICB7: 48kbytes EPROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // ICD6: 8kbytes of RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_DEVREADWRITE("mb8421", mb8421_device, left_r, left_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(subcpu_io, AS_IO, 8, pve500_state)
+ADDRESS_MAP_START(pve500_state::subcpu_io)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(subcpu_prg, AS_PROGRAM, 8, pve500_state)
+ADDRESS_MAP_START(pve500_state::subcpu_prg)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // ICG5: 32kbytes EPROM
 	AM_RANGE(0x8000, 0x8007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE("cxdio", cxd1095_device, read, write)
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)

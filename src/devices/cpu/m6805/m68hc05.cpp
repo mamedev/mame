@@ -106,7 +106,7 @@ m68hc05_device::m68hc05_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: m6805_base_device(
 			mconfig,
 			tag,
@@ -707,7 +707,7 @@ m68hc705_device::m68hc705_device(
 		device_t *owner,
 		u32 clock,
 		device_type type,
-		address_map_delegate internal_map)
+		address_map_constructor internal_map)
 	: m68hc05_device(mconfig, tag, owner, clock, type, internal_map)
 {
 }
@@ -718,7 +718,7 @@ m68hc705_device::m68hc705_device(
  * MC68HC05C4 device
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( c4_map, 8, m68hc05c4_device )
+ADDRESS_MAP_START(m68hc05c4_device::c4_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -756,7 +756,7 @@ m68hc05c4_device::m68hc05c4_device(machine_config const &mconfig, char const *ta
 			owner,
 			clock,
 			M68HC05C4,
-			address_map_delegate(FUNC(m68hc05c4_device::c4_map), this))
+			address_map_constructor(FUNC(m68hc05c4_device::c4_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
@@ -783,7 +783,7 @@ util::disasm_interface *m68hc05c4_device::create_disassembler()
  * MC68HC05C8 device
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( c8_map, 8, m68hc05c8_device )
+ADDRESS_MAP_START(m68hc05c8_device::c8_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -820,7 +820,7 @@ m68hc05c8_device::m68hc05c8_device(machine_config const &mconfig, char const *ta
 			owner,
 			clock,
 			M68HC05C8,
-			address_map_delegate(FUNC(m68hc05c8_device::c8_map), this))
+			address_map_constructor(FUNC(m68hc05c8_device::c8_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
@@ -847,7 +847,7 @@ util::disasm_interface *m68hc05c8_device::create_disassembler()
  * MC68HC705C8A device
  ****************************************************************************/
 
-DEVICE_ADDRESS_MAP_START( c8a_map, 8, m68hc705c8a_device )
+ADDRESS_MAP_START(m68hc705c8a_device::c8a_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -890,7 +890,7 @@ m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const
 			owner,
 			clock,
 			M68HC705C8A,
-			address_map_delegate(FUNC(m68hc705c8a_device::c8a_map), this))
+			address_map_constructor(FUNC(m68hc705c8a_device::c8a_map), this))
 {
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }

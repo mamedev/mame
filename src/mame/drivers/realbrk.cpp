@@ -155,49 +155,50 @@ WRITE16_MEMBER(realbrk_state::backup_ram_w)
 ***************************************************************************/
 
 /*Basic memory map for this HW*/
-static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::base_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                         // ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_SHARE("spriteram") // Sprites
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // Palette
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")  // Background   (0)
 	AM_RANGE(0x602000, 0x603fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")  // Background   (1)
 	AM_RANGE(0x604000, 0x604fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2")  // Text         (2)
-	AM_RANGE(0x606000, 0x60600f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")    // Scroll + Video Regs
 	AM_RANGE(0x605000, 0x61ffff) AM_RAM                                         //
+	AM_RANGE(0x606000, 0x60600f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")    // Scroll + Video Regs
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)   // YMZ280
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                         // RAM
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
 /*realbrk specific memory map*/
-static ADDRESS_MAP_START( realbrk_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::realbrk_mem)
+	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff) //
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")                            // P1 & P2 (Inputs)
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                            // Coins
 	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ(realbrk_dsw_r) AM_SHARE("dsw_select")  // DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM                                         // RAM
-	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
 /*pkgnsh specific memory map*/
-static ADDRESS_MAP_START( pkgnsh_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::pkgnsh_mem)
+	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)   // YM2413
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnsh_input_r             )   // P1 & P2 (Inputs)
 	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_r,backup_ram_w) AM_SHARE("backup_ram") // RAM
-	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
 /*pkgnshdx specific memory map*/
-static ADDRESS_MAP_START( pkgnshdx_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::pkgnshdx_mem)
+	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff) //
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnshdx_input_r               )   // P1 & P2 (Inputs)
 	AM_RANGE(0xc00004, 0xc00005) AM_WRITEONLY AM_SHARE("dsw_select") // DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_dx_r,backup_ram_w) AM_SHARE("backup_ram")  // RAM
-	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
 /*dai2kaku specific memory map*/
-static ADDRESS_MAP_START( dai2kaku_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::dai2kaku_mem)
+	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x605000, 0x6053ff) AM_RAM AM_SHARE("vram_0ras")   // rasterinfo   (0)
 	AM_RANGE(0x605400, 0x6057ff) AM_RAM AM_SHARE("vram_1ras")   // rasterinfo   (1)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff) //
@@ -206,7 +207,6 @@ static ADDRESS_MAP_START( dai2kaku_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ(realbrk_dsw_r) AM_SHARE("dsw_select")  // DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM                                         // RAM
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(dai2kaku_flipscreen_w             )   // Hack! Parallel port data register
-	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -791,7 +791,8 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(realbrk_state::pkgnsh, realbrk)
+MACHINE_CONFIG_START(realbrk_state::pkgnsh)
+	realbrk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
 
@@ -799,12 +800,14 @@ MACHINE_CONFIG_DERIVED(realbrk_state::pkgnsh, realbrk)
 	MCFG_TMP68301_OUT_PARALLEL_CB(NOOP)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(realbrk_state::pkgnshdx, pkgnsh)
+MACHINE_CONFIG_START(realbrk_state::pkgnshdx)
+	pkgnsh(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnshdx_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(realbrk_state::dai2kaku, realbrk)
+MACHINE_CONFIG_START(realbrk_state::dai2kaku)
+	realbrk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dai2kaku_mem)
 

@@ -149,7 +149,7 @@ WRITE8_MEMBER(gradius3_state::sound_bank_w)
 
 
 
-static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
+ADDRESS_MAP_START(gradius3_state::gradius3_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gradius3_map2, AS_PROGRAM, 16, gradius3_state )
+ADDRESS_MAP_START(gradius3_state::gradius3_map2)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(cpuB_irqenable_w)
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( gradius3_map2, AS_PROGRAM, 16, gradius3_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gradius3_s_map, AS_PROGRAM, 8, gradius3_state )
+ADDRESS_MAP_START(gradius3_state::gradius3_s_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_bank_w)             /* 007232 bankswitch */
 	AM_RANGE(0xf010, 0xf010) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

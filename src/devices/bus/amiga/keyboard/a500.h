@@ -47,22 +47,6 @@ namespace bus { namespace amiga { namespace keyboard {
 class a500_kbd_device : public device_t, public device_amiga_keyboard_interface
 {
 public:
-	// from host
-	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
-
-	// 6500/1 internal
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_WRITE8_MEMBER(port_c_w);
-	DECLARE_WRITE8_MEMBER(port_d_w);
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_READ8_MEMBER(counter_r);
-	DECLARE_WRITE8_MEMBER(transfer_latch_w);
-	DECLARE_WRITE8_MEMBER(clear_pa0_detect);
-	DECLARE_WRITE8_MEMBER(clear_pa1_detect);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(check_reset);
 
@@ -80,6 +64,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// from host
+	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override;
 
 private:
 	enum
@@ -120,6 +107,22 @@ private:
 	uint16_t m_latch;
 	uint16_t m_counter;
 	uint8_t m_control;
+
+	// 6500/1 internal
+	DECLARE_READ8_MEMBER(port_a_r);
+	DECLARE_WRITE8_MEMBER(port_a_w);
+	DECLARE_WRITE8_MEMBER(port_b_w);
+	DECLARE_WRITE8_MEMBER(port_c_w);
+	DECLARE_WRITE8_MEMBER(port_d_w);
+	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_READ8_MEMBER(counter_r);
+	DECLARE_WRITE8_MEMBER(transfer_latch_w);
+	DECLARE_WRITE8_MEMBER(clear_pa0_detect);
+	DECLARE_WRITE8_MEMBER(clear_pa1_detect);
+	DECLARE_READ8_MEMBER(control_r);
+	DECLARE_WRITE8_MEMBER(control_w);
+
+	void mpu6500_map(address_map &map);
 };
 
 // ======================> a500_kbd_us_device

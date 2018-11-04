@@ -71,4 +71,6 @@ public:
 	int collision_check_s1p1p2();
 	int collision_check_s2p1p2();
 	void starcrus(machine_config &config);
+	void starcrus_io_map(address_map &map);
+	void starcrus_map(address_map &map);
 };

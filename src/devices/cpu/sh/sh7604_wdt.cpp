@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(SH7604_WDT, sh7604_wdt_device, "sh7604wdt", "SH7604 Watchdog 
 //  LIVE DEVICE
 //**************************************************************************
 
-DEVICE_ADDRESS_MAP_START( wdt_regs, 8, sh7604_wdt_device )
+ADDRESS_MAP_START(sh7604_wdt_device::wdt_regs)
 //  AM_RANGE(0x00, 0x00) timer control/status
 //  AM_RANGE(0x01, 0x01) timer counter
 //  AM_RANGE(0x02, 0x02) write only, reset control register

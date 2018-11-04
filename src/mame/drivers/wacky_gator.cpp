@@ -84,6 +84,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 
 	void wackygtr(machine_config &config);
+	void program_map(address_map &map);
 private:
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
@@ -250,7 +251,7 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 	}
 }
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, wackygtr_state )
+ADDRESS_MAP_START(wackygtr_state::program_map)
 	AM_RANGE(0x0200, 0x0200) AM_READNOP AM_WRITE(irq_ack_w)
 	AM_RANGE(0x0400, 0x0400) AM_READNOP AM_WRITE(firq_ack_w)
 	AM_RANGE(0x0600, 0x0600) AM_WRITE(disp0_w)

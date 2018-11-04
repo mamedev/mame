@@ -167,6 +167,7 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	void hp9k(machine_config &config);
+	void hp9k_mem(address_map &map);
 };
 
 //
@@ -305,7 +306,7 @@ WRITE16_MEMBER(hp9k_state::buserror_w)
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START(hp9k_mem, AS_PROGRAM, 16, hp9k_state)
+ADDRESS_MAP_START(hp9k_state::hp9k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x000909) AM_ROM AM_REGION("bootrom",0)
 	AM_RANGE(0x00090a, 0x00090d) AM_READWRITE(leds_r,leds_w)

@@ -283,38 +283,38 @@ WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( program_map_4k, AS_PROGRAM, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::program_map_4k)
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_map_8k, AS_PROGRAM, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::program_map_8k)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("maincpu", 0x1000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_map_16k, AS_PROGRAM, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::program_map_16k)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_map_32k, AS_PROGRAM, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::program_map_32k)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 16, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::data_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_map_qb3, AS_DATA, 16, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::data_map_qb3)
 	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_SHARE("rambase")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::io_map)
 	AM_RANGE(0x00, 0x0f) AM_READ(inputs_r)
 	AM_RANGE(0x10, 0x16) AM_READ(switches_r)
 	AM_RANGE(0x17, 0x17) AM_READ(coin_input_r)
@@ -322,12 +322,12 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map_qb3, AS_IO, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::io_map_qb3)
+	AM_IMPORT_FROM(io_map)
 	// Some of the outputs here are definitely not mapped through the LS259, since they use multiple bits of data
 	AM_RANGE(0x00, 0x00) AM_WRITE(qb3_ram_bank_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(qb3_sound_fifo_w)
 	AM_RANGE(0x0f, 0x0f) AM_READ(qb3_frame_r)
-	AM_IMPORT_FROM(io_map)
 ADDRESS_MAP_END
 
 
@@ -987,32 +987,37 @@ MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_4k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_4k, cinemat_nojmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_4k)
+	cinemat_nojmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
 	MCFG_CCPU_EXTERNAL_FUNC(DEVREAD8("maincpu",ccpu_cpu_device,read_jmi))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_nojmi_8k, cinemat_nojmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_8k)
+	cinemat_nojmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_8k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_8k, cinemat_jmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_8k)
+	cinemat_jmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_8k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_16k, cinemat_jmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_16k)
+	cinemat_jmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_16k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_32k, cinemat_jmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_32k)
+	cinemat_jmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_32k)
 MACHINE_CONFIG_END
@@ -1026,70 +1031,82 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_DERIVED(cinemat_state::spacewar, cinemat_nojmi_4k)
-	MCFG_FRAGMENT_ADD(spacewar_sound)
+MACHINE_CONFIG_START(cinemat_state::spacewar)
+	cinemat_nojmi_4k(config);
+	spacewar_sound(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cinemat_state, screen_update_spacewar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::barrier, cinemat_jmi_4k)
-	MCFG_FRAGMENT_ADD(barrier_sound)
+MACHINE_CONFIG_START(cinemat_state::barrier)
+	cinemat_jmi_4k(config);
+	barrier_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::speedfrk, cinemat_nojmi_8k)
-	MCFG_FRAGMENT_ADD(speedfrk_sound)
+MACHINE_CONFIG_START(cinemat_state::speedfrk)
+	cinemat_nojmi_8k(config);
+	speedfrk_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::starhawk, cinemat_jmi_4k)
-	MCFG_FRAGMENT_ADD(starhawk_sound)
+MACHINE_CONFIG_START(cinemat_state::starhawk)
+	cinemat_jmi_4k(config);
+	starhawk_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::sundance, cinemat_jmi_8k)
-	MCFG_FRAGMENT_ADD(sundance_sound)
+MACHINE_CONFIG_START(cinemat_state::sundance)
+	cinemat_jmi_8k(config);
+	sundance_sound(config);
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_16level)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::tailg, cinemat_nojmi_8k)
-	MCFG_FRAGMENT_ADD(tailg_sound)
+MACHINE_CONFIG_START(cinemat_state::tailg)
+	cinemat_nojmi_8k(config);
+	tailg_sound(config);
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cinemat_state, mux_select_w))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::warrior, cinemat_jmi_8k)
-	MCFG_FRAGMENT_ADD(warrior_sound)
+MACHINE_CONFIG_START(cinemat_state::warrior)
+	cinemat_jmi_8k(config);
+	warrior_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::armora, cinemat_jmi_16k)
-	MCFG_FRAGMENT_ADD(armora_sound)
+MACHINE_CONFIG_START(cinemat_state::armora)
+	cinemat_jmi_16k(config);
+	armora_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::ripoff, cinemat_jmi_8k)
-	MCFG_FRAGMENT_ADD(ripoff_sound)
+MACHINE_CONFIG_START(cinemat_state::ripoff)
+	cinemat_jmi_8k(config);
+	ripoff_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::starcas, cinemat_jmi_8k)
-	MCFG_FRAGMENT_ADD(starcas_sound)
+MACHINE_CONFIG_START(cinemat_state::starcas)
+	cinemat_jmi_8k(config);
+	starcas_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::solarq, cinemat_jmi_16k)
-	MCFG_FRAGMENT_ADD(solarq_sound)
+MACHINE_CONFIG_START(cinemat_state::solarq)
+	cinemat_jmi_16k(config);
+	solarq_sound(config);
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_64level)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::boxingb, cinemat_jmi_32k)
-	MCFG_FRAGMENT_ADD(boxingb_sound)
+MACHINE_CONFIG_START(cinemat_state::boxingb)
+	cinemat_jmi_32k(config);
+	boxingb_sound(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
@@ -1099,28 +1116,32 @@ MACHINE_CONFIG_DERIVED(cinemat_state::boxingb, cinemat_jmi_32k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::wotw, cinemat_jmi_16k)
+MACHINE_CONFIG_START(cinemat_state::wotw)
+	cinemat_jmi_16k(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 767)
-	MCFG_FRAGMENT_ADD(wotw_sound)
+	wotw_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::wotwc, cinemat_jmi_16k)
-	MCFG_FRAGMENT_ADD(wotw_sound)
+MACHINE_CONFIG_START(cinemat_state::wotwc)
+	cinemat_jmi_16k(config);
+	wotw_sound(config);
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::demon, cinemat_jmi_16k)
-	MCFG_FRAGMENT_ADD(demon_sound)
+MACHINE_CONFIG_START(cinemat_state::demon)
+	cinemat_jmi_16k(config);
+	demon_sound(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 805)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::qb3, cinemat_jmi_32k)
-	MCFG_FRAGMENT_ADD(qb3_sound)
+MACHINE_CONFIG_START(cinemat_state::qb3)
+	cinemat_jmi_32k(config);
+	qb3_sound(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DATA_MAP(data_map_qb3)
 	MCFG_CPU_IO_MAP(io_map_qb3)

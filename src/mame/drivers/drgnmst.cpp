@@ -181,7 +181,7 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 
 /***************************** 68000 Memory Map *****************************/
 
-static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16, drgnmst_state )
+ADDRESS_MAP_START(drgnmst_state::drgnmst_main_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")

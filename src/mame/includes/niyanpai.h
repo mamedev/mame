@@ -101,6 +101,10 @@ public:
 	void zokumahj(machine_config &config);
 	void mhhonban(machine_config &config);
 	void niyanpai(machine_config &config);
+	void mhhonban_map(address_map &map);
+	void musobana_map(address_map &map);
+	void niyanpai_map(address_map &map);
+	void zokumahj_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

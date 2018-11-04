@@ -58,6 +58,7 @@ public:
 	DECLARE_READ8_MEMBER(io_control_r);
 	DECLARE_WRITE8_MEMBER(io_control_w);
 
+	void mn1020012a_internal_map(address_map &map);
 protected:
 	static constexpr unsigned MN10200_NUM_PRESCALERS = 2;
 	static constexpr unsigned MN10200_NUM_TIMERS_8BIT = 10;

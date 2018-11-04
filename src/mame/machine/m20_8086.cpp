@@ -43,14 +43,14 @@ const tiny_rom_entry *m20_8086_device::device_rom_region() const
 	return ROM_NAME( m20_8086 );
 }
 
-static ADDRESS_MAP_START(i86_prog, AS_PROGRAM, 16, m20_8086_device)
+ADDRESS_MAP_START(m20_8086_device::i86_prog)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAMBANK("vram2")
 	AM_RANGE(0xf0000, 0xf3fff) AM_RAMBANK("highram")
 	AM_RANGE(0xf4000, 0xf7fff) AM_RAMBANK("vram")
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("8086",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(i86_io, AS_IO, 16, m20_8086_device)
+ADDRESS_MAP_START(m20_8086_device::i86_io)
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(z8000_io_r, z8000_io_w)
 	AM_RANGE(0x7ffa, 0x7ffd) AM_WRITE(handshake_w)
 ADDRESS_MAP_END

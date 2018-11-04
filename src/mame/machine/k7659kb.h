@@ -67,7 +67,6 @@ private:
 
 
 // device type definition
-extern const device_type K7659_KEYBOARD;
 DECLARE_DEVICE_TYPE(K7659_KEYBOARD, k7659_keyboard_device)
 
 

@@ -33,7 +33,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
+ADDRESS_MAP_START(apple3_state::apple3_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
 ADDRESS_MAP_END
 

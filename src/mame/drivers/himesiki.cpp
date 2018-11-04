@@ -123,7 +123,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( himesiki_prm0, AS_PROGRAM, 8, himesiki_state )
+ADDRESS_MAP_START(himesiki_state::himesiki_prm0)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( himesiki_prm0, AS_PROGRAM, 8, himesiki_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( himesiki_iom0, AS_IO, 8, himesiki_state )
+ADDRESS_MAP_START(himesiki_state::himesiki_iom0)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) // inputs
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) // dips + rombank
@@ -145,12 +145,12 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( himesiki_prm1, AS_PROGRAM, 8, himesiki_state )
+ADDRESS_MAP_START(himesiki_state::himesiki_prm1)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( himesiki_iom1, AS_IO, 8, himesiki_state )
+ADDRESS_MAP_START(himesiki_state::himesiki_iom1)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

@@ -99,6 +99,7 @@ public:
 	emu_timer *m_500hz_timer;
 
 	void kcgd(machine_config &config);
+	void kcgd_mem(address_map &map);
 private:
 	void draw_scanline(uint16_t *p, uint16_t offset);
 	rectangle m_tmpclip;
@@ -119,7 +120,7 @@ protected:
 	required_device<screen_device> m_screen;
 };
 
-static ADDRESS_MAP_START( kcgd_mem, AS_PROGRAM, 16, kcgd_state )
+ADDRESS_MAP_START(kcgd_state::kcgd_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0000000, 0077777) AM_READWRITE(vram_mmap_r, vram_mmap_w)
 	AM_RANGE (0100000, 0157777) AM_ROM

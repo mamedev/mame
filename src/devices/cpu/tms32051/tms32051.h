@@ -62,6 +62,8 @@ public:
 	DECLARE_READ16_MEMBER( cpuregs_r );
 	DECLARE_WRITE16_MEMBER( cpuregs_w );
 
+	void tms32051_internal_data(address_map &map);
+	void tms32051_internal_pgm(address_map &map);
 protected:
 	tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data);
 
@@ -373,6 +375,8 @@ public:
 	// construction/destruction
 	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void tms32053_internal_data(address_map &map);
+	void tms32053_internal_pgm(address_map &map);
 protected:
 	virtual void device_reset() override;
 };

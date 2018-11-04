@@ -234,6 +234,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void supracan(machine_config &config);
+	void supracan_mem(address_map &map);
+	void supracan_sound_mem(address_map &map);
 };
 
 
@@ -1116,13 +1118,13 @@ WRITE16_MEMBER( supracan_state::vram_w )
 
 }
 
-static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
+ADDRESS_MAP_START(supracan_state::supracan_mem)
 	//AM_RANGE( 0x000000, 0x3fffff )        // mapped by the cartslot
+	AM_RANGE( 0xe80000, 0xe8ffff ) AM_READWRITE(_68k_soundram_r, _68k_soundram_w)
 	AM_RANGE( 0xe80200, 0xe80201 ) AM_READ_PORT("P1")
 	AM_RANGE( 0xe80202, 0xe80203 ) AM_READ_PORT("P2")
 	AM_RANGE( 0xe80208, 0xe80209 ) AM_READ_PORT("P3")
 	AM_RANGE( 0xe8020c, 0xe8020d ) AM_READ_PORT("P4")
-	AM_RANGE( 0xe80000, 0xe8ffff ) AM_READWRITE(_68k_soundram_r, _68k_soundram_w)
 	AM_RANGE( 0xe90000, 0xe9001f ) AM_READWRITE(sound_r, sound_w)
 	AM_RANGE( 0xe90020, 0xe9002f ) AM_WRITE(dma_channel0_w)
 	AM_RANGE( 0xe90030, 0xe9003f ) AM_WRITE(dma_channel1_w)
@@ -1227,7 +1229,7 @@ WRITE8_MEMBER( supracan_state::_6502_soundmem_w )
 	}
 }
 
-static ADDRESS_MAP_START( supracan_sound_mem, AS_PROGRAM, 8, supracan_state )
+ADDRESS_MAP_START(supracan_state::supracan_sound_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(_6502_soundmem_r, _6502_soundmem_w) AM_SHARE("soundram")
 ADDRESS_MAP_END
 

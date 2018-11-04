@@ -79,6 +79,10 @@ public:
 	uint32_t screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
 	void cultures(machine_config &config);
+	void cultures_io_map(address_map &map);
+	void cultures_map(address_map &map);
+	void oki_map(address_map &map);
+	void vrambank_map(address_map &map);
 };
 
 
@@ -184,17 +188,17 @@ WRITE8_MEMBER(cultures_state::bg_bank_w)
 }
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8, cultures_state )
+ADDRESS_MAP_START(cultures_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vrambank_map, AS_PROGRAM, 8, cultures_state )
+ADDRESS_MAP_START(cultures_state::vrambank_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram")
 	AM_RANGE(0x4000, 0x6fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8, cultures_state )
+ADDRESS_MAP_START(cultures_state::cultures_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("prgbank")
 	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
@@ -202,7 +206,7 @@ static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8, cultures_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cultures_io_map, AS_IO, 8, cultures_state )
+ADDRESS_MAP_START(cultures_state::cultures_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_RAM
 	AM_RANGE(0x10, 0x13) AM_RAM

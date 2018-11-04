@@ -41,7 +41,7 @@
 #include "logmacro.h"
 
 // each variant of the cammu has different registers and a different addressing map
-DEVICE_ADDRESS_MAP_START(map, 32, cammu_c4t_device)
+ADDRESS_MAP_START(cammu_c4t_device::map)
 	AM_RANGE(0x008, 0x00b) AM_READWRITE(ram_line_r, ram_line_w)
 	AM_RANGE(0x010, 0x013) AM_READWRITE(s_pdo_r, s_pdo_w)
 	AM_RANGE(0x018, 0x01b) AM_READWRITE(u_pdo_r, u_pdo_w)
@@ -67,7 +67,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, cammu_c4t_device)
 	AM_RANGE(0x11c, 0x11f) AM_READWRITE(tlb_ra_line_r, tlb_ra_line_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 32, cammu_c4i_device)
+ADDRESS_MAP_START(cammu_c4i_device::map)
 	AM_RANGE(0x000, 0x003) AM_READWRITE(reset_r, reset_w)
 	AM_RANGE(0x010, 0x013) AM_READWRITE(s_pdo_r, s_pdo_w)
 	AM_RANGE(0x018, 0x01b) AM_READWRITE(u_pdo_r, u_pdo_w)
@@ -89,7 +89,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, cammu_c4i_device)
 	AM_RANGE(0x0c0, 0x0c3) AM_READWRITE(test_address_r, test_address_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 32, cammu_c3_device)
+ADDRESS_MAP_START(cammu_c3_device::map)
 	AM_RANGE(0x000, 0x0ff) AM_NOP // tlb
 	AM_RANGE(0x104, 0x107) AM_READWRITE(s_pdo_r, s_pdo_w)
 	AM_RANGE(0x108, 0x10b) AM_READWRITE(u_pdo_r, u_pdo_w)
@@ -98,7 +98,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, cammu_c3_device)
 	AM_RANGE(0x180, 0x183) AM_READWRITE(reset_r, reset_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map_global, 32, cammu_c3_device)
+ADDRESS_MAP_START(cammu_c3_device::map_global)
 	AM_RANGE(0x000, 0x0ff) AM_NOP // global tlb
 	AM_RANGE(0x104, 0x107) AM_WRITE(g_s_pdo_w)
 	AM_RANGE(0x108, 0x10b) AM_WRITE(g_u_pdo_w)

@@ -17,7 +17,7 @@ class at_mb_device : public device_t
 public:
 	at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(page8_r);
 	DECLARE_WRITE8_MEMBER(page8_w);

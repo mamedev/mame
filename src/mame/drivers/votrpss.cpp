@@ -101,6 +101,8 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_ack);
 
 	void votrpss(machine_config &config);
+	void votrpss_io(address_map &map);
+	void votrpss_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	uint8_t m_porta;
@@ -117,7 +119,7 @@ private:
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(votrpss_mem, AS_PROGRAM, 8, votrpss_state)
+ADDRESS_MAP_START(votrpss_state::votrpss_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM /* main roms (in potted module) */
 	AM_RANGE(0x4000, 0x7fff) AM_NOP /* open bus/space for expansion rom (reads as 0xFF) */
@@ -127,7 +129,7 @@ static ADDRESS_MAP_START(votrpss_mem, AS_PROGRAM, 8, votrpss_state)
 	AM_RANGE(0xe000, 0xffff) AM_NOP /* open bus (space for more personality rom, not normally used) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(votrpss_io, AS_IO, 8, votrpss_state)
+ADDRESS_MAP_START(votrpss_state::votrpss_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3e) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)

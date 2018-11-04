@@ -43,6 +43,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void summit(machine_config &config);
+	void mainmap(address_map &map);
 };
 
 
@@ -76,7 +77,7 @@ WRITE8_MEMBER(summit_state::out_w)
 }
 
 
-static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, summit_state )
+ADDRESS_MAP_START(summit_state::mainmap)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("attr")

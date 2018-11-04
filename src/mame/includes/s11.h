@@ -6,8 +6,8 @@
  *  Created on: 1/01/2013
  */
 
-#ifndef S11_H_
-#define S11_H_
+#ifndef MAME_INCLUDES_S11_H
+#define MAME_INCLUDES_S11_H
 
 #include "audio/s11c_bg.h"
 #include "machine/6821pia.h"
@@ -81,6 +81,9 @@ public:
 	DECLARE_MACHINE_RESET(s11);
 	DECLARE_DRIVER_INIT(s11);
 	void s11(machine_config &config);
+	void s11_audio_map(address_map &map);
+	void s11_bg_map(address_map &map);
+	void s11_main_map(address_map &map);
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -122,4 +125,4 @@ private:
 	bool m_irq_active;
 };
 
-#endif /* S11_H_ */
+#endif // MAME_INCLUDES_S11_H

@@ -107,6 +107,9 @@ public:
 	}
 	void bmcpokr(machine_config &config);
 	void mjmaglmp(machine_config &config);
+	void bmcpokr_mem(address_map &map);
+	void mjmaglmp_map(address_map &map);
+	void ramdac_map(address_map &map);
 };
 
 /***************************************************************************
@@ -377,7 +380,7 @@ WRITE16_MEMBER(bmcpokr_state::irq_ack_w)
 	}
 }
 
-static ADDRESS_MAP_START( bmcpokr_mem, AS_PROGRAM, 16, bmcpokr_state )
+ADDRESS_MAP_START(bmcpokr_state::bmcpokr_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("nvram")
 
@@ -449,7 +452,7 @@ READ16_MEMBER(bmcpokr_state::mjmaglmp_key_r)
 	return ioport("INPUTS")->read() | (key & 0x3f);
 }
 
-static ADDRESS_MAP_START( mjmaglmp_map, AS_PROGRAM, 16, bmcpokr_state )
+ADDRESS_MAP_START(bmcpokr_state::mjmaglmp_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("nvram")
 
@@ -798,7 +801,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
 		if (m_irq_enable & (1<<6)) m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcpokr_state )
+ADDRESS_MAP_START(bmcpokr_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -835,7 +838,8 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bmcpokr_state::mjmaglmp, bmcpokr)
+MACHINE_CONFIG_START(bmcpokr_state::mjmaglmp)
+	bmcpokr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjmaglmp_map)
 MACHINE_CONFIG_END

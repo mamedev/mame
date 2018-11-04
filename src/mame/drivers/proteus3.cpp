@@ -106,6 +106,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
 	void proteus3(machine_config &config);
+	void proteus3_mem(address_map &map);
 private:
 	uint8_t m_video_data;
 	uint8_t m_flashcnt;
@@ -135,7 +136,7 @@ private:
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(proteus3_mem, AS_PROGRAM, 8, proteus3_state)
+ADDRESS_MAP_START(proteus3_state::proteus3_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia", pia6821_device, read, write)

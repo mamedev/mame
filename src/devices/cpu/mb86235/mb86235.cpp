@@ -33,11 +33,11 @@
 DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "MB86235")
 
 
-static ADDRESS_MAP_START(internal_abus, AS_DATA, 32, mb86235_device)
+ADDRESS_MAP_START(mb86235_device::internal_abus)
 	AM_RANGE(0x000000, 0x0003ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(internal_bbus, AS_IO, 32, mb86235_device)
+ADDRESS_MAP_START(mb86235_device::internal_bbus)
 	AM_RANGE(0x000000, 0x0003ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -208,8 +208,8 @@ void mb86235_cpu_device::execute_set_input(int irqline, int state)
 mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, MB86235, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, -3)
-	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, ADDRESS_MAP_NAME(internal_abus))
-	, m_datab_config("data_b", ENDIANNESS_LITTLE, 32, 10, -2, ADDRESS_MAP_NAME(internal_bbus))
+	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, address_map_constructor(FUNC(mb86235_device::internal_abus), this))
+	, m_datab_config("data_b", ENDIANNESS_LITTLE, 32, 10, -2, address_map_constructor(FUNC(mb86235_device::internal_bbus), this))
 	, m_cache(CACHE_SIZE + sizeof(mb86235_internal_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)

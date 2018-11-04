@@ -56,7 +56,7 @@ WRITE16_MEMBER(unico_state::burglarx_sound_bank_w)
 	}
 }
 
-static ADDRESS_MAP_START( burglarx_map, AS_PROGRAM, 16, unico_state )
+ADDRESS_MAP_START(unico_state::burglarx_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                     // ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                     // RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("INPUTS")
@@ -141,7 +141,7 @@ READ16_MEMBER(unico_state::unico_guny_1_msb_r)
 	return ((y&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-static ADDRESS_MAP_START( zeropnt_map, AS_PROGRAM, 16, unico_state )
+ADDRESS_MAP_START(unico_state::zeropnt_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
 	AM_RANGE(0xef0000, 0xefffff) AM_RAM // RAM
 	AM_RANGE(0x800030, 0x800031) AM_WRITENOP    // ? 0
@@ -213,7 +213,7 @@ WRITE32_MEMBER(unico_state::zeropnt2_eeprom_w)
 	}
 }
 
-static ADDRESS_MAP_START( zeropnt2_map, AS_PROGRAM, 32, unico_state )
+ADDRESS_MAP_START(unico_state::zeropnt2_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                             // ROM
 	AM_RANGE(0x800018, 0x80001b) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800024, 0x800027) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff0000)   // Sound

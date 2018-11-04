@@ -110,7 +110,7 @@ WRITE8_MEMBER(yunsun16_state::sound_bank_w)
 	membank("okibank")->set_entry(data & 3);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, yunsun16_state )
+ADDRESS_MAP_START(yunsun16_state::main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")
@@ -165,19 +165,19 @@ DRIVER_INIT_MEMBER(yunsun16_state,magicbub)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, yunsun16_state )
+ADDRESS_MAP_START(yunsun16_state::sound_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, yunsun16_state )
+ADDRESS_MAP_START(yunsun16_state::sound_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x18, 0x18) AM_DEVREAD("soundlatch", generic_latch_8_device, read)     // From Main CPU
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)       // M6295
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, 0, 8, yunsun16_state )
+ADDRESS_MAP_START(yunsun16_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 	ADDRESS_MAP_END

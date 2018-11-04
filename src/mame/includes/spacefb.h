@@ -79,6 +79,9 @@ public:
 
 	void spacefb(machine_config &config);
 	void spacefb_audio(machine_config &config);
+	void spacefb_audio_map(address_map &map);
+	void spacefb_main_io_map(address_map &map);
+	void spacefb_main_map(address_map &map);
 protected:
 
 	enum

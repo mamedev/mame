@@ -46,6 +46,13 @@ public:
 	void shanghai(machine_config &config);
 	void shangha2(machine_config &config);
 	void kothello(machine_config &config);
+	void hd63484_map(address_map &map);
+	void kothello_map(address_map &map);
+	void kothello_sound_map(address_map &map);
+	void shangha2_map(address_map &map);
+	void shangha2_portmap(address_map &map);
+	void shanghai_map(address_map &map);
+	void shanghai_portmap(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -93,20 +100,20 @@ WRITE8_MEMBER(shanghai_state::shanghai_coin_w)
 	machine().bookkeeping().coin_counter_w(1,data & 2);
 }
 
-static ADDRESS_MAP_START( shanghai_map, AS_PROGRAM, 16, shanghai_state )
+ADDRESS_MAP_START(shanghai_state::shanghai_map)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shangha2_map, AS_PROGRAM, 16, shanghai_state )
+ADDRESS_MAP_START(shanghai_state::shangha2_map)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x04000, 0x041ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16, shanghai_state )
+ADDRESS_MAP_START(shanghai_state::shanghai_portmap)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
@@ -117,7 +124,7 @@ static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16, shanghai_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16, shanghai_state )
+ADDRESS_MAP_START(shanghai_state::shangha2_portmap)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x11) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x21) AM_READ_PORT("SYSTEM")
@@ -127,7 +134,7 @@ static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16, shanghai_state )
 	AM_RANGE(0x50, 0x51) AM_WRITE8(shanghai_coin_w,0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
+ADDRESS_MAP_START(shanghai_state::kothello_map)
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
 	AM_RANGE(0x08010, 0x08011) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
 	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
@@ -140,7 +147,7 @@ static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kothello_sound_map, AS_PROGRAM, 8, shanghai_state )
+ADDRESS_MAP_START(shanghai_state::kothello_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
@@ -377,7 +384,7 @@ static INPUT_PORTS_START( shangha2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( hd63484_map, 0, 16, shanghai_state )
+ADDRESS_MAP_START(shanghai_state::hd63484_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 

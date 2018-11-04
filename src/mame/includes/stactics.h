@@ -89,4 +89,5 @@ public:
 	void move_motor();
 	void stactics(machine_config &config);
 	void stactics_video(machine_config &config);
+	void main_map(address_map &map);
 };

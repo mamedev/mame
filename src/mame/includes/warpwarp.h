@@ -102,4 +102,8 @@ public:
 	void navarone(machine_config &config);
 	void bombbee(machine_config &config);
 	void geebeeb(machine_config &config);
+	void bombbee_map(address_map &map);
+	void geebee_map(address_map &map);
+	void geebee_port_map(address_map &map);
+	void warpwarp_map(address_map &map);
 };

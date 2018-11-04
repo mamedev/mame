@@ -53,6 +53,9 @@ private:
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80dart_device> m_sio;
 	optional_shared_ptr<uint8_t> m_char_ram;
+
+	void wangpc_rtc_io(address_map &map);
+	void wangpc_rtc_mem(address_map &map);
 };
 
 

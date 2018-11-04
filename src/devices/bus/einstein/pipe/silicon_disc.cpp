@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SILICON_DISC, einstein_silicon_disc_device, "einstei
 //  device_address_map
 //-------------------------------------------------
 
-DEVICE_ADDRESS_MAP_START(map, 8, einstein_silicon_disc_device)
+ADDRESS_MAP_START(einstein_silicon_disc_device::map)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(sector_low_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_WRITE(sector_high_w)
 ADDRESS_MAP_END

@@ -15,12 +15,12 @@
 
 #define Z80_TAG "mpegcpu"
 
-static ADDRESS_MAP_START( dsbz80_map, AS_PROGRAM, 8, dsbz80_device )
+ADDRESS_MAP_START(dsbz80_device::dsbz80_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(":mpegcpu", 0)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsbz80io_map, AS_IO, 8, dsbz80_device )
+ADDRESS_MAP_START(dsbz80_device::dsbz80io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mpeg_trigger_w)
 	AM_RANGE(0xe2, 0xe4) AM_READWRITE(mpeg_pos_r, mpeg_start_w)

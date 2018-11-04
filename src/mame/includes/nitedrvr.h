@@ -71,6 +71,7 @@ public:
 	void draw_roadway(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nitedrvr_steering();
 	void nitedrvr(machine_config &config);
+	void nitedrvr_map(address_map &map);
 };
 
 /*----------- defined in audio/nitedrvr.c -----------*/

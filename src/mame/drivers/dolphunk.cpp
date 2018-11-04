@@ -108,6 +108,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port06_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
 	void dauphin(machine_config &config);
+	void dauphin_io(address_map &map);
+	void dauphin_mem(address_map &map);
 private:
 	uint8_t m_cass_data;
 	uint8_t m_last_key;
@@ -182,14 +184,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::dauphin_c)
 		m_cass->output(BIT(m_cass_data, 0) ? -1.0 : +1.0); // 2000Hz
 }
 
-static ADDRESS_MAP_START( dauphin_mem, AS_PROGRAM, 8, dauphin_state )
+ADDRESS_MAP_START(dauphin_state::dauphin_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x01ff) AM_ROM
 	AM_RANGE( 0x0200, 0x02ff) AM_RAM
 	AM_RANGE( 0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dauphin_io, AS_IO, 8, dauphin_state )
+ADDRESS_MAP_START(dauphin_state::dauphin_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_WRITE(port00_w) // 4-led display
 	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)  // speaker (NOT a keyclick)

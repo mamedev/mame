@@ -138,7 +138,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_sh_irqtrigger_w)
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
+ADDRESS_MAP_START(chqflag_state::chqflag_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_DEVICE("bank1000", address_map_bank_device, amap8)
 	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)            /* Sprite control registers */
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x48000)               /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank1000_map, AS_PROGRAM, 8, chqflag_state )
+ADDRESS_MAP_START(chqflag_state::bank1000_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READ(k051316_1_ramrom_r) AM_DEVWRITE("k051316_1", k051316_device, write)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
@@ -185,7 +185,7 @@ WRITE8_MEMBER(chqflag_state::k007232_bankswitch_w)
 	m_k007232_2->set_bank(bank_A, bank_B);
 }
 
-static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8, chqflag_state )
+ADDRESS_MAP_START(chqflag_state::chqflag_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w) /* 007232 bankswitch */

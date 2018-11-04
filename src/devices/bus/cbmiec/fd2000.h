@@ -67,6 +67,9 @@ protected:
 	required_device<m65c02_device> m_maincpu;
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
+
+private:
+	void fd2000_mem(address_map &map);
 };
 
 
@@ -81,6 +84,9 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void fd4000_mem(address_map &map);
 };
 
 

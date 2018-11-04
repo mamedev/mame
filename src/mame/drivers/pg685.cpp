@@ -134,6 +134,9 @@ public:
 	void pg685(machine_config &config);
 	void pg675(machine_config &config);
 	void pg685oua12(machine_config &config);
+	void pg675_mem(address_map &map);
+	void pg685_mem(address_map &map);
+	void pg685oua12_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -150,7 +153,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START(pg675_mem, AS_PROGRAM, 8, pg685_state)
+ADDRESS_MAP_START(pg685_state::pg675_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xbffff) AM_RAM
 	AM_RANGE(0xf0000,0xf1fff) AM_RAM
@@ -175,7 +178,7 @@ static ADDRESS_MAP_START(pg675_mem, AS_PROGRAM, 8, pg685_state)
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pg685_mem, AS_PROGRAM, 8, pg685_state)
+ADDRESS_MAP_START(pg685_state::pg685_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(pg675_mem)
 	AM_RANGE(0xf9f34, 0xf9f37) AM_DEVREADWRITE("bppit", pit8253_device, read, write)
@@ -187,7 +190,7 @@ static ADDRESS_MAP_START(pg685_mem, AS_PROGRAM, 8, pg685_state)
 	AM_RANGE(0xf9f79, 0xf9f79) AM_WRITE(f9f79_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pg685oua12_mem, AS_PROGRAM, 16, pg685_state)
+ADDRESS_MAP_START(pg685_state::pg685oua12_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xdffff) AM_RAM
 	AM_RANGE(0xe0000,0xeffff) AM_RAM AM_SHARE ("framebuffer16")
@@ -434,7 +437,7 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	// sound hardware
 
 	// devices
-	MCFG_FRAGMENT_ADD(pg685_module)
+	pg685_module(config);
 
 	MCFG_DEVICE_ADD("mainuart", I8251, XTAL(12'288'000) / 6) // divider guessed
 
@@ -483,8 +486,8 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	// sound hardware
 
 	// devices
-	MCFG_FRAGMENT_ADD(pg685_backplane)
-	MCFG_FRAGMENT_ADD(pg685_module)
+	pg685_backplane(config);
+	pg685_module(config);
 
 	MCFG_DEVICE_ADD("mainuart", I8251, XTAL(12'288'000) / 6) // divider guessed
 
@@ -534,8 +537,8 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// sound hardware
 
 	// devices
-	MCFG_FRAGMENT_ADD(pg685_backplane)
-	MCFG_FRAGMENT_ADD(pg685_module)
+	pg685_backplane(config);
+	pg685_module(config);
 
 	MCFG_DEVICE_ADD("mainuart", I8251, 12288000 / 6) // wrong
 

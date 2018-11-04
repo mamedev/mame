@@ -62,6 +62,9 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
 	void trs80dt1(machine_config &config);
+	void data_map(address_map &map);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
 private:
 	bool m_bow;
 	virtual void machine_reset() override;
@@ -141,15 +144,15 @@ WRITE8_MEMBER( trs80dt1_state::port3_w )
 	m_beep->set_state(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, trs80dt1_state )
+ADDRESS_MAP_START(trs80dt1_state::prg_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_READ(dma_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 8, trs80dt1_state )
+ADDRESS_MAP_START(trs80dt1_state::data_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, trs80dt1_state )
+ADDRESS_MAP_START(trs80dt1_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xbfff) // A14 not used
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(port1_w)
 	AM_RANGE(0x0003, 0x0003) AM_WRITE(port3_w)

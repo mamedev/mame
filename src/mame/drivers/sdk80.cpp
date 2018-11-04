@@ -54,6 +54,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
 
 	void sdk80(machine_config &config);
+	void sdk80_io(address_map &map);
+	void sdk80_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
@@ -66,13 +68,13 @@ private:
 	uint8_t m_usart_clock_state;
 };
 
-static ADDRESS_MAP_START(sdk80_mem, AS_PROGRAM, 8, sdk80_state)
+ADDRESS_MAP_START(sdk80_state::sdk80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sdk80_io, AS_IO, 8, sdk80_state)
+ADDRESS_MAP_START(sdk80_state::sdk80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xec, 0xef) AM_DEVREADWRITE(I8255A_1_TAG, i8255_device, read, write)

@@ -91,6 +91,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void skimaxx(machine_config &config);
+	void m68030_1_map(address_map &map);
+	void m68030_2_map(address_map &map);
+	void tms_program_map(address_map &map);
 };
 
 
@@ -306,7 +309,7 @@ READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
+ADDRESS_MAP_START(skimaxx_state::m68030_1_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x10000000, 0x10000003) AM_WRITE(skimaxx_sub_ctrl_w )
 	AM_RANGE(0x10100000, 0x1010000f) AM_DEVREADWRITE16("tms", tms34010_device, host_r, host_w, 0x0000ffff)
@@ -339,7 +342,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32, skimaxx_state )
+ADDRESS_MAP_START(skimaxx_state::m68030_2_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
 
 	AM_RANGE(0x20000000, 0x2007ffff) AM_READ(skimaxx_blitter_r )    // do blit
@@ -351,8 +354,8 @@ static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32, skimaxx_state )
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfffc0000, 0xfffcffff) AM_RAM AM_SHARE("share1")
 //  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
-	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM             // HACK
 	AM_RANGE(0xfffe0000, 0xfffeffff) AM_RAM AM_SHARE("share1")  // HACK
+	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM             // HACK
 	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -363,9 +366,8 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skimaxx_state )
-	AM_RANGE(0x00000000, 0x000100ff) AM_RAM
-	AM_RANGE(0x00008000, 0x0003ffff) AM_RAM
+ADDRESS_MAP_START(skimaxx_state::tms_program_map)
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM
 	AM_RANGE(0x00050000, 0x0005ffff) AM_RAM
 	AM_RANGE(0x00220000, 0x003fffff) AM_RAM AM_SHARE("fg_buffer")
 	AM_RANGE(0x02000000, 0x0200000f) AM_RAM
@@ -496,11 +498,11 @@ void skimaxx_state::machine_reset()
 
 MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 	MCFG_CPU_ADD("maincpu", M68EC030, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(68030_1_map)
+	MCFG_CPU_PROGRAM_MAP(m68030_1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skimaxx_state,  irq3_line_hold)    // 1,3,7 are identical, rest is RTE
 
 	MCFG_CPU_ADD("subcpu", M68EC030, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(68030_2_map)
+	MCFG_CPU_PROGRAM_MAP(m68030_2_map)
 
 
 	/* video hardware */

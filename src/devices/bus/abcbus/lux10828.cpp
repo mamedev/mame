@@ -171,7 +171,7 @@ const tiny_rom_entry *luxor_55_10828_device::device_rom_region() const
 //  ADDRESS_MAP( luxor_55_10828_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_10828_mem, AS_PROGRAM, 8, luxor_55_10828_device )
+ADDRESS_MAP_START(luxor_55_10828_device::luxor_55_10828_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM
@@ -182,7 +182,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( luxor_55_10828_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( luxor_55_10828_io, AS_IO, 8, luxor_55_10828_device )
+ADDRESS_MAP_START(luxor_55_10828_device::luxor_55_10828_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0xb0, 0xb3) AM_MIRROR(0x0c) AM_READWRITE(fdc_r, fdc_w)

@@ -71,6 +71,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 	void datum(machine_config &config);
+	void datum_mem(address_map &map);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
@@ -80,7 +81,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(datum_mem, AS_PROGRAM, 8, datum_state)
+ADDRESS_MAP_START(datum_state::datum_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0x7fff) // A15 not used
 	AM_RANGE(0x0000, 0x007f) AM_RAM // inside CPU

@@ -139,7 +139,7 @@ WRITE16_MEMBER(rohga_state::wizdfire_irq_ack_w)
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::rohga_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
@@ -189,7 +189,7 @@ WRITE16_MEMBER( rohga_state::wf_protection_region_0_104_w )
 }
 
 
-static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::wizdfire_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
@@ -216,8 +216,8 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w)
 
-	AM_RANGE(0xfe4000, 0xfe7fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0xfdc000, 0xffffff) AM_RAM
+	AM_RANGE(0xfe4000, 0xfe7fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
 ADDRESS_MAP_END
 
 
@@ -239,7 +239,7 @@ WRITE16_MEMBER( rohga_state::nb_protection_region_0_146_w )
 }
 
 
-static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::nitrobal_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotb_base_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::hotb_base_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
@@ -301,21 +301,21 @@ static ADDRESS_MAP_START( hotb_base_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_DEVWRITE("deco_common", decocomn_device, buffered_palette_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::schmeisr_map)
 	AM_IMPORT_FROM(hotb_base_map)
 	AM_RANGE(0xff0000, 0xff7fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( hangzo_map, AS_PROGRAM, 16, rohga_state )
+ADDRESS_MAP_START(rohga_state::hangzo_map)
 	AM_IMPORT_FROM(hotb_base_map)
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( rohga_sound_map, AS_PROGRAM, 8, rohga_state )
+ADDRESS_MAP_START(rohga_state::rohga_sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
@@ -327,7 +327,7 @@ static ADDRESS_MAP_START( rohga_sound_map, AS_PROGRAM, 8, rohga_state )
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nitrobal_sound_map, AS_PROGRAM, 8, rohga_state )
+ADDRESS_MAP_START(rohga_state::nitrobal_sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
@@ -1280,7 +1280,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(rohga_state::hangzo, schmeisr)
+MACHINE_CONFIG_START(rohga_state::hangzo)
+	schmeisr(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

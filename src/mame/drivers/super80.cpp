@@ -246,21 +246,21 @@ ToDo:
     This makes the H and E monitor commands show FF */
 READ8_MEMBER( super80_state::super80_read_ff ) { return 0xff; }
 
-static ADDRESS_MAP_START( super80_map, AS_PROGRAM, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot") AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_READ(super80_read_ff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80m_map, AS_PROGRAM, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80m_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot") AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80v_map, AS_PROGRAM, 8, super80_state)
+ADDRESS_MAP_START(super80_state::super80v_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot")
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xefff) AM_ROM
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( super80v_map, AS_PROGRAM, 8, super80_state)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(super80v_high_r, super80v_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80_io, AS_IO, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xdc, 0xdc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( super80_io, AS_IO, 8, super80_state )
 	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80e_io, AS_IO, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80e_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xbc, 0xbc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( super80e_io, AS_IO, 8, super80_state )
 	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80r_io, AS_IO, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80r_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( super80r_io, AS_IO, 8, super80_state )
 	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80v_io, AS_IO, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80v_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
@@ -753,13 +753,15 @@ MACHINE_CONFIG_START(super80_state::super80)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "super80_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(super80_state::super80d, super80)
+MACHINE_CONFIG_START(super80_state::super80d)
+	super80(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80d)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80d)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(super80_state::super80e, super80)
+MACHINE_CONFIG_START(super80_state::super80e)
+	super80(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80e_io)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80e)
@@ -767,7 +769,8 @@ MACHINE_CONFIG_DERIVED(super80_state::super80e, super80)
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80e)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(super80_state::super80m, super80)
+MACHINE_CONFIG_START(super80_state::super80m)
+	super80(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(super80m_map)
 
@@ -839,7 +842,8 @@ MACHINE_CONFIG_START(super80_state::super80v)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(super80_state::super80r, super80v)
+MACHINE_CONFIG_START(super80_state::super80r)
+	super80v(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80r_io)
 

@@ -164,6 +164,7 @@ public:
 
 	void testcpu(machine_config &config);
 
+	void ppc_mem(address_map &map);
 private:
 	// internal state
 	required_device<ppc603e_device> m_cpu;
@@ -177,7 +178,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( ppc_mem, AS_PROGRAM, 64, testcpu_state )
+ADDRESS_MAP_START(testcpu_state::ppc_mem)
 	AM_RANGE(RAM_BASE, RAM_BASE+7) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(general_r, general_w)
 ADDRESS_MAP_END

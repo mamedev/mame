@@ -30,9 +30,6 @@ public:
 	// construction/destruction
 	superpet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -52,6 +49,11 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	void superpet_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6551_device> m_acia;

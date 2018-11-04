@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef SVISION_H_
-#define SVISION_H_
+#ifndef MAME_INCLUDES_SVISION_H
+#define MAME_INCLUDES_SVISION_H
 
 #include "cpu/m6502/m65c02.h"
 #include "machine/timer.h"
@@ -80,6 +80,8 @@ public:
 	void tvlinkp(machine_config &config);
 	void svision(machine_config &config);
 	void svisionn(machine_config &config);
+	void svision_mem(address_map &map);
+	void tvlink_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<svision_sound_device> m_sound;
@@ -95,4 +97,4 @@ protected:
 	memory_bank *m_bank2;
 };
 
-#endif /* SVISION_H_ */
+#endif // MAME_INCLUDES_SVISION_H

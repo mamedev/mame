@@ -22,7 +22,7 @@
 #define MPCMBANK1_TAG   "m1pcm1_bank"
 #define MPCMBANK2_TAG   "m1pcm2_bank"
 
-static ADDRESS_MAP_START( segam1audio_map, AS_PROGRAM, 16, segam1audio_device )
+ADDRESS_MAP_START(segam1audio_device::segam1audio_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x09ffff) AM_ROM AM_REGION(M68000_TAG, 0x20000) // mirror of upper ROM socket
 	AM_RANGE(0xc20000, 0xc20001) AM_DEVREADWRITE8(UART_TAG, i8251_device, data_r, data_w, 0x00ff)
@@ -36,12 +36,12 @@ static ADDRESS_MAP_START( segam1audio_map, AS_PROGRAM, 16, segam1audio_device )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpcm1_map, 0, 8, segam1audio_device )
+ADDRESS_MAP_START(segam1audio_device::mpcm1_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK(MPCMBANK1_TAG)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpcm2_map, 0, 8, segam1audio_device )
+ADDRESS_MAP_START(segam1audio_device::mpcm2_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK(MPCMBANK2_TAG)
 ADDRESS_MAP_END

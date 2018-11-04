@@ -72,7 +72,7 @@ const tiny_rom_entry *softbox_device::device_rom_region() const
 //  ADDRESS_MAP( softbox_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( softbox_mem, AS_PROGRAM, 8, softbox_device )
+ADDRESS_MAP_START(softbox_device::softbox_mem)
 	AM_RANGE(0x0000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(Z80_TAG, 0)
 ADDRESS_MAP_END
@@ -82,7 +82,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( softbox_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( softbox_io, AS_IO, 8, softbox_device )
+ADDRESS_MAP_START(softbox_device::softbox_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)

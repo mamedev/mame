@@ -209,7 +209,7 @@ WRITE16_MEMBER(lethalj_state::cclownz_control_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16, lethalj_state )
+ADDRESS_MAP_START(lethalj_state::lethalj_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x04000000, 0x0400000f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
@@ -663,7 +663,8 @@ MACHINE_CONFIG_START(lethalj_state::gameroom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(lethalj_state::lethalj, gameroom)
+MACHINE_CONFIG_START(lethalj_state::lethalj)
+	gameroom(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */

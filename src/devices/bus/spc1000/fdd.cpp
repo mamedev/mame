@@ -55,13 +55,13 @@ WRITE8_MEMBER( spc1000_fdd_exp_device::control_w )
 		m_fd1->mon_w(!BIT(data, 0));
 }
 
-static ADDRESS_MAP_START( sd725_mem, AS_PROGRAM, 8, spc1000_fdd_exp_device )
+ADDRESS_MAP_START(spc1000_fdd_exp_device::sd725_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sd725_io, AS_IO, 8, spc1000_fdd_exp_device )
+ADDRESS_MAP_START(spc1000_fdd_exp_device::sd725_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(tc_r, control_w) // (R) Terminal Count Port (W) Motor Control Port

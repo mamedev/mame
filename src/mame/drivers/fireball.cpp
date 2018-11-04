@@ -77,6 +77,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
 	void fireball(machine_config &config);
+	void fireball_io_map(address_map &map);
+	void fireball_map(address_map &map);
 protected:
 
 	// devices
@@ -291,11 +293,11 @@ WRITE8_MEMBER(fireball_state::p3_w)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( fireball_map, AS_PROGRAM, 8, fireball_state )
+ADDRESS_MAP_START(fireball_state::fireball_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fireball_io_map, AS_IO, 8, fireball_state )
+ADDRESS_MAP_START(fireball_state::fireball_io_map)
 
 	AM_RANGE(0x00, 0x01)AM_READWRITE(io_00_r,io_00_w)
 	AM_RANGE(0x02, 0x03)AM_READWRITE(io_02_r,io_02_w)

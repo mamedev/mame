@@ -232,31 +232,31 @@ DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
 }
 
 
-static ADDRESS_MAP_START( sailorws_map, AS_PROGRAM, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::sailorws_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjuraden_map, AS_PROGRAM, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mjuraden_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( koinomp_map, AS_PROGRAM, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::koinomp_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ngpgal_map, AS_PROGRAM, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::ngpgal_map)
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mscoutm_map, AS_PROGRAM, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mscoutm_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe5ff) AM_RAM
 	AM_RANGE(0xe600, 0xebff) AM_RAM_WRITE(nb22090_palette_w) AM_SHARE("paletteram")
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( mscoutm_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0xf200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjegolf_map, AS_PROGRAM, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mjegolf_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe5ff) AM_RAM_WRITE(nb22090_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe600, 0xebff) AM_RAM
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( mjegolf_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0xf200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mjuraden_io_map)
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xb6, 0xb6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::koinomp_io_map)
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xcf, 0xcf) AM_MIRROR(0xff00) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::patimono_io_map)
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
 	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
 
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmehyou_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mmehyou_io_map)
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( mmehyou_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gal10ren_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::gal10ren_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( gal10ren_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( renaiclb_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::renaiclb_io_map)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITENOP
 	AM_RANGE(0x28, 0x28) AM_MIRROR(0xff00) AM_WRITENOP
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( renaiclb_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mjlaman_io_map)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x22, 0x22) AM_MIRROR(0xff00) AM_WRITENOP
 	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITENOP
@@ -370,7 +370,7 @@ static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mkeibaou_io_map)
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -385,7 +385,7 @@ static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::pachiten_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xe6, 0xe6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailorws_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::sailorws_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -415,7 +415,7 @@ static ADDRESS_MAP_START( sailorws_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::sailorwr_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -430,7 +430,7 @@ static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::psailor1_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psailor2_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::psailor2_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -460,7 +460,7 @@ static ADDRESS_MAP_START( psailor2_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( otatidai_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::otatidai_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START( otatidai_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xb8, 0xb8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::yosimoto_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yosimotm_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::yosimotm_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -505,7 +505,7 @@ static ADDRESS_MAP_START( yosimotm_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::jituroku_io_map)
 	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -520,7 +520,7 @@ static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ngpgal_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::ngpgal_io_map)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
 	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
@@ -531,7 +531,7 @@ static ADDRESS_MAP_START( ngpgal_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjgottsu_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mjgottsu_io_map)
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -542,7 +542,7 @@ static ADDRESS_MAP_START( mjgottsu_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cmehyou_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::cmehyou_io_map)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
@@ -553,7 +553,7 @@ static ADDRESS_MAP_START( cmehyou_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjkoiura_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mjkoiura_io_map)
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
 	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
@@ -564,7 +564,7 @@ static ADDRESS_MAP_START( mjkoiura_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mkoiuraa_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mkoiuraa_io_map)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
 	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
@@ -575,7 +575,7 @@ static ADDRESS_MAP_START( mkoiuraa_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mscoutm_io_map)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
 	AM_RANGE(0x82, 0x82) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
 	AM_RANGE(0x84, 0x84) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -592,7 +592,7 @@ static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::imekura_io_map)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
 	AM_RANGE(0x82, 0x82) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
 	AM_RANGE(0x84, 0x84) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -609,7 +609,7 @@ static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::mjegolf_io_map)
 	AM_RANGE(0x80, 0x86) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
 
 	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
@@ -628,13 +628,13 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( sailorws_sound_map, AS_PROGRAM, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::sailorws_sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailorws_sound_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::sailorws_sound_io_map)
 	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym3812_device, write)
 ADDRESS_MAP_END
 
@@ -645,14 +645,14 @@ ADDRESS_MAP_END
 TODO: it probably doesn't belong in here. Both CPUs are certainly tmpz84c011 tho ...
 */
 
-static ADDRESS_MAP_START( shabdama_map, AS_PROGRAM, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::shabdama_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 //  AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 //  AM_RANGE(0xd800, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shabdama_io_map, AS_IO, 8, nbmj9195_state )
+ADDRESS_MAP_START(nbmj9195_state::shabdama_io_map)
 //  ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
 //  AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
@@ -2549,7 +2549,8 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV1, NBMJDRV1_base)
+MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1)
+	NBMJDRV1_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2557,7 +2558,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV1, NBMJDRV1_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV2, NBMJDRV1_base)
+MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV2)
+	NBMJDRV1_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2568,7 +2570,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV2, NBMJDRV1_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::NBMJDRV3, NBMJDRV1_base)
+MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV3)
+	NBMJDRV1_base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2584,7 +2587,8 @@ MACHINE_CONFIG_END
 
 //-------------------------------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjuraden, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::mjuraden)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2593,7 +2597,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjuraden, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::koinomp, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::koinomp)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2602,7 +2607,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::koinomp, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::patimono, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::patimono)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2610,7 +2616,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::patimono, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::janbari, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::janbari)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2620,7 +2627,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::janbari, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mmehyou, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::mmehyou)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2631,7 +2639,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mmehyou, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::ultramhm, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::ultramhm)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2642,7 +2651,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::ultramhm, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::gal10ren, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::gal10ren)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2650,7 +2660,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::gal10ren, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::renaiclb, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::renaiclb)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2658,7 +2669,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::renaiclb, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjlaman, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::mjlaman)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2666,7 +2678,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjlaman, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mkeibaou, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::mkeibaou)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2674,7 +2687,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mkeibaou, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::pachiten, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::pachiten)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2684,13 +2698,15 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::pachiten, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::sailorws, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::sailorws)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::sailorwr, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::sailorwr)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2700,7 +2716,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::sailorwr, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor1, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::psailor1)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2708,7 +2725,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor1, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor2, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::psailor2)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2716,7 +2734,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::psailor2, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::otatidai, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::otatidai)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2724,7 +2743,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::otatidai, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimoto, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::yosimoto)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2732,7 +2752,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimoto, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimotm, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::yosimotm)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2742,7 +2763,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::yosimotm, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::jituroku, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::jituroku)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2750,7 +2772,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::jituroku, NBMJDRV1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::ngpgal, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::ngpgal)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2759,7 +2782,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::ngpgal, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjgottsu, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::mjgottsu)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2768,7 +2792,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjgottsu, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::bakuhatu, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::bakuhatu)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2777,7 +2802,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::bakuhatu, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::cmehyou, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::cmehyou)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2786,7 +2812,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::cmehyou, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjkoiura, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::mjkoiura)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2795,7 +2822,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjkoiura, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mkoiuraa, NBMJDRV2)
+MACHINE_CONFIG_START(nbmj9195_state::mkoiuraa)
+	NBMJDRV2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2804,7 +2832,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mkoiuraa, NBMJDRV2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mscoutm, NBMJDRV3)
+MACHINE_CONFIG_START(nbmj9195_state::mscoutm)
+	NBMJDRV3(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2813,7 +2842,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mscoutm, NBMJDRV3)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::imekura, NBMJDRV3)
+MACHINE_CONFIG_START(nbmj9195_state::imekura)
+	NBMJDRV3(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2822,7 +2852,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::imekura, NBMJDRV3)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::mjegolf, NBMJDRV3)
+MACHINE_CONFIG_START(nbmj9195_state::mjegolf)
+	NBMJDRV3(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2831,7 +2862,8 @@ MACHINE_CONFIG_DERIVED(nbmj9195_state::mjegolf, NBMJDRV3)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(nbmj9195_state::shabdama, NBMJDRV1)
+MACHINE_CONFIG_START(nbmj9195_state::shabdama)
+	NBMJDRV1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

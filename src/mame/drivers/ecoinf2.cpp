@@ -227,6 +227,8 @@ public:
 	DECLARE_MACHINE_START(ecoinf2);
 
 	void ecoinf2_oxo(machine_config &config);
+	void oxo_memmap(address_map &map);
+	void oxo_portmap(address_map &map);
 };
 
 
@@ -235,12 +237,12 @@ WRITE8_MEMBER(ecoinf2_state::ox_port5c_out_w)
 	// Watchdog?
 }
 
-static ADDRESS_MAP_START( oxo_memmap, AS_PROGRAM, 8, ecoinf2_state )
+ADDRESS_MAP_START(ecoinf2_state::oxo_memmap)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oxo_portmap, AS_IO, 8, ecoinf2_state )
+ADDRESS_MAP_START(ecoinf2_state::oxo_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_RAM // z180 internal area?
 

@@ -93,7 +93,7 @@ WRITE8_MEMBER(speedspn_state::okibank_w)
 
 /* main cpu */
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, speedspn_state )
+ADDRESS_MAP_START(speedspn_state::program_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") /* RAM COLOUR */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(attram_w) AM_SHARE("attram")
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("prgbank")                              /* banked ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, speedspn_state )
+ADDRESS_MAP_START(speedspn_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_WRITE(display_disable_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
@@ -118,7 +118,7 @@ ADDRESS_MAP_END
 
 /* sound cpu */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, speedspn_state )
+ADDRESS_MAP_START(speedspn_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, 0, 8, speedspn_state )
+ADDRESS_MAP_START(speedspn_state::oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END

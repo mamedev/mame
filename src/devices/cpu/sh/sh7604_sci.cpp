@@ -99,7 +99,7 @@ READ8_MEMBER(sh7604_sci_device::receive_data_r)
 	return 0;
 }
 
-DEVICE_ADDRESS_MAP_START( sci_regs, 8, sh7604_sci_device )
+ADDRESS_MAP_START(sh7604_sci_device::sci_regs)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(serial_mode_r,   serial_mode_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(bitrate_r,       bitrate_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(serial_control_r,serial_control_w)

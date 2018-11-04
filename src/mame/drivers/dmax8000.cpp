@@ -55,6 +55,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 	void dmax8000(machine_config &config);
+	void dmax8000_io(address_map &map);
+	void dmax8000_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;
@@ -96,12 +98,12 @@ WRITE8_MEMBER( dmax8000_state::port40_w )
 	membank("bankr0")->set_entry(BIT(data, 0));
 }
 
-static ADDRESS_MAP_START(dmax8000_mem, AS_PROGRAM, 8, dmax8000_state)
+ADDRESS_MAP_START(dmax8000_state::dmax8000_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x1000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dmax8000_io, AS_IO, 8, dmax8000_state)
+ADDRESS_MAP_START(dmax8000_state::dmax8000_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", fd1793_device, read, write)

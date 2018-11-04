@@ -147,6 +147,8 @@ kron180_state(const machine_config &mconfig, device_type type, const char *tag) 
 	DECLARE_WRITE8_MEMBER( kbd_reset_w ){   LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
 	DECLARE_WRITE8_MEMBER( dreq_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
 	void kron180(machine_config &config);
+	void kron180_iomap(address_map &map);
+	void kron180_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -156,7 +158,7 @@ private:
 	virtual void machine_start () override;
 };
 
-static ADDRESS_MAP_START (kron180_mem, AS_PROGRAM, 8, kron180_state)
+ADDRESS_MAP_START(kron180_state::kron180_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x0000, 0x7fff) AM_ROM AM_REGION("roms", 0x8000)
 	AM_RANGE (0x8000, 0x85ff) AM_RAM AM_MIRROR(0x6000)
@@ -194,7 +196,7 @@ ADDRESS_MAP_END
  *
  * At the moment we emulate the screen at a high level so I just disregard the special functions on A16 - A18 by mirroring the mapping below
  */
-static ADDRESS_MAP_START( kron180_iomap, AS_IO, 8, kron180_state )
+ADDRESS_MAP_START(kron180_state::kron180_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x0000, 0x000f ) AM_WRITE(sn74259_w)
 	AM_RANGE( 0x0010, 0x001f ) AM_READWRITE(ap5_r, ap5_w)

@@ -77,6 +77,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void quake(machine_config &config);
+	void quake_io(address_map &map);
+	void quake_map(address_map &map);
 };
 
 
@@ -89,11 +91,11 @@ uint32_t quakeat_state::screen_update_quake(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static ADDRESS_MAP_START( quake_map, AS_PROGRAM, 32, quakeat_state )
+ADDRESS_MAP_START(quakeat_state::quake_map)
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM AM_REGION("pc_bios", 0) /* BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quake_io, AS_IO, 32, quakeat_state )
+ADDRESS_MAP_START(quakeat_state::quake_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 //  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
@@ -124,7 +126,7 @@ MACHINE_CONFIG_START(quakeat_state::quake)
 	MCFG_CPU_IO_MAP(quake_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

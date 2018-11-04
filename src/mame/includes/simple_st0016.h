@@ -40,4 +40,9 @@ public:
 	void st0016(machine_config &config);
 	void renju(machine_config &config);
 	void mayjinsn(machine_config &config);
+	void renju_mem(address_map &map);
+	void st0016_io(address_map &map);
+	void st0016_m2_io(address_map &map);
+	void st0016_mem(address_map &map);
+	void v810_mem(address_map &map);
 };

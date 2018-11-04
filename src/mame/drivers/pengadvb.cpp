@@ -69,6 +69,9 @@ public:
 	virtual void machine_reset() override;
 	void pengadvb_decrypt(const char* region);
 	void pengadvb(machine_config &config);
+	void bank_mem(address_map &map);
+	void io_mem(address_map &map);
+	void program_mem(address_map &map);
 };
 
 
@@ -93,11 +96,11 @@ WRITE8_MEMBER(pengadvb_state::megarom_bank_w)
 	m_bank[offset >> 13 & 3]->set_entry(data & 0xf);
 }
 
-static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8, pengadvb_state )
+ADDRESS_MAP_START(pengadvb_state::program_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w) // 4 pages of 16KB
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank_mem, AS_PROGRAM, 8, pengadvb_state )
+ADDRESS_MAP_START(pengadvb_state::bank_mem)
 	// slot 0, MSX BIOS
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("maincpu", 0)
 
@@ -112,7 +115,7 @@ static ADDRESS_MAP_START( bank_mem, AS_PROGRAM, 8, pengadvb_state )
 	AM_RANGE(0x3c000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_mem, AS_IO, 8, pengadvb_state )
+ADDRESS_MAP_START(pengadvb_state::io_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE("tms9128", tms9128_device, vram_read, vram_write)

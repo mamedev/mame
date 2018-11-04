@@ -45,6 +45,7 @@ public:
 	uint8_t convert_key(uint8_t data);
 
 	void elekscmp(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_x0;
@@ -95,7 +96,7 @@ READ8_MEMBER(elekscmp_state::keyboard_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, elekscmp_state)
+ADDRESS_MAP_START(elekscmp_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x000, 0x5ff) AM_ROM // ROM

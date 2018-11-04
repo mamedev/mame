@@ -151,19 +151,19 @@ WRITE_LINE_MEMBER(tiamc1_state::pit8253_2_w)
 }
 
 
-static ADDRESS_MAP_START( tiamc1_map, AS_PROGRAM, 8, tiamc1_state )
+ADDRESS_MAP_START(tiamc1_state::tiamc1_map)
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(tiamc1_videoram_w)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kotrybolov_map, AS_PROGRAM, 8, tiamc1_state )
+ADDRESS_MAP_START(tiamc1_state::kotrybolov_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(kot_videoram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
+ADDRESS_MAP_START(tiamc1_state::tiamc1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x4f) AM_WRITE(tiamc1_sprite_y_w) /* sprites Y */
 	AM_RANGE(0x50, 0x5f) AM_WRITE(tiamc1_sprite_x_w) /* sprites X */
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
 	AM_RANGE(0xda, 0xda) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer1_gate_w) /* timer 1 gate control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kotrybolov_io_map, AS_IO, 8, tiamc1_state )
+ADDRESS_MAP_START(tiamc1_state::kotrybolov_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_WRITE(tiamc1_sprite_y_w)    // sprites Y
 	AM_RANGE(0x10, 0x1f) AM_WRITE(tiamc1_sprite_x_w)    // sprites X
@@ -352,7 +352,8 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tiamc1_state::kot, tiamc1)
+MACHINE_CONFIG_START(tiamc1_state::kot)
+	tiamc1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kotrybolov_map)
 	MCFG_CPU_IO_MAP(kotrybolov_io_map)

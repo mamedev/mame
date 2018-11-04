@@ -123,11 +123,11 @@ MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pcd_video_device, mouse_timer, attotime::from_hz(15000)) // guess
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( pcx_vid_map, AS_PROGRAM, 8, pcx_video_device )
+ADDRESS_MAP_START(pcx_video_device::pcx_vid_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION("graphics", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcx_vid_io, AS_IO, 8, pcx_video_device )
+ADDRESS_MAP_START(pcx_video_device::pcx_vid_io)
 	AM_RANGE(0x8000, 0x8007) AM_DEVREADWRITE("crtc", scn2674_device, read, write)
 	AM_RANGE(0x8008, 0x8008) AM_READ(unk_r)
 	AM_RANGE(0xa000, 0xa001) AM_READWRITE(vram_latch_r, vram_latch_w)
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( pcx_vid_io, AS_IO, 8, pcx_video_device )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcx_vram, 0, 8, pcx_video_device )
+ADDRESS_MAP_START(pcx_video_device::pcx_vram)
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
@@ -416,7 +416,7 @@ void pcd_video_device::device_reset()
 	m_t1 = CLEAR_LINE;
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, pcd_video_device)
+ADDRESS_MAP_START(pcd_video_device::map)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE8("crtc", scn2674_device, write, 0x00ff)
 	AM_RANGE(0x00, 0x0f) AM_DEVREAD8("crtc", scn2674_device, read, 0xff00)
 	AM_RANGE(0x20, 0x21) AM_WRITE8(vram_sw_w, 0x00ff)
@@ -444,7 +444,7 @@ void pcx_video_device::device_reset()
 	m_txd_handler(1);
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, pcx_video_device)
+ADDRESS_MAP_START(pcx_video_device::map)
 	AM_RANGE(0x0, 0xf) AM_READWRITE8(term_r, term_w, 0xffff)
 ADDRESS_MAP_END
 

@@ -49,6 +49,8 @@ public:
 	virtual void machine_reset() override;
 
 	void bob85(machine_config &config);
+	void bob85_io(address_map &map);
+	void bob85_mem(address_map &map);
 protected:
 	required_ioport m_line0;
 	required_ioport m_line1;
@@ -141,13 +143,13 @@ WRITE8_MEMBER(bob85_state::bob85_7seg_w)
 	output().set_digit_value(offset, bitswap<8>( data,3,2,1,0,7,6,5,4 ));
 }
 
-static ADDRESS_MAP_START( bob85_mem, AS_PROGRAM, 8, bob85_state )
+ADDRESS_MAP_START(bob85_state::bob85_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x02ff) AM_ROM
 	AM_RANGE(0x0600, 0x09ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bob85_io, AS_IO, 8, bob85_state )
+ADDRESS_MAP_START(bob85_state::bob85_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0a, 0x0a) AM_READ(bob85_keyboard_r)
 	AM_RANGE(0x0a, 0x0f) AM_WRITE(bob85_7seg_w)

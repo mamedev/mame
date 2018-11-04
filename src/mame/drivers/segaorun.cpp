@@ -883,7 +883,7 @@ WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
 //  MAIN CPU MEMORY MAP
 //**************************************************************************
 
-static ADDRESS_MAP_START( outrun_map, AS_PROGRAM, 16, segaorun_state )
+ADDRESS_MAP_START(segaorun_state::outrun_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
 
@@ -896,7 +896,7 @@ static ADDRESS_MAP_START( outrun_map, AS_PROGRAM, 16, segaorun_state )
 	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segaorun_state )
+ADDRESS_MAP_START(segaorun_state::decrypted_opcodes_map)
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -904,7 +904,7 @@ ADDRESS_MAP_END
 //  SECOND CPU MEMORY MAP
 //**************************************************************************
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaorun_state )
+ADDRESS_MAP_START(segaorun_state::sub_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM AM_SHARE("cpu1rom")
@@ -919,14 +919,14 @@ ADDRESS_MAP_END
 //  SOUND CPU MEMORY MAP
 //**************************************************************************
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segaorun_state )
+ADDRESS_MAP_START(segaorun_state::sound_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaorun_state )
+ADDRESS_MAP_START(segaorun_state::sound_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -1244,7 +1244,8 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_DERIVED(segaorun_state::outrundx, outrun_base)
+MACHINE_CONFIG_START(segaorun_state::outrundx)
+	outrun_base(config);
 
 	// basic machine hardware
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
@@ -1253,21 +1254,24 @@ MACHINE_CONFIG_DERIVED(segaorun_state::outrundx, outrun_base)
 	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaorun_state::outrun, outrundx)
+MACHINE_CONFIG_START(segaorun_state::outrun)
+	outrundx(config);
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1094, outrun)
+MACHINE_CONFIG_START(segaorun_state::outrun_fd1094)
+	outrun(config);
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(outrun_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1089a, outrun)
+MACHINE_CONFIG_START(segaorun_state::outrun_fd1089a)
+	outrun(config);
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
@@ -1275,7 +1279,8 @@ MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1089a, outrun)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segaorun_state::shangon, outrun_base)
+MACHINE_CONFIG_START(segaorun_state::shangon)
+	outrun_base(config);
 
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("i8255")
@@ -1297,7 +1302,8 @@ MACHINE_CONFIG_DERIVED(segaorun_state::shangon, outrun_base)
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(segaorun_state::shangon_fd1089b, shangon)
+MACHINE_CONFIG_START(segaorun_state::shangon_fd1089b)
+	shangon(config);
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK/4)

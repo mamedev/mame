@@ -248,7 +248,7 @@ GFXDECODE_END
  ***************************************/
 
  // we use decimals here to match documentation
-static ADDRESS_MAP_START( regs_map, AS_IO, 8, ygv608_device )
+ADDRESS_MAP_START(ygv608_device::regs_map)
 
 	// address pointers
 	AM_RANGE( 0,  0) AM_READWRITE(pattern_name_table_y_r,pattern_name_table_y_w)
@@ -296,7 +296,7 @@ ADDRESS_MAP_END
  *
  ***************************************/
 
-DEVICE_ADDRESS_MAP_START( port_map, 8, ygv608_device )
+ADDRESS_MAP_START(ygv608_device::port_map)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(pattern_name_table_r,pattern_name_table_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(sprite_data_r,sprite_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(scroll_data_r,scroll_data_w)
@@ -316,7 +316,7 @@ ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, de
 	: device_t(mconfig, YGV608, tag, owner, clock),
 	  device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608)),
 	  device_memory_interface(mconfig, *this),
-	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(regs_map)),
+	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(ygv608_device::regs_map), this)),
 	  m_vblank_handler(*this),
 	  m_raster_handler(*this)
 {

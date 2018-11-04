@@ -215,9 +215,9 @@
 #include "formats/2d_dsk.h"
 
 
-#define MAIN_CLOCK XTAL(16'000'000)
-#define VDP_CLOCK  XTAL(42'954'545)
-#define MCU_CLOCK  XTAL(6'000'000)
+constexpr XTAL MAIN_CLOCK   = 16_MHz_XTAL;
+constexpr XTAL VDP_CLOCK    = 42.954'545_MHz_XTAL;
+//constexpr XTAL MCU_CLOCK    = 6_MHz_XTAL;
 
 /*************************************
  *
@@ -698,7 +698,7 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
 
 READ8_MEMBER( x1_state::x1_rom_r )
 {
-//  printf("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
+//  logerror("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 	if (m_cart->exists())
 		return m_cart->read_rom(space, (m_rom_index[0] << 16) | (m_rom_index[1] << 8) | (m_rom_index[2] << 0));
 	else
@@ -741,16 +741,16 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 		case 0x0ffb:
 			return m_fdc->data_r(space, offset);
 		case 0x0ffc:
-			printf("FDC: read FM type\n");
+			logerror("FDC: read FM type\n");
 			return 0xff;
 		case 0x0ffd:
-			printf("FDC: read MFM type\n");
+			logerror("FDC: read MFM type\n");
 			return 0xff;
 		case 0x0ffe:
-			printf("FDC: read 1.6M type\n");
+			logerror("FDC: read 1.6M type\n");
 			return 0xff;
 		case 0x0fff:
-			printf("FDC: switching between 500k/1M\n");
+			logerror("FDC: switching between 500k/1M\n");
 			return 0xff;
 	}
 
@@ -778,13 +778,7 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 
 		case 0x0ffc:
 			m_fdc_ctrl = data;
-			switch (data & 0x03)
-			{
-			case 0: floppy = m_floppy0->get_device(); break;
-			case 1: floppy = m_floppy1->get_device(); break;
-			case 2: floppy = m_floppy2->get_device(); break;
-			case 3: floppy = m_floppy3->get_device(); break;
-			}
+			floppy = m_floppy[data & 0x03]->get_device();
 
 			m_fdc->set_floppy(floppy);
 
@@ -810,18 +804,8 @@ WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
 
 WRITE_LINE_MEMBER(x1_state::hdl_w)
 {
-	floppy_image_device *floppy = nullptr;
-
-	if(!state)
-		return;
-	switch (m_fdc_ctrl & 0x03)
-	{
-	case 0: floppy = m_floppy0->get_device(); break;
-	case 1: floppy = m_floppy1->get_device(); break;
-	case 2: floppy = m_floppy2->get_device(); break;
-	case 3: floppy = m_floppy3->get_device(); break;
-	}
-	floppy->mon_w(CLEAR_LINE);
+	if (state)
+		m_floppy[m_fdc_ctrl & 0x03]->get_device()->mon_w(CLEAR_LINE);
 }
 
 /*************************************
@@ -856,7 +840,7 @@ uint16_t x1_state::get_pcg_addr( uint16_t width, uint8_t y_char_size )
 	int vbeam = m_screen->vpos() / y_char_size;
 	uint16_t pcg_offset = ((hbeam + vbeam*width) + (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))) & 0x7ff;
 
-	//printf("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine.first_screen()->vpos() & 7,width);
+	//logerror("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine.first_screen()->vpos() & 7,width);
 
 	return pcg_offset;
 }
@@ -966,63 +950,70 @@ void x1_state::set_current_palette()
 	//  m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
-{
-	uint32_t pal_entry;
-	uint8_t r,g,b;
-
-	pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);
-
-	m_pal_4096[pal_entry+((offset & 0x300)<<4)] = data & 0xf;
-
-	r = m_pal_4096[pal_entry+(1<<12)];
-	g = m_pal_4096[pal_entry+(2<<12)];
-	b = m_pal_4096[pal_entry+(0<<12)];
-
-	m_palette->set_pen_color(pal_entry+16, pal3bit(r), pal3bit(g), pal3bit(b));
-}
-
 /* Note: docs claims that reading the palette ports makes the value to change somehow in X1 mode ...
          In 4096 color mode, it's used for reading the value back. */
 WRITE8_MEMBER( x1_state::x1_pal_r_w )
 {
-	if(m_turbo_reg.pal & 0x80) //AEN bit, Turbo Z
-	{
-		if(m_turbo_reg.gfx_pal & 0x80) //APEN bit
-			x1turboz_4096_palette_w(space,offset & 0x3ff,data);
-	}
-	else //compatible mode
-	{
-		m_x_r = data;
-		set_current_palette();
-	}
+	m_x_r = data;
+	set_current_palette();
 }
 
 WRITE8_MEMBER( x1_state::x1_pal_g_w )
 {
-	if(m_turbo_reg.pal & 0x80) //AEN bit, Turbo Z
-	{
-		if(m_turbo_reg.gfx_pal & 0x80) //APEN bit
-			x1turboz_4096_palette_w(space,offset & 0x3ff,data);
-	}
-	else
-	{
-		m_x_g = data;
-		set_current_palette();
-	}
+	m_x_g = data;
+	set_current_palette();
 }
 
 WRITE8_MEMBER( x1_state::x1_pal_b_w )
 {
-	if(m_turbo_reg.pal & 0x80) //AEN bit, Turbo Z
+	m_x_b = data;
+	set_current_palette();
+}
+
+WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
+{
+	if (m_turbo_reg.pal & 0x80) // AEN bit, Turbo Z
 	{
-		if(m_turbo_reg.gfx_pal & 0x80) //APEN bit
-			x1turboz_4096_palette_w(space,offset & 0x3ff,data);
+		if (m_turbo_reg.gfx_pal & 0x80) // APEN bit
+		{
+			uint32_t const pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);
+
+			m_pal_4096[pal_entry+((offset & 0x300)<<4)] = data & 0xf;
+
+			uint8_t const r = m_pal_4096[pal_entry+(1<<12)];
+			uint8_t const g = m_pal_4096[pal_entry+(2<<12)];
+			uint8_t const b = m_pal_4096[pal_entry+(0<<12)];
+
+			m_palette->set_pen_color(pal_entry+16, pal3bit(r), pal3bit(g), pal3bit(b));
+		}
+	}
+	else //compatible mode
+	{
+		switch (data & 0x0300)
+		{
+		case 0x0000:
+			x1_pal_b_w(space, offset & 0x00ff, data);
+			break;
+		case 0x0100:
+			x1_pal_r_w(space, offset & 0x00ff, data);
+			break;
+		case 0x0200:
+			x1_pal_g_w(space, offset & 0x00ff, data);
+			break;
+		}
+	}
+}
+
+READ8_MEMBER( x1_state::x1_ex_gfxram_r )
+{
+	if (!machine().side_effect_disabled())
+	{
+		m_iobank->set_bank(0); // any read disables the extended mode
+		return m_iobank->read8(space, offset);
 	}
 	else
 	{
-		m_x_b = data;
-		set_current_palette();
+		return 0xff;
 	}
 }
 
@@ -1035,9 +1026,10 @@ WRITE8_MEMBER( x1_state::x1_ex_gfxram_w )
 	else if(offset >= 0x8000 && offset <= 0xbfff)   { ex_mask = 5; }
 	else                                            { ex_mask = 3; }
 
-	if(ex_mask & 1) { m_gfx_bitmap_ram[(offset & 0x3fff)+0x0000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
-	if(ex_mask & 2) { m_gfx_bitmap_ram[(offset & 0x3fff)+0x4000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
-	if(ex_mask & 4) { m_gfx_bitmap_ram[(offset & 0x3fff)+0x8000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
+	uint8_t *const ptr = reinterpret_cast<uint8_t *>(m_bitmapbank->base());
+	if(ex_mask & 1) ptr[(offset & 0x3fff)+0x0000] = data;
+	if(ex_mask & 2) ptr[(offset & 0x3fff)+0x4000] = data;
+	if(ex_mask & 4) ptr[(offset & 0x3fff)+0x8000] = data;
 }
 
 /*
@@ -1055,21 +1047,21 @@ WRITE8_MEMBER( x1_state::x1_ex_gfxram_w )
 WRITE8_MEMBER( x1_state::x1_scrn_w )
 {
 	m_scrn_reg.pcg_mode = BIT(data, 5);
-	m_scrn_reg.gfx_bank = BIT(data, 4);
+	m_bitmapbank->set_entry(BIT(data, 4));
 	m_scrn_reg.disp_bank = BIT(data, 3);
 	m_scrn_reg.ank_sel = BIT(data, 2);
 	m_scrn_reg.v400_mode = ((data & 0x03) == 3) ? 1 : 0;
 
 	if(data & 0x80)
-		printf("SCRN = %02x\n",data & 0x80);
+		logerror("SCRN = %02x\n",data & 0x80);
 	if((data & 0x03) == 1)
-		printf("SCRN sets true 400 lines mode\n");
+		logerror("SCRN sets true 400 lines mode\n");
 }
 
 WRITE8_MEMBER( x1_state::x1_pri_w )
 {
 	m_scrn_reg.pri = data;
-//  printf("PRI = %02x\n",data);
+//  logerror("PRI = %02x\n",data);
 }
 
 WRITE8_MEMBER( x1_state::x1_6845_w )
@@ -1103,7 +1095,7 @@ WRITE8_MEMBER( x1_state::x1turbo_blackclip_w )
 	*/
 	m_scrn_reg.blackclip = data;
 	if(data & 0x40)
-		printf("Blackclip data access %02x\n",data);
+		logerror("Blackclip data access %02x\n",data);
 }
 
 READ8_MEMBER( x1_state::x1turbo_pal_r )
@@ -1128,7 +1120,7 @@ READ8_MEMBER( x1_state::x1turbo_gfxpal_r )
 
 WRITE8_MEMBER( x1_state::x1turbo_pal_w )
 {
-	printf("TURBO PAL %02x\n",data);
+	logerror("TURBO PAL %02x\n",data);
 	m_turbo_reg.pal = data;
 }
 
@@ -1136,7 +1128,7 @@ WRITE8_MEMBER( x1_state::x1turbo_txpal_w )
 {
 	int r,g,b;
 
-	printf("TURBO TEXT PAL %02x %02x\n",data,offset);
+	logerror("TURBO TEXT PAL %02x %02x\n",data,offset);
 	m_turbo_reg.txt_pal[offset] = data;
 
 	if(m_turbo_reg.pal & 0x80)
@@ -1151,13 +1143,13 @@ WRITE8_MEMBER( x1_state::x1turbo_txpal_w )
 
 WRITE8_MEMBER( x1_state::x1turbo_txdisp_w )
 {
-	printf("TURBO TEXT DISPLAY %02x\n",data);
+	logerror("TURBO TEXT DISPLAY %02x\n",data);
 	m_turbo_reg.txt_disp = data;
 }
 
 WRITE8_MEMBER( x1_state::x1turbo_gfxpal_w )
 {
-	printf("TURBO GFX PAL %02x\n",data);
+	logerror("TURBO GFX PAL %02x\n",data);
 	m_turbo_reg.gfx_pal = data;
 }
 
@@ -1176,7 +1168,7 @@ uint16_t x1_state::jis_convert(int kanji_addr)
 	if(kanji_addr >= 0x0300 && kanji_addr <= 0x04ff) { kanji_addr -= 0x0300; kanji_addr &= 0x1ff; return ((0x440) + (kanji_addr >> 3)) << 4; } // parentesis
 
 	if(kanji_addr != 0x0720 && kanji_addr != 0x0730)
-		printf("%08x\n",kanji_addr);
+		logerror("%08x\n",kanji_addr);
 
 	return 0x0000;
 }
@@ -1202,7 +1194,7 @@ WRITE8_MEMBER( x1_state::x1_kanji_w )
 		case 0: m_kanji_addr_latch = (data & 0xff)|(m_kanji_addr_latch&0xff00); break;
 		case 1: m_kanji_addr_latch = (data<<8)|(m_kanji_addr_latch&0x00ff);
 			//if(m_kanji_addr_latch != 0x720 && m_kanji_addr_latch != 0x730)
-			//  printf("%08x\n",m_kanji_addr_latch);
+			//  logerror("%08x\n",m_kanji_addr_latch);
 			break;
 		case 2:
 		{
@@ -1214,7 +1206,7 @@ WRITE8_MEMBER( x1_state::x1_kanji_w )
 			{
 				m_kanji_addr = (m_kanji_addr_latch);
 				//m_kanji_addr &= 0x3fff; //<- temp kludge until the rom is redumped.
-				//printf("%08x\n",m_kanji_addr);
+				//logerror("%08x\n",m_kanji_addr);
 				//m_kanji_addr+= m_kanji_count;
 			}
 			m_kanji_eksel = data & 1;
@@ -1229,12 +1221,12 @@ READ8_MEMBER( x1_state::x1_emm_r )
 
 	if(offset & ~3)
 	{
-		printf("Warning: read EMM BASIC area [%02x]\n",offset & 0xff);
+		logerror("Warning: read EMM BASIC area [%02x]\n",offset & 0xff);
 		return 0xff;
 	}
 
 	if(offset != 3)
-		printf("Warning: read EMM address [%02x]\n",offset);
+		logerror("Warning: read EMM address [%02x]\n",offset);
 
 	res = 0xff;
 
@@ -1251,7 +1243,7 @@ WRITE8_MEMBER( x1_state::x1_emm_w )
 {
 	if(offset & ~3)
 	{
-		printf("Warning: write EMM BASIC area [%02x] %02x\n",offset & 0xff,data);
+		logerror("Warning: write EMM BASIC area [%02x] %02x\n",offset & 0xff,data);
 		return;
 	}
 
@@ -1272,7 +1264,7 @@ WRITE8_MEMBER( x1_state::x1_emm_w )
 */
 READ8_MEMBER( x1_state::x1turbo_bank_r )
 {
-//  printf("BANK access read\n");
+//  logerror("BANK access read\n");
 	return m_ex_bank & 0x3f;
 }
 
@@ -1286,7 +1278,7 @@ WRITE8_MEMBER( x1_state::x1turbo_bank_w )
 	*/
 
 	m_ex_bank = data & 0x3f;
-//  printf("BANK access write %02x\n",data);
+//  logerror("BANK access write %02x\n",data);
 }
 
 /* TODO: waitstate penalties */
@@ -1327,195 +1319,105 @@ WRITE8_MEMBER( x1_state::x1turbo_mem_w )
  *
  *************************************/
 
-READ8_MEMBER( x1_state::x1_io_r )
-{
-	m_io_bank_mode = 0; //any read disables the extended mode.
+ADDRESS_MAP_START(x1_state::x1_io_banks_common)
+	ADDRESS_MAP_UNMAP_HIGH
 
-	if(offset == 0x0e03)                            { return x1_rom_r(space, 0); }
-	// TODO: user could install ym2151 on plain X1 too
-	//0x700, 0x701
-	//if(offset >= 0x0704 && offset <= 0x0707)      { return z80ctc_r(m_ctc, offset-0x0704); }
-	else if(offset >= 0x0ff8 && offset <= 0x0fff)   { return x1_fdc_r(space, offset-0xff8); }
-	else if(offset >= 0x1400 && offset <= 0x17ff)   { return x1_pcg_r(space, offset-0x1400); }
-	else if(offset >= 0x1900 && offset <= 0x19ff)   { return x1_sub_io_r(space, 0); }
-	else if(offset >= 0x1a00 && offset <= 0x1aff)   { return machine().device<i8255_device>("ppi8255_0")->read(space, (offset-0x1a00) & 3); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)   { return machine().device<ay8910_device>("ay")->data_r(space, 0); }
-//  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(machine().device("dma"), 0); }
-//  else if(offset >= 0x1f90 && offset <= 0x1f91)   { return z80sio_c_r(machine().device("sio"), (offset-0x1f90) & 1); }
-//  else if(offset >= 0x1f92 && offset <= 0x1f93)   { return z80sio_d_r(machine().device("sio"), (offset-0x1f92) & 1); }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)   { return m_ctc->read(space,offset-0x1fa0); }
-	else if(offset >= 0x1fa8 && offset <= 0x1fab)   { return m_ctc->read(space,offset-0x1fa8); }
-//  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
-//  else if(offset == 0x1fe0)                       { return x1turboz_blackclip_r(space,0); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)   { return m_avram[offset & 0x7ff]; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)   { return m_tvram[offset & 0x7ff]; } // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
-	else if(offset >= 0x4000 && offset <= 0xffff)   { return m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)]; }
-	else
-	{
-		//logerror("(PC=%06x) Read i/o address %04x\n",m_maincpu->pc(),offset);
-	}
-	return 0xff;
-}
+	AM_RANGE(0x0e00, 0x0e02)                   AM_WRITE(x1_rom_w)
+	AM_RANGE(0x0e03, 0x0e03)                   AM_READ(x1_rom_r)
 
-WRITE8_MEMBER( x1_state::x1_io_w )
-{
-	if(m_io_bank_mode == 1)                     { x1_ex_gfxram_w(space, offset, data); }
-	// TODO: user could install ym2151 on plain X1 too
-	//0x700, 0x701
-//  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(m_ctc, offset-0x0704,data); }
-//  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(machine(), 0, data); }
-	else if(offset >= 0x0e00 && offset <= 0x0e02)   { x1_rom_w(space, offset-0xe00,data); }
-//  else if(offset >= 0x0e80 && offset <= 0x0e82)   { x1_kanji_w(machine(), offset-0xe80,data); }
-	else if(offset >= 0x0ff8 && offset <= 0x0fff)   { x1_fdc_w(space, offset-0xff8,data); }
-	else if(offset >= 0x1000 && offset <= 0x10ff)   { x1_pal_b_w(space, 0,data); }
-	else if(offset >= 0x1100 && offset <= 0x11ff)   { x1_pal_r_w(space, 0,data); }
-	else if(offset >= 0x1200 && offset <= 0x12ff)   { x1_pal_g_w(space, 0,data); }
-	else if(offset >= 0x1300 && offset <= 0x13ff)   { x1_pri_w(space, 0,data); }
-	else if(offset >= 0x1400 && offset <= 0x17ff)   { x1_pcg_w(space, offset-0x1400,data); }
-	else if(offset == 0x1800 || offset == 0x1801)   { x1_6845_w(space, offset-0x1800, data); }
-	else if(offset >= 0x1900 && offset <= 0x19ff)   { x1_sub_io_w(space, 0,data); }
-	else if(offset >= 0x1a00 && offset <= 0x1aff)   { machine().device<i8255_device>("ppi8255_0")->write(space, (offset-0x1a00) & 3,data); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)   { machine().device<ay8910_device>("ay")->data_w(space, 0,data); }
-	else if(offset >= 0x1c00 && offset <= 0x1cff)   { machine().device<ay8910_device>("ay")->address_w(space, 0,data); }
-	else if(offset >= 0x1d00 && offset <= 0x1dff)   { x1_rom_bank_1_w(space,0,data); }
-	else if(offset >= 0x1e00 && offset <= 0x1eff)   { x1_rom_bank_0_w(space,0,data); }
-//  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { z80dma_w(machine().device("dma"), 0,data); }
-//  else if(offset >= 0x1f90 && offset <= 0x1f91)   { z80sio_c_w(machine().device("sio"), (offset-0x1f90) & 1,data); }
-//  else if(offset >= 0x1f92 && offset <= 0x1f93)   { z80sio_d_w(machine().device("sio"), (offset-0x1f92) & 1,data); }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)   { m_ctc->write(space,offset-0x1fa0,data); }
-	else if(offset >= 0x1fa8 && offset <= 0x1fab)   { m_ctc->write(space,offset-0x1fa8,data); }
-//  else if(offset == 0x1fb0)                       { x1turbo_pal_w(space,0,data); }
-//  else if(offset >= 0x1fb9 && offset <= 0x1fbf)   { x1turbo_txpal_w(space,offset-0x1fb9,data); }
-//  else if(offset == 0x1fc0)                       { x1turbo_txdisp_w(space,0,data); }
-//  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
-//  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { x1_scrn_w(space,0,data); }
-//  else if(offset == 0x1fe0)                       { x1turbo_blackclip_w(space,0,data); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)   { m_avram[offset & 0x7ff] = data; }
-	else if(offset >= 0x3000 && offset <= 0x3fff)   { m_tvram[offset & 0x7ff] = data; }
-	else if(offset >= 0x4000 && offset <= 0xffff)   { m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
-	else
-	{
-		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",m_maincpu->pc(),data,offset);
-	}
-}
+	AM_RANGE(0x0ff8, 0x0fff)                   AM_READWRITE(x1_fdc_r, x1_fdc_w)
 
-/* TODO: I should actually simplify this, by just overwriting X1 Turbo specifics here, and call plain X1 functions otherwise */
-READ8_MEMBER( x1_state::x1turbo_io_r )
-{
-	m_io_bank_mode = 0; //any read disables the extended mode.
+	AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x00ff) AM_WRITE(x1_pri_w)
+	AM_RANGE(0x1400, 0x17ff)                   AM_READWRITE(x1_pcg_r, x1_pcg_w)
+
+	AM_RANGE(0x1800, 0x1801)                   AM_WRITE(x1_6845_w)
+
+	AM_RANGE(0x1900, 0x1900) AM_MIRROR(0x00ff) AM_READWRITE(x1_sub_io_r, x1_sub_io_w)
+	AM_RANGE(0x1a00, 0x1a03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x1b00, 0x1b00) AM_MIRROR(0x00ff) AM_DEVREADWRITE("ay", ay8910_device, data_r, data_w)
+	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x00ff) AM_DEVWRITE("ay", ay8910_device, address_w)
+	AM_RANGE(0x1d00, 0x1d00) AM_MIRROR(0x00ff) AM_WRITE(x1_rom_bank_1_w)
+	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x00ff) AM_WRITE(x1_rom_bank_0_w)
+
+	AM_RANGE(0x1fa0, 0x1fa3)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	AM_RANGE(0x1fa8, 0x1fab)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+
+	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("avram")
+
+	AM_RANGE(0x4000, 0xffff)                   AM_READWRITE_BANK("bitmapbank")
+
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(x1_ex_gfxram_r, x1_ex_gfxram_w)
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START(x1_state::x1_io_banks)
+	AM_IMPORT_FROM(x1_io_banks_common)
+
+//  AM_RANGE(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
+
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_b_w)
+	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_r_w)
+	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_g_w)
+
+	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("tvram") // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START(x1_state::x1turbo_io_banks)
+	AM_IMPORT_FROM(x1_io_banks_common)
 
 	// a * at the end states devices used on plain X1 too
-	if(offset == 0x0700)                            { return (machine().device<ym2151_device>("ym")->read(space, offset-0x0700) & 0x7f) | (ioport("SOUND_SW")->read() & 0x80); }
-	else if(offset == 0x0701)                       { return machine().device<ym2151_device>("ym")->read(space, offset-0x0700); }
-	//0x704 is FM sound detection port on X1 turboZ
-	else if(offset >= 0x0704 && offset <= 0x0707)   { return m_ctc->read(space,offset-0x0704); }
-	else if(offset == 0x0801)                       { printf("Color image board read\n"); return 0xff; } // *
-	else if(offset == 0x0803)                       { printf("Color image board 2 read\n"); return 0xff; } // *
-	else if(offset >= 0x0a00 && offset <= 0x0a07)   { printf("Stereoscopic board read %04x\n",offset); return 0xff; } // *
-	else if(offset == 0x0b00)                       { return x1turbo_bank_r(space,0); }
-	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C read %04x\n",offset); return 0; } // *
-	else if(offset >= 0x0d00 && offset <= 0x0dff)   { return x1_emm_r(space,offset & 0xff); } // *
-	else if(offset == 0x0e03)                       { return x1_rom_r(space, 0); }
-	else if(offset >= 0x0e80 && offset <= 0x0e81)   { return x1_kanji_r(space, offset-0xe80); }
-	else if(offset >= 0x0fd0 && offset <= 0x0fd3)   { /* printf("SASI HDD read %04x\n",offset); */ return 0xff; } // *
-	else if(offset >= 0x0fe8 && offset <= 0x0fef)   { printf("8-inch FD read %04x\n",offset); return 0xff; } // *
-	else if(offset >= 0x0ff8 && offset <= 0x0fff)   { return x1_fdc_r(space, offset-0xff8); }
-	else if(offset >= 0x1400 && offset <= 0x17ff)   { return x1_pcg_r(space, offset-0x1400); }
-	else if(offset >= 0x1900 && offset <= 0x19ff)   { return x1_sub_io_r(space, 0); }
-	else if(offset >= 0x1a00 && offset <= 0x1aff)   { return machine().device<i8255_device>("ppi8255_0")->read(space, (offset-0x1a00) & 3); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)   { return machine().device<ay8910_device>("ay")->data_r(space, 0); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return m_dma->read(space, 0); }
-	else if(offset >= 0x1f90 && offset <= 0x1f93)   { return machine().device<z80sio0_device>("sio")->ba_cd_r(space, (offset-0x1f90) & 3); }
-	else if(offset >= 0x1f98 && offset <= 0x1f9f)   { printf("Extended SIO/CTC read %04x\n",offset); return 0xff; }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)   { return m_ctc->read(space,offset-0x1fa0); }
-	else if(offset >= 0x1fa8 && offset <= 0x1fab)   { return m_ctc->read(space,offset-0x1fa8); }
-	else if(offset == 0x1fb0)                       { return x1turbo_pal_r(space,0); } // Z only!
-	else if(offset >= 0x1fb8 && offset <= 0x1fbf)   { return x1turbo_txpal_r(space,offset-0x1fb8); } //Z only!
-	else if(offset == 0x1fc0)                       { return x1turbo_txdisp_r(space,0); } // Z only!
-	else if(offset == 0x1fc5)                       { return x1turbo_gfxpal_r(space,0); } // Z only!
-//  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); } //Z only
-	else if(offset == 0x1fe0)                       { return x1turboz_blackclip_r(space,0); }
-	else if(offset == 0x1ff0)                       { return ioport("X1TURBO_DSW")->read(); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)   { return m_avram[offset & 0x7ff]; }
-	else if(offset >= 0x3000 && offset <= 0x37ff)   { return m_tvram[offset & 0x7ff]; }
-	else if(offset >= 0x3800 && offset <= 0x3fff)   { return m_kvram[offset & 0x7ff]; }
-	else if(offset >= 0x4000 && offset <= 0xffff)   { return m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)]; }
-	else
-	{
-		//logerror("(PC=%06x) Read i/o address %04x\n",m_maincpu->pc(),offset);
-	}
-	return 0xff;
-}
 
-WRITE8_MEMBER( x1_state::x1turbo_io_w )
-{
-	// a * at the end states devices used on plain X1 too
-	if(m_io_bank_mode == 1)                    { x1_ex_gfxram_w(space, offset, data); }
-	else if(offset == 0x0700 || offset == 0x0701)   { machine().device<ym2151_device>("ym")->write(space, offset-0x0700,data); }
-	//0x704 is FM sound detection port on X1 turboZ
-	else if(offset >= 0x0704 && offset <= 0x0707)   { m_ctc->write(space,offset-0x0704,data); }
-	else if(offset == 0x0800)                       { printf("Color image board write %02x\n",data); } // *
-	else if(offset == 0x0802)                       { printf("Color image board 2 write %02x\n",data); } // *
-	else if(offset >= 0x0a00 && offset <= 0x0a07)   { printf("Stereoscopic board write %04x %02x\n",offset,data); } // *
-	else if(offset == 0x0b00)                       { x1turbo_bank_w(space,0,data); }
-	else if(offset >= 0x0c00 && offset <= 0x0cff)   { printf("RS-232C write %04x %02x\n",offset,data); } // *
-	else if(offset >= 0x0d00 && offset <= 0x0dff)   { x1_emm_w(space,offset & 0xff,data); } // *
-	else if(offset >= 0x0e00 && offset <= 0x0e02)   { x1_rom_w(space, offset-0xe00,data); }
-	else if(offset >= 0x0e80 && offset <= 0x0e83)   { x1_kanji_w(space, offset-0xe80,data); }
-	else if(offset >= 0x0fd0 && offset <= 0x0fd3)   { printf("SASI HDD write %04x %02x\n",offset,data); } // *
-	else if(offset >= 0x0fe8 && offset <= 0x0fef)   { printf("8-inch FD write %04x %02x\n",offset,data); } // *
-	else if(offset >= 0x0ff8 && offset <= 0x0fff)   { x1_fdc_w(space, offset-0xff8,data); }
-	else if(offset >= 0x1000 && offset <= 0x10ff)   { x1_pal_b_w(space, offset & 0x3ff,data); }
-	else if(offset >= 0x1100 && offset <= 0x11ff)   { x1_pal_r_w(space, offset & 0x3ff,data); }
-	else if(offset >= 0x1200 && offset <= 0x12ff)   { x1_pal_g_w(space, offset & 0x3ff,data); }
-	else if(offset >= 0x1300 && offset <= 0x13ff)   { x1_pri_w(space, 0,data); }
-	else if(offset >= 0x1400 && offset <= 0x17ff)   { x1_pcg_w(space, offset-0x1400,data); }
-	else if(offset == 0x1800 || offset == 0x1801)   { x1_6845_w(space, offset-0x1800, data); }
-	else if(offset >= 0x1900 && offset <= 0x19ff)   { x1_sub_io_w(space, 0,data); }
-	else if(offset >= 0x1a00 && offset <= 0x1aff)   { machine().device<i8255_device>("ppi8255_0")->write(space, (offset-0x1a00) & 3,data); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)   { machine().device<ay8910_device>("ay")->data_w(space, 0,data); }
-	else if(offset >= 0x1c00 && offset <= 0x1cff)   { machine().device<ay8910_device>("ay")->address_w(space, 0,data); }
-	else if(offset >= 0x1d00 && offset <= 0x1dff)   { x1_rom_bank_1_w(space,0,data); }
-	else if(offset >= 0x1e00 && offset <= 0x1eff)   { x1_rom_bank_0_w(space,0,data); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { m_dma->write(space, 0,data); }
-	else if(offset >= 0x1f90 && offset <= 0x1f93)   { machine().device<z80sio0_device>("sio")->ba_cd_w(space, (offset-0x1f90) & 3,data); }
-	else if(offset >= 0x1f98 && offset <= 0x1f9f)   { printf("Extended SIO/CTC write %04x %02x\n",offset,data); }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)   { m_ctc->write(space,offset-0x1fa0,data); }
-	else if(offset >= 0x1fa8 && offset <= 0x1fab)   { m_ctc->write(space,offset-0x1fa8,data); }
-	else if(offset == 0x1fb0)                       { x1turbo_pal_w(space,0,data); } // Z only!
-	else if(offset >= 0x1fb8 && offset <= 0x1fbf)   { x1turbo_txpal_w(space,offset-0x1fb8,data); } //Z only!
-	else if(offset == 0x1fc0)                       { x1turbo_txdisp_w(space,0,data); } //Z only!
-	else if(offset == 0x1fc1)                       { printf("Z image capturing access %02x\n",data); } // Z only!
-	else if(offset == 0x1fc2)                       { printf("Z mosaic effect access %02x\n",data); } // Z only!
-	else if(offset == 0x1fc3)                       { printf("Z Chroma key access %02x\n",data); } // Z only!
-	else if(offset == 0x1fc4)                       { printf("Z Extra scroll config access %02x\n",data); } // Z only!
-	else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); } // Z only!
-	else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { x1_scrn_w(space,0,data); }
-	else if(offset == 0x1fe0)                       { x1turbo_blackclip_w(space,0,data); }
-	else if(offset >= 0x2000 && offset <= 0x2fff)   { m_avram[offset & 0x7ff] = data; }
-	else if(offset >= 0x3000 && offset <= 0x37ff)   { m_tvram[offset & 0x7ff] = data; }
-	else if(offset >= 0x3800 && offset <= 0x3fff)   { m_kvram[offset & 0x7ff] = data; }
-	else if(offset >= 0x4000 && offset <= 0xffff)   { m_gfx_bitmap_ram[offset-0x4000+(m_scrn_reg.gfx_bank*0xc000)] = data; }
-	else
-	{
-		//logerror("(PC=%06x) Write %02x at i/o address %04x\n",m_maincpu->pc(),data,offset);
-	}
-}
+	AM_RANGE(0x0700, 0x0701)                   AM_READ(ym_r) AM_DEVWRITE("ym", ym2151_device, write)
+	// 0x704 is FM sound detection port on X1 turboZ
+	AM_RANGE(0x0704, 0x0707)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 
-static ADDRESS_MAP_START( x1_mem, AS_PROGRAM, 8, x1_state )
+	AM_RANGE(0x0800, 0x0800)                   AM_WRITE(color_board_w)                          // *
+	AM_RANGE(0x0801, 0x0801)                   AM_READ(color_board_r)                           // *
+	AM_RANGE(0x0802, 0x0802)                   AM_WRITE(color_board_2_w)                        // *
+	AM_RANGE(0x0803, 0x0803)                   AM_READ(color_board_2_r)                         // *
+	AM_RANGE(0x0a00, 0x0a07)                   AM_READWRITE(stereo_board_r, stereo_board_w)     // *
+	AM_RANGE(0x0b00, 0x0b00)                   AM_READWRITE(x1turbo_bank_r, x1turbo_bank_w)
+	AM_RANGE(0x0c00, 0x0cff)                   AM_READWRITE(rs232_r, rs232_w)                   // *
+	AM_RANGE(0x0d00, 0x0dff)                   AM_READWRITE(x1_emm_r, x1_emm_w)                 // *
+	AM_RANGE(0x0e80, 0x0e81)                   AM_READ(x1_kanji_r)
+	AM_RANGE(0x0e80, 0x0e83)                   AM_WRITE(x1_kanji_w)
+	AM_RANGE(0x0fd0, 0x0fd3)                   AM_READWRITE(sasi_r, sasi_w)                     // *
+	AM_RANGE(0x0fe8, 0x0fef)                   AM_READWRITE(fdd8_r, fdd8_w)                     // *
+
+	AM_RANGE(0x1000, 0x12ff)                   AM_WRITE(x1turboz_4096_palette_w)
+
+	AM_RANGE(0x1f80, 0x1f80) AM_MIRROR(0x000f) AM_DEVREADWRITE("dma", z80dma_device, read, write)
+    AM_RANGE(0x1f90, 0x1f93)                   AM_DEVREADWRITE("sio", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x1f98, 0x1f9f)                   AM_READWRITE(ext_sio_ctc_r, ext_sio_ctc_w)
+	AM_RANGE(0x1fb0, 0x1fb0)                   AM_READWRITE(x1turbo_pal_r, x1turbo_pal_w)       // Z only!
+	AM_RANGE(0x1fb8, 0x1fbf)                   AM_READWRITE(x1turbo_txpal_r, x1turbo_txpal_w)   // Z only!
+	AM_RANGE(0x1fc0, 0x1fc0)                   AM_READWRITE(x1turbo_txdisp_r, x1turbo_txdisp_w) // Z only!
+	AM_RANGE(0x1fc1, 0x1fc1)                   AM_WRITE(z_img_cap_w)                            // Z only!
+	AM_RANGE(0x1fc2, 0x1fc2)                   AM_WRITE(z_mosaic_w)                             // Z only!
+	AM_RANGE(0x1fc3, 0x1fc3)                   AM_WRITE(z_chroma_key_w)                         // Z only!
+	AM_RANGE(0x1fc4, 0x1fc4)                   AM_WRITE(z_extra_scroll_w)                       // Z only!
+	AM_RANGE(0x1fc5, 0x1fc5)                   AM_READWRITE(x1turbo_gfxpal_r, x1turbo_gfxpal_w) // Z only!
+//  AM_RANGE(0x1fd0, 0x1fdf)                   AM_READ(x1_scrn_r)                               // Z only!
+	AM_RANGE(0x1fd0, 0x1fd0) AM_MIRROR(0x000f) AM_WRITE(x1_scrn_w)
+	AM_RANGE(0x1fe0, 0x1fe0)                   AM_READWRITE(x1turboz_blackclip_r, x1turbo_blackclip_w)
+	AM_RANGE(0x1ff0, 0x1ff0)                   AM_READ_PORT("X1TURBO_DSW")
+
+	AM_RANGE(0x3000, 0x37ff)                   AM_RAM AM_SHARE("tvram")
+	AM_RANGE(0x3800, 0x3fff)                   AM_RAM AM_SHARE("kvram")
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START(x1_state::x1_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x1turbo_mem, AS_PROGRAM, 8, x1_state )
+ADDRESS_MAP_START(x1_state::x1turbo_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_mem_r,x1turbo_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x1_io, AS_IO, 8, x1_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_io_r, x1_io_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( x1turbo_io, AS_IO, 8, x1_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1turbo_io_r, x1turbo_io_w)
+ADDRESS_MAP_START(x1_state::x1_io)
+	AM_RANGE(0x0000, 0xffff) AM_DEVICE("iobank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
 /*************************************
@@ -1526,14 +1428,14 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( x1_state::x1_porta_r )
 {
-	printf("PPI Port A read\n");
+	logerror("PPI Port A read\n");
 	return 0xff;
 }
 
 /* this port is system related */
 READ8_MEMBER( x1_state::x1_portb_r )
 {
-	//printf("PPI Port B read\n");
+	//logerror("PPI Port B read\n");
 	/*
 	x--- ---- "v disp"
 	-x-- ---- "sub cpu ibf"
@@ -1576,7 +1478,7 @@ READ8_MEMBER( x1_state::x1_portb_r )
 /* I/O system port */
 READ8_MEMBER( x1_state::x1_portc_r )
 {
-	//printf("PPI Port C read\n");
+	//logerror("PPI Port C read\n");
 	/*
 	x--- ---- Printer port output
 	-x-- ---- 320 mode (r/w), divider for the pixel clock
@@ -1589,12 +1491,12 @@ READ8_MEMBER( x1_state::x1_portc_r )
 
 WRITE8_MEMBER( x1_state::x1_porta_w )
 {
-	//printf("PPI Port A write %02x\n",data);
+	//logerror("PPI Port A write %02x\n",data);
 }
 
 WRITE8_MEMBER( x1_state::x1_portb_w )
 {
-	//printf("PPI Port B write %02x\n",data);
+	//logerror("PPI Port B write %02x\n",data);
 }
 
 WRITE8_MEMBER( x1_state::x1_portc_w )
@@ -1605,7 +1507,7 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	m_crtc->set_clock(VDP_CLOCK/((m_hres_320) ? 48 : 24));
 
 	if(!BIT(data, 5) && BIT(m_io_switch, 5))
-		m_io_bank_mode = 1;
+		m_iobank->set_bank(1);
 
 	m_io_switch = data & 0x20;
 	m_io_sys = data & 0xff;
@@ -1636,6 +1538,118 @@ WRITE8_MEMBER(x1_state::io_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);
 }
+
+READ8_MEMBER(x1_state::ym_r)
+{
+	uint8_t result = machine().device<ym2151_device>("ym")->read(space, offset);
+	if (!BIT(offset, 0))
+		result = (result & 0x7f) | (ioport("SOUND_SW")->read() & 0x80);
+	return result;
+}
+
+/*************************************
+ *
+ *  Placeholders
+ *
+ *************************************/
+
+READ8_MEMBER(x1_state::color_board_r)
+{
+	logerror("Color image board read\n");
+	return space.unmap();
+}
+
+WRITE8_MEMBER(x1_state::color_board_w)
+{
+	logerror("Color image board write %02x\n", data);
+}
+
+READ8_MEMBER(x1_state::color_board_2_r)
+{
+	logerror("Color image board 2 read\n");
+	return space.unmap();
+}
+
+WRITE8_MEMBER(x1_state::color_board_2_w)
+{
+	logerror("Color image board 2 write %02x\n", data);
+}
+
+READ8_MEMBER(x1_state::stereo_board_r)
+{
+	logerror("Stereoscopic board read %04x\n", offset);
+	return space.unmap();
+}
+
+WRITE8_MEMBER(x1_state::stereo_board_w)
+{
+	logerror("Stereoscopic board write %04x %02x\n", offset, data);
+}
+
+READ8_MEMBER(x1_state::rs232_r)
+{
+	logerror("RS-232C read %04x\n", offset);
+	return 0;
+}
+
+WRITE8_MEMBER(x1_state::rs232_w)
+{
+	logerror("RS-232C write %04x %02x\n", offset, data);
+}
+
+READ8_MEMBER(x1_state::sasi_r)
+{
+	//logerror("SASI HDD read %04x\n",offset);
+	return space.unmap();
+}
+
+WRITE8_MEMBER(x1_state::sasi_w)
+{
+	logerror("SASI HDD write %04x %02x\n", offset, data);
+}
+
+READ8_MEMBER(x1_state::fdd8_r)
+{
+	logerror("8-inch FD read %04x\n", offset);
+	return space.unmap();
+}
+
+WRITE8_MEMBER(x1_state::fdd8_w)
+{
+	logerror("8-inch FD write %04x %02x\n", offset, data);
+}
+
+READ8_MEMBER(x1_state::ext_sio_ctc_r)
+{
+	logerror("Extended SIO/CTC read %04x\n", offset);
+	return space.unmap();
+}
+
+WRITE8_MEMBER(x1_state::ext_sio_ctc_w)
+{
+	logerror("Extended SIO/CTC write %04x %02x\n", offset, data);
+}
+
+WRITE8_MEMBER(x1_state::z_img_cap_w)
+{
+	logerror("Z image capturing access %02x\n", data);
+}
+
+WRITE8_MEMBER(x1_state::z_mosaic_w)
+{
+	logerror("Z mosaic effect access %02x\n", data);
+}
+
+WRITE8_MEMBER(x1_state::z_chroma_key_w)
+{
+	logerror("Z Chroma key access %02x\n", data);
+}
+
+WRITE8_MEMBER(x1_state::z_extra_scroll_w)
+{
+	logerror("Z Extra scroll config access %02x\n", data);
+}
+
 
 /*************************************
  *
@@ -2084,7 +2098,7 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 
 	m_is_turbo = 0;
 
-	m_io_bank_mode = 0;
+	m_iobank->set_bank(0);
 
 	//m_x1_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x1_state::x1_irq_callback),this));
 
@@ -2151,12 +2165,9 @@ MACHINE_START_MEMBER(x1_state,x1)
 		m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x1_state::x1_rtc_increment),this));
 	}
 
-	m_ipl_rom = memregion("ipl")->base();
 	m_work_ram = make_unique_clear<uint8_t[]>(0x10000*0x10);
 	m_emm_ram = make_unique_clear<uint8_t[]>(0x1000000);
 	m_pcg_ram = make_unique_clear<uint8_t[]>(0x1800);
-	m_cg_rom = memregion("cgrom")->base();
-	m_kanji_rom = memregion("kanji")->base();
 
 	save_pointer(NAME(m_work_ram.get()), 0x10000*0x10);
 	save_pointer(NAME(m_emm_ram.get()), 0x1000000);
@@ -2187,6 +2198,13 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
 	MCFG_CPU_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
+
+	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(x1_io_banks)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
@@ -2228,7 +2246,7 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w)) 
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -2265,12 +2283,15 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1_state, x1_cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(x1_state::x1turbo, x1)
+MACHINE_CONFIG_START(x1_state::x1turbo)
+	x1(config);
 	MCFG_CPU_MODIFY("x1_cpu")
 	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
-	MCFG_CPU_IO_MAP(x1turbo_io)
 	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
+
+	MCFG_DEVICE_MODIFY("iobank")
+	MCFG_DEVICE_PROGRAM_MAP(x1turbo_io_banks)
 
 	MCFG_DEVICE_ADD("sio", Z80SIO0, MAIN_CLOCK/4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))

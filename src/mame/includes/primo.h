@@ -73,6 +73,11 @@ public:
 	void primoa64(machine_config &config);
 	void primoc64(machine_config &config);
 	void primoa48(machine_config &config);
+	void primo32_mem(address_map &map);
+	void primo48_mem(address_map &map);
+	void primo64_mem(address_map &map);
+	void primoa_port(address_map &map);
+	void primob_port(address_map &map);
 };
 
 

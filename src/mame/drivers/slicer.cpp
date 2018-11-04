@@ -28,6 +28,8 @@ public:
 	template<unsigned int drive> DECLARE_WRITE_LINE_MEMBER(drive_sel_w);
 
 	void slicer(machine_config &config);
+	void slicer_io(address_map &map);
+	void slicer_map(address_map &map);
 protected:
 	required_device<fd1797_device> m_fdc;
 	required_device<scsi_port_device> m_sasi;
@@ -62,12 +64,12 @@ WRITE_LINE_MEMBER(slicer_state::drive_sel_w)
 	m_fdc->set_floppy(floppy);
 }
 
-static ADDRESS_MAP_START( slicer_map, AS_PROGRAM, 16, slicer_state )
+ADDRESS_MAP_START(slicer_state::slicer_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slicer_io, AS_IO, 16, slicer_state )
+ADDRESS_MAP_START(slicer_state::slicer_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_DEVREADWRITE8("fdc", fd1797_device, read, write, 0x00ff) //PCS0
 	AM_RANGE(0x0080, 0x00ff) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0x00ff) //PCS1

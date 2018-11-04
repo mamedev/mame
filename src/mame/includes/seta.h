@@ -295,6 +295,52 @@ public:
 	void metafox(machine_config &config);
 	void utoukond(machine_config &config);
 	void rezon(machine_config &config);
+	void atehate_map(address_map &map);
+	void blandia_map(address_map &map);
+	void blandiap_map(address_map &map);
+	void blockcar_map(address_map &map);
+	void blockcarb_map(address_map &map);
+	void blockcarb_sound_map(address_map &map);
+	void blockcarb_sound_portmap(address_map &map);
+	void calibr50_map(address_map &map);
+	void calibr50_sub_map(address_map &map);
+	void crazyfgt_map(address_map &map);
+	void daioh_map(address_map &map);
+	void daiohp_map(address_map &map);
+	void downtown_map(address_map &map);
+	void downtown_sub_map(address_map &map);
+	void drgnunit_map(address_map &map);
+	void extdwnhl_map(address_map &map);
+	void jjsquawb_map(address_map &map);
+	void kamenrid_map(address_map &map);
+	void keroppi_map(address_map &map);
+	void kiwame_map(address_map &map);
+	void krzybowl_map(address_map &map);
+	void madshark_map(address_map &map);
+	void magspeed_map(address_map &map);
+	void metafox_sub_map(address_map &map);
+	void msgundam_map(address_map &map);
+	void oisipuzl_map(address_map &map);
+	void orbs_map(address_map &map);
+	void pairlove_map(address_map &map);
+	void thunderl_map(address_map &map);
+	void thunderlbl_map(address_map &map);
+	void thunderlbl_sound_map(address_map &map);
+	void thunderlbl_sound_portmap(address_map &map);
+	void tndrcade_map(address_map &map);
+	void tndrcade_sub_map(address_map &map);
+	void triplfun_map(address_map &map);
+	void twineagl_sub_map(address_map &map);
+	void umanclub_map(address_map &map);
+	void usclssic_map(address_map &map);
+	void utoukond_map(address_map &map);
+	void utoukond_sound_io_map(address_map &map);
+	void utoukond_sound_map(address_map &map);
+	void wiggie_map(address_map &map);
+	void wiggie_sound_map(address_map &map);
+	void wrofaero_map(address_map &map);
+	void zingzipbl_map(address_map &map);
+	void zombraid_map(address_map &map);
 };
 
 class setaroul_state : public seta_state
@@ -341,6 +387,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void setaroul(machine_config &config);
+	void setaroul_map(address_map &map);
 private:
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper;
@@ -394,6 +441,8 @@ public:
 	DECLARE_DRIVER_INIT(inttoote);
 	void inttoote(machine_config &config);
 	void jockeyc(machine_config &config);
+	void inttoote_map(address_map &map);
+	void jockeyc_map(address_map &map);
 private:
 	required_device<upd4992_device> m_rtc;  // ! Actually D4911C !
 	required_device<ticket_dispenser_device> m_hopper1, m_hopper2; // the 2nd hopper is optional

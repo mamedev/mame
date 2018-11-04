@@ -44,4 +44,5 @@ public:
 	required_device<palette_device> m_palette;
 	void mrlo(machine_config &config);
 	void mrdo(machine_config &config);
+	void main_map(address_map &map);
 };

@@ -43,15 +43,6 @@ public:
 	/* Read and Write members */
 	DECLARE_WRITE_LINE_MEMBER(hdd_irq);
 
-	DECLARE_READ8_MEMBER(p0_7_r);
-	DECLARE_WRITE8_MEMBER(p0_7_w);
-	DECLARE_READ8_MEMBER(fdd_68k_r);
-	DECLARE_WRITE8_MEMBER(fdd_68k_w);
-	DECLARE_WRITE8_MEMBER(p38_w);
-	DECLARE_READ8_MEMBER(p38_r);
-	DECLARE_READ8_MEMBER(p39_r);
-	DECLARE_WRITE8_MEMBER(p50_5f_w);
-
 	/* Main CPU accessible registers */
 	uint8_t reg_p0;
 	uint8_t reg_p1;
@@ -88,6 +79,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	DECLARE_READ8_MEMBER(p0_7_r);
+	DECLARE_WRITE8_MEMBER(p0_7_w);
+	DECLARE_READ8_MEMBER(fdd_68k_r);
+	DECLARE_WRITE8_MEMBER(fdd_68k_w);
+	DECLARE_WRITE8_MEMBER(p38_w);
+	DECLARE_READ8_MEMBER(p38_r);
+	DECLARE_READ8_MEMBER(p39_r);
+	DECLARE_WRITE8_MEMBER(p50_5f_w);
+
+	void pdc_io(address_map &map);
+	void pdc_mem(address_map &map);
+
 	/* Protected variables */
 	//uint32_t fdd_68k_dma_address;
 	bool b_fdc_irq;
@@ -108,7 +111,6 @@ private:
 };
 
 /* Device type */
-extern const device_type PDC;
 DECLARE_DEVICE_TYPE(PDC, pdc_device)
 
 /* MCFG defines */

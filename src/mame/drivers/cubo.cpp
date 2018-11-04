@@ -358,6 +358,8 @@ public:
 	uint16_t m_potgo_value;
 
 	void cubo(machine_config &config);
+	void cubo_mem(address_map &map);
+	void overlay_2mb_map32(address_map &map);
 protected:
 	virtual void rs232_tx(int state) override;
 	virtual void potgo_w(uint16_t data) override;
@@ -414,22 +416,23 @@ WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 
 
 
-static ADDRESS_MAP_START( overlay_2mb_map32, AS_PROGRAM, 32, cubo_state )
+ADDRESS_MAP_START(cubo_state::overlay_2mb_map32)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cubo_mem, AS_PROGRAM, 32, cubo_state )
+ADDRESS_MAP_START(cubo_state::cubo_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0x800010, 0x800013) AM_READ_PORT("DIPSW2")
+	AM_RANGE(0xa80000, 0xb7ffff) AM_NOP
 	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE("akiko", akiko_device, read, write)
 	AM_RANGE(0xbf0000, 0xbfffff) AM_READWRITE16(cia_r, gayle_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("kickstart", 0x80000)
-	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
+	AM_RANGE(0xe80000, 0xf7ffff) AM_NOP
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
@@ -1051,7 +1054,7 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 	MCFG_AKIKO_SDA_WRITE_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_sda))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(pal_video)
+	pal_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE

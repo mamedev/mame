@@ -128,4 +128,12 @@ public:
 	void hotmind(machine_config &config);
 	void bigtwinb(machine_config &config);
 	void excelsr(machine_config &config);
+	void bigtwin_main_map(address_map &map);
+	void bigtwinb_main_map(address_map &map);
+	void excelsr_main_map(address_map &map);
+	void hotmind_main_map(address_map &map);
+	void hrdtimes_main_map(address_map &map);
+	void luckboomh_main_map(address_map &map);
+	void oki_map(address_map &map);
+	void wbeachvl_main_map(address_map &map);
 };

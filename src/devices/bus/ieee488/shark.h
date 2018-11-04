@@ -41,6 +41,9 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+
+	void mshark_io(address_map &map);
+	void mshark_mem(address_map &map);
 };
 
 

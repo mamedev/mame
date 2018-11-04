@@ -190,6 +190,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 	void airraid(machine_config &config);
 	void airraid_crypt(machine_config &config);
+	void airraid_map(address_map &map);
+	void airraid_sound_decrypted_opcodes_map(address_map &map);
+	void airraid_sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };
 
 
@@ -240,7 +244,7 @@ WRITE8_MEMBER(airraid_state::bank_w)
 
 
 
-static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
+ADDRESS_MAP_START(airraid_state::airraid_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP // rld result write-back
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
@@ -267,11 +271,11 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, airraid_state )
+ADDRESS_MAP_START(airraid_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
+ADDRESS_MAP_START(airraid_state::airraid_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
@@ -288,7 +292,7 @@ static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( airraid_sound_decrypted_opcodes_map, AS_OPCODES, 8, airraid_state )
+ADDRESS_MAP_START(airraid_state::airraid_sound_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
@@ -386,7 +390,7 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_sound_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -413,9 +417,10 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(airraid_state::airraid_crypt, airraid)
+MACHINE_CONFIG_START(airraid_state::airraid_crypt)
+	airraid(config);
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 

@@ -27,6 +27,7 @@ public:
 	uint32_t screen_update_sanremmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void sanremmg(machine_config &config);
+	void sanremmg_map(address_map &map);
 };
 
 
@@ -41,7 +42,7 @@ uint32_t sanremmg_state::screen_update_sanremmg(screen_device &screen, bitmap_in
 
 
 
-static ADDRESS_MAP_START( sanremmg_map, AS_PROGRAM, 32, sanremmg_state )
+ADDRESS_MAP_START(sanremmg_state::sanremmg_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
 
 ADDRESS_MAP_END

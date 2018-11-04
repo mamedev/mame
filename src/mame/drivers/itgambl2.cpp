@@ -81,6 +81,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	void itgambl2(machine_config &config);
+	void itgambl2_map(address_map &map);
 };
 
 
@@ -154,7 +155,7 @@ uint32_t itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rg
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( itgambl2_map, AS_PROGRAM, 16, itgambl2_state )
+ADDRESS_MAP_START(itgambl2_state::itgambl2_map)
 	AM_RANGE(0x000000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

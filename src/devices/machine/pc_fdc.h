@@ -30,7 +30,7 @@ public:
 	template <class Object> static devcb_base &set_intrq_wr_callback(device_t &device, Object &&cb) { return downcast<pc_fdc_family_device &>(device).intrq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<pc_fdc_family_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 
 	virtual void tc_w(bool state) override;
 	virtual uint8_t dma_r() override;
@@ -69,7 +69,7 @@ class pc_fdc_xt_device : public pc_fdc_family_device {
 public:
 	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 	WRITE8_MEMBER(dor_fifo_w);
 };
 
@@ -77,7 +77,7 @@ class pc_fdc_at_device : public pc_fdc_family_device {
 public:
 	pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 DECLARE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device)

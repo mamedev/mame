@@ -124,7 +124,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( bankp_map, AS_PROGRAM, 8, bankp_state )
+ADDRESS_MAP_START(bankp_state::bankp_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( bankp_map, AS_PROGRAM, 8, bankp_state )
 	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bankp_io_map, AS_IO, 8, bankp_state )
+ADDRESS_MAP_START(bankp_state::bankp_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("sn1", sn76489_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_DEVWRITE("sn2", sn76489_device, write)

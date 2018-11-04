@@ -48,6 +48,7 @@ public:
 	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bmjr(machine_config &config);
+	void bmjr_mem(address_map &map);
 private:
 	bool m_tape_switch;
 	u8 m_xor_display;
@@ -163,7 +164,7 @@ WRITE8_MEMBER( bmjr_state::xor_display_w )
 	m_xor_display = data;
 }
 
-static ADDRESS_MAP_START(bmjr_mem, AS_PROGRAM, 8, bmjr_state)
+ADDRESS_MAP_START(bmjr_state::bmjr_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0

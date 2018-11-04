@@ -577,7 +577,7 @@ READ_LINE_MEMBER( newbrain_state::tdi_r )
 //  ADDRESS_MAP( newbrain_mreq )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( newbrain_mreq, AS_PROGRAM, 8, newbrain_state )
+ADDRESS_MAP_START(newbrain_state::newbrain_mreq)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
 ADDRESS_MAP_END
@@ -587,7 +587,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( newbrain_iorq )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( newbrain_iorq, AS_IO, 8, newbrain_state )
+ADDRESS_MAP_START(newbrain_state::newbrain_iorq)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
 ADDRESS_MAP_END
@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(newbrain_state::newbrain)
 	MCFG_COP400_READ_SI_CB(READLINE(newbrain_state, tdi_r))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(newbrain_video)
+	newbrain_video(config);
 
 	// devices
 	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim")
@@ -846,7 +846,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_ad )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_ad, newbrain)
+MACHINE_CONFIG_START(newbrain_state::newbrain_ad)
+	newbrain(config);
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 
@@ -855,7 +856,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_a )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_a, newbrain)
+MACHINE_CONFIG_START(newbrain_state::newbrain_a)
+	newbrain(config);
 	MCFG_DEFAULT_LAYOUT(layout_newbraina)
 MACHINE_CONFIG_END
 
@@ -864,7 +866,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_md )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_md, newbrain)
+MACHINE_CONFIG_START(newbrain_state::newbrain_md)
+	newbrain(config);
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 

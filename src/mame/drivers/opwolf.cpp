@@ -346,7 +346,7 @@ WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
 ***********************************************************/
 
 
-static ADDRESS_MAP_START( opwolf_map, AS_PROGRAM, 16, opwolf_state )
+ADDRESS_MAP_START(opwolf_state::opwolf_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0f0000, 0x0f07ff) AM_MIRROR(0xf000) AM_READ(opwolf_cchip_data_r)
 	AM_RANGE(0x0f0802, 0x0f0803) AM_MIRROR(0xf000) AM_READ(opwolf_cchip_status_r)
@@ -370,7 +370,7 @@ static ADDRESS_MAP_START( opwolf_map, AS_PROGRAM, 16, opwolf_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( opwolfb_map, AS_PROGRAM, 16, opwolf_state )
+ADDRESS_MAP_START(opwolf_state::opwolfb_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0f0008, 0x0f000b) AM_READ(opwolf_in_r)           /* coins and buttons */
 	AM_RANGE(0x0ff000, 0x0fffff) AM_READWRITE(cchip_r,cchip_w)
@@ -390,7 +390,7 @@ static ADDRESS_MAP_START( opwolfb_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( opwolfp_map, AS_PROGRAM, 16, opwolf_state )
+ADDRESS_MAP_START(opwolf_state::opwolfp_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 
@@ -414,7 +414,7 @@ ADDRESS_MAP_END
     This extra Z80 substitutes for the c-chip in the bootleg
  */
 
-static ADDRESS_MAP_START( opwolfb_sub_z80_map, AS_PROGRAM, 8, opwolf_state )
+ADDRESS_MAP_START(opwolf_state::opwolfb_sub_z80_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x8800) AM_READ(z80_input1_r)  /* read at PC=$637: poked to $c004 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITENOP            /* unknown write, 0 then 1 each interrupt */
@@ -550,7 +550,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
 //  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
 }
 
-static ADDRESS_MAP_START( opwolf_sound_z80_map, AS_PROGRAM, 8, opwolf_state )
+ADDRESS_MAP_START(opwolf_state::opwolf_sound_z80_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -838,7 +838,8 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(opwolf_state::opwolfp, opwolf)
+MACHINE_CONFIG_START(opwolf_state::opwolfp)
+	opwolf(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") /* 8 MHz */

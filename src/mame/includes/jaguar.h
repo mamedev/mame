@@ -254,6 +254,16 @@ public:
 	void jaguar(machine_config &config);
 	void cojag68k(machine_config &config);
 	void cojagr3k(machine_config &config);
+	void dsp_map(address_map &map);
+	void gpu_map(address_map &map);
+	void jag_dsp_map(address_map &map);
+	void jag_gpu_map(address_map &map);
+	void jagcd_dsp_map(address_map &map);
+	void jagcd_gpu_map(address_map &map);
+	void jaguar_map(address_map &map);
+	void jaguarcd_map(address_map &map);
+	void m68020_map(address_map &map);
+	void r3000_map(address_map &map);
 protected:
 	// timer IDs
 	enum

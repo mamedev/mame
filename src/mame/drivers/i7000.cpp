@@ -87,6 +87,8 @@ public:
 	DECLARE_READ8_MEMBER(i7000_kbd_r);
 	DECLARE_WRITE8_MEMBER(i7000_scanlines_w);
 	void i7000(machine_config &config);
+	void i7000_io(address_map &map);
+	void i7000_mem(address_map &map);
 };
 
 WRITE8_MEMBER( i7000_state::i7000_scanlines_w )
@@ -243,14 +245,14 @@ PALETTE_INIT_MEMBER(i7000_state, i7000)
 
 /*FIXME: we still need to figure out the proper memory map
          for the maincpu and where the cartridge slot maps to. */
-static ADDRESS_MAP_START(i7000_mem, AS_PROGRAM, 8, i7000_state)
+ADDRESS_MAP_START(i7000_state::i7000_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("boot", 0)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 //  AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("cardslot", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
+ADDRESS_MAP_START(i7000_state::i7000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(i7000_io_?_w)

@@ -74,6 +74,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
 
 	void cupsocbl(machine_config &config);
+	void cupsocbl_mem(address_map &map);
+	void cupsocbl_sound_mem(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -319,7 +321,7 @@ WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
 	m_sc_layer[3]->mark_tile_dirty(offset);
 }
 
-static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
+ADDRESS_MAP_START(seicupbl_state::cupsocbl_mem)
 //  AM_IMPORT_FROM( legionna_cop_mem )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100400, 0x1005ff) AM_DEVREADWRITE("seibucop_boot", seibu_cop_bootleg_device, copdxbl_0_r,copdxbl_0_w) AM_SHARE("cop_mcu_ram")
@@ -347,7 +349,7 @@ WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
 	m_oki->set_rom_bank(data & 0x7);
 }
 
-static ADDRESS_MAP_START( cupsocbl_sound_mem, AS_PROGRAM, 8, seicupbl_state )
+ADDRESS_MAP_START(seicupbl_state::cupsocbl_sound_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okim_rombank_w)

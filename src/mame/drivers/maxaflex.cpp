@@ -62,6 +62,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mf_interrupt);
 
 	void maxaflex(machine_config &config);
+	void a600xl_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -193,7 +194,7 @@ INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
 
 
 
-static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, maxaflex_state )
+ADDRESS_MAP_START(maxaflex_state::a600xl_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0xd000)    /* self test */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM /* game cartridge */

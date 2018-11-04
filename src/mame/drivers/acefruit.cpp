@@ -61,6 +61,8 @@ public:
 	};
 
 	void acefruit(machine_config &config);
+	void acefruit_io(address_map &map);
+	void acefruit_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -314,7 +316,7 @@ PALETTE_INIT_MEMBER(acefruit_state, acefruit)
 	palette.set_pen_color( 15, rgb_t(0xff, 0x00, 0x00) );
 }
 
-static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
+ADDRESS_MAP_START(acefruit_state::acefruit_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
@@ -336,7 +338,7 @@ static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( acefruit_io, AS_IO, 8, acefruit_state )
+ADDRESS_MAP_START(acefruit_state::acefruit_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_NOP /* ? */
 ADDRESS_MAP_END

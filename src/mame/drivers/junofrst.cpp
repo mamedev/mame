@@ -133,6 +133,10 @@ public:
 
 	INTERRUPT_GEN_MEMBER(_30hz_irq);
 	void junofrst(machine_config &config);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void mcu_map(address_map &map);
 };
 
 
@@ -275,7 +279,7 @@ WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
+ADDRESS_MAP_START(junofrst_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x800f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
@@ -295,7 +299,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, junofrst_state )
+ADDRESS_MAP_START(junofrst_state::audio_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -307,12 +311,12 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, junofrst_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, junofrst_state )
+ADDRESS_MAP_START(junofrst_state::mcu_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, junofrst_state )
+ADDRESS_MAP_START(junofrst_state::mcu_io_map)
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 ADDRESS_MAP_END
 

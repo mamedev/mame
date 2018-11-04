@@ -94,4 +94,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(firetrap_adpcm_int);
 	void firetrapbl(machine_config &config);
 	void firetrap(machine_config &config);
+	void firetrap_base_map(address_map &map);
+	void firetrap_bootleg_map(address_map &map);
+	void firetrap_map(address_map &map);
+	void sound_map(address_map &map);
 };

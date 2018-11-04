@@ -70,7 +70,7 @@ WRITE_LINE_MEMBER(clshroad_state::sound_irq_mask_w)
 }
 
 
-static ADDRESS_MAP_START( clshroad_map, AS_PROGRAM, 8, clshroad_state )
+ADDRESS_MAP_START(clshroad_state::clshroad_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x95ff) AM_RAM
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( clshroad_map, AS_PROGRAM, 8, clshroad_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( clshroad_sound_map, AS_PROGRAM, 8, clshroad_state )
+ADDRESS_MAP_START(clshroad_state::clshroad_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("custom", wiping_sound_device, sound_w)
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")

@@ -52,7 +52,7 @@ PCB Layout
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( gumbo_map, AS_PROGRAM, 16, gumbo_state )
+ADDRESS_MAP_START(gumbo_state::gumbo_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
 	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -65,7 +65,7 @@ ADDRESS_MAP_END
 
 /* Miss Puzzle has a different memory map */
 
-static ADDRESS_MAP_START( mspuzzle_map, AS_PROGRAM, 16, gumbo_state )
+ADDRESS_MAP_START(gumbo_state::mspuzzle_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM // main ram
 	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_SHARE("fg_videoram") // fg tilemap
@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( mspuzzle_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_SHARE("bg_videoram") // bg tilemap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dblpoint_map, AS_PROGRAM, 16, gumbo_state )
+ADDRESS_MAP_START(gumbo_state::dblpoint_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
 	AM_RANGE(0x1b0000, 0x1b03ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -259,13 +259,15 @@ MACHINE_CONFIG_START(gumbo_state::gumbo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gumbo_state::mspuzzle, gumbo)
+MACHINE_CONFIG_START(gumbo_state::mspuzzle)
+	gumbo(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mspuzzle_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(gumbo_state::dblpoint, gumbo)
+MACHINE_CONFIG_START(gumbo_state::dblpoint)
+	gumbo(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dblpoint_map)

@@ -283,7 +283,7 @@ WRITE_LINE_MEMBER(rallyx_state::coin_counter_2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8, rallyx_state )
+ADDRESS_MAP_START(rallyx_state::rallyx_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
@@ -299,13 +299,13 @@ static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa180, 0xa187) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, rallyx_state )
+ADDRESS_MAP_START(rallyx_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0, 0) AM_WRITE(rallyx_interrupt_vector_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8, rallyx_state )
+ADDRESS_MAP_START(rallyx_state::jungler_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
@@ -912,7 +912,8 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(rallyx_state::tactcian, jungler)
+MACHINE_CONFIG_START(rallyx_state::tactcian)
+	jungler(config);
 
 	/* basic machine hardware */
 
@@ -923,7 +924,8 @@ MACHINE_CONFIG_DERIVED(rallyx_state::tactcian, jungler)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(rallyx_state::locomotn, jungler)
+MACHINE_CONFIG_START(rallyx_state::locomotn)
+	jungler(config);
 
 	/* basic machine hardware */
 
@@ -935,7 +937,8 @@ MACHINE_CONFIG_DERIVED(rallyx_state::locomotn, jungler)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(rallyx_state::commsega, jungler)
+MACHINE_CONFIG_START(rallyx_state::commsega)
+	jungler(config);
 
 	/* basic machine hardware */
 

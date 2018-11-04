@@ -455,7 +455,7 @@ void josvolly_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state_base )
+ADDRESS_MAP_START(gsword_state_base::cpu1_map)
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa37f) AM_RAM
@@ -470,18 +470,18 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state_base )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8, gsword_state )
+ADDRESS_MAP_START(gsword_state::cpu1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7e, 0x7f) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_0, write_0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gsword_state )
+ADDRESS_MAP_START(gsword_state::cpu2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("cpu2_ram")
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, gsword_state )
+ADDRESS_MAP_START(gsword_state::cpu2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_2, write_2)
 	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_3, write_3)
@@ -496,19 +496,19 @@ static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, gsword_state )
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* watchdog? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gsword_state )
+ADDRESS_MAP_START(gsword_state::cpu3_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( josvolly_cpu1_io_map, AS_IO, 8, josvolly_state )
+ADDRESS_MAP_START(josvolly_state::josvolly_cpu1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7e, 0x7f) AM_DEVREADWRITE("mcu1", upi41_cpu_device, upi41_master_r, upi41_master_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8, josvolly_state )
+ADDRESS_MAP_START(josvolly_state::josvolly_cpu2_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("cpu2_ram")
 
@@ -519,7 +519,7 @@ static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8, josvolly_state )
 	AM_RANGE(0xA000, 0xA001) AM_DEVREADWRITE("mcu2", upi41_cpu_device, upi41_master_r, upi41_master_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( josvolly_cpu2_io_map, AS_IO, 8, josvolly_state )
+ADDRESS_MAP_START(josvolly_state::josvolly_cpu2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(fake_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)

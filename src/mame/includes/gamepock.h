@@ -46,6 +46,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 	DECLARE_WRITE_LINE_MEMBER(gamepock_to_w);
 	void gamepock(machine_config &config);
+	void gamepock_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_GAMEPOCK_H

@@ -66,6 +66,8 @@ public:
 		: pcat_base_state(mconfig, type, tag){ }
 
 		void su2000(machine_config &config);
+		void pcat_io(address_map &map);
+		void pcat_map(address_map &map);
 };
 
 
@@ -75,7 +77,7 @@ public:
  *
  *************************************/
 
-static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, su2000_state )
+ADDRESS_MAP_START(su2000_state::pcat_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
@@ -84,7 +86,7 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, su2000_state )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcat_io, AS_IO, 32, su2000_state )
+ADDRESS_MAP_START(su2000_state::pcat_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
@@ -142,9 +144,9 @@ MACHINE_CONFIG_START(su2000_state::su2000)
 #endif
 
 	/* Video hardware */
-	MCFG_FRAGMENT_ADD(pcvideo_vga)
+	pcvideo_vga(config);
 
-	MCFG_FRAGMENT_ADD(pcat_common)
+	pcat_common(config);
 
 	MCFG_DEVICE_REMOVE("rtc")
 	MCFG_DS12885_ADD("rtc")

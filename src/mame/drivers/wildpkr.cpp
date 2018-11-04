@@ -219,6 +219,10 @@ public:
 	IRQ_CALLBACK_MEMBER(tabpkr_irq_ack);
 	void wildpkr(machine_config &config);
 	void tabpkr(machine_config &config);
+	void hd63484_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void tabpkr_map(address_map &map);
+	void wildpkr_map(address_map &map);
 };
 
 
@@ -302,7 +306,7 @@ WRITE16_MEMBER(wildpkr_state::unknown_trigger_w)
 *      Memory Map        *
 *************************/
 
-static ADDRESS_MAP_START( wildpkr_map, AS_PROGRAM, 16, wildpkr_state )
+ADDRESS_MAP_START(wildpkr_state::wildpkr_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x113fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE("acrtc", hd63484_device, status16_r, address16_w)
@@ -319,7 +323,7 @@ static ADDRESS_MAP_START( wildpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x800286, 0x800289) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tabpkr_map, AS_PROGRAM, 16, wildpkr_state )
+ADDRESS_MAP_START(wildpkr_state::tabpkr_map)
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
@@ -340,7 +344,7 @@ static ADDRESS_MAP_START( tabpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITENOP // only writes 0 at POST
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hd63484_map, 0, 16, wildpkr_state )
+ADDRESS_MAP_START(wildpkr_state::hd63484_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -432,7 +436,7 @@ void wildpkr_state::machine_start()
 }
 
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, wildpkr_state )
+ADDRESS_MAP_START(wildpkr_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

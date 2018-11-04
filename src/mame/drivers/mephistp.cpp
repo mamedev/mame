@@ -42,6 +42,10 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 
 	void mephisto(machine_config &config);
+	void mephisto_8051_io(address_map &map);
+	void mephisto_8051_map(address_map &map);
+	void mephisto_map(address_map &map);
+	void sport2k_8051_io(address_map &map);
 private:
 	u8 m_ay8910_data;
 	bool m_ay8910_bdir;
@@ -99,7 +103,7 @@ WRITE8_MEMBER(mephisto_pinball_state::sound_rombank_w)
 	m_soundbank->set_entry(data & 0xf);
 }
 
-static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8, mephisto_pinball_state )
+ADDRESS_MAP_START(mephisto_pinball_state::mephisto_map)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_MIRROR(0x08000) AM_REGION("maincpu", 0)
 	AM_RANGE(0x10000, 0x107ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x12000, 0x1201f) AM_NOP //AM_DEVREADWRITE("muart", i8256_device, read, write)
@@ -112,12 +116,12 @@ static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8, mephisto_pinball_state )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mephisto_8051_map, AS_PROGRAM, 8, mephisto_pinball_state )
+ADDRESS_MAP_START(mephisto_pinball_state::mephisto_8051_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mephisto_8051_io, AS_IO, 8, mephisto_pinball_state )
+ADDRESS_MAP_START(mephisto_pinball_state::mephisto_8051_io)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(sound_rombank_w)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac", dac08_device, write)
@@ -129,7 +133,7 @@ static ADDRESS_MAP_START( mephisto_8051_io, AS_IO, 8, mephisto_pinball_state )
 ADDRESS_MAP_END
 
 #ifdef UNUSED_DEFINITION
-static ADDRESS_MAP_START( sport2k_8051_io, AS_IO, 8, mephisto_pinball_state )
+ADDRESS_MAP_START(mephisto_pinball_state::sport2k_8051_io)
 	AM_IMPORT_FROM(mephisto_8051_data)
 	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 ADDRESS_MAP_END
@@ -191,7 +195,8 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_DEFINITION
-static MACHINE_CONFIG_DERIVED(sport2k, mephisto)
+static MACHINE_CONFIG_START(sport2k)
+	mephisto(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sport2k_8051_io)
 

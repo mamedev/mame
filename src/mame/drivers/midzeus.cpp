@@ -78,6 +78,8 @@ public:
 	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
 	void thegrid(machine_config &config);
 	void crusnexo(machine_config &config);
+	void midzeus2(machine_config &config);
+	void zeus2_map(address_map &map);
 private:
 };
 
@@ -730,7 +732,7 @@ READ32_MEMBER(midzeus_state::invasn_gun_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
+ADDRESS_MAP_START(midzeus_state::zeus_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
@@ -745,7 +747,7 @@ static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus2_state )
+ADDRESS_MAP_START(midzeus2_state::zeus2_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
@@ -1286,20 +1288,22 @@ MACHINE_CONFIG_START(midzeus_state::midzeus)
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midzeus_state::mk4, midzeus)
+MACHINE_CONFIG_START(midzeus_state::mk4)
+	midzeus(config);
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(461/* or 474 */)
 	MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midzeus_state::invasn, midzeus)
+MACHINE_CONFIG_START(midzeus_state::invasn)
+	midzeus(config);
 	MCFG_CPU_ADD("pic", PIC16C57, 8000000)  /* ? */
 
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(468/* or 488 */)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(midzeus_state::midzeus2)
+MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
@@ -1329,12 +1333,14 @@ MACHINE_CONFIG_START(midzeus_state::midzeus2)
 	MCFG_MIDWAY_IOASIC_UPPER(474)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midzeus2_state::crusnexo, midzeus2)
+MACHINE_CONFIG_START(midzeus2_state::crusnexo)
+	midzeus2(config);
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(472/* or 476,477,478,110 */)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(midzeus2_state::thegrid, midzeus2)
+MACHINE_CONFIG_START(midzeus2_state::thegrid)
+	midzeus2(config);
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(474/* or 491 */)
 MACHINE_CONFIG_END

@@ -46,6 +46,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void alinvade(machine_config &config);
+	void alinvade_map(address_map &map);
 private:
 	uint8_t m_irqmask;
 	uint8_t m_irqff;
@@ -101,7 +102,7 @@ WRITE8_MEMBER(alinvade_state::irqmask_w)
 	m_irqff = data;
 }
 
-static ADDRESS_MAP_START( alinvade_map, AS_PROGRAM, 8, alinvade_state )
+ADDRESS_MAP_START(alinvade_state::alinvade_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0400, 0x0bff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0dff) AM_RAM

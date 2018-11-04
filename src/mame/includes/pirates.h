@@ -60,4 +60,5 @@ public:
 	void decrypt_s();
 	void decrypt_oki();
 	void pirates(machine_config &config);
+	void pirates_map(address_map &map);
 };

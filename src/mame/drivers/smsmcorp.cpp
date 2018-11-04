@@ -255,6 +255,9 @@ public:
 	required_device<screen_device> m_screen;
 	void sureshot(machine_config &config);
 	void sms(machine_config &config);
+	void sms_map(address_map &map);
+	void sub_map(address_map &map);
+	void sureshot_map(address_map &map);
 };
 
 
@@ -481,7 +484,7 @@ uint32_t smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bi
  *
  *************************************/
 
-static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8, smsmfg_state )
+ADDRESS_MAP_START(smsmfg_state::sms_map)
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x01000, 0x01007) AM_WRITE(video_w)
@@ -492,7 +495,7 @@ static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sureshot_map, AS_PROGRAM, 8, smsmfg_state )
+ADDRESS_MAP_START(smsmfg_state::sureshot_map)
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x02000, 0x02007) AM_WRITE(video_w)
 	AM_RANGE(0x03000, 0x03003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -501,7 +504,7 @@ static ADDRESS_MAP_START( sureshot_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, smsmfg_state )
+ADDRESS_MAP_START(smsmfg_state::sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x3100, 0x3103) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -574,7 +577,8 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(smsmfg_state::sureshot, sms)
+MACHINE_CONFIG_START(smsmfg_state::sureshot)
+	sms(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sureshot_map)

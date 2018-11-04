@@ -137,6 +137,8 @@ public:
 	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
 	const char *m_cputag;
 	void poisk1(machine_config &config);
+	void poisk1_io(address_map &map);
+	void poisk1_map(address_map &map);
 };
 
 /*
@@ -613,12 +615,12 @@ MACHINE_RESET_MEMBER(p1_state, poisk1)
  * macros
  */
 
-static ADDRESS_MAP_START( poisk1_map, AS_PROGRAM, 8, p1_state )
+ADDRESS_MAP_START(p1_state::poisk1_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0xc000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poisk1_io, AS_IO, 8, p1_state )
+ADDRESS_MAP_START(p1_state::poisk1_io)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0028, 0x002B) AM_READWRITE(p1_trap_r, p1_trap_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)

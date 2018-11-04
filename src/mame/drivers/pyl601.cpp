@@ -98,6 +98,7 @@ public:
 	required_device<palette_device> m_palette;
 	void pyl601(machine_config &config);
 	void pyl601a(machine_config &config);
+	void pyl601_mem(address_map &map);
 };
 
 
@@ -253,7 +254,7 @@ READ8_MEMBER(pyl601_state::floppy_r)
 	return m_floppy_ctrl;
 }
 
-static ADDRESS_MAP_START(pyl601_mem, AS_PROGRAM, 8, pyl601_state )
+ADDRESS_MAP_START(pyl601_state::pyl601_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK("bank2")
@@ -568,7 +569,8 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_RAM_DEFAULT_SIZE("576K") // 64 + 512
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pyl601_state::pyl601a, pyl601)
+MACHINE_CONFIG_START(pyl601_state::pyl601a)
+	pyl601(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL(2'000'000))
 

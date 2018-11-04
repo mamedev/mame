@@ -78,6 +78,9 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
 	INTERRUPT_GEN_MEMBER(t2l_int);
 	void instruct(machine_config &config);
+	void data_map(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	uint16_t m_lar;
@@ -215,7 +218,7 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 	}
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, instruct_state )
+ADDRESS_MAP_START(instruct_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0ffe) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0fff, 0x0fff) AM_READWRITE(port_r,port_w)
@@ -224,7 +227,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, instruct_state )
 	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_SHARE("extram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, instruct_state )
+ADDRESS_MAP_START(instruct_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x07, 0x07) AM_READWRITE(port_r,port_w)
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(portf8_w)
@@ -235,7 +238,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, instruct_state )
 	AM_RANGE(0xfe, 0xfe) AM_READ(portfe_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 8, instruct_state )
+ADDRESS_MAP_START(instruct_state::data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(port_r,port_w)
 ADDRESS_MAP_END

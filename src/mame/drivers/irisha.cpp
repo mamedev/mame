@@ -50,6 +50,8 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 
 	void irisha(machine_config &config);
+	void irisha_io(address_map &map);
+	void irisha_mem(address_map &map);
 private:
 	bool m_sg1_line;
 	bool m_keypressed;
@@ -68,13 +70,13 @@ private:
 
 
 /* Address maps */
-static ADDRESS_MAP_START(irisha_mem, AS_PROGRAM, 8, irisha_state )
+ADDRESS_MAP_START(irisha_state::irisha_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM  // ROM
 	AM_RANGE(0x4000, 0xdfff) AM_RAM  // RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( irisha_io , AS_IO, 8, irisha_state )
+ADDRESS_MAP_START(irisha_state::irisha_io)
 	AM_RANGE(0x04, 0x05) AM_READ(irisha_keyboard_r)
 	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
 	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)

@@ -61,6 +61,9 @@ public:
 	DECLARE_DRIVER_INIT(upscope);
 
 	void upscope(machine_config &config);
+	void a500_mem(address_map &map);
+	void main_map(address_map &map);
+	void overlay_512kb_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
 
@@ -204,13 +207,13 @@ WRITE8_MEMBER( upscope_state::coin_counter_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( overlay_512kb_map, AS_PROGRAM, 16, upscope_state )
+ADDRESS_MAP_START(upscope_state::overlay_512kb_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, upscope_state )
+ADDRESS_MAP_START(upscope_state::a500_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
@@ -223,7 +226,7 @@ static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, upscope_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, upscope_state )
+ADDRESS_MAP_START(upscope_state::main_map)
 	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END
@@ -273,7 +276,7 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(ntsc_video)
+	ntsc_video(config);
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(upscope_state,amiga)

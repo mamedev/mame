@@ -92,6 +92,9 @@ public:
 	void midearth(machine_config &config);
 	void atari_s1(machine_config &config);
 	void atarians(machine_config &config);
+	void atari_s1_map(address_map &map);
+	void atarians_map(address_map &map);
+	void midearth_map(address_map &map);
 private:
 	bool m_audiores;
 	uint8_t m_timer_s[3];
@@ -111,7 +114,7 @@ private:
 	required_ioport_array<10> m_switch;
 };
 
-static ADDRESS_MAP_START( atari_s1_map, AS_PROGRAM, 8, atari_s1_state )
+ADDRESS_MAP_START(atari_s1_state::atari_s1_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x1080, 0x1083) AM_READWRITE(m1080_r,m1080_w)
@@ -126,7 +129,7 @@ static ADDRESS_MAP_START( atari_s1_map, AS_PROGRAM, 8, atari_s1_state )
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atarians_map, AS_PROGRAM, 8, atari_s1_state ) // more ram
+ADDRESS_MAP_START(atari_s1_state::atarians_map) // more ram
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x1080, 0x1083) AM_READWRITE(m1080_r,m1080_w)
@@ -140,7 +143,7 @@ static ADDRESS_MAP_START( atarians_map, AS_PROGRAM, 8, atari_s1_state ) // more 
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( midearth_map, AS_PROGRAM, 8, atari_s1_state )
+ADDRESS_MAP_START(atari_s1_state::midearth_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x1000, 0x11ff) AM_WRITE(midearth_w)
@@ -447,7 +450,7 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
@@ -461,12 +464,14 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s1_state, timer_s, attotime::from_hz(AUDIO_CLK))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atari_s1_state::atarians, atari_s1)
+MACHINE_CONFIG_START(atari_s1_state::atarians)
+	atari_s1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atarians_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atari_s1_state::midearth, atari_s1)
+MACHINE_CONFIG_START(atari_s1_state::midearth)
+	atari_s1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(midearth_map)
 MACHINE_CONFIG_END

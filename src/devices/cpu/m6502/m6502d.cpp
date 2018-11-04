@@ -181,6 +181,11 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		flags |= 1;
 		break;
 
+	case DASM_xa3:
+		util::stream_format(stream, " #$%02x%02x%02x", params.r8(pc+1), params.r8(pc+3), params.r8(pc+2));
+		flags |= 4;
+		break;
+
 	default:
 		fprintf(stderr, "Unhandled dasm mode %d\n", e.mode);
 		abort();

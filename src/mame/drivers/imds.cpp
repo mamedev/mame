@@ -41,6 +41,8 @@ public:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	void imds(machine_config &config);
+	void imds_io(address_map &map);
+	void imds_mem(address_map &map);
 };
 
 READ8_MEMBER( imds_state::term_status_r )
@@ -55,13 +57,13 @@ READ8_MEMBER( imds_state::term_r )
 	return (m_term_data) ? 0x21 : 0x20;
 }
 
-static ADDRESS_MAP_START(imds_mem, AS_PROGRAM, 8, imds_state)
+ADDRESS_MAP_START(imds_state::imds_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(imds_io, AS_IO, 8, imds_state)
+ADDRESS_MAP_START(imds_state::imds_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END

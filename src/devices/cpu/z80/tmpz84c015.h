@@ -174,6 +174,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( irq_priority_w );
 
+	void tmpz84c015_internal_io_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

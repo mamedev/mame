@@ -43,6 +43,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void alien(machine_config &config);
+	void alien_map(address_map &map);
 protected:
 
 	// devices
@@ -67,7 +68,7 @@ READ64_MEMBER( alien_state::test_r )
 	return machine().rand();
 }
 
-static ADDRESS_MAP_START( alien_map, AS_PROGRAM, 64, alien_state )
+ADDRESS_MAP_START(alien_state::alien_map)
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x08000000, 0x08000007) AM_READ(test_r) //hangs if zero
 	AM_RANGE(0x0cfe0000, 0x0cffffff) AM_RAM

@@ -63,4 +63,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(sub_scanline);
 	void deadang(machine_config &config);
+	void main_map(address_map &map);
+	void sound_decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
 };

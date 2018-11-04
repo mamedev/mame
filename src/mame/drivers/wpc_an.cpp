@@ -33,6 +33,7 @@ public:
 	void wpc_an_dd(machine_config &config);
 	void wpc_an(machine_config &config);
 	void wpc_an_base(machine_config &config);
+	void wpc_an_map(address_map &map);
 protected:
 
 	// devices
@@ -70,7 +71,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( wpc_an_map, AS_PROGRAM, 8, wpc_an_state )
+ADDRESS_MAP_START(wpc_an_state::wpc_an_map)
 	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(ram_r,ram_w)
 	AM_RANGE(0x3000, 0x3faf) AM_RAM
 	AM_RANGE(0x3fb0, 0x3fff) AM_DEVREADWRITE("wpc",wpc_device,read,write) // WPC device
@@ -335,7 +336,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an)
-	MCFG_FRAGMENT_ADD(wpc_an_base)
+	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
@@ -345,7 +346,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
-	MCFG_FRAGMENT_ADD(wpc_an_base)
+	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("bg", S11C_BG, 0)

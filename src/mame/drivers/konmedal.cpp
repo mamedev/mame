@@ -7,7 +7,7 @@
  Tsukande Toru Chicchi (つかんでとるちっち)
  (c) 1995 Konami
 
- Dam Dam Boy
+ Dam Dam Boy (ダムダム　ボーイ)
  (c) 1995 Konami
 
  Driver by R. Belmont
@@ -88,6 +88,9 @@ public:
 	void shuriboy(machine_config &config);
 	void ddboy(machine_config &config);
 	void tsukande(machine_config &config);
+	void ddboy_main(address_map &map);
+	void medal_main(address_map &map);
+	void shuriboy_main(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -222,7 +225,7 @@ WRITE8_MEMBER(konmedal_state::bankswitch_w)
 	m_control = data & 0xf;
 }
 
-static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
+ADDRESS_MAP_START(konmedal_state::medal_main)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM // work RAM?
@@ -241,7 +244,7 @@ static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ddboy_main, AS_PROGRAM, 8, konmedal_state )
+ADDRESS_MAP_START(konmedal_state::ddboy_main)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM // work RAM
@@ -263,7 +266,7 @@ static ADDRESS_MAP_START( ddboy_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shuriboy_main, AS_PROGRAM, 8, konmedal_state )
+ADDRESS_MAP_START(konmedal_state::shuriboy_main)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN2")
@@ -587,9 +590,13 @@ ROM_START( tsukande )
 	ROM_LOAD32_BYTE( "441-a06.4p",   0x000001, 0x020000, CRC(947a8c45) SHA1(16e3dceb304266bbd2bddc2cec832ebff04e4c71) )
 
 	ROM_REGION( 0x400, "proms", 0 )
+	// R
 	ROM_LOAD( "441a07.20k",   0x000000, 0x000100, CRC(7d0c53c2) SHA1(f357e0cb3d53374208ad1670e70be03b399a4c02) )
+	// G
 	ROM_LOAD( "441a08.21k",   0x000100, 0x000100, CRC(e2c3e853) SHA1(36a3008dde714ade53b9a01ac9d94c6cc655c293) )
+	// B
 	ROM_LOAD( "441a09.23k",   0x000200, 0x000100, CRC(3daca33a) SHA1(38644f574beaa593f3348b49eabea9e03d722013) )
+	// P(riority?)
 	ROM_LOAD( "441a10.21m",   0x000300, 0x000100, CRC(063722ff) SHA1(7ba43acfdccb02e7913dc000c4f9c57c54b1315f) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
@@ -611,9 +618,39 @@ ROM_START( ddboy )
 	ROM_LOAD( "342_a01.27c010.8b", 0x000000, 0x020000, CRC(e9ce569c) SHA1(ce9b3e60eac3543aca9e82a9ccf77c53a6aff504) )
 
 	ROM_REGION( 0x400, "proms", 0 )
+	// R
 	ROM_LOAD( "342_a07.82s129.13f", 0x000000, 0x000100, CRC(f8c11f4d) SHA1(95061d0af7c8bac702aa48e16c0711719250653f) )
+	// G
 	ROM_LOAD( "342_a08.82s129.14f", 0x000100, 0x000100, CRC(1814db4b) SHA1(08b25f96dc3af15b3fa3c88b2884845abd3ff620) )
+	// B
 	ROM_LOAD( "342_a09.82s129.15f", 0x000200, 0x000100, CRC(21e2dd13) SHA1(721c7fa1a01c810a7ce35b4331d280704b4e04fd) )
+	// P(riority?)
+	ROM_LOAD( "342_a10.82s129.14g", 0x000300, 0x000100, CRC(1fa443f9) SHA1(84b0a36a4e49bf75bda1871bf52090ee5a75cd03) )
+ROM_END
+
+// this is a slightly different version on the same PCB as tsukande
+ROM_START( ddboya )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "342-f02-4g-(p).bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) )
+	ROM_LOAD32_BYTE( "342_a04.27c010.4g", 0x000003, 0x020000, CRC(a4d4e15e) SHA1(809afab3f2adc58ca5d18e2413b40a6f33bd0cfa) )
+	ROM_LOAD32_BYTE( "342_a05.27c010.4h", 0x000000, 0x020000, CRC(e7e50901) SHA1(5e01377a3ad8ccb2a2b56610e8225b9b6bf15122) )
+	ROM_LOAD32_BYTE( "342_a06.27c010.4j", 0x000001, 0x020000, CRC(49f35d66) SHA1(3d5cf3b6eb6a3497609117acd002169a31130418) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "342-a11-10d-(s1).bin", 0x000000, 0x080000, CRC(b523bced) SHA1(87a814035af4dcf24454667d4346d301303d697e) )
+	ROM_LOAD( "342-a12-10e-(s2).bin", 0x080000, 0x080000, CRC(6febafe7) SHA1(69e550dd067f326b4d20a859345f193b43a5af99) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	// R
+	ROM_LOAD( "342_a07.82s129.13f", 0x000000, 0x000100, CRC(f8c11f4d) SHA1(95061d0af7c8bac702aa48e16c0711719250653f) )
+	// G
+	ROM_LOAD( "342_a08.82s129.14f", 0x000100, 0x000100, CRC(1814db4b) SHA1(08b25f96dc3af15b3fa3c88b2884845abd3ff620) )
+	// B
+	ROM_LOAD( "342_a09.82s129.15f", 0x000200, 0x000100, CRC(21e2dd13) SHA1(721c7fa1a01c810a7ce35b4331d280704b4e04fd) )
+	// P(riority?)
 	ROM_LOAD( "342_a10.82s129.14g", 0x000300, 0x000100, CRC(1fa443f9) SHA1(84b0a36a4e49bf75bda1871bf52090ee5a75cd03) )
 ROM_END
 
@@ -632,6 +669,7 @@ ROM_START( shuriboy )
 ROM_END
 
 GAME( 1995, tsukande,    0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
-GAME( 1995, ddboy,       0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy", MACHINE_NOT_WORKING)
+GAME( 1995, ddboy,       0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
+GAME( 1995, ddboya,  ddboy, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on Tsukande Tori Chicchi PCB)", MACHINE_NOT_WORKING)
 GAME( 1993, shuriboy,    0, shuriboy, konmedal,  konmedal_state, 0, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
 

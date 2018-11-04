@@ -45,7 +45,7 @@ WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kncljoe_state )
+ADDRESS_MAP_START(kncljoe_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(kncljoe_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd001) AM_WRITE(kncljoe_scroll_w) AM_SHARE("scrollregs")
@@ -103,14 +103,14 @@ WRITE8_MEMBER(kncljoe_state::unused_w)
 	//unused - no MSM on the pcb
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kncljoe_state )
+ADDRESS_MAP_START(kncljoe_state::sound_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, kncljoe_state )
+ADDRESS_MAP_START(kncljoe_state::sound_portmap)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(m6803_port1_r, m6803_port1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END

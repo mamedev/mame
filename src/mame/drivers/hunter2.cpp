@@ -70,6 +70,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
 	void hunter2(machine_config &config);
+	void hunter2_banked_mem(address_map &map);
+	void hunter2_io(address_map &map);
+	void hunter2_mem(address_map &map);
 private:
 	uint8_t m_keydata;
 	uint8_t m_irq_mask;
@@ -85,13 +88,13 @@ private:
 	required_device<address_map_bank_device> m_bank3;
 };
 
-static ADDRESS_MAP_START(hunter2_banked_mem, AS_PROGRAM, 8, hunter2_state)
+ADDRESS_MAP_START(hunter2_state::hunter2_banked_mem)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("roms", 0x0000)
 	AM_RANGE(0x30000, 0x3ffff) AM_NOP
 	AM_RANGE(0x40000, 0xfffff) AM_RAM AM_REGION("rams", 0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(hunter2_mem, AS_PROGRAM, 8, hunter2_state)
+ADDRESS_MAP_START(hunter2_state::hunter2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank2", address_map_bank_device, read8, write8)
@@ -99,7 +102,7 @@ static ADDRESS_MAP_START(hunter2_mem, AS_PROGRAM, 8, hunter2_state)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
+ADDRESS_MAP_START(hunter2_state::hunter2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("iotimer", nsc810_device, read, write)

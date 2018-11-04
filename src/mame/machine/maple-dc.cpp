@@ -7,7 +7,7 @@
 
 DEFINE_DEVICE_TYPE(MAPLE_DC, maple_dc_device, "maple_dc", "Dreamcast Maple Bus")
 
-DEVICE_ADDRESS_MAP_START(amap, 32, maple_dc_device)
+ADDRESS_MAP_START(maple_dc_device::amap)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(sb_mdstar_r, sb_mdstar_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(sb_mdtsel_r, sb_mdtsel_w)
 	AM_RANGE(0x14, 0x17) AM_READWRITE(sb_mden_r, sb_mden_w)

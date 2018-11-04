@@ -134,6 +134,11 @@ public:
 	void opwolfb(machine_config &config);
 	void opwolfp(machine_config &config);
 	void opwolf(machine_config &config);
+	void opwolf_map(address_map &map);
+	void opwolf_sound_z80_map(address_map &map);
+	void opwolfb_map(address_map &map);
+	void opwolfb_sub_z80_map(address_map &map);
+	void opwolfp_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -44,7 +44,7 @@ WRITE_LINE_MEMBER(suprloco_state::pc0_w)
 	machine().output().set_lamp_value(0, state); // ???
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )
+ADDRESS_MAP_START(suprloco_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc200, 0xc7ff) AM_WRITENOP
@@ -60,12 +60,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, suprloco_state )
+ADDRESS_MAP_START(suprloco_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprloco_state )
+ADDRESS_MAP_START(suprloco_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE("sn1", sn76496_device, write)
@@ -178,7 +178,7 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprloco_state,  irq0_line_hold)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 

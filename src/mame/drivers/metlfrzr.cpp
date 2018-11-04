@@ -64,6 +64,8 @@ public:
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
 	void metlfrzr(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void metlfrzr_map(address_map &map);
 };
 
 
@@ -176,7 +178,7 @@ WRITE8_MEMBER(metlfrzr_state::output_w)
 //  popmessage("%02x %02x",m_fg_tilebank,data & 3);
 }
 
-static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
+ADDRESS_MAP_START(metlfrzr_state::metlfrzr_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("vram")
@@ -190,7 +192,7 @@ static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
 	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("START")
 	AM_RANGE(0xd603, 0xd603) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd604, 0xd604) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd600, 0xd61f) AM_RAM AM_SHARE("vregs") // TODO: write-only, debug
+	AM_RANGE(0xd600, 0xd61f) AM_WRITEONLY AM_SHARE("vregs")
 
 	AM_RANGE(0xd700, 0xd700) AM_WRITE(output_w)
 	AM_RANGE(0xd710, 0xd710) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
@@ -204,7 +206,7 @@ static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, metlfrzr_state )
+ADDRESS_MAP_START(metlfrzr_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram") // executes code at 0xf5d5
@@ -240,7 +242,7 @@ static INPUT_PORTS_START( metlfrzr )
 	PORT_DIPNAME( 0x04, 0x04, "2-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, "2-2" )
+	PORT_DIPNAME( 0x08, 0x08, "2-3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
@@ -363,7 +365,7 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(metlfrzr_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metlfrzr_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)

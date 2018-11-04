@@ -41,6 +41,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_oki;
 	void amerihok(machine_config &config);
+	void amerihok_data_map(address_map &map);
+	void amerihok_map(address_map &map);
 };
 
 WRITE8_MEMBER(amerihok_state::control_w)
@@ -49,11 +51,11 @@ WRITE8_MEMBER(amerihok_state::control_w)
 	m_oki->ch2_w(!BIT(data, 7));
 }
 
-static ADDRESS_MAP_START(amerihok_map, AS_PROGRAM, 8, amerihok_state)
+ADDRESS_MAP_START(amerihok_state::amerihok_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(amerihok_data_map, AS_DATA, 8, amerihok_state)
+ADDRESS_MAP_START(amerihok_state::amerihok_data_map)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(control_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("oki", okim6376_device, write)
 ADDRESS_MAP_END

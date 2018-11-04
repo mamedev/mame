@@ -94,4 +94,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_djboy);
 	TIMER_DEVICE_CALLBACK_MEMBER(djboy_scanline);
 	void djboy(machine_config &config);
+	void cpu0_am(address_map &map);
+	void cpu0_port_am(address_map &map);
+	void cpu1_am(address_map &map);
+	void cpu1_port_am(address_map &map);
+	void cpu2_am(address_map &map);
+	void cpu2_port_am(address_map &map);
+	void djboy_mcu_io_map(address_map &map);
 };

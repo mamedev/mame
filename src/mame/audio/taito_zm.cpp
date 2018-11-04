@@ -28,6 +28,7 @@ TODO:
 
 #include "emu.h"
 #include "taito_zm.h"
+#include "machine/intelfsh.h"
 
 /**************************************************************************/
 
@@ -42,7 +43,8 @@ taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *
 	m_soundcpu(*this, "mn10200"),
 	m_zsg2(*this, "zsg2"),
 	m_reg_address(0),
-	m_tms_ctrl(0)
+	m_tms_ctrl(0),
+	m_use_flash(false)
 {
 }
 
@@ -106,8 +108,12 @@ WRITE8_MEMBER(taito_zoom_device::tms_ctrl_w)
 }
 
 
-ADDRESS_MAP_START( taitozoom_mn_map, AS_PROGRAM, 16, taito_zoom_device )
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
+ADDRESS_MAP_START(taito_zoom_device::taitozoom_mn_map)
+	if(m_use_flash) {
+		AM_RANGE(0x080000, 0x0fffff) AM_DEVREAD(":pgmflash", intelfsh16_device, read);
+	} else {
+		AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0);
+	}
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x800000, 0x8007ff) AM_DEVREADWRITE("zsg2", zsg2_device, read, write)
 	AM_RANGE(0xc00000, 0xc00001) AM_RAM // TMS57002 comms

@@ -320,7 +320,7 @@ WRITE16_MEMBER(atarig42_state::guardians_sloop_data_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
+ADDRESS_MAP_START(atarig42_state::main_map)
 	AM_RANGE(0x000000, 0x080001) AM_ROM
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("IN1")
@@ -339,11 +339,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xf80000, 0xf80003) AM_DEVWRITE("asic65", asic65_device, data_w)
 	AM_RANGE(0xfa0000, 0xfa0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xff2000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -563,14 +563,16 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x200, atarig42)
+MACHINE_CONFIG_START(atarig42_state::atarig42_0x200)
+	atarig42(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atarig42_state::atarig42_0x400, atarig42)
+MACHINE_CONFIG_START(atarig42_state::atarig42_0x400)
+	atarig42(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
 
 	/* ASIC65 */

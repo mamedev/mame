@@ -71,6 +71,7 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
 	void ultratnk(machine_config &config);
+	void ultratnk_cpu_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

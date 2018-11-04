@@ -481,7 +481,7 @@ READ8_MEMBER(mcr3_state::turbotag_kludge_r)
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( mcrmono_map, AS_PROGRAM, 8, mcr3_state )
+ADDRESS_MAP_START(mcr3_state::mcrmono_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
@@ -493,7 +493,7 @@ static ADDRESS_MAP_START( mcrmono_map, AS_PROGRAM, 8, mcr3_state )
 ADDRESS_MAP_END
 
 /* I/O map verified from schematics */
-static ADDRESS_MAP_START( mcrmono_portmap, AS_IO, 8, mcr3_state )
+ADDRESS_MAP_START(mcr3_state::mcrmono_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP0")
@@ -515,7 +515,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( spyhunt_map, AS_PROGRAM, 8, mcr3_state )
+ADDRESS_MAP_START(mcr3_state::spyhunt_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_SHARE("videoram")
@@ -526,7 +526,7 @@ static ADDRESS_MAP_START( spyhunt_map, AS_PROGRAM, 8, mcr3_state )
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
-static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8, mcr3_state )
+ADDRESS_MAP_START(mcr3_state::spyhunt_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS("ssio")
@@ -1121,7 +1121,8 @@ MACHINE_CONFIG_END
 
 
 /* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Cheap Squeak */
-MACHINE_CONFIG_DERIVED(mcr3_state::mono_tcs, mcrmono)
+MACHINE_CONFIG_START(mcr3_state::mono_tcs)
+	mcrmono(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
@@ -1129,7 +1130,8 @@ MACHINE_CONFIG_DERIVED(mcr3_state::mono_tcs, mcrmono)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mcr3_state::maxrpm, mono_tcs)
+MACHINE_CONFIG_START(mcr3_state::maxrpm)
+	mono_tcs(config);
 	MCFG_ADC0844_ADD("adc")
 	MCFG_ADC0844_CH1_CB(IOPORT("MONO.IP1"))
 	MCFG_ADC0844_CH2_CB(IOPORT("MONO.IP1.ALT1"))
@@ -1139,7 +1141,8 @@ MACHINE_CONFIG_END
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
-MACHINE_CONFIG_DERIVED(mcr3_state::mono_sg, mcrmono)
+MACHINE_CONFIG_START(mcr3_state::mono_sg)
+	mcrmono(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
@@ -1152,7 +1155,8 @@ MACHINE_CONFIG_END
 
 
 /* Core scrolling system with SSIO sound */
-MACHINE_CONFIG_DERIVED(mcr3_state::mcrscroll, mcrmono)
+MACHINE_CONFIG_START(mcr3_state::mcrscroll)
+	mcrmono(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
@@ -1178,7 +1182,8 @@ MACHINE_CONFIG_END
 
 
 /* Spy Hunter = scrolling system with an SSIO and a cheap squeak deluxe */
-MACHINE_CONFIG_DERIVED(mcr3_state::mcrsc_csd, mcrscroll)
+MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
+	mcrscroll(config);
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)

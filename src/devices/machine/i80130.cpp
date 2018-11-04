@@ -19,11 +19,11 @@
 DEFINE_DEVICE_TYPE(I80130, i80130_device, "i80130", "I80130")
 
 
-DEVICE_ADDRESS_MAP_START( rom_map, 16, i80130_device )
+ADDRESS_MAP_START(i80130_device::rom_map)
 	//AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( io_map, 16, i80130_device )
+ADDRESS_MAP_START(i80130_device::io_map)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(io_r, io_w)
 	//AM_RANGE(0x00, 0x01) AM_MIRROR(0x2) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
 	//AM_RANGE(0x08, 0x0f) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)

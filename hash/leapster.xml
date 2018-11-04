@@ -189,7 +189,7 @@
 		</part>
 	</software>
 
-	<software name="princwen">
+	<software name="princwen" supported="no">
 		<description>Disney Princess - Worlds of Enchantment (USA)</description>
 		<year>2007?</year>
 		<publisher>LeapFrog</publisher>
@@ -213,7 +213,7 @@
 		</part>
 	</software>
 
-	<software name="findnemo">
+	<software name="findnemo" supported="no">
 		<description>Finding Nemo (USA)</description>
 		<year>2005?</year>
 		<publisher>LeapFrog</publisher>
@@ -261,7 +261,7 @@
 		</part>
 	</software>
 
-	<software name="diegogo">
+	<software name="diegogo" supported="no">
 		<description>Go Diego Go! - Animal Rescuer (USA)</description>
 		<year>2007?</year>
 		<publisher>LeapFrog</publisher>
@@ -309,7 +309,7 @@
 		</part>
 	</software>
 
-	<software name="lernleap" supported="no">
+	<software name="lernleapg" cloneof="lernleap" supported="no">
 		<description>Lernen mit Leap (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -321,7 +321,7 @@
 		</part>
 	</software>
 
-	<software name="brunobls">
+	<software name="brunobls" supported="no">
 		<description>Lernst du Malen &amp; Schreiben - Mit Bruno Bleistift  (Ger)</description>
 		<year>2004?</year>
 		<publisher>LeapFrog</publisher>
@@ -369,7 +369,7 @@
 		</part>
 	</software>
 
-	<software name="ratat" supported="no">
+	<software name="ratatg" cloneof="ratat" supported="no">
 		<description>Ratatouille (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -405,6 +405,7 @@
 		</part>
 	</software>
 
+	<!-- same ROM found in Cart ID 500-01168 -->
 	<software name="spongeb" supported="no">
 		<description>Spongebob Squarepants - Saves the Day (USA)</description>
 		<year>2003</year>
@@ -441,7 +442,7 @@
 		</part>
 	</software>
 
-	<software name="spidermn">
+	<software name="spidermn" supported="no">
 		<description>Spider-Man - The Case of the Sinister Speller (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -489,7 +490,7 @@
 		</part>
 	</software>
 
-	<software name="toystor3">
+	<software name="toystor3" supported="no">
 		<description>Toy Story 3 (USA)</description>
 		<year>2010?</year>
 		<publisher>LeapFrog</publisher>
@@ -501,7 +502,7 @@
 		</part>
 	</software>
 
-	<software name="walle">
+	<software name="walleg" cloneof="walle" supported="no">
 		<description>Wall-E (Ger)</description>
 		<year>2008?</year>
 		<publisher>LeapFrog</publisher>
@@ -561,9 +562,189 @@
 		</part>
 	</software>
 
+	<software name="swjedir" supported="no">
+		<description>Star Wars - Jedi Reading (US)</description>
+		<year>2008</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13472-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13472-A - Star Wars - Jedi Reading (US).bin" size="8388608" crc="6239a178" sha1="55c09dbeaabfd21a12369aefa8eae6b7a8d7c1f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="up" supported="no">
+		<description>Up (US)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13563-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13563-A - Up (US).bin" size="8388608" crc="1e2a5031" sha1="ab74239918208cc7dfa7377549086b59e6c40818" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
 
+	<software name="scooby" supported="no">
+		<description>Scooby Doo! (US)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-14005-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-14005-A - Scooby Doo! (US).bin" size="8388608" crc="4cd2c497" sha1="9f06cb4aba2399464a799910be9df1d5678bb23a" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
 
+	<software name="cars2" supported="no">
+		<description>Cars 2 (US)</description>
+		<year>2011</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-14320-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-14320-A - Cars 2 (US).bin" size="8388608" crc="29af42ba" sha1="01263c4b6b178599eca818a514f9a668bdf9081d" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
 
+	<software name="lernleap" supported="no">
+		<description>Learning with Leap (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10093" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-10093 - Learning with Leap (US).bin" size="8388608" crc="2c1fcf40" sha1="ee9dbfa8aabda493cc2a34dc82b253122fa96c91" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="kinderga" supported="no">
+		<description>Kindergarten (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10999" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-10999 - Kindergarten (US).bin" size="8388608" crc="db262164" sha1="2ece5050d65d020cce70e220af3c11c9827029ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="tfcall" supported="no">
+		<description>Thomas and Friends - Calling all Engines! (US)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11204-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-11204-A - Thomas and Friends - Calling all Engines! (US).bin" size="8388608" crc="5303d366" sha1="a7a65b5027d742634dd0860d3db44981c2351a05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="ispychl" supported="no">
+		<description>Scholastic I Spy - Challenger (US)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11929-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-11929-A - Scholastic I Spy - Challenger (US).bin" size="8388608" crc="da56181c" sha1="952a3135131b6543b7e6b4f784c7a239cfd6e75a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="numraid" supported="no">
+		<description>Number Raiders (US)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11993-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-11993-A - Number Raiders (US).bin" size="4194304" crc="0f6d55cf" sha1="f30e7d55c5222e85aca08819ff613343b91138a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="scoobsnk" supported="no">
+		<description>Scooby Doo! - Spooky Snacks! (US)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12160-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12160-A - Scooby Doo! - Spooky Snacks! (US).bin" size="4194304" crc="19da3dd8" sha1="8966d8d1e65ea0f778c9b435de94da793a874efe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="anigeni" supported="no">
+		<description>Animal Genius (US)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12293-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12293-A - Scholastic - Animal Genius (US).bin" size="8388608" crc="af063ba4" sha1="af22fdbb0466e1a078e68fe26752e606b529fcca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="letrpilr" supported="no">
+		<description>Letterpillar (US)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12350-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12350-A - Letterpillar (US).bin" size="4194304" crc="9b86a0fb" sha1="c7d5381205340f85b302342cbe518f20c959a193" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="createcr" supported="no">
+		<description>Creature Create (US)</description>
+		<year>2006</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12677-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12677-A - Creature Create (US).bin" size="8388608" crc="9f08d02a" sha1="82a408b87ff5df6f17d314af17cd20ff4847b30f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="walle" supported="no">
+		<description>Wall-E (US)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13272-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13272-A - Wall-E (US).bin" size="8388608" crc="c71cff35" sha1="ac31af80cf3dedf13ddb94595e2914377f85f819" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratat" supported="no">
+		<description>Ratatouille (US)</description>
+		<year>2006</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13445-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13445-A - Ratatouille (US).bin" size="8388608" crc="d0c4de47" sha1="372c61285eee5c8ce2670d12bedb09150fdaaa45" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+
+	
+	<!-- L-MAX carts -->
+	
 	<software name="numbrun">
 		<description>Numbers on the Run - Counting on Zero (USA, L-MAX)</description>
 		<year>2005?</year>

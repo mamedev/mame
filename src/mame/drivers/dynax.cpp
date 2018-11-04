@@ -85,7 +85,6 @@ TODO:
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/tmpz84c015.h"
-#include "machine/74259.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -397,45 +396,45 @@ MACHINE_RESET_MEMBER(dynax_state,adpcm)
 	m_msm->reset_w(1);
 }
 
-static ADDRESS_MAP_START( cdracula_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::cdracula_mem_map)
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprtmtch_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::sprtmtch_mem_map)
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hnoridur_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::hnoridur_mem_map)
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcnpshnt_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::mcnpshnt_mem_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nanajign_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::nanajign_mem_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjdialq2_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::mjdialq2_mem_map)
+	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x0800, 0x0fff ) AM_RAM
 	AM_RANGE( 0x1000, 0x1fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::yarunara_mem_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
@@ -443,21 +442,21 @@ static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8, dynax_state )
 ADDRESS_MAP_END
 
 //identical to yarunara, but nvram is in the 0x6000 - 0x6fff range
-static ADDRESS_MAP_START( quiztvqq_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::quiztvqq_mem_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jantouki_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::jantouki_mem_map)
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jantouki_sound_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::jantouki_sound_mem_map)
 	AM_RANGE( 0x0000, 0x77ff ) AM_ROM
 	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank2")
@@ -465,32 +464,32 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( hnoridur_banked_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::hnoridur_banked_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x80000, 0x800ff) AM_WRITE(hnoridur_palette_lo_w)
 	AM_RANGE(0xa0000, 0xa00ff) AM_WRITE(hnoridur_palette_hi_w)
 	AM_RANGE(0xc0000, 0xc7fff) AM_RAM // hnoridur: R/W RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjelctrn_banked_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::mjelctrn_banked_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x80000, 0x800ff) AM_WRITE(nanajign_palette_lo_w)
 	AM_RANGE(0xa0000, 0xa00ff) AM_WRITE(nanajign_palette_hi_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nanajign_banked_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::nanajign_banked_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x80000, 0x800ff) AM_WRITE(nanajign_palette_lo_w)
 	AM_RANGE(0xa0000, 0xa00ff) AM_WRITE(nanajign_palette_hi_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yarunara_banked_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::yarunara_banked_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x80000, 0x801ff) AM_WRITE(tenkai_palette_w)
 	AM_RANGE(0xe0000, 0xe000f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjangels_banked_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::mjangels_banked_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0x010000)
 	AM_RANGE(0x080000, 0x0801ff) AM_WRITE(tenkai_palette_w)
 	AM_RANGE(0x0a0000, 0x0bffff) AM_ROM AM_REGION("maincpu", 0x0b0000)
@@ -500,7 +499,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::hanamai_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
@@ -530,7 +529,7 @@ static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::hnoridur_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
@@ -595,20 +594,20 @@ READ8_MEMBER(dynax_state::hjingi_keyboard_1_r)
 	return hanamai_keyboard_1_r(space, 0) | ioport("BET")->read();
 }
 
-static ADDRESS_MAP_START( hjingi_mem_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::hjingi_mem_map)
 	AM_RANGE( 0x0000, 0x01ff ) AM_ROM
 	AM_RANGE( 0x0200, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0x8000, 0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
+	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hjingi_banked_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::hjingi_banked_map)
 	AM_RANGE(0x80000, 0x800ff) AM_WRITE(hnoridur_palette_lo_w)
 	AM_RANGE(0xa0000, 0xa00ff) AM_WRITE(hnoridur_palette_hi_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::hjingi_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
 
@@ -735,7 +734,7 @@ WRITE8_MEMBER(dynax_state::yarunara_blit_romregion_w)
 	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::yarunara_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x01 ) AM_WRITE(yarunara_input_w)       // Controls
 	AM_RANGE( 0x02, 0x03 ) AM_READ(yarunara_input_r)        //
@@ -763,7 +762,7 @@ ADDRESS_MAP_END
 
 
 // Almost identical to hnoridur
-static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::mcnpshnt_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
@@ -797,7 +796,7 @@ static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8, dynax_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sprtmtch_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::sprtmtch_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
 	AM_RANGE( 0x10, 0x11 ) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)  // 2 x DSW
@@ -820,7 +819,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( mjfriday_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::mjfriday_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
 	AM_RANGE( 0x01, 0x01 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes (Low Bits)
@@ -841,7 +840,7 @@ static ADDRESS_MAP_START( mjfriday_io_map, AS_IO, 8, dynax_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nanajign_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::nanajign_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
@@ -903,7 +902,7 @@ WRITE8_MEMBER(dynax_state::jantouki_rombank_w)
 	output().set_led_value(0, data & 0x10);  // maybe
 }
 
-static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::jantouki_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE( 0x40, 0x41 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x48, 0x48 ) AM_WRITE(jantouki_rombank_w)     // BANK ROM Select
@@ -954,7 +953,7 @@ READ8_MEMBER(dynax_state::jantouki_soundlatch_status_r)
 	return (m_soundlatch_full) ? 0 : 0x80;
 }
 
-static ADDRESS_MAP_START( jantouki_sound_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::jantouki_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(jantouki_sound_rombank_w)       // BANK ROM Select
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE(jantouki_sound_vblank_ack_w)    // VBlank IRQ Ack
@@ -987,7 +986,7 @@ READ8_MEMBER(dynax_state::mjelctrn_dsw_r)
 	return ioport(dswnames[dsw])->read();
 }
 
-static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::mjelctrn_io_map)
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0xff00) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_MIRROR(0xff00) AM_WRITE(adpcm_data_w)           // MSM5205 data
@@ -1020,7 +1019,7 @@ static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0xe7, 0xe7 ) AM_MIRROR(0xff00) AM_WRITE(hnoridur_palbank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjembase_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::mjembase_io_map)
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x04, 0x05 ) AM_MIRROR(0xff00) AM_DEVWRITE("ym2413", ym2413_device, write)       //
 	AM_RANGE( 0x06, 0x06 ) AM_MIRROR(0xff00) AM_DEVREAD("aysnd", ay8912_device, data_r)        // AY8912, dsw0
@@ -1252,7 +1251,7 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
 	logerror("%04x: unmapped romregion=%02X\n", m_maincpu->pc(), data);
 }
 
-static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::tenkai_map)
 	AM_RANGE(  0x0000,  0x5fff ) AM_ROM
 	AM_RANGE(  0x6000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
@@ -1267,14 +1266,14 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x10050, 0x10050 ) AM_WRITE(tenkai_priority_w)        // layer priority and enable
 	AM_RANGE( 0x10054, 0x10054 ) AM_WRITE(dynax_blit_backpen_w)     // Background Color
 	AM_RANGE( 0x10058, 0x10058 ) AM_WRITE(tenkai_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0x10060, 0x1007f ) AM_DEVWRITE_MOD("mainlatch", ls259_device, write_d1, rshift<2>)
+	;map(0x10060, 0x1007f).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_d1(space, offset >> 2, data, mem_mask); });
 	AM_RANGE( 0x100c0, 0x100c0 ) AM_WRITE(tenkai_ipsel_w)
 	AM_RANGE( 0x100c1, 0x100c1 ) AM_WRITE(tenkai_ip_w)
 	AM_RANGE( 0x100c2, 0x100c3 ) AM_READ(tenkai_ip_r)
 	AM_RANGE( 0x100e1, 0x100e7 ) AM_WRITE(tenkai_blitter_rev2_w)    // Blitter (inverted scroll values)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tenkai_banked_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::tenkai_banked_map)
 	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE( 0x80000, 0x8000f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE( 0x90000, 0x97fff ) AM_READWRITE(tenkai_palette_r, tenkai_palette_w)
@@ -1326,13 +1325,13 @@ WRITE8_MEMBER(dynax_state::gekisha_p4_w)
 }
 
 
-static ADDRESS_MAP_START( gekisha_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::gekisha_map)
 	AM_RANGE(  0x0000,  0x6fff ) AM_ROM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekisha_banked_map, AS_PROGRAM, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::gekisha_banked_map)
 	AM_RANGE( 0x00000, 0x0ffff ) AM_ROM AM_REGION("maincpu", 0x8000)
 	AM_RANGE( 0x10000, 0x10000 ) AM_WRITENOP   // ? 0
 	AM_RANGE( 0x10001, 0x10001 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes (Low Bits)
@@ -1371,7 +1370,7 @@ WRITE8_MEMBER(dynax_state::cdracula_sound_rombank_w)
 		logerror("%s: warning, invalid sound bank = %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( cdracula_io_map, AS_IO, 8, dynax_state )
+ADDRESS_MAP_START(dynax_state::cdracula_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(cdracula_blitter_rev2_w)       // Blitter + Destination Layers
 	AM_RANGE( 0x10, 0x10 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -4519,7 +4518,8 @@ MACHINE_CONFIG_END
                             Mahjong Dial Q2
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjdialq2, mjfriday)
+MACHINE_CONFIG_START(dynax_state::mjdialq2)
+	mjfriday(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4547,7 +4547,8 @@ INTERRUPT_GEN_MEMBER(dynax_state::yarunara_clock_interrupt)
 	sprtmtch_update_irq();
 }
 
-MACHINE_CONFIG_DERIVED(dynax_state::yarunara, hnoridur)
+MACHINE_CONFIG_START(dynax_state::yarunara)
+	hnoridur(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4569,13 +4570,15 @@ MACHINE_CONFIG_DERIVED(dynax_state::yarunara, hnoridur)
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjangels, yarunara)
+MACHINE_CONFIG_START(dynax_state::mjangels)
+	yarunara(config);
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(mjangels_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::quiztvqq, mjangels)
+MACHINE_CONFIG_START(dynax_state::quiztvqq)
+	mjangels(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -4587,7 +4590,8 @@ MACHINE_CONFIG_END
                             Mahjong Campus Hunting
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(dynax_state::mcnpshnt, hnoridur)
+MACHINE_CONFIG_START(dynax_state::mcnpshnt)
+	hnoridur(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
 	MCFG_CPU_IO_MAP(mcnpshnt_io_map)
@@ -4600,7 +4604,8 @@ MACHINE_CONFIG_END
                             7jigen
 ***************************************************************************/
 
-MACHINE_CONFIG_DERIVED(dynax_state::nanajign, hnoridur)
+MACHINE_CONFIG_START(dynax_state::nanajign)
+	hnoridur(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(nanajign_io_map)
@@ -4698,7 +4703,8 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::janyuki, jantouki)
+MACHINE_CONFIG_START(dynax_state::janyuki)
+	jantouki(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(dynax_state,janyuki)         // static palette
 MACHINE_CONFIG_END
@@ -4721,7 +4727,8 @@ void dynax_state::mjelctrn_update_irq()
 	cpu.trg2(1);
 }
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjelctrn, hnoridur)
+MACHINE_CONFIG_START(dynax_state::mjelctrn)
+	hnoridur(config);
 	MCFG_CPU_REPLACE("maincpu", TMPZ84C015, XTAL(22'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MCFG_CPU_IO_MAP(mjelctrn_io_map)
@@ -4741,7 +4748,8 @@ MACHINE_CONFIG_DERIVED(dynax_state::mjelctrn, hnoridur)
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjembase, mjelctrn)
+MACHINE_CONFIG_START(dynax_state::mjembase)
+	mjelctrn(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mjembase_io_map)
 	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW1"))
@@ -4765,7 +4773,8 @@ MACHINE_CONFIG_END
     0x40 is vblank
     0x46 is a periodic irq? */
 
-MACHINE_CONFIG_DERIVED(dynax_state::neruton, mjelctrn)
+MACHINE_CONFIG_START(dynax_state::neruton)
+	mjelctrn(config);
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,neruton)
 MACHINE_CONFIG_END
 
@@ -4855,13 +4864,15 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::majrjhdx, tenkai)
+MACHINE_CONFIG_START(dynax_state::majrjhdx)
+	tenkai(config);
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dynax_state::mjreach, tenkai)
+MACHINE_CONFIG_START(dynax_state::mjreach)
+	tenkai(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(dynax_state, flipscreen_w)) // not inverted
 MACHINE_CONFIG_END

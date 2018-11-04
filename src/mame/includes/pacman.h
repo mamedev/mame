@@ -30,6 +30,34 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
+	void _8bpm_portmap(address_map &map);
+	void alibaba_map(address_map &map);
+	void bigbucks_map(address_map &map);
+	void bigbucks_portmap(address_map &map);
+	void birdiy_map(address_map &map);
+	void crushs_map(address_map &map);
+	void crushs_portmap(address_map &map);
+	void dremshpr_map(address_map &map);
+	void dremshpr_portmap(address_map &map);
+	void drivfrcp_portmap(address_map &map);
+	void epos_map(address_map &map);
+	void epos_portmap(address_map &map);
+	void mschamp_map(address_map &map);
+	void mschamp_portmap(address_map &map);
+	void mspacman_map(address_map &map);
+	void nmouse_portmap(address_map &map);
+	void numcrash_map(address_map &map);
+	void pacman_map(address_map &map);
+	void pengojpm_map(address_map &map);
+	void piranha_portmap(address_map &map);
+	void porky_portmap(address_map &map);
+	void rocktrv2_map(address_map &map);
+	void s2650games_dataport(address_map &map);
+	void s2650games_map(address_map &map);
+	void superabc_map(address_map &map);
+	void vanvan_portmap(address_map &map);
+	void woodpek_map(address_map &map);
+	void writeport(address_map &map);
 private:
 	optional_device<namco_device> m_namco_sound;
 	required_device<watchdog_timer_device> m_watchdog;

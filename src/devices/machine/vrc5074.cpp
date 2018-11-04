@@ -120,22 +120,22 @@
 
 DEFINE_DEVICE_TYPE(VRC5074, vrc5074_device, "vrc5074", "NEC VRC5074 System Controller")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, vrc5074_device)
+ADDRESS_MAP_START(vrc5074_device::config_map)
+	AM_IMPORT_FROM(pci_bridge_device::config_map)
 	AM_RANGE(0x00000018, 0x00000027) AM_READWRITE(sdram_addr_r, sdram_addr_w)
-	AM_INHERIT_FROM(pci_bridge_device::config_map)
 ADDRESS_MAP_END
 
 // cpu i/f map
-DEVICE_ADDRESS_MAP_START(cpu_map, 32, vrc5074_device)
+ADDRESS_MAP_START(vrc5074_device::cpu_map)
 	AM_RANGE(0x00000000, 0x000001ff) AM_READWRITE(cpu_reg_r, cpu_reg_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(serial_map, 32, vrc5074_device)
+ADDRESS_MAP_START(vrc5074_device::serial_map)
 	AM_RANGE(0x00000000, 0x0000003f) AM_READWRITE(serial_r, serial_w)
 ADDRESS_MAP_END
 
 // Target Window 1 map
-DEVICE_ADDRESS_MAP_START(target1_map, 32, vrc5074_device)
+ADDRESS_MAP_START(vrc5074_device::target1_map)
 	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(target1_r, target1_w)
 ADDRESS_MAP_END
 
@@ -169,7 +169,7 @@ vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, d
 	}
 }
 
-void vrc5074_device::set_map(int id, const address_map_delegate &map, device_t *device)
+void vrc5074_device::set_map(int id, const address_map_constructor &map, device_t *device)
 {
 	if (id < 2)
 		fatalerror("set_map: chip select must be greater or equal to 2.\n");

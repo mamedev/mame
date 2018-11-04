@@ -108,6 +108,11 @@ public:
 	void system18_fd1094_i8751(machine_config &config);
 	void lghost(machine_config &config);
 	void system18_i8751(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void system18_map(address_map &map);
 protected:
 	// timer IDs
 	enum

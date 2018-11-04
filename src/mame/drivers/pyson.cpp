@@ -167,6 +167,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void pyson(machine_config &config);
+	void ps2_map(address_map &map);
 protected:
 
 	// devices
@@ -186,7 +187,7 @@ uint32_t pyson_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-static ADDRESS_MAP_START(ps2_map, AS_PROGRAM, 32, pyson_state)
+ADDRESS_MAP_START(pyson_state::ps2_map)
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM // 32 MB RAM in consumer PS2s, do these have more?
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END

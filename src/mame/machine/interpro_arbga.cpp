@@ -22,7 +22,7 @@
 
 #if 0
 // this might be for an earlier revision of the device
-DEVICE_ADDRESS_MAP_START(map, 32, interpro_arbga_device)
+ADDRESS_MAP_START(interpro_arbga_device::map)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(sdepid_r, sdepid_w)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(snapid_r, snapid_w)
 	AM_RANGE(0x08, 0x0b) AM_READWRITE(prilo_r, prilo_w)
@@ -38,7 +38,7 @@ ADDRESS_MAP_END
 #endif
 
 // derived from the FDM "dump_arb" command
-DEVICE_ADDRESS_MAP_START(map, 32, interpro_arbga_device)
+ADDRESS_MAP_START(interpro_arbga_device::map)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(sdepid_r, sdepid_w)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(arbsnap_r, arbsnap_w)
 	AM_RANGE(0x08, 0x0b) AM_READWRITE(fixprils_r, fixprils_w)

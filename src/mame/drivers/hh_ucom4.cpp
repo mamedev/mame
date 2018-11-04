@@ -1427,7 +1427,8 @@ MACHINE_CONFIG_START(galaxy2_state::galaxy2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(galaxy2_state::galaxy2b, galaxy2)
+MACHINE_CONFIG_START(galaxy2_state::galaxy2b)
+	galaxy2(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

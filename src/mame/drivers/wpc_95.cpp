@@ -61,6 +61,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
 	void wpc_95(machine_config &config);
+	void wpc_95_map(address_map &map);
 protected:
 	// devices
 	required_device<cpu_device> maincpu;
@@ -118,7 +119,7 @@ private:
 	bool sc_aux_lamps_handler(int sid, bool state);
 };
 
-static ADDRESS_MAP_START( wpc_95_map, AS_PROGRAM, 8, wpc_95_state )
+ADDRESS_MAP_START(wpc_95_state::wpc_95_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("mainram")
 
 	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmd0")

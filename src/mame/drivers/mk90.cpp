@@ -33,10 +33,11 @@ public:
 	uint32_t screen_update_mk90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void mk90(machine_config &config);
+	void mk90_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(mk90_mem, AS_PROGRAM, 16, mk90_state)
+ADDRESS_MAP_START(mk90_state::mk90_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM // RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM // Extension ROM

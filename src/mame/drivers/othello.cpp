@@ -113,6 +113,10 @@ public:
 	DECLARE_PALETTE_INIT(othello);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void othello(machine_config &config);
+	void audio_map(address_map &map);
+	void audio_portmap(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
 };
 
 
@@ -156,7 +160,7 @@ PALETTE_INIT_MEMBER(othello_state, othello)
 	palette.set_pen_color(0x0f, rgb_t(0xff, 0xff, 0xff));
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
+ADDRESS_MAP_START(othello_state::main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("videoram")
@@ -209,7 +213,7 @@ WRITE8_MEMBER(othello_state::tilebank_w)
 	logerror("tilebank -> %x\n", data);
 }
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, othello_state )
+ADDRESS_MAP_START(othello_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -253,12 +257,12 @@ WRITE8_MEMBER(othello_state::ay_data_w)
 	if (m_ay_select & 2) m_ay2->data_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, othello_state )
+ADDRESS_MAP_START(othello_state::audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_portmap, AS_IO, 8, othello_state )
+ADDRESS_MAP_START(othello_state::audio_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(latch_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay_data_w)

@@ -71,6 +71,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void cabaret(machine_config &config);
+	void cabaret_map(address_map &map);
+	void cabaret_portmap(address_map &map);
 };
 
 
@@ -187,12 +189,12 @@ WRITE8_MEMBER(cabaret_state::ppi2_c_w)
 
 
 
-static ADDRESS_MAP_START( cabaret_map, AS_PROGRAM, 8, cabaret_state )
+ADDRESS_MAP_START(cabaret_state::cabaret_map)
 	AM_RANGE( 0x00000, 0x0efff ) AM_ROM
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
+ADDRESS_MAP_START(cabaret_state::cabaret_portmap)
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
 	AM_RANGE( 0x0080, 0x0083 ) AM_DEVREADWRITE("ppi1", i8255_device, read, write)

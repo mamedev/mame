@@ -103,6 +103,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual space_config_vector memory_space_config() const override;
 
+	void upd7220_vram(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

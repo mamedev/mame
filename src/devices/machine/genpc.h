@@ -38,7 +38,7 @@ public:
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	uint8_t m_pit_out2;
 
@@ -199,7 +199,7 @@ public:
 	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	uint8_t pit_out2() { return m_pit_out2; } // helper for near-clones with multifunction ics instead of 8255s
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 protected:
 	pc_noppi_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

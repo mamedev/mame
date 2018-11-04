@@ -427,6 +427,8 @@ public:
 	void send_through_panel(uint8_t data);
 	void esq1(machine_config &config);
 	void sq80(machine_config &config);
+	void esq1_map(address_map &map);
+	void sq80_map(address_map &map);
 };
 
 
@@ -501,7 +503,7 @@ WRITE8_MEMBER(esq1_state::seqdosram_w)
 	}
 }
 
-static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
+ADDRESS_MAP_START(esq1_state::esq1_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM                 // OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
@@ -511,7 +513,7 @@ static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)  // OS "high" ROM is always mapped here
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sq80_map, AS_PROGRAM, 8, esq1_state )
+ADDRESS_MAP_START(esq1_state::sq80_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM                 // OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
 //  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
@@ -621,7 +623,8 @@ MACHINE_CONFIG_START(esq1_state::esq1)
 	MCFG_SOUND_ROUTE_EX(7, "filters", 1.0, 7)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq1_state::sq80, esq1)
+MACHINE_CONFIG_START(esq1_state::sq80)
+	esq1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sq80_map)
 

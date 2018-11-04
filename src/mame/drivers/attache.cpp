@@ -181,6 +181,8 @@ public:
 	uint8_t keyboard_data_r();
 	uint16_t get_key();
 	void attache(machine_config &config);
+	void attache_io(address_map &map);
+	void attache_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
@@ -259,6 +261,9 @@ public:
 	virtual void machine_reset() override;
 
 	void attache816(machine_config &config);
+	void attache816_io(address_map &map);
+	void attache_x86_io(address_map &map);
+	void attache_x86_map(address_map &map);
 private:
 	required_device<cpu_device> m_extcpu;
 	required_device<i8255_device> m_ppi;
@@ -895,7 +900,7 @@ WRITE_LINE_MEMBER(attache816_state::x86_dsr)
 	// TODO: /DSR to Z8530 SCC
 }
 
-static ADDRESS_MAP_START( attache_map, AS_PROGRAM, 8, attache_state)
+ADDRESS_MAP_START(attache_state::attache_map)
 	AM_RANGE(0x0000,0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000,0x3fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x4000,0x5fff) AM_RAMBANK("bank3")
@@ -906,7 +911,7 @@ static ADDRESS_MAP_START( attache_map, AS_PROGRAM, 8, attache_state)
 	AM_RANGE(0xe000,0xffff) AM_RAMBANK("bank8")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( attache_io, AS_IO, 8, attache_state)
+ADDRESS_MAP_START(attache_state::attache_io)
 	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
 	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
@@ -918,7 +923,7 @@ static ADDRESS_MAP_START( attache_io, AS_IO, 8, attache_state)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(memmap_r, memmap_w) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( attache816_io, AS_IO, 8, attache816_state)
+ADDRESS_MAP_START(attache816_state::attache816_io)
 	AM_RANGE(0xb8, 0xb8) AM_READWRITE(z80_comms_status_r, z80_comms_ctrl_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xb9, 0xb9) AM_READWRITE(z80_comms_r, z80_comms_w) AM_MIRROR(0xff00)
 	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
@@ -932,13 +937,13 @@ static ADDRESS_MAP_START( attache816_io, AS_IO, 8, attache816_state)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(memmap_r, memmap_w) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( attache_x86_map, AS_PROGRAM, 16, attache816_state)
+ADDRESS_MAP_START(attache816_state::attache_x86_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xb0000, 0xbffff) AM_NOP  // triggers IRQ?
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("x86bios",0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( attache_x86_io, AS_IO, 16, attache816_state)
+ADDRESS_MAP_START(attache816_state::attache_x86_io)
 	AM_RANGE(0x100, 0x107) AM_DEVREADWRITE8("ppi",i8255_device,read,write,0x00ff)
 	AM_RANGE(0x108, 0x10d) AM_WRITE8(x86_iobf_enable_w,0xffff);
 // 0x140/2/4/6 - Z8530 SCC serial

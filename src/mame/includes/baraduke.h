@@ -56,4 +56,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	void set_scroll(int layer);
 	void baraduke(machine_config &config);
+	void baraduke_map(address_map &map);
+	void mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
 };

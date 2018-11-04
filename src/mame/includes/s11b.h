@@ -6,8 +6,8 @@
  *  Created on: 1/01/2013
  */
 
-#ifndef S11B_H_
-#define S11B_H_
+#ifndef MAME_INCLUDES_S11B_H
+#define MAME_INCLUDES_S11B_H
 
 #include "includes/s11a.h"
 
@@ -33,6 +33,9 @@ public:
 	DECLARE_DRIVER_INIT(s11b_invert);
 
 	void s11b(machine_config &config);
+	void s11b_audio_map(address_map &map);
+	void s11b_bg_map(address_map &map);
+	void s11b_main_map(address_map &map);
 protected:
 	optional_device<hc55516_device> m_bg_hc55516;
 
@@ -44,4 +47,4 @@ private:
 
 };
 
-#endif /* S11B_H_ */
+#endif // MAME_INCLUDES_S11B_H

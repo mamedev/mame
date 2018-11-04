@@ -86,6 +86,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mole(machine_config &config);
+	void mole_map(address_map &map);
 };
 
 
@@ -200,7 +201,7 @@ READ8_MEMBER(mole_state::mole_protection_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
+ADDRESS_MAP_START(mole_state::mole_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_READ(mole_protection_r)
 	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???

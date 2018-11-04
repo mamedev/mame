@@ -154,6 +154,7 @@ public:
 
 	void a7800_ntsc(machine_config &config);
 	void a7800_pal(machine_config &config);
+	void a7800_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<tia_device> m_tia;
@@ -281,7 +282,7 @@ READ8_MEMBER(a7800_state::bios_or_cart_r)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
+ADDRESS_MAP_START(a7800_state::a7800_mem)
 	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x300) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_DEVREADWRITE("maria", atari_maria_device, read, write)
 	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("zpmirror") // mirror of 0x2040-0x20ff, for zero page
@@ -1391,7 +1392,8 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(a7800_state::a7800_pal, a7800_ntsc)
+MACHINE_CONFIG_START(a7800_state::a7800_pal)
+	a7800_ntsc(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(CLK_PAL)

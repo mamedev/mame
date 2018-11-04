@@ -272,19 +272,19 @@ WRITE16_MEMBER( acclaim_rax_device::host_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, acclaim_rax_device )
+ADDRESS_MAP_START(acclaim_rax_device::adsp_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, acclaim_rax_device )
+ADDRESS_MAP_START(acclaim_rax_device::adsp_data_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("databank")
 	AM_RANGE(0x2000, 0x3fdf) AM_RAM // Internal RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( adsp_io_map, AS_IO, 16, acclaim_rax_device )
+ADDRESS_MAP_START(acclaim_rax_device::adsp_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(ram_bank_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(rom_bank_w)

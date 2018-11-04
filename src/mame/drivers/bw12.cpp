@@ -168,13 +168,13 @@ READ8_MEMBER( bw12_state::ls259_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( bw12_mem, AS_PROGRAM, 8, bw12_state )
+ADDRESS_MAP_START(bw12_state::bw12_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bw12_io, AS_IO, 8, bw12_state )
+ADDRESS_MAP_START(bw12_state::bw12_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(ls259_r, ls259_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
@@ -634,7 +634,8 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bw12_state::bw12, common)
+MACHINE_CONFIG_START(bw12_state::bw12)
+	common(config);
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats)
@@ -647,7 +648,8 @@ MACHINE_CONFIG_DERIVED(bw12_state::bw12, common)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bw12_state::bw14, common)
+MACHINE_CONFIG_START(bw12_state::bw14)
+	common(config);
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats)

@@ -58,6 +58,8 @@ public:
 	{ }
 
 	void isbc8030(machine_config &config);
+	void isbc8030_io(address_map &map);
+	void isbc8030_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
@@ -67,13 +69,13 @@ private:
 	required_device<rs232_port_device> m_rs232;
 };
 
-static ADDRESS_MAP_START(isbc8030_mem, AS_PROGRAM, 8, isbc8030_state)
+ADDRESS_MAP_START(isbc8030_state::isbc8030_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc8030_io, AS_IO, 8, isbc8030_state)
+ADDRESS_MAP_START(isbc8030_state::isbc8030_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xd8, 0xd9) AM_DEVREADWRITE(I8259A_TAG, pic8259_device, read, write)

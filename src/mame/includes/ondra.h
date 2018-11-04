@@ -43,6 +43,8 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_check_callback);
 
 	void ondra(machine_config &config);
+	void ondra_io(address_map &map);
+	void ondra_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

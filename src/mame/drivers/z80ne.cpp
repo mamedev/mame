@@ -113,14 +113,14 @@
 
 /* LX.382 CPU Board RAM */
 /* LX.382 CPU Board EPROM */
-static ADDRESS_MAP_START( z80ne_mem, AS_PROGRAM, 8, z80ne_state )
+ADDRESS_MAP_START(z80ne_state::z80ne_mem)
 	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x0400, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0x83ff ) AM_ROMBANK("bank2")
 	AM_RANGE( 0x8400, 0xffff ) AM_READNOP AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80net_mem, AS_PROGRAM, 8, z80ne_state )
+ADDRESS_MAP_START(z80ne_state::z80net_mem)
 	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x0400, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0x83ff ) AM_ROMBANK("bank2")
@@ -129,21 +129,21 @@ static ADDRESS_MAP_START( z80net_mem, AS_PROGRAM, 8, z80ne_state )
 	AM_RANGE( 0xee00, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80netb_mem, AS_PROGRAM, 8, z80ne_state )
+ADDRESS_MAP_START(z80ne_state::z80netb_mem)
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0xebff ) AM_RAM
 	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_SHARE("videoram") /* (6847) */
 	AM_RANGE( 0xee00, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80ne_io, AS_IO, 8, z80ne_state )
+ADDRESS_MAP_START(z80ne_state::z80ne_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xee, 0xee) AM_READWRITE(lx385_data_r, lx385_data_w )
 	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
 	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80net_io, AS_IO, 8, z80ne_state )
+ADDRESS_MAP_START(z80ne_state::z80net_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xea, 0xea) AM_READ(lx388_data_r )
 	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( z80net_io, AS_IO, 8, z80ne_state )
 	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80netf_mem, AS_PROGRAM, 8, z80ne_state )
+ADDRESS_MAP_START(z80ne_state::z80netf_mem)
 	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x0400, 0x3fff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( z80netf_mem, AS_PROGRAM, 8, z80ne_state )
 	AM_RANGE( 0xf400, 0xffff ) AM_READNOP AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80netf_io, AS_IO, 8, z80ne_state )
+ADDRESS_MAP_START(z80ne_state::z80netf_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xd0, 0xd7) AM_READWRITE(lx390_fdc_r, lx390_fdc_w)
 	AM_RANGE(0xea, 0xea) AM_READ(lx388_data_r )
@@ -441,7 +441,8 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(z80ne_state::z80net, z80ne)
+MACHINE_CONFIG_START(z80ne_state::z80net)
+	z80ne(config);
 
 	MCFG_CPU_MODIFY("z80ne")
 	MCFG_CPU_PROGRAM_MAP(z80net_mem)

@@ -11,8 +11,8 @@
 
 ******************************************************************************/
 
-#ifndef ATARI_H
-#define ATARI_H
+#ifndef MAME_INCLUDES_ATARI_H
+#define MAME_INCLUDES_ATARI_H
 
 #include "machine/6821pia.h"
 #include "sound/pokey.h"
@@ -52,4 +52,4 @@ protected:
 	optional_ioport m_fake;
 };
 
-#endif /* ATARI_H */
+#endif // MAME_INCLUDES_ATARI_H

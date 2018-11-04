@@ -1105,7 +1105,7 @@ WRITE16_MEMBER(jaguar_state::gpu_clut_w16){ if (!(offset&1)) { gpu_clut_w(space,
 READ16_MEMBER(jaguar_state::gpu_ram_r16){ if (!(offset&1)) { return gpu_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpu_ram_r(space, offset>>1, mem_mask); } }
 WRITE16_MEMBER(jaguar_state::gpu_ram_w16){ if (!(offset&1)) { gpu_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpu_ram_w(space, offset>>1, data, mem_mask); } }
 
-static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::jaguar_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE(shared_ram_r16, shared_ram_w16 );
 	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE(cart_base_r16, cart_base_w16 )
@@ -1293,7 +1293,7 @@ WRITE32_MEMBER(jaguar_state::butch_regs_w)
 	}
 }
 
-static ADDRESS_MAP_START( jaguarcd_map, AS_PROGRAM, 16, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::jaguarcd_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE(shared_ram_r16, shared_ram_w16 );
 	AM_RANGE(0x800000, 0x83ffff) AM_ROM AM_REGION("cdbios", 0)
@@ -1320,7 +1320,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::r3000_map)
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x04800000, 0x04bfffff) AM_ROMBANK("maingfxbank")
 	AM_RANGE(0x04c00000, 0x04dfffff) AM_ROMBANK("mainsndbank")
@@ -1351,7 +1351,7 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, jaguar_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::m68020_map)
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rom")
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM AM_SHARE("mainram")
@@ -1386,7 +1386,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::gpu_map)
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("gpugfxbank")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("dspsndbank")
@@ -1409,7 +1409,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 32, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::dsp_map)
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("gpugfxbank")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("dspsndbank")
@@ -1422,7 +1422,7 @@ ADDRESS_MAP_END
 
 /* ToDo, these maps SHOULD be merged with the ones above */
 
-static ADDRESS_MAP_START( jag_gpu_map, AS_PROGRAM, 32, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::jag_gpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_MIRROR(0x200000)  AM_SHARE("sharedram") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_SHARE("cart") AM_REGION("maincpu", 0x800000)
@@ -1440,7 +1440,7 @@ static ADDRESS_MAP_START( jag_gpu_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_SHARE("waverom") AM_REGION("waverom", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jag_dsp_map, AS_PROGRAM, 32, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::jag_dsp_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE("sharedram") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_SHARE("cart") AM_REGION("maincpu", 0x800000)
@@ -1458,7 +1458,7 @@ static ADDRESS_MAP_START( jag_dsp_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_REGION("waverom", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jagcd_gpu_map, AS_PROGRAM, 32, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::jagcd_gpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_MIRROR(0x200000)  AM_SHARE("sharedram") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0x83ffff) AM_ROM AM_REGION("cdbios", 0)
@@ -1477,7 +1477,7 @@ static ADDRESS_MAP_START( jagcd_gpu_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_SHARE("waverom") AM_REGION("waverom", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jagcd_dsp_map, AS_PROGRAM, 32, jaguar_state )
+ADDRESS_MAP_START(jaguar_state::jagcd_dsp_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE("sharedram") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0x83ffff) AM_ROM AM_REGION("cdbios", 0)
@@ -1838,12 +1838,14 @@ MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jaguar_state::cojagr3k_rom, cojagr3k)
+MACHINE_CONFIG_START(jaguar_state::cojagr3k_rom)
+	cojagr3k(config);
 	MCFG_DEVICE_MODIFY("ide:0")
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jaguar_state::cojag68k, cojagr3k)
+MACHINE_CONFIG_START(jaguar_state::cojag68k)
+	cojagr3k(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC020, M68K_CLOCK/2)
@@ -1896,7 +1898,8 @@ MACHINE_CONFIG_START(jaguar_state::jaguar)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jaguar_state::jaguarcd, jaguar)
+MACHINE_CONFIG_START(jaguar_state::jaguarcd)
+	jaguar(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jaguarcd_map)
 

@@ -100,6 +100,8 @@ public:
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void intel82439tx_init();
 	void gamecstl(machine_config &config);
+	void gamecstl_io(address_map &map);
+	void gamecstl_map(address_map &map);
 };
 
 
@@ -338,7 +340,7 @@ WRITE32_MEMBER(gamecstl_state::bios_ram_w)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( gamecstl_map, AS_PROGRAM, 32, gamecstl_state )
+ADDRESS_MAP_START(gamecstl_state::gamecstl_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
 	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_SHARE("cga_ram")
@@ -349,7 +351,7 @@ static ADDRESS_MAP_START( gamecstl_map, AS_PROGRAM, 32, gamecstl_state )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(gamecstl_io, AS_IO, 32, gamecstl_state )
+ADDRESS_MAP_START(gamecstl_state::gamecstl_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x00ec, 0x00ef) AM_NOP
@@ -436,7 +438,7 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	MCFG_CPU_IO_MAP(gamecstl_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)

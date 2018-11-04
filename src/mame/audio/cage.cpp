@@ -595,7 +595,7 @@ WRITE32_MEMBER( atari_cage_device::speedup_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32, atari_cage_device )
+ADDRESS_MAP_START(atari_cage_device::cage_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cageram")
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
@@ -606,7 +606,7 @@ static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32, atari_cage_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32, atari_cage_seattle_device )
+ADDRESS_MAP_START(atari_cage_seattle_device::cage_map_seattle)
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("cageram")
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")

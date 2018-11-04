@@ -55,6 +55,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void horse(machine_config &config);
+	void horse_io_map(address_map &map);
+	void horse_map(address_map &map);
 };
 
 void horse_state::machine_start()
@@ -97,14 +99,14 @@ uint32_t horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( horse_map, AS_PROGRAM, 8, horse_state )
+ADDRESS_MAP_START(horse_state::horse_map)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x4000, 0x40ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_READWRITE(colorram_r, colorram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( horse_io_map, AS_IO, 8, horse_state )
+ADDRESS_MAP_START(horse_state::horse_io_map)
 	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
 ADDRESS_MAP_END
 

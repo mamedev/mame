@@ -44,10 +44,10 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 //**************************************************************************
 
 #define MCFG_DEVICE_ADDRESS_MAP(_space, _map) \
-	device_memory_interface::static_set_addrmap(*device, _space, ADDRESS_MAP_NAME(_map));
+	dynamic_cast<device_memory_interface *>(device)->set_addrmap(_space, address_map_constructor(&std::remove_pointer_t<decltype(this)>::_map, tag(), this));
 
 #define MCFG_DEVICE_REMOVE_ADDRESS_MAP(_space) \
-	device_memory_interface::static_set_addrmap(*device, _space, nullptr);
+	dynamic_cast<device_memory_interface *>(device)->set_addrmap(_space, address_map_constructor());
 
 #define MCFG_DEVICE_PROGRAM_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
@@ -58,7 +58,7 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 #define MCFG_DEVICE_IO_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _map)
 
-#define MCFG_DEVICE_DECRYPTED_OPCODES_MAP(_map) \
+#define MCFG_DEVICE_OPCODES_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_OPCODES, _map)
 
 
@@ -79,17 +79,16 @@ public:
 	virtual ~device_memory_interface();
 
 	// configuration access
-	address_map_constructor address_map(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_map.size()) ? m_address_map[spacenum] : nullptr; }
+	address_map_constructor get_addrmap(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_map.size()) ? m_address_map[spacenum] : address_map_constructor(); }
 	const address_space_config *space_config(int spacenum = 0) const { return spacenum >= 0 && spacenum < int(m_address_config.size()) ? m_address_config[spacenum] : nullptr; }
 	int max_space_count() const { return m_address_config.size(); }
 
 	// static inline configuration helpers
-	static void static_set_addrmap(device_t &device, int spacenum, address_map_constructor map);
 	void set_addrmap(int spacenum, address_map_constructor map);
 
 	// basic information getters
 	bool has_space(int index = 0) const { return index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]; }
-	bool has_configured_map(int index = 0) const { return index >= 0 && index < int(m_address_map.size()) && m_address_map[index]; }
+	bool has_configured_map(int index = 0) const { return index >= 0 && index < int(m_address_map.size()) && !m_address_map[index].isnull(); }
 	address_space &space(int index = 0) const { assert(index >= 0 && index < int(m_addrspace.size()) && m_addrspace[index]); return *m_addrspace[index]; }
 
 	// address translation

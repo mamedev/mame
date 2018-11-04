@@ -215,6 +215,8 @@ public:
 
 	int m_led[6];
 	void wangpc(machine_config &config);
+	void wangpc_io(address_map &map);
+	void wangpc_mem(address_map &map);
 };
 
 
@@ -728,7 +730,7 @@ READ8_MEMBER( wangpc_state::option_id_r )
 //  ADDRESS_MAP( wangpc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( wangpc_mem, AS_PROGRAM, 16, wangpc_state )
+ADDRESS_MAP_START(wangpc_state::wangpc_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x40000, 0xf3fff) AM_DEVREADWRITE(WANGPC_BUS_TAG, wangpcbus_device, mrdc_r, amwc_w)
@@ -740,7 +742,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( wangpc_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
+ADDRESS_MAP_START(wangpc_state::wangpc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1001) AM_WRITE8(fdc_ctrl_w, 0x00ff)
 	AM_RANGE(0x1004, 0x1005) AM_READWRITE8(deselect_drive1_r, deselect_drive1_w, 0x00ff)

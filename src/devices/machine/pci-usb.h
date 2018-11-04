@@ -25,7 +25,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 };
 
 class usb_uhci_device : public pci_device {
@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 };
 
 class usb_ehci_device : public pci_device {
@@ -49,7 +49,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(USB_OHCI, usb_ohci_device)

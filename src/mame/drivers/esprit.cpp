@@ -34,6 +34,8 @@ public:
 
 	void esprit(machine_config &config);
 	void esprit3(machine_config &config);
+	void mem3_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -41,7 +43,7 @@ private:
 	optional_device<palette_device> m_palette;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, esprit_state )
+ADDRESS_MAP_START(esprit_state::mem_map)
 	ADDRESS_MAP_GLOBAL_MASK (0x7fff)
 	AM_RANGE(0x0058,0x0058) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x0059,0x0059) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -50,7 +52,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, esprit_state )
 	AM_RANGE(0x7000,0x7fff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem3_map, AS_PROGRAM, 8, esprit_state )
+ADDRESS_MAP_START(esprit_state::mem3_map)
 	AM_RANGE(0x0000,0x202f) AM_RAM
 	AM_RANGE(0x2030,0x3fff) AM_RAM AM_SHARE("videoram") // it might start at 3000
 	AM_RANGE(0x81c0,0x81c0) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
@@ -135,7 +137,8 @@ MACHINE_CONFIG_START(esprit_state::esprit)
 	MCFG_MC6845_UPDATE_ROW_CB(esprit_state, crtc_update_row)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esprit_state::esprit3, esprit)
+MACHINE_CONFIG_START(esprit_state::esprit3)
+	esprit(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mem3_map)
 MACHINE_CONFIG_END

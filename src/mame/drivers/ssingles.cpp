@@ -185,6 +185,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	void ssingles(machine_config &config);
 	void atamanot(machine_config &config);
+	void atamanot_io_map(address_map &map);
+	void atamanot_map(address_map &map);
+	void ssingles_io_map(address_map &map);
+	void ssingles_map(address_map &map);
 };
 
 //fake palette
@@ -333,7 +337,7 @@ CUSTOM_INPUT_MEMBER(ssingles_state::controls_r)
 	return data;
 }
 
-static ADDRESS_MAP_START( ssingles_map, AS_PROGRAM, 8, ssingles_state )
+ADDRESS_MAP_START(ssingles_state::ssingles_map)
 	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -371,7 +375,7 @@ WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
 }
 
 
-static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8, ssingles_state )
+ADDRESS_MAP_START(ssingles_state::atamanot_map)
 	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -384,7 +388,7 @@ static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8, ssingles_state )
 //  AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8, ssingles_state )
+ADDRESS_MAP_START(ssingles_state::ssingles_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, data_w)
@@ -399,7 +403,7 @@ static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8, ssingles_state )
 	AM_RANGE(0xff, 0xff) AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atamanot_io_map, AS_IO, 8, ssingles_state )
+ADDRESS_MAP_START(ssingles_state::atamanot_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, data_w)
@@ -574,7 +578,8 @@ INTERRUPT_GEN_MEMBER(ssingles_state::atamanot_irq)
 	// ...
 }
 
-MACHINE_CONFIG_DERIVED(ssingles_state::atamanot, ssingles)
+MACHINE_CONFIG_START(ssingles_state::atamanot)
+	ssingles(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atamanot_map)
 	MCFG_CPU_IO_MAP(atamanot_io_map)

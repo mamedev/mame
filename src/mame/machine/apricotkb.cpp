@@ -51,7 +51,7 @@ const tiny_rom_entry *apricot_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 #ifdef UPD7507_EMULATED
-static ADDRESS_MAP_START( apricot_keyboard_io, AS_IO, 8, apricot_keyboard_device )
+ADDRESS_MAP_START(apricot_keyboard_device::apricot_keyboard_io)
 	AM_RANGE(0x00, 0x00) AM_READ(kb_lo_r)
 	AM_RANGE(0x01, 0x01) AM_READ(kb_hi_r)
 	AM_RANGE(0x03, 0x03) AM_WRITE(kb_p3_w)

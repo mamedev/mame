@@ -56,6 +56,10 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 
 	void pwrview(machine_config &config);
+	void bios_bank(address_map &map);
+	void pwrview_fetch_map(address_map &map);
+	void pwrview_io(address_map &map);
+	void pwrview_map(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -333,41 +337,43 @@ READ8_MEMBER(pwrview_state::pitclock_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(bios_bank, 0, 16, pwrview_state)
+ADDRESS_MAP_START(pwrview_state::bios_bank)
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00000, 0x07fff) AM_WRITE(nmimem_w)
 
+	AM_RANGE(0x08000, 0x0ffff) AM_WRITE(nmimem_w)
 	AM_RANGE(0x0be00, 0x0be7f) AM_RAMBANK("vram1")
 	AM_RANGE(0x0befe, 0x0beff) AM_READWRITE(vram1_r, vram1_w);
 	AM_RANGE(0x0bf00, 0x0bf7f) AM_RAMBANK("vram2")
 	AM_RANGE(0x0bffe, 0x0bfff) AM_READWRITE(vram2_r, vram2_w);
 	AM_RANGE(0x0c000, 0x0ffff) AM_ROM AM_REGION("bios", 0x4000)
-	AM_RANGE(0x08000, 0x0ffff) AM_WRITE(nmimem_w)
 
 	AM_RANGE(0x10000, 0x17fff) AM_RAM
+
+	AM_RANGE(0x18000, 0x1ffff) AM_WRITE(nmimem_w)
 
 	AM_RANGE(0x1be00, 0x1be7f) AM_RAMBANK("vram1")
 	AM_RANGE(0x1befe, 0x1beff) AM_READWRITE(vram1_r, vram1_w);
 	AM_RANGE(0x1bf00, 0x1bf7f) AM_RAMBANK("vram2")
 	AM_RANGE(0x1bffe, 0x1bfff) AM_READWRITE(vram2_r, vram2_w);
 	AM_RANGE(0x1c000, 0x1ffff) AM_ROM AM_REGION("bios", 0x4000)
-	AM_RANGE(0x18000, 0x1ffff) AM_WRITE(nmimem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrview_map, AS_PROGRAM, 16, pwrview_state)
-	AM_RANGE(0x00000, 0x003ff) AM_READWRITE(bank0_r, bank0_w)
+ADDRESS_MAP_START(pwrview_state::pwrview_map)
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x00000, 0x003ff) AM_READWRITE(bank0_r, bank0_w)
 	AM_RANGE(0xf8000, 0xfffff) AM_DEVICE("bios_bank", address_map_bank_device, amap16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrview_fetch_map, AS_OPCODES, 16, pwrview_state)
-	AM_RANGE(0x00000, 0x003ff) AM_READ(bank0_r)
+ADDRESS_MAP_START(pwrview_state::pwrview_fetch_map)
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x00000, 0x003ff) AM_READ(bank0_r)
 	AM_RANGE(0xf8000, 0xfffff) AM_READ(fbios_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
+ADDRESS_MAP_START(pwrview_state::pwrview_io)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmiio_r, nmiio_w)
 	AM_RANGE(0xc000, 0xc001) AM_READWRITE8(unk1_r, unk1_w, 0xff00)
 	AM_RANGE(0xc002, 0xc005) AM_READWRITE8(led_r, led_w, 0xff00)
 	AM_RANGE(0xc006, 0xc007) AM_READ8(rotary_r, 0xff00)
@@ -385,7 +391,6 @@ static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
 	AM_RANGE(0xc2e0, 0xc2e3) AM_DEVICE8("fdc", upd765a_device, map, 0x00ff)
 	AM_RANGE(0xc2e4, 0xc2e5) AM_RAM
 	AM_RANGE(0xc2e6, 0xc2e7) AM_READ8(pitclock_r, 0x00ff)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmiio_r, nmiio_w)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START(pwrview_floppies)
@@ -395,7 +400,7 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START(pwrview_state::pwrview)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(pwrview_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(pwrview_fetch_map)
+	MCFG_CPU_OPCODES_MAP(pwrview_fetch_map)
 	MCFG_CPU_IO_MAP(pwrview_io)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

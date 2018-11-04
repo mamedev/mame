@@ -17,7 +17,7 @@
 
 #include "screen.h"
 
-#include <glm/glm/vec3.hpp>
+#include <glm/vec3.hpp>
 
 #include <functional>
 
@@ -186,6 +186,12 @@ public:
 	void swa(machine_config &config);
 	void netmerc(machine_config &config);
 	void model1_vr(machine_config &config);
+	void model1_io(address_map &map);
+	void model1_mem(address_map &map);
+	void model1_vr_io(address_map &map);
+	void model1_vr_mem(address_map &map);
+	void model1_vr_tgp_map(address_map &map);
+	void polhemus_map(address_map &map);
 private:
 	// Machine
 	void irq_raise(int level);
@@ -491,7 +497,5 @@ private:
 
 
 /*----------- defined in machine/model1.c -----------*/
-
-ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
 
 #endif // MAME_INCLUDES_MODEL1_H

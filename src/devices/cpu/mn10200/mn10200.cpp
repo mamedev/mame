@@ -40,7 +40,7 @@ enum mn10200_flag
 DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "MN1020012A")
 
 // internal memory maps
-static ADDRESS_MAP_START( mn1020012a_internal_map, AS_PROGRAM, 16, mn10200_device )
+ADDRESS_MAP_START(mn10200_device::mn1020012a_internal_map)
 	AM_RANGE(0x00fc00, 0x00ffff) AM_READWRITE8(io_control_r, io_control_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -55,7 +55,7 @@ mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, 
 
 // device definitions
 mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mn10200_device(mconfig, MN1020012A, tag, owner, clock, ADDRESS_MAP_NAME(mn1020012a_internal_map))
+	: mn10200_device(mconfig, MN1020012A, tag, owner, clock, address_map_constructor(FUNC(mn1020012a_device::mn1020012a_internal_map), this))
 { }
 
 

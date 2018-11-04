@@ -125,6 +125,8 @@ public:
 	required_device<discrete_device> m_discrete;
 	required_device<screen_device> m_screen;
 	void cliffhgr(machine_config &config);
+	void mainmem(address_map &map);
+	void mainport(address_map &map);
 };
 
 
@@ -238,13 +240,13 @@ void cliffhgr_state::machine_reset()
 
 /********************************************************/
 
-static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, cliffhgr_state )
+ADDRESS_MAP_START(cliffhgr_state::mainmem)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM     /* ROM */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")   /* NVRAM */
 	AM_RANGE(0xe800, 0xefff) AM_RAM     /* RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mainport, AS_IO, 8, cliffhgr_state )
+ADDRESS_MAP_START(cliffhgr_state::mainport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x44, 0x44) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
 	AM_RANGE(0x45, 0x45) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)

@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(SM590, sm590_device, "sm590", "SM590") // 512x8 ROM, 32x4 RAM
 //DEFINE_DEVICE_TYPE(SM595, sm595_device, "sm595", "SM595") // 768x8 ROM, 32x4 RAM
 
 // internal memory maps
-static ADDRESS_MAP_START(program_1x128x4, AS_PROGRAM, 8, sm510_base_device)
+ADDRESS_MAP_START(sm590_device::program_1x128x4)
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -35,7 +35,7 @@ static ADDRESS_MAP_START(program_1x128x4_1x128x2, AS_PROGRAM, 8, sm510_base_devi
     AM_RANGE(0x000, 0x2ff) AM_ROM
 ADDRESS_MAP_END*/
 
-static ADDRESS_MAP_START(data_16x2x4, AS_DATA, 8, sm510_base_device)
+ADDRESS_MAP_START(sm590_device::data_16x2x4)
 	AM_RANGE(0x00, 0x0f) AM_RAM
 	AM_RANGE(0x10, 0x1f) AM_RAM
 ADDRESS_MAP_END
@@ -51,17 +51,17 @@ ADDRESS_MAP_END
 
 // device definitions
 sm590_device::sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm590_device(mconfig, SM590, tag, owner, clock, 4 /* stack levels */, 9 /* prg width */, ADDRESS_MAP_NAME(program_1x128x4), 5 /* data width */, ADDRESS_MAP_NAME(data_16x2x4))
+	: sm590_device(mconfig, SM590, tag, owner, clock, 4 /* stack levels */, 9 /* prg width */, address_map_constructor(FUNC(sm590_device::program_1x128x4), this), 5 /* data width */, address_map_constructor(FUNC(sm590_device::data_16x2x4), this))
 {
 }
 
 //sm591_device::sm591_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-//  : sm510_base_device(mconfig, SM591, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, ADDRESS_MAP_NAME(program_2x128x4), 6 /* data width */, ADDRESS_MAP_NAME(data_16x3.5x4))
+//  : sm510_base_device(mconfig, SM591, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm591_device::program_2x128x4), this), 6 /* data width */, address_map_constructor(FUNC(sm591_device::data_16x3.5x4), this))
 //{
 //}
 
 //sm595_device::sm595_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-//  : sm510_base_device(mconfig, SM595, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, ADDRESS_MAP_NAME(program_1x128x4_1x128x2), 5 /* data width */, ADDRESS_MAP_NAME(data_16x2x4))
+//  : sm510_base_device(mconfig, SM595, tag, owner, clock, 4 /* stack levels */, 10 /* prg width */, address_map_constructor(FUNC(sm595_device::program_1x128x4_1x128x2), this), 5 /* data width */, address_map_constructor(FUNC(sm595_device::data_16x2x4), this))
 //{
 //}
 

@@ -89,6 +89,8 @@ public:
 	DECLARE_WRITE8_MEMBER(c100_w);
 
 	void tk2000(machine_config &config);
+	void apple2_map(address_map &map);
+	void inhbank_map(address_map &map);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -446,14 +448,14 @@ WRITE8_MEMBER(tk2000_state::ram_w)
 	}
 }
 
-static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, tk2000_state )
+ADDRESS_MAP_START(tk2000_state::apple2_map)
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
 	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
 	AM_RANGE(0xc100, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( inhbank_map, AS_PROGRAM, 8, tk2000_state )
+ADDRESS_MAP_START(tk2000_state::inhbank_map)
 	AM_RANGE(0x0000, 0x3eff) AM_ROM AM_REGION("maincpu", 0x100)
 	AM_RANGE(0x4000, 0x7eff) AM_READWRITE(c100_r, c100_w)
 ADDRESS_MAP_END

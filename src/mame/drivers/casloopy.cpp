@@ -199,6 +199,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bitmap_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(loopy_cart);
 	void casloopy(machine_config &config);
+	void casloopy_map(address_map &map);
+	void casloopy_sub_map(address_map &map);
 };
 
 
@@ -413,7 +415,7 @@ READ32_MEMBER(casloopy_state::cart_r)
 }
 
 
-static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
+ADDRESS_MAP_START(casloopy_state::casloopy_map)
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("bios_rom")
 	AM_RANGE(0x01000000, 0x0107ffff) AM_RAM AM_SHARE("wram")// stack pointer points here
 	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE8(bitmap_r, bitmap_w, 0xffffffff)
@@ -432,7 +434,7 @@ static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( casloopy_sub_map, AS_PROGRAM, 16, casloopy_state )
+ADDRESS_MAP_START(casloopy_state::casloopy_sub_map)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("subcpu",0)
 ADDRESS_MAP_END
 #endif

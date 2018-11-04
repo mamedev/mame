@@ -81,6 +81,9 @@ public:
 
 	void play_2(machine_config &config);
 	void zira(machine_config &config);
+	void play_2_io(address_map &map);
+	void play_2_map(address_map &map);
+	void zira_sound_map(address_map &map);
 private:
 	uint16_t m_clockcnt;
 	uint16_t m_resetcnt;
@@ -100,12 +103,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START( play_2_map, AS_PROGRAM, 8, play_2_state )
+ADDRESS_MAP_START(play_2_state::play_2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( play_2_io, AS_IO, 8, play_2_state )
+ADDRESS_MAP_START(play_2_state::play_2_io)
 	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // digits
 	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("1863", cdp1863_device, str_w)
@@ -115,7 +118,7 @@ static ADDRESS_MAP_START( play_2_io, AS_IO, 8, play_2_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(port07_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zira_sound_map, AS_PROGRAM, 8, play_2_state )
+ADDRESS_MAP_START(play_2_state::zira_sound_map)
 	AM_RANGE(0x000, 0x3ff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -385,14 +388,15 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // int is reversed in mame
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(play_2_state::zira, play_2)
+MACHINE_CONFIG_START(play_2_state::zira)
+	play_2(config);
 	MCFG_CPU_ADD("cop402", COP402, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(zira_sound_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )

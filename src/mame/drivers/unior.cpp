@@ -76,6 +76,8 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	void unior(machine_config &config);
+	void unior_io(address_map &map);
+	void unior_mem(address_map &map);
 private:
 	uint8_t m_4c;
 	uint8_t m_4e;
@@ -88,13 +90,13 @@ private:
 	required_region_ptr<u8> m_p_vram;
 };
 
-static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
+ADDRESS_MAP_START(unior_state::unior_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(vram_w) // main video
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unior_io, AS_IO, 8, unior_state )
+ADDRESS_MAP_START(unior_state::unior_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x38) AM_DEVREADWRITE("dma", i8257_device, read, write) // dma data

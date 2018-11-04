@@ -60,13 +60,14 @@ public:
 
 	void swtpcm(machine_config &config);
 	void swtpc(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<mc14411_device> m_brg;
 };
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, swtpc_state)
+ADDRESS_MAP_START(swtpc_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io0", ss50_interface_port_device, read, write)
 	AM_RANGE(0x8004, 0x8007) AM_MIRROR(0x1fc0) AM_DEVREADWRITE("io1", ss50_interface_port_device, read, write)
@@ -175,7 +176,8 @@ MACHINE_CONFIG_START(swtpc_state::swtpc)
 	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(swtpc_state::swtpcm, swtpc)
+MACHINE_CONFIG_START(swtpc_state::swtpcm)
+	swtpc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(1'797'100) / 2)
 

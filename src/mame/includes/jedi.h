@@ -100,4 +100,6 @@ public:
 	void jedi(machine_config &config);
 	void jedi_audio(machine_config &config);
 	void jedi_video(machine_config &config);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
 };

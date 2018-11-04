@@ -46,6 +46,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 
 	void pro80(machine_config &config);
+	void pro80_io(address_map &map);
+	void pro80_mem(address_map &map);
 private:
 	uint8_t m_digit_sel;
 	uint8_t m_cass_in;
@@ -110,14 +112,14 @@ READ8_MEMBER( pro80_state::kp_r )
 	return data | m_cass_in | 0xc0;
 }
 
-static ADDRESS_MAP_START( pro80_mem, AS_PROGRAM, 8, pro80_state )
+ADDRESS_MAP_START(pro80_state::pro80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 	AM_RANGE(0x1400, 0x17ff) AM_RAM // 2nd RAM is optional
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pro80_io, AS_IO, 8, pro80_state )
+ADDRESS_MAP_START(pro80_state::pro80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pio", z80pio_device, read, write)

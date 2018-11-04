@@ -563,7 +563,7 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 	, m_key(*this, "key")
 {
 	// add the decrypted opcodes map
-//  m_address_map[AS_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
+//  m_address_map[AS_OPCODES] = address_map_constructor(FUNC(fd1094_device::decrypted_opcodes_map), this);
 
 	// create the initial masked opcode table
 	memset(m_masked_opcodes_lookup, 0, sizeof(m_masked_opcodes_lookup));

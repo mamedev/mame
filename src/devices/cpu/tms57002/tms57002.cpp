@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "TMS57002")
 
 // Can't use a DEVICE_ADDRESS_MAP, not yet anyway
-static ADDRESS_MAP_START(internal_pgm, AS_PROGRAM, 32, tms57002_device)
+ADDRESS_MAP_START(tms57002_device::internal_pgm)
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
@@ -25,7 +25,7 @@ tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, TMS57002, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, macc(0), st0(0), st1(0), sti(0), txrd(0)
-	, program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, ADDRESS_MAP_NAME(internal_pgm))
+	, program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(tms57002_device::internal_pgm), this))
 	, data_config("data", ENDIANNESS_LITTLE, 8, 20)
 {
 }

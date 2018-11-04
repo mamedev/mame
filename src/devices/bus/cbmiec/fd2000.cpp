@@ -89,7 +89,7 @@ const tiny_rom_entry *fd4000_device::device_rom_region() const
 //  ADDRESS_MAP( fd2000_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fd2000_mem, AS_PROGRAM, 8, fd2000_device )
+ADDRESS_MAP_START(fd2000_device::fd2000_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(G65SC22P2_TAG, via6522_device, read, write)
 	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(DP8473V_TAG, dp8473_device, map)
@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fd4000_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fd4000_mem, AS_PROGRAM, 8, fd4000_device )
+ADDRESS_MAP_START(fd4000_device::fd4000_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(G65SC22P2_TAG, via6522_device, read, write)
 	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(PC8477AV1_TAG, pc8477a_device, map)

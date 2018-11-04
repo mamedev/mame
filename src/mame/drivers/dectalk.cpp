@@ -322,6 +322,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
 	void dectalk(machine_config &config);
+	void m68k_mem(address_map &map);
+	void tms32010_io(address_map &map);
+	void tms32010_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -789,7 +792,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
               |               |               |               |               |
 */
 
-static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
+ADDRESS_MAP_START(dectalk_state::m68k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x740000) AM_ROM /* ROM */
 	AM_RANGE(0x080000, 0x093fff) AM_MIRROR(0x760000) AM_RAM /* RAM */
@@ -803,11 +806,11 @@ static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
 	AM_RANGE(0x09c006, 0x09c007) AM_MIRROR(0x763ff8) AM_READ(m68k_tlc_dtmf_r) /* telephone dtmf read */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tms32010_mem, AS_PROGRAM, 16, dectalk_state )
+ADDRESS_MAP_START(dectalk_state::tms32010_mem)
 	AM_RANGE(0x000, 0x7ff) AM_ROM /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tms32010_io, AS_IO, 16, dectalk_state )
+ADDRESS_MAP_START(dectalk_state::tms32010_io)
 	AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
 	AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
 	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?

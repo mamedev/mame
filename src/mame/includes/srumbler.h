@@ -45,4 +45,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void srumbler(machine_config &config);
+	void srumbler_map(address_map &map);
+	void srumbler_sound_map(address_map &map);
 };

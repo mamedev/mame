@@ -144,6 +144,7 @@ public:
 
 
 	void mgavegas(machine_config &config);
+	void mgavegas_map(address_map &map);
 protected:
 
 	// devices
@@ -421,7 +422,7 @@ READ8_MEMBER(mgavegas_state::ay8910_b_r)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( mgavegas_map, AS_PROGRAM, 8, mgavegas_state )
+ADDRESS_MAP_START(mgavegas_state::mgavegas_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xa003) AM_READWRITE(r_a0,w_a0)            // AY-3-8910

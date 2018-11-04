@@ -185,6 +185,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
 	void ti99_4p_60hz(machine_config &config);
+	void cru_map(address_map &map);
+	void memmap(address_map &map);
 private:
 	void    datamux_clock_in(int clock);
 
@@ -282,16 +284,16 @@ enum
 	ROM6UBASE = 0xe000
 };
 
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p_state)
+ADDRESS_MAP_START(ti99_4p_state::memmap)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE( memread, memwrite ) AM_SETOFFSET( setoffset )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p_state)
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+ADDRESS_MAP_START(ti99_4p_state::cru_map)
 	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE( cruwrite )
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 ADDRESS_MAP_END
 
 /*

@@ -45,7 +45,7 @@
 
 /* main cpu */
 
-static ADDRESS_MAP_START( crospang_base_map, AS_PROGRAM, 16, crospang_state )
+ADDRESS_MAP_START(crospang_state::crospang_base_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
 
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_SHARE("fg_videoram")
@@ -59,8 +59,7 @@ static ADDRESS_MAP_START( crospang_base_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
-
+ADDRESS_MAP_START(crospang_state::crospang_map)
 	AM_IMPORT_FROM(crospang_base_map)
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
@@ -73,7 +72,7 @@ static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x320000, 0x32ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16, crospang_state )
+ADDRESS_MAP_START(crospang_state::bestri_map)
 	AM_IMPORT_FROM(crospang_base_map)
 
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(bestri_fg_scrollx_w)
@@ -85,7 +84,7 @@ static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x3a0000, 0x3affff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bestria_map, AS_PROGRAM, 16, crospang_state )
+ADDRESS_MAP_START(crospang_state::bestria_map)
 	AM_IMPORT_FROM(crospang_base_map)
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP // ??
@@ -100,12 +99,12 @@ ADDRESS_MAP_END
 
 /* sound cpu */
 
-static ADDRESS_MAP_START( crospang_sound_map, AS_PROGRAM, 8, crospang_state )
+ADDRESS_MAP_START(crospang_state::crospang_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crospang_sound_io_map, AS_IO, 8, crospang_state )
+ADDRESS_MAP_START(crospang_state::crospang_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -382,7 +381,8 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(crospang_state::bestri, crospang)
+MACHINE_CONFIG_START(crospang_state::bestri)
+	crospang(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -390,7 +390,8 @@ MACHINE_CONFIG_DERIVED(crospang_state::bestri, crospang)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(crospang_state::bestria, crospang)
+MACHINE_CONFIG_START(crospang_state::bestria)
+	crospang(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

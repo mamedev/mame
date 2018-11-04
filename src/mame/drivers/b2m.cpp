@@ -24,7 +24,7 @@
 #include "speaker.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(b2m_mem, AS_PROGRAM, 8, b2m_state )
+ADDRESS_MAP_START(b2m_state::b2m_mem)
 	AM_RANGE (0x0000, 0x27ff) AM_RAMBANK("bank1")
 	AM_RANGE (0x2800, 0x2fff) AM_RAMBANK("bank2")
 	AM_RANGE (0x3000, 0x6fff) AM_RAMBANK("bank3")
@@ -32,7 +32,7 @@ static ADDRESS_MAP_START(b2m_mem, AS_PROGRAM, 8, b2m_state )
 	AM_RANGE (0xe000, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( b2m_io, AS_IO, 8, b2m_state )
+ADDRESS_MAP_START(b2m_state::b2m_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
@@ -45,7 +45,7 @@ static ADDRESS_MAP_START( b2m_io, AS_IO, 8, b2m_state )
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( b2m_rom_io, AS_IO, 8, b2m_state )
+ADDRESS_MAP_START(b2m_state::b2m_rom_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)
@@ -251,7 +251,8 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(b2m_state::b2mrom, b2m)
+MACHINE_CONFIG_START(b2m_state::b2mrom)
+	b2m(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(b2m_rom_io)
 MACHINE_CONFIG_END

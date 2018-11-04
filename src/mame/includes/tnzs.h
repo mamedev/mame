@@ -40,10 +40,12 @@ public:
 
 	DECLARE_PALETTE_INIT(prompalette);
 
-	void tnzs(machine_config &config);
 	void tnzs_base(machine_config &config);
 	void tnzs_mainbank(machine_config &config);
 
+	void base_sub_map(address_map &map);
+	void main_map(address_map &map);
+	void mainbank_map(address_map &map);
 protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -81,6 +83,8 @@ public:
 
 	DECLARE_READ8_MEMBER(analog_r);
 
+	void tnzs(machine_config &config);
+	void tnzs_sub_map(address_map &map);
 protected:
 	required_device<upi41_cpu_device> m_mcu;
 	optional_device<upd4701_device> m_upd4701;
@@ -109,6 +113,7 @@ public:
 	{ }
 	void extrmatn(machine_config &config);
 	void plumppop(machine_config &config);
+	void prompal_main_map(address_map &map);
 };
 
 class arknoid2_state : public extrmatn_state
@@ -133,6 +138,7 @@ public:
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 
 	void arknoid2(machine_config &config);
+	void arknoid2_sub_map(address_map &map);
 private:
 	required_ioport m_coin1;
 	required_ioport m_coin2;
@@ -181,6 +187,7 @@ public:
 	SAMPLES_START_CB_MEMBER(init_samples);
 
 	void kageki(machine_config &config);
+	void kageki_sub_map(address_map &map);
 private:
 	required_device<samples_device> m_samples;
 
@@ -207,6 +214,8 @@ public:
 	DECLARE_WRITE8_MEMBER(subbankswitch_w);
 
 	void jpopnics(machine_config &config);
+	void jpopnics_main_map(address_map &map);
+	void jpopnics_sub_map(address_map &map);
 private:
 	required_device<upd4701_device> m_upd4701;
 };
@@ -220,6 +229,7 @@ public:
 
 	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
 	void insectx(machine_config &config);
+	void insectx_sub_map(address_map &map);
 };
 
 class tnzsb_state : public tnzs_base_state
@@ -238,6 +248,11 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(bankswitch1_w) override;
 
 	void tnzsb(machine_config &config);
+	void tnzsb_base_sub_map(address_map &map);
+	void tnzsb_cpu2_map(address_map &map);
+	void tnzsb_io_map(address_map &map);
+	void tnzsb_main_map(address_map &map);
+	void tnzsb_sub_map(address_map &map);
 protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -256,6 +271,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
 	void kabukiz(machine_config &config);
+	void kabukiz_cpu2_map(address_map &map);
+	void kabukiz_sub_map(address_map &map);
 protected:
 	required_memory_bank m_audiobank;
 };

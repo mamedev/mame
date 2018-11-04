@@ -35,11 +35,12 @@ public:
 		dev.m_y_offset = y_offset;
 	}
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip = false );
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip = false );
-	void set_alt_format(bool alt) { m_alt_format = alt; };
-	void set_pix_mix_mask(uint16_t mask) { m_pixmask = mask; };
-	void set_pix_raw_shift(uint16_t shift) { m_raw_shift = shift; };
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
+	void set_alt_format(bool alt) { m_alt_format = alt; }
+	void set_pix_mix_mask(uint16_t mask) { m_pixmask = mask; }
+	void set_pix_raw_shift(uint16_t shift) { m_raw_shift = shift; }
+	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 
 	void alloc_sprite_bitmap();
 	void inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t pri, uint16_t priority_mask, uint16_t colbase, uint16_t palmask, uint8_t alpha = 0xff);
@@ -57,6 +58,7 @@ protected:
 	bool m_alt_format;
 	uint16_t m_pixmask;
 	uint16_t m_raw_shift;
+	bool m_flip_screen;
 
 	// used by various bootleg / clone chips.
 	bool m_is_bootleg; // used by various bootlegs (disables masking of sprite tile number when multi-sprite is used)
@@ -67,7 +69,7 @@ protected:
 
 private:
 	template<class _BitmapClass>
-	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip);
+	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

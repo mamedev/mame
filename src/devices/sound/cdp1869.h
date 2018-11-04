@@ -196,9 +196,9 @@ public:
 	static void static_set_color_clock(device_t &device, int color_clock) { downcast<cdp1869_device &>(device).m_color_clock = color_clock; }
 	static void static_set_color_clock(device_t &device, const XTAL &xtal) { xtal.validate("selecting cdp1869 clock"); static_set_color_clock(device, xtal.value()); }
 
-	virtual DECLARE_ADDRESS_MAP(io_map, 8);
-	virtual DECLARE_ADDRESS_MAP(char_map, 8);
-	virtual DECLARE_ADDRESS_MAP(page_map, 8);
+	virtual void io_map(address_map &map);
+	virtual void char_map(address_map &map);
+	virtual void page_map(address_map &map);
 
 	DECLARE_WRITE8_MEMBER( out3_w );
 	DECLARE_WRITE8_MEMBER( out4_w );
@@ -217,6 +217,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void cdp1869(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

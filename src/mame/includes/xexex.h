@@ -100,4 +100,6 @@ public:
 	K053246_CB_MEMBER(sprite_callback);
 	K054539_CB_MEMBER(ym_set_mixing);
 	void xexex(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

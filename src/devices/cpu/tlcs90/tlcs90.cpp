@@ -41,31 +41,31 @@ enum e_ir
 };
 
 
-static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, tlcs90_device)
+ADDRESS_MAP_START(tlcs90_device::tmp90840_mem)
 	AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // 8KB ROM (internal)
 	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tmp90841_mem, AS_PROGRAM, 8, tlcs90_device)
+ADDRESS_MAP_START(tlcs90_device::tmp90841_mem)
 //  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
 	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   )   AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tmp91640_mem, AS_PROGRAM, 8, tlcs90_device )
+ADDRESS_MAP_START(tlcs90_device::tmp91640_mem)
 	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB ROM (internal)
 	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tmp91641_mem, AS_PROGRAM, 8, tlcs90_device )
+ADDRESS_MAP_START(tlcs90_device::tmp91641_mem)
 //  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
 	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+47   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tmp90ph44_mem, AS_PROGRAM, 8, tlcs90_device )
+ADDRESS_MAP_START(tlcs90_device::tmp90ph44_mem)
 	AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // 16KB PROM (internal)
 	AM_RANGE(   0xfdc0,     0xffbf          ) AM_RAM    // 512b RAM (internal)
 	AM_RANGE(   T90_IOBASE, T90_IOBASE+55   ) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w ) // TODO: has 8 more registers
@@ -82,36 +82,36 @@ tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, co
 
 
 tmp90840_device::tmp90840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90840, tag, owner, clock, ADDRESS_MAP_NAME(tmp90840_mem))
+	: tlcs90_device(mconfig, TMP90840, tag, owner, clock, address_map_constructor(FUNC(tmp90840_device::tmp90840_mem), this))
 {
 }
 
 tmp90841_device::tmp90841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90841, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90841, tag, owner, clock, address_map_constructor(FUNC(tmp90841_device::tmp90841_mem), this))
 {
 }
 
 tmp90845_device::tmp90845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90845, tag, owner, clock, ADDRESS_MAP_NAME(tmp90841_mem))
+	: tlcs90_device(mconfig, TMP90845, tag, owner, clock, address_map_constructor(FUNC(tmp90845_device::tmp90841_mem), this))
 {
 }
 
 
 
 tmp91640_device::tmp91640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91640, tag, owner, clock, ADDRESS_MAP_NAME(tmp91640_mem))
+	: tlcs90_device(mconfig, TMP91640, tag, owner, clock, address_map_constructor(FUNC(tmp91640_device::tmp91640_mem), this))
 {
 }
 
 
 tmp91641_device::tmp91641_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP91641, tag, owner, clock, ADDRESS_MAP_NAME(tmp91641_mem))
+	: tlcs90_device(mconfig, TMP91641, tag, owner, clock, address_map_constructor(FUNC(tmp91641_device::tmp91641_mem), this))
 {
 }
 
 
 tmp90ph44_device::tmp90ph44_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tlcs90_device(mconfig, TMP90PH44, tag, owner, clock, ADDRESS_MAP_NAME(tmp90ph44_mem))
+	: tlcs90_device(mconfig, TMP90PH44, tag, owner, clock, address_map_constructor(FUNC(tmp90ph44_device::tmp90ph44_mem), this))
 {
 }
 

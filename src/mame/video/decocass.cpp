@@ -524,10 +524,9 @@ void decocass_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, c
 						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
 						uint8_t *sprite_ram, int interleave)
 {
-	int i,offs;
-
 	/* Draw the sprites */
-	for (i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
+	int offs = 28 * interleave;
+	for (int i = 0; i < 8; i++, offs -= 4 * interleave)
 	{
 		int sx, sy, flipx, flipy;
 

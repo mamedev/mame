@@ -64,7 +64,7 @@ MACHINE_RESET_MEMBER(blstroid_state,blstroid)
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
+ADDRESS_MAP_START(blstroid_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x83ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x000000) AM_ROM

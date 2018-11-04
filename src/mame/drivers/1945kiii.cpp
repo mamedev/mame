@@ -93,6 +93,9 @@ public:
 	required_device<palette_device> m_palette;
 	void flagrall(machine_config &config);
 	void k3(machine_config &config);
+	void flagrall_map(address_map &map);
+	void k3_base_map(address_map &map);
+	void k3_map(address_map &map);
 };
 
 
@@ -185,7 +188,7 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 }
 
 
-static ADDRESS_MAP_START( k3_base_map, AS_PROGRAM, 16, k3_state )
+ADDRESS_MAP_START(k3_state::k3_base_map)
 	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP    // k3 - bug in code? (clean up log)
 	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITENOP    // l3 - bug in code? (clean up log)
 
@@ -203,7 +206,7 @@ static ADDRESS_MAP_START( k3_base_map, AS_PROGRAM, 16, k3_state )
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
+ADDRESS_MAP_START(k3_state::k3_map)
 	AM_IMPORT_FROM( k3_base_map )
 
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(k3_soundbanks_w)
@@ -214,7 +217,7 @@ static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( flagrall_map, AS_PROGRAM, 16, k3_state )
+ADDRESS_MAP_START(k3_state::flagrall_map)
 	AM_IMPORT_FROM( k3_base_map )
 
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(flagrall_soundbanks_w)
@@ -395,7 +398,8 @@ MACHINE_CONFIG_START(k3_state::flagrall)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(k3_state::k3, flagrall)
+MACHINE_CONFIG_START(k3_state::k3)
+	flagrall(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(k3_map)

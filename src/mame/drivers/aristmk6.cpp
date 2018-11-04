@@ -69,6 +69,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint64_t> m_vram;
 	void aristmk6(machine_config &config);
+	void aristmk6_map(address_map &map);
+	void aristmk6_port(address_map &map);
 };
 
 
@@ -289,7 +291,7 @@ READ64_MEMBER(aristmk6_state::hwver_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
+ADDRESS_MAP_START(aristmk6_state::aristmk6_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x04000000, 0x05ffffff) AM_RAM AM_SHARE("vram") // VRAM 32MB
 	AM_RANGE(0x08000000, 0x0bffffff) AM_ROM AM_REGION("game_rom", 0)
@@ -309,7 +311,7 @@ static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
 	AM_RANGE(0x13800000, 0x13800007) AM_READ8(test_r, 0xffffffffffffffffU)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aristmk6_port, AS_IO, 64, aristmk6_state )
+ADDRESS_MAP_START(aristmk6_state::aristmk6_port)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( aristmk6 )

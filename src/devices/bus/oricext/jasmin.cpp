@@ -24,7 +24,7 @@ INPUT_PORTS_START( jasmin )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, nullptr)
 INPUT_PORTS_END
 
-DEVICE_ADDRESS_MAP_START(map, 8, jasmin_device)
+ADDRESS_MAP_START(jasmin_device::map)
 	AM_RANGE(0x3f4, 0x3f7) AM_DEVREADWRITE("fdc", wd1770_device, read, write)
 	AM_RANGE(0x3f8, 0x3f8) AM_WRITE(side_sel_w)
 	AM_RANGE(0x3f9, 0x3f9) AM_WRITE(fdc_reset_w)

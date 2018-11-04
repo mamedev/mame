@@ -54,6 +54,8 @@ public:
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
 	void pasopia(machine_config &config);
+	void pasopia_io(address_map &map);
+	void pasopia_map(address_map &map);
 private:
 	uint8_t m_hblank;
 	uint16_t m_vram_addr;
@@ -120,13 +122,13 @@ WRITE8_MEMBER( pasopia_state::pasopia_ctrl_w )
 	membank("bank1")->set_entry(m_ram_bank);
 }
 
-static ADDRESS_MAP_START(pasopia_map, AS_PROGRAM, 8, pasopia_state)
+ADDRESS_MAP_START(pasopia_state::pasopia_map)
 	AM_RANGE(0x0000,0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x8000,0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(pasopia_io, AS_IO, 8, pasopia_state)
+ADDRESS_MAP_START(pasopia_state::pasopia_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)

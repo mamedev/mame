@@ -321,14 +321,14 @@ WRITE32_MEMBER(psikyo4_state::io_select_w)
 		logerror("Unk ioselect write %x mask %x\n", data, mem_mask);
 }
 
-static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
+ADDRESS_MAP_START(psikyo4_state::ps4_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM     // program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROM AM_REGION("maincpu", 0x100000) // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READWRITE(ps4_eeprom_r,ps4_eeprom_w)
+	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE(ps4_vidregs_w) AM_SHARE("vidregs") // vid regs?
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
-	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE(ps4_vidregs_w) AM_SHARE("vidregs") // vid regs?
 	AM_RANGE(0x03003ff0, 0x03003ff3) AM_WRITE(ps4_screen1_brt_w) // screen 1 brightness
 	AM_RANGE(0x03003ff4, 0x03003ff7) AM_WRITE(ps4_bgpen_1_dword_w) AM_SHARE("bgpen_1") // screen 1 clear colour
 	AM_RANGE(0x03003ff8, 0x03003ffb) AM_WRITE(ps4_screen2_brt_w) // screen 2 brightness
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("ram") // main RAM (1 meg)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ps4_ymf_map, 0, 8, psikyo4_state )
+ADDRESS_MAP_START(psikyo4_state::ps4_ymf_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK("ymfbank0")
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("ymfbank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("ymfbank2")
@@ -695,7 +695,8 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psikyo4_state::ps4small, ps4big)
+MACHINE_CONFIG_START(psikyo4_state::ps4small)
+	ps4big(config);
 
 	/* basic machine hardware */
 

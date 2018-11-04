@@ -136,8 +136,11 @@ uint32_t lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rg
 	rect.max_y = cliprect.max_y;
 	rect.min_y = cliprect.min_y;
 
-	m_sprgen->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_1, 0x400, true);
-	m_sprgen2->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_0, 0x400, true);
+	// sprites are flipped relative to tilemaps
+	m_sprgen->set_flip_screen(true);
+	m_sprgen2->set_flip_screen(true);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_1, 0x400);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_0, 0x400);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x300, 0xff);

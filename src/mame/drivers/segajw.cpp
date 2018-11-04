@@ -62,6 +62,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
 	void segajw(machine_config &config);
+	void ramdac_map(address_map &map);
+	void segajw_audiocpu_io_map(address_map &map);
+	void segajw_audiocpu_map(address_map &map);
+	void segajw_hd63484_map(address_map &map);
+	void segajw_map(address_map &map);
 protected:
 
 	// devices
@@ -161,7 +166,7 @@ CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
 	return data;
 }
 
-static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
+ADDRESS_MAP_START(segajw_state::segajw_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
@@ -184,18 +189,18 @@ static ADDRESS_MAP_START( segajw_map, AS_PROGRAM, 16, segajw_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segajw_audiocpu_map, AS_PROGRAM, 8, segajw_state )
+ADDRESS_MAP_START(segajw_state::segajw_audiocpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segajw_audiocpu_io_map, AS_IO, 8, segajw_state )
+ADDRESS_MAP_START(segajw_state::segajw_audiocpu_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segajw_hd63484_map, 0, 16, segajw_state )
+ADDRESS_MAP_START(segajw_state::segajw_hd63484_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0x80000, 0xbffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
@@ -346,7 +351,7 @@ void segajw_state::machine_reset()
 	m_coin_counter = 0xff;
 }
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, segajw_state )
+ADDRESS_MAP_START(segajw_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

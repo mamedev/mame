@@ -534,7 +534,7 @@ public:
 
 	void set_default_bios(u8 bios) { m_default_bios = bios; }
 	void set_system_bios(u8 bios) { m_system_bios = bios; }
-	bool findit(bool isvalidation = false) const;
+	bool findit(bool pre_map, bool isvalidation) const;
 
 	// misc
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
@@ -543,7 +543,8 @@ public:
 protected:
 	// miscellaneous helpers
 	void set_machine(running_machine &machine);
-	void resolve_objects();
+	void resolve_pre_map();
+	void resolve_post_map();
 	void start();
 	void stop();
 	void debug_setup();

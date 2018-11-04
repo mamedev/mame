@@ -52,6 +52,8 @@ public:
 	static constexpr int FIFOOUT0_SIZE = 16;
 	static constexpr int FIFOOUT1_SIZE = 16;
 
+	void internal_abus(address_map &map);
+	void internal_bbus(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

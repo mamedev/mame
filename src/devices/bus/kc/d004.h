@@ -27,10 +27,6 @@ public:
 	// construction/destruction
 	kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(hw_input_gate_r);
-	DECLARE_WRITE8_MEMBER(fdd_select_w);
-	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
-
 protected:
 	kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -50,10 +46,17 @@ protected:
 	virtual void io_read(offs_t offset, uint8_t &data) override;
 	virtual void io_write(offs_t offset, uint8_t data) override;
 
+	DECLARE_READ8_MEMBER(hw_input_gate_r);
+	DECLARE_WRITE8_MEMBER(fdd_select_w);
+	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
+
 private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+
+	void kc_d004_io(address_map &map);
+	void kc_d004_mem(address_map &map);
 
 	static const device_timer_id TIMER_RESET = 0;
 
@@ -87,9 +90,6 @@ public:
 	// construction/destruction
 	kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(gide_r);
-	DECLARE_WRITE8_MEMBER(gide_w);
-
 protected:
 	// device-level overrides
 	virtual void device_reset() override;
@@ -103,6 +103,11 @@ private:
 
 	uint16_t              m_ata_data;
 	int                 m_lh;
+
+	DECLARE_READ8_MEMBER(gide_r);
+	DECLARE_WRITE8_MEMBER(gide_w);
+
+	void kc_d004_gide_io(address_map &map);
 };
 
 // device type definition

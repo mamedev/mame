@@ -12,8 +12,8 @@
 void karnov_state::karnov_flipscreen_w( int data )
 {
 	m_flipscreen = data;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	flip_screen_set(m_flipscreen);
+	m_fix_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_spritegen->set_flip_screen(m_flipscreen);
 }
 
 void karnov_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )

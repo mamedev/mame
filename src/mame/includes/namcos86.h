@@ -85,6 +85,19 @@ public:
 	void roishtar(machine_config &config);
 	void rthunder(machine_config &config);
 	void hopmappy(machine_config &config);
+	void common_mcu_map(address_map &map);
+	void cpu1_map(address_map &map);
+	void genpeitd_cpu2_map(address_map &map);
+	void genpeitd_mcu_map(address_map &map);
+	void hopmappy_cpu2_map(address_map &map);
+	void hopmappy_mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
+	void roishtar_cpu2_map(address_map &map);
+	void roishtar_mcu_map(address_map &map);
+	void rthunder_cpu2_map(address_map &map);
+	void rthunder_mcu_map(address_map &map);
+	void wndrmomo_cpu2_map(address_map &map);
+	void wndrmomo_mcu_map(address_map &map);
 private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,uint8_t *vram);
 	void set_scroll(int layer);

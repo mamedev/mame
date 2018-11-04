@@ -129,7 +129,7 @@ READ8_MEMBER(tunhunt_state::dsw2_4r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tunhunt_state )
+ADDRESS_MAP_START(tunhunt_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("workram") /* Work RAM */
 	AM_RANGE(0x1080, 0x10ff) AM_WRITEONLY

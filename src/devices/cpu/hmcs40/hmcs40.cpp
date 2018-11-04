@@ -56,23 +56,23 @@ DEFINE_DEVICE_TYPE(HD44828, hd44828_device, "hd44828", "HD44828") // CMOS versio
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 16, hmcs40_cpu_device)
+ADDRESS_MAP_START(hmcs40_cpu_device::program_1k)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0780, 0x07bf) AM_ROM // patterns on page 30
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_2k, AS_PROGRAM, 16, hmcs40_cpu_device)
+ADDRESS_MAP_START(hmcs40_cpu_device::program_2k)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0f40, 0x0fbf) AM_ROM // patterns on page 61,62
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(data_80x4, AS_DATA, 8, hmcs40_cpu_device)
+ADDRESS_MAP_START(hmcs40_cpu_device::data_80x4)
 	AM_RANGE(0x00, 0x3f) AM_RAM
 	AM_RANGE(0x40, 0x4f) AM_RAM AM_MIRROR(0x30)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_160x4, AS_DATA, 8, hmcs40_cpu_device)
+ADDRESS_MAP_START(hmcs40_cpu_device::data_160x4)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x30)
 	AM_RANGE(0xc0, 0xcf) AM_RAM AM_MIRROR(0x30)
@@ -98,7 +98,7 @@ hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type 
 }
 
 hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity)
-	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_1k), 7 /* data width */, ADDRESS_MAP_NAME(data_80x4))
+	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS43, polarity, 3 /* stack levels */, 10 /* pc width */, 11 /* prg width */, address_map_constructor(FUNC(hmcs43_cpu_device::program_1k), this), 7 /* data width */, address_map_constructor(FUNC(hmcs43_cpu_device::data_80x4), this))
 { }
 
 hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -116,7 +116,7 @@ hd44758_device::hd44758_device(const machine_config &mconfig, const char *tag, d
 
 
 hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity)
-	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS44, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4))
+	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS44, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs44_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs44_cpu_device::data_160x4), this))
 { }
 
 hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -134,7 +134,7 @@ hd44808_device::hd44808_device(const machine_config &mconfig, const char *tag, d
 
 
 hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity)
-	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS45, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4))
+	: hmcs40_cpu_device(mconfig, type, tag, owner, clock, HMCS40_FAMILY_HMCS45, polarity, 4, 11, 12, address_map_constructor(FUNC(hmcs45_cpu_device::program_2k), this), 8, address_map_constructor(FUNC(hmcs45_cpu_device::data_160x4), this))
 { }
 
 hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

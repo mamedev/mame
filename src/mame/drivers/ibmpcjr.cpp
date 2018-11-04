@@ -108,6 +108,10 @@ public:
 	DECLARE_DRIVER_INIT(pcjr);
 	void ibmpcjx(machine_config &config);
 	void ibmpcjr(machine_config &config);
+	void ibmpcjr_io(address_map &map);
+	void ibmpcjr_map(address_map &map);
+	void ibmpcjx_io(address_map &map);
+	void ibmpcjx_map(address_map &map);
 };
 
 static INPUT_PORTS_START( ibmpcjr )
@@ -538,7 +542,7 @@ static GFXDECODE_START( pcjr )
 GFXDECODE_END
 
 
-static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, pcjr_state)
+ADDRESS_MAP_START(pcjr_state::ibmpcjr_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE("pcvideo_pcjr:vram", address_map_bank_device, amap8)
 	AM_RANGE(0xd0000, 0xdffff) AM_DEVREAD("cartslot2", generic_slot_device, read_rom)
@@ -547,7 +551,7 @@ static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, pcjr_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pcjr_state)
+ADDRESS_MAP_START(pcjr_state::ibmpcjr_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
@@ -562,7 +566,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pcjr_state)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD("pcvideo_pcjr", pcvideo_pcjr_device, read) AM_DEVWRITE("pcvideo_pcjr", pcvideo_pcjr_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pcjr_state )
+ADDRESS_MAP_START(pcjr_state::ibmpcjx_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80000, 0xb7fff) AM_ROM AM_REGION("kanji",0)
 	AM_RANGE(0x80000, 0x9ffff) AM_RAM AM_SHARE("vram") // TODO: remove this part of vram hack
@@ -571,10 +575,10 @@ static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pcjr_state )
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pcjr_state)
+ADDRESS_MAP_START(pcjr_state::ibmpcjx_io)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(pcjx_port_1ff_r, pcjx_port_1ff_w)
 	AM_IMPORT_FROM( ibmpcjr_io )
+	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(pcjx_port_1ff_r, pcjx_port_1ff_w)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
@@ -672,7 +676,8 @@ static GFXDECODE_START( ibmpcjx )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 3, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_DERIVED(pcjr_state::ibmpcjx, ibmpcjr)
+MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
+	ibmpcjr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_CPU_IO_MAP(ibmpcjx_io)

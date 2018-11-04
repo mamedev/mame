@@ -218,6 +218,9 @@ public:
 	void scorpion1_adder2(machine_config &config);
 	void scorpion1(machine_config &config);
 	void scorpion1_viper(machine_config &config);
+	void sc1_adder2(address_map &map);
+	void sc1_base(address_map &map);
+	void sc1_viper(address_map &map);
 };
 
 #define VFD_RESET  0x20
@@ -675,7 +678,7 @@ void bfm_sc1_state::machine_reset()
 // scorpion1 board memory map ///////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_base, AS_PROGRAM, 8, bfm_sc1_state )
+ADDRESS_MAP_START(bfm_sc1_state::sc1_base)
 
 	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)             // reel 2+3 latch
@@ -715,7 +718,7 @@ ADDRESS_MAP_END
 // scorpion1 board + adder2 expansion memory map ////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_adder2, AS_PROGRAM, 8, bfm_sc1_state )
+ADDRESS_MAP_START(bfm_sc1_state::sc1_adder2)
 	AM_IMPORT_FROM( sc1_base )
 
 	AM_RANGE(0x3E00, 0x3E00) AM_DEVREADWRITE("adder2", bfm_adder2_device, vid_uart_ctrl_r,vid_uart_ctrl_w)  // video uart control reg read
@@ -727,7 +730,7 @@ ADDRESS_MAP_END
 // scorpion1 board + upd7759 soundcard memory map ///////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_viper, AS_PROGRAM, 8, bfm_sc1_state )
+ADDRESS_MAP_START(bfm_sc1_state::sc1_viper)
 	AM_IMPORT_FROM( sc1_base )
 
 	AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r ) // coin input on gamecard
@@ -1119,7 +1122,8 @@ MACHINE_CONFIG_END
 // machine driver for scorpion1 board + adder2 extension ////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_DERIVED(bfm_sc1_state::scorpion1_adder2, scorpion1)
+MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_adder2)
+	scorpion1(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sc1_adder2)                // setup read and write memorymap
@@ -1133,7 +1137,8 @@ MACHINE_CONFIG_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_DERIVED(bfm_sc1_state::scorpion1_viper, scorpion1)
+MACHINE_CONFIG_START(bfm_sc1_state::scorpion1_viper)
+	scorpion1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sc1_viper)                 // setup read and write memorymap
 

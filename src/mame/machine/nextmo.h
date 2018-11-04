@@ -19,7 +19,7 @@ public:
 	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<nextmo_device &>(device).irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<nextmo_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(r4_r);
 	DECLARE_WRITE8_MEMBER(r4_w);

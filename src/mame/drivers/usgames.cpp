@@ -64,7 +64,7 @@ WRITE8_MEMBER(usgames_state::lamps2_w)
 }
 
 
-static ADDRESS_MAP_START( usgames_map, AS_PROGRAM, 8, usgames_state )
+ADDRESS_MAP_START(usgames_state::usgames_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
 	AM_RANGE(0x2010, 0x2010) AM_READ_PORT("INPUTS")
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( usgames_map, AS_PROGRAM, 8, usgames_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( usg185_map, AS_PROGRAM, 8, usgames_state )
+ADDRESS_MAP_START(usgames_state::usg185_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("aysnd", ay8912_device, address_data_w)
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("DSW")
@@ -250,7 +250,8 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(usgames_state::usg185, usg32)
+MACHINE_CONFIG_START(usgames_state::usg185)
+	usg32(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(usg185_map)
 MACHINE_CONFIG_END

@@ -74,13 +74,14 @@ public:
 	{ }
 
 	void m6805evs(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 };
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, m6805evs_state )
+ADDRESS_MAP_START(m6805evs_state::mem_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	ADDRESS_MAP_UNMAP_HIGH
 

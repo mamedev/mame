@@ -76,6 +76,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
 	void tv950(machine_config &config);
+	void tv950_mem(address_map &map);
 private:
 	uint8_t m_via_row;
 	uint8_t m_attr_row;
@@ -91,7 +92,7 @@ private:
 	int m_row;
 };
 
-static ADDRESS_MAP_START(tv950_mem, AS_PROGRAM, 8, tv950_state)
+ADDRESS_MAP_START(tv950_state::tv950_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("vram") // VRAM

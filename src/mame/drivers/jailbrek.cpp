@@ -136,7 +136,7 @@ WRITE8_MEMBER(jailbrek_state::speech_w)
 	m_vlm->rst((data >> 2) & 1);
 }
 
-static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
+ADDRESS_MAP_START(jailbrek_state::jailbrek_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vlm_map, 0, 8, jailbrek_state )
+ADDRESS_MAP_START(jailbrek_state::vlm_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END

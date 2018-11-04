@@ -64,7 +64,7 @@ const tiny_rom_entry *c64_final_chesscard_device::device_rom_region() const
 //  ADDRESS_MAP( c64_fcc_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c64_fcc_map, AS_PROGRAM, 8, c64_final_chesscard_device )
+ADDRESS_MAP_START(c64_final_chesscard_device::c64_fcc_map)
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_READWRITE(nvram_r, nvram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(G65SC02P4_TAG, 0)
 ADDRESS_MAP_END

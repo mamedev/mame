@@ -81,6 +81,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
 	void tv910(machine_config &config);
+	void tv910_mem(address_map &map);
 private:
 	required_device<m6502_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
@@ -102,7 +103,7 @@ private:
 	uint8_t m_control;
 };
 
-static ADDRESS_MAP_START(tv910_mem, AS_PROGRAM, 8, tv910_state)
+ADDRESS_MAP_START(tv910_state::tv910_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vram") // VRAM

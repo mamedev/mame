@@ -525,7 +525,7 @@ INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
  *
  *************************************/
 
-static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8, m10_state )
+ADDRESS_MAP_START(m10_state::m10_main)
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
@@ -539,7 +539,7 @@ static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8, m10_state )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8, m10_state )
+ADDRESS_MAP_START(m10_state::m11_main)
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
@@ -553,7 +553,7 @@ static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8, m10_state )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m15_main, AS_PROGRAM, 8, m10_state )
+ADDRESS_MAP_START(m10_state::m15_main)
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
 	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_SHARE("rom")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
@@ -862,7 +862,8 @@ MACHINE_CONFIG_START(m10_state::m10)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m10_state::m11, m10)
+MACHINE_CONFIG_START(m10_state::m11)
+	m10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -906,7 +907,8 @@ MACHINE_CONFIG_START(m10_state::m15)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(m10_state::headoni, m15)
+MACHINE_CONFIG_START(m10_state::headoni)
+	m15(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(11730000/16)
 MACHINE_CONFIG_END

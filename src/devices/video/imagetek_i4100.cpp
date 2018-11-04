@@ -77,7 +77,7 @@ DEFINE_DEVICE_TYPE(I4100, imagetek_i4100_device, "i4100", "Imagetek I4100 052 VD
 DEFINE_DEVICE_TYPE(I4220, imagetek_i4220_device, "i4220", "Imagetek I4220 071 VDP")
 DEFINE_DEVICE_TYPE(I4300, imagetek_i4300_device, "i4300", "Imagetek I4300 095 VDP")
 
-DEVICE_ADDRESS_MAP_START( map, 16, imagetek_i4100_device)
+ADDRESS_MAP_START(imagetek_i4100_device::map)
 	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(vram_0_r, vram_0_w) AM_SHARE("vram_0")
 	AM_RANGE(0x20000, 0x3ffff) AM_READWRITE(vram_1_r, vram_1_w) AM_SHARE("vram_1")
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE(vram_2_r, vram_2_w) AM_SHARE("vram_2")
@@ -112,7 +112,7 @@ DEVICE_ADDRESS_MAP_START( map, 16, imagetek_i4100_device)
 ADDRESS_MAP_END
 
 // same as above but with moved video registers (now at 0x797**)
-DEVICE_ADDRESS_MAP_START( v2_map, 16, imagetek_i4220_device)
+ADDRESS_MAP_START(imagetek_i4220_device::v2_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(vram_0_r, vram_0_w) AM_SHARE("vram_0")
 	AM_RANGE(0x20000, 0x3ffff) AM_READWRITE(vram_1_r, vram_1_w) AM_SHARE("vram_1")
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE(vram_2_r, vram_2_w) AM_SHARE("vram_2")
@@ -157,7 +157,7 @@ DEVICE_ADDRESS_MAP_START( v2_map, 16, imagetek_i4220_device)
 ADDRESS_MAP_END
 
 // more changes around, namely the screen offsets being reversed here
-DEVICE_ADDRESS_MAP_START( v3_map, 16, imagetek_i4300_device)
+ADDRESS_MAP_START(imagetek_i4300_device::v3_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(vram_0_r, vram_0_w) AM_SHARE("vram_0")
 	AM_RANGE(0x20000, 0x3ffff) AM_READWRITE(vram_1_r, vram_1_w) AM_SHARE("vram_1")
 	AM_RANGE(0x40000, 0x5ffff) AM_READWRITE(vram_2_r, vram_2_w) AM_SHARE("vram_2")

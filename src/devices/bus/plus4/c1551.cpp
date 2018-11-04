@@ -313,7 +313,7 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
 //  ADDRESS_MAP( c1551_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c1551_mem, AS_PROGRAM, 8, c1551_device )
+ADDRESS_MAP_START(c1551_device::c1551_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(tpi0_r, tpi0_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6510T_TAG, 0)

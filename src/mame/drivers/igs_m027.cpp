@@ -67,6 +67,7 @@ public:
 	void pgm_create_dummy_internal_arm_region();
 	void igs_majhong(machine_config &config);
 	void amazonia(machine_config &config);
+	void igs_majhong_map(address_map &map);
 };
 
 
@@ -142,7 +143,7 @@ uint32_t igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32, igs_m027_state )
+ADDRESS_MAP_START(igs_m027_state::igs_majhong_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM /* Internal ROM */
 	AM_RANGE(0x08000000, 0x0807ffff) AM_ROM AM_REGION("user1", 0)/* Game ROM */
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_SHARE("igs_mainram")// main ram for asic?

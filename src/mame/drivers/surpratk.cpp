@@ -58,10 +58,11 @@ WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 
 /********************************************/
 
-static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
+ADDRESS_MAP_START(surpratk_state::surpratk_map)
 	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")                    /* banked ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x5f8c, 0x5f8c) AM_READ_PORT("P1")
 	AM_RANGE(0x5f8d, 0x5f8d) AM_READ_PORT("P2")
 	AM_RANGE(0x5f8e, 0x5f8e) AM_READ_PORT("DSW3")
@@ -72,11 +73,10 @@ static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
 	AM_RANGE(0x5fc0, 0x5fc0) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(surpratk_5fc0_w)
 	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE("ymsnd", ym2151_device, write)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x38000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, surpratk_state )
+ADDRESS_MAP_START(surpratk_state::bank0000_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")

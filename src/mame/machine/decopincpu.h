@@ -83,6 +83,7 @@ public:
 
 	static void static_set_cpuregion(device_t &device, const char *tag);
 
+	void decocpu1_map(address_map &map);
 protected:
 	static constexpr device_timer_id TIMER_IRQ = 0;
 
@@ -141,6 +142,7 @@ class decocpu_type2_device : public decocpu_type1_device
 public:
 	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void decocpu2_map(address_map &map);
 protected:
 	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

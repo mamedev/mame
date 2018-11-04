@@ -225,7 +225,7 @@ WRITE8_MEMBER(fromance_state::fromance_coinctr_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_main_map, AS_PROGRAM, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::nekkyoku_main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("SERVICE") AM_WRITE(fromance_portselect_w)
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( nekkyoku_main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_main_map, AS_PROGRAM, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::fromance_main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0x9e89, 0x9e89) AM_READNOP         // unknown (idolmj)
@@ -256,7 +256,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_sub_map, AS_PROGRAM, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::nekkyoku_sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xefff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( nekkyoku_sub_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_sub_map, AS_PROGRAM, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::fromance_sub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -280,7 +280,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::nekkyoku_sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
@@ -293,7 +293,7 @@ static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
 	AM_RANGE(0xe9, 0xea) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::idolmj_sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown
@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ym2149_device, data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
+ADDRESS_MAP_START(fromance_state::fromance_sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x12, 0x12) AM_READNOP             // unknown

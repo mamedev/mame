@@ -367,7 +367,7 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
 }
 
 
-static ADDRESS_MAP_START( killbld_mem, AS_PROGRAM, 16, pgm_022_025_state )
+ADDRESS_MAP_START(pgm_022_025_state::killbld_mem)
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK("bank1") /* Game ROM */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("sharedprotram") // Shared with protection device
@@ -375,7 +375,7 @@ ADDRESS_MAP_END
 
 
 MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025)
-	MCFG_FRAGMENT_ADD(pgmbase)
+	pgmbase(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(killbld_mem)
@@ -387,11 +387,13 @@ MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pgm_022_025_state::pgm_022_025_dw3, pgm_022_025)
+MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025_dw3)
+	pgm_022_025(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_022_025_state, dw3)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pgm_022_025_state::pgm_022_025_killbld, pgm_022_025)
+MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025_killbld)
+	pgm_022_025(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_022_025_state, killbld)
 MACHINE_CONFIG_END
 

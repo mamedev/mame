@@ -207,7 +207,7 @@ WRITE8_MEMBER(fgoal_state::sound2_w)
 }
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, fgoal_state )
+ADDRESS_MAP_START(fgoal_state::cpu_map)
 
 	AM_RANGE(0x0000, 0x00ef) AM_RAM
 

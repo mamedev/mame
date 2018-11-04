@@ -93,6 +93,9 @@ public:
 	required_device<ticket_dispenser_device> m_hopper;
 	void rollfr(machine_config &config);
 	void igrosoft_gamble(machine_config &config);
+	void igrosoft_gamble_map(address_map &map);
+	void igrosoft_gamble_portmap(address_map &map);
+	void rollfr_portmap(address_map &map);
 };
 
 

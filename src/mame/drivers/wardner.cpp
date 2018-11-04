@@ -153,6 +153,13 @@ public:
 	DECLARE_DRIVER_INIT(wardner);
 
 	void wardner(machine_config &config);
+	void DSP_io_map(address_map &map);
+	void DSP_program_map(address_map &map);
+	void main_bank_map(address_map &map);
+	void main_io_map(address_map &map);
+	void main_program_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_program_map(address_map &map);
 protected:
 	virtual void driver_start() override;
 	virtual void machine_reset() override;
@@ -166,7 +173,7 @@ WRITE8_MEMBER(wardner_state::wardner_bank_w)
 	m_membank->set_bank(data & 7);
 }
 
-static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::main_program_map)
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w)                     // AM_SHARE("spriteram8")
@@ -177,7 +184,7 @@ ADDRESS_MAP_END
 
 // Overlapped RAM/Banked ROM
 // Can't use AM_RANGE(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
-static ADDRESS_MAP_START( main_bank_map, AS_PROGRAM, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::main_bank_map)
 	AM_RANGE(0x00000, 0x00fff) AM_READ(wardner_sprite_r) AM_SHARE("spriteram8")
 	AM_RANGE(0x01000, 0x01fff) AM_ROM AM_REGION("maincpu", 0x1000)
 	AM_RANGE(0x02000, 0x02fff) AM_READONLY AM_SHARE("palette")
@@ -186,7 +193,7 @@ static ADDRESS_MAP_START( main_bank_map, AS_PROGRAM, 8, wardner_state )
 	AM_RANGE(0x04800, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x4800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
@@ -211,14 +218,14 @@ ADDRESS_MAP_END
 
 /***************************** Z80 Sound Memory Map *************************/
 
-static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::sound_program_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x807f) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, wardner_state )
+ADDRESS_MAP_START(wardner_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 ADDRESS_MAP_END
@@ -226,13 +233,13 @@ ADDRESS_MAP_END
 
 /***************************** TMS32010 Memory Map **************************/
 
-static ADDRESS_MAP_START( DSP_program_map, AS_PROGRAM, 16, wardner_state )
+ADDRESS_MAP_START(wardner_state::DSP_program_map)
 	AM_RANGE(0x000, 0x5ff) AM_ROM
 ADDRESS_MAP_END
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, wardner_state )
+ADDRESS_MAP_START(wardner_state::DSP_io_map)
 	AM_RANGE(0x00, 0x00) AM_WRITE(wardner_dsp_addrsel_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(twincobr_dsp_bio_w)

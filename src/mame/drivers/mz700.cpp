@@ -113,14 +113,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(mz_state::ne556_other_callback)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mz700_mem, AS_PROGRAM, 8, mz_state )
+ADDRESS_MAP_START(mz_state::mz700_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x1000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bankd")
 	AM_RANGE(0xe000, 0xffff) AM_DEVICE("banke", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz700_banke, AS_PROGRAM, 8, mz_state )
+ADDRESS_MAP_START(mz_state::mz700_banke)
 	// bank 0: ram (mz700_bank1)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	// bank 1: devices (mz700_bank3)
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( mz700_banke, AS_PROGRAM, 8, mz_state )
 	AM_RANGE(0x4000, 0x5fff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz700_io, AS_IO, 8, mz_state )
+ADDRESS_MAP_START(mz_state::mz700_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mz700_bank_0_w)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(mz700_bank_1_w)
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( mz700_io, AS_IO, 8, mz_state )
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(mz700_bank_6_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz800_mem, AS_PROGRAM, 8, mz_state )
+ADDRESS_MAP_START(mz_state::mz800_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x7fff) AM_RAM
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( mz800_mem, AS_PROGRAM, 8, mz_state )
 	AM_RANGE(0xe000, 0xffff) AM_DEVICE("bankf", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz800_bankf, AS_PROGRAM, 8, mz_state )
+ADDRESS_MAP_START(mz_state::mz800_bankf)
 	// bank 0: ram (mz700_bank1)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	// bank 1: devices (mz700_bank3)
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( mz800_bankf, AS_PROGRAM, 8, mz_state )
 	AM_RANGE(0x4000, 0x5fff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mz800_io, AS_IO, 8, mz_state )
+ADDRESS_MAP_START(mz_state::mz800_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xcc, 0xcc) AM_WRITE(mz800_write_format_w )
 	AM_RANGE(0xcd, 0xcd) AM_WRITE(mz800_read_format_w )
@@ -432,7 +432,8 @@ MACHINE_CONFIG_START(mz_state::mz700)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mz_state::mz800, mz700)
+MACHINE_CONFIG_START(mz_state::mz800)
+	mz700(config);
 	MCFG_DEVICE_REMOVE("banke")
 
 	/* basic machine hardware */

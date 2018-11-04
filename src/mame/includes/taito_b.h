@@ -105,6 +105,26 @@ public:
 	void viofight(machine_config &config);
 	void crimec(machine_config &config);
 	void selfeena(machine_config &config);
+	void crimec_map(address_map &map);
+	void hitice_map(address_map &map);
+	void masterw_map(address_map &map);
+	void masterw_sound_map(address_map &map);
+	void pbobble_map(address_map &map);
+	void qzshowby_map(address_map &map);
+	void rambo3_map(address_map &map);
+	void rastsag2_map(address_map &map);
+	void realpunc_hd63484_map(address_map &map);
+	void realpunc_map(address_map &map);
+	void sbm_map(address_map &map);
+	void selfeena_map(address_map &map);
+	void silentd_map(address_map &map);
+	void sound_map(address_map &map);
+	void spacedx_map(address_map &map);
+	void spacedxo_map(address_map &map);
+	void tetrist_map(address_map &map);
+	void tetrista_map(address_map &map);
+	void viofight_map(address_map &map);
+	void viofight_sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

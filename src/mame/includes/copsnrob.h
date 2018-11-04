@@ -51,4 +51,5 @@ public:
 	required_device<palette_device> m_palette;
 	void copsnrob(machine_config &config);
 	void copsnrob_audio(machine_config &config);
+	void main_map(address_map &map);
 };

@@ -47,7 +47,6 @@ private:
 
 
 // device type definition
-extern const device_type ABC_MEMORY_CARD;
 DECLARE_DEVICE_TYPE(ABC_MEMORY_CARD, abc_memory_card_device)
 
 

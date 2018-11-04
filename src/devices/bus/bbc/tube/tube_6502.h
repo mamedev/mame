@@ -31,9 +31,6 @@ public:
 	// construction/destruction
 	bbc_tube_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -53,6 +50,11 @@ private:
 	required_memory_region m_rom;
 
 	bool m_rom_enabled;
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	void tube_6502_mem(address_map &map);
 };
 
 

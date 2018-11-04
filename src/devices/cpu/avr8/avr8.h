@@ -258,6 +258,7 @@ class atmega88_device : public avr8_device
 public:
 	// construction/destruction
 	atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void atmega88_internal_map(address_map &map);
 };
 
 // ======================> atmega644_device
@@ -269,6 +270,7 @@ public:
 	atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void update_interrupt(int source) override;
+	void atmega644_internal_map(address_map &map);
 };
 
 // ======================> atmega1280_device
@@ -280,6 +282,7 @@ public:
 	atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void update_interrupt(int source) override;
+	void atmega1280_internal_map(address_map &map);
 };
 
 // ======================> atmega2560_device
@@ -291,6 +294,7 @@ public:
 	atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void update_interrupt(int source) override;
+	void atmega2560_internal_map(address_map &map);
 };
 
 /***************************************************************************

@@ -44,7 +44,7 @@ MACHINE_CONFIG_START(isbc_208_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats)
 MACHINE_CONFIG_END
 
-DEVICE_ADDRESS_MAP_START( map, 8, isbc_208_device )
+ADDRESS_MAP_START(isbc_208_device::map)
 	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("dmac", am9517a_device, read, write)
 	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", i8272a_device, map)
 	AM_RANGE(0x12, 0x15) AM_READWRITE(stat_r, aux_w)

@@ -52,6 +52,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cs4031_tc ) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( cs4031_spkr ) { m_speaker->level_w(state); }
 	void ct486(machine_config &config);
+	void ct486_io(address_map &map);
+	void ct486_map(address_map &map);
 };
 
 
@@ -93,10 +95,10 @@ WRITE_LINE_MEMBER( ct486_state::cs4031_hold )
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( ct486_map, AS_PROGRAM, 32, ct486_state )
+ADDRESS_MAP_START(ct486_state::ct486_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ct486_io, AS_IO, 32, ct486_state )
+ADDRESS_MAP_START(ct486_state::ct486_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

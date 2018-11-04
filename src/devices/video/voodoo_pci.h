@@ -28,7 +28,7 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 
 	void postload(void);
 	void set_cpu_tag(const char *tag);
@@ -54,10 +54,10 @@ private:
 	const char *m_cpu_tag;
 
 	uint32_t m_pcictrl_reg[0x20];
-	DECLARE_ADDRESS_MAP(voodoo_reg_map, 32);
-	DECLARE_ADDRESS_MAP(banshee_reg_map, 32);
-	DECLARE_ADDRESS_MAP(lfb_map, 32);
-	DECLARE_ADDRESS_MAP(io_map, 32);
+	void voodoo_reg_map(address_map &map);
+	void banshee_reg_map(address_map &map);
+	void lfb_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device)

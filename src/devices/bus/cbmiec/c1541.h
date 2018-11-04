@@ -61,6 +61,10 @@ protected:
 
 	required_device<floppy_image_device> m_floppy;
 
+	void c1541_mem(address_map &map);
+	void c1541dd_mem(address_map &map);
+	void c1541pd_mem(address_map &map);
+
 private:
 	enum
 	{
@@ -257,27 +261,25 @@ public:
 	// construction/destruction
 	c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// not really public
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
 protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
-
-protected:
+private:
 	required_device<pia6821_device> m_pia;
 	required_device<output_latch_device> m_cent_data_out;
 	required_memory_region m_mmu_rom;
 
-private:
+	DECLARE_READ8_MEMBER( pia_r );
+	DECLARE_WRITE8_MEMBER( pia_w );
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_READ8_MEMBER( pia_pb_r );
 	DECLARE_WRITE8_MEMBER( pia_pb_w );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	void c1541pdc_mem(address_map &map);
 };
 
 

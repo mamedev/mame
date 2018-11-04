@@ -6,7 +6,6 @@
 #pragma once
 
 
-extern const device_type CEDAR_MAGNET_FLOP;
 DECLARE_DEVICE_TYPE(CEDAR_MAGNET_FLOP, cedar_magnet_flop_device)
 
 #define MCFG_CEDAR_MAGNET_FLOP_ADD(_tag) \

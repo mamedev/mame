@@ -93,6 +93,10 @@ public:
 
 	void rbmk(machine_config &config);
 	void rbspm(machine_config &config);
+	void mcu_io(address_map &map);
+	void mcu_mem(address_map &map);
+	void rbmk_mem(address_map &map);
+	void rbspm_mem(address_map &map);
 protected:
 	virtual void video_start() override;
 
@@ -160,7 +164,7 @@ WRITE16_MEMBER(rbmk_state::eeprom_w)
 }
 
 
-static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
+ADDRESS_MAP_START(rbmk_state::rbmk_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
@@ -177,7 +181,7 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0xc28000, 0xc28001) AM_WRITE(unk_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rbspm_mem, AS_PROGRAM, 16, rbmk_state )
+ADDRESS_MAP_START(rbmk_state::rbspm_mem)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(eeprom_w) // wrong
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(dip_mux_r, dip_mux_w)
@@ -193,7 +197,7 @@ static ADDRESS_MAP_START( rbspm_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8, rbmk_state )
+ADDRESS_MAP_START(rbmk_state::mcu_mem)
 //  AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -232,7 +236,7 @@ WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
 	m_mux_data = ~data;
 }
 
-static ADDRESS_MAP_START( mcu_io, AS_IO, 8, rbmk_state )
+ADDRESS_MAP_START(rbmk_state::mcu_io)
 	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(mcu_io_r, mcu_io_w )
 
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(mcu_io_mux_w )
@@ -595,7 +599,8 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rbmk_state::rbspm, rbmk)
+MACHINE_CONFIG_START(rbmk_state::rbspm)
+	rbmk(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rbspm_mem)
 

@@ -200,6 +200,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
 	void mu100(machine_config &config);
+	void mu100_iomap(address_map &map);
+	void mu100_map(address_map &map);
 };
 
 class mu100r_state : public mu100_state {
@@ -266,7 +268,7 @@ uint32_t mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-static ADDRESS_MAP_START( mu100_map, AS_PROGRAM, 16, mu100_state )
+ADDRESS_MAP_START(mu100_state::mu100_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM // 128K work RAM
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(snd_r, snd_w)
@@ -416,7 +418,7 @@ WRITE16_MEMBER(mu100_state::pg_w)
 	logerror("pbsel3 %d\n", data & 1);
 }
 
-static ADDRESS_MAP_START( mu100_iomap, AS_IO, 16, mu100_state )
+ADDRESS_MAP_START(mu100_state::mu100_iomap)
 	AM_RANGE(h8_device::PORT_1,  h8_device::PORT_1)  AM_READWRITE(p1_r, p1_w)
 	AM_RANGE(h8_device::PORT_2,  h8_device::PORT_2)  AM_WRITE(p2_w)
 	AM_RANGE(h8_device::PORT_3,  h8_device::PORT_3)  AM_WRITE(p3_w)

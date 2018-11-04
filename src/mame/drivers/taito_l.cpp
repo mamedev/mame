@@ -467,7 +467,7 @@ WRITE8_MEMBER(champwr_state::msm5205_volume_w)
 }
 
 
-static ADDRESS_MAP_START( common_banks_map, AS_PROGRAM, 8, taitol_state )
+ADDRESS_MAP_START(taitol_state::common_banks_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w)
@@ -483,13 +483,13 @@ static ADDRESS_MAP_START( common_banks_map, AS_PROGRAM, 8, taitol_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fhawk_map, AS_PROGRAM, 8, fhawk_state )
+ADDRESS_MAP_START(fhawk_state::fhawk_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, fhawk_state )
+ADDRESS_MAP_START(fhawk_state::fhawk_2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
@@ -499,7 +499,7 @@ static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, fhawk_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8, fhawk_state )
+ADDRESS_MAP_START(fhawk_state::fhawk_3_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
@@ -509,7 +509,7 @@ static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8, fhawk_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_2cpu_state )
+ADDRESS_MAP_START(taitol_2cpu_state::raimais_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x87ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("tc0040ioc", tc0040ioc_device, read, write)
@@ -518,7 +518,7 @@ static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_2cpu_state )
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raimais_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
+ADDRESS_MAP_START(taitol_2cpu_state::raimais_2_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
@@ -530,7 +530,7 @@ WRITE8_MEMBER(taitol_2cpu_state::sound_bankswitch_w)
 	m_audio_bnk->set_base(&m_audio_prg[(data & 0x03) * 0x4000]);
 }
 
-static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_2cpu_state )
+ADDRESS_MAP_START(taitol_2cpu_state::raimais_3_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -545,13 +545,13 @@ static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_2cpu_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( champwr_map, AS_PROGRAM, 8, champwr_state )
+ADDRESS_MAP_START(champwr_state::champwr_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, champwr_state )
+ADDRESS_MAP_START(champwr_state::champwr_2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("share1")
@@ -562,7 +562,7 @@ static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, champwr_state )
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(rombank2switch_r, rombank2switch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( champwr_3_map, AS_PROGRAM, 8, champwr_state )
+ADDRESS_MAP_START(champwr_state::champwr_3_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -577,14 +577,14 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_2cpu_state )
+ADDRESS_MAP_START(taitol_2cpu_state::kurikint_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0xa800, 0xa801) AM_DEVREADWRITE("tc0040ioc", tc0040ioc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
+ADDRESS_MAP_START(taitol_2cpu_state::kurikint_2_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
@@ -593,7 +593,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( puzznic_map, AS_PROGRAM, 8, taitol_1cpu_state )
+ADDRESS_MAP_START(taitol_1cpu_state::puzznic_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
@@ -604,7 +604,7 @@ static ADDRESS_MAP_START( puzznic_map, AS_PROGRAM, 8, taitol_1cpu_state )
 ADDRESS_MAP_END
 
 /* bootleg, doesn't have the MCU */
-static ADDRESS_MAP_START( puzznici_map, AS_PROGRAM, 8, taitol_1cpu_state )
+ADDRESS_MAP_START(taitol_1cpu_state::puzznici_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
@@ -615,7 +615,7 @@ static ADDRESS_MAP_START( puzznici_map, AS_PROGRAM, 8, taitol_1cpu_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( plotting_map, AS_PROGRAM, 8, taitol_1cpu_state )
+ADDRESS_MAP_START(taitol_1cpu_state::plotting_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
@@ -624,7 +624,7 @@ static ADDRESS_MAP_START( plotting_map, AS_PROGRAM, 8, taitol_1cpu_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( palamed_map, AS_PROGRAM, 8, taitol_1cpu_state )
+ADDRESS_MAP_START(taitol_1cpu_state::palamed_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -634,7 +634,7 @@ static ADDRESS_MAP_START( palamed_map, AS_PROGRAM, 8, taitol_1cpu_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_1cpu_state )
+ADDRESS_MAP_START(taitol_1cpu_state::cachat_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -645,11 +645,11 @@ static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_1cpu_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, horshoes_state )
+ADDRESS_MAP_START(horshoes_state::horshoes_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
-	AM_RANGE(0xa800, 0xa800) AM_SELECT(0x000c) AM_DEVREAD_MOD("upd4701", upd4701_device, read_xy, rshift<2>)
+	;map(0xa800, 0xa800).select(0x000c).lr8("upd4701_r", [this](address_space &space, offs_t offset, u8 mem_mask) { return m_upd4701->read_xy(space, offset >> 2, mem_mask); });
 	AM_RANGE(0xa802, 0xa802) AM_DEVREAD("upd4701", upd4701_device, reset_x)
 	AM_RANGE(0xa803, 0xa803) AM_DEVREAD("upd4701", upd4701_device, reset_y)
 	AM_RANGE(0xb801, 0xb801) AM_READNOP // Watchdog or interrupt ack
@@ -657,14 +657,14 @@ static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, horshoes_state )
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( evilston_map, AS_PROGRAM, 8, taitol_2cpu_state )
+ADDRESS_MAP_START(taitol_2cpu_state::evilston_map)
 	AM_IMPORT_FROM(common_banks_map)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, right_r, right_w)
 	AM_RANGE(0xa800, 0xa807) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( evilston_2_map, AS_PROGRAM, 8, taitol_2cpu_state )
+ADDRESS_MAP_START(taitol_2cpu_state::evilston_2_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
@@ -1567,7 +1567,7 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1586,7 +1586,8 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(champwr_state::champwr, fhawk)
+MACHINE_CONFIG_START(champwr_state::champwr)
+	fhawk(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1641,7 +1642,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1685,7 +1686,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1709,7 +1710,7 @@ MACHINE_CONFIG_START(taitol_1cpu_state::plotting)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1732,7 +1733,8 @@ MACHINE_CONFIG_START(taitol_1cpu_state::plotting)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznic, plotting)
+MACHINE_CONFIG_START(taitol_1cpu_state::puzznic)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1741,7 +1743,8 @@ MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznic, plotting)
 	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P3, 3_MHz_XTAL)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznici, plotting)
+MACHINE_CONFIG_START(taitol_1cpu_state::puzznici)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1749,7 +1752,8 @@ MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznici, plotting)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(horshoes_state::horshoes, plotting)
+MACHINE_CONFIG_START(horshoes_state::horshoes)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1761,7 +1765,8 @@ MACHINE_CONFIG_DERIVED(horshoes_state::horshoes, plotting)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitol_1cpu_state::palamed, plotting)
+MACHINE_CONFIG_START(taitol_1cpu_state::palamed)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1781,7 +1786,8 @@ MACHINE_CONFIG_DERIVED(taitol_1cpu_state::palamed, plotting)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(taitol_1cpu_state::cachat, plotting)
+MACHINE_CONFIG_START(taitol_1cpu_state::cachat)
+	plotting(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1828,7 +1834,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(l_system_video)
+	l_system_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

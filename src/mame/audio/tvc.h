@@ -53,7 +53,6 @@ private:
 };
 
 // device type definition
-extern const device_type TVC_SOUND;
 DECLARE_DEVICE_TYPE(TVC_SOUND, tvc_sound_device)
 
 #endif // MAME_AUDIO_TVC_H

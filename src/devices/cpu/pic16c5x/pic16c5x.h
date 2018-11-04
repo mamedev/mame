@@ -99,6 +99,11 @@ public:
 	// or with a macro
 	static void set_config_static(device_t &device, uint16_t data) { downcast<pic16c5x_device &>(device).m_temp_config = data; }
 
+	void pic16c5x_ram_5(address_map &map);
+	void pic16c5x_ram_7(address_map &map);
+	void pic16c5x_rom_10(address_map &map);
+	void pic16c5x_rom_11(address_map &map);
+	void pic16c5x_rom_9(address_map &map);
 protected:
 	// construction/destruction
 	pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, int picmodel);

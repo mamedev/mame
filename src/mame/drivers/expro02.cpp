@@ -268,6 +268,17 @@ public:
 	void smissw(machine_config &config);
 	void galhustl(machine_config &config);
 	void expro02(machine_config &config);
+	void comad_map(address_map &map);
+	void expro02_map(address_map &map);
+	void expro02_video_base_map(address_map &map);
+	void expro02_video_base_map_noview2(address_map &map);
+	void fantasia_map(address_map &map);
+	void fantsia2_map(address_map &map);
+	void galhustl_map(address_map &map);
+	void oki_map(address_map &map);
+	void smissw_map(address_map &map);
+	void supmodel_map(address_map &map);
+	void zipzap_map(address_map &map);
 };
 
 
@@ -650,7 +661,7 @@ WRITE8_MEMBER( expro02_state::expro02_6295_bankswitch_w )
  *************************************/
 
 
-static ADDRESS_MAP_START( expro02_video_base_map, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::expro02_video_base_map)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
 	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -662,7 +673,7 @@ static ADDRESS_MAP_START( expro02_video_base_map, AS_PROGRAM, 16, expro02_state 
 	AM_RANGE(0xe80000, 0xe80001) AM_DEVWRITE("view2_0",kaneko_view2_tilemap_device,galsnew_vram_0_tilebank_w)   /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( expro02_video_base_map_noview2, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::expro02_video_base_map_noview2)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
 	AM_RANGE(0x580000, 0x583fff) AM_NOP // games still makes leftover accesses
@@ -674,7 +685,7 @@ static ADDRESS_MAP_START( expro02_video_base_map_noview2, AS_PROGRAM, 16, expro0
 	AM_RANGE(0xe80000, 0xe80001) AM_NOP // games still makes leftover accesses
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( expro02_map, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::expro02_map)
 	AM_IMPORT_FROM(expro02_video_base_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM // main program
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user2",0) // other data
@@ -691,7 +702,7 @@ ADDRESS_MAP_END
 
 
 // bigger ROM space, OKI commands moved, no CALC mcu
-static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::fantasia_map)
 	AM_IMPORT_FROM(expro02_video_base_map)
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
@@ -706,7 +717,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::comad_map)
 	AM_IMPORT_FROM(expro02_video_base_map_noview2)
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
@@ -722,7 +733,7 @@ static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xf80000, 0xf80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* newfant */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::fantsia2_map)
 	AM_IMPORT_FROM(expro02_video_base_map_noview2)
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
@@ -739,7 +750,9 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::galhustl_map)
+	AM_IMPORT_FROM(expro02_video_base_map_noview2)
+
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("maincpudata", 0)
 
@@ -752,12 +765,11 @@ static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM
 
 	AM_RANGE(0x780000, 0x78001f) AM_NOP // prevent sprites being flipped
-
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
-
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::zipzap_map)
+	AM_IMPORT_FROM(expro02_video_base_map_noview2)
+
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x701000, 0x71ffff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
@@ -768,11 +780,9 @@ static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM     // main ram
 
 	AM_RANGE(0x780000, 0x78001f) AM_NOP // prevent sprites being flipped
-
-	AM_IMPORT_FROM(expro02_video_base_map_noview2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::supmodel_map)
 	AM_IMPORT_FROM(expro02_video_base_map_noview2)
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
@@ -790,7 +800,7 @@ static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xf80000, 0xf80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smissw_map, AS_PROGRAM, 16, expro02_state )
+ADDRESS_MAP_START(expro02_state::smissw_map)
 	AM_IMPORT_FROM(expro02_video_base_map_noview2)
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
@@ -808,7 +818,7 @@ static ADDRESS_MAP_START( smissw_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, 0, 8, expro02_state )
+ADDRESS_MAP_START(expro02_state::oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -938,7 +948,8 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(expro02_state::comad, expro02)
+MACHINE_CONFIG_START(expro02_state::comad)
+	expro02(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantasia_map)
@@ -954,20 +965,23 @@ MACHINE_CONFIG_DERIVED(expro02_state::comad, expro02)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::comad_noview2, comad)
+MACHINE_CONFIG_START(expro02_state::comad_noview2)
+	comad(config);
 	MCFG_DEVICE_REMOVE("view2_0")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", expro02_noview2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(expro02_state::fantasia, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::fantasia)
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(10000000)
 	MCFG_CPU_PROGRAM_MAP(comad_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::supmodel, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::supmodel)
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supmodel_map)
 	MCFG_OKIM6295_REPLACE("oki", 1584000, PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -975,17 +989,20 @@ MACHINE_CONFIG_DERIVED(expro02_state::supmodel, comad_noview2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::smissw, comad_noview2) // 951127 PCB, 12 & 16 clocks
+MACHINE_CONFIG_START(expro02_state::smissw) // 951127 PCB, 12 & 16 clocks
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smissw_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::fantsia2, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::fantsia2)
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantsia2_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::galhustl, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::galhustl)
+	comad_noview2(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galhustl_map)
 	MCFG_OKIM6295_REPLACE("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -996,7 +1013,8 @@ MACHINE_CONFIG_DERIVED(expro02_state::galhustl, comad_noview2)
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(expro02_state::zipzap, comad_noview2)
+MACHINE_CONFIG_START(expro02_state::zipzap)
+	comad_noview2(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zipzap_map)

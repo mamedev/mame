@@ -10,6 +10,7 @@ Skeleton driver for Visual 102 display terminal.
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/eeprompar.h"
+#include "machine/input_merger.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -30,6 +31,9 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void v102(machine_config &config);
+	void io_map(address_map &map);
+	void kbd_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -42,7 +46,7 @@ u32 v102_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 }
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v102_state )
+ADDRESS_MAP_START(v102_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -50,7 +54,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v102_state )
 	AM_RANGE(0xb800, 0xb9ff) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, v102_state )
+ADDRESS_MAP_START(v102_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0x3f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
 	AM_RANGE(0x18, 0x19) AM_WRITENOP
@@ -62,7 +66,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, v102_state )
 	//AM_RANGE(0xbf, 0xbf) ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kbd_map, AS_PROGRAM, 8, v102_state )
+ADDRESS_MAP_START(v102_state::kbd_map)
 	AM_RANGE(0x000, 0x7ff) AM_ROM AM_REGION("keyboard", 0)
 ADDRESS_MAP_END
 
@@ -85,8 +89,13 @@ MACHINE_CONFIG_START(v102_state::v102)
 	MCFG_EEPROM_2804_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 

@@ -63,6 +63,8 @@ public:
 
 	uint8_t m_matrix;
 	void sc1(machine_config &config);
+	void sc1_io(address_map &map);
+	void sc1_mem(address_map &map);
 };
 
 /***************************************************************************
@@ -122,13 +124,13 @@ READ8_MEMBER( sc1_state::pio_port_b_r )
 }
 
 
-static ADDRESS_MAP_START(sc1_mem, AS_PROGRAM, 8, sc1_state)
+ADDRESS_MAP_START(sc1_state::sc1_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x43ff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sc1_io, AS_IO, 8, sc1_state)
+ADDRESS_MAP_START(sc1_state::sc1_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)

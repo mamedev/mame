@@ -36,7 +36,7 @@ public:
 
 	igs017_igs031_palette_scramble_delegate m_palette_scramble_cb;
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

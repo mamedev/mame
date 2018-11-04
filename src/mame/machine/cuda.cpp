@@ -67,7 +67,7 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cuda_map, AS_PROGRAM, 8, cuda_device )
+ADDRESS_MAP_START(cuda_device::cuda_map)
 	AM_RANGE(0x0000, 0x0002) AM_READWRITE(ports_r, ports_w)
 	AM_RANGE(0x0004, 0x0006) AM_READWRITE(ddr_r, ddr_w)
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE(pll_r, pll_w)

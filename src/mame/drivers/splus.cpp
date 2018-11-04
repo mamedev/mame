@@ -121,6 +121,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	void splus(machine_config &config);
+	void splus_iomap(address_map &map);
+	void splus_map(address_map &map);
 };
 
 /* Static Variables */
@@ -591,11 +593,11 @@ DRIVER_INIT_MEMBER(splus_state,splus)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( splus_map, AS_PROGRAM, 8, splus_state )
+ADDRESS_MAP_START(splus_state::splus_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
+ADDRESS_MAP_START(splus_state::splus_iomap)
 	// Serial I/O
 	AM_RANGE(0x0000, 0x0000) AM_READ(splus_serial_r) AM_WRITE(splus_serial_w)
 

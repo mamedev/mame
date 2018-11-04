@@ -104,7 +104,7 @@ enum
 
 
 g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: g65816_device(mconfig, G65816, tag, owner, clock, CPU_TYPE_G65816, nullptr)
+	: g65816_device(mconfig, G65816, tag, owner, clock, CPU_TYPE_G65816, address_map_constructor())
 {
 }
 
@@ -125,7 +125,7 @@ device_memory_interface::space_config_vector g65816_device::memory_space_config(
 }
 
 
-static ADDRESS_MAP_START(_5a22_map, AS_PROGRAM, 8, _5a22_device)
+ADDRESS_MAP_START(_5a22_device::_5a22_map)
 	AM_RANGE(0x4202, 0x4202) AM_MIRROR(0xbf0000) AM_WRITE(wrmpya_w)
 	AM_RANGE(0x4203, 0x4203) AM_MIRROR(0xbf0000) AM_WRITE(wrmpyb_w)
 	AM_RANGE(0x4204, 0x4204) AM_MIRROR(0xbf0000) AM_WRITE(wrdivl_w)
@@ -142,7 +142,7 @@ ADDRESS_MAP_END
 
 
 _5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: g65816_device(mconfig, _5A22, tag, owner, clock, CPU_TYPE_5A22, ADDRESS_MAP_NAME(_5a22_map))
+	: g65816_device(mconfig, _5A22, tag, owner, clock, CPU_TYPE_5A22, address_map_constructor(FUNC(_5a22_device::_5a22_map), this))
 {
 }
 

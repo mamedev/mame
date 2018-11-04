@@ -121,6 +121,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void srmp6(machine_config &config);
+	void srmp6_map(address_map &map);
 };
 
 #define VERBOSE 0
@@ -552,7 +553,7 @@ READ16_MEMBER(srmp6_state::srmp6_irq_ack_r)
 	return 0; // value read doesn't matter
 }
 
-static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16, srmp6_state )
+ADDRESS_MAP_START(srmp6_state::srmp6_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM                 // work RAM
 	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")    // banked ROM (used by ROM check)

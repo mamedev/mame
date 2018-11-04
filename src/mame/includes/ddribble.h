@@ -77,4 +77,8 @@ public:
 	INTERRUPT_GEN_MEMBER(ddribble_interrupt_1);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen );
 	void ddribble(machine_config &config);
+	void cpu0_map(address_map &map);
+	void cpu1_map(address_map &map);
+	void cpu2_map(address_map &map);
+	void vlm_map(address_map &map);
 };

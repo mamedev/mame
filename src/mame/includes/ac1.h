@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef AC1_H_
-#define AC1_H_
+#ifndef MAME_INCLUDES_AC1_H
+#define MAME_INCLUDES_AC1_H
 
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
@@ -36,6 +36,9 @@ public:
 
 	void ac1_32(machine_config &config);
 	void ac1(machine_config &config);
+	void ac1_32_mem(address_map &map);
+	void ac1_io(address_map &map);
+	void ac1_mem(address_map &map);
 private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<cpu_device> m_maincpu;
@@ -47,4 +50,4 @@ private:
 /*----------- defined in video/ac1.c -----------*/
 extern const gfx_layout ac1_charlayout;
 
-#endif /* AC1_h_ */
+#endif // MAME_INCLUDES_AC1_H

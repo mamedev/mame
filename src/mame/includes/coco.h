@@ -134,6 +134,8 @@ public:
 	void coco_sound(machine_config &config);
 	void coco_floating(machine_config &config);
 
+	void coco_floating_map(address_map &map);
+	void coco_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

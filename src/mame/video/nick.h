@@ -77,11 +77,12 @@ public:
 
 	template<class _Object> static devcb_base &set_virq_wr_callback(device_t &device, _Object object) { return downcast<nick_device &>(device).m_write_virq.set_callback(object); }
 
-	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
-	virtual DECLARE_ADDRESS_MAP(vio_map, 8);
+	virtual void vram_map(address_map &map);
+	virtual void vio_map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void nick_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(LPC2103, lpc210x_device, "lpc2103", "NXP LPC2103")
 
-static ADDRESS_MAP_START( lpc2103_map, AS_PROGRAM, 32, lpc210x_device )
+ADDRESS_MAP_START(lpc210x_device::lpc2103_map)
 	AM_RANGE(0x00000000, 0x00007fff) AM_READWRITE(flash_r, flash_w) // 32kb internal FLASH rom
 
 	AM_RANGE(0x3FFFC000, 0x3FFFC01f) AM_READWRITE( fio_r, fio_w ) // GPIO
@@ -42,7 +42,7 @@ ADDRESS_MAP_END
 
 lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, LPC2103, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME(lpc2103_map))
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(lpc210x_device::lpc2103_map), this))
 {
 }
 

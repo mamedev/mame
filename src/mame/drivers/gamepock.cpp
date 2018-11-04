@@ -14,7 +14,7 @@
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START(gamepock_mem, AS_PROGRAM, 8, gamepock_state)
+ADDRESS_MAP_START(gamepock_state::gamepock_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x0fff) AM_ROM
 	AM_RANGE(0x1000,0x3fff) AM_NOP

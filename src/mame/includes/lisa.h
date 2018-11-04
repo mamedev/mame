@@ -241,6 +241,9 @@ public:
 	void lisa(machine_config &config);
 	void lisa210(machine_config &config);
 	void macxl(machine_config &config);
+	void lisa210_fdc_map(address_map &map);
+	void lisa_fdc_map(address_map &map);
+	void lisa_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_LISA_H

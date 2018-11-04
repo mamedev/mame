@@ -195,7 +195,7 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 /******************************************************************************/
 
 
-static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8, vsnes_state )
+ADDRESS_MAP_START(vsnes_state::vsnes_cpu1_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8, vsnes_state )
+ADDRESS_MAP_START(vsnes_state::vsnes_cpu2_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram_1")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu2", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_1_w)
@@ -244,15 +244,13 @@ READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_data_r)
 
 
 // the bootleg still makes writes to the PSG addresses, it seems the Z80 should interpret them to play the sounds
-static ADDRESS_MAP_START( vsnes_cpu1_bootleg_map, AS_PROGRAM, 8, vsnes_state )
+ADDRESS_MAP_START(vsnes_state::vsnes_cpu1_bootleg_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
+	AM_RANGE(0x4000, 0x4017) AM_WRITE(bootleg_sound_write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_r, vsnes_in0_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_r) /* IN1 - input port 2 / PSG second control register */
-
-	AM_RANGE(0x4000, 0x4017) AM_WRITE(bootleg_sound_write)
-
 	AM_RANGE(0x4020, 0x4020) AM_READWRITE(vsnes_coin_counter_r, vsnes_coin_counter_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("extra1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -263,14 +261,14 @@ READ8_MEMBER( vsnes_state::vsnes_bootleg_z80_latch_r )
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( vsnes_bootleg_z80_map, AS_PROGRAM, 8, vsnes_state )
+ADDRESS_MAP_START(vsnes_state::vsnes_bootleg_z80_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 
 	AM_RANGE(0x4000, 0x4000) AM_READ( vsnes_bootleg_z80_data_r ) // read in IRQ & NMI
 
 	AM_RANGE(0x6000, 0x6000) AM_READ( vsnes_bootleg_z80_latch_r ) // read in NMI, not explicitly stored (purpose? maybe clear IRQ ?)
-	AM_RANGE(0x6000, 0x6001) AM_READ( vsnes_bootleg_z80_address_r ) // ^
+	AM_RANGE(0x6001, 0x6001) AM_READ( vsnes_bootleg_z80_address_r ) // ^
 
 
 	AM_RANGE(0x60FA, 0x60FA) AM_DEVWRITE("sn1", sn76489_device, write)
@@ -1729,7 +1727,8 @@ MACHINE_CONFIG_START(vsnes_state::vsnes)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vsnes_state::jajamaru, vsnes)
+MACHINE_CONFIG_START(vsnes_state::jajamaru)
+	vsnes(config);
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_01_ADD("ppu1")
@@ -1738,7 +1737,8 @@ MACHINE_CONFIG_DERIVED(vsnes_state::jajamaru, vsnes)
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vsnes_state::mightybj, vsnes)
+MACHINE_CONFIG_START(vsnes_state::mightybj)
+	vsnes(config);
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_02_ADD("ppu1")
@@ -1747,7 +1747,8 @@ MACHINE_CONFIG_DERIVED(vsnes_state::mightybj, vsnes)
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vsnes_state::vsgshoe, vsnes)
+MACHINE_CONFIG_START(vsnes_state::vsgshoe)
+	vsnes(config);
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_03_ADD("ppu1")
@@ -1756,7 +1757,8 @@ MACHINE_CONFIG_DERIVED(vsnes_state::vsgshoe, vsnes)
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vsnes_state::topgun, vsnes)
+MACHINE_CONFIG_START(vsnes_state::topgun)
+	vsnes(config);
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_04_ADD("ppu1")
@@ -1815,7 +1817,8 @@ MACHINE_CONFIG_START(vsnes_state::vsdual)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vsnes_state::vsdual_pi, vsdual)
+MACHINE_CONFIG_START(vsnes_state::vsdual_pi)
+	vsdual(config);
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	// need high level of interleave to keep screens in sync in Balloon Fight.
 	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?

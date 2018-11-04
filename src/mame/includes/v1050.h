@@ -154,6 +154,9 @@ public:
 
 	void v1050(machine_config &config);
 	void v1050_video(machine_config &config);
+	void v1050_crt_mem(address_map &map);
+	void v1050_io(address_map &map);
+	void v1050_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -218,7 +218,7 @@ WRITE8_MEMBER(videopin_state::note_dvsr_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, videopin_state )
+ADDRESS_MAP_START(videopin_state::main_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x0800, 0x0800) AM_READ(misc_r) AM_WRITE(note_dvsr_w)

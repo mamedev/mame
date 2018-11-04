@@ -124,7 +124,12 @@ ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, 
 	m_tx_timer(nullptr),
 	m_read_si_cb(*this),
 	m_write_so_cb(*this),
-	m_status_changed_cb(*this)
+	m_write_pe_cb(*this),
+	m_write_fe_cb(*this),
+	m_write_or_cb(*this),
+	m_write_dav_cb(*this),
+	m_write_tbmt_cb(*this),
+	m_write_eoc_cb(*this)
 {
 	for (auto & elem : m_pins)
 		elem = 0;
@@ -148,7 +153,13 @@ void ay31015_device::device_start()
 {
 	m_read_si_cb.resolve();
 	m_write_so_cb.resolve();
-	m_status_changed_cb.resolve();
+
+	m_write_tbmt_cb.resolve();
+	m_write_dav_cb.resolve();
+	m_write_or_cb.resolve();
+	m_write_fe_cb.resolve();
+	m_write_pe_cb.resolve();
+	m_write_eoc_cb.resolve();
 
 	m_rx_timer = timer_alloc(TIMER_RX);
 	m_rx_timer->adjust(attotime::never);
@@ -197,7 +208,7 @@ void ay31015_device::device_reset()
 inline uint8_t ay31015_device::get_si()
 {
 	if (!m_read_si_cb.isnull())
-		m_pins[AY31015_SI] = m_read_si_cb(0) ? 1 : 0;
+		m_pins[AY31015_SI] = m_read_si_cb();
 
 	return m_pins[AY31015_SI];
 }
@@ -208,19 +219,20 @@ inline void ay31015_device::set_so( int data )
 	m_pins[AY31015_SO] = data ? 1 : 0;
 
 	if (!m_write_so_cb.isnull())
-		m_write_so_cb((offs_t)0, m_pins[AY31015_SO]);
+		m_write_so_cb(m_pins[AY31015_SO]);
 }
 
 
-inline int ay31015_device::update_status_pin( uint8_t reg_bit, ay31015_output_pin_t pin )
+inline void ay31015_device::update_status_pin(uint8_t reg_bit, ay31015_output_pin_t pin, devcb_write_line &write_cb)
 {
 	int new_value = (m_status_reg & reg_bit) ? 1 : 0;
 
-	if (new_value == m_pins[pin])
-		return 0;
-
-	m_pins[pin] = new_value;
-	return 1;
+	if (new_value != m_pins[pin])
+	{
+		m_pins[pin] = new_value;
+		if (!write_cb.isnull())
+			write_cb(new_value);
+	}
 }
 
 
@@ -230,23 +242,17 @@ inline int ay31015_device::update_status_pin( uint8_t reg_bit, ay31015_output_pi
 
 void ay31015_device::update_status_pins()
 {
-	int status_pins_changed = 0;
-
 	/* Should status pins be updated? */
 	if (!m_pins[AY31015_SWE])
 	{
-		status_pins_changed += update_status_pin(STATUS_PE, AY31015_PE);
-		status_pins_changed += update_status_pin(STATUS_FE, AY31015_FE);
-		status_pins_changed += update_status_pin(STATUS_OR, AY31015_OR);
-		status_pins_changed += update_status_pin(STATUS_DAV, AY31015_DAV);
-		status_pins_changed += update_status_pin(STATUS_TBMT, AY31015_TBMT);
+		update_status_pin(STATUS_PE, AY31015_PE, m_write_pe_cb);
+		update_status_pin(STATUS_FE, AY31015_FE, m_write_fe_cb);
+		update_status_pin(STATUS_OR, AY31015_OR, m_write_or_cb);
+		update_status_pin(STATUS_DAV, AY31015_DAV, m_write_dav_cb);
+		update_status_pin(STATUS_TBMT, AY31015_TBMT, m_write_tbmt_cb);
 	}
-	status_pins_changed += update_status_pin(STATUS_EOC, AY31015_EOC);
 
-	if (status_pins_changed && !m_status_changed_cb.isnull())
-	{
-		m_status_changed_cb((offs_t)0, status_pins_changed);
-	}
+	update_status_pin(STATUS_EOC, AY31015_EOC, m_write_eoc_cb);
 }
 
 void ay31015_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

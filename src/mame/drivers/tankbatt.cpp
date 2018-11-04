@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER(tankbatt_state::coinlockout_w)
 	machine().bookkeeping().coin_lockout_w(1, state);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
+ADDRESS_MAP_START(tankbatt_state::main_map)
 	AM_RANGE(0x0000, 0x000f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
@@ -179,7 +179,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
 	AM_RANGE(0x0c18, 0x0c18) AM_WRITENOP    /* watchdog ?? */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("maincpu",0)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu",0) //mirror for the reset/irq vectors
-	AM_RANGE(0x2000, 0xffff) AM_READNOP //anything else might be left-over for a diagnostic ROM or something related to the discrete sound HW
+	AM_RANGE(0x2000, 0x5fff) AM_READNOP //anything else might be left-over for a diagnostic ROM or something related to the discrete sound HW
+	AM_RANGE(0x8000, 0xdfff) AM_READNOP
 ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(tankbatt_state::interrupt)

@@ -522,6 +522,9 @@ public:
 	void aristmk5_touch(machine_config &config);
 	void aristmk5_usa_touch(machine_config &config);
 	void aristmk5_usa(machine_config &config);
+	void aristmk5_drame_map(address_map &map);
+	void aristmk5_map(address_map &map);
+	void aristmk5_usa_map(address_map &map);
 private:
 	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
 	required_device<ds1302_device> m_rtc;
@@ -902,8 +905,10 @@ WRITE8_MEMBER(aristmk5_state::bill_acceptor_lamps_w)
 		output().set_lamp_value(24 + i, BIT(data, i));
 }
 
-static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
+ADDRESS_MAP_START(aristmk5_state::aristmk5_map)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
+
+	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 
 	/* MK-5 overrides */
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE8(sram_banksel_w, 0x000000ff) // SRAM bank select write
@@ -924,7 +929,6 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
 	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
 
-	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03320000, 0x0333ffff) AM_READWRITE8(sram_r, sram_w, 0x000000ff)
 
 	AM_RANGE(0x03400000, 0x035fffff) AM_WRITE(archimedes_vidc_w)
@@ -935,7 +939,9 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 ADDRESS_MAP_END
 
 /* U.S games have no dram emulator enabled */
-static ADDRESS_MAP_START( aristmk5_usa_map, AS_PROGRAM, 32, aristmk5_state )
+ADDRESS_MAP_START(aristmk5_state::aristmk5_usa_map)
+	AM_IMPORT_FROM(aristmk5_map)
+
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 
 	AM_RANGE(0x03010440, 0x03010443) AM_WRITE8(rtc_usa_w, 0x000000ff)
@@ -959,12 +965,12 @@ static ADDRESS_MAP_START( aristmk5_usa_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03012140, 0x0301215f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 	AM_RANGE(0x03012300, 0x0301231f) AM_DEVREADWRITE8("uart_3a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 	AM_RANGE(0x03012340, 0x0301235f) AM_DEVREADWRITE8("uart_3b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-
-	AM_IMPORT_FROM(aristmk5_map)
 ADDRESS_MAP_END
 
 /* with dram emulator enabled */
-static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
+ADDRESS_MAP_START(aristmk5_state::aristmk5_drame_map)
+	AM_IMPORT_FROM(aristmk5_map)
+
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(aristmk5_drame_memc_logical_r, archimedes_memc_logical_w)
 
 	AM_RANGE(0x03010430, 0x03010433) AM_WRITE8(hopper_w, 0x000000ff)
@@ -978,8 +984,6 @@ static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
 
 	AM_RANGE(0x03014000, 0x0301401f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 	AM_RANGE(0x03014020, 0x0301403f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-
-	AM_IMPORT_FROM(aristmk5_map)
 ADDRESS_MAP_END
 
 
@@ -2091,19 +2095,22 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(aristmk5_state::aristmk5_touch, aristmk5)
+MACHINE_CONFIG_START(aristmk5_state::aristmk5_touch)
+	aristmk5(config);
 	MCFG_DEVICE_MODIFY("uart_0a")
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 
 	MCFG_MICROTOUCH_ADD("microtouch", 2400, DEVWRITELINE("uart_0a", ins8250_uart_device, rx_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(aristmk5_state::aristmk5_usa, aristmk5)
+MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa)
+	aristmk5(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aristmk5_usa_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(aristmk5_state::aristmk5_usa_touch, aristmk5_usa)
+MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa_touch)
+	aristmk5_usa(config);
 	MCFG_DEVICE_MODIFY("uart_0a")
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 

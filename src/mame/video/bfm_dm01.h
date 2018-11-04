@@ -35,6 +35,7 @@ public:
 	void writedata(uint8_t data);
 	int busy(void);
 
+	void bfm_dm01_memmap(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

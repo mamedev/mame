@@ -160,7 +160,7 @@ PALETTE_INIT_MEMBER(sega315_5378_device, sega315_5378)
 
 
 // default address map
-static ADDRESS_MAP_START( sega315_5124, 0, 8, sega315_5124_device )
+ADDRESS_MAP_START(sega315_5124_device::sega315_5124)
 	AM_RANGE(0x0000, VRAM_SIZE-1) AM_RAM
 ADDRESS_MAP_END
 
@@ -182,7 +182,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_int_cb(*this)
 	, m_csync_cb(*this)
 	, m_pause_cb(*this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(sega315_5124_device::sega315_5124), this))
 	, m_palette(*this, "palette")
 {
 }

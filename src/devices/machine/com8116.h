@@ -65,15 +65,17 @@ public:
 	DECLARE_WRITE8_MEMBER( stt_w );
 
 protected:
-	static const int divisors_16X_5_0688MHz[];
-	static const int divisors_16X_6_01835MHz[];
-	static const int divisors_16X_4_9152MHz[];
-	static const int divisors_32X_5_0688MHz[];
-	static const int divisors_16X_2_7648MHz[];
-	static const int divisors_16X_5_0688MHz_030[];
-	static const int divisors_16X_4_6080MHz[];
-	static const int divisors_16X_4_9152MHz_SY2661_1[];
-	static const int divisors_16X_4_9152MHz_SY2661_2[];
+	com8116_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int *divisors);
+
+	static const int divisors_16X_5_0688MHz[16];
+	static const int divisors_16X_6_01835MHz[16];
+	static const int divisors_16X_4_9152MHz[16];
+	static const int divisors_32X_5_0688MHz[16];
+	static const int divisors_16X_2_7648MHz[16];
+	static const int divisors_16X_5_0688MHz_030[16];
+	static const int divisors_16X_4_6080MHz[16];
+	static const int divisors_16X_4_9152MHz_SY2661_1[16];
+	static const int divisors_16X_4_9152MHz_SY2661_2[16];
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -96,8 +98,7 @@ private:
 	int m_fr;
 	int m_ft;
 
-	const int *m_fr_divisors;
-	const int *m_ft_divisors;
+	const int *const m_divisors;
 
 	// timers
 	emu_timer *m_fx4_timer;
@@ -106,7 +107,40 @@ private:
 };
 
 
+// ======================> com8116_003_device
+
+class com8116_003_device : public com8116_device
+{
+public:
+	// construction/destruction
+	com8116_003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// ======================> com5016_5_device
+
+class com5016_5_device : public com8116_device
+{
+public:
+	// construction/destruction
+	com5016_5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// ======================> com5016_013_device
+
+class com5016_013_device : public com8116_device
+{
+public:
+	// construction/destruction
+	com5016_013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(COM8116, com8116_device)
+DECLARE_DEVICE_TYPE(COM8116_003, com8116_003_device)
+DECLARE_DEVICE_TYPE(COM5016_5, com5016_5_device)
+DECLARE_DEVICE_TYPE(COM5016_013, com5016_013_device)
 
 #endif // MAME_MACHINE_COM8116_H

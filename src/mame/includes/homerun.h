@@ -67,4 +67,6 @@ public:
 	void ganjaja(machine_config &config);
 	void dynashot(machine_config &config);
 	void homerun(machine_config &config);
+	void homerun_iomap(address_map &map);
+	void homerun_memmap(address_map &map);
 };

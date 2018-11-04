@@ -69,6 +69,8 @@ public:
 	void psu(machine_config &config);
 	void psj(machine_config &config);
 
+	void psx_map(address_map &map);
+	void subcpu_map(address_map &map);
 private:
 	required_device<psx_parallel_slot_device> m_parallel;
 };
@@ -501,11 +503,11 @@ void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
 
-static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
+ADDRESS_MAP_START(psx1_state::psx_map)
 	AM_RANGE(0x1f000000, 0x1f07ffff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, psx1_state )
+ADDRESS_MAP_START(psx1_state::subcpu_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -553,7 +555,8 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psx1_state::psu, psj)
+MACHINE_CONFIG_START(psx1_state::psu)
+	psj(config);
 	MCFG_CPU_ADD( "subcpu", HD63705, 4166667 ) // MC68HC05G6
 	MCFG_CPU_PROGRAM_MAP( subcpu_map )
 MACHINE_CONFIG_END

@@ -71,6 +71,8 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
 	void pv2000(machine_config &config);
+	void pv2000_io_map(address_map &map);
+	void pv2000_map(address_map &map);
 };
 
 
@@ -176,7 +178,7 @@ WRITE8_MEMBER( pv2000_state::cass_out )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8, pv2000_state )
+ADDRESS_MAP_START(pv2000_state::pv2000_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 
 	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
@@ -188,7 +190,7 @@ static ADDRESS_MAP_START( pv2000_map, AS_PROGRAM, 8, pv2000_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pv2000_io_map, AS_IO, 8, pv2000_state )
+ADDRESS_MAP_START(pv2000_state::pv2000_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	//theres also printer and tape I/O (TODO)

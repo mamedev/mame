@@ -197,7 +197,7 @@ WRITE8_MEMBER(sidepckt_state::i8751_w)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
+ADDRESS_MAP_START(sidepckt_state::sidepckt_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x400) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x400) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
@@ -214,14 +214,14 @@ static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sidepcktb_map, AS_PROGRAM, 8, sidepckt_state )
+ADDRESS_MAP_START(sidepckt_state::sidepcktb_map)
+	AM_IMPORT_FROM( sidepckt_map )
 	AM_RANGE(0x3014, 0x3014) AM_READNOP
 	AM_RANGE(0x3018, 0x3018) AM_WRITENOP
-	AM_IMPORT_FROM( sidepckt_map )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sidepckt_state )
+ADDRESS_MAP_START(sidepckt_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_device, write)
@@ -403,7 +403,8 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sidepckt_state::sidepcktb, sidepckt)
+MACHINE_CONFIG_START(sidepckt_state::sidepcktb)
+	sidepckt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

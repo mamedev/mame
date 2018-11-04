@@ -82,16 +82,16 @@ WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
     d000-dfff   Tiles   ""
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yunsung8_state )
+ADDRESS_MAP_START(yunsung8_state::main_map)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(bankswitch_w)    // ROM Bank (again?)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")    // Banked ROM
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(videoram_r, videoram_w) // Video RAM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8, yunsung8_state )
+ADDRESS_MAP_START(yunsung8_state::port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(videobank_w)  // video RAM bank
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(bankswitch_w) // ROM Bank + Layers Enable
@@ -124,7 +124,7 @@ WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
 
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, yunsung8_state )
+ADDRESS_MAP_START(yunsung8_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")      // Banked ROM
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w) // ROM Bank

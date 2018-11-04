@@ -72,7 +72,7 @@ WRITE8_MEMBER(vigilant_state::kikcubic_coin_w)
 
 
 
-static ADDRESS_MAP_START( vigilant_map, AS_PROGRAM, 8, vigilant_state )
+ADDRESS_MAP_START(vigilant_state::vigilant_map)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_SHARE("spriteram")
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( vigilant_map, AS_PROGRAM, 8, vigilant_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vigilant_io_map, AS_IO, 8, vigilant_state )
+ADDRESS_MAP_START(vigilant_state::vigilant_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("m72", m72_audio_device, sound_command_w)    /* SD */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w)          /* OUT2 */
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( vigilant_io_map, AS_IO, 8, vigilant_state )
 	AM_RANGE(0x84, 0x84) AM_WRITE(vigilant_rear_color_w)        /* RCOD */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kikcubic_map, AS_PROGRAM, 8, vigilant_state )
+ADDRESS_MAP_START(vigilant_state::kikcubic_map)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( kikcubic_map, AS_PROGRAM, 8, vigilant_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kikcubic_io_map, AS_IO, 8, vigilant_state )
+ADDRESS_MAP_START(vigilant_state::kikcubic_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(kikcubic_coin_w) /* also flip screen, and...? */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
@@ -113,12 +113,12 @@ static ADDRESS_MAP_START( kikcubic_io_map, AS_IO, 8, vigilant_state )
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vigilant_state )
+ADDRESS_MAP_START(vigilant_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, vigilant_state )
+ADDRESS_MAP_START(vigilant_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x80, 0x81) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("m72", m72_audio_device, vigilant_sample_addr_w)   /* STL / STH */
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, vigilant_state )
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r) /* S ROM C */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( buccanrs_sound_io_map, AS_IO, 8, vigilant_state )
+ADDRESS_MAP_START(vigilant_state::buccanrs_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym2", ym2203_device, read, write)

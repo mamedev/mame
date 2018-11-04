@@ -217,13 +217,14 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
 	void mt32(machine_config &config);
+	void mt32_io(address_map &map);
+	void mt32_map(address_map &map);
 private:
 	uint8_t lcd_data_buffer[256];
 	int lcd_data_buffer_pos;
 	uint8_t midi;
 	int midi_pos;
 	uint8_t port0;
-	required_device<cpu_device> m_maincpu;
 };
 
 mt32_state::mt32_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -232,8 +233,7 @@ mt32_state::mt32_state(const machine_config &mconfig, device_type type, const ch
 	ram(*this, "ram"),
 	lcd(*this, "lcd"),
 	midi_timer(*this, "midi_timer")
-,
-		m_maincpu(*this, "maincpu") {
+{
 }
 
 
@@ -332,7 +332,7 @@ PALETTE_INIT_MEMBER(mt32_state, mt32)
 	palette.set_pen_color(1, rgb_t(0, 255, 0));
 }
 
-static ADDRESS_MAP_START( mt32_map, AS_PROGRAM, 8, mt32_state )
+ADDRESS_MAP_START(mt32_state::mt32_map)
 	AM_RANGE(0x0100, 0x0100) AM_WRITE(bank_w)
 	AM_RANGE(0x0200, 0x0200) AM_WRITE(so_w)
 	AM_RANGE(0x021a, 0x021a) AM_READ_PORT("SC0")
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( mt32_map, AS_PROGRAM, 8, mt32_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("fixed")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mt32_io, AS_IO, 16, mt32_state )
+ADDRESS_MAP_START(mt32_state::mt32_io)
 	AM_RANGE(i8x9x_device::A7,     i8x9x_device::A7)     AM_READ_PORT("A7")
 	AM_RANGE(i8x9x_device::SERIAL, i8x9x_device::SERIAL) AM_WRITE(midi_w)
 	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)

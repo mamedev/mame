@@ -57,6 +57,7 @@ public:
 	DECLARE_READ32_MEMBER(s3c2440_adc_data_r );
 
 	void mini2440(machine_config &config);
+	void mini2440_map(address_map &map);
 };
 
 inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -206,7 +207,7 @@ void mini2440_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mini2440_map, AS_PROGRAM, 32, mini2440_state )
+ADDRESS_MAP_START(mini2440_state::mini2440_map)
 //  AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x30000000, 0x37ffffff) AM_RAM
 ADDRESS_MAP_END

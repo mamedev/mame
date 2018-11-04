@@ -133,6 +133,8 @@ protected:
 	int m_latchflag;
 
 private:
+	TIMER_CALLBACK_MEMBER(write_soundlatch);
+
 	uint8_t region_selects[6];
 
 	uint8_t m_soundlatch;
@@ -145,7 +147,6 @@ public:
 	deco146_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type DECO146PROT;
 DECLARE_DEVICE_TYPE(DECO146PROT, deco146_device)
 
 #define MCFG_DECO146_ADD(_tag) \

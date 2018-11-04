@@ -51,6 +51,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	void tonton(machine_config &config);
+	void tonton_io(address_map &map);
+	void tonton_map(address_map &map);
 };
 
 #define MAIN_CLOCK      XTAL(21'477'272)
@@ -86,13 +88,13 @@ WRITE8_MEMBER(tonton_state::hopper_w)
 *                  Memory Map                    *
 *************************************************/
 
-static ADDRESS_MAP_START( tonton_map, AS_PROGRAM, 8, tonton_state )
+ADDRESS_MAP_START(tonton_state::tonton_map)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tonton_io, AS_IO, 8, tonton_state )
+ADDRESS_MAP_START(tonton_state::tonton_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x00, 0x00) AM_WRITE(tonton_outport_w)

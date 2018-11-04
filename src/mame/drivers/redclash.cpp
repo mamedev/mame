@@ -90,7 +90,7 @@ WRITE8_MEMBER(redclash_state::sraider_misc_w)
 	}
 }
 
-static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8, redclash_state )
+ADDRESS_MAP_START(redclash_state::sraider_cpu1_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_SHARE("spriteram")
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8, redclash_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sraider_cpu2_map, AS_PROGRAM, 8, redclash_state )
+ADDRESS_MAP_START(redclash_state::sraider_cpu2_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(sraider_sound_low_r)
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( sraider_cpu2_map, AS_PROGRAM, 8, redclash_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sraider_cpu2_io_map, AS_IO, 8, redclash_state )
+ADDRESS_MAP_START(redclash_state::sraider_cpu2_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76489_device, write)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("sn2", sn76489_device, write)
@@ -134,7 +134,7 @@ WRITE8_MEMBER( redclash_state::irqack_w )
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8, redclash_state )
+ADDRESS_MAP_START(redclash_state::zerohour_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("spriteram")
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8, redclash_state )
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8, redclash_state )
+ADDRESS_MAP_START(redclash_state::redclash_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP

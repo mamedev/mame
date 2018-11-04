@@ -29,7 +29,7 @@ TODO:
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 
-static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state ) // 6507 has 13-bit address space, 0x0000 - 0x1fff
+ADDRESS_MAP_START(a2600_state::a2600_mem) // 6507 has 13-bit address space, 0x0000 - 0x1fff
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
 #if USE_NEW_RIOT
@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 
-	MCFG_FRAGMENT_ADD(a2600_cartslot)
+	a2600_cartslot(config);
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
 MACHINE_CONFIG_END
 
@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 
-	MCFG_FRAGMENT_ADD(a2600_cartslot)
+	a2600_cartslot(config);
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
 MACHINE_CONFIG_END
 

@@ -68,6 +68,7 @@ public:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void iqunlim(machine_config &config);
+	void iqunlim_mem(address_map &map);
 };
 
 uint32_t iqunlim_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -75,7 +76,7 @@ uint32_t iqunlim_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-static ADDRESS_MAP_START(iqunlim_mem, AS_PROGRAM, 16, iqunlim_state)
+ADDRESS_MAP_START(iqunlim_state::iqunlim_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1FFFFF) AM_ROM
 ADDRESS_MAP_END

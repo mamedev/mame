@@ -332,11 +332,11 @@ void ssv_state::machine_reset()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dsp_prg_map, AS_PROGRAM, 32, ssv_state )
+ADDRESS_MAP_START(ssv_state::dsp_prg_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("dspprg", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::dsp_data_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 
@@ -427,7 +427,8 @@ READ16_MEMBER(ssv_state::drifto94_unknown_r)
 	return machine().rand() & 0xffff;
 }
 
-static ADDRESS_MAP_START( drifto94_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::drifto94_map)
+	SSV_MAP( 0xc00000 )
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY                                       // ?
 	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
@@ -437,7 +438,6 @@ static ADDRESS_MAP_START( drifto94_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x510000, 0x510001) AM_READ(drifto94_unknown_r)                       // ??
 	AM_RANGE(0x520000, 0x520001) AM_READ(drifto94_unknown_r)                       // ??
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_SHARE("nvram")   // NVRAM
-	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
 
@@ -477,7 +477,8 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 }
 
 
-static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::gdfs_map)
+	SSV_MAP( 0xc00000 )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_SHARE("gdfs_tmapram")
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM
 	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_SHARE("gdfs_tmapscroll")
@@ -487,7 +488,6 @@ static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, sprram_r, sprram_w );
 	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE( "st0020_spr", st0020_device, regs_r,   regs_w   );
 	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, gfxram_r, gfxram_w );
-	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
 
@@ -515,7 +515,8 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( hypreact_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::hypreact_map)
+	SSV_MAP( 0xf00000 )
 	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                      // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)            // Inverted lockout lines
@@ -523,7 +524,6 @@ static ADDRESS_MAP_START( hypreact_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(hypreact_input_r)              // Inputs
 	AM_RANGE(0xc00006, 0xc00007) AM_RAM AM_SHARE("input_sel")           //
 	AM_RANGE(0xc00008, 0xc00009) AM_NOP                                 //
-	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
 
@@ -531,7 +531,8 @@ ADDRESS_MAP_END
                                 Hyper Reaction 2
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hypreac2_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::hypreac2_map)
+	SSV_MAP( 0xe00000 )
 	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                // Inverted lockout lines
@@ -540,7 +541,6 @@ static ADDRESS_MAP_START( hypreac2_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x500002, 0x500003) AM_READ(hypreact_input_r)                  // (again?)
 	AM_RANGE(0x520000, 0x520001) AM_WRITEONLY AM_SHARE("input_sel") // Inputs
 //  0x540000, 0x540003  communication with other units
-	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
 
 
@@ -550,13 +550,13 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( janjans1_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::janjans1_map)
+	SSV_MAP( 0xc00000 )
 	AM_RANGE(0x210000, 0x210001) AM_WRITENOP                            // koikois2 but not janjans1
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	AM_RANGE(0x210006, 0x210007) AM_READNOP
 	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_SHARE("input_sel") // Inputs
 	AM_RANGE(0x800002, 0x800003) AM_READ(srmp4_input_r)                     // Inputs
-	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
 
@@ -564,12 +564,12 @@ ADDRESS_MAP_END
                                 Keith & Lucy
 ***************************************************************************/
 
-static ADDRESS_MAP_START( keithlcy_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::keithlcy_map)
+	SSV_MAP( 0xe00000 )
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP  // ? 1 at the start
 	AM_RANGE(0x210010, 0x210011) AM_WRITENOP    //
 	AM_RANGE(0x21000e, 0x21000f) AM_READNOP //
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY   // ?
-	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
 
 
@@ -577,13 +577,13 @@ ADDRESS_MAP_END
                                 Meosis Magic
 ***************************************************************************/
 
-static ADDRESS_MAP_START( meosism_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::meosism_map)
+	SSV_MAP( 0xf00000 )
 	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 5 at the start
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                                       // ? read once, value not used
 //  AM_RANGE(0x500004, 0x500005) AM_WRITENOP                                      // ? 0,58,18
 	AM_RANGE(0x580000, 0x58ffff) AM_RAM AM_SHARE("nvram")   // NVRAM
-	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -602,12 +602,12 @@ WRITE16_MEMBER(ssv_state::mainram_w)
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
-static ADDRESS_MAP_START( mslider_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::mslider_map)
+	SSV_MAP( 0xf00000 )
 	AM_RANGE(0x010000, 0x01ffff) AM_READWRITE(mainram_r, mainram_w) // RAM Mirror
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY                           // ?
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP                          // ? ff at the start
-	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
 
@@ -615,10 +615,10 @@ ADDRESS_MAP_END
                     Gourmet Battle Quiz Ryohrioh CooKing
 ***************************************************************************/
 
-static ADDRESS_MAP_START( ryorioh_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::ryorioh_map)
+	SSV_MAP( 0xc00000 )
 	AM_RANGE(0x210000, 0x210001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 1 at the start
-	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
 
@@ -638,13 +638,13 @@ READ16_MEMBER(ssv_state::srmp4_input_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( srmp4_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::srmp4_map)
+	SSV_MAP( 0xf00000 )
 	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1,5 at the start
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ(srmp4_input_r)                     // Inputs
 	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITEONLY AM_SHARE("input_sel") // Inputs
 	AM_RANGE(0xc00010, 0xc00011) AM_WRITENOP                            //
-	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
 
@@ -685,7 +685,8 @@ READ16_MEMBER(ssv_state::srmp7_input_r)
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::srmp7_map)
+	SSV_MAP( 0xc00000 )
 	AM_RANGE(0x010000, 0x050faf) AM_RAM                                     // More RAM
 	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 0,4 at the start
@@ -695,7 +696,6 @@ static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x580000, 0x580001) AM_WRITE(srmp7_sound_bank_w)               // Sound Bank
 	AM_RANGE(0x600000, 0x600001) AM_READ(srmp7_input_r)                     // Inputs
 	AM_RANGE(0x680000, 0x680001) AM_WRITEONLY AM_SHARE("input_sel") // Inputs
-	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
 
@@ -703,7 +703,8 @@ ADDRESS_MAP_END
                                 Survival Arts
 ***************************************************************************/
 
-static ADDRESS_MAP_START( survarts_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::survarts_map)
+	SSV_MAP( 0xf00000 )
 	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 0,4 at the start
 //  AM_RANGE(0x290000, 0x290001) AM_READNOP               // ?
@@ -712,7 +713,6 @@ static ADDRESS_MAP_START( survarts_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM                         // dyna
 
 	AM_RANGE(0x500008, 0x500009) AM_READ_PORT("ADD_BUTTONS")    // Extra Buttons
-	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
 
@@ -751,7 +751,8 @@ WRITE16_MEMBER(ssv_state::sxyreact_motor_w)
 //  popmessage("%04X",data);   // 8 = motor on; 0 = motor off
 }
 
-static ADDRESS_MAP_START( sxyreact_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::sxyreact_map)
+	SSV_MAP( 0xe00000 )
 //  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(mainram_r, mainram_w)             // sxyreac2 reads / writes here, why?
 	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
@@ -760,7 +761,6 @@ static ADDRESS_MAP_START( sxyreact_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(sxyreact_dial_r, sxyreact_motor_w)        // Dial Value (serial)
 	AM_RANGE(0x520000, 0x520001) AM_WRITE(sxyreact_dial_w)                              // Dial Value (advance 1 bit)
 	AM_RANGE(0x580000, 0x58ffff) AM_RAM AM_SHARE("nvram")   // NVRAM
-	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
 
 
@@ -770,12 +770,12 @@ ADDRESS_MAP_END
 
 /* comes as either a standalone board or a standard SSV rom board (verified) */
 
-static ADDRESS_MAP_START( twineag2_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::twineag2_map)
+	SSV_MAP( 0xe00000 )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM                         // More RAM
 	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) // Watchdog (also value is cmp.b with mem 8)
 	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
 	AM_RANGE(0x482000, 0x482fff) AM_READWRITE(dsp_r, dsp_w)
-	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
 
 
@@ -785,11 +785,11 @@ ADDRESS_MAP_END
 
 /* standalone board based on SSV hardware */
 
-static ADDRESS_MAP_START( ultrax_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::ultrax_map)
+	SSV_MAP( 0xe00000 )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM                         // More RAM
 	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) // Watchdog (also value is cmp.b with memory address 8)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 2,6 at the start
-	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -828,16 +828,16 @@ WRITE16_MEMBER(ssv_state::latch16_w)
 	machine().scheduler().synchronize();
 }
 
-static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::jsk_map)
+	SSV_MAP( 0xf00000 )
 	AM_RANGE(0x050000, 0x05ffff) AM_READWRITE(mainram_r, mainram_w) // RAM Mirror?
 	AM_RANGE(0x210000, 0x210001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM                                     // RAM?
 	AM_RANGE(0x900000, 0x900007) AM_READWRITE(latch16_r, latch16_w)
-	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jsk_v810_mem, AS_PROGRAM, 32, ssv_state )
+ADDRESS_MAP_START(ssv_state::jsk_v810_mem)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
 	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
@@ -881,7 +881,8 @@ WRITE16_MEMBER(ssv_state::eaglshot_gfxram_w)
 }
 
 
-static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16, ssv_state )
+ADDRESS_MAP_START(ssv_state::eaglshot_map)
+	SSV_MAP( 0xf00000 )
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(eaglshot_gfxram_r, eaglshot_gfxram_w)
 	AM_RANGE(0x210000, 0x210001) AM_READNOP /*AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)*/                 // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
@@ -891,7 +892,6 @@ static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROMBANK("gfxrom")
 	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("nvram")   // NVRAM
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8("upd4701", upd4701_device, d_r, 0x00ff)
-	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
 
@@ -2585,7 +2585,8 @@ MACHINE_CONFIG_START(ssv_state::ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::drifto94, ssv)
+MACHINE_CONFIG_START(ssv_state::drifto94)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2605,7 +2606,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::drifto94, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::gdfs, ssv)
+MACHINE_CONFIG_START(ssv_state::gdfs)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2628,7 +2630,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::gdfs, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::hypreact, ssv)
+MACHINE_CONFIG_START(ssv_state::hypreact)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2642,7 +2645,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::hypreact, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::hypreac2, ssv)
+MACHINE_CONFIG_START(ssv_state::hypreac2)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2656,7 +2660,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::hypreac2, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::janjans1, ssv)
+MACHINE_CONFIG_START(ssv_state::janjans1)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2668,7 +2673,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::janjans1, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::keithlcy, ssv)
+MACHINE_CONFIG_START(ssv_state::keithlcy)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2680,7 +2686,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::keithlcy, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::meosism, ssv)
+MACHINE_CONFIG_START(ssv_state::meosism)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2696,7 +2703,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::meosism, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::mslider, ssv)
+MACHINE_CONFIG_START(ssv_state::mslider)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2708,7 +2716,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::mslider, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::ryorioh, ssv)
+MACHINE_CONFIG_START(ssv_state::ryorioh)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2721,7 +2730,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::ryorioh, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::vasara, ssv)
+MACHINE_CONFIG_START(ssv_state::vasara)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2734,7 +2744,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::vasara, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcc-0x24)*2-1, 0,(0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::srmp4, ssv)
+MACHINE_CONFIG_START(ssv_state::srmp4)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2748,7 +2759,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::srmp4, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::srmp7, ssv)
+MACHINE_CONFIG_START(ssv_state::srmp7)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2762,7 +2774,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::srmp7, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::stmblade, ssv)
+MACHINE_CONFIG_START(ssv_state::stmblade)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2782,7 +2795,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::stmblade, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::survarts, ssv)
+MACHINE_CONFIG_START(ssv_state::survarts)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2796,7 +2810,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::survarts, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::dynagear, survarts)
+MACHINE_CONFIG_START(ssv_state::dynagear)
+	survarts(config);
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -2805,7 +2820,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::dynagear, survarts)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::eaglshot, ssv)
+MACHINE_CONFIG_START(ssv_state::eaglshot)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2829,7 +2845,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::eaglshot, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::sxyreact, ssv)
+MACHINE_CONFIG_START(ssv_state::sxyreact)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2844,7 +2861,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::sxyreact, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::sxyreac2, ssv)
+MACHINE_CONFIG_START(ssv_state::sxyreac2)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2859,7 +2877,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::sxyreac2, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::cairblad, ssv)
+MACHINE_CONFIG_START(ssv_state::cairblad)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2874,7 +2893,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::cairblad, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::twineag2, ssv)
+MACHINE_CONFIG_START(ssv_state::twineag2)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2894,7 +2914,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::twineag2, ssv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(ssv_state::ultrax, ssv)
+MACHINE_CONFIG_START(ssv_state::ultrax)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2907,7 +2928,8 @@ MACHINE_CONFIG_DERIVED(ssv_state::ultrax, ssv)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ssv_state::jsk, ssv)
+MACHINE_CONFIG_START(ssv_state::jsk)
+	ssv(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

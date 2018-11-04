@@ -77,7 +77,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::stamp_timer_callback )
 }
 
 
-static ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, sega_segacd_device )
+ADDRESS_MAP_START(sega_segacd_device::segacd_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("prgram")
 	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_SHARE("dataram")
 	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) //AM_SHARE("dataram2")

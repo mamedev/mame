@@ -605,7 +605,7 @@ READ16_MEMBER(coolpool_state::coolpool_input_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( amerdart_map, AS_PROGRAM, 16, coolpool_state )
+ADDRESS_MAP_START(coolpool_state::amerdart_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("vram_base")
 	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(amerdart_misc_w)
 	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(amerdart_iop_r, amerdart_iop_w)
@@ -615,7 +615,7 @@ static ADDRESS_MAP_START( amerdart_map, AS_PROGRAM, 16, coolpool_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( coolpool_map, AS_PROGRAM, 16, coolpool_state )
+ADDRESS_MAP_START(coolpool_state::coolpool_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram_base")
 	AM_RANGE(0x01000000, 0x010000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)    // IMSG176P-40
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
@@ -627,7 +627,7 @@ static ADDRESS_MAP_START( coolpool_map, AS_PROGRAM, 16, coolpool_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nballsht_map, AS_PROGRAM, 16, coolpool_state )
+ADDRESS_MAP_START(coolpool_state::nballsht_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram_base")
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
@@ -646,13 +646,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( amerdart_dsp_pgm_map, AS_PROGRAM, 16, coolpool_state )
+ADDRESS_MAP_START(coolpool_state::amerdart_dsp_pgm_map)
 	AM_RANGE(0x000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 	/* 000 - 0FF  TMS32015 Internal Data RAM (256 words) in Data Address Space */
 
 
-static ADDRESS_MAP_START( amerdart_dsp_io_map, AS_IO, 16, coolpool_state )
+ADDRESS_MAP_START(coolpool_state::amerdart_dsp_io_map)
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(amerdart_dsp_answer_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dac_word_interface, write)
@@ -664,12 +664,12 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( coolpool_dsp_pgm_map, AS_PROGRAM, 16, coolpool_state )
+ADDRESS_MAP_START(coolpool_state::coolpool_dsp_pgm_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( coolpool_dsp_io_map, AS_IO, 16, coolpool_state )
+ADDRESS_MAP_START(coolpool_state::coolpool_dsp_io_map)
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(dsp_cmd_r, dsp_answer_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dac_word_interface, write)
@@ -854,7 +854,8 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(coolpool_state::_9ballsht, coolpool)
+MACHINE_CONFIG_START(coolpool_state::_9ballsht)
+	coolpool(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nballsht_map)

@@ -226,6 +226,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
 	void vboy(machine_config &config);
+	void vboy_io(address_map &map);
+	void vboy_mem(address_map &map);
 };
 
 
@@ -1092,7 +1094,7 @@ WRITE8_MEMBER( vboy_state::rfb0_w ) { m_r_frame_0[offset] = data; }
 WRITE8_MEMBER( vboy_state::rfb1_w ) { m_r_frame_1[offset] = data; }
 
 
-static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
+ADDRESS_MAP_START(vboy_state::vboy_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
 	AM_RANGE( 0x00000000, 0x00005fff ) AM_READWRITE8(lfb0_r, lfb0_w,0xffffffff) // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(font0_r, font0_w, 0xffffffff) // Font 0-511
@@ -1121,7 +1123,7 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 //  AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
+ADDRESS_MAP_START(vboy_state::vboy_io)
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
 	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_SHARE("l_frame_0") // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(font0_r, font0_w, 0xffffffff) // Font 0-511

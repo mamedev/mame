@@ -380,7 +380,7 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, captaven_state )
+ADDRESS_MAP_START(captaven_state::captaven_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100007) AM_READ(_71_r)
 	AM_RANGE(0x100000, 0x100003) AM_WRITE(buffer_spriteram_w)
@@ -409,7 +409,7 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, captaven_state )
 	AM_RANGE(0x1e4000, 0x1e5fff) AM_RAM_WRITE(pf4_rowscroll_w) AM_SHARE("pf4_rowscroll32") // unused
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, fghthist_state )
+ADDRESS_MAP_START(fghthist_state::fghthist_map)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(pf1_data_w) // wtf??
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
@@ -441,7 +441,7 @@ static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, fghthist_state )
 	AM_RANGE(0x208800, 0x208803) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32, fghthist_state )
+ADDRESS_MAP_START(fghthist_state::fghthsta_memmap)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x140000, 0x140003) AM_WRITE(vblank_ack_w)
@@ -468,7 +468,7 @@ ADDRESS_MAP_END
 
 // the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
 // raster effects appear to need some work on it anyway?
-static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
+ADDRESS_MAP_START(dragngun_state::dragngun_map)
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM
 	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x0120000, 0x0127fff) AM_READWRITE16(ioprot_r, ioprot_w, 0x0000ffff)
@@ -515,12 +515,12 @@ static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x1400000, 0x1ffffff) AM_ROM AM_REGION("dvi", 0x00000) // reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are                                                                 // as a result it ends up writing what looks like pointers to the frame data in the ram area above
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lockloadu_map, AS_PROGRAM, 32, dragngun_state )
+ADDRESS_MAP_START(dragngun_state::lockloadu_map)
 	AM_IMPORT_FROM(dragngun_map)
 	AM_RANGE(0x0170000, 0x0170007) AM_READ(lockload_gun_mirror_r) /* Not on Dragongun */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
+ADDRESS_MAP_START(dragngun_state::lockload_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120000, 0x127fff) AM_READWRITE16(ioprot_r, ioprot_w, 0x0000ffff)
@@ -555,7 +555,7 @@ static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x500000, 0x500003) AM_WRITE(sprite_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, nslasher_state )
+ADDRESS_MAP_START(nslasher_state::tattass_map)
 	AM_RANGE(0x000000, 0x0f7fff) AM_ROM
 	AM_RANGE(0x0f8000, 0x0fffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
@@ -594,7 +594,7 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, nslasher_state )
 	AM_RANGE(0x200000, 0x207fff) AM_READ16(nslasher_debug_r, 0x0000ffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, nslasher_state )
+ADDRESS_MAP_START(nslasher_state::nslasher_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120000, 0x1200ff) AM_NOP                         /* ACIA (unused) */
@@ -632,7 +632,7 @@ static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, nslasher_state )
 ADDRESS_MAP_END
 
 // H6280 based sound
-static ADDRESS_MAP_START( h6280_sound_map, AS_PROGRAM, 8, deco32_state )
+ADDRESS_MAP_START(deco32_state::h6280_sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
@@ -643,13 +643,13 @@ static ADDRESS_MAP_START( h6280_sound_map, AS_PROGRAM, 8, deco32_state )
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( h6280_sound_custom_latch_map, AS_PROGRAM, 8, deco32_state )
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+ADDRESS_MAP_START(deco32_state::h6280_sound_custom_latch_map)
 	AM_IMPORT_FROM(h6280_sound_map)
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 // Z80 based sound
-static ADDRESS_MAP_START( z80_sound_mem, AS_PROGRAM, 8, deco32_state )
+ADDRESS_MAP_START(deco32_state::z80_sound_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -658,7 +658,7 @@ static ADDRESS_MAP_START( z80_sound_mem, AS_PROGRAM, 8, deco32_state )
 	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_sound_io, AS_IO, 8, deco32_state )
+ADDRESS_MAP_START(deco32_state::z80_sound_io)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 
@@ -2021,7 +2021,8 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 MACHINE_CONFIG_END
 
 // DE-0395-1
-MACHINE_CONFIG_DERIVED(fghthist_state::fghthsta, fghthist)
+MACHINE_CONFIG_START(fghthist_state::fghthsta)
+	fghthist(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fghthsta_memmap)
 
@@ -2035,7 +2036,8 @@ MACHINE_CONFIG_DERIVED(fghthist_state::fghthsta, fghthist)
 MACHINE_CONFIG_END
 
 // DE-0396-0
-MACHINE_CONFIG_DERIVED(fghthist_state::fghthistu, fghthsta)
+MACHINE_CONFIG_START(fghthist_state::fghthistu)
+	fghthsta(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'220'000) / 9)
@@ -2159,7 +2161,8 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_gun_changed)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dragngun_state::lockloadu, dragngun)
+MACHINE_CONFIG_START(dragngun_state::lockloadu)
+	dragngun(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(lockloadu_map)
 
@@ -2446,7 +2449,8 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 MACHINE_CONFIG_END
 
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
-MACHINE_CONFIG_DERIVED(nslasher_state::nslasheru, nslasher)
+MACHINE_CONFIG_START(nslasher_state::nslasheru)
+	nslasher(config);
 	MCFG_CPU_REPLACE("audiocpu", H6280, 32220000/8)
 	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
 

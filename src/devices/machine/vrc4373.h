@@ -38,7 +38,7 @@ public:
 	void set_ram_size(const int size) { m_ram_size = size; };
 	void set_simm0_size(const int size) { m_simm0_size = size; };
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 
 	DECLARE_READ32_MEMBER(  pcictrl_r);
 	DECLARE_WRITE32_MEMBER( pcictrl_w);
@@ -55,11 +55,11 @@ public:
 	DECLARE_READ32_MEMBER (master_io_r);
 	DECLARE_WRITE32_MEMBER(master_io_w);
 
-	virtual DECLARE_ADDRESS_MAP(target1_map, 32);
+	virtual void target1_map(address_map &map);
 	DECLARE_READ32_MEMBER (target1_r);
 	DECLARE_WRITE32_MEMBER(target1_w);
 
-	virtual DECLARE_ADDRESS_MAP(target2_map, 32);
+	virtual void target2_map(address_map &map);
 	DECLARE_READ32_MEMBER (target2_r);
 	DECLARE_WRITE32_MEMBER(target2_w);
 
@@ -80,7 +80,7 @@ private:
 		AS_PCI_IO = 2
 	};
 
-	DECLARE_ADDRESS_MAP(cpu_map, 32);
+	void cpu_map(address_map &map);
 
 	void map_cpu_space();
 

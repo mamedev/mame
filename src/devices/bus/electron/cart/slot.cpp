@@ -267,18 +267,28 @@ void electron_cartslot_device::write(address_space &space, offs_t offset, uint8_
 //-------------------------------------------------
 
 #include "abr.h"
-//#include "ap34.h"
+#include "ap34.h"
+#include "aqr.h"
 #include "click.h"
-//#include "cumana.h"
+#include "cumana.h"
 #include "peg400.h"
+#include "sndexp.h"
+#include "sndexp3.h"
+#include "sp64.h"
+#include "stlefs.h"
 #include "std.h"
 
 
 SLOT_INTERFACE_START(electron_cart)
 	SLOT_INTERFACE_INTERNAL("std", ELECTRON_STDCART)
 	SLOT_INTERFACE_INTERNAL("abr", ELECTRON_ABR)
-	//SLOT_INTERFACE_INTERNAL("ap34", ELECTRON_AP34)
+	SLOT_INTERFACE_INTERNAL("ap34", ELECTRON_AP34)
+	SLOT_INTERFACE_INTERNAL("aqr", ELECTRON_AQR)
 	SLOT_INTERFACE_INTERNAL("click", ELECTRON_CLICK)
-	//SLOT_INTERFACE_INTERNAL("cumana", ELECTRON_CUMANA)
+	SLOT_INTERFACE_INTERNAL("cumana", ELECTRON_CUMANA)
 	SLOT_INTERFACE_INTERNAL("peg400", ELECTRON_PEG400)
+	SLOT_INTERFACE_INTERNAL("sndexp", ELECTRON_SNDEXP)
+	SLOT_INTERFACE_INTERNAL("sndexp3", ELECTRON_SNDEXP3)
+	SLOT_INTERFACE_INTERNAL("sp64", ELECTRON_SP64)
+	SLOT_INTERFACE_INTERNAL("stlefs", ELECTRON_STLEFS)
 SLOT_INTERFACE_END

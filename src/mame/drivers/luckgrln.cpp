@@ -81,6 +81,7 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "machine/msm6242.h"
 #include "video/mc6845.h"
 #include "screen.h"
 #include "speaker.h"
@@ -147,7 +148,6 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_offset_low_w);
 	DECLARE_WRITE8_MEMBER(palette_offset_high_w);
 	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(rtc_r);
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
@@ -165,6 +165,11 @@ public:
 	required_device<palette_device> m_palette;
 	void _7smash(machine_config &config);
 	void luckgrln(machine_config &config);
+	void _7smash_io(address_map &map);
+	void _7smash_map(address_map &map);
+	void common_portmap(address_map &map);
+	void luckgrln_io(address_map &map);
+	void mainmap(address_map &map);
 };
 
 
@@ -394,7 +399,7 @@ uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, luckgrln_state )
+ADDRESS_MAP_START(luckgrln_state::mainmap)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("rom_data",0x10000)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("rom_data",0x00000)
@@ -429,9 +434,9 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, luckgrln_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( _7smash_map, AS_PROGRAM, 8, luckgrln_state )
-	AM_RANGE(0x00000, 0x0bfff) AM_ROM
+ADDRESS_MAP_START(luckgrln_state::_7smash_map)
 	AM_IMPORT_FROM( mainmap )
+	AM_RANGE(0x00000, 0x0bfff) AM_ROM
 	AM_RANGE(0x10000, 0x2ffff) AM_UNMAP
 	AM_RANGE(0xf0000, 0xfffff) AM_UNMAP
 ADDRESS_MAP_END
@@ -481,33 +486,6 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 
 	m_palette_count++;
 
-}
-
-// Oki M62X428 is a 4-bit RTC, doesn't seem to be millennium bug proof ...
-READ8_MEMBER(luckgrln_state::rtc_r)
-{
-	system_time systime;
-	machine().base_datetime(systime);
-
-	switch(offset)
-	{
-		case 0x00: return (systime.local_time.second % 10);
-		case 0x01: return (systime.local_time.second / 10);
-		case 0x02: return (systime.local_time.minute % 10);
-		case 0x03: return (systime.local_time.minute / 10);
-		case 0x04: return (systime.local_time.hour % 10);
-		case 0x05: return (systime.local_time.hour / 10);
-		case 0x06: return (systime.local_time.mday % 10);
-		case 0x07: return (systime.local_time.mday / 10);
-		case 0x08: return ((systime.local_time.month+1) % 10);
-		case 0x09: return ((systime.local_time.month+1) / 10);
-		case 0x0a: return (systime.local_time.year%10);
-		case 0x0b: return ((systime.local_time.year%100)/10);
-
-		case 0x0d: return 0xff; // bit 1: reset switch for the RTC?
-	}
-
-	return 0;
 }
 
 /* Analizing the lamps, the game should has a 12-buttons control layout */
@@ -575,12 +553,10 @@ WRITE8_MEMBER(luckgrln_state::counters_w)
 
 
 /* are some of these reads / writes mirrored? there seem to be far too many */
-static ADDRESS_MAP_START( portmap, AS_IO, 8, luckgrln_state )
+ADDRESS_MAP_START(luckgrln_state::common_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
 	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
-
-	AM_RANGE(0x0090, 0x009f) AM_READ(rtc_r) //AM_WRITENOP
 
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(palette_offset_low_w)
 	AM_RANGE(0x00a1, 0x00a1) AM_WRITE(palette_offset_high_w)
@@ -629,15 +605,20 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8, luckgrln_state )
 
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START(luckgrln_state::luckgrln_io)
+	AM_IMPORT_FROM( common_portmap )
+	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+ADDRESS_MAP_END
+
 /* reads a bit 1 status there after every round played */
 READ8_MEMBER(luckgrln_state::test_r)
 {
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( _7smash_io, AS_IO, 8, luckgrln_state )
+ADDRESS_MAP_START(luckgrln_state::_7smash_io)
+	AM_IMPORT_FROM( common_portmap )
 	AM_RANGE(0x66, 0x66) AM_READ(test_r)
-	AM_IMPORT_FROM( portmap )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( luckgrln )
@@ -991,12 +972,14 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	MCFG_CPU_ADD("maincpu", Z180,8000000)
 	MCFG_CPU_PROGRAM_MAP(mainmap)
-	MCFG_CPU_IO_MAP(portmap)
+	MCFG_CPU_IO_MAP(luckgrln_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", luckgrln_state,  luckgrln_irq)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 6000000/4) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+
+	MCFG_DEVICE_ADD("rtc", MSM6242, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1013,10 +996,13 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(luckgrln_state::_7smash, luckgrln)
+MACHINE_CONFIG_START(luckgrln_state::_7smash)
+	luckgrln(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(_7smash_map)
 	MCFG_CPU_IO_MAP(_7smash_io)
+
+	MCFG_DEVICE_REMOVE("rtc")
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)

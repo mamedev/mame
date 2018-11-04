@@ -235,7 +235,7 @@ WRITE_LINE_MEMBER(trackfld_state::irq_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
+ADDRESS_MAP_START(trackfld_state::main_map)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)       /* AFE */
 	AM_RANGE(0x1080, 0x1087) AM_MIRROR(0x0078) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)  /* 32 */
@@ -280,7 +280,7 @@ WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
 }
 
 
-static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
+ADDRESS_MAP_START(trackfld_state::yieartf_map)
 	AM_RANGE(0x0000, 0x0000) AM_READ(trackfld_speech_r) AM_WRITE(konami_SN76496_latch_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(konami_SN76496_w)
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(trackfld_VLM5030_control_w)
@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8, trackfld_state )
+ADDRESS_MAP_START(trackfld_state::reaktor_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	/* all usual addresses +0x8000 */
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8, trackfld_state )
 ADDRESS_MAP_END
 
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
-static ADDRESS_MAP_START( reaktor_io_map, AS_IO, 8, trackfld_state )
+ADDRESS_MAP_START(trackfld_state::reaktor_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_NOP
@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( reaktor_io_map, AS_IO, 8, trackfld_state )
 	AM_RANGE(0x03, 0x03) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8, trackfld_state )
+ADDRESS_MAP_START(trackfld_state::mastkin_map)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x10b0, 0x10b7) AM_READNOP AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x1100, 0x1100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -361,7 +361,7 @@ static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
+ADDRESS_MAP_START(trackfld_state::wizzquiz_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
 	AM_RANGE(0x1080, 0x1087) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
@@ -393,7 +393,7 @@ READ8_MEMBER(trackfld_state::trackfld_SN76496_r)
 	return 0xff; // ?
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, trackfld_state )
+ADDRESS_MAP_START(trackfld_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -407,7 +407,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )
+ADDRESS_MAP_START(trackfld_state::hyprolyb_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vlm_map, 0, 8, trackfld_state )
+ADDRESS_MAP_START(trackfld_state::vlm_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
@@ -953,7 +953,8 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trackfld_state::trackfldu, trackfld)
+MACHINE_CONFIG_START(trackfld_state::trackfldu)
+	trackfld(config);
 	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state, vblank_irq)
@@ -1029,7 +1030,7 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8, hyprolyb_adpcm_device )
+ADDRESS_MAP_START(trackfld_state::hyprolyb_adpcm_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, data_r)
 	AM_RANGE(0x1001, 0x1001) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, ready_r)
@@ -1053,7 +1054,8 @@ ADDRESS_MAP_END
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */
-MACHINE_CONFIG_DERIVED(trackfld_state::hyprolyb, trackfld)
+MACHINE_CONFIG_START(trackfld_state::hyprolyb)
+	trackfld(config);
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_sound_map)
@@ -1076,13 +1078,15 @@ MACHINE_CONFIG_DERIVED(trackfld_state::hyprolyb, trackfld)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trackfld_state::atlantol, hyprolyb)
+MACHINE_CONFIG_START(trackfld_state::atlantol)
+	hyprolyb(config);
 
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,atlantol)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(trackfld_state::mastkin, trackfld)
+MACHINE_CONFIG_START(trackfld_state::mastkin)
+	trackfld(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
@@ -1094,7 +1098,8 @@ MACHINE_CONFIG_DERIVED(trackfld_state::mastkin, trackfld)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // actually not used
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trackfld_state::wizzquiz, trackfld)
+MACHINE_CONFIG_START(trackfld_state::wizzquiz)
+	trackfld(config);
 
 	/* basic machine hardware */
 	// right cpu?
@@ -1106,7 +1111,8 @@ MACHINE_CONFIG_DERIVED(trackfld_state::wizzquiz, trackfld)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(trackfld_state::reaktor, trackfld)
+MACHINE_CONFIG_START(trackfld_state::reaktor)
+	trackfld(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)

@@ -161,7 +161,6 @@ protected:
 
 
 // device type definition
-extern const device_type VIC20_EXPANSION_SLOT;
 DECLARE_DEVICE_TYPE(VIC20_EXPANSION_SLOT, vic20_expansion_slot_device)
 
 

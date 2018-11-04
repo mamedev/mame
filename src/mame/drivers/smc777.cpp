@@ -101,6 +101,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 	void smc777(machine_config &config);
+	void smc777_io(address_map &map);
+	void smc777_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -606,12 +608,12 @@ WRITE8_MEMBER(smc777_state::irq_mask_w)
 	m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( smc777_mem, AS_PROGRAM, 8, smc777_state )
+ADDRESS_MAP_START(smc777_state::smc777_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_mem_r, smc777_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smc777_io, AS_IO, 8, smc777_state )
+ADDRESS_MAP_START(smc777_state::smc777_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0x08, 0x0f) AM_SELECT(0xff00) AM_READWRITE(attr_r, attr_w)

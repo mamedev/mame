@@ -106,11 +106,11 @@ WRITE8_MEMBER(hng64_state::hng64_comm_mmu_w)
 	}
 }
 
-static ADDRESS_MAP_START( hng_comm_map, AS_PROGRAM, 8, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_comm_map)
 	AM_RANGE(0x0000,0xffff) AM_READWRITE(hng64_comm_space_r, hng64_comm_space_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hng_comm_io_map, AS_IO, 8, hng64_state )
+ADDRESS_MAP_START(hng64_state::hng_comm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* Reserved for the KL5C80 internal hardware */
 	AM_RANGE(0x00, 0x07) AM_READWRITE(hng64_comm_mmu_r,hng64_comm_mmu_w )

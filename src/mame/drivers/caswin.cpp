@@ -102,6 +102,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void vvillage(machine_config &config);
+	void vvillage_io(address_map &map);
+	void vvillage_mem(address_map &map);
 };
 
 
@@ -189,7 +191,7 @@ WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 	output().set_led_value(4, data & 0x10);
 }
 
-static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8, caswin_state )
+ADDRESS_MAP_START(caswin_state::vvillage_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ(vvillage_rng_r) //accessed by caswin only
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
@@ -197,7 +199,7 @@ static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8, caswin_state )
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_SHARE("sc0_attr")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vvillage_io, AS_IO, 8, caswin_state )
+ADDRESS_MAP_START(caswin_state::vvillage_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)

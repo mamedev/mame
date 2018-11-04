@@ -132,4 +132,6 @@ public:
 	void ssprint(machine_config &config);
 	void _720(machine_config &config);
 	void csprint(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

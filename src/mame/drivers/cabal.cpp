@@ -102,7 +102,7 @@ WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
+ADDRESS_MAP_START(cabal_state::main_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
 	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_SHARE("spriteram")
@@ -116,23 +116,23 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
 	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
+	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( trackball_main_map, AS_PROGRAM, 16, cabal_state )
+ADDRESS_MAP_START(cabal_state::trackball_main_map)
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0xa0008, 0xa000f) AM_DEVREAD8("upd4701l", upd4701_device, read_xy, 0x00ff)
 	AM_RANGE(0xa0008, 0xa000f) AM_DEVREAD8("upd4701h", upd4701_device, read_xy, 0xff00)
 	AM_RANGE(0xc0000, 0xc0001) AM_DEVWRITE8("upd4701l", upd4701_device, reset_xy, 0x00ff)
 	AM_RANGE(0xc0000, 0xc0001) AM_DEVWRITE8("upd4701h", upd4701_device, reset_xy, 0xff00)
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
+ADDRESS_MAP_START(cabal_state::cabalbl_main_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
 	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_SHARE("spriteram")
@@ -172,7 +172,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_coin_w)
 	//data & 0x40? video enable?
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
+ADDRESS_MAP_START(cabal_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
@@ -191,12 +191,12 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, cabal_state )
+ADDRESS_MAP_START(cabal_state::sound_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_sound_map, AS_PROGRAM, 8, cabal_state )
+ADDRESS_MAP_START(cabal_state::cabalbl_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( cabalbl_sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl2_sound_map, AS_PROGRAM, 8, cabal_state )
+ADDRESS_MAP_START(cabal_state::cabalbl2_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( cabalbl2_sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl2_predecrypted_opcodes_map, AS_OPCODES, 8, cabal_state )
+ADDRESS_MAP_START(cabal_state::cabalbl2_predecrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiocpu", 0x2000)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
@@ -253,21 +253,21 @@ WRITE8_MEMBER(cabal_state::cabalbl_2_adpcm_w)
 	m_msm2->vclk_w(1);
 	m_msm2->vclk_w(0);
 }
-static ADDRESS_MAP_START( cabalbl_talk1_map, AS_PROGRAM, 8, cabal_state )
+ADDRESS_MAP_START(cabal_state::cabalbl_talk1_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_talk1_portmap, AS_IO, 8, cabal_state )
+ADDRESS_MAP_START(cabal_state::cabalbl_talk1_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_WRITE(cabalbl_1_adpcm_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_talk2_map, AS_PROGRAM, 8, cabal_state )
+ADDRESS_MAP_START(cabal_state::cabalbl_talk2_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_talk2_portmap, AS_IO, 8, cabal_state )
+ADDRESS_MAP_START(cabal_state::cabalbl_talk2_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch3", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_WRITE(cabalbl_2_adpcm_w)
@@ -498,7 +498,7 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")
@@ -535,7 +535,8 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cabal_state::cabalt, cabal)
+MACHINE_CONFIG_START(cabal_state::cabalt)
+	cabal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trackball_main_map)
 
@@ -548,12 +549,13 @@ MACHINE_CONFIG_DERIVED(cabal_state::cabalt, cabal)
 	MCFG_UPD4701_PORTY("IN3")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(cabal_state::cabalbl2, cabal)
+MACHINE_CONFIG_START(cabal_state::cabalbl2)
+	cabal(config);
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(cabalbl2_sound_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(cabalbl2_predecrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(cabalbl2_predecrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 

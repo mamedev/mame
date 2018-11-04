@@ -217,7 +217,7 @@ WRITE8_MEMBER(route16_state::speakres_out2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( route16_cpu1_map, AS_PROGRAM, 8, route16_state )
+ADDRESS_MAP_START(route16_state::route16_cpu1_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3001) AM_READ(route16_prot_read)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( route16_cpu1_map, AS_PROGRAM, 8, route16_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( routex_cpu1_map, AS_PROGRAM, 8, route16_state )
+ADDRESS_MAP_START(route16_state::routex_cpu1_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( routex_cpu1_map, AS_PROGRAM, 8, route16_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stratvox_cpu1_map, AS_PROGRAM, 8, route16_state )
+ADDRESS_MAP_START(route16_state::stratvox_cpu1_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( stratvox_cpu1_map, AS_PROGRAM, 8, route16_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( speakres_cpu1_map, AS_PROGRAM, 8, route16_state )
+ADDRESS_MAP_START(route16_state::speakres_cpu1_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( speakres_cpu1_map, AS_PROGRAM, 8, route16_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ttmahjng_cpu1_map, AS_PROGRAM, 8, route16_state )
+ADDRESS_MAP_START(route16_state::ttmahjng_cpu1_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
@@ -272,14 +272,14 @@ static ADDRESS_MAP_START( ttmahjng_cpu1_map, AS_PROGRAM, 8, route16_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( route16_cpu2_map, AS_PROGRAM, 8, route16_state )
+ADDRESS_MAP_START(route16_state::route16_cpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<false>) AM_SHARE("sharedram")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stratvox_cpu2_map, AS_PROGRAM, 8, route16_state )
+ADDRESS_MAP_START(route16_state::stratvox_cpu2_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( stratvox_cpu2_map, AS_PROGRAM, 8, route16_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8, route16_state )
+ADDRESS_MAP_START(route16_state::cpu1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
 	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x00ff) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x00ff) AM_DEVWRITE("ay8910", ay8910_device, address_w)
@@ -631,7 +631,8 @@ MACHINE_CONFIG_START(route16_state::route16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::routex, route16)
+MACHINE_CONFIG_START(route16_state::routex)
+	route16(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -639,7 +640,8 @@ MACHINE_CONFIG_DERIVED(route16_state::routex, route16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::stratvox, route16)
+MACHINE_CONFIG_START(route16_state::stratvox)
+	route16(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -679,7 +681,8 @@ MACHINE_CONFIG_DERIVED(route16_state::stratvox, route16)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::speakres, stratvox)
+MACHINE_CONFIG_START(route16_state::speakres)
+	stratvox(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -689,7 +692,8 @@ MACHINE_CONFIG_DERIVED(route16_state::speakres, stratvox)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::spacecho, speakres)
+MACHINE_CONFIG_START(route16_state::spacecho)
+	speakres(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -697,10 +701,11 @@ MACHINE_CONFIG_DERIVED(route16_state::spacecho, speakres)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(route16_state::ttmahjng, route16)
+MACHINE_CONFIG_START(route16_state::ttmahjng)
+	route16(config);
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
-	MCFG_CPU_IO_MAP(0)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_MACHINE_START_OVERRIDE(route16_state, ttmahjng)
 

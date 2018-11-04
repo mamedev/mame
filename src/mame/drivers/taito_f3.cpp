@@ -186,7 +186,7 @@ WRITE16_MEMBER(taito_f3_state::f3_unk_w)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
+ADDRESS_MAP_START(taito_f3_state::f3_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bubsympb_map, AS_PROGRAM, 32, taito_f3_state )
+ADDRESS_MAP_START(taito_f3_state::bubsympb_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
@@ -493,30 +493,35 @@ MACHINE_CONFIG_END
  of the games change the registers during the game (to do so would probably require
  monitor recalibration.)
 */
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224a, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_224a)
+	f3(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224b, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_224b)
+	f3(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224c, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_224c)
+	f3(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
 MACHINE_CONFIG_END
 
 /* recalh and gseeker need a default EEPROM to work */
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_eeprom, f3)
+MACHINE_CONFIG_START(taito_f3_state::f3_eeprom)
+	f3(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224b_eeprom, f3_224b)
+MACHINE_CONFIG_START(taito_f3_state::f3_224b_eeprom)
+	f3_224b(config);
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -3403,6 +3408,9 @@ ROM_START( kirameki )
 	ROM_REGION16_BE(0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )    // V2: 4 banks
 	ROM_LOAD16_BYTE("e44-07.38", 0x000000, 0x400000, CRC(a9e28544) SHA1(0dc3e1755a93fda310d26ed5f95dd211c05e579e) ) // D2 C8 C8 C9 CA CB CC CD
 	ROM_LOAD16_BYTE("e44-08.39", 0x800000, 0x400000, CRC(33ba3037) SHA1(b4bbc4198929938607c444edf159ff40f53235d7) ) // CE CF D0 -- -- -- -std-
+
+	ROM_REGION( 0x0117, "plds", 0 )
+	ROM_LOAD( "d77-20.37",   0x0000, 0x0117, CRC(6bfbec07) SHA1(5dce4f2e9fc13273cd50b67f1d9a0d90128e7397) ) // PALCE16V8
 ROM_END
 
 ROM_START( puchicar )

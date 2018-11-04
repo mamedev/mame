@@ -133,6 +133,10 @@ public:
 	DECLARE_PALETTE_INIT(imolagp);
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void imolagp(machine_config &config);
+	void imolagp_master_io(address_map &map);
+	void imolagp_master_map(address_map &map);
+	void imolagp_slave_io(address_map &map);
+	void imolagp_slave_map(address_map &map);
 };
 
 
@@ -325,7 +329,7 @@ READ8_MEMBER(imolagp_state::imola_draw_mode_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( imolagp_master_map, AS_PROGRAM, 8, imolagp_state )
+ADDRESS_MAP_START(imolagp_state::imolagp_master_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -341,20 +345,20 @@ static ADDRESS_MAP_START( imolagp_master_map, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSWB")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( imolagp_master_io, AS_IO, 8, imolagp_state )
+ADDRESS_MAP_START(imolagp_state::imolagp_master_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(trigger_slave_nmi_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( imolagp_slave_map, AS_PROGRAM, 8, imolagp_state )
+ADDRESS_MAP_START(imolagp_state::imolagp_slave_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x9fff, 0xa000) AM_READ(receive_data_r)
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(screenram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( imolagp_slave_io, AS_IO, 8, imolagp_state )
+ADDRESS_MAP_START(imolagp_state::imolagp_slave_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0xff) AM_READ(imola_draw_mode_r)
 ADDRESS_MAP_END

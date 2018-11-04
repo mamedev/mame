@@ -82,6 +82,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
 	void eacc(machine_config &config);
+	void eacc_mem(address_map &map);
 private:
 	uint8_t m_digit;
 };
@@ -93,7 +94,7 @@ private:
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(eacc_mem, AS_PROGRAM, 8, eacc_state)
+ADDRESS_MAP_START(eacc_state::eacc_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xc7ff) // A11,A12,A13 not connected
 	AM_RANGE(0x0000, 0x001f) AM_RAM AM_SHARE("nvram") // inside cpu, battery-backed

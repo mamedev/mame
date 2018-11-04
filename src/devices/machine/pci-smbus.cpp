@@ -5,7 +5,7 @@
 
 DEFINE_DEVICE_TYPE(SMBUS, smbus_device, "smbus", "SMBus interface")
 
-DEVICE_ADDRESS_MAP_START(map, 32, smbus_device)
+ADDRESS_MAP_START(smbus_device::map)
 	AM_RANGE(0x00, 0x03) AM_READWRITE8 (hst_sts_r,        hst_sts_w,        0x000000ff)
 	AM_RANGE(0x00, 0x03) AM_READWRITE8 (hst_cnt_r,        hst_cnt_w,        0x00ff0000)
 	AM_RANGE(0x00, 0x03) AM_READWRITE8 (hst_cmd_r,        hst_cmd_w,        0xff000000)

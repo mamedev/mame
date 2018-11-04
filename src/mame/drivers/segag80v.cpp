@@ -373,7 +373,7 @@ WRITE8_MEMBER(segag80v_state::unknown_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80v_state )
+ADDRESS_MAP_START(segag80v_state::main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM     /* CPU board ROM */
 	AM_RANGE(0x0800, 0xbfff) AM_ROM     /* PROM board ROM area */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
@@ -382,7 +382,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80v_state )
+ADDRESS_MAP_START(segag80v_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xbc, 0xbc) /* AM_READ ??? */
 	AM_RANGE(0xbd, 0xbe) AM_WRITE(multiply_w)
@@ -894,7 +894,8 @@ MACHINE_CONFIG_START(segag80v_state::g80v_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::elim2, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::elim2)
+	g80v_base(config);
 
 	/* custom sound board */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -904,7 +905,8 @@ MACHINE_CONFIG_DERIVED(segag80v_state::elim2, g80v_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::spacfury, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::spacfury)
+	g80v_base(config);
 
 	/* custom sound board */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -913,11 +915,12 @@ MACHINE_CONFIG_DERIVED(segag80v_state::spacfury, g80v_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
 	/* speech board */
-	MCFG_FRAGMENT_ADD(sega_speech_board)
+	sega_speech_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::zektor, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::zektor)
+	g80v_base(config);
 
 	/* custom sound board */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -929,21 +932,23 @@ MACHINE_CONFIG_DERIVED(segag80v_state::zektor, g80v_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
 
 	/* speech board */
-	MCFG_FRAGMENT_ADD(sega_speech_board)
+	sega_speech_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::tacscan, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::tacscan)
+	g80v_base(config);
 
 	/* universal sound board */
 	MCFG_SEGAUSB_ADD("usbsnd")
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(segag80v_state::startrek, g80v_base)
+MACHINE_CONFIG_START(segag80v_state::startrek)
+	g80v_base(config);
 
 	/* speech board */
-	MCFG_FRAGMENT_ADD(sega_speech_board)
+	sega_speech_board(config);
 
 	/* universal sound board */
 	MCFG_SEGAUSB_ADD("usbsnd")

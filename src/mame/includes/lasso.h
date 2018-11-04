@@ -89,4 +89,14 @@ public:
 	void lasso(machine_config &config);
 	void chameleo(machine_config &config);
 	void pinbo(machine_config &config);
+	void chameleo_audio_map(address_map &map);
+	void chameleo_main_map(address_map &map);
+	void lasso_audio_map(address_map &map);
+	void lasso_coprocessor_map(address_map &map);
+	void lasso_main_map(address_map &map);
+	void pinbo_audio_io_map(address_map &map);
+	void pinbo_audio_map(address_map &map);
+	void pinbo_main_map(address_map &map);
+	void wwjgtin_audio_map(address_map &map);
+	void wwjgtin_main_map(address_map &map);
 };

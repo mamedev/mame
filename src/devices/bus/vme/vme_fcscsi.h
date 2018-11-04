@@ -19,18 +19,6 @@ class vme_fcscsi1_card_device :
 public:
 	vme_fcscsi1_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER (bootvect_r);
-	DECLARE_READ8_MEMBER (tcr_r);
-	DECLARE_WRITE8_MEMBER (tcr_w);
-	DECLARE_WRITE8_MEMBER (led_w);
-
-	/* Dummy driver routines */
-	DECLARE_READ8_MEMBER(not_implemented_r);
-	DECLARE_WRITE8_MEMBER(not_implemented_w);
-
-	DECLARE_READ8_MEMBER(scsi_r);
-	DECLARE_WRITE8_MEMBER(scsi_w);
-
 protected:
 	vme_fcscsi1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -59,6 +47,20 @@ private:
 	DECLARE_READ8_MEMBER(fdc_read_byte);
 	DECLARE_WRITE8_MEMBER(fdc_write_byte);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_READ16_MEMBER (bootvect_r);
+	DECLARE_READ8_MEMBER (tcr_r);
+	DECLARE_WRITE8_MEMBER (tcr_w);
+	DECLARE_WRITE8_MEMBER (led_w);
+
+	/* Dummy driver routines */
+	DECLARE_READ8_MEMBER(not_implemented_r);
+	DECLARE_WRITE8_MEMBER(not_implemented_w);
+
+	DECLARE_READ8_MEMBER(scsi_r);
+	DECLARE_WRITE8_MEMBER(scsi_w);
+
+	void fcscsi1_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;

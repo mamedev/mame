@@ -29,6 +29,7 @@ public:
 	DECLARE_READ16_MEMBER( es5510_dsp_r );
 	DECLARE_WRITE16_MEMBER( es5510_dsp_w );
 
+	void en_sound_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

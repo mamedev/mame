@@ -213,6 +213,10 @@ public:
 	void atomboy(machine_config &config);
 	void m63(machine_config &config);
 	void fghtbskt(machine_config &config);
+	void fghtbskt_map(address_map &map);
+	void i8039_map(address_map &map);
+	void i8039_port_map(address_map &map);
+	void m63_map(address_map &map);
 };
 
 
@@ -468,7 +472,7 @@ WRITE_LINE_MEMBER(m63_state::nmi_mask_w)
 }
 
 
-static ADDRESS_MAP_START( m63_map, AS_PROGRAM, 8, m63_state )
+ADDRESS_MAP_START(m63_state::m63_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
@@ -485,7 +489,7 @@ static ADDRESS_MAP_START( m63_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fghtbskt_map, AS_PROGRAM, 8, m63_state )
+ADDRESS_MAP_START(m63_state::fghtbskt_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -502,16 +506,16 @@ static ADDRESS_MAP_START( fghtbskt_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(snd_irq_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP
 	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(fghtbskt_samples_w) // FIXME
 	AM_RANGE(0xf800, 0xf807) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE(fghtbskt_samples_w) // FIXME
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_map, AS_PROGRAM, 8, m63_state )
+ADDRESS_MAP_START(m63_state::i8039_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( i8039_port_map, AS_IO, 8, m63_state )
+ADDRESS_MAP_START(m63_state::i8039_port_map)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(snddata_r, snddata_w)
 ADDRESS_MAP_END
 
@@ -796,7 +800,8 @@ MACHINE_CONFIG_START(m63_state::m63)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(m63_state::atomboy, m63)
+MACHINE_CONFIG_START(m63_state::atomboy)
+	m63(config);
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 MACHINE_CONFIG_END

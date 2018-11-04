@@ -641,8 +641,8 @@ WRITE_LINE_MEMBER( thomson_state::to7_modem_tx_w )
 
 WRITE_LINE_MEMBER( thomson_state::write_acia_clock )
 {
-	m_acia6850->write_txc(state);
-	m_acia6850->write_rxc(state);
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
 }
 
 void thomson_state::to7_modem_reset()

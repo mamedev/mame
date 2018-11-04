@@ -110,11 +110,11 @@
 // Frequency of beeper
 #define IOC_BEEP_FREQ   3300
 
-static ADDRESS_MAP_START(ipc_mem_map , AS_PROGRAM , 8 , imds2_state)
+ADDRESS_MAP_START(imds2_state::ipc_mem_map)
 	AM_RANGE(0x0000 , 0xffff) AM_READWRITE(ipc_mem_read, ipc_mem_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ipc_io_map , AS_IO , 8 , imds2_state)
+ADDRESS_MAP_START(imds2_state::ipc_io_map)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0xc0 , 0xc0) AM_READWRITE(imds2_ipc_dbbout_r , imds2_ipc_dbbin_data_w)
 	AM_RANGE(0xc1 , 0xc1) AM_READWRITE(imds2_ipc_status_r , imds2_ipc_dbbin_cmd_w)
@@ -129,13 +129,13 @@ static ADDRESS_MAP_START(ipc_io_map , AS_IO , 8 , imds2_state)
 	AM_RANGE(0xff , 0xff) AM_WRITE(imds2_ipc_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ioc_mem_map , AS_PROGRAM , 8 , imds2_state)
+ADDRESS_MAP_START(imds2_state::ioc_mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000 , 0x1fff) AM_ROM
 	AM_RANGE(0x4000 , 0x5fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ioc_io_map , AS_IO , 8 , imds2_state)
+ADDRESS_MAP_START(imds2_state::ioc_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00 , 0x0f) AM_WRITE(imds2_ioc_dbbout_w)
 	AM_RANGE(0x20 , 0x2f) AM_WRITE(imds2_ioc_f0_w)

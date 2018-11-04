@@ -231,6 +231,7 @@ public:
 	required_device<dcs_audio_2k_device> m_dcs;
 
 	void kinst(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -447,7 +448,7 @@ WRITE32_MEMBER(kinst_state::control_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, kinst_state )
+ADDRESS_MAP_START(kinst_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_SHARE("rambase2")

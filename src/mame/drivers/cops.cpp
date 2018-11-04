@@ -70,6 +70,8 @@ public:
 
 	void revlatns(machine_config &config);
 	void cops(machine_config &config);
+	void cops_map(address_map &map);
+	void revlatns_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -800,7 +802,7 @@ WRITE_LINE_MEMBER(cops_state::via2_irq)
  *
  *************************************/
 
-static ADDRESS_MAP_START( cops_map, AS_PROGRAM, 8, cops_state )
+ADDRESS_MAP_START(cops_state::cops_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x9fff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0xa000, 0xafff) AM_READWRITE(io1_r, io1_w)
@@ -812,7 +814,7 @@ static ADDRESS_MAP_START( cops_map, AS_PROGRAM, 8, cops_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("sysbank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( revlatns_map, AS_PROGRAM, 8, cops_state )
+ADDRESS_MAP_START(cops_state::revlatns_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x9fff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0xa000, 0xafff) AM_READWRITE(io1_lm_r, io1_w)

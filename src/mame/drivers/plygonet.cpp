@@ -413,7 +413,7 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank04_write)
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
+ADDRESS_MAP_START(polygonet_state::main_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16("k053936", k053936_device, ctrl_r, ctrl_w, 0xffffffff)
@@ -437,13 +437,13 @@ ADDRESS_MAP_END
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( dsp_program_map, AS_PROGRAM, 16, polygonet_state )
+ADDRESS_MAP_START(polygonet_state::dsp_program_map)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("dsp56k_p_mirror") /* Unsure of size, but 0x1000 matches bank01 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("dsp56k_p_8000")
 	AM_RANGE(0xc000, 0xc000) AM_READ(dsp56k_bootload_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16, polygonet_state )
+ADDRESS_MAP_START(polygonet_state::dsp_data_map)
 	AM_RANGE(0x0800, 0x5fff) AM_RAM      /* Appears to not be affected by banking? */
 	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
 	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)  /* Mirrored in program space @ 0x7000 */
@@ -472,7 +472,7 @@ WRITE8_MEMBER(polygonet_state::sound_ctrl_w)
 
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )
+ADDRESS_MAP_START(polygonet_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

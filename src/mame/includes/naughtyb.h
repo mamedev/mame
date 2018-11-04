@@ -57,4 +57,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void popflame(machine_config &config);
 	void naughtyb(machine_config &config);
+	void naughtyb_map(address_map &map);
+	void popflame_map(address_map &map);
 };

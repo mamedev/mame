@@ -191,6 +191,16 @@ public:
 	void tc2048(machine_config &config);
 	void spectrum_plus3(machine_config &config);
 	void spectrum_128(machine_config &config);
+	void spectrum_128_io(address_map &map);
+	void spectrum_128_mem(address_map &map);
+	void spectrum_io(address_map &map);
+	void spectrum_mem(address_map &map);
+	void spectrum_plus3_io(address_map &map);
+	void spectrum_plus3_mem(address_map &map);
+	void tc2048_io(address_map &map);
+	void tc2048_mem(address_map &map);
+	void ts2068_io(address_map &map);
+	void ts2068_mem(address_map &map);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;

@@ -193,6 +193,16 @@ public:
 	void maxidbl(machine_config &config);
 	void dualgame(machine_config &config);
 	void bankroba(machine_config &config);
+	void bankrob_map(address_map &map);
+	void bankroba_map(address_map &map);
+	void cjffruit_map(address_map &map);
+	void deucesw2_map(address_map &map);
+	void dualgame_map(address_map &map);
+	void hermit_map(address_map &map);
+	void ilpag_map(address_map &map);
+	void maxidbl_map(address_map &map);
+	void ramdac_map(address_map &map);
+	void steaser_map(address_map &map);
 };
 
 /*************************************************************************************************************
@@ -610,7 +620,7 @@ WRITE16_MEMBER(blitz68k_state::sound_write_w)
 }
 #endif
 
-static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::ilpag_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blitter", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
@@ -637,7 +647,7 @@ static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16, blitz68k_state )
 //  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::steaser_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blitter", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
@@ -707,7 +717,7 @@ WRITE8_MEMBER(blitz68k_state::bankrob_mcu2_w)
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::bankrob_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
@@ -792,7 +802,7 @@ WRITE8_MEMBER(blitz68k_state::bankroba_mcu2_w)
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::bankroba_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -935,7 +945,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_mcu_w)
 	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
 
-static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::cjffruit_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x480000, 0x4807ff) AM_RAM
@@ -1034,7 +1044,7 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
 	}
 }
 
-static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::deucesw2_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
@@ -1108,7 +1118,7 @@ WRITE8_MEMBER(blitz68k_state::dualgame_mcu2_w)
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::dualgame_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
@@ -1210,7 +1220,7 @@ READ16_MEMBER(blitz68k_state::hermit_track_r)
 		((0xf - ((ioport("TRACK_X")->read() + 0x7) & 0xf)) << 8)  ;
 }
 
-static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::hermit_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
@@ -1284,7 +1294,7 @@ WRITE8_MEMBER(blitz68k_state::maxidbl_mcu2_w)
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::maxidbl_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -1679,7 +1689,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED(blitz68k_state::crtc_addr)
 {
 }
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, blitz68k_state )
+ADDRESS_MAP_START(blitz68k_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -1742,7 +1752,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
 }
 
 
-MACHINE_CONFIG_DERIVED(blitz68k_state::steaser, ilpag)
+MACHINE_CONFIG_START(blitz68k_state::steaser)
+	ilpag(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(steaser_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?

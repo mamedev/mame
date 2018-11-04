@@ -77,4 +77,5 @@ public:
 	inline void bitmode_autoinc(  );
 	inline void schedule_next_irq(int curscanline);
 	void cloud9(machine_config &config);
+	void cloud9_map(address_map &map);
 };

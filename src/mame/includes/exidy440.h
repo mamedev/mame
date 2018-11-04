@@ -96,4 +96,6 @@ public:
 	void exidy440_audio(machine_config &config);
 	void topsecex(machine_config &config);
 	void topsecex_video(machine_config &config);
+	void exidy440_map(address_map &map);
+	void exidy440_audio_map(address_map &map);
 };

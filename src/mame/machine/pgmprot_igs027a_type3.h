@@ -58,6 +58,8 @@ public:
 	DECLARE_READ32_MEMBER( svgpcb_speedup_r );
 	DECLARE_MACHINE_RESET(pgm_arm_type3_reset);
 	void pgm_arm_type3(machine_config &config);
+	void _55857G_arm7_map(address_map &map);
+	void svg_68k_mem(address_map &map);
 };
 
 INPUT_PORTS_EXTERN(theglad);

@@ -191,6 +191,11 @@ public:
 	DECLARE_READ8_MEMBER( pending_command_r );
 	void pipedrm(machine_config &config);
 	void hatris(machine_config &config);
+	void hatris_sound_portmap(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };
 
 
@@ -247,7 +252,7 @@ READ8_MEMBER(pipedrm_state::pending_command_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pipedrm_state )
+ADDRESS_MAP_START(pipedrm_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
@@ -256,7 +261,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pipedrm_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8, pipedrm_state )
+ADDRESS_MAP_START(pipedrm_state::main_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("gga", vsystem_gga_device, write)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
@@ -276,14 +281,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, pipedrm_state )
+ADDRESS_MAP_START(pipedrm_state::sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, pipedrm_state )
+ADDRESS_MAP_START(pipedrm_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x16, 0x16) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -292,7 +297,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, pipedrm_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hatris_sound_portmap, AS_IO, 8, pipedrm_state )
+ADDRESS_MAP_START(pipedrm_state::hatris_sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x08) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

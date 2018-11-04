@@ -229,7 +229,7 @@ READ32_MEMBER(psikyo_state::s1945_mcu_r)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::psikyo_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                     // ROM (not all used)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")       // Sprites, buffered by two frames (list buffered + fb buffered)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")    // Palette
@@ -270,12 +270,12 @@ WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
 		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n", data & 0x000000ff, mem_mask);
 }
 
-static ADDRESS_MAP_START( s1945bl_oki_map, 0, 8, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::s1945bl_oki_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::psikyo_bootleg_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                     // ROM (not all used)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("boot_spritebuf")              // RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
 
@@ -308,10 +308,10 @@ READ32_MEMBER(psikyo_state::sngkace_input_r)
 	}
 }
 
-static ADDRESS_MAP_START( sngkace_map, AS_PROGRAM, 32, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::sngkace_map)
+	AM_IMPORT_FROM(psikyo_map)
 	AM_RANGE(0xc00000, 0xc0000b) AM_READ(sngkace_input_r)
 	AM_RANGE(0xc00010, 0xc00013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff)
-	AM_IMPORT_FROM(psikyo_map)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(psikyo_state::sngkace_sound_bankswitch_w)
@@ -319,13 +319,13 @@ WRITE8_MEMBER(psikyo_state::sngkace_sound_bankswitch_w)
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-static ADDRESS_MAP_START( sngkace_sound_map, AS_PROGRAM, 8, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::sngkace_sound_map)
 	AM_RANGE(0x0000, 0x77ff) AM_ROM                         // ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM                         // RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")                    // Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sngkace_sound_io_map, AS_IO, 8, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::sngkace_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sngkace_sound_bankswitch_w)
@@ -349,16 +349,16 @@ READ32_MEMBER(psikyo_state::gunbird_input_r)
 	}
 }
 
-static ADDRESS_MAP_START( gunbird_map, AS_PROGRAM, 32, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::gunbird_map)
+	AM_IMPORT_FROM(psikyo_map)
 	AM_RANGE(0xc00000, 0xc0000b) AM_READ(gunbird_input_r)
 	AM_RANGE(0xc00010, 0xc00013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff)
-	AM_IMPORT_FROM(psikyo_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s1945jn_map, AS_PROGRAM, 32, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::s1945jn_map)
+	AM_IMPORT_FROM(psikyo_map)
 	AM_RANGE(0xc00000, 0xc0000b) AM_READ(gunbird_input_r)
 	AM_RANGE(0xc00010, 0xc00013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff0000)
-	AM_IMPORT_FROM(psikyo_map)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(psikyo_state::gunbird_sound_bankswitch_w)
@@ -366,13 +366,13 @@ WRITE8_MEMBER(psikyo_state::gunbird_sound_bankswitch_w)
 	membank("bank1")->set_entry((data >> 4) & 0x03);
 }
 
-static ADDRESS_MAP_START( gunbird_sound_map, AS_PROGRAM, 8, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::gunbird_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                         // ROM
 	AM_RANGE(0x8000, 0x81ff) AM_RAM                         // RAM
 	AM_RANGE(0x8200, 0xffff) AM_ROMBANK("bank1")                    // Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gunbird_sound_io_map, AS_IO, 8, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::gunbird_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
@@ -396,14 +396,14 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 	}
 }
 
-static ADDRESS_MAP_START( s1945_map, AS_PROGRAM, 32, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::s1945_map)
+	AM_IMPORT_FROM(psikyo_map)
 	AM_RANGE(0xc00000, 0xc0000b) AM_READ(s1945_input_r) // input ports
 	AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w) // protection and tile bank switching
 	AM_RANGE(0xc00010, 0xc00013) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff0000)
-	AM_IMPORT_FROM(psikyo_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s1945_sound_io_map, AS_IO, 8, psikyo_state )
+ADDRESS_MAP_START(psikyo_state::s1945_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITENOP
@@ -1086,7 +1086,8 @@ MACHINE_CONFIG_START(psikyo_state::gunbird)
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(psikyo_state::s1945jn, gunbird)
+MACHINE_CONFIG_START(psikyo_state::s1945jn)
+	gunbird(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(s1945jn_map)
 MACHINE_CONFIG_END

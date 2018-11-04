@@ -79,6 +79,8 @@ public:
 
 	void z1013k76(machine_config &config);
 	void z1013(machine_config &config);
+	void z1013_io(address_map &map);
+	void z1013_mem(address_map &map);
 private:
 	uint8_t m_keyboard_line;
 	bool m_keyboard_part;
@@ -91,13 +93,13 @@ private:
 
 
 /* Address maps */
-static ADDRESS_MAP_START(z1013_mem, AS_PROGRAM, 8, z1013_state)
+ADDRESS_MAP_START(z1013_state::z1013_mem)
 	AM_RANGE( 0x0000, 0xebff ) AM_RAM
 	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z1013_io, AS_IO, 8, z1013_state)
+ADDRESS_MAP_START(z1013_state::z1013_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE( 0x08, 0x08 ) AM_WRITE(z1013_keyboard_w)
@@ -398,7 +400,8 @@ MACHINE_CONFIG_START(z1013_state::z1013)
 	MCFG_SNAPSHOT_ADD("snapshot", z1013_state, z1013, "z80", 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(z1013_state::z1013k76, z1013)
+MACHINE_CONFIG_START(z1013_state::z1013k76)
+	z1013(config);
 	MCFG_DEVICE_REMOVE("z80pio")
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
 	MCFG_Z80PIO_IN_PB_CB(READ8(z1013_state, k7659_port_b_r))

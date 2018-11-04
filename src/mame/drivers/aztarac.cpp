@@ -78,7 +78,7 @@ READ16_MEMBER(aztarac_state::joystick_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aztarac_state )
+ADDRESS_MAP_START(aztarac_state::main_map)
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM
 	AM_RANGE(0x022000, 0x0220ff) AM_READ(nvram_r) AM_WRITEONLY AM_SHARE("nvram")
 	AM_RANGE(0x027000, 0x027001) AM_READ(joystick_r)
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, aztarac_state )
+ADDRESS_MAP_START(aztarac_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READ(snd_command_r)

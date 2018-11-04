@@ -132,7 +132,7 @@ WRITE8_MEMBER( tdv2324_state::tdv2324_main_io_e2 )
 //  ADDRESS_MAP( tdv2324_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tdv2324_mem, AS_PROGRAM, 8, tdv2324_state )
+ADDRESS_MAP_START(tdv2324_state::tdv2324_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION(P8085AH_0_TAG, 0)
 	/* when copying code to 4000 area it runs right off the end of rom;
 	 * I'm not sure if its supposed to mirror or read as open bus */
@@ -146,7 +146,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tdv2324_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tdv2324_io, AS_IO, 8, tdv2324_state )
+ADDRESS_MAP_START(tdv2324_state::tdv2324_io)
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* 0x30 is read by main code and if high bit isn't set at some point it will never get anywhere */
 	/* e0, e2, e8, ea are written to */
@@ -164,7 +164,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tdv2324_sub_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tdv2324_sub_mem, AS_PROGRAM, 8, tdv2324_state )
+ADDRESS_MAP_START(tdv2324_state::tdv2324_sub_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(P8085AH_1_TAG, 0)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM // EAROM
@@ -176,7 +176,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tdv2324_sub_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tdv2324_sub_io, AS_IO, 8, tdv2324_state )
+ADDRESS_MAP_START(tdv2324_state::tdv2324_sub_io)
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* 20, 23, 30-36, 38, 3a, 3c, 3e, 60, 70 are written to */
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE(P8253_5_1_TAG, pit8253_device, read, write)
@@ -188,7 +188,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( tdv2324_fdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( tdv2324_fdc_mem, AS_PROGRAM, 8, tdv2324_state )
+ADDRESS_MAP_START(tdv2324_state::tdv2324_fdc_mem)
 	// the following two are probably enabled/disabled via the JP2 jumper block next to the fdc cpu
 	//AM_RANGE(0x0000, 0x001f) AM_RAM // on-6802-die ram (optionally battery backed)
 	//AM_RANGE(0x0020, 0x007f) AM_RAM // on-6802-die ram

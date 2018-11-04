@@ -50,16 +50,18 @@ public:
 	DECLARE_MACHINE_RESET(dsb46);
 
 	void dsb46(machine_config &config);
+	void dsb46_io(address_map &map);
+	void dsb46_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( dsb46_mem, AS_PROGRAM, 8, dsb46_state )
+ADDRESS_MAP_START(dsb46_state::dsb46_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("read") AM_WRITE_BANK("write")
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsb46_io, AS_IO, 8, dsb46_state )
+ADDRESS_MAP_START(dsb46_state::dsb46_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)

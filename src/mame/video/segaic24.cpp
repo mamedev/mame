@@ -555,29 +555,6 @@ WRITE16_MEMBER(segas24_tile_device::char_w)
 		gfx(char_gfx_index)->mark_dirty(offset / 16);
 }
 
-READ32_MEMBER(segas24_tile_device::tile32_r)
-{
-	return tile_r(space, offset*2, mem_mask&0xffff) | tile_r(space, (offset*2)+1, mem_mask>>16)<<16;
-}
-
-READ32_MEMBER(segas24_tile_device::char32_r)
-{
-	return char_r(space, offset*2, mem_mask&0xffff) | char_r(space, (offset*2)+1, mem_mask>>16)<<16;
-}
-
-WRITE32_MEMBER(segas24_tile_device::tile32_w)
-{
-	tile_w(space, offset*2, data&0xffff, mem_mask&0xffff);
-	tile_w(space, (offset*2)+1, data>>16, mem_mask>>16);
-}
-
-WRITE32_MEMBER(segas24_tile_device::char32_w)
-{
-	char_w(space, offset*2, data&0xffff, mem_mask&0xffff);
-	char_w(space, (offset*2)+1, data>>16, mem_mask>>16);
-}
-
-
 segas24_sprite_device::segas24_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, S24SPRITE, tag, owner, clock)
 {

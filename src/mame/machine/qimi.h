@@ -70,7 +70,6 @@ private:
 
 
 // device type definition
-extern const device_type QIMI;
 DECLARE_DEVICE_TYPE(QIMI, qimi_device)
 
 

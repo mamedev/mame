@@ -183,6 +183,10 @@ public:
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
 	void mwskins(machine_config &config);
+	void map0(address_map &map);
+	void map1(address_map &map);
+	void map2(address_map &map);
+	void map3(address_map &map);
 };
 
 // Parallel Port
@@ -661,7 +665,7 @@ void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int para
 /*************************************
  *  Address Maps
  *************************************/
-static ADDRESS_MAP_START( map0, AS_PROGRAM, 32, atlantis_state )
+ADDRESS_MAP_START(atlantis_state::map0)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE8(cmos_r, cmos_w, 0xff)
 	//AM_RANGE(0x00080000, 0x000?0000) AM_READWRITE8(zeus debug)
 	AM_RANGE(0x00100000, 0x0010001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART1 (TL16C552 CS0)
@@ -675,7 +679,7 @@ static ADDRESS_MAP_START( map0, AS_PROGRAM, 32, atlantis_state )
 	//AM_RANGE(0x00f00000, 0x00f00003) AM_NOP // Trackball ctrl
 	ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( map1, AS_PROGRAM, 32, atlantis_state )
+ADDRESS_MAP_START(atlantis_state::map1)
 	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(dcs3_fifo_full_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_DEVWRITE("dcs", dcs_audio_device, dsio_idma_addr_w)
@@ -691,11 +695,11 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 32, atlantis_state )
 	//AM_RANGE(0x00c00000, 0x00c00003) // Trackball Pins 16 bits
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(map2, AS_PROGRAM, 32, atlantis_state)
+ADDRESS_MAP_START(atlantis_state::map2)
 	AM_RANGE(0x00000000, 0x000001ff) AM_DEVREADWRITE("zeus2", zeus2_device, zeus2_r, zeus2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( map3, AS_PROGRAM, 32, atlantis_state )
+ADDRESS_MAP_START(atlantis_state::map3)
 	//AM_RANGE(0x000000, 0xffffff) ROMBUS
 ADDRESS_MAP_END
 
@@ -807,10 +811,10 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
 	MCFG_VRC4373_SET_RAM(0x00800000)
 	MCFG_PCI9050_ADD(                 PCI_ID_9050)
-	MCFG_PCI9050_SET_MAP(0, map0)
-	MCFG_PCI9050_SET_MAP(1, map1)
-	MCFG_PCI9050_SET_MAP(2, map2)
-	MCFG_PCI9050_SET_MAP(3, map3)
+	MCFG_PCI9050_SET_MAP(0, atlantis_state::map0)
+	MCFG_PCI9050_SET_MAP(1, atlantis_state::map1)
+	MCFG_PCI9050_SET_MAP(2, atlantis_state::map2)
+	MCFG_PCI9050_SET_MAP(3, atlantis_state::map3)
 	MCFG_PCI9050_USER_OUTPUT_CALLBACK(DEVWRITE32(":", atlantis_state, user_io_output))
 	MCFG_PCI9050_USER_INPUT_CALLBACK(DEVREAD32(":", atlantis_state, user_io_input))
 

@@ -15,7 +15,7 @@ public:
 	wpc_shift_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_shift_device();
 
-	DECLARE_ADDRESS_MAP(registers, 8);
+	void registers(address_map &map);
 
 	DECLARE_READ8_MEMBER(adrh_r);
 	DECLARE_WRITE8_MEMBER(adrh_w);

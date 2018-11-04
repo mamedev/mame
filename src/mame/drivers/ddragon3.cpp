@@ -290,7 +290,7 @@ CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_c0_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16, ddragon3_state )
+ADDRESS_MAP_START(ddragon3_state::ddragon3_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x000004, 0x000007) AM_WRITENOP
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_SHARE("fg_videoram") /* Foreground (32x32 Tiles - 4 by per tile) */
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
+ADDRESS_MAP_START(ddragon3_state::dd3b_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_SHARE("fg_videoram") /* Foreground (32x32 Tiles - 4 by per tile) */
 	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_SHARE("spriteram")
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
+ADDRESS_MAP_START(ddragon3_state::ctribe_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_SHARE("fg_videoram") /* Foreground (32x32 Tiles - 4 by per tile) */
 	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_SHARE("spriteram")
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
+ADDRESS_MAP_START(wwfwfest_state::main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(wwfwfest_fg0_videoram_w) AM_SHARE("fg0_videoram") /* FG0 Ram - 4 bytes per tile */
 	AM_RANGE(0x0c2000, 0x0c3fff) AM_RAM AM_SHARE("spriteram")                       /* SPR Ram */
@@ -368,7 +368,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon3_state )
+ADDRESS_MAP_START(ddragon3_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon3_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ctribe_sound_map, AS_PROGRAM, 8, ddragon3_state )
+ADDRESS_MAP_START(ddragon3_state::ctribe_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ym2151", ym2151_device, status_r, write)
@@ -853,7 +853,8 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ddragon3_state::ddragon3b, ddragon3)
+MACHINE_CONFIG_START(ddragon3_state::ddragon3b)
+	ddragon3(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dd3b_map)
@@ -862,7 +863,8 @@ MACHINE_CONFIG_DERIVED(ddragon3_state::ddragon3b, ddragon3)
 	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ddragon3_state::ctribe, ddragon3)
+MACHINE_CONFIG_START(ddragon3_state::ctribe)
+	ddragon3(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ctribe_map)
@@ -927,7 +929,8 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(wwfwfest_state::wwfwfstb, wwfwfest)
+MACHINE_CONFIG_START(wwfwfest_state::wwfwfstb)
+	wwfwfest(config);
 	MCFG_VIDEO_START_OVERRIDE(wwfwfest_state,wwfwfstb)
 MACHINE_CONFIG_END
 

@@ -38,6 +38,8 @@ public:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	void ipds(machine_config &config);
+	void ipds_io(address_map &map);
+	void ipds_mem(address_map &map);
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )
@@ -61,13 +63,13 @@ WRITE8_MEMBER( ipds_state::ipds_b1_w )
 {
 }
 
-static ADDRESS_MAP_START(ipds_mem, AS_PROGRAM, 8, ipds_state)
+ADDRESS_MAP_START(ipds_state::ipds_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ipds_io, AS_IO, 8, ipds_state)
+ADDRESS_MAP_START(ipds_state::ipds_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xb0, 0xb0) AM_READ(ipds_b0_r)

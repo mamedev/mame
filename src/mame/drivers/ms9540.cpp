@@ -41,6 +41,7 @@ public:
 	void kbd_put(u8 data);
 
 	void ms9540(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -50,7 +51,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, ms9540_state)
+ADDRESS_MAP_START(ms9540_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("rambase")

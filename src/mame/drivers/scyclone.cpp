@@ -89,6 +89,10 @@ public:
 	CUSTOM_INPUT_MEMBER(collision_r);
 
 	void scyclone(machine_config &config);
+	void scyclone_iomap(address_map &map);
+	void scyclone_map(address_map &map);
+	void scyclone_sub_iomap(address_map &map);
+	void scyclone_sub_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -295,7 +299,7 @@ uint32_t scyclone_state::screen_update_scyclone(screen_device &screen, bitmap_rg
 
 
 
-static ADDRESS_MAP_START( scyclone_map, AS_PROGRAM, 8, scyclone_state )
+ADDRESS_MAP_START(scyclone_state::scyclone_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4400, 0x5fff) AM_READWRITE(vram_r,vram_w)
@@ -303,7 +307,7 @@ static ADDRESS_MAP_START( scyclone_map, AS_PROGRAM, 8, scyclone_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scyclone_iomap, AS_IO, 8, scyclone_state )
+ADDRESS_MAP_START(scyclone_state::scyclone_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
@@ -322,7 +326,7 @@ static ADDRESS_MAP_START( scyclone_iomap, AS_IO, 8, scyclone_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scyclone_sub_map, AS_PROGRAM, 8, scyclone_state )
+ADDRESS_MAP_START(scyclone_state::scyclone_sub_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 
@@ -334,7 +338,7 @@ static ADDRESS_MAP_START( scyclone_sub_map, AS_PROGRAM, 8, scyclone_state )
 	AM_RANGE(0x3005, 0x3005) AM_WRITE(snd_3005_w) // written at the same time, with the same data as 0x3001
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scyclone_sub_iomap, AS_IO, 8, scyclone_state )
+ADDRESS_MAP_START(scyclone_state::scyclone_sub_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

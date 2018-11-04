@@ -190,7 +190,7 @@ WRITE8_MEMBER(freekick_state::freekick_ff_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( omega_map, AS_PROGRAM, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::omega_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM // ram is 2x sony cxk5813d-55
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( omega_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::pbillrd_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -225,12 +225,12 @@ static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( freekick_map, AS_PROGRAM, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::freekick_map)
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")    // tilemap
@@ -248,7 +248,7 @@ static ADDRESS_MAP_START( freekick_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gigas_map, AS_PROGRAM, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::gigas_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_SHARE("videoram")
@@ -265,19 +265,19 @@ static ADDRESS_MAP_START( gigas_map, AS_PROGRAM, 8, freekick_state )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76489a_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( omega_io_map, AS_IO, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::omega_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gigas_io_map, AS_IO, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::gigas_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oigas_io_map, AS_IO, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::oigas_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, gigas_spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( oigas_io_map, AS_IO, 8, freekick_state )
 	AM_RANGE(0x05, 0x05) AM_WRITE(oigas_5_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( freekick_io_map, AS_IO, 8, freekick_state )
+ADDRESS_MAP_START(freekick_state::freekick_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(freekick_ff_r, freekick_ff_w)
 ADDRESS_MAP_END
@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_CPU_ADD("maincpu", MC8123, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_CPU_PROGRAM_MAP(omega_map)
 	MCFG_CPU_IO_MAP(omega_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
@@ -795,7 +795,8 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::pbillrd, base)
+MACHINE_CONFIG_START(freekick_state::pbillrd)
+	base(config);
 	MCFG_DEVICE_MODIFY("outlatch") // 10K
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_x_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(freekick_state, flipscreen_y_w))
@@ -805,15 +806,17 @@ MACHINE_CONFIG_DERIVED(freekick_state::pbillrd, base)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::pbillrdm, pbillrd)
+MACHINE_CONFIG_START(freekick_state::pbillrdm)
+	pbillrd(config);
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::freekick, base)
+MACHINE_CONFIG_START(freekick_state::freekick)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -842,13 +845,14 @@ MACHINE_CONFIG_DERIVED(freekick_state::freekick, base)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_freekick)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::gigas, base)
+MACHINE_CONFIG_START(freekick_state::gigas)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gigas_map)
 	MCFG_CPU_IO_MAP(gigas_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
@@ -862,13 +866,14 @@ MACHINE_CONFIG_DERIVED(freekick_state::gigas, base)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::gigasm, base)
+MACHINE_CONFIG_START(freekick_state::gigasm)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(gigas_map)
 	MCFG_CPU_IO_MAP(gigas_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
@@ -884,7 +889,8 @@ MACHINE_CONFIG_DERIVED(freekick_state::gigasm, base)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(freekick_state::oigas, gigas)
+MACHINE_CONFIG_START(freekick_state::oigas)
+	gigas(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

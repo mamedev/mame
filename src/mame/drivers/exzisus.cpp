@@ -100,7 +100,7 @@ DRIVER_INIT_MEMBER(exzisus_state,exzisus)
 
 **************************************************************************/
 
-static ADDRESS_MAP_START( cpua_map, AS_PROGRAM, 8, exzisus_state )
+ADDRESS_MAP_START(exzisus_state::cpua_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpuabank")
 	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram1")
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( cpua_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("sharedram_ab")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 8, exzisus_state )
+ADDRESS_MAP_START(exzisus_state::cpub_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubbank")
 	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram0")
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("sharedram_ab")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpuc_map, AS_PROGRAM, 8, exzisus_state )
+ADDRESS_MAP_START(exzisus_state::cpuc_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_SHARE("objectram1")
 	AM_RANGE(0x8600, 0x9fff) AM_RAM AM_SHARE("videoram1")
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( cpuc_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, exzisus_state )
+ADDRESS_MAP_START(exzisus_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)

@@ -55,6 +55,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
 	void locomotp(machine_config &config);
 	void zac_1(machine_config &config);
+	void locomotp_data(address_map &map);
+	void locomotp_io(address_map &map);
+	void locomotp_map(address_map &map);
+	void zac_1_data(address_map &map);
+	void zac_1_io(address_map &map);
+	void zac_1_map(address_map &map);
 protected:
 
 	// devices
@@ -70,7 +76,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( zac_1_map, AS_PROGRAM, 8, zac_1_state )
+ADDRESS_MAP_START(zac_1_state::zac_1_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x17ff) AM_WRITE(reset_int_w)
@@ -78,11 +84,11 @@ static ADDRESS_MAP_START( zac_1_map, AS_PROGRAM, 8, zac_1_state )
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zac_1_io, AS_IO, 8, zac_1_state )
+ADDRESS_MAP_START(zac_1_state::zac_1_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zac_1_data, AS_DATA, 8, zac_1_state )
+ADDRESS_MAP_START(zac_1_state::zac_1_data)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
 ADDRESS_MAP_END
@@ -266,23 +272,23 @@ MACHINE_CONFIG_START(zac_1_state::zac_1)
 	MCFG_DEFAULT_LAYOUT(layout_zac_1)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 /*************************** LOCOMOTION ********************************/
 
-static ADDRESS_MAP_START( locomotp_map, AS_PROGRAM, 8, zac_1_state )
+ADDRESS_MAP_START(zac_1_state::locomotp_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0x18ff) AM_MIRROR(0x300) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( locomotp_io, AS_IO, 8, zac_1_state)
+ADDRESS_MAP_START(zac_1_state::locomotp_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( locomotp_data, AS_DATA, 8, zac_1_state)
+ADDRESS_MAP_START(zac_1_state::locomotp_data)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(reset_int_r)
 ADDRESS_MAP_END
@@ -293,7 +299,8 @@ READ8_MEMBER( zac_1_state::reset_int_r )
 	return 0;
 }
 
-MACHINE_CONFIG_DERIVED(zac_1_state::locomotp, zac_1)
+MACHINE_CONFIG_START(zac_1_state::locomotp)
+	zac_1(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(locomotp_map)

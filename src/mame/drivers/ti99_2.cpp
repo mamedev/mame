@@ -114,6 +114,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void ti99_2(machine_config &config);
+	void ti99_2_io(address_map &map);
+	void ti99_2_memmap(address_map &map);
 };
 
 
@@ -217,7 +219,7 @@ GFXDECODE_END
   Memory map - see description above
 */
 
-static ADDRESS_MAP_START( ti99_2_memmap, AS_PROGRAM, 8, ti99_2_state )
+ADDRESS_MAP_START(ti99_2_state::ti99_2_memmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM         /* system ROM */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")    /* system ROM, banked on 32kb ROMs protos */
 	AM_RANGE(0x6000, 0xdfff) AM_NOP         /* free for expansion */
@@ -294,7 +296,7 @@ READ8_MEMBER(ti99_2_state::ti99_2_read_misc_cru)
 	return 0;
 }
 
-static ADDRESS_MAP_START(ti99_2_io, AS_IO, 8, ti99_2_state )
+ADDRESS_MAP_START(ti99_2_state::ti99_2_io)
 	AM_RANGE(0x0E00, 0x0E7f) AM_READ(ti99_2_read_kbd)
 	AM_RANGE(0x0E80, 0x0Eff) AM_READ(ti99_2_read_misc_cru)
 	AM_RANGE(0x7000, 0x73ff) AM_WRITE(ti99_2_write_kbd)

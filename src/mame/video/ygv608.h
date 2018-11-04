@@ -21,7 +21,7 @@ public:
 	// construction/destruction
 	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(port_map, 8);
+	void port_map(address_map &map);
 
 	// ports section
 	DECLARE_READ8_MEMBER(pattern_name_table_r);
@@ -97,6 +97,7 @@ public:
 		return downcast<ygv608_device &>(device).m_raster_handler.set_callback(std::forward<Object>(cb));
 	}
 
+	void regs_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

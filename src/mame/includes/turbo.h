@@ -196,4 +196,10 @@ public:
 	void turbo_samples(machine_config &config);
 	void subroc3d_samples(machine_config &config);
 	void buckrog_samples(machine_config &config);
+	void buckrog_cpu2_map(address_map &map);
+	void buckrog_cpu2_portmap(address_map &map);
+	void buckrog_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void subroc3d_map(address_map &map);
+	void turbo_map(address_map &map);
 };

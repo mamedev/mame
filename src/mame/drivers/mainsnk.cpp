@@ -126,7 +126,7 @@ READ8_MEMBER(mainsnk_state::sound_ack_r)
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mainsnk_state )
+ADDRESS_MAP_START(mainsnk_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mainsnk_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")    // + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mainsnk_state )
+ADDRESS_MAP_START(mainsnk_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mainsnk_state )
 	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, mainsnk_state )
+ADDRESS_MAP_START(mainsnk_state::sound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_ack_r)
 ADDRESS_MAP_END

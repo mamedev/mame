@@ -72,6 +72,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void zx8301(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

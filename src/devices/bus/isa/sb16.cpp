@@ -373,7 +373,7 @@ ROM_START( sb16 )
 	ROM_LOAD("ct1741_v413_xor.bin", 0x00, 0x40, CRC(5243d15a) SHA1(c7637c92828843f47e6e2f956af639b07aee4571))
 ROM_END
 
-static ADDRESS_MAP_START(sb16_io, AS_IO, 8, sb16_lle_device)
+ADDRESS_MAP_START(sb16_lle_device::sb16_io)
 	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0xff00) AM_READWRITE(dsp_data_r, dsp_data_w)
 //  AM_RANGE(0x0001, 0x0001) // MIDI related?
 //  AM_RANGE(0x0002, 0x0002)

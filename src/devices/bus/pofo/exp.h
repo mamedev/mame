@@ -153,7 +153,6 @@ protected:
 
 
 // device type definition
-extern const device_type PORTFOLIO_EXPANSION_SLOT;
 DECLARE_DEVICE_TYPE(PORTFOLIO_EXPANSION_SLOT, portfolio_expansion_slot_device)
 
 

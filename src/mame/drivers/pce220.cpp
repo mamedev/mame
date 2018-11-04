@@ -104,6 +104,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
 	void pce220(machine_config &config);
+	void pce220_io(address_map &map);
+	void pce220_mem(address_map &map);
 };
 
 class pcg850v_state : public pce220_state
@@ -129,6 +131,7 @@ public:
 	DECLARE_WRITE8_MEMBER( g850v_lcd_data_w );
 	void pcg850v(machine_config &config);
 	void pcg815(machine_config &config);
+	void pcg850v_io(address_map &map);
 };
 
 uint32_t pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -573,14 +576,14 @@ WRITE8_MEMBER( pcg850v_state::g850v_lcd_data_w )
 }
 
 
-static ADDRESS_MAP_START(pce220_mem, AS_PROGRAM, 8, pce220_state)
+ADDRESS_MAP_START(pce220_state::pce220_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce220_io , AS_IO, 8, pce220_state)
+ADDRESS_MAP_START(pce220_state::pce220_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ(kb_r)
@@ -604,7 +607,7 @@ static ADDRESS_MAP_START( pce220_io , AS_IO, 8, pce220_state)
 	AM_RANGE(0x5b, 0x5b) AM_READ(lcd_data_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcg850v_io , AS_IO, 8, pcg850v_state)
+ADDRESS_MAP_START(pcg850v_state::pcg850v_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ(kb_r)

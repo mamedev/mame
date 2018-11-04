@@ -66,7 +66,7 @@ protected:
 	virtual void irq_setup() override;
 	virtual void internal_update(uint64_t current_time) override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

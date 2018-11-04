@@ -44,6 +44,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 	void instantm(machine_config &config);
+	void main_map(address_map &map);
+	void sub_io(address_map &map);
+	void sub_map(address_map &map);
 private:
 	u8 m_port01;
 	bool m_clock_en;
@@ -77,7 +80,7 @@ WRITE_LINE_MEMBER( instantm_state::clock_w )
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, instantm_state )
+ADDRESS_MAP_START(instantm_state::main_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) //AM_WRITE
@@ -92,12 +95,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, instantm_state )
 ADDRESS_MAP_END
 
 // doesn't use ram
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, instantm_state )
+ADDRESS_MAP_START(instantm_state::sub_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_io, AS_PROGRAM, 8, instantm_state )
+ADDRESS_MAP_START(instantm_state::sub_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(port01_r,port01_w)
 ADDRESS_MAP_END

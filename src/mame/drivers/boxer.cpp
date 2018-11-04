@@ -74,6 +74,7 @@ public:
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void boxer(machine_config &config);
+	void boxer_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -337,7 +338,7 @@ WRITE8_MEMBER(boxer_state::led_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8, boxer_state )
+ADDRESS_MAP_START(boxer_state::boxer_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_SHARE("tile_ram")

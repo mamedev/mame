@@ -25,19 +25,19 @@ device_memory_interface::space_config_vector address_map_bank_device::memory_spa
 	};
 }
 
-DEVICE_ADDRESS_MAP_START(amap8, 8, address_map_bank_device)
+ADDRESS_MAP_START(address_map_bank_device::amap8)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read8, write8)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(amap16, 16, address_map_bank_device)
+ADDRESS_MAP_START(address_map_bank_device::amap16)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read16, write16)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(amap32, 32, address_map_bank_device)
+ADDRESS_MAP_START(address_map_bank_device::amap32)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read32, write32)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(amap64, 64, address_map_bank_device)
+ADDRESS_MAP_START(address_map_bank_device::amap64)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read64, write64)
 ADDRESS_MAP_END
 

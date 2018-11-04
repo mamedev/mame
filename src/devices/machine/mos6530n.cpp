@@ -28,17 +28,17 @@ DEFINE_DEVICE_TYPE(MOS6530_NEW, mos6530_new_device, "mos6530_new", "MOS 6530 (ne
 DEFINE_DEVICE_TYPE(MOS6532_NEW, mos6532_new_device, "mos6532_new", "MOS 6532 (new)")
 
 
-DEVICE_ADDRESS_MAP_START( rom_map, 8, mos6530_new_device )
+ADDRESS_MAP_START(mos6530_new_device::rom_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x000, 0x3ff) AM_READ(rom_r)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( ram_map, 8, mos6530_new_device )
+ADDRESS_MAP_START(mos6530_new_device::ram_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3f)
 	AM_RANGE(0x00, 0x3f) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( io_map, 8, mos6530_new_device )
+ADDRESS_MAP_START(mos6530_new_device::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xf)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x8) AM_READWRITE(pa_data_r, pa_data_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x8) AM_READWRITE(pa_ddr_r, pa_ddr_w)
@@ -51,12 +51,12 @@ DEVICE_ADDRESS_MAP_START( io_map, 8, mos6530_new_device )
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xa) AM_READ(irq_r)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( ram_map, 8, mos6532_new_device )
+ADDRESS_MAP_START(mos6532_new_device::ram_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 	AM_RANGE(0x00, 0x7f) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START( io_map, 8, mos6532_new_device )
+ADDRESS_MAP_START(mos6532_new_device::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(pa_data_r, pa_data_w)  // SWCHA
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(pa_ddr_r, pa_ddr_w)    // SWACNT

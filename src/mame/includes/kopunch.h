@@ -53,4 +53,6 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void kopunch(machine_config &config);
+	void kopunch_io_map(address_map &map);
+	void kopunch_map(address_map &map);
 };

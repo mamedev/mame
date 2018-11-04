@@ -186,7 +186,9 @@ WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
 // where does the clut (sprite_lookup_w) get uploaded? even if I set a WP on that data in ROM it isn't hit?
 // likewise the sound table.. is it being uploaded in a different format at 0x0c000?
 // we also need the palette data because there is only a single rom on this pcb?
-static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
+ADDRESS_MAP_START(_25pacman_state::_25pacman_map)
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", amd_29lv200t_device, read, write )  // (always fall through if nothing else is mapped?)
+
 	AM_RANGE(0x04000, 0x047ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x04800, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x06fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
@@ -197,19 +199,17 @@ static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
 	AM_RANGE(0x0c000, 0x0dfff) AM_WRITENOP // is this the sound waveforms in a different format?
 	AM_RANGE(0x0e000, 0x0ffff) AM_WRITENOP
 	AM_RANGE(0x1c000, 0x1ffff) AM_WRITENOP
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", amd_29lv200t_device, read, write )  // (always fall through if nothing else is mapped?)
-
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
+ADDRESS_MAP_START(_20pacgal_state::_20pacgal_map)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x04000, 0x07fff) AM_ROM
 	AM_RANGE(0x08000, 0x09fff) AM_ROM
 	AM_RANGE(0x0a000, 0x0ffff) AM_MIRROR(0x40000) AM_ROM
 	AM_RANGE(0x10000, 0x3ffff) AM_ROM
 	AM_RANGE(0x44000, 0x447ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", namco_cus30_device, pacman_sound_w)
 	AM_RANGE(0x44800, 0x45eff) AM_RAM
+	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", namco_cus30_device, pacman_sound_w)
 	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE("namco", namco_cus30_device, namcos1_cus30_w)
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
 	AM_RANGE(0x47100, 0x47100) AM_RAM   /* leftover from original Galaga code */
@@ -232,7 +232,7 @@ READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
 	return 0xff;
 }
 
-	static ADDRESS_MAP_START( 25pacman_io_map, AS_IO, 8, _25pacman_state )
+ADDRESS_MAP_START(_25pacman_state::_25pacman_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
 	AM_RANGE(0x40, 0x7f) AM_NOP /* Z180 internal registers */
@@ -254,7 +254,7 @@ READ8_MEMBER( _25pacman_state::_25pacman_io_87_r )
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(_20pacgal_coin_counter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
+ADDRESS_MAP_START(_20pacgal_state::_20pacgal_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
 	AM_RANGE(0x40, 0x7f) AM_NOP /* Z180 internal registers */
@@ -393,8 +393,8 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(20pacgal_map)
-	MCFG_CPU_IO_MAP(20pacgal_io_map)
+	MCFG_CPU_PROGRAM_MAP(_20pacgal_map)
+	MCFG_CPU_IO_MAP(_20pacgal_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _20pacgal_state,  vblank_irq)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD(_20pacgal_video)
+	_20pacgal_video(config);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -417,12 +417,13 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(_25pacman_state::_25pacman, _20pacgal)
+MACHINE_CONFIG_START(_25pacman_state::_25pacman)
+	_20pacgal(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(25pacman_map)
-	MCFG_CPU_IO_MAP(25pacman_io_map)
+	MCFG_CPU_PROGRAM_MAP(_25pacman_map)
+	MCFG_CPU_IO_MAP(_25pacman_io_map)
 
 	MCFG_AMD_29LV200T_ADD("flash")
 MACHINE_CONFIG_END

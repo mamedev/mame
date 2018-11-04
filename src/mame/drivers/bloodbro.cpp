@@ -149,7 +149,7 @@ Video:
 
 
 /* Memory Maps */
-static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, bloodbro_state )
+ADDRESS_MAP_START(bloodbro_state::common_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_SHARE("spriteram")
@@ -171,12 +171,12 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bloodbro_map, AS_PROGRAM, 16, bloodbro_state )
+ADDRESS_MAP_START(bloodbro_state::bloodbro_map)
 	AM_IMPORT_FROM(common_map)
 	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( skysmash_map, AS_PROGRAM, 16, bloodbro_state )
+ADDRESS_MAP_START(bloodbro_state::skysmash_map)
 	AM_IMPORT_FROM(common_map)
 	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
 ADDRESS_MAP_END
@@ -189,7 +189,7 @@ WRITE8_MEMBER(bloodbro_state::weststry_soundlatch_w)
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16, bloodbro_state )
+ADDRESS_MAP_START(bloodbro_state::weststry_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM // old VRAM areas still used, but bootleg code copies them to higher addresses
 	AM_RANGE(0x0c1000, 0x0c1001) AM_READ_PORT("DSW")
@@ -234,9 +234,9 @@ void bloodbro_state::weststry_soundnmi_update()
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( weststry_sound_map, AS_PROGRAM, 8, bloodbro_state )
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(weststry_soundnmi_ack_w)
+ADDRESS_MAP_START(bloodbro_state::weststry_sound_map)
 	AM_IMPORT_FROM(seibu_sound_map)
+	AM_RANGE(0x4002, 0x4002) AM_WRITE(weststry_soundnmi_ack_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -562,7 +562,8 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bloodbro_state::weststry, bloodbro)
+MACHINE_CONFIG_START(bloodbro_state::weststry)
+	bloodbro(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(weststry_map)
@@ -596,7 +597,8 @@ MACHINE_CONFIG_DERIVED(bloodbro_state::weststry, bloodbro)
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8(bloodbro_state, weststry_opl_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bloodbro_state::skysmash, bloodbro)
+MACHINE_CONFIG_START(bloodbro_state::skysmash)
+	bloodbro(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(skysmash_map)

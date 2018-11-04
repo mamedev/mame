@@ -233,6 +233,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cocoloco(machine_config &config);
+	void cocoloco_map(address_map &map);
 };
 
 /***********************************
@@ -398,7 +399,7 @@ WRITE8_MEMBER( cocoloco_state::coincounter_w )
 *      Memory Map Information      *
 ***********************************/
 
-static ADDRESS_MAP_START( cocoloco_map, AS_PROGRAM, 8, cocoloco_state )
+ADDRESS_MAP_START(cocoloco_state::cocoloco_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(vram_r, vram_w)     // 256 x 256 x 1
 	AM_RANGE(0x6001, 0x6001) AM_DEVREAD("ay8910", ay8910_device, data_r)

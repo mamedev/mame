@@ -33,7 +33,7 @@ public:
 	sh7604_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_ADDRESS_MAP( sci_regs, 8 );
+	void sci_regs(address_map &map);
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );

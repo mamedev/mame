@@ -422,7 +422,7 @@ MACHINE_RESET_MEMBER(polepos_state,polepos)
  * CPU memory structures
  *********************************************************************/
 
-static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, polepos_state )
+ADDRESS_MAP_START(polepos_state::z80_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")                 /* Battery Backup */
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)           /* Motion Object */
@@ -442,14 +442,14 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, polepos_state )
 	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x0cff) AM_DEVWRITE("polepos", polepos_sound_device, polepos_engine_sound_msb_w)    /* Car Sound ( Upper Nibble ) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8, polepos_state )
+ADDRESS_MAP_START(polepos_state::z80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(polepos_adc_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
 /* the same memory map is used by both Z8002 CPUs; all RAM areas are shared */
-static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16, polepos_state )
+ADDRESS_MAP_START(polepos_state::z8002_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_SHARE("sprite16_memory")   /* Motion Object */
 	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_SHARE("road16_memory")     /* Road Memory */
@@ -459,12 +459,12 @@ static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16, polepos_state )
 	AM_RANGE(0xc100, 0xc101) AM_MIRROR(0x38fe) AM_WRITE(polepos_road16_vscroll_w)                       /* Road vertical position */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z8002_map_1, AS_PROGRAM, 16, polepos_state )
+ADDRESS_MAP_START(polepos_state::z8002_map_1)
 	AM_IMPORT_FROM(z8002_map)
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE(polepos_z8002_nvi_enable_w<true>) /* NVI enable - *NOT* shared by the two CPUs */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z8002_map_2, AS_PROGRAM, 16, polepos_state )
+ADDRESS_MAP_START(polepos_state::z8002_map_2)
 	AM_IMPORT_FROM(z8002_map)
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE(polepos_z8002_nvi_enable_w<false>) /* NVI enable - *NOT* shared by the two CPUs */
 ADDRESS_MAP_END
@@ -957,7 +957,7 @@ WRITE8_MEMBER(polepos_state::bootleg_soundlatch_w)
 		m_soundlatch->write(space, 0, data | 0xfc);
 }
 
-static ADDRESS_MAP_START( topracern_io, AS_IO, 8, polepos_state )
+ADDRESS_MAP_START(polepos_state::topracern_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM(z80_io)
 	// extra direct mapped inputs read
@@ -967,14 +967,14 @@ static ADDRESS_MAP_START( topracern_io, AS_IO, 8, polepos_state )
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSWB") AM_WRITE(bootleg_soundlatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_z80_bootleg_map, AS_PROGRAM, 8, polepos_state )
+ADDRESS_MAP_START(polepos_state::sound_z80_bootleg_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2700, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, acknowledge_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_z80_bootleg_iomap, AS_IO, 8, polepos_state )
+ADDRESS_MAP_START(polepos_state::sound_z80_bootleg_iomap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("tms", tms5220_device, status_r, data_w)
 ADDRESS_MAP_END
@@ -1058,7 +1058,8 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(polepos_state::polepos2bi, topracern)
+MACHINE_CONFIG_START(polepos_state::polepos2bi)
+	topracern(config);
 
 	MCFG_CPU_ADD("soundz80bl", Z80, MASTER_CLOCK/8) /*? MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_z80_bootleg_map)

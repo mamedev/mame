@@ -72,6 +72,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_meyc8088);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
 	void meyc8088(machine_config &config);
+	void meyc8088_map(address_map &map);
 };
 
 
@@ -213,7 +214,7 @@ WRITE8_MEMBER(meyc8088_state::video5_flip_w)
 }
 
 
-static ADDRESS_MAP_START( meyc8088_map, AS_PROGRAM, 8, meyc8088_state )
+ADDRESS_MAP_START(meyc8088_state::meyc8088_map)
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xb0000, 0xb00ff) AM_DEVREADWRITE("i8155_2", i8155_device, memory_r, memory_w)

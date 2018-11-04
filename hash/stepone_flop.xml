@@ -10,7 +10,7 @@
 		<publisher>Microsoft</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="10734">
+			<dataarea name="flop" size="167674">
 				<rom name="BASIC.IMD" size="167674" crc="6789a422" sha1="2db2140562f1e033719dd68befd27ef34e6ef539" offset="0" />
 			</dataarea>
 		</part>

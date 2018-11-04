@@ -26,6 +26,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(pc0_r);
 	DECLARE_WRITE_LINE_MEMBER(sync_w);
 
+	void internal_pgm(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

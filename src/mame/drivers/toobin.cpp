@@ -81,7 +81,7 @@ WRITE16_MEMBER(toobin_state::interrupt_scan_w)
  *************************************/
 
 /* full address map decoded from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
+ADDRESS_MAP_START(toobin_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xc7ffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")

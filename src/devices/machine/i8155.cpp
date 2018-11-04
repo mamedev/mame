@@ -110,7 +110,7 @@ enum
 //**************************************************************************
 
 // default address map
-static ADDRESS_MAP_START( i8155, 0, 8, i8155_device )
+ADDRESS_MAP_START(i8155_device::i8155)
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
@@ -286,7 +286,7 @@ i8155_device::i8155_device(const machine_config &mconfig, device_type type, cons
 		m_counter(0),
 		m_count_extra(false),
 		m_to(0),
-		m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, nullptr, *ADDRESS_MAP_NAME(i8155))
+		m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(), address_map_constructor(FUNC(i8155_device::i8155), this))
 {
 }
 

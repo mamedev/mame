@@ -44,6 +44,7 @@ public:
 
 	static void static_set_romregion(device_t &device, const char *tag);
 
+	void s11c_bg_map(address_map &map);
 protected:
 	// overrides
 	virtual void device_start() override;

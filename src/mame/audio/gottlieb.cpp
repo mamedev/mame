@@ -77,7 +77,7 @@ WRITE8_MEMBER( gottlieb_sound_r0_device::write )
 //  audio CPU map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( gottlieb_sound_r0_map, AS_PROGRAM, 8, gottlieb_sound_r0_device )
+ADDRESS_MAP_START(gottlieb_sound_r0_device::gottlieb_sound_r0_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x0000, 0x003f) AM_RAM AM_MIRROR(0x1c0)
 	AM_RANGE(0x0200, 0x020f) AM_DEVREADWRITE("r6530", mos6530_device, read, write)
@@ -265,7 +265,7 @@ WRITE_LINE_MEMBER( gottlieb_sound_r1_device::votrax_request )
 //  audio CPU map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( gottlieb_sound_r1_map, AS_PROGRAM, 8, gottlieb_sound_r1_device )
+ADDRESS_MAP_START(gottlieb_sound_r1_device::gottlieb_sound_r1_map)
 	// A15 not decoded except in expansion socket
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
@@ -615,7 +615,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::sp0250_latch_w )
 //  sound CPU address map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( gottlieb_sound_r2_map, AS_PROGRAM, 8, gottlieb_sound_r2_device )
+ADDRESS_MAP_START(gottlieb_sound_r2_device::gottlieb_sound_r2_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x3c00) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x3ffe) AM_DEVWRITE("dacvol", dac_byte_interface, write)
 	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac", dac_byte_interface, write)
@@ -628,7 +628,7 @@ ADDRESS_MAP_END
 //  sppech CPU address map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( gottlieb_speech_r2_map, AS_PROGRAM, 8, gottlieb_sound_r2_device )
+ADDRESS_MAP_START(gottlieb_sound_r2_device::gottlieb_speech_r2_map)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1fff) AM_WRITE(sp0250_latch_w)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x1fff) AM_WRITE(speech_control_w)

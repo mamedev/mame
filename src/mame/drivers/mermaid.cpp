@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER(mermaid_state::nmi_mask_w)
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8, mermaid_state )
+ADDRESS_MAP_START(mermaid_state::mermaid_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(mermaid_videoram2_w) AM_SHARE("videoram2")
@@ -470,7 +470,8 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mermaid_state::rougien, mermaid)
+MACHINE_CONFIG_START(mermaid_state::rougien)
+	mermaid(config);
 
 	MCFG_DEVICE_MODIFY("latch1")
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mermaid_state, rougien_sample_playback_w))

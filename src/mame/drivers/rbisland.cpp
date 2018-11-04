@@ -346,7 +346,7 @@ WRITE16_MEMBER(rbisland_state::jumping_sound_w)
                             MEMORY STRUCTURES
 ***************************************************************************/
 
-static ADDRESS_MAP_START( rbisland_map, AS_PROGRAM, 16, rbisland_state )
+ADDRESS_MAP_START(rbisland_state::rbisland_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( rbisland_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram + other stuff */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jumping_map, AS_PROGRAM, 16, rbisland_state )
+ADDRESS_MAP_START(rbisland_state::jumping_map)
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM             /* main RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
@@ -408,7 +408,7 @@ READ8_MEMBER(rbisland_state::jumping_latch_r)
 }
 
 
-static ADDRESS_MAP_START( rbisland_sound_map, AS_PROGRAM, 8, rbisland_state )
+ADDRESS_MAP_START(rbisland_state::rbisland_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( rbisland_sound_map, AS_PROGRAM, 8, rbisland_state )
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jumping_sound_map, AS_PROGRAM, 8, rbisland_state )
+ADDRESS_MAP_START(rbisland_state::jumping_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
@@ -723,7 +723,8 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 MACHINE_CONFIG_END
 
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
-MACHINE_CONFIG_DERIVED(rbisland_state::jumpingi, jumping)
+MACHINE_CONFIG_START(rbisland_state::jumpingi)
+	jumping(config);
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(jumping_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)

@@ -791,6 +791,7 @@ class tms32031_device : public tms3203x_device
 public:
 	// construction/destruction
 	tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void internal_32031(address_map &map);
 };
 
 
@@ -801,6 +802,7 @@ class tms32032_device : public tms3203x_device
 public:
 	// construction/destruction
 	tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void internal_32032(address_map &map);
 };
 
 

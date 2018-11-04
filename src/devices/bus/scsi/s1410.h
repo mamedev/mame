@@ -19,14 +19,18 @@ public:
 	// construction/destruction
 	s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void ExecCommand() override;
-	virtual void WriteData( uint8_t *data, int dataLength ) override;
-	virtual void ReadData( uint8_t *data, int dataLength ) override;
-
 protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual void ExecCommand() override;
+	virtual void WriteData( uint8_t *data, int dataLength ) override;
+	virtual void ReadData( uint8_t *data, int dataLength ) override;
+
+private:
+	void s1410_io(address_map &map);
+	void s1410_mem(address_map &map);
 };
 
 

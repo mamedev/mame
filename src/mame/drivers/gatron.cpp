@@ -447,7 +447,7 @@ WRITE8_MEMBER(gatron_state::output_port_1_w)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( gat_map, AS_PROGRAM, 8, gatron_state )
+ADDRESS_MAP_START(gatron_state::gat_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")                          /* battery backed RAM */
@@ -455,7 +455,7 @@ static ADDRESS_MAP_START( gat_map, AS_PROGRAM, 8, gatron_state )
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)                         /* lamps */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gat_portmap, AS_IO, 8, gatron_state )
+ADDRESS_MAP_START(gatron_state::gat_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END

@@ -57,6 +57,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
 	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
 	void et3400(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
@@ -124,7 +125,7 @@ WRITE8_MEMBER(et3400_state::pia_bw)
 }
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, et3400_state)
+ADDRESS_MAP_START(et3400_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAM
 	AM_RANGE( 0x1000, 0x1003 ) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)

@@ -152,22 +152,17 @@ protected:
 	virtual bool common_op(uint8_t op);
 
 	// Accessing memory and io
-	inline uint8_t read_byte(uint32_t addr);
-	inline uint16_t read_word(uint32_t addr);
-	inline void write_byte(uint32_t addr, uint8_t data);
-	inline void write_word(uint32_t addr, uint16_t data);
-	inline address_space *sreg_to_space(int sreg);
-	inline uint8_t read_byte(uint32_t addr, int sreg);
-	inline uint16_t read_word(uint32_t addr, int sreg);
-	inline void write_byte(uint32_t addr, uint8_t data, int sreg);
-	inline void write_word(uint32_t addr, uint16_t data, int sreg);
+	virtual uint8_t read_byte(uint32_t addr);
+	virtual uint16_t read_word(uint32_t addr);
+	virtual void write_byte(uint32_t addr, uint8_t data);
+	virtual void write_word(uint32_t addr, uint16_t data);
 	virtual uint8_t read_port_byte(uint16_t port);
 	virtual uint16_t read_port_word(uint16_t port);
 	virtual void write_port_byte(uint16_t port, uint8_t data);
 	virtual void write_port_word(uint16_t port, uint16_t data);
 
 	// Executing instructions
-	virtual uint8_t fetch_op() = 0;
+	uint8_t fetch_op() { return fetch(); }
 	virtual uint8_t fetch() = 0;
 	inline uint16_t fetch_word();
 	inline uint8_t repx_op();
@@ -319,7 +314,7 @@ protected:
 	uint8_t   m_fire_trap;
 	uint8_t   m_test_state;
 
-	address_space *m_program, *m_opcodes, *m_stack, *m_code, *m_extra;
+	address_space *m_program, *m_opcodes;
 	direct_read_data<0> *m_direct, *m_direct_opcodes;
 	address_space *m_io;
 	offs_t m_fetch_xor;
@@ -331,7 +326,6 @@ protected:
 
 	uint32_t m_ea;
 	uint16_t m_eo;
-	uint16_t m_e16;
 	int m_easeg;
 
 	// Used during execution of instructions
@@ -388,8 +382,12 @@ protected:
 	virtual void execute_run() override;
 	virtual void device_start() override;
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint8_t fetch_op() override;
 	virtual uint8_t fetch() override;
+	inline address_space *sreg_to_space(int sreg) const;
+	virtual uint8_t read_byte(uint32_t addr) override;
+	virtual uint16_t read_word(uint32_t addr) override;
+	virtual void write_byte(uint32_t addr, uint8_t data) override;
+	virtual void write_word(uint32_t addr, uint16_t data) override;
 
 	address_space_config m_program_config;
 	address_space_config m_opcodes_config;
@@ -401,6 +399,8 @@ protected:
 	devcb_write_line m_out_if_func;
 	devcb_write32 m_esc_opcode_handler;
 	devcb_write32 m_esc_data_handler;
+
+	address_space *m_stack, *m_code, *m_extra;
 
 protected:
 	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }

@@ -29,7 +29,8 @@ void neopcb_state::neopcb_postload()
 	set_outputs();
 }
 
-MACHINE_CONFIG_DERIVED(neopcb_state::neopcb, neogeo_arcade)
+MACHINE_CONFIG_START(neopcb_state::neopcb)
+	neogeo_arcade(config);
 	MCFG_CMC_PROT_ADD("cmc50")
 	MCFG_PCM2_PROT_ADD("pcm2")
 	MCFG_PVC_PROT_ADD("pvc")

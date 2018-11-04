@@ -131,4 +131,5 @@ public:
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);
 										void carpolo(machine_config &config);
+										void main_map(address_map &map);
 };

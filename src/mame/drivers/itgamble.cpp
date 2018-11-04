@@ -76,6 +76,7 @@ public:
 
 	void mnumber(machine_config &config);
 	void itgamble(machine_config &config);
+	void itgamble_map(address_map &map);
 protected:
 
 	// devices
@@ -107,7 +108,7 @@ uint32_t itgamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( itgamble_map, AS_PROGRAM, 16, itgamble_state )
+ADDRESS_MAP_START(itgamble_state::itgamble_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
@@ -235,7 +236,8 @@ MACHINE_CONFIG_START(itgamble_state::itgamble)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itgamble_state::mnumber, itgamble)
+MACHINE_CONFIG_START(itgamble_state::mnumber)
+	itgamble(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
 
@@ -245,7 +247,8 @@ MACHINE_CONFIG_END
 
 
 #ifdef UNUSED_CODE
-static MACHINE_CONFIG_DERIVED( ejollyx5, itgamble )
+static MACHINE_CONFIG_START( ejollyx5 )
+	itgamble(config);
 	/* wrong CPU. we need a Renesas M16/62A 16bit microcomputer core */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(EJOLLYX5_MAIN_CLOCK/2)   /* up to 10MHz.*/

@@ -44,6 +44,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -58,7 +60,7 @@ private:
 			volume(0),
 			key(0)
 		{
-			memset(waveram, 0, sizeof(signed char)*32);
+			std::fill(std::begin(waveram), std::end(waveram), 0);
 		}
 
 		unsigned long counter;
@@ -80,7 +82,7 @@ private:
 	/* mixer tables and internal buffers */
 	std::unique_ptr<int16_t[]> m_mixer_table;
 	int16_t *m_mixer_lookup;
-	std::unique_ptr<short[]> m_mixer_buffer;
+	std::vector<short> m_mixer_buffer;
 
 	/* chip registers */
 	uint8_t m_test;

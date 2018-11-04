@@ -60,7 +60,7 @@ Notes:
 #include "speaker.h"
 
 /* Avengers runs on hardware almost identical to Trojan, but with a protection
- * device and some small changes to the memory map and videohardware.
+ * device and some small changes to the memory map and video hardware.
  *
  * Background colors are fetched 64 bytes at a time and copied to palette RAM.
  *
@@ -252,7 +252,7 @@ READ8_MEMBER(lwings_state::avengers_protection_r)
 	/*  Point to Angle Function
 
 	    Input: two cartesian points
-	    Output: direction code (north,northeast,east,...)
+	    Output: direction code (north, northeast, east, ...)
 	 */
 	x = m_param[0] - m_param[2];
 	y = m_param[1] - m_param[3];
@@ -285,7 +285,7 @@ WRITE8_MEMBER(lwings_state::msm5205_w)
 	m_msm->vclk_w(0);
 }
 
-static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::avengers_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::lwings_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::trojan_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::lwings_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -366,7 +366,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( fball_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::fball_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -398,13 +398,13 @@ WRITE8_MEMBER(lwings_state::fball_oki_bank_w)
 	membank("samplebank")->set_entry((data >> 1) & 0x7);
 }
 
-static ADDRESS_MAP_START( fball_oki_map, 0, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::fball_oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("samplebank")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fball_sound_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::fball_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -417,17 +417,17 @@ static ADDRESS_MAP_START( fball_sound_map, AS_PROGRAM, 8, lwings_state )
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
-static ADDRESS_MAP_START( trojan_adpcm_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::trojan_adpcm_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( avengers_adpcm_io_map, AS_IO, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::avengers_adpcm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(avengers_adpcm_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trojan_adpcm_io_map, AS_IO, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::trojan_adpcm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
@@ -1014,7 +1014,8 @@ MACHINE_CONFIG_START(lwings_state::fball)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(lwings_state::trojan, lwings)
+MACHINE_CONFIG_START(lwings_state::trojan)
+	lwings(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1045,7 +1046,8 @@ MACHINE_CONFIG_DERIVED(lwings_state::trojan, lwings)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lwings_state::avengers, trojan)
+MACHINE_CONFIG_START(lwings_state::avengers)
+	trojan(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1059,7 +1061,8 @@ MACHINE_CONFIG_DERIVED(lwings_state::avengers, trojan)
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lwings_state::avengersb, avengers)
+MACHINE_CONFIG_START(lwings_state::avengersb)
+	avengers(config);
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengersb)
 MACHINE_CONFIG_END
@@ -1165,6 +1168,40 @@ ROM_START( lwingsj )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.15g",   0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )    /* timing (not used) */
+ROM_END
+
+
+// PCB Capcom 86607-A-2 + 86607-B-2, only different ROM from lwingsj is AT_01A.6c
+ROM_START( lwingsja )
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_LOAD( "AT_01A.6c",   0x00000, 0x8000, CRC(568f1ea5) SHA1(b1e9a5f06793de7c9e0bf41eae2dd3a6ab5fc8be) )
+	ROM_LOAD( "AT_02.7c",    0x10000, 0x8000, CRC(d6a2edc4) SHA1(ce7eef643b1570cab241355bfd7c2d7adb1e74b6) )
+	ROM_LOAD( "AT_03.9c",    0x18000, 0x8000, CRC(ec5cc201) SHA1(1043c6a9678c18fef920be91b0796c93b83e0f73) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "AT_03.11e", 0x0000, 0x8000, CRC(a20337a2) SHA1(649e13a69ad9154657894fa7bf7c6e49b029a506) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "AT_05.9h",  0x00000, 0x4000, CRC(091d923c) SHA1(d686c860f147c4749ac1ee23cde5a7b570312622) )  /* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "AT_14.3e",    0x00000, 0x8000, CRC(176e3027) SHA1(31947205c7a28d25b5982a9e6c079112c404d6b4) )  /* tiles */
+	ROM_LOAD( "AT_08.1e",    0x08000, 0x8000, CRC(f5d25623) SHA1(ff520df50011af5688be7e88712faa8f8436b462) )
+	ROM_LOAD( "AT_13.3d",    0x10000, 0x8000, CRC(001caa35) SHA1(2042136c592ce124a321fc6d05447b13a612b6b9) )
+	ROM_LOAD( "AT_07.1d",    0x18000, 0x8000, CRC(0ba008c3) SHA1(ed5c0d7191d021d6445f8f31a61eb99172fd2dc1) )
+	ROM_LOAD( "AT_12.3b",    0x20000, 0x8000, CRC(4f8182e9) SHA1(d0db174995be3937f5e5fe62ffe2112583dd78d7) )
+	ROM_LOAD( "AT_06.1b",    0x28000, 0x8000, CRC(f1617374) SHA1(01b77bc16c1e7d669f62adf759f820bc0241d959) )
+	ROM_LOAD( "AT_15.3f",    0x30000, 0x8000, CRC(9b374dcc) SHA1(3cb4243c304579536880ced86f0118c43413c1b4) )
+	ROM_LOAD( "AT_09.1f",    0x38000, 0x8000, CRC(23654e0a) SHA1(d97689b348ac4e1b380ad65133ede4bdd5ecaaee) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "AT_17.3j",    0x00000, 0x8000, CRC(8f3c763a) SHA1(b34e62ab6652a2e9783351dde6a60af38a6ba084) )  /* sprites */
+	ROM_LOAD( "AT_11.1j",    0x08000, 0x8000, CRC(7cc90a1d) SHA1(ff194749397f06ad054917664bd4583b0e4e8d92) )
+	ROM_LOAD( "AT_16.3h",    0x10000, 0x8000, CRC(7d58f532) SHA1(debfb14cd1cefa1f61a8650cbc9f6e0fff3abe8b) )
+	ROM_LOAD( "AT_10.1h",    0x18000, 0x8000, CRC(3e396eda) SHA1(a736f108e0ed5fab6177f0d8a21feab8b686ee85) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "SZB01.15g",   0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )    /* 63s141, timing (not used) */
 ROM_END
 
 ROM_START( lwingsb )
@@ -1746,6 +1783,7 @@ GAME( 1985, sectionza, sectionz, lwings,   sectionz, lwings_state, 0,         RO
 GAME( 1986, lwings,    0,        lwings,   lwings,   lwings_state, 0,         ROT90, "Capcom",            "Legendary Wings (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, lwings2,   lwings,   lwings,   lwings,   lwings_state, 0,         ROT90, "Capcom",            "Legendary Wings (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, lwingsj,   lwings,   lwings,   lwings,   lwings_state, 0,         ROT90, "Capcom",            "Ares no Tsubasa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsja,  lwings,   lwings,   lwings,   lwings_state, 0,         ROT90, "Capcom",            "Ares no Tsubasa (Japan, rev. A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, lwingsb,   lwings,   lwings,   lwingsb,  lwings_state, 0,         ROT90, "bootleg",           "Legendary Wings (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, trojan,    0,        trojan,   trojanls, lwings_state, 0,         ROT0,  "Capcom",            "Trojan (US set 1)", MACHINE_SUPPORTS_SAVE )

@@ -76,9 +76,9 @@ public:
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
 	void midzeus(machine_config &config);
-	void midzeus2(machine_config &config);
 	void invasn(machine_config &config);
 	void mk4(machine_config &config);
+	void zeus_map(address_map &map);
 private:
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);

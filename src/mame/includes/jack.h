@@ -92,4 +92,11 @@ public:
 	void unclepoo(machine_config &config);
 	void striv(machine_config &config);
 	void jack(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void jack_map(address_map &map);
+	void joinem_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void striv_map(address_map &map);
+	void unclepoo_map(address_map &map);
 };

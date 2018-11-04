@@ -99,7 +99,7 @@ const tiny_rom_entry *smioc_device::device_rom_region() const
 //  ADDRESS_MAP( smioc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( smioc_mem, AS_PROGRAM, 8, smioc_device )
+ADDRESS_MAP_START(smioc_device::smioc_mem)
 	AM_RANGE(0x00000, 0x07FFF) AM_RAM AM_SHARE("smioc_ram")
 	AM_RANGE(0xC0080, 0xC008F) AM_DEVREADWRITE("dma8237_1",am9517a_device,read,write) // Probably RAM DMA
 	AM_RANGE(0xC0090, 0xC009F) AM_DEVREADWRITE("dma8237_2",am9517a_device,read,write) // Serial DMA

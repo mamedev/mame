@@ -53,6 +53,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
 	void wpc_dcs(machine_config &config);
+	void wpc_dcs_map(address_map &map);
 protected:
 	// devices
 	required_device<cpu_device> maincpu;
@@ -72,7 +73,7 @@ private:
 	uint16_t rtc_base_day;
 };
 
-static ADDRESS_MAP_START( wpc_dcs_map, AS_PROGRAM, 8, wpc_dcs_state )
+ADDRESS_MAP_START(wpc_dcs_state::wpc_dcs_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("mainram")
 
 	AM_RANGE(0x3000, 0x31ff) AM_RAMBANK("dmd0")

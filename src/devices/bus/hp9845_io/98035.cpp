@@ -727,12 +727,12 @@ ROM_START(hp98035)
 	ROM_LOAD("1818-0469.bin" , 0 , 0x800 , CRC(e16ab3bc) SHA1(34e89a37a2822f27af21969941201317dbff615b))
 ROM_END
 
-static ADDRESS_MAP_START(np_program_map , AS_PROGRAM , 8 , hp98035_io_card_device)
+ADDRESS_MAP_START(hp98035_io_card_device::np_program_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000 , 0x7ff) AM_ROM AM_REGION("np" , 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(np_io_map , AS_IO , 8 , hp98035_io_card_device)
+ADDRESS_MAP_START(hp98035_io_card_device::np_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0 , 0x0) AM_WRITE(ram_addr_w)
 	AM_RANGE(0x1 , 0x1) AM_READ(ram_data_r)

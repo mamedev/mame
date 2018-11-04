@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef POLY88_H_
-#define POLY88_H_
+#ifndef MAME_INCLUDES_POLY88_H
+#define MAME_INCLUDES_POLY88_H
 
 #include "machine/i8251.h"
 #include "imagedev/cassette.h"
@@ -66,6 +66,10 @@ public:
 
 	void poly88(machine_config &config);
 	void poly8813(machine_config &config);
+	void poly8813_io(address_map &map);
+	void poly8813_mem(address_map &map);
+	void poly88_io(address_map &map);
+	void poly88_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
@@ -84,4 +88,4 @@ protected:
 	int m_cas_tx;
 };
 
-#endif /* POLY88_H_ */
+#endif // MAME_INCLUDES_POLY88_H

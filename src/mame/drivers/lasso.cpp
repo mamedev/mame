@@ -74,7 +74,7 @@ WRITE8_MEMBER(lasso_state::sound_select_w)
 }
 
 
-static ADDRESS_MAP_START( lasso_main_map, AS_PROGRAM, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::lasso_main_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_SHARE("colorram")
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( lasso_main_map, AS_PROGRAM, 8, lasso_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( lasso_audio_map, AS_PROGRAM, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::lasso_audio_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x5000, 0x7fff) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_SHARE("chip_data")
@@ -102,14 +102,14 @@ static ADDRESS_MAP_START( lasso_audio_map, AS_PROGRAM, 8, lasso_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( lasso_coprocessor_map, AS_PROGRAM, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::lasso_coprocessor_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("bitmap_ram")
 	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( chameleo_main_map, AS_PROGRAM, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::chameleo_main_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_SHARE("colorram")
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( chameleo_main_map, AS_PROGRAM, 8, lasso_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( chameleo_audio_map, AS_PROGRAM, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::chameleo_audio_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( chameleo_audio_map, AS_PROGRAM, 8, lasso_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( wwjgtin_main_map, AS_PROGRAM, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::wwjgtin_main_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(lasso_colorram_w) AM_SHARE("colorram")
@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( wwjgtin_main_map, AS_PROGRAM, 8, lasso_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( wwjgtin_audio_map, AS_PROGRAM, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::wwjgtin_audio_map)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_SHARE("chip_data")
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( wwjgtin_audio_map, AS_PROGRAM, 8, lasso_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pinbo_main_map, AS_PROGRAM, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::pinbo_main_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_SHARE("colorram")
@@ -188,13 +188,13 @@ static ADDRESS_MAP_START( pinbo_main_map, AS_PROGRAM, 8, lasso_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pinbo_audio_map, AS_PROGRAM, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::pinbo_audio_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pinbo_audio_io_map, AS_IO, 8, lasso_state )
+ADDRESS_MAP_START(lasso_state::pinbo_audio_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -516,7 +516,8 @@ MACHINE_CONFIG_START(lasso_state::base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lasso_state::lasso, base)
+MACHINE_CONFIG_START(lasso_state::lasso)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("blitter", M6502, 11289000/16) /* guess */
@@ -526,7 +527,8 @@ MACHINE_CONFIG_DERIVED(lasso_state::lasso, base)
 	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lasso_state::chameleo, base)
+MACHINE_CONFIG_START(lasso_state::chameleo)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -543,7 +545,8 @@ MACHINE_CONFIG_DERIVED(lasso_state::chameleo, base)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lasso_state::wwjgtin, base)
+MACHINE_CONFIG_START(lasso_state::wwjgtin)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -572,7 +575,8 @@ MACHINE_CONFIG_DERIVED(lasso_state::wwjgtin, base)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(lasso_state::pinbo, base)
+MACHINE_CONFIG_START(lasso_state::pinbo)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, XTAL(18'000'000)/24)

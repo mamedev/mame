@@ -625,6 +625,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/am9519.h,MACHINES["AM9519"] = true
+---------------------------------------------------
+
+if (MACHINES["AM9519"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/am9519.cpp",
+		MAME_DIR .. "src/devices/machine/am9519.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/amigafdc.h,MACHINES["AMIGAFDC"] = true
 ---------------------------------------------------
 

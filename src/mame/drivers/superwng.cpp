@@ -98,6 +98,8 @@ public:
 	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
 	void superwng(machine_config &config);
+	void superwng_map(address_map &map);
+	void superwng_sound_map(address_map &map);
 };
 
 WRITE8_MEMBER(superwng_state::superwng_unk_a187_w)
@@ -318,7 +320,7 @@ WRITE8_MEMBER(superwng_state::superwng_hopper_w)
 {
 }
 
-static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
+ADDRESS_MAP_START(superwng_state::superwng_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x6fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
@@ -343,7 +345,7 @@ static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0xa187, 0xa187) AM_WRITE(superwng_unk_a187_w) // unknown, always(?) 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superwng_sound_map, AS_PROGRAM, 8, superwng_state )
+ADDRESS_MAP_START(superwng_state::superwng_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(superwng_sound_nmi_clear_w)

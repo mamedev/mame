@@ -133,6 +133,9 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
 	void sandscrp(machine_config &config);
+	void sandscrp(address_map &map);
+	void sandscrp_soundmem(address_map &map);
+	void sandscrp_soundport(address_map &map);
 };
 
 
@@ -273,7 +276,7 @@ WRITE16_MEMBER(sandscrp_state::soundlatch_word_w)
 	}
 }
 
-static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
+ADDRESS_MAP_START(sandscrp_state::sandscrp)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM     // ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(irq_cause_w) // IRQ Ack
 
@@ -323,13 +326,13 @@ WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 	m_soundlatch2->write(space,0,data);
 }
 
-static ADDRESS_MAP_START( sandscrp_soundmem, AS_PROGRAM, 8, sandscrp_state )
+ADDRESS_MAP_START(sandscrp_state::sandscrp_soundmem)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM     // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")    // Banked ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM     // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sandscrp_soundport, AS_IO, 8, sandscrp_state )
+ADDRESS_MAP_START(sandscrp_state::sandscrp_soundport)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(bankswitch_w)    // ROM Bank
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)        // PORTA/B read

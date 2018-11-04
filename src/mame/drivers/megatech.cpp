@@ -145,6 +145,8 @@ public:
 	void megatech(machine_config &config);
 	void megatech_multislot(machine_config &config);
 	void megatech_fixedslot(machine_config &config);
+	void megatech_bios_map(address_map &map);
+	void megatech_bios_portmap(address_map &map);
 private:
 	uint8_t m_mt_cart_select_reg;
 	uint32_t m_bios_port_ctrl;
@@ -520,7 +522,7 @@ WRITE8_MEMBER(mtech_state::banked_ram_w )
 
 
 
-static ADDRESS_MAP_START( megatech_bios_map, AS_PROGRAM, 8, mtech_state )
+ADDRESS_MAP_START(mtech_state::megatech_bios_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM // from bios rom (0x0000-0x2fff populated in ROM)
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(banked_ram_r, banked_ram_w) // copies instruction data here at startup, must be banked
 	AM_RANGE(0x4000, 0x5fff) AM_RAM // plain ram?
@@ -574,7 +576,7 @@ READ8_MEMBER(mtech_state::vdp1_count_r)
 		return m_vdp1->vcount_read(prg, offset);
 }
 
-static ADDRESS_MAP_START( megatech_bios_portmap, AS_IO, 8, mtech_state )
+ADDRESS_MAP_START(mtech_state::megatech_bios_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x3f, 0x3f) AM_WRITE(bios_port_ctrl_w)
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(bios_port_7f_w)
@@ -673,7 +675,7 @@ uint32_t mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bi
 
 MACHINE_CONFIG_START(mtech_state::megatech)
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
 	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
@@ -764,7 +766,8 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "megatech_cart") \
 	MCFG_GENERIC_LOAD(mtech_state, _load)
 
-MACHINE_CONFIG_DERIVED(mtech_state::megatech_multislot, megatech)
+MACHINE_CONFIG_START(mtech_state::megatech_multislot)
+	megatech(config);
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
@@ -780,7 +783,8 @@ MACHINE_CONFIG_DERIVED(mtech_state::megatech_multislot, megatech)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mtech_state::megatech_fixedslot, megatech)
+MACHINE_CONFIG_START(mtech_state::megatech_fixedslot)
+	megatech(config);
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)

@@ -25,13 +25,6 @@ public:
 	// construction/destruction
 	isa8_pgc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( stateparam_w );
-	DECLARE_READ8_MEMBER( stateparam_r );
-	DECLARE_WRITE8_MEMBER( lut_w );
-	DECLARE_READ8_MEMBER( init_r );
-
-	void reset_common();
-
 protected:
 	isa8_pgc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -51,6 +44,16 @@ private:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+
+	DECLARE_WRITE8_MEMBER( stateparam_w );
+	DECLARE_READ8_MEMBER( stateparam_r );
+	DECLARE_WRITE8_MEMBER( lut_w );
+	DECLARE_READ8_MEMBER( init_r );
+
+	void reset_common();
+
+	void pgc_io(address_map &map);
+	void pgc_map(address_map &map);
 
 	required_device<i8088_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;

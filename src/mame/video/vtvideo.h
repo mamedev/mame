@@ -22,7 +22,7 @@ public:
 	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> static devcb_base &set_ram_rd_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_clear_video_irq_wr_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_write_clear_video_interrupt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_vert_freq_intr_wr_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_write_vert_freq_intr.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_lba7_wr_callback(device_t &device, Object &&cb) { return downcast<vt100_video_device &>(device).m_write_lba7.set_callback(std::forward<Object>(cb)); }
 
 	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom.set_tag(tag); }
@@ -44,11 +44,13 @@ protected:
 
 	// internal state
 	void recompute_parameters();
+	void vblank_callback(screen_device &screen, bool state);
 	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type);
 	TIMER_CALLBACK_MEMBER(lba7_change);
+	virtual void notify_vblank(bool choice) { }
 
 	devcb_read8        m_read_ram;
-	devcb_write8       m_write_clear_video_interrupt;
+	devcb_write_line   m_write_vert_freq_intr;
 	devcb_write_line   m_write_lba7;
 
 	int m_lba7;
@@ -91,10 +93,10 @@ public:
 
 	int MHFU(int);
 	void palette_select(int choice);
-	void notify_vblank(bool choice);
 
 protected:
 	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type) override;
+	virtual void notify_vblank(bool choice) override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
@@ -111,8 +113,8 @@ DECLARE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device)
 #define MCFG_VT_VIDEO_RAM_CALLBACK(_read) \
 	devcb = &vt100_video_device::set_ram_rd_callback(*device, DEVCB_##_read);
 
-#define MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(_write) \
-	devcb = &vt100_video_device::set_clear_video_irq_wr_callback(*device, DEVCB_##_write);
+#define MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(_write) \
+	devcb = &vt100_video_device::set_vert_freq_intr_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VT_VIDEO_LBA7_CALLBACK(_write) \
 	devcb = &vt100_video_device::set_lba7_wr_callback(*device, DEVCB_##_write);

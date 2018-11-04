@@ -116,6 +116,9 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	void gimix(machine_config &config);
+	void gimix_banked_mem(address_map &map);
+	void gimix_io(address_map &map);
+	void gimix_mem(address_map &map);
 private:
 	uint8_t m_term_data;
 	uint8_t m_dma_status;
@@ -172,7 +175,7 @@ private:
 	required_ioport m_dma_dip;
 };
 
-static ADDRESS_MAP_START( gimix_banked_mem, AS_PROGRAM, 8, gimix_state)
+ADDRESS_MAP_START(gimix_state::gimix_banked_mem)
 	AM_RANGE(0x00000, 0x0dfff) AM_RAMBANK("lower_ram")
 	AM_RANGE(0x0e000, 0x0e001) AM_DEVREADWRITE("acia1", acia6850_device, read, write)
 	AM_RANGE(0x0e004, 0x0e005) AM_DEVREADWRITE("acia2", acia6850_device, read, write)
@@ -191,7 +194,7 @@ static ADDRESS_MAP_START( gimix_banked_mem, AS_PROGRAM, 8, gimix_state)
 	//AM_RANGE(0x10000, 0x1ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gimix_mem, AS_PROGRAM, 8, gimix_state )
+ADDRESS_MAP_START(gimix_state::gimix_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
 	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE("bank2", address_map_bank_device, read8, write8)
 	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE("bank3", address_map_bank_device, read8, write8)
@@ -211,7 +214,7 @@ static ADDRESS_MAP_START( gimix_mem, AS_PROGRAM, 8, gimix_state )
 	AM_RANGE(0xff00, 0xffff) AM_ROMBANK("fixedrombank") AM_WRITE(system_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gimix_io, AS_IO, 8, gimix_state )
+ADDRESS_MAP_START(gimix_state::gimix_io)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gimix )

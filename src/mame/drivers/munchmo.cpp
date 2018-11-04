@@ -29,7 +29,6 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "includes/munchmo.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -94,7 +93,7 @@ READ8_MEMBER(munchmo_state::ay2reset_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8, munchmo_state )
+ADDRESS_MAP_START(munchmo_state::mnchmobl_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("sprite_xpos")
@@ -104,7 +103,7 @@ static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0xbaba, 0xbaba) AM_WRITENOP /* ? */
 	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_SHARE("status_vram")
 	AM_RANGE(0xbe00, 0xbe00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xbe01, 0xbe01) AM_SELECT(0x0070) AM_DEVWRITE_MOD("mainlatch", ls259_device, write_d0, rshift<4>)
+	;map(0xbe01, 0xbe01).select(0x0070).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_d0(space, offset >> 4, data, mem_mask); });
 	AM_RANGE(0xbe02, 0xbe02) AM_READ_PORT("DSW1")
 	AM_RANGE(0xbe03, 0xbe03) AM_READ_PORT("DSW2")
 	AM_RANGE(0xbf00, 0xbf00) AM_WRITE(nmi_ack_w) // CNI 1-8C
@@ -115,7 +114,7 @@ static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8, munchmo_state )
 ADDRESS_MAP_END
 
 /* memory map provided thru schematics */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, munchmo_state )
+ADDRESS_MAP_START(munchmo_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_device, data_w)

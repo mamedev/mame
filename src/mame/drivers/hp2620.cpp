@@ -33,6 +33,8 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void hp2622(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -73,12 +75,12 @@ WRITE8_MEMBER(hp2620_state::modem_w)
 {
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, hp2620_state )
+ADDRESS_MAP_START(hp2620_state::mem_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, hp2620_state )
+ADDRESS_MAP_START(hp2620_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READWRITE(nvram_r, nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x80, 0x80) AM_READ(keystat_r)

@@ -94,6 +94,8 @@ public:
 	required_device<palette_device> m_palette;
 	void sbrkoutct(machine_config &config);
 	void sbrkout(machine_config &config);
+	void main_map(address_map &map);
+	void sbrkoutct_main_map(address_map &map);
 };
 
 
@@ -405,7 +407,7 @@ uint32_t sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_ind1
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbrkout_state )
+ADDRESS_MAP_START(sbrkout_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_SHARE("videoram")
@@ -421,7 +423,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbrkout_state )
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbrkoutct_main_map, AS_PROGRAM, 8, sbrkout_state )
+ADDRESS_MAP_START(sbrkout_state::sbrkoutct_main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_SHARE("videoram")
@@ -615,7 +617,8 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(sbrkout_state::sbrkoutct, sbrkout)
+MACHINE_CONFIG_START(sbrkout_state::sbrkoutct)
+	sbrkout(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sbrkoutct_main_map)
 

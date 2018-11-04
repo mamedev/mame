@@ -59,12 +59,14 @@ public:
 	template <class Object> static devcb_base &set_lh_wr_callback(device_t &device, Object &&cb) { return downcast<dave_device &>(device).m_write_lh.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_rh_wr_callback(device_t &device, Object &&cb) { return downcast<dave_device &>(device).m_write_rh.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(z80_program_map, 8);
-	virtual DECLARE_ADDRESS_MAP(z80_io_map, 8);
+	virtual void z80_program_map(address_map &map);
+	virtual void z80_io_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER( int1_w );
 	DECLARE_WRITE_LINE_MEMBER( int2_w );
 
+	void io_map(address_map &map);
+	void program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -66,10 +66,11 @@ public:
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
 	void ht68k(machine_config &config);
+	void ht68k_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(ht68k_mem, AS_PROGRAM, 16, ht68k_state)
+ADDRESS_MAP_START(ht68k_state::ht68k_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
 	//AM_RANGE(0x00080000, 0x000fffff) // Expansion

@@ -120,6 +120,8 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(atom_atm);
 	void atombb(machine_config &config);
 	void atom(machine_config &config);
+	void atom_mem(address_map &map);
+	void atombb_mem(address_map &map);
 };
 
 class atomeb_state : public atom_state
@@ -167,6 +169,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e0_load) { return load_cart(image, m_e0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, m_e1); }
 	void atomeb(machine_config &config);
+	void atomeb_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_ATOM_H

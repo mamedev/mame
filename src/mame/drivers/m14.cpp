@@ -100,6 +100,8 @@ public:
 	INTERRUPT_GEN_MEMBER(m14_irq);
 
 	void m14(machine_config &config);
+	void m14_io_map(address_map &map);
+	void m14_map(address_map &map);
 private:
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
@@ -298,14 +300,14 @@ WRITE8_MEMBER(m14_state::sound_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( m14_map, AS_PROGRAM, 8, m14_state )
+ADDRESS_MAP_START(m14_state::m14_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_SHARE("video_ram")
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_SHARE("color_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m14_io_map, AS_IO, 8, m14_state )
+ADDRESS_MAP_START(m14_state::m14_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") AM_WRITE(ball_x_w)
 	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN0") AM_WRITE(ball_y_w)

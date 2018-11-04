@@ -122,6 +122,8 @@ public:
 	void tile_callback(int &tile, int& fx, int& fy, int& region);
 
 	void blackt96(machine_config &config);
+	void blackt96_map(address_map &map);
+	void oki1_map(address_map &map);
 protected:
 	// overrides
 	virtual void machine_start() override;
@@ -238,7 +240,7 @@ WRITE16_MEMBER(blackt96_state::tx_vram_w)
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
+ADDRESS_MAP_START(blackt96_state::blackt96_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE8(sound_cmd_w,0xff00) // soundlatch
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE8(output_w,0x00ff) // COIN INPUT
@@ -254,7 +256,7 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki1_map, 0, 8, blackt96_state )
+ADDRESS_MAP_START(blackt96_state::oki1_map)
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki1bank")
 ADDRESS_MAP_END

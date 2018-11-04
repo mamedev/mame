@@ -129,6 +129,8 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
 
 	void ace(machine_config &config);
+	void ace_io(address_map &map);
+	void ace_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -411,7 +413,7 @@ WRITE8_MEMBER(ace_state::pio_bc_w)
 //  ADDRESS_MAP( ace_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ace_mem, AS_PROGRAM, 8, ace_state )
+ADDRESS_MAP_START(ace_state::ace_mem)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x2800, 0x2bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("char_ram") AM_REGION(Z80_TAG, 0xfc00)
@@ -424,7 +426,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ace_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ace_io, AS_IO, 8, ace_state )
+ADDRESS_MAP_START(ace_state::ace_io)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x00fe) AM_SELECT(0xff00) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READ_PORT("JOY")
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff80) AM_READWRITE(ppi_pa_r, ppi_pa_w)

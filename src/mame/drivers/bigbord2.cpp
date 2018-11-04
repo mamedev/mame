@@ -133,6 +133,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void bigbord2(machine_config &config);
+	void bigbord2_io(address_map &map);
+	void bigbord2_mem(address_map &map);
 private:
 	u8 crt8002(u8 ac_ra, u8 ac_chr, u8 ac_attr, uint16_t ac_cnt, bool ac_curs);
 	u8 m_term_data;
@@ -320,7 +322,7 @@ WRITE8_MEMBER(bigbord2_state::syslatch2_w)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( bigbord2_mem, AS_PROGRAM, 8, bigbord2_state )
+ADDRESS_MAP_START(bigbord2_state::bigbord2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bankr")
 	AM_RANGE(0x1000, 0x5fff) AM_RAM
@@ -329,7 +331,7 @@ static ADDRESS_MAP_START( bigbord2_mem, AS_PROGRAM, 8, bigbord2_state )
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
+ADDRESS_MAP_START(bigbord2_state::bigbord2_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w) // u16

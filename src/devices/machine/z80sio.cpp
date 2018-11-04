@@ -1359,7 +1359,7 @@ uint8_t z80sio_channel::do_sioreg_rr1()
    NEC upd7201 MPSC2 Technical Manual: "When the MPSC2 is used in vectored mode, the
    contents of this register are placed on the bus during the appropriate portion of
    interrupt acknowledge sequence. You can read the value of CR2B at any time.
-   This is particularly useful in determining the cause of an interrup when using the
+   This is particularly useful in determining the cause of an interrupt when using the
    MPSC2 in Non-vectored mode."
 */
 uint8_t z80sio_channel::do_sioreg_rr2()

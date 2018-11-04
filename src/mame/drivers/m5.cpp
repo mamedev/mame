@@ -697,7 +697,7 @@ WRITE8_MEMBER( m5_state::mem64KRX_w ) //out 0x7f
 //  ADDRESS_MAP( m5_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m5_mem, AS_PROGRAM, 8, m5_state )
+ADDRESS_MAP_START(m5_state::m5_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1r") AM_WRITE_BANK("bank1w") //monitor rom(bios)
 	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2r") AM_WRITE_BANK("bank2w")
@@ -713,7 +713,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( m5_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m5_io, AS_IO, 8, m5_state )
+ADDRESS_MAP_START(m5_state::m5_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
@@ -741,7 +741,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fd5_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fd5_mem, AS_PROGRAM, 8, m5_state )
+ADDRESS_MAP_START(m5_state::fd5_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -751,7 +751,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( fd5_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( fd5_io, AS_IO, 8, m5_state )
+ADDRESS_MAP_START(m5_state::fd5_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0x10, 0x10) AM_READWRITE(fd5_data_r, fd5_data_w)
@@ -1006,7 +1006,7 @@ static const z80_daisy_config m5_daisy_chain[] =
 //-------------------------------------------------
 
 
-static ADDRESS_MAP_START( m5_mem_brno, AS_PROGRAM, 8, brno_state )
+ADDRESS_MAP_START(brno_state::m5_mem_brno)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE_BANK("bank1")
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE_BANK("bank2")
@@ -1029,7 +1029,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 //  ADDRESS_MAP( brno_io )
 //-------------------------------------------------
-static ADDRESS_MAP_START( brno_io, AS_IO, 8, brno_state )
+ADDRESS_MAP_START(brno_state::brno_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
@@ -1456,10 +1456,11 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_DERIVED( ntsc, m5 )
+//  MACHINE_CONFIG_START( ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(m5_state::ntsc, m5)
+MACHINE_CONFIG_START(m5_state::ntsc)
+	m5(config);
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -1470,10 +1471,11 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_DERIVED( pal, m5 )
+//  MACHINE_CONFIG_START( pal )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(m5_state::pal, m5)
+MACHINE_CONFIG_START(m5_state::pal)
+	m5(config);
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -1487,7 +1489,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_DERIVED(brno_state::brno, m5)
+MACHINE_CONFIG_START(brno_state::brno)
+	m5(config);
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY(Z80_TAG)

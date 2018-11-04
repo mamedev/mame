@@ -186,7 +186,7 @@ WRITE_LINE_MEMBER(gyruss_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::main_cpu1_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("videoram")
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0xc180, 0xc187) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::main_cpu2_map)
 	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(slave_irq_mask_w) AM_READNOP
 	AM_RANGE(0x4000, 0x403f) AM_RAM
@@ -211,13 +211,13 @@ static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu1_map, AS_PROGRAM, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::audio_cpu1_map)
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::audio_cpu1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -238,11 +238,11 @@ static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
 	AM_RANGE(0x18, 0x18) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::audio_cpu2_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8, gyruss_state )
+ADDRESS_MAP_START(gyruss_state::audio_cpu2_io_map)
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 ADDRESS_MAP_END
 

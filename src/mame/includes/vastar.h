@@ -57,4 +57,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void vastar(machine_config &config);
+	void cpu2_map(address_map &map);
+	void cpu2_port_map(address_map &map);
+	void main_map(address_map &map);
+	void main_port_map(address_map &map);
 };

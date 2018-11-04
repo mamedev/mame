@@ -24,7 +24,7 @@
 #include "includes/megadriv_rad.h"
 
 // todo, use actual MD map, easier once maps are part of base class.
-static ADDRESS_MAP_START( megadriv_radica_map, AS_PROGRAM, 16, megadriv_radica_state )
+ADDRESS_MAP_START(megadriv_radica_state::megadriv_radica_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_READ(read) /* Cartridge Program Rom */
 	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
@@ -133,7 +133,7 @@ MACHINE_RESET_MEMBER(megadriv_radica_state, megadriv_radica)
 }
 
 MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_ntsc)
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megadriv_radica_map)
 	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
@@ -141,7 +141,7 @@ MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_ntsc)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_pal)
-	MCFG_FRAGMENT_ADD(md_pal)
+	md_pal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megadriv_radica_map)
 	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_3button)
@@ -149,7 +149,7 @@ MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_3button_pal)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megadriv_radica_state::megadriv_radica_6button_pal)
-	MCFG_FRAGMENT_ADD(md_pal)
+	md_pal(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megadriv_radica_map)
 	MCFG_MACHINE_START_OVERRIDE(megadriv_radica_state, megadriv_radica_6button)

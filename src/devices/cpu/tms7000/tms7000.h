@@ -76,6 +76,13 @@ public:
 	bool chip_is_family_70x2() const { return chip_get_family() == CHIP_FAMILY_70X2; }
 	bool chip_is_family_70cx2() const { return chip_get_family() == CHIP_FAMILY_70CX2; }
 
+	void tms7000_mem(address_map &map);
+	void tms7001_mem(address_map &map);
+	void tms7002_mem(address_map &map);
+	void tms7020_mem(address_map &map);
+	void tms7040_mem(address_map &map);
+	void tms7041_mem(address_map &map);
+	void tms7042_mem(address_map &map);
 protected:
 	// chip info flags
 	static constexpr uint32_t CHIP_IS_CMOS        = 0x01;
@@ -345,6 +352,7 @@ public:
 	DECLARE_READ8_MEMBER(e_bus_data_r) { return machine().side_effect_disabled() ? 0xff : ((m_control & 0x20) ? 0xff : m_port_in_cb[4]()); }
 	DECLARE_WRITE8_MEMBER(e_bus_data_w) { if (~m_control & 0x20) m_port_out_cb[4](data); }
 
+	void tms70c46_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

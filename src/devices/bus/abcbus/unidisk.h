@@ -51,6 +51,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	bool m_cs;
+
+	void unidisk_io(address_map &map);
+	void unidisk_mem(address_map &map);
 };
 
 

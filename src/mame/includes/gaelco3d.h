@@ -13,6 +13,7 @@
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
 #include "machine/gen_latch.h"
+#include "machine/74259.h"
 #include "machine/timer.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "screen.h"
@@ -72,6 +73,8 @@ public:
 		m_serial(*this, "serial"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
+		m_mainlatch(*this, "mainlatch"),
+		m_outlatch(*this, "outlatch"),
 		m_paletteram16(*this, "paletteram"),
 		m_paletteram32(*this, "paletteram"),
 		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3"})
@@ -89,6 +92,8 @@ public:
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<ls259_device> m_mainlatch;
+	required_device<ls259_device> m_outlatch;
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	optional_shared_ptr<uint32_t> m_paletteram32;
@@ -153,4 +158,9 @@ public:
 	void footbpow(machine_config &config);
 	void gaelco3d2(machine_config &config);
 	void gaelco3d(machine_config &config);
+	void adsp_data_map(address_map &map);
+	void adsp_program_map(address_map &map);
+	void main020_map(address_map &map);
+	void main_map(address_map &map);
+	void tms_map(address_map &map);
 };

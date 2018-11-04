@@ -37,6 +37,10 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void djdma_io(address_map &map);
+	void djdma_mem(address_map &map);
 };
 
 

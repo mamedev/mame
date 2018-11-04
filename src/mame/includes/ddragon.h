@@ -131,6 +131,14 @@ public:
 	void ddragonb(machine_config &config);
 	void ddragonba(machine_config &config);
 	void ddragon2(machine_config &config);
+	void dd2_map(address_map &map);
+	void dd2_sound_map(address_map &map);
+	void dd2_sub_map(address_map &map);
+	void ddragon_map(address_map &map);
+	void ddragonba_sub_map(address_map &map);
+	void ddragonba_sub_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
 };
 
 

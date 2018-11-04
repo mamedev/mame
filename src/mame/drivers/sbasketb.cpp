@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER(sbasketb_state::irq_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
+ADDRESS_MAP_START(sbasketb_state::sbasketb_map)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_SHARE("videoram")
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbasketb_sound_map, AS_PROGRAM, 8, sbasketb_state )
+ADDRESS_MAP_START(sbasketb_state::sbasketb_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -245,7 +245,8 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(sbasketb_state::sbasketbu, sbasketb)
+MACHINE_CONFIG_START(sbasketb_state::sbasketbu)
+	sbasketb(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)

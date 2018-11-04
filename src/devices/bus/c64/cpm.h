@@ -29,10 +29,6 @@ public:
 	// construction/destruction
 	c64_cpm_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// not really public
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( dma_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -54,6 +50,12 @@ private:
 	int m_ba;
 
 	int m_reset;
+
+	DECLARE_READ8_MEMBER( dma_r );
+	DECLARE_WRITE8_MEMBER( dma_w );
+
+	void z80_io(address_map &map);
+	void z80_mem(address_map &map);
 };
 
 

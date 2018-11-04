@@ -50,7 +50,7 @@ const tiny_rom_entry *adam_digital_data_pack_device::device_rom_region() const
 //  ADDRESS_MAP( adam_ddp_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_ddp_mem, AS_PROGRAM, 8, adam_digital_data_pack_device )
+ADDRESS_MAP_START(adam_digital_data_pack_device::adam_ddp_mem)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
@@ -62,7 +62,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( adam_ddp_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( adam_ddp_io, AS_IO, 8, adam_digital_data_pack_device )
+ADDRESS_MAP_START(adam_digital_data_pack_device::adam_ddp_io)
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(p1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(p2_r, p2_w)
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_NOP // Multiplexed Address/Data

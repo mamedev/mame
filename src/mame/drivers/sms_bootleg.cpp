@@ -236,7 +236,7 @@ A Korean version has been seen too (unless this can be switched?)
 
 
 
-static ADDRESS_MAP_START( sms_supergame_map, AS_PROGRAM, 8, smsbootleg_state )
+ADDRESS_MAP_START(smsbootleg_state::sms_supergame_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xfff7) AM_RAM
 //  AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
@@ -253,7 +253,7 @@ WRITE8_MEMBER(smsbootleg_state::port18_w)
 }
 
 
-static ADDRESS_MAP_START( sms_supergame_io, AS_IO, 8, smsbootleg_state )
+ADDRESS_MAP_START(smsbootleg_state::sms_supergame_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 

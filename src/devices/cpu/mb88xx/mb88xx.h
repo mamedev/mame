@@ -137,6 +137,13 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
 
+	void data_4bit(address_map &map);
+	void data_5bit(address_map &map);
+	void data_6bit(address_map &map);
+	void data_7bit(address_map &map);
+	void program_10bit(address_map &map);
+	void program_11bit(address_map &map);
+	void program_9bit(address_map &map);
 protected:
 	mb88_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width);
 

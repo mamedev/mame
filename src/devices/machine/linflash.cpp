@@ -42,7 +42,7 @@ WRITE16_MEMBER( linear_flash_pccard_device::write_memory )
 }
 
 
-static ADDRESS_MAP_START(linear_flash_pccard_16mb, 0, 16, linear_flash_pccard_16mb_device)
+ADDRESS_MAP_START(linear_flash_pccard_16mb_device::linear_flash_pccard_16mb)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1l", intelfsh8_device, read, write, 0x00ff)
 	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1u", intelfsh8_device, read, write, 0xff00)
@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 linear_flash_pccard_16mb_device::linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_16MB, tag, owner, clock)
 {
-	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, *ADDRESS_MAP_NAME( linear_flash_pccard_16mb ) );
+	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, address_map_constructor(FUNC(linear_flash_pccard_16mb_device::linear_flash_pccard_16mb), this));
 }
 
 MACHINE_CONFIG_START(linear_flash_pccard_16mb_device::device_add_mconfig)
@@ -72,7 +72,7 @@ MACHINE_CONFIG_START(linear_flash_pccard_16mb_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-static ADDRESS_MAP_START(linear_flash_pccard_32mb, 0, 16, linear_flash_pccard_32mb_device)
+ADDRESS_MAP_START(linear_flash_pccard_32mb_device::linear_flash_pccard_32mb)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1l", intelfsh8_device, read, write, 0x00ff)
 	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1u", intelfsh8_device, read, write, 0xff00)
@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 linear_flash_pccard_32mb_device::linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_32MB, tag, owner, clock)
 {
-	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, *ADDRESS_MAP_NAME( linear_flash_pccard_32mb ) );
+	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, address_map_constructor(FUNC(linear_flash_pccard_32mb_device::linear_flash_pccard_32mb), this));
 }
 
 MACHINE_CONFIG_START(linear_flash_pccard_32mb_device::device_add_mconfig)
@@ -118,7 +118,7 @@ MACHINE_CONFIG_START(linear_flash_pccard_32mb_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-static ADDRESS_MAP_START(linear_flash_pccard_64mb, 0, 16, linear_flash_pccard_64mb_device)
+ADDRESS_MAP_START(linear_flash_pccard_64mb_device::linear_flash_pccard_64mb)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1l", intelfsh8_device, read, write, 0x00ff)
 	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1u", intelfsh8_device, read, write, 0xff00)
@@ -157,7 +157,7 @@ ADDRESS_MAP_END
 linear_flash_pccard_64mb_device::linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_64MB, tag, owner, clock)
 {
-	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, *ADDRESS_MAP_NAME( linear_flash_pccard_64mb ) );
+	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, address_map_constructor(FUNC(linear_flash_pccard_64mb_device::linear_flash_pccard_64mb), this));
 }
 
 MACHINE_CONFIG_START(linear_flash_pccard_64mb_device::device_add_mconfig)

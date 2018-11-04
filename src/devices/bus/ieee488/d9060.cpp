@@ -109,7 +109,7 @@ const tiny_rom_entry *d9060_device_base::device_rom_region() const
 //  ADDRESS_MAP( d9060_main_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( d9060_main_mem, AS_PROGRAM, 8, d9060_device_base )
+ADDRESS_MAP_START(d9060_device_base::d9060_main_mem)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_DEVICE(M6532_0_TAG, mos6532_new_device, ram_map)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_DEVICE(M6532_1_TAG, mos6532_new_device, ram_map)
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVICE(M6532_0_TAG, mos6532_new_device, io_map)
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( d9060_hdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( d9060_hdc_mem, AS_PROGRAM, 8, d9060_device_base )
+ADDRESS_MAP_START(d9060_device_base::d9060_hdc_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x370) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
