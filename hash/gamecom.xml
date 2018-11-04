@@ -1,5 +1,34 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+List of games which were planned but never finished or released.
+
+- A Bug's Life
+- Castlevania: Symphony of the Night (71-742)
+- Command and Conquer: Red Alert
+- Deer Hunter
+- Giga Pets Deluxe (71-748)
+- Holyfield Champion Boxing (71-749)
+- Furbyland
+- Godzilla
+- The Legend of the Lost Creator (unknown "Wyvern" game)
+- Madden Football 99   (71-705)
+- Metal Gear Solid
+- Mutoids
+- Name That Tune (71-729)
+- NASCAR Racing
+- NBA Live 99 (71-741)
+- Shadow Madness
+- Small Soldiers (71-743)
+- Sonic 3D Blast
+- Turok: Dinosaur Hunter
+- WCW Whiplash
+- X-Files
+
+-->
+
 <softwarelist name="gamecom" description="Tiger Game.com cartridges">
 
 	<software name="batmanr">
