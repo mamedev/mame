@@ -459,8 +459,8 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	// BGM, volumes handtuned to make SFXs audible (still not 100% right tho)
 	MCFG_DEVICE_ADD("k054539_2", K054539, 18.432_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.6)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.6)
 MACHINE_CONFIG_END
 
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.
