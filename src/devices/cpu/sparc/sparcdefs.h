@@ -127,7 +127,7 @@
 #define CMASK   ((op >> 4) & 7)
 
 #define RD      ((op >> 25) & 31)
-#define RDBITS	(op & 0x3e000000)
+#define RDBITS  (op & 0x3e000000)
 #define RS1     ((op >> 14) & 31)
 #define RS2     (op & 31)
 

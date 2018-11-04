@@ -7,10 +7,10 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "hp98620.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
-#include "hp98620.h"
 
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98620, bus::hp_dio, dio16_98620_device, "hp98620", "HP98620 DMA Controller")
@@ -28,14 +28,6 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_typ
 	device_dio32_card_interface(mconfig, *this),
 	m_irq_state(false)
 {
-}
-
-static INPUT_PORTS_START(hp98620_port)
-INPUT_PORTS_END
-
-ioport_constructor dio16_98620_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(hp98620_port);
 }
 
 void dio16_98620_device::device_start()

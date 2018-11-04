@@ -87,28 +87,29 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_START(s100_wunderbus_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, s100_wunderbus_device, pic_int_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
+void s100_wunderbus_device::device_add_mconfig(machine_config &config)
+{
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set(FUNC(s100_wunderbus_device::pic_int_w));
+	m_pic->in_sp_callback().set_constant(1);
 
 	INS8250(config, m_ace1, XTAL(18'432'000)/10);
 	m_ace1->out_tx_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_ace1->out_dtr_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_ace1->out_rts_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
-	m_ace1->out_int_callback().set(I8259A_TAG, FUNC(pic8259_device::ir3_w));
+	m_ace1->out_int_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
 
 	INS8250(config, m_ace2, XTAL(18'432'000)/10);
 	m_ace2->out_tx_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	m_ace2->out_dtr_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_ace2->out_rts_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
-	m_ace2->out_int_callback().set(I8259A_TAG, FUNC(pic8259_device::ir4_w));
+	m_ace2->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
 	INS8250(config, m_ace3, XTAL(18'432'000)/10);
 	m_ace3->out_tx_callback().set(RS232_C_TAG, FUNC(rs232_port_device::write_txd));
 	m_ace3->out_dtr_callback().set(RS232_C_TAG, FUNC(rs232_port_device::write_dtr));
 	m_ace3->out_rts_callback().set(RS232_C_TAG, FUNC(rs232_port_device::write_rts));
-	m_ace3->out_int_callback().set(I8259A_TAG, FUNC(pic8259_device::ir5_w));
+	m_ace3->out_int_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, "terminal"));
 	rs232a.rxd_handler().set(m_ace1, FUNC(ins8250_uart_device::rx_w));
@@ -134,7 +135,7 @@ MACHINE_CONFIG_START(s100_wunderbus_device::device_add_mconfig)
 
 	UPD1990A(config, m_rtc);
 	m_rtc->tp_callback().set(FUNC(s100_wunderbus_device::rtc_tp_w));
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

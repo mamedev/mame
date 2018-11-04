@@ -2,11 +2,11 @@
 // copyright-holders:Segher Boessenkool
 /*****************************************************************************
 
-	SunPlus micro'nSP disassembler
+    SunPlus micro'nSP disassembler
 
-	Copyright 2008-2017  Segher Boessenkool  <segher@kernel.crashing.org>
-	Licensed under the terms of the GNU GPL, version 2
-	http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+    Copyright 2008-2017  Segher Boessenkool  <segher@kernel.crashing.org>
+    Licensed under the terms of the GNU GPL, version 2
+    http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
 *****************************************************************************/
 
@@ -166,7 +166,7 @@ offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, uint16_t 
 			util::stream_format(stream, "reti");
 		else if (opA+1 < 8 && opA+opN < 8)
 			util::stream_format(stream, "pop %s, %s from [%s]",
-			       regs[opA+1], regs[opA+opN], regs[opB]);
+				   regs[opA+1], regs[opA+opN], regs[opB]);
 		else
 			util::stream_format(stream, "<BAD>");
 		return UNSP_DASM_OK;
@@ -176,7 +176,7 @@ offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, uint16_t 
 	case 0x2d:
 		if (opA+1 >= opN && opA < opN+7)
 			util::stream_format(stream, "push %s, %s to [%s]",
-			       regs[opA+1-opN], regs[opA], regs[opB]);
+				   regs[opA+1-opN], regs[opA], regs[opB]);
 		else
 			util::stream_format(stream, "<BAD>");
 		return UNSP_DASM_OK;

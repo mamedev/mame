@@ -4197,24 +4197,24 @@ ROM_START( mspacmanbg )
 ROM_END
 
 ROM_START( mspacmanbg2 )
-    ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "11-prg.bin",  0x0000, 0x4000,  CRC(e11d4132) SHA1(9ab6b9e1ec8ad183ccdddb971e8be3eb3f59db01) )
-    ROM_CONTINUE(0x8000,0x4000) // blocks 5+6 are repeated twice in here
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "11-prg.bin",  0x0000, 0x4000,  CRC(e11d4132) SHA1(9ab6b9e1ec8ad183ccdddb971e8be3eb3f59db01) )
+	ROM_CONTINUE(0x8000,0x4000) // blocks 5+6 are repeated twice in here
 
-    ROM_REGION( 0x8000, "gfx1", 0 )
-    ROM_LOAD( "13-chr.bin",    0x0000, 0x0800, CRC(8ee4a3b0) SHA1(01e3453c99f7a5d78ab083c49c650e898c0dd2ee) )
-    ROM_CONTINUE(0x1000,0x800)
-    ROM_CONTINUE(0x0800,0x800)
-    ROM_CONTINUE(0x1800,0x800)
-    ROM_IGNORE(0x2000)
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "13-chr.bin",    0x0000, 0x0800, CRC(8ee4a3b0) SHA1(01e3453c99f7a5d78ab083c49c650e898c0dd2ee) )
+	ROM_CONTINUE(0x1000,0x800)
+	ROM_CONTINUE(0x0800,0x800)
+	ROM_CONTINUE(0x1800,0x800)
+	ROM_IGNORE(0x2000)
 
-    ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set
-    ROM_LOAD( "82s123.h7",    0x0000, 0x0020, BAD_DUMP CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) )
-    ROM_LOAD( "82s129-3.d1",  0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "82s123.h7",    0x0000, 0x0020, BAD_DUMP CRC(3545e7e9) SHA1(b866b02579438afb11296e5c53a32c6425bd044d) )
+	ROM_LOAD( "82s129-3.d1",  0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
-    ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs, not dumped for this set */
-    ROM_LOAD( "82s129-1.a9",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-    ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs, not dumped for this set */
+	ROM_LOAD( "82s129-1.a9",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
 ROM_END
 
 ROM_START( mspacmanbgd )
@@ -4970,7 +4970,7 @@ ROM_START( titanpac ) /* GDP-01 main PCB with GDP-02 auxiliary card (same as Pir
 	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
 ROM_END
 
-/* Bootleg from Spanish company "FAMARE S.A.". Board labeled "FAMARESA 560-002"  
+/* Bootleg from Spanish company "FAMARE S.A.". Board labeled "FAMARESA 560-002"
    It's mainly a hack to remove Namco logo, but it was on an original Famaresa bootleg hardware */
 ROM_START( pacmanfm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5299,17 +5299,17 @@ ROM_START( mspacmbmc )
 	ROM_LOAD( "misspacmanfalgas_4.bin", 0x8000, 0x1000, CRC(8c3e6de6) SHA1(fed6e9a2b210b07e7189a18574f6b8c4ec5bb49b) )
 	ROM_LOAD( "misspacmanfalgas_5.bin", 0x9000, 0x1000, CRC(206a9623) SHA1(20006f945c1b7b0e3c0415eecc0b148e5a6a1dfa) )
 
-        /* Undumped on the Marti Colls PCB, taken from the parent set */
+	/* Undumped on the Marti Colls PCB, taken from the parent set */
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "5e", 0x0000, 0x1000, BAD_DUMP CRC(5c281d01) SHA1(5e8b472b615f12efca3fe792410c23619f067845) )
 	ROM_LOAD( "5f", 0x1000, 0x1000, BAD_DUMP CRC(615af909) SHA1(fd6a1dde780b39aea76bf1c4befa5882573c2ef4) )
 
-        /* Undumped on the Marti Colls PCB, taken from the parent set */
+	/* Undumped on the Marti Colls PCB, taken from the parent set */
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "82s123.7f", 0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
 	ROM_LOAD( "82s126.4a", 0x0020, 0x0100, BAD_DUMP CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
-        /* Undumped on the Marti Colls PCB, taken from the parent set */
+	/* Undumped on the Marti Colls PCB, taken from the parent set */
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
 	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */

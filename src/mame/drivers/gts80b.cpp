@@ -374,7 +374,7 @@ WRITE8_MEMBER( gts80b_state::port3b_w )
 	if (m_r0_sound)
 		m_r0_sound->write(space, offset, sndcmd);
 	if (m_r1_sound)
-		m_r1_sound->write(space, offset, sndcmd);
+		m_r1_sound->write(sndcmd);
 }
 
 void gts80b_state::machine_reset()

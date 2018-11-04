@@ -130,8 +130,8 @@ public:
 private:
 	DECLARE_WRITE_LINE_MEMBER(bankswitch_0_w);
 	DECLARE_WRITE_LINE_MEMBER(bankswitch_1_w);
-	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(watchdog_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(interrupt_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(watchdog_reset_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE_LINE_MEMBER(bitplane_select_0_w);
@@ -149,6 +149,7 @@ private:
 	uint8_t m_rom_bank;
 	uint8_t m_bitplane_select;
 	pen_t m_pens[NUM_PENS];
+	bool m_interrupt_enable;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -190,20 +191,22 @@ WRITE_LINE_MEMBER(supertnk_state::bankswitch_1_w)
 
 WRITE_LINE_MEMBER(supertnk_state::vblank_interrupt)
 {
-	if (state)
+	if (state && m_interrupt_enable)
 		m_maincpu->set_input_line(INT_9980A_LEVEL4, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(supertnk_state::interrupt_ack_w)
+WRITE_LINE_MEMBER(supertnk_state::interrupt_enable_w)
 {
-	m_maincpu->set_input_line(INT_9980A_LEVEL4, CLEAR_LINE);
+	m_interrupt_enable = state;
+	if (!state)
+		m_maincpu->set_input_line(INT_9980A_LEVEL4, CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER(supertnk_state::watchdog_enable_w)
+WRITE_LINE_MEMBER(supertnk_state::watchdog_reset_w)
 {
-	m_watchdog->watchdog_enable(state);
+	m_watchdog->watchdog_enable(!state);
 }
 
 
@@ -345,7 +348,6 @@ void supertnk_state::supertnk_io_map(address_map &map)
 {
 	map(0x0000, 0x0000).nopw();
 	map(0x0400, 0x0407).w("outlatch", FUNC(ls259_device::write_d0));
-	map(0x0406, 0x0406).w(FUNC(supertnk_state::interrupt_ack_w));
 }
 
 
@@ -449,20 +451,16 @@ MACHINE_CONFIG_START(supertnk_state::supertnk)
 	outlatch.q_out_cb<1>().set(FUNC(supertnk_state::bitplane_select_1_w));
 	outlatch.q_out_cb<2>().set(FUNC(supertnk_state::bankswitch_0_w));
 	outlatch.q_out_cb<4>().set(FUNC(supertnk_state::bankswitch_1_w));
-	//outlatch.q_out_cb<6>().set(FUNC(supertnk_state::interrupt_enable_w));
-	outlatch.q_out_cb<7>().set(FUNC(supertnk_state::watchdog_enable_w));
+	outlatch.q_out_cb<6>().set(FUNC(supertnk_state::watchdog_reset_w)).invert();
+	outlatch.q_out_cb<7>().set(FUNC(supertnk_state::interrupt_enable_w));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(supertnk_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, supertnk_state, vblank_interrupt))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(20.79_MHz_XTAL / 4, 330, 0, 32*8, 315, 0, 32*8); // parameters guessed
+	screen.set_screen_update(FUNC(supertnk_state::screen_update));
+	screen.screen_vblank().set(FUNC(supertnk_state::vblank_interrupt));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

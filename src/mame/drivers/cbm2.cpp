@@ -1169,7 +1169,7 @@ void cbm2_state::ext_mem(address_map &map)
 void cbm2_state::ext_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x0001).mirror(0x1e).rw(EXT_I8259A_TAG, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0000, 0x0001).mirror(0x1e).rw(m_ext_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0020, 0x0027).mirror(0x18).rw(EXT_MOS6525_TAG, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
 }
 
@@ -2715,13 +2715,13 @@ MACHINE_CONFIG_START(cbm2hp_state::bx256hp)
 	b256hp(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_ntsc)
 
-	MCFG_DEVICE_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))
+	MCFG_DEVICE_ADD(m_ext_cpu, I8088, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(ext_mem)
 	MCFG_DEVICE_IO_MAP(ext_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD(EXT_I8259A_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0))
+	PIC8259(config, m_ext_pic, 0);
+	m_ext_pic->out_int_callback().set_inputline(m_ext_cpu, INPUT_LINE_IRQ0);
 
 	TPI6525(config, m_ext_tpi, 0);
 	m_ext_tpi->in_pa_cb().set(EXT_MOS6526_TAG, FUNC(mos6526_device::pa_r));
@@ -2784,13 +2784,13 @@ MACHINE_CONFIG_START(cbm2hp_state::cbm730)
 	cbm720(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_pal)
 
-	MCFG_DEVICE_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))
+	MCFG_DEVICE_ADD(m_ext_cpu, I8088, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(ext_mem)
 	MCFG_DEVICE_IO_MAP(ext_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD(EXT_I8259A_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0))
+	PIC8259(config, m_ext_pic, 0);
+	m_ext_pic->out_int_callback().set_inputline(m_ext_cpu, INPUT_LINE_IRQ0);
 
 	TPI6525(config, m_ext_tpi, 0);
 	m_ext_tpi->in_pa_cb().set(EXT_MOS6526_TAG, FUNC(mos6526_device::pa_r));

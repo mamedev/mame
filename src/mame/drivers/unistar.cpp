@@ -66,8 +66,7 @@ void unistar_state::unistar_mem(address_map &map)
 
 void unistar_state::unistar_io(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
-	map.global_mask(0xff);
+	//map.unmap_value_high();
 	map(0x00, 0x0f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x84, 0x84).portr("CONFIG");
 	map(0x8c, 0x8d).rw("stc", FUNC(am9513_device::read8), FUNC(am9513_device::write8));

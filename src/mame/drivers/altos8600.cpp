@@ -22,9 +22,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dmac(*this, "dmac"),
-		m_pic1(*this, "pic8259_1"),
-		m_pic2(*this, "pic8259_2"),
-		m_pic3(*this, "pic8259_3"),
+		m_pic(*this, "pic8259%u", 1U),
 		m_uart8274(*this, "uart8274"),
 		m_fdc(*this, "fd1797"),
 		m_ram(*this, RAM_TAG),
@@ -91,9 +89,7 @@ private:
 	void format_sector();
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i8089_device> m_dmac;
-	required_device<pic8259_device> m_pic1;
-	required_device<pic8259_device> m_pic2;
-	required_device<pic8259_device> m_pic3;
+	required_device_array<pic8259_device, 3> m_pic;
 	required_device<i8274_new_device> m_uart8274;
 	required_device<fd1797_device> m_fdc;
 	required_device<ram_device> m_ram;
@@ -205,7 +201,7 @@ u8 altos8600_state::read_sector()
 	if(secoff >= 511)
 	{
 		m_dmac->drq1_w(CLEAR_LINE);
-		m_pic2->ir0_w(ASSERT_LINE);
+		m_pic[1]->ir0_w(ASSERT_LINE);
 		m_stat &= ~1;
 		m_stat |= 2;
 	}
@@ -225,7 +221,7 @@ bool altos8600_state::write_sector(u8 data)
 		m_stat |= 2;
 		hard_disk_write(m_hdd->get_hard_disk_file(), m_lba, m_sector);
 		m_dmac->drq1_w(CLEAR_LINE);
-		m_pic2->ir0_w(ASSERT_LINE);
+		m_pic[1]->ir0_w(ASSERT_LINE);
 		return true;
 	}
 	return false;
@@ -240,7 +236,7 @@ READ8_MEMBER(altos8600_state::hd_r)
 				return read_sector();
 			break;
 		case 3:
-			m_pic2->ir0_w(CLEAR_LINE);
+			m_pic[1]->ir0_w(CLEAR_LINE);
 			return m_stat;
 	}
 	return 0;
@@ -332,7 +328,7 @@ WRITE8_MEMBER(altos8600_state::hd_w)
 					m_dmac->drq1_w(ASSERT_LINE);
 					break;
 			}
-			m_pic2->ir0_w(ASSERT_LINE);
+			m_pic[1]->ir0_w(ASSERT_LINE);
 			break;
 	}
 }
@@ -360,13 +356,13 @@ WRITE_LINE_MEMBER(altos8600_state::sintr1_w)
 	if(state)
 	{
 		m_dmac->drq1_w(CLEAR_LINE);
-		m_pic2->ir0_w(ASSERT_LINE);
-		m_pic2->ir3_w(ASSERT_LINE);
+		m_pic[1]->ir0_w(ASSERT_LINE);
+		m_pic[1]->ir3_w(ASSERT_LINE);
 		m_stat &= ~1;
 		m_stat |= 2;
 	}
 	else
-		m_pic2->ir3_w(CLEAR_LINE);
+		m_pic[1]->ir3_w(CLEAR_LINE);
 }
 
 READ16_MEMBER(altos8600_state::fault_r)
@@ -480,7 +476,7 @@ WRITE8_MEMBER(altos8600_state::romport_w)
 
 WRITE8_MEMBER(altos8600_state::clrsys_w)
 {
-	m_pic1->ir0_w(CLEAR_LINE);
+	m_pic[0]->ir0_w(CLEAR_LINE);
 }
 
 WRITE8_MEMBER(altos8600_state::ics_attn_w)
@@ -502,9 +498,9 @@ WRITE16_MEMBER(altos8600_state::mode_w)
 READ8_MEMBER(altos8600_state::get_slave_ack)
 {
 	if(offset == 2)
-		return m_pic2->acknowledge();
+		return m_pic[1]->acknowledge();
 	else if(offset == 3)
-		return m_pic3->acknowledge();
+		return m_pic[2]->acknowledge();
 	return 0x00;
 }
 
@@ -605,7 +601,7 @@ READ16_MEMBER(altos8600_state::cpuio_r)
 {
 	if(m_user && !machine().side_effects_disabled())
 	{
-		m_pic1->ir0_w(ASSERT_LINE);
+		m_pic[0]->ir0_w(ASSERT_LINE);
 		return 0;
 	}
 	return m_dmac->space(AS_IO).read_word_unaligned(offset << 1, mem_mask);
@@ -615,7 +611,7 @@ WRITE16_MEMBER(altos8600_state::cpuio_w)
 {
 	if(m_user && !machine().side_effects_disabled())
 	{
-		m_pic1->ir0_w(ASSERT_LINE);
+		m_pic[0]->ir0_w(ASSERT_LINE);
 		return;
 	}
 	m_dmac->space(AS_IO).write_word_unaligned(offset << 1, data, mem_mask);
@@ -661,7 +657,7 @@ IRQ_CALLBACK_MEMBER(altos8600_state::inta)
 {
 	m_user = false;
 	m_mode &= ~1;
-	return m_pic1->acknowledge();
+	return m_pic[0]->acknowledge();
 }
 
 void altos8600_state::cpu_mem(address_map &map)
@@ -709,10 +705,10 @@ void altos8600_state::dmac_io(address_map &map)
 	map(0x0048, 0x004f).rw(m_uart8274, FUNC(i8274_new_device::cd_ba_r), FUNC(i8274_new_device::cd_ba_w)).umask16(0x00ff);
 	map(0x0048, 0x004f).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0050, 0x0057).rw(FUNC(altos8600_state::romport_r), FUNC(altos8600_state::romport_w));
-	map(0x0058, 0x005f).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0058, 0x005f).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x0058, 0x005f).w(FUNC(altos8600_state::clrsys_w)).umask16(0xff00);
-	map(0x0060, 0x0067).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x0068, 0x006f).rw(m_pic3, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0060, 0x0067).rw(m_pic[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0068, 0x006f).rw(m_pic[2], FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x0070, 0x0077).noprw();
 	map(0x0078, 0x0079).w(FUNC(altos8600_state::ics_attn_w));
 	map(0x0200, 0x03ff).rw(FUNC(altos8600_state::mmuflags_r), FUNC(altos8600_state::mmuflags_w));
@@ -740,20 +736,20 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_DEVICE_IO_MAP(dmac_io)
 	MCFG_I8089_DATA_WIDTH(16)
 	MCFG_I8089_SINTR1(WRITELINE(*this, altos8600_state, sintr1_w))
-	MCFG_I8089_SINTR2(WRITELINE(m_pic2, pic8259_device, ir4_w))
+	MCFG_I8089_SINTR2(WRITELINE(m_pic[1], pic8259_device, ir4_w))
 
-	PIC8259(config, m_pic1, 0);
-	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
-	m_pic1->in_sp_callback().set_constant(1);
-	m_pic1->read_slave_ack_callback().set(FUNC(altos8600_state::get_slave_ack));
+	PIC8259(config, m_pic[0], 0);
+	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic[0]->in_sp_callback().set_constant(1);
+	m_pic[0]->read_slave_ack_callback().set(FUNC(altos8600_state::get_slave_ack));
 
-	PIC8259(config, m_pic2, 0);
-	m_pic2->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir2_w));
-	m_pic2->in_sp_callback().set_constant(0);
+	PIC8259(config, m_pic[1], 0);
+	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir2_w));
+	m_pic[1]->in_sp_callback().set_constant(0);
 
-	PIC8259(config, m_pic3, 0);
-	m_pic3->out_int_callback().set(m_pic1, FUNC(pic8259_device::ir3_w));
-	m_pic3->in_sp_callback().set_constant(0);
+	PIC8259(config, m_pic[2], 0);
+	m_pic[2]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir3_w));
+	m_pic[2]->in_sp_callback().set_constant(0);
 
 	RAM(config, RAM_TAG).set_default_size("1M");//.set_extra_options("512K");
 
@@ -764,7 +760,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	m_uart8274->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_uart8274->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
-	m_uart8274->out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir7_w));
+	m_uart8274->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir7_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxa_w));
@@ -785,10 +781,10 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	pit.set_clk<1>(1228800);
 	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_new_device::rxtxcb_w));
 	pit.set_clk<2>(1228800);
-	pit.out_handler<1>().set(m_pic1, FUNC(pic8259_device::ir1_w));
+	pit.out_handler<1>().set(m_pic[0], FUNC(pic8259_device::ir1_w));
 
 	FD1797(config, m_fdc, 2000000);
-	m_fdc->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir1_w));
+	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(FUNC(altos8600_state::fddrq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats)
@@ -797,8 +793,8 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 
 	ACS8600_ICS(config, m_ics, 0);
 	m_ics->set_host_space(m_dmac, AS_PROGRAM); // TODO: fixme
-	m_ics->irq1_callback().set(m_pic1, FUNC(pic8259_device::ir5_w));
-	m_ics->irq2_callback().set(m_pic1, FUNC(pic8259_device::ir6_w));
+	m_ics->irq1_callback().set(m_pic[0], FUNC(pic8259_device::ir5_w));
+	m_ics->irq2_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));
 
 	MCFG_HARDDISK_ADD("hdd")
 MACHINE_CONFIG_END

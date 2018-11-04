@@ -859,7 +859,7 @@ ROM_START( multchmpk )
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(6e741fcd) SHA1(742e0952916c00f67dd9f8d01e721a9a538d2fc4) )
 ROM_END
 
-ROM_START( multchmpa )
+ROM_START( multchmpa ) /* Also found on a ESD 10-10-98 PCB which looks identical to the ESD 11-09-98 PCB */
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000, CRC(bfd39198) SHA1(11c0cb7a865daa1be9301ddfa5f5d2014e8f9908) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000, CRC(cd769077) SHA1(741cca679393dab031691834874c96fee791241e) )
@@ -1573,10 +1573,10 @@ Notes:
               Filename      Type                                      Use
               ---------------------------------------------------------------------------
               68K_PRG.BIN   Hitachi HN27C4096 256K x16 EPROM          68000 Program
-              Z80_PRG.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Z80 Program
-              SAMPLES.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Oki M6295 Samples
-              BG0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Background Graphics
-              SP0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Sprite Graphics
+              Z80_PRG.BIN   Atmel AT27C020 256K x8 OTP mask ROM       Z80 Program
+              SAMPLES.BIN   Atmel AT27C020 256K x8 OTP mask ROM       Oki M6295 Samples
+              BG0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 Flash ROM  Background Graphics
+              SP0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 Flash ROM  Sprite Graphics
 
               Note there are no IC locations on the PCB, so the extension of the ROMs is just 'BIN'
 

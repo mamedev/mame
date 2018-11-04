@@ -43,7 +43,7 @@ enum line_state
 enum
 {
 	// input lines
-	MAX_INPUT_LINES = 32+3,
+	MAX_INPUT_LINES = 64+3,
 	INPUT_LINE_IRQ0 = 0,
 	INPUT_LINE_IRQ1 = 1,
 	INPUT_LINE_IRQ2 = 2,

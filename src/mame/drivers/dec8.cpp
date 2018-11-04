@@ -3173,7 +3173,7 @@ There is a small piggyback attached under CPUs PCB full of 74Sxx
 
 This boards looks like a legit PCB from Data East, even if a Data East logo is not present.
 
-ALL MEMORIES ARE MASKROMS!
+ALL MEMORIES ARE MASK ROMS!
 
 */
 ROM_START( meikyuha )

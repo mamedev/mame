@@ -453,13 +453,13 @@ MACHINE_CONFIG_START(special_state::specimx)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* Devices */
-	MCFG_DEVICE_ADD( "pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("custom", specimx_sound_device, set_input_ch0))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("custom", specimx_sound_device, set_input_ch1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("custom", specimx_sound_device, set_input_ch2))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(2000000);
+	m_pit->out_handler<0>().set("custom", FUNC(specimx_sound_device::set_input_ch0));
+	m_pit->set_clk<1>(2000000);
+	m_pit->out_handler<1>().set("custom", FUNC(specimx_sound_device::set_input_ch1));
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set("custom", FUNC(specimx_sound_device::set_input_ch2));
 
 	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
 	m_ppi->out_pa_callback().set(FUNC(special_state::specialist_8255_porta_w));

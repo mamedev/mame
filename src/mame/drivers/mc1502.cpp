@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    drivers/mc1502.c
+    drivers/mc1502.cpp
 
     Driver file for Elektronika MS 1502
 
@@ -230,24 +230,24 @@ static INPUT_PORTS_START( mc1502 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mc1502_state::mc1502)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(16'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(mc1502_map)
-	MCFG_DEVICE_IO_MAP(mc1502_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, XTAL(16'000'000)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mc1502_state::mc1502_map);
+	m_maincpu->set_addrmap(AS_IO, &mc1502_state::mc1502_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	MCFG_MACHINE_START_OVERRIDE( mc1502_state, mc1502 )
 	MCFG_MACHINE_RESET_OVERRIDE( mc1502_state, mc1502 )
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/12) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/12) /* serial port */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, mc1502_state, mc1502_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000)/12) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mc1502_state, mc1502_pit8253_out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(16'000'000)/12); /* heartbeat IRQ */
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(16'000'000)/12); /* serial port */
+	m_pit8253->out_handler<1>().set(FUNC(mc1502_state::mc1502_pit8253_out1_changed));
+	m_pit8253->set_clk<2>(XTAL(16'000'000)/12); /* pio port c pin 4, and speaker polling enough */
+	m_pit8253->out_handler<2>().set(FUNC(mc1502_state::mc1502_pit8253_out2_changed));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	I8255(config, m_ppi8255n1);
 	m_ppi8255n1->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
@@ -266,8 +266,8 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	m_upd8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_upd8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	/* XXX RxD data are accessible via PPI port C, bit 7 */
-	m_upd8251->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir7_w)); /* default handler does nothing */
-	m_upd8251->txrdy_handler().set("pic8259", FUNC(pic8259_device::ir7_w));
+	m_upd8251->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir7_w)); /* default handler does nothing */
+	m_upd8251->txrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 	m_upd8251->syndet_handler().set(FUNC(mc1502_state::mc1502_i8251_syndet));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
@@ -277,12 +277,12 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(m_pic8259, pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(m_pic8259, pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(m_pic8259, pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(m_pic8259, pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(m_pic8259, pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(m_pic8259, pic8259_device, ir7_w))
 
 	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "cga_mc1502", true) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "fdc", false)

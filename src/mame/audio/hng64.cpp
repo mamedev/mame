@@ -201,7 +201,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 	// seems to one or more of the DMARQ on the V53, writes here when it expects DMA channel 3 to transfer ~0x20 bytes just after startup
 
 	/* TODO: huh? */
-	m_audiocpu->dreq3_w(data&0x1);
+	m_audiocpu->dreq_w<3>(data&0x1);
 	m_dsp->l7a1045_sound_w(space,8/2,data,mem_mask);
 //  m_audiocpu->hack_w(1);
 
@@ -388,23 +388,23 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 
 
 
-MACHINE_CONFIG_START(hng64_state::hng64_audio)
-	MCFG_DEVICE_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
-	MCFG_DEVICE_PROGRAM_MAP(hng_sound_map)
-	MCFG_DEVICE_IO_MAP(hng_sound_io)
-	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE(*this, hng64_state, dma_hreq_cb))
-	MCFG_V53_DMAU_IN_MEMR_CB(READ8(*this, hng64_state, dma_memr_cb))
-	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8(*this, hng64_state,dma_iow3_cb))
+void hng64_state::hng64_audio(machine_config &config)
+{
+	V53A(config, m_audiocpu, 32000000/2);              // V53A, 16? mhz!
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hng64_state::hng_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &hng64_state::hng_sound_io);
+	m_audiocpu->out_hreq_cb().set(FUNC(hng64_state::dma_hreq_cb));
+	m_audiocpu->in_memr_cb().set(FUNC(hng64_state::dma_memr_cb));
+	m_audiocpu->out_iow_cb<3>().set(FUNC(hng64_state::dma_iow3_cb));
 
-	MCFG_V53_TCU_OUT0_HANDLER(WRITELINE(*this, hng64_state, tcu_tm0_cb))
-	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(*this, hng64_state, tcu_tm1_cb))
-	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(*this, hng64_state, tcu_tm2_cb))
+	m_audiocpu->out_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
+	m_audiocpu->out_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
+	m_audiocpu->out_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("l7a1045", L7A1045, 32000000/2 ) // ??
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-MACHINE_CONFIG_END
+	L7A1045(config, m_dsp, 32000000/2); // ??
+	m_dsp->add_route(0, "lspeaker", 1.0);
+	m_dsp->add_route(1, "rspeaker", 1.0);
+}

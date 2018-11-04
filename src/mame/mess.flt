@@ -25,6 +25,7 @@ agat.cpp
 aim65.cpp
 aim65_40.cpp
 akaiax80.cpp
+alcat7100.cpp
 alesis.cpp
 alesis_qs.cpp
 alphasma.cpp
@@ -821,6 +822,8 @@ wangpc.cpp
 wicat.cpp
 wswan.cpp
 wy100.cpp
+wy50.cpp
+wy85.cpp
 wyse.cpp
 x07.cpp
 x1.cpp

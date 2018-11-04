@@ -1824,13 +1824,13 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(FUNC(mz2500_state::mz2500_rtc_alarm_irq));
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(31250)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz2500_state, pit8253_clk0_irq))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(31250);
+	m_pit->out_handler<0>().set(FUNC(mz2500_state::pit8253_clk0_irq));
 	// TODO: is this really right?
-	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit", pit8253_device, write_clk1))
+	m_pit->set_clk<1>(0);
+	m_pit->set_clk<2>(16); //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
+	m_pit->out_handler<2>().set(m_pit, FUNC(pit8253_device::write_clk1));
 
 	MB8877(config, m_fdc, 1_MHz_XTAL);
 

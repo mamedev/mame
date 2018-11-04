@@ -290,6 +290,7 @@ protected:
 	uint16_t m_mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
 	uint16_t m_mmu_tmp_buserror_sz;   /* temporary hack: (first) bus error size` */
 
+	bool m_mmu_tablewalk;			  /* set when MMU walks page tables */
 	uint32_t m_ic_address[M68K_IC_SIZE];   /* instruction cache address data */
 	uint32_t m_ic_data[M68K_IC_SIZE];      /* instruction cache content data */
 	bool   m_ic_valid[M68K_IC_SIZE];     /* instruction cache valid flags */

@@ -2,7 +2,6 @@
 // copyright-holders:Sergey Svishchev
 #include "emu.h"
 #include "hlebase.h"
-#include "hlekbd.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

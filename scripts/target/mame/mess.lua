@@ -673,6 +673,7 @@ MACHINES["IOPINTC"] = true
 MACHINES["IOPSIO2"] = true
 MACHINES["IOPTIMER"] = true
 MACHINES["Z8038"] = true
+MACHINES["AIC6250"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -3444,6 +3445,10 @@ files {
 	MAME_DIR .. "src/mame/machine/xavix.cpp",
 	MAME_DIR .. "src/mame/audio/xavix.cpp",
 	MAME_DIR .. "src/mame/includes/xavix.h",
+	MAME_DIR .. "src/mame/machine/xavix_mtrk_wheel.cpp",
+	MAME_DIR .. "src/mame/machine/xavix_mtrk_wheel.h",
+	MAME_DIR .. "src/mame/machine/xavix_madfb_ball.cpp",
+	MAME_DIR .. "src/mame/machine/xavix_madfb_ball.h",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")
@@ -3641,6 +3646,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/acd.cpp",
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
 	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
+	MAME_DIR .. "src/mame/drivers/alcat7100.cpp",
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",
 	MAME_DIR .. "src/mame/drivers/alphasma.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex.cpp",
@@ -3850,6 +3856,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/vsmilepro.cpp",
 	MAME_DIR .. "src/mame/drivers/wicat.cpp",
 	MAME_DIR .. "src/mame/drivers/wy100.cpp",
+	MAME_DIR .. "src/mame/drivers/wy50.cpp",
+	MAME_DIR .. "src/mame/drivers/wy85.cpp",
 	MAME_DIR .. "src/mame/drivers/wyse.cpp",
 	MAME_DIR .. "src/mame/drivers/xor100.cpp",
 	MAME_DIR .. "src/mame/includes/xor100.h",

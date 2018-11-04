@@ -925,7 +925,7 @@ void lua_engine::initialize()
  * thread.result() - get thread result as string
  * thread.busy - check if thread is running
  * thread.yield - check if thread is yielded
-*/
+ */
 
 	emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>(),
 			"start", [](context &ctx, const char *scr) {
@@ -981,6 +981,15 @@ void lua_engine::initialize()
 			"busy", sol::readonly(&context::busy),
 			"yield", sol::readonly(&context::yield));
 
+/*
+ * emu.item(item_index)
+ * item.size - size of the raw data type
+ * item.count - number of entries
+ * item:read(offset) - read entry value by index
+ * item:read_block(offset, count) - read a block of entry values as a string (byte addressing)
+ * item:write(offset, value) - write entry value by index
+ */
+ 
 	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
 					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
 					{
@@ -1017,7 +1026,7 @@ void lua_engine::initialize()
 					if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
 						buff->set_len(0);
 					else
-						memcpy(buff->get_ptr(), item.base, buff->get_len());
+						memcpy(buff->get_ptr(), (uint8_t *)item.base + offset, buff->get_len());
 					return buff;
 				},
 			"write", [](save_item &item, int offset, uint64_t value) {
@@ -1340,7 +1349,7 @@ void lua_engine::initialize()
  * device:debug() - debug interface, cpus only
  * device.spaces[] - device address spaces table
  * device.state[] - device state entries table
- * device.items[] - device save state items table
+ * device.items[] - device save state items table (item name is key, item index is value)
  */
 
 	sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor,
@@ -1702,25 +1711,25 @@ void lua_engine::initialize()
  * render:max_update_rate() -
  * render:ui_target() - target for ui drawing
  * render:ui_container() - container for ui drawing
- * render.target[] - render_target table
+ * render.targets[] - render_target table
  */
 
 	sol().registry().new_usertype<render_manager>("render", "new", sol::no_constructor,
 			"max_update_rate", &render_manager::max_update_rate,
 			"ui_target", &render_manager::ui_target,
 			"ui_container", &render_manager::ui_container,
-			"targets", [this](render_manager &r) {
+			"targets", sol::property([this](render_manager &r) {
 					sol::table target_table = sol().create_table();
 					int tc = 0;
 					for(render_target &curr_rt : r.targets())
 						target_table[tc++] = &curr_rt;
 					return target_table;
-				});
+				}));
 
 /* machine.screens[screen_tag]
- * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol
+ * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol, color is 32bit argb
  * screen:draw_line(x1, y1, x2, y2, linecol) - draw line from (x1, y1)-(x2, y2) colored linecol
- * screen:draw_text(x || justify, y, message, [opt] color) - draw message at (x, y) or at line y with left, right, center justification
+ * screen:draw_text(x || justify, y, message, [opt] fgcolor, [opt] bgcolor) - draw message at (x, y) or at line y with left, right, center justification
  * screen:height() - screen height
  * screen:width() - screen width
  * screen:orientation() - screen angle, flipx, flipy
@@ -1754,7 +1763,7 @@ void lua_engine::initialize()
 					y2 = std::min(std::max(0.0f, y2), float(sc_height-1)) / float(sc_height);
 					sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				},
-			"draw_text", [this](screen_device &sdev, sol::object xobj, float y, const char *msg, sol::object color) {
+			"draw_text", [this](screen_device &sdev, sol::object xobj, float y, const char *msg, sol::object color, sol::object bcolor) {
 					int sc_width = sdev.visible_area().width();
 					int sc_height = sdev.visible_area().height();
 					auto justify = ui::text_layout::LEFT;
@@ -1778,12 +1787,13 @@ void lua_engine::initialize()
 						return;
 					}
 					rgb_t textcolor = UI_TEXT_COLOR;
-					rgb_t bgcolor = UI_TEXT_BG_COLOR;
+					rgb_t bgcolor = 0;
 					if(color.is<uint32_t>())
 						textcolor = rgb_t(color.as<uint32_t>());
+					if(bcolor.is<uint32_t>())
+						bgcolor = rgb_t(bcolor.as<uint32_t>());
 					mame_machine_manager::instance()->ui().draw_text_full(sdev.container(), msg, x, y, (1.0f - x),
-										justify, ui::text_layout::WORD, mame_ui_manager::NORMAL, textcolor,
-										bgcolor, nullptr, nullptr);
+										justify, ui::text_layout::WORD, mame_ui_manager::OPAQUE_, textcolor, bgcolor);
 				},
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
 			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },

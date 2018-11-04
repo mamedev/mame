@@ -3288,7 +3288,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	// Always set seek complete and track 00 signal (not super clean, but does not affect operation):
 	m_hdc->in_sc_callback().set_constant(1);                             // SEEK COMPLETE (VCC = complete)
-	m_hdc->in_tk000_callback().set_constant(1); 			     // TRACK 00 signal (= from drive)
+	m_hdc->in_tk000_callback().set_constant(1);                  // TRACK 00 signal (= from drive)
 
 	MCFG_HARDDISK_ADD("decharddisk1")
 	/// ******************************** / HARD DISK CONTROLLER ****************************************

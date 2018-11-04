@@ -138,36 +138,36 @@ DEFINE_DEVICE_TYPE(HP_09825_67907, hp_09825_67907_cpu_device, "09825_67907", "He
 WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
 {
 	if (state)
-		BIT_SET(m_flags , HPHYBRID_DMAR_BIT);
+		BIT_SET(m_flags, HPHYBRID_DMAR_BIT);
 	else
-		BIT_CLR(m_flags , HPHYBRID_DMAR_BIT);
+		BIT_CLR(m_flags, HPHYBRID_DMAR_BIT);
 }
 
 WRITE_LINE_MEMBER(hp_hybrid_cpu_device::halt_w)
 {
 	if (state)
-		BIT_SET(m_flags , HPHYBRID_HALT_BIT);
+		BIT_SET(m_flags, HPHYBRID_HALT_BIT);
 	else
-		BIT_CLR(m_flags , HPHYBRID_HALT_BIT);
+		BIT_CLR(m_flags, HPHYBRID_HALT_BIT);
 }
 
 WRITE_LINE_MEMBER(hp_hybrid_cpu_device::status_w)
 {
 	if (state)
-		BIT_SET(m_flags , HPHYBRID_STS_BIT);
+		BIT_SET(m_flags, HPHYBRID_STS_BIT);
 	else
-		BIT_CLR(m_flags , HPHYBRID_STS_BIT);
+		BIT_CLR(m_flags, HPHYBRID_STS_BIT);
 }
 
 WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 {
 	if (state)
-		BIT_SET(m_flags , HPHYBRID_FLG_BIT);
+		BIT_SET(m_flags, HPHYBRID_FLG_BIT);
 	else
-		BIT_CLR(m_flags , HPHYBRID_FLG_BIT);
+		BIT_CLR(m_flags, HPHYBRID_FLG_BIT);
 }
 
-uint8_t hp_hybrid_cpu_device::pa_r(void) const
+uint8_t hp_hybrid_cpu_device::pa_r() const
 {
 	return CURRENT_PA;
 }
@@ -197,23 +197,23 @@ device_memory_interface::space_config_vector hp_hybrid_cpu_device::memory_space_
 void hp_hybrid_cpu_device::device_start()
 {
 	{
-		state_add(HPHYBRID_A,  "A", m_reg_A);
-		state_add(HPHYBRID_B,  "B", m_reg_B);
-		state_add(HPHYBRID_C,  "C", m_reg_C);
-		state_add(HPHYBRID_D,  "D", m_reg_D);
-		state_add(HPHYBRID_P,  "P", m_reg_P);
-		state_add(STATE_GENPC, "GENPC", m_genpc).noshow();
-		state_add(STATE_GENPCBASE, "CURPC", m_genpc).noshow();
-		state_add(HPHYBRID_R,  "R", m_reg_R);
-		state_add(STATE_GENSP, "GENSP", m_reg_R).noshow();
-		state_add(HPHYBRID_IV, "IV", m_reg_IV);
-		state_add(HPHYBRID_PA, "PA", m_reg_PA[ 0 ]);
-		state_add(HPHYBRID_W, "W", m_reg_W).noshow();
-		state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%12s");
-		state_add(HPHYBRID_DMAPA , "DMAPA" , m_dmapa).noshow();
-		state_add(HPHYBRID_DMAMA , "DMAMA" , m_dmama).noshow();
-		state_add(HPHYBRID_DMAC , "DMAC" , m_dmac).noshow();
-		state_add(HPHYBRID_I , "I" , m_reg_I).noshow();
+		state_add(HPHYBRID_A,      "A",        m_reg_A);
+		state_add(HPHYBRID_B,      "B",        m_reg_B);
+		state_add(HPHYBRID_C,      "C",        m_reg_C);
+		state_add(HPHYBRID_D,      "D",        m_reg_D);
+		state_add(HPHYBRID_P,      "P",        m_reg_P);
+		state_add(STATE_GENPC,     "GENPC",    m_genpc).noshow();
+		state_add(STATE_GENPCBASE, "CURPC",    m_genpc).noshow();
+		state_add(HPHYBRID_R,      "R",        m_reg_R);
+		state_add(STATE_GENSP,     "GENSP",    m_reg_R).noshow();
+		state_add(HPHYBRID_IV,     "IV",       m_reg_IV);
+		state_add(HPHYBRID_PA,     "PA",       m_reg_PA[ 0 ]);
+		state_add(HPHYBRID_W,      "W",        m_reg_W).noshow();
+		state_add(STATE_GENFLAGS,  "GENFLAGS", m_flags).noshow().formatstr("%12s");
+		state_add(HPHYBRID_DMAPA,  "DMAPA",    m_dmapa).noshow();
+		state_add(HPHYBRID_DMAMA,  "DMAMA",    m_dmama).noshow();
+		state_add(HPHYBRID_DMAC,   "DMAC",     m_dmac).noshow();
+		state_add(HPHYBRID_I,      "I",        m_reg_I).noshow();
 	}
 
 	m_program = &space(AS_PROGRAM);
@@ -935,7 +935,7 @@ uint32_t hp_hybrid_cpu_device::add_mae(aec_cases_t aec_case , uint16_t addr)
 
 uint16_t hp_hybrid_cpu_device::remove_mae(uint32_t addr)
 {
-	return (uint16_t)(addr & 0xffff);
+	return uint16_t(addr & 0xffff);
 }
 
 uint16_t hp_hybrid_cpu_device::RM(aec_cases_t aec_case , uint16_t addr)
@@ -1165,7 +1165,7 @@ bool hp_hybrid_cpu_device::write_emc_reg(uint16_t addr , uint16_t v)
 	}
 }
 
-uint16_t hp_hybrid_cpu_device::fetch(void)
+uint16_t hp_hybrid_cpu_device::fetch()
 {
 	m_genpc = add_mae(AEC_CASE_A , m_reg_P);
 	return RM(m_genpc);
@@ -1229,7 +1229,7 @@ void hp_hybrid_cpu_device::do_add(uint16_t& addend1 , uint16_t addend2)
 		BIT_SET(m_flags , HPHYBRID_O_BIT);
 	}
 
-	addend1 = (uint16_t)tmp;
+	addend1 = uint16_t(tmp);
 }
 
 uint16_t hp_hybrid_cpu_device::get_skip_addr(uint16_t opcode , bool condition) const
@@ -1271,7 +1271,7 @@ void hp_hybrid_cpu_device::update_pa()
 	}
 }
 
-void hp_hybrid_cpu_device::check_for_interrupts(void)
+void hp_hybrid_cpu_device::check_for_interrupts()
 {
 	if (!BIT(m_flags , HPHYBRID_INTEN_BIT) || BIT(m_flags , HPHYBRID_IRH_SVC_BIT) || BIT(m_flags , HPHYBRID_IM_BIT)) {
 		return;
@@ -1295,7 +1295,7 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 	}
 
 	// Get interrupt vector in low byte
-	uint8_t vector = (uint8_t)standard_irq_callback(irqline);
+	uint8_t vector = uint8_t(standard_irq_callback(irqline));
 	uint8_t new_PA;
 
 	// Get highest numbered 1
@@ -1335,7 +1335,7 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 	m_reg_I = fetch();
 }
 
-void hp_hybrid_cpu_device::enter_isr(void)
+void hp_hybrid_cpu_device::enter_isr()
 {
 	// Do nothing special
 }
@@ -1354,34 +1354,34 @@ void hp_hybrid_cpu_device::WIO(uint8_t pa , uint8_t ic , uint16_t v)
 
 uint8_t hp_hybrid_cpu_device::do_dec_shift_r(uint8_t d1 , uint64_t& mantissa)
 {
-	uint8_t d12 = (uint8_t)(mantissa & 0xf);
+	uint8_t d12 = uint8_t(mantissa & 0xf);
 
-	mantissa = (mantissa >> 4) | ((uint64_t)d1 << 44);
+	mantissa = (mantissa >> 4) | (uint64_t(d1) << 44);
 
 	return d12;
 }
 
 uint8_t hp_hybrid_cpu_device::do_dec_shift_l(uint8_t d12 , uint64_t& mantissa)
 {
-	uint8_t d1 = (uint8_t)((mantissa >> 44) & 0xf);
+	uint8_t d1 = uint8_t((mantissa >> 44) & 0xf);
 
-	mantissa = (mantissa << 4) | ((uint64_t)d12);
+	mantissa = (mantissa << 4) | uint64_t(d12);
 	mantissa &= 0xffffffffffffULL;
 
 	return d1;
 }
 
-uint64_t hp_hybrid_cpu_device::get_ar1(void)
+uint64_t hp_hybrid_cpu_device::get_ar1()
 {
 	uint32_t addr;
 	uint64_t tmp;
 
 	addr = add_mae(AEC_CASE_B , HP_REG_AR1_ADDR + 1);
-	tmp = (uint64_t)RM(addr++);
+	tmp = uint64_t(RM(addr++));
 	tmp <<= 16;
-	tmp |= (uint64_t)RM(addr++);
+	tmp |= uint64_t(RM(addr++));
 	tmp <<= 16;
-	tmp |= (uint64_t)RM(addr);
+	tmp |= uint64_t(RM(addr));
 
 	return tmp;
 }
@@ -1391,33 +1391,33 @@ void hp_hybrid_cpu_device::set_ar1(uint64_t v)
 	uint32_t addr;
 
 	addr = add_mae(AEC_CASE_B , HP_REG_AR1_ADDR + 3);
-	WM(addr-- , (uint16_t)(v & 0xffff));
+	WM(addr-- , uint16_t(v & 0xffff));
 	v >>= 16;
-	WM(addr-- , (uint16_t)(v & 0xffff));
+	WM(addr-- , uint16_t(v & 0xffff));
 	v >>= 16;
-	WM(addr , (uint16_t)(v & 0xffff));
+	WM(addr , uint16_t(v & 0xffff));
 }
 
-uint64_t hp_hybrid_cpu_device::get_ar2(void) const
+uint64_t hp_hybrid_cpu_device::get_ar2() const
 {
 	uint64_t tmp;
 
-	tmp = (uint64_t)m_reg_ar2[ 1 ];
+	tmp = uint64_t(m_reg_ar2[ 1 ]);
 	tmp <<= 16;
-	tmp |= (uint64_t)m_reg_ar2[ 2 ];
+	tmp |= uint64_t(m_reg_ar2[ 2 ]);
 	tmp <<= 16;
-	tmp |= (uint64_t)m_reg_ar2[ 3 ];
+	tmp |= uint64_t(m_reg_ar2[ 3 ]);
 
 	return tmp;
 }
 
 void hp_hybrid_cpu_device::set_ar2(uint64_t v)
 {
-	m_reg_ar2[ 3 ] = (uint16_t)(v & 0xffff);
+	m_reg_ar2[ 3 ] = uint16_t(v & 0xffff);
 	v >>= 16;
-	m_reg_ar2[ 2 ] = (uint16_t)(v & 0xffff);
+	m_reg_ar2[ 2 ] = uint16_t(v & 0xffff);
 	v >>= 16;
-	m_reg_ar2[ 1 ] = (uint16_t)(v & 0xffff);
+	m_reg_ar2[ 1 ] = uint16_t(v & 0xffff);
 }
 
 uint64_t hp_hybrid_cpu_device::do_mrxy(uint64_t ar)
@@ -1445,8 +1445,8 @@ bool hp_hybrid_cpu_device::do_dec_add(bool carry_in , uint64_t& a , uint64_t b)
 	uint8_t digit_a , digit_b;
 
 	for (i = 0; i < 12; i++) {
-		digit_a = (uint8_t)(a & 0xf);
-		digit_b = (uint8_t)(b & 0xf);
+		digit_a = uint8_t(a & 0xf);
+		digit_b = uint8_t(b & 0xf);
 
 		if (carry_in) {
 			digit_a++;
@@ -1460,7 +1460,7 @@ bool hp_hybrid_cpu_device::do_dec_add(bool carry_in , uint64_t& a , uint64_t b)
 			digit_a = (digit_a - 10) & 0xf;
 		}
 
-		tmp |= (uint64_t)digit_a << (4 * i);
+		tmp |= uint64_t(digit_a) << (4 * i);
 
 		a >>= 4;
 		b >>= 4;
@@ -1471,7 +1471,7 @@ bool hp_hybrid_cpu_device::do_dec_add(bool carry_in , uint64_t& a , uint64_t b)
 	return carry_in;
 }
 
-void hp_hybrid_cpu_device::do_mpy(void)
+void hp_hybrid_cpu_device::do_mpy()
 {
 	// Count 0->1 and 1->0 transitions in A register
 	// Correct timing needs this count as real hw uses Booth's algorithm for multiplication
@@ -1486,12 +1486,12 @@ void hp_hybrid_cpu_device::do_mpy(void)
 		mask >>= 1;
 	}
 
-	int32_t a = (int16_t)m_reg_A;
-	int32_t b = (int16_t)m_reg_B;
+	int32_t a = int16_t(m_reg_A);
+	int32_t b = int16_t(m_reg_B);
 	int32_t p = a * b;
 
-	m_reg_A = (uint16_t)(p & 0xffff);
-	m_reg_B = (uint16_t)((p >> 16) & 0xffff);
+	m_reg_A = uint16_t(p & 0xffff);
+	m_reg_B = uint16_t((p >> 16) & 0xffff);
 
 	m_icount -= 59;
 }
@@ -1531,11 +1531,11 @@ bool hp_5061_3011_cpu_device::execute_no_bpc(uint16_t opcode , uint16_t& next_pc
 			// Withdraw
 			if (BIT(opcode , 11)) {
 				// Byte
-				uint32_t tmp_addr = (uint32_t)(*ptr_reg);
+				uint32_t tmp_addr = uint32_t(*ptr_reg);
 				if (m_flags & b_mask) {
 					tmp_addr |= BIT_MASK<uint32_t>(16);
 				}
-				tmp = RM(AEC_CASE_C , (uint16_t)(tmp_addr >> 1));
+				tmp = RM(AEC_CASE_C , uint16_t(tmp_addr >> 1));
 				if (BIT(tmp_addr , 0)) {
 					tmp &= 0xff;
 				} else {
@@ -1574,7 +1574,7 @@ bool hp_5061_3011_cpu_device::execute_no_bpc(uint16_t opcode , uint16_t& next_pc
 			tmp = RM(reg_addr);
 			if (BIT(opcode , 11)) {
 				// Byte
-				uint32_t tmp_addr = (uint32_t)(*ptr_reg);
+				uint32_t tmp_addr = uint32_t(*ptr_reg);
 				if (m_flags & b_mask) {
 					tmp_addr |= BIT_MASK<uint32_t>(16);
 				}
@@ -1843,7 +1843,7 @@ uint32_t hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , uint16_t addr)
 		aec_reg = (aec_reg & 0xf) | 0x20;
 	}
 
-	return (uint32_t)addr | ((uint32_t)aec_reg << 16);
+	return uint32_t(addr) | (uint32_t(aec_reg) << 16);
 }
 
 bool hp_5061_3001_cpu_device::read_non_common_reg(uint16_t addr , uint16_t& v)
@@ -1887,7 +1887,7 @@ std::unique_ptr<util::disasm_interface> hp_5061_3001_cpu_device::create_disassem
 	return std::make_unique<hp_5061_3001_disassembler>(m_relative_mode);
 }
 
-void hp_5061_3001_cpu_device::enter_isr(void)
+void hp_5061_3001_cpu_device::enter_isr()
 {
 	// Set interrupt mode when entering an ISR
 	BIT_SET(m_flags, HPHYBRID_IM_BIT);

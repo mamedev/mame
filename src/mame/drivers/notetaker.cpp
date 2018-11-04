@@ -800,24 +800,23 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
-	MCFG_DEVICE_ADD("iop_cpu", I8086, 24_MHz_XTAL / 3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
-	MCFG_DEVICE_PROGRAM_MAP(iop_mem)
-	MCFG_DEVICE_IO_MAP(iop_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("iop_pic8259", pic8259_device, inta_cb)
+	I8086(config, m_iop_cpu, 24_MHz_XTAL / 3); /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
+	m_iop_cpu->set_addrmap(AS_PROGRAM, &notetaker_state::iop_mem);
+	m_iop_cpu->set_addrmap(AS_IO, &notetaker_state::iop_io);
+	m_iop_cpu->set_irq_acknowledge_callback("iop_pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("iop_pic8259", PIC8259, 0) // iP8259A-2 @ E6
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iop_cpu", 0))
+	PIC8259(config, m_iop_pic, 0); // iP8259A-2 @ E6
+	m_iop_pic->out_int_callback().set_inputline(m_iop_cpu, 0);
 
 	/* Emulator CPU: 8086@5MHz */
-	MCFG_DEVICE_ADD("ep_cpu", I8086, 15_MHz_XTAL / 3)
-	MCFG_DEVICE_DISABLE() // TODO: implement the cpu control bits so this doesn't execute garbage/zeroes before its firmware gets loaded
-	MCFG_DEVICE_PROGRAM_MAP(ep_mem)
-	MCFG_DEVICE_IO_MAP(ep_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("ep_pic8259", pic8259_device, inta_cb)
+	I8086(config, m_ep_cpu, 15_MHz_XTAL / 3);
+	m_ep_cpu->set_disable(); // TODO: implement the cpu control bits so this doesn't execute garbage/zeroes before its firmware gets loaded
+	m_ep_cpu->set_addrmap(AS_PROGRAM, &notetaker_state::ep_mem);
+	m_ep_cpu->set_addrmap(AS_IO, &notetaker_state::ep_io);
+	m_ep_cpu->set_irq_acknowledge_callback("ep_pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("ep_pic8259", PIC8259, 0) // iP8259A-2 @ E6
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("ep_cpu", 0))
-
+	PIC8259(config, m_ep_pic, 0); // iP8259A-2 @ E6
+	m_ep_pic->out_int_callback().set_inputline(m_ep_cpu, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -843,18 +842,18 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in iop_reset();
 	m_crtc->set_char_width(8); //(8 pixels per column/halfword, 16 pixels per fullword)
 	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
-	m_crtc->vsyn_callback().set("iop_pic8259", FUNC(pic8259_device::ir4_w)); // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
+	m_crtc->vsyn_callback().set(m_iop_pic, FUNC(pic8259_device::ir4_w)); // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
 	m_crtc->set_screen("screen");
 
 	AY31015(config, m_kbduart); // HD6402, == AY-3-1015D
 	m_kbduart->set_rx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 	m_kbduart->set_tx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	m_kbduart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
+	m_kbduart->write_dav_callback().set(m_iop_pic, FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
 
 	AY31015(config, m_eiauart); // HD6402, == AY-3-1015D
 	m_eiauart->set_rx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 	m_eiauart->set_tx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	m_eiauart->write_dav_callback().set("iop_pic8259", FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
+	m_eiauart->write_dav_callback().set(m_iop_pic, FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
 
 	/* Floppy */
 	FD1791(config, m_fdc, (((24_MHz_XTAL/3)/2)/2)); // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board

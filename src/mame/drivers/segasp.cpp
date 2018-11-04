@@ -38,7 +38,9 @@ todo: make this actually readable, we don't support unicode source files
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
-Bingo Galaxy                                834-14788                 no          ???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
+Bingo Galaxy (main)                         834-14788    C            ROM  JP     253-5508-0513J  AAFE-01A37754716, AAFE-01E10924916, AAFE-01D67304905, Medal
+Bingo Galaxy (satellite)                    837-14481    C            ROM  JP     not used        AAFE-01A36474716, Medal
+Bingo Galaxy (satellite)                    837-14789    F*           ROM  JP     not used        AAFE-xxxxxxxxxxx, game is same as above
 Bingo Parade                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
 Brick People / Block People                 834-14881                 ROM  ANY    253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
 Dinosaur King                               834-14493-01 D            ROM  US     253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
@@ -68,8 +70,10 @@ Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G            ROM  ANY  
 Thomas: The Tank Engine                     ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 
 REV PCB       IC6s      Flash       AU1500
+C  171-8278C  315-6370  8x 128Mbit  AMD
 D  171-8278D  315-6370  8x 128Mbit  AMD
 F  171-8278F  315-6416  8x 512Mbit  AMD
+F* 171-8278F  315-6416  2x 512Mbit  RMI
 G  171-8278G  315-6416  2x 512Mbit  RMI
 
 */
@@ -331,13 +335,17 @@ void segasp_state::init_segasp()
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
 	ROM_LOAD16_WORD( "mb_serial.ic57", 0x0000, 0x0080, CRC(e1e3c009) SHA1(66bc636c527389c3338f631d78c788b4bd4e93be) )
 
-// net_firm_119.ic72 - Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
-// fpr-24407.ic72 - version 1.25
+// net_firm_119.ic72  - Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
+// fpr-24208a.ic72    - version 1.23, 1st half - 1.10
+// fpr-24407_123.ic72 - version 1.23, 1st half - 1.20
+// fpr-24407.ic72     - version 1.25, 1st half - 1.20
 #define SEGASP_NETFIRM \
 	ROM_REGION( 0x200000, "netcpu", 0) \
 	ROM_LOAD( "net_eeprom.ic74s",  0x00000000,    0x200, CRC(77cc5a6c) SHA1(cbfba546256b70bce6c6fd0030d7e2e410a25526) ) \
 	ROM_LOAD( "net_firm_119.ic72", 0x00000000, 0x200000, CRC(a738ea1c) SHA1(d25187a973a7e166e70334f964363adf2be87257) ) \
-	ROM_LOAD( "fpr-24407.ic72",    0x00000000, 0x200000, CRC(a738ea1c) SHA1(fbcc3d119b47a6da4d194e3fe4a98126c7049edf) )
+	ROM_LOAD( "fpr-24208a.ic72",   0x00000000, 0x200000, CRC(a738ea1c) SHA1(3c32ddfb3c40be66b9fb2ba35fbfd5b534bb3da0) ) \
+	ROM_LOAD( "fpr-24407.ic72",    0x00000000, 0x200000, CRC(a738ea1c) SHA1(fbcc3d119b47a6da4d194e3fe4a98126c7049edf) ) \
+	ROM_LOAD( "fpr-24407_123.ic72",0x00000000, 0x200000, CRC(a738ea1c) SHA1(3f5a2fb03bbb1bd9af9fe32ad76a224c97aa9b7a) )
 
 // keep M4 board code happy for now
 #define SEGASP_MISC \
@@ -389,6 +397,43 @@ ROM_START( brickppl )
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0558-com.ic15", 0, 0x800, BAD_DUMP CRC(7592d004) SHA1(632373d807f54953d68c95a9f874ed3e8011f085) )
+ROM_END
+
+ROM_START( bingogal )
+	SEGASP_BIOS
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x01000000, CRC(c07d9870) SHA1(5d40c14c398c11908f05ef1fd274aa3818409fc6) )
+	ROM_LOAD( "ic63",  0x01000000, 0x01000000, CRC(5d85e6c0) SHA1(c09e843399fa4855ea149564480adbdf02dcc182) )
+	ROM_LOAD( "ic64",  0x02000000, 0x01000000, CRC(73134f52) SHA1(63e32fbbd15bb527d9b840dcc92bb9dd86483ae3) )
+	ROM_LOAD( "ic65",  0x03000000, 0x01000000, CRC(1e4ae511) SHA1(55b4f9dc86f7da8db9e4875a6ee120228be42591) )
+	ROM_LOAD( "ic66s", 0x04000000, 0x01000000, CRC(810d5dfc) SHA1(6998a622d0a4be27ba6d1fcfb2a89586f269b59e) )
+	ROM_LOAD( "ic67s", 0x05000000, 0x01000000, CRC(92014e31) SHA1(6a5cf75da4c81dc55386996b6e62bbb4594591e8) )
+	ROM_LOAD( "ic68s", 0x06000000, 0x01000000, CRC(0640172c) SHA1(44ccf6919922a1ce8ffd49ad3306c68b15193a71) )
+	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(ca26fbf9) SHA1(fe131e23109d4ff2b79ce53b79c22009b2078c85) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
+ROM_END
+
+// Also was dumped 837-14789 PCB, which uses 2x 512Mbit Flash ROMs. Game contents is the same as joined IC 62-64 dumps below.
+ROM_START( bingogals )
+	SEGASP_BIOS
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x01000000, CRC(880eb905) SHA1(7afdb154329d49c85b10316d62aef4934e9a5479) )
+	ROM_LOAD( "ic63",  0x01000000, 0x01000000, CRC(41dab407) SHA1(d4582e6d8a0e67e6bfebcb336a4c8392f7cdba39) )
+	ROM_LOAD( "ic64",  0x02000000, 0x01000000, CRC(97dfb2ab) SHA1(97f95643145717b199cf79020d5e81bf913a96a7) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASEFF) // not populated
 ROM_END
 
 ROM_START( dinoking )
@@ -566,6 +611,8 @@ ROM_END
 
 GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
 // These use ROMs
+GAME( 2009, bingogal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (main)", GAME_FLAGS ) // 28.05.2009
+GAME( 2009, bingogals,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )

@@ -408,7 +408,7 @@ void compis_state::compis_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
-	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(I8253_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(MM58174A_TAG, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
 	map(0x0180, 0x01ff) /* PCS3 */ .rw(GRAPHICS_TAG, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
 	//map(0x0200, 0x0201) /* PCS4 */ .mirror(0x7e);
@@ -753,12 +753,12 @@ MACHINE_CONFIG_START(compis_state::compis)
 	m_osp->delay().set(I80130_TAG, FUNC(i80130_device::ir7_w));
 	m_osp->baud().set(FUNC(compis_state::tmr2_w));
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_mpsc, i8274_device, rxtxcb_w))
-	MCFG_PIT8253_CLK1(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_CLK2(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, compis_state, tmr5_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(15.36_MHz_XTAL/8);
+	m_pit->out_handler<0>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
+	m_pit->set_clk<1>(15.36_MHz_XTAL/8);
+	m_pit->set_clk<2>(15.36_MHz_XTAL/8);
+	m_pit->out_handler<2>().set(FUNC(compis_state::tmr5_w));
 
 	I8255(config, m_ppi);
 	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));

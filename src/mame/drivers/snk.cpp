@@ -2644,6 +2644,11 @@ static INPUT_PORTS_START( ikarijpb )
 	// this is accomplished by hooking the joystick input to the rotary input, plus
 	// of course the code is patched to handle that.
 
+	// According to a SNK 40th Anniversary Collection screenshot, this bootleg
+	// came from Korea:
+	// "The idea for Guevara's use of tanks with a human torso poking out of the top
+	// came from a poorly-programmed Korean bootleg of Ikari."
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x21, 0x01, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x42, 0x02, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
@@ -3281,9 +3286,10 @@ static INPUT_PORTS_START( tdfever )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	// TODO: tdfever2 has different dip switches (at least allow continue seems ignored)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "2 Player Upright" )
 	PORT_DIPSETTING(    0x00, "4 Player Cocktail" )

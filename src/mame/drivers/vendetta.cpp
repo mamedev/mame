@@ -76,13 +76,13 @@
   ***  Dump ROMs  ***
      1) ROM1 (17C)  32Pin 1Mbit UV-EPROM          -> save "975r01" file
      2) ROM2 ( 5F)  28Pin 512Kbit One-Time PROM   -> save "975f02" file
-     3) ROM3 ( 1D)  40Pin 4Mbit MASK ROM          -> save "975c03" file
-     4) ROM4 ( 3K)  42Pin 8Mbit MASK ROM          -> save "975c04" file
-     5) ROM5 ( 8L)  42Pin 8Mbit MASK ROM          -> save "975c05" file
-     6) ROM6 (12M)  42Pin 8Mbit MASK ROM          -> save "975c06" file
-     7) ROM7 (16K)  42Pin 8Mbit MASK ROM          -> save "975c07" file
-     8) ROM8 (16I)  40Pin 4Mbit MASK ROM          -> save "975c08" file
-     9) ROM9 (18I)  40Pin 4Mbit MASK ROM          -> save "975c09" file
+     3) ROM3 ( 1D)  40Pin 4Mbit mask ROM          -> save "975c03" file
+     4) ROM4 ( 3K)  42Pin 8Mbit mask ROM          -> save "975c04" file
+     5) ROM5 ( 8L)  42Pin 8Mbit mask ROM          -> save "975c05" file
+     6) ROM6 (12M)  42Pin 8Mbit mask ROM          -> save "975c06" file
+     7) ROM7 (16K)  42Pin 8Mbit mask ROM          -> save "975c07" file
+     8) ROM8 (16I)  40Pin 4Mbit mask ROM          -> save "975c08" file
+     9) ROM9 (18I)  40Pin 4Mbit mask ROM          -> save "975c09" file
                                                         vvvvvvvvvvvv
                                                         esckidsj.zip
 
@@ -112,14 +112,14 @@ WRITE8_MEMBER(vendetta_state::eeprom_w)
 	/* bit 0 - VOC0 - Video banking related */
 	/* bit 1 - VOC1 - Video banking related */
 	/* bit 2 - MSCHNG - Mono Sound select (Amp) */
-	/* bit 3 - EEPCS - Eeprom CS */
-	/* bit 4 - EEPCLK - Eeprom CLK */
-	/* bit 5 - EEPDI - Eeprom data */
+	/* bit 3 - EEPCS - EEPROM CS */
+	/* bit 4 - EEPCLK - EEPROM clock */
+	/* bit 5 - EEPDI - EEPROM data */
 	/* bit 6 - IRQ enable */
 	/* bit 7 - Unused */
 
 
-	if (data == 0xff ) /* this is a bug in the eeprom write code */
+	if (data == 0xff ) /* this is a bug in the EEPROM write code */
 		return;
 
 	/* EEPROM */
@@ -142,7 +142,7 @@ WRITE8_MEMBER(vendetta_state::K052109_w)
 {
 	// *************************************************************************************
 	// *  Escape Kids uses 052109's mirrored Tilemap ROM bank selector, but only during    *
-	// *  Tilemap MASK-ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
+	// *  Tilemap mask ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
 	// *************************************************************************************
 	if ((offset == 0x1d80) || (offset == 0x1e00) || (offset == 0x1f00))
 		m_k052109->write(space, offset, data);
@@ -250,7 +250,7 @@ void vendetta_state::esckids_map(address_map &map)
 	map(0x3fd6, 0x3fd7).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)); // Sound
 	map(0x3fd8, 0x3fd9).r(m_k053246, FUNC(k053247_device::k053246_r));                // 053246 (Sprite)
 	map(0x3fda, 0x3fda).nopw();                // Not Emulated (Watchdog ???)
-	map(0x4000, 0x4fff).m(m_videobank1, FUNC(address_map_bank_device::amap8));    // 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
+	map(0x4000, 0x4fff).m(m_videobank1, FUNC(address_map_bank_device::amap8));    // 0x2000-0x3fff, Tilemap mask ROM bank selector (mask ROM Test)
 	map(0x6000, 0x7fff).bankr("bank1");                    // 053248 '975r01' 1M ROM (Banked)
 	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);  // 053248 '975r01' 1M ROM (0x18000-0x1ffff)
 }
@@ -519,7 +519,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( vendetta )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
 	ROM_LOAD( "081t01.17c", 0x00000, 0x40000, CRC(e76267f5) SHA1(efef6c2edb4c181374661f358dad09123741b63d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -538,12 +538,12 @@ ROM_START( vendetta )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( vendettar )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
 	ROM_LOAD( "081r01.17c", 0x00000, 0x40000, CRC(84796281) SHA1(e4330c6eaa17adda5b4bd3eb824388c89fb07918) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -562,12 +562,12 @@ ROM_START( vendettar )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendettar.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
 ROM_END
 
 ROM_START( vendettaz )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
 	ROM_LOAD( "081z01.17c", 0x00000, 0x40000, CRC(4d225a8d) SHA1(fe8f6e63d033cf04c9a287d870db244fddb81f03) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -586,13 +586,13 @@ ROM_START( vendettaz )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( vendettaun )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "1.17c", 0x00000, 0x40000, CRC(1a7ceb1b) SHA1(c7454e11b7a06d10c94fe44ba6f83208bca4ced9) ) /* World 4 player, program rom found labeled simply as "1" */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
+	ROM_LOAD( "1.17c", 0x00000, 0x40000, CRC(1a7ceb1b) SHA1(c7454e11b7a06d10c94fe44ba6f83208bca4ced9) ) /* World 4 player, program ROM found labeled simply as "1" */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -610,12 +610,12 @@ ROM_START( vendettaun )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( vendetta2pw )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
 	ROM_LOAD( "081w01.17c", 0x00000, 0x40000, CRC(cee57132) SHA1(8b6413877e127511daa76278910c2ee3247d613a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -634,12 +634,12 @@ ROM_START( vendetta2pw )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( vendetta2peba )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
 	ROM_LOAD( "081-eb-a01.17c", 0x00000, 0x40000, CRC(8430bb52) SHA1(54e896510fa44e76b0640b17150210fbf6b3b5bc)) // Label was unclear apart from EB stamp on the middle line.  Bottom line looked like 401, but probably A01
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -658,13 +658,13 @@ ROM_START( vendetta2peba )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( vendetta2pun )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "1.17c", 0x00000, 0x40000, CRC(b4edde48) SHA1(bf6342cfeb0560cdf9c943f6d112fd89ee5a4f6b) ) /* World 2 player, program rom found labeled simply as "1" */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
+	ROM_LOAD( "1.17c", 0x00000, 0x40000, CRC(b4edde48) SHA1(bf6342cfeb0560cdf9c943f6d112fd89ee5a4f6b) ) /* World 2 player, program ROM found labeled simply as "1" */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -682,12 +682,12 @@ ROM_START( vendetta2pun )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( vendetta2pu )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
 	ROM_LOAD( "081u01.17c", 0x00000, 0x40000, CRC(b4d9ade5) SHA1(fbd543738cb0b68c80ff05eed7849b608de03395) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -706,12 +706,12 @@ ROM_START( vendetta2pu )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( vendetta2pd )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
 	ROM_LOAD( "081d01.17c", 0x00000, 0x40000, CRC(335da495) SHA1(ea74680eb898aeecf9f1eec95f151bcf66e6b6cb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -730,12 +730,12 @@ ROM_START( vendetta2pd )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
 ROM_START( vendettan )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
 	ROM_LOAD( "081n01.17c", 0x00000, 0x40000, CRC(fc766fab) SHA1(a22c82810f2a2b66fc112e2d043e8025d0dc2841) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -754,12 +754,12 @@ ROM_START( vendettan )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendettaj.nv", 0x0000, 0x080, CRC(3550a54e) SHA1(370cd40a12c471b3b6690ecbdde9c7979bc2a652) )
 ROM_END
 
 ROM_START( vendetta2pp )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked ROMs + banked RAM */
 	ROM_LOAD( "081p01.17c", 0x00000, 0x40000, CRC(5fe30242) SHA1(2ea98e66637fa2ad60044b1a2b0dd158a82403a2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
@@ -778,7 +778,7 @@ ROM_START( vendetta2pp )
 	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "vendettaj.nv", 0x0000, 0x080, CRC(3550a54e) SHA1(370cd40a12c471b3b6690ecbdde9c7979bc2a652) )
 ROM_END
 
@@ -790,20 +790,20 @@ ROM_START( esckids )
 	ROM_REGION( 0x010000, "audiocpu", 0 )       // Sound CPU (Z80) Code (512K x 1)
 	ROM_LOAD( "975f02", 0x000000, 0x010000, CRC(994fb229) SHA1(bf194ae91240225b8edb647b1a62cd83abfa215e) )
 
-	ROM_REGION( 0x100000, "k052109", 0 )       // Tilemap MASK-ROM (4M x 2)
+	ROM_REGION( 0x100000, "k052109", 0 )       // Tilemap mask ROM (4M x 2)
 	ROM_LOAD32_WORD( "975c09", 0x000000, 0x080000, CRC(bc52210e) SHA1(301a3892d250495c2e849d67fea5f01fb0196bed) )
 	ROM_LOAD32_WORD( "975c08", 0x000002, 0x080000, CRC(fcff9256) SHA1(b60d29f4d04f074120d4bb7f2a71b9e9bf252d33) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )       // Sprite MASK-ROM (8M x 4)
+	ROM_REGION( 0x400000, "gfx2", 0 )       // Sprite mask ROM (8M x 4)
 	ROM_LOAD64_WORD( "975c04", 0x000000, 0x100000, CRC(15688a6f) SHA1(a445237a11e5f98f0f9b2573a7ef0583366a137e) )
 	ROM_LOAD64_WORD( "975c05", 0x000002, 0x100000, CRC(1ff33bb7) SHA1(eb17da33ba2769ea02f91fece27de2e61705e75a) )
 	ROM_LOAD64_WORD( "975c06", 0x000004, 0x100000, CRC(36d410f9) SHA1(2b1fd93c11839480aa05a8bf27feef7591704f3d) )
 	ROM_LOAD64_WORD( "975c07", 0x000006, 0x100000, CRC(97ec541e) SHA1(d1aa186b17cfe6e505f5b305703319299fa54518) )
 
-	ROM_REGION( 0x100000, "k053260", 0 )    // Samples MASK-ROM (4M x 1)
+	ROM_REGION( 0x100000, "k053260", 0 )    // Samples mask ROM (4M x 1)
 	ROM_LOAD( "975c03", 0x000000, 0x080000, CRC(dc4a1707) SHA1(f252d08483fd664f8fc03bf8f174efd452b4cdc5) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "esckids.nv", 0x0000, 0x080, CRC(a8522e1f) SHA1(43f82fce3c3b854bc8898c63dffc7c01b288c8aa) )
 ROM_END
 
@@ -815,20 +815,20 @@ ROM_START( esckidsj )
 	ROM_REGION( 0x010000, "audiocpu", 0 )       // Sound CPU (Z80) Code (512K x 1)
 	ROM_LOAD( "975f02", 0x000000, 0x010000, CRC(994fb229) SHA1(bf194ae91240225b8edb647b1a62cd83abfa215e) )
 
-	ROM_REGION( 0x100000, "k052109", 0 )       // Tilemap MASK-ROM (4M x 2)
+	ROM_REGION( 0x100000, "k052109", 0 )       // Tilemap mask ROM (4M x 2)
 	ROM_LOAD32_WORD( "975c09", 0x000000, 0x080000, CRC(bc52210e) SHA1(301a3892d250495c2e849d67fea5f01fb0196bed) )
 	ROM_LOAD32_WORD( "975c08", 0x000002, 0x080000, CRC(fcff9256) SHA1(b60d29f4d04f074120d4bb7f2a71b9e9bf252d33) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )       // Sprite MASK-ROM (8M x 4)
+	ROM_REGION( 0x400000, "gfx2", 0 )       // Sprite mask ROM (8M x 4)
 	ROM_LOAD64_WORD( "975c04", 0x000000, 0x100000, CRC(15688a6f) SHA1(a445237a11e5f98f0f9b2573a7ef0583366a137e) )
 	ROM_LOAD64_WORD( "975c05", 0x000002, 0x100000, CRC(1ff33bb7) SHA1(eb17da33ba2769ea02f91fece27de2e61705e75a) )
 	ROM_LOAD64_WORD( "975c06", 0x000004, 0x100000, CRC(36d410f9) SHA1(2b1fd93c11839480aa05a8bf27feef7591704f3d) )
 	ROM_LOAD64_WORD( "975c07", 0x000006, 0x100000, CRC(97ec541e) SHA1(d1aa186b17cfe6e505f5b305703319299fa54518) )
 
-	ROM_REGION( 0x100000, "k053260", 0 )    // Samples MASK-ROM (4M x 1)
+	ROM_REGION( 0x100000, "k053260", 0 )    // Samples mask ROM (4M x 1)
 	ROM_LOAD( "975c03", 0x000000, 0x080000, CRC(dc4a1707) SHA1(f252d08483fd664f8fc03bf8f174efd452b4cdc5) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "esckidsj.nv", 0x0000, 0x080, CRC(985e2a2d) SHA1(afd9e5fc014d593d0a384326f32caf2a73fba867) )
 ROM_END
 
@@ -843,10 +843,10 @@ ROM_END
 GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaun,  vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
+GAME( 1991, vendettaun,  vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program ROM labeled as 1 */
 GAME( 1991, vendetta2pw, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
+GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program ROM labeled as 1 */
 GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendettan,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )

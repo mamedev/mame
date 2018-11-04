@@ -141,7 +141,7 @@ adcl3_acc
 	read_pc_noinc();
 	do_adc((m_l & 0xff000000) >> 24);
 	prefetch();
-	
+
 stal0_acc
 	read_pc_noinc();
 	m_l = (m_l & 0xffffff00) | (A & 0xff); // TODO: flags
@@ -241,7 +241,7 @@ lpa1_acc
 	read_pc_noinc();
 	A = (m_pa & 0x00ff00) >> 8; // TODO: Flags?
 	prefetch();
-	
+
 spa2_acc
 	read_pc_noinc();
 	m_pa = (m_pa & 0x00ffff) | (A << 16); // TODO: Flags?
@@ -322,15 +322,15 @@ eorpa_imp
 	prefetch();
 
 adcpa_imp
-	do_adc(read_full_data_sp(m_pa+Y));
+	do_adc(read_full_data_sp(m_pa));
 	prefetch();
 
 stapa_imp
-	write_full_data_sp(m_pa+Y, A);
+	write_full_data_sp(m_pa, A);
 	prefetch();
 
 ldapa_imp
-	A = read_full_data_sp(m_pa+Y);
+	A = read_full_data_sp(m_pa);
 	prefetch();
 
 cmppa_imp
@@ -339,9 +339,9 @@ cmppa_imp
 	prefetch();
 
 sbcpa_imp
-	do_sbc(read_full_data_sp(m_pa+Y));
+	do_sbc(read_full_data_sp(m_pa));
 	prefetch();
-	
+
 orapb_imp
 	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc_noinc();
@@ -358,15 +358,15 @@ eorpb_imp
 	prefetch();
 
 adcpb_imp
-	do_adc(read_full_data_sp(m_pb+Y));
+	do_adc(read_full_data_sp(m_pb));
 	prefetch();
 
 stapb_imp
-	write_full_data_sp(m_pb+Y, A);
+	write_full_data_sp(m_pb, A);
 	prefetch();
 
 ldapb_imp
-	A = read_full_data_sp(m_pb+Y);
+	A = read_full_data_sp(m_pb);
 	prefetch();
 
 cmppb_imp
@@ -375,7 +375,7 @@ cmppb_imp
 	prefetch();
 
 sbcpb_imp
-	do_sbc(read_full_data_sp(m_pb+Y));
+	do_sbc(read_full_data_sp(m_pb));
 	prefetch();
 
 stx_aby

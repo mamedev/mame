@@ -2785,7 +2785,7 @@ ROM_START( fantzonepr )
 	ROM_LOAD16_BYTE( "ic26-prg20-658q.bin", 0x000001, 0x8000, CRC(a0d53b86) SHA1(02b8ba869c226d929b6b761982efc262467baafc) ) // different
 	ROM_LOAD16_BYTE( "ic42-prg13-eb1f.bin", 0x010000, 0x8000, CRC(a08e9d65) SHA1(e3f8b4f1dcdd7bcdd57ae295d721131b7cc33500) ) // different
 	ROM_LOAD16_BYTE( "ic25-prg15-2b8c.bin", 0x010001, 0x8000, CRC(7e6fdae0) SHA1(c00e7e4e78505ce731483275cfcad285999bbaf3) ) // different
-	ROM_LOAD16_BYTE( "epr-7387.41",         0x020000, 0x8000, CRC(0acd335d) SHA1(f39566a2069eefa7682c57c6521ea7a328738d06) ) // missing - assumed to be the same because the rom below is
+	ROM_LOAD16_BYTE( "epr-7387.41",         0x020000, 0x8000, CRC(0acd335d) SHA1(f39566a2069eefa7682c57c6521ea7a328738d06) ) // missing - assumed to be the same because the ROM below is
 	ROM_LOAD16_BYTE( "ic24-prg20-2f57.bin", 0x020001, 0x8000, CRC(fd909341) SHA1(2f1e01eb7d7b330c9c0dd98e5f8ed4973f0e93fb) ) // MATCH
 
 	ROM_REGION( 0x18000, "gfx1", 0 ) // tiles
@@ -3258,7 +3258,7 @@ ROM_START( shinobls )
 	ROM_CONTINUE(           0x60001, 0x08000 )
 	ROM_LOAD16_BYTE( "b16", 0x20000, 0x08000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
 	ROM_CONTINUE(           0x60000, 0x08000 )
-	// It's possible that the modifications to these roms are meant to stop the Sega logo from appearing,
+	// It's possible that the modifications to these ROMs are meant to stop the Sega logo from appearing,
 	// however, with the current system 16a emulation this doesn't happen, maybe it isn't actually running
 	// on a genuine Sega board?
 	ROM_LOAD16_BYTE( "b13", 0x30001, 0x08000, CRC(7e98bd36) SHA1(069c51478af7567e704fc9e25c9e327f02db171d) )
@@ -3277,7 +3277,7 @@ ROM_START( shinobls )
 ROM_END
 
 //*************************************************************************************************************************
-// Shinobi bootleg by 'Beta' (7751 replaced by what? Sample rom is different, but no extra sound CPU rom present, missing?)
+// Shinobi bootleg by 'Beta' (7751 replaced by what? Sample ROM is different, but no extra sound CPU ROM present, missing?)
 // otherwise it seems to run fine on System 16A
 //
 // note fron any:
@@ -3317,7 +3317,7 @@ ROM_START( shinoblb )
 	ROM_REGION( 0x20000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "1.5s", 0x0000, 0x8000, CRC(dd50b745) SHA1(52e1977569d3713ad864d607170c9a61cd059a65) )
 
-	// these 2 n7751 roms weren't present in this set, it's possible it didn't have them
+	// these 2 n7751 ROMs weren't present in this set, it's possible it didn't have them
 	ROM_REGION( 0x1000, "n7751", 0 )      // 4k for 7751 onboard ROM
 	ROM_LOAD( "7751.bin",     0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) ) // 7751 - U34
 
@@ -3326,7 +3326,7 @@ ROM_START( shinoblb )
 
 	ROM_REGION( 0x08000, "samples", 0 )
 	// sound samples (played by what?, not the same as the original)
-	// marked as 'bad dump' pending investigation, we might actually be missing a cpu rom to play them
+	// marked as 'bad dump' pending investigation, we might actually be missing a cpu ROM to play them
 	ROM_LOAD( "17.6u", 0x0000, 0x8000, BAD_DUMP CRC(b7a6890c) SHA1(6431df82c7dbe454cabc6084c1a677ebb42ae4b3) )
 ROM_END
 
@@ -3957,7 +3957,7 @@ GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,        seg
 GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzonep,  fantzone, system16a_no7751p,        fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (317-5000)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad / missing gfx roms
+GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad / missing gfx ROMs
 
 GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a,      segas16a_state,            init_passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A) (FD1094 317-0071)", MACHINE_SUPPORTS_SAVE )
 

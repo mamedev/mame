@@ -2,13 +2,49 @@
 // copyright-holders:Bryan McPhail, Alex W. Jackson
 /****************************************************************************
 
-    NEC V25/V35 special function registers and internal ram access
+    NEC V25/V35 special function registers and internal data area access
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "v25.h"
 #include "v25priv.h"
+
+void v25_common_device::ida_sfr_map(address_map &map)
+{
+	map(0x000, 0x0ff).ram().share("internal_ram");
+	map(0x100, 0x100).rw(FUNC(v25_common_device::p0_r), FUNC(v25_common_device::p0_w));
+	map(0x101, 0x101).w(FUNC(v25_common_device::pm0_w));
+	map(0x102, 0x102).w(FUNC(v25_common_device::pmc0_w));
+	map(0x108, 0x108).rw(FUNC(v25_common_device::p1_r), FUNC(v25_common_device::p1_w));
+	map(0x109, 0x109).w(FUNC(v25_common_device::pm1_w));
+	map(0x10a, 0x10a).w(FUNC(v25_common_device::pmc1_w));
+	map(0x110, 0x110).rw(FUNC(v25_common_device::p2_r), FUNC(v25_common_device::p2_w));
+	map(0x111, 0x111).w(FUNC(v25_common_device::pm2_w));
+	map(0x112, 0x112).w(FUNC(v25_common_device::pmc2_w));
+	map(0x138, 0x138).r(FUNC(v25_common_device::pt_r));
+	map(0x13b, 0x13b).w(FUNC(v25_common_device::pmt_w));
+	map(0x14c, 0x14c).rw(FUNC(v25_common_device::exic0_r), FUNC(v25_common_device::exic0_w));
+	map(0x14d, 0x14d).rw(FUNC(v25_common_device::exic1_r), FUNC(v25_common_device::exic1_w));
+	map(0x14e, 0x14e).rw(FUNC(v25_common_device::exic2_r), FUNC(v25_common_device::exic2_w));
+	map(0x180, 0x181).rw(FUNC(v25_common_device::tm0_r), FUNC(v25_common_device::tm0_w));
+	map(0x182, 0x183).rw(FUNC(v25_common_device::md0_r), FUNC(v25_common_device::md0_w));
+	map(0x188, 0x189).rw(FUNC(v25_common_device::tm1_r), FUNC(v25_common_device::tm1_w));
+	map(0x18a, 0x18b).rw(FUNC(v25_common_device::md1_r), FUNC(v25_common_device::md1_w));
+	map(0x190, 0x190).w(FUNC(v25_common_device::tmc0_w));
+	map(0x191, 0x191).w(FUNC(v25_common_device::tmc1_w));
+	map(0x19c, 0x19c).rw(FUNC(v25_common_device::tmic0_r), FUNC(v25_common_device::tmic0_w));
+	map(0x19d, 0x19d).rw(FUNC(v25_common_device::tmic1_r), FUNC(v25_common_device::tmic1_w));
+	map(0x19e, 0x19e).rw(FUNC(v25_common_device::tmic2_r), FUNC(v25_common_device::tmic2_w));
+	map(0x1e1, 0x1e1).rw(FUNC(v25_common_device::rfm_r), FUNC(v25_common_device::rfm_w));
+	map(0x1e8, 0x1e9).rw(FUNC(v25_common_device::wtc_r), FUNC(v25_common_device::wtc_w));
+	map(0x1ea, 0x1ea).rw(FUNC(v25_common_device::flag_r), FUNC(v25_common_device::flag_w));
+	map(0x1eb, 0x1eb).rw(FUNC(v25_common_device::prc_r), FUNC(v25_common_device::prc_w));
+	map(0x1ec, 0x1ec).rw(FUNC(v25_common_device::tbic_r), FUNC(v25_common_device::tbic_w));
+	map(0x1ef, 0x1ef).r(FUNC(v25_common_device::irqs_r));
+	map(0x1fc, 0x1fc).r(FUNC(v25_common_device::ispr_r));
+	map(0x1ff, 0x1ff).rw(FUNC(v25_common_device::idb_r), FUNC(v25_common_device::idb_w));
+}
 
 uint8_t v25_common_device::read_irqcontrol(int /*INTSOURCES*/ source, uint8_t priority)
 {
@@ -18,386 +54,436 @@ uint8_t v25_common_device::read_irqcontrol(int /*INTSOURCES*/ source, uint8_t pr
 			| priority);
 }
 
-uint8_t v25_common_device::read_sfr(unsigned o)
-{
-	uint8_t ret;
-
-	switch(o)
-	{
-		case 0x00: /* P0 */
-			ret = m_p0_in();
-			break;
-		case 0x08: /* P1 */
-			/* P1 is combined with the interrupt lines */
-			ret = ((m_p1_in() & 0xF0)
-					| (m_nmi_state     ? 0x00 : 0x01)
-					| (m_intp_state[0] ? 0x00 : 0x02)
-					| (m_intp_state[1] ? 0x00 : 0x04)
-					| (m_intp_state[2] ? 0x00 : 0x08));
-			break;
-		case 0x10: /* P2 */
-			ret = m_p2_in();
-			break;
-		case 0x38: /* PT */
-			ret = m_pt_in();
-			break;
-		case 0x4C: /* EXIC0 */
-			ret = read_irqcontrol(INTP0, m_priority_intp);
-			break;
-		case 0x4D: /* EXIC1 */
-			ret = read_irqcontrol(INTP1, 7);
-			break;
-		case 0x4E: /* EXIC2 */
-			ret = read_irqcontrol(INTP2, 7);
-			break;
-		case 0x9C: /* TMIC0 */
-			ret = read_irqcontrol(INTTU0, m_priority_inttu);
-			break;
-		case 0x9D: /* TMIC1 */
-			ret = read_irqcontrol(INTTU1, 7);
-			break;
-		case 0x9E: /* TMIC2 */
-			ret = read_irqcontrol(INTTU2, 7);
-			break;
-		case 0xEA: /* FLAG */
-			ret = ((m_F0 << 3) | (m_F1 << 5));
-			break;
-		case 0xEB: /* PRC */
-			ret = (m_RAMEN ? 0x40 : 0);
-			switch (m_TB)
-			{
-				case 10:
-					break;
-				case 13:
-					ret |= 0x04;
-					break;
-				case 16:
-					ret |= 0x08;
-					break;
-				case 20:
-					ret |= 0x0C;
-					break;
-			}
-			switch (m_PCK)
-			{
-				case 2:
-					break;
-				case 4:
-					ret |= 0x01;
-					break;
-				case 8:
-					ret |= 0x02;
-					break;
-			}
-			break;
-		case 0xEC: /* TBIC */
-			ret = read_irqcontrol(INTTB, 7);
-			break;
-		case 0xEF: /* IRQS */
-			ret = m_IRQS;
-			break;
-		case 0xFC: /* ISPR */
-			ret = m_ISPR;
-			break;
-		case 0xFF: /* IDB */
-			ret = (m_IDB >> 12);
-			break;
-		default:
-			logerror("%06x: Read from special function register %02x\n",PC(),o);
-			ret = 0;
-	}
-	return ret;
-}
-
-uint16_t v25_common_device::read_sfr_word(unsigned o)
-{
-	uint16_t ret;
-
-	switch(o)
-	{
-		case 0x80:  /* TM0 */
-			logerror("%06x: Warning: read back TM0\n",PC());
-			ret = m_TM0;
-			break;
-		case 0x82: /* MD0 */
-			logerror("%06x: Warning: read back MD0\n",PC());
-			ret = m_MD0;
-			break;
-		case 0x88:  /* TM1 */
-			logerror("%06x: Warning: read back TM1\n",PC());
-			ret = m_TM1;
-			break;
-		case 0x8A: /* MD1 */
-			logerror("%06x: Warning: read back MD1\n",PC());
-			ret = m_MD1;
-			break;
-		default:
-			ret = (read_sfr(o) | (read_sfr(o+1) << 8));
-	}
-	return ret;
-}
-
 void v25_common_device::write_irqcontrol(int /*INTSOURCES*/ source, uint8_t d)
 {
-	if(d & 0x80)
+	if (BIT(d, 7))
 		m_pending_irq |= source;
 	else
 		m_pending_irq &= ~source;
 
-	if(d & 0x40)
+	if (BIT(d, 6))
 		m_unmasked_irq &= ~source;
 	else
 		m_unmasked_irq |= source;
 
-	if(d & 0x20)
+	if (BIT(d, 5))
 		logerror("%06x: Warning: macro service function not implemented\n",PC());
 
-	if(d & 0x10)
+	if (BIT(d, 4))
 		m_bankswitch_irq |= source;
 	else
 		m_bankswitch_irq &= ~source;
 }
 
-void v25_common_device::write_sfr(unsigned o, uint8_t d)
+uint8_t v25_common_device::p0_r()
 {
-	int tmp;
-	attotime time;
+	return m_p0_in();
+}
 
-	static const int timebases[4] = { 10, 13, 16, 20 };
-	static const int clocks[4] = { 2, 4, 8, 0 };
+void v25_common_device::p0_w(uint8_t d)
+{
+	m_p0_out(d);
+}
 
-	switch(o)
+void v25_common_device::pm0_w(uint8_t d)
+{
+	logerror("%06x: PM0 set to %02x\n", PC(), d);
+}
+
+void v25_common_device::pmc0_w(uint8_t d)
+{
+	logerror("%06x: PMC0 set to %02x\n", PC(), d);
+}
+
+uint8_t v25_common_device::p1_r()
+{
+	// P1 is combined with the interrupt lines
+	return ((m_p1_in() & 0xf0)
+			| (m_nmi_state     ? 0x00 : 0x01)
+			| (m_intp_state[0] ? 0x00 : 0x02)
+			| (m_intp_state[1] ? 0x00 : 0x04)
+			| (m_intp_state[2] ? 0x00 : 0x08));
+}
+
+void v25_common_device::p1_w(uint8_t d)
+{
+	// only the upper four bits of P1 can be used as output
+	m_p1_out(d & 0xf0);
+}
+
+void v25_common_device::pm1_w(uint8_t d)
+{
+	logerror("%06x: PM1 set to %02x\n", PC(), d);
+}
+
+void v25_common_device::pmc1_w(uint8_t d)
+{
+	logerror("%06x: PMC1 set to %02x\n", PC(), d);
+}
+
+uint8_t v25_common_device::p2_r()
+{
+	return m_p2_in();
+}
+
+void v25_common_device::p2_w(uint8_t d)
+{
+	m_p2_out(d);
+}
+
+void v25_common_device::pm2_w(uint8_t d)
+{
+	logerror("%06x: PM2 set to %02x\n", PC(), d);
+}
+
+void v25_common_device::pmc2_w(uint8_t d)
+{
+	logerror("%06x: PMC2 set to %02x\n", PC(), d);
+}
+
+uint8_t v25_common_device::pt_r()
+{
+	return m_pt_in();
+}
+
+void v25_common_device::pmt_w(uint8_t d)
+{
+	logerror("%06x: PMT set to %02x\n", PC(), d);
+}
+
+uint8_t v25_common_device::exic0_r()
+{
+	return read_irqcontrol(INTP0, m_priority_intp);
+}
+
+void v25_common_device::exic0_w(uint8_t d)
+{
+	write_irqcontrol(INTP0, d);
+	m_priority_intp = d & 0x7;
+}
+
+uint8_t v25_common_device::exic1_r()
+{
+	return read_irqcontrol(INTP1, 7);
+}
+
+void v25_common_device::exic1_w(uint8_t d)
+{
+	write_irqcontrol(INTP1, d);
+}
+
+uint8_t v25_common_device::exic2_r()
+{
+	return read_irqcontrol(INTP2, 7);
+}
+
+void v25_common_device::exic2_w(uint8_t d)
+{
+	write_irqcontrol(INTP2, d);
+}
+
+uint16_t v25_common_device::tm0_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("%06x: Warning: read back TM0\n",PC());
+	return m_TM0;
+}
+
+void v25_common_device::tm0_w(uint16_t d)
+{
+	m_TM0 = d;
+}
+
+uint16_t v25_common_device::md0_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("%06x: Warning: read back MD0\n",PC());
+	return m_MD0;
+}
+
+void v25_common_device::md0_w(uint16_t d)
+{
+	m_MD0 = d;
+}
+
+uint16_t v25_common_device::tm1_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("%06x: Warning: read back TM1\n",PC());
+	return m_TM1;
+}
+
+void v25_common_device::tm1_w(uint16_t d)
+{
+	m_TM1 = d;
+}
+
+uint16_t v25_common_device::md1_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("%06x: Warning: read back MD1\n",PC());
+	return m_MD1;
+}
+
+void v25_common_device::md1_w(uint16_t d)
+{
+	m_MD1 = d;
+}
+
+void v25_common_device::tmc0_w(uint8_t d)
+{
+	m_TMC0 = d;
+	if (BIT(d, 0))   // oneshot mode
 	{
-		case 0x00: /* P0 */
-			m_p0_out(d);
-			break;
-		case 0x08: /* P1 */
-			/* only the upper four bits of P1 can be used as output */
-			m_p1_out(d & 0xF0);
-			break;
-		case 0x10: /* P2 */
-			m_p2_out(d);
-			break;
-		case 0x4C: /* EXIC0 */
-			write_irqcontrol(INTP0, d);
-			m_priority_intp = d & 0x7;
-			break;
-		case 0x4D: /* EXIC1 */
-			write_irqcontrol(INTP1, d);
-			break;
-		case 0x4E: /* EXIC2 */
-			write_irqcontrol(INTP2, d);
-			break;
-		case 0x90: /* TMC0 */
-			m_TMC0 = d;
-			if(d & 1)   /* oneshot mode */
-			{
-				if(d & 0x80)
-				{
-					tmp = m_PCK * m_TM0 * ((d & 0x40) ? 128 : 12 );
-					time = attotime::from_hz(unscaled_clock()) * tmp;
-					m_timers[0]->adjust(time, INTTU0);
-				}
-				else
-					m_timers[0]->adjust(attotime::never);
+		if (BIT(d, 7))
+		{
+			unsigned tmp = m_PCK * m_TM0 * (BIT(d, 6) ? 128 : 12);
+			attotime time = clocks_to_attotime(tmp);
+			m_timers[0]->adjust(time, INTTU0);
+		}
+		else
+			m_timers[0]->adjust(attotime::never);
 
-				if(d & 0x20)
-				{
-					tmp = m_PCK * m_MD0 * ((d & 0x10) ? 128 : 12 );
-					time = attotime::from_hz(unscaled_clock()) * tmp;
-					m_timers[1]->adjust(time, INTTU1);
-				}
-				else
-					m_timers[1]->adjust(attotime::never);
-			}
-			else    /* interval mode */
-			{
-				if(d & 0x80)
-				{
-					tmp = m_PCK * m_MD0 * ((d & 0x40) ? 128 : 6 );
-					time = attotime::from_hz(unscaled_clock()) * tmp;
-					m_timers[0]->adjust(time, INTTU0, time);
-					m_timers[1]->adjust(attotime::never);
-					m_TM0 = m_MD0;
-				}
-				else
-				{
-					m_timers[0]->adjust(attotime::never);
-					m_timers[1]->adjust(attotime::never);
-				}
-			}
-			break;
-		case 0x91: /* TMC1 */
-			m_TMC1 = d & 0xC0;
-			if(d & 0x80)
-			{
-				tmp = m_PCK * m_MD1 * ((d & 0x40) ? 128 : 6 );
-				time = attotime::from_hz(unscaled_clock()) * tmp;
-				m_timers[2]->adjust(time, INTTU2, time);
-				m_TM1 = m_MD1;
-			}
-			else
-				m_timers[2]->adjust(attotime::never);
-			break;
-		case 0x9C: /* TMIC0 */
-			write_irqcontrol(INTTU0, d);
-			m_priority_inttu = d & 0x7;
-			break;
-		case 0x9D: /* TMIC1 */
-			write_irqcontrol(INTTU1, d);
-			break;
-		case 0x9E: /* TMIC2 */
-			write_irqcontrol(INTTU2, d);
-			break;
-		case 0xEA: /* FLAG */
-			m_F0 = ((d & 0x08) == 0x08);
-			m_F1 = ((d & 0x20) == 0x20);
-			break;
-		case 0xEB: /* PRC */
-			logerror("%06x: PRC set to %02x\n", PC(), d);
-			m_RAMEN = ((d & 0x40) == 0x40);
-			m_TB = timebases[(d & 0x0C) >> 2];
-			m_PCK = clocks[d & 0x03];
-			if (m_PCK == 0)
-			{
-				logerror("        Warning: invalid clock divider\n");
-				m_PCK = 8;
-			}
-			tmp = m_PCK << m_TB;
-			time = attotime::from_hz(unscaled_clock()) * tmp;
-			m_timers[3]->adjust(time, INTTB, time);
-			notify_clock_changed(); /* make device_execute_interface pick up the new clocks_to_cycles() */
-			logerror("        Internal RAM %sabled\n", (m_RAMEN ? "en" : "dis"));
-			logerror("        Time base set to 2^%d\n", m_TB);
-			logerror("        Clock divider set to %d\n", m_PCK);
-			break;
-		case 0xEC: /* TBIC */
-			/* time base interrupt doesn't support macro service, bank switching or priority control */
-			write_irqcontrol(INTTB, d & 0xC0);
-			break;
-		case 0xFF: /* IDB */
-			m_IDB = (d << 12) | 0xE00;
-			logerror("%06x: IDB set to %02x\n",PC(),d);
-			break;
-		default:
-			logerror("%06x: Wrote %02x to special function register %02x\n",PC(),d,o);
+		if (BIT(d, 5))
+		{
+			unsigned tmp = m_PCK * m_MD0 * (BIT(d, 4) ? 128 : 12);
+			attotime time = clocks_to_attotime(tmp);
+			m_timers[1]->adjust(time, INTTU1);
+		}
+		else
+			m_timers[1]->adjust(attotime::never);
+	}
+	else    // interval mode
+	{
+		if (BIT(d, 7))
+		{
+			unsigned tmp = m_PCK * m_MD0 * (BIT(d, 6) ? 128 : 6);
+			attotime time = clocks_to_attotime(tmp);
+			m_timers[0]->adjust(time, INTTU0, time);
+			m_timers[1]->adjust(attotime::never);
+			m_TM0 = m_MD0;
+		}
+		else
+		{
+			m_timers[0]->adjust(attotime::never);
+			m_timers[1]->adjust(attotime::never);
+		}
 	}
 }
 
-void v25_common_device::write_sfr_word(unsigned o, uint16_t d)
+void v25_common_device::tmc1_w(uint8_t d)
 {
-	switch(o)
+	m_TMC1 = d & 0xC0;
+	if (BIT(d, 7))
 	{
-		case 0x80:  /* TM0 */
-			m_TM0 = d;
-			break;
-		case 0x82: /* MD0 */
-			m_MD0 = d;
-			break;
-		case 0x88:  /* TM1 */
-			m_TM1 = d;
-			break;
-		case 0x8A: /* MD1 */
-			m_MD1 = d;
-			break;
-		default:
-			write_sfr(o, d);
-			write_sfr(o+1, d >> 8);
+		unsigned tmp = m_PCK * m_MD1 * (BIT(d, 6) ? 128 : 6);
+		attotime time = clocks_to_attotime(tmp);
+		m_timers[2]->adjust(time, INTTU2, time);
+		m_TM1 = m_MD1;
 	}
+	else
+		m_timers[2]->adjust(attotime::never);
+}
+
+uint8_t v25_common_device::tmic0_r()
+{
+	return read_irqcontrol(INTTU0, m_priority_inttu);
+}
+
+void v25_common_device::tmic0_w(uint8_t d)
+{
+	write_irqcontrol(INTTU0, d);
+	m_priority_inttu = d & 0x7;
+}
+
+uint8_t v25_common_device::tmic1_r()
+{
+	return read_irqcontrol(INTTU1, 7);
+}
+
+void v25_common_device::tmic1_w(uint8_t d)
+{
+	write_irqcontrol(INTTU1, d);
+}
+
+uint8_t v25_common_device::tmic2_r()
+{
+	return read_irqcontrol(INTTU2, 7);
+}
+
+void v25_common_device::tmic2_w(uint8_t d)
+{
+	write_irqcontrol(INTTU2, d);
+}
+
+uint8_t v25_common_device::rfm_r()
+{
+	return m_RFM;
+}
+
+void v25_common_device::rfm_w(uint8_t d)
+{
+	m_RFM = d;
+}
+
+uint16_t v25_common_device::wtc_r()
+{
+	return m_WTC;
+}
+
+void v25_common_device::wtc_w(offs_t a, uint16_t d, uint16_t m)
+{
+	m_WTC = (m_WTC & ~m) | (d & m);
+}
+
+uint8_t v25_common_device::flag_r()
+{
+	return (m_F0 << 3) | (m_F1 << 5);
+}
+
+void v25_common_device::flag_w(uint8_t d)
+{
+	m_F0 = BIT(d, 3);
+	m_F1 = BIT(d, 5);
+}
+
+uint8_t v25_common_device::prc_r()
+{
+	uint8_t ret = m_RAMEN ? 0x40 : 0;
+
+	switch (m_TB)
+	{
+	case 10:
+		break;
+	case 13:
+		ret |= 0x04;
+		break;
+	case 16:
+		ret |= 0x08;
+		break;
+	case 20:
+		ret |= 0x0C;
+		break;
+	}
+
+	switch (m_PCK)
+	{
+	case 2:
+		break;
+	case 4:
+		ret |= 0x01;
+		break;
+	case 8:
+		ret |= 0x02;
+		break;
+	}
+
+	return ret;
+}
+
+void v25_common_device::prc_w(uint8_t d)
+{
+	static const int timebases[4] = { 10, 13, 16, 20 };
+	static const int clocks[4] = { 2, 4, 8, 0 };
+
+	logerror("%06x: PRC set to %02x\n", PC(), d);
+	m_RAMEN = ((d & 0x40) == 0x40);
+	m_TB = timebases[(d & 0x0C) >> 2];
+	m_PCK = clocks[d & 0x03];
+	if (m_PCK == 0)
+	{
+		logerror("        Warning: invalid clock divider\n");
+		m_PCK = 8;
+	}
+
+	unsigned tmp = m_PCK << m_TB;
+	attotime time = clocks_to_attotime(tmp);
+	m_timers[3]->adjust(time, INTTB, time);
+	notify_clock_changed(); // make device_execute_interface pick up the new clocks_to_cycles()
+
+	logerror("        Internal RAM %sabled\n", (m_RAMEN ? "en" : "dis"));
+	logerror("        Time base set to 2^%d\n", m_TB);
+	logerror("        Clock divider set to %d\n", m_PCK);
+}
+
+uint8_t v25_common_device::tbic_r()
+{
+	return read_irqcontrol(INTTB, 7);
+}
+
+void v25_common_device::tbic_w(uint8_t d)
+{
+	// time base interrupt doesn't support macro service, bank switching or priority control
+	write_irqcontrol(INTTB, d & 0xC0);
+}
+
+uint8_t v25_common_device::irqs_r()
+{
+	return m_IRQS;
+}
+
+uint8_t v25_common_device::ispr_r()
+{
+	return m_ISPR;
+}
+
+uint8_t v25_common_device::idb_r()
+{
+	return m_IDB >> 12;
+}
+
+void v25_common_device::idb_w(uint8_t d)
+{
+	m_IDB = (d << 12) | 0xe00;
 }
 
 uint8_t v25_common_device::v25_read_byte(unsigned a)
 {
-	if((a & 0xFFE00) == m_IDB || a == 0xFFFFF)
-	{
-		unsigned o = a & 0x1FF;
-
-		if(m_RAMEN && o < 0x100)
-			return m_ram.b[BYTE_XOR_LE(o)];
-
-		if(o >= 0x100)
-			return read_sfr(o-0x100);
-	}
-
-	return m_program->read_byte(a);
+	if (((a & 0xffe00) == m_IDB && (m_RAMEN || BIT(a, 8))) || a == 0xfffff)
+		return m_data->read_byte(a & 0x1ff);
+	else
+		return m_program->read_byte(a);
 }
 
 uint16_t v25_common_device::v25_read_word(unsigned a)
 {
-	if( a & 1 )
+	if (BIT(a, 0))
 		return (v25_read_byte(a) | (v25_read_byte(a + 1) << 8));
 
-	if((a & 0xFFE00) == m_IDB)
-	{
-		unsigned o = a & 0x1FF;
-
-		if(m_RAMEN && o < 0x100)
-			return m_ram.w[o/2];
-
-		if(o >= 0x100)
-			return read_sfr_word(o-0x100);
-	}
-
-	if(a == 0xFFFFE)    /* not sure about this - manual says FFFFC-FFFFE are "reserved" */
-		return (m_program->read_byte(a) | (read_sfr(0xFF) << 8));
-
-	return m_program->read_word(a);
+	// not sure about this - manual says FFFFC-FFFFE are "reserved"
+	if (a == 0xffffe)
+		return (m_program->read_byte(a) | (m_data->read_byte(0x1ff) << 8));
+	else if ((a & 0xffe00) == m_IDB && (m_RAMEN || BIT(a, 8)))
+		return m_data->read_word(a & 0x1ff);
+	else
+		return m_program->read_word(a);
 }
 
 void v25_common_device::v25_write_byte(unsigned a, uint8_t d)
 {
-	if((a & 0xFFE00) == m_IDB || a == 0xFFFFF)
-	{
-		unsigned o = a & 0x1FF;
-
-		if(m_RAMEN && o < 0x100)
-		{
-			m_ram.b[BYTE_XOR_LE(o)] = d;
-			return;
-		}
-
-		if(o >= 0x100)
-		{
-			write_sfr(o-0x100, d);
-			return;
-		}
-	}
-
-	m_program->write_byte(a, d);
+	if (((a & 0xffe00) == m_IDB && (m_RAMEN || BIT(a, 8))) || a == 0xfffff)
+		m_data->write_byte(a & 0x1ff, d);
+	else
+		m_program->write_byte(a, d);
 }
 
 void v25_common_device::v25_write_word(unsigned a, uint16_t d)
 {
-	if( a & 1 )
+	if (BIT(a, 0))
 	{
 		v25_write_byte(a, d);
 		v25_write_byte(a + 1, d >> 8);
 		return;
 	}
 
-	if((a & 0xFFE00) == m_IDB)
-	{
-		unsigned o = a & 0x1FF;
-
-		if(m_RAMEN && o < 0x100)
-		{
-			m_ram.w[o/2] = d;
-			return;
-		}
-
-		if(o >= 0x100)
-		{
-			write_sfr_word(o-0x100, d);
-			return;
-		}
-	}
-
-	if(a == 0xFFFFE)    /* not sure about this - manual says FFFFC-FFFFE are "reserved" */
+	// not sure about this - manual says FFFFC-FFFFE are "reserved"
+	if (a == 0xffffe)
 	{
 		m_program->write_byte(a, d);
-		write_sfr(0xFF, d >> 8);
-		return;
+		m_data->write_byte(0x1ff, d >> 8);
 	}
-
-	m_program->write_word(a, d);
+	else if ((a & 0xffe00) == m_IDB && (m_RAMEN || BIT(a, 8)))
+		m_data->write_word(a & 0x1ff, d);
+	else
+		m_program->write_word(a, d);
 }

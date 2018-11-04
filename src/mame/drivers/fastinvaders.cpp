@@ -649,11 +649,11 @@ MACHINE_CONFIG_START(fastinvaders_state::fastinvaders)
 //  MCFG_DEVICE_IO_MAP(fastinvaders_io_map)
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold)
 	MCFG_I8085A_SID(READLINE(*this, fastinvaders_state, sid_read))
-MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, "screen", 0, 1)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	I8257(config, m_dma8257, 6144100);
 	m_dma8257->in_memr_cb().set(FUNC(fastinvaders_state::memory_read_byte));

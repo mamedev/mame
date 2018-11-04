@@ -20,7 +20,7 @@ Double Dragon 3 PCB Layout
 --------------------------
 
 TA-0030-P1-03 (early version with EPROMs)
-TA-0030-P1-04 (later version with MASKROMs)
+TA-0030-P1-04 (later version with mask ROMs)
 |----------------------------------------------|
 |VOL M51516 YM3012 YM2151     3.579545MHz IC15 |
 |     MB3615 1.056MHz   Z80               IC14|-|

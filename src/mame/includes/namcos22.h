@@ -12,7 +12,9 @@
 #pragma once
 
 #include "machine/eeprompar.h"
+#include "machine/mb87078.h"
 #include "machine/timer.h"
+#include "sound/c352.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
 #include "emupal.h"
@@ -193,8 +195,10 @@ public:
 		m_slave(*this, "slave"),
 		m_mcu(*this, "mcu"),
 		m_iomcu(*this, "iomcu"),
-		m_shareram(*this, "shareram"),
 		m_eeprom(*this, "eeprom"),
+		m_mb87078(*this, "mb87078"),
+		m_c352(*this, "c352"),
+		m_shareram(*this, "shareram"),
 		m_slave_extram(*this, "slaveextram"),
 		m_master_extram(*this, "masterextram"),
 		m_paletteram(*this, "paletteram"),
@@ -209,11 +213,11 @@ public:
 		m_pc_pedal_interrupt(*this, "pc_p_int"),
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
-		m_p1(*this, "P1"),
-		m_p2(*this, "P2"),
-		m_mcup5a(*this, "MCUP5A"),
-		m_mcup5b(*this, "MCUP5B"),
-		m_led(*this, "led"),
+		m_dsw(*this, "DSW"),
+		m_inputs(*this, "INPUTS"),
+		m_custom(*this, "CUSTOM.%u", 0),
+		m_opt(*this, "OPT.%u", 0),
+		m_mcuout(*this, "mcuout%u", 0U),
 		m_cpuled(*this, "cpuled%u", 0U)
 	{ }
 
@@ -346,22 +350,21 @@ private:
 	DECLARE_READ16_MEMBER(namcos22_portbit_r);
 	DECLARE_WRITE16_MEMBER(namcos22_portbit_w);
 	DECLARE_READ16_MEMBER(namcos22_dipswitch_r);
-	DECLARE_READ32_MEMBER(namcos22_gun_r);
+	DECLARE_READ16_MEMBER(namcos22_gun_r);
 	DECLARE_WRITE16_MEMBER(namcos22_cpuleds_w);
 	DECLARE_READ32_MEMBER(alpinesa_prot_r);
 	DECLARE_WRITE32_MEMBER(alpinesa_prot_w);
 	DECLARE_WRITE32_MEMBER(namcos22s_chipselect_w);
+	DECLARE_WRITE8_MEMBER(ss22_volume_w);
+	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 	DECLARE_WRITE8_MEMBER(mcu_port4_w);
 	DECLARE_READ8_MEMBER(mcu_port4_r);
 	DECLARE_WRITE8_MEMBER(mcu_port5_w);
 	DECLARE_READ8_MEMBER(mcu_port5_r);
 	DECLARE_WRITE8_MEMBER(mcu_port6_w);
 	DECLARE_READ8_MEMBER(mcu_port6_r);
-	DECLARE_WRITE8_MEMBER(mcu_port7_w);
-	DECLARE_READ8_MEMBER(mcu_port7_r);
 	DECLARE_READ8_MEMBER(namcos22s_mcu_adc_r);
-	DECLARE_WRITE8_MEMBER(propcycle_mcu_port5_w);
-	DECLARE_WRITE8_MEMBER(alpine_mcu_port5_w);
+	DECLARE_WRITE8_MEMBER(alpine_mcu_port4_w);
 	DECLARE_READ8_MEMBER(mcu_port4_s22_r);
 	DECLARE_READ8_MEMBER(iomcu_port4_s22_r);
 	DECLARE_READ16_MEMBER(mcu141_speedup_r);
@@ -434,7 +437,6 @@ private:
 	void install_c74_speedup();
 	void install_130_speedup();
 	void install_141_speedup();
-	void namcos22_init(int game_type);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	DECLARE_MACHINE_START(adillor);
@@ -463,7 +465,6 @@ private:
 	void mcu_s22_program(address_map &map);
 	void namcos22_am(address_map &map);
 	void namcos22s_am(address_map &map);
-	void propcycl_io_map(address_map &map);
 	void slave_dsp_data(address_map &map);
 	void slave_dsp_io(address_map &map);
 	void slave_dsp_program(address_map &map);
@@ -474,8 +475,10 @@ private:
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_mcu;
 	optional_device<cpu_device> m_iomcu;
-	required_shared_ptr<u16> m_shareram;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
+	optional_device<mb87078_device> m_mb87078;
+	required_device<c352_device> m_c352;
+	required_shared_ptr<u16> m_shareram;
 	required_shared_ptr<u16> m_slave_extram;
 	required_shared_ptr<u16> m_master_extram;
 	required_shared_ptr<u32> m_paletteram;
@@ -490,11 +493,11 @@ private:
 	optional_device<timer_device> m_pc_pedal_interrupt;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
-	optional_ioport m_p1;
-	optional_ioport m_p2;
-	optional_ioport m_mcup5a;
-	optional_ioport m_mcup5b;
-	output_finder<> m_led;
+	required_ioport m_dsw;
+	required_ioport m_inputs;
+	optional_ioport_array<2> m_custom;
+	optional_ioport_array<2> m_opt;
+	output_finder<16> m_mcuout;
 	output_finder<8> m_cpuled;
 
 	u8 m_syscontrol[0x20];
@@ -518,7 +521,8 @@ private:
 	int m_UploadDestIdx;
 	u32 m_alpinesa_protection;
 	int m_motor_status;
-	int m_p4;
+	u8 m_mcu_iocontrol;
+	u8 m_mcu_outdata;
 	u16 m_su_82;
 	u16 m_keycus_id;
 	u16 m_keycus_rng;

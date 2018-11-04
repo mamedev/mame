@@ -53,7 +53,8 @@ std::string m68k_disassembler::make_signed_hex_str_32(u32 val)
 
 std::string m68k_disassembler::get_imm_str_s(u32 size)
 {
-	switch(size) {
+	switch(size)
+	{
 	case 0: return util::string_format("#%s", make_signed_hex_str_8(read_imm_8()));
 	case 1: return util::string_format("#%s", make_signed_hex_str_16(read_imm_16()));
 	case 2: return util::string_format("#%s", make_signed_hex_str_32(read_imm_32()));
@@ -63,7 +64,8 @@ std::string m68k_disassembler::get_imm_str_s(u32 size)
 
 std::string m68k_disassembler::get_imm_str_u(u32 size)
 {
-	switch(size) {
+	switch(size)
+	{
 	case 0: return util::string_format("#$%x", read_imm_8());
 	case 1: return util::string_format("#$%x", read_imm_16());
 	case 2: return util::string_format("#$%x", read_imm_32());
@@ -2996,13 +2998,14 @@ std::string m68k_disassembler::d68851_p000()
 
 	if ((modes & 0xe000) == 0x8000) // PTEST
 	{
-		if (modes & 0x100) {
+		if (modes & 0x100)
+		{
 			return util::string_format("ptest%c  %s, %s, %d, @A%d",
 					(modes & 0x200) ? 'r' : 'w',
 							fc_to_string(modes),
 							str,
 							(modes >> 10) & 7,
-							(modes >> 4) & 7);
+							(modes >> 5) & 7);
 		}
 		else
 		{

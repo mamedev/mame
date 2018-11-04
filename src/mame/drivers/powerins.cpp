@@ -423,9 +423,9 @@ Notes:
       ROMs -
             -1, -2   : 27C1001 EPROM
             -3, -4   : 27C4096 EPROM
-            -5, -6   : 8M 42 pin MASKROM (578200)
-            -7       : 4M 40 pin MASKROM (574200)
-            -8 to -19: 8M 42 pin MASKROM (578200)
+            -5, -6   : 8M 42 pin mask ROM (578200)
+            -7       : 4M 40 pin mask ROM (574200)
+            -8 to -19: 8M 42 pin mask ROM (578200)
             20       : 82S129 PROM
             21       : 82S135 PROM
             22       : 82S123 PROM
@@ -624,9 +624,9 @@ Power Instinct
 Atlus, 1993
 
 This is a bootleg US version with different sound hardware to the existing bootleg set.
-The PCB is very large and has 2 plug-in daughterboards and many MASK ROMs.
-The addition of the contents of the MASK ROMs would probably equal the contents of presumably
-larger MASK ROMs found on the original PCB....
+The PCB is very large and has 2 plug-in daughterboards and many mask ROMs.
+The addition of the contents of the mask ROMs would probably equal the contents of presumably
+larger mask ROMs found on the original PCB....
 
 PCB Layout
 
@@ -662,7 +662,7 @@ Notes:
       M6295 clock:  4.000MHz (both); sample rate = 4000000/165 (both)
       VSync      :  60Hz
 
-      ROMs 1F and 6N are 1M MASK (MX27C1000), all other ROMs are 4M MASK (MX27C4000).
+      ROMs 1F and 6N are 1M mask (MX27C1000), all other ROMs are 4M mask (MX27C4000).
       ROMS at 5* are located on a plug-in daughterboard.
       ROMS at 11*, 12*, 13G, 13P and 14* are located on a plug-in daughterboard.
       82S123 and 82S147 are PROMs.

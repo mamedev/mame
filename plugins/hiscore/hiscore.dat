@@ -9763,7 +9763,7 @@ rthun2j:
 @:maincpu,program,100020,4,00,00
 
 
-;@s:namcos21.cpp
+;@s:namcos21_c67.cpp
 
 ;********(solvalou)
 solvalou:
@@ -10275,7 +10275,7 @@ macross2k:
 
 
 ;strahla:******koutetsu yousai strahl (japan set 2)
-strahla:
+strahlja:
 @:maincpu,program,f30d1,d9,55,2e
 @:maincpu,program,f3239,27,00,88
 @:maincpu,program,f0d5b,3,00,50
@@ -16888,12 +16888,12 @@ twincobru:
 ;@s:twins.cpp
 
 ;******twins
-twins:
+twinsed1:
 @:maincpu,program,4cc0,60,09,00
 @:maincpu,program,4d1d,1,01,01
 
 
-twinsa:
+twinsed2:
 @:maincpu,program,4cbe,60,09,00
 @:maincpu,program,4d1b,1,01,01
 

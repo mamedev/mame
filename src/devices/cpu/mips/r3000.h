@@ -19,19 +19,19 @@
 ***************************************************************************/
 
 #define MCFG_R3000_ENDIANNESS(_endianness) \
-	downcast<r3000_device &>(*device).set_endianness(_endianness);
+	downcast<r3000_device_base &>(*device).set_endianness(_endianness);
 
 #define MCFG_R3000_BRCOND0_INPUT(_devcb) \
-	downcast<r3000_device &>(*device).set_brcond0_input(DEVCB_##_devcb);
+	downcast<r3000_device_base &>(*device).set_brcond0_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND1_INPUT(_devcb) \
-	downcast<r3000_device &>(*device).set_brcond1_input(DEVCB_##_devcb);
+	downcast<r3000_device_base &>(*device).set_brcond1_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND2_INPUT(_devcb) \
-	downcast<r3000_device &>(*device).set_brcond2_input(DEVCB_##_devcb);
+	downcast<r3000_device_base &>(*device).set_brcond2_input(DEVCB_##_devcb);
 
 #define MCFG_R3000_BRCOND3_INPUT(_devcb) \
-	downcast<r3000_device &>(*device).set_brcond3_input(DEVCB_##_devcb);
+	downcast<r3000_device_base &>(*device).set_brcond3_input(DEVCB_##_devcb);
 
 
 /***************************************************************************
@@ -64,16 +64,17 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> r3000_device
+// ======================> r3000_device_base
 
-class r3000_device : public cpu_device
+class r3000_device_base : public cpu_device
 {
 public:
 	// construction/destruction
-	virtual ~r3000_device();
+	virtual ~r3000_device_base();
 
 	// inline configuration helpers
 	void set_endianness(endianness_t endianness) { m_endianness = endianness; }
+	void set_fpurev(uint32_t revision) { m_hasfpu = true; m_fpurev = revision; }
 
 	template <class Object> devcb_base &set_brcond0_input(Object &&cb) { return m_in_brcond0.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_brcond1_input(Object &&cb) { return m_in_brcond1.set_callback(std::forward<Object>(cb)); }
@@ -85,18 +86,7 @@ public:
 	auto in_brcond3() { return m_in_brcond3.bind(); }
 
 protected:
-	enum chip_type
-	{
-		CHIP_TYPE_R2000,
-		CHIP_TYPE_R3041,
-		CHIP_TYPE_R3051,
-		CHIP_TYPE_R3052,
-		CHIP_TYPE_R3071,
-		CHIP_TYPE_R3081,
-		CHIP_TYPE_IOP
-	};
-
-	r3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype);
+	r3000_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t cpurev, size_t icache_size, size_t dcache_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -124,12 +114,12 @@ protected:
 	// memory accessors
 	struct r3000_data_accessors
 	{
-		uint8_t   (r3000_device::*m_read_byte)(offs_t byteaddress);
-		uint16_t  (r3000_device::*m_read_word)(offs_t byteaddress);
-		uint32_t  (r3000_device::*m_read_dword)(offs_t byteaddress);
-		void    (r3000_device::*m_write_byte)(offs_t byteaddress, uint8_t data);
-		void    (r3000_device::*m_write_word)(offs_t byteaddress, uint16_t data);
-		void    (r3000_device::*m_write_dword)(offs_t byteaddress, uint32_t data);
+		uint8_t   (r3000_device_base::*m_read_byte)(offs_t byteaddress);
+		uint16_t  (r3000_device_base::*m_read_word)(offs_t byteaddress);
+		uint32_t  (r3000_device_base::*m_read_dword)(offs_t byteaddress);
+		void    (r3000_device_base::*m_write_byte)(offs_t byteaddress, uint8_t data);
+		void    (r3000_device_base::*m_write_word)(offs_t byteaddress, uint16_t data);
+		void    (r3000_device_base::*m_write_dword)(offs_t byteaddress, uint32_t data);
 	};
 
 	uint32_t readop(offs_t pc);
@@ -204,8 +194,9 @@ protected:
 	std::function<const void * (offs_t)> m_prptr;
 
 	// configuration
-	chip_type       m_chip_type;
+	uint32_t        m_cpurev;
 	bool            m_hasfpu;
+	uint32_t        m_fpurev;
 	endianness_t    m_endianness;
 
 	// core registers
@@ -226,10 +217,10 @@ protected:
 	int         m_interrupt_cycles;
 
 	// endian-dependent load/store
-	void        (r3000_device::*m_lwl)();
-	void        (r3000_device::*m_lwr)();
-	void        (r3000_device::*m_swl)();
-	void        (r3000_device::*m_swr)();
+	void        (r3000_device_base::*m_lwl)();
+	void        (r3000_device_base::*m_lwr)();
+	void        (r3000_device_base::*m_swl)();
+	void        (r3000_device_base::*m_swr)();
 
 	// memory accesses
 	r3000_data_accessors *m_cur;
@@ -241,8 +232,8 @@ protected:
 	std::vector<uint32_t> m_icache;
 	std::vector<uint32_t> m_dcache;
 	size_t      m_cache_size;
-	size_t      m_icache_size;
-	size_t      m_dcache_size;
+	size_t const m_icache_size;
+	size_t const m_dcache_size;
 
 	// I/O
 	devcb_read_line    m_in_brcond0;
@@ -251,18 +242,45 @@ protected:
 	devcb_read_line    m_in_brcond3;
 };
 
-// ======================> r3041_device
+// ======================> r2000_device
 
-class r2000_device : public r3000_device
+class r2000_device : public r3000_device_base
 {
 public:
-	r2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 0, size_t dcache_size = 0);
+};
+
+
+// ======================> r2000a_device
+
+class r2000a_device : public r3000_device_base
+{
+public:
+	r2000a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 0, size_t dcache_size = 0);
+};
+
+
+// ======================> r3000_device
+
+class r3000_device : public r3000_device_base
+{
+public:
+	r3000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 0, size_t dcache_size = 0);
+};
+
+
+// ======================> r3000a_device
+
+class r3000a_device : public r3000_device_base
+{
+public:
+	r3000a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 0, size_t dcache_size = 0);
 };
 
 
 // ======================> r3041_device
 
-class r3041_device : public r3000_device
+class r3041_device : public r3000_device_base
 {
 public:
 	r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -271,7 +289,7 @@ public:
 
 // ======================> r3051_device
 
-class r3051_device : public r3000_device
+class r3051_device : public r3000_device_base
 {
 public:
 	r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -280,7 +298,7 @@ public:
 
 // ======================> r3052_device
 
-class r3052_device : public r3000_device
+class r3052_device : public r3000_device_base
 {
 public:
 	r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -289,37 +307,37 @@ public:
 
 // ======================> r3071_device
 
-class r3071_device : public r3000_device
+class r3071_device : public r3000_device_base
 {
 public:
-	r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 16384, size_t dcache_size = 4096);
 };
 
 
 // ======================> r3081_device
 
-class r3081_device : public r3000_device
+class r3081_device : public r3000_device_base
 {
 public:
-	r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 16384, size_t dcache_size = 4096);
 };
 
 
 // ======================> iop_device
 
-class iop_device : public r3000_device
+class iop_device : public r3000_device_base
 {
 public:
 	iop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_reset() override;
 };
 
 
 // device type definition
 
 DECLARE_DEVICE_TYPE(R2000,       r2000_device)
+DECLARE_DEVICE_TYPE(R2000A,      r2000a_device)
+DECLARE_DEVICE_TYPE(R3000,       r3000_device)
+DECLARE_DEVICE_TYPE(R3000A,      r3000a_device)
 DECLARE_DEVICE_TYPE(R3041,       r3041_device)
 DECLARE_DEVICE_TYPE(R3051,       r3051_device)
 DECLARE_DEVICE_TYPE(R3052,       r3052_device)

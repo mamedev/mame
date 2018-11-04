@@ -13,7 +13,7 @@ http://oldcomputer.info/terminal/
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 
 
 class terminal_state : public driver_device
@@ -35,7 +35,6 @@ private:
 
 void terminal_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0xffff).rom();
 }
 
@@ -47,7 +46,7 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START( terminal_state::terminal )
-	MCFG_DEVICE_ADD("maincpu", Z80, 4'000'000)
+	MCFG_DEVICE_ADD("maincpu", I8031, 12'000'000)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
@@ -61,16 +60,6 @@ ROM_START( alcat258 ) // MSM80C154 (+ TS9347// 8k ram // b&w
 
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "serial.bin",   0x0000, 0x0100, CRC(f0b99b8f) SHA1(906c285fd327eba2ba9798695acc456535b84570) )
-ROM_END
-
-
-ROM_START( alcat7100 ) // Z80  // 256k ram // b&w  // looks like it needs a boot floppy to start
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom.u117",                  0x0000, 0x0800, CRC(9c0debf7) SHA1(a042db34090656224ede41d8190f22f719d1a634) )
-	ROM_LOAD( "906_513601_012gd2.u110",    0x0800, 0x0800, CRC(9346a41c) SHA1(6f7a2946494adac4d34874da9d5e475c99457000) ) // keyboard?
-
-	ROM_REGION( 0x1000, "chargen", 0 ) // first half blank
-	ROM_LOAD( "906_513301_rev00_ba6d.u20", 0x0000, 0x1000, CRC(143cfdfc) SHA1(4d924d1f16c30d72e1fdbb786488156bb9961442) )
 ROM_END
 
 
@@ -143,7 +132,6 @@ ROM_END
 
 /*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY             FULLNAME                     FLAGS */
 COMP( 1991, alcat258,  0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminatel 258",         MACHINE_IS_SKELETON )
-COMP( 1984, alcat7100, 0,      0,      terminal, terminal, terminal_state, empty_init, "Alcatel",            "Terminal 7100",          MACHINE_IS_SKELETON )
 COMP( 1986, itt9216,   0,      0,      terminal, terminal, terminal_state, empty_init, "ITT",                "Courier 9216-X",         MACHINE_IS_SKELETON )
 COMP( 1992, loewed,    0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multitel D",             MACHINE_IS_SKELETON )
 COMP( 1988, loewe715,  0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe",              "Multicom 715L",          MACHINE_IS_SKELETON )

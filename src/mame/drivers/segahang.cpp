@@ -1143,11 +1143,11 @@ ROM_END
 //   ASSY ROM BD 834-5669
 //   ASSY SOUND BD 834-5670-01 (stickered 834-5706-01 HANG ON)
 //
-//   ROM & SOUND boards were missing, but Manual No. 420-5244 2nd Printing confirms they are the same with the same data / roms.
+//   ROM & SOUND boards were missing, but Manual No. 420-5244 2nd Printing confirms they are the same with the same data / ROMs.
 //
-//  No labels on the main CPU roms just a black sticker, likely the result of repair job in 1995
+//  No labels on the main CPU ROMs just a black sticker, likely the result of repair job in 1995
 //  A second PCB has been seen with hand written labels with matching sum16 values listed, though not labelled as "A" revision
-//  Although the both PCBs were stickered 834-5667-01 REV.A, it's not likely correct for this rom set
+//  Although the both PCBs were stickered 834-5667-01 REV.A, it's not likely correct for this ROM set
 //
 ROM_START( hangon2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -1694,14 +1694,14 @@ ROM_START( endurora )
 	ROM_LOAD( "epr-7646.ic60", 0x10000, 0x08000, CRC(7e432683) SHA1(c8249b23fce77eb456166161c2d9aa34309efe31) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites - ASSY ROM BD 837-6004-02 with jumpers J2, J3, J7 & J8 made
-	ROM_LOAD32_BYTE( "mpr-10146.ic36", 0x00000, 0x20000, CRC(85564401) SHA1(aca73ee936d623de2103f843bd916909e4d0ec7b) ) /* 28pin 1mb MASK ROM */
-	ROM_LOAD32_BYTE( "mpr-10144.ic28", 0x00001, 0x20000, CRC(03569803) SHA1(cad6d5e2dcb785eece2c82e13105378c9857745e) ) /* 28pin 1mb MASK ROM */
-	ROM_LOAD32_BYTE( "mpr-10142.ic18", 0x00002, 0x20000, CRC(4a72251b) SHA1(2de25051d7858b817e290b0806792980a889eb16) ) /* 28pin 1mb MASK ROM */
-	ROM_LOAD32_BYTE( "mpr-10140.ic8",  0x00003, 0x20000, CRC(68ff1691) SHA1(82343227b730ac3a66aac9c362f29dd0dcdb46f8) ) /* 28pin 1mb MASK ROM */
-	ROM_LOAD32_BYTE( "mpr-10145.ic32", 0x80000, 0x20000, CRC(3e64eec0) SHA1(272fd2f318db67368b3d13cacc47f9d32c9bdcaa) ) /* 28pin 1mb MASK ROM */
-	ROM_LOAD32_BYTE( "mpr-10143.ic24", 0x80001, 0x20000, CRC(bdad5fd2) SHA1(914e74fc1ab4c3e7418f2c95305f3bebab8476be) ) /* 28pin 1mb MASK ROM */
-	ROM_LOAD32_BYTE( "mpr-10141.ic14", 0x80002, 0x20000, CRC(560360b9) SHA1(ddae8cc2c5a35540d4a115313049b30f5d2ebeae) ) /* 28pin 1mb MASK ROM */
-	ROM_LOAD32_BYTE( "mpr-10139.ic4",  0x80003, 0x20000, CRC(863c7d9e) SHA1(a77648beeed180b3f00d66ba91b20459e32025fe) ) /* 28pin 1mb MASK ROM */
+	ROM_LOAD32_BYTE( "mpr-10146.ic36", 0x00000, 0x20000, CRC(85564401) SHA1(aca73ee936d623de2103f843bd916909e4d0ec7b) ) // all MPR-101xx here are 28 pin Fujitsu MB831000 mask ROMs
+	ROM_LOAD32_BYTE( "mpr-10144.ic28", 0x00001, 0x20000, CRC(03569803) SHA1(cad6d5e2dcb785eece2c82e13105378c9857745e) )
+	ROM_LOAD32_BYTE( "mpr-10142.ic18", 0x00002, 0x20000, CRC(4a72251b) SHA1(2de25051d7858b817e290b0806792980a889eb16) )
+	ROM_LOAD32_BYTE( "mpr-10140.ic8",  0x00003, 0x20000, CRC(68ff1691) SHA1(82343227b730ac3a66aac9c362f29dd0dcdb46f8) )
+	ROM_LOAD32_BYTE( "mpr-10145.ic32", 0x80000, 0x20000, CRC(3e64eec0) SHA1(272fd2f318db67368b3d13cacc47f9d32c9bdcaa) )
+	ROM_LOAD32_BYTE( "mpr-10143.ic24", 0x80001, 0x20000, CRC(bdad5fd2) SHA1(914e74fc1ab4c3e7418f2c95305f3bebab8476be) )
+	ROM_LOAD32_BYTE( "mpr-10141.ic14", 0x80002, 0x20000, CRC(560360b9) SHA1(ddae8cc2c5a35540d4a115313049b30f5d2ebeae) )
+	ROM_LOAD32_BYTE( "mpr-10139.ic4",  0x80003, 0x20000, CRC(863c7d9e) SHA1(a77648beeed180b3f00d66ba91b20459e32025fe) )
 
 	ROM_REGION( 0x8000, "gfx3", 0 ) // road gfx
 	ROM_LOAD( "epr-7633.ic1", 0x0000, 0x8000, CRC(6f146210) SHA1(2f58f0c3563b434ed02700b9ca1545a696a5716e) )
@@ -1948,7 +1948,7 @@ ROM_START( endurobl )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "7.13j", 0x030000, 0x08000, CRC(f1d6b4b7) SHA1(32bd966191cbb36d1e60ed1a06d4caa023dd6b88) )
 	ROM_CONTINUE(             0x000000, 0x08000 )
-	ROM_LOAD16_BYTE( "4.13h", 0x030001, 0x08000, CRC(43bff873) SHA1(04e906c1965a6211fb8e13987db52f1f99cc0203) ) // rom de-coded
+	ROM_LOAD16_BYTE( "4.13h", 0x030001, 0x08000, CRC(43bff873) SHA1(04e906c1965a6211fb8e13987db52f1f99cc0203) ) // ROM decoded
 	ROM_CONTINUE(             0x000001, 0x08000 )       // data de-coded
 	ROM_LOAD16_BYTE( "8.14j", 0x010000, 0x08000, CRC(2153154a) SHA1(145d8ed59812d26ca412a01ae77cd7872adaba5a) )
 	ROM_LOAD16_BYTE( "5.14h", 0x010001, 0x08000, CRC(0a97992c) SHA1(7a6fc8c575637107ed07a30f6f0f8cb8877cbb43) )
@@ -2020,7 +2020,7 @@ ROM_END
 //
 ROM_START( endurob2 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) // 68000 code
-	// the program roms should be twice the size
+	// the program ROMs should be twice the size
 	ROM_LOAD16_BYTE( "enduro.a07", 0x000000, 0x08000, BAD_DUMP CRC(259069bc) SHA1(42fa47ce4a29294f9eff3eddbba6c305d750aaa5) )
 //  ROM_CONTINUE(                  0x030000, 0x08000 )
 	ROM_LOAD16_BYTE( "enduro.a04", 0x000001, 0x08000, BAD_DUMP CRC(f584fbd9) SHA1(6c9ddcd1d9cf95c6250b705b27865644da45d197) )

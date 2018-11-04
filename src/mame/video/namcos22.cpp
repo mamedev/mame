@@ -22,10 +22,6 @@ void namcos22_renderer::init()
 {
 	memset(&m_scenenode_root, 0, sizeof(m_scenenode_root));
 	m_scenenode_cur = nullptr;
-
-	m_clipx = 320;
-	m_clipy = 240;
-	m_cliprect.set(0, 639, 0, 479);
 }
 
 
@@ -237,31 +233,11 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 
 void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bitmap, struct namcos22_scenenode *node)
 {
-	namcos22_object_data &extra = object_data_alloc();
 	vertex_t v[4];
 	vertex_t clipv[6];
 	int clipverts;
 	int vertnum;
-
 	int direct = node->data.quad.direct;
-	int flags = node->data.quad.flags;
-	int color = node->data.quad.color;
-	int cz_adjust = node->data.quad.cz_adjust;
-
-	extra.destbase = &bitmap;
-	extra.pfade_enabled = 0;
-	extra.zfog_enabled = 0;
-	extra.fadefactor = 0;
-	extra.fogfactor = 0;
-
-	extra.pens = &m_state.m_palette->pen((color & 0x7f) << 8);
-	extra.primap = &screen.priority();
-	extra.bn = node->data.quad.texturebank;
-	extra.flags = flags;
-	extra.cz_adjust = cz_adjust;
-	extra.cmode = node->data.quad.cmode;
-	extra.prioverchar = ((node->data.quad.cmode & 7) == 1) ? 1 : 0;
-	extra.prioverchar |= m_state.m_is_ss22 ? 2 : 0;
 
 	// scene clip
 	float cx = 320.0f + node->data.quad.vx;
@@ -316,6 +292,26 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			clipv[vertnum].p[3] = (node->data.quad.v[vertnum].bri + 0.5f) * ooz;
 		}
 	}
+
+	namcos22_object_data &extra = object_data_alloc();
+	int flags = node->data.quad.flags;
+	int color = node->data.quad.color;
+	int cz_adjust = node->data.quad.cz_adjust;
+
+	extra.destbase = &bitmap;
+	extra.pfade_enabled = 0;
+	extra.zfog_enabled = 0;
+	extra.fadefactor = 0;
+	extra.fogfactor = 0;
+
+	extra.pens = &m_state.m_palette->pen((color & 0x7f) << 8);
+	extra.primap = &screen.priority();
+	extra.bn = node->data.quad.texturebank;
+	extra.flags = flags;
+	extra.cz_adjust = cz_adjust;
+	extra.cmode = node->data.quad.cmode;
+	extra.prioverchar = ((node->data.quad.cmode & 7) == 1) ? 1 : 0;
+	extra.prioverchar |= m_state.m_is_ss22 ? 2 : 0;
 
 	if (m_state.m_is_ss22)
 	{
@@ -624,10 +620,6 @@ void namcos22_renderer::render_scene(screen_device &screen, bitmap_rgb32 &bitmap
 		render_scene_nodes(screen, bitmap, node->data.nonleaf.next[i]);
 		node->data.nonleaf.next[i] = nullptr;
 	}
-
-	m_clipx = 320;
-	m_clipy = 240;
-	m_cliprect.set(0, 639, 0, 479);
 
 	wait("render_scene");
 }
@@ -1221,10 +1213,10 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	m_camera_vx = (s16)(src[0x5] >> 16);
 	m_camera_vy = (s16)(src[0x5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
-	m_camera_vl = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom;
-	m_camera_vr = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom;
-	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom;
-	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom;
+	m_camera_vl = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
+	m_camera_vr = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
+	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom + 0.5f;
+	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom + 0.5f;
 
 	m_reflection = src[0x2] >> 16 & 0x30; // z too?
 	m_cullflip = (m_reflection == 0x10 || m_reflection == 0x20);
@@ -1893,7 +1885,10 @@ READ16_MEMBER(namcos22_state::spotram_r)
 	{
 		// read
 		u16 ret = m_spotram[m_spotram_address >> 1 & 0x7ff];
-		m_spotram_address += 2;
+
+		if (!machine().side_effects_disabled())
+			m_spotram_address += 2;
+
 		return ret;
 	}
 

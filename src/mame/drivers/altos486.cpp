@@ -131,15 +131,16 @@ void altos486_state::altos486_z80_io(address_map &map)
 	//AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio2", z80sio0_device, read, write)
 }
 
-MACHINE_CONFIG_START(altos486_state::altos486)
-	MCFG_DEVICE_ADD(m_maincpu, I80186, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(altos486_mem)
-	MCFG_DEVICE_IO_MAP(altos486_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb) // yes, really
+void altos486_state::altos486(machine_config &config)
+{
+	I80186(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &altos486_state::altos486_mem);
+	m_maincpu->set_addrmap(AS_IO, &altos486_state::altos486_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb)); // yes, really
 
-	MCFG_DEVICE_ADD("iocpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(altos486_z80_mem)
-	MCFG_DEVICE_IO_MAP(altos486_z80_io)
+	z80_device &iocpu(Z80(config, "iocpu", XTAL(8'000'000) / 2));
+	iocpu.set_addrmap(AS_PROGRAM, &altos486_state::altos486_z80_mem);
+	iocpu.set_addrmap(AS_IO, &altos486_state::altos486_z80_io);
 
 	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
 	pic8259.out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
@@ -149,8 +150,7 @@ MACHINE_CONFIG_START(altos486_state::altos486)
 	I8255(config, "ppi8255");
 
 	UPD765A(config, "fdc", false, false);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos486_floppies, "525qd", altos486_state::floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", altos486_floppies, "525qd", altos486_state::floppy_formats).set_fixed(true);
 
 	z80sio0_device& sio0(Z80SIO0(config, "sio0", 4000000));
 	sio0.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
@@ -213,15 +213,16 @@ MACHINE_CONFIG_START(altos486_state::altos486)
 	rs422_wn.dcd_handler().set("i8274", FUNC(z80dart_device::dcda_w));
 	rs422_wn.cts_handler().set("i8274", FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_CLK1(XTAL(22'118'400)/144)
-	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_CLK1(XTAL(22'118'400)/144)
-	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-MACHINE_CONFIG_END
+	pit8253_device &pit0(PIT8253(config, "pit0", 0));
+	pit0.set_clk<0>(XTAL(22'118'400)/18);
+	pit0.set_clk<1>(XTAL(22'118'400)/144);
+	pit0.set_clk<2>(XTAL(22'118'400)/18);
+
+	pit8253_device &pit1(PIT8253(config, "pit1", 0));
+	pit1.set_clk<0>(XTAL(22'118'400)/18);
+	pit1.set_clk<1>(XTAL(22'118'400)/144);
+	pit1.set_clk<2>(XTAL(22'118'400)/18);
+}
 
 
 ROM_START( altos486 )

@@ -932,17 +932,17 @@ static void stepone_isa_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(myb3k_state::myb3k)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181) / 3) /* 14.3182 main crystal divided by three through a 8284A */
-	MCFG_DEVICE_PROGRAM_MAP(myb3k_map)
-	MCFG_DEVICE_IO_MAP(myb3k_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, XTAL(14'318'181) / 3); /* 14.3182 main crystal divided by three through a 8284A */
+	m_maincpu->set_addrmap(AS_PROGRAM, &myb3k_state::myb3k_map);
+	m_maincpu->set_addrmap(AS_IO, &myb3k_state::myb3k_io);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
 
 	/* RAM options */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 256K");
 
 	/* Interrupt controller */
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, myb3k_state, pic_int_w))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set(FUNC(myb3k_state::pic_int_w));
 
 	/* Parallel port */
 	I8255A(config, m_ppi8255);
@@ -970,13 +970,13 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	m_dma8257->out_dack_cb<3>().set(FUNC(myb3k_state::dack3_w));
 
 	/* Timer */
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'318'181) / 12.0) /* TIMINT straight into IRQ0 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(14'318'181) / 12.0) /* speaker if port c bit 5 is low */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, myb3k_state, pit_out1_changed))
-	//  MCFG_PIT8253_CLK2(XTAL(14'318'181) / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
-	//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, myb3k_state, pit_out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(14'318'181) / 12.0); /* TIMINT straight into IRQ0 */
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(14'318'181) / 12.0); /* speaker if port c bit 5 is low */
+	m_pit8253->out_handler<1>().set(FUNC(myb3k_state::pit_out1_changed));
+	// m_pit8253->set_clk<2>(XTAL(14'318'181) / 12.0); /* ANDed with port c bit 6 but marked as "not use"*/
+	// m_pit8253->out_handler<2>().set(FUNC(myb3k_state::pit_out2_changed));
 
 	/* Video controller */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181) / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
@@ -987,11 +987,11 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	/* ISA8+ Expansion bus */
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(m_pic8259, pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(m_pic8259, pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(m_pic8259, pic8259_device, ir4_w))
 	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(*this, myb3k_state, isa_irq5_w)) // Jumper J4 selectable
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(m_pic8259, pic8259_device, ir6_w))
 	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(*this, myb3k_state, isa_irq7_w)) // Jumper J5 selectable
 	//MCFG_ISA_OUT_DRQ0_CB(WRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
 	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma", i8257_device, dreq1_w))

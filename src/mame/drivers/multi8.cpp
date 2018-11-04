@@ -608,9 +608,9 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("uart", I8251, 0) // for cassette
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	I8251(config, "uart", 0); // for cassette
+	PIT8253(config, "pit", 0);
+	PIC8259(config, "pic", 0);
 
 	//UPD765A(config, "fdc", false, true);
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats)

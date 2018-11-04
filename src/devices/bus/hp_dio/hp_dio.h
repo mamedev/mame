@@ -65,7 +65,7 @@ public:
 	// construction/destruction
 	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// inline configuration
-	template<typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 	// callback configuration
 	auto dmar0_out_cb() { return m_dmar0_out_cb.bind(); }
@@ -82,7 +82,7 @@ public:
 
 	// DANGER: these will currently produce different results for a DIO-I card on DIO-I and DIO-II systems
 	//         due to the varying bus widths.  Using all install_memory() shields you from this problem.
-	//         either know what you're doing (m_prgwidth is available to cards for this purpose) or
+	//         Either know what you're doing (m_prgwidth is available to cards for this purpose) or
 	//         only use these for 32-bit DIO-II cards.
 	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 	void install_rom(offs_t start, offs_t end, const char *tag, uint8_t *data);
@@ -138,7 +138,7 @@ protected:
 
 	// internal state
 	required_device<cpu_device> m_maincpu;
-	std::list <device_dio16_card_interface *> m_cards;
+	std::list<device_dio16_card_interface *> m_cards;
 
 	// address spaces
 	address_space *m_prgspace;

@@ -2,22 +2,24 @@
 // copyright-holders:Sven Schnelle
 
 #include "emu.h"
-#define VERBOSE 0
-#include "logmacro.h"
 #include "mb87030.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(MB87030, mb87030_device, "mb87030", "Fujitsu MB87030 SCSI controller")
 
 mb87030_device::mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		mb87030_device(mconfig, MB87030, tag, owner, clock)
+	mb87030_device(mconfig, MB87030, tag, owner, clock)
 {
 
 }
 
 mb87030_device::mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-		nscsi_device(mconfig, type, tag, owner, clock),
-		m_irq_handler(*this),
-		m_dreq_handler(*this)
+	nscsi_device(mconfig, type, tag, owner, clock),
+	m_irq_handler(*this),
+	m_dreq_handler(*this)
 {
 
 }
@@ -71,7 +73,7 @@ void mb87030_device::device_reset()
 
 auto mb87030_device::get_state_name(State state) const
 {
-	switch(state) {
+	switch (state) {
 	case State::Idle:
 		return "Idle";
 	case State::ArbitrationWaitBusFree:
@@ -166,10 +168,6 @@ void mb87030_device::scsi_disconnect()
 	LOG("%s: m_tc %d\n", __FUNCTION__, m_tc);
 	m_ssts &= ~(SSTS_INIT_CONNECTED|SSTS_TARG_CONNECTED|SSTS_SPC_BUSY|SSTS_XFER_IN_PROGRESS);
 	m_ints = INTS_DISCONNECTED;
-	if (m_pctl & PCTL_BUS_FREE_IE) {
-		LOG("disconnect IE\n");
-		m_ints |= INTS_DISCONNECTED;
-	}
 	update_ints();
 	update_state(State::Idle);
 }
@@ -234,22 +232,20 @@ void mb87030_device::step(bool timeout)
 		return;
 	}
 
-
 	if ((m_ssts & SSTS_INIT_CONNECTED) && !(ctrl & S_BSY)) {
 		LOG("SCSI disconnect\n");
 		scsi_disconnect();
 		scsi_set_ctrl(0, S_ALL);
 	}
 
-
-	switch(m_state) {
+	switch (m_state) {
 	case State::Idle:
-
 		if (ctrl == 0 && (m_pctl & PCTL_BUS_FREE_IE)) {
 			m_ints |= INTS_DISCONNECTED;
 			update_ints();
 		}
 		break;
+
 	case State::ArbitrationWaitBusFree:
 		if (!(ctrl & (S_BSY|S_SEL)))
 			update_state(State::ArbitrationAssertBSY, 1);
@@ -262,7 +258,6 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::ArbitrationWait:
-
 		for (int id = (2 << m_bdid); id <= 0x80; id <<= 1) {
 			LOG("check %d\n", id);
 			if (data & id) {
@@ -320,17 +315,12 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferWaitReq:
-
-
-		if (!m_tc && (m_fifo.empty() || m_dma_transfer)) {
+		if (!m_tc && !(m_scmd & SCMD_TERM_MODE)) {
 			LOG("TransferWaitReq: tc == 0\n");
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_command_complete();
 			break;
 		}
-
-		if (m_tc < 0)
-			break;
 
 		if (m_scsi_phase != (ctrl & S_PHASE_MASK)) {
 			LOG("SCSI phase change during transfer\n");
@@ -345,7 +335,7 @@ void mb87030_device::step(bool timeout)
 			break;
 		}
 
-		if (!m_dma_transfer) {
+		if (!m_dma_transfer || (m_scmd & SCMD_TERM_MODE)) {
 			update_state((ctrl & S_INP) ? State::TransferRecvData : State::TransferSendData, 1);
 		} else {
 			update_state((ctrl & S_INP) ? State::TransferRecvDataDMAReq : State::TransferSendDataDMAReq, 1);
@@ -353,6 +343,11 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferRecvData:
+		if (!m_tc && (m_scmd & SCMD_TERM_MODE)) {
+			update_state(State::TransferSendAck, 10);
+			break;
+		}
+
 		if (!m_tc || m_fifo.full())
 			break;
 
@@ -379,15 +374,18 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferSendData:
-
-		if (m_tc < 0 || m_fifo.empty()) {
-			LOG("fifo empty or m_tc(%d) zero\n", m_tc);
+		if (m_tc && !m_fifo.empty()) {
+			scsi_bus->data_w(scsi_refid, m_fifo.dequeue());
+			m_tc--;
+			update_state(State::TransferSendAck, 10);
 			break;
 		}
 
-		scsi_bus->data_w(scsi_refid, m_fifo.dequeue());
-		m_tc--;
-		update_state(State::TransferSendAck, 10);
+		if (!m_tc  && (m_scmd & SCMD_TERM_MODE)) {
+			scsi_bus->data_w(scsi_refid, m_temp);
+			update_state(State::TransferSendAck, 10);
+			break;
+		}
 		break;
 
 	case State::TransferSendDataDMAReq:
@@ -407,12 +405,11 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferSendAck:
+		if (!(m_scmd & SCMD_TERM_MODE) && !(ctrl & S_INP))
+				m_temp = data;
 
-		if (!(ctrl & S_INP))
-			m_temp = data;
-
-		scsi_set_ctrl(S_ACK, S_ACK);
-		scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
+			scsi_set_ctrl(S_ACK, S_ACK);
+			scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
 
 		update_state(State::TransferWaitDeassertREQ, 10);
 		break;
@@ -423,9 +420,9 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferDeassertACK:
-		scsi_set_ctrl(0, S_ACK);
-		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 		update_state(State::TransferWaitReq, 10);
+		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+		scsi_set_ctrl(0, S_ACK);
 		break;
 
 		}
@@ -457,11 +454,11 @@ void mb87030_device::device_start()
 	save_item(NAME(m_hdb));
 	save_item(NAME(m_hdb_loaded));
 	save_item(NAME(m_send_atn_during_selection));
-//	save_item(NAME(m_fifo));
+//  save_item(NAME(m_fifo));
 	save_item(NAME(m_scsi_phase));
 	save_item(NAME(m_scsi_ctrl));
 	save_item(NAME(m_dma_transfer));
-//	save_item(NAME(m_state));
+//  save_item(NAME(m_state));
 }
 
 void mb87030_device::scsi_ctrl_changed()
@@ -504,7 +501,7 @@ void mb87030_device::update_ints()
 READ8_MEMBER(mb87030_device::bdid_r)
 {
 	LOG("%s %02X\n", __FUNCTION__, (1 << m_bdid));
-	return (1 << m_bdid);
+	return 1 << m_bdid;
 }
 
 WRITE8_MEMBER(mb87030_device::bdid_w)
@@ -537,10 +534,11 @@ WRITE8_MEMBER(mb87030_device::scmd_w)
 	LOG("%s: %02X\n", __FUNCTION__, data);
 	m_scmd = data;
 
-	switch(m_scmd & SCMD_CMD_MASK) {
+	switch (m_scmd & SCMD_CMD_MASK) {
 	case SCMD_CMD_BUS_RELEASE:
 		LOG("%s: Bus release\n", __FUNCTION__);
 		break;
+
 	case SCMD_CMD_SELECT:
 		LOG("%s: Select\n", __FUNCTION__);
 		if (m_sctl & SCTL_ARBITRATION_ENABLE)
@@ -549,13 +547,15 @@ WRITE8_MEMBER(mb87030_device::scmd_w)
 			update_state(State::SelectionWaitBusFree, 10);
 		step(false);
 		break;
+
 	case SCMD_CMD_RESET_ATN:
 		LOG("%s: Reset ATN\n", __FUNCTION__);
-//		if (m_state == State::Idle)
+//      if (m_state == State::Idle)
 			m_send_atn_during_selection = false;
-//		else
+//      else
 			scsi_set_ctrl(0, S_ATN);
 		break;
+
 	case SCMD_CMD_SET_ATN:
 		LOG("%s: Set ATN\n", __FUNCTION__);
 		if (m_state == State::Idle)
@@ -563,6 +563,7 @@ WRITE8_MEMBER(mb87030_device::scmd_w)
 		else
 			scsi_set_ctrl(S_ATN, S_ATN);
 		break;
+
 	case SCMD_CMD_TRANSFER:
 		if (!(m_ssts & (SSTS_INIT_CONNECTED|SSTS_TARG_CONNECTED)))
 			break;
@@ -572,9 +573,11 @@ WRITE8_MEMBER(mb87030_device::scmd_w)
 		m_ssts |= SSTS_SPC_BUSY|SSTS_XFER_IN_PROGRESS;
 		update_state(State::TransferWaitReq, 5);
 		break;
+
 	case SCMD_CMD_TRANSFER_PAUSE:
 		LOG("%s: Transfer Pause\n", __FUNCTION__);
 		break;
+
 	case SCMD_CMD_RESET_ACK_REQ:
 		LOG("%s: Reset ACK/REQ\n", __FUNCTION__);
 		if (m_ssts & SSTS_INIT_CONNECTED)
@@ -582,6 +585,7 @@ WRITE8_MEMBER(mb87030_device::scmd_w)
 		if (m_ssts & SSTS_TARG_CONNECTED)
 			scsi_set_ctrl(0, S_REQ);
 		break;
+
 	case SCMD_CMD_SET_ACK_REQ:
 		LOG("%s: Set ACK/REQ\n", __FUNCTION__);
 		if (m_ssts & SSTS_INIT_CONNECTED) {
@@ -674,7 +678,6 @@ WRITE8_MEMBER(mb87030_device::pctl_w)
 	m_scsi_phase = m_pctl & 7;
 	if (m_pctl & PCTL_BUS_FREE_IE)
 		step(false);
-
 }
 
 READ8_MEMBER(mb87030_device::mbc_r)
@@ -685,7 +688,6 @@ READ8_MEMBER(mb87030_device::mbc_r)
 
 READ8_MEMBER(mb87030_device::dreg_r)
 {
-
 	step(false);
 	if (!m_fifo.empty())
 			m_dreg = m_fifo.dequeue();
@@ -707,7 +709,6 @@ READ8_MEMBER(mb87030_device::temp_r)
 	step(false);
 	LOG("%s: %02X\n", __FUNCTION__, m_temp);
 	return m_temp;
-
 }
 
 WRITE8_MEMBER(mb87030_device::temp_w)

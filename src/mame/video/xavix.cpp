@@ -57,6 +57,31 @@ void xavix_state::video_start()
 }
 
 
+WRITE8_MEMBER(xavix_state::palram_sh_w)
+{
+	m_palram_sh[offset] = data;
+	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
+}
+
+WRITE8_MEMBER(xavix_state::palram_l_w)
+{
+	m_palram_l[offset] = data;
+	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
+}
+
+WRITE8_MEMBER(xavix_state::bmp_palram_sh_w)
+{
+	m_bmp_palram_sh[offset] = data;
+	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
+}
+
+WRITE8_MEMBER(xavix_state::bmp_palram_l_w)
+{
+	m_bmp_palram_l[offset] = data;
+	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
+}
+
+
 double xavix_state::hue2rgb(double p, double q, double t)
 {
 	if (t < 0) t += 1;
@@ -67,56 +92,56 @@ double xavix_state::hue2rgb(double p, double q, double t)
 	return p;
 }
 
-void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* ramsh, uint8_t* raml, int size, int basecol)
+void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 {
-	// not verified
-	int offs = 0;
-	for (int index = 0; index < size; index++)
-	{
-		uint16_t dat;
-		dat = ramsh[offs];
-		dat |= raml[offs] << 8;
-	
-		offs++;
+	uint16_t dat;
+	dat = shval;
+	dat |= lval << 8;
 
-		int l_raw = (dat & 0x1f00) >> 8;
-		int s_raw = (dat & 0x00e0) >> 5;
-		int h_raw = (dat & 0x001f) >> 0;
+	int l_raw = (dat & 0x1f00) >> 8;
+	int s_raw = (dat & 0x00e0) >> 5;
+	int h_raw = (dat & 0x001f) >> 0;
 
-		//if (h_raw > 24)
-		//  LOG("hraw >24 (%02x)\n", h_raw);
+	//if (h_raw > 24)
+	//  LOG("hraw >24 (%02x)\n", h_raw);
 
-		//if (l_raw > 17)
-		//  LOG("lraw >17 (%02x)\n", l_raw);
+	//if (l_raw > 24)
+	//  LOG("lraw >24 (%02x)\n", l_raw);
 
-		//if (s_raw > 7)
-		//  LOG("s_raw >5 (%02x)\n", s_raw);
+	//if (s_raw > 7)
+	//  LOG("s_raw >5 (%02x)\n", s_raw);
 
-		double l = (double)l_raw / 17.0f;
-		double s = (double)s_raw / 7.0f;
-		double h = (double)h_raw / 24.0f; // hue values 24-31 render as transparent
+	double l = (double)l_raw / 24.0f; // ekara and drgqst go up to 23 during fades, expect that to be brightest
+	l = l * (std::atan(1)*2); // does not appear to be a linear curve
+	l = std::sin(l);
 
-		double r, g, b;
+	double s = (double)s_raw / 7.0f;
+	s = s * (std::atan(1)*2); // does not appear to be a linear curve
+	s = std::sin(s);
 
-		if (s == 0) {
-			r = g = b = l; // greyscale
-		}
-		else {
-			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-			double p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1 / 3.0f);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1 / 3.0f);
-		}
+	double h = (double)h_raw / 24.0f; // hue values 24-31 render as transparent
 
-		int r_real = r * 255.0f;
-		int g_real = g * 255.0f;
-		int b_real = b * 255.0f;
+	double r, g, b;
 
-		m_palette->set_pen_color(basecol+index, r_real, g_real, b_real);
-
+	if (s == 0) {
+		r = g = b = l; // greyscale
 	}
+	else {
+		double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+		double p = 2 * l - q;
+		r = hue2rgb(p, q, h + 1 / 3.0f);
+		g = hue2rgb(p, q, h);
+		b = hue2rgb(p, q, h - 1 / 3.0f);
+	}
+
+	int r_real = r * 255.0f;
+	int g_real = g * 255.0f;
+	int b_real = b * 255.0f;
+
+	m_palette->set_pen_color(pen, r_real, g_real, b_real);
 }
+
+
 
 void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
@@ -558,9 +583,6 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 
 			xpos += 128 - 8;
 
-
-
-
 			// Everything except directdirect addressing (Addressing Mode 2) goes through the segment registers?
 			if (alt_addressing != 0)
 			{
@@ -578,20 +600,17 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 				tile += gfxbase;
 			}
 
-	
-
-
 			int bpp = 1;
 
 			bpp = (attr0 & 0x0e) >> 1;
 			bpp += 1;
 
-			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos, line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
+			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
 
 			/*
 			if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
 			{
-				LOG("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", spr_ypos[i], spr_attr0[i], spr_attr1[i], spr_xpos[i], spr_addr_lo[i], spr_addr_md[i], spr_addr_hi[i] );
+			    LOG("sprite with enable? %02x attr0 %02x attr1 %02x attr3 %02x attr5 %02x attr6 %02x attr7 %02x\n", spr_ypos[i], spr_attr0[i], spr_attr1[i], spr_xpos[i], spr_addr_lo[i], spr_addr_md[i], spr_addr_hi[i] );
 			}
 			*/
 		}
@@ -601,23 +620,27 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
 	//const pen_t *paldata = m_palette->pens();
-
-	if (flipy)
-		line = drawheight - line;
-
 	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
 		return;
 
 	if ((xpos > cliprect.max_x) || ((xpos + drawwidth) < cliprect.min_x))
 		return;
 
-
 	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
 	{
+		// if bpp>4 then ignore unaligned palette selects bits based on bpp
+		// ttv_lotr uses 5bpp graphics (so 32 colour alignment) but sets palette 0xf (a 16 colour boundary) when it expects palette 0xe
+		if (bpp>4)
+			pal &= (0xf<<(bpp-4));
+
 		int bits_per_tileline = drawwidth * bpp;
 
 		// set the address here so we can increment in bits in the draw function
 		set_data_address(tile, 0);
+
+		if (flipy)
+			line = (drawheight - 1) - line;
+
 		m_tmp_dataaddress = m_tmp_dataaddress + ((line * bits_per_tileline) / 8);
 		m_tmp_databit = (line * bits_per_tileline) % 8;
 
@@ -667,24 +690,9 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, co
 
 uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	handle_palette(screen, bitmap, cliprect, m_palram_sh, m_palram_l, 256, 0);
-
-	if (m_bmp_palram_sh)
-	{
-		handle_palette(screen, bitmap, cliprect, m_bmp_palram_sh, m_bmp_palram_l, 256, 256);
-		handle_palette(screen, bitmap, cliprect, m_colmix_sh, m_colmix_l, 1, 512);
-	}
-	else
-	{
-		handle_palette(screen, bitmap, cliprect, m_colmix_sh, m_colmix_l, 1, 256);
-	}
-
 	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_zbuffer.fill(0, cliprect);
-
-
-
 
 	rectangle clip = cliprect;
 
@@ -739,7 +747,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 			//int count = 0;
 			set_data_address(base + base2, 0);
-	
+
 			for (int y = 0; y < 256; y++)
 			{
 				for (int x = 0; x < 512; x++)
@@ -754,7 +762,8 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						dat |= (get_next_bit() << i);
 					}
 
-					yposptr[x] = dat + 0x100;
+					if (x < cliprect.max_x)
+						yposptr[x] = dat + 0x100;
 				}
 			}
 
@@ -831,33 +840,33 @@ WRITE8_MEMBER(xavix_state::tmap1_regs_w)
 	   0x2 pointer to upper tile bits
 
 	   0x3 Fftt bbb-  Ff = flip Y,X
-					  tt = tile/tilemap size
-					  b = bpp
-					  - = unused
+	                  tt = tile/tilemap size
+	                  b = bpp
+	                  - = unused
 
 	   0x4 scroll
 	   0x5 scroll
 
 	   0x6 pppp zzzz  p = palette
-					  z = priority
+	                  z = priority
 
 	   0x7 e--m mmmm  e = enable
-					  m = mode
+	                  m = mode
 
 	   modes are
-		---0 0000 (00) 8-bit addressing  (Tile Number)
-		---0 0001 (01) 16-bit addressing (Tile Number) (monster truck, ekara)
-		---0 0010 (02) 16-bit addressing (8-byte alignment Addressing Mode) (boxing)
-		---0 0011 (03) 16-bit addressing (Addressing Mode 2)
-		---0 0100 (04) 24-bit addressing (Addressing Mode 2) (epo_efdx)
+	    ---0 0000 (00) 8-bit addressing  (Tile Number)
+	    ---0 0001 (01) 16-bit addressing (Tile Number) (monster truck, ekara)
+	    ---0 0010 (02) 16-bit addressing (8-byte alignment Addressing Mode) (boxing)
+	    ---0 0011 (03) 16-bit addressing (Addressing Mode 2)
+	    ---0 0100 (04) 24-bit addressing (Addressing Mode 2) (epo_efdx)
 
-		---0 1000 (08) 8-bit+8 addressing  (Tile Number + 8-bit Attribute)
-		---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute) (Taito Nostalgia 2)
-		---0 1010 (0a) 16-bit+8 addressing (8-byte alignment Addressing Mode + 8-bit Attribute) (boxing, Snowboard)
-		---0 1011 (0b) 16-bit+8 addressing (Addressing Mode 2 + 8-bit Attribute)
+	    ---0 1000 (08) 8-bit+8 addressing  (Tile Number + 8-bit Attribute)
+	    ---0 1001 (09) 16-bit+8 addressing (Tile Number + 8-bit Attribute) (Taito Nostalgia 2)
+	    ---0 1010 (0a) 16-bit+8 addressing (8-byte alignment Addressing Mode + 8-bit Attribute) (boxing, Snowboard)
+	    ---0 1011 (0b) 16-bit+8 addressing (Addressing Mode 2 + 8-bit Attribute)
 
-		---1 0011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)  (monster truck)
-		---1 0100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
+	    ---1 0011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)  (monster truck)
+	    ---1 0100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
 
 	*/
 
@@ -885,16 +894,16 @@ WRITE8_MEMBER(xavix_state::spriteregs_w)
 {
 	LOG("%s: spriteregs_w data %02x\n", machine().describe_context(), data);
 	/*
-		This is similar to Tilemap reg 7 and is used to set the addressing mode for sprite data
+	    This is similar to Tilemap reg 7 and is used to set the addressing mode for sprite data
 
-		---0 -000 (00) 8-bit addressing  (Tile Number)
-		---0 -001 (01) 16-bit addressing (Tile Number)
-		---0 -010 (02) 16-bit addressing (8-byte alignment Addressing Mode)
-		---0 -011 (03) 16-bit addressing (Addressing Mode 2)
-		---0 -100 (04) 24-bit addressing (Addressing Mode 2)
+	    ---0 -000 (00) 8-bit addressing  (Tile Number)
+	    ---0 -001 (01) 16-bit addressing (Tile Number)
+	    ---0 -010 (02) 16-bit addressing (8-byte alignment Addressing Mode)
+	    ---0 -011 (03) 16-bit addressing (Addressing Mode 2)
+	    ---0 -100 (04) 24-bit addressing (Addressing Mode 2)
 
-		---1 -011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)
-		---1 -100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
+	    ---1 -011 (13) 16-bit addressing (Addressing Mode 2 + Inline Header)
+	    ---1 -100 (14) 24-bit addressing (Addressing Mode 2 + Inline Header)
 	*/
 	m_spritereg = data;
 }

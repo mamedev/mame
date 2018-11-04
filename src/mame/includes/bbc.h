@@ -85,7 +85,7 @@ public:
 		, m_extube(*this, "extube")
 		, m_1mhzbus(*this, "1mhzbus")
 		, m_userport(*this, "userport")
-//		, m_internal(*this, "internal")
+//      , m_internal(*this, "internal")
 		, m_exp(*this, "exp")
 		, m_rtc(*this, "rtc")
 		, m_i2cmem(*this, "i2cmem")

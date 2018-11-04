@@ -435,8 +435,8 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// D30
 	i8255_device &ppi(I8255(config, "ppi8255"));
@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	// D42 - serial connection to host
 	I8251(config, m_i8251line, 0);
 	m_i8251line->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
-	m_i8251line->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir3_w));
+	m_i8251line->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->rxd_handler().set(m_i8251line, FUNC(i8251_device::write_rxd));
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 
 	// D41 - serial connection to MS7004 keyboard
 	I8251(config, m_i8251kbd, 0);
-	m_i8251kbd->rxrdy_handler().set("pic8259", FUNC(pic8259_device::ir1_w));
+	m_i8251kbd->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir1_w));
 	m_i8251kbd->rts_handler().set(FUNC(ksm_state::write_brga));
 	m_i8251kbd->dtr_handler().set(FUNC(ksm_state::write_brgb));
 

@@ -99,9 +99,9 @@ Notes:
       SW4     : 8 position Dip Switch
       U30,U31,
       U32,U33 : Macronix MX27C4000 512k x8 EPROM (DIP32, PCB labelled 'RPRO0', 'RPRO1', 'RPRO2', 'RPRO3')
-      U34,U35 : 8M MASKROM (DIP42, PCB labelled 'RD0', 'RD1')
-      U70     : 16M MASKROM (DIP42, PCB labelled 'ZPRO0')
-      *       : Unpopulated position for 16M DIP42 MASKROM (PCB labelled 'ZPRO1')
+      U34,U35 : 8M mask ROM (DIP42, PCB labelled 'RD0', 'RD1')
+      U70     : 16M mask ROM (DIP42, PCB labelled 'ZPRO0')
+      *       : Unpopulated position for 16M DIP42 mask ROM (PCB labelled 'ZPRO1')
 
 */
 
