@@ -1699,10 +1699,11 @@ ROM_END
 // Known to exist (not dumped) a Japanese version with ROMs 3 & 4 also stamped "A" same as above or different version??
 // Also known to exist (not dumped) a US version of Earth Joker, title screen shows "DISTRIBUTED BY ROMSTAR, INC."  ROMs were numbered
 // from 0 through 4 and the fix ROM at IC30 is labeled 1 even though IC5 is also labled as 1 similar to the below set:
+// (ROMSTAR license is set by a dipswitch, is set mentioned above really undumped?)
 
 ROM_START( earthjkrp ) // was production PCB complete with mask ROM, could just be an early revision, not proto
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
-	ROM_LOAD16_BYTE( "3.ic23", 0x00001, 0x20000, CRC(26c33225) SHA1(b039c47d0776c90813ab52c867e95989cab2c567) )
+	ROM_LOAD16_BYTE( "3.ic23", 0x00001, 0x20000, BAD_DUMP CRC(26c33225) SHA1(b039c47d0776c90813ab52c867e95989cab2c567) )
 	ROM_LOAD16_BYTE( "4.ic8",  0x00000, 0x20000, CRC(e9b1ef0c) SHA1(5e104146d37922a8c7e93696c2c156223653025b) )
 	/* 0x40000 - 0x7ffff is intentionally empty */
 	ROM_LOAD16_WORD( "5.ic30", 0x80000, 0x80000, CRC(bf760b2d) SHA1(4aff36623e5a31ab86c77461fa93e40e77f08edd) ) /* Fix ROM */
@@ -1748,6 +1749,14 @@ void asuka_state::init_cadash()
 	m_cadash_int5_timer = timer_alloc(TIMER_CADASH_INTERRUPT5);
 }
 
+void asuka_state::init_earthjkr()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	// 357c -> 317c, I think this is bitrot, see ROM loading for which ROM needs redumping, causes rowscroll to be broken on final stage (writes to ROM area instead)
+	// code is correct in the 'prototype?' set
+	rom[0x7aaa/2] = 0x317c; 
+}
+
 GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv, asuka_state, empty_init,  ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Newer)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv, asuka_state, empty_init,  ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri, asuka_state, empty_init,  ROT0,   "Taito America Corporation", "Bonze Adventure (US)", MACHINE_SUPPORTS_SAVE )
@@ -1772,7 +1781,7 @@ GAME( 1989, cadashs,   cadash,   cadash,   cadash,   asuka_state, init_cadash, R
 
 GAME( 1992, galmedes,  0,        asuka,    galmedes, asuka_state, empty_init,  ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, empty_init,  ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkr, asuka_state, empty_init,  ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, init_earthjkr,  ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkr, asuka_state, empty_init,     ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, eto,       0,        eto,      eto,      asuka_state, empty_init,  ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
