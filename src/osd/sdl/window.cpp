@@ -370,18 +370,19 @@ void sdl_window_info::update_cursor_state()
 	// the possibility of losing control
 	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
-		bool should_hide_mouse = downcast<sdl_osd_interface&>(machine().osd()).should_hide_mouse();
-
-		if (!fullscreen() && !should_hide_mouse)
-		{
-			show_pointer();
-			release_pointer();
-		}
-		else
-		{
-			hide_pointer();
-			capture_pointer();
-		}
+		show_pointer();
+		release_pointer();
+		//bool should_hide_mouse = downcast<sdl_osd_interface&>(machine().osd()).should_hide_mouse();
+		// if (!fullscreen() && !should_hide_mouse)
+		// {
+		// 	show_pointer();
+		// 	release_pointer();
+		// }
+		// else
+		// {
+		// 	hide_pointer();
+		// 	capture_pointer();
+		// }
 
 		SDL_SetCursor(nullptr); // Force an update in case the underlying driver has changed visibility
 	}

@@ -936,10 +936,10 @@ void running_machine::handle_saveload()
 					break;
 
 				case STATERR_NONE:
-					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
-					else
-						popmessage("State successfully %s.", opnamed);
+				// 	if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
+				// 		popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
+				// 	else
+				// 		popmessage("State successfully %s.", opnamed);
 					break;
 
 				default:

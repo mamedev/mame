@@ -298,6 +298,65 @@ std::string video_manager::speed_text()
 
 
 //-------------------------------------------------
+//  get_bitmap_binary - get bitmap binary
+//-------------------------------------------------
+
+std::string video_manager::get_bitmap_binary(screen_device *screen)
+{
+	// validate
+	assert(!m_snap_native || screen != nullptr);
+
+	// create the bitmap to pass in
+	create_snapshot_bitmap(screen);	
+	
+	std::string bitmap_binary = "";
+
+	if (m_snap_bitmap.format() == BITMAP_FORMAT_RGB32 ||
+		m_snap_bitmap.format() == BITMAP_FORMAT_ARGB32){
+		for (int y = 0; y < m_snap_bitmap.height(); y++){
+			uint32_t *src32 = reinterpret_cast<uint32_t *>(m_snap_bitmap.raw_pixptr(y));
+			for (int x = 0; x < m_snap_bitmap.width(); x++){
+				rgb_t raw = *src32++;
+				bitmap_binary += char(raw.r());
+				bitmap_binary += char(raw.g());
+				bitmap_binary += char(raw.b());
+				if (m_snap_bitmap.format() == BITMAP_FORMAT_ARGB32)
+					bitmap_binary += char(raw.a());
+			}
+		}
+	}
+
+	return bitmap_binary;
+}
+
+//-------------------------------------------------
+//  get_bitmap_format - get bitmap format
+//-------------------------------------------------
+
+std::string video_manager::get_bitmap_format(screen_device *screen)
+{
+	// validate
+	assert(!m_snap_native || screen != nullptr);
+
+	// create the bitmap to pass in
+	create_snapshot_bitmap(screen);
+
+	switch(m_snap_bitmap.format())
+	{
+		case BITMAP_FORMAT_IND8:	return "IND8 - 8bpp"; break;
+		case BITMAP_FORMAT_IND16:	return "IND16 - 16bpp"; break;
+		case BITMAP_FORMAT_IND32:	return "IND32 - 32bpp"; break;
+		case BITMAP_FORMAT_IND64:	return "IND64 - 64bpp"; break;
+		case BITMAP_FORMAT_RGB32:	return "RGB32 - 32bpp 8-8-8 RGB"; break;
+		case BITMAP_FORMAT_ARGB32:	return "ARGB32 - 32bpp 8-8-8-8 ARGB"; break;
+		case BITMAP_FORMAT_YUY16:	return "YUY16 - 16bpp 8-8 Y/Cb Y/Cr"; break;
+		default: break;
+	}
+	return "unknown";
+}
+
+
+//-------------------------------------------------
 //  save_snapshot - save a snapshot to the given
 //  file handle
 //-------------------------------------------------
