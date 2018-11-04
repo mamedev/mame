@@ -1742,7 +1742,7 @@ void lua_engine::initialize()
  * screen:tag() - screen device tag
  * screen:xscale() - screen x scale factor
  * screen:yscale() - screen y scale factor
- * screen:pixel(x, y) - get pixel at (x, y)
+ * screen:pixel(x, y) - get pixel at (x, y) as packed RGB in a u32
 */
 
 	sol().registry().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
