@@ -467,7 +467,6 @@ void xexex_state::machine_reset()
 	m_suspension_active = 0;
 	m_resume_trigger = 1000;
 	m_frame = -1;
-	m_k054539->init_flags(k054539_device::REVERSE_STEREO);
 }
 
 MACHINE_CONFIG_START(xexex_state::xexex)
