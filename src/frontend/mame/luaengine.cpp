@@ -989,7 +989,7 @@ void lua_engine::initialize()
  * item:read_block(offset, count) - read a block of entry values as a string (byte addressing)
  * item:write(offset, value) - write entry value by index
  */
- 
+
 	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
 					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
 					{
@@ -1742,6 +1742,7 @@ void lua_engine::initialize()
  * screen:tag() - screen device tag
  * screen:xscale() - screen x scale factor
  * screen:yscale() - screen y scale factor
+ * screen:pixel(x, y) - get pixel at (x, y)
 */
 
 	sol().registry().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
@@ -1854,7 +1855,11 @@ void lua_engine::initialize()
 			"shortname", &screen_device::shortname,
 			"tag", &screen_device::tag,
 			"xscale", &screen_device::xscale,
-			"yscale", &screen_device::yscale);
+			"yscale", &screen_device::yscale,
+			"pixel", [](screen_device &sdev, float x, float y) {
+					return sdev.pixel((s32)x, (s32)y);
+				}
+			);
 
 /* mame_manager:ui()
  * ui:is_menu_active() - ui menu state
