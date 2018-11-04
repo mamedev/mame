@@ -3325,9 +3325,9 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	printer.dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::ctsb_w)); // actually DTR
 
 	m_comm_port->option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-	//m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
-	//m_comm_port->option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
-	m_comm_port->set_default_option("microsoft_mouse");
+	m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	m_comm_port->option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	m_comm_port->set_default_option("logitech_mouse");
 
 	printer.set_default_option("printer");
 

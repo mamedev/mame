@@ -2,7 +2,7 @@
 // copyright-holders:Segher Boessenkool,Ryan Holtz
 /*****************************************************************************
 
-    SunPlus micro'nSP emulator
+    SunPlus µ'nSP emulator
 
     Copyright 2008-2017  Segher Boessenkool  <segher@kernel.crashing.org>
     Licensed under the terms of the GNU GPL, version 2
