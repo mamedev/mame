@@ -103,7 +103,8 @@ private:
 
 	DECLARE_READ16_MEMBER(dsp_0008_hack_r);
 	DECLARE_WRITE16_MEMBER(dsp_0008_hack_w);
-	DECLARE_READ8_MEMBER(dma_memr_cb);
+	DECLARE_READ16_MEMBER(dma_memr_cb);
+	DECLARE_WRITE16_MEMBER(dma_memw_cb);
 	DECLARE_PALETTE_INIT(mpc3000);
 };
 
@@ -156,10 +157,15 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x00f8, 0x00ff).rw("adcexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
-READ8_MEMBER(mpc3000_state::dma_memr_cb)
+READ16_MEMBER(mpc3000_state::dma_memr_cb)
 {
 	//logerror("dma_memr_cb: offset %x\n", offset);
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_word(offset);
+}
+
+WRITE16_MEMBER(mpc3000_state::dma_memw_cb)
+{
+	m_maincpu->space(AS_PROGRAM).write_word(offset, data);
 }
 
 PALETTE_INIT_MEMBER(mpc3000_state, mpc3000)
@@ -174,9 +180,10 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_map);
 	m_maincpu->set_addrmap(AS_IO, &mpc3000_state::mpc3000_io_map);
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v53a_device::hack_w));
-	m_maincpu->in_memr_cb().set(FUNC(mpc3000_state::dma_memr_cb));
-	m_maincpu->in_ior_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_r_cb));
-	m_maincpu->out_iow_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_w_cb));
+	m_maincpu->in_mem16r_cb().set(FUNC(mpc3000_state::dma_memr_cb));
+	m_maincpu->out_mem16w_cb().set(FUNC(mpc3000_state::dma_memw_cb));
+	m_maincpu->in_io16r_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_r16_cb));
+	m_maincpu->out_io16w_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_w16_cb));
 
 	hc259_device &loledlatch(HC259(config, "loledlatch"));
 	loledlatch.q_out_cb<0>().set_output("led0").invert(); // Edit Loop

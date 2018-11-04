@@ -21,7 +21,7 @@
  *
  * TODO
  *   - fix problems with ATN
- *   - 16 bit DMA including odd address start
+ *   - 16 bit DMA odd address start
  *   - disconnect/reselect
  *   - phase checks
  */
@@ -41,7 +41,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(AIC6250, aic6250_device, "aic6250", "Adaptec High-Performance SCSI Protocol Chip")
+DEFINE_DEVICE_TYPE(AIC6250, aic6250_device, "aic6250", "Adaptec 6250 High-Performance SCSI Protocol Chip")
 
 static char const *const nscsi_phase[] = { "DATA OUT", "DATA IN", "COMMAND", "STATUS", "*", "*", "MESSAGE OUT", "MESSAGE IN" };
 static char const *const aic6250_phase[] = { "DATA OUT", "*", "DATA IN", "*", "COMMAND", "MESSAGE OUT", "STATUS", "MESSAGE IN" };
@@ -85,14 +85,14 @@ READ8_MEMBER(aic6250_device::read)
 	{
 		switch (m_address_reg)
 		{
-		case 0x0: data = dma_count_l_r(); m_address_reg++; break;
-		case 0x1: data = dma_count_m_r(); m_address_reg++; break;
-		case 0x2: data = dma_count_h_r(); m_address_reg++; break;
-		case 0x3: m_address_reg++; break;
-		case 0x4: m_address_reg++; break;
-		case 0x5: data = fifo_status_r(); m_address_reg++; break;
-		case 0x6: data = rev_cntrl_r(); m_address_reg++; break;
-		case 0x7: data = status_reg_0_r(); m_address_reg++; break;
+		case 0x0: data = dma_count_l_r(); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x1: data = dma_count_m_r(); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x2: data = dma_count_h_r(); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x3: if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x4: if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x5: data = fifo_status_r(); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x6: data = rev_cntrl_r(); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x7: data = status_reg_0_r(); if (!machine().side_effects_disabled()) m_address_reg++; break;
 
 		case 0x8: data = status_reg_1_r(); break;
 		case 0x9: data = scsi_signal_reg_r(); break;
@@ -117,14 +117,14 @@ WRITE8_MEMBER(aic6250_device::write)
 	{
 		switch (m_address_reg)
 		{
-		case 0x0: dma_count_l_w(data); m_address_reg++; break;
-		case 0x1: dma_count_m_w(data); m_address_reg++; break;
-		case 0x2: dma_count_h_w(data); m_address_reg++; break;
-		case 0x3: int_msk_reg_0_w(data); m_address_reg++; break;
-		case 0x4: offset_cntrl_w(data); m_address_reg++; break;
-		case 0x5: dma_cntrl_w(data); m_address_reg++; break;
-		case 0x6: int_msk_reg_1_w(data); m_address_reg++; break;
-		case 0x7: control_reg_0_w(data); m_address_reg++; break;
+		case 0x0: dma_count_l_w(data); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x1: dma_count_m_w(data); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x2: dma_count_h_w(data); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x3: int_msk_reg_0_w(data); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x4: offset_cntrl_w(data); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x5: dma_cntrl_w(data); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x6: int_msk_reg_1_w(data); if (!machine().side_effects_disabled()) m_address_reg++; break;
+		case 0x7: control_reg_0_w(data); if (!machine().side_effects_disabled()) m_address_reg++; break;
 
 		case 0x8: control_reg_1_w(data); break;
 		case 0x9: scsi_signal_reg_w(data); break;
