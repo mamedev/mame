@@ -348,71 +348,117 @@ WRITE_LINE_MEMBER(hpc3_device::scsi_irq)
 			logerror("m_wd33c93->get_dma_count() is %d\n", m_wd33c93->get_dma_count() );
 			if (m_scsi0_dma_ctrl & HPC3_DMACTRL_ENABLE)
 			{
-				if (m_scsi0_dma_ctrl & HPC3_DMACTRL_IRQ) logerror("IP22: Unhandled SCSI DMA IRQ\n");
+				if (m_scsi0_dma_ctrl & HPC3_DMACTRL_IRQ)
+					logerror("IP22: Unhandled SCSI DMA IRQ\n");
 			}
 
-			// HPC3 DMA: host to device
-			if ((m_scsi0_dma_ctrl & HPC3_DMACTRL_ENABLE) && (m_scsi0_dma_ctrl & HPC3_DMACTRL_DIR))
+			if (m_scsi0_dma_ctrl & HPC3_DMACTRL_ENABLE)
 			{
-				uint32_t wptr, tmpword;
-				int words, dptr, twords;
-
-				words = m_wd33c93->get_dma_count();
-				words /= 4;
-
-				wptr = space.read_dword(m_scsi0_desc);
-				m_scsi0_desc += words*4;
-				dptr = 0;
-
-				logerror("DMA to device: %d words @ %x\n", words, wptr);
-
-				dump_chain(space, m_scsi0_desc);
-
-				if (words <= (512/4))
+				if (m_scsi0_dma_ctrl & HPC3_DMACTRL_DIR)
 				{
-					// one-shot
-					//m_wd33c93->dma_read_data(m_wd33c93->get_dma_count(), m_dma_buffer);
+					// HPC3 DMA: host to device
+					int words = (m_wd33c93->get_dma_count() + 3) / 4;
 
-					while (words)
+					uint32_t srcoffs = space.read_dword(m_scsi0_desc);
+					m_scsi0_desc += words * 4;
+
+					logerror("DMA to device: %d words @ %x\n", words, srcoffs);
+
+					dump_chain(space, m_scsi0_desc);
+
+					if (words <= (512/4))
 					{
-						tmpword = space.read_dword(wptr);
-
+						int dstoffs = 0;
 						if (m_scsi0_dma_ctrl & HPC3_DMACTRL_ENDIAN)
 						{
-							m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
-							m_dma_buffer[dptr+2] = (tmpword>>16)&0xff;
-							m_dma_buffer[dptr+1] = (tmpword>>8)&0xff;
-							m_dma_buffer[dptr] = tmpword&0xff;
+							for (int i = 0; i < words; i++)
+							{
+								uint32_t tmpword = space.read_dword(srcoffs);
+								m_dma_buffer[dstoffs+3] = (tmpword >> 24) & 0xff;
+								m_dma_buffer[dstoffs+2] = (tmpword >> 16) & 0xff;
+								m_dma_buffer[dstoffs+1] = (tmpword >> 8) & 0xff;
+								m_dma_buffer[dstoffs]   = tmpword & 0xff;
+								srcoffs += 4;
+								dstoffs += 4;
+							}
 						}
 						else
 						{
-							m_dma_buffer[dptr] = (tmpword>>24)&0xff;
-							m_dma_buffer[dptr+1] = (tmpword>>16)&0xff;
-							m_dma_buffer[dptr+2] = (tmpword>>8)&0xff;
-							m_dma_buffer[dptr+3] = tmpword&0xff;
+							for (int i = 0; i < words; i++)
+							{
+								uint32_t tmpword = space.read_dword(srcoffs);
+								m_dma_buffer[dstoffs]   = (tmpword >> 24) & 0xff;
+								m_dma_buffer[dstoffs+1] = (tmpword >> 16) & 0xff;
+								m_dma_buffer[dstoffs+2] = (tmpword >> 8) & 0xff;
+								m_dma_buffer[dstoffs+3] = tmpword & 0xff;
+								srcoffs += 4;
+								dstoffs += 4;
+							}
 						}
 
-						wptr += 4;
-						dptr += 4;
-						words--;
+						m_wd33c93->dma_write_data(m_wd33c93->get_dma_count(), m_dma_buffer);
+					}
+					else
+					{
+						while (words)
+						{
+							int twords = std::min(512/4, words);
+							m_scsi0_desc += twords*4;
+
+							int dstoffs = 0;
+							if (m_scsi0_dma_ctrl & HPC3_DMACTRL_ENDIAN)
+							{
+								for (int i = 0; i < twords; i++)
+								{
+									uint32_t tmpword = space.read_dword(srcoffs);
+									m_dma_buffer[dstoffs+3] = (tmpword >> 24) & 0xff;
+									m_dma_buffer[dstoffs+2] = (tmpword >> 16) & 0xff;
+									m_dma_buffer[dstoffs+1] = (tmpword >> 8) & 0xff;
+									m_dma_buffer[dstoffs]   = tmpword & 0xff;
+									dstoffs += 4;
+									srcoffs += 4;
+								}
+							}
+							else
+							{
+								for (int i = 0; i < twords; i++)
+								{
+									uint32_t tmpword = space.read_dword(srcoffs);
+									m_dma_buffer[dstoffs]   = (tmpword >> 24) & 0xff;
+									m_dma_buffer[dstoffs+1] = (tmpword >> 16) & 0xff;
+									m_dma_buffer[dstoffs+2] = (tmpword >> 8) & 0xff;
+									m_dma_buffer[dstoffs+3] = tmpword & 0xff;
+									dstoffs += 4;
+									srcoffs += 4;
+								}
+							}
+
+							m_wd33c93->dma_write_data(512, m_dma_buffer);
+
+							words -= (512/4);
+						}
 					}
 
-					words = m_wd33c93->get_dma_count();
-					m_wd33c93->dma_write_data(words, m_dma_buffer);
-				}
-				else
-				{
-					while (words)
+					// clear DMA on the controller too
+					m_wd33c93->clear_dma();
+#if 0
+					uint32_t dptr, tmpword;
+					uint32_t bc = space.read_dword(m_scsi0_desc + 4);
+					uint32_t rptr = space.read_dword(m_scsi0_desc);
+					int length = bc & 0x3fff;
+					int xie = (bc & 0x20000000) ? 1 : 0;
+					int eox = (bc & 0x80000000) ? 1 : 0;
+
+					dump_chain(space, m_scsi0_desc);
+
+					logerror("%s DMA to device: length %x xie %d eox %d\n", machine().describe_context().c_str(), length, xie, eox);
+
+					if (length <= 0x4000)
 					{
-						//m_wd33c93->dma_read_data(512, m_dma_buffer);
-						twords = 512/4;
-						m_scsi0_desc += 512;
 						dptr = 0;
-
-						while (twords)
+						while (length > 0)
 						{
-							tmpword = space.read_dword(wptr);
-
+							tmpword = space.read_dword(rptr);
 							if (m_scsi0_dma_ctrl & HPC3_DMACTRL_ENDIAN)
 							{
 								m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
@@ -428,139 +474,96 @@ WRITE_LINE_MEMBER(hpc3_device::scsi_irq)
 								m_dma_buffer[dptr+3] = tmpword&0xff;
 							}
 
-							wptr += 4;
 							dptr += 4;
-							twords--;
+							rptr += 4;
+							length -= 4;
 						}
 
-						m_wd33c93->dma_write_data(512, m_dma_buffer);
+						length = space.read_dword(m_scsi0_desc+4) & 0x3fff;
+						m_wd33c93->write_data(length, m_dma_buffer);
 
-						words -= (512/4);
+						// clear DMA on the controller too
+						m_wd33c93->clear_dma();
 					}
-				}
-
-				// clear DMA on the controller too
-				m_wd33c93->clear_dma();
-#if 0
-				uint32_t dptr, tmpword;
-				uint32_t bc = space.read_dword(m_scsi0_desc + 4);
-				uint32_t rptr = space.read_dword(m_scsi0_desc);
-				int length = bc & 0x3fff;
-				int xie = (bc & 0x20000000) ? 1 : 0;
-				int eox = (bc & 0x80000000) ? 1 : 0;
-
-				dump_chain(space, m_scsi0_desc);
-
-				logerror("%s DMA to device: length %x xie %d eox %d\n", machine().describe_context().c_str(), length, xie, eox);
-
-				if (length <= 0x4000)
-				{
-					dptr = 0;
-					while (length > 0)
+					else
 					{
-						tmpword = space.read_dword(rptr);
+						logerror("IP22: overly large host to device transfer, can't handle!\n");
+					}
+#endif
+				}
+				else
+				{
+					// HPC3 DMA: device to host
+					int words = (m_wd33c93->get_dma_count() + 3) / 4;
+
+					uint32_t dstoffs = space.read_dword(m_scsi0_desc);
+
+	//              logerror("DMA from device: %d words @ %x\n", words, dstoffs);
+
+					dump_chain(space, m_scsi0_desc);
+
+					if (words < (512/4))
+					{
+						// one-shot
+						m_wd33c93->dma_read_data(m_wd33c93->get_dma_count(), m_dma_buffer);
+
+						int srcoffs = 0;
 						if (m_scsi0_dma_ctrl & HPC3_DMACTRL_ENDIAN)
 						{
-							m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
-							m_dma_buffer[dptr+2] = (tmpword>>16)&0xff;
-							m_dma_buffer[dptr+1] = (tmpword>>8)&0xff;
-							m_dma_buffer[dptr] = tmpword&0xff;
+							for (int i = 0; i < words; i++)
+							{
+								uint32_t tmpword = m_dma_buffer[srcoffs+3]<<24 | m_dma_buffer[srcoffs+2]<<16 | m_dma_buffer[srcoffs+1]<<8 | m_dma_buffer[srcoffs];
+								space.write_dword(dstoffs, tmpword);
+								dstoffs += 4;
+								srcoffs += 4;
+							}
 						}
 						else
 						{
-							m_dma_buffer[dptr] = (tmpword>>24)&0xff;
-							m_dma_buffer[dptr+1] = (tmpword>>16)&0xff;
-							m_dma_buffer[dptr+2] = (tmpword>>8)&0xff;
-							m_dma_buffer[dptr+3] = tmpword&0xff;
+							for (int i = 0; i < words; i++)
+							{
+								uint32_t tmpword = m_dma_buffer[srcoffs]<<24 | m_dma_buffer[srcoffs+1]<<16 | m_dma_buffer[srcoffs+2]<<8 | m_dma_buffer[srcoffs+3];
+								space.write_dword(dstoffs, tmpword);
+								dstoffs += 4;
+								srcoffs += 4;
+							}
 						}
-
-						dptr += 4;
-						rptr += 4;
-						length -= 4;
 					}
+					else
+					{
+						while (words)
+						{
+							int length = (m_wd33c93->dma_read_data(512, m_dma_buffer) + 3) / 4;
 
-					length = space.read_dword(m_scsi0_desc+4) & 0x3fff;
-					m_wd33c93->write_data(length, m_dma_buffer);
+							int srcoffs = 0;
+							if (m_scsi0_dma_ctrl & HPC3_DMACTRL_ENDIAN)
+							{
+								for (uint32_t i = 0; i < length; i++)
+								{
+									uint32_t tmpword = m_dma_buffer[srcoffs+3]<<24 | m_dma_buffer[srcoffs+2]<<16 | m_dma_buffer[srcoffs+1]<<8 | m_dma_buffer[srcoffs];
+									space.write_dword(dstoffs, tmpword);
+									dstoffs += 4;
+									srcoffs += 4;
+								}
+							}
+							else
+							{
+								for (uint32_t i = 0; i < length; i++)
+								{
+									uint32_t tmpword = m_dma_buffer[srcoffs]<<24 | m_dma_buffer[srcoffs+1]<<16 | m_dma_buffer[srcoffs+2]<<8 | m_dma_buffer[srcoffs+3];
+									space.write_dword(dstoffs, tmpword);
+									dstoffs += 4;
+									srcoffs += 4;
+								}
+							}
+
+							words -= (512/4);
+						}
+					}
 
 					// clear DMA on the controller too
 					m_wd33c93->clear_dma();
 				}
-				else
-				{
-					logerror("IP22: overly large host to device transfer, can't handle!\n");
-				}
-#endif
-			}
-
-			// HPC3 DMA: device to host
-			if ((m_scsi0_dma_ctrl & HPC3_DMACTRL_ENABLE) && !(m_scsi0_dma_ctrl & HPC3_DMACTRL_DIR))
-			{
-				uint32_t wptr, tmpword;
-				int words, sptr, twords;
-
-				words = m_wd33c93->get_dma_count();
-				words /= 4;
-
-				wptr = space.read_dword(m_scsi0_desc);
-				sptr = 0;
-
-//              osd_printf_info("DMA from device: %d words @ %x\n", words, wptr);
-
-				dump_chain(space, m_scsi0_desc);
-
-				if (words <= (1024/4))
-				{
-					// one-shot
-					m_wd33c93->dma_read_data(m_wd33c93->get_dma_count(), m_dma_buffer);
-
-					while (words)
-					{
-						if (m_scsi0_dma_ctrl & HPC3_DMACTRL_ENDIAN)
-						{
-							tmpword = m_dma_buffer[sptr+3]<<24 | m_dma_buffer[sptr+2]<<16 | m_dma_buffer[sptr+1]<<8 | m_dma_buffer[sptr];
-						}
-						else
-						{
-							tmpword = m_dma_buffer[sptr]<<24 | m_dma_buffer[sptr+1]<<16 | m_dma_buffer[sptr+2]<<8 | m_dma_buffer[sptr+3];
-						}
-
-						space.write_dword(wptr, tmpword);
-						wptr += 4;
-						sptr += 4;
-						words--;
-					}
-				}
-				else
-				{
-					while (words)
-					{
-						m_wd33c93->dma_read_data(512, m_dma_buffer);
-						twords = 512/4;
-						sptr = 0;
-
-						while (twords)
-						{
-							if (m_scsi0_dma_ctrl & HPC3_DMACTRL_ENDIAN)
-							{
-								tmpword = m_dma_buffer[sptr+3]<<24 | m_dma_buffer[sptr+2]<<16 | m_dma_buffer[sptr+1]<<8 | m_dma_buffer[sptr];
-							}
-							else
-							{
-								tmpword = m_dma_buffer[sptr]<<24 | m_dma_buffer[sptr+1]<<16 | m_dma_buffer[sptr+2]<<8 | m_dma_buffer[sptr+3];
-							}
-							space.write_dword(wptr, tmpword);
-
-							wptr += 4;
-							sptr += 4;
-							twords--;
-						}
-
-						words -= (512/4);
-					}
-				}
-
-				// clear DMA on the controller too
-				m_wd33c93->clear_dma();
 			}
 		}
 

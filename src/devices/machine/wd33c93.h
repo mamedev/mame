@@ -28,7 +28,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void dma_read_data(int bytes, uint8_t *data);
+	int dma_read_data(int bytes, uint8_t *data);
 	void dma_write_data(int bytes, uint8_t *data);
 	void clear_dma();
 	int get_dma_count();
@@ -72,8 +72,8 @@ private:
 		WD_AUXILIARY_STATUS     = 0x1f
 	};
 
-	static constexpr unsigned TEMP_INPUT_LEN  = 262144;
-	static constexpr unsigned FIFO_SIZE       = 12;
+	static constexpr int TEMP_INPUT_LEN  = 262144;
+	static constexpr int FIFO_SIZE       = 12;
 
 	uint8_t getunit();
 	void set_xfer_count(int count);

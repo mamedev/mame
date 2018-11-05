@@ -939,7 +939,7 @@ void wd33c93_device::device_start()
 	save_item(NAME(m_read_pending));
 }
 
-void wd33c93_device::dma_read_data(int bytes, uint8_t *data)
+int wd33c93_device::dma_read_data(int bytes, uint8_t *data)
 {
 	int len = bytes;
 
@@ -947,7 +947,7 @@ void wd33c93_device::dma_read_data(int bytes, uint8_t *data)
 		len = get_xfer_count();
 
 	if (len == 0)
-		return;
+		return 0;
 
 	if ((m_temp_input_pos + len) >= TEMP_INPUT_LEN)
 	{
@@ -960,8 +960,8 @@ void wd33c93_device::dma_read_data(int bytes, uint8_t *data)
 	memcpy(data, &m_temp_input[m_temp_input_pos], len);
 
 	m_temp_input_pos += len;
-	len = get_xfer_count() - len;
-	set_xfer_count(len);
+	set_xfer_count(get_xfer_count() - len);
+	return len;
 }
 
 void wd33c93_device::dma_write_data(int bytes, uint8_t *data)
