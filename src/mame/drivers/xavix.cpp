@@ -805,7 +805,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	// sound is PCM
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(xavix_state::xavix_i2c_24lc04)
+MACHINE_CONFIG_START(xavix_i2c_state::xavix_i2c_24lc04)
 	xavix(config);
 
 	// according to http://ww1.microchip.com/downloads/en/devicedoc/21708k.pdf 'the master transmits up to 16 data bytes' however this breaks the Nostalgia games
@@ -813,7 +813,7 @@ MACHINE_CONFIG_START(xavix_state::xavix_i2c_24lc04)
 	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // 24LC04 on Nostalgia games, 24C04 on others
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(xavix_state::xavix_i2c_24c08)
+MACHINE_CONFIG_START(xavix_i2c_state::xavix_i2c_24c08)
 	xavix(config);
 
 	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x400); // 24C08 (Excite Fishing DX)
@@ -844,13 +844,13 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(xavix_state::xavix2000_i2c_24c04)
+MACHINE_CONFIG_START(xavix_i2c_state::xavix2000_i2c_24c04)
 	xavix2000(config);
 
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(xavix_state::xavix2000_i2c_24c02)
+MACHINE_CONFIG_START(xavix_i2c_state::xavix2000_i2c_24c02)
 	xavix2000(config);
 
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02
@@ -1038,13 +1038,13 @@ ROM_END
 
 /* XaviX hardware titles */
 
-CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 CONS( 2000, rad_ping,  0,          0,  xavix,  rad_ping, xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 
@@ -1072,7 +1072,7 @@ CONS( 200?, rad_fb,    0,          0,  xavix_madfb,  rad_fb,    xavix_madfb_stat
 
 CONS( 200?, rad_rh,    0,          0,  xavix,  rad_rh,   xavix_state, init_xavix,    "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  xavix,    xavix_state, init_xavix,    "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  xavix,    xavix_i2c_state, init_xavix,    "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
 CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
@@ -1110,9 +1110,9 @@ ROM_START( drgqst )
 ROM_END
 
 
-CONS( 2004, xavtenni, 0, 0, xavix2000_i2c_24c04, xavix, xavix_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2004, xavtenni, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx, xavix_state, init_xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, xavix, xavix_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, xavix, xavix_i2c_state, init_xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, xavix, xavix_i2c_state, init_xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx, xavix_i2c_state, init_xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, xavix, xavix_i2c_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

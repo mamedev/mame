@@ -22,6 +22,8 @@ class xavix_state : public driver_device
 public:
 	xavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
@@ -41,23 +43,14 @@ public:
 		m_posirq_y(*this, "posirq_y"),
 		m_segment_regs(*this, "segment_regs"),
 		m_palette(*this, "palette"),
-		m_in0(*this, "IN0"),
-		m_in1(*this, "IN1"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lowbus(*this, "lowbus"),
-		m_i2cmem(*this, "i2cmem")
+		m_lowbus(*this, "lowbus")
 	{ }
 
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
-
-	void xavix_i2c_24lc04(machine_config &config);
-	void xavix_i2c_24c08(machine_config &config);
-
-	void xavix2000_i2c_24c04(machine_config &config);
-	void xavix2000_i2c_24c02(machine_config &config);
 
 	void init_xavix();
 
@@ -67,6 +60,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
+
+protected:
+	virtual DECLARE_READ8_MEMBER(io0_data_r);
+	virtual DECLARE_READ8_MEMBER(io1_data_r);
+	virtual DECLARE_WRITE8_MEMBER(io0_data_w);
+	virtual DECLARE_WRITE8_MEMBER(io1_data_w);
+
+	uint8_t m_io0_data;
+	uint8_t m_io1_data;
+	uint8_t m_io0_direction;
+	uint8_t m_io1_direction;
+	required_ioport m_in0;
+	required_ioport m_in1;
 
 private:
 	// screen updates
@@ -126,13 +132,8 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(spritefragment_dma_trg_w);
 	DECLARE_READ8_MEMBER(spritefragment_dma_status_r);
 
-	DECLARE_READ8_MEMBER(io0_data_r);
-	DECLARE_READ8_MEMBER(io1_data_r);
 	DECLARE_READ8_MEMBER(io0_direction_r);
 	DECLARE_READ8_MEMBER(io1_direction_r);
-
-	DECLARE_WRITE8_MEMBER(io0_data_w);
-	DECLARE_WRITE8_MEMBER(io1_data_w);
 	DECLARE_WRITE8_MEMBER(io0_direction_w);
 	DECLARE_WRITE8_MEMBER(io1_direction_w);
 
@@ -258,11 +259,6 @@ void superxavix_lowbus_map(address_map &map);
 	uint8_t m_6ff0;
 	uint8_t m_video_ctrl;
 
-	uint8_t m_io0_data;
-	uint8_t m_io1_data;
-	uint8_t m_io0_direction;
-	uint8_t m_io1_direction;
-
 	uint8_t m_soundregs[0x10];
 
 	uint8_t m_timer_baseval;
@@ -299,8 +295,6 @@ void superxavix_lowbus_map(address_map &map);
 
 	required_device<palette_device> m_palette;
 
-	required_ioport m_in0;
-	required_ioport m_in1;
 	required_ioport m_region;
 
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -331,8 +325,29 @@ void superxavix_lowbus_map(address_map &map);
 
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
-	optional_device<i2cmem_device> m_i2cmem;
 };
+
+class xavix_i2c_state : public xavix_state
+{
+public:
+	xavix_i2c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void xavix_i2c_24lc04(machine_config &config);
+	void xavix_i2c_24c08(machine_config &config);
+
+	void xavix2000_i2c_24c04(machine_config &config);
+	void xavix2000_i2c_24c02(machine_config &config);
+
+	virtual DECLARE_READ8_MEMBER(io1_data_r) override;
+	virtual DECLARE_WRITE8_MEMBER(io1_data_w) override;
+
+protected:
+	required_device<i2cmem_device> m_i2cmem;
+};
+
 
 class xavix_mtrk_state : public xavix_state
 {
@@ -375,6 +390,9 @@ public:
 	{ }
 
 	void xavix_ekara(machine_config &config);
+
+	virtual DECLARE_WRITE8_MEMBER(io0_data_w) override;
+	virtual DECLARE_WRITE8_MEMBER(io1_data_w) override;
 
 protected:
 	required_device<generic_slot_device> m_cart;

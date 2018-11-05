@@ -368,15 +368,19 @@ READ8_MEMBER(xavix_state::io0_data_r)
 
 READ8_MEMBER(xavix_state::io1_data_r)
 {
+	uint8_t ret = m_in1->read() & ~m_io1_direction;
+	ret |= m_io1_data & m_io1_direction;
+	return ret;
+}
+
+READ8_MEMBER(xavix_i2c_state::io1_data_r)
+{
 	uint8_t ret = m_in1->read();
 
-	if (m_i2cmem)
+	if (!(m_io1_direction & 0x08))
 	{
-		if (!(m_io1_direction & 0x08))
-		{
-			ret &= ~0x08;
-			ret |= (m_i2cmem->read_sda() & 1) << 3;
-		}
+		ret &= ~0x08;
+		ret |= (m_i2cmem->read_sda() & 1) << 3;
 	}
 
 	ret &= ~m_io1_direction;
@@ -406,20 +410,38 @@ WRITE8_MEMBER(xavix_state::io1_data_w)
 {
 	m_io1_data = data;
 	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
-
-	if (m_i2cmem)
-	{
-		if (m_io1_direction & 0x08)
-		{
-			m_i2cmem->write_sda((data & 0x08) >> 3);
-		}
-
-		if (m_io1_direction & 0x10)
-		{
-			m_i2cmem->write_scl((data & 0x10) >> 4);
-		}
-	}
 }
+
+WRITE8_MEMBER(xavix_i2c_state::io1_data_w)
+{
+	m_io1_data = data;
+	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
+
+	if (m_io1_direction & 0x08)
+	{
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+	}
+
+	if (m_io1_direction & 0x10)
+	{
+		m_i2cmem->write_scl((data & 0x10) >> 4);
+	}	
+}
+
+
+WRITE8_MEMBER(xavix_ekara_state::io0_data_w)
+{
+	m_io0_data = data;
+	printf("------------- %s: io0_data_w %02x\n", machine().describe_context().c_str(), data & m_io0_direction);
+}
+
+WRITE8_MEMBER(xavix_ekara_state::io1_data_w)
+{
+	m_io1_data = data;
+	printf("%s: io1_data_w %02x\n", machine().describe_context().c_str(), data & m_io1_direction);
+}
+
+
 
 WRITE8_MEMBER(xavix_state::io0_direction_w)
 {
@@ -519,7 +541,7 @@ WRITE8_MEMBER(xavix_state::timer_control_w)
 	// rad_fb / rad_madf don't set bit 0x40 (and doesn't seem to have a valid interrupt handler for timer, so probably means it generates no IRQ?)
 	if (data & 0x01) // timer start?
 	{
-		m_freq_timer->adjust(attotime::from_usec(50000));
+		m_freq_timer->adjust(attotime::from_usec(1000));
 	}
 	else
 	{
