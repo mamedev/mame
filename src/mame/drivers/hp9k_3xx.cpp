@@ -285,7 +285,7 @@ void hp9k3xx_state::add_dio32_bus(machine_config &config)
 
 void hp9k3xx_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
-	if (m_maincpu->m68851_buserror())
+	if (m_maincpu->m68851_buserror(address))
 		return;
 
 	if (m_bus_error)

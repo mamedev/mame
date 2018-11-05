@@ -500,6 +500,8 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, cons
 			__func__, addr_in, fc, ptest, rw, limit);
 	m_mmu_tmp_sr = 0;
 
+	m_mmu_last_logical_addr = addr_in;
+
 	if (pmmu_match_tt(addr_in, fc, m_mmu_tt0, rw) ||
 		pmmu_match_tt(addr_in, fc, m_mmu_tt1, rw) ||
 		fc == 7)
@@ -1262,7 +1264,7 @@ inline uint32_t hmmu_translate_addr(uint32_t addr_in)
 }
 
 public:
-int m68851_buserror(uint32_t addr)
+int m68851_buserror(uint32_t& addr)
 {
 	if (!m_pmmu_enabled)
 	{
@@ -1287,5 +1289,6 @@ int m68851_buserror(uint32_t addr)
 			m_mmu_atc_data[i] |= M68K_MMU_ATC_BUSERROR;
 		}
 	}
+	addr = m_mmu_last_logical_addr;
 	return false;
 }
