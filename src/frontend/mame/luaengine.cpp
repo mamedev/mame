@@ -1860,7 +1860,7 @@ void lua_engine::initialize()
 			"pixel", [](screen_device &sdev, float x, float y) {
 					return sdev.pixel((s32)x, (s32)y);
 				},
-			"pixels", [this](screen_device &sdev, sol::this_state s) {
+			"pixels", [](screen_device &sdev, sol::this_state s) {
 					lua_State *L = s;
 					const rectangle &visarea = sdev.visible_area();
 					luaL_Buffer buff;
