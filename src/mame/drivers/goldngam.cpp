@@ -618,7 +618,7 @@ void goldngam_state::base(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_goldngam);
 
-	PALETTE(config, "palette", 512).set_init(DEVICE_SELF_OWNER, FUNC(goldngam_state::palette_init));
+	PALETTE(config, "palette", 512).set_init(DEVICE_SELF, FUNC(goldngam_state::palette_init));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

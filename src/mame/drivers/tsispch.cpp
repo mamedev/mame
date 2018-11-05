@@ -309,8 +309,7 @@ void tsispch_state::i8086_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x02FFF).mirror(0x34000).ram(); // verified; 6264*2 sram, only first 3/4 used
-	map(0x03000, 0x03000).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x03002, 0x03002).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x03000, 0x03003).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x03200, 0x03203).mirror(0x341FC).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
 	map(0x03400, 0x03400).mirror(0x341FE).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
 	map(0x03401, 0x03401).mirror(0x341FE).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
@@ -392,13 +391,13 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* uarts */
-	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_rxrdy_int))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txrdy_int))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txempty_int))
+	i8251_device &u15(I8251(config, "i8251a_u15", 0));
+	u15.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	u15.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	u15.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	u15.rxrdy_handler().set(FUNC(tsispch_state::i8251_rxrdy_int));
+	u15.txrdy_handler().set(FUNC(tsispch_state::i8251_txrdy_int));
+	u15.txempty_handler().set(FUNC(tsispch_state::i8251_txempty_int));
 
 	clock_device &clock(CLOCK(config, "baudclock", 153600));
 	clock.signal_handler().set("i8251a_u15", FUNC(i8251_device::write_txc));

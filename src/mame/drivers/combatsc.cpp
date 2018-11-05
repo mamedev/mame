@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 
 	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatsc)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

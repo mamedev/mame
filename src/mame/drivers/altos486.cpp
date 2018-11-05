@@ -152,35 +152,35 @@ MACHINE_CONFIG_START(altos486_state::altos486)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos486_floppies, "525qd", altos486_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_DEVICE_ADD("sio0", Z80SIO0, 4000000)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
-	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, altos486_state, sio_interrupt))
+	z80sio0_device& sio0(Z80SIO0(config, "sio0", 4000000));
+	sio0.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	sio0.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	sio0.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	sio0.out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	sio0.out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	sio0.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+	//sio0.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	MCFG_DEVICE_ADD("sio1", Z80SIO0, 4000000)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232c", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232c", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232c", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE("rs232d", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE("rs232d", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE("rs232d", rs232_port_device, write_rts))
-	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, altos486_state, sio_interrupt))
+	z80sio0_device& sio1(Z80SIO0(config, "sio1", 4000000));
+	sio1.out_txda_callback().set("rs232c", FUNC(rs232_port_device::write_txd));
+	sio1.out_dtra_callback().set("rs232c", FUNC(rs232_port_device::write_dtr));
+	sio1.out_rtsa_callback().set("rs232c", FUNC(rs232_port_device::write_rts));
+	sio1.out_txdb_callback().set("rs232d", FUNC(rs232_port_device::write_txd));
+	sio1.out_dtrb_callback().set("rs232d", FUNC(rs232_port_device::write_dtr));
+	sio1.out_rtsb_callback().set("rs232d", FUNC(rs232_port_device::write_rts));
+	//sio1.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	MCFG_DEVICE_ADD("sio2", Z80SIO0, 4000000)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232_lp", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232_lp", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232_lp", rs232_port_device, write_rts))
-	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, altos486_state, sio_interrupt))
+	z80sio0_device& sio2(Z80SIO0(config, "sio2", 4000000));
+	sio2.out_txda_callback().set("rs232_lp", FUNC(rs232_port_device::write_txd));
+	sio2.out_dtra_callback().set("rs232_lp", FUNC(rs232_port_device::write_dtr));
+	sio2.out_rtsa_callback().set("rs232_lp", FUNC(rs232_port_device::write_rts));
+	//sio2.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
-	MCFG_DEVICE_ADD("i8274", I8274, XTAL(16'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs422_wn", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs422_wn", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs422_wn", rs232_port_device, write_rts))
-	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, altos486_state, sio_interrupt))
+	i8274_device& i8274(I8274(config, "i8274", XTAL(16'000'000)/4));
+	i8274.out_txda_callback().set("rs422_wn", FUNC(rs232_port_device::write_txd));
+	i8274.out_dtra_callback().set("rs422_wn", FUNC(rs232_port_device::write_dtr));
+	i8274.out_rtsa_callback().set("rs422_wn", FUNC(rs232_port_device::write_rts));
+	//i8274.out_int_callback().set(FUNC(altos486_state::sio_interrupt));
 
 	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("sio0", z80dart_device, rxa_w))

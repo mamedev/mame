@@ -167,12 +167,12 @@ protected:
 	uint32_t    m_par_cntl;
 	uint8_t m_system_id;
 
-	static const char *SCC_TAG;
-	static const char *PI1_TAG;
-	static const char *KBDC_TAG;
-	static const char *PIT_TAG;
-	static const char *RS232A_TAG;
-	static const char *RS232B_TAG;
+	static char const *const SCC_TAG;
+	static char const *const PI1_TAG;
+	static char const *const KBDC_TAG;
+	static char const *const PIT_TAG;
+	static char const *const RS232A_TAG;
+	static char const *const RS232B_TAG;
 
 	static const XTAL SCC_PCLK;
 	static const XTAL SCC_RXA_CLK;

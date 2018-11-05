@@ -17,7 +17,6 @@
 #include "emu.h"
 #include "includes/cchasm.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6840ptm.h"
@@ -153,17 +152,17 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 	MCFG_DEVICE_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
 	MCFG_DEVICE_PROGRAM_MAP(memmap)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3584229)       /* 3.58  MHz (from schematics) */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_audiocpu, 3584229);       /* 3.58  MHz (from schematics) */
+	m_audiocpu->set_daisy_config(daisy_chain);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cchasm_state::sound_memmap);
+	m_audiocpu->set_addrmap(AS_IO, &cchasm_state::sound_portmap);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 3584229 /* same as "audiocpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, cchasm_state, ctc_timer_1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, cchasm_state, ctc_timer_2_w))
+	Z80CTC(config, m_ctc, 3584229 /* same as "audiocpu" */);
+	m_ctc->intr_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<1>().set(FUNC(cchasm_state::ctc_timer_1_w));
+	m_ctc->zc_callback<2>().set(FUNC(cchasm_state::ctc_timer_2_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

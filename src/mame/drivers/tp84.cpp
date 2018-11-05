@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	mainlatch.q_out_cb<4>().set(FUNC(tp84_state::flip_screen_x_w));
 	mainlatch.q_out_cb<5>().set(FUNC(tp84_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

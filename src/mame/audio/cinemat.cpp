@@ -1395,13 +1395,13 @@ static const z80_daisy_config daisy_chain[] =
 MACHINE_CONFIG_START(demon_state::demon_sound)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(demon_sound_map)
-	MCFG_DEVICE_IO_MAP(demon_sound_ports)
+	z80_device& audiocpu(Z80(config, "audiocpu", 3579545));
+	audiocpu.set_daisy_config(daisy_chain);
+	audiocpu.set_addrmap(AS_PROGRAM, &demon_state::demon_sound_map);
+	audiocpu.set_addrmap(AS_IO, &demon_state::demon_sound_ports);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 3579545 /* same as "audiocpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", 3579545 /* same as "audiocpu" */));
+	ctc.intr_callback().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
 	m_outlatch->q_out_cb<4>().set(FUNC(demon_state::demon_sound4_w));
 
@@ -1418,8 +1418,6 @@ MACHINE_CONFIG_START(demon_state::demon_sound)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DEVICE_ADD("ay3", AY8910, 3579545)
-
-
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, demon_state, sound_output_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

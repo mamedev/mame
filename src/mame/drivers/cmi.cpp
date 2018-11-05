@@ -220,9 +220,7 @@ public:
 		, m_midicpu(*this, "smptemidi")
 		, m_cmi07cpu(*this, "cmi07cpu")
 		, m_msm5832(*this, "msm5832")
-		, m_i8214_0(*this, "i8214_1")
-		, m_i8214_1(*this, "i8214_2")
-		, m_i8214_2(*this, "i8214_3")
+		, m_i8214(*this, "i8214_%u", 1U)
 		, m_q133_pia(*this, "q133_pia_%u", 1U)
 		, m_q133_ptm(*this, "q133_ptm")
 		, m_q133_acia(*this, "q133_acia_%u", 0U)
@@ -377,9 +375,7 @@ protected:
 	required_device<mc6809e_device> m_cmi07cpu;
 
 	required_device<msm5832_device> m_msm5832;
-	required_device<i8214_device> m_i8214_0;
-	required_device<i8214_device> m_i8214_1;
-	required_device<i8214_device> m_i8214_2;
+	required_device_array<i8214_device, 3> m_i8214;
 	required_device_array<pia6821_device, 2> m_q133_pia;
 	required_device<ptm6840_device> m_q133_ptm;
 	required_device_array<mos6551_device, 4> m_q133_acia;
@@ -1369,10 +1365,10 @@ READ8_MEMBER( cmi_state::fdc_r )
 	{
 		switch (m_fdc_addr)
 		{
-			case 0xc: { return m_wd1791->status_r() ^ 0xff; }
-			case 0xd: { return m_wd1791->track_r() ^ 0xff; }
-			case 0xe: { return m_wd1791->sector_r() ^ 0xff; }
-			case 0xf: { return m_wd1791->data_r() ^ 0xff; }
+			case 0xc: return m_wd1791->status_r() ^ 0xff;
+			case 0xd: return m_wd1791->track_r() ^ 0xff;
+			case 0xe: return m_wd1791->sector_r() ^ 0xff;
+			case 0xf: return m_wd1791->data_r() ^ 0xff;
 			default:  return 0;
 		}
 	}
@@ -1585,8 +1581,8 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 			case 0x30:
 				m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 				data ^= 0xff;
-				m_i8214_2->sgs_w((data >> 3) & 1);
-				m_i8214_2->b_w(data & 0x7);
+				m_i8214[2]->sgs_w((data >> 3) & 1);
+				m_i8214[2]->b_w(data & 0x7);
 				break;
 
 			case 0x31: case 0x32:
@@ -1625,8 +1621,8 @@ WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 	//printf("i8214_cpu1_w: %02x\n", data);
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	data ^= 0xff;
-	m_i8214_0->sgs_w((data >> 3) & 1);
-	m_i8214_0->b_w(data & 0x7);
+	m_i8214[0]->sgs_w((data >> 3) & 1);
+	m_i8214[0]->b_w(data & 0x7);
 }
 
 
@@ -1635,8 +1631,8 @@ WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
 	//printf("i8214_cpu2_w: %02x\n", data);
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	data ^= 0xff;
-	m_i8214_1->sgs_w((data >> 3) & 1);
-	m_i8214_1->b_w(data & 0x7);
+	m_i8214[1]->sgs_w((data >> 3) & 1);
+	m_i8214[1]->b_w(data & 0x7);
 }
 
 // TODO: replace with AM_SHARE
@@ -1732,7 +1728,7 @@ IRQ_CALLBACK_MEMBER( cmi_state::cpu1_interrupt_callback )
 	if (irqline == INPUT_LINE_IRQ0)
 	{
 		int vector = (m_hp_int ? 0xffe0 : 0xffd0);
-		int level = (m_hp_int ? m_i8214_2->a_r() : m_i8214_0->a_r()) ^ 7;
+		int level = (m_hp_int ? m_i8214[2]->a_r() : m_i8214[0]->a_r()) ^ 7;
 		m_irq_address[CPU_1][0] = m_cpu1space->read_byte(vector + level*2);
 		m_irq_address[CPU_1][1] = m_cpu1space->read_byte(vector + level*2 + 1);
 
@@ -1753,7 +1749,7 @@ IRQ_CALLBACK_MEMBER( cmi_state::cpu2_interrupt_callback )
 
 	if (irqline == INPUT_LINE_IRQ0)
 	{
-		int level = m_i8214_1->a_r() ^ 0x7;
+		int level = m_i8214[1]->a_r() ^ 0x7;
 		m_irq_address[CPU_2][0] = m_cpu2space->read_byte(0xffe0 + level*2);
 		m_irq_address[CPU_2][1] = m_cpu2space->read_byte(0xffe0 + level*2 + 1);
 
@@ -1769,7 +1765,7 @@ void cmi_state::set_interrupt(int cpunum, int level, int state)
 {
 	//printf("CPU%d Int: %x State: %x\n", cpunum + 1, level, state);
 
-	i8214_device *i8214 = ((cpunum == CPU_2) ? m_i8214_1 : (level < 8 ? m_i8214_2 : m_i8214_0));
+	i8214_device *i8214 = ((cpunum == CPU_2) ? m_i8214[1] : (level < 8 ? m_i8214[2] : m_i8214[0]));
 	i8214->r_w(level & 7, state ? 0 : 1);
 }
 
@@ -2063,12 +2059,12 @@ void cmi_state::machine_reset()
 	m_qfc9_region_ptr = (uint8_t *)m_qfc9_region->base();
 
 	/* Set 8214 interrupt lines */
-	m_i8214_0->etlg_w(1);
-	m_i8214_0->inte_w(1);
-	m_i8214_1->etlg_w(1);
-	m_i8214_1->inte_w(1);
-	m_i8214_2->etlg_w(1);
-	m_i8214_2->inte_w(1);
+	m_i8214[0]->etlg_w(1);
+	m_i8214[0]->inte_w(1);
+	m_i8214[1]->etlg_w(1);
+	m_i8214[1]->inte_w(1);
+	m_i8214[2]->etlg_w(1);
+	m_i8214[2]->inte_w(1);
 
 	m_hblank_timer->adjust(m_screen->time_until_pos(0, HBLANK_START));
 
@@ -2203,13 +2199,13 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 
 	MCFG_DEVICE_ADD("msm5832", MSM5832, 32.768_kHz_XTAL)
 
-	MCFG_DEVICE_ADD("i8214_1", I8214, 1000000) // cmi_8214_intf_1
-	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, cmi_state, i8214_1_int_w))
-	MCFG_DEVICE_ADD("i8214_2", I8214, 1000000) // cmi_8214_intf_2
-	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, cmi_state, i8214_2_int_w))
-	MCFG_DEVICE_ADD("i8214_3", I8214, 1000000) // cmi_8214_intf_3
-	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, cmi_state, i8214_3_int_w))
-	MCFG_I8214_ENLG_CALLBACK(WRITELINE(*this, cmi_state, i8214_3_enlg))
+	I8214(config, m_i8214[0], 1000000); // cmi_8214_intf_1
+	m_i8214[0]->int_wr_callback().set(FUNC(cmi_state::i8214_1_int_w));
+	I8214(config, m_i8214[1], 1000000); // cmi_8214_intf_2
+	m_i8214[1]->int_wr_callback().set(FUNC(cmi_state::i8214_2_int_w));
+	I8214(config, m_i8214[2], 1000000); // cmi_8214_intf_3
+	m_i8214[2]->int_wr_callback().set(FUNC(cmi_state::i8214_3_int_w));
+	m_i8214[2]->enlg_wr_callback().set(FUNC(cmi_state::i8214_3_enlg));
 
 	PIA6821(config, m_q133_pia[0], 0); // pia_q133_1_config
 	m_q133_pia[0]->readpa_handler().set(FUNC(cmi_state::q133_1_porta_r));
@@ -2284,9 +2280,9 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	PTM6840(config, m_cmi07_ptm, 2000000); // ptm_cmi07_config TODO
 	m_cmi07_ptm->irq_callback().set(FUNC(cmi_state::cmi07_irq));
 
-	MCFG_DEVICE_ADD("wd1791", FD1791, 16_MHz_XTAL / 8) // wd1791_interface
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, cmi_state, wd1791_irq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, cmi_state, wd1791_drq))
+	FD1791(config, m_wd1791, 16_MHz_XTAL / 8); // wd1791_interface
+	m_wd1791->intrq_wr_callback().set(FUNC(cmi_state::wd1791_irq));
+	m_wd1791->drq_wr_callback().set(FUNC(cmi_state::wd1791_drq));
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 

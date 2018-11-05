@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 	mainlatch.q_out_cb<6>().set(FUNC(tutankhm_state::flip_screen_x_w));
 	mainlatch.q_out_cb<7>().set(FUNC(tutankhm_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -108,11 +108,6 @@ protected:
 	void update_port_mode(uint8_t index, uint8_t changed);
 	void set_port_output_bit(uint8_t index, uint8_t bit, uint8_t state);
 
-	DECLARE_READ8_MEMBER(program_rombank_r);
-	DECLARE_READ8_MEMBER(data_rombank_r);
-	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_READ8_MEMBER(rambank_r);
-
 	DECLARE_WRITE8_MEMBER(regs_w);
 	DECLARE_READ8_MEMBER(regs_r);
 
@@ -244,9 +239,9 @@ protected:
 	address_space *m_data;
 
 	// FIXME: memory banks do not currently work with internal maps.
-	//required_memory_bank m_rambank;
-	//required_memory_bank m_program_rombank;
-	//required_memory_bank m_data_rombank;
+	required_memory_bank m_rambank;
+	required_memory_bank m_program_rombank;
+	required_memory_bank m_data_rombank;
 	required_memory_region m_rom;
 };
 

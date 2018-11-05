@@ -14,6 +14,7 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "video/huc6271.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -51,6 +52,11 @@ public:
 	DECLARE_READ8_MEMBER( adpcm_update_0 );
 	DECLARE_READ8_MEMBER( adpcm_update_1 );
 
+	// CD-DA operations
+	DECLARE_WRITE8_MEMBER( cdda_update );
+
+	static void cdrom_config(device_t *device);
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -61,6 +67,8 @@ protected:
 
 private:
 	required_device<huc6271_device> m_huc6271;
+	required_device<speaker_device> m_cdda_l;
+	required_device<speaker_device> m_cdda_r;
 
 	uint8_t m_register;
 	uint32_t m_kram_addr_r, m_kram_addr_w;

@@ -111,13 +111,6 @@ WRITE8_MEMBER(taito_zoom_device::tms_ctrl_w)
 	m_tms_ctrl = data;
 }
 
-void taito_zoom_device::update_status_pin(int state)
-{
-	printf("inside callback set status to %d\n",state);
-	m_soundcpu->set_input_line(1, state);
-	machine().scheduler().synchronize();    // the fix to all problems
-}
-
 void taito_zoom_device::taitozoom_mn_map(address_map &map)
 {
 	if(m_use_flash) {
@@ -131,12 +124,11 @@ void taito_zoom_device::taitozoom_mn_map(address_map &map)
 	map(0xe00000, 0xe000ff).rw(FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)); // M66220FP for comms with maincpu
 }
 
-#ifdef USE_DSP
 void taito_zoom_device::tms57002_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram();
 }
-#endif
+
 
 /***************************************************************************
 
@@ -201,26 +193,16 @@ MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	TMS57002(config, m_tms57002, XTAL(25'000'000)/2);
-#ifdef USE_DSP
 	//m_tms57002->empty_callback().set_inputline(m_soundcpu, MN10200_IRQ1, m_tms57002->empty_r()); /*.invert();*/
 	m_tms57002->empty_callback().set_inputline(m_soundcpu, MN10200_IRQ1).invert();
 
 	m_tms57002->set_addrmap(AS_DATA, &taito_zoom_device::tms57002_map);
 	m_tms57002->add_route(2, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_tms57002->add_route(3, *this, 1.0, AUTO_ALLOC_INPUT, 1);
-#else // Unsupported opcode issue
-	m_tms57002->set_disable();
-#endif
 
 	ZSG2(config, m_zsg2, XTAL(25'000'000));
-#ifdef USE_DSP
 	m_zsg2->add_route(0, *m_tms57002, 0.5, 0); // reverb effect
 	m_zsg2->add_route(1, *m_tms57002, 0.5, 1); // chorus effect
 	m_zsg2->add_route(2, *m_tms57002, 1.0, 2); // left direct
 	m_zsg2->add_route(3, *m_tms57002, 1.0, 3); // right direct
-#else
-	m_zsg2->add_route(2, *this, 0.5, AUTO_ALLOC_INPUT, 0);
-	m_zsg2->add_route(3, *this, 0.5, AUTO_ALLOC_INPUT, 1);
-#endif
-
 MACHINE_CONFIG_END

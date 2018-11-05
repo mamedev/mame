@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	MCFG_DEVICE_PROGRAM_MAP(jailbrek_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(jailbrek_state, interrupt_nmi,  500) /* ? */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jailbrek)

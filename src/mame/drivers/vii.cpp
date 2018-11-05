@@ -1452,11 +1452,11 @@ MACHINE_CONFIG_START(spg2xx_cart_state::vsmile)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(spg2xx_game_state::batman)
+void spg2xx_game_state::batman(machine_config &config)
+{
 	spg2xx_base(config);
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x200)
-MACHINE_CONFIG_END
+	I2CMEM(config, "i2cmem", 0).set_data_size(0x200);
+}
 
 
 void spg2xx_cart_state::init_vii()

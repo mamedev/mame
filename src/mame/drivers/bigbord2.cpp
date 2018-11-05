@@ -148,7 +148,7 @@ private:
 	address_space *m_mem;
 	address_space *m_io;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
@@ -549,10 +549,10 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 
 MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(bigbord2_mem)
-	MCFG_DEVICE_IO_MAP(bigbord2_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bigbord2_state::bigbord2_mem);
+	m_maincpu->set_addrmap(AS_IO, &bigbord2_state::bigbord2_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -565,31 +565,31 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bigbord2_state, clock_w))
 
 	/* devices */
-	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, bigbord2_state, busreq_w))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, bigbord2_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, bigbord2_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, bigbord2_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, bigbord2_state, io_write_byte))
+	Z80DMA(config, m_dma, MAIN_CLOCK);
+	m_dma->out_busreq_callback().set(FUNC(bigbord2_state::busreq_w));
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dma->in_mreq_callback().set(FUNC(bigbord2_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(bigbord2_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(bigbord2_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(bigbord2_state::io_write_byte));
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, MAIN_CLOCK)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_SYNCA_CB(WRITELINE("ctc1", z80ctc_device, trg2))
-	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(*this, bigbord2_state, sio_wrdya_w))
-	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(*this, bigbord2_state, sio_wrdyb_w))
+	Z80SIO(config, m_sio, MAIN_CLOCK);
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_sio->out_synca_callback().set(m_ctc1, FUNC(z80ctc_device::trg2));
+	m_sio->out_wrdya_callback().set(FUNC(bigbord2_state::sio_wrdya_w));
+	m_sio->out_wrdyb_callback().set(FUNC(bigbord2_state::sio_wrdyb_w));
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, MAIN_CLOCK)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc1, MAIN_CLOCK);
+	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, MAIN_CLOCK)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))    // to SIO Ch B
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bigbord2_state, ctc_z1_w))  // to SIO Ch A
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc2", z80ctc_device, trg3))
+	Z80CTC(config, m_ctc2, MAIN_CLOCK);
+	m_ctc2->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc2->zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));    // to SIO Ch B
+	m_ctc2->zc_callback<1>().set(FUNC(bigbord2_state::ctc_z1_w));  // to SIO Ch A
+	m_ctc2->zc_callback<2>().set(m_ctc2, FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 16_MHz_XTAL / 8) // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
-	//MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", ??)) // info missing from schematic
+	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
+	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, ??); // info missing from schematic
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
@@ -599,7 +599,7 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(bigbord2_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("ctc1", z80ctc_device, trg3))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(m_ctc1, z80ctc_device, trg3))
 
 	ls259_device &proglatch(LS259(config, "proglatch")); // U41
 	proglatch.q_out_cb<6>().set("outlatch1", FUNC(ls259_device::clear_w)); // FCRST - also resets the 8877

@@ -43,8 +43,10 @@ public:
 
 	void init_ts802();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_MACHINE_RESET(ts802);
 	DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
 	DECLARE_READ8_MEMBER(port0c_r) { return 1; };
 	DECLARE_READ8_MEMBER(port0e_r) { return 0; };
@@ -64,7 +66,7 @@ private:
 	uint8_t m_term_data;
 	address_space *m_mem;
 	address_space *m_io;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
 
@@ -146,7 +148,7 @@ static void ts802_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_RESET_MEMBER( ts802_state, ts802 )
+void ts802_state::machine_reset()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -190,36 +192,34 @@ void ts802_state::init_ts802()
 
 MACHINE_CONFIG_START(ts802_state::ts802)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(ts802_mem)
-	MCFG_DEVICE_IO_MAP(ts802_io)
-	//MCFG_Z80_DAISY_CHAIN(daisy_chain_intf) // causes problems
-	MCFG_MACHINE_RESET_OVERRIDE(ts802_state, ts802)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ts802_state::ts802_mem);
+	m_maincpu->set_addrmap(AS_IO, &ts802_state::ts802_io);
+	//m_maincpu->set_daisy_config(daisy_chain_intf); // causes problems
 
 	/* Devices */
 	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ts802_state, kbd_put))
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, 16_MHz_XTAL / 4)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, ts802_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, ts802_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, ts802_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, ts802_state, io_write_byte))
+	z80dma_device& dma(Z80DMA(config, "dma", 16_MHz_XTAL / 4));
+	dma.out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dma.in_mreq_callback().set(FUNC(ts802_state::memory_read_byte));
+	dma.out_mreq_callback().set(FUNC(ts802_state::memory_write_byte));
+	dma.in_iorq_callback().set(FUNC(ts802_state::io_read_byte));
+	dma.out_iorq_callback().set(FUNC(ts802_state::io_write_byte));
 
-	MCFG_DEVICE_ADD("dart1", Z80DART, 16_MHz_XTAL / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80dart_device& dart1(Z80DART(config, "dart1", 16_MHz_XTAL / 4));
+	dart1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dart2", Z80DART, 16_MHz_XTAL / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80dart_device& dart2(Z80DART(config, "dart2", 16_MHz_XTAL / 4));
+	dart2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 16_MHz_XTAL / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", 16_MHz_XTAL / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 4'000'000 / 2)                  // unknown clock
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FD1793(config, "fdc", 4'000'000 / 2);                  // unknown clock
+	FLOPPY_CONNECTOR(config, "fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
 MACHINE_CONFIG_END
 
 /* ROM definition */

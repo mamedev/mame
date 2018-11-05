@@ -313,22 +313,22 @@ WRITE8_MEMBER( ace_state::io_w )
 
 READ8_MEMBER( ace_state::ppi_pa_r )
 {
-	return m_ppi->read(space, 0);
+	return m_ppi->read(0);
 }
 
 READ8_MEMBER( ace_state::ppi_pb_r )
 {
-	return m_ppi->read(space, 1);
+	return m_ppi->read(1);
 }
 
 READ8_MEMBER( ace_state::ppi_pc_r )
 {
-	return m_ppi->read(space, 2);
+	return m_ppi->read(2);
 }
 
 READ8_MEMBER( ace_state::ppi_control_r )
 {
-	return m_ppi->read(space, 3);
+	return m_ppi->read(3);
 }
 
 
@@ -338,22 +338,22 @@ READ8_MEMBER( ace_state::ppi_control_r )
 
 WRITE8_MEMBER( ace_state::ppi_pa_w )
 {
-	m_ppi->write(space, 0, data);
+	m_ppi->write(0, data);
 }
 
 WRITE8_MEMBER( ace_state::ppi_pb_w )
 {
-	m_ppi->write(space, 1, data);
+	m_ppi->write(1, data);
 }
 
 WRITE8_MEMBER( ace_state::ppi_pc_w )
 {
-	m_ppi->write(space, 2, data);
+	m_ppi->write(2, data);
 }
 
 WRITE8_MEMBER( ace_state::ppi_control_w )
 {
-	m_ppi->write(space, 3, data);
+	m_ppi->write(3, data);
 }
 
 
@@ -666,7 +666,7 @@ WRITE8_MEMBER(ace_state::ald_w)
 
 	if (!BIT(data, 6))
 	{
-		m_sp0256->ald_w(space, 0, data & 0x3f);
+		m_sp0256->ald_w(data & 0x3f);
 	}
 }
 
@@ -793,15 +793,15 @@ MACHINE_CONFIG_START(ace_state::ace)
 
 	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
 
-	MCFG_DEVICE_ADD(I8255_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, ace_state, sby_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ace_state, ald_w))
+	I8255A(config, m_ppi);
+	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));
+	m_ppi->out_pb_callback().set(FUNC(ace_state::ald_w));
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(6'500'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, ace_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, ace_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	Z80PIO(config, m_z80pio, XTAL(6'500'000)/2);
+	m_z80pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80pio->in_pa_callback().set(FUNC(ace_state::pio_pa_r));
+	m_z80pio->out_pa_callback().set(FUNC(ace_state::pio_pa_w));
+	m_z80pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)

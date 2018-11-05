@@ -110,8 +110,7 @@ void meritum_state::io_map(address_map &map)
 	map(0xf0, 0xf3).rw("flopppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf4, 0xf7).rw("mainppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf8, 0xfb).rw("mainpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xfc, 0xfc).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfd, 0xfd).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc, 0xfd).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// map(0xfe, 0xfe) audio interface
 	map(0xff, 0xff).rw(FUNC(meritum_state::port_ff_r), FUNC(meritum_state::port_ff_w));
 }
@@ -400,8 +399,8 @@ MACHINE_CONFIG_START(meritum_state::meritum)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("usart", I8251, 10_MHz_XTAL / 4) // same as CPU clock
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	i8251_device &usart(I8251(config, "usart", 10_MHz_XTAL / 4)); // same as CPU clock
+	usart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))

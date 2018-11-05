@@ -647,20 +647,20 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
 	MCFG_DEVICE_IO_MAP(lordgun_soundio_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DIP"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, lordgun_eeprom_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake2_w))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("DIP");
+	ppi0.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi0.out_pb_callback().set(FUNC(lordgun_state::lordgun_eeprom_w));
+	ppi0.in_pc_callback().set_ioport("SERVICE");
+	ppi0.out_pc_callback().set(FUNC(lordgun_state::fake2_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("START1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("START2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("START1");
+	ppi1.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pb_callback().set_ioport("START2");
+	ppi1.out_pb_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pc_callback().set_ioport("COIN");
+	ppi1.out_pc_callback().set(FUNC(lordgun_state::fake_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -699,20 +699,20 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
 	MCFG_DEVICE_IO_MAP(aliencha_soundio_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, lordgun_state, aliencha_dip_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake2_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, aliencha_eeprom_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, aliencha_dip_w))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set(FUNC(lordgun_state::aliencha_dip_r));
+	ppi0.out_pa_callback().set(FUNC(lordgun_state::fake2_w));
+	ppi0.out_pb_callback().set(FUNC(lordgun_state::aliencha_eeprom_w));
+	ppi0.in_pc_callback().set_ioport("SERVICE");
+	ppi0.out_pc_callback().set(FUNC(lordgun_state::aliencha_dip_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("P1");
+	ppi1.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pb_callback().set_ioport("P2");
+	ppi1.out_pb_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pc_callback().set_ioport("COIN");
+	ppi1.out_pc_callback().set(FUNC(lordgun_state::fake_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

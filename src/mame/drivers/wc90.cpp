@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	/* NMIs are triggered by the main CPU */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

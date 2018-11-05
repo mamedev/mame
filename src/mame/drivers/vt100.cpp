@@ -190,8 +190,7 @@ void vt100_state::vt100_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// 0x00, 0x01 PUSART  (Intel 8251)
-	map(0x00, 0x00).rw(m_pusart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_pusart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_pusart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// 0x02 Baud rate generator
 	map(0x02, 0x02).w("dbrg", FUNC(com8116_device::stt_str_w));
 	// 0x22 Modem buffer
@@ -353,7 +352,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	dbrg.fr_handler().set(m_pusart, FUNC(i8251_device::write_rxc));
 	dbrg.ft_handler().set(m_pusart, FUNC(i8251_device::write_txc));
 
-	ER1400(config, m_nvr, 0);
+	ER1400(config, m_nvr);
 
 	VT100_KEYBOARD(config, m_keyboard, 0).signal_out_callback().set(m_kbduart, FUNC(ay31015_device::write_si));
 

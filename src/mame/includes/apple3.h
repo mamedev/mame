@@ -92,10 +92,9 @@ public:
 	DECLARE_READ8_MEMBER(apple3_c0xx_r);
 	DECLARE_WRITE8_MEMBER(apple3_c0xx_w);
 	void init_apple3();
-	DECLARE_MACHINE_RESET(apple3);
-	DECLARE_VIDEO_START(apple3);
-	uint32_t screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(apple3_interrupt);
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanstart_cb);
 	TIMER_CALLBACK_MEMBER(scanend_cb);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_a);
@@ -119,7 +118,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	void apple3_postload();
+	virtual void device_post_load() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
 	void pdl_handler(int offset);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

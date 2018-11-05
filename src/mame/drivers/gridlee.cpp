@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(gridlee_state::gridlee)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	LS259(config, m_latch); // type can only be guessed
 	m_latch->q_out_cb<0>().set_output("led0");

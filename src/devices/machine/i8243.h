@@ -13,36 +13,15 @@
 
 #pragma once
 
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_I8243_ADD(_tag, _read, _write) \
-	MCFG_DEVICE_ADD(_tag, I8243, 0) \
-	MCFG_I8243_READHANDLER(_read) \
-	MCFG_I8243_WRITEHANDLER(_write)
-#define MCFG_I8243_READHANDLER(_devcb) \
-	downcast<i8243_device &>(*device).set_read_handler(DEVCB_##_devcb);
-#define MCFG_I8243_WRITEHANDLER(_devcb) \
-	downcast<i8243_device &>(*device).set_write_handler(DEVCB_##_devcb);
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-
-// ======================> i8243_device
-
 class i8243_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_read_handler(Object &&cb) { return m_readhandler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_handler(Object &&cb) { return m_writehandler.set_callback(std::forward<Object>(cb)); }
+	auto read_handler() { return m_readhandler.bind(); }
+	auto write_handler() { return m_writehandler.bind(); }
 
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_WRITE8_MEMBER(p2_w);

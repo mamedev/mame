@@ -4,6 +4,7 @@
 #ifndef MAME_INCLUDES_POLYPLAY_H
 #define MAME_INCLUDES_POLYPLAY_H
 
+#include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -69,7 +70,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_characterram;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<z80pio_device> m_z80pio;
 	optional_device<z80sio_device> m_z80sio;

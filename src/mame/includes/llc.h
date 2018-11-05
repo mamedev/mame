@@ -69,7 +69,7 @@ private:
 	uint8_t m_term_data;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_shared_ptr<uint8_t> m_p_videoram;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	optional_device<ram_device> m_ram;
 	required_region_ptr<u8> m_p_chargen;
 	output_finder<8> m_digits;

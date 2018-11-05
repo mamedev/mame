@@ -376,7 +376,7 @@ void midway_ssio_device::ssio_map(address_map &map)
 //  default ports map
 //-------------------------------------------------
 
-void midway_ssio_device::ssio_input_ports(address_map &map, const char *ssio) const
+void midway_ssio_device::ssio_input_ports(address_map &map, const char *ssio)
 {
 	map(0x00, 0x04).mirror(0x18).r(ssio, FUNC(midway_ssio_device::ioport_read));
 	map(0x07, 0x07).mirror(0x18).r(ssio, FUNC(midway_ssio_device::read));
@@ -879,7 +879,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// write strobe -- pass the current command to the TMS5200
 	if (((data ^ m_tms_strobes) & 0x02) && !(data & 0x02))
 	{
-		m_tms5200->data_w(space, offset, m_tms_command);
+		m_tms5200->data_w(m_tms_command);
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);
@@ -889,7 +889,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// read strobe -- read the current status from the TMS5200
 	else if (((data ^ m_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		m_pia1->write_porta(m_tms5200->status_r(space, offset));
+		m_pia1->write_porta(m_tms5200->status_r());
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);

@@ -150,14 +150,14 @@ void bbc_state::bbca_mem(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank4").w(FUNC(bbc_state::bbc_memoryb4_w));                                            //    8000-bfff                 Paged ROM
 	map(0xc000, 0xfbff).bankr("bank7");                                                                               //    c000-fbff                 OS ROM
 	map(0xfc00, 0xfdff).noprw();                                                                                      //    fc00-fdff                 FRED & JIM Pages
-																													  //    fe00-feff                 SHEILA Address Page
+	map(0xfe00, 0xfeff).r(FUNC(bbc_state::bbc_fe_r));                                                                 //    fe00-feff                 SHEILA Address Page
 	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     //    fe00-fe07  6845 CRTC      Video controller
 	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
 	map(0xfe08, 0xfe09).mirror(0x06).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));           //    fe08-fe0f  6850 ACIA      Serial controller
 	map(0xfe10, 0xfe17).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                              //    fe10-fe17  Serial ULA     Serial system chip
 	map(0xfe18, 0xfe1f).noprw();                                                                                      //    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No.
 	map(0xfe20, 0xfe2f).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                               // R: fe20-fe2f  INTON          # ECONET Interrupt On
-																													  // W: fe20-fe2f  Video ULA      Video system chip
+																																																										// W: fe20-fe2f  Video ULA      Video system chip
 	map(0xfe30, 0xfe3f).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::page_selecta_w));                               // W: fe30-fe3f  74LS161        Paged ROM selector
 	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     //    fe40-fe5f  6522 VIA       SYSTEM VIA
 	map(0xfe60, 0xfe7f).noprw();                                                                                      //    fe60-fe7f  6522 VIA       # USER VIA
@@ -173,7 +173,8 @@ void bbc_state::bbc_base(address_map &map)
 {
 	map.unmap_value_high();
 	map(0xc000, 0xfbff).bankr("bank7");                                                                               //    c000-fbff                 OS ROM
-	map(0xfc00, 0xfdff).noprw();                                                                                      //    fc00-fdff                 FRED & JIM Pages
+	map(0xfc00, 0xfcff).rw(m_1mhzbus, FUNC(bbc_1mhzbus_slot_device::fred_r), FUNC(bbc_1mhzbus_slot_device::fred_w));  //    fc00-fcff                 FRED Address Page
+	map(0xfd00, 0xfdff).rw(m_1mhzbus, FUNC(bbc_1mhzbus_slot_device::jim_r), FUNC(bbc_1mhzbus_slot_device::jim_w));    //    fd00-fdff                 JIM Address Page
 	map(0xfe00, 0xfeff).r(FUNC(bbc_state::bbc_fe_r));                                                                 //    fe00-feff                 SHEILA Address Page
 	map(0xfe00, 0xfe00).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::status_r), FUNC(hd6845_device::address_w));     //    fe00-fe07  6845 CRTC      Video controller
 	map(0xfe01, 0xfe01).mirror(0x06).rw(m_hd6845, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
@@ -181,10 +182,10 @@ void bbc_state::bbc_base(address_map &map)
 	map(0xfe10, 0xfe17).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_SerialULA_w));                              //    fe10-fe17  Serial ULA     Serial system chip
 	map(0xfe18, 0xfe1f).portr("STATID");                                                                              //    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.
 	map(0xfe20, 0xfe2f).rw(FUNC(bbc_state::bbc_fe_r), FUNC(bbc_state::bbc_videoULA_w));                               // R: fe20-fe2f  INTON          ECONET Interrupt On
-																													  // W: fe20-fe2f  Video ULA      Video system chip
+																																																										// W: fe20-fe2f  Video ULA      Video system chip
 	map(0xfe40, 0xfe5f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));                     //    fe40-fe5f  6522 VIA       SYSTEM VIA
 	map(0xfe60, 0xfe7f).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));                     //    fe60-fe7f  6522 VIA       USER VIA
-																													  //    fe80-fe9f  FDC            Floppy disc controller
+																																																										//    fe80-fe9f  FDC            Floppy disc controller
 	map(0xfea0, 0xfebf).r(FUNC(bbc_state::bbc_fe_r));                                                                 //    fea0-febf  68B54 ADLC     ECONET controller
 	map(0xfec0, 0xfedf).rw(m_upd7002, FUNC(upd7002_device::read), FUNC(upd7002_device::write));                       //    fec0-fedf  uPD7002        Analogue to digital converter
 	map(0xfee0, 0xfeff).rw(m_tube, FUNC(bbc_tube_slot_device::host_r), FUNC(bbc_tube_slot_device::host_w));           //    fee0-feff  Tube ULA       Tube system interface
@@ -211,6 +212,7 @@ void bbc_state::bbcb_nofdc_mem(address_map &map)
 	map(0x4000, 0x7fff).bankrw("bank3");                                                                              //    4000-7fff                 Regular RAM
 	map(0x8000, 0xbfff).bankr("bank4").w(FUNC(bbc_state::bbc_memoryb4_w));                                            //    8000-bfff                 Paged ROM/RAM
 	map(0xfe30, 0xfe3f).w(FUNC(bbc_state::page_selectb_w));                                                           // W: fe30-fe3f  84LS161        Paged ROM selector
+	map(0xfe80, 0xfe9f).rw(m_fdc, FUNC(bbc_fdc_slot_device::read), FUNC(bbc_fdc_slot_device::write));                 //    fe84-fe9f  8271 FDC       Floppy disc controller
 }
 
 
@@ -796,30 +798,21 @@ WRITE_LINE_MEMBER(bbc_state::adlc_irq_w)
 }
 
 
-WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
-{
-	m_adlc->rxc_w(state);
-	m_adlc->txc_w(state);
-}
-
 // 4 x EPROM sockets (16K) in BBC-A, these should grow to 16 for BBC-B and later...
-MACHINE_CONFIG_START(bbc_state::bbc_eprom_sockets)
-	MCFG_GENERIC_SOCKET_ADD("exp_rom1", generic_linear_slot, "bbc_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(bbc_state, exp1_load)
+void bbc_state::bbc_eprom_sockets(machine_config &config)
+{
+	GENERIC_SOCKET(config, m_exp1, generic_linear_slot, "bbc_rom", "bin,rom");
+	m_exp1->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_exp1_load, this));
 
-	MCFG_GENERIC_SOCKET_ADD("exp_rom2", generic_linear_slot, "bbc_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(bbc_state, exp2_load)
+	GENERIC_SOCKET(config, m_exp2, generic_linear_slot, "bbc_rom", "bin,rom");
+	m_exp2->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_exp2_load, this));
 
-	MCFG_GENERIC_SOCKET_ADD("exp_rom3", generic_linear_slot, "bbc_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(bbc_state, exp3_load)
+	GENERIC_SOCKET(config, m_exp3, generic_linear_slot, "bbc_rom", "bin,rom");
+	m_exp3->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_exp3_load, this));
 
-	MCFG_GENERIC_SOCKET_ADD("exp_rom4", generic_linear_slot, "bbc_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(bbc_state, exp4_load)
-MACHINE_CONFIG_END
+	GENERIC_SOCKET(config, m_exp4, generic_linear_slot, "bbc_rom", "bin,rom");
+	m_exp4->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_exp4_load, this));
+}
 
 
 /***************************************************************************
@@ -831,39 +824,39 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bbc_state::bbca)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 16_MHz_XTAL/8)         /* 2.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bbca_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbca_mem);
+	m_maincpu->set_periodic_int(FUNC(bbc_state::bbcb_keyscan), attotime::from_hz(1000)); /* scan keyboard */
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K").set_default_value(0);
+	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K").set_default_value(0x00);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbca)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbca)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256)
-	MCFG_SCREEN_UPDATE_DEVICE("hd6845", hd6845_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
+	m_screen->set_screen_update("hd6845", FUNC(hd6845_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
+	palette_device &palette(PALETTE(config, "palette", 16));
+	palette.set_init(palette_init_delegate(FUNC(bbc_state::palette_init_bbc), this));
 
-	MCFG_DEVICE_ADD("saa5050", SAA5050, 12_MHz_XTAL/2)
-	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
+	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
+	m_trom->set_screen_size(40, 25, 40);
 
 	/* crtc */
-	MCFG_MC6845_ADD("hd6845", HD6845, "screen", 16_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(12)
-	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, bbc_state, bbc_de_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, bbc_state, bbc_hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, bbc_state, bbc_vsync_changed))
+	HD6845(config, m_hd6845, 16_MHz_XTAL / 8);
+	m_hd6845->set_screen("screen");
+	m_hd6845->set_show_border_area(false);
+	m_hd6845->set_char_width(12);
+	m_hd6845->set_update_row_callback(FUNC(bbc_state::crtc_update_row), this);
+	m_hd6845->out_de_callback().set(FUNC(bbc_state::bbc_de_changed));
+	m_hd6845->out_hsync_callback().set(FUNC(bbc_state::bbc_hsync_changed));
+	m_hd6845->out_vsync_callback().set(FUNC(bbc_state::bbc_vsync_changed));
 
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbc)
 
@@ -871,23 +864,23 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn76489", SN76489, 16_MHz_XTAL/4) /* 4 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, m_sn, 16_MHz_XTAL / 4);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* cassette relay */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(bbc_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(bbc_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("bbc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(bbc_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
+	m_cassette->set_interface("bbc_cass");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_ls_a", "bbca_cass")
+	SOFTWARE_LIST(config, "cass_ls_a").set_original("bbca_cass");
 
 	/* acia */
 	ACIA6850(config, m_acia, 0);
@@ -895,13 +888,13 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	m_acia->rts_handler().set(FUNC(bbc_state::bbc_rts_w));
 	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, bbc_state, write_rxd_serial))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, bbc_state, write_dcd_serial))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, bbc_state, write_cts_serial))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(bbc_state::write_rxd_serial));
+	m_rs232->dcd_handler().set(FUNC(bbc_state::write_dcd_serial));
+	m_rs232->cts_handler().set(FUNC(bbc_state::write_cts_serial));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 16_MHz_XTAL / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bbc_state, write_acia_clock))
+	CLOCK(config, m_acia_clock, 16_MHz_XTAL / 13);
+	m_acia_clock->signal_handler().set(FUNC(bbc_state::write_acia_clock));
 
 	/* system via */
 	VIA6522(config, m_via6522_0, 16_MHz_XTAL / 16);
@@ -919,20 +912,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bbc_state::bbcb)
 	bbca(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bbcb_nofdc_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcb_nofdc_mem);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcb)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcb)
 
 	/* internal ram */
-	m_ram->set_default_size("32K").set_default_value(0);
+	m_ram->set_default_size("32K").set_default_value(0x00);
 
 	/* speech hardware */
-	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
-	MCFG_DEVICE_ADD("tms5220", TMS5220, 640000)
-	MCFG_TMS52XX_SPEECHROM("vsm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEECHROM(config, "vsm", 0).set_reverse_bit_order(true);
+	TMS5220(config, m_tms, 640000);
+	m_tms->set_speechrom_tag("vsm");
+	m_tms->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* user via */
 	VIA6522(config, m_via6522_1, 16_MHz_XTAL / 16);
@@ -950,126 +942,123 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
 	centronics.ack_handler().set("via6522_1", FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(latch);
 
 	/* fdc */
-	MCFG_BBC_FDC_SLOT_ADD("fdc", bbc_fdc_devices, "acorn8271", false)
-	MCFG_BBC_FDC_SLOT_INTRQ_HANDLER(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_BBC_FDC_SLOT_DRQ_HANDLER(WRITELINE(*this, bbc_state, fdc_drq_w))
+	BBC_FDC_SLOT(config, m_fdc, bbc_fdc_devices, "acorn8271");
+	m_fdc->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
 	/* econet */
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set(ECONET_TAG, FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbc_state::adlc_irq_w));
-	MCFG_ECONET_ADD()
-	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))
-	MCFG_ECONET_DATA_CALLBACK(WRITELINE("mc6854", mc6854_device, set_rx))
-	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
+
+	econet_device &econet(ECONET(config, "econet", 0));
+	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
+	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
+	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
+
+	econet_slot_device &econet_slot(ECONET_SLOT(config, "econet254", 0));
+	econet_devices(econet_slot);
+	econet_slot.set_slot(254);
 
 	/* analogue port */
-	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, nullptr)
+	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
+	m_analog->lpstb_handler().set(FUNC(bbc_state::lpstb_w));
 
 	/* 1mhz bus port */
-	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
-	MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<3>))
-	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(WRITELINE(*this, bbc_state, bus_nmi_w))
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbc_1mhzbus_devices, nullptr);
+	m_1mhzbus->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
+	m_1mhzbus->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 
 	/* tube port */
-	MCFG_BBC_TUBE_SLOT_ADD("tube", bbc_extube_devices, nullptr)
-	MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<4>))
+	BBC_TUBE_SLOT(config, m_tube, bbc_extube_devices, nullptr);
+	m_tube->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<4>));
 
 	/* user port */
-	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
-	MCFG_BBC_USERPORT_CB1_HANDLER(WRITELINE("via6522_1", via6522_device, write_cb1))
-	MCFG_BBC_USERPORT_CB2_HANDLER(WRITELINE("via6522_1", via6522_device, write_cb2))
+	BBC_USERPORT_SLOT(config, m_userport, bbc_userport_devices, nullptr);
+	m_userport->cb1_handler().set(m_via6522_1, FUNC(via6522_device::write_cb1));
+	m_userport->cb2_handler().set(m_via6522_1, FUNC(via6522_device::write_cb2));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_ls_b",      "bbcb_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_b",      "bbcb_flop")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_orig", "bbcb_flop_orig")
+	SOFTWARE_LIST(config, "cass_ls_b").set_original("bbcb_cass");
+	SOFTWARE_LIST(config, "flop_ls_b").set_original("bbcb_flop");
+	SOFTWARE_LIST(config, "flop_ls_b_orig").set_original("bbcb_flop_orig");
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(bbc_state::bbcb_de)
+void bbc_state::bbcb_de(machine_config &config)
+{
 	bbcb(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bbcb_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcb_mem);
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("fdc")
-	I8271(config, m_i8271, 0);
+	config.device_remove("fdc");
+	I8271(config, m_i8271, 16_MHz_XTAL / 8);
 	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
 	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
 	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
-	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+
+	FLOPPY_CONNECTOR(config, "i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc).enable_sound(true);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_de", "bbcb_cass_de")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_ls_b_de").set_original("bbcb_cass_de");
+}
 
 
-MACHINE_CONFIG_START(bbc_state::bbcb_us)
+void bbc_state::bbcb_us(machine_config &config)
+{
 	bbcb(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bbcb_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcb_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 262, 0, 200);
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("fdc")
-	I8271(config, m_i8271, 0);
+	config.device_remove("fdc");
+	I8271(config, m_i8271, 16_MHz_XTAL / 8);
 	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
 	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
 	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc).enable_sound(true);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_us", "bbcb_flop_us")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_ls_b_us").set_original("bbcb_cass_us");
+}
 
 
 MACHINE_CONFIG_START(bbc_state::bbcbp)
 	bbcb(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")  /* M6512 */
-	MCFG_DEVICE_PROGRAM_MAP(bbcbp_mem)
-	MCFG_DEVICE_OPCODES_MAP(bbcbp_fetch)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcbp_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &bbc_state::bbcbp_fetch);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcbp)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcbp)
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
+	config.device_remove("fdc");
+	WD1770(config, m_wd1770, 16_MHz_XTAL / 2);
+	m_wd1770->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_wd1770->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "wd1770:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd1770:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc).enable_sound(true);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(bbc_state::bbcbp128)
 	bbcbp(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")  /* M6512 */
-	MCFG_DEVICE_PROGRAM_MAP(bbcbp128_mem)
-	MCFG_DEVICE_OPCODES_MAP(bbcbp_fetch)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcbp128_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &bbc_state::bbcbp_fetch);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcbp)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcbp)
@@ -1092,42 +1081,41 @@ MACHINE_CONFIG_START(torch_state::torchf)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, torch)
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("fdc")
-	I8271(config, m_i8271, 0);
+	config.device_remove("fdc");
+	I8271(config, m_i8271, 16_MHz_XTAL / 8);
 	m_i8271->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
 	m_i8271->hdl_wr_callback().set(FUNC(bbc_state::motor_w));
 	m_i8271->opt_wr_callback().set(FUNC(bbc_state::side_w));
 
-	MCFG_FLOPPY_DRIVE_ADD_FIXED("i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD_FIXED("i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "i8271:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "i8271:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc).enable_sound(true);
 
 	/* Add Torch Z80 Communicator co-processor */
-	MCFG_DEVICE_MODIFY("tube")
-	MCFG_SLOT_DEFAULT_OPTION("zep100")
-	MCFG_SLOT_FIXED(true)
+	m_tube->set_default_option("zep100");
+	m_tube->set_fixed(true);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(torch_state::torchh10)
+void torch_state::torchh10(machine_config &config)
+{
 	torchf(config);
 	/* fdc */
-	MCFG_DEVICE_REMOVE("i8271:1")
+	config.device_remove("i8271:1");
 
 	/* Add 10MB HDD */
 
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(torch_state::torchh21)
+void torch_state::torchh21(machine_config &config)
+{
 	torchf(config);
 	/* fdc */
-	MCFG_DEVICE_REMOVE("i8271:1")
+	config.device_remove("i8271:1");
 
 	/* Add 21MB HDD */
 
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -1137,94 +1125,74 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_START(bbc_state::abc110)
+void bbc_state::abc110(machine_config &config)
+{
 	bbcbp(config);
 	/* fdc */
-	MCFG_DEVICE_REMOVE("wd1770:1")
+	config.device_remove("wd1770:1");
 
 	/* Acorn Z80 co-processor */
-	MCFG_DEVICE_MODIFY("tube")
-	MCFG_SLOT_DEFAULT_OPTION("z80")
-	MCFG_SLOT_FIXED(true)
+	m_tube->set_default_option("z80");
+	m_tube->set_fixed(true);
 
 	/* Add ADAPTEC ACB-4000 Winchester Disc Controller */
-	//scsi_port_device &scsibus(SCSI_PORT(config, SCSIBUS_TAG));
-	//scsibus.set_data_input_buffer("scsi_data_in");
-	//scsibus.msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit0));
-	//scsibus.bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::scsi_bsy_w))
-	//scsibus.req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::scsi_req_w))
-	//scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit6));
-	//scsibus.cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
-	//scsibus.set_slot_device(1, "harddisk", ACB4070, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-
-	//output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
-	//scsibus.set_output_latch(scsiout);
-	//scsiout.bit_handler<0>().set("scsi", FUNC(scsi_port_device::write_data0));
-	//scsiout.bit_handler<1>().set("scsi", FUNC(scsi_port_device::write_data1));
-	//scsiout.bit_handler<2>().set("scsi", FUNC(scsi_port_device::write_data2));
-	//scsiout.bit_handler<3>().set("scsi", FUNC(scsi_port_device::write_data3));
-	//scsiout.bit_handler<4>().set("scsi", FUNC(scsi_port_device::write_data4));
-	//scsiout.bit_handler<5>().set("scsi", FUNC(scsi_port_device::write_data5));
-	//scsiout.bit_handler<6>().set("scsi", FUNC(scsi_port_device::write_data6));
-	//scsiout.bit_handler<7>().set("scsi", FUNC(scsi_port_device::write_data7));
-
-	//INPUT_BUFFER(config, "scsi_ctrl_in");
-	//INPUT_BUFFER(config, "scsi_data_in");
 
 	/* Add 10MB ST-412 Winchester */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-MACHINE_CONFIG_END
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
+}
 
 
-MACHINE_CONFIG_START(bbc_state::acw443)
+void bbc_state::acw443(machine_config &config)
+{
 	bbcbp(config);
 	/* fdc */
-	MCFG_DEVICE_REMOVE("wd1770:1")
+	config.device_remove("wd1770:1");
 
 	/* Add 32016 co-processor */
-	//MCFG_DEVICE_MODIFY("tube")
-	//MCFG_SLOT_DEFAULT_OPTION("32016")
-	//MCFG_SLOT_FIXED(true)
+	//m_tube->set_default_option("32016");
+	//m_tube->set_fixed(true);
 
 	/* Add ADAPTEC ACB-4000 Winchester Disc Controller */
+	//m_1mhzbus->set_default_option("awdd");
+	//m_1mhzbus->set_fixed(true);
 
 	/* Add 10MB ST-412 Winchester ABC210 */
 
 	/* Add 20MB ST-412 Winchester Cambridge */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_flop_32016")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_ls_32016").set_original("bbc_flop_32016");
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
+}
 
 
-MACHINE_CONFIG_START(bbc_state::abc310)
+void bbc_state::abc310(machine_config &config)
+{
 	bbcbp(config);
 	/* fdc */
-	MCFG_DEVICE_REMOVE("wd1770:1")
+	config.device_remove("wd1770:1");
 
 	/* Acorn 80286 co-processor */
-	MCFG_DEVICE_MODIFY("tube")
-	MCFG_SLOT_DEFAULT_OPTION("80286")
-	MCFG_SLOT_FIXED(true)
+	m_tube->set_default_option("80286");
+	m_tube->set_fixed(true);
 
 	/* Add ADAPTEC ACB-4000 Winchester Disc Controller */
 
 	/* Add 10MB ST-412 Winchester */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-MACHINE_CONFIG_END
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_b");
+}
 
 
 /***************************************************************************
@@ -1234,35 +1202,35 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_START(bbc_state::reutapm)
+void bbc_state::reutapm(machine_config &config)
+{
 	bbcbp(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")  /* M6512 */
-	MCFG_DEVICE_PROGRAM_MAP(reutapm_mem)
-	MCFG_DEVICE_OPCODES_MAP(bbcbp_fetch)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::reutapm_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &bbc_state::bbcbp_fetch);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("mono")
-	MCFG_DEVICE_REMOVE("sn76489")
-	MCFG_DEVICE_REMOVE("samples")
-	MCFG_DEVICE_REMOVE("vsm")
-	MCFG_DEVICE_REMOVE("tms5220")
+	config.device_remove("mono");
+	config.device_remove("sn76489");
+	config.device_remove("samples");
+	config.device_remove("vsm");
+	config.device_remove("tms5220");
 
 	/* cassette */
-	MCFG_DEVICE_REMOVE( "cassette" )
+	config.device_remove("cassette");
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("wd1770")
+	config.device_remove("wd1770");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
 
 	/* expansion ports */
-	MCFG_DEVICE_REMOVE("analogue")
-MACHINE_CONFIG_END
+	config.device_remove("analogue");
+}
 
 
 /***************************************************************************
@@ -1272,25 +1240,27 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-MACHINE_CONFIG_START(bbc_state::econx25)
+void bbc_state::econx25(machine_config &config)
+{
 	bbcbp(config);
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("vsm")
-	MCFG_DEVICE_REMOVE("tms5220")
+	config.device_remove("vsm");
+	config.device_remove("tms5220");
 
 	/* fdc */
-	//MCFG_DEVICE_REMOVE("wd1770")
+	//config.device_remove("wd1770")
 
 	/* Add Econet X25 Gateway co-processor */
-	//MCFG_DEVICE_MODIFY("tube")
-	//MCFG_DEVICE_SLOT_INTERFACE(bbc_x25tube_devices, "x25", true)
+	//m_tube->option_list(bbc_x25tube_devices);
+	//m_tube->set_default_option("x25");
+	//m_tube->set_fixed(true);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-MACHINE_CONFIG_END
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
+}
 
 
 /***************************************************************************
@@ -1302,17 +1272,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bbc_state::bbcm)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65SC02, 16_MHz_XTAL/8)        /* 2.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bbcm_mem)
-	MCFG_DEVICE_OPCODES_MAP(bbcm_fetch)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M65SC02(config, m_maincpu, 16_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbcm_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &bbc_state::bbcm_fetch);
+	m_maincpu->set_periodic_int(FUNC(bbc_state::bbcb_keyscan), attotime::from_hz(1000)); /* scan keyboard */
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0x00);
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)
@@ -1320,67 +1289,69 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	config.set_default_layout(layout_bbcm);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256)
-	MCFG_SCREEN_UPDATE_DEVICE("hd6845", hd6845_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
+	m_screen->set_screen_update("hd6845", FUNC(hd6845_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(bbc_state, bbc)
+	palette_device &palette(PALETTE(config, "palette", 16));
+	palette.set_init(palette_init_delegate(FUNC(bbc_state::palette_init_bbc), this));
 
-	MCFG_DEVICE_ADD("saa5050", SAA5050, 12_MHz_XTAL / 2)
-	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
+	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
+	m_trom->set_screen_size(40, 25, 40);
 
 	/* crtc */
-	MCFG_MC6845_ADD("hd6845", HD6845, "screen", 16_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(12)
-	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, bbc_state, bbc_de_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, bbc_state, bbc_hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, bbc_state, bbc_vsync_changed))
+	HD6845(config, m_hd6845, 16_MHz_XTAL / 8);
+	m_hd6845->set_screen("screen");
+	m_hd6845->set_show_border_area(false);
+	m_hd6845->set_char_width(12);
+	m_hd6845->set_update_row_callback(FUNC(bbc_state::crtc_update_row), this);
+	m_hd6845->out_de_callback().set(FUNC(bbc_state::bbc_de_changed));
+	m_hd6845->out_hsync_callback().set(FUNC(bbc_state::bbc_hsync_changed));
+	m_hd6845->out_vsync_callback().set(FUNC(bbc_state::bbc_vsync_changed));
 
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn76489", SN76489, 16_MHz_XTAL/4) /* 4 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76489(config, m_sn, 16_MHz_XTAL / 4);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* cassette relay */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(bbc_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(bbc_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* rtc and cmos */
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* printer */
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
 	centronics.ack_handler().set("via6522_1", FUNC(via6522_device::write_ca1)).invert(); // ack seems to be inverted?
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(latch);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("bbc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(bbc_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
+	m_cassette->set_interface("bbc_cass");
 
 	// 2 x cartridge sockets in BBC-Master
-	MCFG_GENERIC_CARTSLOT_ADD("exp_rom1", generic_plain_slot, "bbcm_cart")
-	MCFG_GENERIC_LOAD(bbc_state, bbcm_exp1_load)
+	GENERIC_CARTSLOT(config, m_exp1, generic_linear_slot, "bbcm_cart", "bin,rom");
+	m_exp1->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_bbcm_cart1_load, this));
 
-	MCFG_GENERIC_CARTSLOT_ADD("exp_rom2", generic_plain_slot, "bbcm_cart")
-	MCFG_GENERIC_LOAD(bbc_state, bbcm_exp2_load)
+	GENERIC_CARTSLOT(config, m_exp2, generic_linear_slot, "bbcm_cart", "bin,rom");
+	m_exp2->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_bbcm_cart2_load, this));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_ls_m", "bbcm_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_m", "bbcm_flop")
-	MCFG_SOFTWARE_LIST_ADD("cart_ls_m", "bbcm_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a",      "bbca_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b",      "bbcb_cass")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b",      "bbcb_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b_orig", "bbcb_flop_orig")
+	SOFTWARE_LIST(config, "cass_ls_m").set_original("bbcm_cass");
+	SOFTWARE_LIST(config, "flop_ls_m").set_original("bbcm_flop");
+	SOFTWARE_LIST(config, "cart_ls_m").set_original("bbcm_cart");
+	SOFTWARE_LIST(config, "cass_ls_a").set_compatible("bbca_cass");
+	SOFTWARE_LIST(config, "cass_ls_b").set_compatible("bbcb_cass");
+	SOFTWARE_LIST(config, "flop_ls_b").set_compatible("bbcb_flop");
+	SOFTWARE_LIST(config, "flop_ls_b_orig").set_compatible("bbcb_flop_orig");
 
 	/* acia */
 	ACIA6850(config, m_acia, 0);
@@ -1388,13 +1359,13 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	m_acia->rts_handler().set(FUNC(bbc_state::bbc_rts_w));
 	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, bbc_state, write_rxd_serial))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, bbc_state, write_dcd_serial))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, bbc_state, write_cts_serial))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(bbc_state::write_rxd_serial));
+	m_rs232->dcd_handler().set(FUNC(bbc_state::write_dcd_serial));
+	m_rs232->cts_handler().set(FUNC(bbc_state::write_cts_serial));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 16_MHz_XTAL / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bbc_state, write_acia_clock))
+	CLOCK(config, m_acia_clock, 16_MHz_XTAL / 13);
+	m_acia_clock->signal_handler().set(FUNC(bbc_state::write_acia_clock));
 
 	/* adc */
 	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
@@ -1418,156 +1389,160 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	m_via6522_1->irq_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
 
 	/* fdc */
-	MCFG_DEVICE_ADD("wd1770", WD1770, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
+	WD1770(config, m_wd1770, 16_MHz_XTAL / 2);
+	m_wd1770->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_wd1770->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "wd1770:0", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd1770:1", bbc_floppies_525, "525qd", bbc_state::floppy_formats_bbc).enable_sound(true);
 
 	/* econet */
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set(ECONET_TAG, FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbc_state::adlc_irq_w));
-	MCFG_ECONET_ADD()
-	MCFG_ECONET_CLK_CALLBACK(WRITELINE(*this, bbc_state, econet_clk_w))
-	MCFG_ECONET_DATA_CALLBACK(WRITELINE("mc6854", mc6854_device, set_rx))
-	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
+
+	econet_device &econet(ECONET(config, "econet", 0));
+	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
+	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
+	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
+
+	econet_slot_device &econet_slot(ECONET_SLOT(config, "econet254", 0));
+	econet_devices(econet_slot);
+	econet_slot.set_slot(254);
 
 	/* analogue port */
-	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, nullptr)
+	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
 
 	/* 1mhz bus port */
-	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
-	MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<3>))
-	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(WRITELINE(*this, bbc_state, bus_nmi_w))
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbc_1mhzbus_devices, nullptr);
+	m_1mhzbus->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
+	m_1mhzbus->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 
 	/* tube ports */
-	MCFG_BBC_TUBE_SLOT_ADD("intube", bbc_intube_devices, nullptr)
-	MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<4>))
-	MCFG_BBC_TUBE_SLOT_ADD("extube", bbc_extube_devices, nullptr)
-	MCFG_BBC_TUBE_SLOT_IRQ_HANDLER(WRITELINE("irqs", input_merger_device, in_w<5>))
+	BBC_TUBE_SLOT(config, m_intube, bbc_intube_devices, nullptr);
+	m_intube->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<4>));
+	BBC_TUBE_SLOT(config, m_extube, bbc_extube_devices, nullptr);
+	m_extube->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<5>));
 
 	/* user port */
-	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
-	MCFG_BBC_USERPORT_CB1_HANDLER(WRITELINE("via6522_1", via6522_device, write_cb1))
-	MCFG_BBC_USERPORT_CB2_HANDLER(WRITELINE("via6522_1", via6522_device, write_cb2))
+	BBC_USERPORT_SLOT(config, m_userport, bbc_userport_devices, nullptr);
+	m_userport->cb1_handler().set(m_via6522_1, FUNC(via6522_device::write_cb1));
+	m_userport->cb2_handler().set(m_via6522_1, FUNC(via6522_device::write_cb2));
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(bbc_state::bbcmt)
+void bbc_state::bbcmt(machine_config &config)
+{
 	bbcm(config);
 	/* Acorn 65C102 co-processor */
-	MCFG_DEVICE_MODIFY("intube")
-	MCFG_SLOT_DEFAULT_OPTION("65c102")
-	MCFG_SLOT_FIXED(true)
-MACHINE_CONFIG_END
+	m_intube->set_default_option("65c102");
+	m_intube->set_fixed(true);
+}
 
 
-MACHINE_CONFIG_START(bbc_state::bbcmaiv)
+void bbc_state::bbcmaiv(machine_config &config)
+{
 	bbcm(config);
 	/* Acorn 65C102 co-processor */
-	MCFG_DEVICE_MODIFY("intube")
-	MCFG_SLOT_DEFAULT_OPTION("65c102")
-	MCFG_SLOT_FIXED(true)
+	m_intube->set_default_option("65c102");
+	m_intube->set_fixed(true);
 
 	/* Add Philips VP415 Laserdisc player */
 
 	/* Acorn Tracker Ball */
-	MCFG_DEVICE_MODIFY("userport")
-	MCFG_SLOT_DEFAULT_OPTION("tracker")
-MACHINE_CONFIG_END
+	m_userport->set_default_option("tracker");
+}
 
 
-MACHINE_CONFIG_START(bbc_state::bbcmet)
+void bbc_state::bbcmet(machine_config &config)
+{
 	bbcm(config);
 	/* printer */
-	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_DEVICE_REMOVE("cent_data_out")
+	config.device_remove("centronics");
+	config.device_remove("cent_data_out");
 
 	/* cassette */
-	MCFG_DEVICE_REMOVE("cassette")
+	config.device_remove("cassette");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
+	config.device_remove("cass_ls_m");
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_m");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
 
 	/* acia */
-	MCFG_DEVICE_REMOVE("acia6850")
-	MCFG_DEVICE_REMOVE(RS232_TAG)
-	MCFG_DEVICE_REMOVE("acia_clock")
+	config.device_remove("acia6850");
+	config.device_remove(RS232_TAG);
+	config.device_remove("acia_clock");
 
 	/* devices */
-	MCFG_DEVICE_REMOVE("upd7002")
-	MCFG_DEVICE_REMOVE("via6522_1")
+	config.device_remove("upd7002");
+	config.device_remove("via6522_1");
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("wd1770")
+	config.device_remove("wd1770");
 
-	/* expansion ports */
-	MCFG_DEVICE_REMOVE("analogue")
-	MCFG_DEVICE_REMOVE("extube")
-	MCFG_DEVICE_REMOVE("1mhzbus")
-	MCFG_DEVICE_REMOVE("userport")
-MACHINE_CONFIG_END
+	/* expansion ports (not fitted) */
+	config.device_remove("analogue");
+	config.device_remove("extube");
+	config.device_remove("1mhzbus");
+	config.device_remove("userport");
+}
 
 
-MACHINE_CONFIG_START(bbc_state::bbcm512)
+void bbc_state::bbcm512(machine_config &config)
+{
 	bbcm(config);
 	/* Acorn Intel 80186 co-processor */
-	MCFG_DEVICE_MODIFY("intube")
-	MCFG_SLOT_DEFAULT_OPTION("80186")
-	MCFG_SLOT_FIXED(true)
+	m_intube->set_default_option("80186");
+	m_intube->set_fixed(true);
 
 	/* Acorn Mouse */
-	MCFG_DEVICE_MODIFY("userport")
-	MCFG_SLOT_DEFAULT_OPTION("m512mouse")
-MACHINE_CONFIG_END
+	m_userport->set_default_option("m512mouse");
+}
 
 
-MACHINE_CONFIG_START(bbc_state::bbcmarm)
+void bbc_state::bbcmarm(machine_config &config)
+{
 	bbcm(config);
 	/* Acorn ARM co-processor */
-	MCFG_DEVICE_MODIFY("extube")
-	MCFG_SLOT_DEFAULT_OPTION("arm")
-	MCFG_SLOT_FIXED(true)
-MACHINE_CONFIG_END
+	m_extube->set_default_option("arm");
+	m_extube->set_fixed(true);
+}
 
 
-MACHINE_CONFIG_START(bbc_state::discmon)
+void bbc_state::discmon(machine_config &config)
+{
 	bbcm(config);
 	/* Add coin slot */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-MACHINE_CONFIG_END
+	config.device_remove("cass_ls_m");
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_m");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
+}
 
 
-MACHINE_CONFIG_START(bbc_state::discmate)
+void bbc_state::discmate(machine_config &config)
+{
 	bbcm(config);
 	/* Add Sony CDK-3000PII Auto Disc Loader */
 
 	/* Add interface boards connected to cassette and RS423 */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-MACHINE_CONFIG_END
+	config.device_remove("cass_ls_m");
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_m");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
+}
 
 
 MACHINE_CONFIG_START(bbc_state::cfa3000)
@@ -1581,24 +1556,21 @@ MACHINE_CONFIG_START(bbc_state::cfa3000)
 	MCFG_DEVICE_SLOT_INTERFACE(bbc_floppies_525, nullptr, false)
 
 	/* keyboard */
-	MCFG_DEVICE_MODIFY("userport")
-	MCFG_SLOT_DEFAULT_OPTION("cfa3000kbd")
+	m_userport->set_default_option("cfa3000kbd");
 
 	/* option board */
-	MCFG_DEVICE_MODIFY("1mhzbus")
-	MCFG_SLOT_DEFAULT_OPTION("cfa3000opt")
+	m_1mhzbus->set_default_option("cfa3000opt");
 
 	/* analogue dials/sensors */
-	MCFG_DEVICE_MODIFY("analogue")
-	MCFG_SLOT_DEFAULT_OPTION("cfa3000a")
+	m_analog->set_default_option("cfa3000a");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
+	config.device_remove("cass_ls_m");
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_m");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
 MACHINE_CONFIG_END
 
 
@@ -1612,22 +1584,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bbc_state::bbcmc)
 	bbcm(config);
 	/* cassette */
-	MCFG_DEVICE_REMOVE("cassette")
+	config.device_remove("cassette");
 
 	/* fdc */
-	MCFG_DEVICE_REMOVE("wd1770")
+	config.device_remove("wd1770");
 
-	MCFG_DEVICE_ADD("wd1772", WD1772, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_state, fdc_drq_w))
+	WD1772(config, m_wd1772, 16_MHz_XTAL / 2);
+	m_wd1772->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
+	m_wd1772->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD_FIXED("wd1772:0", bbc_floppies_35, "35dd", bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_35, nullptr, bbc_state::floppy_formats_bbc)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "wd1772:0", bbc_floppies_35, "35dd", bbc_state::floppy_formats_bbc, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "wd1772:1", bbc_floppies_35, nullptr, bbc_state::floppy_formats_bbc).enable_sound(true);
 
 	/* eeprom pcd8572 */
-	//MCFG_DEVICE_REMOVE("rtc")
+	//config.device_remove("rtc");
 
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcmc)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcmc)
@@ -1638,39 +1608,40 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	m_via6522_1->writepb_handler().set("joyport", FUNC(bbc_joyport_slot_device::pb_w));
 
 	/* cartridge sockets */
-	MCFG_DEVICE_REMOVE("exp_rom1")
-	MCFG_DEVICE_REMOVE("exp_rom2")
+	config.device_remove("exp_rom1");
+	config.device_remove("exp_rom2");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
-	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_m")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
-	MCFG_SOFTWARE_LIST_REMOVE("cart_ls_m")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_mc", "bbcmc_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_pro128s", "pro128s_flop")
+	config.device_remove("cass_ls_m");
+	config.device_remove("cass_ls_a");
+	config.device_remove("cass_ls_b");
+	config.device_remove("flop_ls_m");
+	config.device_remove("flop_ls_b");
+	config.device_remove("flop_ls_b_orig");
+	config.device_remove("cart_ls_m");
+	SOFTWARE_LIST(config, "flop_ls_mc").set_original("bbcmc_flop");
+	SOFTWARE_LIST(config, "flop_ls_pro128s").set_compatible("pro128s_flop");
 
 	/* expansion ports */
-	MCFG_BBC_JOYPORT_ADD("joyport", bbc_joyport_devices, "joystick")
-	MCFG_BBC_JOYPORT_CB1_HANDLER(WRITELINE("via6522_1", via6522_device, write_cb1))
-	MCFG_BBC_JOYPORT_CB2_HANDLER(WRITELINE("via6522_1", via6522_device, write_cb2))
+	BBC_JOYPORT_SLOT(config, m_joyport, bbc_joyport_devices, "joystick");
+	m_joyport->cb1_handler().set(m_via6522_1, FUNC(via6522_device::write_cb1));
+	m_joyport->cb2_handler().set(m_via6522_1, FUNC(via6522_device::write_cb2));
 
-	MCFG_DEVICE_REMOVE("analogue")
-	MCFG_DEVICE_REMOVE("intube")
-	MCFG_DEVICE_REMOVE("extube")
+	config.device_remove("analogue");
+	config.device_remove("intube");
+	config.device_remove("extube");
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(bbc_state::pro128s)
+void bbc_state::pro128s(machine_config &config)
+{
 	bbcmc(config);
 	/* software lists */
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_mc")
-	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_pro128s")
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_pro128s", "pro128s_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_mc", "bbcmc_flop")
-MACHINE_CONFIG_END
+	config.device_remove("flop_ls_mc");
+	config.device_remove("flop_ls_pro128s");
+	SOFTWARE_LIST(config, "flop_ls_pro128s").set_original("pro128s_flop");
+	SOFTWARE_LIST(config, "flop_ls_mc").set_compatible("bbcmc_flop");
+}
 
 
 /***************************************************************************

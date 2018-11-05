@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	mainlatch.q_out_cb<3>().set(FUNC(funkybee_state::coin_counter_2_w));
 	mainlatch.q_out_cb<5>().set(FUNC(funkybee_state::gfx_bank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

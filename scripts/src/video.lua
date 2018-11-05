@@ -497,6 +497,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ims_cvc.h,VIDEOS["IMS_CVC"] = true
+--------------------------------------------------
+
+if (VIDEOS["IMS_CVC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ims_cvc.cpp",
+		MAME_DIR .. "src/devices/video/ims_cvc.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/m50458.h,VIDEOS["M50458"] = true
 --------------------------------------------------
 

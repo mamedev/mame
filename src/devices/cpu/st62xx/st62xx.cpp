@@ -30,29 +30,23 @@ st6228_device::st6228_device(const machine_config &mconfig, const char *tag, dev
 	, m_portd_out{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_program(nullptr)
 	, m_data(nullptr)
-	// FIXME: memory banks do not currently work with internal maps.
-	//, m_rambank(*this, "^rambank")
-	//, m_program_rombank(*this, "^program_rombank")
-	//, m_data_rombank(*this, "^data_rombank")
+	, m_rambank(*this, "rambank")
+	, m_program_rombank(*this, "program_rombank")
+	, m_data_rombank(*this, "data_rombank")
 	, m_rom(*this, this->tag())
 {
 }
 
 void st6228_device::st6228_program_map(address_map &map)
 {
-	// FIXME: memory banks do not currently work with internal maps.
-	//map(0x000, 0x7ff).bankr(m_program_rombank);
-	map(0x000, 0x7ff).r(FUNC(st6228_device::program_rombank_r));
+	map(0x000, 0x7ff).bankr(m_program_rombank);
 	map(0x800, 0xfff).rom().region(tag(), 0x800);
 }
 
 void st6228_device::st6228_data_map(address_map &map)
 {
-	// FIXME: memory banks do not currently work with internal maps.
-	//map(0x00, 0x3f).bankrw(m_rambank);
-	//map(0x40, 0x7f).bankr(m_data_rombank);
-	map(0x00, 0x3f).rw(FUNC(st6228_device::rambank_r), FUNC(st6228_device::rambank_w));
-	map(0x40, 0x7f).r(FUNC(st6228_device::data_rombank_r));
+	map(0x00, 0x3f).bankrw(m_rambank);
+	map(0x40, 0x7f).bankr(m_data_rombank);
 	map(0x80, 0xff).rw(FUNC(st6228_device::regs_r), FUNC(st6228_device::regs_w));
 }
 
@@ -102,10 +96,9 @@ void st6228_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	// FIXME: memory banks do not currently work with internal maps.
-	//m_rambank->configure_entries(0, 2, m_ram, 0x40);
-	//m_program_rombank->configure_entries(0, 4, m_rom, 0x800);
-	//m_data_rombank->configure_entries(0, 128, m_rom, 0x40);
+	m_rambank->configure_entries(0, 2, m_ram, 0x40);
+	m_program_rombank->configure_entries(0, 4, m_rom->base(), 0x800);
+	m_data_rombank->configure_entries(0, 128, m_rom->base(), 0x40);
 
 	// TODO: magic numbers
 	for (uint8_t bit = 0; bit < 6; bit++)
@@ -141,10 +134,9 @@ void st6228_device::device_reset()
 	m_mode = MODE_NMI;
 	m_prev_mode = MODE_NORMAL;
 
-	// FIXME: memory banks do not currently work with internal maps.
-	//m_rambank->set_entry(0);
-	//m_program_rombank->set_entry(0);
-	//m_data_rombank->set_entry(0);
+	m_rambank->set_entry(0);
+	m_program_rombank->set_entry(0);
+	m_data_rombank->set_entry(0);
 
 	m_regs[REG_TIMER_COUNT] = 0xff;
 	m_regs[REG_TIMER_PRESCALE] = 0x7f;
@@ -268,26 +260,6 @@ void st6228_device::update_port_mode(uint8_t index, uint8_t changed)
 	}
 }
 
-READ8_MEMBER(st6228_device::program_rombank_r)
-{
-	return m_rom->base()[(m_regs[REG_ROM_BANK_SELECT] & 3) * 0x800 + offset];
-}
-
-READ8_MEMBER(st6228_device::data_rombank_r)
-{
-	return m_rom->base()[(m_regs[REG_DATA_ROM_WINDOW] & 0x7f) * 0x40 + offset];
-}
-
-WRITE8_MEMBER(st6228_device::rambank_w)
-{
-	m_ram[(m_regs[REG_RAM_BANK_SELECT] & 1) * 0x40 + offset] = data;
-}
-
-READ8_MEMBER(st6228_device::rambank_r)
-{
-	return m_ram[(m_regs[REG_RAM_BANK_SELECT] & 1) * 0x40 + offset];
-}
-
 WRITE8_MEMBER(st6228_device::regs_w)
 {
 	offset += 0x80;
@@ -313,17 +285,17 @@ WRITE8_MEMBER(st6228_device::regs_w)
 
 		case REG_DATA_ROM_WINDOW:
 			m_regs[offset] = data;
-			//m_data_rombank->set_entry(data & 0x7f);
+			m_data_rombank->set_entry(data & 0x7f);
 			break;
 
 		case REG_ROM_BANK_SELECT:
 			m_regs[offset] = data;
-			//m_program_rombank->set_entry(data & 3);
+			m_program_rombank->set_entry(data & 3);
 			break;
 
 		case REG_RAM_BANK_SELECT:
 			m_regs[offset] = data;
-			//m_rambank->set_entry(data & 1);
+			m_rambank->set_entry(data & 1);
 			break;
 
 		case REG_PORTA_DATA:

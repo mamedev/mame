@@ -240,9 +240,9 @@ public:
 
 	void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet) override;
 	void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr) override;
-	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) override;
+	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) override;
 	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank) override;
-	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) override;
+	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) override;
 	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &map, u64 unitmask = 0, int cswidth = 0) override;
 
 	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
@@ -1497,14 +1497,14 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 
 		case AMH_PORT:
 			install_readwrite_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
-							(readorwrite == read_or_write::READ) ? data.m_tag : nullptr,
-							(readorwrite == read_or_write::WRITE) ? data.m_tag : nullptr);
+								   (readorwrite == read_or_write::READ) ? entry.m_devbase.subtag(data.m_tag) : "",
+								   (readorwrite == read_or_write::WRITE) ? entry.m_devbase.subtag(data.m_tag) : "");
 			break;
 
 		case AMH_BANK:
 			install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
-							(readorwrite == read_or_write::READ) ? data.m_tag : nullptr,
-							(readorwrite == read_or_write::WRITE) ? data.m_tag : nullptr);
+								 (readorwrite == read_or_write::READ) ? entry.m_devbase.subtag(data.m_tag) : "",
+								 (readorwrite == read_or_write::WRITE) ? entry.m_devbase.subtag(data.m_tag) : "");
 			break;
 
 		case AMH_DEVICE_SUBMAP:
@@ -1885,42 +1885,42 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  handler into this address space
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
 	VPRINTF(("address_space::install_readwrite_port(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-				(rtag != nullptr) ? rtag : "(none)", (wtag != nullptr) ? wtag : "(none)"));
+				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_readwrite_port", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	// read handler
-	if (rtag != nullptr)
+	if (rtag != "")
 	{
 		// find the port
 		ioport_port *port = device().owner()->ioport(rtag);
 		if (port == nullptr)
-			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
+			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag.c_str(), m_name, m_device.tag());
 
 		// map the range and set the ioport
 		auto hand_r = new handler_entry_read_ioport<Width, AddrShift, Endian>(this, port);
 		m_root_read->populate(nstart, nend, nmirror, hand_r);
 	}
 
-	if (wtag != nullptr)
+	if (wtag != "")
 	{
 		// find the port
 		ioport_port *port = device().owner()->ioport(wtag);
 		if (port == nullptr)
-			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
+			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag.c_str(), m_name, m_device.tag());
 
 		// map the range and set the ioport
 		auto hand_w = new handler_entry_write_ioport<Width, AddrShift, Endian>(this, port);
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}
 
-	invalidate_caches(rtag ? wtag ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
+	invalidate_caches(rtag != "" ? wtag != "" ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
 }
 
 
@@ -1929,18 +1929,18 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  mapping to a particular bank
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-				(rtag != nullptr) ? rtag : "(none)", (wtag != nullptr) ? wtag : "(none)"));
+				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_bank_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	// map the read bank
-	if (rtag != nullptr)
+	if (rtag != "")
 	{
 		std::string fulltag = device().siblingtag(rtag);
 		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::READ);
@@ -1951,7 +1951,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 	}
 
 	// map the write bank
-	if (wtag != nullptr)
+	if (wtag != "")
 	{
 		std::string fulltag = device().siblingtag(wtag);
 		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::WRITE);
@@ -1961,7 +1961,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}
 
-	invalidate_caches(rtag ? wtag ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
+	invalidate_caches(rtag != "" ? wtag != "" ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
 }
 
 

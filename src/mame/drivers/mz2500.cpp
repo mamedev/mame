@@ -1806,23 +1806,23 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 		ADDRESS_MAP_BANK(config, m_rambank[bank]).set_map(&mz2500_state::mz2500_bank_window_map).set_options(ENDIANNESS_LITTLE, 8, 16+3, 0x2000);
 	}
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2500_state, mz2500_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2500_state, mz2500_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz2500_state, mz2500_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz2500_state, mz2500_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2500_state, mz2500_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2500_state, mz2500_portc_w))
+	i8255_device &ppi(I8255(config, "i8255_0"));
+	ppi.in_pa_callback().set(FUNC(mz2500_state::mz2500_porta_r));
+	ppi.out_pa_callback().set(FUNC(mz2500_state::mz2500_porta_w));
+	ppi.in_pb_callback().set(FUNC(mz2500_state::mz2500_portb_r));
+	ppi.out_pb_callback().set(FUNC(mz2500_state::mz2500_portb_w));
+	ppi.in_pc_callback().set(FUNC(mz2500_state::mz2500_portc_r));
+	ppi.out_pc_callback().set(FUNC(mz2500_state::mz2500_portc_w));
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, 6000000)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2500_state, mz2500_pio1_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio_1", 6000000));
+	pio.in_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
+	pio.out_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_w));
+	pio.in_pb_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
 
 	Z80SIO(config, "z80sio", 6000000);
 
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, 32.768_kHz_XTAL)
-	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(*this, mz2500_state, mz2500_rtc_alarm_irq))
+	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->alarm().set(FUNC(mz2500_state::mz2500_rtc_alarm_irq));
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(31250)
@@ -1832,7 +1832,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit", pit8253_device, write_clk1))
 
-	MCFG_DEVICE_ADD("mb8877a", MB8877, 1_MHz_XTAL)
+	MB8877(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)

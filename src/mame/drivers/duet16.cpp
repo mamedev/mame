@@ -94,12 +94,12 @@ void duet16_state::machine_reset()
 
 READ8_MEMBER(duet16_state::pic_r)
 {
-	return m_pic->read(space, offset ^ 1, mem_mask);
+	return m_pic->read(offset ^ 1);
 }
 
 WRITE8_MEMBER(duet16_state::pic_w)
 {
-	m_pic->write(space, offset ^ 1, data);
+	m_pic->write(offset ^ 1, data);
 }
 
 WRITE8_MEMBER(duet16_state::fdcctrl_w)
@@ -157,8 +157,7 @@ void duet16_state::duet16_mem(address_map &map)
 	map(0xf8040, 0xf804f).rw("itm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0xf8060, 0xf8067).rw("bgpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xf8080, 0xf8087).rw("sio", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0x00ff);
-	map(0xf80a0, 0xf80a0).rw("kbusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf80a2, 0xf80a2).rw("kbusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf80a0, 0xf80a3).rw("kbusart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xf80c0, 0xf80c0).rw("crtc", FUNC(h46505_device::status_r), FUNC(h46505_device::address_w));
 	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(h46505_device::register_r), FUNC(h46505_device::register_w));
 	map(0xf80e0, 0xf80e3).rw("i8741", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
@@ -391,11 +390,11 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	upd7201_new_device& sio(UPD7201_NEW(config, "sio", 8_MHz_XTAL / 2));
 	sio.out_int_callback().set("pic", FUNC(pic8259_device::ir1_w)); // INT5
 
-	MCFG_DEVICE_ADD("kbusart", I8251, 8_MHz_XTAL / 4)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("kbd", rs232_port_device, write_txd))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("kbusart", i8251_device, write_cts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("kbint", input_merger_device, in_w<0>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("kbint", input_merger_device, in_w<1>))
+	i8251_device &kbusart(I8251(config, "kbusart", 8_MHz_XTAL / 4));
+	kbusart.txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
+	kbusart.rts_handler().set("kbusart", FUNC(i8251_device::write_cts));
+	kbusart.rxrdy_handler().set("kbint", FUNC(input_merger_device::in_w<0>));
+	kbusart.txrdy_handler().set("kbint", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_DEVICE_ADD("kbd", RS232_PORT, duet16_keyboard_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("kbusart", i8251_device, write_rxd))

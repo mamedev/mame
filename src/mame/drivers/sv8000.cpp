@@ -381,13 +381,13 @@ MACHINE_CONFIG_START(sv8000_state::sv8000)
 	MCFG_DEVICE_IO_MAP(sv8000_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sv8000_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, sv8000_state, i8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sv8000_state, i8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, sv8000_state, i8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sv8000_state, i8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, sv8000_state, i8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sv8000_state, i8255_portc_w))
+	i8255_device &ppi(I8255(config, "i8255"));
+	ppi.in_pa_callback().set(FUNC(sv8000_state::i8255_porta_r));
+	ppi.out_pa_callback().set(FUNC(sv8000_state::i8255_porta_w));
+	ppi.in_pb_callback().set(FUNC(sv8000_state::i8255_portb_r));
+	ppi.out_pb_callback().set(FUNC(sv8000_state::i8255_portb_w));
+	ppi.in_pc_callback().set(FUNC(sv8000_state::i8255_portc_r));
+	ppi.out_pc_callback().set(FUNC(sv8000_state::i8255_portc_w));
 
 	/* video hardware */
 	// S68047P - Unknown whether the internal or an external character rom is used

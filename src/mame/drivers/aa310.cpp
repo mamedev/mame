@@ -415,8 +415,7 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 	m_kart->out_tx_callback().set(FUNC(archimedes_state::a310_kart_tx_w));
 	m_kart->out_rx_callback().set(FUNC(archimedes_state::a310_kart_rx_w));
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x100)
+	I2CMEM(config, "i2cmem", 0).set_data_size(0x100);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -427,10 +426,10 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 
 	RAM(config, m_ram).set_default_size("1M");
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 8000000 / 1) // TODO: frequency
-	MCFG_WD_FDC_DISABLE_MOTOR_CONTROL
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, aa310_state, aa310_wd177x_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, aa310_state, aa310_wd177x_drq_w))
+	wd1772_device& fdc(WD1772(config, "fdc", 8000000 / 1)); // TODO: frequency
+	fdc.set_disable_motor_control(true);
+	fdc.intrq_wr_callback().set(FUNC(aa310_state::aa310_wd177x_intrq_w));
+	fdc.drq_wr_callback().set(FUNC(aa310_state::aa310_wd177x_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aa310_floppies, "35dd", aa310_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aa310_floppies, nullptr, aa310_state::floppy_formats) // rarely had 2nd FDD installed, space was used for HDD

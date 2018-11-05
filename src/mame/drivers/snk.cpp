@@ -6591,6 +6591,56 @@ ROM_START( tdfever2 )
 	ROM_LOAD( "td21.7k", 0x30000, 0x10000, CRC(f5a96d8e) SHA1(33bb2c41426449179fc27ee88b2c8db27b4ed1da) )
 ROM_END
 
+ROM_START( tdfever2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fa-3.h8", 0x0000,  0x10000, CRC(09647773) SHA1(ab0ef5c65a69ddc57ba0982d52f3fe9d018818f5) ) // on main PCB, 27512
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "fa-1.m3", 0x00000, 0x10000, CRC(6ecfe4f1) SHA1(99bad879b540427738f3585e95a7fa03e54c0436) ) // on main PCB, 27512
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "fa-2.d3", 0x00000, 0x10000, CRC(d14eb61a) SHA1(01f2e8f0eabbeb7a44efc35fc18c0d210bccc146) ) // on main PCB, 27512
+
+	ROM_REGION( 0x0c00, "proms", 0 ) // on main PCB
+	ROM_LOAD( "82s137-1.8e", 0x000, 0x00400, CRC(1593c302) SHA1(46008b03c76547d57e3c8658f5f00321c2463cd5) ) /* red */
+	ROM_LOAD( "82s137-2.8d", 0x400, 0x00400, CRC(ac9df947) SHA1(214855e1015f7b519e336159c6ea62ab1f576353) ) /* green */
+	ROM_LOAD( "82s137-3.9e", 0x800, 0x00400, CRC(73cdf192) SHA1(63d1aa1b00035bbfe5bebd9bc9992a5d6f5abd10) ) /* blue */
+
+	ROM_REGION( 0x8000, "tx_tiles", 0 )
+	ROM_LOAD( "fa-14.f17", 0x0000,  0x8000,  CRC(d6521b0d) SHA1(79aba420b2f039d580892fa34de5d63be1a4f222) ) // on sub board, 27256
+
+	ROM_REGION( 0x60000, "bg_tiles", 0 ) // on sub board, all 27512, fa-19 and fa-20 are piggy-backed at b12
+	ROM_LOAD( "fa-15.b5",   0x00000, 0x10000, CRC(ad6e0927) SHA1(dd1c346fbf908af7b3e314f416937f48ade6af4c) )
+	ROM_LOAD( "fa-16.b7",   0x10000, 0x10000, CRC(181db036) SHA1(2c5ed172950fce1467517490a8ab3b7ac6594121) )
+	ROM_LOAD( "fa-17.b9",   0x20000, 0x10000, CRC(c5decca3) SHA1(12aff8adc0ad2bf903122ad065d182692d32fb7a) )
+	ROM_LOAD( "fa-18.b10", 0x30000, 0x10000, CRC(1f275a1c) SHA1(6d1a65d20d580ce093a1bf0c8c729a487239901b) )
+	ROM_LOAD( "fa-19.b12", 0x40000, 0x10000, CRC(f1081329) SHA1(efcc210d50923a8c9125227c741ba4b71cd9f688) )
+	ROM_LOAD( "fa-20.b12", 0x50000, 0x10000, CRC(cb152997) SHA1(776065ca3efcce17510a0ac08a49c4c1d0bad663) )
+
+	ROM_REGION( 0x80000, "sp32_tiles", 0 ) // on sub board, all 27512
+	ROM_LOAD( "fa-13.h23", 0x00000, 0x10000, CRC(88e2e819) SHA1(6d5529792dbd2ba63a1bc470e9d3ea63b876cfd8) )
+	ROM_LOAD( "fa-12.h21", 0x10000, 0x10000, CRC(047e618f) SHA1(1106d5b41082a0f245dd78ccaca1460f9599fe15) )
+	ROM_LOAD( "fa-11.h19", 0x20000, 0x10000, CRC(a0d53fbd) SHA1(a49f29b3f07ec833651aa0e37b0e87f3f72e0e3a) )
+	ROM_LOAD( "fa-10.h18", 0x30000, 0x10000, CRC(0efe5da6) SHA1(35715faac954eb0c9bc226da039f0705c41942c3) )
+	ROM_LOAD( "fa-9.h16",  0x40000, 0x10000, CRC(a8979657) SHA1(ec2f61a24b04437a9abd0a306923ae2aeee3eba9) )
+	ROM_LOAD( "fa-8.h15",  0x50000, 0x10000, CRC(1aa38303) SHA1(a1f511efc052ccf13e0271611f5ff6f2739ab861) )
+	ROM_LOAD( "fa-7.h14",  0x60000, 0x10000, CRC(72a5590d) SHA1(d8bd664702af9c66a2bda756d8417d1b69b0cab8) )
+	ROM_LOAD( "fa-6.h13",  0x70000, 0x10000, CRC(8cdc19cb) SHA1(5782cc0130bc379f76e2865055097bad71a998c6) )
+
+	ROM_REGION( 0x40000, "ym2", 0 ) // on main PCB, all 27512
+	ROM_LOAD( "fa-5.c13",  0x00000, 0x10000, CRC(e332e41f) SHA1(3fe41e35c5abbd8f8b9cff91bf85815275c62776) )
+	ROM_LOAD( "fa-4.c12",  0x10000, 0x10000, CRC(98af6d2d) SHA1(0f41f53d4143ec54b8e84cd480e3ab34c3e7ea20) )
+	ROM_LOAD( "fa-22.c11", 0x20000, 0x10000, CRC(34b4bce9) SHA1(bf9b000995dcbb27450c0ad1a8ef1bcc4feee080) )
+	ROM_LOAD( "fa-21.c10", 0x30000, 0x10000, CRC(1b52357b) SHA1(30ee641cad46cb86a36b1afa292da2dddc154f2f) )
+
+	ROM_REGION( 0x0a00, "plds", 0 )
+	ROM_LOAD( "pal16l8a.c1",  0x0000, 0x0104, CRC(9282d039) SHA1(7a85920fe2da8a19df6ca687704da08a0fa4b048) )
+	ROM_LOAD( "pal16l8a.h3",  0x0200, 0x0104, CRC(4ae59346) SHA1(f5c168f07d82a1c8956f3a7f690bb8a1dffb1bfb) )
+	ROM_LOAD( "pal16r8a.f2",  0x0400, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
+	ROM_LOAD( "pal16l8a.e7",  0x0600, 0x0104, CRC(4c2d02b3) SHA1(f97402225ce60b9d44c5d0cd0507e26a9f3509cb) )
+	ROM_LOAD( "pal16l8a.h11", 0x0800, 0x0104, CRC(e9a0efca) SHA1(a2439c07dc5f9fae2e8a6ea010b00c07e9a58012) )
+ROM_END
+
 /***********************************************************************/
 
 
@@ -6648,6 +6698,7 @@ GAME( 1988, legofair,  chopper,  chopper1,  chopper,   snk_state, empty_init, RO
 GAME( 1987, tdfever,   0,        tdfever,   tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever (US)", 0 )
 GAME( 1987, tdfeverj,  tdfever,  tdfever,   tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever (Japan)", 0 )
 GAME( 1988, tdfever2,  tdfever,  tdfever2,  tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
+GAME( 1988, tdfever2b, tdfever,  tdfever2,  tdfever,   snk_state, empty_init, ROT90,  "bootleg", "TouchDown Fever 2 (bootleg)", 0 )
 GAME( 1988, fsoccer,   0,        tdfever2,  fsoccer,   snk_state, empty_init, ROT0,   "SNK",     "Fighting Soccer (version 4)", 0 )
 GAME( 1988, fsoccerj,  fsoccer,  tdfever2,  fsoccer,   snk_state, empty_init, ROT0,   "SNK",     "Fighting Soccer (Japan)", 0 )
 GAME( 1988, fsoccerb,  fsoccer,  tdfever2,  fsoccerb,  snk_state, empty_init, ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )

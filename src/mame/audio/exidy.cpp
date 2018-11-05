@@ -397,27 +397,27 @@ WRITE8_MEMBER(exidy_sh8253_sound_device::r6532_porta_w)
 	if (m_tms.found())
 	{
 		logerror("(%f)%s:TMS5220 data write = %02X\n", machine().time().as_double(), machine().describe_context(), m_riot->porta_out_get());
-		m_tms->data_w(space, 0, data);
+		m_tms->data_w(data);
 	}
 }
 
 READ8_MEMBER(exidy_sh8253_sound_device::r6532_porta_r)
 {
+	uint8_t status = 0xff;
 	if (m_tms.found())
 	{
-		logerror("(%f)%s:TMS5220 status read = %02X\n", machine().time().as_double(), machine().describe_context(), m_tms->status_r(space, 0));
-		return m_tms->status_r(space, 0);
+		status = m_tms->status_r();
+		logerror("(%f)%s:TMS5220 status read = %02X\n", machine().time().as_double(), machine().describe_context(), status);
 	}
-	else
-		return 0xff;
+	return status;
 }
 
 WRITE8_MEMBER(exidy_sh8253_sound_device::r6532_portb_w)
 {
 	if (m_tms.found())
 	{
-		m_tms->rsq_w(data & 0x01);
-		m_tms->wsq_w((data >> 1) & 0x01);
+		m_tms->rsq_w(BIT(data, 0));
+		m_tms->wsq_w(BIT(data, 1));
 	}
 }
 

@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	mainlatch.q_out_cb<5>().set(FUNC(megazone_state::flipscreen_w));
 	mainlatch.q_out_cb<7>().set(FUNC(megazone_state::irq_mask_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

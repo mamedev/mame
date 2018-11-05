@@ -236,9 +236,9 @@ MACHINE_CONFIG_START(miniframe_state::miniframe)
 	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&miniframe_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);
 
 	// floppy
-	MCFG_DEVICE_ADD("wd2797", WD2797, 1000000)
-//  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_intrq_w))
-//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_drq_w))
+	WD2797(config, m_wd2797, 1000000);
+//  m_wd2797->intrq_wr_callback().set(FUNC(miniframe_state::wd2797_intrq_w));
+//  m_wd2797->drq_wr_callback().set(FUNC(miniframe_state::wd2797_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	// 8263s

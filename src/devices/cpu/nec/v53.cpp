@@ -277,11 +277,11 @@ void v53_base_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_v53icu), write8_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_v53icu), 0xffff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8sm_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_v53icu), write8sm_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_v53icu), 0xffff);
 		}
 		else
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x03, read8_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_v53icu), write8_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_v53icu), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x03, read8sm_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_v53icu), write8sm_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_v53icu), 0x00ff);
 		}
 	}
 
@@ -314,16 +314,16 @@ void v53_base_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::data_r), (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::data_w), (v53_scu_device*)m_v53scu), 0x00ff);
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::status_r),  (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::command_w),  (v53_scu_device*)m_v53scu), 0xff00);
-			space(AS_IO).install_write_handler(base+0x02, base+0x03, write8_delegate(FUNC(v53_scu_device::mode_w), (v53_scu_device*)m_v53scu), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8smo_delegate(FUNC(v53_scu_device::data_r), m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::data_w), m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8smo_delegate(FUNC(v53_scu_device::status_r),  m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::command_w),  m_v53scu.target()), 0xff00);
+			space(AS_IO).install_write_handler(base+0x02, base+0x03, write8smo_delegate(FUNC(v53_scu_device::mode_w), m_v53scu.target()), 0x00ff);
 			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_base_device::scu_simk_r), this), write8_delegate(FUNC(v53_base_device::scu_simk_w), this), 0xff00);
 		}
 		else
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::data_r), (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::data_w), (v53_scu_device*)m_v53scu), 0x00ff);
-			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_scu_device::status_r),  (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::command_w),  (v53_scu_device*)m_v53scu), 0x00ff);
-			space(AS_IO).install_write_handler(base+0x04, base+0x05, write8_delegate(FUNC(v53_scu_device::mode_w), (v53_scu_device*)m_v53scu), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8smo_delegate(FUNC(v53_scu_device::data_r), m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::data_w), m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8smo_delegate(FUNC(v53_scu_device::status_r),  m_v53scu.target()), write8smo_delegate(FUNC(v53_scu_device::command_w),  m_v53scu.target()), 0x00ff);
+			space(AS_IO).install_write_handler(base+0x04, base+0x05, write8smo_delegate(FUNC(v53_scu_device::mode_w), m_v53scu.target()), 0x00ff);
 			space(AS_IO).install_readwrite_handler(base+0x06, base+0x07, read8_delegate(FUNC(v53_base_device::scu_simk_r), this), write8_delegate(FUNC(v53_base_device::scu_simk_w), this), 0x00ff);
 
 		}
@@ -352,15 +352,15 @@ WRITE8_MEMBER(v53_base_device::scu_simk_w)
 
 /*** TCU ***/
 
-WRITE8_MEMBER(v53_base_device::tmu_tct0_w) { m_v53tcu->write(space, 0, data); }
-WRITE8_MEMBER(v53_base_device::tmu_tct1_w) { m_v53tcu->write(space, 1, data); }
-WRITE8_MEMBER(v53_base_device::tmu_tct2_w) { m_v53tcu->write(space, 2, data); }
-WRITE8_MEMBER(v53_base_device::tmu_tmd_w)  { m_v53tcu->write(space, 3, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tct0_w) { m_v53tcu->write(0, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tct1_w) { m_v53tcu->write(1, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tct2_w) { m_v53tcu->write(2, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tmd_w)  { m_v53tcu->write(3, data); }
 
 
-READ8_MEMBER(v53_base_device::tmu_tst0_r) { return m_v53tcu->read(space, 0); }
-READ8_MEMBER(v53_base_device::tmu_tst1_r) { return m_v53tcu->read(space, 1); }
-READ8_MEMBER(v53_base_device::tmu_tst2_r) { return m_v53tcu->read(space, 2); }
+READ8_MEMBER(v53_base_device::tmu_tst0_r) { return m_v53tcu->read(0); }
+READ8_MEMBER(v53_base_device::tmu_tst1_r) { return m_v53tcu->read(1); }
+READ8_MEMBER(v53_base_device::tmu_tst2_r) { return m_v53tcu->read(2); }
 
 
 
@@ -504,8 +504,8 @@ WRITE_LINE_MEMBER(v53_base_device::internal_irq_w)
 }
 
 
-MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
-
+void v53_base_device::device_add_mconfig(machine_config &config)
+{
 	PIT8254(config, m_v53tcu, 0); // functionality identical to uPD71054
 	m_v53tcu->set_clk<0>(16000000); // manual implicitly claims that these runs at same speed as the CPU
 	m_v53tcu->set_clk<1>(16000000);
@@ -537,16 +537,15 @@ MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
 	m_v53icu->in_sp_callback().set_constant(1);
 	m_v53icu->read_slave_ack_callback().set(FUNC(v53_base_device::get_pic_ack));
 
-	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, v53_base_device, scu_txd_trampoline_cb))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, v53_base_device, scu_dtr_trampoline_cb))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, v53_base_device, scu_rts_trampoline_cb))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v53_base_device,scu_rxrdy_trampoline_cb))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, v53_base_device,scu_txrdy_trampoline_cb))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, v53_base_device, scu_txempty_trampoline_cb))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, v53_base_device, scu_syndet_trampoline_cb))
-
-MACHINE_CONFIG_END
+	V53_SCU(config, m_v53scu, 0);
+	m_v53scu->txd_handler().set(FUNC(v53_base_device::scu_txd_trampoline_cb));
+	m_v53scu->dtr_handler().set(FUNC(v53_base_device::scu_dtr_trampoline_cb));
+	m_v53scu->rts_handler().set(FUNC(v53_base_device::scu_rts_trampoline_cb));
+	m_v53scu->rxrdy_handler().set(FUNC(v53_base_device::scu_rxrdy_trampoline_cb));
+	m_v53scu->txrdy_handler().set(FUNC(v53_base_device::scu_txrdy_trampoline_cb));
+	m_v53scu->txempty_handler().set(FUNC(v53_base_device::scu_txempty_trampoline_cb));
+	m_v53scu->syndet_handler().set(FUNC(v53_base_device::scu_syndet_trampoline_cb));
+}
 
 
 v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :

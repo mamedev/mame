@@ -461,11 +461,11 @@ MACHINE_CONFIG_START(flipjack_state::flipjack)
 	MCFG_DEVICE_IO_MAP(flipjack_sound_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flipjack_state,  nmi_line_assert)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, flipjack_state, flipjack_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("P1");
+	ppi.in_pb_callback().set_ioport("P2");
+	ppi.in_pc_callback().set_ioport("P3");
+	ppi.out_pc_callback().set(FUNC(flipjack_state::flipjack_portc_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

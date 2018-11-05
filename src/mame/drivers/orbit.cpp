@@ -288,7 +288,7 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	m_latch->q_out_cb<6>().set_output("led1");
 	m_latch->q_out_cb<7>().set(m_discrete, FUNC(discrete_device::write_line<ORBIT_WARNING_EN>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

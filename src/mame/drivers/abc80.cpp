@@ -487,10 +487,10 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 
 MACHINE_CONFIG_START(abc80_state::abc80)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(11'980'800)/2/2) // 2.9952 MHz
-	MCFG_DEVICE_PROGRAM_MAP(abc80_mem)
-	MCFG_DEVICE_IO_MAP(abc80_io)
-	MCFG_Z80_DAISY_CHAIN(abc80_daisy_chain)
+	Z80(config, m_maincpu, XTAL(11'980'800)/2/2); // 2.9952 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc80_state::abc80_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc80_state::abc80_io);
+	m_maincpu->set_daisy_config(abc80_daisy_chain);
 
 	// video hardware
 	abc80_video(config);
@@ -512,11 +512,11 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	WAVE(config, "wave", CASSETTE_TAG).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(11'980'800)/2/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, abc80_state, pio_pa_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, abc80_state, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, abc80_state, pio_pb_w))
+	Z80PIO(config, m_pio, XTAL(11'980'800)/2/2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(abc80_state::pio_pa_r));
+	m_pio->in_pb_callback().set(FUNC(abc80_state::pio_pb_r));
+	m_pio->out_pb_callback().set(FUNC(abc80_state::pio_pb_w));
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)

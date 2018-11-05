@@ -34,6 +34,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_chargen(*this, "chargen")
+		, m_usart(*this, "usart")
 	{ }
 
 	void v550(machine_config &config);
@@ -52,6 +53,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_chargen;
+	required_device<i8251_device> m_usart;
 };
 
 
@@ -68,8 +70,7 @@ void v550_state::io_map(address_map &map)
 	map(0x00, 0x01).rw("gdc", FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 	map(0x10, 0x10).w("brg1", FUNC(com8116_device::stt_str_w));
 	map(0x20, 0x23).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x30, 0x30).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x31, 0x31).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x30, 0x31).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x40, 0x40).rw("mpsc", FUNC(upd7201_new_device::da_r), FUNC(upd7201_new_device::da_w));
 	map(0x41, 0x41).rw("mpsc", FUNC(upd7201_new_device::ca_r), FUNC(upd7201_new_device::ca_w));
 	map(0x48, 0x48).rw("mpsc", FUNC(upd7201_new_device::db_r), FUNC(upd7201_new_device::db_w));
@@ -102,26 +103,27 @@ INPUT_PORTS_END
 
 void v550_state::machine_start()
 {
-	subdevice<i8251_device>("usart")->write_cts(0);
+	m_usart->write_cts(0);
 }
 
-MACHINE_CONFIG_START(v550_state::v550)
-	MCFG_DEVICE_ADD("maincpu", Z80, 34.846_MHz_XTAL / 16) // NEC D780C (2.177875 MHz verified)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void v550_state::v550(machine_config &config)
+{
+	Z80(config, m_maincpu, 34.846_MHz_XTAL / 16); // NEC D780C (2.177875 MHz verified)
+	m_maincpu->set_addrmap(AS_PROGRAM, &v550_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &v550_state::io_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // NEC D444C-2 + battery
 
-	MCFG_DEVICE_ADD("gdc", UPD7220, 34.846_MHz_XTAL / 16) // NEC D7220D (2.177875 MHz verified)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	upd7220_device &gdc(UPD7220(config, "gdc", 34.846_MHz_XTAL / 16)); // NEC D7220D (2.177875 MHz verified)
+	gdc.set_screen("screen");
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0) // NEC D8255AC-5
+	I8255(config, "ppi"); // NEC D8255AC-5
 
-	MCFG_DEVICE_ADD("usart", I8251, 34.846_MHz_XTAL / 16) // NEC D8251AC
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainint", input_merger_device, in_w<1>))
+	I8251(config, m_usart, 34.846_MHz_XTAL / 16); // NEC D8251AC
+	m_usart->rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 34.846_MHz_XTAL / 16) // NEC D7201C
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainint", input_merger_device, in_w<0>))
+	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 34.846_MHz_XTAL / 16)); // NEC D7201C
+	mpsc.out_int_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
@@ -135,21 +137,21 @@ MACHINE_CONFIG_START(v550_state::v550)
 	brg2.fr_handler().set("usart", FUNC(i8251_device::write_txc));
 	brg2.fr_handler().append("usart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("kbdmcu", I8035, 4'608'000)
-	MCFG_DEVICE_PROGRAM_MAP(kbd_map)
+	mcs48_cpu_device &kbdmcu(I8035(config, "kbdmcu", 4'608'000));
+	kbdmcu.set_addrmap(AS_PROGRAM, &v550_state::kbd_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(34.846_MHz_XTAL, 19 * 102, 0, 19 * 80, 295, 0, 272)
-	MCFG_SCREEN_UPDATE_DRIVER(v550_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(34.846_MHz_XTAL, 19 * 102, 0, 19 * 80, 295, 0, 272);
+	m_screen->set_screen_update(FUNC(v550_state::screen_update));
 
-	MCFG_DEVICE_ADD("pvtc", SCN2672, 34.846_MHz_XTAL / 19)
-	MCFG_DEVICE_ADDRESS_MAP(0, pvtc_char_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, pvtc_attr_map)
-	MCFG_SCN2672_CHARACTER_WIDTH(19)
-	MCFG_SCN2672_INTR_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	scn2672_device &pvtc(SCN2672(config, "pvtc", 34.846_MHz_XTAL / 19));
+	pvtc.set_addrmap(0, &v550_state::pvtc_char_map);
+	pvtc.set_addrmap(1, &v550_state::pvtc_attr_map);
+	pvtc.set_character_width(19);
+	pvtc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	pvtc.set_screen("screen");
 	// SCB2673 clock verified at 17.423 MHz
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( v550 )

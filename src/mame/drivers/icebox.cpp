@@ -9,7 +9,7 @@ Nutting Icebox
 It's a case with many slots for daughter boards, and 2 floppy drives. It's an "in-circuit emulator"
 for Bally / Astrocade development.
 
-The unit has 5 daughter boards: 3 boards were photographed and are: a cpu board (Z80 and unmarked XTAL),
+The unit has 5 daughter boards: 3 boards were photographed and are: a cpu board (Z80 and XTAL),
                     a RS232 board (2x 8251, 8 dipswitches connected to a BR1941L, 4.9152 XTAL),
                     and a board covered with TTL.
 
@@ -18,15 +18,15 @@ Commands:
 -- A = Arcade
 -- C = Commercial
 -- D = Debug
--- ^C = load data to 0 and jump there (disk boot?)
--- ^T = load data from disk?
+-- ^C = boot CP/M
+-- ^T = load data from disk to 0000
 -- ^X = new line
 - At the debug prompt: (to be done)   Q to quit
 
 Status:
 - Machine boots up, you can enter commands.
-- Disk track 00 can be read into memory, hangs when track 01 is requested.
-- Note that disk won't actually do anything until Z-80 IM0 is fixed.
+- For ^C (boot disk), it is able to read track 00 into memory. It then asks for 18x 128 bytes from track 01.
+  It reads 8 of those blocks, then hangs.
 
 To Do:
 - Find out more what ports F2-FF do.
@@ -100,6 +100,20 @@ it looks like zeroing btype disables it.
 
 io port 0xff (misc) is on the I/O board.
 
+The date on the backplane of the system is 1978. It originally used dynamic RAM boards for memory, there is support
+on the 'mapper' board for generating row/col adrs for them, and four ram board selects. It was replaced with a static
+RAM in 1982, based on the date of the boards in the system. Two selects go to each 32k board and there is a DIP switch
+on the boards to say which of the four selects it responds to.
+
+The three byte fifo and a register jams a zero onto the data bus (when?), and we have the source for the CP/M version
+of the debugger/boot prom to see how interrupt handling occurs.
+
+I can sort of piece together what Terse implements and what it evolved from. I think it started as the Caltech FORTH
+implemented for the PDP-10 and 11 with a lot of words stripped out, and others added. This was submitted to DECUS as
+submission 11-232 but much of the early DECUS stuff has been lost, so I've not been able to find a copy to see how the
+FORTH kernel was implemented. I do have the Caltech writeup on it though,
+http://bitsavers.org/pdf/caltech/ovro/Caltech-OVRO_Forth_Manual_Jun78.pdf
+
 ******************************************************************************************************************/
 
 #include "emu.h"
@@ -127,7 +141,6 @@ public:
 	void icebox(machine_config &config);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -156,10 +169,8 @@ void icebox_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xe0, 0xe0).rw(m_uart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe1, 0xe1).rw(m_uart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xe2, 0xe2).rw(m_uart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe3, 0xe3).rw(m_uart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xe0, 0xe1).rw(m_uart0, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xe2, 0xe3).rw(m_uart1, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xe4, 0xe7).lrw8("fdc_usage",
 					[this](offs_t offset) { return m_fdc->read(offset^3); },
 					[this](offs_t offset, u8 data) { m_fdc->write(offset^3, data); });
@@ -241,18 +252,11 @@ void icebox_state::port_f1_w(u8 data)
 	m_fdc->dden_w(1);                 // single density?
 }
 
-// Command complete: release CPU from halt, via IM0.
-WRITE_LINE_MEMBER(icebox_state::intrq_w)
-{
-	if (BIT(m_f1, 2) && state)
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, HOLD_LINE, 0xc9);
-}
-
 // The next byte from floppy is available. Enable CPU so it can get the byte, via IM0.
 WRITE_LINE_MEMBER(icebox_state::drq_w)
 {
-	if (BIT(m_f1, 2) && state)
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, HOLD_LINE, 0xc9);
+	if (BIT(m_f1, 2))
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00);
 }
 
 static void floppies(device_slot_interface &device)
@@ -302,9 +306,8 @@ MACHINE_CONFIG_START(icebox_state::icebox)
 	m_brg->ft_handler().set(m_uart1, FUNC(i8251_device::write_txc));
 	m_brg->ft_handler().append(m_uart1, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD(m_fdc, FD1771, 4_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, icebox_state, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, icebox_state, drq_w))
+	FD1771(config, m_fdc, 4_MHz_XTAL / 2);
+	m_fdc->drq_wr_callback().set(FUNC(icebox_state::drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, floppies, "flop", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, floppies, "flop", floppy_image_device::default_floppy_formats)

@@ -48,6 +48,9 @@ public:
 	DECLARE_WRITE8_MEMBER(test_w);
 	DECLARE_WRITE8_MEMBER(clock_w);
 
+	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
+
 	virtual void scsi_ctrl_changed() override;
 
 	uint8_t dma_r();
@@ -264,6 +267,9 @@ public:
 	DECLARE_READ8_MEMBER(conf2_r) { return config2; };
 	DECLARE_WRITE8_MEMBER(conf2_w) { config2 = data; };
 
+	DECLARE_READ8_MEMBER(read) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+
 protected:
 	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -291,6 +297,9 @@ public:
 	DECLARE_READ8_MEMBER(conf3_r) { return config3; };
 	DECLARE_WRITE8_MEMBER(conf3_w) { config3 = data; };
 	DECLARE_WRITE8_MEMBER(fifo_align_w) { fifo_align = data; };
+
+	DECLARE_READ8_MEMBER(read) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	virtual void device_start() override;

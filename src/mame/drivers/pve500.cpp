@@ -371,13 +371,13 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	m_maincpu->out_txda_callback().set("recorder", FUNC(rs232_port_device::write_txd));
 	m_maincpu->out_txdb_callback().set("player1", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("external_ctc", Z80CTC, 12_MHz_XTAL / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "external_ctc", 12_MHz_XTAL / 2));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("external_sio", Z80SIO0, 12_MHz_XTAL / 2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("player2", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE("edl_inout", rs232_port_device, write_txd))
+	z80sio0_device& sio(Z80SIO0(config, "external_sio", 12_MHz_XTAL / 2));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	sio.out_txda_callback().set("player2", FUNC(rs232_port_device::write_txd));
+	sio.out_txdb_callback().set("edl_inout", FUNC(rs232_port_device::write_txd));
 
 	/* Secondary CPU */
 	MCFG_DEVICE_ADD("subcpu", TMPZ84C015, 12_MHz_XTAL / 2) /* TMPZ84C015BF-6 */

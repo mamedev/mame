@@ -457,22 +457,22 @@ MACHINE_CONFIG_START(aces1_state::aces1)
 	MCFG_DEVICE_IO_MAP(aces1_portmap)
 
 	// 0xafb0 IC24 - lamps, 7segs
-	MCFG_DEVICE_ADD("ic24", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, aces1_state, ic24_write_a))  // 7segs
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, aces1_state, ic24_write_b))  // lamps
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, aces1_state, ic24_write_c))  // strobe
+	i8255_device &ic24(I8255A(config, "ic24"));
+	ic24.out_pa_callback().set(FUNC(aces1_state::ic24_write_a));  // 7segs
+	ic24.out_pb_callback().set(FUNC(aces1_state::ic24_write_b));  // lamps
+	ic24.out_pc_callback().set(FUNC(aces1_state::ic24_write_c));  // strobe
 
 	// 0xafd0 IC25 - lamps, meters, reel comms (writes)
-	MCFG_DEVICE_ADD("ic25", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, aces1_state, ic25_write_a))  // extra lamps
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, aces1_state, ic25_write_b))  // meters, extra lamp select
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, aces1_state, ic25_write_c))  // reel write, extra lamp strobe
+	i8255_device &ic25(I8255A(config, "ic25"));
+	ic25.out_pa_callback().set(FUNC(aces1_state::ic25_write_a));  // extra lamps
+	ic25.out_pb_callback().set(FUNC(aces1_state::ic25_write_b));  // meters, extra lamp select
+	ic25.out_pc_callback().set(FUNC(aces1_state::ic25_write_c));  // reel write, extra lamp strobe
 
 	// 0xafe0 IC37 - doors, coins, reel optics (reads)
-	MCFG_DEVICE_ADD("ic37", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, aces1_state, ic37_read_a)) // extra lamps
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, aces1_state, ic37_read_b)) // meters, extra lamp select
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, aces1_state, ic37_read_c)) // reel write, extra lamp strobe
+	i8255_device &ic37(I8255A(config, "ic37"));
+	ic37.in_pa_callback().set(FUNC(aces1_state::ic37_read_a)); // extra lamps
+	ic37.in_pb_callback().set(FUNC(aces1_state::ic37_read_b)); // meters, extra lamp select
+	ic37.in_pc_callback().set(FUNC(aces1_state::ic37_read_c)); // reel write, extra lamp strobe
 
 	config.set_default_layout(layout_aces1);
 

@@ -881,18 +881,18 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_DEVICE_PROGRAM_MAP(mz2000_map)
 	MCFG_DEVICE_IO_MAP(mz2000_io)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2000_state, mz2000_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2000_state, mz2000_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz2000_state, mz2000_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz2000_state, mz2000_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2000_state, mz2000_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2000_state, mz2000_portc_w))
+	i8255_device &ppi(I8255(config, "i8255_0"));
+	ppi.in_pa_callback().set(FUNC(mz2000_state::mz2000_porta_r));
+	ppi.out_pa_callback().set(FUNC(mz2000_state::mz2000_porta_w));;
+	ppi.in_pb_callback().set(FUNC(mz2000_state::mz2000_portb_r));
+	ppi.out_pb_callback().set(FUNC(mz2000_state::mz2000_portb_w));
+	ppi.in_pc_callback().set(FUNC(mz2000_state::mz2000_portc_r));
+	ppi.out_pc_callback().set(FUNC(mz2000_state::mz2000_portc_w));
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz2000_state, mz2000_pio1_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2000_state, mz2000_pio1_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2000_state, mz2000_pio1_portb_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio_1", MASTER_CLOCK));
+	pio.in_pa_callback().set(FUNC(mz2000_state::mz2000_pio1_porta_r));
+	pio.out_pa_callback().set(FUNC(mz2000_state::mz2000_pio1_porta_w));
+	pio.in_pb_callback().set(FUNC(mz2000_state::mz2000_pio1_portb_r));
 
 	/* TODO: clocks aren't known */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -900,7 +900,7 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
 	MCFG_PIT8253_CLK2(31250)
 
-	MCFG_DEVICE_ADD("mb8877a", MB8877, 1_MHz_XTAL)
+	MB8877(config, m_mb8877a, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)

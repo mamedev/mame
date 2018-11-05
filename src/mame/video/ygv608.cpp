@@ -351,8 +351,8 @@ void ygv608_device::device_start()
 	m_base_y_shift = 0;
 
 	// flag rebuild of the tilemaps
-	m_screen_resize = 1;
-	m_tilemap_resize = 1;
+	m_screen_resize = true;
+	m_tilemap_resize = true;
 	m_namcond1_gfxbank = 0;
 	save_item(NAME(m_namcond1_gfxbank));
 
@@ -439,7 +439,7 @@ void ygv608_device::device_timer(emu_timer &timer, device_timer_id id, int param
 void ygv608_device::set_gfxbank(uint8_t gfxbank)
 {
 	m_namcond1_gfxbank = gfxbank;
-	m_tilemap_resize = 1;
+	m_tilemap_resize = true;
 }
 
 inline int ygv608_device::get_col_division(int raw_col)
@@ -873,10 +873,10 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 	}
 }
 
-void ygv608_device::postload()
+void ygv608_device::device_post_load()
 {
-	m_screen_resize = 1;
-	m_tilemap_resize = 1;
+	m_screen_resize = true;
+	m_tilemap_resize = true;
 }
 
 void ygv608_device::register_state_save()
@@ -891,8 +891,6 @@ void ygv608_device::register_state_save()
 	save_item(NAME(m_color_state_r));
 	save_item(NAME(m_color_state_w));
 	// TODO: register save for the newly added variables
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(ygv608_device::postload), this));
 }
 
 
@@ -1084,7 +1082,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 		m_work_bitmap.resize(screen.width(), screen.height());
 
 		// reset resize flag
-		m_screen_resize = 0;
+		m_screen_resize = false;
 	}
 
 	if( m_tilemap_resize )
@@ -1135,7 +1133,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 		m_work_bitmap.fill(0, finalclip );
 
 		// reset resize flag
-		m_tilemap_resize = 0;
+		m_tilemap_resize = false;
 	}
 
 #ifdef _ENABLE_SCROLLY
@@ -1821,7 +1819,7 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_7_w )
 {
 	uint8_t new_md = (data >> 1) & 3;
 	if( new_md != m_md)
-		m_tilemap_resize = 1;
+		m_tilemap_resize = true;
 
 	m_dckm = BIT(data,7);
 	m_flip = BIT(data,6);
@@ -1882,7 +1880,7 @@ READ8_MEMBER( ygv608_device::screen_ctrl_8_r )
 WRITE8_MEMBER( ygv608_device::screen_ctrl_8_w )
 {
 	if( (data & 1) != m_page_size)
-		m_tilemap_resize = 1;
+		m_tilemap_resize = true;
 
 /**/m_h_display_size = (data >> 6) & 3;
 /**/m_v_display_size = (data >> 4) & 3;
@@ -1915,7 +1913,7 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_9_w )
 	uint8_t new_pts = (data >> 6) & 3;
 
 	if(new_pts != m_pattern_size)
-		m_tilemap_resize = 1;
+		m_tilemap_resize = true;
 
 	m_pattern_size = new_pts;
 /**/m_h_div_size = (data >> 3) & 7;
@@ -2101,7 +2099,7 @@ WRITE8_MEMBER( ygv608_device::base_address_w )
 	m_base_addr[plane][addr] = data & 0x07;
 	m_base_addr[plane][addr+1] = (data >> 4) & 0x7;
 
-	m_tilemap_resize = 1;
+	m_tilemap_resize = true;
 }
 
 // R#25W - R#27W - X coordinate of initial value
@@ -2181,7 +2179,7 @@ WRITE8_MEMBER( ygv608_device::crtc_w )
 			m_crtc.htotal |= ((data & 0xc0) << 3);
 
 			if(new_display_width != m_crtc.display_width)
-				m_screen_resize = 1;
+				m_screen_resize = true;
 
 			m_crtc.display_width = new_display_width;
 			break;
@@ -2216,7 +2214,7 @@ WRITE8_MEMBER( ygv608_device::crtc_w )
 
 			// TODO: VSLS, bit 6
 			if(new_display_height != m_crtc.display_height)
-				m_screen_resize = 1;
+				m_screen_resize = true;
 
 			m_crtc.display_height = new_display_height;
 			break;

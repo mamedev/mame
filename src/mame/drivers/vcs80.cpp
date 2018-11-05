@@ -215,10 +215,10 @@ void vcs80_state::machine_start()
 
 MACHINE_CONFIG_START(vcs80_state::vcs80)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(5'000'000)/2) /* U880D */
-	MCFG_DEVICE_PROGRAM_MAP(vcs80_mem)
-	MCFG_DEVICE_IO_MAP(vcs80_io)
-	MCFG_Z80_DAISY_CHAIN(vcs80_daisy_chain)
+	Z80(config, m_maincpu, XTAL(5'000'000)/2); /* U880D */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcs80_state::vcs80_mem);
+	m_maincpu->set_addrmap(AS_IO, &vcs80_state::vcs80_io);
+	m_maincpu->set_daisy_config(vcs80_daisy_chain);
 
 	/* keyboard timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", vcs80_state, vcs80_keyboard_tick, attotime::from_hz(1000))
@@ -227,10 +227,10 @@ MACHINE_CONFIG_START(vcs80_state::vcs80)
 	config.set_default_layout(layout_vcs80);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(5'000'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, vcs80_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, vcs80_state, pio_pb_w))
+	Z80PIO(config, m_pio, XTAL(5'000'000)/2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(vcs80_state::pio_pa_r));
+	m_pio->out_pb_callback().set(FUNC(vcs80_state::pio_pb_w));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("1K");

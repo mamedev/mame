@@ -187,13 +187,13 @@ MACHINE_CONFIG_START(supstarf_state::supstarf)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, supstarf_state, port2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, supstarf_state, phase_detect_r))
 
-	MCFG_DEVICE_ADD("soundlatch1", I8212, 0)
-	MCFG_I8212_MD_CALLBACK(CONSTANT(0))
-	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	I8212(config, m_soundlatch[0], 0);
+	m_soundlatch[0]->md_rd_callback().set_constant(0);
+	m_soundlatch[0]->int_wr_callback().set_inputline("maincpu", I8085_RST55_LINE);
 
-	MCFG_DEVICE_ADD("soundlatch2", I8212, 0)
-	MCFG_I8212_MD_CALLBACK(CONSTANT(0))
-	MCFG_I8212_INT_CALLBACK(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
+	I8212(config, m_soundlatch[1], 0);
+	m_soundlatch[1]->md_rd_callback().set_constant(0);
+	m_soundlatch[1]->int_wr_callback().set_inputline("soundcpu", MCS48_INPUT_IRQ);
 	//MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("maincpu", I8085_READY_LINE))
 
 	SPEAKER(config, "mono").front_center();

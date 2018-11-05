@@ -3763,14 +3763,14 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp9845_base_state , beeper_off);
 
 	// Tape controller
-	MCFG_DEVICE_ADD("t15" , HP_TACO , 4000000)
-	MCFG_TACO_IRQ_HANDLER(WRITELINE(*this, hp9845_base_state , t15_irq_w))
-	MCFG_TACO_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , t15_flg_w))
-	MCFG_TACO_STS_HANDLER(WRITELINE(*this, hp9845_base_state , t15_sts_w))
-	MCFG_DEVICE_ADD("t14" , HP_TACO , 4000000)
-	MCFG_TACO_IRQ_HANDLER(WRITELINE(*this, hp9845_base_state , t14_irq_w))
-	MCFG_TACO_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , t14_flg_w))
-	MCFG_TACO_STS_HANDLER(WRITELINE(*this, hp9845_base_state , t14_sts_w))
+	hp_taco_device &t15(HP_TACO(config , "t15" , 4000000));
+	t15.irq().set(FUNC(hp9845_base_state::t15_irq_w));
+	t15.flg().set(FUNC(hp9845_base_state::t15_flg_w));
+	t15.sts().set(FUNC(hp9845_base_state::t15_sts_w));
+	hp_taco_device &t14(HP_TACO(config , "t14" , 4000000));
+	t14.irq().set(FUNC(hp9845_base_state::t14_irq_w));
+	t14.flg().set(FUNC(hp9845_base_state::t14_flg_w));
+	t14.sts().set(FUNC(hp9845_base_state::t14_sts_w));
 
 	// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
 	// right-hand side and left-hand side drawers, respectively.

@@ -1963,7 +1963,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 
 ***********************************************************************************************/
 
-void tms5220_device::write_data(uint8_t data)
+void tms5220_device::data_w(uint8_t data)
 {
 	LOGMASKED(LOG_RS_WS, "tms5220_write_data: data %02x\n", data);
 	/* bring up to date first */
@@ -1987,7 +1987,7 @@ void tms5220_device::write_data(uint8_t data)
 
 ***********************************************************************************************/
 
-uint8_t tms5220_device::read_status()
+uint8_t tms5220_device::status_r()
 {
 	// prevent debugger from changing the internal state
 	if (!machine().side_effects_disabled())

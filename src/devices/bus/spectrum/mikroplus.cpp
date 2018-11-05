@@ -82,10 +82,6 @@ spectrum_mikroplus_device::spectrum_mikroplus_device(const machine_config &mconf
 
 void spectrum_mikroplus_device::device_start()
 {
-	address_space& spaceio = machine().device("maincpu")->memory().space(AS_IO);
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
-
-	spaceio.install_read_handler(0xdf, 0xdf, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_mikroplus_device::joystick_r), this));
 }
 
 
@@ -95,6 +91,7 @@ void spectrum_mikroplus_device::device_start()
 
 void spectrum_mikroplus_device::device_reset()
 {
+	io_space().install_read_handler(0xdf, 0xdf, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_mikroplus_device::joystick_r), this));
 }
 
 

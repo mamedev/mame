@@ -152,14 +152,14 @@ MACHINE_CONFIG_START(kingpin_state::kingpin)
 	MCFG_DEVICE_PROGRAM_MAP(kingpin_program_map)
 	MCFG_DEVICE_IO_MAP(kingpin_io_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// PORT A read = watchdog?
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	ppi0.in_pb_callback().set_ioport("DSW1");
 	// PORT C read = unused?
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN0");
+	ppi1.in_pb_callback().set_ioport("IN1");
 	// PORT C read = unknown
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);

@@ -380,7 +380,7 @@ void peplus_state::load_superdata(const char *bank_name)
 
 WRITE8_MEMBER(peplus_state::bgcolor_w)
 {
-	for (int i = 0; i < m_palette->entries(); i++)
+	for (int i = 0; i < m_palette->entries() / 16; i++)
 	{
 		/* red component */
 		int bit0 = (~data >> 0) & 0x01;

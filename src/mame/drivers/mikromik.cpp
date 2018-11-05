@@ -102,7 +102,7 @@ READ8_MEMBER( mm1_state::read )
 			break;
 
 		case 3:
-			data = m_pit->read(space, offset & 0x03);
+			data = m_pit->read(offset & 0x03);
 			break;
 
 		case 4:
@@ -171,7 +171,7 @@ WRITE8_MEMBER( mm1_state::write )
 			break;
 
 		case 3:
-			m_pit->write(space, offset & 0x03, data);
+			m_pit->write(offset & 0x03, data);
 			break;
 
 		case 4:
@@ -498,18 +498,18 @@ MACHINE_CONFIG_START(mm1_state::mm1)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD(UPD7201_TAG, UPD7201, 6.144_MHz_XTAL/2)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(*this, mm1_state, drq2_w))
-	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(*this, mm1_state, drq1_w))
+	UPD7201(config, m_mpsc, 6.144_MHz_XTAL/2);
+	m_mpsc->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_mpsc->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_rxdrqa_callback().set(FUNC(mm1_state::drq2_w));
+	m_mpsc->out_txdrqa_callback().set(FUNC(mm1_state::drq1_w));
 
 	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxa_w))
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_DEVICE_ADD(RS232_C_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsb_w))
 
 	MCFG_DEVICE_ADD(KB_TAG, MM1_KEYBOARD, 2500) // actual KBCLK is 6.144_MHz_XTAL/2/16
 	MCFG_MM1_KEYBOARD_KBST_CALLBACK(WRITELINE(I8212_TAG, i8212_device, stb_w))

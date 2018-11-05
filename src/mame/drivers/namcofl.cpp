@@ -159,7 +159,6 @@ OSC3: 48.384MHz
 
 #include "emu.h"
 #include "includes/namcofl.h"
-#include "machine/namcoic.h"
 
 #include "cpu/i960/i960.h"
 #include "sound/c352.h"
@@ -225,11 +224,11 @@ void namcofl_state::namcofl_mem(address_map &map)
 	map(0x30300000, 0x30303fff).ram(); /* COMRAM */
 	map(0x30380000, 0x303800ff).r(FUNC(namcofl_state::fl_network_r)); /* network registers */
 	map(0x30400000, 0x30407fff).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::namcofl_c116_w));
-	map(0x30800000, 0x3080ffff).rw(FUNC(namcofl_state::c123_tilemap_videoram_r), FUNC(namcofl_state::c123_tilemap_videoram_w));
-	map(0x30a00000, 0x30a0003f).rw(FUNC(namcofl_state::c123_tilemap_control_r), FUNC(namcofl_state::c123_tilemap_control_w));
-	map(0x30c00000, 0x30c1ffff).rw(FUNC(namcofl_state::c169_roz_videoram_r), FUNC(namcofl_state::c169_roz_videoram_w)).share("rozvideoram");
-	map(0x30d00000, 0x30d0001f).rw(FUNC(namcofl_state::c169_roz_control_r), FUNC(namcofl_state::c169_roz_control_w));
-	map(0x30e00000, 0x30e1ffff).rw(FUNC(namcofl_state::c355_obj_ram_r), FUNC(namcofl_state::c355_obj_ram_w)).share("objram");
+	map(0x30800000, 0x3080ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
+	map(0x30a00000, 0x30a0003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
+	map(0x30c00000, 0x30c1ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
+	map(0x30d00000, 0x30d0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
+	map(0x30e00000, 0x30e1ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
 	map(0x30f00000, 0x30f0000f).ram(); /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
 	map(0x40000000, 0x4000005f).rw(FUNC(namcofl_state::namcofl_sysreg_r), FUNC(namcofl_state::namcofl_sysreg_w));
 	map(0xfffffffc, 0xffffffff).r(FUNC(namcofl_state::fl_unk1_r));
@@ -607,6 +606,28 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcofl)
 
+	NAMCO_C169ROZ(config, m_c169roz, 0);
+	m_c169roz->set_gfxdecode_tag("gfxdecode");
+	m_c169roz->set_is_namcofl(true);
+	m_c169roz->set_ram_words(0x20000/2);
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcofl_state::RozCB, this));
+	m_c169roz->set_maskregion_tag(NAMCOFL_ROTMASKREGION);
+	m_c169roz->set_gfxregion(NAMCOFL_ROTGFX);
+
+	NAMCO_C355SPR(config, m_c355spr, 0);
+	m_c355spr->set_palette_tag("palette");
+	m_c355spr->set_gfxdecode_tag("gfxdecode");
+	m_c355spr->set_is_namcofl(true);
+	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));
+	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_gfxregion(NAMCOFL_SPRITEGFX);
+
+	NAMCO_C123TMAP(config, m_c123tmap, 0);
+	m_c123tmap->set_gfxdecode_tag("gfxdecode");
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcofl_state::TilemapCB, this));
+	m_c123tmap->set_maskregion_tag(NAMCOFL_TILEMASKREGION);
+	m_c123tmap->set_gfxregion(NAMCOFL_TILEGFX);
+
 	NAMCO_C116(config, m_c116, 0);
 	m_c116->set_palette(m_palette);
 
@@ -804,13 +825,11 @@ void namcofl_state::common_init()
 void namcofl_state::init_speedrcr()
 {
 	common_init();
-	m_gametype = NAMCOFL_SPEED_RACER;
 }
 
 void namcofl_state::init_finalapr()
 {
 	common_init();
-	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
 GAME(  1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, init_speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

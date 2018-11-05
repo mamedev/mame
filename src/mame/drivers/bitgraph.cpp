@@ -565,7 +565,9 @@ MACHINE_CONFIG_START(bitgraph_state::bg_ppu)
 //  MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, bitgraph_state, ppu_t0_r))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(*this, bitgraph_state, ppu_i8243_w))
+	i8243_device &i8243(I8243(config, "i8243"));
+	i8243.read_handler().set_nop();
+	i8243.write_handler().set(FUNC(bitgraph_state::ppu_i8243_w));
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))

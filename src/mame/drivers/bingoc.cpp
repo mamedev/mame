@@ -129,22 +129,14 @@ WRITE8_MEMBER(bingoc_state::sound_play_w)
 void bingoc_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100001, 0x100001).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x100003, 0x100003).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x100009, 0x100009).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x10000b, 0x10000b).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x100011, 0x100011).rw("uart3", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x100013, 0x100013).rw("uart3", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x100019, 0x100019).rw("uart4", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x10001b, 0x10001b).rw("uart4", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x100021, 0x100021).rw("uart5", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x100023, 0x100023).rw("uart5", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x100029, 0x100029).rw("uart6", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x10002b, 0x10002b).rw("uart6", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x100031, 0x100031).rw("uart7", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x100033, 0x100033).rw("uart7", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x100039, 0x100039).rw("uart8", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x10003b, 0x10003b).rw("uart8", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x100000, 0x100003).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100008, 0x10000b).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100010, 0x100013).rw("uart3", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100018, 0x10001b).rw("uart4", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100020, 0x100023).rw("uart5", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100028, 0x10002b).rw("uart6", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100030, 0x100033).rw("uart7", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x100038, 0x10003b).rw("uart8", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x180000, 0x18001f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0x00ff); //lamps?
 #if 0 // !SOUND_TEST
 	map(0x180010, 0x180011).w(FUNC(bingoc_state::main_sound_latch_w)); //WRONG there...

@@ -69,7 +69,7 @@
 	<element name="act_label_ymf271"><text string="YMF271" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_ymz280b"><text string="YMZ280B" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_rf5c164"><text string="RF5C164" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="act_label_pwm"><text string="32X PWM" align="1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="act_label_pwm"><text string="32X PWM" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_ay8910"><text string="AY-3-8910" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_gameboy"><text string="Game Boy™" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_nesapu"><text string="NES™ APU" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>

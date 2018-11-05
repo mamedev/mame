@@ -110,8 +110,7 @@ void att4425_state::att4425_mem(address_map &map)
 void att4425_state::att4425_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_i8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x10).w(FUNC(att4425_state::port10_w));
 	map(0x14, 0x14).rw(FUNC(att4425_state::port14_r), FUNC(att4425_state::port14_w));
 	map(0x15, 0x15).r(FUNC(att4425_state::port15_r));
@@ -240,10 +239,10 @@ static const z80_daisy_config att4425_daisy_chain[] =
 
 MACHINE_CONFIG_START(att4425_state::att4425)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(32'000'000)/8) // XXX
-	MCFG_DEVICE_PROGRAM_MAP(att4425_mem)
-	MCFG_DEVICE_IO_MAP(att4425_io)
-	MCFG_Z80_DAISY_CHAIN(att4425_daisy_chain)
+	Z80(config, m_maincpu, XTAL(32'000'000)/8); // XXX
+	m_maincpu->set_addrmap(AS_PROGRAM, &att4425_state::att4425_mem);
+	m_maincpu->set_addrmap(AS_IO, &att4425_state::att4425_io);
+	m_maincpu->set_daisy_config(att4425_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -257,12 +256,12 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	// ch.3 -- timer?
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(32'000'000)) // XXX
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(32'000'000))); // XXX;
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 #ifdef notdef
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(m_sio, z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(m_sio, z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(m_sio, z80sio_device, rxtxcb_w))
+	ctc.zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
+	ctc.zc_callback<0>().append(m_sio, FUNC(z80sio_device::txca_w));
+	ctc.zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 #endif
 
 	Z80SIO(config, m_sio, 4800); // XXX
@@ -286,10 +285,10 @@ MACHINE_CONFIG_START(att4425_state::att4425)
 	MCFG_DEVICE_ADD("line_clock", CLOCK, 9600*64)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, att4425_state, write_line_clock))
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, m_i8251, 0);
+	m_i8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_i8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))

@@ -106,8 +106,7 @@ void isbc8010_state::isbc8010_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xe4, 0xe7).rw(m_ppi_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe8, 0xeb).rw(m_ppi_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xec, 0xec).mirror(0x02).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xed, 0xed).mirror(0x02).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xec, 0xed).mirror(0x02).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	//AM_RANGE(0xf0, 0xf7) MCS0 - iSBX Multimodule
 	//AM_RANGE(0xf8, 0xff) MCS1 - iSBX Multimodule
 }
@@ -178,10 +177,10 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 	MCFG_DEVICE_PROGRAM_MAP(isbc8010_mem)
 	MCFG_DEVICE_IO_MAP(isbc8010_io)
 
-	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	I8251(config, m_usart, 0);
+	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
 	MCFG_DEVICE_ADD(I8255A_2_TAG, I8255A, 0)
@@ -225,13 +224,13 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 //  MCFG_AY51013_WRITE_SO_CB(WRITE8(*this, sdk80_state, nascom1_hd6402_so))
 
 	/* Devices */
-//  MCFG_DEVICE_ADD("i8279", I8279, 3100000) // based on divider
-//  MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
-//  MCFG_I8279_OUT_SL_CB(WRITE8(*this, sdk80_state, scanlines_w))          // scan SL lines
-//  MCFG_I8279_OUT_DISP_CB(WRITE8(*this, sdk80_state, digit_w))            // display A&B
-//  MCFG_I8279_IN_RL_CB(READ8(*this, sdk80_state, kbd_r))                  // kbd RL lines
-//  MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-//  MCFG_I8279_IN_CTRL_CB(VCC)
+//  i8279_device &kbdc(I8279(config, "i8279", 3100000)); // based on divider
+//  kbdc.out_irq_callback().set_inputline("maincpu", I8085_RST55_LINE); // irq
+//  kbdc.out_sl_callback().set(FUNC(sdk80_state::scanlines_w));         // scan SL lines
+//  kbdc.out_disp_callback().set(FUNC(sdk80_state::digit_w));           // display A&B
+//  kbdc.in_rl_callback().set(FUNC(sdk80_state::kbd_r));                // kbd RL lines
+//  kbdc.in_shift_callback().set_constant(1);                           // Shift key
+//  kbdc.in_ctrl_callback().set_constant(1);
 
 MACHINE_CONFIG_END
 

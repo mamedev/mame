@@ -89,7 +89,7 @@ private:
 	uint8_t m_memsel[4];
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
 	required_device<cassette_image_device> m_cass;
@@ -571,10 +571,10 @@ static const z80_daisy_config a5105_daisy_chain[] =
 
 MACHINE_CONFIG_START(a5105_state::a5105)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(15'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(a5105_mem)
-	MCFG_DEVICE_IO_MAP(a5105_io)
-	MCFG_Z80_DAISY_CHAIN(a5105_daisy_chain)
+	Z80(config, m_maincpu, XTAL(15'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a5105_state::a5105_mem);
+	m_maincpu->set_addrmap(AS_IO, &a5105_state::a5105_io);
+	m_maincpu->set_daisy_config(a5105_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -598,13 +598,13 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(a5105_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(a5105_state, hgdc_draw_text)
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(15'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg2))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(15'000'000) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, 0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg2));
+	ctc.zc_callback<2>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(15'000'000) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(15'000'000) / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 

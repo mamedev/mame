@@ -2678,6 +2678,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="2630fa">
+		<description>2630 Fourier Analyzer (Demo)</description>
+		<year>1987?</year>
+		<publisher>Tektronix</publisher>
+		<info name="version" value="1.70" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="2630 fourier analyzer 1.70 (demo).img" size="368640" crc="2a593b4a" sha1="bc8fb32634cc1e2beff1d518d9db77d272269d27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="abilityd">
 		<description>Ability (Demo)</description>
 		<year>1985</year>
@@ -2938,6 +2950,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="easypc">
+		<description>Easy-PC Demonstrator for Printed Circuit Boards and Schematics</description>
+		<year>19??</year>
+		<publisher>Number One Systems</publisher>
+		<info name="version" value="Rev. I0123" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="easy-pc demonstrator for printed circuit boards and schematics (rev i0123).img" size="368640" crc="1e105d54" sha1="a63629b56539a1d52fdbe25642a71a860ad89e7b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="editexte">
 		<!-- Dumped from a copied disk -->
 		<description>EDITEXTE</description>
@@ -2947,6 +2971,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] EDITEXTE [5.25].img" size="368640" crc="bbf2d707" sha1="e3a2e08005b6beb097e3db74ce894007b6cebfb5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgipack">
+		<description>The Great International Paper Airplane Construction Kit</description>
+		<year>1985</year>
+		<publisher>Simon &amp; Schuster</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the great international paper airplane construction kit.img" size="368640" crc="a55cdfa9" sha1="bef12645b6851977805226ca1b44586b0a4a6cb8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3063,6 +3098,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			<feature name="part_id" value="Printgraph, Translate &amp; Help Disk"/>
 			<dataarea name="flop" size = "737280">
 				<rom name="Lotus-Amstel-2.img" size="737280" crc="6ba54dce" sha1="8d5be21d71f30372271e336c7526b7febde6a74e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mforsta">
+		<description>Mitt första ordbehandlingsprogram (Swe)</description>
+		<year>1987</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="mitt forsta ordbehandlingsprogram (swe).img" size="368640" crc="e237d825" sha1="57fbdbfa0d91ee5ca8f2b5428a2e2257e523ebfe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3458,6 +3505,30 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop2" size = "368640">
 				<rom name="[PC] Print Master Plus D2.2 [5.25].img" size="368640" crc="bc646f11" sha1="27872f48eb22bd7851921feb31d1becc71d51f2c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ranger1">
+		<description>Ranger 1 (Demo)</description>
+		<year>1991?</year>
+		<publisher>Seetrax CAE</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="368640">
+				<rom name="ranger 1 (demo, disk 1).img" size="368640" crc="1f78644d" sha1="0133bceb8d162f31e05d66cc5b9efd3d6efa250e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="368640">
+				<rom name="ranger 1 (demo, disk 2).img" size="368640" crc="4bf95f56" sha1="1749cb49ac8609781fd8f8dd9d4f56432601ce64" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="368640">
+				<rom name="ranger 1 (demo, disk 3).img" size="368640" crc="351cf1f2" sha1="e1a49c5055a0405940aba2b4bb740d7f80b10792" offset="0" />
 			</dataarea>
 		</part>
 	</software>

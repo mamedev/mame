@@ -41,7 +41,7 @@ READ8_MEMBER(cpc_ssa1_device::ssa1_r)
 
 WRITE8_MEMBER(cpc_ssa1_device::ssa1_w)
 {
-	m_sp0256_device->ald_w(space, 0, data);
+	m_sp0256_device->ald_w(data);
 }
 
 READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
@@ -58,7 +58,7 @@ READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
 
 WRITE8_MEMBER(cpc_dkspeech_device::dkspeech_w)
 {
-	m_sp0256_device->ald_w(space, 0, data & 0x3f);
+	m_sp0256_device->ald_w(data & 0x3f);
 }
 
 WRITE_LINE_MEMBER(cpc_ssa1_device::lrq_cb)

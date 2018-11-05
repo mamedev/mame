@@ -1278,7 +1278,7 @@ void mpu4_state::mpu4_6809_map(address_map &map)
 
 
 MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
-	MCFG_DEVICE_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
+	MCFG_DEVICE_ADD("maincpu", MC6809, MPU4_MASTER_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(mpu4_6809_map)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
@@ -1286,20 +1286,18 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	mpu4_common(config);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE((63*8)+(17*8), (37*8)+17) // note this directly affects the scanline counters used below, and thus the timing of everything
-	MCFG_SCREEN_VISIBLE_AREA(0, (63*8)+(0)-1, 0, (37*8)+0-1)
-
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("scn2674_vid", scn2674_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(VIDEO_MASTER_CLOCK, (63*8)+(17*8), 0, (63*8), (37*8)+17, 0, (37*8));
+	// note this directly affects the scanline counters used below, and thus the timing of everything
+	screen.set_screen_update("scn2674_vid", FUNC(scn2674_device::screen_update));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-	MCFG_DEVICE_ADD("scn2674_vid", SCN2674, 0)
-	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("video", M68K_IRQ_3))
-	MCFG_SCN2674_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(mpu4vid_state, display_pixels)
-	MCFG_DEVICE_ADDRESS_MAP(0, mpu4_vram)
+	SCN2674(config, m_scn2674, VIDEO_MASTER_CLOCK / 8);
+	m_scn2674->intr_callback().set_inputline("video", M68K_IRQ_3);
+	m_scn2674->set_character_width(8);
+	m_scn2674->set_display_callback(FUNC(mpu4vid_state::display_pixels));
+	m_scn2674->set_addrmap(0, &mpu4vid_state::mpu4_vram);
 
 
 	MCFG_DEVICE_ADD("video", M68000, VIDEO_MASTER_CLOCK )

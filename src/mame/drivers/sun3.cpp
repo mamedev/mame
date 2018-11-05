@@ -187,9 +187,14 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "machine/timekpr.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
+#include "machine/am79c90.h"
+#include "machine/ncr5380n.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
+#include "bus/sunmouse/sunmouse.h"
 
 #include "screen.h"
 
@@ -200,6 +205,7 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define KEYBOARD_TAG    "keyboard"
+#define MOUSE_TAG       "mouseport"
 
 // page table entry constants
 #define PM_VALID    (0x80000000)    // page is valid
@@ -225,6 +231,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
+		m_scsibus(*this, "scsibus"),
+		m_scsi(*this, "scsibus:7:ncr5380"),
 		m_p_ram(*this, "p_ram"),
 		m_bw2_vram(*this, "bw2_vram"),
 		m_type0space(*this, "type0"),
@@ -233,7 +241,8 @@ public:
 		m_type3space(*this, "type3"),
 		m_rom(*this, "user1"),
 		m_idprom(*this, "idprom"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_lance(*this, "lance")
 	{ }
 
 	void sun3(machine_config &config);
@@ -242,10 +251,15 @@ public:
 	void sun3200(machine_config &config);
 	void sun3_50(machine_config &config);
 
+	void ncr5380(device_t *device);
+
 private:
 	required_device<m68020_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<ncr5380n_device> m_scsi;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -254,6 +268,7 @@ private:
 	optional_device<address_map_bank_device> m_type0space, m_type1space, m_type2space, m_type3space;
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
+	required_device<am79c90_device> m_lance;
 
 	DECLARE_READ32_MEMBER( tl_mmu_r );
 	DECLARE_WRITE32_MEMBER( tl_mmu_w );
@@ -294,6 +309,27 @@ private:
 
 	uint32_t m_cache_tags[0x4000], m_cache_data[0x4000];
 };
+
+static void sun_cdrom(device_t *device)
+{
+	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
+}
+
+void sun3_state::ncr5380(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
+	MCFG_DEVICE_CLOCK(10000000)
+//  MCFG_NCR5380N_DRQ_HANDLER(WRITELINE(*this, sun3_state, drq_w))
+}
+
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add_internal("ncr5380", NCR5380N);
+	device.set_option_machine_config("cdrom", sun_cdrom);
+}
 
 READ32_MEMBER( sun3_state::ram_r )
 {
@@ -750,6 +786,8 @@ void sun3_state::vmetype1space_map(address_map &map)
 	map(0x00080000, 0x0008000f).rw(FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
 	map(0x000a0000, 0x000a0003).rw(FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
 	map(0x00100000, 0x0010ffff).rom().region("user1", 0);
+	map(0x00120000, 0x00120003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
+	map(0x00140000, 0x00140007).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask32(0xffffffff);
 	map(0x001e0000, 0x001e00ff).rw(FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
 }
 
@@ -981,7 +1019,7 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	RAM(config, m_ram).set_default_size("4M").set_extra_options("6M,8M,12M,16M,20M,24M,28M,32M").set_default_value(0);
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("6M,8M,12M,16M,20M,24M,28M,32M").set_default_value(0x00);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -999,24 +1037,40 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
 	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
+
+	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
 
 	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
+
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+
+	MCFG_NSCSI_BUS_ADD("scsibus")
+	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", [this] (device_t *device) { ncr5380(device); })
 MACHINE_CONFIG_END
 
 // Sun 3/60
@@ -1035,6 +1089,7 @@ MACHINE_CONFIG_END
 // Sun 3/E
 MACHINE_CONFIG_START(sun3_state::sun3e)
 	sun3(config);
+
 	MCFG_DEVICE_REPLACE("maincpu", M68020, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
 MACHINE_CONFIG_END
@@ -1059,6 +1114,8 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	MCFG_DEVICE_ADD("maincpu", M68020, 15700000)
 	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
 
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_350_update)
 	MCFG_SCREEN_SIZE(1600,1100)
@@ -1069,7 +1126,7 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
-	RAM(config, m_ram).set_default_size("4M").set_default_value(0);
+	RAM(config, m_ram).set_default_size("4M").set_default_value(0x00);
 
 	// MMU Type 0 device space
 	ADDRESS_MAP_BANK(config, "type0").set_map(&sun3_state::vmetype0space_novram_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
@@ -1083,24 +1140,38 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun3_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530N, 4.9152_MHz_XTAL)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
 	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530N, 4.9152_MHz_XTAL)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
+
+	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
 
 	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
+
+	MCFG_NSCSI_BUS_ADD("scsibus")
+	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", [this] (device_t *device) { ncr5380(device); })
 MACHINE_CONFIG_END
 
 /* ROM definition */

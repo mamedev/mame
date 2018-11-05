@@ -59,6 +59,10 @@
 #define ENV_PRIMARYROM  (0x02)
 #define ENV_ROMENABLE   (0x01)
 
+// 14M / 14, but with every 65th cycle stretched which we cannot reasonably emulate
+// 2 MHz mode probably has every 33rd cycle stretched but this is currently unproven.
+static constexpr XTAL APPLE2_CLOCK(1'021'800);
+
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
 	uint8_t result = 0xFF;
@@ -469,12 +473,6 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
-{
-	m_via[1]->write_cb1(m_screen->vblank());
-	m_via[1]->write_cb2(m_screen->vblank());
-}
-
 uint8_t *apple3_state::apple3_bankaddr(uint16_t bank, offs_t offset)
 {
 	if (bank != (uint16_t) ~0)
@@ -510,7 +508,7 @@ void apple3_state::apple3_update_memory()
 		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", m_via_0_b, m_via_1_a);
 	}
 
-	m_maincpu->set_unscaled_clock((m_via_0_a & ENV_SLOWSPEED) ? 1021800 : 2000000);
+	m_maincpu->set_unscaled_clock(((m_via_0_a & ENV_SLOWSPEED) ? APPLE2_CLOCK : (14.318181_MHz_XTAL / 7)));
 
 	/* bank 2 (0100-01FF) */
 	if (!(m_via_0_a & ENV_STACK1XX))
@@ -621,7 +619,7 @@ WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 }
 
 
-MACHINE_RESET_MEMBER(apple3_state,apple3)
+void apple3_state::machine_reset()
 {
 	m_indir_bank = 0;
 	m_sync = false;
@@ -729,11 +727,9 @@ void apple3_state::init_apple3()
 	save_item(NAME(m_vb));
 	save_item(NAME(m_vc));
 	save_item(NAME(m_smoothscr));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(apple3_state::apple3_postload), this));
 }
 
-void apple3_state::apple3_postload()
+void apple3_state::device_post_load()
 {
 	apple3_update_memory();
 }

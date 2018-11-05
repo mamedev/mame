@@ -72,6 +72,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_nvr(*this, "nvr")
+		, m_comuart(*this, "comuart")
+		, m_kbduart(*this, "kbduart")
 		, m_chargen(*this, "chargen")
 		, m_mainram(*this, "mainram")
 		, m_extraram(*this, "extraram")
@@ -109,6 +111,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<er2055_device> m_nvr;
+	required_device<i8251_device> m_comuart;
+	required_device<i8251_device> m_kbduart;
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr<u8> m_mainram;
 	required_shared_ptr<u8> m_extraram;
@@ -117,8 +121,8 @@ private:
 
 void cit101_state::machine_start()
 {
-	subdevice<i8251_device>("comuart")->write_cts(0);
-	subdevice<i8251_device>("kbduart")->write_cts(0);
+	m_comuart->write_cts(0);
+	m_kbduart->write_cts(0);
 
 	m_brightness = 0xff;
 
@@ -302,12 +306,9 @@ void cit101_state::mem_map(address_map &map)
 	map(0x8000, 0xbfff).ram().share("extraram"); // only 4 bits wide?
 	map(0x8000, 0x8000).w(FUNC(cit101_state::screen_control_w));
 	map(0xc000, 0xdfff).rw(FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
-	map(0xfc00, 0xfc00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc01, 0xfc01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfc20, 0xfc20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc21, 0xfc21).rw("comuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfc40, 0xfc40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc41, 0xfc41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc00, 0xfc01).rw("auxuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfc20, 0xfc21).rw("comuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfc40, 0xfc41).rw("kbduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xfc60, 0xfc63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc80, 0xfc83).w("pit0", FUNC(pit8253_device::write));
 	map(0xfcc0, 0xfcc3).w("pit1", FUNC(pit8253_device::write));
@@ -315,12 +316,9 @@ void cit101_state::mem_map(address_map &map)
 
 void cit101_state::io_map(address_map &map)
 {
-	map(0x00, 0x00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x20, 0x20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw("comuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x40, 0x40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw("auxuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x20, 0x21).rw("comuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x40, 0x41).rw("kbduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x60, 0x63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa0).w(FUNC(cit101_state::brightness_w));
 	map(0xe0, 0xe0).rw(FUNC(cit101_state::e0_latch_r), FUNC(cit101_state::e0_latch_w));
@@ -344,12 +342,12 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_SCREEN_UPDATE_DRIVER(cit101_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 
-	MCFG_DEVICE_ADD("comuart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("comm", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("comm", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("comm", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<0>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<2>))
+	I8251(config, m_comuart, 6.144_MHz_XTAL / 2);
+	m_comuart->txd_handler().set("comm", FUNC(rs232_port_device::write_txd));
+	m_comuart->dtr_handler().set("comm", FUNC(rs232_port_device::write_dtr));
+	m_comuart->rts_handler().set("comm", FUNC(rs232_port_device::write_rts));
+	m_comuart->rxrdy_handler().set("uartint", FUNC(input_merger_device::in_w<0>));
+	m_comuart->txrdy_handler().set("uartint", FUNC(input_merger_device::in_w<2>));
 
 	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("comuart", i8251_device, write_rxd))
@@ -357,10 +355,10 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	// CTS can be disabled in SET-UP Mode C
 	// DSR, CD, SI, RI are examined only during the modem test, not "always ignored" as the User's Manual claims
 
-	MCFG_DEVICE_ADD("auxuart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<1>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<3>))
+	i8251_device &auxuart(I8251(config, "auxuart", 6.144_MHz_XTAL / 2));
+	auxuart.txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
+	auxuart.rxrdy_handler().set("uartint", FUNC(input_merger_device::in_w<1>));
+	auxuart.txrdy_handler().set("uartint", FUNC(input_merger_device::in_w<3>));
 
 	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("auxuart", i8251_device, write_rxd))
@@ -369,9 +367,9 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_INPUT_MERGER_ANY_HIGH("uartint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE))
 
-	MCFG_DEVICE_ADD("kbduart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("keyboard", cit101_hle_keyboard_device, write_rxd))
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
+	I8251(config, m_kbduart, 6.144_MHz_XTAL / 2);
+	m_kbduart->txd_handler().set("keyboard", FUNC(cit101_hle_keyboard_device::write_rxd));
+	m_kbduart->rxrdy_handler().set_inputline("maincpu", I8085_RST65_LINE);
 
 	MCFG_DEVICE_ADD("keyboard", CIT101_HLE_KEYBOARD, 0)
 	MCFG_CIT101_HLE_KEYBOARD_TXD_CALLBACK(WRITELINE("kbduart", i8251_device, write_rxd))

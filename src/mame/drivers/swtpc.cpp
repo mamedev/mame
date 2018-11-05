@@ -103,46 +103,46 @@ MACHINE_CONFIG_START(swtpc_state::swtpc)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MC14411(config, m_brg, XTAL(1'843'200));
-	m_brg->out_f7_cb().set("io0", FUNC(ss50_interface_port_device::f600_1200_w)); // 1200b
-	m_brg->out_f7_cb().append("io1", FUNC(ss50_interface_port_device::f600_1200_w));
-	m_brg->out_f7_cb().append("io2", FUNC(ss50_interface_port_device::f600_1200_w));
-	m_brg->out_f7_cb().append("io3", FUNC(ss50_interface_port_device::f600_1200_w));
-	m_brg->out_f7_cb().append("io4", FUNC(ss50_interface_port_device::f600_1200_w));
-	m_brg->out_f7_cb().append("io5", FUNC(ss50_interface_port_device::f600_1200_w));
-	m_brg->out_f7_cb().append("io6", FUNC(ss50_interface_port_device::f600_1200_w));
-	m_brg->out_f7_cb().append("io7", FUNC(ss50_interface_port_device::f600_1200_w));
-	m_brg->out_f8_cb().set("io0", FUNC(ss50_interface_port_device::f600_4800_w)); // 600b
-	m_brg->out_f8_cb().append("io1", FUNC(ss50_interface_port_device::f600_4800_w));
-	m_brg->out_f8_cb().append("io2", FUNC(ss50_interface_port_device::f600_4800_w));
-	m_brg->out_f8_cb().append("io3", FUNC(ss50_interface_port_device::f600_4800_w));
-	m_brg->out_f8_cb().append("io4", FUNC(ss50_interface_port_device::f600_4800_w));
-	m_brg->out_f8_cb().append("io5", FUNC(ss50_interface_port_device::f600_4800_w));
-	m_brg->out_f8_cb().append("io6", FUNC(ss50_interface_port_device::f600_4800_w));
-	m_brg->out_f8_cb().append("io7", FUNC(ss50_interface_port_device::f600_4800_w));
-	m_brg->out_f9_cb().set("io0", FUNC(ss50_interface_port_device::f300_w)); // 300b
-	m_brg->out_f9_cb().append("io1", FUNC(ss50_interface_port_device::f300_w));
-	m_brg->out_f9_cb().append("io2", FUNC(ss50_interface_port_device::f300_w));
-	m_brg->out_f9_cb().append("io3", FUNC(ss50_interface_port_device::f300_w));
-	m_brg->out_f9_cb().append("io4", FUNC(ss50_interface_port_device::f300_w));
-	m_brg->out_f9_cb().append("io5", FUNC(ss50_interface_port_device::f300_w));
-	m_brg->out_f9_cb().append("io6", FUNC(ss50_interface_port_device::f300_w));
-	m_brg->out_f9_cb().append("io7", FUNC(ss50_interface_port_device::f300_w));
-	m_brg->out_f11_cb().set("io0", FUNC(ss50_interface_port_device::f150_9600_w)); // 150b
-	m_brg->out_f11_cb().append("io1", FUNC(ss50_interface_port_device::f150_9600_w));
-	m_brg->out_f11_cb().append("io2", FUNC(ss50_interface_port_device::f150_9600_w));
-	m_brg->out_f11_cb().append("io3", FUNC(ss50_interface_port_device::f150_9600_w));
-	m_brg->out_f11_cb().append("io4", FUNC(ss50_interface_port_device::f150_9600_w));
-	m_brg->out_f11_cb().append("io5", FUNC(ss50_interface_port_device::f150_9600_w));
-	m_brg->out_f11_cb().append("io6", FUNC(ss50_interface_port_device::f150_9600_w));
-	m_brg->out_f11_cb().append("io7", FUNC(ss50_interface_port_device::f150_9600_w));
-	m_brg->out_f13_cb().set("io0", FUNC(ss50_interface_port_device::f110_w)); // 110b
-	m_brg->out_f13_cb().append("io1", FUNC(ss50_interface_port_device::f110_w));
-	m_brg->out_f13_cb().append("io2", FUNC(ss50_interface_port_device::f110_w));
-	m_brg->out_f13_cb().append("io3", FUNC(ss50_interface_port_device::f110_w));
-	m_brg->out_f13_cb().append("io4", FUNC(ss50_interface_port_device::f110_w));
-	m_brg->out_f13_cb().append("io5", FUNC(ss50_interface_port_device::f110_w));
-	m_brg->out_f13_cb().append("io6", FUNC(ss50_interface_port_device::f110_w));
-	m_brg->out_f13_cb().append("io7", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<7>().set("io0", FUNC(ss50_interface_port_device::f600_1200_w)); // 1200b
+	m_brg->out_f<7>().append("io1", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io2", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io3", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io4", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io5", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io6", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io7", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<8>().set("io0", FUNC(ss50_interface_port_device::f600_4800_w)); // 600b
+	m_brg->out_f<8>().append("io1", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io2", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io3", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io4", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io5", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io6", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io7", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<9>().set("io0", FUNC(ss50_interface_port_device::f300_w)); // 300b
+	m_brg->out_f<9>().append("io1", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io2", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io3", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io4", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io5", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io6", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io7", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<11>().set("io0", FUNC(ss50_interface_port_device::f150_9600_w)); // 150b
+	m_brg->out_f<11>().append("io1", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io2", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io3", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io4", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io5", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io6", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io7", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<13>().set("io0", FUNC(ss50_interface_port_device::f110_w)); // 110b
+	m_brg->out_f<13>().append("io1", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io2", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io3", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io4", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io5", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io6", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io7", FUNC(ss50_interface_port_device::f110_w));
 
 	MCFG_SS50_INTERFACE_PORT_ADD("io0", default_2rs_devices, nullptr)
 	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<0>))

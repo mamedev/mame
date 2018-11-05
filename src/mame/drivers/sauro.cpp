@@ -181,7 +181,7 @@ WRITE_LINE_MEMBER(sauro_state::flip_screen_w)
 
 WRITE8_MEMBER(sauro_state::adpcm_w)
 {
-	m_sp0256->ald_w(space, 0, data);
+	m_sp0256->ald_w(data);
 }
 
 void sauro_state::sauro_map(address_map &map)
@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(sauro_state::tecfri)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

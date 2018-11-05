@@ -1473,6 +1473,9 @@ public:
 	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_stall_callback(Object &&cb)  { return m_stall.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pciint_callback(Object &&cb) { return m_pciint.set_callback(std::forward<Object>(cb)); }
+	auto vblank_callback() { return m_vblank.bind(); }
+	auto stall_callback() { return m_stall.bind(); }
+	auto pciint_callback() { return m_pciint.bind(); }
 
 	void set_screen(screen_device &screen) { assert(!m_screen); m_screen = &screen; }
 	void set_cpu(cpu_device &cpu) { assert(!m_cpu); m_cpu = &cpu; }

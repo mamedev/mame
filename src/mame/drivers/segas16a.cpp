@@ -247,7 +247,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return m_i8255->read(space, offset & 3);
+			return m_i8255->read(offset & 3);
 
 		case 0x1000/2:
 		{
@@ -627,7 +627,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			m_i8255->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+			m_i8255->write(param >> 8, param & 0xff);
 			break;
 	}
 }
@@ -1981,16 +1981,18 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, segas16a_state, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("n7751_8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("n7751_8243", CONSTANT(0), WRITE8(*this, segas16a_state,n7751_rom_offset_w))
+	I8243(config, m_n7751_i8243);
+	m_n7751_i8243->read_handler().set_constant(0);
+	m_n7751_i8243->write_handler().set(FUNC(segas16a_state::n7751_rom_offset_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segas16a_state, misc_control_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segas16a_state, tilemap_sound_w))
+	I8255(config, m_i8255);
+	m_i8255->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_i8255->out_pb_callback().set(FUNC(segas16a_state::misc_control_w));
+	m_i8255->out_pc_callback().set(FUNC(segas16a_state::tilemap_sound_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -13,14 +13,15 @@ class crospang_state : public driver_device
 {
 public:
 	crospang_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu"),
-		m_sprgen(*this, "spritegen"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch") { }
+		: driver_device(mconfig, type, tag)
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_spriteram(*this, "spriteram")
+		, m_maincpu(*this, "maincpu")
+		, m_sprgen(*this, "spritegen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_soundlatch(*this, "soundlatch")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fg_videoram;
@@ -30,7 +31,8 @@ public:
 	/* video-related */
 	tilemap_t   *m_bg_layer;
 	tilemap_t   *m_fg_layer;
-	int       m_bestri_tilebank;
+	uint8_t m_bestri_tilebank[4];
+	uint8_t m_bestri_tilebankselect;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -38,7 +40,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(bestri_tilebank_w);
+	DECLARE_WRITE16_MEMBER(bestri_tilebank_data_w);
+	DECLARE_WRITE16_MEMBER(bestri_tilebank_select_w);
 	DECLARE_WRITE16_MEMBER(bestri_bg_scrolly_w);
 	DECLARE_WRITE16_MEMBER(bestri_fg_scrolly_w);
 	DECLARE_WRITE16_MEMBER(bestri_fg_scrollx_w);
@@ -60,8 +63,10 @@ public:
 	void crospang(machine_config &config);
 	void bestri(machine_config &config);
 	void bestria(machine_config &config);
+	void pitapat(machine_config &config);
 	void bestri_map(address_map &map);
 	void bestria_map(address_map &map);
+	void pitapat_map(address_map &map);
 	void crospang_base_map(address_map &map);
 	void crospang_map(address_map &map);
 	void crospang_sound_io_map(address_map &map);

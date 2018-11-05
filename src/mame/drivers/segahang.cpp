@@ -167,7 +167,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 	switch (offset & 0x3020/2)
 	{
 		case 0x0000/2: // PPI @ 4B
-			return m_i8255_1->read(space, offset & 3);
+			return m_i8255_1->read(offset & 3);
 
 		case 0x1000/2: // Input ports and DIP switches
 		{
@@ -176,7 +176,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 		}
 
 		case 0x3000/2: // PPI @ 4C
-			return m_i8255_2->read(space, offset & 3);
+			return m_i8255_2->read(offset & 3);
 
 		case 0x3020/2: // ADC0804 data output
 			return m_adc_ports[m_adc_select].read_safe(0);
@@ -203,7 +203,7 @@ WRITE16_MEMBER( segahang_state::hangon_io_w )
 				return;
 
 			case 0x3000/2: // PPI @ 4C
-				m_i8255_2->write(space, offset & 3, data & 0xff);
+				m_i8255_2->write(offset & 3, data & 0xff);
 				return;
 
 			case 0x3020/2: // ADC0804
@@ -224,7 +224,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 	switch (offset & 0x0030/2)
 	{
 		case 0x0000/2:
-			return m_i8255_1->read(space, offset & 3);
+			return m_i8255_1->read(offset & 3);
 
 		case 0x0010/2: // Input ports and DIP switches
 		{
@@ -234,7 +234,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 
 		case 0x0020/2: // PPI @ 4C
 			if (offset == 2) return 0;
-			return m_i8255_2->read(space, offset & 3);
+			return m_i8255_2->read(offset & 3);
 
 		case 0x0030/2: // ADC0804 data output
 			return m_adc_ports[m_adc_select].read_safe(0);
@@ -262,7 +262,7 @@ WRITE16_MEMBER( segahang_state::sharrier_io_w )
 				return;
 
 			case 0x0020/2: // PPI @ 4C
-				m_i8255_2->write(space, offset & 3, data & 0xff);
+				m_i8255_2->write(offset & 3, data & 0xff);
 				return;
 
 			case 0x0030/2: // ADC0804
@@ -362,7 +362,7 @@ void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		// synchronize writes to the 8255 PPI
 		case TID_PPI_WRITE:
-			m_i8255_1->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+			m_i8255_1->write(param >> 8, param & 0xff);
 			break;
 	}
 }
@@ -769,14 +769,14 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segahang_state, video_lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segahang_state, tilemap_sound_w))
+	I8255(config, m_i8255_1);
+	m_i8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_i8255_1->out_pb_callback().set(FUNC(segahang_state::video_lamps_w));
+	m_i8255_1->out_pc_callback().set(FUNC(segahang_state::tilemap_sound_w));
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segahang_state, sub_control_adc_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, segahang_state, adc_status_r))
+	I8255(config, m_i8255_2);
+	m_i8255_2->out_pa_callback().set(FUNC(segahang_state::sub_control_adc_w));
+	m_i8255_2->in_pc_callback().set(FUNC(segahang_state::adc_status_r));
 
 	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
 	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)

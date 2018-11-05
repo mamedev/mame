@@ -32,12 +32,12 @@ DEFINE_DEVICE_TYPE(ISA8_MYB3K_COM, isa8_myb3k_com_device, "isa8_myb3k_com", "ADP
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "usart", I8251, XTAL(15'974'400) / 8 )
-	MCFG_I8251_TXD_HANDLER(WRITELINE("com1", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("com1", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("com1", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, com_int_rx))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, com_int_tx))
+	I8251( config, m_usart, XTAL(15'974'400) / 8 );
+	m_usart->txd_handler().set("com1", FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set("com1", FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set("com1", FUNC(rs232_port_device::write_rts));
+	m_usart->rxrdy_handler().set(FUNC(isa8_myb3k_com_device::com_int_rx));
+	m_usart->txrdy_handler().set(FUNC(isa8_myb3k_com_device::com_int_tx));
 
 	MCFG_DEVICE_ADD( "com1", RS232_PORT, isa8_myb3k_com, nullptr )
 	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
@@ -101,20 +101,17 @@ void isa8_myb3k_com_device::device_reset()
 	{
 		// IO base factory setting is 0x540
 		uint32_t base = m_iobase->read();
-		m_isa->install_device(base, base,
-					read8_delegate(FUNC(i8251_device::data_r), subdevice<i8251_device>("usart")),
-					write8_delegate(FUNC(i8251_device::data_w), subdevice<i8251_device>("usart")) );
-		m_isa->install_device(base + 1, base + 1,
-					read8_delegate(FUNC(i8251_device::status_r), subdevice<i8251_device>("usart")),
-					write8_delegate(FUNC(i8251_device::control_w), subdevice<i8251_device>("usart")) );
+		m_isa->install_device(base, base + 1,
+					read8sm_delegate(FUNC(i8251_device::read), m_usart.target()),
+					write8sm_delegate(FUNC(i8251_device::write), m_usart.target()) );
 
 		m_isa->install_device(base + 2, base + 2,
 					read8_delegate(FUNC(isa8_myb3k_com_device::dce_status), this),
 					write8_delegate(FUNC(isa8_myb3k_com_device::dce_control), this) );
 
 		m_isa->install_device(base + 4, base + 7,
-					read8_delegate(FUNC(pit8253_device::read), subdevice<pit8253_device>("pit")),
-					write8_delegate(FUNC(pit8253_device::write), subdevice<pit8253_device>("pit")) );
+					read8sm_delegate(FUNC(pit8253_device::read), subdevice<pit8253_device>("pit")),
+					write8sm_delegate(FUNC(pit8253_device::write), subdevice<pit8253_device>("pit")) );
 
 		m_irq = m_isairq->read();
 		m_installed = true;

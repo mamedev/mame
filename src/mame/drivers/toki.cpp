@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(toki_state::tokib)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* verified with PCB */
 	MCFG_DEVICE_PROGRAM_MAP(tokib_audio_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)

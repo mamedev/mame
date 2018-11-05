@@ -179,7 +179,7 @@ MACHINE_CONFIG_START(micro20_state::micro20)
 
 	MCFG_DEVICE_ADD(DUART_B_TAG, MC68681, 3.6864_MHz_XTAL)
 
-	MCFG_DEVICE_ADD(FDC_TAG, WD1772, 16.67_MHz_XTAL / 2)
+	WD1772(config, FDC_TAG, 16.67_MHz_XTAL / 2);
 
 	PIT68230(config, m_pit, 16.67_MHz_XTAL / 2);
 	m_pit->timer_irq_callback().set(FUNC(micro20_state::timerirq_w));

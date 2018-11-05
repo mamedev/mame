@@ -269,7 +269,7 @@ void micro3d_state::drmath_data(address_map &map)
 	map(0x01400000, 0x01400003).rw(FUNC(micro3d_state::micro3d_pipe_r), FUNC(micro3d_state::micro3d_fifo_w));
 	map(0x01600000, 0x01600003).w(FUNC(micro3d_state::drmath_intr2_ack));
 	map(0x01800000, 0x01800003).w(FUNC(micro3d_state::micro3d_alt_fifo_w));
-	map(0x03fffff0, 0x03fffff7).rw("scc", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
+	map(0x03fffff0, 0x03ffffff).rw("scc", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
 }
 
 /*************************************
@@ -318,12 +318,8 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_DEVICE_PROGRAM_MAP(drmath_prg)
 	MCFG_DEVICE_DATA_MAP(drmath_data)
 
-	MCFG_DEVICE_ADD("scc", SCC8530N, 32_MHz_XTAL / 2 / 2)
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("monitor_drmath", rs232_port_device, write_txd))
-
-	rs232_port_device &monitor_drmath(RS232_PORT(config, "monitor_drmath", default_rs232_devices, nullptr));
-	monitor_drmath.rxd_handler().set("scc", FUNC(z80scc_device::rxb_w));
-	monitor_drmath.dcd_handler().set("scc", FUNC(z80scc_device::dcdb_w)).exor(1);
+	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
+	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("audiocpu", I8051, 11.0592_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
@@ -362,15 +358,19 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("uart", MC2661, 40_MHz_XTAL / 8) // actually SCN2651
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("monitor_vgb", rs232_port_device, write_txd))
+	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
+	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("monitor_vgb", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", mc2661_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", mc2661_device, dsr_w))
+	rs232_port_device &monitor_host(RS232_PORT(config, "monitor_host", default_rs232_devices, nullptr)); // J2 (4-pin molex)
+	monitor_host.rxd_handler().set("duart", FUNC(mc68681_device::rx_a_w));
 
-	MCFG_DEVICE_ADD("monitor_host", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", mc68681_device, rx_a_w))
+	rs232_port_device &monitor_drmath(RS232_PORT(config, "monitor_drmath", default_rs232_devices, nullptr)); // J4 (4-pin molex)
+	monitor_drmath.rxd_handler().set("scc", FUNC(z80scc_device::rxb_w));
+	monitor_drmath.dcd_handler().set("scc", FUNC(z80scc_device::dcdb_w));
+
+	rs232_port_device &monitor_vgb(RS232_PORT(config, "monitor_vgb", default_rs232_devices, nullptr)); // J3 (4-pin molex)
+	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(mc2661_device::rx_w));
+	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(mc2661_device::dsr_w));
 
 	ADC0844(config, m_adc, 0);
 	m_adc->intr_callback().set("mfp", FUNC(mc68901_device::i3_w));

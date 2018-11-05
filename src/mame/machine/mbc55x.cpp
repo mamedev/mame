@@ -42,12 +42,12 @@ static int instruction_hook(device_t &device, offs_t curpc);
 
 READ8_MEMBER( mbc55x_state::ppi8255_r )
 {
-	return m_ppi->read(space, offset>>1);
+	return m_ppi->read(offset>>1);
 }
 
 WRITE8_MEMBER( mbc55x_state::ppi8255_w )
 {
-	m_ppi->write(space, offset>>1, data);
+	m_ppi->write(offset>>1, data);
 }
 
 READ8_MEMBER( mbc55x_state::mbc55x_ppi_porta_r )
@@ -109,22 +109,22 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_usart_w )
 
 READ8_MEMBER(mbc55x_state::mbcpic8259_r)
 {
-	return m_pic->read(space, offset>>1);
+	return m_pic->read(offset>>1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
 {
-	m_pic->write(space, offset>>1, data);
+	m_pic->write(offset>>1, data);
 }
 
 READ8_MEMBER(mbc55x_state::mbcpit8253_r)
 {
-	return m_pit->read(space, offset >> 1);
+	return m_pit->read(offset >> 1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbcpit8253_w)
 {
-	m_pit->write(space, offset >> 1, data);
+	m_pit->write(offset >> 1, data);
 }
 
 WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )
@@ -251,11 +251,11 @@ READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
 	switch (offset)
 	{
 		case 0: //logerror("%s read kb_uart\n",machine().describe_context());
-			result = m_kb_uart->data_r(space,0);
+			result = m_kb_uart->data_r();
 			break;
 
 		case 1:
-			result = m_kb_uart->status_r(space,0);
+			result = m_kb_uart->status_r();
 			if (m_keyboard.key_special & KEY_BIT_CTRL)  // Parity error used to flag control down
 				result |= i8251_device::I8251_STATUS_PARITY_ERROR;
 			break;
@@ -270,8 +270,8 @@ WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
 
 	switch (offset)
 	{
-		case 0  : m_kb_uart->data_w(space, 0, data); break;
-		case 1  : m_kb_uart->control_w(space, 0, data); break;
+		case 0  : m_kb_uart->data_w(data); break;
+		case 1  : m_kb_uart->control_w(data); break;
 	}
 }
 

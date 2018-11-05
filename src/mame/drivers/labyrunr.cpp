@@ -171,7 +171,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_DEVICE_PROGRAM_MAP(labyrunr_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
