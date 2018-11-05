@@ -583,27 +583,35 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 
 			xpos += 128 - 8;
 
-			// Everything except directdirect addressing (Addressing Mode 2) goes through the segment registers?
-			if (alt_addressing != 0)
-			{
-				// tile based addressing takes into account tile size (and bpp?)
-				if (alt_addressing == 1)
-					tile = (tile * drawheight * drawwidth) / 2;
-
-				// 8-byte alignment Addressing Mode uses a fixed offset?
-				if (alt_addressing == 2)
-					tile = tile * 8;
-
-				int basereg = (tile & 0xf0000) >> 16;
-				tile &= 0xffff;
-				int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-				tile += gfxbase;
-			}
-
 			int bpp = 1;
 
 			bpp = (attr0 & 0x0e) >> 1;
 			bpp += 1;
+
+			// Everything except directdirect addressing (Addressing Mode 2) goes through the segment registers?
+			if (alt_addressing != 0)
+			{
+				int basereg = 0;
+
+				// tile based addressing takes into account tile size (and bpp?)
+				if (alt_addressing == 1)
+				{
+					tile = (tile * drawheight * drawwidth * bpp) / 8;
+					basereg = 0; // always uses segment register 0 in tile addressing mode?
+				}
+				else 
+				{
+					// 8-byte alignment Addressing Mode uses a fixed offset?
+					if (alt_addressing == 2)
+						tile = tile * 8;
+
+					basereg = (tile & 0xf0000) >> 16;
+					tile &= 0xffff;
+				}
+
+				int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+				tile += gfxbase;
+			}
 
 			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
 
