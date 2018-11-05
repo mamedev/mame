@@ -1749,7 +1749,32 @@
 		</part>
 	</software>
 
-<!-- Requires barcode boy set emulation -->
+	<!--
+	Battle Space is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		1 (up):
+			4905672306367
+		1 (down):
+			4902776809367
+		2 (up):
+			4908052808369
+		2 (down):
+			4907981000301
+		3 (up):
+			4911826551347
+		3 (down):
+			4909062206350
+		4 (up):
+			4913508504399
+		4 (down):
+			4912713004366
+		5 (up):
+			4918156001351
+		5 (down):
+			4916911302309
+	There is also a "free card" without barcodes.
+	-->
 	<software name="bspace" supported="no">
 		<description>Battle Space (Jpn)</description>
 		<year>1992</year>
@@ -3730,6 +3755,7 @@
 		</part>
 	</software>
 
+	<!-- Game cart has an integrated infrared port for multiplayer play. -->
 	<software name="spinner">
 		<!-- Notes: SGB enhanced -->
 		<description>Chousoku Spinner (Jpn)</description>
@@ -4214,6 +4240,11 @@
 		</part>
 	</software>
 
+	<!--
+	The Miracle of the Zone supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="miraclzn">
 		<!-- Notes: SGB enhanced -->
 		<description>Daikaijuu Monogatari - The Miracle of the Zone (Jpn)</description>
@@ -5822,6 +5853,24 @@
 		</part>
 	</software>
 
+	<!--
+	Family Jockey 2 is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards:
+		バーコードカード No. 1 (barcode card #1)
+			競争馬 A (Racehorse A): 5893713522816 (EAN-13)
+			競争馬 B (Racehorse B): 1509843019075 (EAN-13)
+		バーコードカード No. 2 (barcode card #2)
+			繁殖馬 A (Breeding horse A): 2378649896765 (EAN-13)
+			繁殖馬 B (Breeding horse B): 4232978865152 (EAN-13)
+		バーコードカード No. 3 (barcode card #3)
+			繁殖馬 C (Breeding horse C): 7164625542390 (EAN-13)
+		バーコードカード No. 4 (barcode card #4)
+			種馬 A (Stallion A): 9845554422318 (EAN-13)
+			種馬 B (Stallion B): 3572821107673 (EAN-13)
+		バーコードカード No. 5 (barcode card #5)
+			種馬 C (Stallion C) : 6319537443513 (EAN-13)
+	-->
 	<software name="famjock2">
 		<description>Family Jockey 2 - Meiba no Kettou (Jpn)</description>
 		<year>1993</year>
@@ -5881,6 +5930,19 @@
 		</part>
 	</software>
 
+	<!--
+	Family Stadium 3 (Famista 3) is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		No. 1: ホームランバッター
+			8357933639923
+		No. 2: 高打率バッター
+			7814374127798
+		No. 3: 駿足バッター
+			9880692151263
+		No. 4: ピッチャー
+			1414213562177
+	-->
 	<software name="famista3">
 		<description>Famista 3 (Jpn)</description>
 		<year>1993</year>
@@ -6995,9 +7057,14 @@
 		</part>
 	</software>
 
+	<!--
+	"GBKiss" is an integrated infrared port for cart-to-cart multiplayer play, but also for PC connection 
+	with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel port (DB25) modem/adaptor for PC-DOS
+	for transfering files between the game and a computer.
+	-->
 	<software name="gbkiss">
 		<description>GBKiss Mini Games (Jpn)</description>
-		<year>19??</year>
+		<year>1997</year> <!-- Year printed on the cart label -->
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AKAJ-JPN"/>
 		<part name="cart" interface="gameboy_cart">
@@ -10039,6 +10106,23 @@
 		</part>
 	</software>
 
+	<!--
+	Kattobi Road is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		No. 1:
+			4903301160625
+		No. 2:
+			4987084410924
+		No. 3:
+			4902888119101
+		No. 4:
+			4901121110004
+		No. 5 (up):
+			4902105002063
+		No. 5 (down):
+			4901780161157
+	-->
 	<software name="kattobi">
 		<description>Kattobi Road (Jpn)</description>
 		<year>1993</year>
@@ -13226,6 +13310,28 @@
 		</part>
 	</software>
 
+	<!--
+	Monster Maker requires Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		1 (fg up):
+			9120153954577
+		1 (fg down):
+			9022038781998
+		1 (bg up):
+			9362462085911
+		1 (bg down):
+			9752412234900
+		2 (fg up):
+			9052091324955
+		2 (fg down):
+			9322158686716
+		2 (bg up):
+			9447410810323
+		2 (bg down):
+			9998017308336
+	Cards 3, 4 and 5 contains no barcodes.
+	-->
 	<software name="monstmkr">
 		<description>Monster Maker (Jpn)</description>
 		<year>1990</year>
@@ -13243,7 +13349,28 @@
 		</part>
 	</software>
 
-<!-- Requires barcode boy set emulation -->
+	<!--
+	Monster Maker - Barcode Saga requires Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		1 (fg up):
+			9120153954577
+		1 (fg down):
+			9022038781998
+		1 (bg up):
+			9362462085911
+		1 (bg down):
+			9752412234900
+		2 (fg up):
+			9052091324955
+		2 (fg down):
+			9322158686716
+		2 (bg up):
+			9447410810323
+		2 (bg down):
+			9998017308336
+	Cards 3, 4 and 5 contains no barcodes.
+	-->
 	<software name="monstmkb" supported="no">
 		<description>Monster Maker - Barcode Saga (Jpn)</description>
 		<year>1993</year>
@@ -14106,6 +14233,11 @@
 		</part>
 	</software>
 
+	<!--
+	Nectaris supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="nectaris">
 		<!-- Notes: SGB enhanced -->
 		<description>Nectaris GB (Jpn)</description>
@@ -16214,6 +16346,11 @@
 		</part>
 	</software>
 
+	<!--
+	Pocket Bomberman supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="pockbman">
 		<!-- Notes: SGB enhanced -->
 		<description>Pocket Bomberman (Euro)</description>
@@ -16268,6 +16405,11 @@
 		</part>
 	</software>
 
+	<!--
+	Pocket Family supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="pockfam">
 		<!-- Notes: SGB enhanced -->
 		<description>Pocket Family (Jpn)</description>
@@ -20811,6 +20953,11 @@
 		</part>
 	</software>
 
+	<!--
+	Super B-Daman - Fighting Phoenix supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="sbdaman">
 		<!-- Notes: SGB enhanced -->
 		<description>Super B-Daman - Fighting Phoenix (Jpn)</description>
@@ -25431,6 +25578,12 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
+	<!--
+	The game cart includes a real 200MHz fishing sonar (developed in cooperation with Honda Electronics).
+	There is a separated PCB labeled "HD0B220002" for the sonar components and a jack connector for attaching the
+	sonar (20 meters cable with its head on the other end).
+	There is a Game Boy prototype version (undumped) named "Handy Watcher", and also a WonderSwan version named "Handy Sonar".
+	-->
 	<software name="pocksonr">
 		<description>Pocket Sonar (Jpn)</description>
 		<year>1998</year>
