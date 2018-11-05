@@ -16,7 +16,13 @@
 #include "emu.h"
 #include "wd33c93.h"
 
-#define VERBOSE 1
+#define LOG_READS		(1 << 0)
+#define LOG_WRITES		(1 << 1)
+#define LOG_COMMANDS	(1 << 2)
+#define LOG_ERRORS		(1 << 3)
+#define LOG_MISC		(1 << 4)
+
+#define VERBOSE			(0)
 #include "logmacro.h"
 
 
@@ -225,7 +231,7 @@ void wd33c93_device::complete_cmd(uint8_t status)
 /* command handlers */
 void wd33c93_device::unimplemented_cmd()
 {
-	logerror("%s:Unimplemented SCSI controller command: %02x\n", machine().describe_context(), m_regs[WD_COMMAND]);
+	LOGMASKED(LOG_COMMANDS | LOG_ERRORS, "%s: Unimplemented SCSI controller command: %02x\n", machine().describe_context(), m_regs[WD_COMMAND]);
 
 	/* complete the command */
 	complete_cmd(CSR_INVALID);
@@ -233,7 +239,7 @@ void wd33c93_device::unimplemented_cmd()
 
 void wd33c93_device::invalid_cmd()
 {
-	logerror("%s:Invalid SCSI controller command: %02x\n", machine().describe_context(), m_regs[WD_COMMAND]);
+	LOGMASKED(LOG_COMMANDS | LOG_ERRORS, "%s: Invalid SCSI controller command: %02x\n", machine().describe_context(), m_regs[WD_COMMAND]);
 
 	/* complete the command */
 	complete_cmd(CSR_INVALID);
@@ -323,7 +329,7 @@ void wd33c93_device::selectxfer_cmd()
 			/* set transfer count */
 			if (get_xfer_count() > TEMP_INPUT_LEN)
 			{
-				logerror("WD33C93: Transfer count too big. Please increase TEMP_INPUT_LEN (size=%d)\n", get_xfer_count());
+				LOGMASKED(LOG_ERRORS, "WD33C93: Transfer count too big. Please increase TEMP_INPUT_LEN (size=%d)\n", get_xfer_count());
 				set_xfer_count(TEMP_INPUT_LEN);
 			}
 
@@ -379,7 +385,7 @@ void wd33c93_device::selectxfer_cmd()
 
 void wd33c93_device::negate_ack()
 {
-	logerror("WD33C93: ACK Negated\n");
+	LOGMASKED(LOG_MISC, "WD33C93: ACK Negated\n");
 
 	/* complete the command */
 	m_regs[WD_AUXILIARY_STATUS] &= ~(ASR_CIP | ASR_BSY);
@@ -404,32 +410,39 @@ void wd33c93_device::dispatch_command()
 	switch (cmd)
 	{
 	case WD_CMD_RESET:
+		LOGMASKED(LOG_COMMANDS, "WD33C93: %s - Reset Command\n", machine().describe_context());
 		reset_cmd();
 		break;
 
 	case WD_CMD_ABORT:
+		LOGMASKED(LOG_COMMANDS, "WD33C93: %s - Abort Command\n", machine().describe_context());
 		abort_cmd();
 		break;
 
 	case WD_CMD_NEGATE_ACK:
+		LOGMASKED(LOG_COMMANDS, "WD33C93: %s - Negate ACK Command\n", machine().describe_context());
 		negate_ack();
 		break;
 
 	case WD_CMD_DISCONNECT:
+		LOGMASKED(LOG_COMMANDS, "WD33C93: %s - Disconnect Command\n", machine().describe_context());
 		disconnect_cmd();
 		break;
 
 	case WD_CMD_SEL_ATN:
 	case WD_CMD_SEL:
+		LOGMASKED(LOG_COMMANDS, "WD33C93: %s - Select %sCommand\n", machine().describe_context(), cmd == WD_CMD_SEL_ATN ? "w/ ATN " : "");
 		select_cmd();
 		break;
 
 	case WD_CMD_SEL_ATN_XFER:
 	case WD_CMD_SEL_XFER:
+		LOGMASKED(LOG_COMMANDS, "WD33C93: %s - Select %sand Xfer Command\n", machine().describe_context(), cmd == WD_CMD_SEL_ATN ? "w/ ATN " : "");
 		selectxfer_cmd();
 		break;
 
 	case WD_CMD_TRANS_INFO:
+		LOGMASKED(LOG_COMMANDS, "WD33C93: %s - Transfer Info Command\n", machine().describe_context());
 		xferinfo_cmd();
 		break;
 
@@ -474,28 +487,101 @@ WRITE8_MEMBER(wd33c93_device::write)
 
 	case 1:
 	{
-		LOG("WD33C93: %s - Write REG=%02x, data = %02x\n", machine().describe_context(), m_sasr, data);
-
 		/* update the register */
-		m_regs[m_sasr] = data;
-
-		/* if we receive a command, schedule to process it */
-		if (m_sasr == WD_COMMAND)
+		if (m_sasr != WD_SCSI_STATUS && m_sasr <= WD_QUEUE_TAG)
 		{
-			LOG( "WDC33C93: %s - Executing command %08x - unit %d\n", machine().describe_context(), data, getunit() );
+			m_regs[m_sasr] = data;
+		}
+
+		switch (m_sasr)
+		{
+		case WD_OWN_ID:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Own ID Register (CDB Size) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CONTROL:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Control Register = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_TIMEOUT_PERIOD:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Timeout Period Register = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_1:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Total Sectors Register (CDB1) = %02x\n", machine().describe_context(), m_sasr, data);
+			m_regs[WD_COMMAND_PHASE] = 0;
+			break;
+		case WD_CDB_2:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Total Heads Register (CDB2) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_3:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Total Cylinders Register MSB (CDB3) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_4:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Total Cylinders Register LSB (CDB4) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_5:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Logical Address Register MSB (CDB5) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_6:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Logical Address Register 2nd (CDB6) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_7:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Logical Address Register 3rd (CDB7) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_8:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Logical Address Register LSB (CDB8) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_9:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Sector Number Register (CDB9) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_10:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Head Number Register (CDB10) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_11:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Cylinder Number Register MSB (CDB11) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_CDB_12:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Cylinder Number Register LSB (CDB12) = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_TARGET_LUN:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Target LUN Register = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_COMMAND_PHASE:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Command Phase Register = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_SYNCHRONOUS_TRANSFER:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Synchronous Transfer Register = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_TRANSFER_COUNT_MSB:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Transfer Count Register MSB = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_TRANSFER_COUNT:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Transfer Count Register 2nd = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_TRANSFER_COUNT_LSB:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Transfer Count Register LSB = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_DESTINATION_ID:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Destination ID Register = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_SOURCE_ID:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Source ID Register = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_SCSI_STATUS:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, SCSI Status Register (read-only!) = %02x (ignored)\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_COMMAND:
+			/* if we receive a command, schedule to process it */
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Command Register = %02x - unit %d\n", machine().describe_context(), m_sasr, data, getunit());
 
 			/* signal we're processing it */
 			m_regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
 
 			/* process the command */
 			dispatch_command();
-		}
-		else if (m_sasr == WD_CDB_1)
+			break;
+		case WD_DATA:
 		{
-			m_regs[WD_COMMAND_PHASE] = 0;
-		}
-		else if (m_sasr == WD_DATA)
-		{
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Data Register = %02x\n", machine().describe_context(), m_sasr, data);
+
 			/* if data was written, and we have a count, send to device */
 			int count = get_xfer_count();
 
@@ -584,8 +670,19 @@ WRITE8_MEMBER(wd33c93_device::write)
 			}
 			else
 			{
-				logerror("WD33C93: Sending data to device with transfer count = 0!. Ignoring...\n");
+				LOGMASKED(LOG_MISC | LOG_ERRORS, "WD33C93: Sending data to device with transfer count = 0!. Ignoring...\n");
 			}
+			break;
+		}
+		case WD_QUEUE_TAG:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Queue Tag Register = %02x\n", machine().describe_context(), m_sasr, data);
+			break;
+		case WD_AUXILIARY_STATUS:
+			LOGMASKED(LOG_WRITES, "WD33C93: %s - Write Register %02x, Auxiliary Status Register (read-only!) = %02x (ignored)\n", machine().describe_context(), m_sasr, data);
+			break;
+		default:
+			LOGMASKED(LOG_WRITES | LOG_ERRORS, "WD33C93: %s - Write Register %02x, Unknown = %02x (ignored)\n", machine().describe_context(), m_sasr, data);
+			break;
 		}
 
 		/* auto-increment register select if not on special registers */
@@ -598,7 +695,7 @@ WRITE8_MEMBER(wd33c93_device::write)
 
 	default:
 	{
-		logerror( "WD33C93: Write to invalid offset %d (data=%02x)\n", offset, data );
+		LOGMASKED(LOG_ERRORS, "WD33C93: Write to invalid offset %d (data=%02x)\n", offset, data);
 	}
 	break;
 	}
@@ -614,19 +711,92 @@ READ8_MEMBER(wd33c93_device::read)
 
 	case 1:
 	{
-		/* if reading status, clear irq flag */
-		if (m_sasr == WD_SCSI_STATUS)
+		switch (m_sasr)
 		{
+		case WD_OWN_ID:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Own ID Register (CDB Size) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CONTROL:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Control Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_TIMEOUT_PERIOD:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Timeout Period Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_1:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Total Sectors Register (CDB1) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			m_regs[WD_COMMAND_PHASE] = 0;
+			break;
+		case WD_CDB_2:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Total Heads Register (CDB2) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_3:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Total Cylinders Register MSB (CDB3) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_4:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Total Cylinders Register LSB (CDB4) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_5:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Logical Address Register MSB (CDB5) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_6:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Logical Address Register 2nd (CDB6) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_7:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Logical Address Register 3rd (CDB7) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_8:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Logical Address Register LSB (CDB8) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_9:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Sector Number Register (CDB9) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_10:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Head Number Register (CDB10) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_11:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Cylinder Number Register MSB (CDB11) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_CDB_12:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Cylinder Number Register LSB (CDB12) (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_TARGET_LUN:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Target LUN Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_COMMAND_PHASE:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Command Phase Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_SYNCHRONOUS_TRANSFER:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Synchronous Transfer Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_TRANSFER_COUNT_MSB:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Transfer Count Register MSB (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_TRANSFER_COUNT:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Transfer Count Register 2nd (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_TRANSFER_COUNT_LSB:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Transfer Count Register LSB (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_DESTINATION_ID:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Destination ID Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_SOURCE_ID:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Source ID Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_SCSI_STATUS:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, SCSI Status Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
 			m_regs[WD_AUXILIARY_STATUS] &= ~ASR_INT;
 
+			/* if reading status, clear irq flag */
 			if (!m_irq_cb.isnull())
 			{
 				m_irq_cb(0);
 			}
-
-			LOG("WD33C93: %s - Status read (%02x)\n", machine().describe_context(), m_regs[WD_SCSI_STATUS]);
-		}
-		else if (m_sasr == WD_DATA)
+			break;
+		case WD_COMMAND:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Command Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_DATA:
 		{
 			/* we're going to be doing synchronous reads */
 
@@ -691,13 +861,25 @@ READ8_MEMBER(wd33c93_device::read)
 						m_regs[WD_AUXILIARY_STATUS] &= ~ASR_DBR;
 					}
 				}
+				LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Data Register (%02x)\n", machine().describe_context(), WD_DATA, m_regs[WD_DATA]);
 			}
+			break;
+		}
+		case WD_QUEUE_TAG:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Queue Tag Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		case WD_AUXILIARY_STATUS:
+			LOGMASKED(LOG_READS, "WD33C93: %s - Read Register %02x, Auxiliary Status Register (%02x)\n", machine().describe_context(), m_sasr, m_regs[m_sasr]);
+			break;
+		default:
+			LOGMASKED(LOG_READS | LOG_ERRORS, "WD33C93: %s - Read Register %02x, Unknown\n", machine().describe_context(), m_sasr);
+			break;
 		}
 
-		LOG("WD33C93: %s - Data read (%02x)\n", machine().describe_context(), m_regs[WD_DATA]);
-
 		/* get the register value */
-		uint8_t ret = m_regs[m_sasr];
+		uint8_t ret = 0xff;
+		if (m_sasr == WD_AUXILIARY_STATUS || m_sasr <= WD_QUEUE_TAG)
+			ret = m_regs[m_sasr];
 
 		/* auto-increment register select if not on special registers */
 		if (m_sasr != WD_COMMAND && m_sasr != WD_DATA && m_sasr != WD_AUXILIARY_STATUS)
@@ -709,7 +891,7 @@ READ8_MEMBER(wd33c93_device::read)
 	}
 
 	default:
-		logerror("WD33C93: Read from invalid offset %d\n", offset);
+		LOGMASKED(LOG_READS | LOG_ERRORS, "WD33C93: Read from invalid offset %d\n", offset);
 		break;
 	}
 
@@ -767,7 +949,7 @@ void wd33c93_device::dma_read_data(int bytes, uint8_t *data)
 
 	if ((m_temp_input_pos + len) >= TEMP_INPUT_LEN)
 	{
-		logerror("Reading past end of buffer, increase TEMP_INPUT_LEN size\n");
+		LOGMASKED(LOG_ERRORS, "Reading past end of buffer, increase TEMP_INPUT_LEN size\n");
 		len = TEMP_INPUT_LEN - len;
 	}
 
