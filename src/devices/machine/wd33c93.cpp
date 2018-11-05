@@ -24,7 +24,7 @@
 #define LOG_REGS		(LOG_READS | LOG_WRITES)
 #define LOG_ALL			(LOG_REGS | LOG_COMMANDS | LOG_ERRORS | LOG_MISC)
 
-#define VERBOSE			(LOG_ALL)
+#define VERBOSE			(0)
 #include "logmacro.h"
 
 
