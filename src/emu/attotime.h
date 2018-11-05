@@ -114,6 +114,7 @@ public:
 	// conversion to other forms
 	constexpr double as_double() const { return double(m_seconds) + ATTOSECONDS_TO_DOUBLE(m_attoseconds); }
 	constexpr attoseconds_t as_attoseconds() const;
+	constexpr double as_hz() const { return is_never() ? 0.0 : 1.0 / as_double(); }
 	u64 as_ticks(u32 frequency) const;
 	u64 as_ticks(const XTAL &xtal) const { return as_ticks(xtal.value()); }
 	/** Convert to string using at @p precision */
