@@ -226,12 +226,12 @@ WRITE32_MEMBER(policetr_state::video_w)
 
 				/* latch 0x50 clears IRQ4 */
 				case 0x50:
-					m_maincpu->set_input_line(R3000_IRQ4, CLEAR_LINE);
+					m_maincpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 					break;
 
 				/* latch 0x60 clears IRQ5 */
 				case 0x60:
-					m_maincpu->set_input_line(R3000_IRQ5, CLEAR_LINE);
+					m_maincpu->set_input_line(INPUT_LINE_IRQ5, CLEAR_LINE);
 					break;
 
 				/* log anything else */

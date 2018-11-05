@@ -305,7 +305,7 @@ WRITE32_MEMBER(decstation_state::cfb_w)
 WRITE_LINE_MEMBER(decstation_state::ioga_irq_w)
 {
 	// not sure this is correct
-	m_maincpu->set_input_line(R3000_IRQ3, state);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ3, state);
 }
 
 void decstation_state::machine_start()

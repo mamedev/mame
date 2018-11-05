@@ -253,7 +253,7 @@ uint32_t turrett_state::update_inputs(void)
 	}
 
 	// Update IRQ state
-	m_maincpu->set_input_line(R3000_IRQ1, m_inputs_active ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, m_inputs_active ? ASSERT_LINE : CLEAR_LINE);
 	return val;
 }
 
@@ -270,13 +270,13 @@ INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
 			if (newval == 0)
 			{
 				m_inputs_active |= p;
-				m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 			}
 		}
 		else
 		{
 			m_inputs_active |= p;
-			m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 	}
 }
@@ -297,7 +297,7 @@ INTERRUPT_GEN_MEMBER( turrett_state::vblank )
 		m_inputs_active |= 0x02000000;
 
 	m_frame ^= 1;
-	m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 
@@ -309,7 +309,7 @@ INTERRUPT_GEN_MEMBER( turrett_state::adc )
 		m_inputs_active |= 0x00000002;
 
 	m_adc ^= 1;
-	m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 /*************************************

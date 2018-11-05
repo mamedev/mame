@@ -102,7 +102,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 WRITE_LINE_MEMBER(policetr_state::vblank)
 {
-	m_maincpu->set_input_line(state ? R3000_IRQ4 : R3000_IRQ5, ASSERT_LINE);
+	m_maincpu->set_input_line(state ? INPUT_LINE_IRQ4 : INPUT_LINE_IRQ5, ASSERT_LINE);
 }
 
 /*************************************
