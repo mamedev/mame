@@ -736,6 +736,15 @@ static INPUT_PORTS_START( earthjkr )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( earthjkrp )
+	PORT_INCLUDE(asuka)
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( eto )
 	PORT_INCLUDE(asuka)
 	/* DSWA: 0x300000 -> 0x200914 */
@@ -954,13 +963,13 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL/4)); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_write_handler().set_membank(m_audiobank).mask(0x03);
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 0.50);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, asuka_state, asuka_msm5205_vck))  /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
@@ -1091,13 +1100,13 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_write_handler().set_membank(m_audiobank).mask(0x03);
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 0.50);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, asuka_state, asuka_msm5205_vck))  /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
@@ -1696,6 +1705,33 @@ ROM_START( earthjkr ) /* Taito PCB: K1100388A / J1100169A */
 	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
+ROM_START( earthjkra )
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
+	/* Blank ROM labels, might be for the Korean market, although region handling is unchanged. Very close to parent set, but some clearly additional intentional changes that can't be attributed to the bitrot in the parent */
+	ROM_LOAD16_BYTE( "ejok_ic23",  0x00000, 0x20000, CRC(cbd29731) SHA1(4cbbdc9352cb203b6b5ec37c1b11c09d827960fc) ) /* ejok_ic23 vs ej_3b.ic23 99.945831% similar (71 changed bytes) */
+	ROM_LOAD16_BYTE( "ejok_ic8",   0x00001, 0x20000, CRC(cfd4953c) SHA1(6aa91ebca4444070841c1f8307430bc787656df3) ) /* ejok_ic8  vs ej_3a.ic8  99.945831% similar (71 changed bytes) */
+	/* 0x40000 - 0x7ffff is intentionally empty */
+	ROM_LOAD16_WORD( "ejok_ic30", 0x80000, 0x80000, CRC(49d1f77f) SHA1(f6c9b2fc88b77cc9baa5be48da5c3eb72310e471) ) /* Fix ROM */
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - mask ROM */
+
+	ROM_REGION( 0xa0000, "gfx2", 0 )
+	ROM_LOAD       ( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - mask ROM */
+	ROM_LOAD16_BYTE( "ejok_ic5",     0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
+	ROM_LOAD16_BYTE( "ejok_ic4",     0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "ejok_ic28", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
+
+	ROM_REGION( 0x10000, "ymsnd", ROMREGION_ERASEFF )   /* ADPCM samples */
+	/* Empty socket on U.N. Defense Force: Earth Joker - but sound chips present */
+
+	ROM_REGION( 0x144, "pals", 0 )
+	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
+ROM_END
+
 // Known to exist (not dumped) a Japanese version with ROMs 3 & 4 also stamped "A" same as above or different version??
 // Also known to exist (not dumped) a US version of Earth Joker, title screen shows "DISTRIBUTED BY ROMSTAR, INC."  ROMs were numbered
 // from 0 through 4 and the fix ROM at IC30 is labeled 1 even though IC5 is also labled as 1 similar to the below set:
@@ -1781,7 +1817,8 @@ GAME( 1989, cadashs,   cadash,   cadash,   cadash,   asuka_state, init_cadash, R
 
 GAME( 1992, galmedes,  0,        asuka,    galmedes, asuka_state, empty_init,  ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, init_earthjkr,  ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkr, asuka_state, empty_init,     ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, init_earthjkr,  ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (US / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // sets 1 + 2 have ROMSTAR (US?) license and no region disclaimer if you change the dipswitch
+GAME( 1993, earthjkra, earthjkr, asuka,    earthjkr, asuka_state, empty_init,     ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (US / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkrp,asuka_state, empty_init,     ROT270, "Visco",                  "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, eto,       0,        eto,      eto,      asuka_state, empty_init,  ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
