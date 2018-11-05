@@ -911,7 +911,7 @@ WRITE64_MEMBER(model3_state::mpc105_addr_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		uint32_t d = flipendian_int32((uint32_t)(data >> 32));
+		uint32_t d = swapendian_int32((uint32_t)(data >> 32));
 		m_mpc105_addr = data >> 32;
 
 		m_pci_bus = (d >> 16) & 0xff;
@@ -924,22 +924,22 @@ WRITE64_MEMBER(model3_state::mpc105_addr_w)
 READ64_MEMBER(model3_state::mpc105_data_r)
 {
 	if(m_pci_device == 0) {
-		return ((uint64_t)(flipendian_int32(m_mpc105_regs[(m_pci_reg/2)+1])) << 32) |
-				((uint64_t)(flipendian_int32(m_mpc105_regs[(m_pci_reg/2)+0])));
+		return ((uint64_t)(swapendian_int32(m_mpc105_regs[(m_pci_reg/2)+1])) << 32) |
+				((uint64_t)(swapendian_int32(m_mpc105_regs[(m_pci_reg/2)+0])));
 	}
-	return flipendian_int32(pci_device_get_reg());
+	return swapendian_int32(pci_device_get_reg());
 }
 
 WRITE64_MEMBER(model3_state::mpc105_data_w)
 {
 	if(m_pci_device == 0) {
-		m_mpc105_regs[(m_pci_reg/2)+1] = flipendian_int32((uint32_t)(data >> 32));
-		m_mpc105_regs[(m_pci_reg/2)+0] = flipendian_int32((uint32_t)(data));
+		m_mpc105_regs[(m_pci_reg/2)+1] = swapendian_int32((uint32_t)(data >> 32));
+		m_mpc105_regs[(m_pci_reg/2)+0] = swapendian_int32((uint32_t)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		pci_device_set_reg(flipendian_int32((uint32_t)data));
+		pci_device_set_reg(swapendian_int32((uint32_t)data));
 	}
 }
 
@@ -987,7 +987,7 @@ WRITE64_MEMBER(model3_state::mpc106_addr_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		uint32_t d = flipendian_int32((uint32_t)(data >> 32));
+		uint32_t d = swapendian_int32((uint32_t)(data >> 32));
 
 		if (((d >> 8) & 0xffffff) == 0x800000)
 		{
@@ -1008,29 +1008,29 @@ WRITE64_MEMBER(model3_state::mpc106_addr_w)
 READ64_MEMBER(model3_state::mpc106_data_r)
 {
 	if(m_pci_device == 0) {
-		return ((uint64_t)(flipendian_int32(m_mpc106_regs[(m_pci_reg/2)+1])) << 32) |
-				((uint64_t)(flipendian_int32(m_mpc106_regs[(m_pci_reg/2)+0])));
+		return ((uint64_t)(swapendian_int32(m_mpc106_regs[(m_pci_reg/2)+1])) << 32) |
+				((uint64_t)(swapendian_int32(m_mpc106_regs[(m_pci_reg/2)+0])));
 	}
 	if (ACCESSING_BITS_32_63)
 	{
-		return (uint64_t)(flipendian_int32(pci_device_get_reg())) << 32;
+		return (uint64_t)(swapendian_int32(pci_device_get_reg())) << 32;
 	}
 	else
 	{
-		return (uint64_t)(flipendian_int32(pci_device_get_reg()));
+		return (uint64_t)(swapendian_int32(pci_device_get_reg()));
 	}
 }
 
 WRITE64_MEMBER(model3_state::mpc106_data_w)
 {
 	if(m_pci_device == 0) {
-		m_mpc106_regs[(m_pci_reg/2)+1] = flipendian_int32((uint32_t)(data >> 32));
-		m_mpc106_regs[(m_pci_reg/2)+0] = flipendian_int32((uint32_t)(data));
+		m_mpc106_regs[(m_pci_reg/2)+1] = swapendian_int32((uint32_t)(data >> 32));
+		m_mpc106_regs[(m_pci_reg/2)+0] = swapendian_int32((uint32_t)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		pci_device_set_reg(flipendian_int32((uint32_t)data));
+		pci_device_set_reg(swapendian_int32((uint32_t)data));
 	}
 }
 
@@ -1132,7 +1132,7 @@ WRITE64_MEMBER(model3_state::scsi_w)
 uint32_t model3_state::scsi_fetch(uint32_t dsp)
 {
 	const uint32_t result = m_maincpu->space(AS_PROGRAM).read_dword(dsp);
-	return flipendian_int32(result);
+	return swapendian_int32(result);
 }
 
 void model3_state::scsi_irq_callback(int state)
@@ -1167,18 +1167,18 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 	{
 		case 0:
 			if(ACCESSING_BITS_32_63) {      /* DMA source address */
-				m_dma_source = flipendian_int32((uint32_t)(data >> 32));
+				m_dma_source = swapendian_int32((uint32_t)(data >> 32));
 				return;
 			}
 			if(ACCESSING_BITS_0_31) {       /* DMA destination address */
-				m_dma_dest = flipendian_int32((uint32_t)(data));
+				m_dma_dest = swapendian_int32((uint32_t)(data));
 				return;
 			}
 			break;
 		case 1:
 			if(ACCESSING_BITS_32_63)        /* DMA length */
 			{
-				int length = flipendian_int32((uint32_t)(data >> 32)) * 4;
+				int length = swapendian_int32((uint32_t)(data >> 32)) * 4;
 				if (m_dma_endian & 0x80)
 				{
 					real3d_dma_callback(m_dma_source, m_dma_dest, length, 0);
@@ -1207,9 +1207,9 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 			break;
 		case 2:
 			if(ACCESSING_BITS_32_63) {      /* DMA command */
-				uint32_t cmd = flipendian_int32((uint32_t)(data >> 32));
+				uint32_t cmd = swapendian_int32((uint32_t)(data >> 32));
 				if(cmd & 0x20000000) {
-					m_dma_data = flipendian_int32(m_real3d_device_id);  /* (PCI Vendor & Device ID) */
+					m_dma_data = swapendian_int32(m_real3d_device_id);  /* (PCI Vendor & Device ID) */
 				}
 				else if(cmd & 0x80000000) {
 					m_dma_status ^= 0xffffffff;
