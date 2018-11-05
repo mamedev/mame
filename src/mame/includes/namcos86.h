@@ -45,7 +45,6 @@ private:
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(cus115_w);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_WRITE8_MEMBER(videoram1_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE8_MEMBER(tilebank_select_w);
@@ -74,7 +73,6 @@ private:
 	void genpeitd_mcu_map(address_map &map);
 	void hopmappy_cpu2_map(address_map &map);
 	void hopmappy_mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 	void roishtar_cpu2_map(address_map &map);
 	void roishtar_mcu_map(address_map &map);
 	void rthunder_cpu2_map(address_map &map);

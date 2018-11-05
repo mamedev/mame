@@ -774,11 +774,11 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	m_uart->set_rx_clock(4800.0);
 	m_uart->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	AY51013(config, m_uart_s); // TMS6011NC
-	m_uart_s->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
-	m_uart_s->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart_s->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
+	m_uart_s->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_uart_s->set_tx_clock(4800.0);
 	m_uart_s->set_rx_clock(4800.0);
 	m_uart_s->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)

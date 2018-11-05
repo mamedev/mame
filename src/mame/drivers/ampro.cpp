@@ -48,8 +48,10 @@ public:
 
 	void init_ampro();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_MACHINE_RESET(ampro);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_READ8_MEMBER(io_r);
@@ -137,7 +139,7 @@ static void ampro_floppies(device_slot_interface &device)
 static INPUT_PORTS_START( ampro )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( ampro_state, ampro )
+void ampro_state::machine_reset()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -152,14 +154,13 @@ void ampro_state::init_ampro()
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-MACHINE_CONFIG_START(ampro_state::ampro)
+void ampro_state::ampro(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ampro_state::ampro_mem);
 	m_maincpu->set_addrmap(AS_IO, &ampro_state::ampro_io);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
-
-	MCFG_MACHINE_RESET_OVERRIDE(ampro_state, ampro)
 
 	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 16_MHz_XTAL / 8)); // 2MHz
 	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
@@ -178,14 +179,13 @@ MACHINE_CONFIG_START(ampro_state::ampro)
 	m_dart->out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
 
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "ampro")
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	SOFTWARE_LIST(config, "flop_list").set_original("ampro");
+}
 
 /* ROM definition */
 ROM_START( ampro )

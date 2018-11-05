@@ -71,28 +71,24 @@ READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 
 // S2 copy
 
-MACHINE_START_MEMBER(namcos2_state,namcos2)
+void namcos2_state::machine_start()
 {
 	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
 
-	if (m_audiobank)
-	{
-		uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
-		for (int i = 0; i < 0x10; i++)
-			m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
+	uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
+	for (int i = 0; i < 0x10; i++)
+		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
-		m_audiobank->set_entry(0);
-	}
 }
 
-MACHINE_RESET_MEMBER(namcos2_state, namcos2)
+void namcos2_state::machine_reset()
 {
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
-	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
+//  address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
 
 	/* Initialise the bank select in the sound CPU */
-	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
+	m_audiobank->set_entry(0); /* Page in bank 0 */
 
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
 
@@ -145,12 +141,12 @@ WRITE8_MEMBER(namcos2_state::system_reset_w)
 /* EEPROM Load/Save and read/write handling                  */
 /*************************************************************/
 
-WRITE8_MEMBER( namcos2_state::namcos2_68k_eeprom_w )
+WRITE8_MEMBER( namcos2_state::eeprom_w )
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER( namcos2_state::namcos2_68k_eeprom_r )
+READ8_MEMBER( namcos2_state::eeprom_r )
 {
 	return m_eeprom[offset];
 }
@@ -397,7 +393,7 @@ WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )
 /*  Sound sub-system                                          */
 /**************************************************************/
 
-WRITE8_MEMBER( namcos2_state::namcos2_sound_bankselect_w )
+WRITE8_MEMBER( namcos2_state::sound_bankselect_w )
 {
 	m_audiobank->set_entry(data>>4);
 }

@@ -8029,9 +8029,9 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX")
-	MCFG_UPD4701_PORTY("TRACKY")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("TRACKX");
+	m_upd4701->set_porty_tag("TRACKY");
 
 	HC157(config, m_buttonmux, 0);
 	m_buttonmux->out_callback().set(m_upd4701, FUNC(upd4701_device::middle_w)).bit(0);
@@ -8098,9 +8098,9 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("ROT1")
-	MCFG_UPD4701_PORTY("ROT2")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("ROT1");
+	m_upd4701->set_porty_tag("ROT2");
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
@@ -8569,7 +8569,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
+	UPD4992(config, m_rtc); // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
@@ -8998,13 +8998,13 @@ MACHINE_CONFIG_START(seta_state::krzybowl)
 	MCFG_DEVICE_PROGRAM_MAP(krzybowl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	upd4701_device &upd1(UPD4701A(config, "upd1"));
+	upd1.set_portx_tag("TRACK1_X");
+	upd1.set_porty_tag("TRACK1_Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK2_X")
-	MCFG_UPD4701_PORTY("TRACK2_Y")
+	upd4701_device &upd2(UPD4701A(config, "upd2"));
+	upd2.set_portx_tag("TRACK2_X");
+	upd2.set_porty_tag("TRACK2_Y");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9256,13 +9256,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::kiwame)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kiwame_map)
 	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta_state, kiwame_row_select_w))
+	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
+	tmp68301.set_cputag(m_maincpu);
+	tmp68301.out_parallel_callback().set(FUNC(seta_state::kiwame_row_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -9830,7 +9830,7 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
+	UPD4992(config, m_rtc); // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )

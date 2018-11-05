@@ -33,13 +33,15 @@ public:
 	auto out_out1_callback() { return m_out_out1_cb.bind(); }
 	auto out_out2_callback() { return m_out_out2_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( ins8250_w );
-	DECLARE_READ8_MEMBER( ins8250_r );
-	DECLARE_WRITE_LINE_MEMBER( dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( ri_w );
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rx_w );
+	DECLARE_WRITE8_MEMBER(ins8250_w);
+	DECLARE_READ8_MEMBER(ins8250_r);
+
+	DECLARE_WRITE_LINE_MEMBER(dcd_w);
+	DECLARE_WRITE_LINE_MEMBER(dsr_w);
+	DECLARE_WRITE_LINE_MEMBER(ri_w);
+	DECLARE_WRITE_LINE_MEMBER(cts_w);
+	DECLARE_WRITE_LINE_MEMBER(rx_w);
+	DECLARE_READ_LINE_MEMBER(intrpt_r);
 
 protected:
 	enum class dev_type {

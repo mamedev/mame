@@ -112,12 +112,6 @@ void kncljoe_state::sound_map(address_map &map)
 	map(0x2000, 0x7fff).rom();
 }
 
-void kncljoe_state::sound_portmap(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(kncljoe_state::m6803_port1_r), FUNC(kncljoe_state::m6803_port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(kncljoe_state::m6803_port2_r), FUNC(kncljoe_state::m6803_port2_w));
-}
-
 
 /******************************************************************************/
 
@@ -262,11 +256,13 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kncljoe_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("soundcpu", M6803, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(kncljoe_state, sound_nmi,  (double)3970) //measured 3.970 kHz
-
+	m6803_cpu_device &soundcpu(M6803(config, "soundcpu", XTAL(3'579'545))); /* verified on pcb */
+	soundcpu.set_addrmap(AS_PROGRAM, &kncljoe_state::sound_map);
+	soundcpu.in_p1_cb().set(FUNC(kncljoe_state::m6803_port1_r));
+	soundcpu.out_p1_cb().set(FUNC(kncljoe_state::m6803_port1_w));
+	soundcpu.in_p2_cb().set(FUNC(kncljoe_state::m6803_port2_r));
+	soundcpu.out_p2_cb().set(FUNC(kncljoe_state::m6803_port2_w));
+	soundcpu.set_periodic_int(FUNC(kncljoe_state::sound_nmi), attotime::from_hz((double)3970)); //measured 3.970 kHz
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

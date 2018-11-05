@@ -105,16 +105,16 @@ MACHINE_CONFIG_START(qvt201_state::qvt201)
 
 	MCFG_DEVICE_ADD("duart", SCN2681, 3.6864_MHz_XTAL) // XTAL not directly connected
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("mainint", input_merger_device, in_w<1>))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("eia", rs232_port_device, write_txd))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m_eia, rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("aux", rs232_port_device, write_txd))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, qvt201_state, duart_out_w))
 
-	MCFG_DEVICE_ADD("eia", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
+	RS232_PORT(config, m_eia, default_rs232_devices, nullptr);
+	m_eia->rxd_handler().set("duart", FUNC(scn2681_device::rx_a_w));
 
-	MCFG_DEVICE_ADD("aux", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("duart", scn2681_device, ip4_w))
+	rs232_port_device &aux(RS232_PORT(config, "aux", default_rs232_devices, nullptr));
+	aux.rxd_handler().set("duart", FUNC(scn2681_device::rx_b_w));
+	aux.dsr_handler().set("duart", FUNC(scn2681_device::ip4_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5516APL-2 or uPD446C-2 + battery
 

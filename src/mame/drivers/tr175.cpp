@@ -106,9 +106,8 @@ void tr175_state::tr175(machine_config &config)
 	duart.irq_cb().set_inputline("maincpu", M68K_IRQ_1);
 
 	PALETTE(config, "palette", 0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &tr175_state::ramdac_map);
-	ramdac.set_palette("palette");
 }
 
 

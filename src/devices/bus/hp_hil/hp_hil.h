@@ -79,17 +79,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_HP_HIL_INT_CALLBACK(_devcb) \
-	downcast<hp_hil_mlc_device &>(*device).set_int_callback(DEVCB_##_devcb);
-
-#define MCFG_HP_HIL_NMI_CALLBACK(_devcb) \
-	downcast<hp_hil_mlc_device &>(*device).set_nmi_callback(DEVCB_##_devcb);
-
-#define MCFG_HP_HIL_SLOT_ADD(_mlc_tag, _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, HP_HIL_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<hp_hil_slot_device &>(*device).set_hp_hil_slot(this, _mlc_tag);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -193,8 +182,6 @@ protected:
 
 	int                     m_device_id;
 	uint16_t                m_device_id16;
-	bool                    m_powerup;
-	bool                    m_passthru;
 
 private:
 	device_hp_hil_interface *m_next;

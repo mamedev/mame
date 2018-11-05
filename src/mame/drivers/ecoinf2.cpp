@@ -497,11 +497,12 @@ static INPUT_PORTS_START( ecoinf2 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(ecoinf2_state::ecoinf2_oxo)
+void ecoinf2_state::ecoinf2_oxo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180,4000000) // some of these hit invalid opcodes with a plain z80, some don't?
-	MCFG_DEVICE_PROGRAM_MAP(oxo_memmap)
-	MCFG_DEVICE_IO_MAP(oxo_portmap)
+	Z180(config, m_maincpu, 4000000); // some of these hit invalid opcodes with a plain z80, some don't?
+	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinf2_state::oxo_memmap);
+	m_maincpu->set_addrmap(AS_IO, &ecoinf2_state::oxo_portmap);
 
 	config.set_default_layout(layout_ecoinf2);
 
@@ -531,20 +532,20 @@ MACHINE_CONFIG_START(ecoinf2_state::ecoinf2_oxo)
 	ic13_leds.out_pb_callback().set(FUNC(ecoinf2_state::ppi8255_ic13_write_b_strobedat1));
 	ic13_leds.in_pc_callback().set(FUNC(ecoinf2_state::ppi8255_ic13_read_c_panel));
 
-	MCFG_DEVICE_ADD("reel0", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<3>))
+	REEL(config, m_reels[0], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[0]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<0>));
+	REEL(config, m_reels[1], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[1]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<1>));
+	REEL(config, m_reels[2], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[2]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<2>));
+	REEL(config, m_reels[3], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reels[3]->optic_handler().set(FUNC(ecoinf2_state::reel_optic_cb<3>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0);
+	m_meters->set_number_meters(8);
 
-//  MCFG_DEVICE_ADD("ic25_dips", I8255, 0)
-MACHINE_CONFIG_END
+//  I8255(config, "ic25_dips", 0);
+}
 
 
 

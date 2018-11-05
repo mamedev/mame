@@ -13,7 +13,11 @@ driver by Hau, Nicola Salmoria
 special thanks to Nekomata, NTD & code-name'Siberia'
 
 TODO:
-- wrong background in fstarfrc title (Video ref. -> https://www.youtube.com/watch?v=EXBTNk-0ejk)
+- wrong background in fstarfrc title
+  (Video ref. ->
+  https://www.youtube.com/watch?v=EXBTNk-0ejk,
+  https://www.youtube.com/watch?v=5iZtgWqUz6c,
+  https://www.youtube.com/watch?v=cgj81VA7j_Y)
 - there could be some priorities problems in riot
   (more noticeable in level 2)
 
@@ -55,6 +59,7 @@ void tecmo16_state::fstarfrc_map(address_map &map)
 	map(0x150030, 0x150031).portr("DSW2").nopw();   /* ??? */
 	map(0x150040, 0x150041).portr("DSW1");
 	map(0x150050, 0x150051).portr("P1_P2");
+//  map(0x160000, 0x160001).nopr();   /* ??? Read at every scene changes */
 	map(0x160000, 0x160001).w(FUNC(tecmo16_state::scroll_char_x_w));
 	map(0x16000c, 0x16000d).w(FUNC(tecmo16_state::scroll_x_w));
 	map(0x160012, 0x160013).w(FUNC(tecmo16_state::scroll_y_w));
@@ -319,42 +324,29 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
-	4096,   /* 4096 characters */
+	RGN_FRAC(1,1),   /* 4096 characters */
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every char takes 32 consecutive bytes */
+	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	4*8*8    /* every char takes 32 consecutive bytes */
 };
 
 static const gfx_layout tilelayout =
 {
 	16,16,  /* 16*16 tiles */
-	8192,   /* 8192 tiles */
+	RGN_FRAC(1,1),   /* 8192 tiles */
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	128*8   /* every sprite takes 128 consecutive bytes */
-};
-
-static const gfx_layout spritelayout =
-{
-	8,8,    /* 8*8 sprites */
-	32768,  /* 32768 sprites */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the bitplanes are packed in one nibble */
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	{ STEP4(0,1) }, /* the bitplanes are packed in one nibble */
+	{ STEP8(0,4), STEP8(4*8*8,4) },
+	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
+	4*8*8*2*2   /* every tile takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_tecmo16 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   1*16*16, 16   )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 0x1000 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 0x1000   )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 1*16*16,    16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,       0, 0x100 )
+	GFXDECODE_ENTRY( "gfx3", 0, charlayout,       0, 0x100 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -375,12 +367,15 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmo16)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096)
@@ -389,13 +384,13 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 	MCFG_TECMO_SPRITE_GFX_REGION(2)
 
-	MCFG_DEVICE_ADD("mixer", TECMO_MIXER, 0)
-	MCFG_TECMO_MIXER_SHIFTS(10,9,4)
-	MCFG_TECMO_MIXER_BLENDCOLS(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 )
-	MCFG_TECMO_MIXER_REGULARCOLS( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
-	MCFG_TECMO_MIXER_BLENDSOURCE( 0x0800 + 0x000, 0x0800 + 0x100) // riot seems to set palettes in 0x800 + 0x200, could be more to this..
-	MCFG_TECMO_MIXER_REVSPRITETILE
-	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x300)
+	TECMO_MIXER(config, m_mixer, 0);
+	m_mixer->set_mixer_shifts(10,9,4);
+	m_mixer->set_blendcols(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 );
+	m_mixer->set_regularcols( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
+	m_mixer->set_blendsource( 0x0800 + 0x000, 0x0800 + 0x100); // riot seems to set palettes in 0x800 + 0x200, could be more to this..
+	m_mixer->set_revspritetile();
+	m_mixer->set_bgpen(0x000 + 0x300, 0x400 + 0x300);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

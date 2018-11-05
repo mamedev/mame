@@ -132,15 +132,16 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M");
 
-	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
-	keybc.system_reset_cb().set("cs4031", FUNC(cs4031_device::kbrst_w));
-	keybc.gate_a20_cb().set("cs4031", FUNC(cs4031_device::gatea20_w));
-	keybc.input_buffer_full_cb().set("cs4031", FUNC(cs4031_device::irq01_w));
-	keybc.keyboard_clock_cb().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	keybc.keyboard_data_cb().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
+	keybc.hot_res().set("cs4031", FUNC(cs4031_device::kbrst_w));
+	keybc.gate_a20().set("cs4031", FUNC(cs4031_device::gatea20_w));
+	keybc.kbd_irq().set("cs4031", FUNC(cs4031_device::irq01_w));
+	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_kbc_device_base, kbd_clk_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_kbc_device_base, kbd_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)

@@ -510,14 +510,14 @@ MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* printer */
-	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("mb:pic8259", pic8259_device, ir7_w))
+	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
+	lpt0.irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
 
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("mb:pic8259", pic8259_device, ir7_w))
+	PC_LPT(config, m_lpt1);
+	m_lpt1->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
 
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("mb:pic8259", pic8259_device, ir5_w))
+	PC_LPT(config, m_lpt2);
+	m_lpt2->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir5_w));
 
 	MCFG_PC_JOY_ADD("pc_joy")
 

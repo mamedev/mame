@@ -154,22 +154,22 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", uart1)
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set("uart1", FUNC(i8251_device::write_rxd));
+	rs232a.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
+	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
+	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(uart1));
 
 	i8251_device &uart2(I8251(config, "uart2", 0)); // enabled for transmit only, 8 bits odd parity, x64
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart2", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart2", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart2", i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", uart2)
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
+	rs232b.rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));
+	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
+	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
+	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(uart2));
 MACHINE_CONFIG_END
 
 /* ROM definition */

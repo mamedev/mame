@@ -927,12 +927,12 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	m_uart->out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set(FUNC(rex6000_state::serial_irq));
 
-	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, ins8250_uart_device, cts_w))
+	rs232_port_device &serport(RS232_PORT(config, "serport", default_rs232_devices, nullptr));
+	serport.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	serport.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	serport.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	serport.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	serport.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
@@ -977,12 +977,12 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	m_uart->out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set(FUNC(rex6000_state::serial_irq));
 
-	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(m_uart, ins8250_uart_device, ri_w))
-	//MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart, ins8250_uart_device, cts_w))
+	rs232_port_device &serport(RS232_PORT(config, "serport", default_rs232_devices, nullptr));
+	serport.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	serport.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	serport.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	serport.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	//serport.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

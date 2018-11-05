@@ -458,8 +458,8 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("dart", FUNC(z80dart_device::rxa_w));
 
 	/* floppy disk */
 	FD1793(config, m_fdc, 1_MHz_XTAL);

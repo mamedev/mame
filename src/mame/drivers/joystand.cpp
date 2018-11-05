@@ -588,15 +588,15 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // !! TMP68301 !!
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(16'000'000)) // !! TMP68301 !!
 	MCFG_DEVICE_PROGRAM_MAP(joystand_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", joystand_state, joystand_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, joystand_state, eeprom_r))
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, joystand_state, eeprom_w))
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
+	m_tmp68301->in_parallel_callback().set(FUNC(joystand_state::eeprom_r));
+	m_tmp68301->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

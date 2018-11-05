@@ -135,13 +135,13 @@ MACHINE_CONFIG_START(vme_hcpu30_card_device::device_add_mconfig)
 	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
 //  MCFG_DUSCC_OUT_INT_CB(WRITELINE()
 
-	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsa_w))
+	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
+	rs232p1.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxa_w));
+	rs232p1.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsa_w));
 
-	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsb_w))
+	rs232_port_device &rs232p2(RS232_PORT(config, RS232P2_TAG, default_rs232_devices, nullptr));
+	rs232p2.rxd_handler().set(m_dusccterm, FUNC(duscc68562_device::rxb_w));
+	rs232p2.cts_handler().set(m_dusccterm, FUNC(duscc68562_device::ctsb_w));
 MACHINE_CONFIG_END
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset */

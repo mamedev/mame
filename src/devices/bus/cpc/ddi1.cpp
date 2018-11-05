@@ -41,7 +41,7 @@ const tiny_rom_entry *cpc_ddi1_device::device_rom_region() const
 
 // device machine config
 MACHINE_CONFIG_START(cpc_ddi1_device::device_add_mconfig)
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ddi1_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 

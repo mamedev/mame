@@ -1004,6 +1004,10 @@ ROM_START( teedoff )
 ROM_END
 
 
+/* There are some dumps out there that only have the year hacked to 1986 and a little bunch of bytes
+   from the graphics zone. I think that not worth to support these hacks...
+*/
+
 
 GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )

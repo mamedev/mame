@@ -859,13 +859,11 @@ static const gfx_layout cps3_tiles8x8_layout =
 
 void cps3_state::cps3_set_mame_colours(int colournum, uint16_t data, uint32_t fadeval)
 {
-	int r,g,b;
 	uint16_t* dst = (uint16_t*)m_colourram.target();
 
-
-	r = (data >> 0) & 0x1f;
-	g = (data >> 5) & 0x1f;
-	b = (data >> 10) & 0x1f;
+	int r = (data >> 0) & 0x1f;
+	int g = (data >> 5) & 0x1f;
+	int b = (data >> 10) & 0x1f;
 
 	/* is this 100% correct? */
 	if (fadeval!=0)
@@ -929,137 +927,162 @@ void cps3_state::video_start()
 	m_renderbuffer_clip.set(0, m_screenwidth-1, 0, 224-1);
 
 	m_renderbuffer_bitmap.fill(0x3f, m_renderbuffer_clip);
-
 }
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-void cps3_state::cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void cps3_state::cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint32_t* tmapregs[4] = { m_tilemap20_regs_base, m_tilemap30_regs_base, m_tilemap40_regs_base, m_tilemap50_regs_base };
-	uint32_t* regs;
-	int line;
-	int scrolly;
-	if (tmnum>3)
+	if (tmnum > 3)
 	{
-		printf("cps3_draw_tilemapsprite_line Illegal tilemap number %d\n",tmnum);
+		printf("cps3_draw_tilemapsprite_line Illegal tilemap number %d\n", tmnum);
 		return;
 	}
-	regs = tmapregs[tmnum];
+	uint32_t* regs = tmapregs[tmnum];
 
-	scrolly =  ((regs[0]&0x0000ffff)>>0)+4;
-	line = drawline+scrolly;
-	line&=0x3ff;
+	int scrolly = ((regs[0] & 0x0000ffff) >> 0) + 4;
+	int line = drawline + scrolly;
+	line &= 0x3ff;
 
+	if (!(regs[1] & 0x00008000)) return;
 
-	if (!(regs[1]&0x00008000)) return;
+	uint32_t mapbase = (regs[2] & 0x007f0000) >> 16;
+	uint32_t linebase = (regs[2] & 0x7f000000) >> 24;
+	int linescroll_enable = (regs[1] & 0x00004000);
 
+	int scrollx;
+	int x;
+	int tileline = (line / 16) + 1;
+	int tilesubline = line % 16;
+	rectangle clip;
+
+	mapbase = mapbase << 10;
+	linebase = linebase << 10;
+
+	if (!linescroll_enable)
 	{
-		uint32_t mapbase =  (regs[2]&0x007f0000)>>16;
-		uint32_t linebase=  (regs[2]&0x7f000000)>>24;
-		int linescroll_enable = (regs[1]&0x00004000);
+		scrollx = (regs[0] & 0xffff0000) >> 16;
+	}
+	else
+	{
+		//printf("linebase %08x\n", linebase);
 
-		int scrollx;
-		int x;
-		int tileline = (line/16)+1;
-		int tilesubline = line % 16;
-		rectangle clip;
+		scrollx = (regs[0] & 0xffff0000) >> 16;
+		scrollx += (m_spriteram[linebase + ((line + 16 - 4) & 0x3ff)] >> 16) & 0x3ff;
 
-		mapbase = mapbase << 10;
-		linebase = linebase << 10;
+	}
 
-		if (!linescroll_enable)
+	//zoombase = (layerregs[1]&0xffff0000)>>16;
+
+	drawline &= 0x3ff;
+
+	if (drawline > cliprect.bottom() + 4) return;
+
+	clip.set(cliprect.left(), cliprect.right(), drawline, drawline);
+
+	for (x = 0; x < (cliprect.right() / 16) + 2; x++)
+	{
+		uint32_t dat;
+		int tileno;
+		int colour;
+		int bpp;
+		int xflip, yflip;
+
+		dat = m_spriteram[mapbase + ((tileline & 63) * 64) + ((x + scrollx / 16) & 63)];
+		tileno = (dat & 0xffff0000) >> 17;
+		colour = (dat & 0x000001ff) >> 0;
+		bpp = (dat & 0x0000200) >> 9;
+		yflip = (dat & 0x00000800) >> 11;
+		xflip = (dat & 0x00001000) >> 12;
+
+		if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
+		else m_gfxdecode->gfx(1)->set_granularity(64);
+
+		cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(1), tileno, colour, xflip, yflip, (x * 16) - scrollx % 16, drawline - tilesubline, CPS3_TRANSPARENCY_PEN_INDEX, 0, 0x10000, 0x10000, nullptr, 0);
+	}
+}
+
+// fg layer (TODO: this could be handled with an actual tilemap)
+void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// bank select? (sfiii2 intro) (could also be a scroll bit if the tilemap is just double height)
+	int bank = 0x800;
+	if (m_ss_bank_base & 0x01000000) bank = 0x000;
+
+	for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
+	{
+		rectangle clip = cliprect;
+		clip.min_y = clip.max_y = line;
+
+		int y = line / 8;
+		int count = (y * 64) + bank;
+
+		// 'combo meter' in JoJo games uses rowscroll
+		int rowscroll = m_ss_ram[((line - 1) & 0x1ff) + 0x4000 / 4] >> 16;
+
+		for (int x = 0; x < 64; x++)
 		{
-			scrollx =  (regs[0]&0xffff0000)>>16;
-		}
-		else
-		{
-		//  printf("linebase %08x\n", linebase);
+			uint32_t data = m_ss_ram[count]; // +0x800 = 2nd bank, used on sfiii2 intro..
+			uint32_t tile = (data >> 16) & 0x1ff;
+			int pal = (data & 0x003f) >> 1;
+			int flipx = (data & 0x0080) >> 7;
+			int flipy = (data & 0x0040) >> 6;
+			pal += m_ss_pal_base << 5;
+			tile += 0x200;
 
-			scrollx =  (regs[0]&0xffff0000)>>16;
-			scrollx+= (m_spriteram[linebase+((line+16-4)&0x3ff)]>>16)&0x3ff;
+			cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000, nullptr, 0);
+			cps3_drawgfxzoom(bitmap, clip, m_gfxdecode->gfx(0), tile, pal, flipx, flipy, 512 + (x * 8) - rowscroll, y * 8, CPS3_TRANSPARENCY_PEN, 0, 0x10000, 0x10000, nullptr, 0);
 
-		}
-
-//  zoombase    =  (layerregs[1]&0xffff0000)>>16;
-
-		drawline&=0x3ff;
-
-		if (drawline>cliprect.bottom()+4) return;
-
-		clip.set(cliprect.left(), cliprect.right(), drawline, drawline);
-
-		for (x=0;x<(cliprect.right()/16)+2;x++)
-		{
-			uint32_t dat;
-			int tileno;
-			int colour;
-			int bpp;
-			int xflip,yflip;
-
-			dat = m_spriteram[mapbase+((tileline&63)*64)+((x+scrollx/16)&63)];
-			tileno = (dat & 0xffff0000)>>17;
-			colour = (dat & 0x000001ff)>>0;
-			bpp = (dat & 0x0000200)>>9;
-			yflip  = (dat & 0x00000800)>>11;
-			xflip  = (dat & 0x00001000)>>12;
-
-			if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
-			else m_gfxdecode->gfx(1)->set_granularity(64);
-
-			cps3_drawgfxzoom(bitmap,clip,m_gfxdecode->gfx(1),tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, nullptr, 0);
+			count++;
 		}
 	}
 }
 
 uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int y,x, count;
 	attoseconds_t period = screen.frame_period().attoseconds();
 	rectangle visarea = screen.visible_area();
 
 	int bg_drawn[4] = { 0, 0, 0, 0 };
 
-	uint32_t fullscreenzoomx, fullscreenzoomy;
-	uint32_t fszx, fszy;
-
-//  decode_ssram();
-//  decode_charram();
+	// decode_ssram();
+	// decode_charram();
 
 	/* registers are normally 002a006f 01ef01c6
 	        widescreen mode = 00230076 026501c6
-	  only SFIII2 uses widescreen, I don't know exactly which register controls it */
-	if (((m_fullscreenzoom[1]&0xffff0000)>>16)==0x0265)
+	    only SFIII2 uses widescreen, I don't know exactly which register controls it */
+	if (((m_fullscreenzoom[1] & 0xffff0000) >> 16) == 0x0265)
 	{
-		if (m_screenwidth!=496)
+		if (m_screenwidth != 496)
 		{
 			m_screenwidth = 496;
-			visarea.set(0, 496-1, 0, 224-1);
+			visarea.set(0, 496 - 1, 0, 224 - 1);
 			screen.configure(496, 224, visarea, period);
 		}
 	}
 	else
 	{
-		if (m_screenwidth!=384)
+		if (m_screenwidth != 384)
 		{
 			m_screenwidth = 384;
-			visarea.set(0, 384-1, 0, 224-1);
+			visarea.set(0, 384 - 1, 0, 224 - 1);
 			screen.configure(384, 224, visarea, period);
 		}
 	}
 
-	fullscreenzoomx = m_fullscreenzoom[3] & 0x000000ff;
-	fullscreenzoomy = m_fullscreenzoom[3] & 0x000000ff;
+	uint32_t fullscreenzoomx = m_fullscreenzoom[3] & 0x000000ff;
+	uint32_t fullscreenzoomy = m_fullscreenzoom[3] & 0x000000ff;
 	/* clamp at 0x80, I don't know if this is accurate */
-	if (fullscreenzoomx>0x80) fullscreenzoomx = 0x80;
-	if (fullscreenzoomy>0x80) fullscreenzoomy = 0x80;
+	if (fullscreenzoomx > 0x80) fullscreenzoomx = 0x80;
+	if (fullscreenzoomy > 0x80) fullscreenzoomy = 0x80;
 
-	fszx = (fullscreenzoomx<<16)/0x40;
-	fszy = (fullscreenzoomy<<16)/0x40;
+	uint32_t fszx = (fullscreenzoomx << 16) / 0x40;
+	uint32_t fszy = (fullscreenzoomy << 16) / 0x40;
 
 	m_renderbuffer_clip.set(
-			0, ((m_screenwidth*fszx)>>16)-1,
-			0, ((224*fszx)>>16)-1);
+		0, ((m_screenwidth*fszx) >> 16) - 1,
+		0, ((224 * fszx) >> 16) - 1);
 
 	m_renderbuffer_bitmap.fill(0, m_renderbuffer_clip);
 
@@ -1068,98 +1091,76 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 		int i;
 
 		//printf("Spritelist start:\n");
-		for (i=0x00000/4;i<0x2000/4;i+=4)
+		for (i = 0x00000 / 4; i < 0x2000 / 4; i += 4)
 		{
-			int xpos =      (m_spriteram[i+1]&0x03ff0000)>>16;
-			int ypos =      m_spriteram[i+1]&0x000003ff;
-			int j;
-			int gscroll =      (m_spriteram[i+0]&0x70000000)>>28;
-			int length =    (m_spriteram[i+0]&0x01ff0000)>>16; // how many entries in the sprite table
-			uint32_t start  =    (m_spriteram[i+0]&0x00007ff0)>>4;
+			int xpos = (m_spriteram[i + 1] & 0x03ff0000) >> 16;
+			int ypos = m_spriteram[i + 1] & 0x000003ff;
+			int gscroll = (m_spriteram[i + 0] & 0x70000000) >> 28;
+			int length = (m_spriteram[i + 0] & 0x01ff0000) >> 16; // how many entries in the sprite table
+			uint32_t start = (m_spriteram[i + 0] & 0x00007ff0) >> 4;
 
-			int whichbpp =     (m_spriteram[i+2]&0x40000000)>>30; // not 100% sure if this is right, jojo title / characters
-			int whichpal =     (m_spriteram[i+2]&0x20000000)>>29;
-			int global_xflip = (m_spriteram[i+2]&0x10000000)>>28;
-			int global_yflip = (m_spriteram[i+2]&0x08000000)>>27;
-			int global_alpha = (m_spriteram[i+2]&0x04000000)>>26; // alpha / shadow? set on sfiii2 shadows, and big black image in jojo intro
-			int global_bpp =   (m_spriteram[i+2]&0x02000000)>>25;
-			int global_pal =   (m_spriteram[i+2]&0x01ff0000)>>16;
+			int whichbpp = (m_spriteram[i + 2] & 0x40000000) >> 30; // not 100% sure if this is right, jojo title / characters
+			int whichpal = (m_spriteram[i + 2] & 0x20000000) >> 29;
+			int global_xflip = (m_spriteram[i + 2] & 0x10000000) >> 28;
+			int global_yflip = (m_spriteram[i + 2] & 0x08000000) >> 27;
+			int global_alpha = (m_spriteram[i + 2] & 0x04000000) >> 26; // alpha / shadow? set on sfiii2 shadows, and big black image in jojo intro
+			int global_bpp = (m_spriteram[i + 2] & 0x02000000) >> 25;
+			int global_pal = (m_spriteram[i + 2] & 0x01ff0000) >> 16;
 
-			int gscrollx = (m_unk_vidregs[gscroll]&0x03ff0000)>>16;
-			int gscrolly = (m_unk_vidregs[gscroll]&0x000003ff)>>0;
+			int gscrollx = (m_unk_vidregs[gscroll] & 0x03ff0000) >> 16;
+			int gscrolly = (m_unk_vidregs[gscroll] & 0x000003ff) >> 0;
 			start = (start * 0x100) >> 2;
 
-			if ((m_spriteram[i+0]&0xf0000000) == 0x80000000)
+			if ((m_spriteram[i + 0] & 0xf0000000) == 0x80000000)
 				break;
 
-			for (j=0;j<(length)*4;j+=4)
+			for (int j = 0; j < (length) * 4; j += 4)
 			{
-				uint32_t value1 =     (m_spriteram[start+j+0]);
-				uint32_t value2 =     (m_spriteram[start+j+1]);
-				uint32_t value3 =     (m_spriteram[start+j+2]);
-
+				uint32_t value1 = (m_spriteram[start + j + 0]);
+				uint32_t value2 = (m_spriteram[start + j + 1]);
+				uint32_t value3 = (m_spriteram[start + j + 2]);
 
 				//uint8_t* srcdata = (uint8_t*)m_char_ram;
 				//uint32_t sourceoffset = (value1 >>14)&0x7fffff;
-				int count;
 
-				uint32_t tileno = (value1&0xfffe0000)>>17;
+				uint32_t tileno = (value1 & 0xfffe0000) >> 17;
 
-				int xpos2 = (value2 & 0x03ff0000)>>16;
-				int ypos2 = (value2 & 0x000003ff)>>0;
-				int flipx = (value1 & 0x00001000)>>12;
-				int flipy = (value1 & 0x00000800)>>11;
-				int alpha = (value1 & 0x00000400)>>10; //? this one is used for alpha effects on warzard
-				int bpp =   (value1 & 0x00000200)>>9;
-				int pal =   (value1 & 0x000001ff);
-
+				int xpos2 = (value2 & 0x03ff0000) >> 16;
+				int ypos2 = (value2 & 0x000003ff) >> 0;
+				int flipx = (value1 & 0x00001000) >> 12;
+				int flipy = (value1 & 0x00000800) >> 11;
+				int alpha = (value1 & 0x00000400) >> 10; //? this one is used for alpha effects on warzard
+				int bpp = (value1 & 0x00000200) >> 9;
+				int pal = (value1 & 0x000001ff);
 
 				/* these are the sizes to actually draw */
-				int ysizedraw2 = ((value3 & 0x7f000000)>>24);
-				int xsizedraw2 = ((value3 & 0x007f0000)>>16);
-				int xx,yy;
+				int ysizedraw2 = ((value3 & 0x7f000000) >> 24);
+				int xsizedraw2 = ((value3 & 0x007f0000) >> 16);
+				int xx, yy;
 
 				static const int tilestable[4] = { 8,1,2,4 };
-				int ysize2 = ((value3 & 0x0000000c)>>2);
-				int xsize2 = ((value3 & 0x00000003)>>0);
-				uint32_t xinc,yinc;
+				int ysize2 = ((value3 & 0x0000000c) >> 2);
+				int xsize2 = ((value3 & 0x00000003) >> 0);
+				uint32_t xinc, yinc;
 
-				if (ysize2==0)
+				if (ysize2 == 0)
 				{
-				//  printf("invalid sprite ysize of 0 tiles\n");
+					//  printf("invalid sprite ysize of 0 tiles\n");
 					continue;
 				}
 
-				if (xsize2==0) // xsize of 0 tiles seems to be a special command to draw tilemaps
+				if (xsize2 == 0) // xsize of 0 tiles seems to be a special command to draw tilemaps
 				{
-					int tilemapnum = ((value3 & 0x00000030)>>4);
-					//int startline;// = value2 & 0x3ff;
-					//int endline;
-					//int height = (value3 & 0x7f000000)>>24;
-					int uu;
-//                  uint32_t* tmapregs[4] = { m_tilemap20_regs_base, m_tilemap30_regs_base, m_tilemap40_regs_base, m_tilemap50_regs_base };
-//                  uint32_t* regs;
-//                  regs = tmapregs[tilemapnum];
-					//endline = value2;
-					//startline = endline - height;
-
-					//startline &=0x3ff;
-					//endline &=0x3ff;
-
-					//printf("tilemap draw %01x %02x %02x %02x\n",tilemapnum, value2, height, regs[0]&0x000003ff );
-
-					//printf("tilemap draw %01x %d %d\n",tilemapnum, startline, endline );
-
+					int tilemapnum = ((value3 & 0x00000030) >> 4);
 
 					/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
-					   which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
-					//for (uu=startline;uu<endline+1;uu++)
+					    which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
 
-					if (bg_drawn[tilemapnum]==0)
+					if (bg_drawn[tilemapnum] == 0)
 					{
-						for (uu=0;uu<1023;uu++)
+						for (int uu = 0; uu < 1023; uu++)
 						{
-							cps3_draw_tilemapsprite_line(tilemapnum, uu, m_renderbuffer_bitmap, m_renderbuffer_clip );
+							cps3_draw_tilemapsprite_line(tilemapnum, uu, m_renderbuffer_bitmap, m_renderbuffer_clip);
 						}
 					}
 					bg_drawn[tilemapnum] = 1;
@@ -1169,53 +1170,53 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 					ysize2 = tilestable[ysize2];
 					xsize2 = tilestable[xsize2];
 
-					xinc = ((xsizedraw2+1)<<16) / ((xsize2*0x10));
-					yinc = ((ysizedraw2+1)<<16) / ((ysize2*0x10));
+					xinc = ((xsizedraw2 + 1) << 16) / ((xsize2 * 0x10));
+					yinc = ((ysizedraw2 + 1) << 16) / ((ysize2 * 0x10));
 
-					xsize2-=1;
-					ysize2-=1;
+					xsize2 -= 1;
+					ysize2 -= 1;
 
 					flipx ^= global_xflip;
 					flipy ^= global_yflip;
 
-					if (!flipx) xpos2+=((xsizedraw2+1)/2);
-					else xpos2-=((xsizedraw2+1)/2);
+					if (!flipx) xpos2 += ((xsizedraw2 + 1) / 2);
+					else xpos2 -= ((xsizedraw2 + 1) / 2);
 
-					ypos2+=((ysizedraw2+1)/2);
+					ypos2 += ((ysizedraw2 + 1) / 2);
 
-					if (!flipx) xpos2-= ((xsize2+1)*16*xinc)>>16;
-					else  xpos2+= (xsize2*16*xinc)>>16;
+					if (!flipx) xpos2 -= ((xsize2 + 1) * 16 * xinc) >> 16;
+					else  xpos2 += (xsize2 * 16 * xinc) >> 16;
 
-					if (flipy) ypos2-= (ysize2*16*yinc)>>16;
+					if (flipy) ypos2 -= (ysize2 * 16 * yinc) >> 16;
 
 					{
-						count = 0;
-						for (xx=0;xx<xsize2+1;xx++)
+						int count = 0;
+						for (xx = 0; xx < xsize2 + 1; xx++)
 						{
 							int current_xpos;
 
-							if (!flipx) current_xpos = (xpos+xpos2+((xx*16*xinc)>>16));
-							else current_xpos = (xpos+xpos2-((xx*16*xinc)>>16));
+							if (!flipx) current_xpos = (xpos + xpos2 + ((xx * 16 * xinc) >> 16));
+							else current_xpos = (xpos + xpos2 - ((xx * 16 * xinc) >> 16));
 							//current_xpos +=  machine().rand()&0x3ff;
 							current_xpos += gscrollx;
 							current_xpos += 1;
-							current_xpos &=0x3ff;
-							if (current_xpos&0x200) current_xpos-=0x400;
+							current_xpos &= 0x3ff;
+							if (current_xpos & 0x200) current_xpos -= 0x400;
 
-							for (yy=0;yy<ysize2+1;yy++)
+							for (yy = 0; yy < ysize2 + 1; yy++)
 							{
 								int current_ypos;
 								int actualpal;
 
-								if (flipy) current_ypos = (ypos+ypos2+((yy*16*yinc)>>16));
-								else current_ypos = (ypos+ypos2-((yy*16*yinc)>>16));
+								if (flipy) current_ypos = (ypos + ypos2 + ((yy * 16 * yinc) >> 16));
+								else current_ypos = (ypos + ypos2 - ((yy * 16 * yinc) >> 16));
 
 								current_ypos += gscrolly;
-								current_ypos = 0x3ff-current_ypos;
+								current_ypos = 0x3ff - current_ypos;
 								current_ypos -= 17;
-								current_ypos &=0x3ff;
+								current_ypos &= 0x3ff;
 
-								if (current_ypos&0x200) current_ypos-=0x400;
+								if (current_ypos & 0x200) current_ypos -= 0x400;
 
 								//if ( (whichbpp) && (m_screen->frame_number() & 1)) continue;
 
@@ -1242,24 +1243,21 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 								}
 
 								{
-									int realtileno = tileno+count;
+									int realtileno = tileno + count;
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, nullptr, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap, m_renderbuffer_clip, m_gfxdecode->gfx(1), realtileno, actualpal, 0 ^ flipx, 0 ^ flipy, current_xpos, current_ypos, CPS3_TRANSPARENCY_PEN_INDEX_BLEND, 0, xinc, yinc, nullptr, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, nullptr, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap, m_renderbuffer_clip, m_gfxdecode->gfx(1), realtileno, actualpal, 0 ^ flipx, 0 ^ flipy, current_xpos, current_ypos, CPS3_TRANSPARENCY_PEN_INDEX, 0, xinc, yinc, nullptr, 0);
 									}
 									count++;
 								}
 							}
 						}
 					}
-	//              */
-
-				//  printf("cell %08x %08x %08x\n",value1, value2, value3);
 				}
 			}
 		}
@@ -1267,22 +1265,16 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 
 	/* copy render bitmap with zoom */
 	{
-		uint32_t renderx,rendery;
-		uint32_t srcx, srcy;
-		uint32_t* srcbitmap;
-		uint32_t* dstbitmap;
-
-
-		srcy=0;
-		for (rendery=0;rendery<224;rendery++)
+		uint32_t srcy = 0;
+		for (uint32_t rendery = 0; rendery < 224; rendery++)
 		{
-			dstbitmap = &bitmap.pix32(rendery);
-			srcbitmap = &m_renderbuffer_bitmap.pix32(srcy>>16);
-			srcx=0;
+			uint32_t* dstbitmap = &bitmap.pix32(rendery);
+			uint32_t* srcbitmap = &m_renderbuffer_bitmap.pix32(srcy >> 16);
+			uint32_t srcx = 0;
 
-			for (renderx=0;renderx<m_screenwidth;renderx++)
+			for (uint32_t renderx = 0; renderx < m_screenwidth; renderx++)
 			{
-				dstbitmap[renderx] = m_mame_colours[srcbitmap[srcx>>16]&0x1ffff];
+				dstbitmap[renderx] = m_mame_colours[srcbitmap[srcx >> 16] & 0x1ffff];
 				srcx += fszx;
 			}
 
@@ -1290,43 +1282,22 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	/* Draw the text layer */
-	/* Copy the first 0x800 colours to be used for fg layer rendering */
-//  for (offset=0;offset<0x200;offset++)
-//  {
-//      int palreadbase = (m_ss_pal_base << 9);
-//      m_palette->set_pen_color(offset,m_mame_colours[palreadbase+offset]);
-//  }
+	draw_fg_layer(screen, bitmap, cliprect);
 
-	// fg layer
-	{
-		// bank select? (sfiii2 intro)
-		if (m_ss_bank_base & 0x01000000) count = 0x000;
-		else count = 0x800;
-
-		for (y=0;y<32;y++)
-		{
-			for (x=0;x<64;x++)
-			{
-				uint32_t data = m_ss_ram[count]; // +0x800 = 2nd bank, used on sfiii2 intro..
-				uint32_t tile = (data >> 16) & 0x1ff;
-				int pal = (data&0x003f) >> 1;
-				int flipx = (data & 0x0080) >> 7;
-				int flipy = (data & 0x0040) >> 6;
-				pal += m_ss_pal_base << 5;
-				tile+=0x200;
-
-				cps3_drawgfxzoom(bitmap, cliprect, m_gfxdecode->gfx(0),tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,nullptr,0);
-				count++;
-			}
-		}
-	}
 	return 0;
 }
 
+/*
+    SSRAM 0x0000 - 0x1fff tilemap layout bank 0
+          0x2000 - 0x3fff tilemap layout bank 1
+          0x4000 - 0x7fff rowscroll (banked?)
+          0x8000 - 0xffff tile character definitions
+
+*/
+
 READ32_MEMBER(cps3_state::cps3_ssram_r)
 {
-	if (offset>0x8000/4)
+	if (offset>=0x8000/4)
 		return little_endianize_int32(m_ss_ram[offset]);
 	else
 		return m_ss_ram[offset];
@@ -1334,7 +1305,7 @@ READ32_MEMBER(cps3_state::cps3_ssram_r)
 
 WRITE32_MEMBER(cps3_state::cps3_ssram_w)
 {
-	if (offset>0x8000/4)
+	if (offset>=0x8000/4)
 	{
 		// we only want to endian-flip the character data, the tilemap info is fine
 		data = little_endianize_int32(data);

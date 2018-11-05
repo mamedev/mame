@@ -694,7 +694,7 @@ int sdl_window_info::complete_create()
 	 *
 	 */
 	osd_printf_verbose("Enter sdl_info::create\n");
-	if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
+	if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL) && !video_config.novideo)
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 

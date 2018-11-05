@@ -421,9 +421,9 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	m_acia2->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia2->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2", acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set(m_acia2, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(m_acia2, FUNC(acia6850_device::write_cts));
 
 	/* Bit Rate Generator */
 	MC14411(config, m_brg, XTAL(1'843'200)); // crystal needs verification but is the likely one

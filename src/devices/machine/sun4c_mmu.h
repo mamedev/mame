@@ -21,8 +21,8 @@ public:
 	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t ctx_mask, uint8_t pmeg_mask)
 		: sun4c_mmu_device(mconfig, tag, owner, clock)
 	{
-		m_ctx_mask = ctx_mask;
-		m_pmeg_mask = pmeg_mask;
+		set_ctx_mask(ctx_mask);
+		set_pmeg_mask(pmeg_mask);
 	}
 
 	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -31,6 +31,12 @@ public:
 	template <typename T> void set_ram(T &&ram_tag) { m_ram.set_tag(std::forward<T>(ram_tag)); }
 	template <typename T> void set_rom(T &&rom_tag) { m_rom.set_tag(std::forward<T>(rom_tag)); }
 	template <typename T> void set_scc(T &&scc_tag) { m_scc.set_tag(std::forward<T>(scc_tag)); }
+
+	auto type1_r() { return m_type1_r.bind(); }
+	auto type1_w() { return m_type1_w.bind(); }
+
+	void set_ctx_mask(uint8_t ctx_mask) { m_ctx_mask = ctx_mask; }
+	void set_pmeg_mask(uint8_t pmeg_mask) { m_pmeg_mask = pmeg_mask; }
 
 	enum insn_data_mode
 	{
@@ -43,13 +49,11 @@ public:
 	template <insn_data_mode MODE> uint32_t insn_data_r(const uint32_t offset, const uint32_t mem_mask);
 	template <insn_data_mode MODE> void insn_data_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask);
 
-	auto type1_r() { return m_type1_r.bind(); }
-	auto type1_w() { return m_type1_w.bind(); }
-
 	// sparc_mmu_device overrides
+	uint32_t fetch_insn(const bool supervisor, const uint32_t offset) override;
 	uint32_t read_asi(uint8_t asi, uint32_t offset, uint32_t mem_mask) override;
 	void write_asi(uint8_t asi, uint32_t offset, uint32_t data, uint32_t mem_mask) override;
-	void set_host(sparc_mmu_host_interface *host) override { logerror("Setting host\n"); m_host = host; }
+	void set_host(sparc_mmu_host_interface *host) override { m_host = host; }
 
 protected:
 	static const device_timer_id TIMER_RESET = 0;
@@ -127,6 +131,7 @@ protected:
 	uint32_t m_ram_size_words;
 	uint32_t m_context;
 	uint32_t m_context_masked;
+	uint32_t m_cache_context;
 	uint8_t m_system_enable;
 	bool m_fetch_bootrom;
 	uint32_t m_buserr[4];
@@ -138,8 +143,11 @@ protected:
 	bool m_page_valid[16384];
 
 	// Internal MAME device state
-	uint8_t m_ctx_mask;   // SS2 is sun4c but has 16 contexts; most have 8
-	uint8_t m_pmeg_mask;  // SS2 is sun4c but has 16384 PTEs; most have 8192
+	uint8_t m_ctx_mask;         // SS2 is sun4c but has 16 contexts; most have 8
+	uint8_t m_pmeg_mask;        // SS2 is sun4c but has 16384 PTEs; most have 8192
+	uint32_t m_ram_set_mask[4]; // Used for mirroring within 4 megabyte sets
+	uint32_t m_ram_set_base[4];
+	uint32_t m_populated_ram_words;
 	emu_timer *m_reset_timer;
 };
 

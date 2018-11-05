@@ -663,6 +663,10 @@ MACHINE_START_MEMBER(combatsc_state,combatsc)
 	save_item(NAME(m_prot));
 	save_item(NAME(m_pos));
 	save_item(NAME(m_sign));
+	save_pointer(NAME(m_page[0]),0x2000);
+	save_pointer(NAME(m_page[1]),0x2000);
+	save_pointer(NAME(m_scrollram0), 0x40);
+	save_pointer(NAME(m_scrollram1), 0x40);
 }
 
 MACHINE_START_MEMBER(combatsc_state,combatscb)

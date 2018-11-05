@@ -422,24 +422,25 @@ static DEVICE_INPUT_DEFAULTS_START( ip2_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(sgi_ip2_state::sgi_ip2)
+void sgi_ip2_state::sgi_ip2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68020, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(sgi_ip2_map)
+	M68020(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sgi_ip2_state::sgi_ip2_map);
 
-	MCFG_DEVICE_ADD("duart68681a", MC68681, 3.6864_MHz_XTAL) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, sgi_ip2_state, duarta_irq_handler))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	MC68681(config, m_duarta, 3.6864_MHz_XTAL); /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	m_duarta->irq_cb().set(FUNC(sgi_ip2_state::duarta_irq_handler));
+	m_duarta->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("duart68681b", MC68681, 3.6864_MHz_XTAL) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, sgi_ip2_state, duartb_irq_handler))
+	MC68681(config, m_duartb, 3.6864_MHz_XTAL); /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	m_duartb->irq_cb().set(FUNC(sgi_ip2_state::duartb_irq_handler));
 
-	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
+	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart68681a", mc68681_device, rx_b_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_duarta, FUNC(mc68681_device::rx_b_w));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(ip2_terminal));
+}
 
 static INPUT_PORTS_START( sgi_ip2 )
 	PORT_START("SWTCH")

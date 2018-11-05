@@ -466,19 +466,6 @@ void fp_state::sound_mem(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( sound_io )
-//-------------------------------------------------
-
-void fp_state::sound_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1);
-	map(M6801_PORT2, M6801_PORT2);
-	map(M6801_PORT3, M6801_PORT3);
-	map(M6801_PORT4, M6801_PORT4);
-}
-
-
 
 //**************************************************************************
 //  INPUT PORTS
@@ -587,7 +574,6 @@ MACHINE_CONFIG_START(fp_state::fp)
 
 	MCFG_DEVICE_ADD(HD63B01V1_TAG, HD6301, 2000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
-	MCFG_DEVICE_IO_MAP(sound_io)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */

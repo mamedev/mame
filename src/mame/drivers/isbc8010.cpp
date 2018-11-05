@@ -182,14 +182,14 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
-	MCFG_DEVICE_ADD(I8255A_2_TAG, I8255A, 0)
+	I8255A(config, m_ppi_0);
+	I8255A(config, m_ppi_1);
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
+	m_rs232->rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	m_rs232->dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr));
+	m_rs232->cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
+	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(18'432'000)/60)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isbc8010_state, usart_clock_tick))

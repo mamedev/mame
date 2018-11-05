@@ -6,7 +6,6 @@
 #include "sound/namco.h"
 #include "video/namco_c116.h"
 #include "machine/74157.h"
-#include "emupal.h"
 
 class namcos1_state : public driver_device
 {
@@ -22,12 +21,12 @@ public:
 		m_dac0(*this, "dac0"),
 		m_dac1(*this, "dac1"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_playfield_control(*this, "pfcontrol"),
 		m_triram(*this, "triram"),
 		m_rom(*this, "user1"),
+		m_tilemap_maskdata(*this, "tmap_mask"),
 		m_soundbank(*this, "soundbank"),
 		m_mcubank(*this, "mcubank"),
 		m_io_dipsw(*this, "DIPSW"),
@@ -70,13 +69,13 @@ private:
 	required_device<dac_8bit_r2r_device> m_dac0;
 	required_device<dac_8bit_r2r_device> m_dac1;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_playfield_control;
 	required_shared_ptr<uint8_t> m_triram;
 	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<uint8_t> m_tilemap_maskdata;
 
 	required_memory_bank m_soundbank;
 	required_memory_bank m_mcubank;
@@ -102,7 +101,6 @@ private:
 	int m_strobe_count;
 	int m_stored_input[2];
 	tilemap_t *m_bg_tilemap[6];
-	uint8_t *m_tilemap_maskdata;
 	int m_copy_sprites;
 	uint8_t m_drawmode_table[16];
 
@@ -135,12 +133,7 @@ private:
 	virtual void video_start() override;
 	void driver_init() override;
 
-	TILE_GET_INFO_MEMBER(bg_get_info0);
-	TILE_GET_INFO_MEMBER(bg_get_info1);
-	TILE_GET_INFO_MEMBER(bg_get_info2);
-	TILE_GET_INFO_MEMBER(bg_get_info3);
-	TILE_GET_INFO_MEMBER(fg_get_info4);
-	TILE_GET_INFO_MEMBER(fg_get_info5);
+	template <int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -148,10 +141,7 @@ private:
 
 	void main_map(address_map &map);
 	void mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void virtual_map(address_map &map);
-
-	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram);
 };

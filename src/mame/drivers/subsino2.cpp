@@ -2399,7 +2399,8 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
@@ -2450,7 +2451,8 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
@@ -2484,7 +2486,8 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
@@ -2522,7 +2525,8 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 

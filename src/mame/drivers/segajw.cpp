@@ -408,7 +408,8 @@ MACHINE_CONFIG_START(segajw_state::segajw)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac.set_addrmap(0, &segajw_state::ramdac_map);
 
 	MCFG_HD63484_ADD("hd63484", 8000000, segajw_hd63484_map) // unknown clock
 

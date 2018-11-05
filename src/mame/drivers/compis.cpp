@@ -791,15 +791,15 @@ MACHINE_CONFIG_START(compis_state::compis)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
+	rs232b.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcdb_w));
+	rs232b.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, compis_state, write_centronics_busy))

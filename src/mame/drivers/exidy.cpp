@@ -132,6 +132,11 @@ Fax                  1982  6502   FXL, FLA
             bit 0 note
             bit 1 upper
 
+    MouseTrap:
+    5101    W  MouseTrap P1/P2 LED States
+               bit 2  Player 1 LED state
+               bit 4  Player 2 LED state
+
     MouseTrap Digital Sound:
     0000-3FFF ROM
 
@@ -193,6 +198,13 @@ WRITE8_MEMBER(exidy_state::fax_bank_select_w)
 
 }
 
+WRITE8_MEMBER(exidy_state::mtrap_ocl_w) // Mouse Trap (possibly others) set P1 and P2 leds value at 5101, too.
+{
+	*m_sprite_enable = data;
+
+	output().set_value("led0", !BIT(data, 2));
+	output().set_value("led1", !BIT(data, 4));
+}
 
 /*************************************
  *
@@ -292,6 +304,11 @@ void exidy_state::pepper2_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
+void exidy_state::mtrap_map(address_map &map)
+{
+	venture_map(map);
+	map(0x5101, 0x5101).w(FUNC(exidy_state::mtrap_ocl_w));
+}
 
 void exidy_state::fax_map(address_map &map)
 {
@@ -926,7 +943,7 @@ MACHINE_CONFIG_START(exidy_state::mtrap)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(venture_map)
+	MCFG_DEVICE_PROGRAM_MAP(mtrap_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 

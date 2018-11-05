@@ -81,7 +81,6 @@ private:
 	DECLARE_WRITE8_MEMBER(count_reset_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
 	void ltd3_map(address_map &map);
-	void ltd4_io(address_map &map);
 	void ltd4_map(address_map &map);
 
 	bool m_timer_r;
@@ -121,12 +120,6 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x3000, 0x3000).w("aysnd_0", FUNC(ay8910_device::data_w));
 	map(0x3800, 0x3800).w("aysnd_1", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xdfff).rom().mirror(0x2000).region("roms", 0);
-}
-
-void ltd_state::ltd4_io(address_map &map)
-{
-	map(0x0100, 0x0100).rw(FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
-	map(0x0101, 0x0101).rw(FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
 }
 
 // bits 6,7 not connected to data bus
@@ -548,9 +541,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ltd_state::ltd4)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545)) // guess, no details available
-	MCFG_DEVICE_PROGRAM_MAP(ltd4_map)
-	MCFG_DEVICE_IO_MAP(ltd4_io)
+	m6803_cpu_device &maincpu(M6803(config, "maincpu", XTAL(3'579'545))); // guess, no details available
+	maincpu.set_addrmap(AS_PROGRAM, &ltd_state::ltd4_map);
+	maincpu.in_p1_cb().set(FUNC(ltd_state::port1_r));
+	maincpu.out_p1_cb().set(FUNC(ltd_state::port1_w));
+	maincpu.in_p2_cb().set(FUNC(ltd_state::port2_r));
+	maincpu.out_p2_cb().set(FUNC(ltd_state::port2_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

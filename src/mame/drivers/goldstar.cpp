@@ -8389,7 +8389,7 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	RAMDAC(config, "ramdac", 0, "palette").set_addrmap(0, &sanghopm_state::ramdac_map);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sangho)
 

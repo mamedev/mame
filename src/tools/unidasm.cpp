@@ -122,6 +122,7 @@ using util::BIT;
 #include "cpu/spc700/spc700ds.h"
 #include "cpu/ssem/ssemdasm.h"
 #include "cpu/ssp1601/ssp1601d.h"
+#include "cpu/st62xx/st62xx_dasm.h"
 #include "cpu/superfx/sfx_dasm.h"
 #include "cpu/t11/t11dasm.h"
 #include "cpu/tlcs870/tlcs870d.h"
@@ -349,8 +350,9 @@ static const dasm_table_entry dasm_table[] =
 	{ "hd6309",          be,  0, []() -> util::disasm_interface * { return new hd6309_disassembler; } },
 	{ "hd63701",         be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(63701); } },
 	{ "hmcs40",          le, -1, []() -> util::disasm_interface * { return new hmcs40_disassembler; } },
-	{ "hp_hybrid",       be, -1, []() -> util::disasm_interface * { return new hp_hybrid_disassembler; } },
 	{ "hp_5061_3001",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3001_disassembler; } },
+	{ "hp_5061_3011",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3011_disassembler; } },
+	{ "hp_09825_67907",  be, -1, []() -> util::disasm_interface * { return new hp_09825_67907_disassembler; } },
 	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
@@ -369,7 +371,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ie15",            le,  0, []() -> util::disasm_interface * { return new ie15_disassembler; } },
 	{ "jaguardsp",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::DSP); } },
 	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::GPU); } },
-	{ "konami",          le,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
+	{ "konami",          be,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
 	{ "lc8670",          be,  0, []() -> util::disasm_interface * { return new lc8670_disassembler; } },
 	{ "lh5801",          le,  0, []() -> util::disasm_interface * { return new lh5801_disassembler; } },
 	{ "lr35902",         le,  0, []() -> util::disasm_interface * { return new lr35902_disassembler; } },
@@ -449,6 +451,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "spc700",          le,  0, []() -> util::disasm_interface * { return new spc700_disassembler; } },
 	{ "ssem",            le,  0, []() -> util::disasm_interface * { return new ssem_disassembler; } },
 	{ "ssp1601",         be, -1, []() -> util::disasm_interface * { return new ssp1601_disassembler; } },
+	{ "st62xx",          le,  0, []() -> util::disasm_interface * { return new st62xx_disassembler; } },
 	{ "superfx",         le,  0, []() -> util::disasm_interface * { return new superfx_disassembler(&superfx_unidasm); } },
 	{ "t11",             le,  0, []() -> util::disasm_interface * { return new t11_disassembler; } },
 	{ "tlcs870",         le,  0, []() -> util::disasm_interface * { return new tlcs870_disassembler; } },
@@ -468,8 +471,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms57002",        le, -2, []() -> util::disasm_interface * { return new tms57002_disassembler; } },
 	{ "tms7000",         le,  0, []() -> util::disasm_interface * { return new tms7000_disassembler; } },
 	{ "tms9900",         be,  0, []() -> util::disasm_interface * { return new tms9900_disassembler(TMS9900_ID); } },
-	{ "tms9980",         le,  0, []() -> util::disasm_interface * { return new tms9900_disassembler(TMS9980_ID); } },
-	{ "tms9995",         le,  0, []() -> util::disasm_interface * { return new tms9900_disassembler(TMS9995_ID); } },
+	{ "tms9980",         be,  0, []() -> util::disasm_interface * { return new tms9900_disassembler(TMS9980_ID); } },
+	{ "tms9995",         be,  0, []() -> util::disasm_interface * { return new tms9900_disassembler(TMS9995_ID); } },
 	{ "tp0320",          be,  0, []() -> util::disasm_interface * { return new tp0320_disassembler; } },
 	{ "tx0_64kw",        be, -2, []() -> util::disasm_interface * { return new tx0_64kw_disassembler; } },
 	{ "tx0_8kw",         be, -2, []() -> util::disasm_interface * { return new tx0_8kw_disassembler; } },

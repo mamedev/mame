@@ -450,11 +450,11 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	m_usart0->rxrdy_handler().set_inputline(M68000_TAG, M68K_IRQ_5);
 	m_usart0->txrdy_handler().set(I8259_TAG, FUNC(pic8259_device::ir2_w));
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart0, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_usart0, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_usart0, i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set(m_usart0, FUNC(i8251_device::write_rxd));
+	rs232a.dsr_handler().set(m_usart0, FUNC(i8251_device::write_dsr));
+	rs232a.cts_handler().set(m_usart0, FUNC(i8251_device::write_cts));
+	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	I8251(config, m_usart1, 0);
 	m_usart1->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
@@ -463,12 +463,12 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	m_usart1->rxrdy_handler().set(I8259_TAG, FUNC(pic8259_device::ir1_w));
 	m_usart1->txrdy_handler().set(I8259_TAG, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_usart1, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_usart1, i8251_device, write_dsr))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_usart1, FUNC(i8251_device::write_rxd));
+	rs232b.dsr_handler().set(m_usart1, FUNC(i8251_device::write_dsr));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, sage2_state, fdc_irq))
+	UPD765A(config, m_fdc, false, false);
+	m_fdc->intrq_wr_callback().set(FUNC(sage2_state::fdc_irq));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, sage2_state, write_centronics_ack))

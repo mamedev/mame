@@ -288,9 +288,9 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	m_dmac->in_ior_cb<0>().set("upd765", FUNC(upd765a_device::mdma_r));
 	m_dmac->out_iow_cb<0>().set("upd765", FUNC(upd765a_device::mdma_w));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic8259_0", pic8259_device, ir2_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_dmac, i8257_device, dreq0_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set("pic8259_0", FUNC(pic8259_device::ir2_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 
@@ -298,9 +298,9 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	m_8251key->rxrdy_handler().set("pic8259_1", FUNC(pic8259_device::ir1_w));
 	m_8251key->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("kbd", RS232_PORT, peoplepc_keyboard_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_0", i8251_device, write_rxd))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	rs232_port_device &kbd(RS232_PORT(config, "kbd", peoplepc_keyboard_devices, "keyboard"));
+	kbd.rxd_handler().set(m_8251key, FUNC(i8251_device::write_rxd));
+	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	I8251(config, m_8251ser, 0);
 MACHINE_CONFIG_END

@@ -1689,42 +1689,37 @@ void tms32025_device::device_start()
 	m_mHackIgnoreARP = 0;
 	m_waiting_for_serial_frame = 0;
 
+	save_item(NAME(m_PREVPC));
 	save_item(NAME(m_PC));
+	save_item(NAME(m_PFC));
 	save_item(NAME(m_STR0));
 	save_item(NAME(m_STR1));
-	save_item(NAME(m_PFC));
 	save_item(NAME(m_IFR));
 	save_item(NAME(m_RPTC));
 	save_item(NAME(m_ACC.d));
 	save_item(NAME(m_ALU.d));
 	save_item(NAME(m_Preg.d));
 	save_item(NAME(m_Treg));
-	save_item(NAME(m_AR[0]));
-	save_item(NAME(m_AR[1]));
-	save_item(NAME(m_AR[2]));
-	save_item(NAME(m_AR[3]));
-	save_item(NAME(m_AR[4]));
-	save_item(NAME(m_AR[5]));
-	save_item(NAME(m_AR[6]));
-	save_item(NAME(m_AR[7]));
-	save_item(NAME(m_STACK[0]));
-	save_item(NAME(m_STACK[1]));
-	save_item(NAME(m_STACK[2]));
-	save_item(NAME(m_STACK[3]));
-	save_item(NAME(m_STACK[4]));
-	save_item(NAME(m_STACK[5]));
-	save_item(NAME(m_STACK[6]));
-	save_item(NAME(m_STACK[7]));
+	save_item(NAME(m_AR));
+	save_item(NAME(m_STACK));
 
-	save_item(NAME(m_oldacc));
-	save_item(NAME(m_memaccess));
-	save_item(NAME(m_mHackIgnoreARP));
+	save_item(NAME(m_drr));
+	save_item(NAME(m_dxr));
+	save_item(NAME(m_tim));
+	save_item(NAME(m_prd));
+	save_item(NAME(m_imr));
+	save_item(NAME(m_greg));
+	save_item(NAME(m_timerover));
 
 	save_item(NAME(m_idle));
 	save_item(NAME(m_hold));
 	save_item(NAME(m_external_mem_access));
 	save_item(NAME(m_init_load_addr));
-	save_item(NAME(m_PREVPC));
+
+	save_item(NAME(m_oldacc.d));
+	save_item(NAME(m_memaccess));
+	save_item(NAME(m_waiting_for_serial_frame));
+	save_item(NAME(m_mp_mc));
 
 	state_add( TMS32025_PC,   "PC",   m_PC).formatstr("%04X");
 	state_add( TMS32025_STR0, "STR0", m_STR0).formatstr("%04X");

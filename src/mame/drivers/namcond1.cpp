@@ -10,8 +10,13 @@
             Walter Fath
 
     abcheck TODOs:
-    - YGV608 brokenness
+    - GFX rom banking is a mystery (bad ROMs? Encryption?)
     - Where is the extra data ROM mapped?
+
+    gynotai TODOs:
+    - printer (disable it in service mode);
+    - ball sensors aren't understood;
+    - Seems to dislike our YGV608 row/colscroll handling;
 
     To make abcheck run when the EEPROM is clear:
     - F2 to enter service mode
@@ -264,6 +269,20 @@ static INPUT_PORTS_START( namcond1 )
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gynotai )
+	PORT_INCLUDE( namcond1 )
+
+	PORT_MODIFY("P1_P2")
+	// TODO: these are presumably ball sensors
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left 1")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Left 2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Center 1")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Center 2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Right 1")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Right 2")
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( abcheck )
 	PORT_INCLUDE( namcond1 )
 
@@ -404,93 +423,125 @@ MACHINE_CONFIG_START(namcond1_state::abcheck)
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )
-	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "nc2main0.14d", 0x00000, 0x80000, CRC(4ffc530b) SHA1(23d622d0261a3584236a77b2cefa522a0f46490e) )
 	ROM_LOAD16_WORD( "nc2main1.13d", 0x80000, 0x80000, CRC(26499a4e) SHA1(4af0c365713b4a51da684a3423b07cbb70d9599b) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x200000,"ygv608", 0 )    /* 2MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    /* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
+	ROM_RELOAD(                     0x200000, 0x200000 )
+	ROM_RELOAD(                     0x400000, 0x200000 )
+	ROM_RELOAD(                     0x600000, 0x200000 )
 
-	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
 ROM_START( ncv1j )
-	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "nc1main0.14d",  0x00000, 0x80000, CRC(48ce0b2b) SHA1(07dfca8ba935ee0151211f9eb4d453f2da1d4bd7) )
 	ROM_LOAD16_WORD( "nc1main1.13d",  0x80000, 0x80000, CRC(49f99235) SHA1(97afde7f7dddd8538de78a74325d0038cb1217f7) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x200000,"ygv608", 0 )    /* 2MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    /* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
+	ROM_RELOAD(                     0x200000, 0x200000 )
+	ROM_RELOAD(                     0x400000, 0x200000 )
+	ROM_RELOAD(                     0x600000, 0x200000 )
 
-	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
 ROM_START( ncv1j2 )
-	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "nc1main0b.14d", 0x00000, 0x80000, CRC(7207469d) SHA1(73faf1973a57c1bc2163e9ee3fe2febd3b8763a4) )
 	ROM_LOAD16_WORD( "nc1main1b.13d", 0x80000, 0x80000, CRC(52401b17) SHA1(60c9f20831d0101c02dafbc0bd15422f71f3ad81) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "nc1sub.1c",          0x00000, 0x80000, CRC(48ea0de2) SHA1(33e57c8d084a960ccbda462d18e355de44ec7ad9) )
 
-	ROM_REGION( 0x200000,"ygv608", 0 )    /* 2MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    /* 2MB character generator */
 	ROM_LOAD( "nc1cg0.10c",         0x000000, 0x200000, CRC(355e7f29) SHA1(47d92c4e28c3610a620d3c9b3be558199477f6d8) )
+	ROM_RELOAD(                     0x200000, 0x200000 )
+	ROM_RELOAD(                     0x400000, 0x200000 )
+	ROM_RELOAD(                     0x600000, 0x200000 )
 
-	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD( "nc1voice.7b",     0x000000, 0x200000, CRC(91c85bd6) SHA1(c2af8b1518b2b601f2b14c3f327e7e3eae9e29fc) )
 ROM_END
 
 ROM_START( ncv2 )
-	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "ncs2main0.14e", 0x00000, 0x80000, CRC(fb8a4123) SHA1(47acdfe9b5441d0e3649aaa9780e676f760c4e42) )
 	ROM_LOAD16_WORD( "ncs2main1.13e", 0x80000, 0x80000, CRC(7a5ef23b) SHA1(0408742424a6abad512b5baff63409fe44353e10) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "ncs1sub.1d",          0x00000, 0x80000, CRC(365cadbf) SHA1(7263220e1630239e3e88b828c00389d02628bd7d) )
 
-	ROM_REGION( 0x400000,"ygv608", 0 )    /* 4MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
-	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
+	ROM_RELOAD(                      0x200000, 0x200000 )
+	ROM_LOAD( "ncs1cg1.10f",         0x400000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
+	ROM_RELOAD(                      0x600000, 0x200000 )
 
-	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_REGION( 0x200000, "c352", 0 ) // Samples
 	ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
 ROM_START( ncv2j )
-	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "ncs1main0.14e", 0x00000, 0x80000, CRC(99991192) SHA1(e0b0e15ae23560b77119b3d3e4b2d2bb9d8b36c9) )
 	ROM_LOAD16_WORD( "ncs1main1.13e", 0x80000, 0x80000, CRC(af4ba4f6) SHA1(ff5adfdd462cfd3f17fbe2401dfc88ff8c71b6f8) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
 	ROM_LOAD("ncs1sub.1d",          0x00000, 0x80000, CRC(365cadbf) SHA1(7263220e1630239e3e88b828c00389d02628bd7d) )
 
-	ROM_REGION( 0x400000,"ygv608", 0 )    /* 4MB character generator */
+	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
 	ROM_LOAD( "ncs1cg0.10e",         0x000000, 0x200000, CRC(fdd24dbe) SHA1(4dceaae3d853075f58a7408be879afc91d80292e) )
-	ROM_LOAD( "ncs1cg1.10e",         0x200000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
+	ROM_RELOAD(                      0x200000, 0x200000 )
+	ROM_LOAD( "ncs1cg1.10f",         0x400000, 0x200000, CRC(007b19de) SHA1(d3c093543511ec1dd2f8be6db45f33820123cabc) )
+	ROM_RELOAD(                      0x600000, 0x200000 )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
+ROM_START( gynotai )
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_LOAD( "gy1main0.14e", 0x000000, 0x080000, CRC(1421dbf5) SHA1(7e4322cddc3317c9ed82a97c0fe387ce1364cf9b) )
+	ROM_LOAD( "gy1main1.13e", 0x080000, 0x080000, CRC(dc10a4a7) SHA1(01a6b5aae8599de9015d6e332f5bd286bc84c807) )
+
+	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
+	ROM_LOAD( "gy1sub0.1d",   0x000000, 0x080000, CRC(fd31e963) SHA1(b658921dd29cfad0c366465ae37a356c3d2fb4d3) )
+
+	ROM_REGION( 0x800000, "ygv608", 0 )    /* 8MB character generator */
+	ROM_LOAD( "gy1cg0.10e",   0x000000, 0x400000, CRC(938c7912) SHA1(36278a945a00e1549ae55ec65a9b4001537023b0) )
+	ROM_LOAD( "gy1cg1.10f",   0x400000, 0x400000, CRC(5a518733) SHA1(b6ea91629bc6ddf67c47c4189084aa947f4e31ed) )
+
+	ROM_REGION( 0x200000, "c352", 0 ) // Samples
+	ROM_LOAD( "gy1voic.7c",     0x000000, 0x200000, CRC(f135e79b) SHA1(01ce3e3b366d0b9045ad8599b60ca33c6d21f150) )
+ROM_END
+
 ROM_START( abcheck )
-	ROM_REGION( 0x100000,"maincpu", 0 )     /* 16MB for Main CPU */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 16MB for Main CPU */
 	ROM_LOAD( "an1main0b.14e", 0x000000, 0x080000, CRC(f1b9777d) SHA1(b28f4106e1e145dc1aaa5af455b6f991d2b04c59) )
 	ROM_LOAD( "an1main1b.13e", 0x080000, 0x080000, CRC(d40ccdcc) SHA1(05f864d84bf34a1722c598378ed8d27fba00f575) )
 
-	ROM_REGION( 0x80000,"mcu", 0 )      /* sub CPU */
+	ROM_REGION( 0x80000, "mcu", 0 )      /* sub CPU */
 	ROM_LOAD( "an1sub.1d",    0x000000, 0x080000, CRC(50de9130) SHA1(470b3977f4bf12ca65bc42631ccdf81753ef56fd) )
 
-	ROM_REGION( 0x400000,"ygv608", 0 )    /* 4MB character generator */
-	ROM_LOAD( "an1cg0.10e",   0x000000, 0x200000, CRC(6dae0531) SHA1(2f4a4a22d461eb9a5bb88bdfccc3aff44cd3faee) )
-	ROM_LOAD( "an1cg1.10f",   0x200000, 0x200000, CRC(8485607a) SHA1(1b9a1950c6db61a2b546fe2f5e56333593e93fb4) )
+	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
+	// TODO: gynotai proves these might be underdumped, please check.
+	ROM_LOAD( "an1cg0.10e",   0x000000, 0x200000, BAD_DUMP CRC(6dae0531) SHA1(2f4a4a22d461eb9a5bb88bdfccc3aff44cd3faee) )
+	ROM_RELOAD(               0x200000, 0x200000 )
+	ROM_LOAD( "an1cg1.10f",   0x400000, 0x200000, BAD_DUMP CRC(8485607a) SHA1(1b9a1950c6db61a2b546fe2f5e56333593e93fb4) )
+	ROM_RELOAD(               0x600000, 0x200000 )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "an1voice.7c",  0x000000, 0x200000, CRC(d2bfa453) SHA1(6b7d6bb4d65290d8fd3df5d12b41ae7dce5f3f1c) )
@@ -512,9 +563,12 @@ ROM_START( abcheck )
 	ROM_LOAD( "npg1624lc.u4", 0x020000, 0x200000, CRC(7e00254f) SHA1(b0fa8f979e8322d71f842de5358ae2a2e36386f7) )
 ROM_END
 
-GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
+// fwiw it looks like version numbering at POST is for the ND1 framework build the games are based on.
+GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 1.00
 GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 1.03
+GAME( 1996, gynotai,   0, namcond1, gynotai,  namcond1_state, empty_init, ROT0,  "Namco", "Gynotai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // 1.04
+GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 1.10
 GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM

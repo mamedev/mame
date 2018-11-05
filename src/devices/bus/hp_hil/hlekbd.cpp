@@ -14,8 +14,8 @@
 DEFINE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device, "hp_ipc_hle_kbd", "HP Integral Keyboard (HLE)")
 DEFINE_DEVICE_TYPE_NS(HP_ITF_HLE_KEYBOARD, bus::hp_hil, hle_hp_itf_device, "hp_itf_hle_kbd", "HP ITF Keyboard")
 
-
-namespace bus { namespace hp_hil {
+namespace bus {
+	namespace hp_hil {
 
 namespace {
 
@@ -408,191 +408,26 @@ INPUT_PORTS_START( itf_basic )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
 INPUT_PORTS_END
 
-
-
 INPUT_PORTS_START( hle_hp_itf_device )
 	PORT_INCLUDE( itf_basic )
 	PORT_INCLUDE( itf_id )
 INPUT_PORTS_END
 
-
 } // anonymous namespace
 
-
-/***************************************************************************
-    BASE HLE KEYBOARD DEVICE
-***************************************************************************/
-
-/*--------------------------------------------------
-    hle_device_base::hle_device_base
-    designated device constructor
---------------------------------------------------*/
-
-hle_device_base::hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_hp_hil_interface(mconfig, *this)
-	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
-{ }
-
-
-/*--------------------------------------------------
-    hle_device_base::~hle_device_base
-    destructor
---------------------------------------------------*/
-
-hle_device_base::~hle_device_base()
-{ }
-
-
-/*--------------------------------------------------
-    hle_device_base::device_start
-    perform expensive initialisations, allocate
-    resources, register for save state
---------------------------------------------------*/
-
-void hle_device_base::device_start()
-{
-	set_hp_hil_mlc_device();
-
-	m_powerup = true;
-	m_passthru = false;
-}
-
-
-/*--------------------------------------------------
-    hle_device_base::device_reset
-    perform startup tasks, also used for host
-    requested reset
---------------------------------------------------*/
-
-void hle_device_base::device_reset()
-{
-	m_fifo.clear();
-
-	// kick the base
-	reset_key_state();
-	start_processing(attotime::from_hz(1'200));
-}
-
-// '
-bool hle_device_base::hil_write(uint16_t *pdata)
-{
-	int frames = 0;
-	uint8_t addr = (*pdata >> 8) & 7;
-	uint8_t data = *pdata & 0xff;
-	bool command = BIT(*pdata, 11);
-
-	LOG("rx from mlc %04X (%s addr %d, data %02X)\n", *pdata,
-		command ? "command" : "data", addr, data);
-	if (!command)
-		goto out;
-
-	if (addr != 0 && addr != m_device_id)
-		goto out;
-
-	switch (data)
-	{
-	case HPHIL_IFC:
-		m_powerup = false;
-		break;
-
-	case HPHIL_EPT:
-		m_passthru = true;
-		break;
-
-	case HPHIL_ELB:
-		m_passthru = false;
-		break;
-
-	case 0x09:
-	case 0x0a:
-	case 0x0b:
-	case 0x0c:
-	case 0x0d:
-	case 0x0e:
-	case 0x0f:
-		m_device_id = data - 8;
-		m_device_id16 = (data - 8) << 8;
-		*pdata &= ~7;
-		*pdata += (data - 7);
-		break;
-
-	case HPHIL_POL:
-		if (!m_fifo.empty())
-		{
-
-			frames = 1;
-			m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
-			while (!m_fifo.empty())
-			{
-				m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
-				frames++;
-			}
-		}
-		m_hp_hil_mlc->hil_write(HPMLC_W1_C | (addr << 8) | HPHIL_POL | (frames));
-		*pdata &= ~7;
-		*pdata += frames;
-		return true;
-
-	case HPHIL_DSR:
-		m_device_id = m_device_id16 = 0;
-		m_powerup = true;
-		break;
-
-	case HPHIL_IDD:
-		m_hp_hil_mlc->hil_write(0x0100 | ioport("COL0")->read());
-		m_hp_hil_mlc->hil_write(m_device_id16 | 0);
-		break;
-
-	case HPHIL_DHR:
-		m_powerup = true;
-		m_passthru = false;
-		device_reset();
-		return true;
-		break;
-
-	default:
-		LOG("command %02X unknown\n", data);
-		break;
-	}
-out:
-	if (!m_passthru) {
-		m_hp_hil_mlc->hil_write(*pdata);
-		return false;
-	}
-	return true;
-}
-
-void hle_device_base::transmit_byte(uint8_t byte)
+void hle_hp_ipc_device::transmit_byte(uint8_t byte)
 {
 	if (!m_fifo.full()) {
 		m_fifo.enqueue(byte);
 	}
-//  else
-//      printf("queuing fail (fifo full)\n");
 }
 
-/*--------------------------------------------------
-    hle_device_base::key_make
-    handle a key being pressed
---------------------------------------------------*/
-
-void hle_device_base::key_make(uint8_t row, uint8_t column)
+void hle_hp_itf_device::transmit_byte(uint8_t byte)
 {
-	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1));
+	if (!m_fifo.full()) {
+		m_fifo.enqueue(byte);
+	}
 }
-
-
-/*--------------------------------------------------
-    hle_device_base::key_break
-    handle a key being released
---------------------------------------------------*/
-
-void hle_device_base::key_break(uint8_t row, uint8_t column)
-{
-	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1) + 1);
-}
-
 
 /***************************************************************************
     HP INTEGRAL HLE KEYBOARD DEVICE
@@ -605,8 +440,62 @@ void hle_device_base::key_break(uint8_t row, uint8_t column)
 
 hle_hp_ipc_device::hle_hp_ipc_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: hle_device_base(mconfig, HP_IPC_HLE_KEYBOARD, tag, owner, clock)
+	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
 { }
 
+void hle_hp_ipc_device::device_reset()
+{
+	m_fifo.clear();
+	reset_key_state();
+	start_processing(attotime::from_hz(1'200));
+}
+
+void hle_hp_ipc_device::hil_idd()
+{
+	m_hp_hil_mlc->hil_write(0x0100 |  ioport("COL0")->read());
+	m_hp_hil_mlc->hil_write(m_device_id16 | 0);
+	return;
+}
+
+void hle_hp_ipc_device::key_make(uint8_t row, uint8_t column)
+{
+	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1));
+}
+
+
+void hle_hp_ipc_device::key_break(uint8_t row, uint8_t column)
+{
+	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1) + 1);
+}
+
+int hle_hp_ipc_device::hil_poll()
+{
+	int frames = 1;
+	if (m_fifo.empty())
+		return frames;
+
+	m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
+	while (!m_fifo.empty()) {
+		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
+		frames++;
+	}
+	return frames;
+}
+
+int hle_hp_itf_device::hil_poll()
+{
+	int frames = 0;
+	if (m_fifo.empty())
+		return frames;
+	LOG("KBD HAVE DATA\n");
+	frames++;
+	m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
+	while (!m_fifo.empty()) {
+		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
+		frames++;
+	}
+	return frames;
+}
 
 /*--------------------------------------------------
     hle_hp_ipc_device::device_input_ports
@@ -629,8 +518,28 @@ ioport_constructor hle_hp_ipc_device::device_input_ports() const
 
 hle_hp_itf_device::hle_hp_itf_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: hle_device_base(mconfig, HP_ITF_HLE_KEYBOARD, tag, owner, clock)
+	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
 { }
 
+void hle_hp_itf_device::device_reset()
+{
+	m_fifo.clear();
+	reset_key_state();
+	start_processing(attotime::from_hz(1'200));
+}
+
+void hle_hp_itf_device::key_make(uint8_t row, uint8_t column)
+{
+	LOG("make\n");
+	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1));
+}
+
+
+void hle_hp_itf_device::key_break(uint8_t row, uint8_t column)
+{
+	LOG("break\n");
+	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1) + 1);
+}
 
 /*--------------------------------------------------
     hle_hp_itf_device::device_input_ports
@@ -643,4 +552,12 @@ ioport_constructor hle_hp_itf_device::device_input_ports() const
 }
 
 
-} } // namespace bus::hp_hil
+void hle_hp_itf_device::hil_idd()
+{
+	m_hp_hil_mlc->hil_write(m_device_id16 |  ioport("COL0")->read());
+	m_hp_hil_mlc->hil_write(m_device_id16 | 0x04);
+	return;
+}
+
+} // namespace bus::hp_hil
+} // namespace bus

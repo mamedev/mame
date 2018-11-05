@@ -971,11 +971,11 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_dmac->out_dack_callback<3>().set(FUNC(apc_state::apc_dack3_w));
 
 	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
-	MCFG_UPD1990A_ADD(m_rtc, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
-	MCFG_UPD765A_ADD(m_fdc, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(m_i8259_s, pic8259_device, ir4_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_dmac, am9517a_device, dreq1_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
