@@ -94,7 +94,6 @@ private:
 	void hp9k300(machine_config &config);
 	required_device<m68000_base_device> m_maincpu;
 
-	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void driver_start() override;
 
@@ -220,13 +219,6 @@ void hp9k3xx_state::driver_start()
 	m_diag_led.resolve();
 }
 
-void hp9k3xx_state::machine_reset()
-{
-	auto *dio = subdevice<bus::hp_dio::dio16_device>("diobus");
-	if (dio)
-		m_maincpu->set_reset_callback(write_line_delegate(FUNC(bus::hp_dio::dio16_device::reset_in), dio));
-}
-
 void hp9k3xx_state::machine_start()
 {
 	m_bus_error_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9k3xx_state::bus_error_timeout), this));
@@ -255,10 +247,12 @@ WRITE16_MEMBER(hp9k3xx_state::led_w)
 	m_diag_led[7] = BIT(data, 7);
 }
 
+
 void hp9k3xx_state::add_dio16_bus(machine_config &config)
 {
 	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
 	dio16.set_cputag(m_maincpu);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(bus::hp_dio::dio16_device::reset_in), &dio16));
 
 	dio16.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio16.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));
@@ -273,6 +267,7 @@ void hp9k3xx_state::add_dio32_bus(machine_config &config)
 {
 	bus::hp_dio::dio32_device &dio32(DIO32(config, "diobus", 0));
 	dio32.set_cputag(m_maincpu);
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(bus::hp_dio::dio16_device::reset_in), &dio32));
 
 	dio32.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio32.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));
