@@ -1730,6 +1730,80 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Nintendo Game & Watch: Tropical Fish (model TF-104)
+  * PCB label TF-104
+  * Sharp SM510 label TF-104 8739A (no decap)
+  * vertical lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_tfish_state : public hh_sm510_state
+{
+public:
+	gnw_tfish_state(const machine_config &mconfig, device_type type, const char *tag)
+	: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_tfish(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_tfish )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(gnw_tfish_state::gnw_tfish)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", SM510)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1572, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1572-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Nintendo Game & Watch: Super Mario Bros. (model: see below)
   * Sharp SM511 label YM-105 9024B (new wide screen version) (die label ?)
   * lcd screen with custom segments, 1-bit sound
@@ -6806,6 +6880,15 @@ ROM_START( gnw_mariocm )
 ROM_END
 
 
+ROM_START( gnw_tfish )
+        ROM_REGION( 0x1000, "maincpu", 0 )
+        ROM_LOAD( "tf-104", 0x0000, 0x1000, CRC(53cde918) SHA1(bc1e1b8f8b282bb886bb076c1c7ce35d00eca6fc) )
+
+        ROM_REGION( 257088, "svg", 0)
+        ROM_LOAD( "gnw_tfish.svg", 0, 257088, CRC(11cd56c1) SHA1(151b627ed667e33d7e9f4f2f4a57eb5fe6cd9ac1) )
+ROM_END
+
+
 ROM_START( gnw_smb )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ym-105.program", 0x0000, 0x1000, CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) )
@@ -7332,6 +7415,7 @@ CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_stat
 // new wide screen
 CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1985, gnw_tfish,   0,          0, gnw_tfish,   gnw_tfish,   gnw_tfish_state,   empty_init, "Nintendo", "Game & Watch: Tropical Fish (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 
 // micro vs.
