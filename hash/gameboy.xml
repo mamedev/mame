@@ -1750,7 +1750,7 @@
 	</software>
 
 	<!--
-	Battle Space is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+	Battle Space requires Barcode Boy, a barcode reader accessory for Game Boy.
 	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
 	It came bundled with the following barcode cards (all EAN-13):
 		1 (up):
