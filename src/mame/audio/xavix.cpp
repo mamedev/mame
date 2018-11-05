@@ -135,6 +135,12 @@ WRITE8_MEMBER(xavix_state::sound_75fd_w)
 	LOG("%s: sound_75fd_w %02x\n", machine().describe_context(), data);
 }
 
+READ8_MEMBER(xavix_state::sound_75fe_r)
+{
+	// rescue heros checks this after doing something that looks like an irq ack
+	return 0xff;
+}
+
 WRITE8_MEMBER(xavix_state::sound_75fe_w)
 {
 	m_soundregs[14] = data;

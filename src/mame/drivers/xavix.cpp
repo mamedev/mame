@@ -339,7 +339,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_75fb_r), FUNC(xavix_state::sound_75fb_w)); // r/w tested
 	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_75fc_r), FUNC(xavix_state::sound_75fc_w)); // r/w tested
 	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_75fd_r), FUNC(xavix_state::sound_75fd_w)); // r/w tested
-	map(0x75fe, 0x75fe).w(FUNC(xavix_state::sound_75fe_w));
+	map(0x75fe, 0x75fe).rw(FUNC(xavix_state::sound_75fe_r), FUNC(xavix_state::sound_75fe_w));
 	// taitons1 written other 75xx operations
 	map(0x75ff, 0x75ff).w(FUNC(xavix_state::sound_75ff_w));
 

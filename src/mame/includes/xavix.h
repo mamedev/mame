@@ -190,6 +190,7 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_READ8_MEMBER(sound_75fd_r);
 	DECLARE_WRITE8_MEMBER(sound_75fd_w);
 
+	DECLARE_READ8_MEMBER(sound_75fe_r);
 	DECLARE_WRITE8_MEMBER(sound_75fe_w);
 	DECLARE_WRITE8_MEMBER(sound_75ff_w);
 
