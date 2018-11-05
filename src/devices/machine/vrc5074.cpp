@@ -966,7 +966,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		if (!(olddata & 1) && (m_cpu_regs[offset] & 1))
 		{
 			m_timer[which]->adjust(attotime::from_hz(clock()) * m_cpu_regs[NREG_T0CNTR + which * 4], which);
-			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, ATTOSECONDS_TO_HZ(attotime::from_double(m_timer_period[which]).as_attoseconds()));
+			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, attotime::from_double(m_timer_period[which]).as_hz());
 		}
 
 		/* timer disabled? */

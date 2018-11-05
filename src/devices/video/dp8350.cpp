@@ -249,7 +249,7 @@ void dp835x_device::reconfigure_screen()
 		screen().configure(m_dots_per_line, lines_per_frame, screen().visible_area(), refresh.as_attoseconds());
 
 	logerror("Frame rate refresh: %.2f Hz (f%d); horizontal rate scan: %.4f kHz; character rate: %.4f MHz; dot rate: %.5f MHz\n",
-		ATTOSECONDS_TO_HZ(refresh.as_attoseconds()),
+		refresh.as_hz(),
 		m_60hz_refresh ? 1 : 0,
 		clock() / (m_dots_per_line * 1000.0),
 		clock() / (m_char_width * 1000000.0),

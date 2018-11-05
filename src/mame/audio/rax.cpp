@@ -390,7 +390,7 @@ void acclaim_rax_device::recompute_sample_rate(int which)
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
 	sample_period = sample_period * (16 * 1);
-	dmadac_set_frequency(&m_dmadac[0], 2, ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
+	dmadac_set_frequency(&m_dmadac[0], 2, sample_period.as_hz());
 	dmadac_enable(&m_dmadac[0], 2, 1);
 
 	/* fire off a timer which will hit every half-buffer */

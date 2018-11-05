@@ -372,7 +372,7 @@ u8 z80ctc_channel_device::read()
 	{
 		attotime period = m_device->clocks_to_attotime((m_mode & PRESCALER) == PRESCALER_16 ? 16 : 256);
 
-		LOG("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds()));
+		LOG("CTC clock %f\n", period.as_hz());
 
 		if (m_timer != nullptr)
 			return ((int)(m_timer->remaining().as_double() / period.as_double()) + 1) & 0xff;
