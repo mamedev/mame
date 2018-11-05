@@ -429,16 +429,85 @@ WRITE8_MEMBER(xavix_i2c_state::io1_data_w)
 }
 
 
+
+READ8_MEMBER(xavix_ekara_state::io1_data_r)
+{
+	uint8_t ret = m_in1->read();
+		
+	ret &= 0xfc;
+		
+	ret |= m_extrainlatch0 << 0;
+	ret |= m_extrainlatch1 << 1;
+		
+	ret &= ~m_io1_direction;
+	ret |= m_io1_data & m_io1_direction;
+	return ret;
+}
+
 WRITE8_MEMBER(xavix_ekara_state::io0_data_w)
 {
 	m_io0_data = data;
-	printf("------------- %s: io0_data_w %02x\n", machine().describe_context().c_str(), data & m_io0_direction);
+
+	m_extraioselect = data & m_io0_direction;
+
+	// is bit 0x80 an enable for something else? LED? Microphone? it doesn't seem related to the multiplexing
+
+	LOG("------------- %s: io0_data_w %02x\n", machine().describe_context(), data & m_io0_direction);
 }
 
 WRITE8_MEMBER(xavix_ekara_state::io1_data_w)
 {
 	m_io1_data = data;
-	printf("%s: io1_data_w %02x\n", machine().describe_context().c_str(), data & m_io1_direction);
+
+	uint8_t extraiowrite = data & m_io1_direction;
+
+	if ((extraiowrite & 0x80) != (m_extraiowrite & 0x80))
+	{
+		if (extraiowrite & 0x80)
+		{
+			// clock out bits 0x0c using m_extraioselect (TODO)  (probably the 7segs?)
+			// also latch in bits for reading later?
+
+			switch (m_extraioselect & 0x7f)
+			{
+			case 0x01:
+				m_extrainlatch0 = (m_extra0->read() & 0x01) >> 0;
+				m_extrainlatch1 = (m_extra0->read() & 0x02) >> 1;
+				break;
+			case 0x02:
+				m_extrainlatch0 = (m_extra0->read() & 0x04) >> 2;
+				m_extrainlatch1 = (m_extra0->read() & 0x08) >> 3;
+				break;
+			case 0x04:
+				m_extrainlatch0 = (m_extra0->read() & 0x10) >> 4;
+				m_extrainlatch1 = (m_extra0->read() & 0x20) >> 5;
+				break;
+			case 0x08:
+				m_extrainlatch0 = (m_extra0->read() & 0x40) >> 6;
+				m_extrainlatch1 = (m_extra0->read() & 0x80) >> 7;
+				break;
+			case 0x10:
+				m_extrainlatch0 = (m_extra1->read() & 0x01) >> 0;
+				m_extrainlatch1 = (m_extra1->read() & 0x02) >> 1;
+				break;
+			case 0x20:
+				m_extrainlatch0 = (m_extra1->read() & 0x04) >> 2;
+				m_extrainlatch1 = (m_extra1->read() & 0x08) >> 3;
+				break;
+			case 0x40:
+				m_extrainlatch0 = (m_extra1->read() & 0x10) >> 4;
+				m_extrainlatch1 = (m_extra1->read() & 0x20) >> 5;
+				break;
+			default:
+				LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
+				break;
+			}	
+		}
+	}
+
+	m_extraiowrite = extraiowrite;
+
+	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data & m_io1_direction);
 }
 
 

@@ -387,11 +387,18 @@ class xavix_ekara_state : public xavix_state
 public:
 	xavix_ekara_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_extra0(*this, "EXTRA0"),
+		m_extra1(*this, "EXTRA1"),
+		m_extraioselect(0),
+		m_extraiowrite(0),
+		m_extrainlatch0(0),
+		m_extrainlatch1(0)
 	{ }
 
 	void xavix_ekara(machine_config &config);
 
+	virtual DECLARE_READ8_MEMBER(io1_data_r) override;
 	virtual DECLARE_WRITE8_MEMBER(io0_data_w) override;
 	virtual DECLARE_WRITE8_MEMBER(io1_data_w) override;
 
@@ -399,6 +406,16 @@ protected:
 	required_device<generic_slot_device> m_cart;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ekara_cart);
 	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
+
+	required_ioport m_extra0;
+	required_ioport m_extra1;
+
+	uint8_t m_extraioselect;
+	uint8_t m_extraiowrite;
+
+	uint8_t m_extrainlatch0;
+	uint8_t m_extrainlatch1;
+
 };
 
 #endif // MAME_INCLUDES_XAVIX_H
