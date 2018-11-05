@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
 license:CC0
-copyright-holders:Sven Schnelle
-Hewlett-Packard 9000/3xx Layout
+copyright-holders:F. Ulivi
+Hewlett-Packard 9825 Layout
 -->
 <mamelayout version="2">
 	<element name="dotmatrix5dot">
