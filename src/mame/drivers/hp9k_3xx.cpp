@@ -187,12 +187,12 @@ void hp9k3xx_state::hp9k360_map(address_map &map)
 	map(0xff000000, 0xffffffff).ram();
 }
 
-// 9000/370 - 8 MB RAM standard
+// 9000/370 - with 48 MB RAM (max. configuration)
 void hp9k3xx_state::hp9k370_map(address_map &map)
 {
 	hp9k3xx_common(map);
 	// main memory
-	map(0xff800000, 0xffffffff).ram();
+	map(0xfd000000, 0xffffffff).ram();
 }
 
 // 9000/380 - '040
