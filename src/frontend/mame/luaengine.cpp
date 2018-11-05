@@ -1743,6 +1743,7 @@ void lua_engine::initialize()
  * screen:xscale() - screen x scale factor
  * screen:yscale() - screen y scale factor
  * screen:pixel(x, y) - get pixel at (x, y) as packed RGB in a u32
+ * screen:pixels() - get whole screen bitmap as string
 */
 
 	sol().registry().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
@@ -1858,6 +1859,16 @@ void lua_engine::initialize()
 			"yscale", &screen_device::yscale,
 			"pixel", [](screen_device &sdev, float x, float y) {
 					return sdev.pixel((s32)x, (s32)y);
+				},
+			"pixels", [this](screen_device &sdev, sol::this_state s) {
+					lua_State *L = s;
+					const rectangle &visarea = sdev.visible_area();
+					luaL_Buffer buff;
+					int size = visarea.height() * visarea.width() * 4;
+					u32 *ptr = (u32 *)luaL_buffinitsize(L, &buff, size);
+					sdev.pixels(ptr);
+					luaL_pushresultsize(&buff, size);
+					return sol::make_reference(L, sol::stack_reference(L, -1));
 				}
 			);
 
