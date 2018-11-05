@@ -183,6 +183,7 @@ const double XTAL::known_xtals[] = {
 	 13'400'000, /* 13.4_MHz_XTAL          TNK3, Ikari Warriors h/w */
 	 13'478'400, /* 13.4784_MHz_XTAL       TeleVideo 970 80-column display clock */
 	 13'495'200, /* 13.4952_MHz_XTAL       Used on Shadow Force pcb and maybe other Technos pcbs? */
+	 13'500'000, /* 13.5_MHz_XTAL          Microbee */
 	 13'516'800, /* 13.5168_MHz_XTAL       Kontron KDT6 */
 	 13'608'000, /* 13.608_MHz_XTAL        TeleVideo 910 & 925 */
 	 13'824'000, /* 13.824_MHz_XTAL        Robotron PC-1715 display circuit */
