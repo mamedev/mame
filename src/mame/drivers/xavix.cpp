@@ -339,7 +339,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_75fb_r), FUNC(xavix_state::sound_75fb_w)); // r/w tested
 	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_75fc_r), FUNC(xavix_state::sound_75fc_w)); // r/w tested
 	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_75fd_r), FUNC(xavix_state::sound_75fd_w)); // r/w tested
-	map(0x75fe, 0x75fe).rw(FUNC(xavix_state::sound_75fe_r), FUNC(xavix_state::sound_75fe_w));
+	map(0x75fe, 0x75fe).rw(FUNC(xavix_state::sound_irqstatus_r), FUNC(xavix_state::sound_irqstatus_w));
 	// taitons1 written other 75xx operations
 	map(0x75ff, 0x75ff).w(FUNC(xavix_state::sound_75ff_w));
 
@@ -574,7 +574,7 @@ static INPUT_PORTS_START( rad_bass ) // also an analog reel
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Menu") // pressing this ingame currently crashes it, check why, might be related to the timer crash even with timer disabled
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Menu") // pressing this ingame currently crashes it if read from sound_irqstatus_r is incorrect?
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Forward") // used to navigate menus
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Back")

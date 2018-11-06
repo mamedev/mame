@@ -196,9 +196,10 @@ private:
 	DECLARE_READ8_MEMBER(sound_75fd_r);
 	DECLARE_WRITE8_MEMBER(sound_75fd_w);
 
-	DECLARE_READ8_MEMBER(sound_75fe_r);
-	DECLARE_WRITE8_MEMBER(sound_75fe_w);
+	DECLARE_READ8_MEMBER(sound_irqstatus_r);
+	DECLARE_WRITE8_MEMBER(sound_irqstatus_w);
 	DECLARE_WRITE8_MEMBER(sound_75ff_w);
+	uint8_t m_sound_irqstatus;
 
 	DECLARE_READ8_MEMBER(timer_status_r);
 	DECLARE_WRITE8_MEMBER(timer_control_w);
