@@ -1746,6 +1746,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				break;
 			}
 			st1 &= ~ST1_MA;
+			st1 |= ST1_ND;
 			if(!sector_matches()) {
 				if(cur_live.idbuf[0] != command[2]) {
 					if(cur_live.idbuf[0] == 0xff)
@@ -1757,6 +1758,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
+			st1 &= ~ST1_ND;
 			LOGRW("reading sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
 						cur_live.idbuf[1],
@@ -1775,11 +1777,6 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 		case SCAN_ID_FAILED:
 			LOGSTATE("SCAN_ID_FAILED\n");
 			fi.st0 |= ST0_FAIL;
-			// MZ: The HX5102 does not correctly detect a FM/MFM mismatch
-			// when the ND bit is set, because in the firmware the ND bit wins
-			// against MA, and thus concludes that the format is correct
-			// but the sector is missing.
-			// st1 |= ST1_ND;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
@@ -1907,11 +1904,13 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 
 		case SCAN_ID:
 			LOGSTATE("SCAN_ID\n");
+			st1 |= ST1_ND;
 			if(!sector_matches()) {
 				LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
+			st1 &= ~ST1_ND;
 			if(cur_live.crc) {
 				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_DE|ST1_ND;
@@ -1929,7 +1928,6 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 		case SCAN_ID_FAILED:
 			LOGSTATE("SCAN_ID_FAILED\n");
 			fi.st0 |= ST0_FAIL;
-			// st1 |= ST1_ND;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
