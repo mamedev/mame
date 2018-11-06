@@ -1044,10 +1044,10 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	m_mcu->out_p2_cb().set(FUNC(namcos1_state::dac_gain_w));
 	m_mcu->set_vblank_int("screen", FUNC(namcos1_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("c117", NAMCO_C117, 0)
-	MCFG_DEVICE_PROGRAM_MAP(virtual_map)
-	MCFG_CUS117_CPUS("maincpu", "subcpu")
-	MCFG_CUS117_SUBRES_CB(WRITELINE(*this, namcos1_state, subres_w))
+	NAMCO_C117(config, m_c117, 0);
+	m_c117->set_addrmap(AS_PROGRAM, &namcos1_state::virtual_map);
+	m_c117->set_cpu_tags("maincpu", "subcpu");
+	m_c117->subres_cb().set(FUNC(namcos1_state::subres_w));
 
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
 	MCFG_QUANTUM_TIME(attotime::from_hz(38400))
