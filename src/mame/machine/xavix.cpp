@@ -359,28 +359,134 @@ WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 	m_interrupt_timer->adjust(m_screen->time_until_pos(m_posirq_y[0], m_posirq_x[0]), 0);
 }
 
+/* Per Game IO port callbacks */
+
+uint8_t xavix_state::read_io0(uint8_t direction)
+{
+	// no special handling
+	return m_in0->read();
+}
+
+uint8_t xavix_state::read_io1(uint8_t direction)
+{
+	// no special handling
+	return m_in1->read();
+}
+
+void xavix_state::write_io0(uint8_t data, uint8_t direction)
+{
+	// no special handling
+}
+
+void xavix_state::write_io1(uint8_t data, uint8_t direction)
+{
+	// no special handling
+}
+
+uint8_t xavix_i2c_state::read_io1(uint8_t direction)
+{
+	uint8_t ret = m_in1->read();
+
+	if (!(direction & 0x08))
+	{
+		ret &= ~0x08;
+		ret |= (m_i2cmem->read_sda() & 1) << 3;
+	}
+
+	return ret;
+}
+
+void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
+{
+	if (direction & 0x08)
+	{
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+	}
+
+	if (direction & 0x10)
+	{
+		m_i2cmem->write_scl((data & 0x10) >> 4);
+	}	
+}
+
+uint8_t xavix_ekara_state::read_io1(uint8_t direction)
+{
+	uint8_t ret = m_in1->read();
+	ret &= 0xfc;
+	ret |= m_extrainlatch0 << 0;
+	ret |= m_extrainlatch1 << 1;
+	return ret;
+}
+
+void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)
+{
+	// is bit 0x80 an enable for something else? LED? Microphone? it doesn't seem related to the multiplexing
+	m_extraioselect = data & direction;
+}
+
+void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
+{
+	uint8_t extraiowrite = data & direction;
+
+	if ((extraiowrite & 0x80) != (m_extraiowrite & 0x80))
+	{
+		if (extraiowrite & 0x80)
+		{
+			// clock out bits 0x0c using m_extraioselect (TODO)  (probably the 7segs?)
+			// also latch in bits for reading later?
+
+			switch (m_extraioselect & 0x7f)
+			{
+			case 0x01:
+				m_extrainlatch0 = (m_extra0->read() & 0x01) >> 0;
+				m_extrainlatch1 = (m_extra0->read() & 0x02) >> 1;
+				break;
+			case 0x02:
+				m_extrainlatch0 = (m_extra0->read() & 0x04) >> 2;
+				m_extrainlatch1 = (m_extra0->read() & 0x08) >> 3;
+				break;
+			case 0x04:
+				m_extrainlatch0 = (m_extra0->read() & 0x10) >> 4;
+				m_extrainlatch1 = (m_extra0->read() & 0x20) >> 5;
+				break;
+			case 0x08:
+				m_extrainlatch0 = (m_extra0->read() & 0x40) >> 6;
+				m_extrainlatch1 = (m_extra0->read() & 0x80) >> 7;
+				break;
+			case 0x10:
+				m_extrainlatch0 = (m_extra1->read() & 0x01) >> 0;
+				m_extrainlatch1 = (m_extra1->read() & 0x02) >> 1;
+				break;
+			case 0x20:
+				m_extrainlatch0 = (m_extra1->read() & 0x04) >> 2;
+				m_extrainlatch1 = (m_extra1->read() & 0x08) >> 3;
+				break;
+			case 0x40:
+				m_extrainlatch0 = (m_extra1->read() & 0x10) >> 4;
+				m_extrainlatch1 = (m_extra1->read() & 0x20) >> 5;
+				break;
+			default:
+				LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
+				break;
+			}	
+		}
+	}
+
+	m_extraiowrite = extraiowrite;
+}
+
+/* General IO port handling */
+
 READ8_MEMBER(xavix_state::io0_data_r)
 {
-	uint8_t ret = m_in0->read() & ~m_io0_direction;
+	uint8_t ret = read_io0(m_io0_direction) & ~m_io0_direction;
 	ret |= m_io0_data & m_io0_direction;
 	return ret;
 }
 
 READ8_MEMBER(xavix_state::io1_data_r)
 {
-	uint8_t ret = m_in1->read();
-
-	if (m_i2cmem)
-	{
-		if (!(m_io1_direction & 0x08))
-		{
-			ret &= ~0x08;
-			ret |= (m_i2cmem->read_sda() & 1) << 3;
-		}
-	}
-
-	ret &= ~m_io1_direction;
-
+	uint8_t ret = read_io1(m_io1_direction) & ~m_io1_direction;
 	ret |= m_io1_data & m_io1_direction;
 	return ret;
 }
@@ -399,27 +505,17 @@ READ8_MEMBER(xavix_state::io1_direction_r)
 WRITE8_MEMBER(xavix_state::io0_data_w)
 {
 	m_io0_data = data;
+	write_io0(data, m_io0_direction);
 	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(xavix_state::io1_data_w)
 {
 	m_io1_data = data;
+	write_io1(data, m_io1_direction);
 	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
-
-	if (m_i2cmem)
-	{
-		if (m_io1_direction & 0x08)
-		{
-			m_i2cmem->write_sda((data & 0x08) >> 3);
-		}
-
-		if (m_io1_direction & 0x10)
-		{
-			m_i2cmem->write_scl((data & 0x10) >> 4);
-		}
-	}
 }
+
 
 WRITE8_MEMBER(xavix_state::io0_direction_w)
 {
@@ -434,6 +530,8 @@ WRITE8_MEMBER(xavix_state::io1_direction_w)
 	LOG("%s: io1_direction_w %02x\n", machine().describe_context(), data);
 	io1_data_w(space, 0, m_io1_data); // requires this for i2cmem to work, is it correct tho?
 }
+
+/* Arena (Visible Area + hblank?) handling */
 
 READ8_MEMBER(xavix_state::arena_start_r)
 {
@@ -519,7 +617,15 @@ WRITE8_MEMBER(xavix_state::timer_control_w)
 	// rad_fb / rad_madf don't set bit 0x40 (and doesn't seem to have a valid interrupt handler for timer, so probably means it generates no IRQ?)
 	if (data & 0x01) // timer start?
 	{
-		m_freq_timer->adjust(attotime::from_usec(50000));
+		// eka_bass will crash after a certain number of timer IRQs, needs investigation
+		if (!m_hack_timer_disable)
+		{
+			// TODO: work out the proper calculation here
+			// int divide = 1 << ((m_timer_freq&0x0f)+1);
+			// uint32_t freq = m_maincpu->unscaled_clock()/2;
+			// m_freq_timer->adjust(attotime::from_hz(freq / divide) * m_timer_baseval*20);
+			m_freq_timer->adjust(attotime::from_usec(1000));
+		}
 	}
 	else
 	{
@@ -555,7 +661,8 @@ WRITE8_MEMBER(xavix_state::timer_freq_w)
 
 	/* if master clock (MC) is XTAL(21'477'272) (NTSC master)
 
-	   0x0 = MC / 2      = 10.738636 MHz
+	   divide value        clock source
+	   0x0 = MC / 2      = 10.738636 MHz (10738636 Hz)
 	   0x1 = MC / 4      = 5.369318 MHz
 	   0x2 = MC / 8      = 2.684659 MHz
 	   0x3 = MC / 16     = 1.3423295 MHz
@@ -755,6 +862,8 @@ void xavix_state::machine_reset()
 
 	m_ioevent_enable = 0x00;
 	m_ioevent_active = 0x00;
+
+	m_sound_irqstatus = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
