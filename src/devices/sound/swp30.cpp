@@ -334,7 +334,6 @@ template<int filter, int coef> u16 swp30_device::eq_filter_r(offs_t offset)
 template<int filter, int coef> void swp30_device::eq_filter_w(offs_t offset, u16 data)
 {
 	m_stream->update();
-	logerror("chan %02x eq filter %s coef %d: %04x (%f)\n", offset >> 6, filter, coef, data, s16(data)/8192.0);
 	m_eq_filter[offset >> 6][filter][coef] = data;
 }
 
