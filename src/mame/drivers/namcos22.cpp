@@ -2755,11 +2755,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
 		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-WRITE8_MEMBER(namcos22_state::ss22_volume_w)
-{
-	m_mb87078->data_w(data, offset);
-}
-
 WRITE8_MEMBER(namcos22_state::mb87078_gain_changed)
 {
 	m_c352->set_output_gain(offset ^ 3, data / 100.0);
@@ -2886,7 +2881,7 @@ void namcos22_state::mcu_program(address_map &map)
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
 	map(0x300000, 0x300001).nopr(); // ? (cybrcycc, alpinesa - writes data to RAM, but then never reads from there)
 	map(0x301000, 0x301001).nopw(); // watchdog? LEDs?
-	map(0x308000, 0x308003).w(FUNC(namcos22_state::ss22_volume_w)).umask16(0x00ff);
+	map(0x308000, 0x308003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0x00ff);
 }
 
 void namcos22_state::mcu_io(address_map &map)

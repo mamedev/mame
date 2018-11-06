@@ -355,7 +355,6 @@ private:
 	DECLARE_READ32_MEMBER(alpinesa_prot_r);
 	DECLARE_WRITE32_MEMBER(alpinesa_prot_w);
 	DECLARE_WRITE32_MEMBER(namcos22s_chipselect_w);
-	DECLARE_WRITE8_MEMBER(ss22_volume_w);
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 	DECLARE_WRITE8_MEMBER(mcu_port4_w);
 	DECLARE_READ8_MEMBER(mcu_port4_r);
