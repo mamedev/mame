@@ -33,12 +33,52 @@
 #if 0
 // 929a6: 00 2e 30 32 33 34 35 36 37 3a 3c
 
+// 3fb80: list of reverb times as text, 4chars/entry
+
+// 84268: 7c 76 77 78
+//        80 79 7a 7b
+//        84 7e 7d 7f
+//        88 81 82 83
+//        8c 85 86 87
+//        91 89 8a 8b
+
+
 void f_62fcc(e0, r0, e1, r1l, er5) // 8 (11/12) 1 6 84268
 {
+	// 929b1
+	// 00 00 00 00 00 00
+	// 38 3c 40 43 49 3b
+	// 46 4a 4e 51 55 43
+	// 3e 3f 41 43 48 3c
+	// 4b 51 59 5c 00 4e
+
+	// 92560
+	// 00 01 12 1c 23 28 2d 30 34 37 39 3c 3e 40 42 43
+	// 45 46 48 49 4a 4c 4d 4e 4f 50 51 52 53 54 54 55
+	// 56 57 58 58 59 5a 5a 5b 5c 5c 5d 5d 5e 5e 5f 60
+	// 60 61 61 63 66 68 69 6b 6d 6e 70 71 72 75 77 79
+	// 7b 7c 7e 7f 81 82
+
 	l8 = 929b1 + 6*e1;
 	r6 = r1l == 6 ? 0x15 : r1l == 4 ? 0xd : r1l == 3 ? 0x9 : e1;
-	f_64a34(0x01, 01, t929a6[e0].b << 8, 0x40, 0, er5 + 2*r6); // 0101 3700 40 0  84292
+	f_64a34(0x01, 01, t929a6[e0].b << 8, 0x40, 0, er5 + 2*r6); // 0101 3700 40 0  84292 - writes 1ff2/1ff1
+	pr0 = r0;
+	for(r3h=0; r3h<6; r3h++) {
+		r0l = *l8++;
+		if(r0l) {
+			r6 = clamp(r0l + l92560[pr0] - 0x38, 0, 0xff);
+			r6, e6 = l925a6[r6].l; // 13d2 5368
+		} else
+			r6, e6 = 0, 0;
+		
+	}
+	er0 = *er5.w++;
+	g214ca4[0x10 + er0].w = e6;
+	lc = &g214ca4[0x20 + er0].w
+	er0 = float(r6);
 }
+
+// 80914 = convert unsigned short to float
 
 void write_regs(r0b, er1) // 728c0, r0=3, er1=84292
 {
@@ -102,15 +142,35 @@ void swp30_device::device_start()
 
 void swp30_device::device_reset()
 {
+	m_keyon_mask = 0;
+	m_active_mask = 0;
+
 	memset(m_pre_size, 0, sizeof(m_pre_size));
 	memset(m_post_size, 0, sizeof(m_post_size));
 	memset(m_address, 0, sizeof(m_address));
+
+	memset(m_sample_pos, 0, sizeof(m_sample_pos));
+	memset(m_sample_history, 0, sizeof(m_sample_history));
+
 	memset(m_volume, 0, sizeof(m_volume));
 	memset(m_freq, 0, sizeof(m_freq));
 	memset(m_pan, 0, sizeof(m_pan));
+	memset(m_lpf_cutoff, 0, sizeof(m_lpf_cutoff));
+	memset(m_lpf_reso, 0, sizeof(m_lpf_reso));
+	memset(m_hpf_cutoff, 0, sizeof(m_hpf_cutoff));
+	memset(m_eq_filter, 0, sizeof(m_eq_filter));
 
-	m_keyon_mask = 0;
-	m_active_mask = 0;
+	memset(m_variation_delay, 0, sizeof(m_variation_delay));
+	memset(m_variation_fb_level, 0, sizeof(m_variation_fb_level));
+	memset(m_variation_final_level, 0, sizeof(m_variation_final_level));
+	memset(m_variation_high_damp, 0, sizeof(m_variation_high_damp));
+	memset(m_variation_inv_high_damp, 0, sizeof(m_variation_inv_high_damp));
+
+	memset(m_insertion_delay, 0, sizeof(m_insertion_delay));
+	memset(m_insertion_fb_level, 0, sizeof(m_insertion_fb_level));
+	memset(m_insertion_final_level, 0, sizeof(m_insertion_final_level));
+	memset(m_insertion_high_damp, 0, sizeof(m_insertion_high_damp));
+	memset(m_insertion_inv_high_damp, 0, sizeof(m_insertion_inv_high_damp));
 }
 
 void swp30_device::rom_bank_updated()
@@ -121,17 +181,75 @@ void swp30_device::rom_bank_updated()
 void swp30_device::map(address_map &map)
 {
 	map(0x0000, 0x1fff).rw(FUNC(swp30_device::snd_r), FUNC(swp30_device::snd_w));
+	map(0x0000, 0x0001).select(0x1f80).rw(FUNC(swp30_device::lpf_cutoff_r), FUNC(swp30_device::lpf_cutoff_w));
+	map(0x0004, 0x0005).select(0x1f80).rw(FUNC(swp30_device::hpf_cutoff_r), FUNC(swp30_device::hpf_cutoff_w));
+	map(0x0008, 0x0009).select(0x1f80).rw(FUNC(swp30_device::lpf_reso_r), FUNC(swp30_device::lpf_reso_w));
 	map(0x0012, 0x0013).select(0x1f80).rw(FUNC(swp30_device::volume_r), FUNC(swp30_device::volume_w));
 	map(0x0022, 0x0023).select(0x1f80).rw(FUNC(swp30_device::freq_r), FUNC(swp30_device::freq_w));
 	map(0x0024, 0x0027).select(0x1f80).rw(FUNC(swp30_device::pre_size_r), FUNC(swp30_device::pre_size_w));
 	map(0x0028, 0x002b).select(0x1f80).rw(FUNC(swp30_device::post_size_r), FUNC(swp30_device::post_size_w));
 	map(0x002c, 0x002f).select(0x1f80).rw(FUNC(swp30_device::address_r), FUNC(swp30_device::address_w));
+	map(0x0040, 0x0041).select(0x1f80).rw(&swp30_device::eq_filter_r<0, 0>, "swp30_device::eq_filter_r<0, 0>", &swp30_device::eq_filter_w<0, 0>, "swp30_device::eq_filter_w<0, 0>");
+	map(0x0044, 0x0045).select(0x1f80).rw(&swp30_device::eq_filter_r<0, 1>, "swp30_device::eq_filter_r<0, 1>", &swp30_device::eq_filter_w<0, 1>, "swp30_device::eq_filter_w<0, 1>");
+	map(0x0048, 0x0049).select(0x1f80).rw(&swp30_device::eq_filter_r<0, 2>, "swp30_device::eq_filter_r<0, 2>", &swp30_device::eq_filter_w<0, 2>, "swp30_device::eq_filter_w<0, 2>");
+	map(0x004c, 0x004d).select(0x1f80).rw(&swp30_device::eq_filter_r<1, 0>, "swp30_device::eq_filter_r<1, 0>", &swp30_device::eq_filter_w<1, 0>, "swp30_device::eq_filter_w<1, 0>");
+	map(0x0050, 0x0051).select(0x1f80).rw(&swp30_device::eq_filter_r<1, 1>, "swp30_device::eq_filter_r<1, 1>", &swp30_device::eq_filter_w<1, 1>, "swp30_device::eq_filter_w<1, 1>");
+	map(0x0054, 0x0055).select(0x1f80).rw(&swp30_device::eq_filter_r<1, 2>, "swp30_device::eq_filter_r<1, 2>", &swp30_device::eq_filter_w<1, 2>, "swp30_device::eq_filter_w<1, 2>");
 	map(0x0064, 0x0065).select(0x1f80).rw(FUNC(swp30_device::pan_r), FUNC(swp30_device::pan_w));
 	map(0x031c, 0x031d).               rw(FUNC(swp30_device::keyon_mask_r<3>), FUNC(swp30_device::keyon_mask_w<3>));
 	map(0x031e, 0x031f).               rw(FUNC(swp30_device::keyon_mask_r<2>), FUNC(swp30_device::keyon_mask_w<2>));
 	map(0x039c, 0x039d).               rw(FUNC(swp30_device::keyon_mask_r<1>), FUNC(swp30_device::keyon_mask_w<1>));
 	map(0x039e, 0x039f).               rw(FUNC(swp30_device::keyon_mask_r<0>), FUNC(swp30_device::keyon_mask_w<0>));
 	map(0x041c, 0x041d).               rw(FUNC(swp30_device::keyon_r), FUNC(swp30_device::keyon_w));
+
+	map(0x1060, 0x1061).               rw(&swp30_device::insertion_delay_r<0, 0>, "swp30_device::insertion_delay_r<0, 0>", &swp30_device::insertion_delay_w<0, 0>, "swp30_device::insertion_delay_w<0, 0>");
+	map(0x1062, 0x1063).               rw(&swp30_device::insertion_delay_r<0, 1>, "swp30_device::insertion_delay_r<0, 1>", &swp30_device::insertion_delay_w<0, 1>, "swp30_device::insertion_delay_w<0, 1>");
+	map(0x10e0, 0x10e1).               rw(&swp30_device::insertion_delay_r<0, 2>, "swp30_device::insertion_delay_r<0, 2>", &swp30_device::insertion_delay_w<0, 2>, "swp30_device::insertion_delay_w<0, 2>");
+	map(0x10e2, 0x10e3).               rw(&swp30_device::insertion_delay_r<0, 3>, "swp30_device::insertion_delay_r<0, 3>", &swp30_device::insertion_delay_w<0, 3>, "swp30_device::insertion_delay_w<0, 3>");
+	map(0x1152, 0x1153).               rw(&swp30_device::insertion_inv_high_damp_r<0, 0>, "swp30_device::insertion_inv_high_damp_r<0, 0>", &swp30_device::insertion_inv_high_damp_w<0, 0>, "swp30_device::insertion_inv_high_damp_w<0, 0>");
+	map(0x1156, 0x1157).               rw(&swp30_device::insertion_high_damp_r<0, 0>, "swp30_device::insertion_high_damp_r<0, 0>", &swp30_device::insertion_high_damp_w<0, 0>, "swp30_device::insertion_high_damp_w<0, 0>");
+	map(0x11ca, 0x11cb).               rw(&swp30_device::insertion_inv_high_damp_r<0, 1>, "swp30_device::insertion_inv_high_damp_r<0, 1>", &swp30_device::insertion_inv_high_damp_w<0, 1>, "swp30_device::insertion_inv_high_damp_w<0, 1>");
+	map(0x11ce, 0x11cf).               rw(&swp30_device::insertion_high_damp_r<0, 1>, "swp30_device::insertion_high_damp_r<0, 1>", &swp30_device::insertion_high_damp_w<0, 1>, "swp30_device::insertion_high_damp_w<0, 1>");
+	map(0x1242, 0x1243).               rw(&swp30_device::insertion_fb_level_r<0, 0>, "swp30_device::insertion_fb_level_r<0, 0>", &swp30_device::insertion_fb_level_w<0, 0>, "swp30_device::insertion_fb_level_w<0, 0>");
+	map(0x1246, 0x1247).               rw(&swp30_device::insertion_fb_level_r<0, 1>, "swp30_device::insertion_fb_level_r<0, 1>", &swp30_device::insertion_fb_level_w<0, 1>, "swp30_device::insertion_fb_level_w<0, 1>");
+	map(0x124e, 0x124f).               rw(&swp30_device::insertion_fb_level_r<0, 2>, "swp30_device::insertion_fb_level_r<0, 2>", &swp30_device::insertion_fb_level_w<0, 2>, "swp30_device::insertion_fb_level_w<0, 2>");
+	map(0x12d6, 0x12d7).               rw(&swp30_device::insertion_final_level_r<0, 0>, "swp30_device::insertion_final_level_r<0, 0>", &swp30_device::insertion_final_level_w<0, 0>, "swp30_device::insertion_final_level_w<0, 0>");
+	map(0x1342, 0x1343).               rw(&swp30_device::insertion_final_level_r<0, 1>, "swp30_device::insertion_final_level_r<0, 1>", &swp30_device::insertion_final_level_w<0, 1>, "swp30_device::insertion_final_level_w<0, 1>");
+	map(0x1346, 0x1347).               rw(&swp30_device::insertion_final_level_r<0, 2>, "swp30_device::insertion_final_level_r<0, 2>", &swp30_device::insertion_final_level_w<0, 2>, "swp30_device::insertion_final_level_w<0, 2>");
+	map(0x134a, 0x134b).               rw(&swp30_device::insertion_final_level_r<0, 3>, "swp30_device::insertion_final_level_r<0, 3>", &swp30_device::insertion_final_level_w<0, 3>, "swp30_device::insertion_final_level_w<0, 3>");
+
+	map(0x1460, 0x1461).               rw(&swp30_device::insertion_delay_r<1, 0>, "swp30_device::insertion_delay_r<1, 0>", &swp30_device::insertion_delay_w<1, 0>, "swp30_device::insertion_delay_w<1, 0>");
+	map(0x1462, 0x1463).               rw(&swp30_device::insertion_delay_r<1, 1>, "swp30_device::insertion_delay_r<1, 1>", &swp30_device::insertion_delay_w<1, 1>, "swp30_device::insertion_delay_w<1, 1>");
+	map(0x14e0, 0x14e1).               rw(&swp30_device::insertion_delay_r<1, 2>, "swp30_device::insertion_delay_r<1, 2>", &swp30_device::insertion_delay_w<1, 2>, "swp30_device::insertion_delay_w<1, 2>");
+	map(0x14e2, 0x14e3).               rw(&swp30_device::insertion_delay_r<1, 3>, "swp30_device::insertion_delay_r<1, 3>", &swp30_device::insertion_delay_w<1, 3>, "swp30_device::insertion_delay_w<1, 3>");
+	map(0x1552, 0x1553).               rw(&swp30_device::insertion_inv_high_damp_r<1, 0>, "swp30_device::insertion_inv_high_damp_r<1, 0>", &swp30_device::insertion_inv_high_damp_w<1, 0>, "swp30_device::insertion_inv_high_damp_w<1, 0>");
+	map(0x1556, 0x1557).               rw(&swp30_device::insertion_high_damp_r<1, 0>, "swp30_device::insertion_high_damp_r<1, 0>", &swp30_device::insertion_high_damp_w<1, 0>, "swp30_device::insertion_high_damp_w<1, 0>");
+	map(0x15ca, 0x15cb).               rw(&swp30_device::insertion_inv_high_damp_r<1, 1>, "swp30_device::insertion_inv_high_damp_r<1, 1>", &swp30_device::insertion_inv_high_damp_w<1, 1>, "swp30_device::insertion_inv_high_damp_w<1, 1>");
+	map(0x15ce, 0x15cf).               rw(&swp30_device::insertion_high_damp_r<1, 1>, "swp30_device::insertion_high_damp_r<1, 1>", &swp30_device::insertion_high_damp_w<1, 1>, "swp30_device::insertion_high_damp_w<1, 1>");
+	map(0x1642, 0x1643).               rw(&swp30_device::insertion_fb_level_r<1, 0>, "swp30_device::insertion_fb_level_r<1, 0>", &swp30_device::insertion_fb_level_w<1, 0>, "swp30_device::insertion_fb_level_w<1, 0>");
+	map(0x1646, 0x1647).               rw(&swp30_device::insertion_fb_level_r<1, 1>, "swp30_device::insertion_fb_level_r<1, 1>", &swp30_device::insertion_fb_level_w<1, 1>, "swp30_device::insertion_fb_level_w<1, 1>");
+	map(0x164e, 0x164f).               rw(&swp30_device::insertion_fb_level_r<1, 2>, "swp30_device::insertion_fb_level_r<1, 2>", &swp30_device::insertion_fb_level_w<1, 2>, "swp30_device::insertion_fb_level_w<1, 2>");
+	map(0x16d6, 0x16d7).               rw(&swp30_device::insertion_final_level_r<1, 0>, "swp30_device::insertion_final_level_r<1, 0>", &swp30_device::insertion_final_level_w<1, 0>, "swp30_device::insertion_final_level_w<1, 0>");
+	map(0x1742, 0x1743).               rw(&swp30_device::insertion_final_level_r<1, 1>, "swp30_device::insertion_final_level_r<1, 1>", &swp30_device::insertion_final_level_w<1, 1>, "swp30_device::insertion_final_level_w<1, 1>");
+	map(0x1746, 0x1747).               rw(&swp30_device::insertion_final_level_r<1, 2>, "swp30_device::insertion_final_level_r<1, 2>", &swp30_device::insertion_final_level_w<1, 2>, "swp30_device::insertion_final_level_w<1, 2>");
+	map(0x174a, 0x174b).               rw(&swp30_device::insertion_final_level_r<1, 3>, "swp30_device::insertion_final_level_r<1, 3>", &swp30_device::insertion_final_level_w<1, 3>, "swp30_device::insertion_final_level_w<1, 3>");
+
+	map(0x18e0, 0x18e1).               rw(FUNC(swp30_device::variation_delay_r<0>), FUNC(swp30_device::variation_delay_w<0>));
+	map(0x1960, 0x1961).               rw(FUNC(swp30_device::variation_delay_r<1>), FUNC(swp30_device::variation_delay_w<1>));
+	map(0x19e0, 0x19e1).               rw(FUNC(swp30_device::variation_delay_r<2>), FUNC(swp30_device::variation_delay_w<2>));
+	map(0x1ae0, 0x1ae1).               rw(FUNC(swp30_device::variation_delay_r<3>), FUNC(swp30_device::variation_delay_w<3>));
+	map(0x1bd6, 0x1bd7).               rw(FUNC(swp30_device::variation_inv_high_damp_r<0>), FUNC(swp30_device::variation_inv_high_damp_w<0>));
+	map(0x1c46, 0x1c47).               rw(FUNC(swp30_device::variation_high_damp_r<0>), FUNC(swp30_device::variation_high_damp_w<0>));
+	map(0x1c52, 0x1c53).               rw(FUNC(swp30_device::variation_inv_high_damp_r<1>), FUNC(swp30_device::variation_inv_high_damp_w<1>));
+	map(0x1cc2, 0x1cc3).               rw(FUNC(swp30_device::variation_high_damp_r<1>), FUNC(swp30_device::variation_high_damp_w<1>));
+	map(0x1cce, 0x1ccf).               rw(FUNC(swp30_device::variation_fb_level_r<0>), FUNC(swp30_device::variation_fb_level_w<0>));
+	map(0x1cd2, 0x1cd3).               rw(FUNC(swp30_device::variation_fb_level_r<1>), FUNC(swp30_device::variation_fb_level_w<1>));
+	map(0x1d46, 0x1d47).               rw(FUNC(swp30_device::variation_fb_level_r<2>), FUNC(swp30_device::variation_fb_level_w<2>));
+	map(0x1f4a, 0x1f4b).               rw(FUNC(swp30_device::variation_final_level_r<0>), FUNC(swp30_device::variation_final_level_w<0>));
+	map(0x1f52, 0x1f53).               rw(FUNC(swp30_device::variation_final_level_r<1>), FUNC(swp30_device::variation_final_level_w<1>));
+	map(0x1f56, 0x1f57).               rw(FUNC(swp30_device::variation_final_level_r<2>), FUNC(swp30_device::variation_final_level_w<2>));
+	map(0x1fc6, 0x1fc7).               rw(FUNC(swp30_device::variation_final_level_r<3>), FUNC(swp30_device::variation_final_level_w<3>));
+
 }
 
 
@@ -150,21 +268,76 @@ u16 swp30_device::keyon_r()
 	return 0;
 }
 
+static int ncount = 0;
 void swp30_device::keyon_w(u16)
 {
 	m_stream->update();
-	static int count = 0;
 	for(int i=0; i<64; i++) {
 		u64 mask = u64(1) << i;
 		if((m_keyon_mask & mask) && !(m_active_mask & mask) && !(m_volume[i] & 0x8000)) {
 			m_sample_pos[i] = -s32(m_pre_size[i] << 8);
-			logerror("sample count %3d %02x %08x %08x %08x vol %04x pan %04x\n", count, i, m_pre_size[i], m_post_size[i], m_address[i], m_volume[i], m_pan[i]);
+			logerror("sample count %3d %02x %08x %08x %08x vol %04x pan %04x\n", ncount, i, m_pre_size[i], m_post_size[i], m_address[i], m_volume[i], m_pan[i]);
 			m_active_mask |= mask;
-			count++;
+			ncount++;
 		}
 	}
 	m_keyon_mask = 0;
 }
+
+u16 swp30_device::lpf_cutoff_r(offs_t offset)
+{
+	return m_lpf_cutoff[offset >> 6];
+}
+
+void swp30_device::lpf_cutoff_w(offs_t offset, u16 data)
+{
+	m_stream->update();
+	u8 chan = offset >> 6;
+	if(m_lpf_cutoff[chan] != data)
+		logerror("chan %02x lpf cutoff %04x\n", chan, data);
+	m_lpf_cutoff[chan] = data;
+}
+
+u16 swp30_device::hpf_cutoff_r(offs_t offset)
+{
+	return m_hpf_cutoff[offset >> 6];
+}
+
+void swp30_device::hpf_cutoff_w(offs_t offset, u16 data)
+{
+	m_stream->update();
+	u8 chan = offset >> 6;
+	if(m_hpf_cutoff[chan] != data)
+		logerror("chan %02x hpf cutoff %04x\n", chan, data);
+	m_hpf_cutoff[chan] = data;
+}
+
+u16 swp30_device::lpf_reso_r(offs_t offset)
+{
+	return m_lpf_reso[offset >> 6];
+}
+
+void swp30_device::lpf_reso_w(offs_t offset, u16 data)
+{
+	m_stream->update();
+	u8 chan = offset >> 6;
+	if(m_lpf_reso[chan] != data)
+		logerror("chan %02x lpf resonance %04x\n", chan, data);
+	m_lpf_reso[chan] = data;
+}
+
+template<int filter, int coef> u16 swp30_device::eq_filter_r(offs_t offset)
+{
+	return m_eq_filter[offset >> 6][filter][coef];
+}
+
+template<int filter, int coef> void swp30_device::eq_filter_w(offs_t offset, u16 data)
+{
+	m_stream->update();
+	logerror("chan %02x eq filter %s coef %d: %04x (%f)\n", offset >> 6, filter, coef, data, s16(data)/8192.0);
+	m_eq_filter[offset >> 6][filter][coef] = data;
+}
+
 
 u16 swp30_device::volume_r(offs_t offset)
 {
@@ -270,6 +443,119 @@ void swp30_device::address_w(offs_t offset, u16 data)
 		m_address[chan] = (m_address[chan] & 0x0000ffff) | (data << 16);
 }
 
+template<int id> void swp30_device::variation_delay_w(u16 data)
+{
+	m_variation_delay[id] = data;
+	logerror("variation delay %d: %04x (%fms)\n", id, data, data/44.100);
+}
+
+template<int id> u16  swp30_device::variation_delay_r()
+{
+	return m_variation_delay[id];
+}
+
+template<int id> void swp30_device::variation_fb_level_w(u16 data)
+{
+	m_variation_fb_level[id] = data;
+	logerror("variation feedback level %d: %04x (%+f)\n", id, data, s16(data)/500.0);
+}
+
+template<int id> u16  swp30_device::variation_fb_level_r()
+{
+	return m_variation_fb_level[id];
+}
+
+template<int id> void swp30_device::variation_final_level_w(u16 data)
+{
+	m_variation_final_level[id] = data;
+	logerror("variation final level %s %s: %04x (%f)\n", id & 1 ? "wet" : "dry", id & 2 ? "left" : "right", data, data/16383.0);
+}
+
+template<int id> u16  swp30_device::variation_final_level_r()
+{
+	return m_variation_final_level[id];
+}
+
+template<int id> void swp30_device::variation_high_damp_w(u16 data)
+{
+	m_variation_high_damp[id] = data;
+	logerror("variation high damp %d: %04x (%f)\n", id, data, 0.1+double(data-0x2000)/0x2000*0.9);
+}
+
+template<int id> u16  swp30_device::variation_high_damp_r()
+{
+	return m_variation_high_damp[id];
+}
+
+template<int id> void swp30_device::variation_inv_high_damp_w(u16 data)
+{
+	m_variation_inv_high_damp[id] = data;
+	logerror("variation inverse high damp %d: %04x (%f)\n", id, data, 0.1+double(0x2000-data)/0x2000*0.9);
+}
+
+template<int id> u16  swp30_device::variation_inv_high_damp_r()
+{
+	return m_variation_inv_high_damp[id];
+}
+
+
+template<int ins, int id> void swp30_device::insertion_delay_w(u16 data)
+{
+	m_insertion_delay[ins][id] = data;
+	logerror("insertion %d delay %d: %04x (%fms)\n", ins, id, data, data/44.100);
+}
+
+template<int ins, int id> u16  swp30_device::insertion_delay_r()
+{
+	return m_insertion_delay[ins][id];
+}
+
+template<int ins, int id> void swp30_device::insertion_fb_level_w(u16 data)
+{
+	m_insertion_fb_level[ins][id] = data;
+	logerror("insertion %d feedback level %d: %04x (%+f)\n", ins, id, data, s16(data)/500.0);
+}
+
+template<int ins, int id> u16  swp30_device::insertion_fb_level_r()
+{
+	return m_insertion_fb_level[ins][id];
+}
+
+template<int ins, int id> void swp30_device::insertion_final_level_w(u16 data)
+{
+	m_insertion_final_level[ins][id] = data;
+	logerror("insertion %d final level %s %s: %04x (%f)\n", ins, id & 1 ? "wet" : "dry", id & 2 ? "left" : "right", data, data/8191.0);
+}
+
+template<int ins, int id> u16  swp30_device::insertion_final_level_r()
+{
+	return m_insertion_final_level[ins][id];
+}
+
+template<int ins, int id> void swp30_device::insertion_high_damp_w(u16 data)
+{
+	m_insertion_high_damp[ins][id] = data;
+	logerror("insertion %d high damp %d: %04x (%f)\n", ins, id, data, 0.1+double(data-0x4000)/0x4000*0.9);
+}
+
+template<int ins, int id> u16  swp30_device::insertion_high_damp_r()
+{
+	return m_insertion_high_damp[ins][id];
+}
+
+template<int ins, int id> void swp30_device::insertion_inv_high_damp_w(u16 data)
+{
+	m_insertion_inv_high_damp[ins][id] = data;
+	logerror("insertion %s inverse high damp %d: %04x (%f)\n", ins, id, data, 0.1+double(0x4000-data)/0x4000*0.9);
+}
+
+template<int ins, int id> u16  swp30_device::insertion_inv_high_damp_r()
+{
+	return m_insertion_inv_high_damp[ins][id];
+}
+
+
+
 static u16 rr[0x40*0x40];
 
 u16 swp30_device::snd_r(offs_t offset)
@@ -297,6 +583,8 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 		return;
 	}
 	rr[offset] = data;
+	if(offset == 0x4e)
+		return;
 	int chan = (offset >> 6) & 0x3f;
 	int slot = offset & 0x3f;
 	std::string preg = "-";
@@ -304,48 +592,6 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 		preg = util::string_format("%03x", (slot-0x21)/2 + 6*chan);
 	logerror("snd_w [%04x %04x - %-4s] %02x.%02x, %04x\n", offset, offset*2, preg, chan, slot, data);
 }
-
-/*
-[:swp30] sample 00 46a86f [3] -5848 0180  00ff 3e06
-[:swp30] sample 01 4a2a69 [1] -5789 0400  001b 0122
-[:swp30] sample 02 42a89b [3] -4110 0100  00ff 0a3a
-[:swp30] sample 03 46ce62 [3] -6727 0380  00ff 3e06
-[:swp30] sample 08 427193 [3] -4190 0540  00ff 0a3a
-#[:swp30] sample 09 94ba25 [0] -11267 0000  0026 0830
-[:swp30] sample 0b 41b5c1 [3]  +617 fe80  003c 0a3a
-#[:swp30] sample 20 455235 [3] +19583 0580  002f 3e06
-#[:swp30] sample 24 4117b1 [3] +18465 fa80  0034 0a3a
-#[:swp30] sample 2a 41f4bf [3] +19969 ff40  0039 0a3a
-[:swp30] sample 2d 467938 [3] +7441 ff40  00ff 3e06
-[:swp30] sample 30 435fd3 [3] -5882 fdc0  0039 0a3a
-[:swp30] sample 33 431a0a [3] +1960 0340  0043 0a3a
-#[:swp30] sample 36 94ba25 [0] -2174 0000  0047 081c
-[:swp30] sample 39 42e187 [3] +4221 ffc0  00ff 0a3a
-[:swp30] sample 3a 46f798 [3] +2522 0000  00ff 3e06
-
-[:swp30] sample id  1226729 085f 0402
-
-[:swp30] sample 00 46a86f [3] -5847 00c0  00ff 3e06
-[:swp30] sample 01 4a2a69 [1] -5788 3010  001b 0122
-[:swp30] sample 02 42a89b [3] -4109 00c0  00ff 0a3a
-[:swp30] sample 03 46ce62 [3] -6726 0000  00ff 3e06
-[:swp30] sample 08 427193 [3] -4189 03c0  00ff 0a3a
-#[:swp30] sample 09 94ba25 [0] -11267 0000  0026 0830
-[:swp30] sample 0b 41b5c1 [3]  +618 0180  003c 0a3a
-#[:swp30] sample 20 455235 [3] +19583 0580  002f 3e06
-#[:swp30] sample 24 4117b1 [3] +18465 fa80  0034 0a3a
-#[:swp30] sample 2a 41f4bf [3] +19970 fe40  0039 0a3a
-[:swp30] sample 2d 467938 [3] +7442 ff00  00ff 3e06
-[:swp30] sample 30 435fd3 [3] -5882 fdc0  0039 0a3a
-[:swp30] sample 33 431a0a [3] +1961 0040  0043 0a3a
-#[:swp30] sample 36 94ba25 [0] -2173 0000  0047 081c
-[:swp30] sample 39 42e187 [3] +4222 02c0  00ff 0a3a
-[:swp30] sample 3a 46f798 [3] +2523 ff80  00ff 3e06
-
-[:swp30] sample id  1226730 0ea3 2e06
-*/
-
- //static int sid = 0;
 
 void swp30_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
@@ -428,12 +674,23 @@ void swp30_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 				}
 
 				// Third, filter the sample
+				// - missing lpf_cutoff, lpf_reso, hpf_cutoff
 
-				// - no idea what's needed there
+				// - eq lowpass
+				s32 samp1 = (samp  * m_eq_filter[channel][0][2] + m_sample_history[channel][0][0] * m_eq_filter[channel][0][1] + m_sample_history[channel][0][1] * m_eq_filter[channel][0][0]) >> 13;
+				m_sample_history[channel][0][1] = m_sample_history[channel][0][0];
+				m_sample_history[channel][0][0] = samp;
 
-				// Fourth, volume and pan, clamp the attenuation at -96dB
-				s32 sampl = samp * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] >> 8))];
-				s32 sampr = samp * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] & 0xff))];
+				// - eq highpass
+				s32 samp2 = (samp1 * m_eq_filter[channel][1][2] + m_sample_history[channel][1][0] * m_eq_filter[channel][1][1] + m_sample_history[channel][1][1] * m_eq_filter[channel][1][0]) >> 13;
+				m_sample_history[channel][1][1] = m_sample_history[channel][1][0];
+				m_sample_history[channel][1][0] = samp1;
+
+				// - anything else?
+
+				// Fourth, volume (disabled) and pan, clamp the attenuation at -96dB
+				s32 sampl = samp2 * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] >> 8))];
+				s32 sampr = samp2 * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] & 0xff))];
 
 				// Fifth, add to the accumulators
 				acc_left  += sampl;
@@ -443,6 +700,8 @@ void swp30_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 			}
 
 		// Samples are 16 bits, there are up to 64 of them, and the accumulators are fixed-point signed 48.16
+		// Global EQ is missing
+
 		acc_left >>= (16+6);
 		if(acc_left < -0x8000)
 			acc_left = -0x8000;
@@ -456,8 +715,5 @@ void swp30_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		else if(acc_right > 0x7fff)
 			acc_right = 0x7fff;
 		outputs[1][sample] = acc_right;
-
-		//		logerror("sample id %8d %04x %04x %016x [%08x]\n", sid, acc_right & 0xffff, acc_left & 0xffff, m_active_mask, m_address[4]);
-		//		sid++;
 	}
 }

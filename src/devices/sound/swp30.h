@@ -32,9 +32,30 @@ private:
 	u32 m_pre_size[0x40], m_post_size[0x40], m_address[0x40];
 
 	s32 m_sample_pos[64];
+	s32 m_sample_history[0x40][2][2];
 
 	u16 m_volume[0x40], m_freq[0x40], m_pan[0x40];
+	u16 m_lpf_cutoff[0x40], m_lpf_reso[0x40], m_hpf_cutoff[0x40];
+	s16 m_eq_filter[0x40][2][3];
 
+	u16 m_variation_delay[4];
+	u16 m_variation_fb_level[3];
+	u16 m_variation_final_level[4];
+	u16 m_variation_high_damp[2], m_variation_inv_high_damp[2];
+
+	u16 m_insertion_delay[2][4];
+	u16 m_insertion_fb_level[2][3];
+	u16 m_insertion_final_level[2][4];
+	u16 m_insertion_high_damp[2][2], m_insertion_inv_high_damp[2][2];
+
+	u16 lpf_cutoff_r(offs_t offset);
+	void lpf_cutoff_w(offs_t offset, u16 data);
+	u16 hpf_cutoff_r(offs_t offset);
+	void hpf_cutoff_w(offs_t offset, u16 data);
+	u16 lpf_reso_r(offs_t offset);
+	void lpf_reso_w(offs_t offset, u16 data);
+	template<int filter, int coef> u16 eq_filter_r(offs_t offset);
+	template<int filter, int coef> void eq_filter_w(offs_t offset, u16 data);
 	u16 volume_r(offs_t offset);
 	void volume_w(offs_t offset, u16 data);
 	u16 freq_r(offs_t offset);
@@ -51,6 +72,28 @@ private:
 	template<int sel> void keyon_mask_w(u16 data);
 	u16 keyon_r();
 	void keyon_w(u16);
+
+	template<int id> void variation_delay_w(u16 data);
+	template<int id> u16  variation_delay_r();
+	template<int id> void variation_fb_level_w(u16 data);
+	template<int id> u16  variation_fb_level_r();
+	template<int id> void variation_final_level_w(u16 data);
+	template<int id> u16  variation_final_level_r();
+	template<int id> void variation_high_damp_w(u16 data);
+	template<int id> u16  variation_high_damp_r();
+	template<int id> void variation_inv_high_damp_w(u16 data);
+	template<int id> u16  variation_inv_high_damp_r();
+
+	template<int ins, int id> void insertion_delay_w(u16 data);
+	template<int ins, int id> u16  insertion_delay_r();
+	template<int ins, int id> void insertion_fb_level_w(u16 data);
+	template<int ins, int id> u16  insertion_fb_level_r();
+	template<int ins, int id> void insertion_final_level_w(u16 data);
+	template<int ins, int id> u16  insertion_final_level_r();
+	template<int ins, int id> void insertion_high_damp_w(u16 data);
+	template<int ins, int id> u16  insertion_high_damp_r();
+	template<int ins, int id> void insertion_inv_high_damp_w(u16 data);
+	template<int ins, int id> u16  insertion_inv_high_damp_r();
 
 	u16 snd_r(offs_t offset);
 	void snd_w(offs_t offset, u16 data);

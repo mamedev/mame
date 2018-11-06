@@ -265,7 +265,7 @@ public:
 	int seq;
 
 	virtual void machine_reset() override {
-		timer_alloc()->adjust(attotime::from_double(5));
+	  timer_alloc()->adjust(attotime::from_double(5));
 		seq = 0;
 	}
 
@@ -275,9 +275,9 @@ public:
 		switch(seq) {
 		case 0: push(0x90); logerror("swp30 midi keyon %d\n", note); timer.adjust(attotime::from_double(0.0005)); if(1) machine().debug_break(); break;
 		case 1: push(xnote[note]); timer.adjust(attotime::from_double(0.0005)); break;
-		case 2: push(0x7f); timer.adjust(attotime::from_double(0.5)); break;
+		case 2: push(0x7f); timer.adjust(attotime::from_double(0.5)); seq = seq; break;
 		case 3: push(0x80); logerror("swp30 midi keyoff\n"); timer.adjust(attotime::from_double(0.0005)); if(0) machine().debug_break(); break;
-		case 4: push(xnote[note]); timer.adjust(attotime::from_double(0.0005)); note++; if(note == 8) note = 0; break;
+		case 4: push(xnote[note]); timer.adjust(attotime::from_double(0.0005)); ; if(note == 8) note = 0; break;
 		case 5: push(0x7f); timer.adjust(attotime::from_double(0.05)); seq=0; return;
 		}
 		seq ++;
@@ -760,7 +760,8 @@ ROM_START( mu100 )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x800000, 0x200000, CRC(225c2280) SHA1(23b5e046fd2e2ac01af3e6dc6357c5c6547b286b) )
 	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(a1d138a3) SHA1(46a7a7225cd7e1818ba551325d2af5ac1bf5b2bf) )
-	// Two missing roms at 100000+, ic38 and 39
+	ROM_LOAD32_WORD( "xt963a0.ic38", 0x1000000, 0x400000, NO_DUMP )
+	ROM_LOAD32_WORD( "xt964a0.ic39", 0x1000002, 0x400000, NO_DUMP )
 
 	ROM_REGION( 0x1000, "lcd", 0)
 	// Hand made, 3 characters unused
@@ -779,8 +780,9 @@ ROM_START( mu100r )
 	ROM_LOAD32_WORD( "sx518b0.ic34", 0x000000, 0x400000, CRC(2550d44f) SHA1(fd3cce228c7d389a2fde25c808a5b26080588cba) )
 	ROM_LOAD32_WORD( "sx743b0.ic35", 0x000002, 0x400000, CRC(a9109a6c) SHA1(a67bb49378a38a2d809bd717d286e18bc6496db0) )
 	ROM_LOAD32_WORD( "xt445a0-828.ic36", 0x800000, 0x200000, CRC(d4483a43) SHA1(5bfd0762dea8598eda19db20251dac20e31fa02c) )
-	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(c5af4501) SHA1(1c88de197c36382311053add8b19a5740802cb78) )
-	// Two missing roms, ic38 and 39
+	ROM_LOAD32_WORD( "xt461a0-829.ic37", 0x800002, 0x200000, CRC(c5af4501) SHA1(1c88de197c36382311053add8b19a5740802cb<78) )
+	ROM_LOAD32_WORD( "xt963a0.ic38", 0x1000000, 0x400000, NO_DUMP )
+	ROM_LOAD32_WORD( "xt964a0.ic39", 0x1000002, 0x400000, NO_DUMP )
 
 	ROM_REGION( 0x1000, "lcd", 0)
 	// Hand made, 3 characters unused
