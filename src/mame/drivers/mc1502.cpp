@@ -275,14 +275,14 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	rs232.dsr_handler().set(m_upd8251, FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set(m_upd8251, FUNC(i8251_device::write_cts));
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(m_pic8259, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(m_pic8259, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(m_pic8259, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(m_pic8259, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(m_pic8259, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(m_pic8259, pic8259_device, ir7_w))
+	isa8_device &isa(ISA8(config, "isa", 0));
+	isa.set_cputag("maincpu");
+	isa.irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	isa.irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
+	isa.irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+	isa.irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	isa.irq6_callback().set(m_pic8259, FUNC(pic8259_device::ir6_w));
+	isa.irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
 	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "cga_mc1502", true) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "fdc", false)

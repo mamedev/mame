@@ -678,13 +678,14 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	m_ppi8255n2->out_pb_callback().set(FUNC(p1_state::p1_ppi2_portb_w));  /*61H*/
 	m_ppi8255n2->in_pc_callback().set(FUNC(p1_state::p1_ppi2_portc_r));    /*62H*/
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(m_pic8259, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(m_pic8259, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(m_pic8259, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(m_pic8259, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(m_pic8259, pic8259_device, ir7_w))
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_cputag("maincpu");
+	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	m_isabus->irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
+
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", p1_isa8_cards, "fdc", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)

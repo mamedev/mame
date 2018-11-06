@@ -985,18 +985,19 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_MC6845_UPDATE_ROW_CB(myb3k_state, crtc_update_row)
 
 	/* ISA8+ Expansion bus */
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(m_pic8259, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(m_pic8259, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(m_pic8259, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(*this, myb3k_state, isa_irq5_w)) // Jumper J4 selectable
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(m_pic8259, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(*this, myb3k_state, isa_irq7_w)) // Jumper J5 selectable
-	//MCFG_ISA_OUT_DRQ0_CB(WRITELINE("dma", i8257_device, dreq0_w)) // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma", i8257_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma", i8257_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma", i8257_device, dreq3_w))
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_cputag("maincpu");
+	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set(FUNC(myb3k_state::isa_irq5_w)); // Jumper J4 selectable
+	m_isabus->irq6_callback().set(m_pic8259, FUNC(pic8259_device::ir6_w));
+	m_isabus->irq7_callback().set(FUNC(myb3k_state::isa_irq7_w)); // Jumper J5 selectable
+	//m_isabus->drq0_callback().set("dma", FUNC(i8257_device::dreq0_w)); // Part of ISA16 but not ISA8 standard but implemented on ISA8 B8 (SRDY) on this motherboard
+	m_isabus->drq1_callback().set("dma", FUNC(i8257_device::dreq1_w));
+	m_isabus->drq2_callback().set("dma", FUNC(i8257_device::dreq2_w));
+	m_isabus->drq3_callback().set("dma", FUNC(i8257_device::dreq3_w));
+
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", stepone_isa_cards, "myb3k_fdc4711", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", stepone_isa_cards, "myb3k_com", false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", stepone_isa_cards, nullptr, false)

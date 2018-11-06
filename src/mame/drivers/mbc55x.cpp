@@ -330,10 +330,10 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(m_maincpu)
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(m_pic, pic8259_device, ir7_w)) // all other IRQ and DRQ lines are NC
-	//MCFG_ISA_BUS_IOCHCK(INPUTLINE(m_maincpu, INPUT_LINE_NMI))
+	isa8_device &isa(ISA8(config, "isa", 0));
+	isa.set_cputag(m_maincpu);
+	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
+	//isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI));
 
 	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false);
 

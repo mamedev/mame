@@ -1238,17 +1238,17 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
-	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(I8086_TAG)
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(m_pic, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(m_pic, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(m_pic, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(m_pic, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(m_pic, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(m_pic, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq3_w))
+	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
+	isa.set_cputag(I8086_TAG);
+	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
+	isa.irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	isa.irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	isa.irq5_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	isa.irq6_callback().set(m_pic, FUNC(pic8259_device::ir6_w));
+	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
+	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
+	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
+	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
@@ -1369,17 +1369,17 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
-	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(I8086_TAG)
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(m_pic, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(m_pic, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(m_pic, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(m_pic, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(m_pic, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(m_pic, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq3_w))
+	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
+	isa.set_cputag(I8086_TAG);
+	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
+	isa.irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	isa.irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	isa.irq5_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	isa.irq6_callback().set(m_pic, FUNC(pic8259_device::ir6_w));
+	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
+	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
+	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
+	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
