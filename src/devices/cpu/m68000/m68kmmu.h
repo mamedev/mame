@@ -500,6 +500,8 @@ uint32_t pmmu_translate_addr_with_fc(uint32_t addr_in, uint8_t fc, bool rw, cons
 			__func__, addr_in, fc, ptest, rw, limit);
 	m_mmu_tmp_sr = 0;
 
+	m_mmu_last_logical_addr = addr_in;
+
 	if (pmmu_match_tt(addr_in, fc, m_mmu_tt0, rw) ||
 		pmmu_match_tt(addr_in, fc, m_mmu_tt1, rw) ||
 		fc == 7)
@@ -1262,13 +1264,31 @@ inline uint32_t hmmu_translate_addr(uint32_t addr_in)
 }
 
 public:
-int m68851_buserror()
+int m68851_buserror(uint32_t& addr)
 {
-	if (!m_mmu_tablewalk)
+	if (!m_pmmu_enabled)
 	{
 		return false;
 	}
-	MMULOG("buserror during table walk\n");
-	m_mmu_tmp_sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
-	return true;
+
+	if (m_mmu_tablewalk)
+	{
+		MMULOG("buserror during table walk\n");
+		m_mmu_tmp_sr |= M68K_MMU_SR_BUS_ERROR|M68K_MMU_SR_INVALID;
+		return true;
+	}
+
+
+	const int ps = (m_mmu_tc >> 16) & 0xf;
+	for(int i = 0; i < MMU_ATC_ENTRIES; i++)
+	{
+		if ((m_mmu_atc_tag[i] & M68K_MMU_ATC_VALID) &&
+				((m_mmu_atc_data[i] >> ps) << (ps -8)) == ((addr >> ps) << (ps == 8)))
+		{
+			MMULOG("%s: set B in ATC entry %d\n", __func__, i);
+			m_mmu_atc_data[i] |= M68K_MMU_ATC_BUSERROR;
+		}
+	}
+	addr = m_mmu_last_logical_addr;
+	return false;
 }
