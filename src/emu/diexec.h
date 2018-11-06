@@ -275,6 +275,12 @@ protected:
 			device().debug()->exception_hook(exception);
 	}
 
+	void debugger_privilege_hook()
+	{
+		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+			device().debug()->privilege_hook();
+	}
+
 private:
 	// internal information about the state of inputs
 	class device_input
