@@ -35,27 +35,27 @@
 		</text>
 	</element>
 
-	<element name="take" defstate="0">
+	<element name="card" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
 		<rect state="0">
 			<color red="0.3" green="0.0" blue="0.0" />
 		</rect>
-		<text string="Take">
+		<text string="Card">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
 	</element>
 
-	<element name="stand" defstate="0">
+	<element name="stop" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
 		<rect state="0">
 			<color red="0.3" green="0.0" blue="0.0" />
 		</rect>
-		<text string="Stand">
+		<text string="Stop">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
@@ -117,10 +117,10 @@
 		<bezel name="lamp0" element="start" inputtag="IN42" inputmask="0x04">
 			<bounds x="0.4" y="3.05" width="0.35" height="0.24" />
 		</bezel>
-		<bezel name="lamp1" element="take" inputtag="IN42" inputmask="0x08">
+		<bezel name="lamp1" element="card" inputtag="IN42" inputmask="0x08">
 			<bounds x="0.8" y="3.05" width="0.35" height="0.24" />
 		</bezel>
-		<bezel name="lamp2" element="stand" inputtag="IN42" inputmask="0x10">
+		<bezel name="lamp2" element="stop" inputtag="IN42" inputmask="0x10">
 			<bounds x="1.2" y="3.05" width="0.35" height="0.24" />
 		</bezel>
 		<bezel name="lamp3" element="accept" inputtag="IN44" inputmask="0x40">
