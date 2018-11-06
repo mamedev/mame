@@ -72,6 +72,7 @@ public:
 		, m_mainram(*this, "mainram")
 		, m_mem_ctrl(*this, "memctrl")
 		, m_scsi_ctrl(*this, "wd33c93")
+		, m_dac(*this, "dac")
 		, m_newport(*this, "newport")
 		, m_hal2(*this, HAL2_TAG)
 		, m_hpc3(*this, HPC3_TAG)
@@ -90,6 +91,9 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	DECLARE_READ32_MEMBER(enet_r);
+	DECLARE_WRITE32_MEMBER(enet_w);
+
 	DECLARE_WRITE32_MEMBER(ip22_write_ram);
 
 	void ip225015_map(address_map &map);
@@ -105,6 +109,7 @@ private:
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93_device> m_scsi_ctrl;
+	required_device<dac_16bit_r2r_twos_complement_device> m_dac;
 	required_device<newport_video_device> m_newport;
 	required_device<hal2_device> m_hal2;
 	required_device<hpc3_device> m_hpc3;
@@ -131,6 +136,29 @@ inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_f
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
 		logerror("%08x: %s", m_maincpu->pc(), buf);
+	}
+}
+
+READ32_MEMBER(ip22_state::enet_r)
+{
+	switch (offset)
+	{
+		case 0x000/4:
+			logerror("%s: enet_r: Read MAC Address bytes 0-3, 0x80675309 & %08x\n", machine().describe_context(), mem_mask);
+			return 0x80675309;
+		default:
+			logerror("%s: enet_r: Read Unknown Register %08x & %08x\n", machine().describe_context(), 0x1fbd4000 + (offset << 2), mem_mask);
+			return 0;
+	}
+}
+
+WRITE32_MEMBER(ip22_state::enet_w)
+{
+	switch (offset)
+	{
+		default:
+			logerror("%s: enet_w: Write Unknown Register %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd4000 + (offset << 2), data, mem_mask);
+			break;
 	}
 }
 
@@ -164,6 +192,7 @@ void ip22_state::ip225015_map(address_map &map)
 	map(0x1fbc0000, 0x1fbc7fff).rw(m_hpc3, FUNC(hpc3_device::hd0_r), FUNC(hpc3_device::hd0_w));
 	map(0x1fbc8000, 0x1fbcffff).rw(m_hpc3, FUNC(hpc3_device::unkpbus0_r), FUNC(hpc3_device::unkpbus0_w)).share("unkpbus0");
 	map(0x1fb80000, 0x1fb8ffff).rw(m_hpc3, FUNC(hpc3_device::pbusdma_r), FUNC(hpc3_device::pbusdma_w));
+	map(0x1fbd4000, 0x1fbd44ff).rw(FUNC(ip22_state::enet_r), FUNC(ip22_state::enet_w));
 	map(0x1fbd8000, 0x1fbd83ff).rw(m_hal2, FUNC(hal2_device::read), FUNC(hal2_device::write));
 	map(0x1fbd8400, 0x1fbd87ff).ram(); /* hack */
 	map(0x1fbd9000, 0x1fbd93ff).rw(m_hpc3, FUNC(hpc3_device::pbus4_r), FUNC(hpc3_device::pbus4_w));
@@ -230,9 +259,9 @@ void ip22_state::ip225015(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	dac_16bit_r2r_twos_complement_device &dac(DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0));
-	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0);
+	m_dac->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_dac->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	voltage_regulator_device &vreg = VOLTAGE_REGULATOR(config, "vref");
 	vreg.set_output(5.0);
@@ -250,7 +279,7 @@ void ip22_state::ip225015(machine_config &config)
 
 	SGI_HAL2(config, m_hal2);
 	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
-	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_ioc2);
+	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_ioc2, m_dac);
 
 	DS1386_8K(config, m_rtc, 32768);
 MACHINE_CONFIG_END

@@ -14,17 +14,19 @@
 #include "cpu/mips/mips3.h"
 #include "machine/ioc2.h"
 #include "machine/wd33c93.h"
+#include "sound/dac.h"
 
 class hpc3_device : public device_t
 {
 public:
-	template <typename T, typename U, typename V>
-	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&scsi_tag, V &&ioc2_tag)
+	template <typename T, typename U, typename V, typename W>
+	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&scsi_tag, V &&ioc2_tag, W &&dac_tag)
 		: hpc3_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_wd33c93.set_tag(std::forward<U>(scsi_tag));
 		m_ioc2.set_tag(std::forward<V>(ioc2_tag));
+		m_dac.set_tag(std::forward<W>(dac_tag));
 	}
 
 	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -50,6 +52,10 @@ protected:
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void dump_chain(address_space &space, uint32_t ch_base);
+	void fetch_chain(address_space &space);
+	bool decrement_chain(address_space &space);
+
+	static const device_timer_id TIMER_PBUS_DMA = 0;
 
 	struct pbus_dma_t
 	{
@@ -58,11 +64,6 @@ protected:
 		uint32_t m_desc_ptr;
 		uint32_t m_next_ptr;
 		uint32_t m_words_left;
-	};
-
-	enum
-	{
-		TIMER_DMA
 	};
 
 	enum
@@ -99,6 +100,7 @@ protected:
 	required_device<mips3_device> m_maincpu;
 	required_device<wd33c93_device> m_wd33c93;
 	required_device<ioc2_device> m_ioc2;
+	required_device<dac_16bit_r2r_twos_complement_device> m_dac;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_unkpbus0;
 
@@ -108,8 +110,13 @@ protected:
 	uint32_t m_unk1;
 	uint32_t m_ic_unk0;
 	uint32_t m_scsi0_desc;
+	uint32_t m_scsi0_addr;
+	uint32_t m_scsi0_flags;
+	uint32_t m_scsi0_byte_count;
+	uint32_t m_scsi0_next_addr;
 	uint32_t m_scsi0_dma_ctrl;
 	pbus_dma_t m_pbus_dma;
+	emu_timer *m_pbus_dma_timer;
 
 	uint8_t m_dma_buffer[4096];
 
