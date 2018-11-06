@@ -275,7 +275,7 @@ public:
 		switch(seq) {
 		case 0: push(0x90); logerror("swp30 midi keyon %d\n", note); timer.adjust(attotime::from_double(0.0005)); if(1) machine().debug_break(); break;
 		case 1: push(xnote[note]); timer.adjust(attotime::from_double(0.0005)); break;
-		case 2: push(0x7f); timer.adjust(attotime::from_double(0.5)); seq = seq; break;
+		case 2: push(0x7f); timer.adjust(attotime::from_double(0.5)); break;
 		case 3: push(0x80); logerror("swp30 midi keyoff\n"); timer.adjust(attotime::from_double(0.0005)); if(0) machine().debug_break(); break;
 		case 4: push(xnote[note]); timer.adjust(attotime::from_double(0.0005)); ; if(note == 8) note = 0; break;
 		case 5: push(0x7f); timer.adjust(attotime::from_double(0.05)); seq=0; return;
