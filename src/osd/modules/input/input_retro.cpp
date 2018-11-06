@@ -532,16 +532,27 @@ void retro_osd_interface::process_keyboard_state(running_machine &machine)
 void retro_osd_interface::process_joypad_state(running_machine &machine)
 {
    unsigned i, j;
+   int analog_l2, analog_r2;
 
    for(j = 0;j < 4; j++)
    {
       for(i = 0;i < RETRO_MAX_BUTTONS; i++)
          joystate[j].button[i] = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0,i)?0x80:0;
 
-      joystate[j].a1[0] = 2 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X));
-      joystate[j].a1[1] = 2 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y));
-      joystate[j].a2[0] = 2 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X));
-      joystate[j].a2[1] = 2 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y));
+      joystate[j].a1[0] = 2.01 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X));
+      joystate[j].a1[1] = -2.01 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y));
+      joystate[j].a2[0] = 2.01 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X));
+      joystate[j].a2[1] = -2.01 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y));
+
+      analog_l2 = input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_BUTTON, RETRO_DEVICE_ID_JOYPAD_L2);
+      analog_r2 = input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_BUTTON, RETRO_DEVICE_ID_JOYPAD_R2);
+      /* Fallback, if no analog trigger support, use digital */
+      if (analog_l2 == 0)
+         analog_l2 = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2) ? 0x7FFF : 0;
+      if (analog_r2 == 0)
+         analog_r2 = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2) ? 0x7FFF : 0;
+      joystate[j].a3[0] = -2.01 * analog_l2;
+      joystate[j].a3[1] = -2.01 * analog_r2;
    }
 }
 
@@ -908,6 +919,18 @@ public:
 				static_cast<input_item_id>(ITEM_ID_RYAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a2[1]);
+            
+         devinfo->device()->add_item(
+				"L2",
+				static_cast<input_item_id>(ITEM_ID_RZAXIS),
+				generic_axis_get_state<std::int32_t>,
+				&joystate[i].a3[0]);
+
+			devinfo->device()->add_item(
+				"R2",
+				static_cast<input_item_id>(ITEM_ID_ZAXIS),
+				generic_axis_get_state<std::int32_t>,
+				&joystate[i].a3[1]);
 
 			//add the buttons
 
@@ -925,13 +948,13 @@ public:
 					 (input_item_id)(ITEM_ID_BUTTON1+j),\
 					 generic_button_get_state<std::int32_t>,\
 					  &joystate[i].button[Buttons_mapping[j]]);
-
+/* Replaced with analog triggers and fallback to digital
 			devinfo->device()->add_item(Buttons_Name[RETROPAD_L2],ITEM_ID_BUTTON7,\
 				generic_button_get_state<std::uint8_t>,&joystate[i].button[RETROPAD_L2]);
 
 			devinfo->device()->add_item(Buttons_Name[RETROPAD_R2],ITEM_ID_BUTTON8,\
 				generic_button_get_state<std::int32_t>,&joystate[i].button[RETROPAD_R2]);
-
+*/
 			devinfo->device()->add_item(Buttons_Name[RETROPAD_L3],ITEM_ID_BUTTON9,\
 				generic_button_get_state<std::int32_t>,&joystate[i].button[RETROPAD_L3]);
 

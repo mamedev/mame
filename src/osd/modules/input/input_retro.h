@@ -19,6 +19,7 @@ typedef struct joystate_t
    int button[RETRO_MAX_BUTTONS];
    int a1[2];
    int a2[2];
+   int a3[2];
 }Joystate;
 
 struct KeyPressEventArgs
