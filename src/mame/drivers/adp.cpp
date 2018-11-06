@@ -592,9 +592,9 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 	HD63484(config, m_acrtc, 0).set_addrmap(0, &adp_state::adp_hd63484_map);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 3686400/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("PA"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ym2149_device &aysnd(YM2149(config, "aysnd", 3686400/2));
+	aysnd.port_a_read_callback().set_ioport("PA");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 MACHINE_CONFIG_END
 

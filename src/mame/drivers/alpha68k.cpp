@@ -2042,9 +2042,9 @@ MACHINE_CONFIG_START(alpha68k_state::jongbou)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.65);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_I)
@@ -2134,9 +2134,9 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
+	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
+	ym1.port_a_write_callback().set(FUNC(alpha68k_state::porta_w));
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.65);
 
 	MCFG_DEVICE_ADD("ym2", YM2413, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -2200,9 +2200,9 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DEVICE_ADD("ym1", YM2203, ALPHA68K_PIXEL_CLOCK / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
+	ym2203_device &ym1(YM2203(config, "ym1", ALPHA68K_PIXEL_CLOCK / 2));
+	ym1.port_a_write_callback().set(FUNC(alpha68k_state::porta_w));
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.65);
 
 	MCFG_DEVICE_ADD("ym2", YM2413, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

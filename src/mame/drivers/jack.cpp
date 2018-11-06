@@ -942,10 +942,10 @@ MACHINE_CONFIG_START(jack_state::jack)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'000'000)/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device,read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jack_state, timer_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'000'000)/12));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.port_b_read_callback().set(FUNC(jack_state::timer_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jack_state::treahunt)

@@ -1362,13 +1362,13 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
-	MCFG_DEVICE_ADD("ay8910", AY8910, 10.738635_MHz_XTAL / 3 / 2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, msx_state, msx_psg_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, msx_state, msx_psg_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, msx_state, msx_psg_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, msx_state, msx_psg_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, m_ay8910, 10.738635_MHz_XTAL / 3 / 2);
+	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910->port_a_read_callback().set(FUNC(msx_state::msx_psg_port_a_r));
+	m_ay8910->port_b_read_callback().set(FUNC(msx_state::msx_psg_port_b_r));
+	m_ay8910->port_a_write_callback().set(FUNC(msx_state::msx_psg_port_a_w));
+	m_ay8910->port_b_write_callback().set(FUNC(msx_state::msx_psg_port_b_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	/* printer */
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
@@ -1430,13 +1430,13 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
-	MCFG_DEVICE_ADD("ay8910", AY8910, 21.477272_MHz_XTAL / 6 / 2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, msx2_state, msx_psg_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, msx2_state, msx_psg_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, msx2_state, msx_psg_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, msx2_state, msx_psg_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
+	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910->port_a_read_callback().set(FUNC(msx2_state::msx_psg_port_a_r));
+	m_ay8910->port_b_read_callback().set(FUNC(msx2_state::msx_psg_port_b_r));
+	m_ay8910->port_a_write_callback().set(FUNC(msx2_state::msx_psg_port_a_w));
+	m_ay8910->port_b_write_callback().set(FUNC(msx2_state::msx_psg_port_b_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	/* printer */
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
@@ -1489,13 +1489,13 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
-	MCFG_DEVICE_ADD("ay8910", AY8910, 21.477272_MHz_XTAL / 6 / 2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, msx2_state, msx_psg_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, msx2_state, msx_psg_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, msx2_state, msx_psg_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, msx2_state, msx_psg_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
+	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910->port_a_read_callback().set(FUNC(msx2_state::msx_psg_port_a_r));
+	m_ay8910->port_b_read_callback().set(FUNC(msx2_state::msx_psg_port_b_r));
+	m_ay8910->port_a_write_callback().set(FUNC(msx2_state::msx_psg_port_a_w));
+	m_ay8910->port_b_write_callback().set(FUNC(msx2_state::msx_psg_port_b_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	/* printer */
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")

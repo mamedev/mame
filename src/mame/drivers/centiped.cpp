@@ -1812,9 +1812,7 @@ MACHINE_CONFIG_START(centiped_state::caterplr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 12096000/8)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, m_aysnd, 12096000/8).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -1830,9 +1828,9 @@ MACHINE_CONFIG_START(centiped_state::centipdb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 12096000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, centiped_state, caterplr_unknown_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	AY8910(config, m_aysnd, 12096000/8);
+	m_aysnd->port_a_read_callback().set(FUNC(centiped_state::caterplr_unknown_r));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 2.0);
 MACHINE_CONFIG_END
 
 
@@ -1850,9 +1848,7 @@ MACHINE_CONFIG_START(centiped_state::magworm)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 12096000/8) // AY-3-8912 at 2/3H
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-
+	AY8912(config, m_aysnd, 12096000/8).add_route(ALL_OUTPUTS, "mono", 2.0); // AY-3-8912 at 2/3H
 MACHINE_CONFIG_END
 
 
