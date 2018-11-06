@@ -1753,8 +1753,8 @@ public:
 
 static INPUT_PORTS_START( gnw_tfish )
 	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -1777,7 +1777,7 @@ MACHINE_CONFIG_START(gnw_tfish_state::gnw_tfish)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2) // confirmed
+	MCFG_SM510_R_MASK_OPTION(2)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -6881,11 +6881,11 @@ ROM_END
 
 
 ROM_START( gnw_tfish )
-        ROM_REGION( 0x1000, "maincpu", 0 )
-        ROM_LOAD( "tf-104", 0x0000, 0x1000, CRC(53cde918) SHA1(bc1e1b8f8b282bb886bb076c1c7ce35d00eca6fc) )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tf-104", 0x0000, 0x1000, CRC(53cde918) SHA1(bc1e1b8f8b282bb886bb076c1c7ce35d00eca6fc) )
 
-        ROM_REGION( 257088, "svg", 0)
-        ROM_LOAD( "gnw_tfish.svg", 0, 257088, CRC(11cd56c1) SHA1(151b627ed667e33d7e9f4f2f4a57eb5fe6cd9ac1) )
+	ROM_REGION( 257278, "svg", 0)
+	ROM_LOAD( "gnw_tfish.svg", 0, 257278, CRC(fc970f4a) SHA1(a73f5ee35b60842707f13edc5d58869fb2ec98cf) )
 ROM_END
 
 
