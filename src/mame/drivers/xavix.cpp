@@ -589,6 +589,9 @@ static INPUT_PORTS_START( ekara )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // multiplexed input
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) // multiplexed input
+
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 
 	PORT_START("EXTRA0")
@@ -714,22 +717,21 @@ static INPUT_PORTS_START( rad_fb )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER( xavix_state::rad_rh_in1_08_r )
-{
-	// it's unclear what rad_rh wants here
-	// it sits in loops waiting for this to toggle, but changing it can simply crash the code
-	return 0; //machine().rand();
-}
+
 
 static INPUT_PORTS_START( rad_rh )
 	PORT_INCLUDE(xavix)
 
-	PORT_MODIFY("IN0") // hold Button1+2 when resetting for a version number
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_MODIFY("IN0") // hold Right+Button 3 when resetting for a version number
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Skip") // skips level, cheat or real input?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Forward")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Back")
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_state,rad_rh_in1_08_r, (void *)0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
 

@@ -54,23 +54,17 @@ public:
 
 	void init_xavix();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(rad_rh_in1_08_r);
-
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
 
 protected:
-	virtual DECLARE_READ8_MEMBER(io0_data_r);
-	virtual DECLARE_READ8_MEMBER(io1_data_r);
-	virtual DECLARE_WRITE8_MEMBER(io0_data_w);
-	virtual DECLARE_WRITE8_MEMBER(io1_data_w);
 
-	uint8_t m_io0_data;
-	uint8_t m_io1_data;
-	uint8_t m_io0_direction;
-	uint8_t m_io1_direction;
+	virtual uint8_t read_io0(uint8_t direction);
+	virtual uint8_t read_io1(uint8_t direction);
+	virtual void write_io0(uint8_t data, uint8_t direction);
+	virtual void write_io1(uint8_t data, uint8_t direction);
 	required_ioport m_in0;
 	required_ioport m_in1;
 
@@ -82,7 +76,7 @@ private:
 
 	void xavix_lowbus_map(address_map &map);
 	void xavix_extbus_map(address_map &map);
-void superxavix_lowbus_map(address_map &map);
+	void superxavix_lowbus_map(address_map &map);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
@@ -132,10 +126,20 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(spritefragment_dma_trg_w);
 	DECLARE_READ8_MEMBER(spritefragment_dma_status_r);
 
+	DECLARE_READ8_MEMBER(io0_data_r);
+	DECLARE_READ8_MEMBER(io1_data_r);
+	DECLARE_WRITE8_MEMBER(io0_data_w);
+	DECLARE_WRITE8_MEMBER(io1_data_w);
+
 	DECLARE_READ8_MEMBER(io0_direction_r);
 	DECLARE_READ8_MEMBER(io1_direction_r);
 	DECLARE_WRITE8_MEMBER(io0_direction_w);
 	DECLARE_WRITE8_MEMBER(io1_direction_w);
+
+	uint8_t m_io0_data;
+	uint8_t m_io1_data;
+	uint8_t m_io0_direction;
+	uint8_t m_io1_direction;
 
 	DECLARE_WRITE8_MEMBER(vector_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_vector_lo_w);
@@ -342,10 +346,10 @@ public:
 	void xavix2000_i2c_24c04(machine_config &config);
 	void xavix2000_i2c_24c02(machine_config &config);
 
-	virtual DECLARE_READ8_MEMBER(io1_data_r) override;
-	virtual DECLARE_WRITE8_MEMBER(io1_data_w) override;
-
 protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
 	required_device<i2cmem_device> m_i2cmem;
 };
 
@@ -398,10 +402,6 @@ public:
 
 	void xavix_ekara(machine_config &config);
 
-	virtual DECLARE_READ8_MEMBER(io1_data_r) override;
-	virtual DECLARE_WRITE8_MEMBER(io0_data_w) override;
-	virtual DECLARE_WRITE8_MEMBER(io1_data_w) override;
-
 protected:
 	required_device<generic_slot_device> m_cart;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ekara_cart);
@@ -409,6 +409,10 @@ protected:
 
 	required_ioport m_extra0;
 	required_ioport m_extra1;
+
+	virtual uint8_t read_io1(uint8_t direction) override;
+	virtual void write_io0(uint8_t data, uint8_t direction) override;
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	uint8_t m_extraioselect;
 	uint8_t m_extraiowrite;

@@ -359,107 +359,74 @@ WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 	m_interrupt_timer->adjust(m_screen->time_until_pos(m_posirq_y[0], m_posirq_x[0]), 0);
 }
 
-READ8_MEMBER(xavix_state::io0_data_r)
+/* Per Game IO port callbacks */
+
+uint8_t xavix_state::read_io0(uint8_t direction)
 {
-	uint8_t ret = m_in0->read() & ~m_io0_direction;
-	ret |= m_io0_data & m_io0_direction;
-	return ret;
+	// no special handling
+	return m_in0->read();
 }
 
-READ8_MEMBER(xavix_state::io1_data_r)
+uint8_t xavix_state::read_io1(uint8_t direction)
 {
-	uint8_t ret = m_in1->read() & ~m_io1_direction;
-	ret |= m_io1_data & m_io1_direction;
-	return ret;
+	// no special handling
+	return m_in1->read();
 }
 
-READ8_MEMBER(xavix_i2c_state::io1_data_r)
+void xavix_state::write_io0(uint8_t data, uint8_t direction)
+{
+	// no special handling
+}
+
+void xavix_state::write_io1(uint8_t data, uint8_t direction)
+{
+	// no special handling
+}
+
+uint8_t xavix_i2c_state::read_io1(uint8_t direction)
 {
 	uint8_t ret = m_in1->read();
 
-	if (!(m_io1_direction & 0x08))
+	if (!(direction & 0x08))
 	{
 		ret &= ~0x08;
 		ret |= (m_i2cmem->read_sda() & 1) << 3;
 	}
 
-	ret &= ~m_io1_direction;
-
-	ret |= m_io1_data & m_io1_direction;
 	return ret;
 }
 
-READ8_MEMBER(xavix_state::io0_direction_r)
+void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 {
-	return m_io0_direction;
-}
-
-READ8_MEMBER(xavix_state::io1_direction_r)
-{
-	return m_io1_direction;
-}
-
-
-WRITE8_MEMBER(xavix_state::io0_data_w)
-{
-	m_io0_data = data;
-	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(xavix_state::io1_data_w)
-{
-	m_io1_data = data;
-	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(xavix_i2c_state::io1_data_w)
-{
-	m_io1_data = data;
-	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
-
-	if (m_io1_direction & 0x08)
+	if (direction & 0x08)
 	{
 		m_i2cmem->write_sda((data & 0x08) >> 3);
 	}
 
-	if (m_io1_direction & 0x10)
+	if (direction & 0x10)
 	{
 		m_i2cmem->write_scl((data & 0x10) >> 4);
 	}	
 }
 
-
-
-READ8_MEMBER(xavix_ekara_state::io1_data_r)
+uint8_t xavix_ekara_state::read_io1(uint8_t direction)
 {
 	uint8_t ret = m_in1->read();
-		
 	ret &= 0xfc;
-		
 	ret |= m_extrainlatch0 << 0;
 	ret |= m_extrainlatch1 << 1;
-		
-	ret &= ~m_io1_direction;
-	ret |= m_io1_data & m_io1_direction;
 	return ret;
 }
 
-WRITE8_MEMBER(xavix_ekara_state::io0_data_w)
+void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)
 {
-	m_io0_data = data;
-
-	m_extraioselect = data & m_io0_direction;
-
 	// is bit 0x80 an enable for something else? LED? Microphone? it doesn't seem related to the multiplexing
-
-	LOG("------------- %s: io0_data_w %02x\n", machine().describe_context(), data & m_io0_direction);
+	m_extraioselect = data & direction;
 }
 
-WRITE8_MEMBER(xavix_ekara_state::io1_data_w)
+void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 {
-	m_io1_data = data;
-
-	uint8_t extraiowrite = data & m_io1_direction;
+	uint8_t extraiowrite = data & direction;
 
 	if ((extraiowrite & 0x80) != (m_extraiowrite & 0x80))
 	{
@@ -506,10 +473,48 @@ WRITE8_MEMBER(xavix_ekara_state::io1_data_w)
 	}
 
 	m_extraiowrite = extraiowrite;
-
-	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data & m_io1_direction);
 }
 
+/* General IO port handling */
+
+READ8_MEMBER(xavix_state::io0_data_r)
+{
+	uint8_t ret = read_io0(m_io0_direction) & ~m_io0_direction;
+	ret |= m_io0_data & m_io0_direction;
+	return ret;
+}
+
+READ8_MEMBER(xavix_state::io1_data_r)
+{
+	uint8_t ret = read_io1(m_io1_direction) & ~m_io1_direction;
+	ret |= m_io1_data & m_io1_direction;
+	return ret;
+}
+
+READ8_MEMBER(xavix_state::io0_direction_r)
+{
+	return m_io0_direction;
+}
+
+READ8_MEMBER(xavix_state::io1_direction_r)
+{
+	return m_io1_direction;
+}
+
+
+WRITE8_MEMBER(xavix_state::io0_data_w)
+{
+	m_io0_data = data;
+	write_io0(data, m_io0_direction);
+	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::io1_data_w)
+{
+	m_io1_data = data;
+	write_io1(data, m_io1_direction);
+	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
+}
 
 
 WRITE8_MEMBER(xavix_state::io0_direction_w)
@@ -525,6 +530,8 @@ WRITE8_MEMBER(xavix_state::io1_direction_w)
 	LOG("%s: io1_direction_w %02x\n", machine().describe_context(), data);
 	io1_data_w(space, 0, m_io1_data); // requires this for i2cmem to work, is it correct tho?
 }
+
+/* Arena (Visible Area + hblank?) handling */
 
 READ8_MEMBER(xavix_state::arena_start_r)
 {
