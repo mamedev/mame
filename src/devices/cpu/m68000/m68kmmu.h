@@ -126,9 +126,7 @@ void pmmu_atc_add(uint32_t logical, uint32_t physical, int fc, const int rw)
 {
 	// get page size (i.e. # of bits to ignore); is 10 for Apollo
 	int ps = (m_mmu_tc >> 20) & 0xf;
-	// Note: exact emulation would use (logical >> ps) << (ps-8)
-
-	uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | logical >> ps;
+	const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | ((logical >> ps) << (ps - 8));
 	uint32_t atc_data = (physical >> ps) << (ps - 8);
 
 
@@ -198,13 +196,61 @@ void pmmu_atc_flush()
 	m_mmu_atc_rr = 0;
 }
 
+void pmmu_atc_flush_fc_ea(const uint16_t modes)
+{
+	const int fcmask = (modes >> 5) & 7;
+	const int fc = fc_from_modes(modes) & fcmask;
+	const int ps = (m_mmu_tc >> 16) & 0xf;
+	const int mode = (modes >> 10) & 7;
+	uint32_t ea;
+
+	switch (mode)
+	{
+	case 1: // PFLUSHA
+		pmmu_atc_flush();
+		break;
+
+	case 4: // flush by fc
+		MMULOG("flush by fc: %d, mask %d\n", fc, fcmask);
+		for (auto &e: m_mmu_atc_tag)
+		{
+			if ((e & M68K_MMU_ATC_VALID) && ((e >> 24) & fcmask) == fc)
+			{
+				MMULOG("flushing entry %08x\n", e);
+				e = 0;
+			}
+		}
+		break;
+
+	case 6: // flush by fc + ea
+
+		ea = DECODE_EA_32(m_ir);
+		MMULOG("flush by fc/ea: fc %d, mask %d, ea %08x\n", fc, fcmask, ea);
+		for (auto &e: m_mmu_atc_tag)
+		{
+			if ((e & M68K_MMU_ATC_VALID) &&
+				(((e >> 24) & fcmask) == fc) &&
+				(((e >> ps) << (ps - 8)) == ((ea >> ps) << (ps - 8))))
+			{
+				MMULOG("flushing entry %08x\n", e);
+				e = 0;
+			}
+		}
+		break;
+
+	default:
+		logerror("PFLUSH mode %d not supported\n", mode);
+		break;
+	}
+}
+
 template<bool ptest>
 bool pmmu_atc_lookup(const uint32_t addr_in, const int fc, const bool rw,
 					 uint32_t& addr_out)
 {
 	MMULOG("%s: LOOKUP addr_in=%08x, fc=%d, ptest=%d\n", __func__, addr_in, fc, ptest);
 	const int ps = (m_mmu_tc >> 20) & 0xf;
-	const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | (addr_in >> ps);
+	const uint32_t atc_tag = M68K_MMU_ATC_VALID | ((fc & 7) << 24) | ((addr_in >> ps) << (ps - 8));
 
 	for (int i = 0; i < MMU_ATC_ENTRIES; i++)
 	{
@@ -1185,11 +1231,7 @@ void m68851_mmu_ops()
 				}
 				else if ((modes & 0xe200) == 0x2000)    // PFLUSH
 				{
-					if (((modes >> 10) & 7) != 1)
-					{
-						logerror("PFLUSH by fc/ea not supported\n");
-					}
-					pmmu_atc_flush();
+					pmmu_atc_flush_fc_ea(modes);
 					return;
 				}
 				else if (modes == 0xa000)   // PFLUSHR
