@@ -1600,6 +1600,40 @@ void m68000_base_device::define_state(void)
 		state_add(M68K_FPSR, "FPSR", m_fpsr);
 		state_add(M68K_FPCR, "FPCR", m_fpcr);
 	}
+
+	if (m_has_pmmu)
+	{
+		state_add(M68K_MMU_TC, "TC", m_mmu_tc);
+		state_add(M68K_MMU_SR, "PSR", m_mmu_sr);
+
+		if (m_cpu_type & (CPU_TYPE_010|CPU_TYPE_020)) // 68010/68020 + 68851 PMMU
+		{
+			state_add(M68K_CRP_LIMIT, "CRP_LIMIT", m_mmu_crp_limit);
+			state_add(M68K_CRP_APTR, "CRP_APTR", m_mmu_crp_aptr);
+			state_add(M68K_SRP_LIMIT, "SRP_LIMIT", m_mmu_srp_limit);
+			state_add(M68K_SRP_APTR, "SRP_APTR", m_mmu_srp_aptr);
+		}
+
+		if (m_cpu_type & CPU_TYPE_030)
+		{
+			state_add(M68K_TT0, "TT0", m_mmu_tt0);
+			state_add(M68K_TT1, "TT1", m_mmu_tt1);
+			state_add(M68K_CRP_LIMIT, "CRP_LIMIT", m_mmu_crp_limit);
+			state_add(M68K_CRP_APTR, "CRP_APTR", m_mmu_crp_aptr);
+			state_add(M68K_SRP_LIMIT, "SRP_LIMIT", m_mmu_srp_limit);
+			state_add(M68K_SRP_APTR, "SRP_APTR", m_mmu_srp_aptr);
+		}
+
+		if (m_cpu_type & CPU_TYPE_040)
+		{
+			state_add(M68K_ITT0, "ITT0", m_mmu_itt0);
+			state_add(M68K_ITT1, "ITT1", m_mmu_itt1);
+			state_add(M68K_DTT0, "DTT0", m_mmu_dtt0);
+			state_add(M68K_DTT1, "DTT1", m_mmu_dtt1);
+			state_add(M68K_URP_APTR, "URP", m_mmu_urp_aptr);
+			state_add(M68K_SRP_APTR, "SRP", m_mmu_srp_aptr);
+		}
+	}
 }
 
 
