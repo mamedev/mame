@@ -7,7 +7,7 @@
 #pragma once
 
 // processors and memory
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/nec/v5x.h"
 #include "machine/ram.h"
 

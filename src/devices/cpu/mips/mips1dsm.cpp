@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "r3kdasm.h"
+#include "mips1dsm.h"
 
 const char *const mips1_disassembler::reg[32] =
 {

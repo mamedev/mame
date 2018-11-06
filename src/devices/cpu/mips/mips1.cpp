@@ -15,8 +15,8 @@
  *
  */
 #include "emu.h"
-#include "r3000.h"
-#include "r3kdasm.h"
+#include "mips1.h"
+#include "mips1dsm.h"
 #include "debugger.h"
 
 #define LOG_GENERAL (1U << 0)

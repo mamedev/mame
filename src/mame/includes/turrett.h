@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
 #include "emupal.h"

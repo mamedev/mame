@@ -57,7 +57,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/mips/mips3.h"
 #include "machine/decioga.h"
 #include "machine/mc146818.h"

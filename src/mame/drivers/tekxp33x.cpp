@@ -36,7 +36,7 @@
 
 
 #include "emu.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/tms34010/tms34010.h"
 #include "emupal.h"
 #include "screen.h"

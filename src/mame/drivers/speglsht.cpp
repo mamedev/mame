@@ -108,7 +108,7 @@ Notes:
 #include "emu.h"
 #include "emupal.h"
 #include "machine/st0016.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include <algorithm>
 
 class speglsht_state : public driver_device

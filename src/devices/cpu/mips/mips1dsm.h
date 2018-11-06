@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_MIPS_R3KDASM_H
-#define MAME_CPU_MIPS_R3KDASM_H
+#ifndef MAME_CPU_MIPS_MIPS1DSM_H
+#define MAME_CPU_MIPS_MIPS1DSM_H
 
 #pragma once
 
@@ -33,4 +33,4 @@ private:
 
 };
 
-#endif
+#endif // MAME_CPU_MIPS_MIPS1DSM_H

@@ -338,7 +338,7 @@ Notes:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/jaguar/jaguar.h"
 #include "imagedev/chd_cd.h"
 #include "imagedev/snapquik.h"

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "includes/policetr.h"
 
 

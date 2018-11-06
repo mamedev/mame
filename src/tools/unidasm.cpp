@@ -92,7 +92,7 @@ using util::BIT;
 #include "cpu/melps4/melps4d.h"
 #include "cpu/minx/minxd.h"
 #include "cpu/mips/mips3dsm.h"
-#include "cpu/mips/r3kdasm.h"
+#include "cpu/mips/mips1dsm.h"
 #include "cpu/mn10200/mn102dis.h"
 #include "cpu/nanoprocessor/nanoprocessor_dasm.h"
 #include "cpu/nec/necdasm.h"

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#ifndef MAME_CPU_MIPS_R3000_H
-#define MAME_CPU_MIPS_R3000_H
+#ifndef MAME_CPU_MIPS_MIPS1_H
+#define MAME_CPU_MIPS_MIPS1_H
 
 #pragma once
 
@@ -323,4 +323,4 @@ DECLARE_DEVICE_TYPE(R3071,       r3071_device)
 DECLARE_DEVICE_TYPE(R3081,       r3081_device)
 DECLARE_DEVICE_TYPE(SONYPS2_IOP, iop_device)
 
-#endif // MAME_CPU_MIPS_R3000_H
+#endif // MAME_CPU_MIPS_MIPS1_H

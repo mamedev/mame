@@ -22,7 +22,7 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "machine/8530scc.h"
 #include "machine/eepromser.h"
 #include "machine/sgi.h"
