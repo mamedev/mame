@@ -1733,7 +1733,7 @@ MACHINE_CONFIG_END
   Nintendo Game & Watch: Tropical Fish (model TF-104)
   * PCB label TF-104
   * Sharp SM510 label TF-104 8739A (no decap)
-  * vertical lcd screen with custom segments, 1-bit sound
+  * lcd screen with custom segments, 1-bit sound
 
 ***************************************************************************/
 
