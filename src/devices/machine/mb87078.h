@@ -35,7 +35,7 @@ protected:
 
 private:
 	void gain_recalc();
-	double m_lut_gains[64+2];
+	double m_lut_gains[64+3];
 
 	// internal state
 	int m_gain_index[4]; // per-channel current index to m_lut_gains

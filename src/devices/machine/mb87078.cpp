@@ -96,13 +96,15 @@ void mb87078_device::device_start()
 	m_data = 0;
 	m_control = 0;
 
+	// invalidate gain index
 	for (int i = 0; i < 4; i++)
-		m_gain_index[i] = 0;
+		m_gain_index[i] = 66;
 
 	// output volume table, 0dB to -32dB in steps of -0.5dB
 	for (int i = 0; i < (64+1); i++)
 		m_lut_gains[i] = pow(10.0, (-0.5 * i) / 20.0);
 	m_lut_gains[65] = 0.0; // -infinity
+	m_lut_gains[66] = m_lut_gains[0];
 
 	// register for savestates
 	save_item(NAME(m_gain_index));
@@ -164,10 +166,13 @@ void mb87078_device::data_w(offs_t offset, u8 data)
 	if (offset & 1)
 		m_control = data & 0x1f;
 	else
+	{
 		m_data = data & 0x3f;
 
-	m_channel_latch[m_control & 3] = (m_control << 4 & 0x1c0) | m_data;
-	gain_recalc();
+		// set channel volume gain
+		m_channel_latch[m_control & 3] = (m_control << 4 & 0x1c0) | m_data;
+		gain_recalc();
+	}
 }
 
 u8 mb87078_device::data_r(offs_t offset)
