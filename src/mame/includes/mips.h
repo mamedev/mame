@@ -98,7 +98,7 @@ private:
 	};
 
 	// processors and memory
-	required_device<r3000_device_base> m_cpu;
+	required_device<r2000a_device> m_cpu;
 	required_device<v50_device> m_iop;
 	required_device<ram_device> m_ram;
 

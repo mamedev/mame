@@ -11,14 +11,6 @@
 #include "emu.h"
 #include "includes/turrett.h"
 
-#include "cpu/mips/r3000.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
-#include "emupal.h"
-#include "speaker.h"
-
-
-
 /*************************************
  *
  *  Definitions
@@ -356,13 +348,13 @@ void turrett_devices(device_slot_interface &device)
 MACHINE_CONFIG_START(turrett_state::turrett)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R3041, R3041_CLOCK)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_R3000_BRCOND2_INPUT(READLINE(*this, turrett_state, sbrc2_r))
-	MCFG_R3000_BRCOND3_INPUT(READLINE(*this, turrett_state, sbrc3_r))
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
+	R3041(config, m_maincpu, R3041_CLOCK);
+	m_maincpu->set_endianness(ENDIANNESS_BIG);
+	m_maincpu->in_brcond<2>().set(FUNC(turrett_state::sbrc2_r));
+	m_maincpu->in_brcond<3>().set(FUNC(turrett_state::sbrc3_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &turrett_state::cpu_map);
+	m_maincpu->set_vblank_int("screen", FUNC(turrett_state::vblank));
+	m_maincpu->set_periodic_int(FUNC(turrett_state::adc), attotime::from_hz(60));
 
 	ATA_INTERFACE(config, m_ata).options(turrett_devices, "hdd", nullptr, true);
 

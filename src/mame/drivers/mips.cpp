@@ -234,10 +234,10 @@ void rx2030_state::iop_io_map(address_map &map)
 	{
 		switch (data)
 		{
-		case 0: LOG("cpu interrupt 0 asserted\n"); m_cpu->set_input_line(R3000_IRQ0, ASSERT_LINE); break;
-		case 1: LOG("cpu interrupt 1 asserted\n"); m_cpu->set_input_line(R3000_IRQ1, ASSERT_LINE); break;
-		case 2: LOG("cpu interrupt 2 asserted\n"); m_cpu->set_input_line(R3000_IRQ2, ASSERT_LINE); break;
-		case 3: LOG("cpu interrupt 4 asserted\n"); m_cpu->set_input_line(R3000_IRQ4, ASSERT_LINE); break;
+		case 0: LOG("cpu interrupt 0 asserted\n"); m_cpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); break;
+		case 1: LOG("cpu interrupt 1 asserted\n"); m_cpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE); break;
+		case 2: LOG("cpu interrupt 2 asserted\n"); m_cpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE); break;
+		case 3: LOG("cpu interrupt 4 asserted\n"); m_cpu->set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE); break;
 
 		case 4:
 			if (m_cpu->suspended())
@@ -274,10 +274,10 @@ void rx2030_state::rx2030_map(address_map &map)
 		{
 			switch (data)
 			{
-			case 0: LOG("cpu interrupt 0 cleared\n"); m_cpu->set_input_line(R3000_IRQ0, CLEAR_LINE); break;
-			case 1: LOG("cpu interrupt 1 cleared\n"); m_cpu->set_input_line(R3000_IRQ1, CLEAR_LINE); break;
-			case 2: LOG("cpu interrupt 2 cleared\n"); m_cpu->set_input_line(R3000_IRQ2, CLEAR_LINE); break;
-			case 3: LOG("cpu interrupt 4 cleared\n"); m_cpu->set_input_line(R3000_IRQ4, CLEAR_LINE); break;
+			case 0: LOG("cpu interrupt 0 cleared\n"); m_cpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); break;
+			case 1: LOG("cpu interrupt 1 cleared\n"); m_cpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE); break;
+			case 2: LOG("cpu interrupt 2 cleared\n"); m_cpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE); break;
+			case 3: LOG("cpu interrupt 4 cleared\n"); m_cpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); break;
 				break;
 
 			case 4:
@@ -344,7 +344,7 @@ void rx2030_state::rx2030(machine_config &config)
 {
 	R2000A(config, m_cpu, 33.333_MHz_XTAL / 2, 32768, 32768);
 	m_cpu->set_fpurev(0x0315); // 0x0315 == R2010A v1.5
-	m_cpu->in_brcond0().set([this]() { logerror("brcond0 sampled (%s)\n", machine().describe_context()); return ASSERT_LINE; });
+	m_cpu->in_brcond<0>().set([this]() { logerror("brcond0 sampled (%s)\n", machine().describe_context()); return ASSERT_LINE; });
 
 	V50(config, m_iop, 20_MHz_XTAL / 2);
 	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
@@ -480,7 +480,7 @@ void rx2030_state::rs2030(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(pixclock, 1688, 248, 1528, 1066, 38, 1062);
 	m_screen->set_screen_update(FUNC(rx2030_state::screen_update));
-	m_screen->screen_vblank().set_inputline(m_cpu, R3000_IRQ5);
+	m_screen->screen_vblank().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 
 	BT458(config, m_ramdac, pixclock);
 }

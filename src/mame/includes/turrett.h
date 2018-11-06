@@ -10,7 +10,11 @@
 
 #pragma once
 
+#include "cpu/mips/r3000.h"
 #include "machine/ataintf.h"
+#include "machine/idehd.h"
+#include "emupal.h"
+#include "speaker.h"
 #include "screen.h"
 
 
@@ -38,7 +42,7 @@ private:
 	static const uint32_t VRAM_BANK_WORDS = 256 * 1024;
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<r3041_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_shared_ptr<uint16_t> m_bank_a;
 	required_shared_ptr<uint16_t> m_bank_b;

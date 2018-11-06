@@ -1,338 +1,315 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-/***************************************************************************
-
-    r3000.h
-    Interface file for the portable MIPS R3000 emulator.
-    Written by Aaron Giles
-
-***************************************************************************/
 
 #ifndef MAME_CPU_MIPS_R3000_H
 #define MAME_CPU_MIPS_R3000_H
 
 #pragma once
 
-
-/***************************************************************************
-    INTERFACE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_R3000_ENDIANNESS(_endianness) \
-	downcast<r3000_device_base &>(*device).set_endianness(_endianness);
-
-#define MCFG_R3000_BRCOND0_INPUT(_devcb) \
-	downcast<r3000_device_base &>(*device).set_brcond0_input(DEVCB_##_devcb);
-
-#define MCFG_R3000_BRCOND1_INPUT(_devcb) \
-	downcast<r3000_device_base &>(*device).set_brcond1_input(DEVCB_##_devcb);
-
-#define MCFG_R3000_BRCOND2_INPUT(_devcb) \
-	downcast<r3000_device_base &>(*device).set_brcond2_input(DEVCB_##_devcb);
-
-#define MCFG_R3000_BRCOND3_INPUT(_devcb) \
-	downcast<r3000_device_base &>(*device).set_brcond3_input(DEVCB_##_devcb);
-
-
-/***************************************************************************
-    REGISTER ENUMERATION
-***************************************************************************/
-
-enum
-{
-	R3000_PC=1,R3000_SR,
-	R3000_R0,R3000_R1,R3000_R2,R3000_R3,R3000_R4,R3000_R5,R3000_R6,R3000_R7,
-	R3000_R8,R3000_R9,R3000_R10,R3000_R11,R3000_R12,R3000_R13,R3000_R14,R3000_R15,
-	R3000_R16,R3000_R17,R3000_R18,R3000_R19,R3000_R20,R3000_R21,R3000_R22,R3000_R23,
-	R3000_R24,R3000_R25,R3000_R26,R3000_R27,R3000_R28,R3000_R29,R3000_R30,R3000_R31
-};
-
-
-/***************************************************************************
-    INTERRUPT CONSTANTS
-***************************************************************************/
-
-#define R3000_IRQ0      0       /* IRQ0 */
-#define R3000_IRQ1      1       /* IRQ1 */
-#define R3000_IRQ2      2       /* IRQ2 */
-#define R3000_IRQ3      3       /* IRQ3 */
-#define R3000_IRQ4      4       /* IRQ4 */
-#define R3000_IRQ5      5       /* IRQ5 */
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> r3000_device_base
-
-class r3000_device_base : public cpu_device
+class mips1core_device_base : public cpu_device
 {
 public:
-	// construction/destruction
-	virtual ~r3000_device_base();
-
-	// inline configuration helpers
+	// device configuration
 	void set_endianness(endianness_t endianness) { m_endianness = endianness; }
-	void set_fpurev(uint32_t revision) { m_hasfpu = true; m_fpurev = revision; }
+	void set_fpurev(u32 revision) { m_hasfpu = true; m_fpurev = revision; }
 
-	template <class Object> devcb_base &set_brcond0_input(Object &&cb) { return m_in_brcond0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_brcond1_input(Object &&cb) { return m_in_brcond1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_brcond2_input(Object &&cb) { return m_in_brcond2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_brcond3_input(Object &&cb) { return m_in_brcond3.set_callback(std::forward<Object>(cb)); }
-	auto in_brcond0() { return m_in_brcond0.bind(); }
-	auto in_brcond1() { return m_in_brcond1.bind(); }
-	auto in_brcond2() { return m_in_brcond2.bind(); }
-	auto in_brcond3() { return m_in_brcond3.bind(); }
+	// input lines
+	template <unsigned Coprocessor> auto in_brcond() { return m_in_brcond[Coprocessor].bind(); }
 
 protected:
-	r3000_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t cpurev, size_t icache_size, size_t dcache_size);
+	mips1core_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
 
-	// device-level overrides
+	enum registers
+	{
+		// general purpose cpu registers
+		MIPS1_R0, MIPS1_R1, MIPS1_R2, MIPS1_R3, MIPS1_R4, MIPS1_R5, MIPS1_R6, MIPS1_R7,
+		MIPS1_R8, MIPS1_R9, MIPS1_R10, MIPS1_R11, MIPS1_R12, MIPS1_R13, MIPS1_R14, MIPS1_R15,
+		MIPS1_R16, MIPS1_R17, MIPS1_R18, MIPS1_R19, MIPS1_R20, MIPS1_R21, MIPS1_R22, MIPS1_R23,
+		MIPS1_R24, MIPS1_R25, MIPS1_R26, MIPS1_R27, MIPS1_R28, MIPS1_R29, MIPS1_R30, MIPS1_R31,
+
+		// other cpu registers
+		MIPS1_HI,
+		MIPS1_LO,
+		MIPS1_PC,
+
+		// coprocessor 0 registers
+		MIPS1_COP0_INDEX,    // reg 0, tlb only
+		MIPS1_COP0_RANDOM,   // reg 1, tlb only
+		MIPS1_COP0_ENTRYLO,  // reg 2, tlb only
+		MIPS1_COP0_BUSCTRL,  // reg 2, r3041 only
+		MIPS1_COP0_CONFIG,   // reg 3, r3041/r3071/r3081 only
+		MIPS1_COP0_CONTEXT,  // reg 4, tlb only
+		MIPS1_COP0_BADVADDR, // reg 8
+		MIPS1_COP0_COUNT,    // reg 9, r3041 only
+		MIPS1_COP0_ENTRYHI,  // reg 10, tlb only
+		MIPS1_COP0_PORTSIZE, // reg 10, r3041 only
+		MIPS1_COP0_COMPARE,  // reg 11, r3041 only
+		MIPS1_COP0_SR,       // reg 12
+		MIPS1_COP0_CAUSE,    // reg 13
+		MIPS1_COP0_EPC,      // reg 14
+		MIPS1_COP0_PRID,     // reg 15
+	};
+
+	enum exception : int
+	{
+		EXCEPTION_INTERRUPT = 0,
+		EXCEPTION_TLBMOD    = 1,
+		EXCEPTION_TLBLOAD   = 2,
+		EXCEPTION_TLBSTORE  = 3,
+		EXCEPTION_ADDRLOAD  = 4,
+		EXCEPTION_ADDRSTORE = 5,
+		EXCEPTION_BUSINST   = 6,
+		EXCEPTION_BUSDATA   = 7,
+		EXCEPTION_SYSCALL   = 8,
+		EXCEPTION_BREAK     = 9,
+		EXCEPTION_INVALIDOP = 10,
+		EXCEPTION_BADCOP    = 11,
+		EXCEPTION_OVERFLOW  = 12,
+		EXCEPTION_TRAP      = 13,
+	};
+
+	enum cop0_reg : u8
+	{
+		COP0_Index    = 0,
+		COP0_Random   = 1,
+		COP0_EntryLo  = 2,
+		COP0_BusCtrl  = 2,  // r3041 only
+		COP0_Config   = 3,  // r3041/r3071/r3081 only
+		COP0_Context  = 4,
+		COP0_BadVAddr = 8,
+		COP0_Count    = 9,  // r3041 only
+		COP0_EntryHi  = 10,
+		COP0_PortSize = 10, // r3041 only
+		COP0_Compare  = 11, // r3041 only
+		COP0_Status   = 12,
+		COP0_Cause    = 13,
+		COP0_EPC      = 14,
+		COP0_PRId     = 15,
+	};
+
+	enum sr_mask : u32
+	{
+		SR_IEc   = 0x00000001,
+		SR_KUc   = 0x00000002,
+		SR_IEp   = 0x00000004,
+		SR_KUp   = 0x00000008,
+		SR_IEo   = 0x00000010,
+		SR_KUo   = 0x00000020,
+		SR_IMSW0 = 0x00000100,
+		SR_IMSW1 = 0x00000200,
+		SR_IMEX0 = 0x00000400,
+		SR_IMEX1 = 0x00000800,
+		SR_IMEX2 = 0x00001000,
+		SR_IMEX3 = 0x00002000,
+		SR_IMEX4 = 0x00004000,
+		SR_IMEX5 = 0x00008000,
+		SR_IsC   = 0x00010000,
+		SR_SwC   = 0x00020000,
+		SR_PZ    = 0x00040000,
+		SR_CM    = 0x00080000,
+		SR_PE    = 0x00100000,
+		SR_TS    = 0x00200000,
+		SR_BEV   = 0x00400000,
+		SR_RE    = 0x02000000,
+		SR_COP0  = 0x10000000,
+		SR_COP1  = 0x20000000,
+		SR_COP2  = 0x40000000,
+		SR_COP3  = 0x80000000,
+	};
+
+	enum entryhi_mask : u32
+	{
+		EH_VPN  = 0xfffff000, // virtual page number
+		EH_ASID = 0x00000fc0, // address space identifier
+	};
+	enum entrylo_mask : u32
+	{
+		EL_PFN = 0xfffff000, // physical frame
+		EL_N   = 0x00000800, // noncacheable
+		EL_D   = 0x00000400, // dirty
+		EL_V   = 0x00000200, // valid
+		EL_G   = 0x00000100, // global
+	};
+
+	// device_t overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 40; }
+	virtual u32 execute_input_lines() const override { return 6; }
 	virtual void execute_run() override;
-	virtual void execute_set_input(int inputnum, int state) override;
+	virtual void execute_set_input(int inputnum, int state) override { set_irq_line(inputnum, state); }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-
-	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	// memory accessors
-	struct r3000_data_accessors
-	{
-		uint8_t   (r3000_device_base::*m_read_byte)(offs_t byteaddress);
-		uint16_t  (r3000_device_base::*m_read_word)(offs_t byteaddress);
-		uint32_t  (r3000_device_base::*m_read_dword)(offs_t byteaddress);
-		void    (r3000_device_base::*m_write_byte)(offs_t byteaddress, uint8_t data);
-		void    (r3000_device_base::*m_write_word)(offs_t byteaddress, uint16_t data);
-		void    (r3000_device_base::*m_write_dword)(offs_t byteaddress, uint32_t data);
-	};
-
-	uint32_t readop(offs_t pc);
-	uint8_t readmem(offs_t offset);
-	uint16_t readmem_word(offs_t offset);
-	uint32_t readmem_dword(offs_t offset);
-	void writemem(offs_t offset, uint8_t data);
-	void writemem_word(offs_t offset, uint16_t data);
-	void writemem_dword(offs_t offset, uint32_t data);
-
-	uint8_t readcache_be(offs_t offset);
-	uint16_t readcache_be_word(offs_t offset);
-	uint32_t readcache_be_dword(offs_t offset);
-	void writecache_be(offs_t offset, uint8_t data);
-	void writecache_be_word(offs_t offset, uint16_t data);
-	void writecache_be_dword(offs_t offset, uint32_t data);
-
-	uint8_t readcache_le(offs_t offset);
-	uint16_t readcache_le_word(offs_t offset);
-	uint32_t readcache_le_dword(offs_t offset);
-	void writecache_le(offs_t offset, uint8_t data);
-	void writecache_le_word(offs_t offset, uint16_t data);
-	void writecache_le_dword(offs_t offset, uint32_t data);
+	void icache_map(address_map &map);
+	void dcache_map(address_map &map);
 
 	// interrupts
-	void generate_exception(int exception, bool backup);
+	void generate_exception(int exception);
 	void check_irqs();
 	void set_irq_line(int irqline, int state);
-	void invalid_instruction();
 
-	// instructions
-	uint32_t get_cop0_reg(int idx);
-	void set_cop0_reg(int idx, uint32_t val);
-	uint32_t get_cop0_creg(int idx);
-	void set_cop0_creg(int idx, uint32_t val);
-	void handle_cop0();
+	// cop0
+	virtual u32 get_cop0_reg(int const index);
+	void set_cop0_reg(int const index, u32 const data);
+	virtual void handle_cop0(u32 const op);
 
-	uint32_t get_cop1_reg(int idx);
-	void set_cop1_reg(int idx, uint32_t val);
-	uint32_t get_cop1_creg(int idx);
-	void set_cop1_creg(int idx, uint32_t val);
-	void handle_cop1();
+	// cop1
+	void set_cop1_creg(int const index, u32 const data);
+	void handle_cop1(u32 const op);
 
-	uint32_t get_cop2_reg(int idx);
-	void set_cop2_reg(int idx, uint32_t val);
-	uint32_t get_cop2_creg(int idx);
-	void set_cop2_creg(int idx, uint32_t val);
-	void handle_cop2();
+	// generic coprocessor implementation
+	template <unsigned Coprocessor> void handle_cop(u32 const op);
+	template <unsigned Coprocessor> u32 get_cop_reg(int const index) { return m_cpr[Coprocessor][index]; }
+	template <unsigned Coprocessor> void set_cop_reg(int const index, u32 const data) { m_cpr[Coprocessor][index] = data; }
+	template <unsigned Coprocessor> u32 get_cop_creg(int const index) { return m_ccr[Coprocessor][index]; }
+	template <unsigned Coprocessor> void set_cop_creg(int const index, u32 const data) { m_ccr[Coprocessor][index] = data; }
 
-	uint32_t get_cop3_reg(int idx);
-	void set_cop3_reg(int idx, uint32_t val);
-	uint32_t get_cop3_creg(int idx);
-	void set_cop3_creg(int idx, uint32_t val);
-	void handle_cop3();
+	// load/store left/right opcodes
+	void lwl(u32 const op);
+	void lwr(u32 const op);
+	void swl(u32 const op);
+	void swr(u32 const op);
 
-	// complex opcodes
-	void lwl_be();
-	void lwr_be();
-	void swl_be();
-	void swr_be();
-
-	void lwl_le();
-	void lwr_le();
-	void swl_le();
-	void swr_le();
+	// memory accessors
+	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> load(u32 program_address, U &&apply);
+	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> store(u32 program_address, U data);
+	bool fetch(u32 program_address, std::function<void(u32)> &&apply);
 
 	// address spaces
 	const address_space_config m_program_config_be;
 	const address_space_config m_program_config_le;
-	address_space *m_program;
-	std::function<u32 (offs_t)> m_pr32;
-	std::function<const void * (offs_t)> m_prptr;
+	const address_space_config m_icache_config;
+	const address_space_config m_dcache_config;
+
+	int m_data_spacenum;
 
 	// configuration
-	uint32_t        m_cpurev;
-	bool            m_hasfpu;
-	uint32_t        m_fpurev;
-	endianness_t    m_endianness;
+	u32 m_cpurev;
+	bool m_hasfpu;
+	u32 m_fpurev;
+	endianness_t m_endianness;
 
 	// core registers
-	uint32_t      m_pc;
-	uint32_t      m_nextpc;
-	uint32_t      m_hi;
-	uint32_t      m_lo;
-	uint32_t      m_r[32];
+	u32 m_pc;
+	u32 m_nextpc;
+	u32 m_hi;
+	u32 m_lo;
+	u32 m_r[32];
 
 	// COP registers
-	uint32_t      m_cpr[4][32];
-	uint32_t      m_ccr[4][32];
+	u32 m_cpr[4][32];
+	u32 m_ccr[4][32];
 
 	// internal stuff
-	uint32_t      m_ppc;
-	uint32_t      m_op;
-	int         m_icount;
-	int         m_interrupt_cycles;
-
-	// endian-dependent load/store
-	void        (r3000_device_base::*m_lwl)();
-	void        (r3000_device_base::*m_lwr)();
-	void        (r3000_device_base::*m_swl)();
-	void        (r3000_device_base::*m_swr)();
-
-	// memory accesses
-	r3000_data_accessors *m_cur;
-	r3000_data_accessors m_memory_hand;
-	r3000_data_accessors m_cache_hand;
+	u32 m_ppc;
+	int m_icount;
 
 	// cache memory
-	uint32_t *    m_cache;
-	std::vector<uint32_t> m_icache;
-	std::vector<uint32_t> m_dcache;
-	size_t      m_cache_size;
 	size_t const m_icache_size;
 	size_t const m_dcache_size;
 
 	// I/O
-	devcb_read_line    m_in_brcond0;
-	devcb_read_line    m_in_brcond1;
-	devcb_read_line    m_in_brcond2;
-	devcb_read_line    m_in_brcond3;
+	devcb_read_line m_in_brcond[4];
 };
 
-// ======================> r2000_device
+class mips1_device_base : public mips1core_device_base
+{
+protected:
+	mips1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size);
 
-class r2000_device : public r3000_device_base
+	// device_t overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_memory_interface overrides
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+
+	virtual u32 get_cop0_reg(int idx) override;
+	virtual void handle_cop0(u32 const op) override;
+
+private:
+	u64 m_reset_time;
+	u32 m_tlb[64][2]; // 0 is hi, 1 is lo
+};
+
+class r2000_device : public mips1_device_base
 {
 public:
-	r2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 0, size_t dcache_size = 0);
+	r2000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
 };
 
-
-// ======================> r2000a_device
-
-class r2000a_device : public r3000_device_base
+class r2000a_device : public mips1_device_base
 {
 public:
-	r2000a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 0, size_t dcache_size = 0);
+	r2000a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
 };
 
-
-// ======================> r3000_device
-
-class r3000_device : public r3000_device_base
+class r3000_device : public mips1_device_base
 {
 public:
-	r3000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 0, size_t dcache_size = 0);
+	r3000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
 };
 
-
-// ======================> r3000a_device
-
-class r3000a_device : public r3000_device_base
+class r3000a_device : public mips1_device_base
 {
 public:
-	r3000a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 0, size_t dcache_size = 0);
+	r3000a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 0, size_t dcache_size = 0);
 };
 
-
-// ======================> r3041_device
-
-class r3041_device : public r3000_device_base
+class r3041_device : public mips1core_device_base
 {
 public:
-	r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_start() override;
 };
 
-
-// ======================> r3051_device
-
-class r3051_device : public r3000_device_base
+class r3051_device : public mips1core_device_base
 {
 public:
-	r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-
-// ======================> r3052_device
-
-class r3052_device : public r3000_device_base
+class r3052_device : public mips1core_device_base
 {
 public:
-	r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-
-// ======================> r3071_device
-
-class r3071_device : public r3000_device_base
+class r3052e_device : public mips1_device_base
 {
 public:
-	r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 16384, size_t dcache_size = 4096);
+	r3052e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-
-// ======================> r3081_device
-
-class r3081_device : public r3000_device_base
+class r3071_device : public mips1core_device_base
 {
 public:
-	r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, size_t icache_size = 16384, size_t dcache_size = 4096);
+	r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 16384, size_t dcache_size = 4096);
 };
 
-
-// ======================> iop_device
-
-class iop_device : public r3000_device_base
+class r3081_device : public mips1core_device_base
 {
 public:
-	iop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, size_t icache_size = 16384, size_t dcache_size = 4096);
 };
 
-
-// device type definition
+class iop_device : public mips1core_device_base
+{
+public:
+	iop_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
 
 DECLARE_DEVICE_TYPE(R2000,       r2000_device)
 DECLARE_DEVICE_TYPE(R2000A,      r2000a_device)
@@ -341,6 +318,7 @@ DECLARE_DEVICE_TYPE(R3000A,      r3000a_device)
 DECLARE_DEVICE_TYPE(R3041,       r3041_device)
 DECLARE_DEVICE_TYPE(R3051,       r3051_device)
 DECLARE_DEVICE_TYPE(R3052,       r3052_device)
+DECLARE_DEVICE_TYPE(R3052E,      r3052e_device)
 DECLARE_DEVICE_TYPE(R3071,       r3071_device)
 DECLARE_DEVICE_TYPE(R3081,       r3081_device)
 DECLARE_DEVICE_TYPE(SONYPS2_IOP, iop_device)

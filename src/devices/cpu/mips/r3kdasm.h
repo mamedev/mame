@@ -13,11 +13,11 @@
 
 #pragma once
 
-class r3000_disassembler : public util::disasm_interface
+class mips1_disassembler : public util::disasm_interface
 {
 public:
-	r3000_disassembler() = default;
-	virtual ~r3000_disassembler() = default;
+	mips1_disassembler() = default;
+	virtual ~mips1_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;

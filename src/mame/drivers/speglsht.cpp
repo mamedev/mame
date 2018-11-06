@@ -132,7 +132,7 @@ public:
 private:
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<r3051_device> m_subcpu;
 
 	required_shared_ptr<uint8_t> m_shared;
 	required_shared_ptr<uint32_t> m_framebuffer;
@@ -421,10 +421,10 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("sub", R3051, 25000000)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_DEVICE_PROGRAM_MAP(speglsht_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
+	R3051(config, m_subcpu, 25000000);
+	m_subcpu->set_endianness(ENDIANNESS_LITTLE);
+	m_subcpu->set_addrmap(AS_PROGRAM, &speglsht_state::speglsht_mem);
+	m_subcpu->set_vblank_int("screen", FUNC(speglsht_state::irq4_line_assert));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)

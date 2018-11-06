@@ -85,7 +85,7 @@ public:
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<r3051_device> m_maincpu;
 	required_device<st0016_cpu_device> m_soundcpu;
 
 	required_region_ptr<uint16_t> m_chrrom;
@@ -569,10 +569,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(srmp5_state::srmp5)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R3051, 25000000)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_DEVICE_PROGRAM_MAP(srmp5_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp5_state,  irq4_line_assert)
+	R3051(config, m_maincpu, 25000000);
+	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
+	m_maincpu->set_addrmap(AS_PROGRAM, &srmp5_state::srmp5_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(srmp5_state::irq4_line_assert));
 
 	MCFG_DEVICE_ADD("soundcpu",ST0016_CPU,8000000)
 	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)

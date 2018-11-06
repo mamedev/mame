@@ -586,9 +586,9 @@ void indigo_state::cdrom_config(device_t *device)
 }
 
 MACHINE_CONFIG_START(indigo_state::indigo3k)
-	MCFG_DEVICE_ADD("maincpu", R3041, 33000000)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_DEVICE_PROGRAM_MAP(indigo3k_map)
+	R3000A(config, m_maincpu, 33.333_MHz_XTAL, 32768, 32768);
+	downcast<r3000a_device &>(*m_maincpu).set_endianness(ENDIANNESS_BIG);
+	m_maincpu->set_addrmap(AS_PROGRAM, &indigo_state::indigo3k_map);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
