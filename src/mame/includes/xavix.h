@@ -45,7 +45,8 @@ public:
 		m_palette(*this, "palette"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lowbus(*this, "lowbus")
+		m_lowbus(*this, "lowbus"),
+		m_hack_timer_disable(false)
 	{ }
 
 	void xavix(machine_config &config);
@@ -53,6 +54,7 @@ public:
 	void xavix2000(machine_config &config);
 
 	void init_xavix();
+	void init_bass();
 
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
@@ -330,6 +332,8 @@ private:
 
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
+
+	bool m_hack_timer_disable;
 };
 
 class xavix_i2c_state : public xavix_state

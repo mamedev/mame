@@ -617,7 +617,15 @@ WRITE8_MEMBER(xavix_state::timer_control_w)
 	// rad_fb / rad_madf don't set bit 0x40 (and doesn't seem to have a valid interrupt handler for timer, so probably means it generates no IRQ?)
 	if (data & 0x01) // timer start?
 	{
-		m_freq_timer->adjust(attotime::from_usec(1000));
+		// eka_bass will crash after a certain number of timer IRQs, needs investigation
+		if (!m_hack_timer_disable)
+		{
+			// TODO: work out the proper calculation here
+			// int divide = 1 << ((m_timer_freq&0x0f)+1);
+			// uint32_t freq = m_maincpu->unscaled_clock()/2;
+			// m_freq_timer->adjust(attotime::from_hz(freq / divide) * m_timer_baseval*20);
+			m_freq_timer->adjust(attotime::from_usec(1000));
+		}
 	}
 	else
 	{
@@ -653,7 +661,8 @@ WRITE8_MEMBER(xavix_state::timer_freq_w)
 
 	/* if master clock (MC) is XTAL(21'477'272) (NTSC master)
 
-	   0x0 = MC / 2      = 10.738636 MHz
+	   divide value        clock source
+	   0x0 = MC / 2      = 10.738636 MHz (10738636 Hz)
 	   0x1 = MC / 4      = 5.369318 MHz
 	   0x2 = MC / 8      = 2.684659 MHz
 	   0x3 = MC / 16     = 1.3423295 MHz
