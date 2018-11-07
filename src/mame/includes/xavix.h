@@ -48,7 +48,7 @@ public:
 		m_lowbus(*this, "lowbus"),
 		m_hack_timer_disable(false)
 	{ }
-
+	
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
@@ -168,18 +168,17 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_READ8_MEMBER(sound_75f0_r);
-	DECLARE_WRITE8_MEMBER(sound_75f0_w);
+	DECLARE_READ8_MEMBER(sound_reg16_0_r);
+	DECLARE_WRITE8_MEMBER(sound_reg16_0_w);
+	DECLARE_READ8_MEMBER(sound_reg16_1_r);
+	DECLARE_WRITE8_MEMBER(sound_reg16_1_w);
 
-	DECLARE_READ8_MEMBER(sound_75f1_r);
-	DECLARE_WRITE8_MEMBER(sound_75f1_w);
-
-	DECLARE_READ8_MEMBER(sound_75f4_r);
+	DECLARE_READ8_MEMBER(sound_sta16_r);
 	DECLARE_READ8_MEMBER(sound_75f5_r);
-	DECLARE_READ8_MEMBER(sound_75f6_r);
-	DECLARE_WRITE8_MEMBER(sound_75f6_w);
+	DECLARE_READ8_MEMBER(sound_volume_r);
+	DECLARE_WRITE8_MEMBER(sound_volume_w);
 
-	DECLARE_WRITE8_MEMBER(sound_75f7_w);
+	DECLARE_WRITE8_MEMBER(sound_regbase_w);
 
 	DECLARE_READ8_MEMBER(sound_75f8_r);
 	DECLARE_WRITE8_MEMBER(sound_75f8_w);
@@ -187,19 +186,22 @@ private:
 	DECLARE_READ8_MEMBER(sound_75f9_r);
 	DECLARE_WRITE8_MEMBER(sound_75f9_w);
 
-	DECLARE_READ8_MEMBER(sound_75fa_r);
-	DECLARE_WRITE8_MEMBER(sound_75fa_w);
-	DECLARE_READ8_MEMBER(sound_75fb_r);
-	DECLARE_WRITE8_MEMBER(sound_75fb_w);
-	DECLARE_READ8_MEMBER(sound_75fc_r);
-	DECLARE_WRITE8_MEMBER(sound_75fc_w);
-	DECLARE_READ8_MEMBER(sound_75fd_r);
-	DECLARE_WRITE8_MEMBER(sound_75fd_w);
+	DECLARE_READ8_MEMBER(sound_timer0_r);
+	DECLARE_WRITE8_MEMBER(sound_timer0_w);
+	DECLARE_READ8_MEMBER(sound_timer1_r);
+	DECLARE_WRITE8_MEMBER(sound_timer1_w);
+	DECLARE_READ8_MEMBER(sound_timer2_r);
+	DECLARE_WRITE8_MEMBER(sound_timer2_w);
+	DECLARE_READ8_MEMBER(sound_timer3_r);
+	DECLARE_WRITE8_MEMBER(sound_timer3_w);
 
 	DECLARE_READ8_MEMBER(sound_irqstatus_r);
 	DECLARE_WRITE8_MEMBER(sound_irqstatus_w);
 	DECLARE_WRITE8_MEMBER(sound_75ff_w);
 	uint8_t m_sound_irqstatus;
+	uint8_t m_soundreg16_0[2];
+	uint8_t m_soundreg16_1[2];
+	uint8_t m_sound_regbase;
 
 	DECLARE_READ8_MEMBER(timer_status_r);
 	DECLARE_WRITE8_MEMBER(timer_control_w);
