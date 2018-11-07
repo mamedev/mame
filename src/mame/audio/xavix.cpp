@@ -9,6 +9,40 @@
 
 // 16 stereo channels?
 
+// xavix_sound_device
+
+DEFINE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device, "xavix_sound", "XaviX Sound")
+
+xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, XAVIX_SOUND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+{
+}
+
+void xavix_sound_device::device_start()
+{
+	m_stream = stream_alloc(0, 1, 8000);
+}
+
+void xavix_sound_device::device_reset()
+{
+}
+
+void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// reset the output stream
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+
+	// loop while we still have samples to generate
+	while (samples-- != 0)
+	{
+		// 
+	}
+}
+
+// xavix_state support
+
 /* 75f0, 75f1 - 2x8 bits (16 channels?) */
 READ8_MEMBER(xavix_state::sound_reg16_0_r)
 {

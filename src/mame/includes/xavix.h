@@ -17,6 +17,27 @@
 #include "machine/xavix_mtrk_wheel.h"
 #include "machine/xavix_madfb_ball.h"
 
+
+class xavix_sound_device : public device_t, public device_sound_interface
+{
+public:
+	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+private:
+	sound_stream *m_stream;
+};
+
+DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)
+
+
 class xavix_state : public driver_device
 {
 public:
@@ -24,6 +45,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
+		m_sound(*this, "xavix_sound"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
@@ -71,6 +93,8 @@ protected:
 	required_ioport m_in1;
 
 private:
+	required_device<xavix_sound_device> m_sound;
+
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
