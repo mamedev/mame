@@ -63,19 +63,25 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 				uint16_t param1 = (m_mainram[memorybase + 0x1]<<8) | (m_mainram[memorybase + 0x0]); // sample rate maybe?
 				uint16_t param2 = (m_mainram[memorybase + 0x3]<<8) | (m_mainram[memorybase + 0x2]); // seems to be a start position
 				uint16_t param3 = (m_mainram[memorybase + 0x5]<<8) | (m_mainram[memorybase + 0x4]); // another start position? sometimes same as param6
-				uint16_t param4 = (m_mainram[memorybase + 0x7]<<8) | (m_mainram[memorybase + 0x6]); // upper 8 bits of memory address? 8 bits unused?
+				uint8_t param4a = (m_mainram[memorybase + 0x7]); 
+				uint8_t param4b = (m_mainram[memorybase + 0x6]); // upper 8 bits of memory address? 8 bits unused?
 
 				// these don't seem to be populated as often, maybe some kind of effect / envelope filter?
 				uint16_t param5 = (m_mainram[memorybase + 0x9]<<8) | (m_mainram[memorybase + 0x8]);
 				uint16_t param6 = (m_mainram[memorybase + 0xb]<<8) | (m_mainram[memorybase + 0xa]); // seems to be a start position
 				uint16_t param7 = (m_mainram[memorybase + 0xd]<<8) | (m_mainram[memorybase + 0xc]); // another start position? sometimes same as param6
-				uint16_t param8 = (m_mainram[memorybase + 0xf]<<8) | (m_mainram[memorybase + 0xe]); // upper 8 bits of memory address? 8 bits unused (or not unused?, get populated with increasing values sometimes?)
-				LOG(" (params %04x %04x %04x %04x   %04x %04x %04x %04x)\n", param1, param2, param3, param4, param5, param6, param7, param8);
+				uint8_t param8a = (m_mainram[memorybase + 0xf]);
+				uint8_t param8b = (m_mainram[memorybase + 0xe]); // upper 8 bits of memory address? 8 bits unused (or not unused?, get populated with increasing values sometimes?)
+				LOG(" (params %04x %04x %04x %02x %02x   %04x %04x %04x %02x %02x)\n", param1, param2, param3, param4a, param4b, param5, param6, param7, param8a, param8b);
 
-				uint32_t address0 = (param2 | param4 << 16) & 0x00ffffff; // definitely addresses based on rad_snow
-				uint32_t address1 = (param3 | param4 << 16) & 0x00ffffff;
+				uint32_t address1 = (param2 | param4b << 16) & 0x00ffffff; // definitely addresses based on rad_snow
+				uint32_t address2 = (param3 | param4b << 16) & 0x00ffffff;
 
-				LOG(" (possible meanings rate %04x address1 %08x address2 %08x)\n", param1, address0, address1);
+				uint32_t address3 = (param6 | param8b << 16) & 0x00ffffff; // still looks like addresses, sometimes pointing at RAM
+				uint32_t address4 = (param7 | param8b << 16) & 0x00ffffff;
+
+
+				LOG(" (possible meanings rate %04x address1 %08x address2 %08x address3 %08x address4 %08x)\n", param1, address1, address2, address3, address4);
 
 				// samples appear to be PCM, 0x80 terminated
 			}
