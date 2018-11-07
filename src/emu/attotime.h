@@ -139,7 +139,7 @@ public:
 	/** Create an attotime from at the given frequency @frequency */
 	static attotime from_hz(u32 frequency) { return (frequency > 1) ? attotime(0, HZ_TO_ATTOSECONDS(frequency)) : (frequency == 1) ? attotime(1, 0) : attotime::never; }
 	static attotime from_hz(int frequency) { return (frequency > 0) ? from_hz(u32(frequency)) : attotime::never; }
-	static attotime from_hz(const XTAL &xtal) { return from_hz(xtal.value()); }
+	static attotime from_hz(const XTAL &xtal) { return (double(xtal.value()) == xtal.dvalue()) ? from_hz(xtal.value()) : from_hz(xtal.dvalue()); } // -> u32 or double
 	static attotime from_hz(double frequency) { if (frequency > 0.0) { double i, f = modf(1.0 / frequency, &i); return attotime(i, f * ATTOSECONDS_PER_SECOND); } else return attotime::never; }
 
 	// math
