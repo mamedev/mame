@@ -8,7 +8,6 @@
  *
  * TODO
  *   - FPU support
- *   - fix and enable overflow exceptions
  *   - further cleanup on coprocessors
  *   - R3041 features
  *   - cache emulation
@@ -25,7 +24,6 @@
 //#define VERBOSE     (LOG_GENERAL|LOG_TLB)
 #include "logmacro.h"
 
-#define ENABLE_OVERFLOWS    (0)
 #define ENABLE_IOP_KPUTS    (0)
 
 #define RSREG           ((op >> 21) & 31)
@@ -641,13 +639,27 @@ void mips1core_device_base::execute_run()
 						m_icount -= 34;
 						break;
 					case 0x20:  /* ADD */
-						if (ENABLE_OVERFLOWS && RSVAL > ~RTVAL) generate_exception(EXCEPTION_OVERFLOW);
-						else RDVAL = RSVAL + RTVAL;
+						{
+							u32 const sum = RSVAL + RTVAL;
+
+							// overflow: (sign(addend0) == sign(addend1)) && (sign(addend0) != sign(sum))
+							if (!BIT(RSVAL ^ RTVAL, 31) && BIT(RSVAL ^ sum, 31))
+								generate_exception(EXCEPTION_OVERFLOW);
+							else if (RDREG)
+								RDVAL = sum;
+						}
 						break;
 					case 0x21:  /* ADDU */      if (RDREG) RDVAL = RSVAL + RTVAL;                  break;
 					case 0x22:  /* SUB */
-						if (ENABLE_OVERFLOWS && RSVAL < RTVAL) generate_exception(EXCEPTION_OVERFLOW);
-						else RDVAL = RSVAL - RTVAL;
+						{
+							u32 const difference = RSVAL - RTVAL;
+
+							// overflow: (sign(minuend) != sign(subtrahend)) && (sign(minuend) != sign(difference))
+							if (BIT(RSVAL ^ RTVAL, 31) && BIT(RSVAL ^ difference, 31))
+								generate_exception(EXCEPTION_OVERFLOW);
+							else if (RDREG)
+								RDVAL = difference;
+						}
 						break;
 					case 0x23:  /* SUBU */      if (RDREG) RDVAL = RSVAL - RTVAL;                  break;
 					case 0x24:  /* AND */       if (RDREG) RDVAL = RSVAL & RTVAL;                  break;
@@ -694,8 +706,15 @@ void mips1core_device_base::execute_run()
 				case 0x06:  /* BLEZ */      if (s32(RSVAL) <= 0) ADDPC(SIMMVAL);                   break;
 				case 0x07:  /* BGTZ */      if (s32(RSVAL) > 0) ADDPC(SIMMVAL);                    break;
 				case 0x08:  /* ADDI */
-					if (ENABLE_OVERFLOWS && RSVAL > ~SIMMVAL) generate_exception(EXCEPTION_OVERFLOW);
-					else if (RTREG) RTVAL = RSVAL + SIMMVAL;
+					{
+						u32 const sum = RSVAL + SIMMVAL;
+
+						// overflow: (sign(addend0) == sign(addend1)) && (sign(addend0) != sign(sum))
+						if (!BIT(RSVAL ^ s32(SIMMVAL), 31) && BIT(RSVAL ^ sum, 31))
+							generate_exception(EXCEPTION_OVERFLOW);
+						else if (RTREG)
+							RTVAL = sum;
+					}
 					break;
 				case 0x09:  /* ADDIU */     if (RTREG) RTVAL = RSVAL + SIMMVAL;                    break;
 				case 0x0a:  /* SLTI */      if (RTREG) RTVAL = s32(RSVAL) < s32(SIMMVAL);          break;
