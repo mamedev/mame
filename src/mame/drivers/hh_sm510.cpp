@@ -1777,7 +1777,7 @@ MACHINE_CONFIG_START(gnw_tfish_state::gnw_tfish)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
