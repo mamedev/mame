@@ -95,6 +95,74 @@ private:
 	DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
 	DECLARE_WRITE8_MEMBER(extbus_w) { logerror("write to external bus %06x %02x\n", offset, data); }
 
+
+	/* this is just a quick memory system bypass for video reads etc. because going through the
+	   memory system is slow and also pollutes logs significantly with unmapped reads if the games
+	   enable the video before actually setting up the source registers! 
+   
+	   this will need modifying if any games have RAM instead of ROM (which I think is possible
+	   with SuperXaviX at least)
+	*/
+	inline uint8_t read_full_data_sp_lowbus_bypass(uint16_t adr)
+	{
+		adr &= 0x7fff;
+
+		if (adr < 0x4000)
+		{
+			adr &= 0x3fff;
+			return m_mainram[adr];
+		}
+		else if (adr < 0x5000)
+		{
+			adr &= 0xfff;
+			return txarray_r(adr);
+		}
+		else if ((adr >= 0x6000) && (adr < 0x6800))
+		{
+			adr &= 0x7ff;
+			return m_fragment_sprite[adr];
+		}
+		else if ((adr >= 0x6800) && (adr < 0x6900))
+		{
+			adr &= 0xff;
+			return m_palram_sh[adr];
+		}
+		else if ((adr >= 0x6900) && (adr < 0x6a00))
+		{
+			adr &= 0xff;
+			return m_palram_l[adr];
+		}
+		else if ((adr >= 0x6a00) && (adr < 0x6a20))
+		{
+			adr &= 0x1f;
+			return m_segment_regs[adr];
+		}
+		// superxavix bitmap palette?
+
+		return 0x00;
+	}
+
+	inline uint8_t read_full_data_sp_bypass(uint32_t adr)
+	{
+		uint8_t databank = adr >> 16;
+
+		if (databank >= 0x80)
+		{
+			return m_rgn[adr & (m_rgnlen - 1)];
+		}
+		else
+		{
+			if ((adr&0xffff) >= 0x8000)
+			{
+				return m_rgn[adr & (m_rgnlen - 1)];
+			}
+			else
+			{
+				return read_full_data_sp_lowbus_bypass(adr);
+			}
+		}
+	}
+
 	DECLARE_WRITE8_MEMBER(extintrf_7900_w);
 	DECLARE_WRITE8_MEMBER(extintrf_7901_w);
 	DECLARE_WRITE8_MEMBER(extintrf_7902_w);
@@ -235,6 +303,44 @@ private:
 	DECLARE_READ8_MEMBER(xavix_memoryemu_txarray_r);
 	DECLARE_WRITE8_MEMBER(xavix_memoryemu_txarray_w);
 	uint8_t m_txarray[3];
+
+	inline uint8_t txarray_r(uint16_t offset)
+	{
+		if (offset < 0x100)
+		{
+			offset &= 0xff;
+			return ((offset >> 4) | (offset << 4));
+		}
+		else if (offset < 0x200)
+		{
+			offset &= 0xff;
+			return ((offset >> 4) | (~offset << 4));
+		}
+		else if (offset < 0x300)
+		{
+			offset &= 0xff;
+			return ((~offset >> 4) | (offset << 4));
+		}
+		else if (offset < 0x400)
+		{
+			offset &= 0xff;
+			return ((~offset >> 4) | (~offset << 4));
+		}
+		else if (offset < 0x800)
+		{
+			return m_txarray[0];
+		}
+		else if (offset < 0xc00)
+		{
+			return m_txarray[1];
+		}
+		else if (offset < 0x1000)
+		{
+			return m_txarray[2];
+		}
+
+		return 0xff;
+	}
 
 	DECLARE_READ8_MEMBER(mult_r);
 	DECLARE_WRITE8_MEMBER(mult_w);

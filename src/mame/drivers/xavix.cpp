@@ -267,7 +267,6 @@ void xavix_state::xavix_extbus_map(address_map &map)
 	map(0x000000, 0xffffff).rw(FUNC(xavix_state::extbus_r), FUNC(xavix_state::extbus_w));
 }
 
-
 void xavix_state::xavix_lowbus_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("mainram");
@@ -411,7 +410,6 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 
 	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 }
-
 
 static INPUT_PORTS_START( xavix )
 	PORT_START("IN0")

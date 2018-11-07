@@ -18,7 +18,8 @@ inline uint8_t xavix_state::get_next_bit()
 	// going through memory is slow, try not to do it too often!
 	if (m_tmp_databit == 0)
 	{
-		m_bit = m_maincpu->read_full_data_sp(m_tmp_dataaddress);
+		//m_bit = m_maincpu->read_full_data_sp(m_tmp_dataaddress);
+		m_bit = read_full_data_sp_bypass(m_tmp_dataaddress);
 	}
 
 	uint8_t ret = m_bit >> m_tmp_databit;
@@ -245,15 +246,25 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 		int tile = 0;
 
 		// the register being 0 probably isn't the condition here
-		if (tileregs[0x0] != 0x00) tile |= m_maincpu->read_full_data_sp((tileregs[0x0] << 8) + count);
+		if (tileregs[0x0] != 0x00)
+		{
+			//tile |= m_maincpu->read_full_data_sp((tileregs[0x0] << 8) + count);
+			tile |= read_full_data_sp_bypass((tileregs[0x0] << 8) + count);		
+		}
 
 		// only read the next byte if we're not in an 8-bit mode
 		if (((tileregs[0x7] & 0x7f) != 0x00) && ((tileregs[0x7] & 0x7f) != 0x08))
-			tile |= m_maincpu->read_full_data_sp((tileregs[0x1] << 8) + count) << 8;
+		{
+			//tile |= m_maincpu->read_full_data_sp((tileregs[0x1] << 8) + count) << 8;
+			tile |= read_full_data_sp_bypass((tileregs[0x1] << 8) + count) << 8;
+		}
 
 		// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
 		if (alt_tileaddressing2 == 2)
-			tile |= m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count) << 16;
+		{
+			//tile |= m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count) << 16;
+			tile |= read_full_data_sp_bypass((tileregs[0x2] << 8) + count) << 16;
+		}
 
 
 		int bpp = (tileregs[0x3] & 0x0e) >> 1;
@@ -309,7 +320,9 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 			// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
 			if (tileregs[0x7] & 0x08)
 			{
-				uint8_t extraattr = m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count);
+				//uint8_t extraattr = m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count);
+				uint8_t extraattr = read_full_data_sp_bypass((tileregs[0x2] << 8) + count);
+
 				// make use of the extraattr stuff?
 				pal = (extraattr & 0xf0) >> 4;
 				zval = (extraattr & 0x0f) >> 0;
@@ -819,7 +832,8 @@ WRITE8_MEMBER(xavix_state::spritefragment_dma_trg_w)
 	{
 		for (int i = 0; i < len; i++)
 		{
-			uint8_t dat = m_maincpu->read_full_data_sp(src + i);
+			//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
+			uint8_t dat = read_full_data_sp_bypass(src + i);
 			m_fragment_sprite[(dst + i) & 0x7ff] = dat;
 		}
 	}
@@ -951,38 +965,5 @@ WRITE8_MEMBER(xavix_state::xavix_memoryemu_txarray_w)
 
 READ8_MEMBER(xavix_state::xavix_memoryemu_txarray_r)
 {
-	if (offset < 0x100)
-	{
-		offset &= 0xff;
-		return ((offset >> 4) | (offset << 4));
-	}
-	else if (offset < 0x200)
-	{
-		offset &= 0xff;
-		return ((offset >> 4) | (~offset << 4));
-	}
-	else if (offset < 0x300)
-	{
-		offset &= 0xff;
-		return ((~offset >> 4) | (offset << 4));
-	}
-	else if (offset < 0x400)
-	{
-		offset &= 0xff;
-		return ((~offset >> 4) | (~offset << 4));
-	}
-	else if (offset < 0x800)
-	{
-		return m_txarray[0];
-	}
-	else if (offset < 0xc00)
-	{
-		return m_txarray[1];
-	}
-	else if (offset < 0x1000)
-	{
-		return m_txarray[2];
-	}
-
-	return 0xff;
+	return txarray_r(offset);
 }
