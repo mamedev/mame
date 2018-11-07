@@ -4605,6 +4605,13 @@ ROM_START( rascot )
 
 	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
 	// none??
+
+	// identification needed
+	ROM_REGION( 0x40000, "satellite", 0 )
+	ROM_LOAD16_WORD_SWAP( "r1230.bin", 0x00000, 0x20000, CRC(48bddec5) SHA1(e281aa9cc992bd7c2c5a03ea7d994b4dd3411ab9) ) // M68K code, 3x satellite units program ROMs ?
+	ROM_LOAD16_WORD_SWAP( "r1232.bin", 0x00000, 0x20000, CRC(3f1671ef) SHA1(2363d4300dd52a2ebf2706942fc282b6e1c8fc58) )
+	ROM_LOAD16_WORD_SWAP( "r1234.bin", 0x00000, 0x20000, CRC(c7d01444) SHA1(eea74eaa1a6ccee85393aaac2a450cd1943153e7) )
+	ROM_LOAD( "g1049.bin", 0x20000, 0x20000, CRC(3ab80f90) SHA1(64dfa739429d558146ea9894728c07c76f71d37e) ) // text line display device ROM ? there also was ROM labeled R1049, contents is same as G1049.
 ROM_END
 
 
