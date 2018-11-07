@@ -7,7 +7,7 @@
 #define VERBOSE 1
 #include "logmacro.h"
 
-// 16 channel sound?
+// 16 stereo channels?
 
 /* 75f0, 75f1 - 2x8 bits (16 channels?) */
 READ8_MEMBER(xavix_state::sound_reg16_0_r)
@@ -40,12 +40,43 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 	  data & 0x40 - channel 14 (registers at regbase + 0xf0) eg 0x3be0 - 0x3bef in monster truck
 	  data & 0x80 - channel 15 (registers at regbase + 0xf0) eg 0x3bf0 - 0x3bff in monster truck
 */
-	m_soundreg16_0[offset] = data;
-
 	if (offset == 0)
 		LOG("%s: sound_reg16_0_w %02x, %02x (%d %d %d %d %d %d %d %d - - - - - - - -)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
 	else
 		LOG("%s: sound_reg16_0_w %02x, %02x (- - - - - - - - %d %d %d %d %d %d %d %d)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
+
+
+	for (int i = 0; i < 8; i++)
+	{
+		int channel_state = (data & (1<<i));
+		int old_channel_state = (m_soundreg16_0[offset] & (1<<i));
+		if (channel_state != old_channel_state)
+		{
+			if (channel_state)
+			{
+				int channel = (offset*8 + i);
+
+				LOG("channel %d 0->1 ", channel);
+
+				uint16_t memorybase = ((m_sound_regbase & 0x3f) << 8) | (channel * 0x10);
+
+				uint16_t param1 = (m_mainram[memorybase + 0x0]<<8) | (m_mainram[memorybase + 0x1]);
+				uint16_t param2 = (m_mainram[memorybase + 0x2]<<8) | (m_mainram[memorybase + 0x3]);
+				uint16_t param3 = (m_mainram[memorybase + 0x4]<<8) | (m_mainram[memorybase + 0x5]);
+				uint16_t param4 = (m_mainram[memorybase + 0x6]<<8) | (m_mainram[memorybase + 0x7]);
+				uint16_t param5 = (m_mainram[memorybase + 0x8]<<8) | (m_mainram[memorybase + 0x9]);
+				uint16_t param6 = (m_mainram[memorybase + 0xa]<<8) | (m_mainram[memorybase + 0xb]); // seems to be a start position
+				uint16_t param7 = (m_mainram[memorybase + 0xc]<<8) | (m_mainram[memorybase + 0xd]); // another start position? sometimes same as param6
+				uint16_t param8 = (m_mainram[memorybase + 0xe]<<8) | (m_mainram[memorybase + 0xf]); // upper 8 bits of memory address? 8 bits unused?
+				LOG(" (params %04x %04x %04x %04x   %04x %04x %04x %04x)\n", param1, param2, param3, param4, param5, param6, param7, param8);
+
+				// samples appear to be PCM, 0x80 terminated
+			}
+		}
+	}
+
+	m_soundreg16_0[offset] = data;
+
 }
 
 /* 75f0, 75f1 - 2x8 bits (16 channels?) */
