@@ -140,7 +140,18 @@ public:
 	static attotime from_hz(u32 frequency) { return (frequency > 1) ? attotime(0, HZ_TO_ATTOSECONDS(frequency)) : (frequency == 1) ? attotime(1, 0) : attotime::never; }
 	static attotime from_hz(int frequency) { return (frequency > 0) ? from_hz(u32(frequency)) : attotime::never; }
 	static attotime from_hz(const XTAL &xtal) { return (xtal.dvalue() > 1.0) ? attotime(0, HZ_TO_ATTOSECONDS(xtal)) : from_hz(xtal.dvalue()); }
-	static attotime from_hz(double frequency) { if (frequency > 0.0) { double i, f = modf(1.0 / frequency, &i); return attotime(i, f * ATTOSECONDS_PER_SECOND); } else return attotime::never; }
+	static attotime from_hz(double frequency)
+	{
+		if (frequency > 1.0)
+			return attotime(0, HZ_TO_ATTOSECONDS(frequency));
+		else if (frequency > 0.0)
+		{
+			double i, f = modf(1.0 / frequency, &i);
+			return attotime(i, f * ATTOSECONDS_PER_SECOND);
+		}
+		else
+			return attotime::never;
+	}
 
 	// math
 	attotime &operator+=(const attotime &right);
