@@ -67,6 +67,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	DECLARE_WRITE_LINE_MEMBER(timer0_int);
+	DECLARE_WRITE_LINE_MEMBER(timer1_int);
+
 	enum
 	{
 		PI1_DATA_REG       = 0x00/4,
@@ -160,7 +163,6 @@ protected:
 	uint8_t m_int3_map_mask0_reg;
 	uint8_t m_int3_map_mask1_reg;
 	uint8_t m_int3_map_pol_reg;
-	uint8_t m_int3_timer_clear_reg;
 	uint8_t m_int3_err_status_reg;
 
 	uint32_t    m_par_read_cnt;
