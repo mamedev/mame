@@ -285,15 +285,15 @@ MACHINE_CONFIG_START(scramble_state::ad2083_audio)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &ay1(AY8910(config, "ay1", 14318000/8));
+	ay1.port_a_read_callback().set(FUNC(scramble_state::scramble_portB_r));
+	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, hotshock_soundlatch_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318000/8));
+	ay2.port_a_read_callback().set(FUNC(scramble_state::hotshock_soundlatch_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MCFG_DEVICE_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
 	MCFG_TMS5110_M0_CB(WRITELINE("tmsprom", tmsprom_device, m0_w))

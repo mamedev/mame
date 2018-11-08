@@ -3498,10 +3498,10 @@ MACHINE_CONFIG_START(royalmah_state::royalmah)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, royalmah_state, player_1_port_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, royalmah_state, player_2_port_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
+	AY8910(config, m_ay, 18432000/12);
+	m_ay->port_a_read_callback().set(FUNC(royalmah_state::player_1_port_r));
+	m_ay->port_b_read_callback().set(FUNC(royalmah_state::player_2_port_r));
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.33);
 MACHINE_CONFIG_END
 
 

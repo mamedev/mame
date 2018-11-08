@@ -537,10 +537,10 @@ MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 	MCFG_PALETTE_INIT_OWNER(jongkyo_state, jongkyo)
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jongkyo_state, input_1p_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jongkyo_state, input_2p_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8910_device &aysnd(AY8910(config, "aysnd", JONGKYO_CLOCK/8));
+	aysnd.port_a_read_callback().set(FUNC(jongkyo_state::input_1p_r));
+	aysnd.port_b_read_callback().set(FUNC(jongkyo_state::input_2p_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 

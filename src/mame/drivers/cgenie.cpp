@@ -457,12 +457,12 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("par", cg_parallel_slot_device, pa_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pa_w))
-	MCFG_AY8910_PORT_B_READ_CB(READ8("par", cg_parallel_slot_device, pb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(17'734'470) / 8));
+	ay8910.port_a_read_callback().set("par", FUNC(cg_parallel_slot_device::pa_r));
+	ay8910.port_a_write_callback().set("par", FUNC(cg_parallel_slot_device::pa_w));
+	ay8910.port_b_read_callback().set("par", FUNC(cg_parallel_slot_device::pb_r));
+	ay8910.port_b_write_callback().set("par", FUNC(cg_parallel_slot_device::pb_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(cgenie_cassette_formats)

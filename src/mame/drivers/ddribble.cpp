@@ -294,13 +294,13 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ddribble_state, ddribble_vlm5030_busy_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ddribble_state, ddribble_vlm5030_ctrl_w))
-	MCFG_SOUND_ROUTE(0, "filter1", 0.25)
-	MCFG_SOUND_ROUTE(1, "filter2", 0.25)
-	MCFG_SOUND_ROUTE(2, "filter3", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.25)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.port_b_read_callback().set(FUNC(ddribble_state::ddribble_vlm5030_busy_r));
+	ymsnd.port_a_write_callback().set(FUNC(ddribble_state::ddribble_vlm5030_ctrl_w));
+	ymsnd.add_route(0, "filter1", 0.25);
+	ymsnd.add_route(1, "filter2", 0.25);
+	ymsnd.add_route(2, "filter3", 0.25);
+	ymsnd.add_route(3, "mono", 0.25);
 
 	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

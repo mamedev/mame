@@ -1436,15 +1436,15 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<0>))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	ym1.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<1>))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym2(YM2203(config, "ym2", 1500000));
+	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
+	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
@@ -1517,15 +1517,15 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<0>))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL/4));  /* 4MHz verified for Last Day / D-day */
+	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	ym1.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", input_merger_any_high_device, in_w<1>))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym2(YM2203(config, "ym2", 16_MHz_XTAL/4));  /* 4MHz verified for Last Day / D-day */
+	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
+	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)

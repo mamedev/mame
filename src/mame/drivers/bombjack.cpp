@@ -380,14 +380,11 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* Confirmed from PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13); /* Confirmed from PCB */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
+	AY8910(config, "ay3", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.13);
 MACHINE_CONFIG_END
 
 
