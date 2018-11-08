@@ -267,7 +267,6 @@ void xavix_state::xavix_extbus_map(address_map &map)
 	map(0x000000, 0xffffff).rw(FUNC(xavix_state::extbus_r), FUNC(xavix_state::extbus_w));
 }
 
-
 void xavix_state::xavix_lowbus_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("mainram");
@@ -319,26 +318,24 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// map(0x6ffc, 0x6fff)
 
 	// Sound RAM
-	// map(0x7400, 0x75ff)
+	// map(0x7400, 0x757f)
 
 	// Sound Control
-	map(0x75f0, 0x75f0).rw(FUNC(xavix_state::sound_75f0_r), FUNC(xavix_state::sound_75f0_w)); // r/w tested read/written 8 times in a row
-	map(0x75f1, 0x75f1).rw(FUNC(xavix_state::sound_75f1_r), FUNC(xavix_state::sound_75f1_w)); // r/w tested read/written 8 times in a row
-	map(0x75f2, 0x75f3).ram();
-	map(0x75f4, 0x75f4).r(FUNC(xavix_state::sound_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
-	map(0x75f5, 0x75f5).r(FUNC(xavix_state::sound_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
+	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_reg16_0_r), FUNC(xavix_state::sound_reg16_0_w)); // r/w tested read/written 8 times in a row
+	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_reg16_1_r), FUNC(xavix_state::sound_reg16_1_w));
+	map(0x75f4, 0x75f5).r(FUNC(xavix_state::sound_sta16_r)); // related to 75f0 / 75f1 (read after writing there - rad_mtrk)
 	// taitons1 after 75f7/75f8
-	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_75f6_r), FUNC(xavix_state::sound_75f6_w)); // r/w tested
+	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_volume_r), FUNC(xavix_state::sound_volume_w)); // r/w tested
 	// taitons1 written as a pair
-	map(0x75f7, 0x75f7).w(FUNC(xavix_state::sound_75f7_w));
+	map(0x75f7, 0x75f7).w(FUNC(xavix_state::sound_regbase_w));
 	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::sound_75f8_r), FUNC(xavix_state::sound_75f8_w)); // r/w tested
 	// taitons1 written after 75f6, then read
 	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::sound_75f9_r), FUNC(xavix_state::sound_75f9_w));
 	// at another time
-	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::sound_75fa_r), FUNC(xavix_state::sound_75fa_w)); // r/w tested
-	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_75fb_r), FUNC(xavix_state::sound_75fb_w)); // r/w tested
-	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_75fc_r), FUNC(xavix_state::sound_75fc_w)); // r/w tested
-	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_75fd_r), FUNC(xavix_state::sound_75fd_w)); // r/w tested
+	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::sound_timer0_r), FUNC(xavix_state::sound_timer0_w)); // r/w tested
+	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_timer1_r), FUNC(xavix_state::sound_timer1_w)); // r/w tested
+	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_timer2_r), FUNC(xavix_state::sound_timer2_w)); // r/w tested
+	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_timer3_r), FUNC(xavix_state::sound_timer3_w)); // r/w tested
 	map(0x75fe, 0x75fe).rw(FUNC(xavix_state::sound_irqstatus_r), FUNC(xavix_state::sound_irqstatus_w));
 	// taitons1 written other 75xx operations
 	map(0x75ff, 0x75ff).w(FUNC(xavix_state::sound_75ff_w));
@@ -413,7 +410,6 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 
 	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 }
-
 
 static INPUT_PORTS_START( xavix )
 	PORT_START("IN0")
@@ -821,6 +817,8 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
+	XAVIX_SOUND(config, "xavix_sound", MAIN_CLOCK);
+
 	SPEAKER(config, "mono").front_center();
 	// sound is PCM
 MACHINE_CONFIG_END

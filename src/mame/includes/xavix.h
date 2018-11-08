@@ -17,6 +17,27 @@
 #include "machine/xavix_mtrk_wheel.h"
 #include "machine/xavix_madfb_ball.h"
 
+
+class xavix_sound_device : public device_t, public device_sound_interface
+{
+public:
+	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+private:
+	sound_stream *m_stream;
+};
+
+DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)
+
+
 class xavix_state : public driver_device
 {
 public:
@@ -24,6 +45,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
+		m_sound(*this, "xavix_sound"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
@@ -48,7 +70,7 @@ public:
 		m_lowbus(*this, "lowbus"),
 		m_hack_timer_disable(false)
 	{ }
-
+	
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
@@ -71,6 +93,8 @@ protected:
 	required_ioport m_in1;
 
 private:
+	required_device<xavix_sound_device> m_sound;
+
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -94,6 +118,74 @@ private:
 
 	DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
 	DECLARE_WRITE8_MEMBER(extbus_w) { logerror("write to external bus %06x %02x\n", offset, data); }
+
+
+	/* this is just a quick memory system bypass for video reads etc. because going through the
+	   memory system is slow and also pollutes logs significantly with unmapped reads if the games
+	   enable the video before actually setting up the source registers! 
+   
+	   this will need modifying if any games have RAM instead of ROM (which I think is possible
+	   with SuperXaviX at least)
+	*/
+	inline uint8_t read_full_data_sp_lowbus_bypass(uint16_t adr)
+	{
+		adr &= 0x7fff;
+
+		if (adr < 0x4000)
+		{
+			adr &= 0x3fff;
+			return m_mainram[adr];
+		}
+		else if (adr < 0x5000)
+		{
+			adr &= 0xfff;
+			return txarray_r(adr);
+		}
+		else if ((adr >= 0x6000) && (adr < 0x6800))
+		{
+			adr &= 0x7ff;
+			return m_fragment_sprite[adr];
+		}
+		else if ((adr >= 0x6800) && (adr < 0x6900))
+		{
+			adr &= 0xff;
+			return m_palram_sh[adr];
+		}
+		else if ((adr >= 0x6900) && (adr < 0x6a00))
+		{
+			adr &= 0xff;
+			return m_palram_l[adr];
+		}
+		else if ((adr >= 0x6a00) && (adr < 0x6a20))
+		{
+			adr &= 0x1f;
+			return m_segment_regs[adr];
+		}
+		// superxavix bitmap palette?
+
+		return 0x00;
+	}
+
+	inline uint8_t read_full_data_sp_bypass(uint32_t adr)
+	{
+		uint8_t databank = adr >> 16;
+
+		if (databank >= 0x80)
+		{
+			return m_rgn[adr & (m_rgnlen - 1)];
+		}
+		else
+		{
+			if ((adr&0xffff) >= 0x8000)
+			{
+				return m_rgn[adr & (m_rgnlen - 1)];
+			}
+			else
+			{
+				return read_full_data_sp_lowbus_bypass(adr);
+			}
+		}
+	}
 
 	DECLARE_WRITE8_MEMBER(extintrf_7900_w);
 	DECLARE_WRITE8_MEMBER(extintrf_7901_w);
@@ -168,18 +260,17 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_READ8_MEMBER(sound_75f0_r);
-	DECLARE_WRITE8_MEMBER(sound_75f0_w);
+	DECLARE_READ8_MEMBER(sound_reg16_0_r);
+	DECLARE_WRITE8_MEMBER(sound_reg16_0_w);
+	DECLARE_READ8_MEMBER(sound_reg16_1_r);
+	DECLARE_WRITE8_MEMBER(sound_reg16_1_w);
 
-	DECLARE_READ8_MEMBER(sound_75f1_r);
-	DECLARE_WRITE8_MEMBER(sound_75f1_w);
-
-	DECLARE_READ8_MEMBER(sound_75f4_r);
+	DECLARE_READ8_MEMBER(sound_sta16_r);
 	DECLARE_READ8_MEMBER(sound_75f5_r);
-	DECLARE_READ8_MEMBER(sound_75f6_r);
-	DECLARE_WRITE8_MEMBER(sound_75f6_w);
+	DECLARE_READ8_MEMBER(sound_volume_r);
+	DECLARE_WRITE8_MEMBER(sound_volume_w);
 
-	DECLARE_WRITE8_MEMBER(sound_75f7_w);
+	DECLARE_WRITE8_MEMBER(sound_regbase_w);
 
 	DECLARE_READ8_MEMBER(sound_75f8_r);
 	DECLARE_WRITE8_MEMBER(sound_75f8_w);
@@ -187,19 +278,22 @@ private:
 	DECLARE_READ8_MEMBER(sound_75f9_r);
 	DECLARE_WRITE8_MEMBER(sound_75f9_w);
 
-	DECLARE_READ8_MEMBER(sound_75fa_r);
-	DECLARE_WRITE8_MEMBER(sound_75fa_w);
-	DECLARE_READ8_MEMBER(sound_75fb_r);
-	DECLARE_WRITE8_MEMBER(sound_75fb_w);
-	DECLARE_READ8_MEMBER(sound_75fc_r);
-	DECLARE_WRITE8_MEMBER(sound_75fc_w);
-	DECLARE_READ8_MEMBER(sound_75fd_r);
-	DECLARE_WRITE8_MEMBER(sound_75fd_w);
+	DECLARE_READ8_MEMBER(sound_timer0_r);
+	DECLARE_WRITE8_MEMBER(sound_timer0_w);
+	DECLARE_READ8_MEMBER(sound_timer1_r);
+	DECLARE_WRITE8_MEMBER(sound_timer1_w);
+	DECLARE_READ8_MEMBER(sound_timer2_r);
+	DECLARE_WRITE8_MEMBER(sound_timer2_w);
+	DECLARE_READ8_MEMBER(sound_timer3_r);
+	DECLARE_WRITE8_MEMBER(sound_timer3_w);
 
 	DECLARE_READ8_MEMBER(sound_irqstatus_r);
 	DECLARE_WRITE8_MEMBER(sound_irqstatus_w);
 	DECLARE_WRITE8_MEMBER(sound_75ff_w);
 	uint8_t m_sound_irqstatus;
+	uint8_t m_soundreg16_0[2];
+	uint8_t m_soundreg16_1[2];
+	uint8_t m_sound_regbase;
 
 	DECLARE_READ8_MEMBER(timer_status_r);
 	DECLARE_WRITE8_MEMBER(timer_control_w);
@@ -233,6 +327,44 @@ private:
 	DECLARE_READ8_MEMBER(xavix_memoryemu_txarray_r);
 	DECLARE_WRITE8_MEMBER(xavix_memoryemu_txarray_w);
 	uint8_t m_txarray[3];
+
+	inline uint8_t txarray_r(uint16_t offset)
+	{
+		if (offset < 0x100)
+		{
+			offset &= 0xff;
+			return ((offset >> 4) | (offset << 4));
+		}
+		else if (offset < 0x200)
+		{
+			offset &= 0xff;
+			return ((offset >> 4) | (~offset << 4));
+		}
+		else if (offset < 0x300)
+		{
+			offset &= 0xff;
+			return ((~offset >> 4) | (offset << 4));
+		}
+		else if (offset < 0x400)
+		{
+			offset &= 0xff;
+			return ((~offset >> 4) | (~offset << 4));
+		}
+		else if (offset < 0x800)
+		{
+			return m_txarray[0];
+		}
+		else if (offset < 0xc00)
+		{
+			return m_txarray[1];
+		}
+		else if (offset < 0x1000)
+		{
+			return m_txarray[2];
+		}
+
+		return 0xff;
+	}
 
 	DECLARE_READ8_MEMBER(mult_r);
 	DECLARE_WRITE8_MEMBER(mult_w);
