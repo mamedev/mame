@@ -268,8 +268,8 @@ void i8251_device::update_tx_empty()
 {
 	if (m_status & I8251_STATUS_TX_EMPTY)
 	{
-		/* tx is in marking state (high) when tx empty! */
-		m_txd_handler(1);
+		// return TxD to marking state (high) if not sending break character
+		m_txd_handler(!BIT(m_command, 3));
 	}
 
 	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) != 0);
