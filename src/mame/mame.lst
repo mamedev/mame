@@ -38069,6 +38069,7 @@ unior                           //
 unistar                         //
 
 @source:univac.cpp
+uts10                           //
 uts20                           //
 
 @source:unixpc.cpp
