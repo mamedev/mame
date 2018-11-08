@@ -28,9 +28,11 @@
     - ASCII keyboard
     - low-profile keyboard
 
-    http://users.telenet.be/lust/Xerox820/index.htm
-    http://www.classiccmp.org/dunfield/img41867/system.htm
-    http://www.microcodeconsulting.com/z80/plus2.htm
+	http://www.vintagesbc.it/?page_id=233
+	http://mccworkshop.com/computers/comphistory7.htm
+	http://bitsavers.org/bits/Xerox/820/
+	http://bitsavers.org/bits/Xerox/820-II/
+    http://www.classiccmp.org/dunfield/img54306/system.htm
 
     Note:
     - MK-82 have same roms as original Big Board
@@ -43,6 +45,10 @@
     5.25-inch formats
     40 tracks, 1 head, 18 sectors, 128 bytes sector length, first sector id 1
     40 tracks, 2 heads, 18 sectors, 128 bytes sector length, first sector id 1
+	
+	SmartROM and Plus2 ROM both come for 2.5MHz or 4MHz systems, and there is another distinction between variants for generic or Xerox keyboards 
+	http://www.microcodeconsulting.com/z80/plus2.htm
+	http://www.microcodeconsulting.com/z80/smartrom.htm
 
 */
 
@@ -851,7 +857,13 @@ ROM_START( x820ii )
 	ROMX_LOAD( "u33.5.0_537p10828.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(5) )
 	ROMX_LOAD( "u34.5.0_537p10829.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(5) )
 	ROMX_LOAD( "u35.5.0_537p10830.bin", 0x1000, 0x0800, CRC(278fa75f) SHA1(f47cf9eb30366211280f93a8460523fcc53eebe9), ROM_BIOS(5) )
-	ROMX_LOAD( "v500.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "v500.u36", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(5) )
+	
+	ROM_SYSTEM_BIOS( 6, "v50v018", "Balcones Operating System v5.0 v018" ) // shows ROM ERROR
+	ROMX_LOAD( "537p10828.u33.5.0.bin", 0x0000, 0x0800, CRC(a17af0f1) SHA1(b1d9a151ed4558f49b3cdc1adbf348b54da48877), ROM_BIOS(6) )
+	ROMX_LOAD( "537p10829.u34.5.0.bin", 0x0800, 0x0800, CRC(c9f5182e) SHA1(ac830848614cea984c849a42687ea2944d6765d9), ROM_BIOS(6) )
+	ROMX_LOAD( "537p10830.u35.5.0.bin", 0x1000, 0x0800, CRC(cc4e1c2b) SHA1(375bbed76d9088dec82b9599cd810727d3e605f3), ROM_BIOS(6) )
+	ROMX_LOAD( "537p10831.u36.5.0.bin", 0x1800, 0x0800, CRC(cda7f598) SHA1(08ffd18959e1708136076c82486b8d121a04fa23), ROM_BIOS(6) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	
@@ -872,6 +884,9 @@ ROM_START( x820ii )
 	
 	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(5) )
 	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(5) )
+	
+	ROMX_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9), ROM_BIOS(6) )
+	ROMX_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3), ROM_BIOS(6) )
 	
 ROM_END
 
