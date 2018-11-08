@@ -979,8 +979,8 @@ Parasol Stars - often been mentioned, but still not confirmed, for Tourvision. F
 		<year>1990</year>
 		<publisher>bootleg (Tourvision) / Sting / Data East Corporation</publisher>
 		<part name="cart" interface="tourvision_cart">
-			<dataarea name="rom" size="262144">
 			<feature name="id" value="53"/>
+			<dataarea name="rom" size="262144">
 		<!-- verified identical -->
 				<rom name="override (japan).pce" size="262144" crc="b74ec562" sha1="9da08c896e02b67257521b948c2fa5bc55724c0d" offset="000000" />
 			</dataarea>
