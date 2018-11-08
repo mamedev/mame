@@ -778,18 +778,17 @@ ROM_START(cobrapb)
 	ROM_LOAD("u5 - scb 1 c0 - sonido.bin", 0x10000, 0x8000, CRC(c36340ab) SHA1(cd662457959de3a929ba02779e2046ed18b797e2))
 ROM_END
 
-#ifdef UNUSED_DEFINITION
 // Come Back (Nondum)
 ROM_START(comeback)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("jco_6a0.u18", 0x0000, 0x8000, NO_DUMP)
+	ROM_LOAD("jeb_5a0.u18", 0x0000, 0x8000, CRC(87615a7d) SHA1(b27ca2d863040a2641f88f9bd3143467a83f181b))
 
 	ROM_REGION(0x28000, "zsu:soundcpu", 0)
-	ROM_LOAD("cbs_3a0.u3", 0x00000, 0x8000, NO_DUMP)
-	ROM_LOAD("cbs_3b0.u4", 0x08000, 0x8000, NO_DUMP)
-	ROM_LOAD("cbs_1c0.u5", 0x10000, 0x8000, NO_DUMP)
+	ROM_LOAD("cbs_3a0.u3", 0x00000, 0x8000, CRC(d0f55dc9) SHA1(91186e2cbe248323380418911240a9a5887063fb))
+	ROM_LOAD("cbs_3b0.u4", 0x08000, 0x8000, CRC(1da16d36) SHA1(9f7a27ae23064c1183a346ff042e6cba148257c7))
+	ROM_LOAD("cbs_1c0.u5", 0x10000, 0x8000, CRC(794ae588) SHA1(adaa5e69232523369a6a2da865ac05102cc04ec8))
 ROM_END
-#endif
+
 
 GAME(1982,  spain82,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Spain '82",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(1983,  megaaton,  0,        megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -812,6 +811,6 @@ GAME(1987,  ironball,  0,        play_3,   play_3,   play_3_state, empty_init, R
 // "Z-Pinball" hardware, Z80 main and sound CPUs - to be split (?)
 GAME(1986,  eballchps, eballchp, sklflite, play_3,   play_3_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  cobrapb,   0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Playbar",   "Cobra (Playbar)",              MACHINE_IS_SKELETON_MECHANICAL)
-//GAME(198?, comeback, 0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Nondum",    "Come Back",                    MACHINE_IS_SKELETON_MECHANICAL) // undumped
+GAME(198?,  comeback, 0,         sklflite, play_3,   play_3_state, empty_init, ROT0, "Nondum / CIFA", "Come Back",                MACHINE_IS_SKELETON_MECHANICAL)
 // bingo hardware, to be split (?)
 GAME(1983,  msdisco,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Miss Disco (Bingo)",           MACHINE_IS_SKELETON_MECHANICAL)
