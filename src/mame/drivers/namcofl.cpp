@@ -224,8 +224,8 @@ void namcofl_state::namcofl_mem(address_map &map)
 	map(0x30300000, 0x30303fff).ram(); /* COMRAM */
 	map(0x30380000, 0x303800ff).r(FUNC(namcofl_state::fl_network_r)); /* network registers */
 	map(0x30400000, 0x30407fff).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::namcofl_c116_w));
-	map(0x30800000, 0x3080ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
-	map(0x30a00000, 0x30a0003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
+	map(0x30800000, 0x3080ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
+	map(0x30a00000, 0x30a0003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x30c00000, 0x30c1ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0x30d00000, 0x30d0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 	map(0x30e00000, 0x30e1ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
