@@ -23,7 +23,9 @@ class xavix_sound_device : public device_t, public device_sound_interface
 public:
 	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto trackx_callback() { return m_trackx_cb.bind(); }
+	auto read_regs_callback() { return m_readregs_cb.bind(); }
+
+	void enable_voice(int voice);
 
 protected:
 	// device-level overrides
@@ -41,7 +43,7 @@ private:
 		uint32_t position;
 	};
 
-	devcb_read8 m_trackx_cb;
+	devcb_read8 m_readregs_cb;
 	xavix_voice m_voice[16];
 };
 

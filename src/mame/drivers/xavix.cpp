@@ -818,7 +818,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	/* sound hardware */
 	XAVIX_SOUND(config, m_sound, MAIN_CLOCK);
-	m_sound->trackx_callback().set(FUNC(xavix_state::sound_regram_read_cb));
+	m_sound->read_regs_callback().set(FUNC(xavix_state::sound_regram_read_cb));
 
 	SPEAKER(config, "mono").front_center();
 	// sound is PCM

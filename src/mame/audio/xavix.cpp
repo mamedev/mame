@@ -17,13 +17,13 @@ xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char
 	: device_t(mconfig, XAVIX_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_trackx_cb(*this)
+	, m_readregs_cb(*this)
 {
 }
 
 void xavix_sound_device::device_start()
 {
-	m_trackx_cb.resolve_safe(0xff);
+	m_readregs_cb.resolve_safe(0xff);
 
 	m_stream = stream_alloc(0, 1, 8000);
 }
@@ -49,6 +49,40 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 		// 
 	}
 }
+
+void xavix_sound_device::enable_voice(int voice)
+{
+	LOG("voice %d 0->1 ", voice);
+	int voicemembase = voice * 0x10;
+
+	uint16_t param1 = (m_readregs_cb(voicemembase + 0x1) << 8) | (m_readregs_cb(voicemembase + 0x0)); // sample rate maybe?
+	uint16_t param2 = (m_readregs_cb(voicemembase + 0x3) << 8) | (m_readregs_cb(voicemembase + 0x2)); // seems to be a start position
+	uint16_t param3 = (m_readregs_cb(voicemembase + 0x5) << 8) | (m_readregs_cb(voicemembase + 0x4)); // another start position? sometimes same as param6
+	uint8_t param4a = (m_readregs_cb(voicemembase + 0x7));
+	uint8_t param4b = (m_readregs_cb(voicemembase + 0x6)); // upper 8 bits of memory address? 8 bits unused?
+
+	// these don't seem to be populated as often, maybe some kind of effect / envelope filter?
+	uint8_t param5a = (m_readregs_cb(voicemembase + 0x9));
+	uint8_t param5b = (m_readregs_cb(voicemembase + 0x8));
+	uint16_t param6 = (m_readregs_cb(voicemembase + 0xb) << 8) | (m_readregs_cb(voicemembase + 0xa)); // seems to be a start position
+	uint16_t param7 = (m_readregs_cb(voicemembase + 0xd) << 8) | (m_readregs_cb(voicemembase + 0xc)); // another start position? sometimes same as param6
+	uint8_t param8a = (m_readregs_cb(voicemembase + 0xf));
+	uint8_t param8b = (m_readregs_cb(voicemembase + 0xe)); // upper 8 bits of memory address? 8 bits unused (or not unused?, get populated with increasing values sometimes?)
+	LOG(" (params %04x %04x %04x %02x %02x     %02x %02x  %04x %04x %02x %02x)\n", param1, param2, param3, param4a, param4b, param5a, param5b, param6, param7, param8a, param8b);
+
+	uint32_t address1 = (param2 | param4b << 16) & 0x00ffffff; // definitely addresses based on rad_snow
+	uint32_t address2 = (param3 | param4b << 16) & 0x00ffffff;
+
+	uint32_t address3 = (param6 | param8b << 16) & 0x00ffffff; // still looks like addresses, sometimes pointing at RAM
+	uint32_t address4 = (param7 | param8b << 16) & 0x00ffffff;
+
+
+	LOG(" (possible meanings mode %01x rate %04x address1 %08x address2 %08x address3 %08x address4 %08x)\n", param1 & 0x3, param1 >> 2, address1, address2, address3, address4);
+
+	// samples appear to be PCM, 0x80 terminated
+}
+
+
 
 // xavix_state support
 
@@ -113,35 +147,7 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 			{
 				int voice = (offset * 8 + i);
 
-				LOG("voice %d 0->1 ", voice);
-
-				uint16_t memorybase = ((m_sound_regbase & 0x3f) << 8) | (voice * 0x10);
-
-				uint16_t param1 = (m_mainram[memorybase + 0x1] << 8) | (m_mainram[memorybase + 0x0]); // sample rate maybe?
-				uint16_t param2 = (m_mainram[memorybase + 0x3] << 8) | (m_mainram[memorybase + 0x2]); // seems to be a start position
-				uint16_t param3 = (m_mainram[memorybase + 0x5] << 8) | (m_mainram[memorybase + 0x4]); // another start position? sometimes same as param6
-				uint8_t param4a = (m_mainram[memorybase + 0x7]);
-				uint8_t param4b = (m_mainram[memorybase + 0x6]); // upper 8 bits of memory address? 8 bits unused?
-
-				// these don't seem to be populated as often, maybe some kind of effect / envelope filter?
-				uint8_t param5a = (m_mainram[memorybase + 0x9]);
-				uint8_t param5b = (m_mainram[memorybase + 0x8]);
-				uint16_t param6 = (m_mainram[memorybase + 0xb] << 8) | (m_mainram[memorybase + 0xa]); // seems to be a start position
-				uint16_t param7 = (m_mainram[memorybase + 0xd] << 8) | (m_mainram[memorybase + 0xc]); // another start position? sometimes same as param6
-				uint8_t param8a = (m_mainram[memorybase + 0xf]);
-				uint8_t param8b = (m_mainram[memorybase + 0xe]); // upper 8 bits of memory address? 8 bits unused (or not unused?, get populated with increasing values sometimes?)
-				LOG(" (params %04x %04x %04x %02x %02x     %02x %02x  %04x %04x %02x %02x)\n", param1, param2, param3, param4a, param4b, param5a, param5b, param6, param7, param8a, param8b);
-
-				uint32_t address1 = (param2 | param4b << 16) & 0x00ffffff; // definitely addresses based on rad_snow
-				uint32_t address2 = (param3 | param4b << 16) & 0x00ffffff;
-
-				uint32_t address3 = (param6 | param8b << 16) & 0x00ffffff; // still looks like addresses, sometimes pointing at RAM
-				uint32_t address4 = (param7 | param8b << 16) & 0x00ffffff;
-
-
-				LOG(" (possible meanings mode %01x rate %04x address1 %08x address2 %08x address3 %08x address4 %08x)\n", param1 & 0x3, param1 >> 2, address1, address2, address3, address4);
-
-				// samples appear to be PCM, 0x80 terminated
+				m_sound->enable_voice(voice);
 			}
 		}
 	}
