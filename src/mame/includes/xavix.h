@@ -33,6 +33,13 @@ protected:
 
 private:
 	sound_stream *m_stream;
+
+	struct xavix_voice {
+		bool enabled;
+		uint32_t position;
+	};
+
+	xavix_voice m_voice[16];
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)

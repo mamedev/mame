@@ -7,7 +7,7 @@
 #define VERBOSE 1
 #include "logmacro.h"
 
-// 16 stereo channels?
+// 16 stereo voices?
 
 // xavix_sound_device
 
@@ -27,7 +27,13 @@ void xavix_sound_device::device_start()
 
 void xavix_sound_device::device_reset()
 {
+	for (int v = 0; v < 16; v++)
+	{
+		m_voice[v].enabled = false;
+		m_voice[v].position = 0x00;
+	}
 }
+
 
 void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
@@ -43,7 +49,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 
 // xavix_state support
 
-/* 75f0, 75f1 - 2x8 bits (16 channels?) */
+/* 75f0, 75f1 - 2x8 bits (16 voices?) */
 READ8_MEMBER(xavix_state::sound_reg16_0_r)
 {
 	LOG("%s: sound_reg16_0_r %02x\n", machine().describe_context(), offset);
@@ -55,24 +61,24 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 	/* looks like the sound triggers
 
 	  offset 0
-	  data & 0x01 - channel 0  (registers at regbase + 0x00) eg 0x3b00 - 0x3b0f in monster truck
-	  data & 0x02 - channel 1  (registers at regbase + 0x10) eg 0x3b10 - 0x3b1f in monster truck
-	  data & 0x04 - channel 2  
-	  data & 0x08 - channel 3
-	  data & 0x10 - channel 4
-	  data & 0x20 - channel 5
-	  data & 0x40 - channel 6
-	  data & 0x80 - channel 7
+	  data & 0x01 - voice 0  (registers at regbase + 0x00) eg 0x3b00 - 0x3b0f in monster truck
+	  data & 0x02 - voice 1  (registers at regbase + 0x10) eg 0x3b10 - 0x3b1f in monster truck
+	  data & 0x04 - voice 2  
+	  data & 0x08 - voice 3
+	  data & 0x10 - voice 4
+	  data & 0x20 - voice 5
+	  data & 0x40 - voice 6
+	  data & 0x80 - voice 7
 
 	  offset 1
-	  data & 0x01 - channel 8
-	  data & 0x02 - channel 9
-	  data & 0x04 - channel 10
-	  data & 0x08 - channel 11
-	  data & 0x10 - channel 12
-	  data & 0x20 - channel 13
-	  data & 0x40 - channel 14 (registers at regbase + 0xf0) eg 0x3be0 - 0x3bef in monster truck
-	  data & 0x80 - channel 15 (registers at regbase + 0xf0) eg 0x3bf0 - 0x3bff in monster truck
+	  data & 0x01 - voice 8
+	  data & 0x02 - voice 9
+	  data & 0x04 - voice 10
+	  data & 0x08 - voice 11
+	  data & 0x10 - voice 12
+	  data & 0x20 - voice 13
+	  data & 0x40 - voice 14 (registers at regbase + 0xf0) eg 0x3be0 - 0x3bef in monster truck
+	  data & 0x80 - voice 15 (registers at regbase + 0xf0) eg 0x3bf0 - 0x3bff in monster truck
 */
 	if (offset == 0)
 		LOG("%s: sound_reg16_0_w %02x, %02x (%d %d %d %d %d %d %d %d - - - - - - - -)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
@@ -82,17 +88,17 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 
 	for (int i = 0; i < 8; i++)
 	{
-		int channel_state = (data & (1 << i));
-		int old_channel_state = (m_soundreg16_0[offset] & (1 << i));
-		if (channel_state != old_channel_state)
+		int voice_state = (data & (1 << i));
+		int old_voice_state = (m_soundreg16_0[offset] & (1 << i));
+		if (voice_state != old_voice_state)
 		{
-			if (channel_state)
+			if (voice_state)
 			{
-				int channel = (offset * 8 + i);
+				int voice = (offset * 8 + i);
 
-				LOG("channel %d 0->1 ", channel);
+				LOG("voice %d 0->1 ", voice);
 
-				uint16_t memorybase = ((m_sound_regbase & 0x3f) << 8) | (channel * 0x10);
+				uint16_t memorybase = ((m_sound_regbase & 0x3f) << 8) | (voice * 0x10);
 
 				uint16_t param1 = (m_mainram[memorybase + 0x1] << 8) | (m_mainram[memorybase + 0x0]); // sample rate maybe?
 				uint16_t param2 = (m_mainram[memorybase + 0x3] << 8) | (m_mainram[memorybase + 0x2]); // seems to be a start position
@@ -127,7 +133,7 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 
 }
 
-/* 75f0, 75f1 - 2x8 bits (16 channels?) */
+/* 75f0, 75f1 - 2x8 bits (16 voices?) */
 READ8_MEMBER(xavix_state::sound_reg16_1_r)
 {
 	LOG("%s: sound_reg16_1_r %02x\n", machine().describe_context(), offset);
@@ -145,7 +151,7 @@ WRITE8_MEMBER(xavix_state::sound_reg16_1_w)
 }
 
 
-/* 75f4, 75f5 - 2x8 bits (16 channels?) status? */
+/* 75f4, 75f5 - 2x8 bits (16 voices?) status? */
 READ8_MEMBER(xavix_state::sound_sta16_r)
 {
 	// used with 75f0/75f1
@@ -170,7 +176,7 @@ WRITE8_MEMBER(xavix_state::sound_volume_w)
 WRITE8_MEMBER(xavix_state::sound_regbase_w)
 {
 	// this is the upper 6 bits of the RAM address where the actual sound register sets are
-	// (16x16 regs, so complete 0x100 bytes of RAM eg 0x3b means the complete 0x3b00 - 0x3bff range with 0x3b00 - 0x3b0f being channel 1 etc)
+	// (16x16 regs, so complete 0x100 bytes of RAM eg 0x3b means the complete 0x3b00 - 0x3bff range with 0x3b00 - 0x3b0f being voice 1 etc)
 	m_sound_regbase = data;
 	LOG("%s: sound_regbase_w %02x (sound regs are at 0x%02x00 to 0x%02xff)\n", machine().describe_context(), data, m_sound_regbase & 0x3f, m_sound_regbase & 0x3f);
 }
@@ -272,7 +278,7 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 		m_sound_irqstatus &= ~data & 0xf0;
 	}
 
-	m_sound_irqstatus = data & 0x0f; // look like IRQ enable flags - 4 sources? channels? timers?
+	m_sound_irqstatus = data & 0x0f; // look like IRQ enable flags - 4 sources? voices? timers?
 
 	LOG("%s: sound_irqstatus_w %02x\n", machine().describe_context(), data);
 }

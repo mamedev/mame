@@ -865,6 +865,8 @@ void xavix_state::machine_reset()
 	m_ioevent_active = 0x00;
 
 	m_sound_irqstatus = 0x00;
+
+	m_sound_regbase = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
