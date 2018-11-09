@@ -519,8 +519,8 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	/* YM3014B + YM2203C */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4000000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.port_a_write_callback().set_ioport("DSW1");
-	ymsnd.port_b_write_callback().set_ioport("DSW2");
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
