@@ -18,12 +18,14 @@ xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_readregs_cb(*this)
+	, m_readsamples_cb(*this)
 {
 }
 
 void xavix_sound_device::device_start()
 {
 	m_readregs_cb.resolve_safe(0xff);
+	m_readsamples_cb.resolve_safe(0x80);
 
 	m_stream = stream_alloc(0, 1, 8000);
 }
@@ -46,7 +48,13 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 	// loop while we still have samples to generate
 	while (samples-- != 0)
 	{
-		// 
+		for (int v = 0; v < 16; v++)
+		{
+			if (m_voice[v].enabled == true)
+			{
+
+			}
+		}
 	}
 }
 
@@ -78,6 +86,11 @@ void xavix_sound_device::enable_voice(int voice)
 
 
 	LOG(" (possible meanings mode %01x rate %04x address1 %08x address2 %08x address3 %08x address4 %08x)\n", param1 & 0x3, param1 >> 2, address1, address2, address3, address4);
+
+	m_voice[voice].enabled = true;
+
+	m_voice[voice].bank = param4b;
+	m_voice[voice].position = param2; // param3
 
 	// samples appear to be PCM, 0x80 terminated
 }

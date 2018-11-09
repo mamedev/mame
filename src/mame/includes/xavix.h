@@ -24,6 +24,7 @@ public:
 	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto read_regs_callback() { return m_readregs_cb.bind(); }
+	auto read_samples_callback() { return m_readsamples_cb.bind(); }
 
 	void enable_voice(int voice);
 
@@ -40,10 +41,14 @@ private:
 
 	struct xavix_voice {
 		bool enabled;
-		uint32_t position;
+		uint16_t position;
+		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
 	};
 
 	devcb_read8 m_readregs_cb;
+
+	devcb_read8 m_readsamples_cb;
+
 	xavix_voice m_voice[16];
 };
 
@@ -176,6 +181,11 @@ private:
 
 		return 0x00;
 	}
+
+	DECLARE_READ8_MEMBER(sample_read)
+	{
+		return read_full_data_sp_bypass(offset);
+	};
 
 	inline uint8_t read_full_data_sp_bypass(uint32_t adr)
 	{
