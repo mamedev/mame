@@ -36,6 +36,7 @@ void xavix_sound_device::device_reset()
 	{
 		m_voice[v].enabled = false;
 		m_voice[v].position = 0x00;
+		m_voice[v].bank = 0x00;
 	}
 }
 
@@ -45,6 +46,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 
+	int outpos = 0;
 	// loop while we still have samples to generate
 	while (samples-- != 0)
 	{
@@ -52,9 +54,19 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 		{
 			if (m_voice[v].enabled == true)
 			{
+				int8_t sample = m_readsamples_cb((m_voice[v].bank << 16) | m_voice[v].position);
 
+				if ((uint8_t)sample == 0x80)
+				{
+					m_voice[v].enabled = false;
+					break;
+				}
+
+				outputs[0][outpos] += sample * 0x100;
+				m_voice[v].position++;
 			}
 		}
+		outpos++;
 	}
 }
 

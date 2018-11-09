@@ -817,12 +817,13 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
+
+	SPEAKER(config, "mono").front_center();
+
 	XAVIX_SOUND(config, m_sound, MAIN_CLOCK);
 	m_sound->read_regs_callback().set(FUNC(xavix_state::sound_regram_read_cb));
 	m_sound->read_samples_callback().set(FUNC(xavix_state::sample_read));
-
-	SPEAKER(config, "mono").front_center();
-	// sound is PCM
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xavix_i2c_state::xavix_i2c_24lc04)
