@@ -43,6 +43,7 @@ private:
 		bool enabled;
 		uint16_t position;
 		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
+		int type;
 	};
 
 	devcb_read8 m_readregs_cb;

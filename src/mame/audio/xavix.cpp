@@ -54,16 +54,19 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 		{
 			if (m_voice[v].enabled == true)
 			{
-				int8_t sample = m_readsamples_cb((m_voice[v].bank << 16) | m_voice[v].position);
-
-				if ((uint8_t)sample == 0x80)
+				if (m_voice[v].type == 2 || m_voice[v].type == 3)
 				{
-					m_voice[v].enabled = false;
-					break;
-				}
+					int8_t sample = m_readsamples_cb((m_voice[v].bank << 16) | m_voice[v].position);
 
-				outputs[0][outpos] += sample * 0x100;
-				m_voice[v].position++;
+					if ((uint8_t)sample == 0x80)
+					{
+						m_voice[v].enabled = false;
+						break;
+					}
+
+					outputs[0][outpos] += sample * 0x10;
+					m_voice[v].position++;
+				}
 			}
 		}
 		outpos++;
@@ -103,6 +106,8 @@ void xavix_sound_device::enable_voice(int voice)
 
 	m_voice[voice].bank = param4b;
 	m_voice[voice].position = param2; // param3
+	m_voice[voice].type = param1 & 0x3; 
+	
 
 	// samples appear to be PCM, 0x80 terminated
 }
