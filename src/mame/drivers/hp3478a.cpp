@@ -9,7 +9,7 @@
 *
 * Some of this will probably be applicable to HP 3468A units too.
 *
-* Current status : hahahaaa
+* Current status : compiles, runs (with banking !)
 *
 * the TODO list is longer than the code here
 *
@@ -33,10 +33,10 @@ P22 : !CS for DIPswitch; disp.ISA (for instructions)
 P23 = !OE for RAM ; disp.sync (enable instruction)
 P24 = disp.PWO	(enable)
 P25 = disp.clk2
-
 P26 : address bit12 ! (0x1000) => hardware banking
 P27 : data out thru isol, to analog CPU
-T1 : data in thru isol (opcodes jt1 / jnt1)
+
+T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 */
 
 #include "emu.h"
@@ -44,12 +44,14 @@ T1 : data in thru isol (opcodes jt1 / jnt1)
 
 #include "cpu/mcs48/mcs48.h"
 
+
+
 #define CPU_CLOCK       XTAL(5'856'000)
 
-//XXX
-#undef DEBUG_FIFO
-#undef DEBUG_SERIAL_CB
-#undef DEBUG_PORTS
+#define A12_PIN	P26
+
+//#define DEBUG_PORTS
+#define DEBUG_BANKING
 
 WRITE8_MEMBER( hp3478a_state::port1_w )
 {
@@ -67,7 +69,29 @@ READ8_MEMBER( hp3478a_state::port1_r )
 	return data;
 }
 
+WRITE8_MEMBER( hp3478a_state::p2write )
+{
+#ifdef DEBUG_PORTS
+	logerror("port2 write: %02X\n", data);
+#endif
+
+	/* inefficient ? calls set_entry on every P2 write. Should maybe do "if oldstate != newstate" ? */
+	if (data & A12_PIN) {
+		m_bank0->set_entry(1);
+		#ifdef DEBUG_BANKING
+			logerror("changed to bank1\n");
+		#endif // DEBUG_BANKING
+	} else {
+		m_bank0->set_entry(0);
+		#ifdef DEBUG_BANKING
+			logerror("changed to bank0\n");
+		#endif // DEBUG_BANKING
+	}
+
+}
+
 void hp3478a_state::machine_start() {
+	m_bank0->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
 }
 
 /******************************************************************************
@@ -76,8 +100,8 @@ void hp3478a_state::machine_start() {
 
 void hp3478a_state::i8039_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rom(); /* 27C64 ROM */
-	// AM_RANGE(0x2000, 0x3fff) AM_RAM /* 6164 8k SRAM, not populated */
+	//map(0x0000, 0x0fff).rom(); /* CPU address space : 4kB */
+	map(0x0000, 0x0fff).bankr("bank0");	// CPU address space (4kB), banked according to P26 pin
 }
 
 void hp3478a_state::i8039_io(address_map &map)
@@ -101,6 +125,8 @@ MACHINE_CONFIG_START(hp3478a_state::hp3478a)
 	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
 	MCFG_DEVICE_IO_MAP(i8039_io)
 
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, hp3478a_state, p2write))	//XXX no idea what I'm doing
+
 MACHINE_CONFIG_END
 
 /******************************************************************************
@@ -108,7 +134,7 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 ROM_START( hp3478a )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	//ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(7e65cdf6) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))	//main CPU ROM, can match other datecodes too
+	ROM_LOAD_OPTIONAL("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))	//main CPU ROM, can match other datecodes too
 ROM_END
 
 /******************************************************************************
