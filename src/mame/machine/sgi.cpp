@@ -84,6 +84,10 @@ void sgi_mc_device::device_start()
 	{
 		m_sys_id = 0x11; // rev. B MC, EISA bus present
 	}
+	else
+	{
+		m_sys_id = 0x01; // rev. B MC, no EISA bus
+	}
 
 	m_rpss_timer = timer_alloc(TIMER_RPSS);
 	m_rpss_timer->adjust(attotime::never);

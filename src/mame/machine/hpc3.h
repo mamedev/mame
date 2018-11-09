@@ -76,6 +76,7 @@ protected:
 	struct pbus_dma_t
 	{
 		bool m_active;
+		uint32_t m_buf_ptr;
 		uint32_t m_cur_ptr;
 		uint32_t m_desc_ptr;
 		uint32_t m_desc_flags;
@@ -126,9 +127,6 @@ protected:
 
 	uint32_t m_enetr_nbdp;
 	uint32_t m_enetr_cbp;
-	uint32_t m_unk0;
-	uint32_t m_unk1;
-	uint32_t m_ic_unk0;
 	uint32_t m_scsi0_desc;
 	uint32_t m_scsi0_addr;
 	uint32_t m_scsi0_flags;

@@ -16,7 +16,7 @@
 #define LOG_PBUS4		(1 << 4)
 #define LOG_CHAIN		(1 << 5)
 
-#define VERBOSE		(0)
+#define VERBOSE		(LOG_PBUS_DMA | LOG_PBUS4 | LOG_UNKNOWN | LOG_ETHERNET)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_HPC3, hpc3_device, "hpc3", "SGI HPC3")
@@ -38,9 +38,6 @@ void hpc3_device::device_start()
 	save_item(NAME(m_enetr_nbdp));
 	save_item(NAME(m_enetr_cbp));
 
-	save_item(NAME(m_unk0));
-	save_item(NAME(m_unk1));
-	save_item(NAME(m_ic_unk0));
 	save_item(NAME(m_scsi0_desc));
 	save_item(NAME(m_scsi0_addr));
 	save_item(NAME(m_scsi0_flags));
@@ -52,6 +49,7 @@ void hpc3_device::device_start()
 	for (uint32_t i = 0; i < 8; i++)
 	{
 		save_item(NAME(m_pbus_dma[i].m_active), i);
+		save_item(NAME(m_pbus_dma[i].m_buf_ptr), i);
 		save_item(NAME(m_pbus_dma[i].m_cur_ptr), i);
 		save_item(NAME(m_pbus_dma[i].m_desc_ptr), i);
 		save_item(NAME(m_pbus_dma[i].m_desc_flags), i);
@@ -69,10 +67,6 @@ void hpc3_device::device_reset()
 	m_enetr_nbdp = 0x80000000;
 	m_enetr_cbp = 0x80000000;
 
-	m_unk0 = 0;
-	m_unk1 = 0;
-	m_ic_unk0 = 0;
-
 	m_scsi0_desc = 0;
 	m_scsi0_addr = 0;
 	m_scsi0_flags = 0;
@@ -84,6 +78,7 @@ void hpc3_device::device_reset()
 	{
 		m_pbus_dma[i].m_active = 0;
 		m_pbus_dma[i].m_cur_ptr = 0;
+		m_pbus_dma[i].m_buf_ptr = 0;
 		m_pbus_dma[i].m_desc_ptr = 0;
 		m_pbus_dma[i].m_desc_flags = 0;
 		m_pbus_dma[i].m_next_ptr = 0;
@@ -168,19 +163,19 @@ READ32_MEMBER(hpc3_device::hd_enet_r)
 	switch (offset)
 	{
 	case 0x0004/4:
-		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI0DESC Read: %08x (%08x): %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), mem_mask, m_scsi0_desc);
+		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI0 Desc Address Read: %08x & %08x\n", machine().describe_context(), m_scsi0_desc, mem_mask);
 		return m_scsi0_desc;
 	case 0x1004/4:
-		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI0DMACTRL Read: %08x (%08x): %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), mem_mask, m_scsi0_dma_ctrl);
+		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI0 DMA Control Read: %08x & %08x\n", machine().describe_context(), m_scsi0_dma_ctrl, mem_mask);
 		return m_scsi0_dma_ctrl;
 	case 0x4000/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 ENETR CBP Read: %08x (%08x): %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), mem_mask, m_enetr_nbdp);
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet CBP Read: %08x & %08x\n", machine().describe_context(), m_enetr_nbdp, mem_mask);
 		return m_enetr_cbp;
 	case 0x4004/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 ENETR NBDP Read: %08x (%08x): %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), mem_mask, m_enetr_nbdp);
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet NBDP Read: %08x & %08x\n", machine().describe_context(), m_enetr_nbdp, mem_mask);
 		return m_enetr_nbdp;
 	default:
-		LOGMASKED(LOG_UNKNOWN, "%s: Unknown HPC3 ENET/HDx Read: %08x (%08x)\n", machine().describe_context(), 0x1fb90000 + (offset << 2), mem_mask);
+		LOGMASKED(LOG_UNKNOWN, "%s: Unknown HPC3 ENET/HDx Read: %08x & %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), mem_mask);
 		return 0;
 	}
 }
@@ -190,23 +185,23 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 	switch (offset)
 	{
 	case 0x0004/4:
-		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI0DESC Write: %08x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI0 Desc Address Write: %08x\n", machine().describe_context(), data);
 		m_scsi0_desc = data;
 		break;
 	case 0x1004/4:
-		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI0DMACTRL Write: %08x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI0 DMA Control Write: %08x\n", machine().describe_context(), data);
 		m_scsi0_dma_ctrl = data;
 		break;
 	case 0x4000/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 ENETR CBP Write: %08x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet CBP Write: %08x\n", machine().describe_context(), data);
 		m_enetr_cbp = data;
 		break;
 	case 0x4004/4:
-		LOGMASKED(LOG_ETHERNET, "%s: HPC3 ENETR NBDP Write: %08x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet NBDP Write: %08x\n", machine().describe_context(), data);
 		m_enetr_nbdp = data;
 		break;
 	default:
-		LOGMASKED(LOG_UNKNOWN, "%s: Unknown HPC3 ENET/HDx write: %08x (%08x): %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), mem_mask, data);
+		LOGMASKED(LOG_UNKNOWN, "%s: Unknown HPC3 ENET/HDx write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fb90000 + (offset << 2), data, mem_mask);
 		break;
 	}
 }
@@ -275,21 +270,58 @@ template DECLARE_WRITE32_MEMBER(hpc3_device::hd_w<1>);
 
 READ32_MEMBER(hpc3_device::pbus4_r)
 {
+	uint32_t ret = 0;
 	switch (offset)
 	{
+	case 0x0000/4:
+		ret = m_ioc2->get_local0_int_status();
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local0 Interrupt Status Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
 	case 0x0004/4:
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PBUS4 Unknown 0 Read: (%08x): %08x\n", machine().describe_context(), mem_mask, m_unk0);
-		return m_unk0;
+		ret = m_ioc2->get_local0_int_mask();
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local0 Interrupt Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
+	case 0x0008/4:
+		ret = m_ioc2->get_local1_int_status();
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local1 Interrupt Status Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
 	case 0x000c/4:
-		LOGMASKED(LOG_PBUS4, "%s: Interrupt Controller(?) Read: (%08x): %08x\n", machine().describe_context(), mem_mask, m_ic_unk0);
-		return m_ic_unk0;
+		ret = m_ioc2->get_local1_int_mask();
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local1 Interrupt Mask Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
+	case 0x0010/4:
+		ret = m_ioc2->get_map_int_status();
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mappable Interrupt Status: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
 	case 0x0014/4:
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PBUS4 Unknown 1 Read: (%08x): %08x\n", machine().describe_context(), mem_mask, m_unk1);
-		return m_unk1;
+		ret = m_ioc2->get_map0_int_mask();
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
+	case 0x0018/4:
+		ret = m_ioc2->get_map1_int_mask();
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
+	case 0x0030/4:
+		ret = m_ioc2->get_pit_reg(0);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 0 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
+	case 0x0034/4:
+		ret = m_ioc2->get_pit_reg(1);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 1 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
+	case 0x0038/4:
+		ret = m_ioc2->get_pit_reg(2);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 2 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
+	case 0x003c/4:
+		ret = m_ioc2->get_pit_reg(3);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Control Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+		break;
 	default:
 		LOGMASKED(LOG_PBUS4 | LOG_UNKNOWN, "%s: Unknown HPC3 PBUS4 Read: %08x (%08x)\n", machine().describe_context(), 0x1fbd9000 + (offset << 2), mem_mask);
-		return 0;
+		break;
 	}
+	return ret;
 }
 
 WRITE32_MEMBER(hpc3_device::pbus4_w)
@@ -297,16 +329,40 @@ WRITE32_MEMBER(hpc3_device::pbus4_w)
 	switch (offset)
 	{
 	case 0x0004/4:
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PBUS4 Unknown 0 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_unk0 = data;
+		m_ioc2->set_local0_int_mask(data);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local0 Interrupt Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x000c/4:
-		LOGMASKED(LOG_PBUS4, "%s: Interrupt Controller(?) Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_ic_unk0 = data;
+		m_ioc2->set_local1_int_mask(data);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Local1 Interrupt Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x0014/4:
-		LOGMASKED(LOG_PBUS4, "%s: HPC3 PBUS4 Unknown 1 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_unk1 = data;
+		m_ioc2->set_map0_int_mask(data);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 0 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case 0x0018/4:
+		m_ioc2->set_map1_int_mask(data);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Mapped Interrupt 1 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case 0x0020/4:
+		m_ioc2->set_timer_int_clear(data);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 INT3 Timer Interrupt Clear Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case 0x0030/4:
+		m_ioc2->set_pit_reg(0, (uint8_t)data);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 0 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case 0x0034/4:
+		m_ioc2->set_pit_reg(1, (uint8_t)data);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 1 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case 0x0038/4:
+		m_ioc2->set_pit_reg(2, (uint8_t)data);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Counter 2 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case 0x003c/4:
+		m_ioc2->set_pit_reg(3, (uint8_t)data);
+		LOGMASKED(LOG_PBUS4, "%s: HPC3 PIT Control Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	default:
 		LOGMASKED(LOG_PBUS4 | LOG_UNKNOWN, "%s: Unknown HPC3 PBUS4 Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd9000 + (offset << 2), data, mem_mask);
@@ -318,7 +374,28 @@ READ32_MEMBER(hpc3_device::pbusdma_r)
 {
 	uint32_t channel = offset / (0x2000/4);
 	LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Read: %08x & %08x\n", machine().describe_context(), channel, 0x1fb80000 + offset*4, mem_mask);
-	return 0;
+	pbus_dma_t &dma = m_pbus_dma[channel];
+
+	uint32_t ret = 0;
+	switch (offset & 0x07ff)
+	{
+	case 0x0000/4:
+		ret = dma.m_buf_ptr;
+		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Buffer Pointer Read: %08x & %08x\n", machine().describe_context(), channel, ret, mem_mask);
+		break;
+	case 0x0004/4:
+		ret = dma.m_desc_ptr;
+		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Descriptor Pointer Read: %08x & %08x\n", machine().describe_context(), channel, ret, mem_mask);
+		break;
+	case 0x1000/4:
+		ret = (dma.m_timer->remaining() != attotime::never) ? 2 : 0;
+		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Control Read: %08x & %08x\n", machine().describe_context(), channel, ret, mem_mask);
+		break;
+	default:
+		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Unknown Read: %08x & %08x\n", machine().describe_context(), channel, 0x1fb80000 + (offset << 2), mem_mask);
+		break;
+	}
+	return ret;
 }
 
 WRITE32_MEMBER(hpc3_device::pbusdma_w)
@@ -330,6 +407,7 @@ WRITE32_MEMBER(hpc3_device::pbusdma_w)
 	{
 	case 0x0000/4:
 		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Buffer Pointer Write: %08x\n", machine().describe_context(), channel, data);
+		dma.m_buf_ptr = data;
 		break;
 	case 0x0004/4:
 		LOGMASKED(LOG_PBUS_DMA, "%s: PBUS DMA Channel %d Descriptor Pointer Write: %08x\n", machine().describe_context(), channel, data);

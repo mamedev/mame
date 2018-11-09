@@ -75,6 +75,7 @@ void ioc2_device::device_add_mconfig(machine_config &config)
 	m_scc->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtrb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_rts));
+	m_scc->out_int_callback().set(FUNC(ioc2_device::duart_int_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
 	rs232a.cts_handler().set(m_scc, FUNC(scc85230_device::ctsa_w));
@@ -91,6 +92,7 @@ void ioc2_device::device_add_mconfig(machine_config &config)
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
 	m_kbdc->system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	m_kbdc->input_buffer_full_callback().set(FUNC(ioc2_device::kbdc_int_w));
 
 	PIT8254(config, m_pit, 0);
 	m_pit->set_clk<0>(1000000);
@@ -162,7 +164,7 @@ void ioc2_device::device_reset()
 
 	m_gen_ctrl_select_reg = 0;
 	m_gen_ctrl_reg = 0;
-	m_front_panel_reg = FRONT_PANEL_POWER_STATE;
+	m_front_panel_reg = FRONT_PANEL_VOL_UP_HOLD | FRONT_PANEL_VOL_DOWN_HOLD | FRONT_PANEL_POWER_STATE;
 
 	m_read_reg = 0;
 	m_dma_sel = 0;
@@ -183,23 +185,25 @@ void ioc2_device::device_reset()
 void ioc2_device::raise_local0_irq(uint8_t source_mask)
 {
 	m_int3_local0_status_reg |= source_mask;
-	m_maincpu->set_input_line(MIPS3_IRQ0, (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(MIPS3_IRQ0, (m_int3_local0_mask_reg & m_int3_local0_status_reg) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void ioc2_device::lower_local0_irq(uint8_t source_mask)
 {
 	m_int3_local0_status_reg &= ~source_mask;
+	m_maincpu->set_input_line(MIPS3_IRQ0, (m_int3_local0_mask_reg & m_int3_local0_status_reg) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void ioc2_device::raise_local1_irq(uint8_t source_mask)
 {
 	m_int3_local1_status_reg |= source_mask;
-	m_maincpu->set_input_line(MIPS3_IRQ1, (m_int3_local1_mask_reg & m_int3_local1_status_reg) != 0 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(MIPS3_IRQ1, (m_int3_local1_mask_reg & m_int3_local1_status_reg) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void ioc2_device::lower_local1_irq(uint8_t source_mask)
 {
 	m_int3_local1_status_reg &= ~source_mask;
+	m_maincpu->set_input_line(MIPS3_IRQ1, (m_int3_local1_mask_reg & m_int3_local1_status_reg) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(ioc2_device::timer0_int)
@@ -210,6 +214,34 @@ WRITE_LINE_MEMBER(ioc2_device::timer0_int)
 WRITE_LINE_MEMBER(ioc2_device::timer1_int)
 {
 	m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::kbdc_int_w)
+{
+	set_mappable_int(0x10, state);
+}
+
+WRITE_LINE_MEMBER(ioc2_device::duart_int_w)
+{
+	set_mappable_int(0x20, state);
+}
+
+void ioc2_device::set_mappable_int(uint8_t mask, bool state)
+{
+	if (state)
+		m_int3_map_status_reg |= mask;
+	else
+		m_int3_map_status_reg &= ~mask;
+
+	if (m_int3_map_mask0_reg & m_int3_map_status_reg)
+		raise_local0_irq(INT3_LOCAL0_MAPPABLE0);
+	else
+		lower_local0_irq(INT3_LOCAL0_MAPPABLE0);
+
+	if (m_int3_map_mask1_reg & m_int3_map_status_reg)
+		raise_local1_irq(INT3_LOCAL1_MAPPABLE1);
+	else
+		lower_local1_irq(INT3_LOCAL1_MAPPABLE1);
 }
 
 READ32_MEMBER(ioc2_device::read)
@@ -400,25 +432,25 @@ READ32_MEMBER(ioc2_device::read)
 
 		case TIMER_COUNT0_REG:
 		{
-			const uint8_t data = m_pit->read(offset - TIMER_COUNT0_REG);
+			const uint8_t data = m_pit->read(0);
 			LOGMASKED(LOG_PIT, "%s: Read Timer Count0 Register: %02x\n", machine().describe_context(), data);
 			return data;
 		}
 		case TIMER_COUNT1_REG:
 		{
-			const uint8_t data = m_pit->read(offset - TIMER_COUNT0_REG);
+			const uint8_t data = m_pit->read(1);
 			LOGMASKED(LOG_PIT, "%s: Read Timer Count1 Register: %02x\n", machine().describe_context(), data);
 			return data;
 		}
 		case TIMER_COUNT2_REG:
 		{
-			const uint8_t data = m_pit->read(offset - TIMER_COUNT0_REG);
+			const uint8_t data = m_pit->read(2);
 			LOGMASKED(LOG_PIT, "%s: Read Timer Count2 Register: %02x\n", machine().describe_context(), data);
 			return data;
 		}
 		case TIMER_CONTROL_REG:
 		{
-			const uint8_t data = m_pit->read(offset - TIMER_COUNT0_REG);
+			const uint8_t data = m_pit->read(3);
 			LOGMASKED(LOG_PIT, "%s: Read Timer Control Register: %02x\n", machine().describe_context(), data);
 			return data;
 		}
@@ -433,15 +465,15 @@ WRITE32_MEMBER( ioc2_device::write )
 	{
 		case PI1_DATA_REG:
 			LOGMASKED(LOG_PI1, "%s: Write PI1 Data Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pi1->write(space, offset, data & 0xff, 0xff);
+			m_pi1->write(space, offset, (uint8_t)data);
 			return;
 		case PI1_CTRL_REG:
 			LOGMASKED(LOG_PI1, "%s: Write PI1 Control Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pi1->write(space, offset, data & 0xff, 0xff);
+			m_pi1->write(space, offset, (uint8_t)data);
 			return;
 		case PI1_STATUS_REG:
 			LOGMASKED(LOG_PI1, "%s: Write PI1 Status Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pi1->write(space, offset, data & 0xff, 0xff);
+			m_pi1->write(space, offset, (uint8_t)data);
 			return;
 
 		case PI1_DMA_CTRL_REG:
@@ -495,6 +527,8 @@ WRITE32_MEMBER( ioc2_device::write )
 		case PANEL_REG:
 			LOGMASKED(LOG_PANEL, "%s: Write Front Panel Register: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_front_panel_reg &= ~(data & (FRONT_PANEL_VOL_UP_INT | FRONT_PANEL_VOL_DOWN_INT | FRONT_PANEL_POWER_BUTTON_INT));
+			if (!(m_front_panel_reg & FRONT_PANEL_INT_MASK))
+				lower_local1_irq(INT3_LOCAL1_PANEL);
 			return;
 
 		case DMA_SEL_REG:
@@ -541,43 +575,27 @@ WRITE32_MEMBER( ioc2_device::write )
 		case INT3_LOCAL0_MASK_REG:
 		{
 			LOGMASKED(LOG_INT3, "%s: Write Interrupt Local0 Mask Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			uint8_t old = m_int3_local0_mask_reg;
-			m_int3_local0_mask_reg = data;
-			bool old_line = (old & m_int3_local0_status_reg) != 0;
-			bool new_line = (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0;
-			if (old_line != new_line)
-			{
-				const uint32_t int_bits = (m_int3_local1_mask_reg & m_int3_local1_status_reg) | (m_int3_local0_mask_reg & m_int3_local0_status_reg);
-				m_maincpu->set_input_line(MIPS3_IRQ0, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
-			}
+			set_local0_int_mask(data);
 			return;
 		}
 
 		case INT3_LOCAL1_MASK_REG:
 		{
 			LOGMASKED(LOG_INT3, "%s: Write Interrupt Local1 Mask Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			uint8_t old = m_int3_local1_mask_reg;
-			m_int3_local1_mask_reg = data;
-			bool old_line = (old & m_int3_local1_status_reg) != 0;
-			bool new_line = (m_int3_local1_mask_reg & m_int3_local1_status_reg) != 0;
-			if (old_line != new_line)
-			{
-				const uint32_t int_bits = (m_int3_local1_mask_reg & m_int3_local1_status_reg) | (m_int3_local0_mask_reg & m_int3_local0_status_reg);
-				m_maincpu->set_input_line(MIPS3_IRQ0, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
-			}
+			set_local1_int_mask(data);
 			return;
 		}
 
 		case INT3_MAP_MASK0_REG:
 			// TODO: Implement mappable interrupts
 			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Mask0 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_int3_map_mask0_reg = data;
+			set_map0_int_mask(data);
 			return;
 
 		case INT3_MAP_MASK1_REG:
 			// TODO: Implement mappable interrupts
 			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Mask1 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_int3_map_mask1_reg = data;
+			set_map1_int_mask(data);
 			return;
 
 		case INT3_MAP_POLARITY_REG:
@@ -589,44 +607,92 @@ WRITE32_MEMBER( ioc2_device::write )
 		case INT3_TIMER_CLEAR_REG:
 		{
 			LOGMASKED(LOG_INT3, "%s: Write Interrupt Timer Clear Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			if (BIT(data, 0))
-				m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
-			if (BIT(data, 1))
-				m_maincpu->set_input_line(MIPS3_IRQ3, CLEAR_LINE);
+			set_timer_int_clear(data);
 			return;
 		}
 
 		case TIMER_COUNT0_REG:
 			LOGMASKED(LOG_PIT, "%s: Write Timer Count0 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pit->write(offset - TIMER_COUNT0_REG, data & 0xff);
+			m_pit->write(0, (uint8_t)data);
 			return;
 		case TIMER_COUNT1_REG:
 			LOGMASKED(LOG_PIT, "%s: Write Timer Count1 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pit->write(offset - TIMER_COUNT0_REG, data & 0xff);
+			m_pit->write(1, (uint8_t)data);
 			return;
 		case TIMER_COUNT2_REG:
 			LOGMASKED(LOG_PIT, "%s: Write Timer Count2 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pit->write(offset - TIMER_COUNT0_REG, data & 0xff);
+			m_pit->write(2, (uint8_t)data);
 			return;
 		case TIMER_CONTROL_REG:
 			LOGMASKED(LOG_PIT, "%s: Write Timer Control Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			m_pit->write(offset - TIMER_COUNT0_REG, data & 0xff);
+			m_pit->write(3, (uint8_t)data);
 			return;
 	}
+}
+
+void ioc2_device::set_local0_int_mask(uint32_t data)
+{
+	uint8_t old = m_int3_local0_mask_reg;
+	m_int3_local0_mask_reg = (uint8_t)data;
+	bool old_line = (old & m_int3_local0_status_reg) != 0;
+	bool new_line = (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0;
+	if (old_line != new_line)
+	{
+		const uint32_t int_bits = (m_int3_local1_mask_reg & m_int3_local1_status_reg) | (m_int3_local0_mask_reg & m_int3_local0_status_reg);
+		m_maincpu->set_input_line(MIPS3_IRQ0, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+void ioc2_device::set_local1_int_mask(uint32_t data)
+{
+	uint8_t old = m_int3_local1_mask_reg;
+	m_int3_local1_mask_reg = (uint8_t)data;
+	bool old_line = (old & m_int3_local1_status_reg) != 0;
+	bool new_line = (m_int3_local1_mask_reg & m_int3_local1_status_reg) != 0;
+	if (old_line != new_line)
+	{
+		const uint32_t int_bits = (m_int3_local1_mask_reg & m_int3_local1_status_reg) | (m_int3_local0_mask_reg & m_int3_local0_status_reg);
+		m_maincpu->set_input_line(MIPS3_IRQ0, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+void ioc2_device::set_map0_int_mask(uint32_t data)
+{
+	m_int3_map_mask0_reg = (uint8_t)data;
+}
+
+void ioc2_device::set_map1_int_mask(uint32_t data)
+{
+	m_int3_map_mask1_reg = (uint8_t)data;
+}
+
+void ioc2_device::set_timer_int_clear(uint32_t data)
+{
+	if (BIT(data, 0))
+		m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
+	if (BIT(data, 1))
+		m_maincpu->set_input_line(MIPS3_IRQ3, CLEAR_LINE);
 }
 
 void ioc2_device::handle_reset_reg_write(uint8_t data)
 {
 	// guinness/fullhouse-specific implementations can handle bit 3 being used for ISDN reset on Indy only and bit 2 for EISA reset on Indigo 2 only, but for now we do nothing with it
-	m_reset_reg = data;
+	if (BIT(data, 1))
+	{
+		m_kbdc->reset();
+	}
+	m_reset_reg = 0;
 }
 
 INPUT_CHANGED_MEMBER( ioc2_device::power_button )
 {
 	if (!newval)
-	{
 		m_front_panel_reg |= FRONT_PANEL_POWER_BUTTON_INT;
-	}
+	else
+		m_front_panel_reg &= ~FRONT_PANEL_POWER_BUTTON_INT;
+
+	if (m_front_panel_reg & FRONT_PANEL_INT_MASK)
+		raise_local1_irq(INT3_LOCAL1_PANEL);
 }
 
 INPUT_CHANGED_MEMBER( ioc2_device::volume_up )
@@ -634,12 +700,15 @@ INPUT_CHANGED_MEMBER( ioc2_device::volume_up )
 	if (!newval)
 	{
 		m_front_panel_reg |= FRONT_PANEL_VOL_UP_INT;
-		m_front_panel_reg |= FRONT_PANEL_VOL_UP_HOLD;
+		m_front_panel_reg &= ~FRONT_PANEL_VOL_UP_HOLD;
 	}
 	else
 	{
-		m_front_panel_reg &= ~FRONT_PANEL_VOL_UP_HOLD;
+		m_front_panel_reg |= FRONT_PANEL_VOL_UP_HOLD;
 	}
+
+	if (m_front_panel_reg & FRONT_PANEL_INT_MASK)
+		raise_local1_irq(INT3_LOCAL1_PANEL);
 }
 
 INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
@@ -647,10 +716,13 @@ INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
 	if (!newval)
 	{
 		m_front_panel_reg |= FRONT_PANEL_VOL_DOWN_INT;
-		m_front_panel_reg |= FRONT_PANEL_VOL_DOWN_HOLD;
+		m_front_panel_reg &= ~FRONT_PANEL_VOL_DOWN_HOLD;
 	}
 	else
 	{
-		m_front_panel_reg &= ~FRONT_PANEL_VOL_DOWN_HOLD;
+		m_front_panel_reg |= FRONT_PANEL_VOL_DOWN_HOLD;
 	}
+
+	if (m_front_panel_reg & FRONT_PANEL_INT_MASK)
+		raise_local1_irq(INT3_LOCAL1_PANEL);
 }

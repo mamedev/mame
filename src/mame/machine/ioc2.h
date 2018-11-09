@@ -59,6 +59,23 @@ public:
 		INT3_LOCAL1_RETRACE   = 0x80,
 	};
 
+	uint32_t get_local0_int_status() const { return m_int3_local0_status_reg; }
+	uint32_t get_local0_int_mask() const { return m_int3_local0_mask_reg; }
+	uint32_t get_local1_int_status() const { return m_int3_local1_status_reg; }
+	uint32_t get_local1_int_mask() const { return m_int3_local1_mask_reg; }
+	uint32_t get_map_int_status() const { return m_int3_map_status_reg; }
+	uint32_t get_map0_int_mask() const { return m_int3_map_mask0_reg; }
+	uint32_t get_map1_int_mask() const { return m_int3_map_mask1_reg; }
+
+	void set_local0_int_mask(const uint32_t data);
+	void set_local1_int_mask(const uint32_t data);
+	void set_map0_int_mask(const uint32_t data);
+	void set_map1_int_mask(const uint32_t data);
+	void set_timer_int_clear(const uint32_t data);
+
+	uint8_t get_pit_reg(uint32_t offset) { return m_pit->read(offset); }
+	void set_pit_reg(uint32_t offset, uint8_t data) { return m_pit->write(offset, data); }
+
 protected:
 	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -69,6 +86,10 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(timer0_int);
 	DECLARE_WRITE_LINE_MEMBER(timer1_int);
+	DECLARE_WRITE_LINE_MEMBER(kbdc_int_w);
+	DECLARE_WRITE_LINE_MEMBER(duart_int_w);
+
+	void set_mappable_int(uint8_t mask, bool state);
 
 	enum
 	{
@@ -126,6 +147,10 @@ protected:
 		FRONT_PANEL_VOL_DOWN_HOLD    = 0x20,
 		FRONT_PANEL_VOL_UP_INT       = 0x40,
 		FRONT_PANEL_VOL_UP_HOLD      = 0x80,
+
+		FRONT_PANEL_INT_MASK         = FRONT_PANEL_POWER_BUTTON_INT |
+                                       FRONT_PANEL_VOL_DOWN_INT |
+                                       FRONT_PANEL_VOL_UP_INT
 	};
 
 	enum
