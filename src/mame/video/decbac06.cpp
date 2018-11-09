@@ -3,20 +3,20 @@
 /*
  Deco BAC06 tilemap generator:
 
- this a direct relative of the later chip implemented in deco16ic.c
+ this a direct relative of the later chip implemented in deco16ic.cpp
  we could implement this as either an 8-bit or a 16-bit chip, for now
- I'm using the 16-bit implementation from dec0.c
+ I'm using the 16-bit implementation from dec0.cpp
 
  used by:
 
- actfancr.c
- dec0.c
- dec8.c (oscar, cobracom, ghostb)
- madmotor.c
- stadhero.c
- pcktgal.c
+ actfancr.cpp
+ dec0.cpp
+ dec8.cpp (oscar, cobracom, ghostb)
+ madmotor.cpp
+ stadhero.cpp
+ pcktgal.cpp
 
- Notes (from dec0.c)
+ Notes (from dec0.cpp)
 
  All games contain three BAC06 background generator chips, usual (software)
 configuration is 2 chips of 16*16 tiles, 1 of 8*8.
@@ -82,8 +82,10 @@ deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *
 	, m_gfxregion8x8(0)
 	, m_gfxregion16x16(0)
 	, m_wide(0)
-	, m_bppmult(0)
-	, m_bppmask(0)
+	, m_bppmult_8x8(0)
+	, m_bppmask_8x8(0)
+	, m_bppmult_16x16(0)
+	, m_bppmask_16x16(0)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	for (int i = 0; i < 8; i++)
@@ -105,8 +107,12 @@ void deco_bac06_device::device_start()
 	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);
 	m_gfxcolmask = 0x0f;
 
-	m_bppmult = 0x10;
-	m_bppmask = 0x0f;
+	m_bppmult_8x8 = m_gfxdecode->gfx(m_gfxregion8x8)->granularity();
+	m_bppmask_8x8 = m_gfxdecode->gfx(m_gfxregion8x8)->depth() - 1;
+
+	m_bppmult_16x16 = m_gfxdecode->gfx(m_gfxregion16x16)->granularity();
+	m_bppmask_16x16 = m_gfxdecode->gfx(m_gfxregion16x16)->depth() - 1;
+
 	m_rambank = 0;
 	m_flip_screen = false;
 
@@ -190,28 +196,27 @@ void deco_bac06_device::create_tilemaps(int region8x8, int region16x16)
 	m_tile_region_8 = region8x8;
 	m_tile_region_16 = region16x16;
 
-	m_pf8x8_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_8x8_scan),this), 8, 8,128, 32);
-	m_pf8x8_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_8x8_scan),this), 8, 8, 64, 64);
-	m_pf8x8_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_8x8_scan),this), 8, 8, 32,128);
-
+	m_pf8x8_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_8x8_scan),this), 8, 8, 128,  32);
+	m_pf8x8_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_8x8_scan),this), 8, 8,  64,  64);
+	m_pf8x8_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_8x8_scan),this), 8, 8,  32, 128);
 
 	if (m_wide==2)
 	{
 		m_pf16x16_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this), 16, 16, 256, 16);
-		m_pf16x16_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this),  16, 16,  128, 32);
-		m_pf16x16_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this),  16, 16,  64, 64);
+		m_pf16x16_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this), 16, 16, 128, 32);
+		m_pf16x16_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this), 16, 16,  64, 64);
 	}
 	else if (m_wide==1)
 	{
 		m_pf16x16_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this), 16, 16, 128, 16);
-		m_pf16x16_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this),  16, 16,  64, 32);
-		m_pf16x16_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this),  16, 16,  32, 64);
+		m_pf16x16_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this), 16, 16,  64, 32);
+		m_pf16x16_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this), 16, 16,  32, 64);
 	}
 	else
 	{
-		m_pf16x16_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this),    16,16, 64, 16);
-		m_pf16x16_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this),    16,16, 32, 32);
-		m_pf16x16_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this),    16,16, 16, 64);
+		m_pf16x16_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this), 16,16, 64, 16);
+		m_pf16x16_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this), 16,16, 32, 32);
+		m_pf16x16_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this), 16,16, 16, 64);
 	}
 }
 
@@ -226,7 +231,9 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 								uint16_t penmask,
 								uint16_t pencondition,
 								uint16_t colprimask,
-								uint16_t colpricondition
+								uint16_t colpricondition,
+								uint8_t bppmult,
+								uint8_t bppmask
 								)
 {
 	const bitmap_ind16 &src_bitmap = tilemap_ptr->pixmap();
@@ -282,7 +289,8 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 	else
 		src_y = scrolly;
 
-	for (y=0; y<=cliprect.bottom(); y++) {
+	src_y += cliprect.top();
+	for (y=cliprect.top(); y<=cliprect.bottom(); y++) {
 		if (row_scroll_enabled)
 			src_x=scrollx + rowscroll_ptr[(src_y >> (control1[3]&0xf))&(0x1ff>>(control1[3]&0xf))];
 		else
@@ -291,7 +299,8 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 		if (m_flip_screen)
 			src_x=(src_bitmap.width() - 256) - src_x;
 
-		for (x=0; x<=cliprect.right(); x++) {
+		src_x += cliprect.left();
+		for (x=cliprect.left(); x<=cliprect.right(); x++) {
 			if (col_scroll_enabled)
 				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2]&0xf))&(0x3f>>(control1[2]&0xf))];
 
@@ -299,11 +308,11 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 			colpri =  flags_bitmap.pix8((src_y + column_offset)&height_mask, src_x&width_mask)&0xf;
 
 			src_x++;
-			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&m_bppmask))
+			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&bppmask))
 			{
 				if ((p&penmask)==pencondition)
 					if((colpri&colprimask)==colpricondition)
-						bitmap.pix16(y, x) = p+(colpri&m_gfxcolmask)*m_bppmult;
+						bitmap.pix16(y, x) = p+(colpri&m_gfxcolmask)*bppmult;
 			}
 		}
 		src_y++;
@@ -313,6 +322,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,uint16_t penmask, uint16_t pencondition,uint16_t colprimask, uint16_t colpricondition)
 {
 	tilemap_t* tm = nullptr;
+	uint8_t bppmult = 0, bppmask = 0;
 
 	int tm_dimensions = m_pf_control_0[3] & 0x3;
 	if (tm_dimensions == 3) tm_dimensions = 1; // 3 is invalid / the same as 1?
@@ -322,10 +332,14 @@ void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle 
 		if (m_supports_8x8)
 		{
 			tm = m_pf8x8_tilemap[tm_dimensions];
+			bppmult = m_bppmult_8x8;
+			bppmask = m_bppmask_8x8;
 		}
 		else if (m_supports_16x16)
 		{
 			tm = m_pf16x16_tilemap[tm_dimensions];
+			bppmult = m_bppmult_16x16;
+			bppmask = m_bppmask_16x16;
 		}
 	}
 	else // 16x16 tiles mode is selected
@@ -333,15 +347,19 @@ void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle 
 		if (m_supports_16x16)
 		{
 			tm = m_pf16x16_tilemap[tm_dimensions];
+			bppmult = m_bppmult_16x16;
+			bppmask = m_bppmask_16x16;
 		}
 		else if (m_supports_8x8)
 		{
 			tm = m_pf8x8_tilemap[tm_dimensions];
+			bppmult = m_bppmult_8x8;
+			bppmask = m_bppmask_8x8;
 		}
 	}
 
 	if (tm)
-		custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
+		custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition, bppmult, bppmask);
 
 }
 
@@ -349,15 +367,26 @@ void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle 
 void deco_bac06_device::deco_bac06_pf_draw_bootleg(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type)
 {
 	tilemap_t* tm = nullptr;
-	if (!mode) tm = m_pf8x8_tilemap[type];
-	else tm = m_pf16x16_tilemap[type];
+	uint8_t bppmult, bppmask;
+	if (!mode)
+	{
+		tm = m_pf8x8_tilemap[type];
+		bppmult = m_bppmult_8x8;
+		bppmask = m_bppmask_8x8;
+	}
+	else
+	{
+		tm = m_pf16x16_tilemap[type];
+		bppmult = m_bppmult_16x16;
+		bppmask = m_bppmask_16x16;
+	}
 
-	custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),nullptr,nullptr,flags, 0, 0, 0, 0);
+	custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),nullptr,nullptr,flags, 0, 0, 0, 0, bppmult, bppmask);
 }
 
 
 
-WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
+void deco_bac06_device::pf_control_0_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset &= 3;
 
@@ -371,7 +400,7 @@ WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
 			// I don't know WHY Stadium Hero uses this as a bank but the RAM test expects it..
 			// I'm curious as to if anything else sets it tho
 			if (strcmp(machine().system().name,"stadhero"))
-				printf("tilemap ram bank change to %d\n", newbank&1);
+				logerror("tilemap ram bank change to %02x\n", newbank&1);
 
 			m_rambank = newbank&1;
 			m_pf8x8_tilemap[0]->mark_all_dirty();
@@ -384,19 +413,19 @@ WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
 	}
 }
 
-READ16_MEMBER( deco_bac06_device::pf_control_1_r )
+u16 deco_bac06_device::pf_control_1_r(offs_t offset, u16 mem_mask)
 {
 	offset &= 7;
 	return m_pf_control_1[offset];
 }
 
-WRITE16_MEMBER( deco_bac06_device::pf_control_1_w )
+void deco_bac06_device::pf_control_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset &= 7;
 	COMBINE_DATA(&m_pf_control_1[offset]);
 }
 
-WRITE16_MEMBER( deco_bac06_device::pf_data_w )
+void deco_bac06_device::pf_data_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (m_rambank&1) offset+=0x1000;
 
@@ -409,144 +438,143 @@ WRITE16_MEMBER( deco_bac06_device::pf_data_w )
 	m_pf16x16_tilemap[2]->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER( deco_bac06_device::pf_data_r )
+u16 deco_bac06_device::pf_data_r(offs_t offset, u16 mem_mask)
 {
 	if (m_rambank&1) offset+=0x1000;
 
 	return m_pf_data[offset];
 }
 
-WRITE8_MEMBER( deco_bac06_device::pf_data_8bit_w )
+void deco_bac06_device::pf_data_8bit_w(offs_t offset, u8 data)
 {
 	if (offset&1)
-		pf_data_w(space,offset/2,data,0x00ff);
+		pf_data_w(offset/2,data,0x00ff);
 	else
-		pf_data_w(space,offset/2,data<<8,0xff00);
+		pf_data_w(offset/2,data<<8,0xff00);
 }
 
-READ8_MEMBER( deco_bac06_device::pf_data_8bit_r )
+u8 deco_bac06_device::pf_data_8bit_r(offs_t offset)
 {
 	if (offset&1) /* MSB */
-		return pf_data_r(space,offset/2,0x00ff);
+		return pf_data_r(offset/2,0x00ff);
 	else
-		return pf_data_r(space,offset/2,0xff00)>>8;
+		return pf_data_r(offset/2,0xff00)>>8;
 }
 
-WRITE16_MEMBER( deco_bac06_device::pf_rowscroll_w )
+void deco_bac06_device::pf_rowscroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pf_rowscroll[offset]);
 }
 
-WRITE16_MEMBER( deco_bac06_device::pf_colscroll_w )
+void deco_bac06_device::pf_colscroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pf_colscroll[offset]);
 }
 
-READ16_MEMBER( deco_bac06_device::pf_rowscroll_r )
+u16 deco_bac06_device::pf_rowscroll_r(offs_t offset, u16 mem_mask)
 {
 	return m_pf_rowscroll[offset];
 }
 
-READ16_MEMBER( deco_bac06_device::pf_colscroll_r )
+u16 deco_bac06_device::pf_colscroll_r(offs_t offset, u16 mem_mask)
 {
 	return m_pf_colscroll[offset];
 }
 
-/* used by dec8.c */
-WRITE8_MEMBER( deco_bac06_device::pf_control0_8bit_w )
+/* used by dec8.cpp */
+void deco_bac06_device::pf_control0_8bit_w(offs_t offset, u8 data)
 {
 	if (offset&1)
-		pf_control_0_w(space,offset/2,data,0x00ff); // oscar (mirrors?)
+		pf_control_0_w(offset/2,data,0x00ff); // oscar (mirrors?)
 	else
-		pf_control_0_w(space,offset/2,data,0x00ff);
+		pf_control_0_w(offset/2,data,0x00ff);
 }
 
-/* used by dec8.c */
-READ8_MEMBER( deco_bac06_device::pf_control1_8bit_r )
+/* used by dec8.cpp */
+u8 deco_bac06_device::pf_control1_8bit_r(offs_t offset)
 {
 	if (offset&1)
-		return pf_control_1_r(space,offset/2,0x00ff);
+		return pf_control_1_r(offset/2,0x00ff);
 	else
-		return pf_control_1_r(space,offset/2,0xff00)>>8;
+		return pf_control_1_r(offset/2,0xff00)>>8;
 }
 
-/* used by dec8.c */
-WRITE8_MEMBER( deco_bac06_device::pf_control1_8bit_w )
+/* used by dec8.cpp */
+void deco_bac06_device::pf_control1_8bit_w(offs_t offset, u8 data)
 {
 	if (offset<4) // these registers are 16-bit?
 	{
 		if (offset&1)
-			pf_control_1_w(space,offset/2,data,0x00ff);
+			pf_control_1_w(offset/2,data,0x00ff);
 		else
-			pf_control_1_w(space,offset/2,data<<8,0xff00);
+			pf_control_1_w(offset/2,data<<8,0xff00);
 	}
 	else // these registers are 8-bit and mirror? (triothep vs actfancr)
 	{
 		if (offset&1)
-			pf_control_1_w(space,offset/2,data,0x00ff);
+			pf_control_1_w(offset/2,data,0x00ff);
 		else
-			pf_control_1_w(space,offset/2,data,0x00ff);
+			pf_control_1_w(offset/2,data,0x00ff);
 	}
 }
 
-READ8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_r )
+u8 deco_bac06_device::pf_rowscroll_8bit_r(offs_t offset)
 {
 	if (offset&1)
-		return pf_rowscroll_r(space,offset/2,0x00ff);
+		return pf_rowscroll_r(offset/2,0x00ff);
 	else
-		return pf_rowscroll_r(space,offset/2,0xff00)>>8;
+		return pf_rowscroll_r(offset/2,0xff00)>>8;
 }
 
 
-WRITE8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_w )
+void deco_bac06_device::pf_rowscroll_8bit_w(offs_t offset, u8 data)
 {
 	if (offset&1)
-		pf_rowscroll_w(space,offset/2,data,0x00ff);
+		pf_rowscroll_w(offset/2,data,0x00ff);
 	else
-		pf_rowscroll_w(space,offset/2,data<<8,0xff00);
+		pf_rowscroll_w(offset/2,data<<8,0xff00);
 }
 
-READ8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_swap_r )
+u8 deco_bac06_device::pf_rowscroll_8bit_swap_r(offs_t offset)
 {
 	if (offset&1)
-		return pf_rowscroll_r(space,offset/2,0xff00)>>8;
+		return pf_rowscroll_r(offset/2,0xff00)>>8;
 	else
-		return pf_rowscroll_r(space,offset/2,0x00ff);
+		return pf_rowscroll_r(offset/2,0x00ff);
 }
 
-WRITE8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_swap_w )
+void deco_bac06_device::pf_rowscroll_8bit_swap_w(offs_t offset, u8 data)
 {
 	if (offset&1)
-		pf_rowscroll_w(space,offset/2,data<<8,0xff00);
+		pf_rowscroll_w(offset/2,data<<8,0xff00);
 	else
-		pf_rowscroll_w(space,offset/2,data,0x00ff);
+		pf_rowscroll_w(offset/2,data,0x00ff);
 }
-
 
 
 /* used by hippodrm */
-WRITE8_MEMBER( deco_bac06_device::pf_control0_8bit_packed_w )
+void deco_bac06_device::pf_control0_8bit_packed_w(offs_t offset, u8 data)
 {
 	if (offset&1)
-		pf_control_0_w(space,offset/2,data<<8,0xff00);
+		pf_control_0_w(offset/2,data<<8,0xff00);
 	else
-		pf_control_0_w(space,offset/2,data,0x00ff);
+		pf_control_0_w(offset/2,data,0x00ff);
 }
 
 /* used by hippodrm */
-WRITE8_MEMBER( deco_bac06_device::pf_control1_8bit_swap_w )
+void deco_bac06_device::pf_control1_8bit_swap_w(offs_t offset, u8 data)
 {
-	pf_control1_8bit_w(space, offset^1, data);
+	pf_control1_8bit_w(offset^1, data);
 }
 
 /* used by hippodrm */
-READ8_MEMBER( deco_bac06_device::pf_data_8bit_swap_r )
+u8 deco_bac06_device::pf_data_8bit_swap_r(offs_t offset)
 {
-	return pf_data_8bit_r(space, offset^1);
+	return pf_data_8bit_r(offset^1);
 }
 
 /* used by hippodrm */
-WRITE8_MEMBER( deco_bac06_device::pf_data_8bit_swap_w )
+void deco_bac06_device::pf_data_8bit_swap_w(offs_t offset, u8 data)
 {
-	pf_data_8bit_w(space, offset^1, data);
+	pf_data_8bit_w(offset^1, data);
 }
