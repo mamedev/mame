@@ -17,11 +17,14 @@ xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char
 	: device_t(mconfig, XAVIX_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
+	, m_trackx_cb(*this)
 {
 }
 
 void xavix_sound_device::device_start()
 {
+	m_trackx_cb.resolve_safe(0xff);
+
 	m_stream = stream_alloc(0, 1, 8000);
 }
 
@@ -48,6 +51,20 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 }
 
 // xavix_state support
+
+READ8_MEMBER(xavix_state::sound_regram_read_cb)
+{
+	// 0x00 would be zero page memory, and problematic for many reasons, assume it just doesn't work like that
+	if ((m_sound_regbase & 0x3f) != 0x00)
+	{
+		uint16_t memorybase = (m_sound_regbase & 0x3f) << 8;
+
+		return m_mainram[memorybase + offset];
+	}
+
+	return 0x00;
+}
+
 
 /* 75f0, 75f1 - 2x8 bits (16 voices?) */
 READ8_MEMBER(xavix_state::sound_reg16_0_r)

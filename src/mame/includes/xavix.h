@@ -23,6 +23,8 @@ class xavix_sound_device : public device_t, public device_sound_interface
 public:
 	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto trackx_callback() { return m_trackx_cb.bind(); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,6 +41,7 @@ private:
 		uint32_t position;
 	};
 
+	devcb_read8 m_trackx_cb;
 	xavix_voice m_voice[16];
 };
 
@@ -52,7 +55,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
-		m_sound(*this, "xavix_sound"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
@@ -75,7 +77,8 @@ public:
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lowbus(*this, "lowbus"),
-		m_hack_timer_disable(false)
+		m_hack_timer_disable(false),
+		m_sound(*this, "xavix_sound")
 	{ }
 	
 	void xavix(machine_config &config);
@@ -100,7 +103,6 @@ protected:
 	required_ioport m_in1;
 
 private:
-	required_device<xavix_sound_device> m_sound;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -474,6 +476,9 @@ private:
 	required_device<address_map_bank_device> m_lowbus;
 
 	bool m_hack_timer_disable;
+
+	required_device<xavix_sound_device> m_sound;
+	DECLARE_READ8_MEMBER(sound_regram_read_cb);
 };
 
 class xavix_i2c_state : public xavix_state
