@@ -36,6 +36,8 @@ You can use a debug trick to get UTS10 to boot:
 - When it stops @0157 halt, pc = 158 and g
 - When it loops at @0B33, pc = B35 and g
 
+2018-11-10 Info from AL: cpu clock 3.072MHz; hsync 22.74KHz; vsync 60Hz
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -322,14 +324,14 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(univac_state::uts20)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000)); // unknown clock
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &univac_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(univac_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 25*14)
@@ -340,19 +342,19 @@ MACHINE_CONFIG_START(univac_state::uts20)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 2000000));
+	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 2000000));  // unknown
 	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
 	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
 	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
 	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
 
-	Z80CTC(config, m_ctc, 4_MHz_XTAL);
+	Z80CTC(config, m_ctc, 18.432_MHz_XTAL / 6);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<1>().set(m_uart, FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().append(m_uart, FUNC(z80sio_device::rxca_w));
 	m_ctc->zc_callback<2>().set(m_uart, FUNC(z80sio_device::rxtxcb_w));
 
-	Z80SIO(config, m_uart, 4_MHz_XTAL);
+	Z80SIO(config, m_uart, 18.432_MHz_XTAL / 6);
 	m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_uart->out_txda_callback().set(m_uart, FUNC(z80sio_device::rxa_w)); // FIXME: hacked in permanent loopback to pass test
 	m_uart->out_txdb_callback().set(m_uart, FUNC(z80sio_device::rxb_w)); // FIXME: hacked in permanent loopback to pass test
@@ -376,7 +378,7 @@ ROM_START( uts10 )
 	ROM_LOAD( "f3577_5.bin",  0x2000, 0x0800, CRC(38d671b5) SHA1(3fb3feaaddb08af5ba50a9c08511cbb3949a7985) )
 	ROM_LOAD( "f3577_6.bin",  0x2800, 0x0800, CRC(6dbe9c4a) SHA1(11bc4b7c99811bd26423a15b33d02a86fa0bfd17) )
 
-	ROM_REGION( 0x0800, "chargen", 0 ) // possibly some bitrot, see h and m in F4 displayer
+	ROM_REGION( 0x0800, "chargen", 0 ) // possibly some bitrot, see h,m,n in F4 displayer
 	ROM_LOAD( "chr_5565.bin", 0x0000, 0x0800, CRC(7d99744f) SHA1(2db330ca94a91f7b2ac2ac088ae9255f5bb0a7b4) )
 ROM_END
 
