@@ -23,6 +23,11 @@ class xavix_sound_device : public device_t, public device_sound_interface
 public:
 	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto read_regs_callback() { return m_readregs_cb.bind(); }
+	auto read_samples_callback() { return m_readsamples_cb.bind(); }
+
+	void enable_voice(int voice);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -33,6 +38,19 @@ protected:
 
 private:
 	sound_stream *m_stream;
+
+	struct xavix_voice {
+		bool enabled;
+		uint16_t position;
+		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
+		int type;
+	};
+
+	devcb_read8 m_readregs_cb;
+
+	devcb_read8 m_readsamples_cb;
+
+	xavix_voice m_voice[16];
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)
@@ -45,7 +63,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
-		m_sound(*this, "xavix_sound"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
@@ -68,7 +85,8 @@ public:
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lowbus(*this, "lowbus"),
-		m_hack_timer_disable(false)
+		m_hack_timer_disable(false),
+		m_sound(*this, "xavix_sound")
 	{ }
 	
 	void xavix(machine_config &config);
@@ -93,7 +111,6 @@ protected:
 	required_ioport m_in1;
 
 private:
-	required_device<xavix_sound_device> m_sound;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -165,6 +182,11 @@ private:
 
 		return 0x00;
 	}
+
+	DECLARE_READ8_MEMBER(sample_read)
+	{
+		return read_full_data_sp_bypass(offset);
+	};
 
 	inline uint8_t read_full_data_sp_bypass(uint32_t adr)
 	{
@@ -467,6 +489,9 @@ private:
 	required_device<address_map_bank_device> m_lowbus;
 
 	bool m_hack_timer_disable;
+
+	required_device<xavix_sound_device> m_sound;
+	DECLARE_READ8_MEMBER(sound_regram_read_cb);
 };
 
 class xavix_i2c_state : public xavix_state

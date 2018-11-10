@@ -7,7 +7,7 @@
 #define VERBOSE 1
 #include "logmacro.h"
 
-// 16 stereo channels?
+// 16 stereo voices?
 
 // xavix_sound_device
 
@@ -17,33 +17,120 @@ xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char
 	: device_t(mconfig, XAVIX_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
+	, m_readregs_cb(*this)
+	, m_readsamples_cb(*this)
 {
 }
 
 void xavix_sound_device::device_start()
 {
+	m_readregs_cb.resolve_safe(0xff);
+	m_readsamples_cb.resolve_safe(0x80);
+
 	m_stream = stream_alloc(0, 1, 8000);
 }
 
 void xavix_sound_device::device_reset()
 {
+	for (int v = 0; v < 16; v++)
+	{
+		m_voice[v].enabled = false;
+		m_voice[v].position = 0x00;
+		m_voice[v].bank = 0x00;
+	}
 }
+
 
 void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 
+	int outpos = 0;
 	// loop while we still have samples to generate
 	while (samples-- != 0)
 	{
-		// 
+		for (int v = 0; v < 16; v++)
+		{
+			if (m_voice[v].enabled == true)
+			{
+				if (m_voice[v].type == 2 || m_voice[v].type == 3)
+				{
+					int8_t sample = m_readsamples_cb((m_voice[v].bank << 16) | m_voice[v].position);
+
+					if ((uint8_t)sample == 0x80)
+					{
+						m_voice[v].enabled = false;
+						break;
+					}
+
+					outputs[0][outpos] += sample * 0x10;
+					m_voice[v].position++;
+				}
+			}
+		}
+		outpos++;
 	}
 }
 
+void xavix_sound_device::enable_voice(int voice)
+{
+	LOG("voice %d 0->1 ", voice);
+	int voicemembase = voice * 0x10;
+
+	uint16_t param1 = (m_readregs_cb(voicemembase + 0x1) << 8) | (m_readregs_cb(voicemembase + 0x0)); // sample rate maybe?
+	uint16_t param2 = (m_readregs_cb(voicemembase + 0x3) << 8) | (m_readregs_cb(voicemembase + 0x2)); // seems to be a start position
+	uint16_t param3 = (m_readregs_cb(voicemembase + 0x5) << 8) | (m_readregs_cb(voicemembase + 0x4)); // another start position? sometimes same as param6
+	uint8_t param4a = (m_readregs_cb(voicemembase + 0x7));
+	uint8_t param4b = (m_readregs_cb(voicemembase + 0x6)); // upper 8 bits of memory address? 8 bits unused?
+
+	// these don't seem to be populated as often, maybe some kind of effect / envelope filter?
+	uint8_t param5a = (m_readregs_cb(voicemembase + 0x9));
+	uint8_t param5b = (m_readregs_cb(voicemembase + 0x8));
+	uint16_t param6 = (m_readregs_cb(voicemembase + 0xb) << 8) | (m_readregs_cb(voicemembase + 0xa)); // seems to be a start position
+	uint16_t param7 = (m_readregs_cb(voicemembase + 0xd) << 8) | (m_readregs_cb(voicemembase + 0xc)); // another start position? sometimes same as param6
+	uint8_t param8a = (m_readregs_cb(voicemembase + 0xf));
+	uint8_t param8b = (m_readregs_cb(voicemembase + 0xe)); // upper 8 bits of memory address? 8 bits unused (or not unused?, get populated with increasing values sometimes?)
+	LOG(" (params %04x %04x %04x %02x %02x     %02x %02x  %04x %04x %02x %02x)\n", param1, param2, param3, param4a, param4b, param5a, param5b, param6, param7, param8a, param8b);
+
+	uint32_t address1 = (param2 | param4b << 16) & 0x00ffffff; // definitely addresses based on rad_snow
+	uint32_t address2 = (param3 | param4b << 16) & 0x00ffffff;
+
+	uint32_t address3 = (param6 | param8b << 16) & 0x00ffffff; // still looks like addresses, sometimes pointing at RAM
+	uint32_t address4 = (param7 | param8b << 16) & 0x00ffffff;
+
+
+	LOG(" (possible meanings mode %01x rate %04x address1 %08x address2 %08x address3 %08x address4 %08x)\n", param1 & 0x3, param1 >> 2, address1, address2, address3, address4);
+
+	m_voice[voice].enabled = true;
+
+	m_voice[voice].bank = param4b;
+	m_voice[voice].position = param2; // param3
+	m_voice[voice].type = param1 & 0x3; 
+	
+
+	// samples appear to be PCM, 0x80 terminated
+}
+
+
+
 // xavix_state support
 
-/* 75f0, 75f1 - 2x8 bits (16 channels?) */
+READ8_MEMBER(xavix_state::sound_regram_read_cb)
+{
+	// 0x00 would be zero page memory, and problematic for many reasons, assume it just doesn't work like that
+	if ((m_sound_regbase & 0x3f) != 0x00)
+	{
+		uint16_t memorybase = (m_sound_regbase & 0x3f) << 8;
+
+		return m_mainram[memorybase + offset];
+	}
+
+	return 0x00;
+}
+
+
+/* 75f0, 75f1 - 2x8 bits (16 voices?) */
 READ8_MEMBER(xavix_state::sound_reg16_0_r)
 {
 	LOG("%s: sound_reg16_0_r %02x\n", machine().describe_context(), offset);
@@ -55,24 +142,24 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 	/* looks like the sound triggers
 
 	  offset 0
-	  data & 0x01 - channel 0  (registers at regbase + 0x00) eg 0x3b00 - 0x3b0f in monster truck
-	  data & 0x02 - channel 1  (registers at regbase + 0x10) eg 0x3b10 - 0x3b1f in monster truck
-	  data & 0x04 - channel 2  
-	  data & 0x08 - channel 3
-	  data & 0x10 - channel 4
-	  data & 0x20 - channel 5
-	  data & 0x40 - channel 6
-	  data & 0x80 - channel 7
+	  data & 0x01 - voice 0  (registers at regbase + 0x00) eg 0x3b00 - 0x3b0f in monster truck
+	  data & 0x02 - voice 1  (registers at regbase + 0x10) eg 0x3b10 - 0x3b1f in monster truck
+	  data & 0x04 - voice 2  
+	  data & 0x08 - voice 3
+	  data & 0x10 - voice 4
+	  data & 0x20 - voice 5
+	  data & 0x40 - voice 6
+	  data & 0x80 - voice 7
 
 	  offset 1
-	  data & 0x01 - channel 8
-	  data & 0x02 - channel 9
-	  data & 0x04 - channel 10
-	  data & 0x08 - channel 11
-	  data & 0x10 - channel 12
-	  data & 0x20 - channel 13
-	  data & 0x40 - channel 14 (registers at regbase + 0xf0) eg 0x3be0 - 0x3bef in monster truck
-	  data & 0x80 - channel 15 (registers at regbase + 0xf0) eg 0x3bf0 - 0x3bff in monster truck
+	  data & 0x01 - voice 8
+	  data & 0x02 - voice 9
+	  data & 0x04 - voice 10
+	  data & 0x08 - voice 11
+	  data & 0x10 - voice 12
+	  data & 0x20 - voice 13
+	  data & 0x40 - voice 14 (registers at regbase + 0xf0) eg 0x3be0 - 0x3bef in monster truck
+	  data & 0x80 - voice 15 (registers at regbase + 0xf0) eg 0x3bf0 - 0x3bff in monster truck
 */
 	if (offset == 0)
 		LOG("%s: sound_reg16_0_w %02x, %02x (%d %d %d %d %d %d %d %d - - - - - - - -)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
@@ -82,43 +169,15 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 
 	for (int i = 0; i < 8; i++)
 	{
-		int channel_state = (data & (1 << i));
-		int old_channel_state = (m_soundreg16_0[offset] & (1 << i));
-		if (channel_state != old_channel_state)
+		int voice_state = (data & (1 << i));
+		int old_voice_state = (m_soundreg16_0[offset] & (1 << i));
+		if (voice_state != old_voice_state)
 		{
-			if (channel_state)
+			if (voice_state)
 			{
-				int channel = (offset * 8 + i);
+				int voice = (offset * 8 + i);
 
-				LOG("channel %d 0->1 ", channel);
-
-				uint16_t memorybase = ((m_sound_regbase & 0x3f) << 8) | (channel * 0x10);
-
-				uint16_t param1 = (m_mainram[memorybase + 0x1] << 8) | (m_mainram[memorybase + 0x0]); // sample rate maybe?
-				uint16_t param2 = (m_mainram[memorybase + 0x3] << 8) | (m_mainram[memorybase + 0x2]); // seems to be a start position
-				uint16_t param3 = (m_mainram[memorybase + 0x5] << 8) | (m_mainram[memorybase + 0x4]); // another start position? sometimes same as param6
-				uint8_t param4a = (m_mainram[memorybase + 0x7]);
-				uint8_t param4b = (m_mainram[memorybase + 0x6]); // upper 8 bits of memory address? 8 bits unused?
-
-				// these don't seem to be populated as often, maybe some kind of effect / envelope filter?
-				uint8_t param5a = (m_mainram[memorybase + 0x9]);
-				uint8_t param5b = (m_mainram[memorybase + 0x8]);
-				uint16_t param6 = (m_mainram[memorybase + 0xb] << 8) | (m_mainram[memorybase + 0xa]); // seems to be a start position
-				uint16_t param7 = (m_mainram[memorybase + 0xd] << 8) | (m_mainram[memorybase + 0xc]); // another start position? sometimes same as param6
-				uint8_t param8a = (m_mainram[memorybase + 0xf]);
-				uint8_t param8b = (m_mainram[memorybase + 0xe]); // upper 8 bits of memory address? 8 bits unused (or not unused?, get populated with increasing values sometimes?)
-				LOG(" (params %04x %04x %04x %02x %02x     %02x %02x  %04x %04x %02x %02x)\n", param1, param2, param3, param4a, param4b, param5a, param5b, param6, param7, param8a, param8b);
-
-				uint32_t address1 = (param2 | param4b << 16) & 0x00ffffff; // definitely addresses based on rad_snow
-				uint32_t address2 = (param3 | param4b << 16) & 0x00ffffff;
-
-				uint32_t address3 = (param6 | param8b << 16) & 0x00ffffff; // still looks like addresses, sometimes pointing at RAM
-				uint32_t address4 = (param7 | param8b << 16) & 0x00ffffff;
-
-
-				LOG(" (possible meanings mode %01x rate %04x address1 %08x address2 %08x address3 %08x address4 %08x)\n", param1 & 0x3, param1 >> 2, address1, address2, address3, address4);
-
-				// samples appear to be PCM, 0x80 terminated
+				m_sound->enable_voice(voice);
 			}
 		}
 	}
@@ -127,7 +186,7 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 
 }
 
-/* 75f0, 75f1 - 2x8 bits (16 channels?) */
+/* 75f0, 75f1 - 2x8 bits (16 voices?) */
 READ8_MEMBER(xavix_state::sound_reg16_1_r)
 {
 	LOG("%s: sound_reg16_1_r %02x\n", machine().describe_context(), offset);
@@ -145,7 +204,7 @@ WRITE8_MEMBER(xavix_state::sound_reg16_1_w)
 }
 
 
-/* 75f4, 75f5 - 2x8 bits (16 channels?) status? */
+/* 75f4, 75f5 - 2x8 bits (16 voices?) status? */
 READ8_MEMBER(xavix_state::sound_sta16_r)
 {
 	// used with 75f0/75f1
@@ -170,7 +229,7 @@ WRITE8_MEMBER(xavix_state::sound_volume_w)
 WRITE8_MEMBER(xavix_state::sound_regbase_w)
 {
 	// this is the upper 6 bits of the RAM address where the actual sound register sets are
-	// (16x16 regs, so complete 0x100 bytes of RAM eg 0x3b means the complete 0x3b00 - 0x3bff range with 0x3b00 - 0x3b0f being channel 1 etc)
+	// (16x16 regs, so complete 0x100 bytes of RAM eg 0x3b means the complete 0x3b00 - 0x3bff range with 0x3b00 - 0x3b0f being voice 1 etc)
 	m_sound_regbase = data;
 	LOG("%s: sound_regbase_w %02x (sound regs are at 0x%02x00 to 0x%02xff)\n", machine().describe_context(), data, m_sound_regbase & 0x3f, m_sound_regbase & 0x3f);
 }
@@ -272,7 +331,7 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 		m_sound_irqstatus &= ~data & 0xf0;
 	}
 
-	m_sound_irqstatus = data & 0x0f; // look like IRQ enable flags - 4 sources? channels? timers?
+	m_sound_irqstatus = data & 0x0f; // look like IRQ enable flags - 4 sources? voices? timers?
 
 	LOG("%s: sound_irqstatus_w %02x\n", machine().describe_context(), data);
 }
