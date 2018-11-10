@@ -8485,6 +8485,9 @@ ROM_END
 //  Wonder Boy III, Sega System 16B
 //  CPU: FD1094 (317-0089)
 //  ROM Board type: 171-5704
+//  Sega game ID: 833-6851-03 MONSTER LAIR
+//    Main board: 837-6855-03
+//     ROM board: 834-6854-03
 //
 ROM_START( wb33 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -8618,7 +8621,9 @@ ROM_END
 //  Wrestle War, Sega System 16B
 //  CPU: 68000 + i8751 (317-0103)
 //  ROM Board type: 171-5704
-//  GAME NUMBER: 837-6889-02 (MB:833-6887-07, ROM:834-6888-07)
+//  Sega game ID: 833-6887-07
+//    Main board: 837-6889-02
+//     ROM board: 834-6888-07
 //
 //  LOC   NAME         LOC   NAME
 //  A1    OPR-12141    B1    MPR-12153

@@ -21,7 +21,11 @@ public:
 		m_txvideoram(*this, "txvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_fgscroll(*this, "fgscroll"),
+		m_bgscroll(*this, "bgscroll"),
+		m_adpcm_rom(*this, "adpcm"),
+		m_mainbank(*this, "mainbank") { }
 
 	void geminib(machine_config &config);
 	void backfirt(machine_config &config);
@@ -32,7 +36,6 @@ public:
 
 	void init_silkworm();
 	void init_rygar();
-	void init_backfirt();
 	void init_gemini();
 
 private:
@@ -48,12 +51,15 @@ private:
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fgscroll;
+	required_shared_ptr<uint8_t> m_bgscroll;
+
+	optional_region_ptr<uint8_t> m_adpcm_rom;
+	required_memory_bank m_mainbank;
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	uint8_t m_fgscroll[3];
-	uint8_t m_bgscroll[3];
 	int m_adpcm_pos;
 	int m_adpcm_end;
 	int m_adpcm_data;

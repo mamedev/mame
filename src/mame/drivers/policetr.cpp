@@ -237,6 +237,8 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 void policetr_state::mem(address_map &map)
 {
+	map.global_mask(0x3fffffff);
+
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
 	map(0x00200000, 0x0020000f).w(FUNC(policetr_state::video_w));
 	map(0x00400000, 0x00400003).r(FUNC(policetr_state::video_r));
@@ -257,6 +259,8 @@ void policetr_state::mem(address_map &map)
 
 void sshooter_state::mem(address_map &map)
 {
+	map.global_mask(0x3fffffff);
+
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
 	map(0x00200000, 0x00200003).w(FUNC(sshooter_state::bsmt2000_data_w));
 	map(0x00300001, 0x00300001).w(FUNC(sshooter_state::palette_offset_w));

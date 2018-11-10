@@ -4896,6 +4896,24 @@ ROM_START( snowbro2b ) // seems to be the same data as the main set, but with th
 	ROM_LOAD( "sb2-unk.u100", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
 ROM_END
 
+ROM_START( snowbro2b2 ) // seems to mostly be the same data, but with copyright changed to Q Elec. Only set with staff credits still present. Also differently arranged graphics ROMs data.
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "rom10.bin", 0x000000, 0x080000, CRC(3e96da41) SHA1(692211d40f506efb9cb49848521de2da7890e248) ) // 27c04002
+
+	ROM_REGION( 0x300000, "gp9001_0", 0 )
+	ROM_LOAD16_BYTE( "rom07.bin", 0x000000, 0x080000, CRC(c54ae0b3) SHA1(94099b2da52eb12638799eab0819fe8a13aa3879) ) // 27c040
+	ROM_LOAD16_BYTE( "rom05.bin", 0x000001, 0x080000, CRC(af3c74d1) SHA1(e97a688db50dfe41723452a9f652564e89e367ed) ) // 27c040
+	ROM_LOAD16_BYTE( "rom08.bin", 0x100000, 0x040000, CRC(72812088) SHA1(1c0d410a7dd8de0bc48b7ff677979ad269966f7d) ) // 27c02001
+	ROM_LOAD16_BYTE( "rom06.bin", 0x100001, 0x040000, CRC(c8f80774) SHA1(004752d7dfa08c3beb774f545fe3260d328abff0) ) // 27c02001
+	ROM_LOAD16_BYTE( "rom03.bin", 0x180000, 0x080000, CRC(42fecbd7) SHA1(96dc9d5495d7830400ca7475c6613119099e93f2) ) // 27c040
+	ROM_LOAD16_BYTE( "rom01.bin", 0x180001, 0x080000, CRC(e7134937) SHA1(7c12e7c6b08f804613e5ea0db8d622bda01bc036) ) // 27c040
+	ROM_LOAD16_BYTE( "rom04.bin", 0x280000, 0x040000, CRC(3343b7a7) SHA1(10efcb2dfae635f005773655faa573bf51ddc6a3) ) // 27c020
+	ROM_LOAD16_BYTE( "rom02.bin", 0x280001, 0x040000, CRC(af4d9551) SHA1(adcf1641e37b239b1ae4322b5710d49e53c30684) ) // 27c020
+
+	ROM_REGION( 0x80000, "oki1", 0 )         /* ADPCM Samples */
+	ROM_LOAD( "rom09.bin", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
+ROM_END
+
 /* -------------------------- Raizing games ------------------------- */
 
 
@@ -5672,8 +5690,9 @@ GAME( 1993, batsugunsp,  batsugun, batsugun,   batsugun,   toaplan2_state, init_
 GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
 
-GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise",           MACHINE_SUPPORTS_SAVE )
-GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg",  "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Hanafram",           "Snow Bros. 2 - With New Elves / Otenki Paradise",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg",            "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, snowbro2b2,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg (Q Elec)",   "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   toaplan2_state, empty_init,      ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
 GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  toaplan2_state, empty_init,      ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)" ,  MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version

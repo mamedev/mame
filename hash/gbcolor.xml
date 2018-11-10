@@ -14837,6 +14837,20 @@ Unreleased (music source code exists, possibly no prototypes exist)
 		</part>
 	</software>
 
+	<software name="pockgtp" cloneof="pockrace">
+		<description>Pocket GT (Eur, Prototype?)</description>
+		<year>1999</year>
+		<publisher>MTO</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="pocket gt.gb" size="1048576" crc="9f69ff15" sha1="9da7d739319baa8def35b9e04bd9a5ead0e7cd94" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pockhana">
 		<!-- Notes: GBC only -->
 		<description>Pocket Hanafuda (Jpn)</description>

@@ -127,7 +127,7 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 			}
 
 			dest[x] = rgb.to_rgba();
-			primap[x] |= prioverchar;
+			primap[x] = (primap[x] & ~1) | prioverchar;
 
 			u += du;
 			v += dv;
@@ -171,7 +171,7 @@ void namcos22_renderer::renderscanline_uvi_full(int32_t scanline, const extent_t
 			rgb.scale_imm_and_clamp(shade << 2);
 
 			dest[x] = rgb.to_rgba();
-			primap[x] |= prioverchar;
+			primap[x] = (primap[x] & ~1) | prioverchar;
 
 			u += du;
 			v += dv;
@@ -221,7 +221,7 @@ void namcos22_renderer::renderscanline_sprite(int32_t scanline, const extent_t &
 			}
 
 			dest[x] = rgb.to_rgba();
-			primap[x] |= prioverchar;
+			primap[x] = (primap[x] & ~1) | prioverchar;
 		}
 		x_index += dx;
 	}

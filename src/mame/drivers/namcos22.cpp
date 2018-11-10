@@ -35,7 +35,6 @@
  * - alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
  * - ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
  * - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
- * - cybrcomm arrows(black part) should be below textlayer when a messagebox pops up
  * - cybrcycc speed dial needle is missing
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
  * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?

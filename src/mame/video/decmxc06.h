@@ -12,7 +12,7 @@ public:
 	deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int region) { m_gfxregion = region; }
 	void set_ram_size(int size) { m_ramsize = size; }
 
