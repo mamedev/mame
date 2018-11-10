@@ -1037,7 +1037,7 @@ WRITE32_MEMBER( nslasher_state::tattass_control_w )
 				int i;
 				logerror("Eprom reset (bit count %d): ", m_read_bit_count);
 				for (i = 0; i < m_buf_ptr; i++)
-					logerror("%s", BIT(m_buffer, m_buf_ptr - i) ? "1" : "0");
+					logerror("%s", BIT(m_buffer, m_buf_ptr - 1 - i) ? "1" : "0");
 				logerror("\n");
 
 			}
