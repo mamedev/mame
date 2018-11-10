@@ -323,7 +323,8 @@ void ip22_state::ip22_base(machine_config &config)
 
 	WD33C93(config, m_scsi_ctrl);
 	m_scsi_ctrl->set_scsi_port("scsi");
-	m_scsi_ctrl->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi_irq));
+	m_scsi_ctrl->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_irq));
+	//m_scsi_ctrl->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
 
 	SGI_HAL2(config, m_hal2);
 	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
@@ -368,7 +369,8 @@ void ip24_state::ip244415(machine_config &config)
 
 	WD33C93(config, m_scsi_ctrl2);
 	m_scsi_ctrl2->set_scsi_port("scsi2");
-	m_scsi_ctrl2->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi_irq));
+	m_scsi_ctrl->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_irq));
+	//m_scsi_ctrl->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_scsi_ctrl2, m_ioc2, m_ldac, m_rdac);
 }
