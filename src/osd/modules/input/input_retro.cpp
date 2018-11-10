@@ -539,20 +539,20 @@ void retro_osd_interface::process_joypad_state(running_machine &machine)
       for(i = 0;i < RETRO_MAX_BUTTONS; i++)
          joystate[j].button[i] = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0,i)?0x80:0;
 
-      joystate[j].a1[0] = 2.01 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X));
-      joystate[j].a1[1] = -2.01 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y));
-      joystate[j].a2[0] = 2.01 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X));
-      joystate[j].a2[1] = -2.01 * (input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y));
+      joystate[j].a1[0] = normalize_absolute_axis((input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X)), -32767, 32767);
+      joystate[j].a1[1] = normalize_absolute_axis((input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y)), -32767, 32767);
+      joystate[j].a2[0] = normalize_absolute_axis((input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X)), -32767, 32767);
+      joystate[j].a2[1] = normalize_absolute_axis((input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y)), -32767, 32767);
 
       analog_l2 = input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_BUTTON, RETRO_DEVICE_ID_JOYPAD_L2);
       analog_r2 = input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_BUTTON, RETRO_DEVICE_ID_JOYPAD_R2);
       /* Fallback, if no analog trigger support, use digital */
       if (analog_l2 == 0)
-         analog_l2 = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2) ? 0x7FFF : 0;
+         analog_l2 = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2) ? 32767 : 0;
       if (analog_r2 == 0)
-         analog_r2 = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2) ? 0x7FFF : 0;
-      joystate[j].a3[0] = -2.01 * analog_l2;
-      joystate[j].a3[1] = -2.01 * analog_r2;
+         analog_r2 = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2) ? 32767 : 0;
+      joystate[j].a3[0] = -normalize_absolute_axis(analog_l2, 0, 32767);
+      joystate[j].a3[1] = -normalize_absolute_axis(analog_r2, 0, 32767);
    }
 }
 
