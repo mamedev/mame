@@ -123,12 +123,15 @@ WRITE_LINE_MEMBER( z80ctc_device::trg3 ) { m_channel[3]->trigger(state != 0); }
 //  machine configuration
 //-------------------------------------------------
 
-void z80ctc_device::device_add_mconfig(machine_config & config)
+void z80ctc_device::device_add_mconfig(machine_config &config)
 {
-	Z80CTC_CHANNEL(config, m_channel[0], 0);
-	Z80CTC_CHANNEL(config, m_channel[1], 0);
-	Z80CTC_CHANNEL(config, m_channel[2], 0);
-	Z80CTC_CHANNEL(config, m_channel[3], 0);
+	for (int ch = 0; ch < 4; ch++)
+	{
+		Z80CTC_CHANNEL(config, m_channel[ch]);
+
+		// assign channel index
+		m_channel[ch]->m_index = ch;
+	}
 }
 
 
@@ -142,13 +145,8 @@ void z80ctc_device::device_resolve_objects()
 {
 	// resolve callbacks
 	m_intr_cb.resolve_safe();
-	for (int ch = 0; ch < 4; ch++)
-	{
-		m_zc_cb[ch].resolve_safe();
-
-		// assign channel index
-		m_channel[ch]->m_index = ch;
-	}
+	for (auto &cb : m_zc_cb)
+		cb.resolve_safe();
 }
 
 
@@ -342,14 +340,11 @@ attotime z80ctc_channel_device::period() const
 {
 	// if reset active, no period
 	if ((m_mode & RESET) == RESET_ACTIVE)
-		return attotime::zero;
+		return attotime::never;
 
-	// if counter mode, no real period
+	// if counter mode, no real period unless the channel clock is specifically configured
 	if ((m_mode & MODE) == MODE_COUNTER)
-	{
-		logerror("CounterMode : Can't calculate period\n");
-		return attotime::zero;
-	}
+		return clocks_to_attotime(m_tconst);
 
 	// compute the period
 	attotime period = m_device->clocks_to_attotime((m_mode & PRESCALER) == PRESCALER_16 ? 16 : 256);
@@ -364,20 +359,21 @@ attotime z80ctc_channel_device::period() const
 u8 z80ctc_channel_device::read()
 {
 	// if we're in counter mode, just return the count
-	if ((m_mode & MODE) == MODE_COUNTER || (m_mode & WAITING_FOR_TRIG))
+	if (!m_timer->enabled() || (m_mode & WAITING_FOR_TRIG))
 		return m_down;
 
 	// else compute the down counter value
 	else
 	{
-		attotime period = m_device->clocks_to_attotime((m_mode & PRESCALER) == PRESCALER_16 ? 16 : 256);
+		attotime period;
+		if ((m_mode & MODE) == MODE_COUNTER)
+			period = clocks_to_attotime(1);
+		else
+			period = m_device->clocks_to_attotime((m_mode & PRESCALER) == PRESCALER_16 ? 16 : 256);
 
 		LOG("CTC clock %f\n", period.as_hz());
 
-		if (m_timer != nullptr)
-			return ((int)(m_timer->remaining().as_double() / period.as_double()) + 1) & 0xff;
-		else
-			return 0;
+		return u8((m_timer->remaining().as_double() / period.as_double()) + 1.0);
 	}
 }
 
@@ -402,19 +398,18 @@ void z80ctc_channel_device::write(u8 data)
 		// also clear the reset, since the constant gets it going again
 		m_mode &= ~RESET;
 
-		// if we're in timer mode....
-		if ((m_mode & MODE) == MODE_TIMER)
+		// if we're triggering on the time constant, reset the down counter now
+		if ((m_mode & MODE) == MODE_COUNTER || (m_mode & TRIGGER) == TRIGGER_AUTO)
 		{
-			// if we're triggering on the time constant, reset the down counter now
-			if ((m_mode & TRIGGER) == TRIGGER_AUTO)
-			{
-				attotime curperiod = period();
-				m_timer->adjust(curperiod, 0, curperiod);
-			}
+			attotime curperiod = period();
+			m_timer->adjust(curperiod, 0, curperiod);
+		}
 
-			// else set the bit indicating that we're waiting for the appropriate trigger
-			else
-				m_mode |= WAITING_FOR_TRIG;
+		// else set the bit indicating that we're waiting for the appropriate trigger
+		else
+		{
+			m_mode |= WAITING_FOR_TRIG;
+			m_timer->adjust(clocks_to_attotime(1));
 		}
 
 		// also set the down counter in case we're clocking externally
@@ -443,6 +438,15 @@ void z80ctc_channel_device::write(u8 data)
 			m_timer->adjust(attotime::never);
 		}
 
+		// if we're being reset, clear out any pending timers for this channel
+		if ((data & RESET) == RESET_ACTIVE)
+		{
+			// remember the present count
+			m_down = read();
+			m_timer->adjust(attotime::never);
+			// note that we don't clear the interrupt state here!
+		}
+
 		// set the new mode
 		m_mode = data;
 		LOG("Channel mode = %02x\n", data);
@@ -453,13 +457,6 @@ void z80ctc_channel_device::write(u8 data)
 			m_int_state &= ~Z80_DAISY_INT;
 			LOG("Interrupt forced off\n");
 			m_device->interrupt_check();
-		}
-
-		// if we're being reset, clear out any pending timers for this channel
-		if ((data & RESET) == RESET_ACTIVE)
-		{
-			m_timer->adjust(attotime::never);
-			// note that we don't clear the interrupt state here!
 		}
 	}
 }
@@ -510,6 +507,18 @@ void z80ctc_channel_device::trigger(bool state)
 
 TIMER_CALLBACK_MEMBER(z80ctc_channel_device::timer_callback)
 {
+	if (m_mode & WAITING_FOR_TRIG)
+	{
+		attotime curperiod = period();
+		LOG("Period = %s\n", curperiod.as_string());
+		m_timer->adjust(curperiod, 0, curperiod);
+
+		// we're no longer waiting
+		m_mode &= ~WAITING_FOR_TRIG;
+
+		return;
+	}
+
 	// down counter has reached zero - see if we should interrupt
 	if ((m_mode & INTERRUPT) == INTERRUPT_ON)
 	{
@@ -518,8 +527,7 @@ TIMER_CALLBACK_MEMBER(z80ctc_channel_device::timer_callback)
 		m_device->interrupt_check();
 	}
 
-	// generate the clock pulse
-	// FIXME: should only be cleared after one cycle of the channel input clock
+	// generate the clock pulse (FIXME: pulse width is based on bus clock)
 	m_device->m_zc_cb[m_index](1);
 	m_device->m_zc_cb[m_index](0);
 

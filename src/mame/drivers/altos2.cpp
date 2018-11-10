@@ -19,7 +19,6 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-1
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
-#include "machine/clock.h"
 #include "machine/x2212.h"
 #include "sound/beep.h"
 //#include "video/crt9006.h"
@@ -139,13 +138,11 @@ void altos2_state::altos2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &altos2_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 4.9152_MHz_XTAL / 4));
-	ctc_clock.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg1));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
-
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 8_MHz_XTAL / 2));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.set_clk<0>(4.9152_MHz_XTAL / 4);
+	ctc.set_clk<1>(4.9152_MHz_XTAL / 4);
+	ctc.set_clk<2>(4.9152_MHz_XTAL / 4);
 	ctc.zc_callback<0>().set("dart1", FUNC(z80dart_device::txca_w));
 	ctc.zc_callback<0>().append("dart1", FUNC(z80dart_device::rxca_w));
 	ctc.zc_callback<1>().set("dart2", FUNC(z80dart_device::rxca_w));

@@ -164,6 +164,7 @@ MACHINE_CONFIG_START(sys9002_state::sys9002)
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
+	uart2.rxrdy_handler().set_inputline("maincpu", I8085_RST55_LINE);
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
 	rs232b.rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));

@@ -524,13 +524,11 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	INPUT_BUFFER(config, "cent_data_in");
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 4.9152_MHz_XTAL / 4));
-	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
-
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->set_clk<0>(4.9152_MHz_XTAL / 4);
+	m_ctc->set_clk<1>(4.9152_MHz_XTAL / 4);
+	m_ctc->set_clk<2>(4.9152_MHz_XTAL / 4);
 	m_ctc->zc_callback<0>().set("sio1", FUNC(z80sio_device::rxca_w));
 	m_ctc->zc_callback<0>().append("sio1", FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().set("sio1", FUNC(z80sio_device::rxtxcb_w));
