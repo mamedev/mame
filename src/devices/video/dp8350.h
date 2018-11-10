@@ -170,8 +170,18 @@ public:
 	dp8367_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+// ======================> dp835x_a_device
+
+class dp835x_a_device : public dp835x_device
+{
+public:
+	// device constructor
+	dp835x_a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 // device type declarations
 DECLARE_DEVICE_TYPE(DP8350, dp8350_device)
 DECLARE_DEVICE_TYPE(DP8367, dp8367_device)
+DECLARE_DEVICE_TYPE(DP835X_A, dp835x_a_device)
 
 #endif // MAME_VIDEO_DP8350_H
