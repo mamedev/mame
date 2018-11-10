@@ -9,10 +9,22 @@
 *
 * Some of this will probably be applicable to HP 3468A units too.
 *
-* Current status : compiles, runs (with banking !)
+* Current status : runs (with banking !), fails CAL checksum due to unimplemented
 *
-* the TODO list is longer than the code here
 *
+* TODO kindof important
+* * keypad on port1
+* * something something display
+*
+* TODO next level
+* * DIP switches
+* * proper CAL RAM (see NVRAM() macro ?)
+* * ability to preload CAL RAM on startup ("media" or "software" ?)
+*
+* TODO level 9000
+* * Connect this with the existing i8291.cpp driver
+* * dump + add analog CPU (8049)
+
 
 **** Hardware details (refer to service manual for schematics)
 Main CPU : i8039 , no internal ROM
@@ -49,46 +61,129 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #define CPU_CLOCK       XTAL(5'856'000)
 
 #define A12_PIN	P26
+#define CALRAM_CS P23
+#define DIPSWITCH_CS P22
+#define GPIB_CS P21
 
-//#define DEBUG_PORTS
-#define DEBUG_BANKING
 
-WRITE8_MEMBER( hp3478a_state::port1_w )
+/**** optional debug outputs, must be before #include */
+#define DEBUG_PORTS (LOG_GENERAL << 1)
+#define DEBUG_BANKING (LOG_GENERAL << 2)
+#define DEBUG_BUS (LOG_GENERAL << 3)
+
+#define VERBOSE (DEBUG_BUS)
+
+#include "logmacro.h"
+
+
+
+/***** callbacks */
+
+WRITE8_MEMBER( hp3478a_state::p1write )
 {
-#ifdef DEBUG_PORTS
-	logerror("port1 write: %02X\n", data);
-#endif
+	LOGMASKED(DEBUG_PORTS, "port1 write: %02X\n", data);
 }
 
-READ8_MEMBER( hp3478a_state::port1_r )
+READ8_MEMBER( hp3478a_state::p1read )
 {
 	uint8_t data = 0;
-#ifdef DEBUG_PORTS
-	logerror("port1 read: 0x%02X\n", data);
-#endif
+	LOGMASKED(DEBUG_PORTS, "port1 read: 0x%02X\n", data);
 	return data;
 }
 
 WRITE8_MEMBER( hp3478a_state::p2write )
 {
-#ifdef DEBUG_PORTS
-	logerror("port2 write: %02X\n", data);
-#endif
+	LOGMASKED(DEBUG_PORTS, "port2 write: %02X\n", data);
 
 	/* inefficient ? calls set_entry on every P2 write. Should maybe do "if oldstate != newstate" ? */
 	if (data & A12_PIN) {
 		m_bank0->set_entry(1);
-		#ifdef DEBUG_BANKING
-			logerror("changed to bank1\n");
-		#endif // DEBUG_BANKING
+		LOGMASKED(DEBUG_BANKING, "changed to bank1\n");
 	} else {
 		m_bank0->set_entry(0);
-		#ifdef DEBUG_BANKING
-			logerror("changed to bank0\n");
-		#endif // DEBUG_BANKING
+		LOGMASKED(DEBUG_BANKING, "changed to bank0\n");
 	}
 
 }
+
+/** external bus read callback
+ * runs when main cpu accesses an external IC, e.g. GPIB or CAL RAM.
+ */
+READ8_MEMBER( hp3478a_state::busread )
+{
+	uint8_t p2_state;
+	uint8_t data = 0;
+	unsigned found = 0;
+
+	p2_state = m_maincpu->p2_r();
+	// check which CS line is active.
+
+	if (!(p2_state & CALRAM_CS)) {
+		//XXX read from calram
+		found += 1;
+		LOGMASKED(DEBUG_BUS, "read 0x%02X from CAL RAM[0x%02X]\n", data, offset);
+	}
+	if (!(p2_state & DIPSWITCH_CS)) {
+		//XXX parse inputs
+		found += 1;
+		LOGMASKED(DEBUG_BUS, "read DIP state : 0x%02X\n", data);
+	}
+	if (!(p2_state & GPIB_CS)) {
+		found += 1 ;
+		LOGMASKED(DEBUG_BUS, "read GPIB register %X\n", offset & 0x07);
+	}
+
+	if (!found) {
+		logerror("Bus read with no CS active !\n");
+		return 0xFF;	//pulled up
+	}
+
+	if (found > 1) {
+		logerror("Bus read with more than one CS active !\n");
+	}
+	return data;
+}
+
+
+
+WRITE8_MEMBER( hp3478a_state::buswrite )
+{
+	uint8_t p2_state;
+	unsigned found = 0;
+
+	p2_state = m_maincpu->p2_r();
+	// check which CS line is active.
+
+	if (!(p2_state & CALRAM_CS)) {
+		//XXX write from calram
+		found += 1;
+		LOGMASKED(DEBUG_BUS, "write 0x%02X to CAL RAM[0x%02X]\n", data, offset);
+	}
+	if (!(p2_state & DIPSWITCH_CS)) {
+		logerror("Illegal write to DIP switch !\n");
+		found += 1;
+	}
+	if (!(p2_state & GPIB_CS)) {
+		found += 1 ;
+		LOGMASKED(DEBUG_BUS, "GPIB register %X write 0x%02X\n", offset & 0x07, data);
+	}
+
+
+	if (!found) {
+		logerror("Bus write with no CS active !\n");
+	}
+
+	if (found > 1) {
+		logerror("Bus write with more than one CS active !\n");
+	}
+}
+
+
+
+
+
+
+
 
 void hp3478a_state::machine_start() {
 	m_bank0->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
@@ -107,7 +202,7 @@ void hp3478a_state::i8039_map(address_map &map)
 void hp3478a_state::i8039_io(address_map &map)
 {
 	map.global_mask(0xff);
-//XXX	map(0x1, 0x1).rw(FUNC(hp3478a_state::port1_r), FUNC(hp3478a_state::port1_w)); /* tms5220 reads and writes */
+	map(0,0xff).rw(FUNC(hp3478a_state::busread), FUNC(hp3478a_state::buswrite));	//"external" access callbacks
 }
 
 /******************************************************************************
@@ -119,15 +214,16 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-MACHINE_CONFIG_START(hp3478a_state::hp3478a)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8039, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
-	MCFG_DEVICE_IO_MAP(i8039_io)
 
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, hp3478a_state, p2write))	//XXX no idea what I'm doing
-
-MACHINE_CONFIG_END
+void hp3478a_state::hp3478a(machine_config &config)
+{
+	auto &mcu(I8039(config, "maincpu", CPU_CLOCK));
+	mcu.set_addrmap(AS_PROGRAM, &hp3478a_state::i8039_map);
+	mcu.set_addrmap(AS_IO, &hp3478a_state::i8039_io);
+	mcu.p1_in_cb().set(FUNC(hp3478a_state::p1read));
+	mcu.p1_out_cb().set(FUNC(hp3478a_state::p1write));
+	mcu.p2_out_cb().set(FUNC(hp3478a_state::p2write));
+}
 
 /******************************************************************************
  ROM Definitions

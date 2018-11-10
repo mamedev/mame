@@ -41,9 +41,11 @@ protected:
 	virtual void machine_start() override;
 	//virtual void machine_reset() override;	//not needed?
 
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port1_r);
+	DECLARE_WRITE8_MEMBER(p1write);
+	DECLARE_READ8_MEMBER(p1read);
 	DECLARE_WRITE8_MEMBER(p2write);
+	DECLARE_READ8_MEMBER(busread);
+	DECLARE_WRITE8_MEMBER(buswrite);
 
 	required_device<i8039_device> m_maincpu;
 	required_memory_bank m_bank0;
