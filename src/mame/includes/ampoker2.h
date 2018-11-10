@@ -29,7 +29,6 @@ public:
 	DECLARE_WRITE8_MEMBER(watchdog_reset_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	void init_rabbitpk();
-	void init_piccolop();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(s2k_get_bg_tile_info);
 	DECLARE_PALETTE_INIT(ampoker2);
