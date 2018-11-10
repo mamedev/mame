@@ -11,7 +11,7 @@
   Supported games:
                                                              lex 425   boot      test     MC68000     MCU     NVRAM or  PCB
   Game                           year  manufacturer          19951006  sequence  at boot  size+place  H8/330  battery   marking
-  
+
   Music Sort (ver. 2.02)         1995  ABM Games             pre lex   direct    yes       ?          no      NVRAM     ?
   Magic's 10 (ver. 16.15)        1995  A.W.P. Games          post lex  direct    yes       DIP H      no      battery   039
   Magic's 10 (ver. 16.45)        1995  A.W.P. Games          post lex  direct    yes       ?          no      NVRAM     ?
@@ -25,7 +25,7 @@
   Magic Colors (ver. 1.6)        1999  ABM Games             post lex  [3]       no        DIP V      yes     battery   9743 Rev.01
   Magic Colors (ver. 1.7a)       1999  ABM Games             post lex  [3]       no        LCC        yes     none      Rev.03
   Alta Tensione (ver. 2.01a)     1999  Unknown               post lex  [3]       no        LCC        yes     battery   H3
-  
+
 *************************************************************************************************************************************
 
   Game Notes & Boot Sequence
@@ -98,7 +98,7 @@ and the NEWER one based on
 1x H8/330 (MCU)
 1x M6295 (sound)
 
-Both setups show different variants for components layout, memory size, NVRAM, etc.etc. 
+Both setups show different variants for components layout, memory size, NVRAM, etc.etc.
 
 *****************************************************************************
 
@@ -846,7 +846,7 @@ MACHINE_CONFIG_END
   1x 12 legs connector (J1)
   1x trimmer (volume)(P1)
   1x 8 DIP switches bank (DIP1)
-  
+
   Notes:
   PCB is marked: "040" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
   PCB is labelled: "PASSED BY:_R_ DATE:_29.03.96_" on component side
@@ -854,8 +854,8 @@ MACHINE_CONFIG_END
 */
 ROM_START( magic10 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "2.16.55S.u3", 0x000000, 0x20000, CRC(191a46f4) SHA1(65bc22cdcc4b2f102d3eef595626819af709cacb) )
-	ROM_LOAD16_BYTE( "3.16.55S.u2", 0x000001, 0x20000, CRC(a03a80bc) SHA1(a21da8912f1d2c8c2fa4a8d3ce4d43da8a934e21) )
+	ROM_LOAD16_BYTE( "2.16.55s.u3", 0x000000, 0x20000, CRC(191a46f4) SHA1(65bc22cdcc4b2f102d3eef595626819af709cacb) )
+	ROM_LOAD16_BYTE( "3.16.55s.u2", 0x000001, 0x20000, CRC(a03a80bc) SHA1(a21da8912f1d2c8c2fa4a8d3ce4d43da8a934e21) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "16.u25", 0x00000, 0x20000, CRC(7abb8136) SHA1(1d4daf6a4477853d89d08afb524516ef79f60dd6) )
@@ -917,7 +917,7 @@ ROM_END
   1x 12 legs connector (J1)
   1x trimmer (volume)(P1)
   1x 8 DIP switches bank (DIP1)
-  
+
 */
 ROM_START( magic10b )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -994,13 +994,13 @@ ROM_END
 
 /*
   Magic's 10 2 (ver 1.1)
-  
+
   CPUs:
   1x 68000 (main)
   1x HD6473308CP10 (MCU)
   1x OKI6295 (sound)
-  1x oscillator	30.000MHz		
-  1x oscillator	20.000MHz
+  1x oscillator 30.000MHz
+  1x oscillator 20.000MHz
 
   ROMs:
   6x 27010 1-6
@@ -1149,7 +1149,7 @@ ROM_END
   1x trimmer (unknown)(P2).
   1x 8x2 DIP switches (DIP1).
   1x CR2032 3v. lithium battery.
-  
+
   Notes:
   PCB is marked: "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
   PCB is marked: "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
@@ -1204,7 +1204,7 @@ ROM_END
 
 /*
   Magic Colors (ver. 1.7a)
-  
+
   CPU:
   1x missing CPU MC68000 (QFP68 socket, u1)
   1x HD6473308CP10 (u24)(MCU)
@@ -1219,7 +1219,7 @@ ROM_END
   ROMs:
   6x 27C010 (2,3,4,5,6,7)
   1x 27C020 (1)
-  
+
   RAMs:
   1x U6216ADC-08L (u6)
   4x LP6264D-70LL (u4,u5,u43,u44)
@@ -1277,7 +1277,7 @@ ROM_END
 
 /*
   Magic Colors (ver. 1.6)
-  
+
   CPU:
   1x MC68000P12 (u1)(main)
   1x HD6473308CP10 (u24)(MCU)
@@ -1292,7 +1292,7 @@ ROM_END
   ROMs:
   6x AM27C010 (2,3,4,5,6,7)
   1x M27C2001 (1)
-  
+
   RAMs:
   1x LH6116-10 (u6)
   4x UM6264D-70LL (u4,u5,u43,u44)
@@ -1347,17 +1347,17 @@ ROM_END
   1x M6295
   1x TDA2002
   1x GL324
-  1x oscillator	30.000MHz
-  
+  1x oscillator 30.000MHz
+
   ROMs:
   2x M27C512 (1,2)
   1x M27C2001 (3)
   4x M27C1001 (4,5,6,7)
-  
+
   RAMs:
-  6x GM76C88AL-15	
+  6x GM76C88AL-15
   1x M48Z02 (u37 dumped)
-  
+
   PLDs:
   2x A1020B-PL84C read protected
 
@@ -1433,7 +1433,7 @@ ROM_END
   1x 12 legs connector (J1)
   1x trimmer (volume)(P1)
   1x 8 DIP switches bank (DIP1)
-  
+
 */
 ROM_START( musicsrt )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
@@ -1490,7 +1490,7 @@ ROM_END
   1x trimmer (volume)(P1).
   1x 8x2 DIP switches (DIP1).
   1x Renata 3V. CR2032 lithium battery.
-  
+
   Notes:
   PCB is marked: "OC ABM - 9743 Rev.02" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
   PCB is marked: "44-98 ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
