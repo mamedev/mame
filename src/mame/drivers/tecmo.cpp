@@ -244,11 +244,15 @@ void tecmo_state::silkwormp_sound_map(address_map &map)
 	map(0xcc00, 0xcc00).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 }
 
-void tecmo_state::tecmo_sound_map(address_map &map)
+void tecmo_state::backfirt_sound_map(address_map &map)
 {
 	silkwormp_sound_map(map);
-	map(0x2000, 0x207f).ram();             /* Silkworm set #2 has a custom CPU which */
-												/* writes code to this area */
+	map(0x2000, 0x207f).ram(); // Silkworm set #2 has a custom CPU which writes code to this area
+}
+
+void tecmo_state::tecmo_sound_map(address_map &map)
+{
+	backfirt_sound_map(map);
 	map(0xc000, 0xc000).w(FUNC(tecmo_state::adpcm_start_w));
 	map(0xc400, 0xc400).w(FUNC(tecmo_state::adpcm_end_w));
 	map(0xc800, 0xc800).w(FUNC(tecmo_state::adpcm_vol_w));
@@ -778,7 +782,7 @@ MACHINE_CONFIG_START(tecmo_state::backfirt)
 	/* this pcb has no MSM5205 */
 	MCFG_DEVICE_REMOVE("msm")
 	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(silkwormp_sound_map)
+	MCFG_DEVICE_PROGRAM_MAP(backfirt_sound_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tecmo_state::silkwormp)
