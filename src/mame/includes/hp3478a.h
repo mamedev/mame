@@ -50,6 +50,29 @@ protected:
 	required_device<i8039_device> m_maincpu;
 	required_memory_bank m_bank0;
 
+	/////////////// stuff for internal LCD emulation
+	void lcd_interface(uint8_t p2new);
+	uint8_t lcd_bitcount;
+	uint8_t lcd_want;
+	uint64_t lcd_bitbuf;
+	enum class lcd_state : uint8_t {
+		IDLE,
+		SYNC_SKIP,
+		SELECTED_ISA,
+		SELECTED_IWA
+	} m_lcdstate;
+	enum class lcd_iwatype : uint8_t {
+		ANNUNS,
+		REG_A,
+		REG_B,
+		REG_C,
+		DISCARD
+	} m_lcdiwa;
+	uint8_t lcd_chrbuf[12];	//raw digits (not ASCII)
+	uint8_t lcd_text[13];	//mapped to ASCII
+
+	uint8_t p2_oldstate;	//used to detect edges on Port2 IO pins. Should be saveable ?
+
 };
 
 
