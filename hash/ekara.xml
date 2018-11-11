@@ -21,7 +21,7 @@
 	    ***********************************************************************************
 			 
 		 Japanese cart listing (by EC code) - the EC number is printed on the left side of the cart label, as well as in the serial code
-		  * = dumped, titles in parenthesis are guessed
+		  * = dumped, # = identified, but not dumped.  Titles in parenthesis are guessed
 		 	 
 		 EC0001-  (J-Pop Mix Volume 1?)
 		 EC0002-  (J-Pop Mix Volume 2?)
@@ -44,10 +44,10 @@
 		 EC0018-
 		 EC0019-
 	 
-		 EC0020-
+		#EC0020-  Kid's Mix Volume 2
 		 EC0021-
 		*EC0022-  J-Pop Mix Volume 10
-		 EC0023-  (J-Pop Mix Volume 11?)
+		#EC0023-  J-Pop Mix Volume 11
 		 EC0024-  (J-Pop Mix Volume 12?)
 		 EC0025-  (J-Pop Mix Volume 13?)
 		*EC0026-  J-Pop Mix Volume 14 
@@ -60,7 +60,7 @@
 		 EC0032-
 		 EC0033-
 		*EC0034-  Kid's Mix Volume 3 
-		 EC0035-
+		#EC0035-  Artist Selection Volume 5 - Matsuda Seiko
 		*EC0036-  Artist Selection Volume 6 - KinKi Kids
 		 EC0037-
 		 EC0038-
@@ -87,13 +87,24 @@
 		 
 	    ***********************************************************************************
 
-		 Japanese cart listing (by BC code)
- 		  * = dumped
+		 Japanese cart listing (by GC code)
+ 		  * = dumped, # = identified, but not dumped.  Titles in parenthesis are guessed
 
 		 GC0001- 
 		*GC0002-  BHT Volume 1
 		 
  		 (more? what's the BC highest number?)
+		 
+	    ***********************************************************************************
+	 
+		 Japanese cart listing (by DC code) (the numbering on these doesn't make much sense)
+ 		  * = dumped, # = identified, but not dumped.  Titles in parenthesis are guessed
+
+		#(cartridge marked D-2) DC0002-BAT  Best Artist Volume 6 
+		#(cartridge marked D-3) DC0003-BHT  Best Artist Volume 9 
+		
+		 
+ 		 (more? what's the BC highest number?) 
 	-->
 	
 	
