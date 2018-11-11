@@ -29820,6 +29820,9 @@ nc100                           // 1992 NC100
 nc150                           // 1992 NC150
 nc200                           // 1993 NC200
 
+@source:ncd17c.cpp
+ncd17c                          // 1990 Network Computing Devices
+
 @source:nds.cpp
 nds                             // 2004 Nintendo
 
