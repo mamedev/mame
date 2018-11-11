@@ -2568,6 +2568,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/nascom1.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "ncd")
+files {
+	MAME_DIR .. "src/mame/drivers/ncd17c.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "ne")
 files {
 	MAME_DIR .. "src/mame/drivers/z80ne.cpp",
