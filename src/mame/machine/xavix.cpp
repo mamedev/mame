@@ -46,11 +46,11 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 		{
 			m_irqsource |= 0x20;
 			update_irqs();
-
-			// ekara definitely wants this cleared
-			m_rom_dma_len[0] = 0;
-			m_rom_dma_len[1] = 0;
 		}
+
+		// ekara definitely wants this cleared
+		m_rom_dma_len[0] = 0;
+		m_rom_dma_len[1] = 0;
 
 	}
 	else // the interrupt routine writes 0x80 to the trigger, maybe 'clear IRQ?'
