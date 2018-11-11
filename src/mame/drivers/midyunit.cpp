@@ -9,7 +9,7 @@
     and Aaron Giles
 
     Games supported (prototype and release versions):
-        * Narc
+        * NARC
         * Trog
         * Strike Force
         * Smash TV
@@ -20,7 +20,7 @@
         * Total Carnage
 
     Known bugs:
-        * when the Porsche spins in Narc, the wheels are missing for
+        * when the Porsche spins in NARC, the wheels are missing for
             a single frame (may be an original bug)
         * Terminator 2 freezes while playing the movies after destroying
             skynet. Currently we have a hack in which prevents the freeze,
@@ -3063,9 +3063,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, narc,       0,        zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "Narc (rev 7.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, narc3,      narc,     zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "Narc (rev 3.20)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, narc2,      narc,     zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "Narc (rev 2.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc,       0,        zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "NARC (rev 7.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc3,      narc,     zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "NARC (rev 3.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc2,      narc,     zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "NARC (rev 2.00)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, trog,       0,        yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA5 03/29/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, trog4,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA4 03/11/91)", MACHINE_SUPPORTS_SAVE )
