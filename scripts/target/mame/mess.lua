@@ -3325,6 +3325,7 @@ files {
 	MAME_DIR .. "src/mame/video/ti85.cpp",
 	MAME_DIR .. "src/mame/drivers/ti89.cpp",
 	MAME_DIR .. "src/mame/includes/ti89.h",
+	MAME_DIR .. "src/mame/drivers/ti931.cpp",
 	MAME_DIR .. "src/mame/drivers/ti99_2.cpp",
 	MAME_DIR .. "src/mame/drivers/ti99_4x.cpp",
 	MAME_DIR .. "src/mame/drivers/ti99_4p.cpp",

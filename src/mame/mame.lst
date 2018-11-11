@@ -37256,6 +37256,9 @@ ti92                            // 1995 TI-92
 ti92p                           // 1999 TI-92 Plus
 v200                            // 2002 Voyage 200 PLT
 
+@source:ti931.cpp
+ti931                           // 1983
+
 @source:ti99_2.cpp
 ti99_224                        // 1983 TI 99/2 (24kb ROMs)
 ti99_232                        // 1983 TI 99/2 (32kb ROMs)
