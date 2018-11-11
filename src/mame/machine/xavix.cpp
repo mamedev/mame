@@ -48,6 +48,10 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 			update_irqs();
 		}
 
+		// ekara definitely wants this cleared
+		m_rom_dma_len[0] = 0;
+		m_rom_dma_len[1] = 0;
+
 	}
 	else // the interrupt routine writes 0x80 to the trigger, maybe 'clear IRQ?'
 	{
@@ -237,7 +241,14 @@ WRITE8_MEMBER(xavix_state::adc_7b80_w)
 
 WRITE8_MEMBER(xavix_state::adc_7b81_w)
 {
+//	m_irqsource &= ~0x04;
+//	update_irqs();
+
 	LOG("%s: adc_7b81_w %02x\n", machine().describe_context(), data);
+	m_adc_control = data;
+
+//	m_adc_timer->adjust(attotime::from_usec(200));
+
 }
 
 READ8_MEMBER(xavix_state::adc_7b81_r)
@@ -700,6 +711,12 @@ TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 	//m_freq_timer->adjust(attotime::from_usec(50000));
 }
 
+TIMER_CALLBACK_MEMBER(xavix_state::adc_timer_done)
+{
+	//m_irqsource |= 0x04;
+	//update_irqs();
+}
+
 
 
 READ8_MEMBER(xavix_state::mult_r)
@@ -803,6 +820,8 @@ void xavix_state::machine_start()
 
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::interrupt_gen), this));
 	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
+	m_adc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::adc_timer_done), this));
+
 }
 
 void xavix_state::machine_reset()
@@ -867,6 +886,8 @@ void xavix_state::machine_reset()
 	m_sound_irqstatus = 0x00;
 
 	m_sound_regbase = 0x00;
+
+	m_adc_control = 0x00;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
