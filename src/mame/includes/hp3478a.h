@@ -23,6 +23,8 @@
 #define P26	(1 << 6)
 #define P27	(1 << 7)
 
+#define VFD_TAG     "vfd"
+
 class hp3478a_state : public driver_device
 {
 public:
@@ -51,7 +53,11 @@ protected:
 	required_memory_bank m_bank0;
 
 	/////////////// stuff for internal LCD emulation
+	// could be split to a separate driver ?
+	std::unique_ptr<output_finder<16> > m_outputs;
+
 	void lcd_interface(uint8_t p2new);
+	void lcd_map_chars(void);
 	uint8_t lcd_bitcount;
 	uint8_t lcd_want;
 	uint64_t lcd_bitbuf;
@@ -70,6 +76,7 @@ protected:
 	} m_lcdiwa;
 	uint8_t lcd_chrbuf[12];	//raw digits (not ASCII)
 	uint8_t lcd_text[13];	//mapped to ASCII
+	uint32_t lcd_segdata[12];
 
 	uint8_t p2_oldstate;	//used to detect edges on Port2 IO pins. Should be saveable ?
 

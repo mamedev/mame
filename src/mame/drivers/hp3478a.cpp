@@ -9,17 +9,19 @@
 *
 * Some of this will probably be applicable to HP 3468A units too.
 *
-* Current status : runs (with banking !), fails CAL checksum due to unimplemented
+* Current status : runs, AD LINK ERROR on stock ROM due to unimplemented
+* - patching the AD comms, we get to "UNCALIBRATED" due to no CALRAM
 *
 *
 * TODO kindof important
 * * keypad on port1
-* * something something display
+* * do something for analog CPU serial link (not quite uart)
 *
 * TODO next level
 * * DIP switches
 * * proper CAL RAM (see NVRAM() macro ?)
 * * ability to preload CAL RAM on startup ("media" or "software" ?)
+* * better display render and layout
 *
 * TODO level 9000
 * * Connect this with the existing i8291.cpp driver
@@ -56,6 +58,7 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 
 #include "emu.h"
 #include "includes/hp3478a.h"
+#include "hp3478a.lh"
 
 #include "cpu/mcs48/mcs48.h"
 
@@ -85,7 +88,7 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #define DEBUG_LCD (LOG_GENERAL << 5)	//low level
 #define DEBUG_LCD2 (LOG_GENERAL << 6)
 
-#define VERBOSE (DEBUG_LCD2)
+#define VERBOSE (DEBUG_KEYPAD)
 
 #include "logmacro.h"
 
@@ -201,12 +204,85 @@ WRITE8_MEMBER( hp3478a_state::buswrite )
 }
 
 
-/* Yuck. Emulate serial LCD module interface. don't really want to make a separate driver for this...
+/**** LCD emulation
+ *
+ * Yuck. Emulate serial LCD module interface. don't really want to make a separate driver for this...
  * The protocol is common to many HP products of the era. Some sources have the instruction words written as 10-bit
  * words, but it would appear more consistent (and matches the intent guessed from the disassembled functions)
  * that they are actually 8-bit bytes. The 2-bit difference is a "bogus" 2 clock cycles for when SYNC or PWO changes ?
  *
 */
+
+/** charset copied from roc10937 driver. Some special chars are wrong */
+static const uint16_t hpcharset[]=
+{           // FEDC BA98 7654 3210
+	0x507F, // 0101 0000 0111 1111 @.
+	0x44CF, // 0100 0100 1100 1111 A.
+	0x153F, // 0001 0101 0011 1111 B.
+	0x00F3, // 0000 0000 1111 0011 C.
+	0x113F, // 0001 0001 0011 1111 D.
+	0x40F3, // 0100 0000 1111 0011 E.
+	0x40C3, // 0100 0000 1100 0011 F.
+	0x04FB, // 0000 0100 1111 1011 G.
+	0x44CC, // 0100 0100 1100 1100 H.
+	0x1133, // 0001 0001 0011 0011 I.
+	0x007C, // 0000 0000 0111 1100 J.
+	0x4AC0, // 0100 1010 1100 0000 K.
+	0x00F0, // 0000 0000 1111 0000 L.
+	0x82CC, // 1000 0010 1100 1100 M.
+	0x88CC, // 1000 1000 1100 1100 N.
+	0x00FF, // 0000 0000 1111 1111 O.
+	0x44C7, // 0100 0100 1100 0111 P.
+	0x08FF, // 0000 1000 1111 1111 Q.
+	0x4CC7, // 0100 1100 1100 0111 R.
+	0x44BB, // 0100 0100 1011 1011 S.
+	0x1103, // 0001 0001 0000 0011 T.
+	0x00FC, // 0000 0000 1111 1100 U.
+	0x22C0, // 0010 0010 1100 0000 V.
+	0x28CC, // 0010 1000 1100 1100 W.
+	0xAA00, // 1010 1010 0000 0000 X.
+	0x9200, // 1001 0010 0000 0000 Y.
+	0x2233, // 0010 0010 0011 0011 Z.
+	0x00E1, // 0000 0000 1110 0001 [.
+	0x8800, // 1000 1000 0000 0000 \.
+	0x001E, // 0000 0000 0001 1110 ].
+	0x2800, // 0010 1000 0000 0000 ^.
+	0x0030, // 0000 0000 0011 0000 _.
+	0x0000, // 0000 0000 0000 0000 dummy.
+	0x8121, // 1000 0001 0010 0001 !.
+	0x0180, // 0000 0001 1000 0000 ".
+	0x553C, // 0101 0101 0011 1100 #.
+	0x55BB, // 0101 0101 1011 1011 $.
+	0x7799, // 0111 0111 1001 1001 %.
+	0xC979, // 1100 1001 0111 1001 &.
+	0x0200, // 0000 0010 0000 0000 '.
+	0x0A00, // 0000 1010 0000 0000 (.
+	0xA050, // 1010 0000 0000 0000 ).
+	0xFF00, // 1111 1111 0000 0000 *.
+	0x5500, // 0101 0101 0000 0000 +.
+	0x0000, // 0000 0000 0000 0000 ;. (Set separately)
+	0x4400, // 0100 0100 0000 0000 --.
+	0x0000, // 0000 0000 0000 0000 . .(Set separately)
+	0x2200, // 0010 0010 0000 0000 /.
+	0x22FF, // 0010 0010 1111 1111 0.
+	0x1100, // 0001 0001 0000 0000 1.
+	0x4477, // 0100 0100 0111 0111 2.
+	0x443F, // 0100 0100 0011 1111 3.
+	0x448C, // 0100 0100 1000 1100 4.
+	0x44BB, // 0100 0100 1011 1011 5.
+	0x44FB, // 0100 0100 1111 1011 6.
+	0x000F, // 0000 0000 0000 1111 7.
+	0x44FF, // 0100 0100 1111 1111 8.
+	0x44BF, // 0100 0100 1011 1111 9.
+	0x0021, // 0000 0000 0010 0001 -
+			//                     -.
+	0x2001, // 0010 0000 0000 0001 -
+			//                     /.
+	0x2230, // 0010 0010 0011 0000 <.
+	0x4430, // 0100 0100 0011 0000 =.
+	0x8830, // 1000 1000 0011 0000 >.
+	0x1407, // 0001 0100 0000 0111 ?.
+};
 
 /** copy data in shiftreg to the high nibble of each digit in chrbuf */
 static void lcd_update_hinib(uint8_t *chrbuf, uint64_t shiftreg)
@@ -230,17 +306,27 @@ static void lcd_update_lonib(uint8_t *chrbuf, uint64_t shiftreg)
 	}
 }
 
-/** map LCD char buffer to ASCII
+/** map LCD char to ASCII and segment data + update
  *
  * discards extra bits
  */
-static void lcd_map_ascii(uint8_t *chrbuf, uint8_t *sbuf)
+void hp3478a_state::lcd_map_chars()
 {
 	int i;
+	LOGMASKED(DEBUG_LCD2, "LCD : map ");
 	for (i=0; i < 12; i++) {
-		sbuf[i] = (chrbuf[i] & 0x3F)+ 0x40;
+		bool dp = lcd_chrbuf[i] & 0x40;	//check decimal point. Needs to be mapped to seg_bit16
+		lcd_text[i] = (lcd_chrbuf[i] & 0x3F) + 0x40;
+		lcd_segdata[i] = hpcharset[lcd_chrbuf[i] & 0x3F] | (dp << 16);
+		LOGMASKED(DEBUG_LCD2, "[%02X>%04X] ", lcd_chrbuf[i] & 0x3F, lcd_segdata[i]);
 	}
-	sbuf[12] = 0;
+	LOGMASKED(DEBUG_LCD2, "\n");
+}
+
+/** ?? from roc10937 */
+static uint32_t lcd_set_display(uint32_t segin)
+{
+	return bitswap<32>(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
 }
 
 // ISA command bytes
@@ -371,16 +457,16 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 				LOGMASKED(DEBUG_LCD2, "LCD : write annuns 0x%02X\n", lcd_bitbuf & 0xFF);
 				break;
 			case lcd_iwatype::REG_A:
-				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib)\n");
 				lcd_update_lonib(lcd_chrbuf, lcd_bitbuf);
-				lcd_map_ascii(lcd_chrbuf, lcd_text);
-				LOGMASKED(DEBUG_LCD2, "LCD text: %s\n", (char *) lcd_text);
+				lcd_map_chars();
+				std::transform(std::begin(lcd_segdata), std::end(lcd_segdata), std::begin(*m_outputs), lcd_set_display);
+				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %I64X, text=%s\n", lcd_bitbuf, (char *) lcd_text);
 				break;
 			case lcd_iwatype::REG_B:
-				LOGMASKED(DEBUG_LCD2, "LCD : write reg B (hinib) %I64X\n", lcd_bitbuf);
 				lcd_update_hinib(lcd_chrbuf, lcd_bitbuf);
-				lcd_map_ascii(lcd_chrbuf, lcd_text);
-				LOGMASKED(DEBUG_LCD2, "LCD text: %s\n", (char *) lcd_text);
+				lcd_map_chars();
+				std::transform(std::begin(lcd_segdata), std::end(lcd_segdata), std::begin(*m_outputs), lcd_set_display);
+				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %I64X, text=%s\n", lcd_bitbuf, (char *) lcd_text);
 				break;
 			default:
 				//discard
@@ -402,6 +488,9 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 void hp3478a_state::machine_start()
 {
 	m_bank0->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
+
+	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", (unsigned) 0);
+	m_outputs->resolve();
 }
 
 /******************************************************************************
@@ -410,7 +499,6 @@ void hp3478a_state::machine_start()
 
 void hp3478a_state::i8039_map(address_map &map)
 {
-	//map(0x0000, 0x0fff).rom(); /* CPU address space : 4kB */
 	map(0x0000, 0x0fff).bankr("bank0");	// CPU address space (4kB), banked according to P26 pin
 }
 
@@ -438,6 +526,10 @@ void hp3478a_state::hp3478a(machine_config &config)
 	mcu.p1_in_cb().set(FUNC(hp3478a_state::p1read));
 	mcu.p1_out_cb().set(FUNC(hp3478a_state::p1write));
 	mcu.p2_out_cb().set(FUNC(hp3478a_state::p2write));
+
+	// video
+
+	config.set_default_layout(layout_hp3478a);
 }
 
 /******************************************************************************
