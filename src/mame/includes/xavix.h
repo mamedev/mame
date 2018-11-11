@@ -226,6 +226,9 @@ private:
 	DECLARE_WRITE8_MEMBER(adc_7b80_w);
 	DECLARE_READ8_MEMBER(adc_7b81_r);
 	DECLARE_WRITE8_MEMBER(adc_7b81_w);
+	TIMER_CALLBACK_MEMBER(adc_timer_done);
+	emu_timer *m_adc_timer;
+	uint8_t m_adc_control;
 
 	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
 
