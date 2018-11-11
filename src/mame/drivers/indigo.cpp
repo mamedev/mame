@@ -725,12 +725,12 @@ void indigo_state::set_timer_int_clear(uint32_t data)
 {
 	if (BIT(data, 0))
 	{
-		LOGMASKED(LOG_PIT | LOG_INT, "Clearing Timer 0 Interrupt: %d\n", state);
+		LOGMASKED(LOG_PIT | LOG_INT, "Clearing Timer 0 Interrupt: %d\n", data);
 		m_maincpu->set_input_line(MIPS3_IRQ2, CLEAR_LINE);
 	}
 	if (BIT(data, 1))
 	{
-		LOGMASKED(LOG_PIT | LOG_INT, "Clearing Timer 1 Interrupt: %d\n", state);
+		LOGMASKED(LOG_PIT | LOG_INT, "Clearing Timer 1 Interrupt: %d\n", data);
 		m_maincpu->set_input_line(MIPS3_IRQ3, CLEAR_LINE);
 	}
 }
