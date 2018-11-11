@@ -18600,18 +18600,19 @@ madalienb                       // (c) 1980
 madmotor                        // (c) [1989] Mitchell
 
 @source:magic10.cpp
-hotslot                         // (c) 1996 ABM Electronics
+hotslot                         // (c) 1996 ABM Games
 magic10                         // (c) 1995 A.W.P. Games
 magic102                        // (c) 1997 ABM Games
 magic10a                        // (c) 1995 A.W.P. Games
 magic10b                        // (c) 1995 A.W.P. Games
 magic10c                        // (c) 1995 A.W.P. Games
-mcolors                         // 1999 unknown
+mcolors                         // (c) 1999 ABM Games
+mcolorsa                        // (c) 1999 ABM Games
 musicsrt                        // (c) 1995 ABM Games
 sgsafari                        // (c) 1996 New Impeuropex Corp.
-suprpool                        // (c) 1997 ABM Games
+suprpool                        // (c) 1998 ABM Games
 lunaprk                         // (c) 1998 ABM Games
-altaten                         // 199? unknown
+altaten                         // 1999 unknown
 
 @source:magicard.cpp
 hotslots                        // (c) 2002 Impera
