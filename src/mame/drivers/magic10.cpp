@@ -1662,17 +1662,17 @@ void magic10_state::init_altaten()
 *        Game Drivers         *
 ******************************/
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT           ROT   COMPANY                 FULLNAME                          FLAGS            LAYOUT
-GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,               layout_sgsafari )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT           ROT   COMPANY                 FULLNAME                          FLAGS                 LAYOUT
+GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,                    layout_sgsafari )
+GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,                    layout_sgsafari )
+GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,                    layout_sgsafari )
+GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,                    layout_sgsafari )
 GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. 1.1)",        MACHINE_NOT_WORKING )
 GAME(  1998, suprpool, 0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING )
 GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, init_hotslot,  ROT0, "ABM Games",            "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING )
-GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, init_magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
-GAME(  1999, mcolorsa, 0,        magic102, magic102, magic10_state, init_magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.6)",        MACHINE_NOT_WORKING )
-GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, init_sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver. 3.11)",   0,               layout_sgsafari )
-GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)", 0,               layout_musicsrt )
+GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
+GAME(  1999, mcolorsa, mcolors,  magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.6)",        MACHINE_NOT_WORKING )
+GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, init_sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver. 3.11)",  0,                    layout_sgsafari )
+GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)", 0,                            layout_musicsrt )
 GAME(  1998, lunaprk,  0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING )
 GAME(  1999, altaten,  0,        magic102, magic102, magic10_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )
