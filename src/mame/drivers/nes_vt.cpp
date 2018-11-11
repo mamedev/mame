@@ -1842,7 +1842,10 @@ CONS( 201?, cbrs8,      0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 CONS( 200?, gprnrs1,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
 
-// Console has stereo output (dual RCA connectors)
+// Notes:
+// Console has stereo output (dual RCA connectors).
+// The original console shows a "Konami" banner on startup, but it seems to be missing on the emulation.
+// Also, it hangs when reset on a MAME debug build.
 CONS( 2001, ddrdismx,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Disney", "Dance Dance Revolution Disney Mix", MACHINE_IMPERFECT_GRAPHICS )
 		
 // unsorted, these were all in nes.xml listed as ONE BUS systems
