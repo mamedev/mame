@@ -6287,14 +6287,14 @@ GAME( 1996, scuda,       scud,      scud, scud,     model3_state,     init_scud,
 GAME( 1997, scudplus,    scud,      scud, scud,     model3_state, init_scudplus, ROT0, "Sega", "Scud Race Plus (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, scudplusa,   scud,      scud, scud,     model3_state,init_scudplusa, ROT0, "Sega", "Scud Race Plus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lostwsga,       0, model3_15, lostwsga, model3_state, init_lostwsga, ROT0, "Sega", "The Lost World (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, vs215,        vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, vs215o,       vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, older)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, vs215,        vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, vs215o,       vs2, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lemans24,       0, model3_15, scud,     model3_state, init_lemans24, ROT0, "Sega", "Le Mans 24 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, vs29815,    vs298, model3_15, model3,   model3_state,  init_vs29815, ROT0, "Sega", "Virtua Striker 2 '98 (Step 1.5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, vs29915,  vs2v991, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 '99 (Step 1.5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs29915,  vs2v991, model3_15, model3,   model3_state,    init_vs215, ROT0, "Sega", "Virtua Striker 2 '99 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Model 3 Step 2.0 */
-GAME( 1997, vs2,            0, model3_20,      model3,   model3_state,      init_vs2, ROT0, "Sega", "Virtua Striker 2 (Step 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, vs2,            0, model3_20,      model3,   model3_state,      init_vs2, ROT0, "Sega", "Virtua Striker 2 (Step 2.0, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, harley,         0, model3_20,      harley,   model3_state,   init_harley, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, harleya,   harley, model3_20,      harley,   model3_state,  init_harleya, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, lamachin,       0, model3_20_5881, model3,   model3_state, init_lamachin, ROT0, "Sega", "L.A. Machineguns (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -6309,10 +6309,10 @@ GAME( 1998, von254g,     von2, model3_20_5881, von2,     model3_state,     init_
 GAME( 1998, fvipers2,       0, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Fighting Vipers 2 (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, fvipers2o,fvipers2,model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Fighting Vipers 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, vs298,          0, model3_20_5881, model3,   model3_state,    init_vs298, ROT0, "Sega", "Virtua Striker 2 '98 (Step 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, vs2v991,        0, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99.1 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, vs299b,   vs2v991, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, vs299a,   vs2v991, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, vs299,    vs2v991, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs2v991,        0, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99.1 (Export, USA, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs299b,   vs2v991, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs299a,   vs2v991, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Export, USA, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs299,    vs2v991, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Model 3 Step 2.1 */
 GAME( 1998, daytona2,         0, model3_21_5881, daytona2, model3_state, init_daytona2, ROT0, "Sega", "Daytona USA 2 (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
