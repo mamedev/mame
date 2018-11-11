@@ -8,7 +8,94 @@
 		 
 		 There are some carts which are meant to be compatible with both Japanese e-Kara units and
 		 several other systems.
-    -->
+    
+	     The genres in the Japanese games are represented by the code after the EC number
+		 ECxxxx-JPM = J-Pop Mix
+		 ECxxxx-ATS = Artist Selection (all songs by a single artist)
+		 ECxxxx-KID = Kid's Mix? (guess)
+		 ECxxxx-ENK = unknown
+		 
+		 Some Japanese carts have a number starting with BC
+		 BCxxxx-BHT = unknown
+			 
+	    ***********************************************************************************
+			 
+		 Japanese cart listing (by EC code) - the EC number is printed on the left side of the cart label, as well as in the serial code
+		  * = dumped, titles in parenthesis are guessed
+		 	 
+		 EC0001-  (J-Pop Mix Volume 1?)
+		 EC0002-  (J-Pop Mix Volume 2?)
+		*EC0003-  J-Pop Mix Volume 3
+		 EC0004-
+		 EC0005-
+		*EC0006-  ENK Volume 1
+		 EC0007-
+		 EC0008-
+		 EC0009-
+	
+		*EC0010-  Kid's Mix Volume 1
+		 EC0011-
+		*EC0012-  J-Pop Mix Volume 7 
+		*EC0013-  J-Pop Mix Volume 8
+		 EC0014-
+		*EC0015-  Artist Selection Volume 2 - unknown artist
+		 EC0016-
+		 EC0017-
+		 EC0018-
+		 EC0019-
+	 
+		 EC0020-
+		 EC0021-
+		*EC0022-  J-Pop Mix Volume 10
+		 EC0023-  (J-Pop Mix Volume 11?)
+		 EC0024-  (J-Pop Mix Volume 12?)
+		 EC0025-  (J-Pop Mix Volume 13?)
+		*EC0026-  J-Pop Mix Volume 14 
+		*EC0027-  J-Pop Mix Volume 15 
+		 EC0028-
+		*EC0029-  Artist Selection Volume 3 - Dreams Come True	
+
+		 EC0030-
+		*EC0031-  Artist Selection Volume 4 - unknown artist
+		 EC0032-
+		 EC0033-
+		*EC0034-  Kid's Mix Volume 3 
+		 EC0035-
+		*EC0036-  Artist Selection Volume 6 - KinKi Kids
+		 EC0037-
+		 EC0038-
+		 EC0039-
+	
+		 EC0040-
+		 EC0041-
+		*EC0042-  J-Pop Mix Volume 19
+		 EC0043-
+		*EC0044-  Artist Selection Volume 9 - Every Little Thing 
+		*EC0045-  Artist Selection Volume 10 - Mr. Children 
+		 EC0046-
+		 EC0047-
+		*EC0048-  ENK Volume 6
+		*EC0049-  Artist Selection Volume 11 - Judy and Mary
+
+		 EC0050-
+		 EC0051-
+		 EC0052-
+		 EC0053-
+		*EC0054-  J-Pop Mix Volume 23
+		 
+		 (more? what's the GC highest number?)
+		 
+	    ***********************************************************************************
+
+		 Japanese cart listing (by BC code)
+ 		  * = dumped
+
+		 GC0001- 
+		*GC0002-  BHT Volume 1
+		 
+ 		 (more? what's the BC highest number?)
+	-->
+	
 	
 	<!-- US cartridges -->
 	
@@ -93,7 +180,7 @@
 	
 	<software name="uk_vol1">
 		<description>e-kara UK / Europe Volume 1 (UK-E001)</description>
-		<year>2000</year>
+		<year>2002</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -101,5 +188,271 @@
 			</dataarea>
 		</part>
 	</software>	
+	
+	<!--
+	1.  "I'm A Slave 4 U"                    Britney Spears
+	2.  "It's Gonna Be Me"                   *N Sync
+	3.  "Doesn't Really Matter (radio edit)" Janet Jackson
+	4.  "Love Don't Cost a Thing"            Jennifer Lopez
+	5.  "I'll Be There For You"              Backstreet Boys
+	6.  "I Just Called To Say I Love You"    Stevie Wonder
+	7.  "Crazy For You"                      Madonna
+	8.  "True Colors"                        Cyndi Lauper
+	9.  "When It's Over"                     Sugar Ray
+	10. "Breathe"                            Faith Hill
+	-->	
+	<software name="uk_vol7">
+		<description>e-kara UK / Europe Volume 7 (UK-E007)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="uk-e007.u1" size="0x100000" crc="753ce591" sha1="e12ac98470f1dbc470f2e3d957f1b72f0a90bee1" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	
+	<!-- Note, same lineup as US Starter, but with 2002 copyright, different background picture on 'Stronger'
+	1. "Stronger"                  Britney Spears
+	2. "Bye Bye Bye"               *N Sync
+	3. "Independent Woman Part 1"  Destiny's Child
+	4. "I Want It That Way"        Backstreet Boys
+	5. "Yellow Submarine"          The Beatles
+	-->	
+	<software name="ger_strt">
+		<description>e-kara Germany 5-Songs Starter (GER-M001)</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="ger-m001.u1" size="0x080000" crc="ff2881f3" sha1="3470fc1ed81da5e2c929205fcd290da82d031c4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<!-- Japanese e-kara cartridges EC series -->
+	
+	<software name="ec0003">
+		<description>J-Pop Mix Volume 3 (Japan) (EC0003-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0003-jpm.u1" size="0x100000" crc="bb6a6edf" sha1="48b0a04865f8aa2b34022e29d37f44a9468a315c" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+
+	<software name="ec0006">
+		<description>ENK Volume 1 (Japan) (EC0006-ENK)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0006-enk.u1" size="0x100000" crc="294a0639" sha1="f1f58057a80257c9083093be146ed287ca1aee39" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="ec0010">
+		<description>Kid's Mix Volume 1 (Japan) (EC0010-KID)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0010-kid.u1" size="0x100000" crc="3cc17df6" sha1="50e5916850ac20921a6a7aa98f4fff126943b7b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ec0012">
+		<description>J-Pop Mix Volume 7 (Japan) (EC0012-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0012-jpm.u1" size="0x100000" crc="6df0e8f5" sha1="122744fc5b17348a00778b08855626b8b1c2f9e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="ec0013">
+		<description>J-Pop Mix Volume 8 (Japan) (EC0013-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0013-jpm.u1" size="0x100000" crc="75d0d784" sha1="a7d2f937a5f4cc5894a90992a32cf2dbce50dadf" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+		
+	<software name="ec0015">
+		<description>Artist Selection Volume 2 (unknown) (Japan) (EC0015-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0015-ats.u1" size="0x100000" crc="3ae1c656" sha1="53e1e8b8b742ef6c5c9c76c7830949ee6fcb6631" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ec0022">
+		<description>J-Pop Mix Volume 10 (Japan) (EC0022-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0022-jpm.u1" size="0x100000" crc="6dfb1b9c" sha1="1554df7fa710e398fbe69951bf187e0260bc71d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ec0026">
+		<description>J-Pop Mix Volume 14 (Japan) (EC0026-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0026-jpm.u1" size="0x100000" crc="bae82f82" sha1="cb2d61796d79bc82866c8f0f711c567887df608a" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="ec0027">
+		<description>J-Pop Mix Volume 15 (Japan) (EC0027-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0027-jpm.u1" size="0x100000" crc="d72b685c" sha1="519da4b496e4c90d04f48043eb537c3644e8d0d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ec0029">
+		<description>Artist Selection Volume 3 (Dreams Come True) (Japan) (EC0029-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0029-ats.u1" size="0x100000" crc="cb9b1ab0" sha1="70f1c40e58aac1dcd6777c90063c2ae8d0cbb895" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ec0031">
+		<description>Artist Selection Volume 4 (unknown) (Japan) (EC0031-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0031-ats.u1" size="0x100000" crc="0e4f6c31" sha1="3f42e80fde8c5d5cf6321b0fe1547ad2d1936e5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ec0034">
+		<description>Kid's Mix Volume 3 (Japan) (EC0034-KID)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0034-kid.u1" size="0x100000" crc="80fb5241" sha1="5619605ae7099e955fff69466a0a2f0b2ce3049a" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+
+	<software name="ec0036">
+		<description>Artist Selection Volume 6 (KinKi Kids) (Japan) (EC0036-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0036-ats.u1" size="0x100000" crc="c8a7117d" sha1="a3b4a48816119c898acbf5078c906692f2fc68c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ec0042">
+		<description>J-Pop Mix Volume 19 (Japan) (EC0042-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0042-jpm.u1" size="0x100000" crc="4082d883" sha1="66c517f72cef5fceffe94cc4ed1b5d7c0f16b151" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ec0044">
+		<description>Artist Selection Volume 9 (Every Little Thing) (Japan) (EC0044-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0044-ats.u1" size="0x100000" crc="06557370" sha1="0ce7a193b214adaf14f3332ddd8ccbcbec830985" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ec0045">
+		<description>Artist Selection Volume 10 (Mr. Children) (Japan) (EC0045-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0045-ats.u1" size="0x100000" crc="d1f4ba12" sha1="385a341a9e92881ae362294bd61cb66bf05e2b08" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ec0048">
+		<description>ENK Volume 6 (Japan) (EC0048-ENK)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0048-enk.u1" size="0x100000" crc="32ad1da7" sha1="7033988a6652fffca840348c68d5d54e5e28f225" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+		
+	<software name="ec0049">
+		<description>Artist Selection Volume 11 (Judy and Mary) (Japan) (EC0049-ATS)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0049-ats.u1" size="0x100000" crc="110a1cde" sha1="339901556bcb54e3d09b5291038746687bfaed14" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ec0054">
+		<description>J-Pop Mix Volume 23 (Japan) (EC0054-JPM)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ec0054-jpm.u1" size="0x100000" crc="3dcf6eb2" sha1="f235126a900544bb44397ebe9e0fd963927d6cdb" offset="0" />
+			</dataarea>
+		</part>
+	</software>			
+	
+	<!-- Japanese e-kara cartridges GC series -->
+	
+	<software name="gc0002bht">
+		<description>BHT Volume 1 (Japan) (GC0002-BHT)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="gc0002-bht.u1" size="0x100000" crc="eae1cb3b" sha1="d1e594858eecde5409898684654caab0555ac1b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
 	
 </softwarelist>
