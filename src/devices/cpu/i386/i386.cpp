@@ -417,11 +417,15 @@ void i386_device::i386_load_segment_descriptor(int segment )
 {
 	if (PROTECTED_MODE)
 	{
+		uint16_t old_flags = m_sreg[segment].flags;
 		if (!V8086_MODE)
 		{
-			i386_load_protected_mode_segment(&m_sreg[segment], nullptr );
-			if(m_sreg[segment].selector)
+			i386_load_protected_mode_segment(&m_sreg[segment], nullptr);
+			if (m_sreg[segment].selector)
+			{
 				i386_set_descriptor_accessed(m_sreg[segment].selector);
+				m_sreg[segment].flags |= 0x0001;
+			}
 		}
 		else
 		{
@@ -431,6 +435,8 @@ void i386_device::i386_load_segment_descriptor(int segment )
 			m_sreg[segment].d = 0;
 			m_sreg[segment].valid = true;
 		}
+		if (segment == CS && m_sreg[segment].flags != old_flags)
+			debugger_privilege_hook();
 	}
 	else
 	{
@@ -438,11 +444,11 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		m_sreg[segment].d = 0;
 		m_sreg[segment].valid = true;
 
-		if( segment == CS )
+		if (segment == CS)
 		{
-			if( !m_performed_intersegment_jump )
+			if (!m_performed_intersegment_jump)
 				m_sreg[segment].base |= 0xfff00000;
-			if(m_cpu_version < 0x500)
+			if (m_cpu_version < 0x500)
 				m_sreg[segment].flags = 0x93;
 		}
 	}
