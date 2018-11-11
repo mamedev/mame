@@ -17,7 +17,7 @@
 #define LOG_PBUS4		(1 << 5)
 #define LOG_CHAIN		(1 << 6)
 
-#define VERBOSE		(LOG_SCSI_DMA)
+#define VERBOSE			(0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_HPC3, hpc3_device, "hpc3", "SGI HPC3")

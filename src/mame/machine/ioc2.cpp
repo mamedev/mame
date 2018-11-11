@@ -208,12 +208,14 @@ void ioc2_device::lower_local1_irq(uint8_t source_mask)
 
 WRITE_LINE_MEMBER(ioc2_device::timer0_int)
 {
-	m_maincpu->set_input_line(MIPS3_IRQ2, ASSERT_LINE);
+	if (state)
+		m_maincpu->set_input_line(MIPS3_IRQ2, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(ioc2_device::timer1_int)
 {
-	m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
+	if (state)
+		m_maincpu->set_input_line(MIPS3_IRQ3, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(ioc2_device::kbdc_int_w)

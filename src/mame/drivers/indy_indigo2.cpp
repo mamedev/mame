@@ -108,7 +108,6 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(unknown_r);
 	DECLARE_READ32_MEMBER(enet_r);
 	DECLARE_WRITE32_MEMBER(enet_w);
 	DECLARE_READ32_MEMBER(eisa_io_r);
@@ -223,18 +222,12 @@ WRITE32_MEMBER(ip22_state::ip22_write_ram)
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
-READ32_MEMBER(ip22_state::unknown_r)
-{
-	return 0x043b2800;
-}
-
 void ip22_state::ip22_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
 	map(0x00080000, 0x0009ffff).r(FUNC(ip22_state::eisa_io_r));
 	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip22_state::ip22_write_ram));     /* 128 MB of main RAM */
 	map(0x1f0f0000, 0x1f0f1fff).rw(m_newport, FUNC(newport_video_device::rex3_r), FUNC(newport_video_device::rex3_w));
-	//map(0x1f4f0100, 0x1f4f0103).r(FUNC(ip22_state::unknown_r));
 	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
 
 	map(0x1fb80000, 0x1fb8ffff).rw(m_hpc3, FUNC(hpc3_device::pbusdma_r), FUNC(hpc3_device::pbusdma_w));
@@ -278,9 +271,9 @@ INPUT_PORTS_END
 
 void ip22_state::cdrom_config(device_t *device)
 {
-	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, ":lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, ":rspeaker", 1.0)
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, ":lspeaker", 1.0);
+	cdda->add_route(1, ":rspeaker", 1.0);
 }
 
 void ip22_state::ip22_base(machine_config &config)
