@@ -33,10 +33,63 @@ Notes:
   - This has to be some kind of warm boot detection, but how does it work?
 
 You can use a debug trick to get UTS10 to boot:
-- When it stops @0157 halt, pc = 158 and g
 - When it loops at @0B33, pc = B35 and g
 
-2018-11-10 Info from AL: cpu clock 3.072MHz; hsync 22.74KHz; vsync 60Hz
+How to create a FCC (field control code):
+- Move the cursor to where you want the FCC to be
+- Press FCC GEN
+- Now you enter a sequence of 4 bytes
+- 1. Video Attribute
+- - Spacebar or N: Normal
+- - L: Low intensity
+- - O: Off
+- - B: Blink (low-half)
+- - 1: Rev-video/Normal
+- - 2: Rev-video/half-intensity
+- - 3: Rev-video/blink: normal-half
+- - 4: Rev-video/blink: low
+- 2. Tab-stop
+- - Spacebar or S: No tab-stop
+- - T: Tab-stop
+- - 6: Tab-stop protected
+- - 7: No tab protected
+- 3. Data-entry control
+- - Spacebar or U: Unprotected
+- - P: Protected
+- - A: Alpha only
+- - N: Numeric only
+- 4. Justified
+- - Spacebar: Normal
+- - R: Right-justified
+- Press Spacebar to enable the new FCC and exit back to normal.
+
+Control-page parameters. These vary depending on the terminal and feature set. Press FCTN and CTRL PAGE keys together.
+You get a proected area covering the first 2 lines where you can configure the terminal. Settings are saved in the NVRAM.
+Depending on the setting, it may take effect immediately (after exiting the control page), or after a reboot.
+Entries may be in upper or lower case.
+UC/NO : Upper and lower case can be entered
+UC/YS : Lower case is automatically folded to upper case.
+AB/LI : Alternate brightness is Low Intensity
+AB/RV : Alternate brightness is Reverse Video
+AB/NI : Alternate brightness is Normal Intensity
+IL/RV : Indicator Line is Reverse Video
+IL/NI : Indicator Line is Normal Intensity
+KK/ON : Keyclick on
+KK/OF : Keyclick off
+SP/NS : Non-destructive spacebar (works like right-arrow)
+SP/DS : Destructive spacebar
+VO/01 : Video off after 1 minute (a blank screen saver)
+VO/04 : Video off after 4 minutes
+VO/16 : Video off after 16 minutes
+VO/64 : Video off after 64 minutes
+CC/ON : Control characters show
+CC/OF : Control characters off (look like a space)
+CS/LO : Cursor repeat slow
+CS/HI : Cursor repeat fast
+RI/xx : Set the RID (generally 21-2F)
+SI/xx : Set the SID (generally 51-7F)
+After entering the characters, press FCTN and CTRL PAGE keys again to save the setting.
+
 
 ****************************************************************************/
 
@@ -193,7 +246,7 @@ WRITE8_MEMBER( univac_state::portc4_w )
 
 WRITE8_MEMBER( univac_state::porte6_w )
 {
-	//m_beep->set_state(BIT(data, 0));
+	//m_beep->set_state(BIT(data, 0)); // not sure what belongs here, but it isn't the beeper
 }
 
 
