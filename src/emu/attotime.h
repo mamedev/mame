@@ -344,14 +344,19 @@ inline u64 attotime::as_ticks(u32 frequency) const
 /** Create an attotime from a tick count @ticks at the given frequency @frequency  */
 inline attotime attotime::from_ticks(u64 ticks, u32 frequency)
 {
-	attoseconds_t attos_per_tick = HZ_TO_ATTOSECONDS(frequency);
+	if (frequency > 0)
+	{
+		attoseconds_t attos_per_tick = HZ_TO_ATTOSECONDS(frequency);
 
-	if (ticks < frequency)
-		return attotime(0, ticks * attos_per_tick);
+		if (ticks < frequency)
+			return attotime(0, ticks * attos_per_tick);
 
-	u32 remainder;
-	s32 secs = divu_64x32_rem(ticks, frequency, &remainder);
-	return attotime(secs, u64(remainder) * attos_per_tick);
+		u32 remainder;
+		s32 secs = divu_64x32_rem(ticks, frequency, &remainder);
+		return attotime(secs, u64(remainder) * attos_per_tick);
+	}
+	else
+		return attotime::never;
 }
 
 /** Create an attotime from floating point count of seconds @p _time */

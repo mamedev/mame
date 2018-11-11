@@ -232,15 +232,13 @@ void facit4440_state::facit4440(machine_config &config)
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 32_MHz_XTAL / 8));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.set_clk<0>(2.4576_MHz_XTAL / 4);
+	ctc.set_clk<1>(2.4576_MHz_XTAL / 4);
+	ctc.set_clk<2>(2.4576_MHz_XTAL / 4);
 	ctc.zc_callback<0>().set("iodart", FUNC(z80dart_device::txca_w));
 	ctc.zc_callback<1>().set("iodart", FUNC(z80dart_device::rxca_w));
 	ctc.zc_callback<2>().set("iodart", FUNC(z80dart_device::txcb_w));
 	ctc.zc_callback<2>().append("iodart", FUNC(z80dart_device::rxcb_w));
-
-	clock_device &baudclk(CLOCK(config, "baudclk", 2.4576_MHz_XTAL / 4));
-	baudclk.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
-	baudclk.signal_handler().append("ctc", FUNC(z80ctc_device::trg1));
-	baudclk.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
 
 	clock_device &keybclk(CLOCK(config, "keybclk", 2.4576_MHz_XTAL / 32)); // unclear
 	keybclk.signal_handler().set("kbdart", FUNC(z80dart_device::txca_w));

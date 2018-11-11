@@ -58,7 +58,10 @@ public:
 	DECLARE_READ32_MEMBER(pio_config_r);
 	DECLARE_WRITE32_MEMBER(pio_config_w);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsi0_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsi0_drq);
+	DECLARE_WRITE_LINE_MEMBER(scsi1_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
 
 protected:
 	void device_start() override;
@@ -67,9 +70,11 @@ protected:
 
 	void do_pbus_dma(uint32_t channel);
 
-	void dump_chain(address_space &space, uint32_t ch_base);
-	void fetch_chain(address_space &space);
-	bool decrement_chain(address_space &space);
+	void dump_chain(uint32_t base);
+	void fetch_chain(int channel);
+	void decrement_chain(int channel);
+	void scsi_drq(bool state, int channel);
+	void scsi_dma(int channel);
 
 	static const device_timer_id TIMER_PBUS_DMA = 0;
 
@@ -127,14 +132,25 @@ protected:
 
 	uint32_t m_enetr_nbdp;
 	uint32_t m_enetr_cbp;
-	uint32_t m_scsi0_desc;
-	uint32_t m_scsi0_addr;
-	uint32_t m_scsi0_flags;
-	uint32_t m_scsi0_byte_count;
-	uint32_t m_scsi0_next_addr;
-	uint32_t m_scsi0_dma_ctrl;
+
+	struct scsi_dma_t
+	{
+		uint32_t m_desc;
+		uint32_t m_addr;
+		uint32_t m_ctrl;
+		uint32_t m_length;
+		uint32_t m_next;
+		bool m_irq;
+		bool m_big_endian;
+		bool m_to_device;
+		bool m_active;
+	};
+
+	scsi_dma_t m_scsi_dma[2];
 	pbus_dma_t m_pbus_dma[8];
 	uint32_t m_pio_config[10];
+
+	address_space *m_cpu_space;
 
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };

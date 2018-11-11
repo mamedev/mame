@@ -1105,6 +1105,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"multitch",
 		"nakajima",
 		"nascom",
+		"ncd",
 		"ne",
 		"nec",
 		"netronic",
@@ -2565,6 +2566,11 @@ files {
 createMESSProjects(_target, _subtarget, "nascom")
 files {
 	MAME_DIR .. "src/mame/drivers/nascom1.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "ncd")
+files {
+	MAME_DIR .. "src/mame/drivers/ncd17c.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ne")
