@@ -81,6 +81,7 @@ public:
 		, m_framecnt(0)
 	{ }
 
+	void uts10(machine_config &config);
 	void uts20(machine_config &config);
 
 private:
@@ -98,6 +99,7 @@ private:
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+	void uts10_map(address_map &map);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
@@ -191,7 +193,7 @@ WRITE8_MEMBER( univac_state::portc4_w )
 
 WRITE8_MEMBER( univac_state::porte6_w )
 {
-	m_beep->set_state(BIT(data, 0));
+	//m_beep->set_state(BIT(data, 0));
 }
 
 
@@ -200,6 +202,14 @@ void univac_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x4fff).rom().region("roms", 0);
 	map(0x8000, 0xbfff).rw(FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
+	map(0xc000, 0xffff).ram().w(FUNC(univac_state::ram_w)).share("videoram");
+}
+
+void univac_state::uts10_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x4fff).rom().region("roms", 0);
+	map(0x8000, 0x9fff).mirror(0x2000).rw(FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
 	map(0xc000, 0xffff).ram().w(FUNC(univac_state::ram_w)).share("videoram");
 }
 
@@ -257,7 +267,7 @@ void univac_state::device_post_load()
 uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y,ra,chr;
-	uint16_t sy=0,x,ma=0; //m_bank_mask; (it isn't port43 that selects the screen)
+	uint16_t sy=0,x,ma=0,gfx; //m_bank_mask; (it isn't port43 that selects the screen)
 
 	m_framecnt++;
 
@@ -271,7 +281,7 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			{
 				chr = m_p_videoram[x];    // bit 7 = rv attribute (or dim, depending on control-page setting)
 
-				uint16_t gfx = m_p_chargen[((chr & 0x7f)<<4) | ra] ^ (BIT(chr, 7) ? 0x1ff : 0);
+				gfx = m_p_chargen[((chr & 0x7f)<<4) | ra];
 
 				// chars 1C, 1D, 1F need special handling
 				if ((chr >= 0x1c) && (chr <= 0x1f) && BIT(gfx, 7))
@@ -281,6 +291,10 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					if (m_framecnt & 16)
 						gfx = 0;
 				}
+
+				// reverse-video attribute
+				if (BIT(chr, 7))
+					gfx = ~gfx;
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 8);
@@ -324,6 +338,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
+// All frequencies confirmed
 MACHINE_CONFIG_START(univac_state::uts20)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz
@@ -366,6 +381,12 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(univac_state::uts10)
+	uts20(config);
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(uts10_map)
+MACHINE_CONFIG_END
+
 
 /* ROM definition */
 ROM_START( uts10 )
@@ -379,6 +400,9 @@ ROM_START( uts10 )
 
 	ROM_REGION( 0x0800, "chargen", 0 ) // possibly some bitrot, see h,m,n in F4 displayer
 	ROM_LOAD( "chr_5565.bin", 0x0000, 0x0800, CRC(7d99744f) SHA1(2db330ca94a91f7b2ac2ac088ae9255f5bb0a7b4) )
+
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "2716264.bin",  0x0000, 0x0800, CRC(75e188aa) SHA1(a6486576525f7eec617fd7f9db469063f8c357fc) )
 ROM_END
 
 ROM_START( uts20 )
@@ -389,13 +413,17 @@ ROM_START( uts20 )
 	ROM_LOAD( "uts20d.rom", 0x3000, 0x1000, CRC(76757cf7) SHA1(b0509d9a35366b21955f83ec3685163844c4dbf1) )
 	ROM_LOAD( "uts20e.rom", 0x4000, 0x1000, CRC(0dfc8062) SHA1(cd681020bfb4829d4cebaf1b5bf618e67b55bda3) )
 
-	/* character generator not dumped, using the one from 'UTS10' for now */
+	// character generator not dumped, using the one from 'UTS10' for now
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "chr_5565.bin", 0x0000, 0x0800, BAD_DUMP CRC(7d99744f) SHA1(2db330ca94a91f7b2ac2ac088ae9255f5bb0a7b4) )
+
+	// keyboard not dumped, using the one from 'UTS10' for now. The keyboard looks the same, and is most likely identical.
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "2716264.bin",  0x0000, 0x0800, BAD_DUMP CRC(75e188aa) SHA1(a6486576525f7eec617fd7f9db469063f8c357fc) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY          FULLNAME  FLAGS
-COMP( 1979?, uts10, uts20,  0,      uts20,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-10", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1979?, uts10, uts20,  0,      uts10,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-10", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, uts20, 0,      0,      uts20,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-20", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
