@@ -6,7 +6,7 @@
     NCD 17" color X terminal
 
     Hardware:
-        - MC68020FE20E CPU, no FPU, no MMU
+        - MC68020FE20E CPU, no FPU, no MMU ("COPROC" location is empty)
         - SCN2681AC1N40 DUART (Logitech serial mouse)
         - Unknown AMD Ethernet chip (c) 1987.  LANCE or derivative?
         - Bt478KPJ80 RAMDAC
