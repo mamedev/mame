@@ -268,7 +268,6 @@ ROMs:
 #include "includes/segaxbd.h"
 #include "includes/segaipt.h"
 
-#include "machine/i8251.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
@@ -1085,7 +1084,7 @@ void segaxbd_state::smgp_comm_portmap(address_map &map)
 //  RASCOT LINK CPU ADDRESS MAP
 //**************************************************************************
 
-void segaxbd_rascot_state::z80_map(address_map &map)
+void segaxbd_rascot_state::comm_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
@@ -1991,7 +1990,7 @@ MACHINE_CONFIG_START(segaxbd_rascot_state::device_add_mconfig)
 	m_cmptimer_1->zint_callback().set_nop();
 
 	cpu_device &commcpu(Z80(config, "commcpu", 8'000'000)); // clock unknown
-	commcpu.set_addrmap(AS_PROGRAM, &segaxbd_rascot_state::z80_map);
+	commcpu.set_addrmap(AS_PROGRAM, &segaxbd_rascot_state::comm_map);
 
 	MB8421(config, m_commram).intl_callback().set_inputline("commcpu", INPUT_LINE_IRQ0);
 

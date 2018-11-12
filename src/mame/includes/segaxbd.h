@@ -240,8 +240,7 @@ private:
 	DECLARE_WRITE8_MEMBER(commram_bank_w);
 
 	void sub_map(address_map &map);
-	void z80_map(address_map &map);
-	void z80_portmap(address_map &map);
+	void comm_map(address_map &map);
 
 	required_device<mb8421_device> m_commram;
 	required_device<i8251_device> m_usart;
