@@ -267,15 +267,15 @@ DISCRETE_SOUND_END
 WRITE8_MEMBER(wiz_state::stinger_explosion_w)
 {
 	// explosion sound trigger(analog?)
-	m_discrete->write(space, STINGER_BOOM_EN1, m_dsc1);
-	m_discrete->write(space, STINGER_BOOM_EN2, m_dsc1^=1);
+	m_discrete->write(STINGER_BOOM_EN1, m_dsc1);
+	m_discrete->write(STINGER_BOOM_EN2, m_dsc1^=1);
 }
 
 WRITE8_MEMBER(wiz_state::stinger_shot_w)
 {
 	// player shot sound trigger(analog?)
-	m_discrete->write(space, STINGER_SHOT_EN1, m_dsc0);
-	m_discrete->write(space, STINGER_SHOT_EN2, m_dsc0^=1);
+	m_discrete->write(STINGER_SHOT_EN1, m_dsc0);
+	m_discrete->write(STINGER_SHOT_EN2, m_dsc0^=1);
 }
 
 

@@ -283,7 +283,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(asteroid_state::asteroid_explode_w)
 {
-	m_discrete->write(space,ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);                // Volume
+	m_discrete->write(ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);                // Volume
 	/* We will modify the pitch data to send the divider value. */
 	switch ((data&0xc0))
 	{
@@ -300,18 +300,18 @@ WRITE8_MEMBER(asteroid_state::asteroid_explode_w)
 			data = 5;
 			break;
 	}
-	m_discrete->write(space, ASTEROID_EXPLODE_PITCH, data);
+	m_discrete->write(ASTEROID_EXPLODE_PITCH, data);
 }
 
 WRITE8_MEMBER(asteroid_state::asteroid_thump_w)
 {
-	m_discrete->write(space, ASTEROID_THUMP_EN,   data & 0x10);
-	m_discrete->write(space, ASTEROID_THUMP_DATA, data & 0x0f);
+	m_discrete->write(ASTEROID_THUMP_EN,   data & 0x10);
+	m_discrete->write(ASTEROID_THUMP_DATA, data & 0x0f);
 }
 
 WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)
 {
-	m_discrete->write(space, ASTEROID_NOISE_RESET, 0);
+	m_discrete->write(ASTEROID_NOISE_RESET, 0);
 }
 
 

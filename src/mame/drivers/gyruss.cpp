@@ -120,7 +120,7 @@ READ8_MEMBER(gyruss_state::gyruss_portA_r)
 
 WRITE8_MEMBER(gyruss_state::gyruss_dac_w)
 {
-	m_discrete->write(space, NODE(16), data);
+	m_discrete->write(NODE(16), data);
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
@@ -135,7 +135,7 @@ void gyruss_state::filter_w(address_space &space, int chip, int data )
 	{
 		/* low bit: 47000pF = 0.047uF */
 		/* high bit: 220000pF = 0.22uF */
-		m_discrete->write(space, NODE(3 * chip + i + 21), data & 3);
+		m_discrete->write(NODE(3 * chip + i + 21), data & 3);
 		data >>= 2;
 	}
 }

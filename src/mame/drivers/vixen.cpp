@@ -551,7 +551,7 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 	m_256 = !BIT(data, 4);
 
 	// beep enable
-	m_discrete->write(space, NODE_01, !BIT(data, 5));
+	m_discrete->write(NODE_01, !BIT(data, 5));
 }
 
 //-------------------------------------------------

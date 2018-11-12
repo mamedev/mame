@@ -837,7 +837,7 @@ WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 
 					/* low bit goes to 0.22uF capacitor = 220000pF  */
 					/* high bit goes to 0.047uF capacitor = 47000pF */
-					m_discrete->write(space, NODE(3 * which + chan + 11), bits);
+					m_discrete->write(NODE(3 * which + chan + 11), bits);
 				}
 			}
 		}
@@ -6065,7 +6065,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::galaxian)
 	galaxian_base(config);
-	galaxian_audio(config);
+
+	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, galaxian_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::victoryc)
@@ -6150,7 +6155,11 @@ MACHINE_CONFIG_START(galaxian_state::mooncrst)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mooncrst_map)
 
-	mooncrst_audio(config);
+	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, mooncrst_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::moonqsr)

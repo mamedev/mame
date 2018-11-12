@@ -342,9 +342,6 @@ public:
 	void kong(machine_config &config);
 	void scorpnmc(machine_config &config);
 
-	void galaxian_audio(machine_config &config);
-	void mooncrst_audio(machine_config &config);
-
 protected:
 	void amigo2_map(address_map &map);
 	void anteaterg_map(address_map &map);

@@ -333,18 +333,18 @@ WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
 			/* bit 2-4: ATTACK UP 1-3 */
 			/* bit 5-6: SIFT 1-2 */
 			/* bit 7:   ENGINE CS */
-			m_discrete->write(space, GRCHAMP_ENGINE_CS_EN, data & 0x80);
-			m_discrete->write(space, GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
-			m_discrete->write(space, GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
-			m_discrete->write(space, GRCHAMP_IDLING_EN, data & 0x02);
-			m_discrete->write(space, GRCHAMP_FOG_EN, data & 0x01);
+			m_discrete->write(GRCHAMP_ENGINE_CS_EN, data & 0x80);
+			m_discrete->write(GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
+			m_discrete->write(GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
+			m_discrete->write(GRCHAMP_IDLING_EN, data & 0x02);
+			m_discrete->write(GRCHAMP_FOG_EN, data & 0x01);
 			break;
 
 		case 0x0d: /* OUTD */
 			/* bit 0-3: ATTACK SPEED 1-4 */
 			/* bit 4-7: PLAYER SPEED 1-4 */
-			m_discrete->write(space, GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
-			m_discrete->write(space, GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
+			m_discrete->write(GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
+			m_discrete->write(GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
 			break;
 
 		default:
@@ -480,12 +480,12 @@ READ8_MEMBER(grchamp_state::soundlatch_flags_r)
 
 WRITE8_MEMBER(grchamp_state::portA_0_w)
 {
-	m_discrete->write(space, GRCHAMP_A_DATA, data);
+	m_discrete->write(GRCHAMP_A_DATA, data);
 }
 
 WRITE8_MEMBER(grchamp_state::portB_0_w)
 {
-	m_discrete->write(space, GRCHAMP_B_DATA, 255-data);
+	m_discrete->write(GRCHAMP_B_DATA, 255-data);
 }
 
 WRITE8_MEMBER(grchamp_state::portA_2_w)

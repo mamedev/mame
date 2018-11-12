@@ -47,9 +47,9 @@ WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
 
 WRITE8_MEMBER(ironhors_state::filter_w)
 {
-	m_disc_ih->write(space, NODE_11, (data & 0x04) >> 2);
-	m_disc_ih->write(space, NODE_12, (data & 0x02) >> 1);
-	m_disc_ih->write(space, NODE_13, (data & 0x01) >> 0);
+	m_disc_ih->write(NODE_11, (data & 0x04) >> 2);
+	m_disc_ih->write(NODE_12, (data & 0x02) >> 1);
+	m_disc_ih->write(NODE_13, (data & 0x01) >> 0);
 }
 
 /*************************************

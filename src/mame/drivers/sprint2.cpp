@@ -105,10 +105,9 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 		}
 	}
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_discrete->write(space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
-	m_discrete->write(space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
-	m_discrete->write(space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
+	m_discrete->write(SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
+	m_discrete->write(SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
+	m_discrete->write(SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -218,7 +217,7 @@ WRITE8_MEMBER(sprint2_state::output_latch_w)
 
 WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
 {
-	m_discrete->write(space, SPRINT2_NOISE_RESET, 0);
+	m_discrete->write(SPRINT2_NOISE_RESET, 0);
 }
 
 

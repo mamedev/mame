@@ -644,7 +644,7 @@ WRITE_LINE_MEMBER( as2888_state::u11_cb2_as2888_w )
 	{
 		m_snd_sustain_timer->adjust(attotime::from_msec(5));
 
-		m_discrete->write(machine().dummy_space(), NODE_08, 11);  // 11 volt pulse
+		m_discrete->write(NODE_08, 11);  // 11 volt pulse
 	}
 
 	u11_cb2_w(state);
@@ -919,8 +919,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_s )
 		m_snd_tone_gen = m_snd_sel;
 		m_snd_div++;
 
-		m_discrete->write(machine().dummy_space(), NODE_04, BIT(m_snd_div, 2) * 1);
-		m_discrete->write(machine().dummy_space(), NODE_01, BIT(m_snd_div, 0) * 1);
+		m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
+		m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
 
 		if (m_snd_sel == 0x01) LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
 	}
@@ -939,7 +939,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_as2888 )
 		LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
 	}
 
-	m_discrete->write(machine().dummy_space(), NODE_08, 0);
+	m_discrete->write(NODE_08, 0);
 	m_snd_sustain_timer->adjust(attotime::never);
 
 	LOG("Sustain off\n");

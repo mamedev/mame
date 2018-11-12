@@ -1767,7 +1767,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
 {
-	m_dacvol->write(space, NODE_01, data ^ 0xff); // 7416 hex inverter
+	m_dacvol->write(NODE_01, data ^ 0xff); // 7416 hex inverter
 }
 
 MACHINE_CONFIG_START(taitosj_state::nomcu)
