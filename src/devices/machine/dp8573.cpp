@@ -14,7 +14,7 @@
 #define LOG_TICKS   (1 << 1)
 #define LOG_ALL		(LOG_GENERAL | LOG_TICKS)
 
-#define VERBOSE (LOG_ALL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 // device type definition
