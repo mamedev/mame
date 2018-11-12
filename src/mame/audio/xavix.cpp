@@ -34,7 +34,8 @@ void xavix_sound_device::device_reset()
 {
 	for (int v = 0; v < 16; v++)
 	{
-		m_voice[v].enabled = false;
+		m_voice[v].enabled[0] = false;
+		m_voice[v].enabled[1] = false;
 		m_voice[v].position[0] = 0x00;
 		m_voice[v].position[1] = 0x00;
 		m_voice[v].bank = 0x00;
@@ -56,7 +57,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 		{
 			for (int v = 0; v < 16; v++)
 			{
-				if (m_voice[v].enabled == true)
+				if (m_voice[v].enabled[channel] == true)
 				{
 					// 2 is looping? 3 is single shot? 0/1 are something else?
 					if (m_voice[v].type == 2 || m_voice[v].type == 3)
@@ -64,11 +65,11 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 						uint32_t pos = (m_voice[v].bank << 16) | (m_voice[v].position[channel] >> 14);
 						int8_t sample = m_readsamples_cb(pos);
 
-						if ((uint8_t)sample == 0x80) // would both channels stop / loop or just one?
+						if ((uint8_t)sample == 0x80) // would both channels stop / loop or just one?, Yellow submarine indicates just one, but might be running in some interleaved mode?
 						{
 							//if (m_voice[v].type == 3)
 							{
-								m_voice[v].enabled = false;
+								m_voice[v].enabled[channel] = false;
 								break;
 							}
 							/* need envelopes or some of these loop forever!
@@ -121,7 +122,8 @@ void xavix_sound_device::enable_voice(int voice)
 
 	LOG(" (possible meanings mode %01x rate %04x address1 %08x address2 %08x address3 %08x address4 %08x)\n", param1 & 0x3, param1 >> 2, address1, address2, address3, address4);
 
-	m_voice[voice].enabled = true;
+	m_voice[voice].enabled[0] = true;
+	m_voice[voice].enabled[1] = true;
 
 	m_voice[voice].bank = param4b;
 	m_voice[voice].position[0] = param2 << 14;
@@ -141,7 +143,8 @@ void xavix_sound_device::enable_voice(int voice)
 
 void xavix_sound_device::disable_voice(int voice)
 {
-	m_voice[voice].enabled = false;
+	m_voice[voice].enabled[0] = false;
+	m_voice[voice].enabled[1] = false;
 }
 
 

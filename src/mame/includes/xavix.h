@@ -41,7 +41,7 @@ private:
 	sound_stream *m_stream;
 
 	struct xavix_voice {
-		bool enabled;
+		bool enabled[2];
 		uint32_t position[2];
 		uint32_t startposition[2];
 		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
