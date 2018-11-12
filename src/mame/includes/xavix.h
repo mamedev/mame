@@ -27,6 +27,7 @@ public:
 	auto read_samples_callback() { return m_readsamples_cb.bind(); }
 
 	void enable_voice(int voice);
+	void disable_voice(int voice);
 
 protected:
 	// device-level overrides
@@ -41,7 +42,8 @@ private:
 
 	struct xavix_voice {
 		bool enabled;
-		uint32_t position;
+		uint32_t position[2];
+		uint32_t startposition[2];
 		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
 		int type;
 		int rate;

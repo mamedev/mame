@@ -27,7 +27,7 @@ void xavix_sound_device::device_start()
 	m_readregs_cb.resolve_safe(0xff);
 	m_readsamples_cb.resolve_safe(0x80);
 
-	m_stream = stream_alloc(0, 1, 163840);
+	m_stream = stream_alloc(0, 2, 163840);
 }
 
 void xavix_sound_device::device_reset()
@@ -35,7 +35,8 @@ void xavix_sound_device::device_reset()
 	for (int v = 0; v < 16; v++)
 	{
 		m_voice[v].enabled = false;
-		m_voice[v].position = 0x00;
+		m_voice[v].position[0] = 0x00;
+		m_voice[v].position[1] = 0x00;
 		m_voice[v].bank = 0x00;
 	}
 }
@@ -45,29 +46,45 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	int outpos = 0;
 	// loop while we still have samples to generate
 	while (samples-- != 0)
 	{
-		for (int v = 0; v < 16; v++)
+		for (int channel = 0; channel < 2; channel++)
 		{
-			if (m_voice[v].enabled == true)
+			for (int v = 0; v < 16; v++)
 			{
-				// 2 is looping? 3 is single shot? 0/1 are something else?
-				if (m_voice[v].type == 2 || m_voice[v].type == 3)
+				if (m_voice[v].enabled == true)
 				{
-					const uint32_t pos = (m_voice[v].bank << 16) | (m_voice[v].position >> 14);
-					int8_t sample = m_readsamples_cb(pos);
-
-					if ((uint8_t)sample == 0x80)
+					// 2 is looping? 3 is single shot? 0/1 are something else?
+					if (m_voice[v].type == 2 || m_voice[v].type == 3)
 					{
-						m_voice[v].enabled = false;
-						break;
-					}
+						uint32_t pos = (m_voice[v].bank << 16) | (m_voice[v].position[channel] >> 14);
+						int8_t sample = m_readsamples_cb(pos);
 
-					outputs[0][outpos] += sample * 0x10;
-					m_voice[v].position += m_voice[v].rate;
+						if ((uint8_t)sample == 0x80) // would both channels stop / loop or just one?
+						{
+							//if (m_voice[v].type == 3)
+							{
+								m_voice[v].enabled = false;
+								break;
+							}
+							/* need envelopes or some of these loop forever!
+							else if (m_voice[v].type == 2)
+							{
+								m_voice[v].position[channel] = m_voice[v].startposition[channel];
+								// presumably don't want to play 0x80 byte, so read in a new one
+								pos = (m_voice[v].bank << 16) | (m_voice[v].position[channel] >> 14);
+								sample = m_readsamples_cb(pos);
+							}
+							*/
+						}
+
+						outputs[channel][outpos] += sample * 0x10;
+						m_voice[v].position[channel] += m_voice[v].rate;
+					}
 				}
 			}
 		}
@@ -107,16 +124,25 @@ void xavix_sound_device::enable_voice(int voice)
 	m_voice[voice].enabled = true;
 
 	m_voice[voice].bank = param4b;
-	m_voice[voice].position = param2 << 14; // param3
+	m_voice[voice].position[0] = param2 << 14;
+	m_voice[voice].position[1] = param3 << 14;
 	m_voice[voice].type = param1 & 0x3; 
 	m_voice[voice].rate = param1 >> 2; 
 	
+	m_voice[voice].startposition[0] = m_voice[voice].position[0]; // for looping
+	m_voice[voice].startposition[1] = m_voice[voice].position[1];
+
+
 	// 0320 (800) == 8000hz
 	// 4000 (16384) == 163840hz ? = 163.840kHz
 
 	// samples appear to be PCM, 0x80 terminated, looks like there's a way of specifying mono (interleave channels?) or stereo, maybe in master regs?
 }
 
+void xavix_sound_device::disable_voice(int voice)
+{
+	m_voice[voice].enabled = false;
+}
 
 
 // xavix_state support
@@ -174,21 +200,24 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 
 	for (int i = 0; i < 8; i++)
 	{
-		int voice_state = (data & (1 << i));
-		int old_voice_state = (m_soundreg16_0[offset] & (1 << i));
+		const int voice_state = (data & (1 << i));
+		const int old_voice_state = (m_soundreg16_0[offset] & (1 << i));
 		if (voice_state != old_voice_state)
 		{
+			const int voice = (offset * 8 + i);
+
 			if (voice_state)
 			{
-				int voice = (offset * 8 + i);
-
 				m_sound->enable_voice(voice);
+			}
+			else
+			{
+				m_sound->disable_voice(voice);
 			}
 		}
 	}
 
 	m_soundreg16_0[offset] = data;
-
 }
 
 /* 75f0, 75f1 - 2x8 bits (16 voices?) */
@@ -200,6 +229,7 @@ READ8_MEMBER(xavix_state::sound_reg16_1_r)
 
 WRITE8_MEMBER(xavix_state::sound_reg16_1_w)
 {
+	// used to update envelopes without restarting sound?
 	m_soundreg16_1[offset] = data;
 
 	if (offset == 0)
