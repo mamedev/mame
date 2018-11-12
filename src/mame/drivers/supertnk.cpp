@@ -439,8 +439,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(supertnk_state::supertnk)
-
+void supertnk_state::supertnk(machine_config &config)
+{
 	// CPU TMS9980A; no line connections
 	TMS9980A(config, m_maincpu, 20.79_MHz_XTAL / 2); // divider not verified (possibly should be /3)
 	m_maincpu->set_addrmap(AS_PROGRAM, &supertnk_state::supertnk_map);
@@ -465,9 +465,8 @@ MACHINE_CONFIG_START(supertnk_state::supertnk)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 

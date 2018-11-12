@@ -575,11 +575,9 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000) /* ? MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.5); /* ? MHz */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000) /* ? MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.5); /* ? MHz */
 
 MACHINE_CONFIG_END
 

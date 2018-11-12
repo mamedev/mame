@@ -1334,7 +1334,7 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
 
 	I8255A(config, m_ppi8255_1);
-	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
 	/* video hardware */
@@ -1355,15 +1355,14 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("8910.1", AY8910, 14318000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	AY8910(config, "8910.1", 14318000/8).add_route(ALL_OUTPUTS, "mono", 0.16);
 
-	MCFG_DEVICE_ADD("8910.2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	ay8910_device &ay2(AY8910(config, "8910.2", 14318000/8));
+	ay2.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay2.port_b_read_callback().set(FUNC(scramble_state::scramble_portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.16);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::mars)
@@ -1373,7 +1372,7 @@ MACHINE_CONFIG_START(scramble_state::mars)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
-	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 	m_ppi8255_1->in_pc_callback().set_ioport("IN3");
 
@@ -1420,7 +1419,7 @@ MACHINE_CONFIG_START(scramble_state::mrkougb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mrkougar_map)
 
-	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::mrkougar_sh_irqtrigger_w));
 	m_ppi8255_1->in_pc_callback().set_constant(0);
 
@@ -1472,15 +1471,12 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
-	MCFG_DEVICE_MODIFY("8910.1")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	subdevice<ay8910_device>("8910.1")->reset_routes();
+	subdevice<ay8910_device>("8910.1")->add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	MCFG_DEVICE_MODIFY("8910.2")
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, hotshock_soundlatch_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	subdevice<ay8910_device>("8910.2")->port_a_read_callback().set(FUNC(scramble_state::hotshock_soundlatch_r));
+	subdevice<ay8910_device>("8910.2")->reset_routes();
+	subdevice<ay8910_device>("8910.2")->add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::cavelon)
@@ -1636,13 +1632,12 @@ MACHINE_CONFIG_START(scramble_state::harem)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,harem)
 
 	/* extra AY8910 with I/O ports */
-	MCFG_DEVICE_ADD("8910.3", AY8910, 14318000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("digitalker", digitalker_device, digitalker_data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, scramble_state, harem_digitalker_control_w))
+	ay8910_device &ay3(AY8910(config, "8910.3", 14318000/8));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.16);
+	ay3.port_a_write_callback().set(m_digitalker, FUNC(digitalker_device::digitalker_data_w));
+	ay3.port_b_write_callback().set(FUNC(scramble_state::harem_digitalker_control_w));
 
-	MCFG_DIGITALKER_ADD("digitalker", 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	DIGITALKER(config, m_digitalker, 4000000).add_route(ALL_OUTPUTS, "mono", 0.16);
 MACHINE_CONFIG_END
 
 /***************************************************************************

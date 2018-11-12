@@ -392,15 +392,14 @@ MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("ay2", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("ay3", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "ay1", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	AY8912(config, "ay3", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 MACHINE_CONFIG_END
 

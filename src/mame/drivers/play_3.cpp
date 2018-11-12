@@ -516,10 +516,8 @@ MACHINE_CONFIG_START(play_3_state::play_3)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("aysnd1", AY8910, 3.579545_MHz_XTAL / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_DEVICE_ADD("aysnd2", AY8910, 3.579545_MHz_XTAL / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	AY8910(config, m_aysnd1, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	AY8910(config, m_aysnd2, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(play_3_state::megaaton)

@@ -355,13 +355,13 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pandoras_state, pandoras_portA_r))   // not used
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pandoras_state, pandoras_portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SOUND_CLOCK/8));
+	aysnd.port_a_read_callback().set(FUNC(pandoras_state::pandoras_portA_r));   // not used
+	aysnd.port_b_read_callback().set(FUNC(pandoras_state::pandoras_portB_r));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.4);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

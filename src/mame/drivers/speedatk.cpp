@@ -336,10 +336,10 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, speedatk_state, output_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/4)); //divider is unknown
+	aysnd.port_b_read_callback().set_ioport("DSW");
+	aysnd.port_a_write_callback().set(FUNC(speedatk_state::output_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
 ROM_START( speedatk )

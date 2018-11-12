@@ -5985,7 +5985,7 @@ void galaxian_state::konami_base(machine_config &config)
 	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_0_w));
 
 	I8255A(config, m_ppi8255[1]);
-	m_ppi8255[1]->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255[1]->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::konami_sound_control_w));
 	m_ppi8255[1]->in_pc_callback().set_ioport("IN3");
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_1_w));
@@ -5999,17 +5999,17 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
 	MCFG_DEVICE_PROGRAM_MAP(frogger_sound_map)
 	MCFG_DEVICE_IO_MAP(frogger_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, frogger_sound_timer_r))
-	MCFG_SOUND_ROUTE(0, "konami", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "konami", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "konami", 1.0, 2)
+	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
+	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
+	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::frogger_sound_timer_r));
+	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
+	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
+	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
 	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
@@ -6023,24 +6023,24 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
-	MCFG_SOUND_ROUTE(0, "konami", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "konami", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "konami", 1.0, 2)
+	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
+	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
+	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
+	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
+	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
+	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
 
-	MCFG_DEVICE_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
-	MCFG_SOUND_ROUTE(0, "konami", 1.0, 3)
-	MCFG_SOUND_ROUTE(1, "konami", 1.0, 4)
-	MCFG_SOUND_ROUTE(2, "konami", 1.0, 5)
+	AY8910(config, m_ay8910[1], KONAMI_SOUND_CLOCK/8);
+	m_ay8910[1]->set_flags(AY8910_DISCRETE_OUTPUT);
+	m_ay8910[1]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
+	m_ay8910[1]->add_route(0, "konami", 1.0, 3);
+	m_ay8910[1]->add_route(1, "konami", 1.0, 4);
+	m_ay8910[1]->add_route(2, "konami", 1.0, 5);
 
 	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -6128,8 +6128,7 @@ MACHINE_CONFIG_START(galaxian_state::zigzag)
 	MCFG_DEVICE_PROGRAM_MAP(zigzag_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) /* matches PCB video - unconfirmed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.5); /* matches PCB video - unconfirmed */
 MACHINE_CONFIG_END
 
 
@@ -6193,11 +6192,9 @@ MACHINE_CONFIG_START(galaxian_state::fantastc)
 	MCFG_DEVICE_PROGRAM_MAP(fantastc_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
 
-	MCFG_DEVICE_ADD("8910.1", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, m_ay8910[1], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
 MACHINE_CONFIG_END
 
 
@@ -6231,8 +6228,7 @@ MACHINE_CONFIG_START(galaxian_state::jumpbug)
 	MCFG_DEVICE_PROGRAM_MAP(jumpbug_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2/2)    /* matches PCB video - unconfirmed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "speaker", 0.5);   /* matches PCB video - unconfirmed */
 MACHINE_CONFIG_END
 
 
@@ -6245,11 +6241,10 @@ MACHINE_CONFIG_START(galaxian_state::checkman)
 	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)   /* NMIs are triggered by the main CPU */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, 1789750)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], 1789750).add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -6266,12 +6261,12 @@ MACHINE_CONFIG_START(galaxian_state::checkmaj)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq0", galaxian_state, checkmaj_irq0_gen, "screen", 0, 8)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, 1620000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 2)
+	AY8910(config, m_ay8910[0], 1620000);
+	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 2);
 MACHINE_CONFIG_END
 
 
@@ -6297,7 +6292,7 @@ MACHINE_CONFIG_START(galaxian_state::kingball)
 	MCFG_DEVICE_PROGRAM_MAP(kingball_sound_map)
 	MCFG_DEVICE_IO_MAP(kingball_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.53) // unknown DAC
@@ -6408,12 +6403,11 @@ MACHINE_CONFIG_START(galaxian_state::jungsub)
 	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state, irq0_line_hold)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK / 3 / 2 / 2) // clock not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK / 3 / 2 / 2).add_route(ALL_OUTPUTS, "speaker", 0.5); // clock not verified
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
@@ -6428,16 +6422,16 @@ MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware is a pair of AY-3-8912 */
-	MCFG_DEVICE_ADD("8910.0", AY8912, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, explorer_sound_latch_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8912(config, m_ay8910[0], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
+	m_ay8910[0]->port_a_read_callback().set(FUNC(galaxian_state::explorer_sound_latch_r));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("8910.1", AY8912, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8912(config, m_ay8910[1], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
+	m_ay8910[0]->port_a_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::takeoff) // Sidam 10900, with 1 x AY-3-8912
@@ -6449,12 +6443,12 @@ MACHINE_CONFIG_START(galaxian_state::takeoff) // Sidam 10900, with 1 x AY-3-8912
 	MCFG_DEVICE_IO_MAP(takeoff_sound_portmap)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("8910.0")
-	MCFG_DEVICE_REMOVE("8910.1")
+	config.device_remove("8910.0");
+	config.device_remove("8910.1");
 
-	MCFG_DEVICE_ADD("8912", AY8912, XTAL(12'000'000) / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, explorer_sound_latch_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8912_device &ay8912(AY8912(config, "8912", XTAL(12'000'000) / 8));
+	ay8912.port_a_read_callback().set(FUNC(galaxian_state::explorer_sound_latch_r));
+	ay8912.add_route(ALL_OUTPUTS, "speaker", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to above
@@ -6468,15 +6462,15 @@ MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to abo
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("8910.0", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("8910.1", AY8910, 12_MHz_XTAL / 2 / 2 / 2) /* matches PCB, needs verification */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, m_ay8910[0], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
+	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	AY8910(config, m_ay8910[1], 12_MHz_XTAL / 2 / 2 / 2).add_route(ALL_OUTPUTS, "speaker", 0.25); /* matches PCB, needs verification */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::scorpion)
@@ -6493,13 +6487,12 @@ MACHINE_CONFIG_START(galaxian_state::scorpion)
 	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::scorpion_protection_w));
 
 	/* extra AY8910 with I/O ports */
-	MCFG_DEVICE_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("digitalker", digitalker_device, digitalker_data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, galaxian_state, scorpion_digitalker_control_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, m_ay8910[2], KONAMI_SOUND_CLOCK/8);
+	m_ay8910[2]->port_a_write_callback().set(m_digitalker, FUNC(digitalker_device::digitalker_data_w));
+	m_ay8910[2]->port_b_write_callback().set(FUNC(galaxian_state::scorpion_digitalker_control_w));
+	m_ay8910[2]->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DIGITALKER_ADD("digitalker", 4_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
+	DIGITALKER(config, m_digitalker, 4_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.16);
 MACHINE_CONFIG_END
 
 
@@ -6519,12 +6512,11 @@ MACHINE_CONFIG_START(galaxian_state::sfx)
 	I8255A(config, m_ppi8255[2]);
 	m_ppi8255[2]->in_pa_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	/* port on 2nd 8910 is used for communication */
-	MCFG_DEVICE_MODIFY("8910.1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("soundlatch2", generic_latch_8_device, write))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, galaxian_state, sfx_sample_control_w))
+	m_ay8910[1]->port_a_write_callback().set("soundlatch2", FUNC(generic_latch_8_device::write));
+	m_ay8910[1]->port_b_write_callback().set(FUNC(galaxian_state::sfx_sample_control_w));
 
 	/* DAC for the sample player */
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // 16-pin IC (not identified by schematics)
@@ -6617,8 +6609,7 @@ MACHINE_CONFIG_START(galaxian_state::quaak)
 	konami_base(config);
 	konami_sound_2x_ay8910(config);
 
-	MCFG_DEVICE_MODIFY("8910.0")
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, frogger_sound_timer_r))
+	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::frogger_sound_timer_r));
 
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")

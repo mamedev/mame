@@ -887,7 +887,7 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
 
 	I8255A(config, m_ppi8255_1);
-	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
 	ttl7474_device &ttl7474_9m_1(TTL7474(config, "7474_9m_1", 0));
@@ -918,15 +918,14 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 14318000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	AY8910(config, "ay1", 14318000/8).add_route(ALL_OUTPUTS, "mono", 0.16);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	ay8910_device &ay2(AY8910(config, "ay2", 14318000/8));
+	ay2.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay2.port_b_read_callback().set(FUNC(scramble_state::scramble_portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.16);
 MACHINE_CONFIG_END
 
 
@@ -1016,7 +1015,7 @@ MACHINE_CONFIG_START(scobra_state::stratgyx)
 
 	/* basic machine hardware */
 
-	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 	m_ppi8255_1->in_pc_callback().set_ioport("IN3");
 
@@ -1075,7 +1074,7 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
 
 	I8255A(config, m_ppi8255_1);
-	m_ppi8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));
+	m_ppi8255_1->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
 	m_ppi8255_1->out_pb_callback().set(FUNC(scramble_state::scramble_sh_irqtrigger_w));
 
 	/* video hardware */
@@ -1095,11 +1094,12 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_DEVICE_ADD("aysnd", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, hustler_portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	ay8910_device &aysnd(AY8910(config, "aysnd", 14318000/8));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.port_b_read_callback().set(FUNC(scramble_state::hustler_portB_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scobra_state::hustlerb)
