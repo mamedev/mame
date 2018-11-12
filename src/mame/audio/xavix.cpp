@@ -27,7 +27,7 @@ void xavix_sound_device::device_start()
 	m_readregs_cb.resolve_safe(0xff);
 	m_readsamples_cb.resolve_safe(0x80);
 
-	m_stream = stream_alloc(0, 1, 8000);
+	m_stream = stream_alloc(0, 1, 163840);
 }
 
 void xavix_sound_device::device_reset()
@@ -54,9 +54,11 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 		{
 			if (m_voice[v].enabled == true)
 			{
+				// 2 is looping? 3 is single shot? 0/1 are something else?
 				if (m_voice[v].type == 2 || m_voice[v].type == 3)
 				{
-					int8_t sample = m_readsamples_cb((m_voice[v].bank << 16) | m_voice[v].position);
+					const uint32_t pos = (m_voice[v].bank << 16) | (m_voice[v].position >> 14);
+					int8_t sample = m_readsamples_cb(pos);
 
 					if ((uint8_t)sample == 0x80)
 					{
@@ -65,7 +67,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 					}
 
 					outputs[0][outpos] += sample * 0x10;
-					m_voice[v].position++;
+					m_voice[v].position += m_voice[v].rate;
 				}
 			}
 		}
@@ -105,11 +107,14 @@ void xavix_sound_device::enable_voice(int voice)
 	m_voice[voice].enabled = true;
 
 	m_voice[voice].bank = param4b;
-	m_voice[voice].position = param2; // param3
+	m_voice[voice].position = param2 << 14; // param3
 	m_voice[voice].type = param1 & 0x3; 
+	m_voice[voice].rate = param1 >> 2; 
 	
+	// 0320 (800) == 8000hz
+	// 4000 (16384) == 163840hz ? = 163.840kHz
 
-	// samples appear to be PCM, 0x80 terminated
+	// samples appear to be PCM, 0x80 terminated, looks like there's a way of specifying mono (interleave channels?) or stereo, maybe in master regs?
 }
 
 
