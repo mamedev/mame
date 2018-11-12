@@ -21,8 +21,10 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "bus/scsi/scsihd.h"
+//#include "cpu/dsp56k/dsp56k.h"
 #include "cpu/mips/mips1.h"
 #include "cpu/mips/mips3.h"
+#include "machine/dp8573.h"
 #include "machine/eepromser.h"
 #include "machine/pit8253.h"
 #include "machine/sgi.h"
@@ -34,14 +36,13 @@
 #define LOG_UNKNOWN		(1 << 0)
 #define LOG_INT			(1 << 1)
 #define LOG_HPC			(1 << 2)
-#define LOG_RTC			(1 << 3)
 #define LOG_EEPROM		(1 << 4)
 #define LOG_DMA			(1 << 5)
 #define LOG_SCSI		(1 << 6)
 #define LOG_SCSI_DMA	(1 << 7)
 #define LOG_DUART		(1 << 8)
 #define LOG_PIT			(1 << 9)
-#define LOG_ALL			(LOG_UNKNOWN | LOG_INT | LOG_HPC | LOG_RTC | LOG_EEPROM | LOG_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT)
+#define LOG_ALL			(LOG_UNKNOWN | LOG_INT | LOG_HPC | LOG_EEPROM | LOG_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT)
 
 #define VERBOSE			(0)
 #include "logmacro.h"
@@ -56,6 +57,7 @@ public:
 		, m_scc(*this, "scc%u", 0U)
 		, m_eeprom(*this, "eeprom")
 		, m_pit(*this, "pit")
+		, m_rtc(*this, "rtc")
 	{
 	}
 
@@ -64,14 +66,13 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	static const device_timer_id TIMER_RTC = 0;
 
 	DECLARE_READ32_MEMBER(hpc_r);
 	DECLARE_WRITE32_MEMBER(hpc_w);
 	DECLARE_READ32_MEMBER(int_r);
 	DECLARE_WRITE32_MEMBER(int_w);
+	DECLARE_READ32_MEMBER(dspram_r);
+	DECLARE_WRITE32_MEMBER(dspram_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 
 	void set_timer_int_clear(uint32_t data);
@@ -142,36 +143,17 @@ protected:
 		HPC_DMACTRL_ENABLE	= 0x80
 	};
 
-	enum
-	{
-		RTC_DAYOFWEEK	= 0x0e,
-		RTC_YEAR		= 0x0b,
-		RTC_MONTH		= 0x0a,
-		RTC_DAY			= 0x09,
-		RTC_HOUR		= 0x08,
-		RTC_MINUTE		= 0x07,
-		RTC_SECOND		= 0x06,
-		RTC_HUNDREDTH	= 0x05
-	};
-
-	struct rtc_t
-	{
-		uint8_t m_ram[32];
-	};
-
 	required_device<cpu_device> m_maincpu;
 	required_device<wd33c93_device> m_wd33c93;
 	required_device_array<scc85230_device, 3> m_scc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<pit8254_device> m_pit;
+	required_device<dp8573_device> m_rtc;
+
+	std::unique_ptr<uint32_t[]> m_dsp_ram;
 
 	hpc_t m_hpc;
-	rtc_t m_rtc;
 	uint8_t m_duart_int_status;
-
-	emu_timer *m_rtc_timer;
-
-	void indigo_timer_rtc();
 
 	static char const *const RS232A_TAG;
 	static char const *const RS232B_TAG;
@@ -222,8 +204,7 @@ protected:
 
 void indigo_state::machine_start()
 {
-	m_rtc_timer = timer_alloc(TIMER_RTC);
-	m_rtc_timer->adjust(attotime::never);
+	m_dsp_ram = std::make_unique<uint32_t[]>(0x8000);
 
 	save_item(NAME(m_hpc.m_misc_status));
 	save_item(NAME(m_hpc.m_parbuf_ptr));
@@ -243,29 +224,24 @@ void indigo_state::machine_start()
 	save_item(NAME(m_hpc.m_scsi0_dma_to_mem));
 	save_item(NAME(m_hpc.m_scsi0_dma_active));
 
-	save_item(NAME(m_rtc.m_ram));
-
 	save_item(NAME(m_duart_int_status));
+
+	save_pointer(NAME(m_dsp_ram), 0x8000);
 }
 
 void indigo_state::machine_reset()
 {
 	memset(&m_hpc, 0, sizeof(hpc_t));
+	memset(&m_dsp_ram[0], 0, sizeof(uint32_t) * 0x8000);
 
 	m_duart_int_status = 0;
-
-	// update RTC every 1/100th of a second
-	m_rtc_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
 READ32_MEMBER(indigo_state::hpc_r)
 {
 	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
-	{
-		uint8_t ret = m_rtc.m_ram[offset - 0xe00/4];
-		LOGMASKED(LOG_RTC, "%s: RTC RAM[0x%02x] Read: %02x\n", machine().describe_context(), offset - 0xe00/4, ret);
-		return ret;
-	}
+		return m_rtc->read(space, offset - 0xe00/4);
+
 	switch (offset)
 	{
 	case 0x005c/4:
@@ -421,27 +397,7 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 {
 	if (offset >= 0x0e00/4 && offset <= 0x0e7c/4)
 	{
-		LOGMASKED(LOG_RTC, "%s: RTC RAM[%02x] Write: %02x\n", machine().describe_context(), offset - 0xe00/4, (uint8_t)data);
-		m_rtc.m_ram[offset - 0xe00/4] = (uint8_t)data;
-
-		switch (offset - 0xe00/4)
-		{
-		case 0:
-			break;
-		case 4:
-			if (!BIT(m_rtc.m_ram[0x00], 7))
-			{
-				if (BIT(data, 7))
-				{
-					m_rtc.m_ram[0x19] = m_rtc.m_ram[RTC_SECOND];
-					m_rtc.m_ram[0x1a] = m_rtc.m_ram[RTC_MINUTE];
-					m_rtc.m_ram[0x1b] = m_rtc.m_ram[RTC_HOUR];
-					m_rtc.m_ram[0x1c] = m_rtc.m_ram[RTC_DAY];
-					m_rtc.m_ram[0x1d] = m_rtc.m_ram[RTC_MONTH];
-				}
-			}
-			break;
-		}
+		m_rtc->write(space, offset - 0xe00/4, (uint8_t)data);
 		return;
 	}
 
@@ -709,18 +665,6 @@ WRITE_LINE_MEMBER(indigo_state::scsi_irq)
 	}
 }
 
-void indigo_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_RTC:
-		indigo_timer_rtc();
-		break;
-	default:
-		assert_always(false, "Unknown id in indigo_state::device_timer");
-	}
-}
-
 void indigo_state::set_timer_int_clear(uint32_t data)
 {
 	if (BIT(data, 0))
@@ -818,53 +762,16 @@ WRITE32_MEMBER(indigo_state::int_w)
 	LOGMASKED(LOG_INT, "%s: INT Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd9000 + offset*4, data, mem_mask);
 }
 
-void indigo_state::indigo_timer_rtc()
+READ32_MEMBER(indigo_state::dspram_r)
 {
-	m_rtc.m_ram[RTC_HUNDREDTH]++;
+	LOGMASKED(LOG_INT, "%s: DSP RAM Read: %08x & %08x\n", machine().describe_context(), 0x1fbe0000 + offset*4, mem_mask);
+	return m_dsp_ram[offset];
+}
 
-	if ((m_rtc.m_ram[RTC_HUNDREDTH] & 0x0f) == 0x0a)
-	{
-		m_rtc.m_ram[RTC_HUNDREDTH] -= 0x0a;
-		m_rtc.m_ram[RTC_HUNDREDTH] += 0x10;
-		if ((m_rtc.m_ram[RTC_HUNDREDTH] & 0xa0) == 0xa0)
-		{
-			m_rtc.m_ram[RTC_HUNDREDTH] = 0;
-			m_rtc.m_ram[RTC_SECOND]++;
-
-			if ((m_rtc.m_ram[RTC_SECOND] & 0x0f) == 0x0a)
-			{
-				m_rtc.m_ram[RTC_SECOND] -= 0x0a;
-				m_rtc.m_ram[RTC_SECOND] += 0x10;
-				if (m_rtc.m_ram[RTC_SECOND] == 0x60)
-				{
-					m_rtc.m_ram[RTC_SECOND] = 0;
-					m_rtc.m_ram[RTC_MINUTE]++;
-
-					if ((m_rtc.m_ram[RTC_MINUTE] & 0x0f) == 0x0a)
-					{
-						m_rtc.m_ram[RTC_MINUTE] -= 0x0a;
-						m_rtc.m_ram[RTC_MINUTE] += 0x10;
-						if (m_rtc.m_ram[RTC_MINUTE] == 0x60)
-						{
-							m_rtc.m_ram[RTC_MINUTE] = 0;
-							m_rtc.m_ram[RTC_HOUR]++;
-
-							if ((m_rtc.m_ram[RTC_HOUR] & 0x0f) == 0x0a)
-							{
-								m_rtc.m_ram[RTC_HOUR] -= 0x0a;
-								m_rtc.m_ram[RTC_HOUR] += 0x10;
-								if (m_rtc.m_ram[RTC_HOUR] == 0x24)
-								{
-									m_rtc.m_ram[RTC_HOUR] = 0;
-									m_rtc.m_ram[RTC_DAY]++;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+WRITE32_MEMBER(indigo_state::dspram_w)
+{
+	LOGMASKED(LOG_INT, "%s: DSP RAM Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbe0000 + offset*4, data, mem_mask);
+	COMBINE_DATA(&m_dsp_ram[offset]);
 }
 
 void indigo_state::indigo_map(address_map &map)
@@ -878,6 +785,7 @@ void indigo_state::indigo_map(address_map &map)
 	map(0x18000000, 0x187fffff).ram().share("share7");
 	map(0x1fb80000, 0x1fb8ffff).rw(FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
 	map(0x1fbd9000, 0x1fbd903f).rw(FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
+	map(0x1fbe0000, 0x1fbe7fff).rw(FUNC(indigo_state::dspram_r), FUNC(indigo_state::dspram_w));
 }
 
 void indigo3k_state::mem_map(address_map &map)
@@ -940,6 +848,8 @@ void indigo_state::indigo_base(machine_config &config)
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
 	scsi.set_slot_device(2, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 	scsi.slot(2).set_option_machine_config("cdrom", cdrom_config);
+
+	DP8573(config, m_rtc);
 
 	WD33C93(config, m_wd33c93);
 	m_wd33c93->set_scsi_port("scsi");

@@ -21180,6 +21180,7 @@ gldarrow                        // (c) 1984 Meyco Games
 
 @source:mfabfz.cpp
 mfabfz                          //
+mfabfz64k                       //
 mfabfz85                        //
 
 @source:mgames.cpp
