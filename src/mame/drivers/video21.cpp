@@ -132,8 +132,8 @@ WRITE8_MEMBER(video21_state::lamp1_w)
 	m_hopper_motor = BIT(data, 4);
 
 	// lamps:
-	// d5: take/stand(which?)
-	// d6: take/stand(which?)
+	// d5: card/stop(which?)
+	// d6: card/stop(which?)
 	// d7: start
 	for (int i = 0; i < 3; i++)
 		m_lamps[i+0] = BIT(data, 7-i);
@@ -200,8 +200,8 @@ static INPUT_PORTS_START( video21 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Card")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stop")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, video21_state, hopper_coinout_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")

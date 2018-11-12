@@ -563,12 +563,12 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	//uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(16_MHz_XTAL / 16) /* Timer 0: tone gen for speaker */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
-	//MCFG_PIT8253_CLK1(16_MHz_XTAL / 16) /* Timer 1: baud rate gen for 8251 */
-	//MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, excali64_state, write_uart_clock))
-	//MCFG_PIT8253_CLK2(16_MHz_XTAL / 16) /* Timer 2: not used */
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(16_MHz_XTAL / 16); /* Timer 0: tone gen for speaker */
+	pit.out_handler<0>().set("speaker", FUNC(speaker_sound_device::level_w));
+	//pit.set_clk<1>(16_MHz_XTAL / 16); /* Timer 1: baud rate gen for 8251 */
+	//pit.out_handler<1>().set(FUNC(excali64_state::write_uart_clock));
+	//pit.set_clk<2>(16_MHz_XTAL / 16); /* Timer 2: not used */
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w)); // parallel port

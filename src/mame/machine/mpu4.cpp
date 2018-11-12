@@ -2984,7 +2984,7 @@ void mpu4_state::mpu4_bwb_7reel(machine_config &config)
 MACHINE_CONFIG_START(mpu4_state::mpu4_common)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu4_state, gen_50hz, attotime::from_hz(100))
 
-	MCFG_MSC1937_ADD("vfd",0)
+	MSC1937(config, m_vfd);
 	/* 6840 PTM */
 	PTM6840(config, m_6840ptm, MPU4_MASTER_CLOCK / 4);
 	m_6840ptm->set_external_clocks(0, 0, 0);
@@ -3085,25 +3085,27 @@ MACHINE_CONFIG_START(mpu4_state::mpu4base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(mpu4_state::mod2)
+void mpu4_state::mod2(machine_config &config)
+{
 	mpu4base(config);
-	MCFG_DEVICE_ADD("ay8913", AY8913, MPU4_MASTER_CLOCK/4)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(820, 0, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
+	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8913->set_resistors_load(820, 0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	mpu4_std_6reel(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mpu4_state::mod2_alt)
+void mpu4_state::mod2_alt(machine_config &config)
+{
 	mpu4base(config);
-	MCFG_DEVICE_ADD("ay8913", AY8913, MPU4_MASTER_CLOCK/4)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(820, 0, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
+	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8913->set_resistors_load(820, 0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	mpu4_type2_6reel(config);
-MACHINE_CONFIG_END
+}
 
 
 

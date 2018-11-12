@@ -3005,7 +3005,7 @@ std::string m68k_disassembler::d68851_p000()
 							fc_to_string(modes),
 							str,
 							(modes >> 10) & 7,
-							(modes >> 4) & 7);
+							(modes >> 5) & 7);
 		}
 		else
 		{

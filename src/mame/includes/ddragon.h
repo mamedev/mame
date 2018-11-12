@@ -152,7 +152,6 @@ private:
 	void dd2_sub_map(address_map &map);
 	void ddragon_map(address_map &map);
 	void ddragonba_sub_map(address_map &map);
-	void ddragonba_sub_portmap(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 };

@@ -595,21 +595,19 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
+	ay8910_device &ay1(AY8910(config, "ay1", AUDIO_CLOCK));  /* 1.5 MHz */
+	ay1.set_flags(AY8910_RESISTOR_OUTPUT);
+	ay1.set_resistors_load(10000.0, 10000.0, 10000.0);
+	ay1.add_route(0, "snd_nl", 1.0, 0);
+	ay1.add_route(1, "snd_nl", 1.0, 1);
+	ay1.add_route(2, "snd_nl", 1.0, 2);
 
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
-
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 3)
-	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 4)
-	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 5)
+	ay8910_device &ay2(AY8910(config, "ay2", AUDIO_CLOCK));  /* 1.5 MHz */
+	ay2.set_flags(AY8910_RESISTOR_OUTPUT);
+	ay2.set_resistors_load(10000.0, 10000.0, 10000.0);
+	ay2.add_route(0, "snd_nl", 1.0, 3);
+	ay2.add_route(1, "snd_nl", 1.0, 4);
+	ay2.add_route(2, "snd_nl", 1.0, 5);
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 

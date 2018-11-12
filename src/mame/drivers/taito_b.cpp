@@ -222,23 +222,6 @@ READ16_MEMBER(taitob_state::trackx_lo_r)
 	return (m_tracky_io[Player]->read() & 0xff) << 8;
 }
 
-WRITE16_MEMBER(taitob_state::gain_control_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		if (offset == 0)
-		{
-			m_mb87078->data_w(data >> 8, 0);
-				//logerror("MB87078 dsel=0 data=%4x\n", data);
-		}
-		else
-		{
-			m_mb87078->data_w(data >> 8, 1);
-				//logerror("MB87078 dsel=1 data=%4x\n", data);
-		}
-	}
-}
-
 INPUT_CHANGED_MEMBER(taitob_c_state::realpunc_sensor)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE);
@@ -427,7 +410,7 @@ void taitob_state::pbobble_map(address_map &map)
 	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
 	map(0x500028, 0x500029).w(FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
 	map(0x50002e, 0x50002f).portr("P3_P4_B");        /* shown in service mode, game omits to read it */
-	map(0x600000, 0x600003).w(FUNC(taitob_state::gain_control_w));
+	map(0x600000, 0x600003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0xff00);
 	map(0x700000, 0x700001).nopr();
 	map(0x700000, 0x700000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x700002, 0x700002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -445,7 +428,7 @@ void taitob_state::spacedx_map(address_map &map)
 	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
 	map(0x500028, 0x500029).w(FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
 	map(0x50002e, 0x50002f).portr("P3_P4_B");
-	map(0x600000, 0x600003).w(FUNC(taitob_state::gain_control_w));
+	map(0x600000, 0x600003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0xff00);
 	map(0x700000, 0x700001).nopr();
 	map(0x700000, 0x700000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x700002, 0x700002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -483,7 +466,7 @@ void taitob_state::qzshowby_map(address_map &map)
 	map(0x600000, 0x600001).nopr();
 	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x700000, 0x700003).w(FUNC(taitob_state::gain_control_w));
+	map(0x700000, 0x700003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0xff00);
 	map(0x800000, 0x801fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x900000, 0x90ffff).ram(); /* Main RAM */
 }

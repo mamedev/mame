@@ -827,11 +827,11 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(50)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, dmv_state, pit_out0))
-	MCFG_PIT8253_CLK2(XTAL(24'000'000) / 3 / 16)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, dmv_state, timint_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(50);
+	m_pit->out_handler<0>().set(FUNC(dmv_state::pit_out0));
+	m_pit->set_clk<2>(XTAL(24'000'000) / 3 / 16);
+	m_pit->out_handler<2>().set(FUNC(dmv_state::timint_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

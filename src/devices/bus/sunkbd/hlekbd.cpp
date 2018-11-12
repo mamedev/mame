@@ -989,7 +989,6 @@ void hle_device_base::received_byte(uint8_t byte)
 		switch (byte)
 		{
 		case COMMAND_RESET:
-			printf("Resetting keyboard\n");
 			device_reset();
 			break;
 

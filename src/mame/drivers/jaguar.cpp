@@ -338,7 +338,7 @@ Notes:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/jaguar/jaguar.h"
 #include "imagedev/chd_cd.h"
 #include "imagedev/snapquik.h"
@@ -1841,9 +1841,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R3041, R3000_CLOCK)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_DEVICE_PROGRAM_MAP(r3000_map)
+	R3041(config, m_maincpu, R3000_CLOCK);
+	downcast<r3041_device &>(*m_maincpu).set_endianness(ENDIANNESS_BIG);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
 	MCFG_DEVICE_ADD("gpu", JAGUARGPU, COJAG_CLOCK/2)
 	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))

@@ -210,7 +210,7 @@ ROM board (Operating System ROM PCA. Assembly# HP82991A or HP82995A)
 Notes:
       J1/J2 - 20 pin connector joining to 'Option ROM PCA'
       J3/J4 - 20 pin connector joining to 'LOGIC A PCA'
-      U1-U4 - 28 pin EPROM/MASKROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
+      U1-U4 - 28 pin EPROM/mask ROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
 
 
 ROM board (Option ROM PCA)
@@ -229,7 +229,7 @@ Note this PCB plugs in upside-down on top of the Operating System ROM PCB
 Notes:
       J1/J2 - 20 pin connector joining to 'Operating System ROM PCA'
       J3/J4 - 20 pin connector joining to 'LOGIC A PCA'
-      U1-U4 - 28 pin EPROM/MASKROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
+      U1-U4 - 28 pin EPROM/mask ROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
 
 
 Physical Memory Map
@@ -457,7 +457,7 @@ void hp_ipc_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	m_bus_error = false;
 }
 
-void hp_ipc_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
+void hp_ipc_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
 	if (m_bus_error)
 	{
@@ -468,7 +468,7 @@ void hp_ipc_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask
 		address++;
 	}
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
+	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
@@ -562,14 +562,14 @@ WRITE16_MEMBER(hp_ipc_state::mem_w)
 
 READ16_MEMBER(hp_ipc_state::trap_r)
 {
-	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 0, mem_mask);
+	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
 
 	return 0xffff;
 }
 
 WRITE16_MEMBER(hp_ipc_state::trap_w)
 {
-	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 1, mem_mask);
+	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
 }
 
 
@@ -757,15 +757,9 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	hp_hil_mlc_device &mlc(HP_HIL_MLC(config, "mlc", XTAL(15'920'000)/2));
 	mlc.int_callback().set(FUNC(hp_ipc_state::irq_2));
 	mlc.nmi_callback().set(FUNC(hp_ipc_state::irq_7));
-	hp_hil_slot_device &keyboard(HP_HIL_SLOT(config, "hil1", 0));
-	hp_hil_devices(keyboard);
-	keyboard.set_default_option("hp_ipc_kbd");
-	keyboard.set_hp_hil_slot(this, "mlc");
 
-	hp_hil_slot_device &mouse(HP_HIL_SLOT(config, "hil2", 0));
-	hp_hil_devices(mouse);
-	mouse.set_default_option("hp_46060b");
-	mouse.set_hp_hil_slot(this, "mlc");
+	HP_HIL_SLOT(config, "hil1", "mlc", hp_hil_devices, "hp_ipc_kbd");
+	HP_HIL_SLOT(config, "hil2", "mlc", hp_hil_devices, "hp_46060b");
 
 	tms9914_device &hpib(TMS9914(config, "hpib", 4_MHz_XTAL));
 	hpib.int_write_cb().set(FUNC(hp_ipc_state::irq_3));

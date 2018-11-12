@@ -247,11 +247,9 @@ MACHINE_CONFIG_START(vulgus_state::vulgus)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5 MHz */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5 MHz */
 MACHINE_CONFIG_END
 
 

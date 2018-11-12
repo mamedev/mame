@@ -807,8 +807,8 @@ MACHINE_CONFIG_START(bingor_state::vip2000)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymz", YMZ284, 1250000) // probably clocked by square wave output of 80186 timer 0
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ymz284_device &ymz(YMZ284(config, "ymz", 1250000)); // probably clocked by square wave output of 80186 timer 0
+	ymz.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 // I doubt we need to load the eeproms

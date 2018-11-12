@@ -609,7 +609,7 @@ WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
 
 			for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
 			{
-				m_dmadac[i]->set_frequency(ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
+				m_dmadac[i]->set_frequency(sample_period.as_hz());
 				m_dmadac[i]->enable(1);
 			}
 

@@ -553,8 +553,8 @@ MACHINE_CONFIG_START(moo_state::moo)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(moo_state::moobl)

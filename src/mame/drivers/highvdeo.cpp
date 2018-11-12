@@ -1628,20 +1628,30 @@ ROM_START( record ) // do checks and expect something... pc=e8044
 	ROM_LOAD( "sound-record-hrc-vers1-memory-2m.ic16", 0x00000, 0x40000, CRC(8b72ffec) SHA1(fca5cf2594325e0c9fe446ddf2330c669f7f37a9) )
 ROM_END
 
-GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Tour 4000",                0,                   layout_fashion )
-GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 4.0",         0,                   layout_fashion )
-GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 5.0",         0,                   layout_fashion )
-GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",     "Tour 4010",                0,                   layout_fashion )
-GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 5.1",         0,                   layout_fashion )
-GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 6.1",         0,                   layout_fashion )
-GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",     "New York Joker",           0,                   layout_fashion )
-GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 1k",          0,                   layout_fashion )
-GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "GiroTutto",                0,                   layout_fashion )
-GAMEL( 2000, galeone,   0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "San Remo Games", "Il Galeone",               0,                   layout_fashion )
-GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Ciclone",                  0,                   layout_fashion )
-GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "New Magic Card",           0,                   layout_fashion )
-GAMEL( 2000, brasil,    0,      brasil,   brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Bra$il (Version 3)",       0,                   layout_fashion )
-GAMEL( 2000, fashion,   brasil, fashion,  fashion, highvdeo_state, empty_init, ROT0, "High Video",     "Fashion (Version 2.14)",   0,                   layout_fashion )
-GAMEL( 2000, grancapi,  0,      grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Gran Capitan (Version 3)", MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state, empty_init, ROT0, "High Video",     "Magic Bomb (Version 1)",   MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 2000, record,    0,      record,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Record (Version 1)",       0,                   layout_fashion )
+ROM_START( cuncino )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* N80C186XL25 Code */
+	ROM_LOAD16_BYTE( "capitan uncino-hcu i27 vers.2_high video ic7.u7", 0x000000, 0x100000, CRC(47501ad8) SHA1(1aca8427dbd88bf8dbab768361e9d3e359ade78e) )
+	ROM_LOAD16_BYTE( "capitan uncino-hcu i28 vers.2_high video ic8.u8", 0x000001, 0x100000, CRC(81593809) SHA1(833b5226143d9d11f4e2db09ea76831f34e8751d) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* M6376 Samples */
+	ROM_LOAD( "sound-capitan uncino-hcu vers.1.u16", 0x00000, 0x80000, CRC(de87edb0) SHA1(a54c17dd21a756b1dbaec94b144db797d25ab7d6) ) // 1ST AND 2ND HALF IDENTICAL, matches grancapi's one when split in half
+ROM_END
+
+GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Tour 4000",                              0,                   layout_fashion )
+GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 4.0",                       0,                   layout_fashion )
+GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 5.0",                       0,                   layout_fashion )
+GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",     "Tour 4010",                              0,                   layout_fashion )
+GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 5.1",                       0,                   layout_fashion )
+GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 6.1",                       0,                   layout_fashion )
+GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "High Video",     "New York Joker",                         0,                   layout_fashion )
+GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Casino Fever 1k",                        0,                   layout_fashion )
+GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "GiroTutto",                              0,                   layout_fashion )
+GAMEL( 2000, galeone,   0,      nyjoker,  nyjoker, highvdeo_state, empty_init, ROT0, "San Remo Games", "Il Galeone",                             0,                   layout_fashion )
+GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Ciclone",                                0,                   layout_fashion )
+GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "New Magic Card",                         0,                   layout_fashion )
+GAMEL( 2000, brasil,    0,      brasil,   brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Bra$il (Version 3)",                     0,                   layout_fashion )
+GAMEL( 2000, fashion,   brasil, fashion,  fashion, highvdeo_state, empty_init, ROT0, "High Video",     "Fashion (Version 2.14)",                 0,                   layout_fashion )
+GAMEL( 2000, grancapi,  0,      grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Gran Capitan (Version 3)",               MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state, empty_init, ROT0, "High Video",     "Magic Bomb (Version 1)",                 MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 2000, record,    0,      record,   tv_tcf,  highvdeo_state, empty_init, ROT0, "High Video",     "Record (Version 1)",                     0,                   layout_fashion )
+GAMEL( 2000, cuncino,   0,      grancapi, brasil,  highvdeo_state, empty_init, ROT0, "High Video",     "Capitan Uncino (High Video, version 2)", MACHINE_NOT_WORKING, layout_fashion )

@@ -347,8 +347,8 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xmen_state::xmen6p)
@@ -413,8 +413,8 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
 

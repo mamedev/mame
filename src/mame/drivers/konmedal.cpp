@@ -664,6 +664,11 @@ ROM_START( shuriboy )
 
 	ROM_REGION( 0x200000, "upd", 0 )
 	ROM_LOAD( "341-a02.13c", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "am27s21apc.2d", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "am27s21apc.3d", 0x100, 0x100, NO_DUMP )
+	ROM_LOAD( "am27s21apc.4d", 0x200, 0x100, NO_DUMP )
 ROM_END
 
 GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)

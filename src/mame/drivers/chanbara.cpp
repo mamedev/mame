@@ -413,11 +413,11 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000/8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, chanbara_state, chanbara_ay_out_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, chanbara_state, chanbara_ay_out_1_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12000000/8));
+	ymsnd.irq_handler().set_inputline(m_maincpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_0_w));
+	ymsnd.port_b_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_1_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

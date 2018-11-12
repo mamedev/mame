@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz, Robbbert
+// copyright-holders:Ryan Holtz
 /******************************************************************************
 
     Short Description:

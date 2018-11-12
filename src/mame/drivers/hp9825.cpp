@@ -16,8 +16,9 @@
 // - DC100 tape drive
 // - Printer
 // - Beeper
+// - Internal expansion ROMs
 // What's not yet in:
-// - Internal & external expansion ROMs
+// - External expansion ROMs
 // - Configurable RAM size
 // - I/O expansion slots: 98034 & 98035 modules from hp9845 emulation can be used here, too
 //
@@ -92,6 +93,10 @@ public:
 
 	void hp9825b(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<hp_09825_67907_cpu_device> m_cpu;
 	required_device<timer_device> m_cursor_timer;
@@ -126,9 +131,6 @@ private:
 	uint8_t m_printer_mem[ 16 ];
 	uint8_t m_printer_idx;
 	unsigned m_printer_line;    // 0: printer idle, 1..10: line being printed
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);
@@ -210,12 +212,13 @@ void hp9825_state::cpu_mem_map(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x0000 , 0x2fff).rom();
+	map(0x3400 , 0x3bff).rom();
+	map(0x4000 , 0x4fff).rom();
 	map(0x5000 , 0x7fff).ram();
 }
 
 READ16_MEMBER(hp9825_state::kb_scancode_r)
 {
-	// TODO:
 	uint8_t res = m_scancode;
 	if (m_shift_key->read()) {
 		BIT_SET(res , 7);
@@ -226,7 +229,6 @@ READ16_MEMBER(hp9825_state::kb_scancode_r)
 
 WRITE16_MEMBER(hp9825_state::disp_w)
 {
-	// TODO:
 	if (m_display_on) {
 		m_display_on = false;
 		m_cursor_timer->reset();
@@ -252,7 +254,6 @@ READ16_MEMBER(hp9825_state::kdp_status_r)
 
 WRITE16_MEMBER(hp9825_state::kdp_control_w)
 {
-	// TODO:
 	bool regen_display = false;
 	if (BIT(data , 1) && !m_display_on) {
 		m_display_on = true;
@@ -830,11 +831,16 @@ static INPUT_PORTS_START(hp9825)
 INPUT_PORTS_END
 
 ROM_START(hp9825b)
-	ROM_REGION(0x6000 , "cpu" , ROMREGION_16BIT | ROMREGION_BE)
+	ROM_REGION(0xa000 , "cpu" , ROMREGION_16BIT | ROMREGION_BE)
 	ROM_LOAD("sysrom1.bin" , 0x0000 , 0x2000 , CRC(fe429268) SHA1(f2fe7c5abca92bd13f81b4385fc4fce0cafb0da0))
 	ROM_LOAD("sysrom2.bin" , 0x2000 , 0x2000 , CRC(96093b5d) SHA1(c6ec4cafd019887df0fa849b3c7070bb74faee54))
 	ROM_LOAD("sysrom3.bin" , 0x4000 , 0x2000 , CRC(f9470f67) SHA1(b80cb4a366d93bd7acc3508ce987bb11c5986b2a))
+	ROM_LOAD("genio_t.bin" , 0x6800 , 0x0800 , CRC(ade1d1ed) SHA1(9af74a65b29ef1885f74164238ecf8d16ac995d6))
+	ROM_LOAD("plot72.bin"  , 0x7000 , 0x0800 , CRC(0a9cb8db) SHA1(d0d126fca108f2715e1e408cb31b09ba69385ac4))
+	ROM_LOAD("advpgm_t.bin", 0x8000 , 0x0800 , CRC(965b5e5a) SHA1(ff44dd15f8fa4ca03dfd970ed8b200e8a071ec13))
+	ROM_LOAD("extio_t.bin" , 0x8800 , 0x1000 , CRC(a708b978) SHA1(baf53c8a2b24d059f95252baf1452188eaf6e4be))
+	ROM_LOAD("strings_t.bin",0x9800 , 0x0800 , CRC(b5ca5da5) SHA1(af13abb3c15836c566863c656e1659f7e6f96d04))
 ROM_END
 
 //   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME    FLAGS
-COMP(1980, hp9825b, 0,      0,      hp9825b, hp9825, hp9825_state, empty_init, "Hewlett-Packard", "HP 9825B", MACHINE_NO_SOUND)
+COMP(1980, hp9825b, 0,      0,      hp9825b, hp9825, hp9825_state, empty_init, "Hewlett-Packard", "HP 9825B", 0)

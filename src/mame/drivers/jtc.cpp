@@ -910,7 +910,7 @@ ROM_START( jtc )
 	ROM_REGION( 0x10000, UB8830D_TAG, 0 )
 	ROM_LOAD( "u883rom.bin", 0x0000, 0x0800, CRC(2453c8c1) SHA1(816f5d08f8064b69b1779eb6661fde091aa58ba8) )
 	ROM_LOAD( "os2k_0800.bin", 0x0800, 0x0800, CRC(c81a2e19) SHA1(97c3b36c7b555081e084403e8f800fc9dbf5e68d) ) // u2716c1.bin
-	ROM_LOAD_OPTIONAL( "u2716c2.bin", 0x2000, 0x0800, NO_DUMP ) // doesn't seem to be needed?
+	ROM_LOAD( "u2716c2.bin", 0x2000, 0x0800, NO_DUMP ) // doesn't seem to be needed?
 ROM_END
 
 ROM_START( jtces88 )

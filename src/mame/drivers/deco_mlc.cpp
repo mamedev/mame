@@ -603,7 +603,7 @@ custom DE156 encrypted CPU.
 Notes:
       - SH2 (QFP144) clock: 21.000MHz (42 / 2)
       - All ROMs SD* are 4M x 16bit EPROMS (27C4096)
-      - All MCG* ROMs are surface mounted 16M MASK ROMs
+      - All MCG* ROMs are surface mounted 16M mask ROMs
       - (mcg-01.1d read in 8 bit mode because this ROM had fixed bits when read in 16 bit
         mode, reading as 8 bit gave a good read. Others read in 16 bit mode)
 */

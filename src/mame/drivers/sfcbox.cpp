@@ -474,7 +474,7 @@ MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 	MCFG_DEVICE_IO_MAP(sfcbox_io)
 
 	MCFG_MB90082_ADD("mb90082",XTAL(12'000'000) / 2) /* TODO: correct clock */
-	MCFG_S3520CF_ADD("s3520cf") /* RTC */
+	S3520CF(config, m_s3520cf); /* RTC */
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

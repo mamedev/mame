@@ -701,8 +701,8 @@ void namconb1_state::namconb1_am(address_map &map)
 	map(0x580000, 0x5807ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
 	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
-	map(0x640000, 0x64ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
-	map(0x660000, 0x66003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
+	map(0x640000, 0x64ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
+	map(0x660000, 0x66003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x680000, 0x68000f).ram().share("spritebank32");
 	map(0x6e0000, 0x6e001f).r(FUNC(namconb1_state::custom_key_r)).nopw();
 	map(0x700000, 0x707fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
@@ -719,8 +719,8 @@ void namconb1_state::namconb2_am(address_map &map)
 	map(0x600000, 0x61ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
 	map(0x620000, 0x620007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0x640000, 0x64000f).ram(); /* unknown xy offset */
-	map(0x680000, 0x68ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram_r), FUNC(namco_c123tmap_device::videoram_w));
-	map(0x6c0000, 0x6c003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control_r), FUNC(namco_c123tmap_device::control_w));
+	map(0x680000, 0x68ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
+	map(0x6c0000, 0x6c003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x700000, 0x71ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0x740000, 0x74001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 	map(0x800000, 0x807fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
@@ -1064,7 +1064,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
-	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
 	m_c355spr->set_palxor(0x0);
 	m_c355spr->set_buffer(2); // triple buffered
@@ -1131,13 +1131,13 @@ MACHINE_CONFIG_END
 
 /***************************************************************/
 
-ROM_START( ptblank ) /* World set using 4Mb sound data rom (verified) */
+ROM_START( ptblank ) /* World set using 4Mb sound data ROM (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn2_mprlb.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) )
 	ROM_LOAD32_WORD( "gn2_mprub.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
-//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
+//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
 	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -1167,8 +1167,8 @@ ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's 
 	ROM_LOAD32_WORD( "nr3_spr0.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) ) // == gn2_mprlb.15b
 	ROM_LOAD32_WORD( "nr2_spr0.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) ) // == gn2_mprub.12b
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
-//  ROM_LOAD( "nr1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
+//  ROM_LOAD( "nr1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
 	ROM_LOAD( "nr1_spr0.5b", 0, 0x80000, CRC(a0bde3fb) SHA1(b5fac1d0339b1df6b8880fcd7aa2725a774765a4) ) /* 4Megabit, same data at 0x00000-0x1ffff repeated 4 time */
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -1193,13 +1193,13 @@ ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's 
 	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
-ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
+ROM_START( gunbuletw ) /* World set using 4Mb sound data ROM (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn3_mprlb.15b", 0x00002, 0x80000, CRC(9260fce5) SHA1(064579be1ac90e04082a8b403c6adf35dbb46a7e) )
 	ROM_LOAD32_WORD( "gn3_mprub.13b", 0x00000, 0x80000, CRC(6c1ac697) SHA1(7b52b5ef8154a5d741ac24673f3e6bbfa246a494) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
-//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
+//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
 	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -1224,13 +1224,13 @@ ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
 	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
-ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data rom (verified) */
+ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data ROM (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn1_mprl.15b", 0x00002, 0x80000, CRC(f99e309e) SHA1(3fe0ddf756e6849f8effc7672456cbe32f65c98a) )
 	ROM_LOAD32_WORD( "gn1_mpru.13b", 0x00000, 0x80000, CRC(72a4db07) SHA1(8c5e1e51cd961b311d03f7b21f36a5bd5e8e9104) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
-	ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either ROM is correct */
+	ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb ROM at 0x00000-0x1ffff */
 //  ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -1481,20 +1481,20 @@ ROM Label       Label     Type
 GS1MPRU.13B     PRGU      27C240        \ Main program
 GS1MPRL.15B     PRGL      27C240        /
 GS1SPR0.5B      SPRG      27C240        Sound program, linked to 75, C351 and C352
-GS1VOI-0.5J     VOICE     16M MASK      Sound voices
-GS1CHR-0.8J     CHR0      8M MASK       Character
-GS1CHR-1.9J     CHR1      8M MASK       Character
-GS1CHR-2.10J    CHR2      8M MASK       Character
-GS1CHR-3.11J    CHR3      8M MASK       Character
-GS1SHA-0.5M     SHAPE     4M MASK       Shape
+GS1VOI-0.5J     VOICE     16M mask      Sound voices
+GS1CHR-0.8J     CHR0      8M mask       Character
+GS1CHR-1.9J     CHR1      8M mask       Character
+GS1CHR-2.10J    CHR2      8M mask       Character
+GS1CHR-3.11J    CHR3      8M mask       Character
+GS1SHA-0.5M     SHAPE     4M mask       Shape
 
 ROMs, MEMEXT OBJ2 PCB  (All ROMs surface mounted)
 ---------------------
 Filename /      PCB       ROM
 ROM Label       Label     Type
 ----------------------------------------
-GS1OBJ-0.IC1    OBJL      16M MASK SOP44
-GS1OBJ-1.IC2    OBJU      16M MASK SOP44
+GS1OBJ-0.IC1    OBJL      16M mask SOP44
+GS1OBJ-1.IC2    OBJU      16M mask SOP44
 
 Note! All ROMs are different to the Great Sluggers '94 set.
 
@@ -1761,10 +1761,10 @@ ou2mprl.11c     PRGL      27C4002       \ Main program
 ou2mpru.11d     PRGU      27C4002       /
 ou1spr0.5b      SPRG      27C240        Sound program, linked to C352 and C382
 ou1voi0.6n      VOICE0    MB8316200B    Sound voices
-ou1shas.12s     SHAPE-S   16M MASK      Shape
-ou1shar.18s     SHAPE-R   16M MASK      Shape
+ou1shas.12s     SHAPE-S   16M mask      Shape
+ou1shar.18s     SHAPE-R   16M mask      Shape
 
-ROMs, MASK ROM PCB (All ROMs surface mounted)
+ROMs, mask ROM PCB (All ROMs surface mounted)
 ------------------
 Filename /      PCB       ROM
 ROM Label       Label     Type

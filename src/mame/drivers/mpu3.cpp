@@ -841,7 +841,7 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_DEVICE_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
 	MCFG_DEVICE_PROGRAM_MAP(mpu3_basemap)
 
-	MCFG_MSC1937_ADD("vfd",0)
+	MSC1937(config, m_vfd);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu3_state, gen_50hz, attotime::from_hz(100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("555_ic10", mpu3_state, ic10_callback, PERIOD_OF_555_ASTABLE(10000,1000,0.0000001))

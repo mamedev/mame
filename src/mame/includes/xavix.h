@@ -11,6 +11,49 @@
 #include "speaker.h"
 #include "machine/bankdev.h"
 #include "machine/i2cmem.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
+#include "machine/xavix_mtrk_wheel.h"
+#include "machine/xavix_madfb_ball.h"
+
+
+class xavix_sound_device : public device_t, public device_sound_interface
+{
+public:
+	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto read_regs_callback() { return m_readregs_cb.bind(); }
+	auto read_samples_callback() { return m_readsamples_cb.bind(); }
+
+	void enable_voice(int voice);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+private:
+	sound_stream *m_stream;
+
+	struct xavix_voice {
+		bool enabled;
+		uint16_t position;
+		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
+		int type;
+	};
+
+	devcb_read8 m_readregs_cb;
+
+	devcb_read8 m_readsamples_cb;
+
+	xavix_voice m_voice[16];
+};
+
+DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)
 
 
 class xavix_state : public driver_device
@@ -18,6 +61,8 @@ class xavix_state : public driver_device
 public:
 	xavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
@@ -37,26 +82,36 @@ public:
 		m_posirq_y(*this, "posirq_y"),
 		m_segment_regs(*this, "segment_regs"),
 		m_palette(*this, "palette"),
-		m_in0(*this, "IN0"),
-		m_in1(*this, "IN1"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lowbus(*this, "lowbus"),
-		m_i2cmem(*this, "i2cmem")
+		m_hack_timer_disable(false),
+		m_sound(*this, "xavix_sound")
 	{ }
-
+	
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
 
-	void xavix_i2c(machine_config &config);
-	void xavix2000_i2c(machine_config &config);
-
 	void init_xavix();
+	void init_bass();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(rad_rh_in1_08_r);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg04);
+	DECLARE_WRITE_LINE_MEMBER(ioevent_trg08);
+
+protected:
+
+	virtual uint8_t read_io0(uint8_t direction);
+	virtual uint8_t read_io1(uint8_t direction);
+	virtual void write_io0(uint8_t data, uint8_t direction);
+	virtual void write_io1(uint8_t data, uint8_t direction);
+	required_ioport m_in0;
+	required_ioport m_in1;
 
 private:
+
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -64,7 +119,7 @@ private:
 
 	void xavix_lowbus_map(address_map &map);
 	void xavix_extbus_map(address_map &map);
-void superxavix_lowbus_map(address_map &map);
+	void superxavix_lowbus_map(address_map &map);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
@@ -75,26 +130,105 @@ void superxavix_lowbus_map(address_map &map);
 
 	virtual void video_start() override;
 
-	DECLARE_READ8_MEMBER(main_r);
-	DECLARE_WRITE8_MEMBER(main_w);
-	DECLARE_READ8_MEMBER(main2_r);
-	DECLARE_WRITE8_MEMBER(main2_w);
-	DECLARE_READ8_MEMBER(main3_r);
-	DECLARE_WRITE8_MEMBER(main3_w);
+	DECLARE_READ8_MEMBER(opcodes_000000_r);
+	DECLARE_READ8_MEMBER(opcodes_800000_r);
 
 	DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
 	DECLARE_WRITE8_MEMBER(extbus_w) { logerror("write to external bus %06x %02x\n", offset, data); }
+
+
+	/* this is just a quick memory system bypass for video reads etc. because going through the
+	   memory system is slow and also pollutes logs significantly with unmapped reads if the games
+	   enable the video before actually setting up the source registers! 
+   
+	   this will need modifying if any games have RAM instead of ROM (which I think is possible
+	   with SuperXaviX at least)
+	*/
+	inline uint8_t read_full_data_sp_lowbus_bypass(uint16_t adr)
+	{
+		adr &= 0x7fff;
+
+		if (adr < 0x4000)
+		{
+			adr &= 0x3fff;
+			return m_mainram[adr];
+		}
+		else if (adr < 0x5000)
+		{
+			adr &= 0xfff;
+			return txarray_r(adr);
+		}
+		else if ((adr >= 0x6000) && (adr < 0x6800))
+		{
+			adr &= 0x7ff;
+			return m_fragment_sprite[adr];
+		}
+		else if ((adr >= 0x6800) && (adr < 0x6900))
+		{
+			adr &= 0xff;
+			return m_palram_sh[adr];
+		}
+		else if ((adr >= 0x6900) && (adr < 0x6a00))
+		{
+			adr &= 0xff;
+			return m_palram_l[adr];
+		}
+		else if ((adr >= 0x6a00) && (adr < 0x6a20))
+		{
+			adr &= 0x1f;
+			return m_segment_regs[adr];
+		}
+		// superxavix bitmap palette?
+
+		return 0x00;
+	}
+
+	DECLARE_READ8_MEMBER(sample_read)
+	{
+		return read_full_data_sp_bypass(offset);
+	};
+
+	inline uint8_t read_full_data_sp_bypass(uint32_t adr)
+	{
+		uint8_t databank = adr >> 16;
+
+		if (databank >= 0x80)
+		{
+			return m_rgn[adr & (m_rgnlen - 1)];
+		}
+		else
+		{
+			if ((adr&0xffff) >= 0x8000)
+			{
+				return m_rgn[adr & (m_rgnlen - 1)];
+			}
+			else
+			{
+				return read_full_data_sp_lowbus_bypass(adr);
+			}
+		}
+	}
 
 	DECLARE_WRITE8_MEMBER(extintrf_7900_w);
 	DECLARE_WRITE8_MEMBER(extintrf_7901_w);
 	DECLARE_WRITE8_MEMBER(extintrf_7902_w);
 
-	DECLARE_WRITE8_MEMBER(xavix_7a80_w);
+	DECLARE_READ8_MEMBER(ioevent_enable_r);
+	DECLARE_WRITE8_MEMBER(ioevent_enable_w);
+	DECLARE_READ8_MEMBER(ioevent_irqstate_r);
+	DECLARE_WRITE8_MEMBER(ioevent_irqack_w);
+	uint8_t m_ioevent_enable;
+	uint8_t m_ioevent_active;
+	void process_ioevent(uint8_t bits);
+
 	DECLARE_WRITE8_MEMBER(adc_7b00_w);
 	DECLARE_READ8_MEMBER(adc_7b80_r);
 	DECLARE_WRITE8_MEMBER(adc_7b80_w);
 	DECLARE_READ8_MEMBER(adc_7b81_r);
 	DECLARE_WRITE8_MEMBER(adc_7b81_w);
+	TIMER_CALLBACK_MEMBER(adc_timer_done);
+	emu_timer *m_adc_timer;
+	uint8_t m_adc_control;
 
 	DECLARE_WRITE8_MEMBER(slotreg_7810_w);
 
@@ -113,13 +247,18 @@ void superxavix_lowbus_map(address_map &map);
 
 	DECLARE_READ8_MEMBER(io0_data_r);
 	DECLARE_READ8_MEMBER(io1_data_r);
-	DECLARE_READ8_MEMBER(io0_direction_r);
-	DECLARE_READ8_MEMBER(io1_direction_r);
-
 	DECLARE_WRITE8_MEMBER(io0_data_w);
 	DECLARE_WRITE8_MEMBER(io1_data_w);
+
+	DECLARE_READ8_MEMBER(io0_direction_r);
+	DECLARE_READ8_MEMBER(io1_direction_r);
 	DECLARE_WRITE8_MEMBER(io0_direction_w);
 	DECLARE_WRITE8_MEMBER(io1_direction_w);
+
+	uint8_t m_io0_data;
+	uint8_t m_io1_data;
+	uint8_t m_io0_direction;
+	uint8_t m_io1_direction;
 
 	DECLARE_WRITE8_MEMBER(vector_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_vector_lo_w);
@@ -146,18 +285,17 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_READ8_MEMBER(sound_75f0_r);
-	DECLARE_WRITE8_MEMBER(sound_75f0_w);
+	DECLARE_READ8_MEMBER(sound_reg16_0_r);
+	DECLARE_WRITE8_MEMBER(sound_reg16_0_w);
+	DECLARE_READ8_MEMBER(sound_reg16_1_r);
+	DECLARE_WRITE8_MEMBER(sound_reg16_1_w);
 
-	DECLARE_READ8_MEMBER(sound_75f1_r);
-	DECLARE_WRITE8_MEMBER(sound_75f1_w);
-
-	DECLARE_READ8_MEMBER(sound_75f4_r);
+	DECLARE_READ8_MEMBER(sound_sta16_r);
 	DECLARE_READ8_MEMBER(sound_75f5_r);
-	DECLARE_READ8_MEMBER(sound_75f6_r);
-	DECLARE_WRITE8_MEMBER(sound_75f6_w);
+	DECLARE_READ8_MEMBER(sound_volume_r);
+	DECLARE_WRITE8_MEMBER(sound_volume_w);
 
-	DECLARE_WRITE8_MEMBER(sound_75f7_w);
+	DECLARE_WRITE8_MEMBER(sound_regbase_w);
 
 	DECLARE_READ8_MEMBER(sound_75f8_r);
 	DECLARE_WRITE8_MEMBER(sound_75f8_w);
@@ -165,22 +303,42 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_READ8_MEMBER(sound_75f9_r);
 	DECLARE_WRITE8_MEMBER(sound_75f9_w);
 
-	DECLARE_READ8_MEMBER(sound_75fa_r);
-	DECLARE_WRITE8_MEMBER(sound_75fa_w);
-	DECLARE_READ8_MEMBER(sound_75fb_r);
-	DECLARE_WRITE8_MEMBER(sound_75fb_w);
-	DECLARE_READ8_MEMBER(sound_75fc_r);
-	DECLARE_WRITE8_MEMBER(sound_75fc_w);
-	DECLARE_READ8_MEMBER(sound_75fd_r);
-	DECLARE_WRITE8_MEMBER(sound_75fd_w);
+	DECLARE_READ8_MEMBER(sound_timer0_r);
+	DECLARE_WRITE8_MEMBER(sound_timer0_w);
+	DECLARE_READ8_MEMBER(sound_timer1_r);
+	DECLARE_WRITE8_MEMBER(sound_timer1_w);
+	DECLARE_READ8_MEMBER(sound_timer2_r);
+	DECLARE_WRITE8_MEMBER(sound_timer2_w);
+	DECLARE_READ8_MEMBER(sound_timer3_r);
+	DECLARE_WRITE8_MEMBER(sound_timer3_w);
 
-	DECLARE_WRITE8_MEMBER(sound_75fe_w);
+	DECLARE_READ8_MEMBER(sound_irqstatus_r);
+	DECLARE_WRITE8_MEMBER(sound_irqstatus_w);
 	DECLARE_WRITE8_MEMBER(sound_75ff_w);
+	uint8_t m_sound_irqstatus;
+	uint8_t m_soundreg16_0[2];
+	uint8_t m_soundreg16_1[2];
+	uint8_t m_sound_regbase;
 
+	DECLARE_READ8_MEMBER(timer_status_r);
 	DECLARE_WRITE8_MEMBER(timer_control_w);
 	DECLARE_READ8_MEMBER(timer_baseval_r);
 	DECLARE_WRITE8_MEMBER(timer_baseval_w);
+	DECLARE_READ8_MEMBER(timer_freq_r);
 	DECLARE_WRITE8_MEMBER(timer_freq_w);
+	DECLARE_READ8_MEMBER(timer_curval_r);
+	uint8_t m_timer_control;
+	uint8_t m_timer_freq;
+	TIMER_CALLBACK_MEMBER(freq_timer_done);
+	emu_timer *m_freq_timer;
+
+	DECLARE_WRITE8_MEMBER(palram_sh_w);
+	DECLARE_WRITE8_MEMBER(palram_l_w);
+	DECLARE_WRITE8_MEMBER(colmix_sh_w);
+	DECLARE_WRITE8_MEMBER(colmix_l_w);
+	DECLARE_WRITE8_MEMBER(bmp_palram_sh_w);
+	DECLARE_WRITE8_MEMBER(bmp_palram_l_w);
+
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
@@ -195,6 +353,44 @@ void superxavix_lowbus_map(address_map &map);
 	DECLARE_WRITE8_MEMBER(xavix_memoryemu_txarray_w);
 	uint8_t m_txarray[3];
 
+	inline uint8_t txarray_r(uint16_t offset)
+	{
+		if (offset < 0x100)
+		{
+			offset &= 0xff;
+			return ((offset >> 4) | (offset << 4));
+		}
+		else if (offset < 0x200)
+		{
+			offset &= 0xff;
+			return ((offset >> 4) | (~offset << 4));
+		}
+		else if (offset < 0x300)
+		{
+			offset &= 0xff;
+			return ((~offset >> 4) | (offset << 4));
+		}
+		else if (offset < 0x400)
+		{
+			offset &= 0xff;
+			return ((~offset >> 4) | (~offset << 4));
+		}
+		else if (offset < 0x800)
+		{
+			return m_txarray[0];
+		}
+		else if (offset < 0xc00)
+		{
+			return m_txarray[1];
+		}
+		else if (offset < 0x1000)
+		{
+			return m_txarray[2];
+		}
+
+		return 0xff;
+	}
+
 	DECLARE_READ8_MEMBER(mult_r);
 	DECLARE_WRITE8_MEMBER(mult_w);
 	DECLARE_READ8_MEMBER(mult_param_r);
@@ -202,6 +398,9 @@ void superxavix_lowbus_map(address_map &map);
 
 	required_device<xavix_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	
+	void update_irqs();
+	uint8_t m_irqsource;
 
 	uint8_t m_vectorenable;
 	uint8_t m_nmi_vector_lo_data;
@@ -224,11 +423,6 @@ void superxavix_lowbus_map(address_map &map);
 
 	uint8_t m_6ff0;
 	uint8_t m_video_ctrl;
-
-	uint8_t m_io0_data;
-	uint8_t m_io1_data;
-	uint8_t m_io0_direction;
-	uint8_t m_io1_direction;
 
 	uint8_t m_soundregs[0x10];
 
@@ -266,13 +460,11 @@ void superxavix_lowbus_map(address_map &map);
 
 	required_device<palette_device> m_palette;
 
-	required_ioport m_in0;
-	required_ioport m_in1;
 	required_ioport m_region;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* ramsh, uint8_t* raml, int size, int basecol);
+	void update_pen(int pen, uint8_t shval, uint8_t lval);
 	double hue2rgb(double p, double q, double t);
 	void draw_tile_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
 	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
@@ -298,7 +490,101 @@ void superxavix_lowbus_map(address_map &map);
 
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
-	optional_device<i2cmem_device> m_i2cmem;
+
+	bool m_hack_timer_disable;
+
+	required_device<xavix_sound_device> m_sound;
+	DECLARE_READ8_MEMBER(sound_regram_read_cb);
+};
+
+class xavix_i2c_state : public xavix_state
+{
+public:
+	xavix_i2c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void xavix_i2c_24lc04(machine_config &config);
+	void xavix_i2c_24c08(machine_config &config);
+
+	void xavix2000_i2c_24c04(machine_config &config);
+	void xavix2000_i2c_24c02(machine_config &config);
+
+protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+
+class xavix_mtrk_state : public xavix_state
+{
+public:
+	xavix_mtrk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_wheel(*this, "wheel")
+	{ }
+
+	void xavix_mtrk(machine_config &config);
+	void xavix_mtrkp(machine_config &config);
+
+	CUSTOM_INPUT_MEMBER( mtrk_wheel_r );
+
+protected:
+	required_device<xavix_mtrk_wheel_device> m_wheel;
+};
+
+class xavix_madfb_state : public xavix_state
+{
+public:
+	xavix_madfb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_ball(*this, "ball")
+	{ }
+
+	void xavix_madfb(machine_config &config);
+
+protected:
+	required_device<xavix_madfb_ball_device> m_ball;
+};
+
+
+class xavix_ekara_state : public xavix_state
+{
+public:
+	xavix_ekara_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_extra0(*this, "EXTRA0"),
+		m_extra1(*this, "EXTRA1"),
+		m_extraioselect(0),
+		m_extraiowrite(0),
+		m_extrainlatch0(0),
+		m_extrainlatch1(0)
+	{ }
+
+	void xavix_ekara(machine_config &config);
+
+protected:
+	required_device<generic_slot_device> m_cart;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ekara_cart);
+	//READ8_MEMBER(cart_r) { return m_cart->read_rom(space, offset); }
+
+	required_ioport m_extra0;
+	required_ioport m_extra1;
+
+	virtual uint8_t read_io1(uint8_t direction) override;
+	virtual void write_io0(uint8_t data, uint8_t direction) override;
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+	uint8_t m_extraioselect;
+	uint8_t m_extraiowrite;
+
+	uint8_t m_extrainlatch0;
+	uint8_t m_extrainlatch1;
+
 };
 
 #endif // MAME_INCLUDES_XAVIX_H

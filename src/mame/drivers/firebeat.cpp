@@ -1185,7 +1185,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
-	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
+	RTC65271(config, "rtc", 0);
 
 	FUJITSU_29F016A(config, "flash_main");
 	FUJITSU_29F016A(config, "flash_snd1");
@@ -1243,7 +1243,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
-	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
+	RTC65271(config, "rtc", 0);
 
 	FUJITSU_29F016A(config, "flash_main");
 	FUJITSU_29F016A(config, "flash_snd1");

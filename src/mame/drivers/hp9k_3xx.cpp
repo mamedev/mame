@@ -187,12 +187,12 @@ void hp9k3xx_state::hp9k360_map(address_map &map)
 	map(0xff000000, 0xffffffff).ram();
 }
 
-// 9000/370 - 8 MB RAM standard
+// 9000/370 - with 48 MB RAM (max. configuration)
 void hp9k3xx_state::hp9k370_map(address_map &map)
 {
 	hp9k3xx_common(map);
 	// main memory
-	map(0xff800000, 0xffffffff).ram();
+	map(0xfd000000, 0xffffffff).ram();
 }
 
 // 9000/380 - '040
@@ -283,13 +283,16 @@ void hp9k3xx_state::add_dio32_bus(machine_config &config)
 	dio32.irq7_out_cb().set(FUNC(hp9k3xx_state::dio_irq7_w));
 }
 
-void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
+void hp9k3xx_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
+	if (m_maincpu->m68851_buserror(address))
+		return;
+
 	if (m_bus_error)
 		return;
 
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
+	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
@@ -297,14 +300,14 @@ void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mas
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
 	if (!machine().side_effects_disabled())
-		set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
+		set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
 	return 0xffff;
 }
 
 WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 {
 	if (!machine().side_effects_disabled())
-		set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
+		set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
 }
 
 READ32_MEMBER(hp9k3xx_state::buserror_r)
@@ -403,7 +406,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k360)
 	hp9k320(config);
 
 	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k370_map)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k360_map)
 MACHINE_CONFIG_END
 
 

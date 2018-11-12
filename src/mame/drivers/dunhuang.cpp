@@ -832,13 +832,12 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, 12000000/8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, dunhuang_state, dsw_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, dunhuang_state, input_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &ay8910(AY8910(config, "ay8910", 12000000/8));
+	ay8910.port_b_read_callback().set(FUNC(dunhuang_state::dsw_r));
+	ay8910.port_a_write_callback().set(FUNC(dunhuang_state::input_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

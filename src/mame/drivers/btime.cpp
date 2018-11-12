@@ -1311,20 +1311,20 @@ MACHINE_CONFIG_START(btime_state::btime)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_DEVICE_ADD("ay1", AY8910, HCLK2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
+	ay8910_device &ay1(AY8910(config, "ay1", HCLK2));
+	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
+	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
+	ay1.add_route(0, "discrete", 1.0, 0);
+	ay1.add_route(1, "discrete", 1.0, 1);
+	ay1.add_route(2, "discrete", 1.0, 2);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, HCLK2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(1), RES_K(5), RES_K(5))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 3)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 4)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 5)
+	ay8910_device &ay2(AY8910(config, "ay2", HCLK2));
+	ay2.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay2.set_resistors_load(RES_K(1), RES_K(5), RES_K(5));
+	ay2.add_route(0, "discrete", 1.0, 3);
+	ay2.add_route(1, "discrete", 1.0, 4);
+	ay2.add_route(2, "discrete", 1.0, 5);
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, btime_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1438,14 +1438,14 @@ MACHINE_CONFIG_START(btime_state::zoar)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ay1", AY8910, HCLK1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", HCLK1));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.23);
+	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
+	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
 
-	MCFG_DEVICE_REPLACE("ay2", AY8910, HCLK1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", HCLK1));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.23);
 MACHINE_CONFIG_END
 
 

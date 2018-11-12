@@ -1073,10 +1073,10 @@ MACHINE_CONFIG_START(equites_state::common_sound)
 	MCFG_SOUND_ROUTE(9, "speaker", 1.0)        // pin 2 SOLO 16' (this actually feeds an analog section)
 	MCFG_SOUND_ROUTE(10,"speaker", 0.12)       // pin 22 Noise Output (this actually feeds an analog section)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 6.144_MHz_XTAL/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, equites_state, equites_8910porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, equites_state, equites_8910portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 6.144_MHz_XTAL/4)); /* verified on pcb */
+	aysnd.port_a_write_callback().set(FUNC(equites_state::equites_8910porta_w));
+	aysnd.port_b_write_callback().set(FUNC(equites_state::equites_8910portb_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MCFG_DEVICE_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC

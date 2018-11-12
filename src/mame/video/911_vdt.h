@@ -7,6 +7,7 @@
 
 #include "sound/beep.h"
 #include "emupal.h"
+#include "screen.h"
 
 #define vdt911_chr_region ":gfx1"
 
@@ -73,7 +74,6 @@ protected:
 
 private:
 	void refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
-	int get_refresh_rate();
 	void check_keyboard();
 
 	DECLARE_PALETTE_INIT(vdt911);
@@ -110,7 +110,10 @@ private:
 	int m_last_modifier_state;
 	char m_foreign_mode;
 
-	required_device<beep_device>        m_beeper;
+	required_device<beep_device> m_beeper;
+	required_device<screen_device> m_screen;
+	required_ioport_array<6> m_keys;
+
 	devcb_write_line                   m_keyint_line;
 	devcb_write_line                   m_lineint_line;
 };

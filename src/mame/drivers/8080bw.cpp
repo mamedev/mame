@@ -959,8 +959,7 @@ MACHINE_CONFIG_START(_8080bw_state::invrvnge)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(4'000'000)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
 

@@ -160,6 +160,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("ge",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
 	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
 	m_console.register_command("gt",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
+	m_console.register_command("gp",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1, _2));
 	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
 	m_console.register_command("n",         CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
 	m_console.register_command("focus",     CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1, _2));
@@ -898,6 +899,19 @@ void debugger_commands::execute_go_time(int ref, const std::vector<std::string> 
 	m_cpu.get_visible_cpu()->debug()->go_milliseconds(milliseconds);
 }
 
+
+
+/*-------------------------------------------------
+    execute_go_privilege - execute the gp command
+-------------------------------------------------*/
+void debugger_commands::execute_go_privilege(int ref, const std::vector<std::string> &params)
+{
+	parsed_expression condition(&m_cpu.get_visible_cpu()->debug()->symtable());
+	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
+		return;
+
+	m_cpu.get_visible_cpu()->debug()->go_privilege((condition.is_empty()) ? "1" : condition.original_string());
+}
 
 /*-------------------------------------------------
     execute_next - execute the next command

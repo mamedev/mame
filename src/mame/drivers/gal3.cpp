@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	NAMCO_C355SPR(config, m_c355spr[0], 0);
 	m_c355spr[0]->set_screen("lscreen");
 	m_c355spr[0]->set_gfxdecode_tag("gfxdecode_1");
-	m_c355spr[0]->set_is_namcofl(false);
+	m_c355spr[0]->set_scroll_offsets(0x26, 0x19);
 	m_c355spr[0]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[0]->set_palxor(0xf); // reverse mapping
 	m_c355spr[0]->set_gfxregion(0);
@@ -686,7 +686,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	NAMCO_C355SPR(config, m_c355spr[1], 0);
 	m_c355spr[1]->set_screen("rscreen");
 	m_c355spr[1]->set_gfxdecode_tag("gfxdecode_2");
-	m_c355spr[1]->set_is_namcofl(false);
+	m_c355spr[1]->set_scroll_offsets(0x26, 0x19);
 	m_c355spr[1]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr[1]->set_palxor(0xf); // reverse mapping
 	m_c355spr[1]->set_gfxregion(0);

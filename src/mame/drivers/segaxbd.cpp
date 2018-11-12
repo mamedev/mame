@@ -1988,8 +1988,8 @@ MACHINE_CONFIG_END
 //  Afterburner, Sega X-board
 //  CPU: 68000 (317-????)
 //
-//  Missing the Deluxe/Upright English (US?) version rom set
-//   Program roms:
+//  Missing the Deluxe/Upright English (US?) version ROM set
+//   Program ROMs:
 //     EPR-11092.58
 //     EPR-11093.63
 //     EPR-10950.57
@@ -2028,7 +2028,7 @@ ROM_START( aburner )
 	ROM_LOAD( "epr-10924.152", 0x20000, 0x10000, CRC(50c15a6d) SHA1(fc202cc583fc6804647abc884fdf332e72ea3100) )
 
 	ROM_REGION32_LE( 0x200000, "mainpcb:sprites", 0 ) // sprites
-	ROM_LOAD32_BYTE( "mpr-10932.90",  0x000000, 0x20000, CRC(cc0821d6) SHA1(22e84419a585209bbda1466d2180504c316a9b7f) ) // First 8 roms are MPR, the rest are EPR
+	ROM_LOAD32_BYTE( "mpr-10932.90",  0x000000, 0x20000, CRC(cc0821d6) SHA1(22e84419a585209bbda1466d2180504c316a9b7f) ) // First 8 ROMs are MPR, the rest are EPR
 	ROM_LOAD32_BYTE( "mpr-10934.94",  0x000001, 0x20000, CRC(4a51b1fa) SHA1(2eed018a5a1e935bb72b6f440a794466a1397dc5) )
 	ROM_LOAD32_BYTE( "mpr-10936.98",  0x000002, 0x20000, CRC(ada70d64) SHA1(ba6203b0fdb4c4998b7be5b446eb8354751d553a) )
 	ROM_LOAD32_BYTE( "mpr-10938.102", 0x000003, 0x20000, CRC(e7675baf) SHA1(aa979319a44c0b18c462afb5ca9cdeed2292c76a) )
@@ -2079,7 +2079,7 @@ ROM_START( aburner2 )
 	ROM_LOAD( "epr-11113.152", 0x20000, 0x10000, CRC(36058c8c) SHA1(52befe6c6c53f10b6fd4971098abc8f8d3eef9d4) )
 
 	ROM_REGION32_LE( 0x200000, "mainpcb:sprites", 0 ) // sprites
-	ROM_LOAD32_BYTE( "mpr-10932.90",  0x000000, 0x20000, CRC(cc0821d6) SHA1(22e84419a585209bbda1466d2180504c316a9b7f) ) // First 8 roms are MPR, the rest are EPR
+	ROM_LOAD32_BYTE( "mpr-10932.90",  0x000000, 0x20000, CRC(cc0821d6) SHA1(22e84419a585209bbda1466d2180504c316a9b7f) ) // First 8 ROMs are MPR, the rest are EPR
 	ROM_LOAD32_BYTE( "mpr-10934.94",  0x000001, 0x20000, CRC(4a51b1fa) SHA1(2eed018a5a1e935bb72b6f440a794466a1397dc5) )
 	ROM_LOAD32_BYTE( "mpr-10936.98",  0x000002, 0x20000, CRC(ada70d64) SHA1(ba6203b0fdb4c4998b7be5b446eb8354751d553a) )
 	ROM_LOAD32_BYTE( "mpr-10938.102", 0x000003, 0x20000, CRC(e7675baf) SHA1(aa979319a44c0b18c462afb5ca9cdeed2292c76a) )
@@ -2128,7 +2128,7 @@ ROM_START( aburner2g )
 	ROM_LOAD( "epr-11113.152", 0x20000, 0x10000, CRC(36058c8c) SHA1(52befe6c6c53f10b6fd4971098abc8f8d3eef9d4) )
 
 	ROM_REGION32_LE( 0x200000, "mainpcb:sprites", 0 ) // sprites
-	ROM_LOAD32_BYTE( "mpr-10932.90",  0x000000, 0x20000, CRC(cc0821d6) SHA1(22e84419a585209bbda1466d2180504c316a9b7f) ) // First 8 roms are MPR, the rest are EPR
+	ROM_LOAD32_BYTE( "mpr-10932.90",  0x000000, 0x20000, CRC(cc0821d6) SHA1(22e84419a585209bbda1466d2180504c316a9b7f) ) // First 8 ROMs are MPR, the rest are EPR
 	ROM_LOAD32_BYTE( "mpr-10934.94",  0x000001, 0x20000, CRC(4a51b1fa) SHA1(2eed018a5a1e935bb72b6f440a794466a1397dc5) )
 	ROM_LOAD32_BYTE( "mpr-10936.98",  0x000002, 0x20000, CRC(ada70d64) SHA1(ba6203b0fdb4c4998b7be5b446eb8354751d553a) )
 	ROM_LOAD32_BYTE( "mpr-10938.102", 0x000003, 0x20000, CRC(e7675baf) SHA1(aa979319a44c0b18c462afb5ca9cdeed2292c76a) )
@@ -2152,7 +2152,7 @@ ROM_START( aburner2g )
 	ROM_LOAD( "epr-11112.17",    0x00000, 0x10000, CRC(d777fc6d) SHA1(46ce1c3875437044c0a172960d560d6acd6eaa92) )
 
 	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) ) // There is known to exist German Sample roms
+	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) ) // There is known to exist German Sample ROMs
 	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
 	ROM_LOAD( "epr-10929.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
 ROM_END
@@ -2378,7 +2378,7 @@ ROM_END
 ROM_START( loffirej )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
 	// repaired using data from the loffire set since they are mostly identical
-	// when decrypted, they pass the rom check so are assumed to be ok but double
+	// when decrypted, they pass the ROM check so are assumed to be ok but double
 	// checking them when possible never hurts
 	ROM_LOAD16_BYTE( "epr-12794.58", 0x000000, 0x20000, CRC(1e588992) SHA1(fe7107e83c12643e7d22fd4b4cd0c7bcff0d84c3) )
 	ROM_LOAD16_BYTE( "epr-12795.63", 0x000001, 0x20000, CRC(d43d7427) SHA1(ecbd425bab6aa65ffbd441d6a0936ac055d5f06d) )
@@ -2479,7 +2479,7 @@ ROM_END
 //  Thunder Blade, Sega X-board
 //  CPU: FD1094 (317-0056)
 //
-//  GAME BD NO. 834-6493-03 (Uses "MPR" mask roms) or 834-6493-05 (Uses "EPR" eproms)
+//  GAME BD NO. 834-6493-03 (Uses "MPR" mask ROMs) or 834-6493-05 (Uses "EPR" EPROMs)
 //
 ROM_START( thndrbld )
 	ROM_REGION( 0x100000, "mainpcb:maincpu", 0 ) // 68000 code
@@ -2584,7 +2584,7 @@ ROM_END
 //  Thunder Blade (Japan), Sega X-board
 //  CPU: MC68000
 //
-//  GAME BD NO. 834-6493-03 (Uses "MPR" mask roms) or 834-6493-05 (Uses "EPR" eproms)
+//  GAME BD NO. 834-6493-03 (Uses "MPR" mask ROMs) or 834-6493-05 (Uses "EPR" EPROMs)
 //
 ROM_START( thndrbld1 )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
@@ -2852,7 +2852,7 @@ ROM_END
 //
 //  Xtal is 16.000 Mhz.
 //
-//  It has also one eprom (Epr 12587.14) two pal 16L8 (315-5336 and 315-5337) and two
+//  It has also one EPROM (Epr 12587.14) two pal 16L8 (315-5336 and 315-5337) and two
 //  fujitsu IC MB89372P and MB8421-12LP
 //
 //  Main Board : (834-8180-02)
@@ -3012,7 +3012,7 @@ ROM_END
 //  Super Monaco GP, Sega X-board
 //  CPU: FD1094 (317-0126a)
 //
-// this set contained only prg roms
+// this set contained only prg ROMs
 ROM_START( smgp6 )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-12563a.58", 0x00000, 0x20000, CRC(2e64b10e) SHA1(2be1ffb3120e4af6a61880e2a2602db07a73f373) )
@@ -3142,9 +3142,9 @@ ROM_END
 //  This set is coming from a sitdown "air drive" version.
 //
 //  This set has an extra sound board (837-7000) under the main board with a Z80
-//  and a few eproms, some of those eproms are already on the main board !
+//  and a few EPROMs, some of those EPROMs are already on the main board !
 //
-//  It has also an "air drive" board with a Z80 and one eprom.
+//  It has also an "air drive" board with a Z80 and one EPROM.
 //
 //  Main Board : (834-7016-05)
 //
@@ -3564,9 +3564,9 @@ ROM_END
 //         IC63 : epr-12562A.63 (27C010 EPROM)
 //         IC62 : not populated
 //
-//         IC11 : mpr-12437.11  (831000 MASKROM)
-//         IC12 : mpr-12438.12  (831000 MASKROM)
-//         IC13 : mpr-12439.13  (831000 MASKROM)
+//         IC11 : mpr-12437.11  (Fujitsu MB831000 mask ROM)
+//         IC12 : mpr-12438.12  (Fujitsu MB831000 mask ROM)
+//         IC13 : mpr-12439.13  (Fujitsu MB831000 mask ROM)
 //         IC17 : epr-12436.17  (27C512 EPROM)
 //
 //         IC21 : not populated
@@ -3576,24 +3576,24 @@ ROM_END
 //
 //         IC40 : not populated
 //
-//         IC90 : mpr-12425.90  (831000 MASKROM)
-//         IC91 : mpr-12421.91  (831000 MASKROM)
-//         IC92 : mpr-12417.92  (831000 MASKROM)
+//         IC90 : mpr-12425.90  (Fujitsu MB831000 mask ROM)
+//         IC91 : mpr-12421.91  (Fujitsu MB831000 mask ROM)
+//         IC92 : mpr-12417.92  (Fujitsu MB831000 mask ROM)
 //         IC93 : epr-12609.93  (27C010 EPROM)
 //
-//         IC94 : mpr-12426.94  (831000 MASKROM)
-//         IC95 : mpr-12422.95  (831000 MASKROM)
-//         IC96 : mpr-12418.96  (831000 MASKROM)
+//         IC94 : mpr-12426.94  (Fujitsu MB831000 mask ROM)
+//         IC95 : mpr-12422.95  (Fujitsu MB831000 mask ROM)
+//         IC96 : mpr-12418.96  (Fujitsu MB831000 mask ROM)
 //         IC97 : epr-12610.97  (27C010 EPROM)
 //
-//         IC98 : mpr-12427.98  (831000 MASKROM)
-//         IC99 : mpr-12423.99  (831000 MASKROM)
-//         IC100: mpr-12419.100 (831000 MASKROM)
+//         IC98 : mpr-12427.98  (Fujitsu MB831000 mask ROM)
+//         IC99 : mpr-12423.99  (Fujitsu MB831000 mask ROM)
+//         IC100: mpr-12419.100 (Fujitsu MB831000 mask ROM)
 //         IC101: epr-12611.101 (27C010 EPROM)
 //
-//         IC102: mpr-12428.102 (831000 MASKROM)
-//         IC103: mpr-12424.103 (831000 MASKROM)
-//         IC104: mpr-12420.104 (831000 MASKROM)
+//         IC102: mpr-12428.102 (Fujitsu MB831000 mask ROM)
+//         IC103: mpr-12424.103 (Fujitsu MB831000 mask ROM)
+//         IC104: mpr-12420.104 (Fujitsu MB831000 mask ROM)
 //         IC105: epr-12612.105 (27C010 EPROM)
 //
 //         IC154: epr-12429.154 (27C512 EPROM)
@@ -4117,7 +4117,7 @@ ROM_END
 //  GP Rider (World), Sega X-board
 //  CPU: FD1094 (317-0163)
 //  Custom Chip 315-5304 (IC 127)
-//  IC BD Number: 834-7626-03 (roms are "MPR") / 834-7626-05 (roms are "EPR")
+//  IC BD Number: 834-7626-03 (ROMs are "MPR") / 834-7626-05 (ROMs are "EPR")
 //
 ROM_START( gpriders )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
@@ -4270,7 +4270,7 @@ ROM_END
 //  GP Rider (US), Sega X-board
 //  CPU: FD1094 (317-0162)
 //  Custom Chip 315-5304 (IC 127)
-//  IC BD Number: 834-7626-01 (roms are "MPR") / 834-7626-04 (roms are "EPR")
+//  IC BD Number: 834-7626-01 (ROMs are "MPR") / 834-7626-04 (ROMs are "EPR")
 //
 ROM_START( gpriderus )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
@@ -4422,7 +4422,7 @@ ROM_END
 //  GP Rider (Japan), Sega X-board
 //  CPU: FD1094 (317-0161)
 //  Custom Chip 315-5304 (IC 127)
-//  IC BD Number: 834-7626-01 (roms are "MPR") / 834-7626-04 (roms are "EPR")
+//  IC BD Number: 834-7626-01 (ROMs are "MPR") / 834-7626-04 (ROMs are "EPR")
 //
 ROM_START( gpriderjs )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
@@ -4600,11 +4600,18 @@ ROM_START( rascot )
 	// none??
 
 	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
-	// is this really a sound rom, or a terminal / link rom? accesses unexpected addresses
+	// is this really a sound ROM, or a terminal / link ROM? accesses unexpected addresses
 	ROM_LOAD( "epr-14221a",    0x00000, 0x10000, CRC(0d429ac4) SHA1(9cd4c7e858874f372eb3e409ba37964f1ebf07d5) )
 
 	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
 	// none??
+
+	// identification needed
+	ROM_REGION( 0x40000, "satellite", 0 )
+	ROM_LOAD16_WORD_SWAP( "r1230.bin", 0x00000, 0x20000, CRC(48bddec5) SHA1(e281aa9cc992bd7c2c5a03ea7d994b4dd3411ab9) ) // M68K code, 3x satellite units program ROMs ?
+	ROM_LOAD16_WORD_SWAP( "r1232.bin", 0x00000, 0x20000, CRC(3f1671ef) SHA1(2363d4300dd52a2ebf2706942fc282b6e1c8fc58) )
+	ROM_LOAD16_WORD_SWAP( "r1234.bin", 0x00000, 0x20000, CRC(c7d01444) SHA1(eea74eaa1a6ccee85393aaac2a450cd1943153e7) )
+	ROM_LOAD( "g1049.bin", 0x20000, 0x20000, CRC(3ab80f90) SHA1(64dfa739429d558146ea9894728c07c76f71d37e) ) // text line display device ROM ? there also was ROM labeled R1049, contents is same as G1049.
 ROM_END
 
 
@@ -4657,7 +4664,7 @@ void segaxbd_new_state::init_rascot()
 {
 	// patch out bootup link test
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("mainpcb:subcpu")->base());
-	rom[0xb78/2] = 0x601e; // subrom checksum test
+	rom[0xb78/2] = 0x601e; // subROM checksum test
 	rom[0x57e/2] = 0x4e71;
 	rom[0x5d0/2] = 0x6008;
 	rom[0x606/2] = 0x4e71;

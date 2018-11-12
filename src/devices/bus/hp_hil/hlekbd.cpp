@@ -14,8 +14,7 @@
 DEFINE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device, "hp_ipc_hle_kbd", "HP Integral Keyboard (HLE)")
 DEFINE_DEVICE_TYPE_NS(HP_ITF_HLE_KEYBOARD, bus::hp_hil, hle_hp_itf_device, "hp_itf_hle_kbd", "HP ITF Keyboard")
 
-namespace bus {
-	namespace hp_hil {
+namespace bus { namespace hp_hil {
 
 namespace {
 
@@ -219,6 +218,7 @@ INPUT_PORTS_START( hle_hp_ipc_device )
 	PORT_INCLUDE( ipc_id )
 INPUT_PORTS_END
 
+
 INPUT_PORTS_START( itf_id )
 	PORT_START("COL0")
 	PORT_DIPNAME( 0xff, 0xdf, "Layout" )
@@ -417,16 +417,14 @@ INPUT_PORTS_END
 
 void hle_hp_ipc_device::transmit_byte(uint8_t byte)
 {
-	if (!m_fifo.full()) {
+	if (!m_fifo.full())
 		m_fifo.enqueue(byte);
-	}
 }
 
 void hle_hp_itf_device::transmit_byte(uint8_t byte)
 {
-	if (!m_fifo.full()) {
+	if (!m_fifo.full())
 		m_fifo.enqueue(byte);
-	}
 }
 
 /***************************************************************************
@@ -454,7 +452,6 @@ void hle_hp_ipc_device::hil_idd()
 {
 	m_hp_hil_mlc->hil_write(0x0100 |  ioport("COL0")->read());
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0);
-	return;
 }
 
 void hle_hp_ipc_device::key_make(uint8_t row, uint8_t column)
@@ -475,7 +472,8 @@ int hle_hp_ipc_device::hil_poll()
 		return frames;
 
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
-	while (!m_fifo.empty()) {
+	while (!m_fifo.empty())
+	{
 		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
 		frames++;
 	}
@@ -490,7 +488,8 @@ int hle_hp_itf_device::hil_poll()
 	LOG("KBD HAVE DATA\n");
 	frames++;
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
-	while (!m_fifo.empty()) {
+	while (!m_fifo.empty())
+	{
 		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
 		frames++;
 	}
@@ -556,8 +555,6 @@ void hle_hp_itf_device::hil_idd()
 {
 	m_hp_hil_mlc->hil_write(m_device_id16 |  ioport("COL0")->read());
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0x04);
-	return;
 }
 
-} // namespace bus::hp_hil
-} // namespace bus
+} } // namespace bus::hp_hil

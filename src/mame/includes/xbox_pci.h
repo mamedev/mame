@@ -143,6 +143,7 @@ private:
 	ohci_usb_controller *ohci_usb;
 	devcb_write_line m_interrupt_handler;
 	emu_timer *timer;
+	required_device<cpu_device> maincpu;
 	std::function<void(void)> hack_callback;
 	void ohci_mmio(address_map &map);
 	struct dev_t {

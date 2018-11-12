@@ -355,7 +355,7 @@ WRITE8_MEMBER( model1io2_device::io_pf_w )
 	m_eeprom->cs_write(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (BIT(data, 3) == 0 && BIT(data, 2) == 1 && BIT(data, 1) == 0)
-		m_lcd->write(space, BIT(data, 0), m_lcd_data);
+		m_lcd->write(BIT(data, 0), m_lcd_data);
 }
 
 WRITE8_MEMBER( model1io2_device::io_pg_w )

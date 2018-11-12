@@ -2056,10 +2056,10 @@ void dcs_audio_device::recompute_sample_rate()
 		sample_period = attotime::from_hz(31250);
 	}
 
-	dmadac_set_frequency(&m_dmadac[0], m_channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
+	dmadac_set_frequency(&m_dmadac[0], m_channels, sample_period.as_hz());
 	dmadac_enable(&m_dmadac[0], m_channels, 1);
 	if (LOG_DCS_IO)
-		logerror("recompute_sample_rate: Channels: %d Freq: %e Size: 0x%x m_incs: 0x%x\n", m_channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds()), m_size, m_incs);
+		logerror("recompute_sample_rate: Channels: %d Freq: %e Size: 0x%x m_incs: 0x%x\n", m_channels, sample_period.as_hz(), m_size, m_incs);
 
 	/* fire off a timer which will hit every half-buffer */
 	if (m_incs)

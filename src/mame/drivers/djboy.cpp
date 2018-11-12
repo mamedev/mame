@@ -74,16 +74,16 @@ Notes:
                 BS15.6Y    27C512 EPROM (DIP28)   \ There is an alt. set of labels used for these ROMs with an 'S'
                 BS07.1B    27C512 EPROM (DIP28)   | added to the name (i.e. 'BS15S'), but the actual ROM contents is identical
                 BS19.4B    27C1001 EPROM (DIP32)  / to the regular set (both sets dumped / verified)
-                BS-000.1H  4M MASKROM (DIP32) {sprite}
-                BS-001.1F  4M MASKROM (DIP32) {sprite}
-                BS-002.1D  4M MASKROM (DIP32) {sprite}
-                BS-003.1K  4M MASKROM (DIP32) {sprite}
-                BS-004.1S  4M MASKROM (DIP32) {tile}
-                BS-005.1U  4M MASKROM (DIP32) {tile}
-                BS-100.4D  1M MASKROM (DIP28) {z80}
-                BS-101.6W  1M MASKROM (DIP28) {z80 data}
-                BS-200.8C  1M MASKROM (DIP28) {z80}
-                BS-203.5J  2M MASKROM (DIP32) {oki-m6295 samples}
+                BS-000.1H  4M mask ROM (DIP32) {sprite}
+                BS-001.1F  4M mask ROM (DIP32) {sprite}
+                BS-002.1D  4M mask ROM (DIP32) {sprite}
+                BS-003.1K  4M mask ROM (DIP32) {sprite}
+                BS-004.1S  4M mask ROM (DIP32) {tile}
+                BS-005.1U  4M mask ROM (DIP32) {tile}
+                BS-100.4D  1M mask ROM (DIP28) {Z80}
+                BS-101.6W  1M mask ROM (DIP28) {Z80 data}
+                BS-200.8C  1M mask ROM (DIP28) {Z80}
+                BS-203.5J  2M mask ROM (DIP32) {OKI-M6295 samples}
 
       DIPs    - SW1
                 |--------------------------------------------|

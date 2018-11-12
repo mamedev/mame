@@ -36,15 +36,8 @@ void human_interface_device::device_add_mconfig(machine_config &config)
 	iocpu.t1_in_cb().set_constant(1);
 
 	HP_HIL_MLC(config, m_mlc, XTAL(8'000'000));
-	hp_hil_slot_device &keyboard(HP_HIL_SLOT(config, "hil1", 0));
-	hp_hil_devices(keyboard);
-	keyboard.set_default_option("hp_46021a");
-	keyboard.set_hp_hil_slot(this, "mlc");
-
-	hp_hil_slot_device &mouse(HP_HIL_SLOT(config, "hil2", 0));
-	hp_hil_devices(mouse);
-	mouse.set_default_option("hp_46060b");
-	mouse.set_hp_hil_slot(this, "mlc");
+	HP_HIL_SLOT(config, "hil1", m_mlc, hp_hil_devices, "hp_46021a");
+	HP_HIL_SLOT(config, "hil2", m_mlc, hp_hil_devices, "hp_46060b");
 
 	SPEAKER(config, "mono").front_center();
 	sn76494_device &sound(SN76494(config, "sn76494", 333333));
@@ -145,6 +138,7 @@ void human_interface_device::device_reset()
 	m_ppoll_sc = 0;
 	m_gpib_irq_line = false;
 	m_kbd_nmi = false;
+	m_old_latch_enable = true;
 	m_rtc->cs1_w(ASSERT_LINE);
 	m_rtc->cs2_w(CLEAR_LINE);
 	m_rtc->write_w(CLEAR_LINE);

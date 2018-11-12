@@ -1506,7 +1506,7 @@ ROM_START( astorm )
 	ROM_LOAD16_BYTE( "epr-13086.bin", 0x180000, 0x40000, CRC(8c9a71c4) SHA1(40b774765ac888792aad46b6351a24b7ef40d2dc) )
 
 	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
-	ROM_LOAD( "epr-13083a.bin", 0x000000, 0x20000, CRC(e7528e06) SHA1(1f4e618692c20aeb316d578c5ded12440eb072ab) ) // Also known to come with EPR-13083B rom instead of EPR-13083A (like astormj)
+	ROM_LOAD( "epr-13083a.bin", 0x000000, 0x20000, CRC(e7528e06) SHA1(1f4e618692c20aeb316d578c5ded12440eb072ab) ) // Also known to come with EPR-13083B ROM instead of EPR-13083A (like astormj)
 	ROM_LOAD( "epr-13076.bin",  0x080000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
 	ROM_LOAD( "epr-13077.bin",  0x100000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
 	ROM_LOAD( "epr-13078.bin",  0x180000, 0x40000, CRC(15684dc5) SHA1(595051006de24f791dae937584e502ff2fa31d9c) )
@@ -1516,7 +1516,9 @@ ROM_END
     Alien Storm (3 players World version), Sega System 18
     CPU: FD1094 (317-0148)
     ROM Board: 171-5873B
-    Game numbers: 833-7379-02 (main pcb: 834-7381-02, rom pcb: 834-7380-02)
+        main pcb: 834-7381-02
+    Game numbers: 833-7379-02
+	     ROM pcb: 834-7380-02
 */
 ROM_START( astorm3 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // 68000 code
@@ -1542,7 +1544,7 @@ ROM_START( astorm3 )
 	ROM_LOAD16_BYTE( "epr-13086.bin", 0x180000, 0x40000, CRC(8c9a71c4) SHA1(40b774765ac888792aad46b6351a24b7ef40d2dc) )
 
 	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
-	ROM_LOAD( "epr-13083.bin", 0x000000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) ) // Also known to come with EPR-13083A rom instead of EPR-13083
+	ROM_LOAD( "epr-13083.bin", 0x000000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) ) // Also known to come with EPR-13083A ROM instead of EPR-13083
 	ROM_LOAD( "epr-13076.bin", 0x080000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
 	ROM_LOAD( "epr-13077.bin", 0x100000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
 	ROM_LOAD( "epr-13078.bin", 0x180000, 0x40000, CRC(15684dc5) SHA1(595051006de24f791dae937584e502ff2fa31d9c) )
@@ -1754,7 +1756,7 @@ ROM_END
     ROM Board: 171-5873B
 
     game No. 833-7916-01 CLUTCH HITTER
-    rom  No. 834-7917-01
+    ROM  No. 834-7917-01
 */
 ROM_START( cltchitr )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
@@ -1838,7 +1840,7 @@ ROM_START( cltchitrj )
 	ROM_LOAD16_BYTE( "mpr-13788.a11", 0x200000, 0x80000, CRC(0106fea6) SHA1(e16e2a469ecbbc704021dee6264db30aa0898368) )
 	ROM_LOAD16_BYTE( "mpr-13781.c12", 0x400001, 0x80000, CRC(f33b13af) SHA1(d3eb64dcf12d532454bf3cd6c86528c0f11ee316) )
 	ROM_LOAD16_BYTE( "mpr-13789.a12", 0x400000, 0x80000, CRC(09ba8835) SHA1(72e83dd1793a7f4b2b881e71f262493e3d4992b3) )
-	// extra gfx roms??*/
+	// extra gfx ROMs??*/
 	ROM_LOAD16_BYTE( "epr-13782.c13", 0x600001, 0x40000, CRC(73790852) SHA1(891345cb8ce4b04bd293ee9bac9b1b9940d6bcb2) )
 	ROM_LOAD16_BYTE( "epr-13790.a13", 0x600000, 0x40000, CRC(23849101) SHA1(1aeb0fefb6688dfd841bd7d0b17ffdfce69f1dd9) )
 
@@ -1868,7 +1870,7 @@ ROM_START( cltchitrjd )
 	ROM_LOAD16_BYTE( "mpr-13788.a11", 0x200000, 0x80000, CRC(0106fea6) SHA1(e16e2a469ecbbc704021dee6264db30aa0898368) )
 	ROM_LOAD16_BYTE( "mpr-13781.c12", 0x400001, 0x80000, CRC(f33b13af) SHA1(d3eb64dcf12d532454bf3cd6c86528c0f11ee316) )
 	ROM_LOAD16_BYTE( "mpr-13789.a12", 0x400000, 0x80000, CRC(09ba8835) SHA1(72e83dd1793a7f4b2b881e71f262493e3d4992b3) )
-	// extra gfx roms??*/
+	// extra gfx ROMs??*/
 	ROM_LOAD16_BYTE( "epr-13782.c13", 0x600001, 0x40000, CRC(73790852) SHA1(891345cb8ce4b04bd293ee9bac9b1b9940d6bcb2) )
 	ROM_LOAD16_BYTE( "epr-13790.a13", 0x600000, 0x40000, CRC(23849101) SHA1(1aeb0fefb6688dfd841bd7d0b17ffdfce69f1dd9) )
 
@@ -2085,7 +2087,7 @@ ROM_END
     D.D. Crew, Sega System 18
     CPU: FD1094 (317-0187)
     PCB Board: 171-5873-02B (833-8165-05)
-    Rom Board : 171-5987A (834-8166-05)
+    ROM Board : 171-5987A (834-8166-05)
 */
 ROM_START( ddcrew1 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
@@ -2291,7 +2293,7 @@ ROM_END
 
     game No. 833-8830-02
     pcb  No. 837-8832-02 (171-5873-02b)
-    rom  No. 834-8831-02 (171-5987a)
+    ROM  No. 834-8831-02 (171-5987a)
     CPU Hiatchi FD1094 317-0196
 */
 ROM_START( desertbr )
@@ -2361,7 +2363,7 @@ ROM_END
 
     game No. 833-8830?
     pcb  No. 837-8832? (171-5873B)
-    rom  No. 834-8831 (171-5987A)
+    ROM  No. 834-8831 (171-5987A)
     CPU Hiatchi FD1094 317-0194
 */
 ROM_START( desertbrj )
@@ -2542,7 +2544,7 @@ ROM_END
     A/D BD NO. 837-7536
 
 A PCB was found with a Game BD: 833-7627-01-T GHOST HUNTERS
-While the DATA matched the set below (lghostu), all roms were hand labeled and dated as follows:
+While the DATA matched the set below (lghostu), all ROMs were hand labeled and dated as follows:
 
 ROM0 E * A3AB @ A4
 ROM0 O * B21C @ A6
@@ -2569,7 +2571,7 @@ Sound 1 10/22 @ C6
 Sound 2 10/22 @ C5
 Sound 3 10/22 @ C4
 
-suggesting the original name for the game was Ghost Hunters and the roms dated 11/20-14 & 11/19-14
+suggesting the original name for the game was Ghost Hunters and the ROMs dated 11/20-14 & 11/19-14
 contain the data for name change to Laser Ghost
 */
 ROM_START( lghostu )
@@ -2922,7 +2924,7 @@ ROM_END
 
     game No. 833-7246-03
     pcb  No. 837-7248-01
-    rom  No. 834-7247-02
+    ROM  No. 834-7247-02
 */
 ROM_START( shdancer )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -2986,7 +2988,7 @@ ROM_END
 
     game No. 833-7246-01
     pcb  No. 837-7248
-    rom  No. 834-7247-01
+    ROM  No. 834-7247-01
 */
 ROM_START( shdancer1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -3232,7 +3234,7 @@ GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state, 
 GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state, init_generic_shad, ROT0,   "Sega",          "Shadow Dancer (Japan)", 0 )
 GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state, init_generic_shad, ROT0,   "Sega",          "Shadow Dancer (US)", 0 )
 
-GAME( 1992, wwallyj,   0,        wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan) (FD1094 317-0197B)", 0 ) // the roms do contain an english logo so maybe there is a world / us set too
+GAME( 1992, wwallyj,   0,        wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan) (FD1094 317-0197B)", 0 ) // the ROMs do contain an english logo so maybe there is a world / us set too
 GAME( 1992, wwallyja,  wwallyj,  wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan) (FD1094 317-0197A)", 0 )
 
 // decrypted bootleg sets

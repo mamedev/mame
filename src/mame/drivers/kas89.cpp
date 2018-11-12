@@ -792,10 +792,9 @@ MACHINE_CONFIG_START(kas89_state::kas89)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* Confirmed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, "aysnd", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 1.0);    /* Confirmed */
 MACHINE_CONFIG_END
 
 

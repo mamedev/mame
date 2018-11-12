@@ -160,7 +160,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636_0->read_data(space, offset);
+		return m_s2636[0]->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
@@ -172,7 +172,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636_0->write_data(space, offset, data);
+		m_s2636[0]->write_data(space, offset, data);
 }
 
 
@@ -181,7 +181,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636_1->read_data(space, offset);
+		return m_s2636[1]->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
@@ -193,7 +193,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636_1->write_data(space, offset, data);
+		m_s2636[1]->write_data(space, offset, data);
 }
 
 
@@ -202,7 +202,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636_2->read_data(space, offset);
+		return m_s2636[2]->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
@@ -214,7 +214,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636_2->write_data(space, offset, data);
+		m_s2636[2]->write_data(space, offset, data);
 }
 
 
@@ -1005,14 +1005,14 @@ MACHINE_CONFIG_START(cvs_state::cvs)
 	MCFG_SCREEN_UPDATE_DRIVER(cvs_state, screen_update_cvs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
-	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
+	S2636(config, m_s2636[0], 0);
+	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
-	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
-	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
+	S2636(config, m_s2636[1], 0);
+	m_s2636[1]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
-	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
-	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
+	S2636(config, m_s2636[2], 0);
+	m_s2636[2]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

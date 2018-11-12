@@ -1592,8 +1592,8 @@ Notes:
                          PAL.7          PALCE16V8H
                          D49-12-1       PAL16L8B
 
-      D69-01 to D69-08          16M MASKROM (DIP42)
-      d69-09 to d69-11          8M MASKROM  (DIP42)
+      D69-01 to D69-08          16M mask ROM (DIP42)
+      d69-09 to d69-11          8M mask ROM  (DIP42)
       D69-13 to D69-15/D69-20   27C040 EPROM (DIP32)
       D69-18/D69-19             27C1001 EPROM (DIP32)
 */

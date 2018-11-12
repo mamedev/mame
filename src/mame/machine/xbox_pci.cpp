@@ -193,25 +193,26 @@ void mcpx_smbus_device::device_reset()
 
 READ32_MEMBER(mcpx_smbus_device::smbus_r)
 {
-	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
-		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | ((smbusst.status << 0) & mem_mask);
-	if ((offset == 1) && ((mem_mask == 0x00ff0000) || (mem_mask == 0xffff0000))) // 6 smbus data
-		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | ((smbusst.data << 16) & mem_mask);
+	if (offset == 0) // 0 smbus status
+		smbusst.words[offset] = (smbusst.words[offset] & ~0xffff) | ((smbusst.status & 0xffff) << 0);
+	if (offset == 1) // 6 smbus data
+		smbusst.words[offset] = (smbusst.words[offset] & ~(0xffff << 16)) | ((smbusst.data & 0xffff) << 16);
 	return smbusst.words[offset];
 }
 
 WRITE32_MEMBER(mcpx_smbus_device::smbus_w)
 {
 	COMBINE_DATA(smbusst.words);
-	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
+	if ((offset == 0) && (ACCESSING_BITS_0_7 || ACCESSING_BITS_8_15)) // 0 smbus status
 	{
 		if (!((smbusst.status ^ data) & 0x10)) // clearing interrupt
 		{
-			m_interrupt_handler(0);
+			if (m_interrupt_handler)
+				m_interrupt_handler(0);
 		}
 		smbusst.status &= ~data;
 	}
-	if ((offset == 0) && (mem_mask == 0xff0000)) // 2 smbus control
+	if ((offset == 0) && ACCESSING_BITS_16_23) // 2 smbus control
 	{
 		data = data >> 16;
 		smbusst.control = data;
@@ -229,22 +230,23 @@ WRITE32_MEMBER(mcpx_smbus_device::smbus_w)
 				smbusst.status |= 0x10;
 				if (smbusst.control & 0x10)
 				{
-					m_interrupt_handler(1);
+					if (m_interrupt_handler)
+						m_interrupt_handler(1);
 				}
 			}
 		}
 	}
-	if ((offset == 1) && (mem_mask == 0xff)) // 4 smbus address
+	if ((offset == 1) && ACCESSING_BITS_0_7) // 4 smbus address
 	{
 		smbusst.address = data >> 1;
 		smbusst.rw = data & 1;
 	}
-	if ((offset == 1) && ((mem_mask == 0x00ff0000) || (mem_mask == 0xffff0000))) // 6 smbus data
+	if ((offset == 1) && (ACCESSING_BITS_16_23 || ACCESSING_BITS_16_31)) // 6 smbus data
 	{
 		data = data >> 16;
 		smbusst.data = data;
 	}
-	if ((offset == 2) && (mem_mask == 0xff)) // 8 smbus command
+	if ((offset == 2) && ACCESSING_BITS_0_7) // 8 smbus command
 		smbusst.command = data;
 }
 
@@ -264,6 +266,7 @@ mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *ta
 	ohci_usb(nullptr),
 	m_interrupt_handler(*this),
 	timer(nullptr),
+	maincpu(*this, ":maincpu"),
 	connecteds_count(0)
 {
 	set_ids(0x10de01c2, 0, 0, 0);
@@ -282,7 +285,7 @@ void mcpx_ohci_device::device_start()
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
 	bank_infos[0].adr = 0xfed00000;
 	ohci_usb = new ohci_usb_controller();
-	ohci_usb->set_cpu(machine().device<cpu_device>("maincpu"));
+	ohci_usb->set_cpu(maincpu.target());
 	ohci_usb->set_irq_callbaclk(
 		[&](int state)
 		{

@@ -378,10 +378,10 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(20'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, homerun_state, homerun_banking_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(20'000'000)/8));
+	ymsnd.port_a_read_callback().set_ioport("DSW");
+	ymsnd.port_b_write_callback().set(FUNC(homerun_state::homerun_banking_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homerun_state::homerun)

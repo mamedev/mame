@@ -206,7 +206,7 @@ void dio16_device::set_dmar(unsigned int index, unsigned int num, int state)
 		m_dmar[num] &= ~(1 << index);
 
 
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 
 		if (card->get_index() == index)
 			continue;
@@ -224,7 +224,7 @@ void dio16_device::set_dmar(unsigned int index, unsigned int num, int state)
 
 void dio16_device::dmack_w_out(int index, int channel, uint8_t val)
 {
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 		if (card->get_index() == index)
 			continue;
 		card->dmack_w_in(channel, val);
@@ -235,7 +235,7 @@ uint8_t dio16_device::dmack_r_out(int index, int channel)
 {
 	uint8_t ret = 0xff;
 
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 		if (card->get_index() == index)
 			continue;
 		ret &= card->dmack_r_in(channel);
@@ -245,7 +245,7 @@ uint8_t dio16_device::dmack_r_out(int index, int channel)
 
 WRITE_LINE_MEMBER(dio16_device::reset_in)
 {
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 		if (card->get_index() != m_bus_index)
 			card->reset_in(state);
 	}

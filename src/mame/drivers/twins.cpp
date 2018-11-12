@@ -438,10 +438,10 @@ MACHINE_CONFIG_START(twins_state::twinsed1)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
+	aysnd.port_a_read_callback().set_ioport("P1");
+	aysnd.port_b_read_callback().set_ioport("P2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -488,10 +488,10 @@ MACHINE_CONFIG_START(twins_state::twins)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(16'000'000)/8) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(16'000'000)/8)); /* verified on pcb */
+	aysnd.port_a_read_callback().set_ioport("P1");
+	aysnd.port_b_read_callback().set_ioport("P2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 WRITE16_MEMBER(twins_state::spider_pal_w)
@@ -610,11 +610,10 @@ MACHINE_CONFIG_START(twins_state::spider)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
+	aysnd.port_a_read_callback().set_ioport("P1");
+	aysnd.port_b_read_callback().set_ioport("P2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

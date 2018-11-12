@@ -28,6 +28,7 @@ DEFINE_DEVICE_TYPE(HP_HIL_SLOT, hp_hil_slot_device, "hp_hil_slot", "HP-HIL Slot"
 hp_hil_slot_device::hp_hil_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HP_HIL_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
+	, m_mlc(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -39,8 +40,8 @@ hp_hil_slot_device::hp_hil_slot_device(const machine_config &mconfig, const char
 void hp_hil_slot_device::device_start()
 {
 	device_hp_hil_interface *dev = dynamic_cast<device_hp_hil_interface *>(get_card_device());
-
-	if (dev) dev->set_hp_hil_mlc(m_owner->subdevice(m_mlc_tag));
+	if (dev)
+		dev->set_hp_hil_mlc(*m_mlc);
 }
 
 
@@ -243,7 +244,6 @@ WRITE_LINE_MEMBER(hp_hil_mlc_device::ap_w)
 device_hp_hil_interface::device_hp_hil_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 	, m_hp_hil_mlc(nullptr)
-	, m_hp_hil_mlc_dev(nullptr)
 	, m_next(nullptr)
 {
 }
@@ -259,6 +259,6 @@ device_hp_hil_interface::~device_hp_hil_interface()
 
 void device_hp_hil_interface::set_hp_hil_mlc_device()
 {
-	m_hp_hil_mlc = dynamic_cast<hp_hil_mlc_device *>(m_hp_hil_mlc_dev);
+	assert(m_hp_hil_mlc);
 	m_hp_hil_mlc->add_hp_hil_device(this);
 }

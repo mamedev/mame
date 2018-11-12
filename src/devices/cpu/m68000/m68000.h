@@ -98,7 +98,9 @@ enum
 	M68K_D0, M68K_D1, M68K_D2, M68K_D3, M68K_D4, M68K_D5, M68K_D6, M68K_D7,
 	M68K_A0, M68K_A1, M68K_A2, M68K_A3, M68K_A4, M68K_A5, M68K_A6, M68K_A7,
 	M68K_FP0, M68K_FP1, M68K_FP2, M68K_FP3, M68K_FP4, M68K_FP5, M68K_FP6, M68K_FP7,
-	M68K_FPSR, M68K_FPCR
+	M68K_FPSR, M68K_FPCR, M68K_CRP_LIMIT, M68K_CRP_APTR, M68K_SRP_LIMIT, M68K_SRP_APTR,
+	M68K_MMU_TC, M68K_TT0, M68K_TT1, M68K_MMU_SR, M68K_ITT0, M68K_ITT1,
+	M68K_DTT0, M68K_DTT1, M68K_URP_APTR
 };
 
 class m68000_base_device : public cpu_device
@@ -290,6 +292,8 @@ protected:
 	uint16_t m_mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
 	uint16_t m_mmu_tmp_buserror_sz;   /* temporary hack: (first) bus error size` */
 
+	bool m_mmu_tablewalk;			  /* set when MMU walks page tables */
+	uint32_t m_mmu_last_logical_addr;
 	uint32_t m_ic_address[M68K_IC_SIZE];   /* instruction cache address data */
 	uint32_t m_ic_data[M68K_IC_SIZE];      /* instruction cache content data */
 	bool   m_ic_valid[M68K_IC_SIZE];     /* instruction cache valid flags */

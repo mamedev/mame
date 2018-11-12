@@ -980,13 +980,13 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("fd_list","octopus")
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(4.9152_MHz_XTAL / 2)  // DART channel A
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, octopus_state,serial_clock_w))  // being able to write both Rx and Tx clocks at one time would be nice
-	MCFG_PIT8253_CLK1(4.9152_MHz_XTAL / 2)  // DART channel B
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_serial,z80sio_device,rxtxcb_w))
-	MCFG_PIT8253_CLK2(4.9152_MHz_XTAL / 2)  // speaker frequency
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, octopus_state,spk_freq_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(4.9152_MHz_XTAL / 2);  // DART channel A
+	m_pit->out_handler<0>().set(FUNC(octopus_state::serial_clock_w));  // being able to write both Rx and Tx clocks at one time would be nice
+	m_pit->set_clk<1>(4.9152_MHz_XTAL / 2);  // DART channel B
+	m_pit->out_handler<1>().set(m_serial, FUNC(z80sio_device::rxtxcb_w));
+	m_pit->set_clk<2>(4.9152_MHz_XTAL / 2);  // speaker frequency
+	m_pit->out_handler<2>().set(FUNC(octopus_state::spk_freq_w));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)

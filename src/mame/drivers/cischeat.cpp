@@ -3424,10 +3424,10 @@ Notes:
       ROMs -
             PR88004Q_8.IC102      - 82S147 PROM
             AC91106_VER1.2_7.IC99 - 27C010 EPROM
-            MR91042007-R66_6.IC95 - 4M MASKROM
+            MR91042007-R66_6.IC95 - 4M mask ROM
             AC91106_VER1.7_4.IC63 - 27C010 EPROM
             AC91106_VER1.7_3.IC62 - 27C010 EPROM
-            MR91042-08_2.IC57     - 4M MASKROM
+            MR91042-08_2.IC57     - 4M mask ROM
             AC91106_VER1.2_1.IC56 - 27C4001 EPROM
             PR91042_5.IC91        - 82S129 PROM
 
@@ -3483,14 +3483,14 @@ Notes:
             CH9072-5_11.IC33      - Atmel AT27HC642R
             CH9072-6_12.IC35      - Atmel AT27HC642R
             CH9072-8_15.IC59      - Atmel AT27HC642R
-            MR90015-35-W33_14.IC54- 4M MASKROM  \
-            MR90015-35-W33_17.IC67- 4M MASKROM  / Contain same data
-            MR91042-01-R60_1.IC1  - 4M MASKROM
-            MR91042-02-R61_2.IC2  - 4M MASKROM
-            MR91042-03-R62_3.IC5  - 4M MASKROM
-            MR91042-04-R63_4.IC6  - 4M MASKROM
-            MR91042-05-R64_5.IC11 - 4M MASKROM
-            MR91042-06-R65_6.IC12 - 4M MASKROM
+            MR90015-35-W33_14.IC54- 4M mask ROM  \
+            MR90015-35-W33_17.IC67- 4M mask ROM  / Contain same data
+            MR91042-01-R60_1.IC1  - 4M mask ROM
+            MR91042-02-R61_2.IC2  - 4M mask ROM
+            MR91042-03-R62_3.IC5  - 4M mask ROM
+            MR91042-04-R63_4.IC6  - 4M mask ROM
+            MR91042-05-R64_5.IC11 - 4M mask ROM
+            MR91042-06-R65_6.IC12 - 4M mask ROM
 
 ***************************************************************************/
 

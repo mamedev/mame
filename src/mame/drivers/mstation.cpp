@@ -471,8 +471,8 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	// IRQ 1 is used for scan the kb and for cursor blinking
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", mstation_state, mstation_kb_timer, attotime::from_hz(50))
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, mstation_state, rtc_irq))
+	rp5c01_device &rtc(RP5C01(config, "rtc", XTAL(32'768)));
+	rtc.out_alarm_callback().set(FUNC(mstation_state::rtc_irq));
 
 	ADDRESS_MAP_BANK(config, "bank0").set_map(&mstation_state::mstation_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&mstation_state::mstation_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);

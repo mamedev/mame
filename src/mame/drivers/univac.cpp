@@ -6,8 +6,7 @@ Univac Terminals
 
 2009-05-25 Skeleton driver
 
-The terminals are models UTS20, UTS30, UTS40, UTS50 and SVT1120,
-however only the UTS20 is dumped (program roms only).
+The terminals are models UTS10, UTS20, UTS30, UTS40, UTS50 and SVT1120.
 
 There were other terminals (Uniscope 100/200/300/400) and UTS60, but
 they had different hardware. Uniscope models are believed to use the i8080,
@@ -33,6 +32,65 @@ Notes:
   - On boot it reads (0x81) & 0x10, and if set preserves 0xd831 to 0xd863
   - This has to be some kind of warm boot detection, but how does it work?
 
+You can use a debug trick to get UTS10 to boot:
+- When it loops at @0B33, pc = B35 and g
+
+How to create a FCC (field control code):
+- Move the cursor to where you want the FCC to be
+- Press FCC GEN
+- Now you enter a sequence of 4 bytes
+- 1. Video Attribute
+- - Spacebar or N: Normal
+- - L: Low intensity
+- - O: Off
+- - B: Blink (low-half)
+- - 1: Rev-video/Normal
+- - 2: Rev-video/half-intensity
+- - 3: Rev-video/blink: normal-half
+- - 4: Rev-video/blink: low
+- 2. Tab-stop
+- - Spacebar or S: No tab-stop
+- - T: Tab-stop
+- - 6: Tab-stop protected
+- - 7: No tab protected
+- 3. Data-entry control
+- - Spacebar or U: Unprotected
+- - P: Protected
+- - A: Alpha only
+- - N: Numeric only
+- 4. Justified
+- - Spacebar: Normal
+- - R: Right-justified
+- Press Spacebar to enable the new FCC and exit back to normal.
+
+Control-page parameters. These vary depending on the terminal and feature set. Press FCTN and CTRL PAGE keys together.
+You get a proected area covering the first 2 lines where you can configure the terminal. Settings are saved in the NVRAM.
+Depending on the setting, it may take effect immediately (after exiting the control page), or after a reboot.
+Entries may be in upper or lower case.
+UC/NO : Upper and lower case can be entered
+UC/YS : Lower case is automatically folded to upper case.
+AB/LI : Alternate brightness is Low Intensity
+AB/RV : Alternate brightness is Reverse Video
+AB/NI : Alternate brightness is Normal Intensity
+IL/RV : Indicator Line is Reverse Video
+IL/NI : Indicator Line is Normal Intensity
+KK/ON : Keyclick on
+KK/OF : Keyclick off
+SP/NS : Non-destructive spacebar (works like right-arrow)
+SP/DS : Destructive spacebar
+VO/01 : Video off after 1 minute (a blank screen saver)
+VO/04 : Video off after 4 minutes
+VO/16 : Video off after 16 minutes
+VO/64 : Video off after 64 minutes
+CC/ON : Control characters show
+CC/OF : Control characters off (look like a space)
+CS/LO : Cursor repeat slow
+CS/HI : Cursor repeat fast
+RI/xx : Set the RID (generally 21-2F)
+SI/xx : Set the SID (generally 51-7F)
+After entering the characters, press FCTN and CTRL PAGE keys again to save the setting.
+
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -43,6 +101,7 @@ Notes:
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "sound/beep.h"
+#include "video/dp8350.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -75,6 +134,7 @@ public:
 		, m_framecnt(0)
 	{ }
 
+	void uts10(machine_config &config);
 	void uts20(machine_config &config);
 
 private:
@@ -92,6 +152,7 @@ private:
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+	void uts10_map(address_map &map);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_post_load() override;
@@ -185,7 +246,7 @@ WRITE8_MEMBER( univac_state::portc4_w )
 
 WRITE8_MEMBER( univac_state::porte6_w )
 {
-	m_beep->set_state(BIT(data, 0));
+	//m_beep->set_state(BIT(data, 0)); // not sure what belongs here, but it isn't the beeper
 }
 
 
@@ -194,6 +255,14 @@ void univac_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x4fff).rom().region("roms", 0);
 	map(0x8000, 0xbfff).rw(FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
+	map(0xc000, 0xffff).ram().w(FUNC(univac_state::ram_w)).share("videoram");
+}
+
+void univac_state::uts10_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x4fff).rom().region("roms", 0);
+	map(0x8000, 0x9fff).mirror(0x2000).rw(FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
 	map(0xc000, 0xffff).ram().w(FUNC(univac_state::ram_w)).share("videoram");
 }
 
@@ -250,28 +319,38 @@ void univac_state::device_post_load()
 
 uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,x,ma=0; //m_bank_mask; (it isn't port43 that selects the screen)
+	uint8_t y,ra,chr;
+	uint16_t sy=0,x,ma=0,gfx; //m_bank_mask; (it isn't port43 that selects the screen)
 
 	m_framecnt++;
 
 	for (y = 0; y < 25; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (ra = 0; ra < 14; ra++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
-				chr = m_p_videoram[x];
+				chr = m_p_videoram[x];    // bit 7 = rv attribute (or dim, depending on control-page setting)
 
-				/* Take care of 'corner' characters */
-				if (((chr == 0x1c) || (chr == 0x1d)) && (m_framecnt & 16))
-					chr = 0x20;
+				gfx = m_p_chargen[((chr & 0x7f)<<4) | ra];
 
-				gfx = (ra ? m_p_chargen[((chr & 0x7f)<<4) | (ra-1) ] : 0) ^ (BIT(chr, 7) ? 0xff : 0);
+				// chars 1C, 1D, 1F need special handling
+				if ((chr >= 0x1c) && (chr <= 0x1f) && BIT(gfx, 7))
+				{
+					gfx &= 0x7f;
+				// They also blink
+					if (m_framecnt & 16)
+						gfx = 0;
+				}
+
+				// reverse-video attribute
+				if (BIT(chr, 7))
+					gfx = ~gfx;
 
 				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 8);
 				*p++ = BIT(gfx, 7);
 				*p++ = BIT(gfx, 6);
 				*p++ = BIT(gfx, 5);
@@ -288,21 +367,21 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 /* F4 Character Displayer */
-static const gfx_layout c10_charlayout =
+static const gfx_layout uts_charlayout =
 {
-	8, 9,                   /* 8 x 9 characters */
-	512,                    /* 512 characters */
+	8, 14,                   /* 8 x 14 characters */
+	128,                    /* 128 characters */
 	1,                  /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8 },
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( gfx_c10 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, c10_charlayout, 0, 1 )
+static GFXDECODE_START( gfx_uts )
+	GFXDECODE_ENTRY( "chargen", 0x0000, uts_charlayout, 0, 1 )
 GFXDECODE_END
 
 static const z80_daisy_config daisy_chain[] =
@@ -312,39 +391,37 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
+// All frequencies confirmed
 MACHINE_CONFIG_START(univac_state::uts20)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000)); // unknown clock
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &univac_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(univac_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 250)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uts)
+
+	dp835x_device &crtc(DP835X_A(config, "crtc", 19'980'000));
+	crtc.set_screen("screen");
+	crtc.vblank_callback().set(m_ctc, FUNC(z80ctc_device::trg0));
+	crtc.vblank_callback().append(m_ctc, FUNC(z80ctc_device::trg3));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 2000000));
-	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
-
-	Z80CTC(config, m_ctc, 4_MHz_XTAL);
+	Z80CTC(config, m_ctc, 18.432_MHz_XTAL / 6);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->set_clk<1>(18.432_MHz_XTAL / 12);
+	m_ctc->set_clk<2>(18.432_MHz_XTAL / 12);
 	m_ctc->zc_callback<1>().set(m_uart, FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().append(m_uart, FUNC(z80sio_device::rxca_w));
 	m_ctc->zc_callback<2>().set(m_uart, FUNC(z80sio_device::rxtxcb_w));
 
-	Z80SIO(config, m_uart, 4_MHz_XTAL);
+	Z80SIO(config, m_uart, 18.432_MHz_XTAL / 6);
 	m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_uart->out_txda_callback().set(m_uart, FUNC(z80sio_device::rxa_w)); // FIXME: hacked in permanent loopback to pass test
 	m_uart->out_txdb_callback().set(m_uart, FUNC(z80sio_device::rxb_w)); // FIXME: hacked in permanent loopback to pass test
@@ -357,8 +434,30 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(univac_state::uts10)
+	uts20(config);
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(uts10_map)
+MACHINE_CONFIG_END
+
 
 /* ROM definition */
+ROM_START( uts10 )
+	ROM_REGION( 0x5000, "roms", ROMREGION_ERASEFF )
+	ROM_LOAD( "f3577_1.bin",  0x0000, 0x0800, CRC(f7d47484) SHA1(84c01d054df19e8da44c242a67d97f643bdabc4c) )
+	ROM_LOAD( "f3577_2.bin",  0x0800, 0x0800, CRC(7c1045f0) SHA1(732e8c111a346476c59bcfda73f0f826cdcd7eb3) )
+	ROM_LOAD( "f3577_3.bin",  0x1000, 0x0800, CRC(10f47af2) SHA1(a61b693af264bfa6565c43b4fe473833f8aba046) )
+	ROM_LOAD( "f3577_4.bin",  0x1800, 0x0800, CRC(bed8924c) SHA1(1fe3e118cc1c17f4c8b9c0025257822b99fcde38) )
+	ROM_LOAD( "f3577_5.bin",  0x2000, 0x0800, CRC(38d671b5) SHA1(3fb3feaaddb08af5ba50a9c08511cbb3949a7985) )
+	ROM_LOAD( "f3577_6.bin",  0x2800, 0x0800, CRC(6dbe9c4a) SHA1(11bc4b7c99811bd26423a15b33d02a86fa0bfd17) )
+
+	ROM_REGION( 0x0800, "chargen", 0 ) // possibly some bitrot, see h,m,n in F4 displayer
+	ROM_LOAD( "chr_5565.bin", 0x0000, 0x0800, CRC(7d99744f) SHA1(2db330ca94a91f7b2ac2ac088ae9255f5bb0a7b4) )
+
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "2716264.bin",  0x0000, 0x0800, CRC(75e188aa) SHA1(a6486576525f7eec617fd7f9db469063f8c357fc) )
+ROM_END
+
 ROM_START( uts20 )
 	ROM_REGION( 0x5000, "roms", ROMREGION_ERASEFF )
 	ROM_LOAD( "uts20a.rom", 0x0000, 0x1000, CRC(1a7b4b4e) SHA1(c3732e25b4b7c7a80172e3fe55c77b923cf511eb) )
@@ -367,46 +466,17 @@ ROM_START( uts20 )
 	ROM_LOAD( "uts20d.rom", 0x3000, 0x1000, CRC(76757cf7) SHA1(b0509d9a35366b21955f83ec3685163844c4dbf1) )
 	ROM_LOAD( "uts20e.rom", 0x4000, 0x1000, CRC(0dfc8062) SHA1(cd681020bfb4829d4cebaf1b5bf618e67b55bda3) )
 
-	/* character generator not dumped, using the one from 'c10' for now */
-	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf) )
-	// create special unisys gfx
-	ROM_FILL(0x1C0, 0x30, 0)
-	// left corner
-	ROM_FILL(0x1C0, 1, 0xF8)
-	ROM_FILL(0x1C1, 1, 0xF0)
-	ROM_FILL(0x1C2, 1, 0xE0)
-	ROM_FILL(0x1C3, 1, 0xC0)
-	ROM_FILL(0x1C4, 1, 0x80)
-	// right corner
-	ROM_FILL(0x1D0, 1, 0x1F)
-	ROM_FILL(0x1D1, 1, 0x0F)
-	ROM_FILL(0x1D2, 1, 0x07)
-	ROM_FILL(0x1D3, 1, 0x03)
-	ROM_FILL(0x1D4, 1, 0x01)
-	// SOE
-	ROM_FILL(0x1E0, 1, 0x80)
-	ROM_FILL(0x1E1, 1, 0xC0)
-	ROM_FILL(0x1E2, 1, 0xE0)
-	ROM_FILL(0x1E3, 1, 0xF0)
-	ROM_FILL(0x1E4, 1, 0xF8)
-	ROM_FILL(0x1E5, 1, 0xF0)
-	ROM_FILL(0x1E6, 1, 0xE0)
-	ROM_FILL(0x1E7, 1, 0xC0)
-	ROM_FILL(0x1E8, 1, 0x80)
-	// cursor
-	ROM_FILL(0x000, 1, 0x7F)
-	ROM_FILL(0x001, 1, 0x7E)
-	ROM_FILL(0x002, 1, 0x7C)
-	ROM_FILL(0x003, 1, 0x79)
-	ROM_FILL(0x004, 1, 0x73)
-	ROM_FILL(0x005, 1, 0x67)
-	ROM_FILL(0x006, 1, 0x4F)
-	ROM_FILL(0x007, 1, 0x1F)
-	ROM_FILL(0x008, 1, 0x7F)
+	// character generator not dumped, using the one from 'UTS10' for now
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "chr_5565.bin", 0x0000, 0x0800, BAD_DUMP CRC(7d99744f) SHA1(2db330ca94a91f7b2ac2ac088ae9255f5bb0a7b4) )
+
+	// keyboard not dumped, using the one from 'UTS10' for now. The keyboard looks the same, and is most likely identical.
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "2716264.bin",  0x0000, 0x0800, BAD_DUMP CRC(75e188aa) SHA1(a6486576525f7eec617fd7f9db469063f8c357fc) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY          FULLNAME  FLAGS
+COMP( 1979?, uts10, uts20,  0,      uts10,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-10", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, uts20, 0,      0,      uts20,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-20", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

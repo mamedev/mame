@@ -165,17 +165,17 @@ MACHINE_CONFIG_START(madalien_state::madalien)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // 7400 at 3A used as R/S latch
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0); // 7400 at 3A used as R/S latch
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, madalien_state, madalien_portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, madalien_state, madalien_portB_w))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SOUND_CLOCK / 4));
+	aysnd.port_a_write_callback().set(FUNC(madalien_state::madalien_portA_w));
+	aysnd.port_b_write_callback().set(FUNC(madalien_state::madalien_portB_w));
+	aysnd.add_route(0, "discrete", 1.0, 0);
+	aysnd.add_route(1, "discrete", 1.0, 1);
+	aysnd.add_route(2, "discrete", 1.0, 2);
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, madalien_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

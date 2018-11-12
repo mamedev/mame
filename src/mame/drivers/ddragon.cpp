@@ -574,11 +574,6 @@ void ddragon_state::dd2_sub_map(address_map &map)
 	map(0xe000, 0xe000).w(FUNC(ddragon_state::ddragon2_sub_irq_w));
 }
 
-void ddragon_state::ddragonba_sub_portmap(address_map &map)
-{
-	map(0x0000, 0x01ff).w(FUNC(ddragon_state::ddragonba_port_w));
-}
-
 
 /*************************************
  *
@@ -1008,14 +1003,15 @@ MACHINE_CONFIG_START(ddragon_state::ddragonb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(ddragon_state::ddragonba)
+void ddragon_state::ddragonba(machine_config &config)
+{
 	ddragon(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
-	MCFG_DEVICE_PROGRAM_MAP(ddragonba_sub_map)
-	MCFG_DEVICE_IO_MAP(ddragonba_sub_portmap)
-MACHINE_CONFIG_END
+	m6803_cpu_device &sub(M6803(config.replace(), "sub", MAIN_CLOCK / 2));  // 6MHz / 4 internally
+	sub.set_addrmap(AS_PROGRAM, &ddragon_state::ddragonba_sub_map);
+	sub.out_p2_cb().set(FUNC(ddragon_state::ddragonba_port_w));
+}
 
 
 MACHINE_CONFIG_START(ddragon_state::ddragon6809)
