@@ -531,10 +531,10 @@ MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, SND_AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN-P2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN-P1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay, SND_AY_CLOCK);
+	m_ay->port_a_read_callback().set_ioport("IN-P2");
+	m_ay->port_b_read_callback().set_ioport("IN-P1");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

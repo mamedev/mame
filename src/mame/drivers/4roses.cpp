@@ -486,8 +486,7 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz, guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
+	AY8910(config, "ay8910", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 2.5);    /* 2MHz, guess */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rugby_state::rugby)

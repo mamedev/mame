@@ -491,17 +491,17 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, (4000000 / 4))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay1, (4000000 / 4));
+	m_ay1->port_a_read_callback().set_ioport("DSWB");
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, (4000000 / 4))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay2, (4000000 / 4));
+	m_ay2->port_a_read_callback().set_ioport("IN1");
+	m_ay2->port_b_read_callback().set_ioport("DSWA");
+	m_ay2->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 MACHINE_CONFIG_END
 

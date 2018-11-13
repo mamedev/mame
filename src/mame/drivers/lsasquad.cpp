@@ -598,17 +598,16 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
-	MCFG_SOUND_ROUTE(0, "mono", 0.12)
-	MCFG_SOUND_ROUTE(1, "mono", 0.12)
-	MCFG_SOUND_ROUTE(2, "mono", 0.12)
-	MCFG_SOUND_ROUTE(3, "mono", 0.63)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.port_b_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.add_route(0, "mono", 0.12);
+	ymsnd.add_route(1, "mono", 0.12);
+	ymsnd.add_route(2, "mono", 0.12);
+	ymsnd.add_route(3, "mono", 0.63);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lsasquad_state::storming)
@@ -619,8 +618,7 @@ MACHINE_CONFIG_START(lsasquad_state::storming)
 
 	MCFG_DEVICE_REMOVE("bmcu")
 
-	MCFG_DEVICE_REPLACE("aysnd", AY8910, MASTER_CLOCK / 8) // AY-3-8910A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	AY8910(config.replace(), "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12); // AY-3-8910A
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lsasquad_state::daikaiju)
@@ -664,17 +662,16 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
-	MCFG_SOUND_ROUTE(0, "mono", 0.12)
-	MCFG_SOUND_ROUTE(1, "mono", 0.12)
-	MCFG_SOUND_ROUTE(2, "mono", 0.12)
-	MCFG_SOUND_ROUTE(3, "mono", 0.63)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.port_b_write_callback().set(FUNC(lsasquad_state::unk));
+	ymsnd.add_route(0, "mono", 0.12);
+	ymsnd.add_route(1, "mono", 0.12);
+	ymsnd.add_route(2, "mono", 0.12);
+	ymsnd.add_route(3, "mono", 0.63);
 MACHINE_CONFIG_END
 
 

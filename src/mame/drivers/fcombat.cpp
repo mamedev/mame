@@ -140,12 +140,12 @@ void fcombat_state::audio_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
-	map(0x8002, 0x8003).w("ay1", FUNC(ay8910_device::data_address_w));
-	map(0xa001, 0xa001).r("ay2", FUNC(ay8910_device::data_r));
-	map(0xa002, 0xa003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0xc001, 0xc001).r("ay3", FUNC(ay8910_device::data_r));
-	map(0xc002, 0xc003).w("ay3", FUNC(ay8910_device::data_address_w));
+	map(0x8001, 0x8001).r("ay1", FUNC(ym2149_device::data_r));
+	map(0x8002, 0x8003).w("ay1", FUNC(ym2149_device::data_address_w));
+	map(0xa001, 0xa001).r("ay2", FUNC(ym2149_device::data_r));
+	map(0xa002, 0xa003).w("ay2", FUNC(ym2149_device::data_address_w));
+	map(0xc001, 0xc001).r("ay3", FUNC(ym2149_device::data_r));
+	map(0xc002, 0xc003).w("ay3", FUNC(ym2149_device::data_address_w));
 }
 
 
@@ -314,11 +314,11 @@ MACHINE_CONFIG_START(fcombat_state::fcombat)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	AY8910(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 MACHINE_CONFIG_END
 
 /*************************************

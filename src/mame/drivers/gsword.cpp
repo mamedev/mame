@@ -826,14 +826,13 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000)/12) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, m_ay0, XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, gsword_state, nmi_set_w)) /* portA write */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, m_ay1, 1500000);
+	m_ay1->port_a_write_callback().set(FUNC(gsword_state::nmi_set_w));
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */

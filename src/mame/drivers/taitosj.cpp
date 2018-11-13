@@ -1808,32 +1808,32 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundnmi2")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	AY8910(config, m_ay1, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
+	m_ay1->port_a_read_callback().set_ioport("DSW2");
+	m_ay1->port_b_read_callback().set_ioport("DSW3");
+	m_ay1->add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC51
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, taitosj_state, taitosj_dacvol_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay2, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC51
+	m_ay2->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay2->port_a_write_callback().set(m_dac, FUNC(dac_byte_interface::data_w));
+	m_ay2->port_b_write_callback().set(FUNC(taitosj_state::taitosj_dacvol_w));
+	m_ay2->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, taitosj_state, input_port_4_f0_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay3, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC49
+	m_ay3->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay3->port_a_write_callback().set(FUNC(taitosj_state::input_port_4_f0_w));
+	m_ay3->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("ay4", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	AY8910(config, m_ay4, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC50
+	m_ay4->set_flags(AY8910_SINGLE_OUTPUT);
 	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
 	   collector inverter, to selectively tie none, either or both of two
 	   capacitors between the ay4 audio output signal and ground, or between
 	   audio output signal and high-z (i.e. do nothing).
 	   Bio Attack uses this?
 	*/
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	m_ay4->port_b_write_callback().set(FUNC(taitosj_state::taitosj_sndnmi_msk_w));
+	m_ay4->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 

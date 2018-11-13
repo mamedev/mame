@@ -615,8 +615,7 @@ MACHINE_CONFIG_START(route16_state::route16)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, 10000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, "ay8910", 10000000/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -645,8 +644,7 @@ MACHINE_CONFIG_START(route16_state::stratvox)
 	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_jongpute)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8910")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, route16_state, stratvox_sn76477_w))  /* SN76477 commands (not used in Route 16?) */
+	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(route16_state::stratvox_sn76477_w));  /* SN76477 commands (not used in Route 16?) */
 
 	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(150), CAP_U(0.001)) // noise + filter
