@@ -105,6 +105,8 @@ protected:
 	void advance_chain(address_space &space);
 	void scsi_dma();
 
+	void do_rex_command(uint32_t command);
+
 	static void cdrom_config(device_t *device);
 	void indigo_map(address_map &map);
 
@@ -201,6 +203,18 @@ protected:
 		uint32_t m_config_sel;
 		uint32_t m_write_addr;
 		uint32_t m_control;
+
+		uint32_t m_x_start_i;
+		uint32_t m_y_start_i;
+		uint32_t m_xy_move;
+		uint32_t m_color_red_i;
+		uint32_t m_color_green_i;
+		uint32_t m_color_blue_i;
+		uint32_t m_color_back;
+		uint32_t m_z_pattern;
+		uint32_t m_x_end_i;
+		uint32_t m_y_end_i;
+
 		uint8_t m_palette_idx;
 		uint8_t m_palette_channel;
 		uint8_t m_palette_entry[3];
@@ -227,6 +241,7 @@ protected:
 
 	hpc_t m_hpc;
 	lg1_t m_lg1;
+	std::unique_ptr<uint8_t[]> m_framebuffer;
 	uint8_t m_duart_int_status;
 
 	static char const *const RS232A_TAG;
@@ -278,6 +293,8 @@ protected:
 
 void indigo_state::machine_start()
 {
+	m_framebuffer = std::make_unique<uint8_t[]>(1024*768);
+
 	save_item(NAME(m_hpc.m_misc_status));
 	save_item(NAME(m_hpc.m_cpu_aux_ctrl));
 	save_item(NAME(m_hpc.m_parbuf_ptr));
@@ -300,6 +317,16 @@ void indigo_state::machine_start()
 	save_item(NAME(m_lg1.m_config_sel));
 	save_item(NAME(m_lg1.m_write_addr));
 	save_item(NAME(m_lg1.m_control));
+	save_item(NAME(m_lg1.m_x_start_i));
+	save_item(NAME(m_lg1.m_y_start_i));
+	save_item(NAME(m_lg1.m_xy_move));
+	save_item(NAME(m_lg1.m_color_red_i));
+	save_item(NAME(m_lg1.m_color_green_i));
+	save_item(NAME(m_lg1.m_color_blue_i));
+	save_item(NAME(m_lg1.m_color_back));
+	save_item(NAME(m_lg1.m_z_pattern));
+	save_item(NAME(m_lg1.m_x_end_i));
+	save_item(NAME(m_lg1.m_y_end_i));
 	save_item(NAME(m_lg1.m_palette_idx));
 	save_item(NAME(m_lg1.m_palette_channel));
 	save_item(NAME(m_lg1.m_palette_entry));
@@ -307,12 +334,15 @@ void indigo_state::machine_start()
 	save_item(NAME(m_lg1.m_pix_read_mask));
 
 	save_item(NAME(m_duart_int_status));
+
+	save_pointer(NAME(&m_framebuffer[0]), 1024*768);
 }
 
 void indigo_state::machine_reset()
 {
 	memset(&m_hpc, 0, sizeof(hpc_t));
 	memset(&m_lg1, 0, sizeof(lg1_t));
+	memset(&m_framebuffer[0], 0, 1024*768);
 	m_duart_int_status = 0;
 }
 
@@ -873,11 +903,98 @@ READ32_MEMBER(indigo_state::entry_r)
 	return ret;
 }
 
+void indigo_state::do_rex_command(uint32_t command)
+{
+	/*
+	REX15_OP_FLAG_BLOCK			= 0x00000008,
+	REX15_OP_FLAG_LENGTH32		= 0x00000010,
+	REX15_OP_FLAG_QUADMODE		= 0x00000020,
+	REX15_OP_FLAG_XYCONTINUE	= 0x00000080,
+	REX15_OP_FLAG_STOPONX		= 0x00000100,
+	REX15_OP_FLAG_STOPONY		= 0x00000200,
+	REX15_OP_FLAG_ENZPATTERN	= 0x00000400,
+	REX15_OP_FLAG_LOGICSRC		= 0x00080000,
+	REX15_OP_FLAG_ZOPAQUE		= 0x00800000,
+	REX15_OP_FLAG_ZCONTINUE		= 0x01000000,
+	*/
+	if (command == 0x30000329)
+	{
+		for (uint32_t y = m_lg1.m_y_start_i; y <= m_lg1.m_y_end_i; y++)
+		{
+			for (uint32_t x = m_lg1.m_x_start_i; x <= m_lg1.m_x_end_i; x++)
+			{
+				m_framebuffer[y*1024 + x] = m_lg1.m_color_red_i;
+			}
+		}
+	}
+	else
+	{
+		LOGMASKED(LOG_GFX, "%s: Unknown LG1 command: %08x\n", command);
+	}
+}
+
 WRITE32_MEMBER(indigo_state::entry_w)
 {
 	switch (offset)
 	{
+		case (REX15_PAGE0_SET+REX15_P0REG_COMMAND)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_COMMAND)/4:
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 Command Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			do_rex_command(data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_XSTARTI)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_XSTARTI)/4:
+			m_lg1.m_x_start_i = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 XStartI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_YSTARTI)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_YSTARTI)/4:
+			m_lg1.m_y_start_i = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 YStartI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_XYMOVE)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_XYMOVE)/4:
+			m_lg1.m_xy_move = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 XYMove Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_COLORREDI)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_COLORREDI)/4:
+			m_lg1.m_color_red_i = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 ColorRedI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_COLORGREENI)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_COLORGREENI)/4:
+			m_lg1.m_color_green_i = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 ColorGreenI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_COLORBLUEI)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_COLORBLUEI)/4:
+			m_lg1.m_color_blue_i = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 ColorBlueI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_COLORBACK)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_COLORBACK)/4:
+			m_lg1.m_color_back = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 ColorBlueI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_ZPATTERN)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_ZPATTERN)/4:
+			m_lg1.m_z_pattern = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 ZPattern Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_XENDI)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_XENDI)/4:
+			m_lg1.m_x_end_i = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 XEndI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+		case (REX15_PAGE0_SET+REX15_P0REG_YENDI)/4:
+		case (REX15_PAGE0_GO+REX15_P0REG_YENDI)/4:
+			m_lg1.m_y_end_i = data;
+			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 YEndI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			break;
+
 		case (REX15_PAGE1_SET+REX15_P1REG_CFGSEL)/4:
+		case (REX15_PAGE1_GO+REX15_P1REG_CFGSEL)/4:
 			m_lg1.m_config_sel = data;
 			switch (data)
 			{
@@ -899,6 +1016,9 @@ WRITE32_MEMBER(indigo_state::entry_w)
 			}
 			break;
 		case (REX15_PAGE1_SET+REX15_P1REG_CFGDATA)/4:
+		case (REX15_PAGE1_GO+REX15_P1REG_CFGDATA)/4:
+			if (offset & 0x200) // Ignore 'Go' writes for now
+				break;
 			switch (m_lg1.m_config_sel)
 			{
 				case REX15_WRITE_ADDR:
@@ -943,15 +1063,13 @@ uint32_t indigo_state::screen_update(screen_device &device, bitmap_rgb32 &bitmap
 {
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
 
-	for (int y = 0; y < 256; y++)
+	for (int y = 0; y < 768; y++)
 	{
-		for (int suby = 0; suby < 3; suby++)
+		uint32_t *dst = &bitmap.pix32(y);
+		uint8_t *src = &m_framebuffer[y*1024];
+		for (int x = 0; x < 1024; x++)
 		{
-			uint32_t *dst = &bitmap.pix32(y*3 + suby);
-			for (int x = 0; x < 1024; x++)
-			{
-				*dst++ = pens[y];
-			}
+			*dst++ = pens[*src++];
 		}
 	}
 	return 0;
