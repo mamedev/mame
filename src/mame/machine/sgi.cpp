@@ -13,10 +13,11 @@
 
 #define LOG_READS		(1 << 0)
 #define LOG_WRITES		(1 << 1)
-#define LOG_WATCHDOG	(1 << 2)
-#define LOG_MEMCFG		(1 << 3)
-#define LOG_UNKNOWN		(1 << 4)
-#define LOG_DEFAULT		(LOG_READS | LOG_WRITES | LOG_WATCHDOG)
+#define LOG_RPSS		(1 << 2)
+#define LOG_WATCHDOG	(1 << 3)
+#define LOG_MEMCFG		(1 << 4)
+#define LOG_UNKNOWN		(1 << 5)
+#define LOG_DEFAULT		(LOG_READS | LOG_WRITES | LOG_RPSS | LOG_WATCHDOG | LOG_UNKNOWN)
 
 #define VERBOSE			(0)
 #include "logmacro.h"
@@ -167,7 +168,7 @@ READ32_MEMBER(sgi_mc_device::read)
 		LOGMASKED(LOG_READS, "%s: System ID Read: %08x & %08x\n", machine().describe_context(), m_sys_id, mem_mask);
 		return m_sys_id;
 	case 0x0028:
-		LOGMASKED(LOG_READS, "%s: RPSS Divider Read: %08x & %08x\n", machine().describe_context(), m_rpss_divider, mem_mask);
+		LOGMASKED(LOG_RPSS, "%s: RPSS Divider Read: %08x & %08x\n", machine().describe_context(), m_rpss_divider, mem_mask);
 		return m_rpss_divider;
 	case 0x0030:
 		LOGMASKED(LOG_READS, "%s: R4000 EEPROM Read\n", machine().describe_context());
@@ -257,7 +258,7 @@ READ32_MEMBER(sgi_mc_device::read)
 		LOGMASKED(LOG_READS, "%s: DMA TLB Entry 3 Low Read: %08x & %08x\n", machine().describe_context(), m_dma_tlb_entry3_lo, mem_mask);
 		return m_dma_tlb_entry3_lo;
 	case 0x1000:
-		LOGMASKED(LOG_READS, "%s: RPSS 100ns Counter Read: %08x & %08x\n", machine().describe_context(), m_rpss_counter, mem_mask);
+		LOGMASKED(LOG_RPSS, "%s: RPSS 100ns Counter Read: %08x & %08x\n", machine().describe_context(), m_rpss_counter, mem_mask);
 		return m_rpss_counter;
 	case 0x2000:
 	case 0x2008:
@@ -340,7 +341,7 @@ WRITE32_MEMBER( sgi_mc_device::write )
 		m_watchdog = 0;
 		break;
 	case 0x0028:
-		LOGMASKED(LOG_WRITES, "%s: RPSS Divider Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_RPSS, "%s: RPSS Divider Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_rpss_divider = data;
 		m_rpss_divide_count = (int)(m_rpss_divider & 0xff);
 		m_rpss_divide_counter = m_rpss_divide_count;

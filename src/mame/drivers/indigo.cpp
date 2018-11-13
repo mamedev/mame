@@ -19,8 +19,9 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
+#include "bus/scsi/scsicd512.h"
 #include "bus/scsi/scsihd.h"
+#include "bus/sgikbd/sgikbd.h"
 //#include "cpu/dsp56k/dsp56k.h"
 #include "cpu/mips/mips1.h"
 #include "cpu/mips/mips3.h"
@@ -33,6 +34,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define ENABLE_ENTRY_GFX	(0)
+
 #define LOG_UNKNOWN		(1 << 0)
 #define LOG_INT			(1 << 1)
 #define LOG_HPC			(1 << 2)
@@ -40,11 +43,16 @@
 #define LOG_DMA			(1 << 5)
 #define LOG_SCSI		(1 << 6)
 #define LOG_SCSI_DMA	(1 << 7)
-#define LOG_DUART		(1 << 8)
-#define LOG_PIT			(1 << 9)
-#define LOG_ALL			(LOG_UNKNOWN | LOG_INT | LOG_HPC | LOG_EEPROM | LOG_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT)
+#define LOG_DUART0		(1 << 8)
+#define LOG_DUART1		(1 << 9)
+#define LOG_DUART2		(1 << 10)
+#define LOG_PIT			(1 << 11)
+#define LOG_DSP			(1 << 12)
+#define LOG_GFX			(1 << 13)
+#define LOG_DUART		(LOG_DUART0 | LOG_DUART1 | LOG_DUART2)
+#define LOG_ALL			(LOG_UNKNOWN | LOG_INT | LOG_HPC | LOG_EEPROM | LOG_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT | LOG_DSP | LOG_GFX)
 
-#define VERBOSE			(0)
+#define VERBOSE			(LOG_ALL & ~(LOG_DUART1 | LOG_DUART0 | LOG_SCSI | LOG_SCSI_DMA | LOG_EEPROM | LOG_PIT | LOG_DSP))
 #include "logmacro.h"
 
 class indigo_state : public driver_device
@@ -58,6 +66,7 @@ public:
 		, m_eeprom(*this, "eeprom")
 		, m_pit(*this, "pit")
 		, m_rtc(*this, "rtc")
+		, m_dsp_ram(*this, "dspram")
 	{
 	}
 
@@ -71,8 +80,10 @@ protected:
 	DECLARE_WRITE32_MEMBER(hpc_w);
 	DECLARE_READ32_MEMBER(int_r);
 	DECLARE_WRITE32_MEMBER(int_w);
-	DECLARE_READ32_MEMBER(dspram_r);
-	DECLARE_WRITE32_MEMBER(dspram_w);
+	DECLARE_READ32_MEMBER(dsp_ram_r);
+	DECLARE_WRITE32_MEMBER(dsp_ram_w);
+	DECLARE_READ32_MEMBER(entry_r);
+	DECLARE_WRITE32_MEMBER(entry_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 
 	void set_timer_int_clear(uint32_t data);
@@ -84,10 +95,9 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(duart2_int_w);
 
 	void duart_int_w(int channel, int status);
-	void raise_local0_irq(uint8_t source_mask);
-	void lower_local0_irq(uint8_t source_mask);
-	void raise_local1_irq(uint8_t source_mask);
-	void lower_local1_irq(uint8_t source_mask);
+	void raise_local_irq(int channel, uint8_t source_mask);
+	void lower_local_irq(int channel, uint8_t source_mask);
+	void update_irq(int channel);
 
 	void fetch_chain(address_space &space);
 	void advance_chain(address_space &space);
@@ -118,11 +128,11 @@ protected:
 	struct hpc_t
 	{
 		uint8_t m_misc_status;
+		uint32_t m_cpu_aux_ctrl;
 		uint32_t m_parbuf_ptr;
-		uint32_t m_local_int0_status;
-		uint32_t m_local_int0_mask;
-		uint32_t m_local_int1_status;
-		uint32_t m_local_int1_mask;
+		uint32_t m_local_int_status[2];
+		uint32_t m_local_int_mask[2];
+		bool m_int_status[2];
 		uint32_t m_vme_intmask0;
 		uint32_t m_vme_intmask1;
 		uint32_t m_scsi0_dma_desc;
@@ -133,6 +143,7 @@ protected:
 		uint16_t m_scsi0_dma_length;
 		bool m_scsi0_dma_to_mem;
 		bool m_scsi0_dma_active;
+		bool m_scsi0_dma_end;
 	};
 
 	enum
@@ -145,12 +156,11 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd33c93_device> m_wd33c93;
-	required_device_array<scc85230_device, 3> m_scc;
+	required_device_array<scc8530_device, 3> m_scc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<pit8254_device> m_pit;
 	required_device<dp8573_device> m_rtc;
-
-	std::unique_ptr<uint32_t[]> m_dsp_ram;
+	required_shared_ptr<uint32_t> m_dsp_ram;
 
 	hpc_t m_hpc;
 	uint8_t m_duart_int_status;
@@ -204,14 +214,12 @@ protected:
 
 void indigo_state::machine_start()
 {
-	m_dsp_ram = std::make_unique<uint32_t[]>(0x8000);
-
 	save_item(NAME(m_hpc.m_misc_status));
+	save_item(NAME(m_hpc.m_cpu_aux_ctrl));
 	save_item(NAME(m_hpc.m_parbuf_ptr));
-	save_item(NAME(m_hpc.m_local_int0_status));
-	save_item(NAME(m_hpc.m_local_int0_mask));
-	save_item(NAME(m_hpc.m_local_int1_status));
-	save_item(NAME(m_hpc.m_local_int1_mask));
+	save_item(NAME(m_hpc.m_local_int_status));
+	save_item(NAME(m_hpc.m_local_int_mask));
+	save_item(NAME(m_hpc.m_int_status));
 	save_item(NAME(m_hpc.m_vme_intmask0));
 	save_item(NAME(m_hpc.m_vme_intmask1));
 
@@ -223,17 +231,14 @@ void indigo_state::machine_start()
 	save_item(NAME(m_hpc.m_scsi0_dma_length));
 	save_item(NAME(m_hpc.m_scsi0_dma_to_mem));
 	save_item(NAME(m_hpc.m_scsi0_dma_active));
+	save_item(NAME(m_hpc.m_scsi0_dma_end));
 
 	save_item(NAME(m_duart_int_status));
-
-	save_pointer(NAME(m_dsp_ram), 0x8000);
 }
 
 void indigo_state::machine_reset()
 {
 	memset(&m_hpc, 0, sizeof(hpc_t));
-	memset(&m_dsp_ram[0], 0, sizeof(uint32_t) * 0x8000);
-
 	m_duart_int_status = 0;
 }
 
@@ -249,7 +254,7 @@ READ32_MEMBER(indigo_state::hpc_r)
 			machine().describe_context(), 0x1fb80000 + offset*4, mem_mask);
 		return 0;
 	case 0x0094/4:
-		LOGMASKED(LOG_HPC | LOG_DMA, "%s: HPC SCSI DMA Control Register Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_scsi0_dma_ctrl, mem_mask);
+		LOGMASKED(LOG_SCSI_DMA, "%s: HPC SCSI DMA Control Register Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_scsi0_dma_ctrl, mem_mask);
 		return m_hpc.m_scsi0_dma_ctrl;
 	case 0x00ac/4:
 		LOGMASKED(LOG_HPC, "%s: HPC Parallel Buffer Pointer Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_parbuf_ptr, mem_mask);
@@ -274,22 +279,22 @@ READ32_MEMBER(indigo_state::hpc_r)
 		return m_hpc.m_misc_status;
 	case 0x01bc/4:
 	{
-		uint32_t ret = m_eeprom->do_read() << 4;
+		uint32_t ret = (m_hpc.m_cpu_aux_ctrl & ~0x10) | m_eeprom->do_read() << 4;
 		LOGMASKED(LOG_EEPROM, "%s: HPC Serial EEPROM Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		return ret;
 	}
 	case 0x01c0/4:
-		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 0 Status Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_local_int0_status, mem_mask);
-		return m_hpc.m_local_int0_status;
+		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 0 Status Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_local_int_status[0], mem_mask);
+		return m_hpc.m_local_int_status[0];
 	case 0x01c4/4:
-		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 0 Mask Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_local_int0_mask, mem_mask);
-		return m_hpc.m_local_int0_mask;
+		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 0 Mask Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_local_int_mask[0], mem_mask);
+		return m_hpc.m_local_int_mask[0];
 	case 0x01c8/4:
-		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 1 Status Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_local_int1_status, mem_mask);
-		return m_hpc.m_local_int1_status;
+		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 1 Status Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_local_int_status[1], mem_mask);
+		return m_hpc.m_local_int_status[1];
 	case 0x01cc/4:
-		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 1 Mask Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_local_int1_mask, mem_mask);
-		return m_hpc.m_local_int1_mask;
+		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 1 Mask Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_local_int_mask[1], mem_mask);
+		return m_hpc.m_local_int_mask[1];
 	case 0x01d4/4:
 		LOGMASKED(LOG_HPC, "%s: HPC VME Interrupt Mask 0 Read: %08x & %08x\n", machine().describe_context(), m_hpc.m_vme_intmask0, mem_mask);
 		return m_hpc.m_vme_intmask0;
@@ -298,26 +303,26 @@ READ32_MEMBER(indigo_state::hpc_r)
 		return m_hpc.m_vme_intmask1;
 	case 0x01f0/4:
 	{
-		const uint8_t data = 0;//m_pit->read(0);
-		LOGMASKED(LOG_PIT, "%s: Read Timer Count0 Register (Disabled): %02x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint8_t data = m_pit->read(0);
+		LOGMASKED(LOG_PIT, "%s: Read Timer Count0 Register: %02x & %08x\n", machine().describe_context(), data, mem_mask);
 		return data;
 	}
 	case 0x01f4/4:
 	{
-		const uint8_t data = 0;//m_pit->read(1);
-		LOGMASKED(LOG_PIT, "%s: Read Timer Count1 Register (Disabled): %02x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint8_t data = m_pit->read(1);
+		LOGMASKED(LOG_PIT, "%s: Read Timer Count1 Register: %02x & %08x\n", machine().describe_context(), data, mem_mask);
 		return data;
 	}
 	case 0x01f8/4:
 	{
-		const uint8_t data = 0;//m_pit->read(2);
-		LOGMASKED(LOG_PIT, "%s: Read Timer Count2 Register (Disabled): %02x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint8_t data = m_pit->read(2);
+		LOGMASKED(LOG_PIT, "%s: Read Timer Count2 Register: %02x & %08x\n", machine().describe_context(), data, mem_mask);
 		return data;
 	}
 	case 0x01fc/4:
 	{
-		const uint8_t data = 0;//m_pit->read(3);
-		LOGMASKED(LOG_PIT, "%s: Read Timer Control Register (Disabled): %02x & %08x\n", machine().describe_context(), data, mem_mask);
+		const uint8_t data = m_pit->read(3);
+		LOGMASKED(LOG_PIT, "%s: Read Timer Control Register: %02x & %08x\n", machine().describe_context(), data, mem_mask);
 		return data;
 	}
 	case 0x0d00/4:
@@ -326,7 +331,7 @@ READ32_MEMBER(indigo_state::hpc_r)
 	{
 		const uint32_t index = (offset >> 2) & 3;
 		uint32_t ret = m_scc[index]->ba_cd_r(space, 3);
-		LOGMASKED(LOG_DUART, "%s: HPC DUART%d Channel B Control Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
+		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Control Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
 		return ret;
 	}
 	case 0x0d04/4:
@@ -335,7 +340,7 @@ READ32_MEMBER(indigo_state::hpc_r)
 	{
 		const uint32_t index = (offset >> 2) & 3;
 		const uint32_t ret = m_scc[index]->ba_cd_r(space, 2);
-		LOGMASKED(LOG_DUART, "%s: HPC DUART%d Channel B Data Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
+		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Data Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
 		return ret;
 	}
 	case 0x0d08/4:
@@ -344,7 +349,7 @@ READ32_MEMBER(indigo_state::hpc_r)
 	{
 		const uint32_t index = (offset >> 2) & 3;
 		const uint32_t ret = m_scc[index]->ba_cd_r(space, 1);
-		LOGMASKED(LOG_DUART, "%s: HPC DUART%d Channel A Control Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
+		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Control Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
 		return ret;
 	}
 	case 0x0d0c/4:
@@ -353,7 +358,7 @@ READ32_MEMBER(indigo_state::hpc_r)
 	{
 		const uint32_t index = (offset >> 2) & 3;
 		const uint32_t ret = m_scc[index]->ba_cd_r(space, 0);
-		LOGMASKED(LOG_DUART, "%s: HPC DUART%d Channel A Data Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
+		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Data Read: %08x & %08x\n", machine().describe_context(), index, ret, mem_mask);
 		return ret;
 	}
 	default:
@@ -366,14 +371,17 @@ READ32_MEMBER(indigo_state::hpc_r)
 void indigo_state::fetch_chain(address_space &space)
 {
 	m_hpc.m_scsi0_dma_flag = space.read_dword(m_hpc.m_scsi0_dma_desc);
-	m_hpc.m_scsi0_dma_addr = space.read_dword(m_hpc.m_scsi0_dma_desc+4) & 0x7fffffff;
+	m_hpc.m_scsi0_dma_addr = space.read_dword(m_hpc.m_scsi0_dma_desc+4);
 	m_hpc.m_scsi0_dma_next = space.read_dword(m_hpc.m_scsi0_dma_desc+8);
-	m_hpc.m_scsi0_dma_length = m_hpc.m_scsi0_dma_flag & 0x3fff;
-	LOGMASKED(LOG_HPC | LOG_DMA, "Fetched SCSI DMA Descriptor block:\n");
-	LOGMASKED(LOG_HPC | LOG_DMA, "    Ctrl: %08x\n", m_hpc.m_scsi0_dma_flag);
-	LOGMASKED(LOG_HPC | LOG_DMA, "    Addr: %08x\n", m_hpc.m_scsi0_dma_addr);
-	LOGMASKED(LOG_HPC | LOG_DMA, "    Next: %08x\n", m_hpc.m_scsi0_dma_next);
-	LOGMASKED(LOG_HPC | LOG_DMA, "    Length: %04x\n", m_hpc.m_scsi0_dma_length);
+	m_hpc.m_scsi0_dma_length = m_hpc.m_scsi0_dma_flag & 0x1fff;
+	LOGMASKED(LOG_SCSI_DMA, "Fetched SCSI DMA Descriptor block:\n");
+	LOGMASKED(LOG_SCSI_DMA, "    Ctrl: %08x\n", m_hpc.m_scsi0_dma_flag);
+	LOGMASKED(LOG_SCSI_DMA, "    Addr: %08x\n", m_hpc.m_scsi0_dma_addr);
+	LOGMASKED(LOG_SCSI_DMA, "    Next: %08x\n", m_hpc.m_scsi0_dma_next);
+	LOGMASKED(LOG_SCSI_DMA, "    Length: %04x\n", m_hpc.m_scsi0_dma_length);
+	m_hpc.m_scsi0_dma_end = BIT(m_hpc.m_scsi0_dma_addr, 31);
+	m_hpc.m_scsi0_dma_addr &= 0x0fffffff;
+	m_hpc.m_scsi0_dma_next &= 0x0fffffff;
 }
 
 void indigo_state::advance_chain(address_space &space)
@@ -382,13 +390,16 @@ void indigo_state::advance_chain(address_space &space)
 	m_hpc.m_scsi0_dma_length--;
 	if (m_hpc.m_scsi0_dma_length == 0)
 	{
-		m_hpc.m_scsi0_dma_desc = m_hpc.m_scsi0_dma_next;
-		fetch_chain(space);
-		if (m_hpc.m_scsi0_dma_addr == 0 || m_hpc.m_scsi0_dma_length == 0)
+		if (m_hpc.m_scsi0_dma_end)
 		{
 			LOGMASKED(LOG_SCSI_DMA, "HPC: Disabling SCSI DMA due to end of chain\n");
 			m_hpc.m_scsi0_dma_active = false;
 			m_hpc.m_scsi0_dma_ctrl &= ~HPC_DMACTRL_ENABLE;
+		}
+		else
+		{
+			m_hpc.m_scsi0_dma_desc = m_hpc.m_scsi0_dma_next;
+			fetch_chain(space);
 		}
 	}
 }
@@ -404,13 +415,13 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 	switch (offset)
 	{
 	case 0x0090/4:
-		LOGMASKED(LOG_HPC | LOG_DMA, "%s: HPC SCSI DMA Descriptor Pointer: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_SCSI_DMA, "%s: HPC SCSI DMA Descriptor Pointer Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_hpc.m_scsi0_dma_desc = data;
 		fetch_chain(space);
 		break;
 
 	case 0x0094/4:
-		LOGMASKED(LOG_HPC | LOG_DMA, "%s: HPC SCSI DMA Control Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		LOGMASKED(LOG_SCSI_DMA, "%s: HPC SCSI DMA Control Register Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		m_hpc.m_scsi0_dma_ctrl = data &~ (HPC_DMACTRL_FLUSH | HPC_DMACTRL_RESET);
 		m_hpc.m_scsi0_dma_to_mem = (m_hpc.m_scsi0_dma_ctrl & HPC_DMACTRL_TO_MEM);
 		m_hpc.m_scsi0_dma_active = (m_hpc.m_scsi0_dma_ctrl & HPC_DMACTRL_ENABLE);
@@ -455,28 +466,29 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 		m_hpc.m_misc_status = data;
 		break;
 	case 0x01bc/4:
+		m_hpc.m_cpu_aux_ctrl = data;
 		LOGMASKED(LOG_EEPROM, "%s: HPC Serial EEPROM Write: %08x & %08x\n", machine().describe_context(), data, mem_mask );
 		if (BIT(data, 0))
 		{
 			LOGMASKED(LOG_EEPROM, "    CPU board LED on\n");
 		}
 		m_eeprom->di_write(BIT(data, 3));
-		m_eeprom->cs_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->clk_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->cs_write(BIT(data, 1));
+		m_eeprom->clk_write(BIT(data, 2));
 		break;
 	case 0x01c0/4:
 		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 0 Status Write (Ignored): %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x01c4/4:
 		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 0 Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_hpc.m_local_int0_mask = data;
+		m_hpc.m_local_int_mask[0] = data;
 		break;
 	case 0x01c8/4:
 		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 1 Status Write (Ignored): %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case 0x01cc/4:
 		LOGMASKED(LOG_HPC, "%s: HPC Local Interrupt 1 Mask Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_hpc.m_local_int1_mask = data;
+		m_hpc.m_local_int_mask[1] = data;
 		break;
 	case 0x01d4/4:
 		LOGMASKED(LOG_HPC, "%s: HPC VME Interrupt Mask 0 Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
@@ -491,23 +503,23 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 		set_timer_int_clear(data);
 		break;
 	case 0x01f0/4:
-		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Count0 Register (Disabled): %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		//if (ACCESSING_BITS_24_31)
-		//	m_pit->write(0, (uint8_t)(data >> 24));
-		//else if (ACCESSING_BITS_0_7)
-		//	m_pit->write(0, (uint8_t)data);
+		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Count0 Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		if (ACCESSING_BITS_24_31)
+			m_pit->write(0, (uint8_t)(data >> 24));
+		else if (ACCESSING_BITS_0_7)
+			m_pit->write(0, (uint8_t)data);
 		return;
 	case 0x01f4/4:
-		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Count1 Register (Disabled): %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		//m_pit->write(1, (uint8_t)data);
+		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Count1 Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_pit->write(1, (uint8_t)data);
 		return;
 	case 0x01f8/4:
-		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Count2 Register (Disabled): %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		//m_pit->write(2, (uint8_t)data);
+		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Count2 Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_pit->write(2, (uint8_t)data);
 		return;
 	case 0x01fc/4:
-		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Control Register (Disabled): %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		//m_pit->write(3, (uint8_t)data);
+		LOGMASKED(LOG_PIT, "%s: HPC Write Timer Control Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_pit->write(3, (uint8_t)data);
 		return;
 	case 0x0d00/4:
 	case 0x0d10/4:
@@ -515,7 +527,7 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 	{
 		const uint32_t index = (offset >> 2) & 3;
 		m_scc[index]->ba_cd_w(space, 3, (uint8_t)data);
-		LOGMASKED(LOG_DUART, "%s: HPC DUART%d Channel B Control Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
+		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Control Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
 		break;
 	}
 	case 0x0d04/4:
@@ -524,7 +536,7 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 	{
 		const uint32_t index = (offset >> 2) & 3;
 		m_scc[index]->ba_cd_w(space, 2, (uint8_t)data);
-		LOGMASKED(LOG_DUART, "%s: HPC DUART%d Channel B Data Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
+		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel B Data Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
 		break;
 	}
 	case 0x0d08/4:
@@ -533,7 +545,7 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 	{
 		const uint32_t index = (offset >> 2) & 3;
 		m_scc[index]->ba_cd_w(space, 1, (uint8_t)data);
-		LOGMASKED(LOG_DUART, "%s: HPC DUART%d Channel A Control Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
+		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Control Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
 		break;
 	}
 	case 0x0d0c/4:
@@ -542,7 +554,7 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 	{
 		const uint32_t index = (offset >> 2) & 3;
 		m_scc[index]->ba_cd_w(space, 0, (uint8_t)data);
-		LOGMASKED(LOG_DUART, "%s: HPC DUART%d Channel A Data Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
+		LOGMASKED(LOG_DUART0 << index, "%s: HPC DUART%d Channel A Data Write: %08x & %08x\n", machine().describe_context(), index, data, mem_mask);
 		break;
 	}
 	default:
@@ -650,18 +662,18 @@ WRITE_LINE_MEMBER(indigo_state::scsi_irq)
 {
 	if (state)
 	{
-		LOGMASKED(LOG_SCSI | LOG_INT, "SCSI: Set IRQ\n");
+		LOGMASKED(LOG_SCSI, "SCSI: Set IRQ\n");
 		int count = m_wd33c93->get_dma_count();
-		LOGMASKED(LOG_SCSI, "SCSI: count %d, active %d\n", count, m_hpc.m_scsi0_dma_active);
+		LOGMASKED(LOG_SCSI_DMA, "SCSI: count %d, active %d\n", count, m_hpc.m_scsi0_dma_active);
 		if (count && m_hpc.m_scsi0_dma_active)
 			scsi_dma();
 
-		raise_local0_irq(LOCAL0_SCSI);
+		raise_local_irq(0, LOCAL0_SCSI);
 	}
 	else
 	{
-		LOGMASKED(LOG_SCSI | LOG_INT, "SCSI: Clear IRQ\n");
-		lower_local0_irq(LOCAL0_SCSI);
+		LOGMASKED(LOG_SCSI, "SCSI: Clear IRQ\n");
+		lower_local_irq(0, LOCAL0_SCSI);
 	}
 }
 
@@ -709,46 +721,43 @@ void indigo_state::duart_int_w(int channel, int state)
 
 	if (m_duart_int_status)
 	{
-		LOGMASKED(LOG_PIT, "Raising DUART Interrupt: %02x\n", m_duart_int_status);
-		raise_local0_irq(LOCAL0_DUART);
+		LOGMASKED(LOG_DUART0 << channel, "Raising DUART Interrupt: %02x\n", m_duart_int_status);
+		raise_local_irq(0, LOCAL0_DUART);
 	}
 	else
 	{
-		LOGMASKED(LOG_PIT, "Lowering DUART Interrupt\n");
-		lower_local0_irq(LOCAL0_DUART);
+		LOGMASKED(LOG_DUART0 << channel, "Lowering DUART Interrupt\n");
+		lower_local_irq(0, LOCAL0_DUART);
 	}
 }
 
-void indigo_state::raise_local0_irq(uint8_t source_mask)
+void indigo_state::raise_local_irq(int channel, uint8_t source_mask)
 {
-	m_hpc.m_local_int0_status |= source_mask;
-	LOGMASKED(LOG_INT, "%s IRQ0: %02x & %08x\n", (m_hpc.m_local_int0_status & m_hpc.m_local_int0_mask) ? "Asserting" : "Clearing",
-		m_hpc.m_local_int0_status, m_hpc.m_local_int0_mask);
-	m_maincpu->set_input_line(MIPS3_IRQ0, (m_hpc.m_local_int0_status & m_hpc.m_local_int0_mask) ? ASSERT_LINE : CLEAR_LINE);
+	m_hpc.m_local_int_status[channel] |= source_mask;
+
+	bool old_status = m_hpc.m_int_status[channel];
+	m_hpc.m_int_status[channel] = (m_hpc.m_local_int_status[channel] & m_hpc.m_local_int_mask[channel]);
+
+	if (old_status != m_hpc.m_int_status[channel])
+		update_irq(channel);
 }
 
-void indigo_state::lower_local0_irq(uint8_t source_mask)
+void indigo_state::lower_local_irq(int channel, uint8_t source_mask)
 {
-	m_hpc.m_local_int0_status &= ~source_mask;
-	LOGMASKED(LOG_INT, "%s IRQ0: %02x & %08x\n", (m_hpc.m_local_int0_status & m_hpc.m_local_int0_mask) ? "Asserting" : "Clearing",
-		m_hpc.m_local_int0_status, m_hpc.m_local_int0_mask);
-	m_maincpu->set_input_line(MIPS3_IRQ0, (m_hpc.m_local_int0_status & m_hpc.m_local_int0_mask) ? ASSERT_LINE : CLEAR_LINE);
+	m_hpc.m_local_int_status[channel] &= ~source_mask;
+
+	bool old_status = m_hpc.m_int_status[channel];
+	m_hpc.m_int_status[channel] = (m_hpc.m_local_int_status[channel] & m_hpc.m_local_int_mask[channel]);
+
+	if (old_status != m_hpc.m_int_status[channel])
+		update_irq(channel);
 }
 
-void indigo_state::raise_local1_irq(uint8_t source_mask)
+void indigo_state::update_irq(int channel)
 {
-	m_hpc.m_local_int1_status |= source_mask;
-	LOGMASKED(LOG_INT, "%s IRQ1: %02x & %08x\n", (m_hpc.m_local_int1_status & m_hpc.m_local_int1_mask) ? "Asserting" : "Clearing",
-		m_hpc.m_local_int1_status, m_hpc.m_local_int1_mask);
-	m_maincpu->set_input_line(MIPS3_IRQ1, (m_hpc.m_local_int1_status & m_hpc.m_local_int1_mask) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void indigo_state::lower_local1_irq(uint8_t source_mask)
-{
-	m_hpc.m_local_int1_status &= ~source_mask;
-	LOGMASKED(LOG_INT, "%s IRQ1: %02x & %08x\n", (m_hpc.m_local_int1_status & m_hpc.m_local_int1_mask) ? "Asserting" : "Clearing",
-		m_hpc.m_local_int1_status, m_hpc.m_local_int1_mask);
-	m_maincpu->set_input_line(MIPS3_IRQ1, (m_hpc.m_local_int1_status & m_hpc.m_local_int1_mask) ? ASSERT_LINE : CLEAR_LINE);
+	LOGMASKED(LOG_INT, "%s IRQ%d: %02x & %02x\n", channel, m_hpc.m_int_status[channel] ? "Asserting" : "Clearing",
+		m_hpc.m_local_int_status[channel], m_hpc.m_local_int_mask[channel]);
+	m_maincpu->set_input_line(MIPS3_IRQ0, m_hpc.m_int_status[channel] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ32_MEMBER(indigo_state::int_r)
@@ -762,43 +771,57 @@ WRITE32_MEMBER(indigo_state::int_w)
 	LOGMASKED(LOG_INT, "%s: INT Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbd9000 + offset*4, data, mem_mask);
 }
 
-READ32_MEMBER(indigo_state::dspram_r)
+READ32_MEMBER(indigo_state::dsp_ram_r)
 {
-	LOGMASKED(LOG_INT, "%s: DSP RAM Read: %08x & %08x\n", machine().describe_context(), 0x1fbe0000 + offset*4, mem_mask);
+	LOGMASKED(LOG_DSP, "%s: DSP RAM Read: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbe0000 + offset*4, m_dsp_ram[offset], mem_mask);
 	return m_dsp_ram[offset];
 }
 
-WRITE32_MEMBER(indigo_state::dspram_w)
+WRITE32_MEMBER(indigo_state::dsp_ram_w)
 {
-	LOGMASKED(LOG_INT, "%s: DSP RAM Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbe0000 + offset*4, data, mem_mask);
+	LOGMASKED(LOG_DSP, "%s: DSP RAM Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbe0000 + offset*4, data, mem_mask);
 	COMBINE_DATA(&m_dsp_ram[offset]);
+}
+
+READ32_MEMBER(indigo_state::entry_r)
+{
+	uint32_t ret = 0;
+#if ENABLE_ENTRY_GFX
+	if (offset == 0x0014/4)
+		ret = 0x033c0000;
+#endif
+	LOGMASKED(LOG_GFX, "%s: Entry Graphics(?) Read: %08x = %08x & %08x\n", machine().describe_context(), 0x1f3f0000 + offset*4, ret, mem_mask);
+	return ret;
+}
+
+WRITE32_MEMBER(indigo_state::entry_w)
+{
+	LOGMASKED(LOG_GFX, "%s: Entry Graphics(?) Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1f3f0000 + offset*4, data, mem_mask);
 }
 
 void indigo_state::indigo_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).ram().share("share1");
-	map(0x08000000, 0x08ffffff).ram().share("share2");
-	map(0x09000000, 0x097fffff).ram().share("share3");
-	map(0x0a000000, 0x0a7fffff).ram().share("share4");
-	map(0x0c000000, 0x0c7fffff).ram().share("share5");
-	map(0x10000000, 0x107fffff).ram().share("share6");
-	map(0x18000000, 0x187fffff).ram().share("share7");
+	map(0x00000000, 0x0007ffff).ram().share("share1");
+	map(0x08000000, 0x0fffffff).ram().share("share2");
+	map(0x10000000, 0x13ffffff).ram().share("share3");
+	map(0x18000000, 0x1bffffff).ram().share("share4");
+	map(0x1f3f0000, 0x1f3fffff).rw(FUNC(indigo_state::entry_r), FUNC(indigo_state::entry_w));
 	map(0x1fb80000, 0x1fb8ffff).rw(FUNC(indigo_state::hpc_r), FUNC(indigo_state::hpc_w));
 	map(0x1fbd9000, 0x1fbd903f).rw(FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
-	map(0x1fbe0000, 0x1fbe7fff).rw(FUNC(indigo_state::dspram_r), FUNC(indigo_state::dspram_w));
+	map(0x1fbe0000, 0x1fbfffff).rw(FUNC(indigo_state::dsp_ram_r), FUNC(indigo_state::dsp_ram_w)).share("dspram");
 }
 
 void indigo3k_state::mem_map(address_map &map)
 {
 	indigo_map(map);
-	map(0x1fc00000, 0x1fc3ffff).rom().share("share2").region("user1", 0);
+	map(0x1fc00000, 0x1fc3ffff).rom().share("share5").region("user1", 0);
 }
 
 void indigo4k_state::mem_map(address_map &map)
 {
 	indigo_map(map);
 	map(0x1fa00000, 0x1fa1ffff).rw("sgi_mc", FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
-	map(0x1fc00000, 0x1fc7ffff).rom().share("share8").region("user1", 0);
+	map(0x1fc00000, 0x1fc7ffff).rom().share("share5").region("user1", 0);
 }
 
 static INPUT_PORTS_START( indigo )
@@ -816,11 +839,12 @@ void indigo_state::indigo_base(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	SCC85230(config, m_scc[0], SCC_PCLK);
+	SCC8530N(config, m_scc[0], SCC_PCLK);
 	m_scc[0]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
 	m_scc[0]->out_int_callback().set(FUNC(indigo_state::duart0_int_w));
+	m_scc[0]->out_txda_callback().set("keyboard", FUNC(sgi_keyboard_port_device::write_txd));
 
-	SCC85230(config, m_scc[1], SCC_PCLK);
+	SCC8530N(config, m_scc[1], SCC_PCLK);
 	m_scc[1]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
 	m_scc[1]->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc[1]->out_dtra_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_dtr));
@@ -830,23 +854,25 @@ void indigo_state::indigo_base(machine_config &config)
 	m_scc[1]->out_rtsb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_rts));
 	m_scc[1]->out_int_callback().set(FUNC(indigo_state::duart1_int_w));
 
-	SCC85230(config, m_scc[2], SCC_PCLK);
+	SCC8530N(config, m_scc[2], SCC_PCLK);
 	m_scc[2]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
 	m_scc[2]->out_int_callback().set(FUNC(indigo_state::duart2_int_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
-	rs232a.cts_handler().set(m_scc[1], FUNC(scc85230_device::ctsa_w));
-	rs232a.dcd_handler().set(m_scc[1], FUNC(scc85230_device::dcda_w));
-	rs232a.rxd_handler().set(m_scc[1], FUNC(scc85230_device::rxa_w));
+	rs232a.cts_handler().set(m_scc[1], FUNC(scc8530_device::ctsa_w));
+	rs232a.dcd_handler().set(m_scc[1], FUNC(scc8530_device::dcda_w));
+	rs232a.rxd_handler().set(m_scc[1], FUNC(scc8530_device::rxa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
-	rs232b.cts_handler().set(m_scc[1], FUNC(scc85230_device::ctsb_w));
-	rs232b.dcd_handler().set(m_scc[1], FUNC(scc85230_device::dcdb_w));
-	rs232b.rxd_handler().set(m_scc[1], FUNC(scc85230_device::rxb_w));
+	rs232b.cts_handler().set(m_scc[1], FUNC(scc8530_device::ctsb_w));
+	rs232b.dcd_handler().set(m_scc[1], FUNC(scc8530_device::dcdb_w));
+	rs232b.rxd_handler().set(m_scc[1], FUNC(scc8530_device::rxb_w));
+
+	SGIKBD_PORT(config, "keyboard", default_sgi_keyboard_devices, "hlekbd").rxd_handler().set(m_scc[0], FUNC(z80scc_device::rxa_w));
 
 	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(2, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+	scsi.set_slot_device(2, "cdrom", RRD45, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
 	scsi.slot(2).set_option_machine_config("cdrom", cdrom_config);
 
 	DP8573(config, m_rtc);
@@ -860,7 +886,7 @@ void indigo_state::indigo_base(machine_config &config)
 	PIT8254(config, m_pit, 0);
 	m_pit->set_clk<0>(1000000);
 	m_pit->set_clk<1>(1000000);
-	m_pit->set_clk<2>(1000000);
+	m_pit->set_clk<2>(1500000);
 	m_pit->out_handler<0>().set(FUNC(indigo_state::timer0_int));
 	m_pit->out_handler<1>().set(FUNC(indigo_state::timer1_int));
 	m_pit->out_handler<2>().set(FUNC(indigo_state::timer2_int));
