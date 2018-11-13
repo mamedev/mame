@@ -120,7 +120,7 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 	uint8_t envmode = (envmode_unk >> 4)&3; // upper bits not used?
 	uint8_t envunk = envmode_unk & 0x0f;
 
-	if (update_only) printf("(UPDATE ONLY) ");
+	if (update_only) LOG("(UPDATE ONLY) ");
 
 	LOG("voice %01x (params %04x %04x %04x %02x %02x     %02x %02x  %04x %04x %02x %02x)\n", voice, freq_mode, sampleaddrleft, sampleaddrright, unused1, sampleaddrbank, envfreq, envmode_unk, envaddrleft, envaddrright, unused2, envaddrbank);
 
