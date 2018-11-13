@@ -850,15 +850,15 @@ void xavix_state::machine_reset()
 
 	m_spritereg = 0;
 
-	m_soundregs[0] = 0;
-	m_soundregs[1] = 0;
+	m_mastervol = 0x00;
+	m_unk_snd75f8 = 0x00;
+	m_unksnd75f9 = 0x00;
+	m_unksnd75ff = 0x00;
 
-	m_soundregs[6] = 0;
-	m_soundregs[8] = 0;
-	m_soundregs[10] = 0;
-	m_soundregs[11] = 0;
-	m_soundregs[12] = 0;
-	m_soundregs[13] = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		m_sndtimer[i] = 0x00;
+	}
 
 	std::fill(std::begin(m_multparams), std::end(m_multparams), 0x00);
 	std::fill(std::begin(m_multresults), std::end(m_multresults), 0x00);

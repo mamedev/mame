@@ -321,8 +321,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// map(0x7400, 0x757f)
 
 	// Sound Control
-	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_reg16_0_r), FUNC(xavix_state::sound_reg16_0_w)); // r/w tested read/written 8 times in a row
-	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_reg16_1_r), FUNC(xavix_state::sound_reg16_1_w));
+	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_startstop_r), FUNC(xavix_state::sound_startstop_w)); // r/w tested read/written 8 times in a row
+	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_updateenv_r), FUNC(xavix_state::sound_updateenv_w));
 	map(0x75f4, 0x75f5).r(FUNC(xavix_state::sound_sta16_r)); // related to 75f0 / 75f1 (read after writing there - rad_mtrk)
 	// taitons1 after 75f7/75f8
 	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_volume_r), FUNC(xavix_state::sound_volume_w)); // r/w tested
@@ -818,12 +818,17 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	/* sound hardware */
 
-	SPEAKER(config, "mono").front_center();
+	//SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	XAVIX_SOUND(config, m_sound, MAIN_CLOCK);
 	m_sound->read_regs_callback().set(FUNC(xavix_state::sound_regram_read_cb));
 	m_sound->read_samples_callback().set(FUNC(xavix_state::sample_read));
-	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+	//m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_sound->add_route(0, "lspeaker", 1.0);
+	m_sound->add_route(1, "rspeaker", 1.0);
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xavix_i2c_state::xavix_i2c_24lc04)

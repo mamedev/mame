@@ -26,7 +26,9 @@ public:
 	auto read_regs_callback() { return m_readregs_cb.bind(); }
 	auto read_samples_callback() { return m_readsamples_cb.bind(); }
 
-	void enable_voice(int voice);
+	void enable_voice(int voice, bool update_only);
+	void disable_voice(int voice);
+	bool is_voice_enabled(int voice);
 
 protected:
 	// device-level overrides
@@ -40,10 +42,13 @@ private:
 	sound_stream *m_stream;
 
 	struct xavix_voice {
-		bool enabled;
-		uint16_t position;
+		bool enabled[2];
+		uint32_t position[2];
+		uint32_t startposition[2];
 		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
 		int type;
+		int rate;
+		int vol;
 	};
 
 	devcb_read8 m_readregs_cb;
@@ -285,10 +290,10 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_READ8_MEMBER(sound_reg16_0_r);
-	DECLARE_WRITE8_MEMBER(sound_reg16_0_w);
-	DECLARE_READ8_MEMBER(sound_reg16_1_r);
-	DECLARE_WRITE8_MEMBER(sound_reg16_1_w);
+	DECLARE_READ8_MEMBER(sound_startstop_r);
+	DECLARE_WRITE8_MEMBER(sound_startstop_w);
+	DECLARE_READ8_MEMBER(sound_updateenv_r);
+	DECLARE_WRITE8_MEMBER(sound_updateenv_w);
 
 	DECLARE_READ8_MEMBER(sound_sta16_r);
 	DECLARE_READ8_MEMBER(sound_75f5_r);
@@ -424,7 +429,11 @@ private:
 	uint8_t m_6ff0;
 	uint8_t m_video_ctrl;
 
-	uint8_t m_soundregs[0x10];
+	uint8_t m_mastervol;
+	uint8_t m_unk_snd75f8;
+	uint8_t m_unksnd75f9;
+	uint8_t m_unksnd75ff;
+	uint8_t m_sndtimer[4];
 
 	uint8_t m_timer_baseval;
 
