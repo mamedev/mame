@@ -26,6 +26,7 @@ TODO:
 - Super Stingray MCU irq controls timer speed, needs the MCU to be hooked up.
 - Super Champion Baseball "ball speed" protection
 - Fix sound CPU crashes properly on Alpha 68k II / V HW games (nested NMIs)
+- Sky Soldiers : BGM Fade out before boss battle isn't implemented
 
 General notes:
 
