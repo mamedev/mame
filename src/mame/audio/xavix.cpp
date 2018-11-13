@@ -83,8 +83,13 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 							*/
 						}
 
-						outputs[channel][outpos] += sample * 0x10;
+						outputs[channel][outpos] += sample * (m_voice[v].vol + 1);
 						m_voice[v].position[channel] += m_voice[v].rate;
+					}
+					else
+					{
+						popmessage("unsupported voice type %01x", m_voice[v].type);
+						m_voice[v].enabled[channel] = false;
 					}
 				}
 			}
@@ -152,8 +157,27 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 	{
 		// envelopes usually point to 8-byte sequences of values?
 		// when written from sound_updateenv_w (update only) then mode is usually 0x3 (key off?)
+		// mode 1 is used for most samples (key on?)
+		// mode 2 is used on monster truck
 
 		LOG("voice %01x (possible meanings mode %01x rate %04x sampleaddrleft_full %08x sampleaddrright_full %08x envaddrleft_full %08x envaddrright_full %08x envfreq %02x envmode_unk [%01x, %01x])\n", voice, freq_mode & 0x3, freq_mode >> 2, sampleaddrleft_full, sampleaddrright_full, envaddrleft_full, envaddrright_full, envfreq, envmode, envunk);
+		
+		LOG("  (ENV1 ");
+		for (int i = 0; i < 8; i++)
+		{
+			uint8_t env = m_readsamples_cb(envaddrleft_full+i);
+			LOG("%02x ", env);
+		}
+		LOG(")  ");
+
+		LOG("  (ENV2 ");
+		for (int i = 0; i < 8; i++)
+		{
+			uint8_t env = m_readsamples_cb(envaddrright_full+i);
+			LOG("%02x ", env);
+		}
+		LOG(")  \n");
+	
 	}
 
 	if (envmode_unk & 0xc0)
@@ -171,6 +195,7 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 		m_voice[voice].position[1] = sampleaddrright << 14;
 		m_voice[voice].type = freq_mode & 0x3;
 		m_voice[voice].rate = freq_mode >> 2;
+		m_voice[voice].vol = envunk;
 
 		m_voice[voice].startposition[0] = m_voice[voice].position[0]; // for looping
 		m_voice[voice].startposition[1] = m_voice[voice].position[1];
@@ -321,12 +346,12 @@ READ8_MEMBER(xavix_state::sound_sta16_r)
 READ8_MEMBER(xavix_state::sound_volume_r)
 {
 	LOG("%s: sound_volume_r\n", machine().describe_context());
-	return m_soundregs[6];
+	return m_mastervol;
 }
 
 WRITE8_MEMBER(xavix_state::sound_volume_w)
 {
-	m_soundregs[6] = data;
+	m_mastervol = data;
 	LOG("%s: sound_volume_w %02x\n", machine().describe_context(), data);
 }
 
@@ -345,25 +370,25 @@ WRITE8_MEMBER(xavix_state::sound_regbase_w)
 READ8_MEMBER(xavix_state::sound_75f8_r)
 {
 	LOG("%s: sound_75f8_r\n", machine().describe_context());
-	return m_soundregs[8];
+	return m_unk_snd75f8;
 }
 
 WRITE8_MEMBER(xavix_state::sound_75f8_w)
 {
-	m_soundregs[8] = data;
+	m_unk_snd75f8 = data;
 	LOG("%s: sound_75f8_w %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(xavix_state::sound_75f9_r)
 {
 	LOG("%s: sound_75f9_r\n", machine().describe_context());
-	return 0x00;
+	return m_unksnd75f9;
 }
 
 WRITE8_MEMBER(xavix_state::sound_75f9_w)
 {
-	m_soundregs[9] = data;
-	LOG("%s: sound_75f9_w %02x\n", machine().describe_context(), data);
+	m_unksnd75f9 = data;
+	LOG("%s: sound_75f9_w %02x\n", machine().describe_context().c_str(), data);
 }
 
 /* 75fa, 75fb, 75fc, 75fd - timers?? generate interrupts?? */
@@ -371,48 +396,48 @@ WRITE8_MEMBER(xavix_state::sound_75f9_w)
 READ8_MEMBER(xavix_state::sound_timer0_r)
 {
 	LOG("%s: sound_timer0_r\n", machine().describe_context());
-	return m_soundregs[10];
+	return m_sndtimer[0];
 }
 
 WRITE8_MEMBER(xavix_state::sound_timer0_w)
 {
-	m_soundregs[10] = data;
+	m_sndtimer[0] = data;
 	LOG("%s: sound_timer0_w %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(xavix_state::sound_timer1_r)
 {
 	LOG("%s: sound_timer1_r\n", machine().describe_context());
-	return m_soundregs[11];
+	return m_sndtimer[1];
 }
 
 WRITE8_MEMBER(xavix_state::sound_timer1_w)
 {
-	m_soundregs[11] = data;
+	m_sndtimer[1] = data;
 	LOG("%s: sound_timer1_w %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(xavix_state::sound_timer2_r)
 {
 	LOG("%s: sound_timer2_r\n", machine().describe_context());
-	return m_soundregs[12];
+	return m_sndtimer[2];
 }
 
 WRITE8_MEMBER(xavix_state::sound_timer2_w)
 {
-	m_soundregs[12] = data;
+	m_sndtimer[2] = data;
 	LOG("%s: sound_timer2_w %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(xavix_state::sound_timer3_r)
 {
 	LOG("%s: sound_timer3_r\n", machine().describe_context());
-	return m_soundregs[13];
+	return m_sndtimer[3];
 }
 
 WRITE8_MEMBER(xavix_state::sound_timer3_w)
 {
-	m_soundregs[13] = data;
+	m_sndtimer[3] = data;
 	LOG("%s: sound_timer3_w %02x\n", machine().describe_context(), data);
 }
 
@@ -446,7 +471,7 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 
 WRITE8_MEMBER(xavix_state::sound_75ff_w)
 {
-	m_soundregs[15] = data;
+	m_unksnd75ff = data;
 	LOG("%s: sound_75ff_w %02x\n", machine().describe_context(), data);
 }
 

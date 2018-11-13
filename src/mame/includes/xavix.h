@@ -48,6 +48,7 @@ private:
 		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
 		int type;
 		int rate;
+		int vol;
 	};
 
 	devcb_read8 m_readregs_cb;
@@ -428,7 +429,11 @@ private:
 	uint8_t m_6ff0;
 	uint8_t m_video_ctrl;
 
-	uint8_t m_soundregs[0x10];
+	uint8_t m_mastervol;
+	uint8_t m_unk_snd75f8;
+	uint8_t m_unksnd75f9;
+	uint8_t m_unksnd75ff;
+	uint8_t m_sndtimer[4];
 
 	uint8_t m_timer_baseval;
 
