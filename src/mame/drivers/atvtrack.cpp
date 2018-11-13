@@ -711,6 +711,17 @@ ROM_START( smashdrv ) // World Version: 3.3, Version 3D: 1.9, Checksum: 707A
 	// ic21 unpopulated
 ROM_END
 
+ROM_START( smashdrvs ) // Spain/Portugal Version: 3.3, Version 3D: 1.9, Checksum: 707B
+	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
+	ROM_LOAD("prg_spain.ic23", 0x0000000, 0x0400000, CRC(66b80283) SHA1(7d569670fd96aaa99da24378c77a265bc2ddc91c) )
+
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
+	ROM_LOAD32_WORD("sdrb.ic14",    0x00000002, 0x01000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
+	ROM_LOAD32_WORD("sdrc.ic20",    0x02000000, 0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) )
+	// ic21 unpopulated
+ROM_END
+
 ROM_START( smashdrvb ) // UK Version: 3.3, Version 3D: 1.9, Checksum: 707C
 	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
 	ROM_LOAD("prg.ic23", 0x0000000, 0x0400000, CRC(5cc6d3ac) SHA1(0c8426774212d891796b59c95b8c70f64db5b67a) )
@@ -729,3 +740,4 @@ GAME( 2002, gfootbal,  0,        atvtrack, atvtrack, atvtrack_state, empty_init,
 // almost identical PCB, FlashROM mapping and master registers addresses different
 GAME( 2000, smashdrv,  0,        smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco",                       "Smashing Drive (World)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, smashdrvb, smashdrv, smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco (Brent Sales license)", "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrvs, smashdrv, smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Smashing Drive (Spain, Portugal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
