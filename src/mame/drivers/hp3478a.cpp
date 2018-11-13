@@ -10,29 +10,29 @@
 * Some of this will probably be applicable to HP 3468A units too.
 *
 * Current status : runs, AD LINK ERROR on stock ROM due to unimplemented
-* - patching the AD comms, we get to "UNCALIBRATED" due to no CALRAM
+* - patching the AD comms, we get to "OVLD C VDC"
 *
 *
 * TODO kindof important
 * * keypad on port1
-* * do something for analog CPU serial link (not quite uart)
 *
 * TODO next level
 * * DIP switches
-* * proper CAL RAM (see NVRAM() macro ?)
-* * ability to preload CAL RAM on startup ("media" or "software" ?)
+* * do something for analog CPU serial link (not quite uart), or dump+emulate CPU
 * * better display render and layout
+* * "cal enable" switch
 *
 * TODO level 9000
 * * Connect this with the existing i8291.cpp driver
 * * dump + add analog CPU (8049)
+* * validate one single chipselect active when doing external access (movx)
 
 
 **** Hardware details (refer to service manual for schematics)
 Main CPU : i8039 , no internal ROM
 Analog (floating) CPU : i8049, internal ROM (never dumped ?)
-ROM : 2764 (64kbit, org 8kB) . Stores calibration data
-RAM : 5101 , 256 * 4bit
+ROM : 2764 (64kbit, org 8kB)
+RAM : 5101 , 256 * 4bit (!), battery-backed calibration data
 GPIB:  i8291
 Display : unknown; similar protocol for HP 3457A documented on
 	http://www.eevblog.com/forum/projects/led-display-for-hp-3457a-multimeter-i-did-it-)/25/
@@ -60,9 +60,6 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #include "includes/hp3478a.h"
 #include "hp3478a.lh"
 
-#include "cpu/mcs48/mcs48.h"
-
-
 
 #define CPU_CLOCK       XTAL(5'856'000)
 
@@ -79,6 +76,10 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 	//don't care about CK2 since it's supposed to be a delayed copy of CK1
 #define DISP_MASK (DISP_PWO | DISP_SYNC | DISP_ISA | DISP_IWA | DISP_CK1)	//used for edge detection
 
+// IO banking : indexes of m_iobank maps
+#define CALRAM_ENTRY 0
+#define GPIB_ENTRY 1
+#define DIP_ENTRY 2
 
 /**** optional debug outputs, must be before #include */
 #define DEBUG_PORTS (LOG_GENERAL << 1)
@@ -87,8 +88,9 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #define DEBUG_KEYPAD (LOG_GENERAL << 4)
 #define DEBUG_LCD (LOG_GENERAL << 5)	//low level
 #define DEBUG_LCD2 (LOG_GENERAL << 6)
+#define DEBUG_CAL (LOG_GENERAL << 7)
 
-#define VERBOSE (DEBUG_KEYPAD)
+#define VERBOSE (DEBUG_CAL)
 
 #include "logmacro.h"
 
@@ -108,9 +110,33 @@ READ8_MEMBER( hp3478a_state::p1read )
 	return data;
 }
 
+READ8_MEMBER( hp3478a_state::dipread )
+{
+	logerror("dip read unimpl\n");
+	return 0;
+}
+
+/** a lot of stuff multiplexed on the P2 pins.
+ * parse the chipselect lines, A12 line, and LCD interface.
+ */
 WRITE8_MEMBER( hp3478a_state::p2write )
 {
 	LOGMASKED(DEBUG_PORTS, "port2 write: %02X\n", data);
+
+	// check which CS line is active. No collision checking is done here
+	// because the LCD interface reuses those pins and we'd get spurious errors.
+	// So the last evaluated condition will be kept.
+
+	if (!(data & CALRAM_CS)) {
+		//will read lower 4 bits from calram
+		m_iobank->set_bank(CALRAM_ENTRY);
+	}
+	if (!(data & DIPSWITCH_CS)) {
+		m_iobank->set_bank(DIP_ENTRY);
+	}
+	if (!(data & GPIB_CS)) {
+		m_iobank->set_bank(GPIB_ENTRY);
+	}
 
 	if ((p2_oldstate ^ data) & A12_PIN) {
 		/* A12 pin state changed */
@@ -131,77 +157,7 @@ WRITE8_MEMBER( hp3478a_state::p2write )
 	p2_oldstate = data;
 }
 
-/** external bus read callback
- * runs when main cpu accesses an external IC, e.g. GPIB or CAL RAM.
- */
-READ8_MEMBER( hp3478a_state::busread )
-{
-	uint8_t p2_state;
-	uint8_t data = 0;
-	unsigned found = 0;
 
-	p2_state = m_maincpu->p2_r();
-	// check which CS line is active.
-
-	if (!(p2_state & CALRAM_CS)) {
-		//XXX read from calram
-		found += 1;
-		LOGMASKED(DEBUG_BUS, "read 0x%02X from CAL RAM[0x%02X]\n", data, offset);
-	}
-	if (!(p2_state & DIPSWITCH_CS)) {
-		//XXX parse inputs
-		found += 1;
-		LOGMASKED(DEBUG_BUS, "read DIP state : 0x%02X\n", data);
-	}
-	if (!(p2_state & GPIB_CS)) {
-		found += 1 ;
-		LOGMASKED(DEBUG_BUS, "read GPIB register %X\n", offset & 0x07);
-	}
-
-	if (!found) {
-		logerror("Bus read with no CS active !\n");
-		return 0xFF;	//pulled up
-	}
-
-	if (found > 1) {
-		logerror("Bus read with more than one CS active !\n");
-	}
-	return data;
-}
-
-
-
-WRITE8_MEMBER( hp3478a_state::buswrite )
-{
-	uint8_t p2_state;
-	unsigned found = 0;
-
-	p2_state = m_maincpu->p2_r();
-	// check which CS line is active.
-
-	if (!(p2_state & CALRAM_CS)) {
-		//XXX write from calram
-		found += 1;
-		LOGMASKED(DEBUG_BUS, "write 0x%02X to CAL RAM[0x%02X]\n", data, offset);
-	}
-	if (!(p2_state & DIPSWITCH_CS)) {
-		logerror("Illegal write to DIP switch !\n");
-		found += 1;
-	}
-	if (!(p2_state & GPIB_CS)) {
-		found += 1 ;
-		LOGMASKED(DEBUG_BUS, "GPIB register %X write 0x%02X\n", offset & 0x07, data);
-	}
-
-
-	if (!found) {
-		logerror("Bus write with no CS active !\n");
-	}
-
-	if (found > 1) {
-		logerror("Bus write with more than one CS active !\n");
-	}
-}
 
 
 /**** LCD emulation
@@ -335,6 +291,10 @@ static uint32_t lcd_set_display(uint32_t segin)
 #define DISP_ISA_WB 0x1A	//hi nib
 #define DISP_ISA_WC 0x2A	// "extended bit" ?
 
+/** LCD serial interface state machine. I cheat and don't implement all commands.
+ * Also, it's not clear when exactly the display should be updated. After each regA/regB write
+ * seems to generate some glitches. After PWO deselect causes some half-written text to appear sometimes.
+ */
 void hp3478a_state::lcd_interface(uint8_t p2new)
 {
 	bool pwo_state, sync_state, isa_state, iwa_state;
@@ -358,7 +318,7 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 
 	// CK1 clock positive edge
 	if (!pwo_state) {
-		//not selected, reset everything.
+		//not selected, reset everything
 		LOGMASKED(DEBUG_LCD, "LCD : state=IDLE, PWO deselected, %d stray bits(0x...%02X)\n",lcd_bitcount, lcd_bitbuf & 0xFF);
 		m_lcdstate = lcd_state::IDLE;
 		lcd_bitcount = 0;
@@ -466,7 +426,7 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 				lcd_update_hinib(lcd_chrbuf, lcd_bitbuf);
 				lcd_map_chars();
 				std::transform(std::begin(lcd_segdata), std::end(lcd_segdata), std::begin(*m_outputs), lcd_set_display);
-				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %I64X, text=%s\n", lcd_bitbuf, (char *) lcd_text);
+				LOGMASKED(DEBUG_LCD2, "LCD : write reg B (lonib) %I64X, text=%s\n", lcd_bitbuf, (char *) lcd_text);
 				break;
 			default:
 				//discard
@@ -491,6 +451,7 @@ void hp3478a_state::machine_start()
 
 	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", (unsigned) 0);
 	m_outputs->resolve();
+
 }
 
 /******************************************************************************
@@ -505,8 +466,21 @@ void hp3478a_state::i8039_map(address_map &map)
 void hp3478a_state::i8039_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0,0xff).rw(FUNC(hp3478a_state::busread), FUNC(hp3478a_state::buswrite));	//"external" access callbacks
+	map(0x00, 0xff).m(m_iobank, FUNC(address_map_bank_device::amap8));
 }
+
+/* depending on the P2 port state, different chipselect lines are activated, which
+ * affect the subsequent external accesses (movx)
+ * The addresses in here have nothing to do with the mcs48 address space.
+ */
+void hp3478a_state::io_bank(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x0ff).ram().region("nvram", 0).share("nvram");
+	map(0x100, 0x107).ram().share("gpibregs");	//XXX TODO : connect to i8291.cpp
+	map(0x200, 0x2ff).r(FUNC(hp3478a_state::dipread));
+}
+
 
 /******************************************************************************
  Input Ports
@@ -527,8 +501,15 @@ void hp3478a_state::hp3478a(machine_config &config)
 	mcu.p1_out_cb().set(FUNC(hp3478a_state::p1write));
 	mcu.p2_out_cb().set(FUNC(hp3478a_state::p2write));
 
-	// video
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	ADDRESS_MAP_BANK(config, m_iobank, 0);
+	m_iobank->set_map(&hp3478a_state::io_bank);
+	m_iobank->set_data_width(8);
+	m_iobank->set_addr_width(18);
+	m_iobank->set_stride(0x100);
+
+	// video
 	config.set_default_layout(layout_hp3478a);
 }
 
@@ -537,7 +518,10 @@ void hp3478a_state::hp3478a(machine_config &config)
 ******************************************************************************/
 ROM_START( hp3478a )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD_OPTIONAL("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))	//main CPU ROM, can match other datecodes too
+	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))	//main CPU ROM, can match other datecodes too
+
+	ROM_REGION( 0x100, "nvram", 0 )	/* Calibration RAM, battery-backed */
+	ROM_LOAD_OPTIONAL( "calram.bin", 0, 0x100, CRC(0))
 ROM_END
 
 /******************************************************************************

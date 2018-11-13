@@ -12,6 +12,8 @@
 #define MAME_INCLUDES_HP3478A_H
 
 #include "cpu/mcs48/mcs48.h"
+#include "machine/bankdev.h"
+#include "machine/nvram.h"
 
 /* port pin/bit defs */
 #define P20	(1 << 0)
@@ -29,15 +31,15 @@ class hp3478a_state : public driver_device
 {
 public:
 	hp3478a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_bank0(*this, "bank0")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_nvram(*this, "nvram")
+		, m_bank0(*this, "bank0")
+		, m_iobank(*this, "iobank")
 	{
 	}
 
 	void hp3478a(machine_config &config);
-	void i8039_io(address_map &map);
-	void i8039_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -48,9 +50,16 @@ protected:
 	DECLARE_WRITE8_MEMBER(p2write);
 	DECLARE_READ8_MEMBER(busread);
 	DECLARE_WRITE8_MEMBER(buswrite);
+	DECLARE_READ8_MEMBER(dipread);
+
+	void io_bank(address_map &map);
+	void i8039_io(address_map &map);
+	void i8039_map(address_map &map);
 
 	required_device<i8039_device> m_maincpu;
+	required_device<nvram_device> m_nvram;
 	required_memory_bank m_bank0;
+	required_device<address_map_bank_device> m_iobank;
 
 	/////////////// stuff for internal LCD emulation
 	// could be split to a separate driver ?
