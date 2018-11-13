@@ -105,7 +105,7 @@ protected:
 	void advance_chain(address_space &space);
 	void scsi_dma();
 
-	void do_rex_command(uint32_t command);
+	void do_rex_command();
 
 	static void cdrom_config(device_t *device);
 	void indigo_map(address_map &map);
@@ -204,6 +204,7 @@ protected:
 		uint32_t m_write_addr;
 		uint32_t m_control;
 
+		uint32_t m_command;
 		uint32_t m_x_start_i;
 		uint32_t m_y_start_i;
 		uint32_t m_xy_move;
@@ -317,6 +318,7 @@ void indigo_state::machine_start()
 	save_item(NAME(m_lg1.m_config_sel));
 	save_item(NAME(m_lg1.m_write_addr));
 	save_item(NAME(m_lg1.m_control));
+	save_item(NAME(m_lg1.m_command));
 	save_item(NAME(m_lg1.m_x_start_i));
 	save_item(NAME(m_lg1.m_y_start_i));
 	save_item(NAME(m_lg1.m_xy_move));
@@ -903,7 +905,7 @@ READ32_MEMBER(indigo_state::entry_r)
 	return ret;
 }
 
-void indigo_state::do_rex_command(uint32_t command)
+void indigo_state::do_rex_command()
 {
 	/*
 	REX15_OP_FLAG_BLOCK			= 0x00000008,
@@ -917,7 +919,11 @@ void indigo_state::do_rex_command(uint32_t command)
 	REX15_OP_FLAG_ZOPAQUE		= 0x00800000,
 	REX15_OP_FLAG_ZCONTINUE		= 0x01000000,
 	*/
-	if (command == 0x30000329)
+	if (m_lg1.m_command == 0)
+	{
+		return;
+	}
+	else if (m_lg1.m_command == 0x30000329)
 	{
 		for (uint32_t y = m_lg1.m_y_start_i; y <= m_lg1.m_y_end_i; y++)
 		{
@@ -927,20 +933,39 @@ void indigo_state::do_rex_command(uint32_t command)
 			}
 		}
 	}
+	else if (m_lg1.m_command == 0x300005b9)
+	{
+		uint32_t start_x = m_lg1.m_x_start_i;
+		uint32_t start_y = m_lg1.m_y_start_i;
+		uint32_t end_x = m_lg1.m_x_end_i;
+		for (uint32_t x = start_x; x <= end_x && x < (start_x + 32); x++)
+		{
+			if (BIT(m_lg1.m_z_pattern, 31 - (x - start_x)))
+			{
+				m_framebuffer[start_y*1024 + x] = m_lg1.m_color_red_i;
+			}
+		}
+		start_y--;
+		m_lg1.m_y_start_i = start_y;
+	}
 	else
 	{
-		LOGMASKED(LOG_GFX, "%s: Unknown LG1 command: %08x\n", command);
+		LOGMASKED(LOG_GFX, "%s: Unknown LG1 command: %08x\n", machine().describe_context(), m_lg1.m_command);
 	}
 }
 
 WRITE32_MEMBER(indigo_state::entry_w)
 {
+	bool go = (offset >= REX15_PAGE1_GO/4) || (offset >= REX15_PAGE0_GO/4 && offset < REX15_PAGE1_SET/4);
+
 	switch (offset)
 	{
 		case (REX15_PAGE0_SET+REX15_P0REG_COMMAND)/4:
 		case (REX15_PAGE0_GO+REX15_P0REG_COMMAND)/4:
+			m_lg1.m_command = data;
 			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 Command Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
-			do_rex_command(data);
+			if (go || !(m_lg1.m_command & REX15_OP_FLAG_ENZPATTERN))
+				do_rex_command();
 			break;
 		case (REX15_PAGE0_SET+REX15_P0REG_XSTARTI)/4:
 		case (REX15_PAGE0_GO+REX15_P0REG_XSTARTI)/4:
@@ -981,6 +1006,8 @@ WRITE32_MEMBER(indigo_state::entry_w)
 		case (REX15_PAGE0_GO+REX15_P0REG_ZPATTERN)/4:
 			m_lg1.m_z_pattern = data;
 			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 ZPattern Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			if (go)
+				do_rex_command();
 			break;
 		case (REX15_PAGE0_SET+REX15_P0REG_XENDI)/4:
 		case (REX15_PAGE0_GO+REX15_P0REG_XENDI)/4:

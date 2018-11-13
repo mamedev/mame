@@ -239,13 +239,12 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 		/* loop over columns */
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
-			uint32_t ram_pixel = (*src) & 0xf8f8f8;
 			uint32_t cursor_pixel = 0;
 			if (x >= (m_vc2.m_cursor_x - 31) && x <= m_vc2.m_cursor_x && y >= (m_vc2.m_cursor_y - 31) && y <= m_vc2.m_cursor_y && enable_cursor)
 			{
 				cursor_pixel = get_cursor_pixel(x - ((int)m_vc2.m_cursor_x - 31), y - ((int)m_vc2.m_cursor_y - 31));
 			}
-			*dest++ = cursor_pixel ? cursor_pixel : ram_pixel;
+			*dest++ = cursor_pixel ? cursor_pixel : *src;
 			src++;
 		}
 	}
