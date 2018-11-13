@@ -321,8 +321,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// map(0x7400, 0x757f)
 
 	// Sound Control
-	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_reg16_0_r), FUNC(xavix_state::sound_reg16_0_w)); // r/w tested read/written 8 times in a row
-	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_reg16_1_r), FUNC(xavix_state::sound_reg16_1_w));
+	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_startstop_r), FUNC(xavix_state::sound_startstop_w)); // r/w tested read/written 8 times in a row
+	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_updateenv_r), FUNC(xavix_state::sound_updateenv_w));
 	map(0x75f4, 0x75f5).r(FUNC(xavix_state::sound_sta16_r)); // related to 75f0 / 75f1 (read after writing there - rad_mtrk)
 	// taitons1 after 75f7/75f8
 	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_volume_r), FUNC(xavix_state::sound_volume_w)); // r/w tested

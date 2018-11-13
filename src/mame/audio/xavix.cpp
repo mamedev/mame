@@ -93,47 +93,69 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 	}
 }
 
-void xavix_sound_device::enable_voice(int voice)
+void xavix_sound_device::enable_voice(int voice, bool update_only)
 {
-	LOG("voice %d 0->1 ", voice);
 	int voicemembase = voice * 0x10;
 
-	uint16_t param1 = (m_readregs_cb(voicemembase + 0x1) << 8) | (m_readregs_cb(voicemembase + 0x0)); // sample rate maybe?
-	uint16_t param2 = (m_readregs_cb(voicemembase + 0x3) << 8) | (m_readregs_cb(voicemembase + 0x2)); // seems to be a start position
-	uint16_t param3 = (m_readregs_cb(voicemembase + 0x5) << 8) | (m_readregs_cb(voicemembase + 0x4)); // another start position? sometimes same as param6
-	uint8_t param4a = (m_readregs_cb(voicemembase + 0x7));
-	uint8_t param4b = (m_readregs_cb(voicemembase + 0x6)); // upper 8 bits of memory address? 8 bits unused?
+	uint16_t freq_mode = (m_readregs_cb(voicemembase + 0x1) << 8) | (m_readregs_cb(voicemembase + 0x0)); // sample rate maybe?
+	uint16_t sampleaddrleft = (m_readregs_cb(voicemembase + 0x3) << 8) | (m_readregs_cb(voicemembase + 0x2)); // seems to be a start position
+	uint16_t sampleaddrright = (m_readregs_cb(voicemembase + 0x5) << 8) | (m_readregs_cb(voicemembase + 0x4)); // another start position? sometimes same as envaddrleft
+	uint8_t unused1 = (m_readregs_cb(voicemembase + 0x7)); // data gets written but doesn't look like it's used by the chip?
+	uint8_t sampleaddrbank = (m_readregs_cb(voicemembase + 0x6)); // upper 8 bits of memory address? 8 bits unused?
 
 	// these don't seem to be populated as often, maybe some kind of effect / envelope filter?
-	uint8_t param5a = (m_readregs_cb(voicemembase + 0x9));
-	uint8_t param5b = (m_readregs_cb(voicemembase + 0x8));
-	uint16_t param6 = (m_readregs_cb(voicemembase + 0xb) << 8) | (m_readregs_cb(voicemembase + 0xa)); // seems to be a start position
-	uint16_t param7 = (m_readregs_cb(voicemembase + 0xd) << 8) | (m_readregs_cb(voicemembase + 0xc)); // another start position? sometimes same as param6
-	uint8_t param8a = (m_readregs_cb(voicemembase + 0xf));
-	uint8_t param8b = (m_readregs_cb(voicemembase + 0xe)); // upper 8 bits of memory address? 8 bits unused (or not unused?, get populated with increasing values sometimes?)
-	LOG(" (params %04x %04x %04x %02x %02x     %02x %02x  %04x %04x %02x %02x)\n", param1, param2, param3, param4a, param4b, param5a, param5b, param6, param7, param8a, param8b);
+	uint8_t envfreq = (m_readregs_cb(voicemembase + 0x9));
+	uint8_t envmode_unk = (m_readregs_cb(voicemembase + 0x8));
+	uint16_t envaddrleft = (m_readregs_cb(voicemembase + 0xb) << 8) | (m_readregs_cb(voicemembase + 0xa)); // seems to be a start position, lower byte is direct value, not address in some modes??
+	uint16_t envaddrright = (m_readregs_cb(voicemembase + 0xd) << 8) | (m_readregs_cb(voicemembase + 0xc)); // another start position? sometimes same as envaddrleft
+	uint8_t unused2 = (m_readregs_cb(voicemembase + 0xf)); // data gets written but doesn't look like it's used by the chip?
+	uint8_t envaddrbank = (m_readregs_cb(voicemembase + 0xe)); // upper 8 bits of memory address? 8 bits unused (or not unused?, get populated with increasing values sometimes?)
 
-	uint32_t address1 = (param2 | param4b << 16) & 0x00ffffff; // definitely addresses based on rad_snow
-	uint32_t address2 = (param3 | param4b << 16) & 0x00ffffff;
+	uint32_t sampleaddrleft_full = (sampleaddrleft | sampleaddrbank << 16) & 0x00ffffff; // definitely addresses based on rad_snow
+	uint32_t sampleaddrright_full = (sampleaddrright | sampleaddrbank << 16) & 0x00ffffff;
 
-	uint32_t address3 = (param6 | param8b << 16) & 0x00ffffff; // still looks like addresses, sometimes pointing at RAM
-	uint32_t address4 = (param7 | param8b << 16) & 0x00ffffff;
+	uint32_t envaddrleft_full = (envaddrleft | envaddrbank << 16) & 0x00ffffff; // still looks like addresses, sometimes pointing at RAM
+	uint32_t envaddrright_full = (envaddrright | envaddrbank << 16) & 0x00ffffff;
 
+	uint8_t envmode = (envmode_unk >> 4)&3; // upper bits not used?
+	uint8_t envunk = envmode_unk & 0x0f;
 
-	LOG(" (possible meanings mode %01x rate %04x address1 %08x address2 %08x address3 %08x address4 %08x)\n", param1 & 0x3, param1 >> 2, address1, address2, address3, address4);
+	if (update_only) printf("(UPDATE ONLY) ");
 
-	m_voice[voice].enabled[0] = true;
-	m_voice[voice].enabled[1] = true;
+	LOG("voice %01x (params %04x %04x %04x %02x %02x     %02x %02x  %04x %04x %02x %02x)\n", voice, freq_mode, sampleaddrleft, sampleaddrright, unused1, sampleaddrbank, envfreq, envmode_unk, envaddrleft, envaddrright, unused2, envaddrbank);
 
-	m_voice[voice].bank = param4b;
-	m_voice[voice].position[0] = param2 << 14;
-	m_voice[voice].position[1] = param3 << 14;
-	m_voice[voice].type = param1 & 0x3; 
-	m_voice[voice].rate = param1 >> 2; 
-	
-	m_voice[voice].startposition[0] = m_voice[voice].position[0]; // for looping
-	m_voice[voice].startposition[1] = m_voice[voice].position[1];
+	if (envmode == 0)
+	{
+		// mode 0 doesn't seem to use a second pair of addresses for the envelope but instead a fixed value in the lower part of the address registers?, usually used with non-looping samples too? upper bytes of address end up being leftovers from previous sounds
+		LOG("voice %01x (possible meanings mode %01x rate %04x sampleaddrleft_full %08x sampleaddrright_full %08x envvalue_left %02x envvalue_right %02x envfreq %02x envmode_unk [%01x, %01x])\n", voice, freq_mode & 0x3, freq_mode >> 2, sampleaddrleft_full, sampleaddrright_full, envaddrleft_full & 0xff, envaddrright_full & 0xff, envfreq, envmode, envunk);
+	}
+	else
+	{
+		// envelopes usually point to 8-byte sequences of values?
+		// when written from sound_updateenv_w (update only) then mode is usually 0x3 (key off?)
 
+		LOG("voice %01x (possible meanings mode %01x rate %04x sampleaddrleft_full %08x sampleaddrright_full %08x envaddrleft_full %08x envaddrright_full %08x envfreq %02x envmode_unk [%01x, %01x])\n", voice, freq_mode & 0x3, freq_mode >> 2, sampleaddrleft_full, sampleaddrright_full, envaddrleft_full, envaddrright_full, envfreq, envmode, envunk);
+	}
+
+	if (envmode_unk & 0xc0)
+	{
+		LOG("   (unexpected bits set in envmode_unk %02x)\n", envmode_unk & 0xc0);
+	}
+
+	if (!update_only)
+	{
+		m_voice[voice].enabled[0] = true;
+		m_voice[voice].enabled[1] = true;
+
+		m_voice[voice].bank = sampleaddrbank;
+		m_voice[voice].position[0] = sampleaddrleft << 14;
+		m_voice[voice].position[1] = sampleaddrright << 14;
+		m_voice[voice].type = freq_mode & 0x3;
+		m_voice[voice].rate = freq_mode >> 2;
+
+		m_voice[voice].startposition[0] = m_voice[voice].position[0]; // for looping
+		m_voice[voice].startposition[1] = m_voice[voice].position[1];
+	}
 
 	// 0320 (800) == 8000hz
 	// 4000 (16384) == 163840hz ? = 163.840kHz
@@ -165,13 +187,13 @@ READ8_MEMBER(xavix_state::sound_regram_read_cb)
 
 
 /* 75f0, 75f1 - 2x8 bits (16 voices?) */
-READ8_MEMBER(xavix_state::sound_reg16_0_r)
+READ8_MEMBER(xavix_state::sound_startstop_r)
 {
-	LOG("%s: sound_reg16_0_r %02x\n", machine().describe_context(), offset);
+	LOG("%s: sound_startstop_r %02x\n", machine().describe_context(), offset);
 	return m_soundreg16_0[offset];
 }
 
-WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
+WRITE8_MEMBER(xavix_state::sound_startstop_w)
 {
 	/* looks like the sound triggers
 
@@ -196,9 +218,9 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 	  data & 0x80 - voice 15 (registers at regbase + 0xf0) eg 0x3bf0 - 0x3bff in monster truck
 */
 	if (offset == 0)
-		LOG("%s: sound_reg16_0_w %02x, %02x (%d %d %d %d %d %d %d %d - - - - - - - -)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
+		LOG("%s: sound_startstop_w %02x, %02x (%d %d %d %d %d %d %d %d - - - - - - - -)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
 	else
-		LOG("%s: sound_reg16_0_w %02x, %02x (- - - - - - - - %d %d %d %d %d %d %d %d)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
+		LOG("%s: sound_startstop_w %02x, %02x (- - - - - - - - %d %d %d %d %d %d %d %d)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
 
 
 	for (int i = 0; i < 8; i++)
@@ -211,7 +233,7 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 
 			if (voice_state)
 			{
-				m_sound->enable_voice(voice);
+				m_sound->enable_voice(voice, false);
 			}
 			else
 			{
@@ -224,21 +246,40 @@ WRITE8_MEMBER(xavix_state::sound_reg16_0_w)
 }
 
 /* 75f0, 75f1 - 2x8 bits (16 voices?) */
-READ8_MEMBER(xavix_state::sound_reg16_1_r)
+READ8_MEMBER(xavix_state::sound_updateenv_r)
 {
-	LOG("%s: sound_reg16_1_r %02x\n", machine().describe_context(), offset);
+	LOG("%s: sound_updateenv_r %02x\n", machine().describe_context(), offset);
 	return m_soundreg16_1[offset];
 }
 
-WRITE8_MEMBER(xavix_state::sound_reg16_1_w)
+WRITE8_MEMBER(xavix_state::sound_updateenv_w)
 {
-	// used to update envelopes without restarting sound?
-	m_soundreg16_1[offset] = data;
-
 	if (offset == 0)
-		LOG("%s: sound_reg16_1_w %02x, %02x (%d %d %d %d %d %d %d %d - - - - - - - -)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
+		LOG("%s: sound_updateenv_w %02x, %02x (%d %d %d %d %d %d %d %d - - - - - - - -)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
 	else
-		LOG("%s: sound_reg16_1_w %02x, %02x (- - - - - - - - %d %d %d %d %d %d %d %d)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
+		LOG("%s: sound_updateenv_w %02x, %02x (- - - - - - - - %d %d %d %d %d %d %d %d)\n", machine().describe_context(), offset, data, (data & 0x01) ? 1 : 0, (data & 0x02) ? 1 : 0, (data & 0x04) ? 1 : 0, (data & 0x08) ? 1 : 0, (data & 0x10) ? 1 : 0, (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0, (data & 0x80) ? 1 : 0);
+
+	// used to update envelopes without restarting sound? for key-off events?
+	for (int i = 0; i < 8; i++)
+	{
+		const int voice_state = (data & (1 << i));
+		const int old_voice_state = (m_soundreg16_1[offset] & (1 << i));
+		if (voice_state != old_voice_state)
+		{
+			const int voice = (offset * 8 + i);
+
+			if (voice_state)
+			{
+				m_sound->enable_voice(voice, true);
+			}
+			else
+			{
+				m_sound->disable_voice(voice);
+			}
+		}
+	}
+
+	m_soundreg16_1[offset] = data;
 }
 
 

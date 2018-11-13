@@ -26,7 +26,7 @@ public:
 	auto read_regs_callback() { return m_readregs_cb.bind(); }
 	auto read_samples_callback() { return m_readsamples_cb.bind(); }
 
-	void enable_voice(int voice);
+	void enable_voice(int voice, bool update_only);
 	void disable_voice(int voice);
 
 protected:
@@ -288,10 +288,10 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_READ8_MEMBER(sound_reg16_0_r);
-	DECLARE_WRITE8_MEMBER(sound_reg16_0_w);
-	DECLARE_READ8_MEMBER(sound_reg16_1_r);
-	DECLARE_WRITE8_MEMBER(sound_reg16_1_w);
+	DECLARE_READ8_MEMBER(sound_startstop_r);
+	DECLARE_WRITE8_MEMBER(sound_startstop_w);
+	DECLARE_READ8_MEMBER(sound_updateenv_r);
+	DECLARE_WRITE8_MEMBER(sound_updateenv_w);
 
 	DECLARE_READ8_MEMBER(sound_sta16_r);
 	DECLARE_READ8_MEMBER(sound_75f5_r);
