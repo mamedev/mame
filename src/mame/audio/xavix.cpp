@@ -93,8 +93,27 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 	}
 }
 
+bool xavix_sound_device::is_voice_enabled(int voice)
+{
+	m_stream->update();
+
+/*
+	if ((m_voice[voice].enabled[0] == true) || (m_voice[voice].enabled[1] == true))
+		return true;
+	else
+		return false;
+*/
+	if ((m_voice[voice].enabled[0] == true) && (m_voice[voice].enabled[1] == true))
+		return true;
+	else
+		return false;
+}
+
+
 void xavix_sound_device::enable_voice(int voice, bool update_only)
 {
+	m_stream->update();
+
 	int voicemembase = voice * 0x10;
 
 	uint16_t freq_mode = (m_readregs_cb(voicemembase + 0x1) << 8) | (m_readregs_cb(voicemembase + 0x0)); // sample rate maybe?
@@ -286,8 +305,16 @@ WRITE8_MEMBER(xavix_state::sound_updateenv_w)
 /* 75f4, 75f5 - 2x8 bits (16 voices?) status? */
 READ8_MEMBER(xavix_state::sound_sta16_r)
 {
-	// used with 75f0/75f1
-	return machine().rand();
+	uint8_t ret = 0x00;
+
+	for (int i = 0; i < 8; i++)
+	{
+		const int voice = (offset * 8 + i);
+		const bool enabled = m_sound->is_voice_enabled(voice);
+		ret |= enabled ? 1 << i : 0;
+	}
+
+	return ret;
 }
 
 /* 75f6 - master volume control? */

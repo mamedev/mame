@@ -28,6 +28,7 @@ public:
 
 	void enable_voice(int voice, bool update_only);
 	void disable_voice(int voice);
+	bool is_voice_enabled(int voice);
 
 protected:
 	// device-level overrides
