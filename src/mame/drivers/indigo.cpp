@@ -31,10 +31,11 @@
 #include "machine/sgi.h"
 #include "machine/wd33c93.h"
 #include "machine/z80scc.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
-#define ENABLE_ENTRY_GFX	(0)
+#define ENABLE_ENTRY_GFX	(1)
 
 #define LOG_UNKNOWN		(1 << 0)
 #define LOG_INT			(1 << 1)
@@ -67,6 +68,7 @@ public:
 		, m_pit(*this, "pit")
 		, m_rtc(*this, "rtc")
 		, m_dsp_ram(*this, "dspram")
+		, m_palette(*this, "palette")
 	{
 	}
 
@@ -106,6 +108,8 @@ protected:
 	static void cdrom_config(device_t *device);
 	void indigo_map(address_map &map);
 
+	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	enum
 	{
 		LOCAL0_FIFO_GIO0	= 0x01,
@@ -123,6 +127,52 @@ protected:
 		LOCAL1_ACFAIL		= 0x20,
 		LOCAL1_VIDEO		= 0x40,
 		LOCAL1_RETRACE_GIO2	= 0x80
+	};
+
+	enum
+	{
+		REX15_PAGE0_SET				= 0x00000000,
+		REX15_PAGE0_GO				= 0x00000800,
+		REX15_PAGE1_SET				= 0x00004790,
+		REX15_PAGE1_GO				= 0x00004f90,
+
+		REX15_P0REG_COMMAND			= 0x00000000,
+		REX15_P0REG_XSTARTI			= 0x0000000c,
+		REX15_P0REG_YSTARTI			= 0x0000001c,
+		REX15_P0REG_XYMOVE			= 0x00000034,
+		REX15_P0REG_COLORREDI		= 0x00000038,
+		REX15_P0REG_COLORGREENI		= 0x00000040,
+		REX15_P0REG_COLORBLUEI		= 0x00000048,
+		REX15_P0REG_COLORBACK		= 0x0000005c,
+		REX15_P0REG_ZPATTERN		= 0x00000060,
+		REX15_P0REG_XENDI			= 0x00000084,
+		REX15_P0REG_YENDI			= 0x00000088,
+
+		REX15_P1REG_WCLOCKREV		= 0x00000054,
+		REX15_P1REG_CFGDATA			= 0x00000058,
+		REX15_P1REG_CFGSEL			= 0x0000005c,
+		REX15_P1REG_VC1_ADDRDATA	= 0x00000060,
+		REX15_P1REG_CFGMODE			= 0x00000068,
+		REX15_P1REG_XYOFFSET		= 0x0000006c,
+
+		REX15_OP_NOP				= 0x00000000,
+		REX15_OP_DRAW				= 0x00000001,
+
+		REX15_OP_FLAG_BLOCK			= 0x00000008,
+		REX15_OP_FLAG_LENGTH32		= 0x00000010,
+		REX15_OP_FLAG_QUADMODE		= 0x00000020,
+		REX15_OP_FLAG_XYCONTINUE	= 0x00000080,
+		REX15_OP_FLAG_STOPONX		= 0x00000100,
+		REX15_OP_FLAG_STOPONY		= 0x00000200,
+		REX15_OP_FLAG_ENZPATTERN	= 0x00000400,
+		REX15_OP_FLAG_LOGICSRC		= 0x00080000,
+		REX15_OP_FLAG_ZOPAQUE		= 0x00800000,
+		REX15_OP_FLAG_ZCONTINUE		= 0x01000000,
+
+		REX15_WRITE_ADDR			= 0x00,
+		REX15_PALETTE_RAM			= 0x01,
+		REX15_PIXEL_READ_MASK		= 0x02,
+		REX15_CONTROL				= 0x06
 	};
 
 	struct hpc_t
@@ -146,6 +196,18 @@ protected:
 		bool m_scsi0_dma_end;
 	};
 
+	struct lg1_t
+	{
+		uint32_t m_config_sel;
+		uint32_t m_write_addr;
+		uint32_t m_control;
+		uint8_t m_palette_idx;
+		uint8_t m_palette_channel;
+		uint8_t m_palette_entry[3];
+		bool m_waiting_for_palette_addr;
+		uint8_t m_pix_read_mask[256];
+	};
+
 	enum
 	{
 		HPC_DMACTRL_RESET	= 0x01,
@@ -161,8 +223,10 @@ protected:
 	required_device<pit8254_device> m_pit;
 	required_device<dp8573_device> m_rtc;
 	required_shared_ptr<uint32_t> m_dsp_ram;
+	required_device<palette_device> m_palette;
 
 	hpc_t m_hpc;
+	lg1_t m_lg1;
 	uint8_t m_duart_int_status;
 
 	static char const *const RS232A_TAG;
@@ -233,12 +297,22 @@ void indigo_state::machine_start()
 	save_item(NAME(m_hpc.m_scsi0_dma_active));
 	save_item(NAME(m_hpc.m_scsi0_dma_end));
 
+	save_item(NAME(m_lg1.m_config_sel));
+	save_item(NAME(m_lg1.m_write_addr));
+	save_item(NAME(m_lg1.m_control));
+	save_item(NAME(m_lg1.m_palette_idx));
+	save_item(NAME(m_lg1.m_palette_channel));
+	save_item(NAME(m_lg1.m_palette_entry));
+	save_item(NAME(m_lg1.m_waiting_for_palette_addr));
+	save_item(NAME(m_lg1.m_pix_read_mask));
+
 	save_item(NAME(m_duart_int_status));
 }
 
 void indigo_state::machine_reset()
 {
 	memset(&m_hpc, 0, sizeof(hpc_t));
+	memset(&m_lg1, 0, sizeof(lg1_t));
 	m_duart_int_status = 0;
 }
 
@@ -786,17 +860,101 @@ WRITE32_MEMBER(indigo_state::dsp_ram_w)
 READ32_MEMBER(indigo_state::entry_r)
 {
 	uint32_t ret = 0;
-#if ENABLE_ENTRY_GFX
-	if (offset == 0x0014/4)
+	switch (offset)
+	{
+	case 0x0014/4:
 		ret = 0x033c0000;
-#endif
-	LOGMASKED(LOG_GFX, "%s: Entry Graphics(?) Read: %08x = %08x & %08x\n", machine().describe_context(), 0x1f3f0000 + offset*4, ret, mem_mask);
+		LOGMASKED(LOG_GFX, "%s: LG1 Read: Presence Detect(?) %08x = %08x & %08x\n", machine().describe_context(), 0x1f3f0000 + offset*4, ret, mem_mask);
+		break;
+	default:
+		LOGMASKED(LOG_GFX, "%s: Unknown LG1 Read: %08x = %08x & %08x\n", machine().describe_context(), 0x1f3f0000 + offset*4, ret, mem_mask);
+		break;
+	}
 	return ret;
 }
 
 WRITE32_MEMBER(indigo_state::entry_w)
 {
-	LOGMASKED(LOG_GFX, "%s: Entry Graphics(?) Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1f3f0000 + offset*4, data, mem_mask);
+	switch (offset)
+	{
+		case (REX15_PAGE1_SET+REX15_P1REG_CFGSEL)/4:
+			m_lg1.m_config_sel = data;
+			switch (data)
+			{
+				case REX15_WRITE_ADDR:
+					LOGMASKED(LOG_GFX, "%s: LG1 ConfigSel Write = %08x (Write Addr)\n", machine().describe_context(), data);
+					break;
+				case REX15_PALETTE_RAM:
+					LOGMASKED(LOG_GFX, "%s: LG1 ConfigSel Write = %08x (Palette RAM)\n", machine().describe_context(), data);
+					break;
+				case REX15_CONTROL:
+					LOGMASKED(LOG_GFX, "%s: LG1 ConfigSel Write = %08x (Control)\n", machine().describe_context(), data);
+					break;
+				case REX15_PIXEL_READ_MASK:
+					LOGMASKED(LOG_GFX, "%s: LG1 ConfigSel Write = %08x (Pixel Read Mask)\n", machine().describe_context(), data);
+					break;
+				default:
+					LOGMASKED(LOG_GFX, "%s: LG1 ConfigSel Write = %08x (Unknown)\n", machine().describe_context(), data);
+					break;
+			}
+			break;
+		case (REX15_PAGE1_SET+REX15_P1REG_CFGDATA)/4:
+			switch (m_lg1.m_config_sel)
+			{
+				case REX15_WRITE_ADDR:
+					LOGMASKED(LOG_GFX, "%s: LG1 ConfigSel Write: Setting WriteAddr to %08x\n", machine().describe_context(), data);
+					m_lg1.m_write_addr = data;
+					if (m_lg1.m_control == 0xf)
+					{
+						LOGMASKED(LOG_GFX, "%s: LG1 about to set palette entry %02x\n", machine().describe_context(), (uint8_t)data);
+						m_lg1.m_palette_idx = (uint8_t)data;
+						m_lg1.m_palette_channel = 0;
+					}
+					break;
+				case REX15_PALETTE_RAM:
+					LOGMASKED(LOG_GFX, "%s: LG1 ConfigSel Write: Setting Palette RAM %02x entry %d to %02x\n", machine().describe_context(),
+						m_lg1.m_palette_idx, m_lg1.m_palette_channel, (uint8_t)data);
+					m_lg1.m_palette_entry[m_lg1.m_palette_channel++] = (uint8_t)data;
+					if (m_lg1.m_palette_channel == 3)
+					{
+						m_palette->set_pen_color(m_lg1.m_palette_idx, m_lg1.m_palette_entry[0], m_lg1.m_palette_entry[1], m_lg1.m_palette_entry[2]);
+					}
+					break;
+				case REX15_CONTROL:
+					LOGMASKED(LOG_GFX, "%s: LG1 ConfigSel Write: Setting Control to %08x\n", machine().describe_context(), data);
+					m_lg1.m_control = data;
+					break;
+				case REX15_PIXEL_READ_MASK:
+					LOGMASKED(LOG_GFX, "%s: LG1 ConfigSel Write = %08x (Pixel Read Mask, entry %02x)\n", machine().describe_context(), data, m_lg1.m_palette_idx);
+					m_lg1.m_pix_read_mask[m_lg1.m_palette_idx] = (uint8_t)data;
+					break;
+				default:
+					LOGMASKED(LOG_GFX, "%s: LG1 Unknown ConfigData Write = %08x\n", machine().describe_context(), data);
+					break;
+			}
+			break;
+		default:
+			LOGMASKED(LOG_GFX, "%s: Unknown LG1 Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1f3f0000 + offset*4, data, mem_mask);
+			break;
+	}
+}
+
+uint32_t indigo_state::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const rgb_t *pens = m_palette->palette()->entry_list_raw();
+
+	for (int y = 0; y < 256; y++)
+	{
+		for (int suby = 0; suby < 3; suby++)
+		{
+			uint32_t *dst = &bitmap.pix32(y*3 + suby);
+			for (int x = 0; x < 1024; x++)
+			{
+				*dst++ = pens[y];
+			}
+		}
+	}
+	return 0;
 }
 
 void indigo_state::indigo_map(address_map &map)
@@ -837,6 +995,16 @@ void indigo_state::cdrom_config(device_t *device)
 
 void indigo_state::indigo_base(machine_config &config)
 {
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 1024-1, 0, 768-1);
+	screen.set_screen_update(FUNC(indigo_state::screen_update));
+
+	PALETTE(config, m_palette, 256);
+
 	SPEAKER(config, "mono").front_center();
 
 	SCC8530N(config, m_scc[0], SCC_PCLK);
