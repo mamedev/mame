@@ -10694,6 +10694,9 @@ crimfght                        // GX821 (c) 1989 (World)
 crimfghtu                       // GX821 (c) 1989 (US)
 crimfghtj                       // GX821 (c) 1989 (Japan)
 
+@source:crimson.cpp
+crimson                         // (c) 1992 SGI
+
 @source:crospang.cpp
 bestri                          // (c) F2 System
 bestria                         //
