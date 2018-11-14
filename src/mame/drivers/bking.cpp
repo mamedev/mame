@@ -433,7 +433,7 @@ MACHINE_CONFIG_START(bking_state::bking)
 	AY8910(config, "ay1", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	ay8910_device &ay2(AY8910(config, "ay2", XTAL(6'000'000)/4));
-	ay2.port_b_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	ay2.port_a_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
 	ay2.port_b_write_callback().set(FUNC(bking_state::port_b_w));
 	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
 

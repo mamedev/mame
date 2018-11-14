@@ -414,9 +414,9 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	ym2203_device &ym2203(YM2203(config, "ym2203", 18432000/6));
 	ym2203.port_a_write_callback().set(FUNC(ironhors_state::filter_w));
 	ym2203.add_route(0, "disc_ih", 1.0, 0);
-	ym2203.add_route(0, "disc_ih", 1.0, 1);
-	ym2203.add_route(0, "disc_ih", 1.0, 2);
-	ym2203.add_route(0, "disc_ih", 1.0, 3);
+	ym2203.add_route(1, "disc_ih", 1.0, 1);
+	ym2203.add_route(2, "disc_ih", 1.0, 2);
+	ym2203.add_route(3, "disc_ih", 1.0, 3);
 
 	MCFG_DEVICE_ADD("disc_ih", DISCRETE, ironhors_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
