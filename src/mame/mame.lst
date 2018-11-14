@@ -89,6 +89,9 @@ casanova                        //
 fieldday                        // A23 (c) 1984 Taito
 undoukai                        // A17 (c) 1984 Taito
 
+@source:4d20.cpp
+4d20                            // (c) SGI 1991
+
 @source:4dpi.cpp
 sgi_ip6                         // IP6: 4D/PI, R2000, 20MHz
 
@@ -30546,8 +30549,14 @@ nyny                            // (c) 1980 Sigma Ent. Inc.
 nynyg                           // (c) 1980 Sigma Ent. Inc. + Gottlieb
 warcadia                        // (c) 1982 Sigma Ent. Inc.
 
+@source:o2.cpp
+o2                              // (c) 1996 SGI
+
 @source:ob68k1a.cpp
 ob68k1a                         //
+
+@source:octane.cpp
+octane                          // (c) 1997 SGI
 
 @source:octopus.cpp
 octopus                         //

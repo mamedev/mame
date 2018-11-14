@@ -1,5 +1,6 @@
 3do.cpp
 4004clk.cpp
+4d20.cpp
 4dpi.cpp
 68ksbc.cpp
 a2600.cpp
@@ -490,7 +491,9 @@ novag6502.cpp
 novag68k.cpp
 novagf8.cpp
 novagmcs48.cpp
+o2.cpp
 ob68k1a.cpp
+octane.cpp
 octopus.cpp
 odyssey2.cpp
 okean240.cpp
