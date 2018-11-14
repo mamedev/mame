@@ -553,9 +553,9 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 	MCFG_DEVICE_ADD(EAROM_TAG, ER2055, 0)
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(PSG_TAG, AY8912, XTAL(1'294'400))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, bitgraph_state, earom_write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8912(config, m_psg, XTAL(1'294'400));
+	m_psg->port_a_write_callback().set(FUNC(bitgraph_state::earom_write));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_FUNCTION

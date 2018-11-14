@@ -610,21 +610,23 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tnx1_state, popeye_portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(8'000'000)/4));
+	aysnd.port_a_read_callback().set_ioport("DSW0");
+	aysnd.port_b_write_callback().set(FUNC(tnx1_state::popeye_portB_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tpp2_state::config)
 	tpp1_state::config(config);
-	MCFG_DEVICE_MODIFY("aysnd")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT) /* Does tnx1, tpp1 & popeyebl have the same filtering? */
-	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
+
+	auto &aysnd(*subdevice<ay8910_device>("aysnd"));
+	aysnd.reset_routes();
+	aysnd.set_flags(AY8910_RESISTOR_OUTPUT); /* Does tnx1, tpp1 & popeyebl have the same filtering? */
+	aysnd.set_resistors_load(2000.0, 2000.0, 2000.0);
+	aysnd.add_route(0, "snd_nl", 1.0, 0);
+	aysnd.add_route(1, "snd_nl", 1.0, 1);
+	aysnd.add_route(2, "snd_nl", 1.0, 2);
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 

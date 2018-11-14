@@ -204,15 +204,15 @@ MACHINE_CONFIG_START(marywu_state::marywu)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, marywu_state, ay1_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, marywu_state, ay1_port_b_w))
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635))); /* should it be perhaps a fraction of the XTAL clock ? */
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
+	ay1.port_a_write_callback().set(FUNC(marywu_state::ay1_port_a_w));
+	ay1.port_b_write_callback().set(FUNC(marywu_state::ay1_port_b_w));
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, marywu_state, ay2_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, marywu_state, ay2_port_b_w))
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635))); /* should it be perhaps a fraction of the XTAL clock ? */
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
+	ay2.port_a_write_callback().set(FUNC(marywu_state::ay2_port_a_w));
+	ay2.port_b_write_callback().set(FUNC(marywu_state::ay2_port_b_w));
 MACHINE_CONFIG_END
 
 ROM_START( marywu )

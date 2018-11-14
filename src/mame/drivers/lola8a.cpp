@@ -274,10 +274,10 @@ MACHINE_CONFIG_START(lola8a_state::lola8a)
 	MCFG_I8085A_SOD(WRITELINE(*this, lola8a_state, cass_w))
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, lola8a_state, lola8a_port_a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lola8a_state, lola8a_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	ay8910_device &aysnd(AY8910(config, AY8910_TAG, XTAL(4'915'200) / 4));
+	aysnd.port_a_read_callback().set(FUNC(lola8a_state::lola8a_port_a_r));
+	aysnd.port_b_write_callback().set(FUNC(lola8a_state::lola8a_port_b_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -547,10 +547,10 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK / 8)    /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, miniboy7_state, ay_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, miniboy7_state, ay_pb_w))
+	ay8910_device &ay8910(AY8910(config, "ay8910", MASTER_CLOCK / 8));    /* guess */
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
+	ay8910.port_a_write_callback().set(FUNC(miniboy7_state::ay_pa_w));
+	ay8910.port_b_write_callback().set(FUNC(miniboy7_state::ay_pb_w));
 
 MACHINE_CONFIG_END
 

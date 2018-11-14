@@ -723,10 +723,10 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)   /* 1.5 MHz, measured */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortecar_state, ayporta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortecar_state, ayportb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));   /* 1.5 MHz, measured */
+	aysnd.port_a_write_callback().set(FUNC(fortecar_state::ayporta_w));
+	aysnd.port_b_write_callback().set(FUNC(fortecar_state::ayportb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

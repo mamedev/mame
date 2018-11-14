@@ -619,10 +619,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(IC_I030, AY8910, XTAL_X002 / 4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, einstein_state, keyboard_data_read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	AY8910(config, m_psg, XTAL_X002 / 4);
+	m_psg->port_b_read_callback().set(FUNC(einstein_state::keyboard_data_read));
+	m_psg->port_a_write_callback().set(FUNC(einstein_state::keyboard_line_write));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	adc0844_device &adc(ADC0844(config, "adc", 0));
 	adc.intr_callback().set(m_adc_daisy, FUNC(z80daisy_generic_device::int_w));

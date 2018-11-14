@@ -774,10 +774,10 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8912_TAG, AY8912, 8_MHz_XTAL / 4)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tiki100_state, video_scroll_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_psg, 8_MHz_XTAL / 4);
+	m_psg->set_flags(AY8910_SINGLE_OUTPUT);
+	m_psg->port_a_write_callback().set(FUNC(tiki100_state::video_scroll_w));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

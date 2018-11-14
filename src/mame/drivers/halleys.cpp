@@ -1667,12 +1667,12 @@ void halleys_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4801).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x4801, 0x4801).r("ay2", FUNC(ay8910_device::data_r));
-	map(0x4802, 0x4803).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x4803, 0x4803).r("ay3", FUNC(ay8910_device::data_r));
-	map(0x4804, 0x4805).w("ay4", FUNC(ay8910_device::address_data_w));
-	map(0x4805, 0x4805).r("ay4", FUNC(ay8910_device::data_r));
+	map(0x4800, 0x4801).w("ay2", FUNC(ym2149_device::address_data_w));
+	map(0x4801, 0x4801).r("ay2", FUNC(ym2149_device::data_r));
+	map(0x4802, 0x4803).w("ay3", FUNC(ym2149_device::address_data_w));
+	map(0x4803, 0x4803).r("ay3", FUNC(ym2149_device::data_r));
+	map(0x4804, 0x4805).w("ay4", FUNC(ym2149_device::address_data_w));
+	map(0x4805, 0x4805).r("ay4", FUNC(ym2149_device::data_r));
 	map(0x5000, 0x5000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xefff).rom(); // space for diagnostic ROM
 }
@@ -1957,13 +1957,13 @@ MACHINE_CONFIG_START(halleys_state::halleys)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.15); /* verified on pcb */
+	YM2149(config, "ay1", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.15); /* verified on pcb */
 
-	AY8910(config, "ay2", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.15); /* verified on pcb */
+	YM2149(config, "ay2", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.15); /* verified on pcb */
 
-	AY8910(config, "ay3", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.15); /* verified on pcb */
+	YM2149(config, "ay3", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.15); /* verified on pcb */
 
-	ay8910_device &ay4(AY8910(config, "ay4", XTAL(6'000'000)/4)); /* verified on pcb */
+	ym2149_device &ay4(YM2149(config, "ay4", XTAL(6'000'000)/4)); /* verified on pcb */
 	ay4.port_b_write_callback().set(FUNC(halleys_state::sndnmi_msk_w));
 	ay4.add_route(ALL_OUTPUTS, "mono", 0.15);
 MACHINE_CONFIG_END
