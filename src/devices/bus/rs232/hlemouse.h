@@ -218,8 +218,6 @@ public:
 
 protected:
 	virtual void device_start() override;
-
-	virtual void rcv_complete() override;
 };
 
 } } // namespace bus::rs232
