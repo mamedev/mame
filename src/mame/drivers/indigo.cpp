@@ -50,8 +50,9 @@
 #define LOG_PIT			(1 << 11)
 #define LOG_DSP			(1 << 12)
 #define LOG_GFX			(1 << 13)
+#define LOG_GFX_CMD		(1 << 14)
 #define LOG_DUART		(LOG_DUART0 | LOG_DUART1 | LOG_DUART2)
-#define LOG_ALL			(LOG_UNKNOWN | LOG_INT | LOG_HPC | LOG_EEPROM | LOG_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT | LOG_DSP | LOG_GFX)
+#define LOG_ALL			(LOG_UNKNOWN | LOG_INT | LOG_HPC | LOG_EEPROM | LOG_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT | LOG_DSP | LOG_GFX | LOG_GFX_CMD)
 
 #define VERBOSE			(LOG_ALL & ~(LOG_DUART1 | LOG_DUART0 | LOG_SCSI | LOG_SCSI_DMA | LOG_EEPROM | LOG_PIT | LOG_DSP))
 #include "logmacro.h"
@@ -215,6 +216,8 @@ protected:
 		uint32_t m_z_pattern;
 		uint32_t m_x_end_i;
 		uint32_t m_y_end_i;
+		uint32_t m_x_curr_i;
+		uint32_t m_y_curr_i;
 
 		uint8_t m_palette_idx;
 		uint8_t m_palette_channel;
@@ -329,6 +332,8 @@ void indigo_state::machine_start()
 	save_item(NAME(m_lg1.m_z_pattern));
 	save_item(NAME(m_lg1.m_x_end_i));
 	save_item(NAME(m_lg1.m_y_end_i));
+	save_item(NAME(m_lg1.m_x_curr_i));
+	save_item(NAME(m_lg1.m_y_curr_i));
 	save_item(NAME(m_lg1.m_palette_idx));
 	save_item(NAME(m_lg1.m_palette_channel));
 	save_item(NAME(m_lg1.m_palette_entry));
@@ -894,6 +899,10 @@ READ32_MEMBER(indigo_state::entry_r)
 	uint32_t ret = 0;
 	switch (offset)
 	{
+	case REX15_PAGE0_GO/4:
+		LOGMASKED(LOG_GFX, "%s: LG1 Read: Status(?) (Go) %08x = %08x & %08x\n", machine().describe_context(), 0x1f3f0000 + offset*4, ret, mem_mask);
+		do_rex_command();
+		break;
 	case 0x0014/4:
 		ret = 0x033c0000;
 		LOGMASKED(LOG_GFX, "%s: LG1 Read: Presence Detect(?) %08x = %08x & %08x\n", machine().describe_context(), 0x1f3f0000 + offset*4, ret, mem_mask);
@@ -907,50 +916,58 @@ READ32_MEMBER(indigo_state::entry_r)
 
 void indigo_state::do_rex_command()
 {
-	/*
-	REX15_OP_FLAG_BLOCK			= 0x00000008,
-	REX15_OP_FLAG_LENGTH32		= 0x00000010,
-	REX15_OP_FLAG_QUADMODE		= 0x00000020,
-	REX15_OP_FLAG_XYCONTINUE	= 0x00000080,
-	REX15_OP_FLAG_STOPONX		= 0x00000100,
-	REX15_OP_FLAG_STOPONY		= 0x00000200,
-	REX15_OP_FLAG_ENZPATTERN	= 0x00000400,
-	REX15_OP_FLAG_LOGICSRC		= 0x00080000,
-	REX15_OP_FLAG_ZOPAQUE		= 0x00800000,
-	REX15_OP_FLAG_ZCONTINUE		= 0x01000000,
-	*/
 	if (m_lg1.m_command == 0)
 	{
 		return;
 	}
-	else if (m_lg1.m_command == 0x30000329)
+
+	if (m_lg1.m_command == 0x30000329)
 	{
-		for (uint32_t y = m_lg1.m_y_start_i; y <= m_lg1.m_y_end_i; y++)
+		bool xycontinue = (m_lg1.m_command & REX15_OP_FLAG_XYCONTINUE);
+		uint32_t start_x = xycontinue ? m_lg1.m_x_curr_i : m_lg1.m_x_start_i;
+		uint32_t start_y = xycontinue ? m_lg1.m_y_curr_i : m_lg1.m_y_start_i;
+		uint32_t end_x = m_lg1.m_x_end_i;
+		uint32_t end_y = m_lg1.m_y_end_i;
+
+		LOGMASKED(LOG_GFX, "LG1: Command %08x: Block draw from %d,%d-%d,%d inclusive.\n", m_lg1.m_command, start_x, start_y, end_x, end_y);
+		for (uint32_t y = start_y; y <= end_y; y++)
 		{
-			for (uint32_t x = m_lg1.m_x_start_i; x <= m_lg1.m_x_end_i; x++)
+			for (uint32_t x = start_x; x <= end_x; x++)
 			{
 				m_framebuffer[y*1024 + x] = m_lg1.m_color_red_i;
 			}
 		}
 	}
-	else if (m_lg1.m_command == 0x300005b9)
+	else if (m_lg1.m_command == 0x300005a1 ||
+             m_lg1.m_command == 0x300005a9 ||
+             m_lg1.m_command == 0x300005b9)
 	{
-		uint32_t start_x = m_lg1.m_x_start_i;
-		uint32_t start_y = m_lg1.m_y_start_i;
+		bool xycontinue = (m_lg1.m_command & REX15_OP_FLAG_XYCONTINUE);
+		uint32_t start_x = xycontinue ? m_lg1.m_x_curr_i : m_lg1.m_x_start_i;
+		uint32_t start_y = xycontinue ? m_lg1.m_y_curr_i : m_lg1.m_y_start_i;
 		uint32_t end_x = m_lg1.m_x_end_i;
+		LOGMASKED(LOG_GFX, "LG1: Command %08x: Pattern draw from %d-%d at %d\n", m_lg1.m_command, start_x, end_x, start_y);
 		for (uint32_t x = start_x; x <= end_x && x < (start_x + 32); x++)
 		{
 			if (BIT(m_lg1.m_z_pattern, 31 - (x - start_x)))
 			{
 				m_framebuffer[start_y*1024 + x] = m_lg1.m_color_red_i;
 			}
+			m_lg1.m_x_curr_i++;
 		}
-		start_y--;
-		m_lg1.m_y_start_i = start_y;
+
+		if (m_lg1.m_command & REX15_OP_FLAG_BLOCK)
+		{
+			if (m_lg1.m_x_curr_i > m_lg1.m_x_end_i)
+			{
+				m_lg1.m_y_curr_i--;
+				m_lg1.m_x_curr_i = m_lg1.m_x_start_i;
+			}
+		}
 	}
 	else
 	{
-		LOGMASKED(LOG_GFX, "%s: Unknown LG1 command: %08x\n", machine().describe_context(), m_lg1.m_command);
+		LOGMASKED(LOG_GFX_CMD | LOG_UNKNOWN, "%s: Unknown LG1 command: %08x\n", machine().describe_context(), m_lg1.m_command);
 	}
 }
 
@@ -964,17 +981,19 @@ WRITE32_MEMBER(indigo_state::entry_w)
 		case (REX15_PAGE0_GO+REX15_P0REG_COMMAND)/4:
 			m_lg1.m_command = data;
 			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 Command Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
-			if (go || !(m_lg1.m_command & REX15_OP_FLAG_ENZPATTERN))
+			if (go)
 				do_rex_command();
 			break;
 		case (REX15_PAGE0_SET+REX15_P0REG_XSTARTI)/4:
 		case (REX15_PAGE0_GO+REX15_P0REG_XSTARTI)/4:
 			m_lg1.m_x_start_i = data;
+			m_lg1.m_x_curr_i = m_lg1.m_x_start_i;
 			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 XStartI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
 			break;
 		case (REX15_PAGE0_SET+REX15_P0REG_YSTARTI)/4:
 		case (REX15_PAGE0_GO+REX15_P0REG_YSTARTI)/4:
 			m_lg1.m_y_start_i = data;
+			m_lg1.m_y_curr_i = m_lg1.m_y_start_i;
 			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 YStartI Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
 			break;
 		case (REX15_PAGE0_SET+REX15_P0REG_XYMOVE)/4:
