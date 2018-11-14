@@ -1843,10 +1843,10 @@ CONS( 200?, gprnrs1,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
 
 // Notes:
-// Console has stereo output (dual RCA connectors).
-// The original console shows a "Konami" banner on startup, but it seems to be missing on the emulation.
-// Also, it hangs when reset on a MAME debug build.
-CONS( 2001, ddrdismx,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix", MACHINE_IMPERFECT_GRAPHICS )
+// * Seems to have missing a few PCM sounds.
+// * Console has stereo output (dual RCA connectors).
+// * It hangs when reset (F3) on a MAME debug build.
+CONS( 2001, ddrdismx,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 		
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
