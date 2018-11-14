@@ -693,13 +693,11 @@ REF 010131
 |  TDA1543  TDA1543                            |
 |----------------------------------------------|
 
-*/
-
-/*
-   PRG ROM useful locations:
+ PRG ROM useful locations:
    0x64C44 Country: 0 - World, 1 - Spain, 2 - UK, 3 - Italy, 4 - USA
    0x727AC 1 - enable Develop/debug option in test mode
 */
+
 ROM_START( smashdrv ) // World Version: 3.3, Version 3D: 1.9, Checksum: 707A
 	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
 	ROM_LOAD("prg_world.ic23", 0x0000000, 0x0400000, CRC(c642b059) SHA1(8a898f46cebc5951a6355f2b51e31ac5e17b4bca) )
@@ -711,7 +709,7 @@ ROM_START( smashdrv ) // World Version: 3.3, Version 3D: 1.9, Checksum: 707A
 	// ic21 unpopulated
 ROM_END
 
-ROM_START( smashdrvs ) // Spain/Portugal Version: 3.3, Version 3D: 1.9, Checksum: 707B
+ROM_START( smashdrvs ) // Spain/Portugal Version: 3.3, Version 3D: 1.9, Checksum: 707B. There is another known (undumped) Spain/Portugal (Covielsa license) set with Version: 3.3, Version 3D: 1.9, Checksum: EDD9.
 	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
 	ROM_LOAD("prg_spain.ic23", 0x0000000, 0x0400000, CRC(66b80283) SHA1(7d569670fd96aaa99da24378c77a265bc2ddc91c) )
 
