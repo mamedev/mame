@@ -139,7 +139,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="lostwrld" supported="no">
+	<software name="lostwrld">
 		<description>The Lost World - Jurassic Park</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
