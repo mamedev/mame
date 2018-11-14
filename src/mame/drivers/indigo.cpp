@@ -18,6 +18,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd512.h"
 #include "bus/scsi/scsihd.h"
@@ -54,7 +55,7 @@
 #define LOG_DUART		(LOG_DUART0 | LOG_DUART1 | LOG_DUART2)
 #define LOG_ALL			(LOG_UNKNOWN | LOG_INT | LOG_HPC | LOG_EEPROM | LOG_DMA | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT | LOG_DSP | LOG_GFX | LOG_GFX_CMD)
 
-#define VERBOSE			(LOG_ALL & ~(LOG_DUART1 | LOG_DUART0 | LOG_SCSI | LOG_SCSI_DMA | LOG_EEPROM | LOG_PIT | LOG_DSP))
+#define VERBOSE			(LOG_ALL & ~(LOG_DUART0 | LOG_DUART1 | LOG_SCSI | LOG_SCSI_DMA | LOG_EEPROM | LOG_PIT | LOG_DSP))
 #include "logmacro.h"
 
 class indigo_state : public driver_device
@@ -920,8 +921,32 @@ void indigo_state::do_rex_command()
 	{
 		return;
 	}
+	if (m_lg1.m_command == 0x30080329)
+	{
+		bool xycontinue = (m_lg1.m_command & REX15_OP_FLAG_XYCONTINUE);
+		bool copy = (m_lg1.m_command & REX15_OP_FLAG_LOGICSRC);
+		const uint32_t start_x = xycontinue ? m_lg1.m_x_curr_i : m_lg1.m_x_start_i;
+		const uint32_t start_y = xycontinue ? m_lg1.m_y_curr_i : m_lg1.m_y_start_i;
+		const uint32_t end_x = m_lg1.m_x_end_i;
+		const uint32_t end_y = m_lg1.m_y_end_i;
+		const uint32_t src_start_x = start_x + (m_lg1.m_xy_move >> 16);
+		const uint32_t src_start_y = start_y + (uint16_t)m_lg1.m_xy_move;;
 
-	if (m_lg1.m_command == 0x30000329)
+		LOGMASKED(LOG_GFX, "LG1: Command %08x: Block copy from %d,%d-%d,%d inclusive.\n", m_lg1.m_command, start_x, start_y, end_x, end_y);
+		if (copy)
+		{
+			for (uint32_t y = start_y, src_y = src_start_y; y <= end_y; y++, src_y++)
+				for (uint32_t x = start_x, src_x = src_start_x; x <= end_x; x++, src_x++)
+					m_framebuffer[y*1024 + x] = m_framebuffer[src_y*1024 + src_x];
+		}
+		else
+		{
+			for (uint32_t y = start_y; y <= end_y; y++)
+				for (uint32_t x = start_x; x <= end_x; x++)
+					m_framebuffer[y*1024 + x] = m_lg1.m_color_red_i;
+		}
+	}
+	else if (m_lg1.m_command == 0x30000329)
 	{
 		bool xycontinue = (m_lg1.m_command & REX15_OP_FLAG_XYCONTINUE);
 		uint32_t start_x = xycontinue ? m_lg1.m_x_curr_i : m_lg1.m_x_start_i;
@@ -1000,6 +1025,8 @@ WRITE32_MEMBER(indigo_state::entry_w)
 		case (REX15_PAGE0_GO+REX15_P0REG_XYMOVE)/4:
 			m_lg1.m_xy_move = data;
 			LOGMASKED(LOG_GFX, "%s: LG1 REX1.5 XYMove Write (%s) = %08x\n", machine().describe_context(), (offset & 0x200) ? "Go" : "Set", data);
+			if (go)
+				do_rex_command();
 			break;
 		case (REX15_PAGE0_SET+REX15_P0REG_COLORREDI)/4:
 		case (REX15_PAGE0_GO+REX15_P0REG_COLORREDI)/4:
@@ -1063,7 +1090,7 @@ WRITE32_MEMBER(indigo_state::entry_w)
 			break;
 		case (REX15_PAGE1_SET+REX15_P1REG_CFGDATA)/4:
 		case (REX15_PAGE1_GO+REX15_P1REG_CFGDATA)/4:
-			if (offset & 0x200) // Ignore 'Go' writes for now
+			if (go) // Ignore 'Go' writes for now, unsure what they do
 				break;
 			switch (m_lg1.m_config_sel)
 			{
@@ -1157,6 +1184,11 @@ void indigo_state::cdrom_config(device_t *device)
 	cdda->add_route(ALL_OUTPUTS, ":mono", 1.0);
 }
 
+static void indigo_mice(device_slot_interface &device)
+{
+	device.option_add("sgimouse", SGI_HLE_SERIAL_MOUSE);
+}
+
 void indigo_state::indigo_base(machine_config &config)
 {
 	/* video hardware */
@@ -1190,6 +1222,14 @@ void indigo_state::indigo_base(machine_config &config)
 	m_scc[2]->configure_channels(SCC_RXA_CLK.value(), SCC_TXA_CLK.value(), SCC_RXB_CLK.value(), SCC_TXB_CLK.value());
 	m_scc[2]->out_int_callback().set(FUNC(indigo_state::duart2_int_w));
 
+	SGIKBD_PORT(config, "keyboard", default_sgi_keyboard_devices, "hlekbd").rxd_handler().set(m_scc[0], FUNC(z80scc_device::rxa_w));
+
+	rs232_port_device &mouseport(RS232_PORT(config, "mouseport", indigo_mice, "sgimouse"));
+	mouseport.set_fixed(true);
+	mouseport.rxd_handler().set(m_scc[0], FUNC(scc8530_device::rxa_w));
+	mouseport.cts_handler().set(m_scc[0], FUNC(scc8530_device::ctsa_w));
+	mouseport.dcd_handler().set(m_scc[0], FUNC(scc8530_device::dcda_w));
+
 	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
 	rs232a.cts_handler().set(m_scc[1], FUNC(scc8530_device::ctsa_w));
 	rs232a.dcd_handler().set(m_scc[1], FUNC(scc8530_device::dcda_w));
@@ -1199,8 +1239,6 @@ void indigo_state::indigo_base(machine_config &config)
 	rs232b.cts_handler().set(m_scc[1], FUNC(scc8530_device::ctsb_w));
 	rs232b.dcd_handler().set(m_scc[1], FUNC(scc8530_device::dcdb_w));
 	rs232b.rxd_handler().set(m_scc[1], FUNC(scc8530_device::rxb_w));
-
-	SGIKBD_PORT(config, "keyboard", default_sgi_keyboard_devices, "hlekbd").rxd_handler().set(m_scc[0], FUNC(z80scc_device::rxa_w));
 
 	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));

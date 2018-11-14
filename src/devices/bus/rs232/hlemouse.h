@@ -160,6 +160,8 @@ public:
 	hle_msystems_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
+	hle_msystems_mouse_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
@@ -205,6 +207,21 @@ private:
 	uint8_t m_btn_val, m_btn_sent;
 };
 
+//**************************************************
+//  SGI IRIS Indigo mouse
+//**************************************************
+
+class hle_sgi_mouse_device : public hle_msystems_mouse_device
+{
+public:
+	hle_sgi_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+
+	virtual void rcv_complete() override;
+};
+
 } } // namespace bus::rs232
 
 
@@ -217,5 +234,6 @@ DECLARE_DEVICE_TYPE_NS(LOGITECH_HLE_SERIAL_MOUSE,  bus::rs232, hle_logitech_mous
 DECLARE_DEVICE_TYPE_NS(WHEEL_HLE_SERIAL_MOUSE,     bus::rs232, hle_wheel_mouse_device)
 DECLARE_DEVICE_TYPE_NS(MSYSTEMS_HLE_SERIAL_MOUSE,  bus::rs232, hle_msystems_mouse_device)
 DECLARE_DEVICE_TYPE_NS(ROTATABLE_HLE_SERIAL_MOUSE, bus::rs232, hle_rotatable_mouse_device)
+DECLARE_DEVICE_TYPE_NS(SGI_HLE_SERIAL_MOUSE,       bus::rs232, hle_sgi_mouse_device)
 
 #endif // MAME_BUS_RS232_SER_MOUSE_H
