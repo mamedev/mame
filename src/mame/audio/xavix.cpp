@@ -446,15 +446,9 @@ WRITE8_MEMBER(xavix_state::sound_timer3_w) // this one is used by ekara (uk cart
 READ8_MEMBER(xavix_state::sound_irqstatus_r)
 {
 	// rad_rh checks this after doing something that looks like an irq ack
-	// rad_bass does the same, but returning the wrong status bits causes it to corrupt memory and crash in certain situations, see code around 0037D5
-
 	// the UK ekara sets check the upper bit to see if the interrupt is from the sound timer (rather than checking interrupt source register)
 	// and decrease a counter that controls the tempo (the US / Japan sets don't enable the sound timer at all)
-
-	//if (m_sound_irqstatus & 0x08) // hack for rad_rh
-	//	return 0xf0 | m_sound_irqstatus;
-
-	return m_sound_irqstatus; // otherwise, keep rad_bass happy
+	return m_sound_irqstatus; 
 }
 
 WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
@@ -480,29 +474,28 @@ WRITE8_MEMBER(xavix_state::sound_irqstatus_w)
 
 	update_irqs();
 
-	if (!m_hack_timer_disable) // again timers / interrupts cause bad code to execute in rad_bass even if they're needed for sound there, investigate!
-	{
-		for (int t = 0; t < 4; t++)
-		{
-			int bit = 1 << t;
 
-			if ((m_sound_irqstatus & bit) != (data & bit))
+	for (int t = 0; t < 4; t++)
+	{
+		int bit = 1 << t;
+
+		if ((m_sound_irqstatus & bit) != (data & bit))
+		{
+			if (data & bit)
 			{
-				if (data & bit)
-				{
-					// period should be based on m_sndtimer[t] at least, maybe also some other regs?
-					m_sound_timer[t]->adjust(attotime::from_usec(1000), t, attotime::from_usec(1000));
-				}
-				else
-				{
-					m_sound_timer[t]->adjust(attotime::never, t);
-				}
+				// period should be based on m_sndtimer[t] at least, maybe also some other regs?
+				m_sound_timer[t]->adjust(attotime::from_usec(1000), t, attotime::from_usec(1000));
+			}
+			else
+			{
+				m_sound_timer[t]->adjust(attotime::never, t);
 			}
 		}
-
-		// see if we're enabling any timers (should probably check if they're already running so we don't end up restarting them)
-		m_sound_irqstatus |= data & 0x0f; // look like IRQ enable flags - 4 sources? voices? timers?
 	}
+
+	// see if we're enabling any timers (should probably check if they're already running so we don't end up restarting them)
+	m_sound_irqstatus |= data & 0x0f; // look like IRQ enable flags - 4 sources? voices? timers?
+	
 
 	LOG("%s: sound_irqstatus_w %02x\n", machine().describe_context(), data);
 }

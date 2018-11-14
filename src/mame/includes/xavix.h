@@ -90,7 +90,6 @@ public:
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lowbus(*this, "lowbus"),
-		m_hack_timer_disable(false),
 		m_sound(*this, "xavix_sound")
 	{ }
 	
@@ -99,7 +98,6 @@ public:
 	void xavix2000(machine_config &config);
 
 	void init_xavix();
-	void init_bass();
 
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
@@ -503,8 +501,6 @@ private:
 
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
-
-	bool m_hack_timer_disable;
 
 	required_device<xavix_sound_device> m_sound;
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);

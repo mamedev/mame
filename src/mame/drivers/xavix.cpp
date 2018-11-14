@@ -938,12 +938,6 @@ void xavix_state::init_xavix()
 	m_rgn = memregion("bios")->base();
 }
 
-void xavix_state::init_bass()
-{
-	init_xavix();
-	m_hack_timer_disable = true;
-}
-
 /***************************************************************************
 
   Game driver(s)
@@ -1091,8 +1085,8 @@ CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_xavix
 
 CONS( 2002, rad_bb2,   0,          0,  xavix,  rad_bb2,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  rad_bass, xavix_state, init_bass,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_bass,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 2001, rad_bass,  0,          0,  xavix,  rad_bass, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
 CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
