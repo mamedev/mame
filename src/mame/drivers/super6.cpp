@@ -453,11 +453,9 @@ void super6_state::super6(machine_config &config)
 
 	// devices
 	Z80CTC(config, m_ctc, 24_MHz_XTAL / 4);
+	m_ctc->set_clk<0>(24_MHz_XTAL / 16);   // J6 pin 1-14 (1.5MHz)
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));   // J6 pin 2-3
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	clock_device &ctc_tick(CLOCK(config, "ctc_tick", 24_MHz_XTAL / 16));
-	ctc_tick.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));   // J6 pin 1-14 (1.5MHz)
 
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
 	m_dma->out_busreq_callback().set(m_dma, FUNC(z80dma_device::bai_w));

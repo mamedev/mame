@@ -19,7 +19,6 @@
 #include "bus/einstein/userport/userport.h"
 #include "bus/rs232/rs232.h"
 #include "machine/adc0844.h"
-#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
@@ -597,14 +596,12 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	z80ctc_device& ctc(Z80CTC(config, IC_I058, XTAL_X002 / 2));
 	ctc.intr_callback().set(FUNC(einstein_state::int_w<1>));
+	ctc.set_clk<0>(XTAL_X002 / 4);
+	ctc.set_clk<1>(XTAL_X002 / 4);
+	ctc.set_clk<2>(XTAL_X002 / 4);
 	ctc.zc_callback<0>().set(IC_I060, FUNC(i8251_device::write_txc));
 	ctc.zc_callback<1>().set(IC_I060, FUNC(i8251_device::write_rxc));
 	ctc.zc_callback<2>().set(IC_I058, FUNC(z80ctc_device::trg3));
-
-	clock_device &ctc_trigger(CLOCK(config, "ctc_trigger", XTAL_X002 / 4));
-	ctc_trigger.signal_handler().set(IC_I058, FUNC(z80ctc_device::trg0));
-	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg1));
-	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg2));
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	Z80DAISY_GENERIC(config, m_keyboard_daisy, 0xf7);
