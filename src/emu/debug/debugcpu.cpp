@@ -2895,12 +2895,12 @@ void device_debug::watchpoint::setEnabled(bool value)
 
 void device_debug::watchpoint::install(read_or_write mode)
 {
-	if(m_installing)
+	if (m_installing)
 		return;
 	m_installing = true;
-	if ((u32(mode) & u32(read_or_write::READ) && m_phr)
+	if ((u32(mode) & u32(read_or_write::READ)) && m_phr)
 		m_phr->remove();
-	if ((u32(mode) & u32(read_or_write::WRITE) && m_phw)
+	if ((u32(mode) & u32(read_or_write::WRITE)) && m_phw)
 		m_phw->remove();
 	std::string name = util::string_format("wp@%x", m_address);
 	switch (m_space.data_width())
