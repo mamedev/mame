@@ -814,7 +814,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 256)
 
 	/* sound hardware */
 
@@ -866,7 +866,7 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
 
 MACHINE_CONFIG_END
 
