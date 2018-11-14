@@ -2787,7 +2787,8 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	  m_address(address & space.addrmask()),
 	  m_length(length),
 	  m_condition(&symbols, (condition != nullptr) ? condition : "1"),
-	  m_action((action != nullptr) ? action : "")
+	  m_action((action != nullptr) ? action : ""),
+	  m_installing(false)
 {
 	std::fill(std::begin(m_start_address), std::end(m_start_address), 0);
 	std::fill(std::begin(m_end_address), std::end(m_end_address), 0);
@@ -2859,10 +2860,6 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	m_notifier = m_space.add_change_notifier([this](read_or_write mode) {
 												 if (m_enabled)
 												 {
-													 if (u32(mode) & u32(m_type) & u32(read_or_write::READ))
-														 m_phr->remove();
-													 if (u32(mode) & u32(m_type) & u32(read_or_write::WRITE))
-														 m_phw->remove();
 													 install(mode);
 												 }
 											 });
@@ -2870,11 +2867,11 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 
 device_debug::watchpoint::~watchpoint()
 {
+	m_space.remove_change_notifier(m_notifier);
 	if (m_phr)
 		m_phr->remove();
 	if (m_phw)
 		m_phw->remove();
-	m_space.remove_change_notifier(m_notifier);
 }
 
 void device_debug::watchpoint::setEnabled(bool value)
@@ -2886,16 +2883,25 @@ void device_debug::watchpoint::setEnabled(bool value)
 			install(read_or_write::READWRITE);
 		else
 		{
+			m_installing = true;
 			if(m_phr)
 				m_phr->remove();
 			if(m_phw)
 				m_phw->remove();
+			m_installing = false;
 		}
 	}
 }
 
 void device_debug::watchpoint::install(read_or_write mode)
 {
+	if(m_installing)
+		return;
+	m_installing = true;
+	if ((u32(mode) & u32(read_or_write::READ) && m_phr)
+		m_phr->remove();
+	if ((u32(mode) & u32(read_or_write::WRITE) && m_phw)
+		m_phw->remove();
 	std::string name = util::string_format("wp@%x", m_address);
 	switch (m_space.data_width())
 	{
@@ -2972,6 +2978,7 @@ void device_debug::watchpoint::install(read_or_write mode)
 			}
 		break;
 	}
+	m_installing = false;
 }
 
 void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask)
