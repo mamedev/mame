@@ -237,7 +237,7 @@ uint32_t namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	/* bit 3   disable  */
 	for (int priority = 0; priority < 8; priority++)
 	{
-		m_c123tmap->draw(screen, bitmap, new_clip, priority, priority);
+		m_c123tmap->draw(screen, bitmap, new_clip, priority, priority, 0);
 	}
 
 	draw_sprites(screen, bitmap, new_clip);
