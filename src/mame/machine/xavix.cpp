@@ -28,7 +28,7 @@ WRITE8_MEMBER(xavix_state::rom_dmatrg_w)
 		uint16_t dest = (m_rom_dma_dst[1] << 8) | m_rom_dma_dst[0];
 		uint16_t len = (m_rom_dma_len[1] << 8) | m_rom_dma_len[0];
 
-		printf("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
+		LOG("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
 
 		for (int i = 0; i < len; i++)
 		{
