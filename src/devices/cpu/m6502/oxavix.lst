@@ -123,3 +123,67 @@ xavlda_idy
 	A = read_special(TMP+Y);
 	set_nz(A);
 	prefetch();
+
+xavadc_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	do_adc(read_special(TMP+Y));
+	prefetch();
+
+xavcmp_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	do_cmp(A, read_special(TMP+Y));
+	prefetch();
+
+xavsbc_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	do_sbc(read_special(TMP+Y));
+	prefetch();
+
+xaveor_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A ^= read_special(TMP+Y);
+	set_nz(A);
+	prefetch();
+
+xavand_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A &= read_special(TMP+Y);
+	set_nz(A);
+	prefetch();
+
+xavora_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A |= read_special(TMP+Y);
+	set_nz(A);
+	prefetch();
+

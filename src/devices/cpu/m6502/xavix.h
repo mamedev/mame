@@ -32,7 +32,13 @@ public:
 	O(brk_xav_imp);
 	O(rti_xav_imp);
 
+	O(xavora_idy);
+	O(xavand_idy);
+	O(xaveor_idy);
+	O(xavadc_idy);
 	O(xavlda_idy);
+	O(xavcmp_idy);
+	O(xavsbc_idy);
 
 	typedef device_delegate<int16_t (int which, int half)> xavix_interrupt_vector_delegate;
 

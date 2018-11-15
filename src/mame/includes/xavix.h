@@ -90,7 +90,6 @@ public:
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lowbus(*this, "lowbus"),
-		m_hack_timer_disable(false),
 		m_sound(*this, "xavix_sound")
 	{ }
 	
@@ -99,7 +98,6 @@ public:
 	void xavix2000(machine_config &config);
 
 	void init_xavix();
-	void init_bass();
 
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
@@ -325,6 +323,10 @@ private:
 	uint8_t m_soundreg16_1[2];
 	uint8_t m_sound_regbase;
 
+	TIMER_CALLBACK_MEMBER(sound_timer_done);
+	emu_timer *m_sound_timer[4];
+
+
 	DECLARE_READ8_MEMBER(timer_status_r);
 	DECLARE_WRITE8_MEMBER(timer_control_w);
 	DECLARE_READ8_MEMBER(timer_baseval_r);
@@ -500,8 +502,6 @@ private:
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
 
-	bool m_hack_timer_disable;
-
 	required_device<xavix_sound_device> m_sound;
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
 };
@@ -569,9 +569,7 @@ public:
 		m_extra0(*this, "EXTRA0"),
 		m_extra1(*this, "EXTRA1"),
 		m_extraioselect(0),
-		m_extraiowrite(0),
-		m_extrainlatch0(0),
-		m_extrainlatch1(0)
+		m_extraiowrite(0)
 	{ }
 
 	void xavix_ekara(machine_config &config);
@@ -590,10 +588,6 @@ protected:
 
 	uint8_t m_extraioselect;
 	uint8_t m_extraiowrite;
-
-	uint8_t m_extrainlatch0;
-	uint8_t m_extrainlatch1;
-
 };
 
 #endif // MAME_INCLUDES_XAVIX_H
