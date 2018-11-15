@@ -1033,7 +1033,7 @@ case 0x3A:  /* MOVW rr,@rr / MOV rr,(rr)+ / MOV rr,@ww / MOV rr,ww(rr) / MOV rr,
 	mem_writeword( r1, mem_readword( s2 ) );
 	switch( r2 & 0xC0 ) {
 	case 0x00:  mycycles += 11; break;
-	case 0x40:  mycycles += 16;
+	case 0x40:  mycycles += 16; break;
 	case 0x80:  mycycles += ( ( r2 & 0x07 ) ? 18 : 14 ); break;
 	case 0xC0:  mycycles += 16; break;
 	}
