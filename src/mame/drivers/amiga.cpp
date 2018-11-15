@@ -1932,12 +1932,13 @@ MACHINE_CONFIG_START(a600_state::a600)
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map16).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
-	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a600_state::GAYLE_ID)
-	MCFG_GAYLE_INT2_HANDLER(WRITELINE(*this, a600_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, cs0_r))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs0_w))
-	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, cs1_r))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs1_w))
+	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
+	gayle.set_id(a600_state::GAYLE_ID);
+	gayle.int2_handler().set(FUNC(a600_state::gayle_int2_w));
+	gayle.cs0_read_handler().set("ata", FUNC(ata_interface_device::cs0_r));
+	gayle.cs0_write_handler().set("ata", FUNC(ata_interface_device::cs0_w));
+	gayle.cs1_read_handler().set("ata", FUNC(ata_interface_device::cs1_r));
+	gayle.cs1_write_handler().set("ata", FUNC(ata_interface_device::cs1_w));
 
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
 	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
@@ -1989,12 +1990,13 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
-	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a1200_state::GAYLE_ID)
-	MCFG_GAYLE_INT2_HANDLER(WRITELINE(*this, a1200_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, cs0_r))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs0_w))
-	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, cs1_r))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, cs1_w))
+	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
+	gayle.set_id(a1200_state::GAYLE_ID);
+	gayle.int2_handler().set(FUNC(a1200_state::gayle_int2_w));
+	gayle.cs0_read_handler().set("ata", FUNC(ata_interface_device::cs0_r));
+	gayle.cs0_write_handler().set("ata", FUNC(ata_interface_device::cs0_w));
+	gayle.cs1_read_handler().set("ata", FUNC(ata_interface_device::cs1_r));
+	gayle.cs1_write_handler().set("ata", FUNC(ata_interface_device::cs1_w));
 
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
 	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
