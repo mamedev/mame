@@ -145,8 +145,6 @@ void cit220_state::cit220p(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//m_screen->set_raw(14'916'000, 960, 0, 800, 259, 0, 240);
 	m_screen->set_raw(22'096'000, 1422, 0, 1188, 259, 0, 240);
-
-	m_screen->set_raw(24553200, 1580, 0, 1320, 259, 0, 240); // dot clock guessed
 	m_screen->set_screen_update("avdc", FUNC(scn2674_device::screen_update));
 
 	SCN2674(config, m_avdc, 22'096'000 / 9);
