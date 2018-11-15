@@ -82,19 +82,19 @@ public:
 	O(sbcl_imp);
 	O(sbcm_imp);
 
-	O(spa2_acc); // Store accumulator in 24-bit address register PA MSB (Bank bit)
-	O(lpa2_acc); // Load accumulator from 24-bit address register PA MSB (Bank bit)
-	O(spa0_acc); // Store accumulator in 24-bit address register PA LSB (Low 8 bits of address)
-	O(lpa0_acc); // Load accumulator from 24-bit address register PA LSB (Low 8 bits of address)
-	O(spa1_acc); // Store accumulator in 24-bit address register PA MID (High 8 bits of address)
-	O(lpa1_acc); // Load accumulator from 24-bit address register PA MID (High 8 bits of address)
+	O(spa2_imp); // Store accumulator in 24-bit address register PA MSB (Bank bit)
+	O(lpa2_imp); // Load accumulator from 24-bit address register PA MSB (Bank bit)
+	O(spa0_imp); // Store accumulator in 24-bit address register PA LSB (Low 8 bits of address)
+	O(lpa0_imp); // Load accumulator from 24-bit address register PA LSB (Low 8 bits of address)
+	O(spa1_imp); // Store accumulator in 24-bit address register PA MID (High 8 bits of address)
+	O(lpa1_imp); // Load accumulator from 24-bit address register PA MID (High 8 bits of address)
 
-	O(spb2_acc); // Store accumulator in 24-bit address register PB MSB (Bank bit)
-	O(lpb2_acc); // Load accumulator from 24-bit address register PB MSB (Bank bit)
-	O(spb0_acc); // Store accumulator in 24-bit address register PB LSB (Low 8 bits of address)
-	O(lpb0_acc); // Load accumulator from 24-bit address register PB LSB (Low 8 bits of address)
-	O(spb1_acc); // Store accumulator in 24-bit address register PB MID (High 8 bits of address)
-	O(lpb1_acc); // Load accumulator from 24-bit address register PB MID (High 8 bits of address)
+	O(spb2_imp); // Store accumulator in 24-bit address register PB MSB (Bank bit)
+	O(lpb2_imp); // Load accumulator from 24-bit address register PB MSB (Bank bit)
+	O(spb0_imp); // Store accumulator in 24-bit address register PB LSB (Low 8 bits of address)
+	O(lpb0_imp); // Load accumulator from 24-bit address register PB LSB (Low 8 bits of address)
+	O(spb1_imp); // Store accumulator in 24-bit address register PB MID (High 8 bits of address)
+	O(lpb1_imp); // Load accumulator from 24-bit address register PB MID (High 8 bits of address)
 
 	O(incpa_imp);
 	O(decpa_imp);
