@@ -284,25 +284,25 @@ lpb2_acc
 
 incpa_imp
 	read_pc_noinc();
-	m_pa++;
+	m_pa = (m_pa & ~0xff) | ((m_pa+1) & 0xff);
 	set_nz(m_pa&0xff); // startup code seems to require flag to set if low byte is 0x00?
 	prefetch();
 
 incpb_imp
 	read_pc_noinc();
-	m_pb++;
+	m_pb = (m_pb & ~0xff) | ((m_pb+1) & 0xff);
 	set_nz(m_pb&0xff); // startup code seems to require flag to set if low byte is 0x00?
 	prefetch();
 
 decpa_imp
 	read_pc_noinc();
-	m_pa--;
+	m_pa = (m_pa & ~0xff) | ((m_pa-1) & 0xff);
 	set_nz(m_pa&0xff); // startup code seems to require flag to set if low byte is 0x00?
 	prefetch();
 
 decpb_imp
 	read_pc_noinc();
-	m_pb--;
+	m_pb = (m_pb & ~0xff) | ((m_pb-1) & 0xff);
 	set_nz(m_pb&0xff); // startup code seems to require flag to set if low byte is 0x00?
 	prefetch();
 
