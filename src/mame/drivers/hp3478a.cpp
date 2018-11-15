@@ -9,18 +9,21 @@
 *
 * Some of this will probably be applicable to HP 3468A units too.
 *
-* Current status : runs, AD LINK ERROR on stock ROM due to unimplemented
-* - patching the AD comms, we get to "OVLD C VDC"
+* Current status : runs, AD LINK ERROR on stock ROM due to unimplemented AD link
+* - patching the AD comms, we get to a functional state but with an altered display
+* due to the CAL RAM not being write-protected.
+* - pressing Shift+Sgl to force a 'test/reset' gets the firmware in an endless loop, not sure why.
 *
 *
 * TODO kindof important
 * * keypad on port1
 *
 * TODO next level
+* * annunciators
 * * DIP switches
 * * do something for analog CPU serial link (not quite uart), or dump+emulate CPU
-* * better display render and layout
-* * "cal enable" switch
+* * better display render and layout (show button subtext)
+* * "cal enable" switch must make NVRAM write-protected
 *
 * TODO level 9000
 * * Connect this with the existing i8291.cpp driver
@@ -90,7 +93,7 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #define DEBUG_LCD2 (LOG_GENERAL << 6)
 #define DEBUG_CAL (LOG_GENERAL << 7)
 
-#define VERBOSE (DEBUG_CAL)
+#define VERBOSE (DEBUG_KEYPAD)
 
 #include "logmacro.h"
 
@@ -169,7 +172,10 @@ WRITE8_MEMBER( hp3478a_state::p2write )
  *
 */
 
-/** charset copied from roc10937 driver. Some special chars are wrong */
+/** charset copied from roc10937 driver. Some special chars are wrong.
+ * Interestingly, the 3478a usually doesn't use "0x30" for the number 0, but instead
+ * maps it to the character 'O' ! It does use 0x30 when printing the GPIB address however.
+ */
 static const uint16_t hpcharset[]=
 {           // FEDC BA98 7654 3210
 	0x507F, // 0101 0000 0111 1111 @.
@@ -204,7 +210,7 @@ static const uint16_t hpcharset[]=
 	0x001E, // 0000 0000 0001 1110 ].
 	0x2800, // 0010 1000 0000 0000 ^.
 	0x0030, // 0000 0000 0011 0000 _.
-	0x0000, // 0000 0000 0000 0000 dummy.
+	0x0000, // 0000 0000 0000 0000 [space] , 0x20
 	0x8121, // 1000 0001 0010 0001 !.
 	0x0180, // 0000 0001 1000 0000 ".
 	0x553C, // 0101 0101 0011 1100 #.
@@ -216,11 +222,11 @@ static const uint16_t hpcharset[]=
 	0xA050, // 1010 0000 0000 0000 ).
 	0xFF00, // 1111 1111 0000 0000 *.
 	0x5500, // 0101 0101 0000 0000 +.
-	0x0000, // 0000 0000 0000 0000 ;. (Set separately)
+	0x0000, // 0000 0000 0000 0000  //XXX (0x2C)
 	0x4400, // 0100 0100 0000 0000 --.
-	0x0000, // 0000 0000 0000 0000 . .(Set separately)
+	0x0000, // 0000 0000 0000 0000  //XXX (0x2E)
 	0x2200, // 0010 0010 0000 0000 /.
-	0x22FF, // 0010 0010 1111 1111 0.
+	0x22FF, // 0010 0010 1111 1111 0. (0x30)
 	0x1100, // 0001 0001 0000 0000 1.
 	0x4477, // 0100 0100 0111 0111 2.
 	0x443F, // 0100 0100 0011 1111 3.
@@ -230,10 +236,8 @@ static const uint16_t hpcharset[]=
 	0x000F, // 0000 0000 0000 1111 7.
 	0x44FF, // 0100 0100 1111 1111 8.
 	0x44BF, // 0100 0100 1011 1111 9.
-	0x0021, // 0000 0000 0010 0001 -
-			//                     -.
-	0x2001, // 0010 0000 0000 0001 -
-			//                     /.
+	0xFFFF, // 1111 1111 1111 1111 [all segs] (0x3A)
+	0x2001, // 0010 0000 0000 0001  //XXX
 	0x2230, // 0010 0010 0011 0000 <.
 	0x4430, // 0100 0100 0011 0000 =.
 	0x8830, // 1000 1000 0011 0000 >.
@@ -272,8 +276,9 @@ void hp3478a_state::lcd_map_chars()
 	LOGMASKED(DEBUG_LCD2, "LCD : map ");
 	for (i=0; i < 12; i++) {
 		bool dp = lcd_chrbuf[i] & 0x40;	//check decimal point. Needs to be mapped to seg_bit16
+		bool comma = lcd_chrbuf[i] & 0x80;	//check comma, maps to seg17
 		lcd_text[i] = (lcd_chrbuf[i] & 0x3F) + 0x40;
-		lcd_segdata[i] = hpcharset[lcd_chrbuf[i] & 0x3F] | (dp << 16);
+		lcd_segdata[i] = hpcharset[lcd_chrbuf[i] & 0x3F] | (dp << 16) | (comma << 17);
 		LOGMASKED(DEBUG_LCD2, "[%02X>%04X] ", lcd_chrbuf[i] & 0x3F, lcd_segdata[i]);
 	}
 	LOGMASKED(DEBUG_LCD2, "\n");
@@ -321,6 +326,8 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 		//not selected, reset everything
 		LOGMASKED(DEBUG_LCD, "LCD : state=IDLE, PWO deselected, %d stray bits(0x...%02X)\n",lcd_bitcount, lcd_bitbuf & 0xFF);
 		m_lcdstate = lcd_state::IDLE;
+		m_lcdiwa = lcd_iwatype::DISCARD;
+		std::transform(std::begin(lcd_segdata), std::end(lcd_segdata), std::begin(*m_outputs), lcd_set_display);
 		lcd_bitcount = 0;
 		lcd_bitbuf = 0;
 		return;
@@ -350,6 +357,7 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 			break;
 		case lcd_state::SELECTED_ISA:
 			if (!sync_state) {
+				//changing to SELECTED_IWA
 				m_lcdstate = lcd_state::SYNC_SKIP;
 				if (lcd_bitcount) {
 					LOGMASKED(DEBUG_LCD, "LCD : ISA->IWA, %d stray bits (0x%0X)\n", lcd_bitcount, lcd_bitbuf);
@@ -362,37 +370,39 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 			}
 			lcd_bitbuf |= (isa_state << lcd_bitcount);
 			lcd_bitcount++;
-			if (lcd_bitcount == lcd_want) {
-				LOGMASKED(DEBUG_LCD, "LCD : Instruction 0x%02X\n", lcd_bitbuf & 0xFF);
-				//shouldn't get extra bits, but we have nothing better to do so just reset the shiftreg.
-				lcd_bitcount = 0;
-				switch (lcd_bitbuf & 0xFF) {
-				case DISP_ISA_WANNUN:
-					lcd_want = 44;
-					m_lcdiwa = lcd_iwatype::ANNUNS;
-					break;
-				case DISP_ISA_WA:
-					lcd_want = 100;	//no, doesn't fit in a uint64, but only the first 36 bits are significant.
-					m_lcdiwa = lcd_iwatype::REG_A;
-					break;
-				case DISP_ISA_WB:
-					lcd_want = 100;
-					m_lcdiwa = lcd_iwatype::REG_B;
-					break;
-				case DISP_ISA_WC:
-					lcd_want = 44;
-					m_lcdiwa = lcd_iwatype::REG_C;
-					break;
-				default:
-					lcd_want = 44;
-					m_lcdiwa = lcd_iwatype::DISCARD;
-					break;
-				}
-				lcd_bitbuf = 0;
+			if (lcd_bitcount != lcd_want) {
+				break;
 			}
+			LOGMASKED(DEBUG_LCD, "LCD : Instruction 0x%02X\n", lcd_bitbuf & 0xFF);
+			//shouldn't get extra bits, but we have nothing better to do so just reset the shiftreg.
+			lcd_bitcount = 0;
+			switch (lcd_bitbuf & 0xFF) {
+			case DISP_ISA_WANNUN:
+				lcd_want = 44;
+				m_lcdiwa = lcd_iwatype::ANNUNS;
+				break;
+			case DISP_ISA_WA:
+				lcd_want = 100;	//no, doesn't fit in a uint64, but only the first 36 bits are significant.
+				m_lcdiwa = lcd_iwatype::REG_A;
+				break;
+			case DISP_ISA_WB:
+				lcd_want = 100;
+				m_lcdiwa = lcd_iwatype::REG_B;
+				break;
+			case DISP_ISA_WC:
+				lcd_want = 44;
+				m_lcdiwa = lcd_iwatype::REG_C;
+				break;
+			default:
+				lcd_want = 44;
+				m_lcdiwa = lcd_iwatype::DISCARD;
+				break;
+			}
+			lcd_bitbuf = 0;
 			break;
 		case lcd_state::SELECTED_IWA:
 			if (sync_state) {
+				//changing to SELECTED_ISA
 				m_lcdstate = lcd_state::SYNC_SKIP;
 				if (lcd_bitcount) {
 					LOGMASKED(DEBUG_LCD, "LCD : IWA->ISA, %d stray bits (0x%I64X)\n", lcd_bitcount, lcd_bitbuf);
@@ -419,13 +429,11 @@ void hp3478a_state::lcd_interface(uint8_t p2new)
 			case lcd_iwatype::REG_A:
 				lcd_update_lonib(lcd_chrbuf, lcd_bitbuf);
 				lcd_map_chars();
-				std::transform(std::begin(lcd_segdata), std::end(lcd_segdata), std::begin(*m_outputs), lcd_set_display);
 				LOGMASKED(DEBUG_LCD2, "LCD : write reg A (lonib) %I64X, text=%s\n", lcd_bitbuf, (char *) lcd_text);
 				break;
 			case lcd_iwatype::REG_B:
 				lcd_update_hinib(lcd_chrbuf, lcd_bitbuf);
 				lcd_map_chars();
-				std::transform(std::begin(lcd_segdata), std::end(lcd_segdata), std::begin(*m_outputs), lcd_set_display);
 				LOGMASKED(DEBUG_LCD2, "LCD : write reg B (lonib) %I64X, text=%s\n", lcd_bitbuf, (char *) lcd_text);
 				break;
 			default:
