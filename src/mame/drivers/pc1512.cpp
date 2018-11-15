@@ -1210,9 +1210,9 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, pc1512_state, fdc_int_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, pc1512_state, fdc_drq_w))
+	PC_FDC_XT(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(pc1512_state::fdc_int_w));
+	m_fdc->drq_wr_callback().set(FUNC(pc1512_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 
@@ -1341,9 +1341,9 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, pc1512_base_state, fdc_int_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, pc1512_base_state, fdc_drq_w))
+	PC_FDC_XT(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(pc1512_base_state::fdc_int_w));
+	m_fdc->drq_wr_callback().set(FUNC(pc1512_base_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 

@@ -120,8 +120,8 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
-	MCFG_PC_FDC_XT_ADD("fdc")
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE("mb:pic8259", pic8259_device, ir6_w))
+	PC_FDC_XT(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set("mb:pic8259", FUNC(pic8259_device::ir6_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 
