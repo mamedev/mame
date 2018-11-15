@@ -1189,8 +1189,7 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/4)  /* 1.5 MHz, measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);  /* 1.5 MHz, measured */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ampoker2_state::sigma2k)

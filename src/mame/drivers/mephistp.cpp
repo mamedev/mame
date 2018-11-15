@@ -190,10 +190,10 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mephisto_pinball_state, ay8910_columns_w))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mephisto_pinball_state, ay8910_inputs_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	AY8910(config, m_aysnd, XTAL(12'000'000)/8);
+	m_aysnd->port_a_write_callback().set(FUNC(mephisto_pinball_state::ay8910_columns_w));
+	m_aysnd->port_b_read_callback().set(FUNC(mephisto_pinball_state::ay8910_inputs_r));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	MCFG_DEVICE_ADD("dac", DAC08, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

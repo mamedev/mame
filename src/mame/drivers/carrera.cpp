@@ -341,11 +341,11 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/12));
 	/* these are set as input, but I have no idea which input port it uses is for the AY */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, carrera_state, unknown_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, carrera_state, unknown_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	aysnd.port_a_read_callback().set(FUNC(carrera_state::unknown_r));
+	aysnd.port_b_read_callback().set(FUNC(carrera_state::unknown_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 

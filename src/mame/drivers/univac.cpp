@@ -64,7 +64,7 @@ How to create a FCC (field control code):
 - Press Spacebar to enable the new FCC and exit back to normal.
 
 Control-page parameters. These vary depending on the terminal and feature set. Press FCTN and CTRL PAGE keys together.
-You get a proected area covering the first 2 lines where you can configure the terminal. Settings are saved in the NVRAM.
+You get a protected area covering the first 2 lines where you can configure the terminal. Settings are saved in the NVRAM.
 Depending on the setting, it may take effect immediately (after exiting the control page), or after a reboot.
 Entries may be in upper or lower case.
 UC/NO : Upper and lower case can be entered

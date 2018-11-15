@@ -89,6 +89,9 @@ casanova                        //
 fieldday                        // A23 (c) 1984 Taito
 undoukai                        // A17 (c) 1984 Taito
 
+@source:4d20.cpp
+4d20                            // (c) SGI 1991
+
 @source:4dpi.cpp
 sgi_ip6                         // IP6: 4D/PI, R2000, 20MHz
 
@@ -2664,6 +2667,7 @@ atvtracka                       // (c) 2002 - Ref 020419
 gfootbal                        // (c) 2002 - Ref 020201
 smashdrv                        // (c) 2000
 smashdrvb                       // (c) 2000
+smashdrvs                       // (c) 2000
 
 @source:aussiebyte.cpp
 aussieby                        //
@@ -10229,6 +10233,7 @@ sf2ceub                         // 13/05/1992 (c) 1992 (USA)
 sf2ceuc                         // 03/08/1992 (c) 1992 (USA)
 sf2dkot2                        // hack
 sf2dongb                        // hack
+sf2ea                           // 04/02/1991 (c) 1991 (World)
 sf2eb                           // 14/02/1991 (c) 1991 (World)
 sf2ebbl                         // 14/02/1991 (c) 1991 (World, bootleg)
 sf2ebbl2                        // 14/02/1991 (c) 1991 (World, bootleg)
@@ -10236,7 +10241,7 @@ sf2ebbl3                        // 14/02/1991 (c) 1991 (World, bootleg)
 sf2ed                           // 18/03/1991 (c) 1991 (World)
 sf2ee                           // 28/02/1991 (c) 1991 (World)
 sf2em                           // 29/01/1991 (c) 1991 (World)
-sf2en                           // 04/02/1991 (c) 1991 (World)
+sf2en                           // 04/02/1991 (c) 1991 (World, conversion)
 sf2hf                           // 09/12/1992 (c) 1992 (World)
 sf2hfj                          // 09/12/1992 (c) 1992 (Japan)
 sf2hfu                          // 09/12/1992 (c) 1992 (USA)
@@ -10691,6 +10696,9 @@ mastrglf
 crimfght                        // GX821 (c) 1989 (World)
 crimfghtu                       // GX821 (c) 1989 (US)
 crimfghtj                       // GX821 (c) 1989 (Japan)
+
+@source:crimson.cpp
+crimson                         // (c) 1992 SGI
 
 @source:crospang.cpp
 bestri                          // (c) F2 System
@@ -30541,8 +30549,14 @@ nyny                            // (c) 1980 Sigma Ent. Inc.
 nynyg                           // (c) 1980 Sigma Ent. Inc. + Gottlieb
 warcadia                        // (c) 1982 Sigma Ent. Inc.
 
+@source:o2.cpp
+o2                              // (c) 1996 SGI
+
 @source:ob68k1a.cpp
 ob68k1a                         //
+
+@source:octane.cpp
+octane                          // (c) 1997 SGI
 
 @source:octopus.cpp
 octopus                         //

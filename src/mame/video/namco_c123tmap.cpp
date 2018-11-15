@@ -125,14 +125,14 @@ void namco_c123tmap_device::init_scroll(int flip) // 8 bit control with external
 	}
 }
 
-void namco_c123tmap_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int prival)
+void namco_c123tmap_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int prival, int primask)
 {
 	for (int i = 0; i < 6; i++)
 	{
 		// bit 3 : disable layer
 		if ((m_tilemapinfo.control[0x20 / 2 + i] & 0x7) == pri)
 		{
-			m_tilemapinfo.tmap[i]->draw(screen, bitmap, cliprect, 0, prival);
+			m_tilemapinfo.tmap[i]->draw(screen, bitmap, cliprect, 0, prival, primask);
 		}
 	}
 } /* draw */

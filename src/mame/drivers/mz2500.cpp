@@ -1855,14 +1855,14 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym", YM2203, 2000000) //unknown clock / divider
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mz2500_state, opn_porta_r))  // read A
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))   // read B
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mz2500_state, opn_porta_w))  // write A
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym(YM2203(config, "ym", 2000000)); //unknown clock / divider
+	ym.port_a_read_callback().set(FUNC(mz2500_state::opn_porta_r));
+	ym.port_b_read_callback().set_ioport("DSW1");
+	ym.port_a_write_callback().set(FUNC(mz2500_state::opn_porta_w));
+	ym.add_route(0, "mono", 0.25);
+	ym.add_route(1, "mono", 0.25);
+	ym.add_route(2, "mono", 0.50);
+	ym.add_route(3, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)

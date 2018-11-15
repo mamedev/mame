@@ -2947,6 +2947,8 @@ if (BUSES["SCSI"]~=null) then
 		MAME_DIR .. "src/devices/bus/scsi/scsihle.h",
 		MAME_DIR .. "src/devices/bus/scsi/cdu76s.cpp",
 		MAME_DIR .. "src/devices/bus/scsi/cdu76s.h",
+		MAME_DIR .. "src/devices/bus/scsi/scsicd512.cpp",
+		MAME_DIR .. "src/devices/bus/scsi/scsicd512.h",
 		MAME_DIR .. "src/devices/bus/scsi/acb4070.cpp",
 		MAME_DIR .. "src/devices/bus/scsi/acb4070.h",
 		MAME_DIR .. "src/devices/bus/scsi/d9060hd.cpp",
@@ -3047,6 +3049,20 @@ if (BUSES["ZORRO"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/action_replay.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/sgikbd/sgikbd.h,BUSES["SGIKBD"] = true
+---------------------------------------------------
+
+if (BUSES["SGIKBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sgikbd/hlekbd.cpp",
+		MAME_DIR .. "src/devices/bus/sgikbd/hlekbd.h",
+		MAME_DIR .. "src/devices/bus/sgikbd/sgikbd.cpp",
+		MAME_DIR .. "src/devices/bus/sgikbd/sgikbd.h",
 	}
 end
 

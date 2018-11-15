@@ -749,14 +749,13 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, PIXEL_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", PIXEL_CLOCK/4));
+	ay1.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, PIXEL_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", PIXEL_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 void thepit_state::fitter(machine_config &config)

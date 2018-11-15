@@ -7880,11 +7880,11 @@ MACHINE_CONFIG_START(seta_state::tndrcade)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 16000000/4)   /* 4 MHz */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, seta_state, dsw1_r))     /* input A: DSW 1 */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seta_state, dsw2_r))     /* input B: DSW 2 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	ym2203_device &ym1(YM2203(config, "ym1", 16000000/4));   /* 4 MHz */
+	ym1.port_a_read_callback().set(FUNC(seta_state::dsw1_r));     /* input A: DSW 1 */
+	ym1.port_b_read_callback().set(FUNC(seta_state::dsw2_r));     /* input B: DSW 2 */
+	ym1.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	ym1.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
 	MCFG_DEVICE_ADD("ym2", YM3812, 16000000/4)   /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

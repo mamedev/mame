@@ -554,13 +554,12 @@ ROM_START( brkthruj )
 ROM_END
 
 // Tecfri PCB with Data East license.
-// Although only program ROM "8.bin" is marked as BAD_DUMP, it would be better to redump all program ROMs, to be 100% sure it's a good set.
 ROM_START( brkthrut )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for main CPU + 64k for banked ROMs */
 	ROM_LOAD( "5.bin", 0x04000, 0x4000,          CRC(158e660a) SHA1(608082e8b49d3c5595c25be8c19b80402310406a) )
-	ROM_LOAD( "6.bin", 0x08000, 0x8000,          CRC(1d88c59f) SHA1(d2cbcb0fffc21237d9b9e821a9122e4b447cf22b) )
+	ROM_LOAD( "6.bin", 0x08000, 0x8000, BAD_DUMP CRC(1d88c59f) SHA1(d2cbcb0fffc21237d9b9e821a9122e4b447cf22b) )
 	ROM_LOAD( "8.bin", 0x10000, 0x8000, BAD_DUMP CRC(0f933b74) SHA1(3e544346e84a5690d757ebde823895ca98b1cd0a) )
-	ROM_LOAD( "7.bin", 0x18000, 0x8000,          CRC(9c564f44) SHA1(c8d727b63ac29c24659d12f1d573c81e3fbf6745) )
+	ROM_LOAD( "7.bin", 0x18000, 0x8000, BAD_DUMP CRC(9c564f44) SHA1(c8d727b63ac29c24659d12f1d573c81e3fbf6745) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "9.bin", 0x00000, 0x2000, CRC(58c0b29b) SHA1(9dc075f8afae7e8fe164a9fe325e9948cdc7e4bb) ) /* characters */ /* Same as parent */

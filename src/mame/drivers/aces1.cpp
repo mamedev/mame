@@ -447,11 +447,11 @@ static INPUT_PORTS_START( aces1 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(aces1_state::aces1)
-
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000) / 2 ) /* XTAL verified, divisor not */
-	MCFG_DEVICE_PROGRAM_MAP(aces1_map)
-	MCFG_DEVICE_IO_MAP(aces1_portmap)
+void aces1_state::aces1(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2); /* XTAL verified, divisor not */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aces1_state::aces1_map);
+	m_maincpu->set_addrmap(AS_IO, &aces1_state::aces1_portmap);
 
 	// 0xafb0 IC24 - lamps, 7segs
 	i8255_device &ic24(I8255A(config, "ic24"));
@@ -477,10 +477,10 @@ MACHINE_CONFIG_START(aces1_state::aces1)
 	SPEAKER(config, "mono").front_center();
 
 	// 0xadf0 - Dips, Sound
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(8'000'000) / 8) /* XTAL verified, divisor not */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(8'000'000) / 8)); /* XTAL verified, divisor not */
+	aysnd.port_a_read_callback().set_ioport("DSWA");
+	aysnd.port_b_read_callback().set_ioport("DSWB");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* steppers */
 	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(aces1_state::aces1)
 	m_reel[2]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<2>));
 	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[3]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<3>));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( ac1clbmn )

@@ -3462,6 +3462,17 @@
 		</part>
 	</software>
 
+	<software name="ewgeebez">
+		<description>Ewgeebez</description>
+		<year>1984</year>
+		<publisher>Software Projects</publisher>
+		<part name="cass" interface="electron_cass">
+			<dataarea name="cass" size="8365">
+				<rom name="ewgeebez(1984)(softwareprojects).uef" size="8365" crc="495b927c" sha1="ef58977e38d4b18c1dae3d5c6cb8ccefcfc093b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="exile">
 		<description>Exile</description>
 		<year>1988</year>

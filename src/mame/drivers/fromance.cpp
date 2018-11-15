@@ -981,8 +981,7 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000) / 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	YM2149(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */

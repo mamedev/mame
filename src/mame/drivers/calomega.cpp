@@ -2606,9 +2606,9 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8912", AY8912, SND_CLOCK) /* confirmed */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW3"))                /* from schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	ay8912_device &ay8912(AY8912(config, "ay8912", SND_CLOCK)); /* confirmed */
+	ay8912.port_a_read_callback().set_ioport("SW3");                /* from schematics */
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	/* acia */
 	ACIA6850(config, m_acia6850_0, 0);
@@ -2628,8 +2628,7 @@ MACHINE_CONFIG_START(calomega_state::s903mod)
 	MCFG_DEVICE_PROGRAM_MAP(s903mod_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(CONSTANT(0))
+	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -2651,8 +2650,7 @@ MACHINE_CONFIG_START(calomega_state::sys905)
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(CONSTANT(0))
+	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -2682,8 +2680,7 @@ MACHINE_CONFIG_START(calomega_state::sys906)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sys906)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))    /* From PCB pic. Value is stored at $0539 */
+	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_ioport("SW2");    /* From PCB pic. Value is stored at $0539 */
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 

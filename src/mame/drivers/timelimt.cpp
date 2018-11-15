@@ -262,14 +262,13 @@ MACHINE_CONFIG_START(timelimt_state::timelimt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 18432000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", 18432000/12));
+	ay2.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 /***************************************************************************

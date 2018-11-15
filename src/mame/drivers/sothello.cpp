@@ -380,18 +380,16 @@ MACHINE_CONFIG_START(sothello_state::sothello)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(21'477'272) / 12)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("subcpu", 0))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(21'477'272) / 12));
+	ymsnd.irq_handler().set_inputline(m_subcpu, 0);
+	ymsnd.port_a_read_callback().set_ioport("DSWA");
+	ymsnd.port_b_read_callback().set_ioport("DSWB");
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
+	ymsnd.add_route(3, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, sothello_state, adpcm_int))      /* interrupt function */

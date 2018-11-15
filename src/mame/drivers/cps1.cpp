@@ -6390,6 +6390,55 @@ ROM_START( sf2 )
 ROM_END
 
 /* B-Board 90629B-2 */
+ROM_START( sf2ea )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "sf2e_30a.11e", 0x00000, 0x20000, CRC(bc02c14c) SHA1(83198317c3838d9a031f78c866fe690d185647f6) ) // had a red stripe through label
+	ROM_LOAD16_BYTE( "sf2e_37a.11f", 0x00001, 0x20000, CRC(1c1266b3) SHA1(756f54e82305af6b4374b748d486ae587bf7571b) ) // had a red stripe through label
+	ROM_LOAD16_BYTE( "sf2e_31a.12e", 0x40000, 0x20000, CRC(8b8221e6) SHA1(98d143943ea830a046f0f799b1cf27cc4024729b) ) // had a red stripe through label
+	ROM_LOAD16_BYTE( "sf2e_38a.12f", 0x40001, 0x20000, CRC(2d42d82a) SHA1(4a1f23efef6ae6fe4bebd475f7429cf8ae291adf) ) // had a red stripe through label
+	ROM_LOAD16_BYTE( "sf2_28a.9e",   0x80000, 0x20000, CRC(852e10ec) SHA1(a39e0feac1ba9db209aae89b1d33a3a6a1bec2e1) ) // had a red stripe through label
+	ROM_LOAD16_BYTE( "sf2_35a.9f",   0x80001, 0x20000, CRC(3b075de1) SHA1(8dcadee5bbf8c91c60d6775d107543fb5e36d75d) ) // had a red stripe through label
+	ROM_LOAD16_BYTE( "sf2_29.10e",   0xc0000, 0x20000, CRC(fdd0b5c1) SHA1(af9051d77f8e7039ea9b55482fcdbb0bad8bb63c) )
+	ROM_LOAD16_BYTE( "sf2_36.10f",   0xc0001, 0x20000, CRC(db66b127) SHA1(cbf6aba28e24d5a7cd73733ee4c04ddc5e15e2a7) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "sf2-5m.4a",  0x000000, 0x80000, CRC(22c9cc8e) SHA1(b9194fb337b30502c1c9501cd6c64ae4035544d4) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "2" socket
+	ROMX_LOAD( "sf2-7m.6a",  0x000002, 0x80000, CRC(57213be8) SHA1(3759b851ac0904ec79cbb67a2264d384b6f2f9f9) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "4" socket
+	ROMX_LOAD( "sf2-1m.3a",  0x000004, 0x80000, CRC(ba529b4f) SHA1(520840d727161cf09ca784919fa37bc9b54cc3ce) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "1" socket
+	ROMX_LOAD( "sf2-3m.5a",  0x000006, 0x80000, CRC(4b1b33a8) SHA1(2360cff890551f76775739e2d6563858bff80e41) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "3" socket
+	ROMX_LOAD( "sf2-6m.4c",  0x200000, 0x80000, CRC(2c7e2229) SHA1(357c2275af9133fd0bd6fbb1fa9ad5e0b490b3a2) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "11" socket
+	ROMX_LOAD( "sf2-8m.6c",  0x200002, 0x80000, CRC(b5548f17) SHA1(baa92b91cf616bc9e2a8a66adc777ffbf962a51b) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "13" socket
+	ROMX_LOAD( "sf2-2m.3c",  0x200004, 0x80000, CRC(14b84312) SHA1(2eea16673e60ba7a10bd4d8f6c217bb2441a5b0e) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "10" socket
+	ROMX_LOAD( "sf2-4m.5c",  0x200006, 0x80000, CRC(5e9cd89a) SHA1(f787aab98668d4c2c54fc4ba677c0cb808e4f31e) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "12" socket
+	ROMX_LOAD( "sf2-13m.4d", 0x400000, 0x80000, CRC(994bfa58) SHA1(5669b845f624b10e7be56bfc89b76592258ce48b) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "21" socket
+	ROMX_LOAD( "sf2-15m.6d", 0x400002, 0x80000, CRC(3e66ad9d) SHA1(9af9df0826988872662753e9717c48d46f2974b0) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "23" socket
+	ROMX_LOAD( "sf2-9m.3d",  0x400004, 0x80000, CRC(c1befaa8) SHA1(a6a7f4725e52678cbd8d557285c01cdccb2c2602) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "20" socket
+	ROMX_LOAD( "sf2-11m.5d", 0x400006, 0x80000, CRC(0627c831) SHA1(f9a92d614e8877d648449de2612fc8b43c85e4c2) , ROM_GROUPWORD | ROM_SKIP(6) )    // in "22" socket
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sf2_9.12a",   0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) )
+	ROM_CONTINUE(            0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "sf2_18.11c",  0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
+	ROM_LOAD( "sf2_19.12c",  0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "stf29.1a",     0x0000, 0x0117, CRC(043309c5) SHA1(f6b9610c9f896c495041ba56a654776a521c356b) )
+	ROM_LOAD( "iob1.11d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+
+	ROM_REGION( 0x0200, "cboardplds", 0 )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+ROM_END
+
+/* B-Board 90629B-2 */
 ROM_START( sf2eb )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "sf2e_30b.11e", 0x00000, 0x20000, CRC(57bd7051) SHA1(5e211e75b1649b07723cabc03cf15636dbbae595) )
@@ -13004,6 +13053,7 @@ GAME( 1990, nemo,        0,        cps1_10MHz, nemo,     cps_state, init_cps1,  
 GAME( 1990, nemor1,      nemo,     cps1_10MHz, nemo,     cps_state, init_cps1,     ROT0,   "Capcom", "Nemo (World 901109)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, nemoj,       nemo,     cps1_10MHz, nemo,     cps_state, init_cps1,     ROT0,   "Capcom", "Nemo (Japan 901120)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, sf2,         0,        cps1_10MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II: The World Warrior (World 910522)", MACHINE_SUPPORTS_SAVE )   // "ETC"
+GAME( 1991, sf2ea,       sf2,      cps1_10MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II: The World Warrior (World 910204)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1991, sf2eb,       sf2,      cps1_10MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II: The World Warrior (World 910214)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1991, sf2ed,       sf2,      cps1_10MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II: The World Warrior (World 910318)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1991, sf2ee,       sf2,      cps1_10MHz, sf2,      cps_state, init_sf2ee,    ROT0,   "Capcom", "Street Fighter II: The World Warrior (World 910228)", MACHINE_SUPPORTS_SAVE )   // "ETC"

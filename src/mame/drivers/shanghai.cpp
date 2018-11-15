@@ -424,13 +424,13 @@ MACHINE_CONFIG_START(shanghai_state::shanghai)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(16'000'000)/4));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(0, "mono", 0.15);
+	ymsnd.add_route(1, "mono", 0.15);
+	ymsnd.add_route(2, "mono", 0.15);
+	ymsnd.add_route(3, "mono", 0.80);
 MACHINE_CONFIG_END
 
 
@@ -459,13 +459,13 @@ MACHINE_CONFIG_START(shanghai_state::shangha2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(16'000'000)/4));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(0, "mono", 0.15);
+	ymsnd.add_route(1, "mono", 0.15);
+	ymsnd.add_route(2, "mono", 0.15);
+	ymsnd.add_route(3, "mono", 0.80);
 MACHINE_CONFIG_END
 
 
@@ -501,11 +501,11 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	SPEAKER(config, "mono").front_center();
 
 	/* same as standard seibu ym2203, but also reads "DSW" */
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(16'000'000)/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")

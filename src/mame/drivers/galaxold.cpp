@@ -2287,6 +2287,23 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(galaxold_state::galaxian_audio)
+	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, galaxian_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxold_state::mooncrst_audio)
+	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, mooncrst_discrete)
+
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
+
 
 MACHINE_CONFIG_START(galaxold_state::galaxian)
 	galaxold_base(config);
@@ -2495,8 +2512,7 @@ MACHINE_CONFIG_START(galaxold_state::ozon1)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
-	MCFG_DEVICE_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, "aysnd", PIXEL_CLOCK/4).add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -2546,9 +2562,9 @@ MACHINE_CONFIG_START(galaxold_state::bongo)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	ay8910_device &aysnd(AY8910(config, "aysnd", PIXEL_CLOCK/4));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 

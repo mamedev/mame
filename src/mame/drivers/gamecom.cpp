@@ -24,12 +24,7 @@ Todo:
 Game Status:
 - Inbuilt ROM and PDA functions all work
 - Due to an irritating message, the NVRAM is commented out in the machine config
-- All carts appear to work except:
-- - Lost World: freeze just after entering Stage 2 (the nest).
-- --- If you do nothing it freezes at the point where the stegasaurus
-      should turn around. So, straight away start moving to the right
-      and you can keep playing.
-- Weblink and Internet are of no use as there is nothing to connect to.
+- All carts appear to work.
 
 ***************************************************************************/
 

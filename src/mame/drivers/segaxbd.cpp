@@ -375,7 +375,6 @@ public:
 	void init_lastsurv();
 	void init_loffire();
 	void init_smgp();
-	void init_rascot();
 	void init_gprider();
 
 protected:
@@ -519,8 +518,9 @@ WRITE8_MEMBER(segaxbd_state::pc_0_w)
 
 	m_segaic16vid->set_display_enable(data & 0x20);
 
-	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	if (m_soundcpu2 != nullptr)
+	if (m_soundcpu.found())
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_soundcpu2.found())
 		m_soundcpu2->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -571,31 +571,6 @@ WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
-}
-
-
-//-------------------------------------------------
-//  rascot_excs_r - /EXCS region reads for Rascot
-//-------------------------------------------------
-
-READ16_MEMBER( segaxbd_state::rascot_excs_r )
-{
-	//logerror("%06X:rascot_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
-
-	// probably receives commands from the server here
-	//return machine().rand() & 0xff;
-
-	return 0xff;
-}
-
-
-//-------------------------------------------------
-//  rascot_excs_w - /EXCS region writes for Rascot
-//-------------------------------------------------
-
-WRITE16_MEMBER( segaxbd_state::rascot_excs_w )
-{
-	//logerror("%06X:rascot_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
 
 
@@ -747,6 +722,39 @@ READ8_MEMBER(segaxbd_state::smgp_motor_r)
 WRITE8_MEMBER(segaxbd_state::smgp_motor_w)
 {
 	// TODO
+}
+
+
+//-------------------------------------------------
+//  commram_r - banked reads from the MB8421
+//  dual-port communications RAM for Royal Ascot
+//-------------------------------------------------
+
+READ8_MEMBER(segaxbd_rascot_state::commram_r)
+{
+	return m_commram->right_r(space, m_commram_bank << 3 | offset);
+}
+
+
+//-------------------------------------------------
+//  commram_w - banked writes to the MB8421
+//  dual-port communications RAM for Royal Ascot
+//-------------------------------------------------
+
+WRITE8_MEMBER(segaxbd_rascot_state::commram_w)
+{
+	m_commram->right_w(space, m_commram_bank << 3 | offset, data);
+}
+
+
+//-------------------------------------------------
+//  commram_bank_w - set bank for MB8421 in blocks
+//  of 8 bytes
+//-------------------------------------------------
+
+WRITE8_MEMBER(segaxbd_rascot_state::commram_bank_w)
+{
+	m_commram_bank = data;
 }
 
 
@@ -971,7 +979,14 @@ void segaxbd_state::sub_map(address_map &map)
 	map(0x0e8000, 0x0e800f).mirror(0x003ff0).rw("cmptimer_subx", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
 	map(0x0ec000, 0x0ecfff).mirror(0x001000).ram().share("roadram");
 	map(0x0ee000, 0x0effff).rw("segaic16road", FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
-//  AM_RANGE(0x0f0000, 0x0f3fff) AM_READWRITE(excs_r, excs_w)
+}
+
+void segaxbd_rascot_state::sub_map(address_map &map)
+{
+	segaxbd_state::sub_map(map);
+	map(0x0f0000, 0x0f000f).mirror(0x70).r(FUNC(segaxbd_rascot_state::commram_r)).umask16(0x00ff);
+	map(0x0f0000, 0x0f000f).w(FUNC(segaxbd_rascot_state::commram_w)).umask16(0x00ff);
+	map(0x0f0011, 0x0f0011).w(FUNC(segaxbd_rascot_state::commram_bank_w));
 }
 
 
@@ -1066,21 +1081,17 @@ void segaxbd_state::smgp_comm_portmap(address_map &map)
 
 
 //**************************************************************************
-//  RASCOT UNKNOWN Z80 CPU ADDRESS MAPS
+//  RASCOT LINK CPU ADDRESS MAP
 //**************************************************************************
 
-// Z80, unknown function
-void segaxbd_state::rascot_z80_map(address_map &map)
+void segaxbd_rascot_state::comm_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xafff).ram();
-}
-
-void segaxbd_state::rascot_z80_portmap(address_map &map)
-{
-	map.unmap_value_high();
-	map.global_mask(0xff);
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa7ff).rw(m_commram, FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0xc000, 0xc001).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xe003, 0xe003).nopw(); // ?
 }
 
 
@@ -1664,11 +1675,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_state::main_map);
 
-	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	M68000(config, m_subcpu, MASTER_CLOCK/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segaxbd_state::sub_map);
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -1960,16 +1971,30 @@ DEFINE_DEVICE_TYPE(SEGA_XBD_RASCOT, segaxbd_rascot_state, "segaxbd_pcb_rascot", 
 
 segaxbd_rascot_state::segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segaxbd_state(mconfig, SEGA_XBD_RASCOT, tag, owner, clock)
+	, m_commram(*this, "commram")
+	, m_usart(*this, "usart")
 {
 }
 
 MACHINE_CONFIG_START(segaxbd_rascot_state::device_add_mconfig)
 	segaxbd_state::xboard_base_mconfig(config);
 
+	m_subcpu->set_addrmap(AS_PROGRAM, &segaxbd_rascot_state::sub_map);
+
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(rascot_z80_map)
-	MCFG_DEVICE_IO_MAP(rascot_z80_portmap)
+	MCFG_DEVICE_REMOVE("soundcpu")
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("pcm")
+	MCFG_DEVICE_REMOVE("lspeaker")
+	MCFG_DEVICE_REMOVE("rspeaker")
+	m_cmptimer_1->zint_callback().set_nop();
+
+	cpu_device &commcpu(Z80(config, "commcpu", 8'000'000)); // clock unknown
+	commcpu.set_addrmap(AS_PROGRAM, &segaxbd_rascot_state::comm_map);
+
+	MB8421(config, m_commram).intl_callback().set_inputline("commcpu", INPUT_LINE_IRQ0);
+
+	I8251(config, m_usart, 2'000'000); // clock unknown
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_rascot)
@@ -4599,12 +4624,8 @@ ROM_START( rascot )
 	ROM_REGION( 0x10000, "mainpcb:gfx3", ROMREGION_ERASE00 ) // road gfx
 	// none??
 
-	ROM_REGION( 0x10000, "mainpcb:soundcpu", 0 ) // sound CPU
-	// is this really a sound ROM, or a terminal / link ROM? accesses unexpected addresses
+	ROM_REGION( 0x10000, "mainpcb:commcpu", 0 ) // link ROM?
 	ROM_LOAD( "epr-14221a",    0x00000, 0x10000, CRC(0d429ac4) SHA1(9cd4c7e858874f372eb3e409ba37964f1ebf07d5) )
-
-	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
-	// none??
 
 	// identification needed
 	ROM_REGION( 0x40000, "satellite", 0 )
@@ -4660,17 +4681,14 @@ void segaxbd_new_state::init_smgp()
 	m_mainpcb->install_smgp();
 }
 
-void segaxbd_new_state::init_rascot()
+void segaxbd_rascot_state::device_start()
 {
-	// patch out bootup link test
-	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("mainpcb:subcpu")->base());
-	rom[0xb78/2] = 0x601e; // subROM checksum test
-	rom[0x57e/2] = 0x4e71;
-	rom[0x5d0/2] = 0x6008;
-	rom[0x606/2] = 0x4e71;
+	segaxbd_state::device_start();
 
-	// map /EXCS space
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0f0000, 0x0f3fff, read16_delegate(FUNC(segaxbd_state::rascot_excs_r), (segaxbd_state*)m_mainpcb), write16_delegate(FUNC(segaxbd_state::rascot_excs_w), (segaxbd_state*)m_mainpcb));
+	m_commram_bank = 0;
+	save_item(NAME(m_commram_bank));
+
+	m_usart->write_cts(0);
 }
 
 void segaxbd_state::install_gprider(void)
@@ -4739,7 +4757,7 @@ GAME( 1990, gprideru,gprider,  sega_xboard_fd1094_double, gprider_double, segaxb
 GAME( 1990, gpriderj,gprider,  sega_xboard_fd1094_double, gprider_double, segaxbd_new_state_double, init_gprider_double, ROT0, "Sega", "GP Rider (Japan, FD1094 317-0161) (Twin setup)", 0 )
 
 // X-Board + other boards?
-GAME( 1991, rascot,    0,        sega_rascot,  rascot,   segaxbd_new_state, init_rascot,  ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, rascot,    0,        sega_rascot,  rascot,   segaxbd_new_state, empty_init,   ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // decrypted bootlegs
 

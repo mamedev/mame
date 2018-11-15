@@ -364,7 +364,7 @@ TIMER_CALLBACK_MEMBER(timekeeper_device::watchdog_callback)
 	else {
 		m_irq_cb(ASSERT_LINE);
 	}
-	//printf("watchdog_callback: WD Control: %02x WD Flags: %02x\n", m_data[m_offset_watchdog], m_data[m_offset_flags]);
+	logerror("watchdog_callback: WD Control: %02x WD Flags: %02x\n", m_data[m_offset_watchdog], m_data[m_offset_flags]);
 }
 
 WRITE8_MEMBER(timekeeper_device::watchdog_write)
@@ -408,12 +408,11 @@ WRITE8_MEMBER( timekeeper_device::write )
 		}
 		else {
 			// Calculate the time unit
-			m_watchdog_delay = attotime::from_usec(62500);
-			m_watchdog_delay *= 4 << (data & 0x3);
+			m_watchdog_delay = attotime::from_usec(62500 << (2 * (data & 0x3)));
 			// Adjust by multiplier
 			m_watchdog_delay *= (data >> 2) & 0x1f;
 			m_watchdog_timer->adjust(m_watchdog_delay);
-			//printf("write: setting watchdog to %s WatchdogReg = 0x%02x\n", m_watchdog_delay.as_string(), data);
+			//logerror("write: setting watchdog to %s WatchdogReg = 0x%02x\n", m_watchdog_delay.as_string(), data);
 		}
 	}
 

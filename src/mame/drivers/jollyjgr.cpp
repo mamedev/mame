@@ -704,8 +704,7 @@ MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545)/2) /* 1.7897725MHz verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	AY8910(config, "aysnd", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.45); /* 1.7897725MHz verified */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jollyjgr_state::fspider)

@@ -1582,10 +1582,10 @@ MACHINE_CONFIG_START(tnzs_mcu_state::tnzs)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4));
+	ymsnd.port_a_read_callback().set_ioport("DSWA");
+	ymsnd.port_b_read_callback().set_ioport("DSWB");
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(extrmatn_state::extrmatn)
@@ -1634,10 +1634,10 @@ MACHINE_CONFIG_START(insectx_state::insectx)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_insectx)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
+	ymsnd.port_a_read_callback().set_ioport("DSWA");
+	ymsnd.port_b_read_callback().set_ioport("DSWB");
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
 MACHINE_CONFIG_END
 
 
@@ -1648,13 +1648,13 @@ MACHINE_CONFIG_START(kageki_state::kageki)
 	MCFG_DEVICE_PROGRAM_MAP(kageki_sub_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kageki_state, csport_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kageki_state, csport_w))
-	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.15)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.15)
-	MCFG_SOUND_ROUTE(3, "speaker", 0.35)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
+	ymsnd.port_a_read_callback().set(FUNC(kageki_state::csport_r));
+	ymsnd.port_b_write_callback().set(FUNC(kageki_state::csport_w));
+	ymsnd.add_route(0, "speaker", 0.15);
+	ymsnd.add_route(1, "speaker", 0.15);
+	ymsnd.add_route(2, "speaker", 0.15);
+	ymsnd.add_route(3, "speaker", 0.35);
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
@@ -1680,14 +1680,14 @@ MACHINE_CONFIG_START(tnzsb_state::tnzsb)
 	MCFG_SCREEN_REFRESH_RATE(59.15)   /* verified on pcb */
 
 	/* sound hardware */
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, tnzsb_state, ym2203_irqhandler))
-	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "speaker", 1.0)
-	MCFG_SOUND_ROUTE(2, "speaker", 1.0)
-	MCFG_SOUND_ROUTE(3, "speaker", 2.0)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
+	ymsnd.irq_handler().set(FUNC(tnzsb_state::ym2203_irqhandler));
+	ymsnd.add_route(0, "speaker", 1.0);
+	ymsnd.add_route(1, "speaker", 1.0);
+	ymsnd.add_route(2, "speaker", 1.0);
+	ymsnd.add_route(3, "speaker", 2.0);
 MACHINE_CONFIG_END
 
 
@@ -1702,9 +1702,9 @@ MACHINE_CONFIG_START(kabukiz_state::kabukiz)
 	MCFG_DEVICE_PROGRAM_MAP(kabukiz_cpu2_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, kabukiz_state, sound_bank_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
+	ym2203_device &ymsnd(*subdevice<ym2203_device>("ymsnd"));
+	ymsnd.port_a_write_callback().set(FUNC(kabukiz_state::sound_bank_w));
+	ymsnd.port_b_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -1732,8 +1732,7 @@ MACHINE_CONFIG_START(jpopnics_state::jpopnics)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(12'000'000)/4) /* Not verified - Main board Crystal is 12MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	YM2151(config, "ymsnd", XTAL(12'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Not verified - Main board Crystal is 12MHz */
 MACHINE_CONFIG_END
 
 /***************************************************************************

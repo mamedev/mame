@@ -341,13 +341,6 @@ READ8_MEMBER(m72_state::mcu_data_r)
 	return (m_dpram->right_r(space, offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
 }
 
-INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
-{
-	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
-	//m_mcu_snd_cmd_latch = 0x11;// | (machine().rand() & 1); /* 0x10 is special as well - FIXME */
-	device.execute().set_input_line(1, ASSERT_LINE);
-}
-
 READ8_MEMBER(m72_state::mcu_sample_r)
 {
 	uint8_t sample;
@@ -358,12 +351,9 @@ READ8_MEMBER(m72_state::mcu_sample_r)
 WRITE8_MEMBER(m72_state::mcu_port1_w)
 {
 	m_mcu_sample_latch = data;
-	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
 
-WRITE8_MEMBER(m72_state::mcu_port3_w)
-{
-	logerror("port3: %02x\n", data);
+	// FIXME: this can't be the NMI trigger
+	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(m72_state::mcu_low_w)
@@ -1888,8 +1878,6 @@ MACHINE_CONFIG_START(m72_state::m72_8751)
 	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000)) /* Uses its own XTAL */
 	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, m72_state, mcu_port1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, m72_state, mcu_port3_w))
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
 MACHINE_CONFIG_END
 
 

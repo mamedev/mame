@@ -585,9 +585,9 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, multi8_state, ym2203_porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8912(config, m_aysnd, 1500000); //unknown clock / divider
+	m_aysnd->port_a_write_callback().set(FUNC(multi8_state::ym2203_porta_w));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.50);
 	MCFG_DEVICE_ADD("beeper", BEEP, 1200) // guesswork
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 

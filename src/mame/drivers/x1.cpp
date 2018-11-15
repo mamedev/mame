@@ -2264,13 +2264,13 @@ MACHINE_CONFIG_START(x1_state::x1)
 	SPEAKER(config, "rspeaker").front_right();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
+	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
+	ay.port_a_read_callback().set_ioport("P1");
+	ay.port_b_read_callback().set_ioport("P2");
+	ay.add_route(0, "lspeaker", 0.25);
+	ay.add_route(0, "rspeaker", 0.25);
+	ay.add_route(1, "lspeaker", 0.5);
+	ay.add_route(2, "rspeaker", 0.5);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
 	MCFG_CASSETTE_ADD("cassette")

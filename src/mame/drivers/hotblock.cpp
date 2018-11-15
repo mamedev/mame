@@ -228,10 +228,10 @@ MACHINE_CONFIG_START(hotblock_state::hotblock)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 24_MHz_XTAL / 24)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2149_device &aysnd(YM2149(config, "aysnd", 24_MHz_XTAL / 24));
+	aysnd.port_a_read_callback().set_ioport("P1");
+	aysnd.port_b_read_callback().set_ioport("P2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 ROM_START( hotblock )

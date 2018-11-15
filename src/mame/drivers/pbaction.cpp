@@ -479,16 +479,13 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 12_MHz_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 12_MHz_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 12_MHz_XTAL/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay3", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 void pbaction_state::pbactionx(machine_config &config)

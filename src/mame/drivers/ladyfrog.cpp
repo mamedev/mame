@@ -319,12 +319,12 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ladyfrog_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ladyfrog_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(8'000'000)/4));
+	aysnd.port_a_write_callback().set(FUNC(ladyfrog_state::unk_w));
+	aysnd.port_b_write_callback().set(FUNC(ladyfrog_state::unk_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6)

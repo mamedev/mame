@@ -120,7 +120,7 @@ READ8_MEMBER(gyruss_state::gyruss_portA_r)
 
 WRITE8_MEMBER(gyruss_state::gyruss_dac_w)
 {
-	m_discrete->write(space, NODE(16), data);
+	m_discrete->write(NODE(16), data);
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
@@ -135,7 +135,7 @@ void gyruss_state::filter_w(address_space &space, int chip, int data )
 	{
 		/* low bit: 47000pF = 0.047uF */
 		/* high bit: 220000pF = 0.22uF */
-		m_discrete->write(space, NODE(3 * chip + i + 21), data & 3);
+		m_discrete->write(NODE(3 * chip + i + 21), data & 3);
 		data >>= 2;
 	}
 }
@@ -517,46 +517,46 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, gyruss_state, gyruss_filter0_w))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
+	ay8910_device &ay1(AY8910(config, "ay1", SOUND_CLOCK/8));
+	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay1.set_resistors_load(RES_K(3.3), RES_K(3.3), RES_K(3.3));
+	ay1.port_b_write_callback().set(FUNC(gyruss_state::gyruss_filter0_w));
+	ay1.add_route(0, "discrete", 1.0, 0);
+	ay1.add_route(1, "discrete", 1.0, 1);
+	ay1.add_route(2, "discrete", 1.0, 2);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, gyruss_state, gyruss_filter1_w))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 3)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 4)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 5)
+	ay8910_device &ay2(AY8910(config, "ay2", SOUND_CLOCK/8));
+	ay2.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay2.set_resistors_load(RES_K(3.3), RES_K(3.3), RES_K(3.3));
+	ay2.port_b_write_callback().set(FUNC(gyruss_state::gyruss_filter1_w));
+	ay2.add_route(0, "discrete", 1.0, 3);
+	ay2.add_route(1, "discrete", 1.0, 4);
+	ay2.add_route(2, "discrete", 1.0, 5);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, gyruss_state, gyruss_portA_r))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 6)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 7)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 8)
+	ay8910_device &ay3(AY8910(config, "ay3", SOUND_CLOCK/8));
+	ay3.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay3.set_resistors_load(RES_K(3.3), RES_K(3.3), RES_K(3.3));
+	ay3.port_a_read_callback().set(FUNC(gyruss_state::gyruss_portA_r));
+	ay3.add_route(0, "discrete", 1.0, 6);
+	ay3.add_route(1, "discrete", 1.0, 7);
+	ay3.add_route(2, "discrete", 1.0, 8);
 
-	MCFG_DEVICE_ADD("ay4", AY8910, SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 9)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 10)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 11)
+	ay8910_device &ay4(AY8910(config, "ay4", SOUND_CLOCK/8));
+	ay4.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay4.set_resistors_load(RES_K(3.3), RES_K(3.3), RES_K(3.3));
+	ay4.add_route(0, "discrete", 1.0, 9);
+	ay4.add_route(1, "discrete", 1.0, 10);
+	ay4.add_route(2, "discrete", 1.0, 11);
 
-	MCFG_DEVICE_ADD("ay5", AY8910, SOUND_CLOCK/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(3.3), RES_K(3.3), RES_K(3.3))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 12)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 13)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 14)
+	ay8910_device &ay5(AY8910(config, "ay5", SOUND_CLOCK/8));
+	ay5.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay5.set_resistors_load(RES_K(3.3), RES_K(3.3), RES_K(3.3));
+	ay5.add_route(0, "discrete", 1.0, 12);
+	ay5.add_route(1, "discrete", 1.0, 13);
+	ay5.add_route(2, "discrete", 1.0, 14);
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, gyruss_sound_discrete)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)

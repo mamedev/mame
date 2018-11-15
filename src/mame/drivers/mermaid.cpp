@@ -457,11 +457,9 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay8910[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay8910[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 MACHINE_CONFIG_END
 

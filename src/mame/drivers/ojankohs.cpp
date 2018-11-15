@@ -742,10 +742,10 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 12000000/6)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw2_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ym2149_device &aysnd(YM2149(config, "aysnd", 12000000/6));
+	aysnd.port_a_read_callback().set(FUNC(ojankohs_state::ojankohs_dipsw1_r));
+	aysnd.port_b_read_callback().set(FUNC(ojankohs_state::ojankohs_dipsw2_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
@@ -782,10 +782,10 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12000000/8));
+	aysnd.port_a_read_callback().set_ioport("dsw1");
+	aysnd.port_b_read_callback().set_ioport("dsw2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
@@ -823,10 +823,10 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12000000/8));
+	aysnd.port_a_read_callback().set_ioport("dsw1");
+	aysnd.port_b_read_callback().set_ioport("dsw2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
@@ -861,10 +861,10 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 8000000/4));
+	aysnd.port_a_read_callback().set_ioport("dsw1");
+	aysnd.port_b_read_callback().set_ioport("dsw2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 8000000/22)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */

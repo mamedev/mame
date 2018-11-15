@@ -693,16 +693,25 @@ REF 010131
 |  TDA1543  TDA1543                            |
 |----------------------------------------------|
 
-*/
-
-/*
-   PRG ROM useful locations:
+ PRG ROM useful locations:
    0x64C44 Country: 0 - World, 1 - Spain, 2 - UK, 3 - Italy, 4 - USA
    0x727AC 1 - enable Develop/debug option in test mode
 */
+
 ROM_START( smashdrv ) // World Version: 3.3, Version 3D: 1.9, Checksum: 707A
 	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
 	ROM_LOAD("prg_world.ic23", 0x0000000, 0x0400000, CRC(c642b059) SHA1(8a898f46cebc5951a6355f2b51e31ac5e17b4bca) )
+
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
+	ROM_LOAD32_WORD("sdrb.ic14",    0x00000002, 0x01000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
+	ROM_LOAD32_WORD("sdrc.ic20",    0x02000000, 0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) )
+	// ic21 unpopulated
+ROM_END
+
+ROM_START( smashdrvs ) // Spain/Portugal Version: 3.3, Version 3D: 1.9, Checksum: 707B. There is another known (undumped) Spain/Portugal (Covielsa license) set with Version: 3.3, Version 3D: 1.9, Checksum: EDD9.
+	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
+	ROM_LOAD("prg_spain.ic23", 0x0000000, 0x0400000, CRC(66b80283) SHA1(7d569670fd96aaa99da24378c77a265bc2ddc91c) )
 
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
@@ -729,3 +738,4 @@ GAME( 2002, gfootbal,  0,        atvtrack, atvtrack, atvtrack_state, empty_init,
 // almost identical PCB, FlashROM mapping and master registers addresses different
 GAME( 2000, smashdrv,  0,        smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco",                       "Smashing Drive (World)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, smashdrvb, smashdrv, smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco (Brent Sales license)", "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrvs, smashdrv, smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Smashing Drive (Spain, Portugal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

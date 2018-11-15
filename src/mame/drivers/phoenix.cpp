@@ -538,9 +538,10 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	SPEAKER(config, "mono").front_center();
 
 	/* FIXME: check clock */
-	MCFG_DEVICE_ADD("aysnd", AY8910, 11000000/4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, phoenix_state, survival_protection_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 11000000/4));
+	aysnd.port_b_read_callback().set(FUNC(phoenix_state::survival_protection_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+
 MACHINE_CONFIG_END
 
 

@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(SAA5057, saa5057_device, "saa5057", "SAA5057 Teletext Charact
 
 ROM_START( saa5050 )
 	ROM_REGION( 0x500, "chargen", 0 )
-	ROM_LOAD("saa5050", 0x0140, 0x03c0, BAD_DUMP CRC(6298fc0b) SHA1(ae38e7f51dd33733bacfa896425ca105682b31d6))
+	ROM_LOAD("saa5050", 0x0140, 0x03c0, CRC(201490f3) SHA1(6c8daba70374e5aa3a6402f24cdc5f8677d58a0f)) // verified both from datasheet listing and decap
 ROM_END
 
 

@@ -472,10 +472,10 @@ MACHINE_CONFIG_START(shangha3_state::shangha3)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 48_MHz_XTAL/32) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym2149_device &aysnd(YM2149(config, "aysnd", 48_MHz_XTAL/32)); // 1.5MHz
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

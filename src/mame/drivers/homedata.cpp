@@ -1300,13 +1300,13 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
+	YM2203(config, m_ymsnd, 3000000);
+	m_ymsnd->port_a_read_callback().set_ioport("DSW1");
+	m_ymsnd->port_b_read_callback().set_ioport("DSW2");
+	m_ymsnd->add_route(0, "speaker", 0.25);
+	m_ymsnd->add_route(1, "speaker", 0.25);
+	m_ymsnd->add_route(2, "speaker", 0.25);
+	m_ymsnd->add_route(3, "speaker", 1.0);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -1527,11 +1527,11 @@ MACHINE_CONFIG_START(homedata_state::mirderby)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 2000000)
-	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
+	YM2203(config, m_ymsnd, 2000000);
+	m_ymsnd->add_route(0, "speaker", 0.25);
+	m_ymsnd->add_route(1, "speaker", 0.25);
+	m_ymsnd->add_route(2, "speaker", 0.25);
+	m_ymsnd->add_route(3, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 /**************************************************************************/

@@ -482,8 +482,7 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(28'480'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, AY8910_TAG, XTAL(28'480'000)/16).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)

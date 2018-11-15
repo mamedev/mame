@@ -1519,12 +1519,12 @@ MACHINE_CONFIG_START(tenpindx_state::tenpindx)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)  /* real clock unknown */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DIPSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8912_device &aysnd(AY8912(config, "aysnd", ASTROCADE_CLOCK/4));  /* real clock unknown */
+	aysnd.port_a_read_callback().set_ioport("DIPSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 

@@ -423,10 +423,48 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 
 uint8_t xavix_ekara_state::read_io1(uint8_t direction)
 {
+	uint8_t extrainlatch0 = 0x00;
+	uint8_t extrainlatch1 = 0x00;
+
+	switch (m_extraioselect & 0x7f)
+	{
+	case 0x01:
+		extrainlatch0 = (m_extra0->read() & 0x01) >> 0;
+		extrainlatch1 = (m_extra0->read() & 0x02) >> 1;
+		break;
+	case 0x02:
+		extrainlatch0 = (m_extra0->read() & 0x04) >> 2;
+		extrainlatch1 = (m_extra0->read() & 0x08) >> 3;
+		break;
+	case 0x04:
+		extrainlatch0 = (m_extra0->read() & 0x10) >> 4;
+		extrainlatch1 = (m_extra0->read() & 0x20) >> 5;
+		break;
+	case 0x08:
+		extrainlatch0 = (m_extra0->read() & 0x40) >> 6;
+		extrainlatch1 = (m_extra0->read() & 0x80) >> 7;
+		break;
+	case 0x10:
+		extrainlatch0 = (m_extra1->read() & 0x01) >> 0;
+		extrainlatch1 = (m_extra1->read() & 0x02) >> 1;
+		break;
+	case 0x20:
+		extrainlatch0 = (m_extra1->read() & 0x04) >> 2;
+		extrainlatch1 = (m_extra1->read() & 0x08) >> 3;
+		break;
+	case 0x40:
+		extrainlatch0 = (m_extra1->read() & 0x10) >> 4;
+		extrainlatch1 = (m_extra1->read() & 0x20) >> 5;
+		break;
+	default:
+		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
+		break;
+	}
+
 	uint8_t ret = m_in1->read();
 	ret &= 0xfc;
-	ret |= m_extrainlatch0 << 0;
-	ret |= m_extrainlatch1 << 1;
+	ret |= extrainlatch0 << 0;
+	ret |= extrainlatch1 << 1;
 	return ret;
 }
 
@@ -439,51 +477,6 @@ void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)
 void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 {
 	uint8_t extraiowrite = data & direction;
-
-	if ((extraiowrite & 0x80) != (m_extraiowrite & 0x80))
-	{
-		if (extraiowrite & 0x80)
-		{
-			// clock out bits 0x0c using m_extraioselect (TODO)  (probably the 7segs?)
-			// also latch in bits for reading later?
-
-			switch (m_extraioselect & 0x7f)
-			{
-			case 0x01:
-				m_extrainlatch0 = (m_extra0->read() & 0x01) >> 0;
-				m_extrainlatch1 = (m_extra0->read() & 0x02) >> 1;
-				break;
-			case 0x02:
-				m_extrainlatch0 = (m_extra0->read() & 0x04) >> 2;
-				m_extrainlatch1 = (m_extra0->read() & 0x08) >> 3;
-				break;
-			case 0x04:
-				m_extrainlatch0 = (m_extra0->read() & 0x10) >> 4;
-				m_extrainlatch1 = (m_extra0->read() & 0x20) >> 5;
-				break;
-			case 0x08:
-				m_extrainlatch0 = (m_extra0->read() & 0x40) >> 6;
-				m_extrainlatch1 = (m_extra0->read() & 0x80) >> 7;
-				break;
-			case 0x10:
-				m_extrainlatch0 = (m_extra1->read() & 0x01) >> 0;
-				m_extrainlatch1 = (m_extra1->read() & 0x02) >> 1;
-				break;
-			case 0x20:
-				m_extrainlatch0 = (m_extra1->read() & 0x04) >> 2;
-				m_extrainlatch1 = (m_extra1->read() & 0x08) >> 3;
-				break;
-			case 0x40:
-				m_extrainlatch0 = (m_extra1->read() & 0x10) >> 4;
-				m_extrainlatch1 = (m_extra1->read() & 0x20) >> 5;
-				break;
-			default:
-				LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
-				break;
-			}	
-		}
-	}
-
 	m_extraiowrite = extraiowrite;
 }
 
@@ -629,15 +622,12 @@ WRITE8_MEMBER(xavix_state::timer_control_w)
 	// rad_fb / rad_madf don't set bit 0x40 (and doesn't seem to have a valid interrupt handler for timer, so probably means it generates no IRQ?)
 	if (data & 0x01) // timer start?
 	{
-		// eka_bass will crash after a certain number of timer IRQs, needs investigation
-		if (!m_hack_timer_disable)
-		{
-			// TODO: work out the proper calculation here
-			// int divide = 1 << ((m_timer_freq&0x0f)+1);
-			// uint32_t freq = m_maincpu->unscaled_clock()/2;
-			// m_freq_timer->adjust(attotime::from_hz(freq / divide) * m_timer_baseval*20);
-			m_freq_timer->adjust(attotime::from_usec(1000));
-		}
+		// TODO: work out the proper calculation here
+		// int divide = 1 << ((m_timer_freq&0x0f)+1);
+		// uint32_t freq = m_maincpu->unscaled_clock()/2;
+		// m_freq_timer->adjust(attotime::from_hz(freq / divide) * m_timer_baseval*20);
+		//m_freq_timer->adjust(attotime::from_usec(1000));
+		m_freq_timer->adjust(attotime::from_usec(50));	
 	}
 	else
 	{
@@ -822,6 +812,10 @@ void xavix_state::machine_start()
 	m_freq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::freq_timer_done), this));
 	m_adc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::adc_timer_done), this));
 
+	for (int i = 0; i < 4; i++)
+	{
+		m_sound_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_state::sound_timer_done), this));
+	}
 }
 
 void xavix_state::machine_reset()
@@ -850,15 +844,15 @@ void xavix_state::machine_reset()
 
 	m_spritereg = 0;
 
-	m_soundregs[0] = 0;
-	m_soundregs[1] = 0;
+	m_mastervol = 0x00;
+	m_unk_snd75f8 = 0x00;
+	m_unksnd75f9 = 0x00;
+	m_unksnd75ff = 0x00;
 
-	m_soundregs[6] = 0;
-	m_soundregs[8] = 0;
-	m_soundregs[10] = 0;
-	m_soundregs[11] = 0;
-	m_soundregs[12] = 0;
-	m_soundregs[13] = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		m_sndtimer[i] = 0x00;
+	}
 
 	std::fill(std::begin(m_multparams), std::end(m_multparams), 0x00);
 	std::fill(std::begin(m_multresults), std::end(m_multresults), 0x00);

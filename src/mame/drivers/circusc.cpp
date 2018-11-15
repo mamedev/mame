@@ -139,9 +139,9 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 
 		/* CS6 */
 		case 4:
-			m_discrete->write(space, NODE_05, (offset & 0x20) >> 5);
-			m_discrete->write(space, NODE_06, (offset & 0x18) >> 3);
-			m_discrete->write(space, NODE_07, (offset & 0x40) >> 6);
+			m_discrete->write(NODE_05, (offset & 0x20) >> 5);
+			m_discrete->write(NODE_06, (offset & 0x18) >> 3);
+			m_discrete->write(NODE_07, (offset & 0x40) >> 6);
 			break;
 	}
 }

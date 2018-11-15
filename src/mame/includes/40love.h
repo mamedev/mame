@@ -75,7 +75,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
-	required_device<ay8910_device> m_ay;
+	required_device<ym2149_device> m_ay;
 	required_device<ta7630_device> m_ta7630;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

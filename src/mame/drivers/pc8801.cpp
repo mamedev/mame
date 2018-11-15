@@ -2405,17 +2405,17 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pc8801_state, pc8801_sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc8801_state, opn_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc8801_state, opn_portb_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	YM2203(config, m_opn, MASTER_CLOCK);
+	m_opn->irq_handler().set(FUNC(pc8801_state::pc8801_sound_irq));
+	m_opn->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
+	m_opn->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
+	m_opn->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("opna", YM2608, MASTER_CLOCK*2)
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc8801_state, pc8801_sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc8801_state, opn_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc8801_state, opn_portb_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	YM2608(config, m_opna, MASTER_CLOCK*2);
+	m_opna->irq_handler().set(FUNC(pc8801_state::pc8801_sound_irq));
+	m_opna->port_a_read_callback().set(FUNC(pc8801_state::opn_porta_r));
+	m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
+	m_opna->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)

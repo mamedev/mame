@@ -424,6 +424,7 @@ MACHINES["CS8221"] = true
 MACHINES["CXD1095"] = true
 MACHINES["DP8390"] = true
 MACHINES["DP83932C"] = true
+MACHINES["DP8573"] = true
 --MACHINES["DS1204"] = true
 MACHINES["DS1302"] = true
 MACHINES["DS1315"] = true
@@ -786,6 +787,7 @@ BUSES["SCSI"] = true
 BUSES["SCV"] = true
 BUSES["SEGA8"] = true
 BUSES["SG1000_EXP"] = true
+BUSES["SGIKBD"] = true
 BUSES["SMS_CTRL"] = true
 BUSES["SMS_EXP"] = true
 BUSES["SNES"] = true
@@ -3009,6 +3011,10 @@ files {
 
 createMESSProjects(_target, _subtarget, "sgi")
 files {
+	MAME_DIR .. "src/mame/drivers/4d20.cpp",
+	MAME_DIR .. "src/mame/drivers/crimson.cpp",
+	MAME_DIR .. "src/mame/drivers/o2.cpp",
+	MAME_DIR .. "src/mame/drivers/octane.cpp",
 	MAME_DIR .. "src/mame/machine/sgi.cpp",
 	MAME_DIR .. "src/mame/machine/sgi.h",
 	MAME_DIR .. "src/mame/machine/hal2.cpp",

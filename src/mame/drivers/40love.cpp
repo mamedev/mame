@@ -427,7 +427,7 @@ void fortyl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xc801).w(m_ay, FUNC(ay8910_device::address_data_w));
+	map(0xc800, 0xc801).w(m_ay, FUNC(ym2149_device::address_data_w));
 	map(0xca00, 0xca0d).w(m_msm, FUNC(msm5232_device::write));
 	map(0xcc00, 0xcc00).w(FUNC(fortyl_state::sound_control_0_w));
 	map(0xce00, 0xce00).w(FUNC(fortyl_state::sound_control_1_w));
@@ -712,10 +712,10 @@ MACHINE_CONFIG_START(fortyl_state::_40love)
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	YM2149(config, m_ay, 2000000);
+	m_ay->port_a_write_callback().set(FUNC(fortyl_state::sound_control_2_w));
+	m_ay->port_b_write_callback().set(FUNC(fortyl_state::sound_control_3_w));
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, 8000000/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
@@ -776,10 +776,10 @@ MACHINE_CONFIG_START(fortyl_state::undoukai)
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fortyl_state, sound_control_3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	YM2149(config, m_ay, 2000000);
+	m_ay->port_a_write_callback().set(FUNC(fortyl_state::sound_control_2_w));
+	m_ay->port_b_write_callback().set(FUNC(fortyl_state::sound_control_3_w));
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, 8000000/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */

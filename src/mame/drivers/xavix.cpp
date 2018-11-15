@@ -321,8 +321,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	// map(0x7400, 0x757f)
 
 	// Sound Control
-	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_reg16_0_r), FUNC(xavix_state::sound_reg16_0_w)); // r/w tested read/written 8 times in a row
-	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_reg16_1_r), FUNC(xavix_state::sound_reg16_1_w));
+	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_startstop_r), FUNC(xavix_state::sound_startstop_w)); // r/w tested read/written 8 times in a row
+	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_updateenv_r), FUNC(xavix_state::sound_updateenv_w));
 	map(0x75f4, 0x75f5).r(FUNC(xavix_state::sound_sta16_r)); // related to 75f0 / 75f1 (read after writing there - rad_mtrk)
 	// taitons1 after 75f7/75f8
 	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_volume_r), FUNC(xavix_state::sound_volume_w)); // r/w tested
@@ -814,16 +814,21 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 256)
 
 	/* sound hardware */
 
-	SPEAKER(config, "mono").front_center();
+	//SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	XAVIX_SOUND(config, m_sound, MAIN_CLOCK);
 	m_sound->read_regs_callback().set(FUNC(xavix_state::sound_regram_read_cb));
 	m_sound->read_samples_callback().set(FUNC(xavix_state::sample_read));
-	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+	//m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_sound->add_route(0, "lspeaker", 1.0);
+	m_sound->add_route(1, "rspeaker", 1.0);
+
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xavix_i2c_state::xavix_i2c_24lc04)
@@ -861,7 +866,7 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
 
 MACHINE_CONFIG_END
 
@@ -931,12 +936,6 @@ void xavix_state::init_xavix()
 {
 	m_rgnlen = memregion("bios")->bytes();
 	m_rgn = memregion("bios")->base();
-}
-
-void xavix_state::init_bass()
-{
-	init_xavix();
-	m_hack_timer_disable = true;
 }
 
 /***************************************************************************
@@ -1086,8 +1085,8 @@ CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_xavix
 
 CONS( 2002, rad_bb2,   0,          0,  xavix,  rad_bb2,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  rad_bass, xavix_state, init_bass,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_bass,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 2001, rad_bass,  0,          0,  xavix,  rad_bass, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
 CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

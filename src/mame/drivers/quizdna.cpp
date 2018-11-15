@@ -464,13 +464,13 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MCLK/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MCLK/4));
+	ymsnd.port_a_read_callback().set_ioport("DSW3");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(0, "mono", 0.10);
+	ymsnd.add_route(1, "mono", 0.10);
+	ymsnd.add_route(2, "mono", 0.10);
+	ymsnd.add_route(3, "mono", 0.40);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, (MCLK/1024)*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

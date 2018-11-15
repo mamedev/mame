@@ -3648,17 +3648,14 @@ MACHINE_CONFIG_START(snk_state::marvins)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(HOLDLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* verified on schematics */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)  /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);/* verified on schematics */
 
-	MCFG_DEVICE_ADD("wave", SNKWAVE, 8000000)   /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	SNKWAVE(config, "wave", 8000000).add_route(ALL_OUTPUTS, "mono", 0.30);   /* verified on schematics */
 MACHINE_CONFIG_END
 
 
@@ -3723,13 +3720,11 @@ MACHINE_CONFIG_START(snk_state::jcross)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)  /* NOT verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)  /* NOT verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
 MACHINE_CONFIG_END
 
 

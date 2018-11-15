@@ -424,8 +424,7 @@ MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 8000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	YM2149(config, "aysnd", 8000000/4).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, 8000000/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors */

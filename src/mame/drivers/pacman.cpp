@@ -3683,9 +3683,8 @@ MACHINE_CONFIG_START(pacman_state::dremshpr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, vblank_nmi))
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("namco")
-	MCFG_DEVICE_ADD("ay8910", AY8910, 14318000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	config.device_remove("namco");
+	AY8910(config, "ay8910", 14318000/8).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	m_mainlatch->q_out_cb<1>().set_nop();
 MACHINE_CONFIG_END
@@ -3892,8 +3891,7 @@ MACHINE_CONFIG_START(pacman_state::crushs)
 	MCFG_DEVICE_IO_MAP(crushs_portmap)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ay8912", AY8912, 1789750)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	AY8912(config, "ay8912", 1789750).add_route(ALL_OUTPUTS, "mono", 0.75);
 MACHINE_CONFIG_END
 
 

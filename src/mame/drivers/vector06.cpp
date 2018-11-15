@@ -226,8 +226,7 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	m_pit8253->out_handler<2>().set(FUNC(vector06_state::speaker_w));
 
 	// optional
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1773400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay, 1773400).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /* ROM definition */

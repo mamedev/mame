@@ -26,7 +26,9 @@ public:
 	auto read_regs_callback() { return m_readregs_cb.bind(); }
 	auto read_samples_callback() { return m_readsamples_cb.bind(); }
 
-	void enable_voice(int voice);
+	void enable_voice(int voice, bool update_only);
+	void disable_voice(int voice);
+	bool is_voice_enabled(int voice);
 
 protected:
 	// device-level overrides
@@ -40,10 +42,13 @@ private:
 	sound_stream *m_stream;
 
 	struct xavix_voice {
-		bool enabled;
-		uint16_t position;
+		bool enabled[2];
+		uint32_t position[2];
+		uint32_t startposition[2];
 		uint8_t bank; // no samples appear to cross a bank boundary, so likely wraps
 		int type;
+		int rate;
+		int vol;
 	};
 
 	devcb_read8 m_readregs_cb;
@@ -85,7 +90,6 @@ public:
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lowbus(*this, "lowbus"),
-		m_hack_timer_disable(false),
 		m_sound(*this, "xavix_sound")
 	{ }
 	
@@ -94,7 +98,6 @@ public:
 	void xavix2000(machine_config &config);
 
 	void init_xavix();
-	void init_bass();
 
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg01);
 	DECLARE_WRITE_LINE_MEMBER(ioevent_trg02);
@@ -285,10 +288,10 @@ private:
 	DECLARE_READ8_MEMBER(dispctrl_6ff8_r);
 	DECLARE_WRITE8_MEMBER(dispctrl_6ff8_w);
 
-	DECLARE_READ8_MEMBER(sound_reg16_0_r);
-	DECLARE_WRITE8_MEMBER(sound_reg16_0_w);
-	DECLARE_READ8_MEMBER(sound_reg16_1_r);
-	DECLARE_WRITE8_MEMBER(sound_reg16_1_w);
+	DECLARE_READ8_MEMBER(sound_startstop_r);
+	DECLARE_WRITE8_MEMBER(sound_startstop_w);
+	DECLARE_READ8_MEMBER(sound_updateenv_r);
+	DECLARE_WRITE8_MEMBER(sound_updateenv_w);
 
 	DECLARE_READ8_MEMBER(sound_sta16_r);
 	DECLARE_READ8_MEMBER(sound_75f5_r);
@@ -319,6 +322,10 @@ private:
 	uint8_t m_soundreg16_0[2];
 	uint8_t m_soundreg16_1[2];
 	uint8_t m_sound_regbase;
+
+	TIMER_CALLBACK_MEMBER(sound_timer_done);
+	emu_timer *m_sound_timer[4];
+
 
 	DECLARE_READ8_MEMBER(timer_status_r);
 	DECLARE_WRITE8_MEMBER(timer_control_w);
@@ -424,7 +431,11 @@ private:
 	uint8_t m_6ff0;
 	uint8_t m_video_ctrl;
 
-	uint8_t m_soundregs[0x10];
+	uint8_t m_mastervol;
+	uint8_t m_unk_snd75f8;
+	uint8_t m_unksnd75f9;
+	uint8_t m_unksnd75ff;
+	uint8_t m_sndtimer[4];
 
 	uint8_t m_timer_baseval;
 
@@ -490,8 +501,6 @@ private:
 
 	int get_current_address_byte();
 	required_device<address_map_bank_device> m_lowbus;
-
-	bool m_hack_timer_disable;
 
 	required_device<xavix_sound_device> m_sound;
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
@@ -560,9 +569,7 @@ public:
 		m_extra0(*this, "EXTRA0"),
 		m_extra1(*this, "EXTRA1"),
 		m_extraioselect(0),
-		m_extraiowrite(0),
-		m_extrainlatch0(0),
-		m_extrainlatch1(0)
+		m_extraiowrite(0)
 	{ }
 
 	void xavix_ekara(machine_config &config);
@@ -581,10 +588,6 @@ protected:
 
 	uint8_t m_extraioselect;
 	uint8_t m_extraiowrite;
-
-	uint8_t m_extrainlatch0;
-	uint8_t m_extrainlatch1;
-
 };
 
 #endif // MAME_INCLUDES_XAVIX_H
