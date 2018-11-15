@@ -58,7 +58,7 @@ private:
 	required_device<m68000_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_shared_ptr_array<uint16_t, 2> m_videoram;
-	required_shared_ptr_array<uint16_t, 2> m_scrollram;
+	required_shared_ptr_array<uint16_t, 3> m_scrollram;
 	required_shared_ptr<uint16_t> m_pixram;
 	required_shared_ptr<uint16_t> m_priority;
 	required_shared_ptr<uint16_t> m_layerctrl;
