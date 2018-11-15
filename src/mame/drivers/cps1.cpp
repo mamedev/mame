@@ -6631,17 +6631,17 @@ ROM_START( sf2em )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
-/* B-Board 89625B-1, converted, doesn't have original Capcom labels */
+/* B-Board 89625B-1, Same data as sf2ea, converted for the 89625B ROM board, doesn't have original Capcom labels */
 ROM_START( sf2en )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code, all 27c010 */
-	ROM_LOAD16_BYTE( "epr-b-05.12f", 0x00000, 0x20000, CRC(bc02c14c) SHA1(83198317c3838d9a031f78c866fe690d185647f6) )
-	ROM_LOAD16_BYTE( "epr-b-09.12h", 0x00001, 0x20000, CRC(1c1266b3) SHA1(756f54e82305af6b4374b748d486ae587bf7571b) )
-	ROM_LOAD16_BYTE( "epr-b-06.13f", 0x40000, 0x20000, CRC(8b8221e6) SHA1(98d143943ea830a046f0f799b1cf27cc4024729b) )
-	ROM_LOAD16_BYTE( "epr-b-10.13h", 0x40001, 0x20000, CRC(2d42d82a) SHA1(4a1f23efef6ae6fe4bebd475f7429cf8ae291adf) )
-	ROM_LOAD16_BYTE( "epr-b-03.10f", 0x80000, 0x20000, CRC(852e10ec) SHA1(a39e0feac1ba9db209aae89b1d33a3a6a1bec2e1) )
-	ROM_LOAD16_BYTE( "epr-b-07.10h", 0x80001, 0x20000, CRC(3b075de1) SHA1(8dcadee5bbf8c91c60d6775d107543fb5e36d75d) )
-	ROM_LOAD16_BYTE( "epr-b-04.11f", 0xc0000, 0x20000, CRC(fdd0b5c1) SHA1(af9051d77f8e7039ea9b55482fcdbb0bad8bb63c) )
-	ROM_LOAD16_BYTE( "epr-b-08.11h", 0xc0001, 0x20000, CRC(db66b127) SHA1(cbf6aba28e24d5a7cd73733ee4c04ddc5e15e2a7) )
+	ROM_LOAD16_BYTE( "epr-b-05.12f", 0x00000, 0x20000, CRC(bc02c14c) SHA1(83198317c3838d9a031f78c866fe690d185647f6) ) // == sf2e_30a.11e
+	ROM_LOAD16_BYTE( "epr-b-09.12h", 0x00001, 0x20000, CRC(1c1266b3) SHA1(756f54e82305af6b4374b748d486ae587bf7571b) ) // == sf2e_37a.11f
+	ROM_LOAD16_BYTE( "epr-b-06.13f", 0x40000, 0x20000, CRC(8b8221e6) SHA1(98d143943ea830a046f0f799b1cf27cc4024729b) ) // == sf2e_31a.12e
+	ROM_LOAD16_BYTE( "epr-b-10.13h", 0x40001, 0x20000, CRC(2d42d82a) SHA1(4a1f23efef6ae6fe4bebd475f7429cf8ae291adf) ) // == sf2e_38a.12f
+	ROM_LOAD16_BYTE( "epr-b-03.10f", 0x80000, 0x20000, CRC(852e10ec) SHA1(a39e0feac1ba9db209aae89b1d33a3a6a1bec2e1) ) // == sf2_28a.9e
+	ROM_LOAD16_BYTE( "epr-b-07.10h", 0x80001, 0x20000, CRC(3b075de1) SHA1(8dcadee5bbf8c91c60d6775d107543fb5e36d75d) ) // == sf2_35a.9f
+	ROM_LOAD16_BYTE( "epr-b-04.11f", 0xc0000, 0x20000, CRC(fdd0b5c1) SHA1(af9051d77f8e7039ea9b55482fcdbb0bad8bb63c) ) // == sf2_29.10e
+	ROM_LOAD16_BYTE( "epr-b-08.11h", 0xc0001, 0x20000, CRC(db66b127) SHA1(cbf6aba28e24d5a7cd73733ee4c04ddc5e15e2a7) ) // == sf2_36.10f
 
 	ROM_REGION( 0x600000, "gfx", 0 ) // all 27c020, data matches parent, but arranged differently
 	ROMX_LOAD( "epr-b-18.5e",  0x000000, 0x40000, CRC(88f3485a) SHA1(12df3a823a29eb5cc69993015108cb3da2c961f2) , ROM_SKIP(7) )
@@ -6670,11 +6670,11 @@ ROM_START( sf2en )
 	ROMX_LOAD( "epr-b-06.12a", 0x400007, 0x40000, CRC(67dcc295) SHA1(0bcec5d2dcd7e3423a577eeb458b5f7cff3c571c) , ROM_SKIP(7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks), data matches parent */
-	ROM_LOAD( "27c512.13b",   0x00000, 0x10000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) ) // not labeled
+	ROM_LOAD( "27c512.13b",  0x00000, 0x10000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) ) // not labeled
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples, 27c010, data matches parent */
-	ROM_LOAD( "epr-b-01.12c",  0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
-	ROM_LOAD( "epr-b-02.13c",  0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
+	ROM_LOAD( "epr-b-01.12c",  0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) ) // == sf2_18.11c
+	ROM_LOAD( "epr-b-02.13c",  0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) ) // == sf2_19.12c
 
 	ROM_REGION( 0x0200, "aboardplds", 0 )
 	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )

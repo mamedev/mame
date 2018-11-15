@@ -6598,6 +6598,8 @@ ROM_END
 //  ROM Board type: 171-5704
 //  Sega ID# for ROM board: 834-7002-04
 //
+// NOTE: ROM board 834-7002-04EP has EPROMs for EPR-12383, EPR-12378, EPR-12379 & EPR-12384 instead of MPR mask ROMs
+//
 ROM_START( goldnaxej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	// fails ROM test on 8 & 6 ?! ROMs verfied from two separate sources
@@ -6629,7 +6631,7 @@ ROM_START( goldnaxej )
 	ROM_CONTINUE(                    0x180000, 0x20000 )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-12390.a10",     0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
+	ROM_LOAD( "epr-12390.a10", 0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "mpr-12384.a11", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 ROM_END
 
@@ -6660,7 +6662,7 @@ ROM_START( goldnaxejd )
 	ROM_CONTINUE(                    0x180000, 0x20000 )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-12390.a10",     0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
+	ROM_LOAD( "epr-12390.a10", 0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "mpr-12384.a11", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 ROM_END
 
