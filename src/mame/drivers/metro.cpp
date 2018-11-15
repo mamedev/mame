@@ -3252,7 +3252,7 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
@@ -3292,7 +3292,7 @@ MACHINE_CONFIG_START(metro_state::dharma)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3319,7 +3319,7 @@ MACHINE_CONFIG_START(metro_state::karatour)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3347,7 +3347,7 @@ MACHINE_CONFIG_START(metro_state::sankokushi)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3375,7 +3375,7 @@ MACHINE_CONFIG_START(metro_state::lastfort)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3401,7 +3401,7 @@ MACHINE_CONFIG_START(metro_state::lastforg)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3536,7 +3536,7 @@ MACHINE_CONFIG_START(metro_state::pangpoms)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3564,7 +3564,7 @@ MACHINE_CONFIG_START(metro_state::poitto)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3592,7 +3592,7 @@ MACHINE_CONFIG_START(metro_state::pururun)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)  /* Confirmed match to reference video */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
@@ -3620,7 +3620,7 @@ MACHINE_CONFIG_START(metro_state::skyalert)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3648,7 +3648,7 @@ MACHINE_CONFIG_START(metro_state::toride2g)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3756,8 +3756,8 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

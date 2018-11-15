@@ -3801,7 +3801,7 @@ MACHINE_CONFIG_START(snk_state::tnk3)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
@@ -3903,7 +3903,7 @@ MACHINE_CONFIG_START(snk_state::ikari)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
@@ -3961,7 +3961,7 @@ MACHINE_CONFIG_START(snk_state::bermudat)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
@@ -4066,7 +4066,7 @@ MACHINE_CONFIG_START(snk_state::tdfever)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM3526, 4000000)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))

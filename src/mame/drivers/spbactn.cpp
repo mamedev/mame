@@ -448,8 +448,8 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -503,8 +503,8 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	/* sound hardware  - different? */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

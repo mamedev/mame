@@ -1944,7 +1944,7 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2017,7 +2017,7 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

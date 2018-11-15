@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))  /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

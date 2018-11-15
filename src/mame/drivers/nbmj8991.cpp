@@ -1387,7 +1387,7 @@ MACHINE_CONFIG_START(nbmj8991_state::nbmjdrv2) // pstadium
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("fmsnd", YM3812, 25000000/6.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)

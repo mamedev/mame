@@ -371,7 +371,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("y2404_1", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)

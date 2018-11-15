@@ -2194,7 +2194,7 @@ MACHINE_CONFIG_START(system1_state::sys1ppi)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

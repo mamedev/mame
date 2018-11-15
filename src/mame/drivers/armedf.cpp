@@ -1259,7 +1259,7 @@ MACHINE_CONFIG_START(armedf_state::terraf_sound)
 
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -1340,7 +1340,7 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -1421,7 +1421,7 @@ MACHINE_CONFIG_START(armedf_state::armedf)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -1468,7 +1468,7 @@ MACHINE_CONFIG_START(armedf_state::cclimbr2)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(24'000'000)/6) // or YM3526?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -1510,7 +1510,7 @@ MACHINE_CONFIG_START(armedf_state::legion_common)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // 10-pin SIP with 74HC374P latch
 	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // 10-pin SIP with 74HC374P latch

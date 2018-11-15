@@ -627,7 +627,7 @@ MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 
 #if (DAC_BUFFER_CHANNELS == 4)
 	MCFG_DEVICE_ADD("dac1", DMADAC)

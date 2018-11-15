@@ -665,7 +665,7 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	//GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/8, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
@@ -703,7 +703,7 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	//GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)

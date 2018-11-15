@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(toki_state::tokib)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

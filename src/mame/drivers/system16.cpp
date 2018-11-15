@@ -2183,7 +2183,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system16_base)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::shinobi_datsu)
@@ -2284,7 +2284,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb_base)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb1)
@@ -2459,7 +2459,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("3438.0", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
@@ -2511,8 +2511,8 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
 	// 1 OKI M6295 instead of original sound hardware
 	SPEAKER(config, "mono").front_center();

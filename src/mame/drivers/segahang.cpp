@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 	MCFG_SCREEN_UPDATE_DRIVER(segahang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 

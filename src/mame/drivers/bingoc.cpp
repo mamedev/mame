@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 	SPEAKER(config, "lspeaker").front_left(); //might just be mono...
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 7159160/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

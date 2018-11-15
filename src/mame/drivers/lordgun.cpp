@@ -671,8 +671,8 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -725,8 +725,8 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymf", YMF278B, XTAL(33'868'800))            // ? 33.8688MHz matches video (decrease for faster music tempo)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)

@@ -2014,7 +2014,7 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, segas16a_state, n7751_control_w))

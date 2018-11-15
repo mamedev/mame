@@ -1294,8 +1294,8 @@ MACHINE_CONFIG_START(mitchell_state::spangbl)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spangbl)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_REMOVE("oki")
 	MCFG_DEVICE_ADD("msm", MSM5205, 400000) // clock and prescaler unknown
@@ -1353,7 +1353,7 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 990000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

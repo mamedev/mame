@@ -672,8 +672,8 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "mono").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
 	MCFG_DEVICE_ADDRESS_MAP(0, punchout_vlm_map)

@@ -732,9 +732,9 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, coolpool_state, amerdart_dsp_bio_line_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
 
-	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
-	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
+	GENERIC_LATCH_16(config, m_main2dsp);
+	GENERIC_LATCH_16(config, m_dsp2main);
+	m_dsp2main->data_pending_callback().set_inputline(m_maincpu, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -773,13 +773,13 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	dsp.hold_in_cb().set(FUNC(coolpool_state::dsp_hold_line_r));
 //  dsp.hold_ack_out_cb().set(FUNC(coolpool_state::dsp_HOLDA_signal_w));
 
-	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("dsp", 0)) /* ???  I have no idea who should generate this! */
+	GENERIC_LATCH_16(config, m_main2dsp);
+	m_main2dsp->data_pending_callback().set_inputline(m_dsp, 0); /* ???  I have no idea who should generate this! */
 															/* the DSP polls the status bit so it isn't strictly */
 															/* necessary to also have an IRQ */
 
-	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
+	GENERIC_LATCH_16(config, m_dsp2main);
+	m_dsp2main->data_pending_callback().set_inputline(m_maincpu, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

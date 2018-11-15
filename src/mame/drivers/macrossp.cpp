@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(macrossp_state::macrossp)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ensoniq", ES5506, 16000000)
 	MCFG_ES5506_REGION0("ensoniq.0")

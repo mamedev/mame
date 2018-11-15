@@ -1011,7 +1011,7 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

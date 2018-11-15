@@ -764,7 +764,7 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, "soundlatch");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

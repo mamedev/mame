@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(hyperspt_state::hypersptb)
 	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
 	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 

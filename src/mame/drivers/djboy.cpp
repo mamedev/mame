@@ -508,11 +508,11 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_GENERIC_LATCH_8_ADD("slavelatch")
+	GENERIC_LATCH_8(config, m_slavelatch);
 
-	MCFG_GENERIC_LATCH_8_ADD("beastlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("beast", INPUT_LINE_IRQ0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_beastlatch);
+	m_beastlatch->data_pending_callback().set_inputline(m_beast, INPUT_LINE_IRQ0);
+	m_beastlatch->set_separate_acknowledge(true);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57.5)
@@ -532,8 +532,8 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)

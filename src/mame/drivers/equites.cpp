@@ -1056,7 +1056,7 @@ MACHINE_CONFIG_START(equites_state::common_sound)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)   // will be adjusted at runtime through PORT_ADJUSTER
 	MCFG_MSM5232_SET_CAPACITORS(0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6) // verified

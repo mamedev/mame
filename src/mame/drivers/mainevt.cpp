@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(mainevt_state::mainevt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3.579545_MHz_XTAL)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, mainevt_state, volume_callback))
@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(mainevt_state::devstors)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)

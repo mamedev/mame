@@ -680,8 +680,8 @@ MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 3580000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

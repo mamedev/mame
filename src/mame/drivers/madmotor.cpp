@@ -300,8 +300,7 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 21470000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

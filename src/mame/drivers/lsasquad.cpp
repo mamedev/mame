@@ -575,13 +575,13 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -641,8 +641,8 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

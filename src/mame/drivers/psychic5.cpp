@@ -753,7 +753,7 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -800,7 +800,7 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

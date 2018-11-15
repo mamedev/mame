@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(neoprint_state::neoprint)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 24000000 / 3)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -574,7 +574,7 @@ MACHINE_CONFIG_START(neoprint_state::nprsp)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 24000000 / 3)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

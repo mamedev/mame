@@ -508,10 +508,10 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+ 
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/6, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
