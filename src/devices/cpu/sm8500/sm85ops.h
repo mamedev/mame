@@ -1034,11 +1034,6 @@ case 0x3A:  /* MOVW rr,@rr / MOV rr,(rr)+ / MOV rr,@ww / MOV rr,ww(rr) / MOV rr,
 	switch( r2 & 0xC0 ) {
 	case 0x00:  mycycles += 11; break;
 	case 0x40:  mycycles += 16;
-	// lostwrld expects reads from videoram to return 0. It is unknown if this should happen just in this case,
-	// or all the time, or in some other special circumstance.
-		if ((s2 >= 0xc000) && (s2 <= 0xdfff))
-			mem_writeword( r1, 0 );
-		break;
 	case 0x80:  mycycles += ( ( r2 & 0x07 ) ? 18 : 14 ); break;
 	case 0xC0:  mycycles += 16; break;
 	}
