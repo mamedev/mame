@@ -20,6 +20,7 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
+		m_spriteram(*this, "spriteram"),
 		m_palette(*this, "palette"),
 		m_paletteram(*this, "palette"),
 		m_subcpu(*this, "sub"),
@@ -27,7 +28,6 @@ public:
 		m_pfprotect(*this, "pfprotect"),
 		m_sndprotect(*this, "sndprotect"),
 		m_ram(*this, "ram"),
-		m_spriteram(*this, "spriteram"),
 		m_robocop_shared_ram(*this, "robocop_shared"),
 		m_hippodrm_shared_ram(*this, "hippodrm_shared")
 	{ }
@@ -64,6 +64,7 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device_array<deco_bac06_device, 3> m_tilegen;
 	optional_device<deco_mxc06_device> m_spritegen;
+	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_paletteram;
 
@@ -86,7 +87,6 @@ private:
 	optional_device<address_map_bank_device> m_pfprotect;
 	optional_device<address_map_bank_device> m_sndprotect;
 	required_shared_ptr<uint16_t> m_ram;
-	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
 
