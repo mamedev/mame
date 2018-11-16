@@ -136,6 +136,7 @@ void lb4_state::lb4(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, chars);
 
 	H46505(config, m_crtc, MASTER_CLOCK / 10);
+	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(lb4_state::crtc_update_row), this);
