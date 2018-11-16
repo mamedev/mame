@@ -128,6 +128,9 @@ SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
 	u16 dots = m_chargen[charcode << 4 | linecount] << 2;
 	const int width = m_132_cols ? 9 : 10;
 
+	if (BIT(dots, 2))
+		dots |= 3;
+
 	for (int i = 0; i < width; i++)
 	{
 		bitmap.pix32(y, x++) = BIT(dots, 9) ? rgb_t::white() : rgb_t::black();
