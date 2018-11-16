@@ -174,25 +174,25 @@ stam_imp
 
 ldaj_imp
 	read_pc_noinc();
-	A = m_j; // TODO: flags
+	A = m_j;
 	set_nz(A);
 	prefetch();
 
 ldak_imp
 	read_pc_noinc();
-	A = m_k; // TODO: flags
+	A = m_k;
 	set_nz(A);
 	prefetch();
 
 ldal_imp
 	read_pc_noinc();
-	A = m_l; // TODO: flags
+	A = m_l;
 	set_nz(A);
 	prefetch();
 
 ldam_imp
 	read_pc_noinc();
-	A = m_m; // TODO: flags
+	A = m_m;
 	set_nz(A);
 	prefetch();
 
@@ -243,7 +243,7 @@ spa0_imp
 
 lpa0_imp
 	read_pc_noinc();
-	A = (m_pa & 0x0000ff) >> 0; // TODO: Flags?
+	A = (m_pa & 0x0000ff) >> 0;
 	set_nz(A);
 	prefetch();
 
@@ -254,7 +254,7 @@ spa1_imp
 
 lpa1_imp
 	read_pc_noinc();
-	A = (m_pa & 0x00ff00) >> 8; // TODO: Flags?
+	A = (m_pa & 0x00ff00) >> 8;
 	set_nz(A);
 	prefetch();
 
@@ -265,7 +265,7 @@ spa2_imp
 
 lpa2_imp
 	read_pc_noinc();
-	A = (m_pa & 0xff0000) >> 16; // TODO: Flags?
+	A = (m_pa & 0xff0000) >> 16;
 	set_nz(A);
 	prefetch();
 
@@ -276,7 +276,7 @@ spb0_imp
 
 lpb0_imp
 	read_pc_noinc();
-	A = (m_pb & 0x0000ff) >> 0; // TODO: Flags?
+	A = (m_pb & 0x0000ff) >> 0;
 	set_nz(A);
 	prefetch();
 
@@ -287,7 +287,7 @@ spb1_imp
 
 lpb1_imp
 	read_pc_noinc();
-	A = (m_pb & 0x00ff00) >> 8; // TODO: Flags?
+	A = (m_pb & 0x00ff00) >> 8;
 	set_nz(A);
 	prefetch();
 
@@ -298,7 +298,7 @@ spb2_imp
 
 lpb2_imp
 	read_pc_noinc();
-	A = (m_pb & 0xff0000) >> 16; // TODO: Flags?
+	A = (m_pb & 0xff0000) >> 16;
 	set_nz(A);
 	prefetch();
 

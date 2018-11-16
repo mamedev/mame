@@ -757,33 +757,58 @@ WRITE8_MEMBER(xavix_state::mult_param_w)
 	if (offset == 2)
 	{
 		// assume 0 is upper bits, might be 'mode' instead, check
-		int param1 = m_multparams[1];
-		int param2 = m_multparams[2];
 
-#if 0
-		int signparam1 = (m_multparams[0] & 0x02) >> 1;
-		int signparam2 = (m_multparams[0] & 0x01) >> 0;
 
-		if (signparam1) param1 = -param1;
-		if (signparam2) param2 = -param2;
-#endif
+		int signmode = (m_multparams[0] & 0x3f);
 
 		uint16_t result = 0;
 
 		// rad_madf uses this mode (add to previous result)
 		if ((m_multparams[0] & 0xc0) == 0xc0)
 		{
-			result = param1 * param2;
+			if (signmode == 0x0)
+			{
+				uint8_t param1 = m_multparams[1];
+				uint8_t param2 = m_multparams[2];
+				result = param1 * param2;
+			}
+			else
+			{
+				popmessage("unknown signmode %02x", m_multparams[0] & 0x3f);
+			}
+
 			uint16_t oldresult = (m_multresults[1] << 8) | m_multresults[0];
 			result = oldresult + result;
 		}
 		else if ((m_multparams[0] & 0xc0) == 0x00)
 		{
+			int param1 = 0, param2 = 0;
+			
+			if (signmode == 0x0)
+			{
+				param1 = (uint8_t)m_multparams[1];
+				param2 = (uint8_t)m_multparams[2];
+			}
+			else if (signmode == 0x2)
+			{
+				param1 = (int8_t)m_multparams[1];
+				param2 = (uint8_t)m_multparams[2];
+			}
+			else if (signmode == 0x1)
+			{
+				param1 = (uint8_t)m_multparams[1];
+				param2 = (int8_t)m_multparams[2];
+			}
+			else
+			{
+				popmessage("unknown signmode %02x", m_multparams[0] & 0x3f);
+			}
+
 			result = param1 * param2;
 		}
 		else
 		{
-			popmessage("unknown multiplier mode %02n", m_multparams[0] & 0xc0);
+			popmessage("unknown multiplier mode %02x", m_multparams[0] & 0xc0);
 		}
 
 		m_multresults[1] = (result >> 8) & 0xff;
