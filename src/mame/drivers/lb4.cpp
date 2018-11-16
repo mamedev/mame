@@ -49,9 +49,12 @@ private:
 	required_device<palette_device> m_palette;
 };
 
-
 void lb4_state::mem_map(address_map &map)
 {
+	// There are what look like RAM reads/writes from 0000-03ff, but also accesses which look like attempts to talk to a device.
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8000).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x8001, 0x8001).w(m_crtc, FUNC(mc6845_device::register_w));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -92,7 +95,7 @@ INPUT_PORTS_END
 
 ROM_START( lb4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u8.bin", 0xe000, 0x2000, CRC(2e375abc) SHA1(12ad1e49c5773c36c3a8d65845c9a50f9dec141f) )
+	ROM_LOAD( "u8.bin", 0x0000, 0x2000, CRC(2e375abc) SHA1(12ad1e49c5773c36c3a8d65845c9a50f9dec141f) )
 
 	ROM_REGION( 0x1000, "chars", 0 )
 	ROM_LOAD( "u32.bin", 0x0000, 0x1000, CRC(f6d86e87) SHA1(c0885e4a35095a730d760bf91a1cf4e8edd6a2bb) )
