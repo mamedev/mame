@@ -81,7 +81,7 @@
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
         code1d,b            RTC self check bad
         gticlub2            Attract mode works. Coins up. Hangs in car selection.
-        gticlub2ea          Doesn't boot: bad CHD?
+        gticlub2ea          Asks for password.
         jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC) - with IRQ3 crashes at first 3d frame
         mocapglf            Security code error
         mocapb,j            Crash after self checks
@@ -600,20 +600,20 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 
 static inline uint64_t read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
 {
-	mem_mask = flipendian_int64(mem_mask);
+	mem_mask = swapendian_int64(mem_mask);
 	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
 		result = (uint64_t)(handler)(space, offset * 2, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
 		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
-	return flipendian_int64(result);
+	return swapendian_int64(result);
 }
 
 
 static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	data = flipendian_int64(data);
-	mem_mask = flipendian_int64(mem_mask);
+	data = swapendian_int64(data);
+	mem_mask = swapendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
@@ -1050,7 +1050,7 @@ READ32_MEMBER(viper_state::epic_r)
 		}
 	}
 
-	return flipendian_int32(ret);
+	return swapendian_int32(ret);
 }
 
 WRITE32_MEMBER(viper_state::epic_w)
@@ -1058,7 +1058,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 	int reg;
 	reg = offset * 4;
 
-	data = flipendian_int32(data);
+	data = swapendian_int32(data);
 
 #if VIPER_DEBUG_EPIC_REGS
 	if (reg != 0x600b0)     // interrupt clearing is spammy
@@ -2388,40 +2388,42 @@ void viper_state::machine_reset()
 MACHINE_CONFIG_START(viper_state::viper)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MPC8240, 166666666) // Unknown
-	MCFG_PPC_BUS_FREQUENCY(100000000)
-	MCFG_DEVICE_PROGRAM_MAP(viper_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", viper_state, viper_vblank)
+	MPC8240(config, m_maincpu, 166666666); // Unknown
+	m_maincpu->set_bus_frequency(100000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &viper_state::viper_map);
+	m_maincpu->set_vblank_int("screen", FUNC(viper_state::viper_vblank));
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, viper_state, mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(12, DEVICE_SELF, viper_state, voodoo3_pci_r, voodoo3_pci_w)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
-	MCFG_VOODOO_FBMEM(8)
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("maincpu")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, viper_state,voodoo_vblank))
-	MCFG_VOODOO_PCIINT_CB(WRITELINE(*this, viper_state, voodoo_pciint))
+	VOODOO_3(config, m_voodoo, STD_VOODOO_3_CLOCK);
+	m_voodoo->set_fbmem(8);
+	m_voodoo->set_screen_tag("screen");
+	m_voodoo->set_cpu_tag("maincpu");
+	m_voodoo->vblank_callback().set(FUNC(viper_state::voodoo_vblank));
+	m_voodoo->pciint_callback().set(FUNC(viper_state::voodoo_pciint));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(viper_state, screen_update_viper)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	// Screeen size and timing is re-calculated later in voodoo card
+	screen.set_refresh_hz(60);
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 1024 - 1, 0, 768 - 1);
+	screen.set_screen_update(FUNC(viper_state::screen_update_viper));
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, "palette", 65536);
 
-	MCFG_TIMER_ADD_NONE("ds2430_timer2")
+	TIMER(config, "ds2430_timer2", 0);
+	//MCFG_TIMER_ADD_NONE("ds2430_timer2")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
+	M48T58(config, "m48t58", 0);
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
@@ -2551,8 +2553,8 @@ ROM_START(gticlub2ea) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, BAD_DUMP CRC(5ee7004d) SHA1(92e0ce01049308f459985d466fbfcfac82f34a47))
 
-	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "941a02", 0,  NO_DUMP )
+	DISK_REGION( "ata:0:hdd:image" ) // 32 MB Memory Card labeled 941 EA A02
+	DISK_IMAGE( "941a02", 0,  SHA1(dd180ad92dd344b38f160e31833077e342cee38d) ) // with ATA id included
 ROM_END
 
 /* This CF card has sticker B41C02 */

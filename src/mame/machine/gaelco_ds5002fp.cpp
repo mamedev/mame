@@ -45,7 +45,7 @@ MACHINE_CONFIG_START(gaelco_ds5002fp_device::device_add_mconfig)
 
 	MCFG_QUANTUM_PERFECT_CPU("mcu")
 
-	MCFG_NVRAM_ADD_0FILL("sram")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 void gaelco_ds5002fp_device::device_start()

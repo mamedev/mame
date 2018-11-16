@@ -663,6 +663,10 @@ MACHINE_START_MEMBER(combatsc_state,combatsc)
 	save_item(NAME(m_prot));
 	save_item(NAME(m_pos));
 	save_item(NAME(m_sign));
+	save_pointer(NAME(m_page[0]),0x2000);
+	save_pointer(NAME(m_page[1]),0x2000);
+	save_pointer(NAME(m_scrollram0), 0x40);
+	save_pointer(NAME(m_scrollram1), 0x40);
 }
 
 MACHINE_START_MEMBER(combatsc_state,combatscb)
@@ -710,7 +714,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 
 	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatsc)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -738,11 +742,11 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, combatsc_state, combatsc_portA_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 3000000));
+	ymsnd.port_a_write_callback().set(FUNC(combatsc_state::combatsc_portA_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
@@ -783,8 +787,8 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)

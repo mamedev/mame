@@ -83,7 +83,7 @@ void stratos_state::machine_reset()
 
 void stratos_state::show_leds()
 {
-	static const char *led_pos[18] = {
+	static char const *const led_pos[18] = {
 		nullptr, nullptr, "gPawn", "gKnight", "gBishop", "gRook", "gQueen", "gKing", nullptr, nullptr, "rPawn", "rKnight", "rBishop", "rRook", "rQueen", "rKing", nullptr, nullptr
 	};
 	char str_red[64];
@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(stratos_state::stratos)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", stratos_state, irq_timer, attotime::from_hz(1000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START( stratos )

@@ -183,13 +183,13 @@ WRITE8_MEMBER(rpunch_state::upd_control_w)
 		m_upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (m_upd_rom_bank + 1), 0x20000);
 	}
-	m_upd7759->reset_w(data >> 7);
+	m_upd7759->reset_w(BIT(data, 7));
 }
 
 
 WRITE8_MEMBER(rpunch_state::upd_data_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
@@ -466,8 +466,8 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
@@ -517,8 +517,8 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))

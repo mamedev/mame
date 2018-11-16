@@ -301,6 +301,17 @@ void es5506_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void es550x_device::device_clock_changed()
+{
+	m_master_clock = clock();
+	m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
+	m_stream->set_sample_rate(m_sample_rate);
+}
+
+//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 

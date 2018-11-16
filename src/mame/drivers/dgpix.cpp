@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(dgpix_state::dgpix)
     running at 16.9MHz
 */
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

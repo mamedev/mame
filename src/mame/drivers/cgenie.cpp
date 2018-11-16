@@ -457,12 +457,12 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("par", cg_parallel_slot_device, pa_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pa_w))
-	MCFG_AY8910_PORT_B_READ_CB(READ8("par", cg_parallel_slot_device, pb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(17'734'470) / 8));
+	ay8910.port_a_read_callback().set("par", FUNC(cg_parallel_slot_device::pa_r));
+	ay8910.port_a_write_callback().set("par", FUNC(cg_parallel_slot_device::pa_w));
+	ay8910.port_b_read_callback().set("par", FUNC(cg_parallel_slot_device::pb_r));
+	ay8910.port_b_write_callback().set("par", FUNC(cg_parallel_slot_device::pb_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(cgenie_cassette_formats)
@@ -472,9 +472,9 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
 	// serial port
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, cgenie_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, cgenie_state, rs232_dcd_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(FUNC(cgenie_state::rs232_rx_w));
+	rs232.dcd_handler().set(FUNC(cgenie_state::rs232_dcd_w));
 
 	// cartridge expansion slot
 	MCFG_CG_EXP_SLOT_ADD("exp")
@@ -484,9 +484,7 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_CG_PARALLEL_SLOT_ADD("par")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 MACHINE_CONFIG_END
 
 

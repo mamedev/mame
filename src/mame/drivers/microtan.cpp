@@ -209,7 +209,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(microtan_state::microtan)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M6502, XTAL(6'000'000) / 8)  // 750 kHz
+	MCFG_DEVICE_ADD(m_maincpu, M6502, 6_MHz_XTAL / 8)  // 750 kHz
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", microtan_state, interrupt)
 
@@ -232,10 +232,8 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	MCFG_DEVICE_ADD(m_ay8910[0], AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD(m_ay8910[1], AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay8910[0], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, m_ay8910[1], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", microtan_state, microtan, "m65", 0.5)
@@ -245,8 +243,8 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_CASSETTE_ADD( m_cassette )
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
 	/* via */
 	VIA6522(config, m_via6522[0], 6_MHz_XTAL / 8);
@@ -257,7 +255,7 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	m_via6522[0]->cb2_handler().set(FUNC(microtan_state::via_0_out_cb2));
 	m_via6522[0]->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA_0>));
 
-	MCFG_DEVICE_ADD(m_via6522[1], VIA6522, XTAL(6'000'000) / 8)
+	MCFG_DEVICE_ADD(m_via6522[1], VIA6522, 6_MHz_XTAL / 8)
 	m_via6522[1]->writepa_handler().set(FUNC(microtan_state::via_1_out_a));
 	m_via6522[1]->writepb_handler().set(FUNC(microtan_state::via_1_out_b));
 	m_via6522[1]->ca2_handler().set(FUNC(microtan_state::via_1_out_ca2));

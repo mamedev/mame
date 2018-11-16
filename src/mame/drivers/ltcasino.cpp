@@ -764,11 +764,11 @@ MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/18) /* 1.024MHz ?? (or 18.432MHz/16 = 1.152MHz) - not verified */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN6"))
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000)/18)); /* 1.024MHz ?? (or 18.432MHz/16 = 1.152MHz) - not verified */
+	aysnd.port_a_read_callback().set_ioport("BUTTONS");
+	aysnd.port_b_read_callback().set_ioport("IN6");
 	//ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.4);
 MACHINE_CONFIG_END
 
 

@@ -6,7 +6,11 @@
     Heavy Smash
     World Cup Volleyball 95
 
-    See also deco32.c, deco_mlc.c, backfire.c
+    See also deco32.cpp, deco_mlc.cpp, backfire.cpp
+
+    How to get the version and region:
+    Heavy Smash: Exit test mode
+    World Cup Volleyball 95: Boot the game holding down player 2 button 1
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 */
@@ -334,7 +338,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_DEVICE_PROGRAM_MAP(hvysmsh_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -388,7 +392,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_DEVICE_PROGRAM_MAP(wcvol95_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -603,6 +607,30 @@ Notes:
 
 ROM_START( wcvol95 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
+	ROM_LOAD32_WORD( "pw00-0.2f",    0x000002, 0x080000, CRC(86765209) SHA1(f78d073610b630ba6aa2352da9b394ef8b8ef628) )
+	ROM_LOAD32_WORD( "pw01-0.4f",    0x000000, 0x080000, CRC(3a0ee861) SHA1(568ab26e9985b0a63b10bb0f57d45e1f15593047) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
+	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
+
+	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
+	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
+
+//  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
+//  ROM_LOAD( "93c46.3k",    0x00, 0x80, CRC(88f8e270) SHA1(cb82203ad38e0c12ea998562b7b785979726afe5) )
+
+	ROM_REGION( 0x200, "gals", 0 )
+	ROM_LOAD( "gal16v8b.10j.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
+	ROM_LOAD( "gal16v8b.5d.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
+ROM_END
+
+
+ROM_START( wcvol95j )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "pn00-0.2f",    0x000002, 0x080000, CRC(c9ed2006) SHA1(cee93eafc42c4de7a1453c85e7d6bca8d62cdc7b) )
 	ROM_LOAD32_WORD( "pn01-0.4f",    0x000000, 0x080000, CRC(1c3641c3) SHA1(60dddc3585e4dedb485f7505fee03495f615c0c0) )
 
@@ -623,7 +651,6 @@ ROM_START( wcvol95 )
 	ROM_LOAD( "gal16v8b.10j.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
 	ROM_LOAD( "gal16v8b.5d.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
 ROM_END
-
 
 
 ROM_START( wcvol95x )
@@ -694,5 +721,6 @@ void deco156_state::init_wcvol95()
 GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Europe version -2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 (Asia v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcvol95j, wcvol95, wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wcvol95x, wcvol95, wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 Extra Version (Asia v2.0B)", MACHINE_SUPPORTS_SAVE )

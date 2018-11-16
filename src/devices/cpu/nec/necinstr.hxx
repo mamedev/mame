@@ -45,8 +45,8 @@ OP( 0x0f, i_pre_nec  ) { uint32_t ModRM, tmp, tmp2;
 		case 0x2a : ModRM = fetch(); tmp = GetRMByte(ModRM); tmp2 = (Breg(AL) & 0xf)<<4; Breg(AL) = (Breg(AL) & 0xf0) | (tmp&0xf); tmp = tmp2 | (tmp>>4);   PutbackRMByte(ModRM,tmp); CLKM(17,17,13,32,32,19); break;
 		case 0x31 : ModRM = fetch(); ModRM=0; logerror("%06x: Unimplemented bitfield INS\n",PC()); break;
 		case 0x33 : ModRM = fetch(); ModRM=0; logerror("%06x: Unimplemented bitfield EXT\n",PC()); break;
-		case 0xe0 : ModRM = fetch(); ModRM=0; logerror("%06x: V33 unimplemented BRKXA (break to expansion address)\n",PC()); break;
-		case 0xf0 : ModRM = fetch(); ModRM=0; logerror("%06x: V33 unimplemented RETXA (return from expansion address)\n",PC()); break;
+		case 0xe0 : BRKXA(true); CLK(12); break;
+		case 0xf0 : BRKXA(false); CLK(12); break;
 		case 0xff : ModRM = fetch(); ModRM=0; logerror("%06x: unimplemented BRKEM (break to 8080 emulation mode)\n",PC()); break;
 		default:    logerror("%06x: Unknown V20 instruction\n",PC()); break;
 	}
@@ -360,7 +360,7 @@ OP( 0x99, i_cwd       ) { Wreg(DW) = (Breg(AH) & 0x80) ? 0xffff : 0;    CLK(4); 
 OP( 0x9a, i_call_far  ) { uint32_t tmp, tmp2; tmp = fetchword(); tmp2 = fetchword(); PUSH(Sreg(PS)); PUSH(m_ip); m_ip = (WORD)tmp; Sreg(PS) = (WORD)tmp2; CHANGE_PC; CLKW(29,29,13,29,21,9,Wreg(SP)); }
 OP( 0x9b, i_wait      ) { if (!m_poll_state) m_ip--; CLK(5); }
 OP( 0x9c, i_pushf     ) { uint16_t tmp = CompressFlags(); PUSH( tmp ); CLKS(12,8,3); }
-OP( 0x9d, i_popf      ) { uint32_t tmp; POP(tmp); ExpandFlags(tmp); CLKS(12,8,5); if (m_TF) nec_trap(); }
+OP( 0x9d, i_popf      ) { uint32_t tmp; POP(tmp); ExpandFlags(tmp | 0xf000); CLKS(12,8,5); if (m_TF) nec_trap(); }
 OP( 0x9e, i_sahf      ) { uint32_t tmp = (CompressFlags() & 0xff00) | (Breg(AH) & 0xd5); ExpandFlags(tmp); CLKS(3,3,2); }
 OP( 0x9f, i_lahf      ) { Breg(AH) = CompressFlags() & 0xff; CLKS(3,3,2); }
 

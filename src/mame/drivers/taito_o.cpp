@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_DEVICE_PROGRAM_MAP(parentj_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitoo_state, parentj_interrupt, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -262,13 +262,13 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 2000000) /*?? MHz */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(0, "mono",  0.25)
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono",  1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 2000000)); /* ?? MHz */
+	ymsnd.port_a_read_callback().set_ioport("DSWA");
+	ymsnd.port_b_read_callback().set_ioport("DSWB");
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
 MACHINE_CONFIG_END
 
 ROM_START( parentj )

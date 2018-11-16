@@ -3462,12 +3462,11 @@ MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
 	MCFG_PSX_RCNT_IRQ1_HANDLER( WRITELINE( "irq", psxirq_device, intin5 ) )
 	MCFG_PSX_RCNT_IRQ2_HANDLER( WRITELINE( "irq", psxirq_device, intin6 ) )
 
-	MCFG_DEVICE_ADD( "sio0", PSX_SIO0, 0 )
-	MCFG_PSX_SIO_IRQ_HANDLER( WRITELINE( "irq", psxirq_device, intin7 ) )
+	auto &sio0(PSX_SIO0(config, "sio0", DERIVED_CLOCK(1, 2)));
+	sio0.irq_handler().set("irq", FUNC(psxirq_device::intin7));
 
-	MCFG_DEVICE_ADD( "sio1", PSX_SIO1, 0 )
-	MCFG_PSX_SIO_IRQ_HANDLER( WRITELINE( "irq", psxirq_device, intin8 ) )
+	auto &sio1(PSX_SIO1(config, "sio1", DERIVED_CLOCK(1, 2)));
+	sio1.irq_handler().set("irq", FUNC(psxirq_device::intin8));
 
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_VALUE( 0x00 )
+	RAM( config, "ram" ).set_default_value( 0x00 );
 MACHINE_CONFIG_END

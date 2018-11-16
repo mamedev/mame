@@ -10,7 +10,70 @@
 
 #include "machine/idectrl.h"
 #include "machine/pic8259.h"
-#include "machine/pci.h"
+
+/*
+ * PIC16LC connected to SMBus
+ */
+
+class xbox_pic16lc_device : public device_t, public smbus_interface
+{
+public:
+	xbox_pic16lc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	uint8_t buffer[0xff];
+};
+
+DECLARE_DEVICE_TYPE(XBOX_PIC16LC, xbox_pic16lc_device)
+
+/*
+ * CX25871 connected to SMBus
+ */
+
+class xbox_cx25871_device : public device_t, public smbus_interface
+{
+public:
+	xbox_cx25871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+};
+
+DECLARE_DEVICE_TYPE(XBOX_CX25871, xbox_cx25871_device)
+
+/*
+ * EEPROM connected to SMBus
+ */
+
+class xbox_eeprom_device : public device_t, public smbus_interface
+{
+public:
+	xbox_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+
+	std::function<void(void)> hack_eeprom;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+};
+
+DECLARE_DEVICE_TYPE(XBOX_EEPROM, xbox_eeprom_device)
+
+/*
+ * Base
+ */
 
 class xbox_base_state : public driver_device
 {
@@ -63,7 +126,6 @@ protected:
 		int selected;
 		uint8_t registers[16][256]; // 256 registers for up to 16 devices, registers 0-0x2f common to all
 	} superiost;
-	uint8_t pic16lc_buffer[0xff];
 	nv2a_renderer *nvidia_nv2a;
 	bool debug_irq_active;
 	int debug_irq_number;

@@ -469,7 +469,7 @@ READ8_MEMBER(pmd85_state::pmd85_io_r)
 				switch (offset & 0x80)
 				{
 					case 0x80:  /* Motherboard 8255 */
-							return m_ppi8255_0->read(space, offset & 0x03);
+							return m_ppi8255_0->read(offset & 0x03);
 				}
 				break;
 		case 0x08:  /* ROM module connector */
@@ -485,7 +485,7 @@ READ8_MEMBER(pmd85_state::pmd85_io_r)
 							switch (offset & 0x80)
 							{
 								case 0x80:  /* ROM module 8255 */
-									return m_ppi8255_3->read(space, offset & 0x03);
+									return m_ppi8255_3->read(offset & 0x03);
 							}
 						}
 						break;
@@ -498,18 +498,13 @@ READ8_MEMBER(pmd85_state::pmd85_io_r)
 							switch (offset & 0x70)
 							{
 								case 0x10:  /* 8251 (casette recorder, V24) */
-										switch (offset & 0x01)
-										{
-											case 0x00: return m_uart->data_r(space, offset & 0x01);
-											case 0x01: return m_uart->status_r(space, offset & 0x01);
-										}
-										break;
+										return m_uart->read(offset & 0x01);
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
-										return m_ppi8255_1->read(space, offset & 0x03);
+										return m_ppi8255_1->read(offset & 0x03);
 								case 0x50:  /* 8253 */
-										return m_pit8253->read(space, offset & 0x03);
+										return m_pit8253->read(offset & 0x03);
 								case 0x70:  /* 8255 (IMS-2) */
-										return m_ppi8255_2->read(space, offset & 0x03);
+										return m_ppi8255_2->read(offset & 0x03);
 							}
 							break;
 					case 0x80:  /* external interfaces */
@@ -536,7 +531,7 @@ WRITE8_MEMBER(pmd85_state::pmd85_io_w)
 				switch (offset & 0x80)
 				{
 					case 0x80:  /* Motherboard 8255 */
-							m_ppi8255_0->write(space, offset & 0x03, data);
+							m_ppi8255_0->write(offset & 0x03, data);
 							/* PMD-85.3 memory banking */
 							if ((offset & 0x03) == 0x03)
 							{
@@ -559,7 +554,7 @@ WRITE8_MEMBER(pmd85_state::pmd85_io_w)
 							switch (offset & 0x80)
 							{
 								case 0x80:  /* ROM module 8255 */
-										m_ppi8255_3->write(space, offset & 0x03, data);
+										m_ppi8255_3->write(offset & 0x03, data);
 										break;
 							}
 						}
@@ -573,21 +568,17 @@ WRITE8_MEMBER(pmd85_state::pmd85_io_w)
 							switch (offset & 0x70)
 							{
 								case 0x10:  /* 8251 (casette recorder, V24) */
-										switch (offset & 0x01)
-										{
-											case 0x00: m_uart->data_w(space, offset & 0x01, data); break;
-											case 0x01: m_uart->control_w(space, offset & 0x01, data); break;
-										}
+										m_uart->write(offset & 0x01, data);
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
-										m_ppi8255_1->write(space, offset & 0x03, data);
+										m_ppi8255_1->write(offset & 0x03, data);
 										break;
 								case 0x50:  /* 8253 */
-										m_pit8253->write(space, offset & 0x03, data);
+										m_pit8253->write(offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:  /* 8255 (IMS-2) */
-										m_ppi8255_2->write(space, offset & 0x03, data);
+										m_ppi8255_2->write(offset & 0x03, data);
 										break;
 							}
 							break;
@@ -621,7 +612,7 @@ READ8_MEMBER(pmd85_state::mato_io_r)
 				switch (offset & 0x80)
 				{
 					case 0x80:  /* Motherboard 8255 */
-							return m_ppi8255_0->read(space, offset & 0x03);
+							return m_ppi8255_0->read(offset & 0x03);
 				}
 				break;
 	}
@@ -644,7 +635,7 @@ WRITE8_MEMBER(pmd85_state::mato_io_w)
 				switch (offset & 0x80)
 				{
 					case 0x80:  /* Motherboard 8255 */
-							return m_ppi8255_0->write(space, offset & 0x03, data);
+							return m_ppi8255_0->write(offset & 0x03, data);
 				}
 				break;
 	}

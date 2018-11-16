@@ -123,9 +123,9 @@ MACHINE_CONFIG_START(attckufo_state::attckufo)
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
 	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("INPUT"))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpa_handler().set_ioport("DSW");
+	pia.readpb_handler().set_ioport("INPUT");
 
 	SPEAKER(config, "mono").front_center();
 

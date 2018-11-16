@@ -32,9 +32,11 @@ enum map_handler_type
 	AMH_ROM,
 	AMH_NOP,
 	AMH_UNMAP,
-	AMH_DEVICE_DELEGATE_F,
+	AMH_DEVICE_DELEGATE,
+	AMH_DEVICE_DELEGATE_M,
 	AMH_DEVICE_DELEGATE_S,
 	AMH_DEVICE_DELEGATE_SM,
+	AMH_DEVICE_DELEGATE_MO,
 	AMH_DEVICE_DELEGATE_SMO,
 	AMH_PORT,
 	AMH_BANK,
@@ -338,6 +340,15 @@ public:
 	write32_delegate        m_wproto32;             // 32-bit write proto-delegate
 	write64_delegate        m_wproto64;             // 64-bit write proto-delegate
 
+	read8m_delegate         m_rproto8m;             // 8-bit read proto-delegate
+	read16m_delegate        m_rproto16m;            // 16-bit read proto-delegate
+	read32m_delegate        m_rproto32m;            // 32-bit read proto-delegate
+	read64m_delegate        m_rproto64m;            // 64-bit read proto-delegate
+	write8m_delegate        m_wproto8m;             // 8-bit write proto-delegate
+	write16m_delegate       m_wproto16m;            // 16-bit write proto-delegate
+	write32m_delegate       m_wproto32m;            // 32-bit write proto-delegate
+	write64m_delegate       m_wproto64m;            // 64-bit write proto-delegate
+
 	read8s_delegate         m_rproto8s;             // 8-bit read proto-delegate
 	read16s_delegate        m_rproto16s;            // 16-bit read proto-delegate
 	read32s_delegate        m_rproto32s;            // 32-bit read proto-delegate
@@ -355,6 +366,15 @@ public:
 	write16sm_delegate      m_wproto16sm;           // 16-bit write proto-delegate
 	write32sm_delegate      m_wproto32sm;           // 32-bit write proto-delegate
 	write64sm_delegate      m_wproto64sm;           // 64-bit write proto-delegate
+
+	read8mo_delegate        m_rproto8mo;            // 8-bit read proto-delegate
+	read16mo_delegate       m_rproto16mo;           // 16-bit read proto-delegate
+	read32mo_delegate       m_rproto32mo;           // 32-bit read proto-delegate
+	read64mo_delegate       m_rproto64mo;           // 64-bit read proto-delegate
+	write8mo_delegate       m_wproto8mo;            // 8-bit write proto-delegate
+	write16mo_delegate      m_wproto16mo;           // 16-bit write proto-delegate
+	write32mo_delegate      m_wproto32mo;           // 32-bit write proto-delegate
+	write64mo_delegate      m_wproto64mo;           // 64-bit write proto-delegate
 
 	read8smo_delegate       m_rproto8smo;           // 8-bit read proto-delegate
 	read16smo_delegate      m_rproto16smo;          // 16-bit read proto-delegate
@@ -374,40 +394,56 @@ public:
 	// handler setters for 8-bit delegates
 	address_map_entry &r(read8_delegate func);
 	address_map_entry &w(write8_delegate func);
+	address_map_entry &r(read8m_delegate func);
+	address_map_entry &w(write8m_delegate func);
 	address_map_entry &r(read8s_delegate func);
 	address_map_entry &w(write8s_delegate func);
 	address_map_entry &r(read8sm_delegate func);
 	address_map_entry &w(write8sm_delegate func);
+	address_map_entry &r(read8mo_delegate func);
+	address_map_entry &w(write8mo_delegate func);
 	address_map_entry &r(read8smo_delegate func);
 	address_map_entry &w(write8smo_delegate func);
 
 	// handler setters for 16-bit delegates
 	address_map_entry &r(read16_delegate func);
 	address_map_entry &w(write16_delegate func);
+	address_map_entry &r(read16m_delegate func);
+	address_map_entry &w(write16m_delegate func);
 	address_map_entry &r(read16s_delegate func);
 	address_map_entry &w(write16s_delegate func);
 	address_map_entry &r(read16sm_delegate func);
 	address_map_entry &w(write16sm_delegate func);
+	address_map_entry &r(read16mo_delegate func);
+	address_map_entry &w(write16mo_delegate func);
 	address_map_entry &r(read16smo_delegate func);
 	address_map_entry &w(write16smo_delegate func);
 
 	// handler setters for 32-bit delegates
 	address_map_entry &r(read32_delegate func);
 	address_map_entry &w(write32_delegate func);
+	address_map_entry &r(read32m_delegate func);
+	address_map_entry &w(write32m_delegate func);
 	address_map_entry &r(read32s_delegate func);
 	address_map_entry &w(write32s_delegate func);
 	address_map_entry &r(read32sm_delegate func);
 	address_map_entry &w(write32sm_delegate func);
+	address_map_entry &r(read32mo_delegate func);
+	address_map_entry &w(write32mo_delegate func);
 	address_map_entry &r(read32smo_delegate func);
 	address_map_entry &w(write32smo_delegate func);
 
 	// handler setters for 64-bit delegates
 	address_map_entry &r(read64_delegate func);
 	address_map_entry &w(write64_delegate func);
+	address_map_entry &r(read64m_delegate func);
+	address_map_entry &w(write64m_delegate func);
 	address_map_entry &r(read64s_delegate func);
 	address_map_entry &w(write64s_delegate func);
 	address_map_entry &r(read64sm_delegate func);
 	address_map_entry &w(write64sm_delegate func);
+	address_map_entry &r(read64mo_delegate func);
+	address_map_entry &w(write64mo_delegate func);
 	address_map_entry &r(read64smo_delegate func);
 	address_map_entry &w(write64smo_delegate func);
 

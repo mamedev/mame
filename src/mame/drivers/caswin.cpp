@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 	MCFG_SCREEN_UPDATE_DRIVER(caswin_state, screen_update_vvillage)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vvillage)
 	MCFG_PALETTE_ADD("palette", 0x40)
@@ -358,10 +358,10 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 4000000 / 4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 4000000 / 4));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 ROM_START( caswin )

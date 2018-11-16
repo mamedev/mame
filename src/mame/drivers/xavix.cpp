@@ -206,32 +206,8 @@
 #include "emu.h"
 #include "includes/xavix.h"
 
-// not confirmed for all games
+// NTSC clock for regular XaviX?
 #define MAIN_CLOCK XTAL(21'477'272)
-
-READ8_MEMBER(xavix_state::main_r)
-{
-	if (offset & 0x8000)
-	{
-		return  m_rgn[(offset) & (m_rgnlen - 1)];
-	}
-	else
-	{
-		return m_lowbus->read8(space, offset&0x7fff);
-	}
-}
-
-WRITE8_MEMBER(xavix_state::main_w)
-{
-	if (offset & 0x8000)
-	{
-		logerror("write to ROM area?\n");
-	}
-	else
-	{
-		m_lowbus->write8(space, offset & 0x7fff, data);
-	}
-}
 
 /* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably
    the CPU 0 page memory and stack are still at 0 but ROM must be in the 3xxx range (game hasn't got far enough to call this yet to help either)
@@ -244,167 +220,195 @@ WRITE8_MEMBER(xavix_state::main_w)
    note, many DMA operations and tile bank redirects etc. have the high bit set too, so that could be significant if it defines how it accesses
    memory in those cases too
 
+   this can't be correct, it breaks monster truck which expects ROM at 8000 even in the >0x800000 region, maybe code + data mappings need
+   to be kept separate, with >0x800000 showing both ROM banks for code, but still having the zero page area etc. for data?
+
+   The code at 00EA84 in Ping Pong stores 8e to the data bank, reads 16 bit pointer from from 0000 + y (expecting it to come from zero page ram - value 3081)
+   then reads data from 3081, pushes it to stack (which is expected to work) then sets data bank back to 00 (writes to ff, expecting it to work) then pulls
+   the value written and puts it in RAM.  Is stack actually still memory mapped at this point, or do stack operations always go to stack regardless?
+   Do reads return databank/codebank/stack, or only zero page? is zero page visibility maybe even conditional on how it gets used?
+
+   in namcons1 the code at 00F3F2 has data bank set to 0x84 and expects to read from ROM using lda ($0a), y where the content of 0x0a is 0000
+   this means that 0a and 0b must be read as zero page, but the actual pointer read from is ROM, bypassing zero page entirely, I currently have a separate
+   address space called by that single opcode to handle this, it might need expanding to any other opcodes that aren't using zero page directly tho
+   possible stack is similar?
+
+
 */
-READ8_MEMBER(xavix_state::main2_r)
+
+READ8_MEMBER(xavix_state::opcodes_000000_r)
 {
 	if (offset & 0x8000)
 	{
-		return m_lowbus->read8(space, offset&0x7fff);
+		return m_rgn[(offset) & (m_rgnlen - 1)];
 	}
 	else
 	{
-		if (offset>0x200)
-			return  m_rgn[(offset) & (m_rgnlen - 1)];
-		else
-			return m_lowbus->read8(space, offset&0x7fff);
+		return m_lowbus->read8(space, offset & 0x7fff);
 	}
 }
 
-WRITE8_MEMBER(xavix_state::main2_w)
+READ8_MEMBER(xavix_state::opcodes_800000_r)
 {
-	if (offset & 0x8000)
-	{
-		m_lowbus->write8(space, offset & 0x7fff, data);
-	}
-	else
-	{
-		if (offset>0x200)
-			logerror("write to ROM area?\n");
-		else
-			m_lowbus->write8(space, offset & 0x7fff, data);
-	}
+	// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
+	return m_rgn[(offset) & (m_rgnlen - 1)];
 }
 
-// DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
-
+// this is only used for opcode / oprand reads, data memory addressing is handled in core, doing the opcode / oprand addressing in core causes disassembly issues when running from lowbus space (ram, interrupts on most games)
 void xavix_state::xavix_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rw(FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
-	map(0x800000, 0xffffff).rw(FUNC(xavix_state::main2_r), FUNC(xavix_state::main2_w));
+	map(0x000000, 0x7fffff).r(FUNC(xavix_state::opcodes_000000_r));
+	map(0x800000, 0xffffff).r(FUNC(xavix_state::opcodes_800000_r));
+}
+
+// this is used by data reads / writes after some processing in the core to decide if data reads can see lowbus, zeropage, stack, bank registers etc. and only falls through to here on a true external bus access
+void xavix_state::xavix_extbus_map(address_map &map)
+{
+	map(0x000000, 0xffffff).rw(FUNC(xavix_state::extbus_r), FUNC(xavix_state::extbus_w));
 }
 
 void xavix_state::xavix_lowbus_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x3fff).ram().share("mainram");
+	map(0x0000, 0x3fff).ram().share("mainram");
 
-	// this might not be a real area, the tilemap base register gets set to 0x40 in monster truck service mode, and expects a fixed layout.
-	// As that would point at this address maybe said layout is being read from here, or maybe it's just a magic tilemap register value that doesn't read address space at all.
-	map(0x4000, 0x41ff).r(FUNC(xavix_state::xavix_4000_r));
+	// Memory Emulator / Text Array
+	map(0x4000, 0x4fff).rw(FUNC(xavix_state::xavix_memoryemu_txarray_r), FUNC(xavix_state::xavix_memoryemu_txarray_w));
 
-	// 6xxx ranges are the video hardware
-	// appears to be 256 sprites
-	map(0x6000, 0x60ff).ram().share("spr_attr0");
-	map(0x6100, 0x61ff).ram().share("spr_attr1");
-	map(0x6200, 0x62ff).ram().share("spr_ypos"); // cleared to 0x80 by both games, maybe enable registers?
-	map(0x6300, 0x63ff).ram().share("spr_xpos");
-	map(0x6400, 0x64ff).ram(); // 6400 range gets populated in some cases, but it seems to be more like work ram, data doesn't matter and must be ignored?
-	map(0x6500, 0x65ff).ram().share("spr_addr_lo");
-	map(0x6600, 0x66ff).ram().share("spr_addr_md");
-	map(0x6700, 0x67ff).ram().share("spr_addr_hi");
-	map(0x6800, 0x68ff).ram().share("palram1"); // written with 6900
-	map(0x6900, 0x69ff).ram().share("palram2"); // startup (taitons1)
-	map(0x6a00, 0x6a1f).ram().share("spr_attra"); // test mode, pass flag 0x20
+	// Sprite RAM (aka Fragment RAM)
+	map(0x6000, 0x67ff).ram().share("fragment_sprite");
 
-	map(0x6fc0, 0x6fc0).w(FUNC(xavix_state::xavix_6fc0_w)); // startup (maybe this is a mirror of tmap1_regs_w)
+	// Palette RAM
+	map(0x6800, 0x68ff).ram().w(FUNC(xavix_state::palram_sh_w)).share("palram_sh");
+	map(0x6900, 0x69ff).ram().w(FUNC(xavix_state::palram_l_w)).share("palram_l");
 
-	map(0x6fc8, 0x6fcf).w(FUNC(xavix_state::tmap1_regs_w)); // video registers
+	// Segment RAM
+	map(0x6a00, 0x6a1f).ram().share("segment_regs"); // test mode, pass flag 0x20
 
+	// Tilemap 1 Registers
+	map(0x6fc8, 0x6fcf).rw(FUNC(xavix_state::tmap1_regs_r), FUNC(xavix_state::tmap1_regs_w));
+
+	// Tilemap 2 Registers
 	map(0x6fd0, 0x6fd7).rw(FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
-	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::xavix_6fd8_w)); // startup (mirror of tmap2_regs_w?)
 
-	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::vid_dma_trigger_r), FUNC(xavix_state::vid_dma_trigger_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
-	map(0x6fe1, 0x6fe2).w(FUNC(xavix_state::vid_dma_params_1_w));
-	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::vid_dma_params_2_w));
+	// Sprite Registers
+	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::spriteregs_w));
 
-	// function in rad_mtrk at 0184b7 uses this
-	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::xavix_6fe8_r), FUNC(xavix_state::xavix_6fe8_w)); // r/w tested
-	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::xavix_6fe9_r), FUNC(xavix_state::xavix_6fe9_w)); // r/w tested
-	map(0x6fea, 0x6fea).w(FUNC(xavix_state::xavix_6fea_w));
+	// Sprite DMA
+	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::spritefragment_dma_status_r), FUNC(xavix_state::spritefragment_dma_trg_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
+	map(0x6fe1, 0x6fe2).w(FUNC(xavix_state::spritefragment_dma_params_1_w));
+	map(0x6fe5, 0x6fe6).w(FUNC(xavix_state::spritefragment_dma_params_2_w));
 
-	map(0x6ff0, 0x6ff0).rw(FUNC(xavix_state::xavix_6ff0_r), FUNC(xavix_state::xavix_6ff0_w)); // r/w tested
-	map(0x6ff1, 0x6ff1).w(FUNC(xavix_state::xavix_6ff1_w)); // startup - cleared in interrupt 0
-	map(0x6ff2, 0x6ff2).w(FUNC(xavix_state::xavix_6ff2_w)); // set to 07 after clearing above things in interrupt 0
+	// Arena Registers (controls visible window + more?)
+	map(0x6fe8, 0x6fe8).rw(FUNC(xavix_state::arena_start_r), FUNC(xavix_state::arena_start_w)); // r/w tested
+	map(0x6fe9, 0x6fe9).rw(FUNC(xavix_state::arena_end_r), FUNC(xavix_state::arena_end_w)); // r/w tested
+	map(0x6fea, 0x6fea).rw(FUNC(xavix_state::arena_control_r), FUNC(xavix_state::arena_control_w));
 
-	map(0x6ff8, 0x6ff8).rw(FUNC(xavix_state::xavix_6ff8_r), FUNC(xavix_state::xavix_6ff8_w)); // always seems to be a read/store or read/modify/store
+	// Colour Mixing / Enabling Registers
+	map(0x6ff0, 0x6ff0).ram().w(FUNC(xavix_state::colmix_sh_w)).share("colmix_sh"); // effect colour?
+	map(0x6ff1, 0x6ff1).ram().w(FUNC(xavix_state::colmix_l_w)).share("colmix_l");
+	map(0x6ff2, 0x6ff2).ram().w(FUNC(xavix_state::colmix_6ff2_w)).share("colmix_ctrl"); // set to 07 after clearing above things in interrupt 0
+
+	// Display Control Register / Status Flags
+	map(0x6ff8, 0x6ff8).rw(FUNC(xavix_state::dispctrl_6ff8_r), FUNC(xavix_state::dispctrl_6ff8_w)); // always seems to be a read/store or read/modify/store
 	map(0x6ff9, 0x6ff9).r(FUNC(xavix_state::pal_ntsc_r));
-	map(0x6ffa, 0x6ffa).w(FUNC(xavix_state::xavix_6ffa_w));
-	map(0x6ffb, 0x6ffb).w(FUNC(xavix_state::xavix_6ffb_w)); // increases / decreases when you jump in snowboard, maybe raster irq pos or part of a clipping window?
+	map(0x6ffa, 0x6ffa).ram().w(FUNC(xavix_state::dispctrl_posirq_x_w)).share("posirq_x");
+	map(0x6ffb, 0x6ffb).ram().w(FUNC(xavix_state::dispctrl_posirq_y_w)).share("posirq_y"); // increases / decreases when you jump in snowboard (snowboard, used to blank ground)
 
-	// 7xxx ranges system controller?
-	map(0x75f0, 0x75f0).rw(FUNC(xavix_state::xavix_75f0_r), FUNC(xavix_state::xavix_75f0_w)); // r/w tested read/written 8 times in a row
-	map(0x75f1, 0x75f1).rw(FUNC(xavix_state::xavix_75f1_r), FUNC(xavix_state::xavix_75f1_w)); // r/w tested read/written 8 times in a row
-	map(0x75f3, 0x75f3).ram();
-	map(0x75f4, 0x75f4).r(FUNC(xavix_state::xavix_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
-	map(0x75f5, 0x75f5).r(FUNC(xavix_state::xavix_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
+	// Lightgun / pen 1 control
+	// map(0x6ffc, 0x6fff)
 
+	// Sound RAM
+	// map(0x7400, 0x757f)
+
+	// Sound Control
+	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_startstop_r), FUNC(xavix_state::sound_startstop_w)); // r/w tested read/written 8 times in a row
+	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_updateenv_r), FUNC(xavix_state::sound_updateenv_w));
+	map(0x75f4, 0x75f5).r(FUNC(xavix_state::sound_sta16_r)); // related to 75f0 / 75f1 (read after writing there - rad_mtrk)
 	// taitons1 after 75f7/75f8
-	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::xavix_75f6_r), FUNC(xavix_state::xavix_75f6_w)); // r/w tested
+	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_volume_r), FUNC(xavix_state::sound_volume_w)); // r/w tested
 	// taitons1 written as a pair
-	map(0x75f7, 0x75f7).w(FUNC(xavix_state::xavix_75f7_w));
-	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::xavix_75f8_r), FUNC(xavix_state::xavix_75f8_w)); // r/w tested
+	map(0x75f7, 0x75f7).w(FUNC(xavix_state::sound_regbase_w));
+	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::sound_75f8_r), FUNC(xavix_state::sound_75f8_w)); // r/w tested
 	// taitons1 written after 75f6, then read
-	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::xavix_75f9_r), FUNC(xavix_state::xavix_75f9_w));
+	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::sound_75f9_r), FUNC(xavix_state::sound_75f9_w));
 	// at another time
-	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::xavix_75fa_r), FUNC(xavix_state::xavix_75fa_w)); // r/w tested
-	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::xavix_75fb_r), FUNC(xavix_state::xavix_75fb_w)); // r/w tested
-	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::xavix_75fc_r), FUNC(xavix_state::xavix_75fc_w)); // r/w tested
-	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::xavix_75fd_r), FUNC(xavix_state::xavix_75fd_w)); // r/w tested
-	map(0x75fe, 0x75fe).w(FUNC(xavix_state::xavix_75fe_w));
+	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::sound_timer0_r), FUNC(xavix_state::sound_timer0_w)); // r/w tested
+	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_timer1_r), FUNC(xavix_state::sound_timer1_w)); // r/w tested
+	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_timer2_r), FUNC(xavix_state::sound_timer2_w)); // r/w tested
+	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_timer3_r), FUNC(xavix_state::sound_timer3_w)); // r/w tested
+	map(0x75fe, 0x75fe).rw(FUNC(xavix_state::sound_irqstatus_r), FUNC(xavix_state::sound_irqstatus_w));
 	// taitons1 written other 75xx operations
-	map(0x75ff, 0x75ff).w(FUNC(xavix_state::xavix_75ff_w));
+	map(0x75ff, 0x75ff).w(FUNC(xavix_state::sound_75ff_w));
 
-	map(0x7810, 0x7810).w(FUNC(xavix_state::xavix_7810_w)); // startup
+	// Slot Registers
+	map(0x7810, 0x7810).w(FUNC(xavix_state::slotreg_7810_w)); // startup
 
-	map(0x7900, 0x7900).w(FUNC(xavix_state::xavix_7900_w));
-	map(0x7901, 0x7901).w(FUNC(xavix_state::xavix_7901_w));
-	map(0x7902, 0x7902).w(FUNC(xavix_state::xavix_7902_w));
+	// External Interface
+	map(0x7900, 0x7900).w(FUNC(xavix_state::extintrf_7900_w));
+	map(0x7901, 0x7901).w(FUNC(xavix_state::extintrf_7901_w));
+	map(0x7902, 0x7902).w(FUNC(xavix_state::extintrf_7902_w));
 
-	// DMA trigger for below (written after the others) waits on status of bit 1 in a loop
-	map(0x7980, 0x7980).rw(FUNC(xavix_state::dma_trigger_r), FUNC(xavix_state::dma_trigger_w));
-	// DMA source
-	map(0x7981, 0x7981).w(FUNC(xavix_state::rom_dmasrc_lo_w));
-	map(0x7982, 0x7982).w(FUNC(xavix_state::rom_dmasrc_md_w));
-	map(0x7983, 0x7983).w(FUNC(xavix_state::rom_dmasrc_hi_w));
-	// DMA dest
-	map(0x7984, 0x7984).w(FUNC(xavix_state::rom_dmadst_lo_w));
-	map(0x7985, 0x7985).w(FUNC(xavix_state::rom_dmadst_hi_w));
-	// DMA length
-	map(0x7986, 0x7986).w(FUNC(xavix_state::rom_dmalen_lo_w));
-	map(0x7987, 0x7987).w(FUNC(xavix_state::rom_dmalen_hi_w));
+	// DMA Controller
+	map(0x7980, 0x7980).rw(FUNC(xavix_state::rom_dmastat_r), FUNC(xavix_state::rom_dmatrg_w));
+	map(0x7981, 0x7983).ram().w(FUNC(xavix_state::rom_dmasrc_w)).share("rom_dma_src");
+	map(0x7984, 0x7985).ram().w(FUNC(xavix_state::rom_dmadst_w)).share("rom_dma_dst");
+	map(0x7986, 0x7987).ram().w(FUNC(xavix_state::rom_dmalen_w)).share("rom_dma_len");
 
-	// GPIO stuff
-	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::xavix_io_0_r),FUNC(xavix_state::xavix_7a00_w));
-	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::xavix_io_1_r),FUNC(xavix_state::xavix_7a01_w)); // startup (taitons1)
-	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::xavix_7a02_r),FUNC(xavix_state::xavix_7a02_w)); // startup, gets set to 20, 7a00 is then also written with 20
-	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::xavix_7a03_r),FUNC(xavix_state::xavix_7a03_w)); // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
+	// IO Ports
+	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io0_data_r), FUNC(xavix_state::io0_data_w));
+	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io1_data_r), FUNC(xavix_state::io1_data_w));
+	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io0_direction_r), FUNC(xavix_state::io0_direction_w));
+	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io1_direction_r), FUNC(xavix_state::io1_direction_w));
 
-	map(0x7a80, 0x7a80).w(FUNC(xavix_state::xavix_7a80_w)); // still IO? ADC related?
+	// IO Event Interrupt control
+	map(0x7a80, 0x7a80).rw(FUNC(xavix_state::ioevent_enable_r), FUNC(xavix_state::ioevent_enable_w));
+	map(0x7a81, 0x7a81).rw(FUNC(xavix_state::ioevent_irqstate_r), FUNC(xavix_state::ioevent_irqack_w));
 
-	map(0x7b00, 0x7b00).w(FUNC(xavix_state::xavix_7b00_w)); // rad_snow (not often)
+	// Mouse?
+	map(0x7b00, 0x7b00).w(FUNC(xavix_state::adc_7b00_w)); // rad_snow (not often, why?)
 
-	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::xavix_7b80_r), FUNC(xavix_state::xavix_7b80_w)); // rad_snow (not often)
-	map(0x7b81, 0x7b81).w(FUNC(xavix_state::xavix_7b81_w)); // written (often, m_trck, analog related?)
+	// Lightgun / pen 2 control
+	//map(0x7b18, 0x7b1b)
 
-	map(0x7c00, 0x7c00).w(FUNC(xavix_state::xavix_7c00_w));
-	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::xavix_7c01_r), FUNC(xavix_state::xavix_7c01_w)); // r/w tested
-	map(0x7c02, 0x7c02).w(FUNC(xavix_state::xavix_7c02_w));
+	// ADC registers
+	map(0x7b80, 0x7b80).rw(FUNC(xavix_state::adc_7b80_r), FUNC(xavix_state::adc_7b80_w)); // rad_snow (not often)
+	map(0x7b81, 0x7b81).rw(FUNC(xavix_state::adc_7b81_r), FUNC(xavix_state::adc_7b81_w)); // written (often, m_trck, analog related?)
 
-	// this is a multiplication chip
-	map(0x7ff2, 0x7ff4).w(FUNC(xavix_state::mult_param_w));
+	// Sleep control
+	//map(0x7b82, 0x7b83)
+
+	// Timer control
+	map(0x7c00, 0x7c00).rw(FUNC(xavix_state::timer_status_r), FUNC(xavix_state::timer_control_w));
+	map(0x7c01, 0x7c01).rw(FUNC(xavix_state::timer_baseval_r), FUNC(xavix_state::timer_baseval_w)); // r/w tested
+	map(0x7c02, 0x7c02).rw(FUNC(xavix_state::timer_freq_r), FUNC(xavix_state::timer_freq_w));
+	map(0x7c03, 0x7c03).r(FUNC(xavix_state::timer_curval_r));
+
+	// Barrel Shifter registers
+	// map(0x7ff0, 0x7ff1)
+
+	// Multiply / Divide registers
+	map(0x7ff2, 0x7ff4).rw(FUNC(xavix_state::mult_param_r), FUNC(xavix_state::mult_param_w));
 	map(0x7ff5, 0x7ff6).rw(FUNC(xavix_state::mult_r), FUNC(xavix_state::mult_w));
 
-	// maybe irq enable, written after below
-	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::irq_enable_w)); // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
-	// an IRQ vector (nmi?)
-	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::irq_vector0_lo_w));
-	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::irq_vector0_hi_w));
-
+	// CPU Vector registers
+	map(0x7ff9, 0x7ff9).w(FUNC(xavix_state::vector_enable_w)); // enables / disables the custom vectors
+	map(0x7ffa, 0x7ffa).w(FUNC(xavix_state::nmi_vector_lo_w)); // an IRQ vector (nmi?)
+	map(0x7ffb, 0x7ffb).w(FUNC(xavix_state::nmi_vector_hi_w));
 	map(0x7ffc, 0x7ffc).rw(FUNC(xavix_state::irq_source_r), FUNC(xavix_state::irq_source_w));
+	// map(0x7ffd, 0x7ffd) some of the Nostalgia games read here, why?
+	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector_lo_w)); // an IRQ vector (irq?)
+	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector_hi_w));
+}
 
-	// an IRQ vector (irq?)
-	map(0x7ffe, 0x7ffe).w(FUNC(xavix_state::irq_vector1_lo_w));
-	map(0x7fff, 0x7fff).w(FUNC(xavix_state::irq_vector1_hi_w));
+void xavix_state::superxavix_lowbus_map(address_map &map)
+{
+	xavix_lowbus_map(map);
+
+	// bitmap layer palette
+	map(0x6c00, 0x6cff).ram().w(FUNC(xavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
+	map(0x6d00, 0x6dff).ram().w(FUNC(xavix_state::bmp_palram_l_w)).share("bmp_palram_l");
+
+	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 }
 
 static INPUT_PORTS_START( xavix )
@@ -464,12 +468,14 @@ static INPUT_PORTS_START( xavix )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
+/*
 static INPUT_PORTS_START( xavixp )
-	PORT_INCLUDE(xavix)
+    PORT_INCLUDE(xavix)
 
-	PORT_MODIFY("REGION") // PAL/NTSC flag
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
+    PORT_MODIFY("REGION") // PAL/NTSC flag
+    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
+*/
 
 /* Test mode lists the following
 
@@ -484,6 +490,12 @@ INPUT_PORTS_END
 
 */
 
+CUSTOM_INPUT_MEMBER( xavix_mtrk_state::mtrk_wheel_r )
+{
+	return m_wheel->read_direction();
+}
+
+
 static INPUT_PORTS_START( rad_mtrk )
 	PORT_INCLUDE(xavix)
 
@@ -493,9 +505,11 @@ static INPUT_PORTS_START( rad_mtrk )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Throttle Low")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Reverse / Back")
 
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_mtrk_state,mtrk_wheel_r, (void *)0)
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Horn")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // some kind of 'power off' (fades screen to black, jumps to an infinite loop) maybe low battery condition or just the power button?
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_mtrkp )
@@ -509,7 +523,14 @@ static INPUT_PORTS_START( rad_crdn )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // can press this to get to a game select screen
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_crdnp )
@@ -545,6 +566,57 @@ static INPUT_PORTS_START( rad_boxp )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rad_bass ) // also an analog reel
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Menu") // pressing this ingame currently crashes it if read from sound_irqstatus_r is incorrect?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Forward") // used to navigate menus
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Back")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) // definitely the dpad, see map screen
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ekara )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // multiplexed input
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) // multiplexed input
+
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+
+	PORT_START("EXTRA0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Echo")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Effects")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Key Down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Key Up")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("BGM Down")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("BGM Up")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Tempo Down")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Tempo Up")
+
+	PORT_START("EXTRA1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel")
+	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// no 40/80 due to multiplexer code
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_bassp )
+	PORT_INCLUDE(rad_bass)
+
+	PORT_MODIFY("REGION") // PAL/NTSC flag
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( rad_snow )
 	PORT_INCLUDE(xavix)
@@ -564,14 +636,102 @@ static INPUT_PORTS_START( rad_snowp )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( namcons2 )
+static INPUT_PORTS_START( rad_ping )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select?")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pause?")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) // resets? not a real button?
+
+	PORT_MODIFY("IN1") // are these for the 2nd player?
+	//PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pause?")
+	//PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	//PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	//PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) // resets? not a real button?
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( namcons2 )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0") // mappings based on Dragon Buster button list, inputs don't seem to work properly in some games, probably because bad EEPROM support means all buttons are mapped to the same thing?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // Fire4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Fire3
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // not a button? (but can be used to pass prompts?)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // Pause / Add Coins, marked 'Credit' (but not a coin slot)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Fire2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Fire1
+
+INPUT_PORTS_END
+
+// to access hidden test mode reset while holding Button1 and Button2 (works every other reset)
+// to cycle through modes use Button 1 until you get to the input test
+static INPUT_PORTS_START( rad_bb2 )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("X")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("O")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ttv_mx )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Accel
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Brake
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( rad_fb )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
+INPUT_PORTS_END
+
+
+
+static INPUT_PORTS_START( rad_rh )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0") // hold Right+Button 3 when resetting for a version number
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Skip") // skips level, cheat or real input?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Forward")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Back")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
 
 /* correct, 4bpp gfxs */
@@ -592,7 +752,7 @@ static const gfx_layout char16layout =
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
-	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4, 9*4,8*4,11*4,10*4,13*4,12*4,15*4,14*4   },
+	{ 1*4,0*4,3*4,2*4,5*4,4*4,7*4,6*4, 9*4,8*4,11*4,10*4,13*4,12*4,15*4,14*4 },
 	{ STEP16(0,4*16) },
 	16*16*4
 };
@@ -620,7 +780,7 @@ static const gfx_layout char16layout8bpp =
 };
 
 static GFXDECODE_START( gfx_xavix )
-	GFXDECODE_ENTRY( "bios", 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "bios", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout8bpp, 0, 1 )
@@ -632,19 +792,15 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",XAVIX,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
+	MCFG_DEVICE_ADDRESS_MAP(5, xavix_lowbus_map)
+	MCFG_DEVICE_ADDRESS_MAP(6, xavix_extbus_map)
 	MCFG_M6502_DISABLE_CACHE()
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state, interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xavix_state, scanline_cb, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("lowbus", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(xavix_lowbus_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
-
+	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -652,18 +808,42 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_UPDATE_DRIVER(xavix_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
+	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 256)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	// sound is PCM
+
+	//SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	XAVIX_SOUND(config, m_sound, MAIN_CLOCK);
+	m_sound->read_regs_callback().set(FUNC(xavix_state::sound_regram_read_cb));
+	m_sound->read_samples_callback().set(FUNC(xavix_state::sample_read));
+	//m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_sound->add_route(0, "lspeaker", 1.0);
+	m_sound->add_route(1, "rspeaker", 1.0);
+
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(xavix_i2c_state::xavix_i2c_24lc04)
+	xavix(config);
+
+	// according to http://ww1.microchip.com/downloads/en/devicedoc/21708k.pdf 'the master transmits up to 16 data bytes' however this breaks the Nostalgia games
+	// of note Galplus Phalanx on Namco Nostalgia 2, which will hang between stages unable to properly access the device, but with no page support it doesn't hang and scores save
+	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // 24LC04 on Nostalgia games, 24C04 on others
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(xavix_i2c_state::xavix_i2c_24c08)
+	xavix(config);
+
+	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x400); // 24C08 (Excite Fishing DX)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xavix_state::xavixp)
 	xavix(config);
@@ -679,29 +859,83 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 
 	MCFG_DEVICE_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
+	MCFG_DEVICE_ADDRESS_MAP(5, superxavix_lowbus_map)
+	MCFG_DEVICE_ADDRESS_MAP(6, xavix_extbus_map)
 	MCFG_M6502_DISABLE_CACHE()
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state, interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
+
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512)
 
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(xavix_i2c_state::xavix2000_i2c_24c04)
+	xavix2000(config);
+
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(xavix_i2c_state::xavix2000_i2c_24c02)
+	xavix2000(config);
+
+	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrk)
+	xavix(config);
+
+	XAVIX_MTRK_WHEEL(config, m_wheel, 0);
+	m_wheel->event_out_cb().set(FUNC(xavix_state::ioevent_trg08));
+
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(xavix_mtrk_state::xavix_mtrkp)
+	xavix_mtrk(config);
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(50)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(xavix_madfb_state::xavix_madfb)
+	xavix(config);
+
+	XAVIX_MADFB_BALL(config, m_ball, 0);
+	m_ball->event_out_cb().set(FUNC(xavix_state::ioevent_trg01));
+
+MACHINE_CONFIG_END
+
+DEVICE_IMAGE_LOAD_MEMBER( xavix_ekara_state, ekara_cart )
+{
+	uint32_t size = m_cart->common_get_size("rom");
+	std::vector<uint8_t> temp;
+	temp.resize(size);
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(&temp[0], size, "rom");
+
+	memcpy(memregion("bios")->base(), &temp[0], size);
+
+	return image_init_result::PASS;
+}
+
+MACHINE_CONFIG_START(xavix_ekara_state::xavix_ekara)
+	xavix(config);
+
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ekara_cart")
+	MCFG_GENERIC_EXTENSIONS("bin")
+	MCFG_GENERIC_WIDTH(GENERIC_ROM8_WIDTH)
+	MCFG_GENERIC_LOAD(xavix_ekara_state, ekara_cart)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","ekara")
+
+MACHINE_CONFIG_END
 
 void xavix_state::init_xavix()
 {
 	m_rgnlen = memregion("bios")->bytes();
 	m_rgn = memregion("bios")->base();
-}
-
-void xavix_state::init_taitons1()
-{
-	init_xavix();
-	m_alt_addressing = 1;
-}
-
-void xavix_state::init_rad_box()
-{
-	init_xavix();
-	m_alt_addressing = 2;
 }
 
 /***************************************************************************
@@ -813,31 +1047,14 @@ ROM_START( rad_rh )
 ROM_END
 
 /*
-    There's more code in here than in the 'eka_strt' set, but all it seems to do is display an 'insert cartridge' message,
-    however eka_strt also seems a complete program in it's own right, it's unclear if it can see any of the data from this
-    ROM.
-
-    (TODO: turn the cartridges into a software list once the mapping is properly understood)
+    The e-kara cartridges require the BIOS rom to map into 2nd external bus space as they fetch palette data from
+    it etc.
 */
 
-ROM_START( eka_base )
-	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "ekara.bin", 0x000000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
-ROM_END
-
-ROM_START( eka_strt )
-	ROM_REGION( 0x080000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
-ROM_END
-
-ROM_START( eka_vol1 )
-	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "ekaravol1.bin", 0x000000, 0x100000, CRC(29df4aea) SHA1(b95835aaf8630b61b47e5da0968cd4a1dd3bc517) )
-ROM_END
-
-ROM_START( eka_vol2 )
-	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "ekaravol2.bin", 0x000000, 0x100000, CRC(6c66772e) SHA1(e1e719df1e51caaafd9b3af187059334f7abbba3) )
+ROM_START( ekara )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekara.bin", 0x600000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
+	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( has_wamg )
@@ -845,53 +1062,49 @@ ROM_START( has_wamg )
 	ROM_LOAD( "minigolf.bin", 0x000000, 0x400000, CRC(35cee2ad) SHA1(c7344e8ba336bc329638485ea571cd731ebf7649) )
 ROM_END
 
-/* Standalone TV Games */
+/* XaviX hardware titles */
 
-CONS( 2006, taitons1,  0,          0,  xavix,  xavix,    xavix_state, init_taitons1, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2006, taitons2,  0,          0,  xavix,  namcons2, xavix_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_IS_SKELETON )
+CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_state, init_xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2006, namcons1,  0,          0,  xavix,  namcons2, xavix_state, init_taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_IS_SKELETON )
+CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2006, namcons2,  0,          0,  xavix,  namcons2, xavix_state, init_taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_IS_SKELETON )
+CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2000, rad_ping,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2000, rad_ping,  0,          0,  xavix,  rad_ping, xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 
-CONS( 2003, rad_mtrk,  0,          0,  xavix,  rad_mtrk, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_IS_SKELETON )
-CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavixp, rad_mtrkp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_IS_SKELETON )
+CONS( 2003, rad_mtrk,  0,          0,  xavix_mtrk,  rad_mtrk, xavix_mtrk_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavix_mtrkp, rad_mtrkp,xavix_mtrk_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Boxing (NTSC)", MACHINE_IS_SKELETON)
-CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Boxing (PAL)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IS_SKELETON)
-CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 2002, rad_bb2,   0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
+CONS( 2002, rad_bb2,   0,          0,  xavix,  rad_bb2,  xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bass,  0,          0,  xavix,  rad_bass, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, rad_bassp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
-CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
-CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, init_rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
+CONS( 2003, rad_madf,  0,          0,  xavix_madfb,  rad_fb,    xavix_madfb_state, init_xavix,    "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // no Play TV branding, USA only release?
 
-CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
+CONS( 200?, rad_fb,    0,          0,  xavix_madfb,  rad_fb,    xavix_madfb_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // USA only release? doesn't change logo for PAL.
 
-CONS( 200?, rad_rh,    0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_IS_SKELETON)
+CONS( 200?, rad_rh,    0,          0,  xavix,  rad_rh,   xavix_state, init_xavix,    "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,  xavix_state, init_taitons1,  "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_IS_SKELETON)
+CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  xavix,    xavix_i2c_state, init_xavix,    "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,  xavix_state, init_rad_box,   "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
+CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,    xavix_state, init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-CONS( 200?, eka_base,  0,          0,  xavix,  xavix,  xavix_state, init_xavix,     "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON)
+CONS( 200?, ekara,    0,          0,  xavix_ekara,  ekara,    xavix_ekara_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",   "e-kara (US?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT)
 
-CONS( 200?, eka_strt,  0,          0,   xavix,  xavix,  xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
-
-CONS( 200?, eka_vol1,  0,          0,   xavix,  xavix,  xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
-
-CONS( 200?, eka_vol2,  0,          0,   xavix,  xavix,  xavix_state, init_xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
+/* SuperXaviX hardware titles */
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
@@ -901,9 +1114,6 @@ ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
 ROM_END
-
-/* Tiger games have extended opcodes too */
-
 
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
@@ -926,9 +1136,9 @@ ROM_START( drgqst )
 ROM_END
 
 
-CONS( 2004, xavtenni, 0, 0, xavix2000, xavix, xavix_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
+CONS( 2004, xavtenni, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2005, ttv_sw,   0, 0, xavix2000, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_lotr, 0, 0, xavix2000, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_mx,   0, 0, xavix2000, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
-CONS( 2003, drgqst,   0, 0, xavix2000, xavix, xavix_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, xavix, xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, xavix, xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx, xavix_i2c_state, init_xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, xavix, xavix_i2c_lotr_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

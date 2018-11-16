@@ -47,6 +47,7 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
 
+	void bshark_base(machine_config &config);
 	void sci(machine_config &config);
 	void spacegun(machine_config &config);
 	void chasehq(machine_config &config);

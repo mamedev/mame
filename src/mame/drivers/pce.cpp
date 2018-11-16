@@ -61,7 +61,6 @@ Super System Card:
 
 #include "bus/pce/pce_rom.h"
 #include "cpu/h6280/h6280.h"
-#include "sound/c6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
 #include "video/huc6202.h"
@@ -259,10 +258,6 @@ void pce_state::pce_mem(address_map &map)
 	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000).share("user_ram");
 	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
-	map(0x1FE800, 0x1FEBFF).rw(C6280_TAG, FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
-	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(FUNC(pce_state::mess_pce_joystick_r), FUNC(pce_state::mess_pce_joystick_w));
-	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
 }
 
@@ -284,10 +279,6 @@ void pce_state::sgx_mem(address_map &map)
 	map(0x1FE008, 0x1FE00F).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
 	map(0x1FE010, 0x1FE017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
-	map(0x1FE800, 0x1FEBFF).rw(C6280_TAG, FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
-	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(FUNC(pce_state::mess_pce_joystick_r), FUNC(pce_state::mess_pce_joystick_w));
-	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 	map(0x1FF800, 0x1FFBFF).rw(FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
 }
 
@@ -316,9 +307,14 @@ static void pce_cart(device_slot_interface &device)
 
 MACHINE_CONFIG_START(pce_state::pce_common)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
-	MCFG_DEVICE_IO_MAP(pce_io)
+	H6280(config, m_maincpu, MAIN_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::pce_mem);
+	m_maincpu->set_addrmap(AS_IO, &pce_state::pce_io);
+	m_maincpu->port_in_cb().set(FUNC(pce_state::mess_pce_joystick_r));
+	m_maincpu->port_out_cb().set(FUNC(pce_state::mess_pce_joystick_w));
+	m_maincpu->add_route(0, "lspeaker", 1.00);
+	m_maincpu->add_route(1, "rspeaker", 1.00);
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
@@ -342,10 +338,6 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
-	MCFG_C6280_CPU("maincpu")
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	MCFG_PCE_CD_ADD("pce_cd")
 
@@ -369,9 +361,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pce_state::sgx)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(sgx_mem)
-	MCFG_DEVICE_IO_MAP(sgx_io)
+	H6280(config, m_maincpu, MAIN_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::sgx_mem);
+	m_maincpu->set_addrmap(AS_IO, &pce_state::sgx_io);
+	m_maincpu->port_in_cb().set(FUNC(pce_state::mess_pce_joystick_r));
+	m_maincpu->port_out_cb().set(FUNC(pce_state::mess_pce_joystick_w));
+	m_maincpu->add_route(0, "lspeaker", 1.00);
+	m_maincpu->add_route(1, "rspeaker", 1.00);
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
@@ -410,10 +407,6 @@ MACHINE_CONFIG_START(pce_state::sgx)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
-	MCFG_C6280_CPU("maincpu")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")

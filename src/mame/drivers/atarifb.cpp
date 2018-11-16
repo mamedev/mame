@@ -563,7 +563,7 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	MCFG_DEVICE_PROGRAM_MAP(atarifb_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(atarifb_state, irq0_line_hold, 4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

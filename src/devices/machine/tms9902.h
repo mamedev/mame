@@ -50,10 +50,11 @@ public:
 
 	tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rcv_callback(Object &&cb) { return m_rcv_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_xmit_callback(Object &&cb) { return m_xmit_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ctrl_callback(Object &&cb) { return m_ctrl_cb.set_callback(std::forward<Object>(cb)); }
+	// Callbacks
+	auto int_cb() { return m_int_cb.bind(); }
+	auto rcv_cb() { return m_rcv_cb.bind(); }
+	auto xmit_cb() { return m_xmit_cb.bind(); }
+	auto ctrl_cb() { return m_ctrl_cb.bind(); }
 
 	void    set_clock(bool state);
 
@@ -184,21 +185,5 @@ private:
 	// Caches the last configuration setting (used with the ctrl_callback)
 	int     m_last_config_value;
 };
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_TMS9902_INT_CB(cb) \
-	downcast<tms9902_device &>(*device).set_int_callback((DEVCB_##cb));
-
-#define MCFG_TMS9902_RCV_CB(cb) \
-	downcast<tms9902_device &>(*device).set_rcv_callback((DEVCB_##cb));
-
-#define MCFG_TMS9902_XMIT_CB(cb) \
-	downcast<tms9902_device &>(*device).set_xmit_callback((DEVCB_##cb));
-
-#define MCFG_TMS9902_CTRL_CB(cb) \
-	downcast<tms9902_device &>(*device).set_ctrl_callback((DEVCB_##cb));
 
 #endif // MAME_MACHINE_TMS9902_H

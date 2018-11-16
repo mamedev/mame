@@ -80,7 +80,7 @@ private:
 	DECLARE_WRITE16_MEMBER(legionna_midground_w);
 	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
 	DECLARE_WRITE16_MEMBER(legionna_text_w);
-	DECLARE_READ8_MEMBER(denjinmk_sound_comms_r);
+	u8 denjinmk_sound_comms_r(offs_t offset);
 	DECLARE_WRITE8_MEMBER(godzilla_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
 	DECLARE_WRITE16_MEMBER(heatbrl_setgfxbank);

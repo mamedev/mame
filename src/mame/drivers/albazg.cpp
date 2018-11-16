@@ -367,15 +367,14 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	MCFG_DEVICE_IO_MAP(port_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", albazg_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // timing is unknown
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, albazg_state, mux_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, albazg_state, mux_r))
+	i8255_device &ppi(I8255A(config, "ppi8255_0"));
+	ppi.out_pa_callback().set(FUNC(albazg_state::mux_w));
+	ppi.in_pb_callback().set_ioport("SYSTEM");
+	ppi.in_pc_callback().set(FUNC(albazg_state::mux_r));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -398,11 +397,11 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, albazg_state, yumefuda_output_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/16)); /* guessed to use the same xtal as the crtc */
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.port_a_write_callback().set(FUNC(albazg_state::yumefuda_output_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /***************************************************************************************/

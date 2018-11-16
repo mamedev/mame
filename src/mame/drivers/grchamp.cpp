@@ -333,18 +333,18 @@ WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
 			/* bit 2-4: ATTACK UP 1-3 */
 			/* bit 5-6: SIFT 1-2 */
 			/* bit 7:   ENGINE CS */
-			m_discrete->write(space, GRCHAMP_ENGINE_CS_EN, data & 0x80);
-			m_discrete->write(space, GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
-			m_discrete->write(space, GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
-			m_discrete->write(space, GRCHAMP_IDLING_EN, data & 0x02);
-			m_discrete->write(space, GRCHAMP_FOG_EN, data & 0x01);
+			m_discrete->write(GRCHAMP_ENGINE_CS_EN, data & 0x80);
+			m_discrete->write(GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
+			m_discrete->write(GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
+			m_discrete->write(GRCHAMP_IDLING_EN, data & 0x02);
+			m_discrete->write(GRCHAMP_FOG_EN, data & 0x01);
 			break;
 
 		case 0x0d: /* OUTD */
 			/* bit 0-3: ATTACK SPEED 1-4 */
 			/* bit 4-7: PLAYER SPEED 1-4 */
-			m_discrete->write(space, GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
-			m_discrete->write(space, GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
+			m_discrete->write(GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
+			m_discrete->write(GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
 			break;
 
 		default:
@@ -480,12 +480,12 @@ READ8_MEMBER(grchamp_state::soundlatch_flags_r)
 
 WRITE8_MEMBER(grchamp_state::portA_0_w)
 {
-	m_discrete->write(space, GRCHAMP_A_DATA, data);
+	m_discrete->write(GRCHAMP_A_DATA, data);
 }
 
 WRITE8_MEMBER(grchamp_state::portB_0_w)
 {
-	m_discrete->write(space, GRCHAMP_B_DATA, 255-data);
+	m_discrete->write(GRCHAMP_B_DATA, 255-data);
 }
 
 WRITE8_MEMBER(grchamp_state::portA_2_w)
@@ -755,8 +755,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
@@ -764,7 +763,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(grchamp_state, grchamp)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(grchamp_state, screen_update)
@@ -776,18 +775,17 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_0_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	ay8910_device &ay1(AY8910(config, "ay1", SOUND_CLOCK/4));    /* 3B */
+	ay1.port_a_write_callback().set(FUNC(grchamp_state::portA_0_w));
+	ay1.port_b_write_callback().set(FUNC(grchamp_state::portB_0_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	AY8910(config, "ay2", SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_2_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	ay8910_device &ay3(AY8910(config, "ay3", SOUND_CLOCK/4));    /* 1B */
+	ay3.port_a_write_callback().set(FUNC(grchamp_state::portA_2_w));
+	ay3.port_b_write_callback().set(FUNC(grchamp_state::portB_2_w));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, grchamp_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

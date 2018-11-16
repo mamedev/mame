@@ -60,6 +60,7 @@ public:
 		, m_audiocpu1(*this, "audiocpu1")
 		, m_audiocpu2(*this, "audiocpu2")
 		, m_videocpu(*this, "videocpu")
+		, m_selectlatch(*this, "selectlatch")
 		, m_io_dsw0(*this, "DSW0")
 		, m_io_dsw1(*this, "DSW1")
 		, m_io_x0(*this, "X0")
@@ -129,6 +130,7 @@ private:
 	required_device<z80_device> m_audiocpu1;
 	required_device<z80_device> m_audiocpu2;
 	required_device<z80_device> m_videocpu;
+	required_device<ls259_device> m_selectlatch;
 	required_ioport m_io_dsw0;
 	required_ioport m_io_dsw1;
 	required_ioport m_io_x0;
@@ -156,7 +158,7 @@ void mrgame_state::video_map(address_map &map)
 	map(0x4000, 0x47ff).ram();
 	map(0x4800, 0x4bff).mirror(0x0400).ram().share("videoram");
 	map(0x5000, 0x50ff).mirror(0x0700).ram().share("objectram");
-	map(0x6800, 0x6807).mirror(0x07f8).w("selectlatch", FUNC(ls259_device::write_d0));
+	map(0x6800, 0x6807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0x7000, 0x7000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0x8100, 0x8103).mirror(0x7efc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -167,7 +169,7 @@ void mrgame_state::wcup90_video_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8bff).mirror(0x0400).ram().share("videoram");
 	map(0x9000, 0x90ff).mirror(0x0700).ram().share("objectram");
-	map(0xa800, 0xa807).mirror(0x07f8).w("selectlatch", FUNC(ls259_device::write_d0));
+	map(0xa800, 0xa807).mirror(0x07f8).w(m_selectlatch, FUNC(ls259_device::write_d0));
 	map(0xb000, 0xb000).mirror(0x07ff).nopr(); //AFR - watchdog reset
 	map(0xc000, 0xc003).mirror(0x3ffc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -550,14 +552,14 @@ MACHINE_CONFIG_START(mrgame_state::mrgame)
 	MCFG_DEVICE_PROGRAM_MAP(audio2_map)
 	MCFG_DEVICE_IO_MAP(audio2_io)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5564 (x2) + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5564 (x2) + battery
 
-	ls259_device &select(LS259(config, "selectlatch")); // 5B
-	select.q_out_cb<0>().set(FUNC(mrgame_state::video_a11_w));
-	select.q_out_cb<1>().set(FUNC(mrgame_state::nmi_intst_w));
-	select.q_out_cb<3>().set(FUNC(mrgame_state::video_a12_w));
-	select.q_out_cb<4>().set(FUNC(mrgame_state::video_a13_w));
-	select.q_out_cb<6>().set(FUNC(mrgame_state::flip_w));
+	LS259(config, m_selectlatch); // 5B
+	m_selectlatch->q_out_cb<0>().set(FUNC(mrgame_state::video_a11_w));
+	m_selectlatch->q_out_cb<1>().set(FUNC(mrgame_state::nmi_intst_w));
+	m_selectlatch->q_out_cb<3>().set(FUNC(mrgame_state::video_a12_w));
+	m_selectlatch->q_out_cb<4>().set(FUNC(mrgame_state::video_a13_w));
+	m_selectlatch->q_out_cb<6>().set(FUNC(mrgame_state::flip_w));
 
 	//watchdog_timer_device &watchdog(WATCHDOG_TIMER(config, "watchdog")); // LS393 at 5D (video board) driven by VBLANK
 	//watchdog.set_vblank_count("screen", 8);
@@ -592,10 +594,11 @@ MACHINE_CONFIG_START(mrgame_state::mrgame)
 
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mrgame_state, irq_timer, attotime::from_hz(16000)) //ugh
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mrgame_state, porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mrgame_state, portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mrgame_state, portc_r))
+
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set(FUNC(mrgame_state::porta_r));
+	ppi.out_pb_callback().set(FUNC(mrgame_state::portb_w));
+	ppi.in_pc_callback().set(FUNC(mrgame_state::portc_r));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mrgame_state::wcup90)
@@ -604,8 +607,7 @@ MACHINE_CONFIG_START(mrgame_state::wcup90)
 	MCFG_DEVICE_MODIFY("videocpu")
 	MCFG_DEVICE_PROGRAM_MAP(wcup90_video_map)
 
-	MCFG_DEVICE_MODIFY("selectlatch") // U48
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mrgame_state, intst_w))
+	m_selectlatch->q_out_cb<1>().set(FUNC(mrgame_state::intst_w)); // U48
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mrgame_state, vblank_int_w))

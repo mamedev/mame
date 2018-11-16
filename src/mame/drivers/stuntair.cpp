@@ -527,19 +527,19 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	MCFG_DEVICE_IO_MAP(stuntair_sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 420) // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // type and location not verified
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // set but never cleared
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, stuntair_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // cleared at start
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, stuntair_state, spritebank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // cleared at start
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, stuntair_state, spritebank0_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // cleared at start
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // cleared at start
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // type and location not verified
+	mainlatch.q_out_cb<0>().set_nop(); // set but never cleared
+	mainlatch.q_out_cb<1>().set(FUNC(stuntair_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set_nop(); // cleared at start
+	mainlatch.q_out_cb<3>().set(FUNC(stuntair_state::spritebank1_w));
+	mainlatch.q_out_cb<4>().set_nop(); // cleared at start
+	mainlatch.q_out_cb<5>().set(FUNC(stuntair_state::spritebank0_w));
+	mainlatch.q_out_cb<6>().set_nop(); // cleared at start
+	mainlatch.q_out_cb<7>().set_nop(); // cleared at start
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -559,15 +559,14 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); // stereo?
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, stuntair_state, ay8910_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(18'432'000)/12));
+	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.port_b_write_callback().set(FUNC(stuntair_state::ay8910_portb_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

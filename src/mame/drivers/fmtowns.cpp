@@ -478,13 +478,13 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 	switch(offset)
 	{
 		case 0x00:
-			return m_fdc->status_r(space, 0);
+			return m_fdc->status_r();
 		case 0x02:
-			return m_fdc->track_r(space, 0);
+			return m_fdc->track_r();
 		case 0x04:
-			return m_fdc->sector_r(space, 0);
+			return m_fdc->sector_r();
 		case 0x06:
-			return m_fdc->data_r(space, 0);
+			return m_fdc->data_r();
 		case 0x08:  // selected drive status?
 			//logerror("FDC: read from offset 0x08\n");
 			ret = 0x80;  // always set
@@ -532,19 +532,19 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 				return;
 			if(data == 0xfe)
 				return;
-			m_fdc->cmd_w(space, 0,data);
+			m_fdc->cmd_w(data);
 			logerror("FDC: Command %02x\n",data);
 			break;
 		case 0x02:
-			m_fdc->track_w(space, 0,data);
+			m_fdc->track_w(data);
 			logerror("FDC: Track %02x\n",data);
 			break;
 		case 0x04:
-			m_fdc->sector_w(space, 0,data);
+			m_fdc->sector_w(data);
 			logerror("FDC: Sector %02x\n",data);
 			break;
 		case 0x06:
-			m_fdc->data_w(space, 0,data);
+			m_fdc->data_w(data);
 			logerror("FDC: Data %02x\n",data);
 			break;
 		case 0x08:
@@ -601,13 +601,13 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 }
 
 READ16_MEMBER(towns_state::towns_fdc_dma_r)
-{   uint16_t data = m_fdc->data_r(generic_space(), 0);
+{   uint16_t data = m_fdc->data_r();
 	return data;
 }
 
 WRITE16_MEMBER(towns_state::towns_fdc_dma_w)
 {
-	m_fdc->data_w(generic_space(), 0,data);
+	m_fdc->data_w(data);
 }
 
 /*
@@ -776,8 +776,6 @@ READ8_MEMBER(towns_state::towns_port60_r)
 
 WRITE8_MEMBER(towns_state::towns_port60_w)
 {
-	//device_t* dev = m_pic_master;
-
 	if(data & 0x80)
 	{
 		//towns_pic_irq(dev,0);
@@ -2122,10 +2120,8 @@ WRITE8_MEMBER( towns_state::towns_serial_w )
 	switch(offset)
 	{
 		case 0:
-			m_i8251->data_w(space,0,data);
-			break;
 		case 1:
-			m_i8251->control_w(space,0,data);
+			m_i8251->write(offset, data);
 			break;
 		case 4:
 			m_serial_irq_enable = data;
@@ -2140,9 +2136,8 @@ READ8_MEMBER( towns_state::towns_serial_r )
 	switch(offset)
 	{
 		case 0:
-			return m_i8251->data_r(space,0);
 		case 1:
-			return m_i8251->status_r(space,0);
+			return m_i8251->read(offset);
 		case 3:
 			return m_serial_irq_source;
 		default:
@@ -2796,32 +2791,32 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "lspeaker", 0.50).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(307200)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, towns_state, towns_pit_out0_changed))
-	MCFG_PIT8253_CLK1(307200)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, towns_state, towns_pit_out1_changed))
-	MCFG_PIT8253_CLK2(307200)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, towns_state, pit_out2_changed))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(307200);
+	m_pit->out_handler<0>().set(FUNC(towns_state::towns_pit_out0_changed));
+	m_pit->set_clk<1>(307200);
+	m_pit->out_handler<1>().set(FUNC(towns_state::towns_pit_out1_changed));
+	m_pit->set_clk<2>(307200);
+	m_pit->out_handler<2>().set(FUNC(towns_state::pit_out2_changed));
 
-	MCFG_DEVICE_ADD("pit2", PIT8253, 0)
-	MCFG_PIT8253_CLK0(307200) // reserved
-	MCFG_PIT8253_CLK1(1228800) // RS-232
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, towns_state, pit2_out1_changed))
-	MCFG_PIT8253_CLK2(307200) // reserved
+	pit8253_device &pit2(PIT8253(config, "pit2", 0));
+	pit2.set_clk<0>(307200); // reserved
+	pit2.set_clk<1>(1228800); // RS-232
+	pit2.out_handler<1>().set(FUNC(towns_state::pit2_out1_changed));
+	pit2.set_clk<2>(307200); // reserved
 
-	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, towns_state, get_slave_ack))
+	PIC8259(config, m_pic_master, 0);
+	m_pic_master->out_int_callback().set_inputline(m_maincpu, 0);
+	m_pic_master->in_sp_callback().set_constant(1);
+	m_pic_master->read_slave_ack_callback().set(FUNC(towns_state::get_slave_ack));
 
-	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pic_slave, 0);
+	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir7_w));
+	m_pic_slave->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD("fdc", MB8877, 8'000'000 / 4)  // clock unknown
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, towns_state,mb8877a_drq_w))
+	MB8877(config, m_fdc, 8'000'000 / 4);  // clock unknown
+	m_fdc->intrq_wr_callback().set(FUNC(towns_state::mb8877a_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(towns_state::mb8877a_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", towns_floppies, "35hd", towns_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("fd_list","fmtowns_flop")
@@ -2842,43 +2837,42 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_FMSCSI_IRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_irq))
 	MCFG_FMSCSI_DRQ_HANDLER(WRITELINE(*this, towns_state, towns_scsi_drq))
 
-	MCFG_DEVICE_ADD("dma_1", UPD71071, 0)
-	MCFG_UPD71071_CPU("maincpu")
-	MCFG_UPD71071_CLOCK(4000000)
-	MCFG_UPD71071_DMA_READ_0_CB(READ16(*this, towns_state, towns_fdc_dma_r))
-	MCFG_UPD71071_DMA_READ_1_CB(READ16(*this, towns_state, towns_scsi_dma_r))
-	MCFG_UPD71071_DMA_READ_3_CB(READ16(*this, towns_state, towns_cdrom_dma_r))
-	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(*this, towns_state, towns_fdc_dma_w))
-	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(*this, towns_state, towns_scsi_dma_w))
-	MCFG_DEVICE_ADD("dma_2", UPD71071, 0)
-	MCFG_UPD71071_CPU("maincpu")
-	MCFG_UPD71071_CLOCK(4000000)
-	MCFG_UPD71071_DMA_READ_0_CB(READ16(*this, towns_state, towns_fdc_dma_r))
-	MCFG_UPD71071_DMA_READ_1_CB(READ16(*this, towns_state, towns_scsi_dma_r))
-	MCFG_UPD71071_DMA_READ_3_CB(READ16(*this, towns_state, towns_cdrom_dma_r))
-	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(*this, towns_state, towns_fdc_dma_w))
-	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(*this, towns_state, towns_scsi_dma_w))
+	UPD71071(config, m_dma[0], 0);
+	m_dma[0]->set_cpu_tag("maincpu");
+	m_dma[0]->set_clock(4000000);
+	m_dma[0]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
+	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
+	m_dma[0]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
+	m_dma[0]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
+	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+	UPD71071(config, m_dma[1], 0);
+	m_dma[1]->set_cpu_tag("maincpu");
+	m_dma[1]->set_clock(4000000);
+	m_dma[1]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
+	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
+	m_dma[1]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
+	m_dma[1]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
+	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, towns_state, towns_rxrdy_irq))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, towns_state, towns_txrdy_irq))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, towns_state, towns_syndet_irq))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232c", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232c", rs232_port_device, write_rts))
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232c", rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251",i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251",i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251",i8251_device, write_cts))
+	I8251(config, m_i8251, 0);
+	m_i8251->rxrdy_handler().set(FUNC(towns_state::towns_rxrdy_irq));
+	m_i8251->txrdy_handler().set(FUNC(towns_state::towns_txrdy_irq));
+	m_i8251->syndet_handler().set(FUNC(towns_state::towns_syndet_irq));
+	m_i8251->dtr_handler().set("rs232c", FUNC(rs232_port_device::write_dtr));
+	m_i8251->rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
+	m_i8251->txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232c(RS232_PORT(config, "rs232c", default_rs232_devices, nullptr));
+	rs232c.rxd_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
+	rs232c.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
+	rs232c.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
 
 	MCFG_FMT_ICMEMCARD_ADD("icmemcard")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M,32M,64M,96M")
+	RAM(config, m_ram).set_default_size("6M").set_extra_options("2M,4M,8M,16M,32M,64M,96M");
 
 	MCFG_DEVICE_ADD("rtc58321", MSM58321, 32768_Hz_XTAL)
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, towns_state, rtc_d0_w))
@@ -2890,10 +2884,11 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_MSM58321_DEFAULT_24H(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(towns_state::towns)
+void towns_state::towns(machine_config &config)
+{
 	towns_base(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(towns16_state::townsux)
 	towns_base(config);
@@ -2904,11 +2899,9 @@ MACHINE_CONFIG_START(towns16_state::townsux)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("10M")
+	m_ram->set_default_size("2M").set_extra_options("10M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram16")
+	NVRAM(config, "nvram16", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(towns_state::townssj)
@@ -2920,9 +2913,7 @@ MACHINE_CONFIG_START(towns_state::townssj)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("40M,72M")
+	m_ram->set_default_size("8M").set_extra_options("40M,72M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(towns_state::townshr)
@@ -2933,9 +2924,7 @@ MACHINE_CONFIG_START(towns_state::townshr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("12M,20M,28M")
+	m_ram->set_default_size("4M").set_extra_options("12M,20M,28M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(towns_state::townsftv)
@@ -2946,9 +2935,7 @@ MACHINE_CONFIG_START(towns_state::townsftv)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6M")
-	MCFG_RAM_EXTRA_OPTIONS("32M,68M")
+	m_ram->set_default_size("6M").set_extra_options("32M,68M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(marty_state::marty)
@@ -2960,10 +2947,9 @@ MACHINE_CONFIG_START(marty_state::marty)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6M")
+	m_ram->set_default_size("6M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram16")
+	NVRAM(config, "nvram16", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 /* ROM definitions */

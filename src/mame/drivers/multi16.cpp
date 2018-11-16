@@ -140,10 +140,10 @@ void multi16_state::machine_reset()
 
 MACHINE_CONFIG_START(multi16_state::multi16)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(multi16_map)
-	MCFG_DEVICE_IO_MAP(multi16_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &multi16_state::multi16_map);
+	m_maincpu->set_addrmap(AS_IO, &multi16_state::multi16_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -161,8 +161,8 @@ MACHINE_CONFIG_START(multi16_state::multi16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 MACHINE_CONFIG_END
 
 /* ROM definition */

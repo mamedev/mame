@@ -607,10 +607,10 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(m_pia, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, apple1_state, pia_keyboard_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apple1_state, pia_display_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, apple1_state, pia_display_gate_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(apple1_state::pia_keyboard_r));
+	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
+	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
 	MCFG_DEVICE_ADD(A1_BUS_TAG, A1BUS, 0)
 	MCFG_A1BUS_CPU(m_maincpu)
@@ -620,9 +620,7 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple1")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K")
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K");
 MACHINE_CONFIG_END
 
 ROM_START(apple1)

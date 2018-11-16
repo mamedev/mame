@@ -284,17 +284,12 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, blockhl_state, banking_callback))
 
-	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank5800_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+	ADDRESS_MAP_BANK(config, "bank5800").set_map(&blockhl_state::bank5800_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -322,7 +317,7 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)

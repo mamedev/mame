@@ -27,17 +27,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TTL166_DATA_CB(_devcb) \
-	downcast<ttl166_device &>(*device).set_data_callback(DEVCB_##_devcb);
-
-#define MCFG_TTL166_QH_CB(_devcb) \
-	downcast<ttl166_device &>(*device).set_qh_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -47,9 +36,8 @@ public:
 	// construction/destruction
 	ttl166_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// configuration
-	template <class Object> devcb_base &set_data_callback(Object &&cb) { return m_data_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_qh_callback(Object &&cb) { return m_qh_cb.set_callback(std::forward<Object>(cb)); }
+	auto data_callback() { return m_data_cb.bind(); }
+	auto qh_callback() { return m_qh_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);

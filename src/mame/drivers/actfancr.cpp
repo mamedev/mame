@@ -58,7 +58,7 @@ READ8_MEMBER(actfancr_state::triothep_control_r)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(actfancr_state::actfancr_buffer_spriteram_w)
+WRITE8_MEMBER(actfancr_state::buffer_spriteram_w)
 {
 	uint8_t *src = reinterpret_cast<uint8_t *>(memshare("spriteram")->ptr());
 	// copy to a 16-bit region for our sprite draw code too
@@ -71,14 +71,14 @@ WRITE8_MEMBER(actfancr_state::actfancr_buffer_spriteram_w)
 void actfancr_state::actfan_map(address_map &map)
 {
 	map(0x000000, 0x02ffff).rom();
-	map(0x060000, 0x060007).w(m_tilegen1, FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x060010, 0x06001f).w(m_tilegen1, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x062000, 0x063fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x070000, 0x070007).w(m_tilegen2, FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x070010, 0x07001f).w(m_tilegen2, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x072000, 0x0727ff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
+	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
+	map(0x062000, 0x063fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
+	map(0x070000, 0x070007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x070010, 0x07001f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
+	map(0x072000, 0x0727ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
 	map(0x100000, 0x1007ff).ram().share("spriteram");
-	map(0x110000, 0x110001).w(FUNC(actfancr_state::actfancr_buffer_spriteram_w));
+	map(0x110000, 0x110001).w(FUNC(actfancr_state::buffer_spriteram_w));
 	map(0x120000, 0x1205ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x130000, 0x130000).portr("P1");
 	map(0x130001, 0x130001).portr("P2");
@@ -86,28 +86,26 @@ void actfancr_state::actfan_map(address_map &map)
 	map(0x130003, 0x130003).portr("DSW2");
 	map(0x140000, 0x140001).portr("SYSTEM"); /* VBL */
 	map(0x150000, 0x150000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1f0000, 0x1f3fff).ram().share("main_ram"); /* Main ram */
+	map(0x1f0000, 0x1f3fff).ram(); /* Main ram */
 }
 
 void actfancr_state::triothep_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x040007).w(m_tilegen2, FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x040010, 0x04001f).w(m_tilegen2, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x044000, 0x045fff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x046400, 0x0467ff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
-	map(0x060000, 0x060007).w(m_tilegen1, FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x060010, 0x06001f).w(m_tilegen1, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x064000, 0x0647ff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
-	map(0x066400, 0x0667ff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
+	map(0x040000, 0x040007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x040010, 0x04001f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
+	map(0x044000, 0x045fff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
+	map(0x046400, 0x0467ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
+	map(0x060000, 0x060007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x060010, 0x06001f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
+	map(0x064000, 0x0647ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
+	map(0x066400, 0x0667ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_swap_w));
 	map(0x100000, 0x100000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x110000, 0x110001).w(FUNC(actfancr_state::actfancr_buffer_spriteram_w));
+	map(0x110000, 0x110001).w(FUNC(actfancr_state::buffer_spriteram_w));
 	map(0x120000, 0x1207ff).ram().share("spriteram");
 	map(0x130000, 0x1305ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x140000, 0x140001).nopr(); /* Value doesn't matter */
-	map(0x1f0000, 0x1f3fff).ram().share("main_ram"); /* Main ram */
-	map(0x1ff000, 0x1ff001).rw(FUNC(actfancr_state::triothep_control_r), FUNC(actfancr_state::triothep_control_select_w));
-	map(0x1ff400, 0x1ff403).w(m_maincpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f3fff).ram(); /* Main ram */
 }
 
 /******************************************************************************/
@@ -290,9 +288,9 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 MACHINE_CONFIG_START(actfancr_state::actfancr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
-	MCFG_DEVICE_PROGRAM_MAP(actfan_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
+	H6280(config, m_maincpu, 21477200/3); /* Should be accurate */
+	m_maincpu->set_addrmap(AS_PROGRAM, &actfancr_state::actfan_map);
+	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_DEVICE_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
 	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
@@ -303,7 +301,8 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
+	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0)) /* VBL */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actfan)
@@ -325,8 +324,8 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -345,9 +344,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(actfancr_state::triothep)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",H6280,XTAL(21'477'272)/3) /* XIN=21.4772Mhz, verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(triothep_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
+	H6280(config, m_maincpu, XTAL(21'477'272)/3); /* XIN=21.4772Mhz, verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &actfancr_state::triothep_map);
+	m_maincpu->port_in_cb().set(FUNC(actfancr_state::triothep_control_r));
+	m_maincpu->port_out_cb().set(FUNC(actfancr_state::triothep_control_select_w));
+	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_DEVICE_ADD("audiocpu",M6502, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
@@ -361,7 +362,8 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
+	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0)) /* VBL */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triothep)
@@ -383,8 +385,8 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)

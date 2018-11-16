@@ -114,6 +114,7 @@ const double XTAL::known_xtals[] = {
 	  5'990'400, /* 5.9904_MHz_XTAL        Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent) */
 	  6'000'000, /* 6_MHz_XTAL             American Poker II, Taito SJ System */
 	  6'144'000, /* 6.144_MHz_XTAL         Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco Universal System 16 */
+	  6'400'000, /* 6.4_MHz_XTAL           Textel Compact */
 	  6'500'000, /* 6.5_MHz_XTAL           Jupiter Ace */
 	  6'880'000, /* 6.88_MHz_XTAL          Barcrest MPU4 */
 	  6'900'000, /* 6.9_MHz_XTAL           BBN BitGraph CPU */
@@ -139,6 +140,7 @@ const double XTAL::known_xtals[] = {
 	  9'877'680, /* 9.87768_MHz_XTAL       Microterm 420 */
 	  9'987'000, /* 9.987_MHz_XTAL         Crazy Balloon */
 	 10'000'000, /* 10_MHz_XTAL            - */
+	 10'137'600, /* 10.1376_MHz_XTAL       Wyse WY-100 */
 	 10'245'000, /* 10.245_MHz_XTAL        PES Speech box */
 	 10'380'000, /* 10.38_MHz_XTAL         Fairlight Q219 Lightpen/Graphics Card */
 	 10'500'000, /* 10.5_MHz_XTAL          Agat-7 */
@@ -153,6 +155,7 @@ const double XTAL::known_xtals[] = {
 	 10'816'000, /* 10.816_MHz_XTAL        Universal 1979-1980 (Cosmic Alien, etc) */
 	 10'920'000, /* 10.92_MHz_XTAL         ADDS Viewpoint 60, Viewpoint A2 */
 	 11'000'000, /* 11_MHz_XTAL            Mario I8039 sound */
+	 11'004'000, /* 11.004_MHz_XTAL        TI 911 VDT */
 	 11'059'200, /* 11.0592_MHz_XTAL       Used with MCS-51 to generate common baud rates */
 	 11'200'000, /* 11.2_MHz_XTAL          New York, New York */
 	 11'289'000, /* 11.289_MHz_XTAL        Vanguard */
@@ -180,8 +183,10 @@ const double XTAL::known_xtals[] = {
 	 13'400'000, /* 13.4_MHz_XTAL          TNK3, Ikari Warriors h/w */
 	 13'478'400, /* 13.4784_MHz_XTAL       TeleVideo 970 80-column display clock */
 	 13'495'200, /* 13.4952_MHz_XTAL       Used on Shadow Force pcb and maybe other Technos pcbs? */
+	 13'500'000, /* 13.5_MHz_XTAL          Microbee */
 	 13'516'800, /* 13.5168_MHz_XTAL       Kontron KDT6 */
 	 13'608'000, /* 13.608_MHz_XTAL        TeleVideo 910 & 925 */
+	 13'824'000, /* 13.824_MHz_XTAL        Robotron PC-1715 display circuit */
 	 14'000'000, /* 14_MHz_XTAL            - */
 	 14'112'000, /* 14.112_MHz_XTAL        Timex/Sinclair TS2068 */
 	 14'192'640, /* 14.19264_MHz_XTAL      Central Data 2650 */
@@ -191,6 +196,7 @@ const double XTAL::known_xtals[] = {
 	 14'318'181, /* 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
+	 14'784'000, /* 14.784_MHz_XTAL        Zenith Z-29 */
 	 14'916'000, /* 14.916_MHz_XTAL        ADDS Viewpoint 122 */
 	 14'976'000, /* 14.976_MHz_XTAL        CIT-101 80-column display clock */
 	 15'000'000, /* 15_MHz_XTAL            Sinclair QL, Amusco Poker */
@@ -210,24 +216,29 @@ const double XTAL::known_xtals[] = {
 	 16'128'000, /* 16.128_MHz_XTAL        Fujitsu FM-7 */
 	 16'384'000, /* 16.384_MHz_XTAL        - */
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */
+	 16'572'000, /* 16.572_MHz_XTAL        Micro-Term ACT-5A */
 	 16'588'800, /* 16.5888_MHz_XTAL       SM 7238 */
 	 16'669'800, /* 16.6698_MHz_XTAL       Qume QVT-102 */
 	 16'670'000, /* 16.67_MHz_XTAL         - */
 	 16'777'216, /* 16.777216_MHz_XTAL     Nintendo Game Boy Advance */
 	 16'934'400, /* 16.9344_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
+	 17'350'000, /* 17.35_MHz_XTAL         ITT Courier 1700 */
 	 17'360'000, /* 17.36_MHz_XTAL         OMTI Series 10 SCSI controller */
 	 17'550'000, /* 17.55_MHz_XTAL         HP 264x display clock (50 Hz configuration) */
+	 17'600'000, /* 17.6_MHz_XTAL          LSI Octopus */
 	 17'734'470, /* 17.73447_MHz_XTAL      (~4x PAL subcarrier) */
 	 17'734'472, /* 17.734472_MHz_XTAL     actually ~4x PAL subcarrier */
-	 17'971'200, /* 17.9712_MHz_XTAL       - */
+	 17'971'200, /* 17.9712_MHz_XTAL       Compucolor II, Hazeltine Esprit III */
 	 18'000'000, /* 18_MHz_XTAL            S.A.R, Ikari Warriors 3 */
 	 18'432'000, /* 18.432_MHz_XTAL        Extremely common, used on 100's of PCBs (48000 * 384) */
+	 18'480'000, /* 18.48_MHz_XTAL         Wyse WY-100 video */
 	 18'575'000, /* 18.575_MHz_XTAL        Visual 102, Visual 220 */
 	 18'720'000, /* 18.72_MHz_XTAL         Nokia MikroMikko 1 */
 	 18'869'600, /* 18.8696_MHz_XTAL       Memorex 2178 */
 	 19'339'600, /* 19.3396_MHz_XTAL       TeleVideo TVI-955 80-column display clock */
 	 19'600'000, /* 19.6_MHz_XTAL          Universal Mr. Do - Model 8021 PCB */
+	 19'602'000, /* 19.602_MHz_XTAL        Ampex 210+ 80-column display clock */
 	 19'660'800, /* 19.6608_MHz_XTAL       Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
 	 19'661'400, /* 19.6614_MHz_XTAL       Wyse WY-30 */
 	 19'923'000, /* 19.923_MHz_XTAL        Cinematronics vectors */
@@ -245,6 +256,7 @@ const double XTAL::known_xtals[] = {
 	 21'300'000, /* 21.3_MHz_XTAL          - */
 	 21'477'272, /* 21.477272_MHz_XTAL     BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
 	 22'000'000, /* 22_MHz_XTAL            - */
+	 22'032'000, /* 22.032_MHz_XTAL        Intellec Series II I/O controller */
 	 22'096'000, /* 22.096_MHz_XTAL        ADDS Viewpoint 122 */
 	 22'118'400, /* 22.1184_MHz_XTAL       Amusco Poker */
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
@@ -296,6 +308,7 @@ const double XTAL::known_xtals[] = {
 	 31'684'000, /* 31.684_MHz_XTAL        TeleVideo TVI-955 132-column display clock */
 	 31'948'800, /* 31.9488_MHz_XTAL       NEC PC-88xx, PC-98xx */
 	 32'000'000, /* 32_MHz_XTAL            - */
+	 32'147'000, /* 32.147_MHz_XTAL        Ampex 210+ 132-column display clock */
 	 32'220'000, /* 32.22_MHz_XTAL         Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz */
 	 32'317'400, /* 32.3174_MHz_XTAL       DEC VT330, VT340 */
 	 32'530'400, /* 32.5304_MHz_XTAL       Seta 2 */
@@ -309,6 +322,7 @@ const double XTAL::known_xtals[] = {
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
 	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */
 	 36'000'000, /* 36_MHz_XTAL            Sega Model 1 video board */
+	 37'980'000, /* 37.98_MHz_XTAL         Falco 5220 */
 	 38'769'220, /* 38.76922_MHz_XTAL      Namco System 21 video board */
 	 38'863'630, /* 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video */
 	 39'321'600, /* 39.3216_MHz_XTAL       Sun 2/120 */
@@ -320,6 +334,7 @@ const double XTAL::known_xtals[] = {
 	 42'954'545, /* 42.954545_MHz_XTAL     CPS3 (12x NTSC subcarrier)*/
 	 43'320'000, /* 43.32_MHz_XTAL         DEC VT420 */
 	 44'100'000, /* 44.1_MHz_XTAL          Subsino's Bishou Jan */
+	 44'236'800, /* 44.2368_MHz_XTAL       ReCo6502 */
 	 44'452'800, /* 44.4528_MHz_XTAL       TeleVideo 965 */
 	 45'000'000, /* 45_MHz_XTAL            Eolith with Hyperstone CPUs */
 	 45'158'000, /* 45.158_MHz_XTAL        Sega Model 2A video board, Model 3 CPU board */
@@ -337,6 +352,7 @@ const double XTAL::known_xtals[] = {
 	 50'000'000, /* 50_MHz_XTAL            Williams/Midway T/W/V-unit system */
 	 50'113'000, /* 50.113_MHz_XTAL        Namco NA-1 (14x NTSC subcarrier)*/
 	 50'349'000, /* 50.349_MHz_XTAL        Sega System 18 (~3200x NTSC line rate) */
+	 51'200'000, /* 51.2_MHz_XTAL          Namco Super System 22 video clock */
 	 52'000'000, /* 52_MHz_XTAL            Cojag */
 	 52'832'000, /* 52.832_MHz_XTAL        Wang PC TIG video controller */
 	 53'203'400, /* 53.2034_MHz_XTAL       Master System, Mega Drive PAL (~12x PAL subcarrier) */
@@ -349,6 +365,7 @@ const double XTAL::known_xtals[] = {
 	 60'000'000, /* 60_MHz_XTAL            ARM610 */
 	 61'440'000, /* 61.44_MHz_XTAL         Donkey Kong */
 	 64'000'000, /* 64_MHz_XTAL            BattleToads */
+	 64'108'800, /* 64.108.800_Mhz_XTAL    HP Topcat high-res */
 	 66'666'700, /* 66.6667_MHz_XTAL       Later Midway games */
 	 67'737'600, /* 67.7376_MHz_XTAL       PSX-based h/w, Sony ZN1-2-based */
 	 68'850'000, /* 68.85_MHz_XTAL         Wyse WY-50 */
@@ -356,6 +373,7 @@ const double XTAL::known_xtals[] = {
 	 72'000'000, /* 72_MHz_XTAL            Aristocrat MKV */
 	 72'576'000, /* 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede" */
 	 73'728'000, /* 73.728_MHz_XTAL        Ms. Pac-Man/Galaga 20th Anniversary */
+	 77'414'400, /* 77.4144_MHz_XTAL       NCD17c */
 	 80'000'000, /* 80_MHz_XTAL            ARM710 */
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */

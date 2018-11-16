@@ -305,23 +305,22 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 128))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(CLOCK_3KHZ / 128));
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // designated as "137243-001" on parts list and "157249-120" on schematics
-	MCFG_ADC0808_IN0_CB(IOPORT("STICKY")) // pitch
-	MCFG_ADC0808_IN1_CB(IOPORT("STICKX")) // yaw
-	MCFG_ADC0808_IN2_CB(CONSTANT(0)) // thrust (unused)
+	adc0809_device &adc(ADC0809(config, "adc", MASTER_CLOCK / 16)); // designated as "137243-001" on parts list and "157249-120" on schematics
+	adc.in_callback<0>().set_ioport("STICKY"); // pitch
+	adc.in_callback<1>().set_ioport("STICKX"); // yaw
+	adc.in_callback<2>().set_constant(0); // thrust (unused)
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK / 8)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, starwars_state, r6532_porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, starwars_state, r6532_porta_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8("tms", tms5220_device, status_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8("tms", tms5220_device, data_w))
-	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
+	RIOT6532(config, m_riot, MASTER_CLOCK / 8);
+	m_riot->in_pa_callback().set(FUNC(starwars_state::r6532_porta_r));
+	m_riot->out_pa_callback().set(FUNC(starwars_state::r6532_porta_w));
+	m_riot->in_pb_callback().set("tms", FUNC(tms5220_device::status_r));
+	m_riot->out_pb_callback().set("tms", FUNC(tms5220_device::data_w));
+	m_riot->irq_callback().set_inputline("audiocpu", M6809_IRQ_LINE);
 
 	X2212(config, "x2212").set_auto_save(true); /* nvram */
 

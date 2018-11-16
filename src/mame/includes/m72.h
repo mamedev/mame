@@ -153,7 +153,6 @@ private:
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_sample_r);
 	DECLARE_WRITE8_MEMBER(mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_WRITE8_MEMBER(mcu_low_w);
 	DECLARE_WRITE8_MEMBER(mcu_high_w);
 	DECLARE_WRITE16_MEMBER(irq_line_w);
@@ -197,7 +196,6 @@ private:
 	DECLARE_MACHINE_START(kengo);
 	DECLARE_MACHINE_RESET(kengo);
 
-	INTERRUPT_GEN_MEMBER(mcu_int);
 	DECLARE_WRITE_LINE_MEMBER(fake_nmi);
 	TIMER_CALLBACK_MEMBER(synch_callback);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);

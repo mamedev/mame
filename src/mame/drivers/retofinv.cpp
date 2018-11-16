@@ -107,7 +107,6 @@ Notes:
 #include "includes/retofinv.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "screen.h"
@@ -432,15 +431,15 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC72 - probably shared between CPUs
-	mainlatch.q_out_cb<0>().set(FUNC(retofinv_state::irq0_ack_w));
-	mainlatch.q_out_cb<1>().set(FUNC(retofinv_state::coinlockout_w));
-	mainlatch.q_out_cb<2>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
-	mainlatch.q_out_cb<3>().set(m_68705, FUNC(taito68705_mcu_device::reset_w)).invert();
-	mainlatch.q_out_cb<4>().set(FUNC(retofinv_state::irq1_ack_w));
-	mainlatch.q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
+	LS259(config, m_mainlatch); // IC72 - probably shared between CPUs
+	m_mainlatch->q_out_cb<0>().set(FUNC(retofinv_state::irq0_ack_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(retofinv_state::coinlockout_w));
+	m_mainlatch->q_out_cb<2>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
+	m_mainlatch->q_out_cb<3>().set(m_68705, FUNC(taito68705_mcu_device::reset_w)).invert();
+	m_mainlatch->q_out_cb<4>().set(FUNC(retofinv_state::irq1_ack_w));
+	m_mainlatch->q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -459,7 +458,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(18'432'000)/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -481,8 +480,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
+	m_mainlatch->q_out_cb<3>().set_nop();
 
 	MCFG_DEVICE_REMOVE("68705")
 MACHINE_CONFIG_END
@@ -493,8 +491,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
+	m_mainlatch->q_out_cb<3>().set_nop();
 
 	MCFG_DEVICE_REMOVE("68705")
 MACHINE_CONFIG_END

@@ -28,6 +28,8 @@ public:
 
 	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_drq_callback(Object &&cb) { return m_out_drq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return m_out_irq_cb.bind(); }
+	auto drq_callback() { return m_out_drq_cb.bind(); }
 
 	// our API
 	DECLARE_READ8_MEMBER(read);

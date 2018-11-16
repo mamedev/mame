@@ -1666,17 +1666,17 @@
 	<software name="comm3joy">
 		<description>Commander 3 Joystick</description>
 		<year>1984</year>
-		<publisher>Bud Computers</publisher>
+		<publisher>Bud Software</publisher>
 		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Joystick Programming Utility"/>
-			<dataarea name="cass" size="1724">
-				<rom name="cm3-programmingutility_e.uef" size="1724" crc="b97875fb" sha1="8f4a2bf0958aa38353f1d56d2696c10347007bb5" offset="0"/>
+			<feature name="part_id" value="Joystick Adval Utility"/>
+			<dataarea name="cass" size="1171">
+				<rom name="cm3-advalutility_e.uef" size="1171" crc="b6dedba4" sha1="ac05b22467f2a3629f7c61b9730436dd77b2cf79" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="electron_cass">
-			<feature name="part_id" value="Adval Utility"/>
-			<dataarea name="cass" size="1171">
-				<rom name="cm3-advalutility_e.uef" size="1171" crc="b6dedba4" sha1="ac05b22467f2a3629f7c61b9730436dd77b2cf79" offset="0"/>
+			<feature name="part_id" value="Joystick Programming Utility"/>
+			<dataarea name="cass" size="1724">
+				<rom name="cm3-programmingutility_e.uef" size="1724" crc="b97875fb" sha1="8f4a2bf0958aa38353f1d56d2696c10347007bb5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2580,7 +2580,7 @@
 	</software>
 
 	<software name="euser202">
-		<description>Electron User Vol.2, No.2</description>
+		<description>Electron User Vol.2, No.2: Star Fighter</description>
 		<year>1984</year>
 		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
@@ -3462,6 +3462,17 @@
 		</part>
 	</software>
 
+	<software name="ewgeebez">
+		<description>Ewgeebez</description>
+		<year>1984</year>
+		<publisher>Software Projects</publisher>
+		<part name="cass" interface="electron_cass">
+			<dataarea name="cass" size="8365">
+				<rom name="ewgeebez(1984)(softwareprojects).uef" size="8365" crc="495b927c" sha1="ef58977e38d4b18c1dae3d5c6cb8ccefcfc093b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="exile">
 		<description>Exile</description>
 		<year>1988</year>
@@ -3621,7 +3632,7 @@
 	<software name="fireisla">
 		<description>Fire Island</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="10298">
 				<rom name="fireisland_e.uef" size="10298" crc="7875509b" sha1="6f9ba787788f55ba793d645f6d2aee2c3a3597cf" offset="0"/>
@@ -5866,7 +5877,7 @@
 	<software name="missxp2">
 		<description>Mission XP2</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="8463">
 				<rom name="missionxp-2_e.uef" size="8463" crc="e1d7e35d" sha1="0b09dd32476793feebcb97f53c82cc5563f51976" offset="0"/>
@@ -6602,7 +6613,7 @@
 	<software name="ponyexpr">
 		<description>Pony Express</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="9030">
 				<rom name="ponyexpress_e.uef" size="9030" crc="fa5532e8" sha1="a138bbf06c90054713a81e5e038586f55fd6a096" offset="0"/>
@@ -8854,7 +8865,7 @@
 	<software name="banprinc">
 		<description>The Banished Prince</description>
 		<year>1984</year>
-		<publisher>Orbit</publisher>
+		<publisher>Orbit Software</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="12621">
 				<rom name="thebanishedprince_e.uef" size="12621" crc="dd4b87cc" sha1="bce640fde7f07acea67d9b8e804ec52e169b1af2" offset="0"/>
@@ -8910,7 +8921,7 @@
 	<software name="druidsci">
 		<description>The Druids Circle</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="9266">
 				<rom name="druidscircle_e.uef" size="9266" crc="9154b8a4" sha1="de5b7eff6294131a7e74c85cca3d11513982643c" offset="0"/>
@@ -9397,7 +9408,7 @@
 	<software name="tombdeat">
 		<description>Tomb of Death</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="8855">
 				<rom name="tombofdeath_e.uef" size="8855" crc="dbaab767" sha1="e9738e67d8f32ebc840294f2f51ae94d5c5ecdcc" offset="0"/>

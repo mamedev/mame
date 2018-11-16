@@ -52,26 +52,26 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 }
 
 MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
-	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
-	MCFG_NVRAM_ADD_1FILL("eagle1_bram")
+	NVRAM(config, "eagle2_rtc", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "eagle1_bram", nvram_device::DEFAULT_ALL_1);
 
 	// RS232 serial ports
 	// The console terminal (com1) operates at 38400 baud
-	MCFG_DEVICE_ADD(AM85C30_TAG, SCC85C30, 7.3728_MHz_XTAL)
-	MCFG_Z80SCC_OFFSETS((7.3728_MHz_XTAL).value(), 0, (7.3728_MHz_XTAL).value(), 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, iteagle_fpga_device, serial_interrupt))
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(COM2_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(COM1_TAG, rs232_port_device, write_txd))
+	SCC85C30(config, m_scc1, 7.3728_MHz_XTAL);
+	m_scc1->configure_channels((7.3728_MHz_XTAL).value(), 0, (7.3728_MHz_XTAL).value(), 0);
+	m_scc1->out_int_callback().set(FUNC(iteagle_fpga_device::serial_interrupt));
+	m_scc1->out_txda_callback().set(COM2_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc1->out_txdb_callback().set(COM1_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(COM1_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, ctsb_w))
+	rs232_port_device &com1(RS232_PORT(config, COM1_TAG, default_rs232_devices, nullptr));
+	com1.rxd_handler().set(m_scc1, FUNC(scc85c30_device::rxb_w));
+	com1.dcd_handler().set(m_scc1, FUNC(scc85c30_device::dcdb_w));
+	com1.cts_handler().set(m_scc1, FUNC(scc85c30_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(COM2_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, ctsa_w))
+	rs232_port_device &com2(RS232_PORT(config, COM2_TAG, default_rs232_devices, nullptr));
+	com2.rxd_handler().set(m_scc1, FUNC(scc85c30_device::rxa_w));
+	com2.dcd_handler().set(m_scc1, FUNC(scc85c30_device::dcda_w));
+	com2.cts_handler().set(m_scc1, FUNC(scc85c30_device::ctsa_w));
 MACHINE_CONFIG_END
 
 void iteagle_fpga_device::device_start()
@@ -293,19 +293,19 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 				m_cpu->eat_cycles(40);
 			}
 			if (ACCESSING_BITS_0_7) {
-				result |= m_scc1->cb_r(space, offset) << 0;
+				result |= m_scc1->cb_r(offset) << 0;
 				if (LOG_SERIAL) m_serial0_1.read_control(1);
 			}
 			if (ACCESSING_BITS_8_15) {
-				result |= m_scc1->ca_r(space, offset) << 8;
+				result |= m_scc1->ca_r(offset) << 8;
 				if (LOG_SERIAL) m_serial0_1.read_control(0);
 			}
 			if (ACCESSING_BITS_16_23) {
-				result |= m_scc1->db_r(space, offset) <<16;
+				result |= m_scc1->db_r(offset) <<16;
 				if (LOG_SERIAL) m_serial0_1.read_data(1);
 			}
 			if (ACCESSING_BITS_24_31) {
-				result |= m_scc1->da_r(space, offset) << 24;
+				result |= m_scc1->da_r(offset) << 24;
 				if (LOG_SERIAL) m_serial0_1.read_data(0);
 			}
 			if (0 && LOG_FPGA && m_prev_reg != offset)
@@ -390,20 +390,20 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 			break;
 		case 0x0c/4:
 			if (ACCESSING_BITS_0_7) {
-				m_scc1->cb_w(space, offset, (data >> 0) & 0xff);
+				m_scc1->cb_w(offset, (data >> 0) & 0xff);
 				if (LOG_SERIAL) m_serial0_1.write_control((data >> 0) & 0xff, 1);
 			}
 			if (ACCESSING_BITS_8_15) {
-				m_scc1->ca_w(space, offset, (data >> 8) & 0xff);
+				m_scc1->ca_w(offset, (data >> 8) & 0xff);
 				if (LOG_SERIAL) m_serial0_1.write_control((data >> 8) & 0xff, 0);
 			}
 			if (ACCESSING_BITS_16_23) {
 				// Convert 0xd to 0xa
 				uint8_t byte = data >> 16;
 				if (byte==0xd)
-					m_scc1->db_w(space, offset, 0xa);
+					m_scc1->db_w(offset, 0xa);
 				else
-					m_scc1->db_w(space, offset, byte);
+					m_scc1->db_w(offset, byte);
 				if (LOG_SERIAL) {
 					m_serial0_1.write_data((data >> 16) & 0xff, 1);
 					if (m_serial0_1.get_tx_str(1).back() == 0xd) {
@@ -414,7 +414,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 				}
 			}
 			if (ACCESSING_BITS_24_31) {
-				m_scc1->da_w(space, offset, (data >> 24) & 0xff);
+				m_scc1->da_w(offset, (data >> 24) & 0xff);
 				if (LOG_SERIAL) m_serial0_1.write_data((data >> 24) & 0xff, 0);
 			}
 			if (1 && LOG_FPGA)
@@ -670,9 +670,10 @@ void iteagle_eeprom_device::eeprom_map(address_map &map)
 	map(0x0000, 0x000F).rw(FUNC(iteagle_eeprom_device::eeprom_r), FUNC(iteagle_eeprom_device::eeprom_w));
 }
 
-MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-MACHINE_CONFIG_END
+void iteagle_eeprom_device::device_add_mconfig(machine_config &config)
+{
+	EEPROM_93C46_16BIT(config, "eeprom");
+}
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock)
@@ -714,7 +715,7 @@ void iteagle_eeprom_device::device_start()
 	}
 	m_iteagle_default_eeprom[0x3f] = checkSum;
 
-	m_eeprom->set_default_data(m_iteagle_default_eeprom.data(), 0x80);
+	m_eeprom->default_data(m_iteagle_default_eeprom.data(), 0x80);
 
 	pci_device::device_start();
 	skip_map_regs(1);
@@ -786,9 +787,10 @@ WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
 // Attached Peripheral Controller
 //************************************
 
-MACHINE_CONFIG_START(iteagle_periph_device::device_add_mconfig)
-	MCFG_NVRAM_ADD_0FILL("eagle1_rtc")
-MACHINE_CONFIG_END
+void iteagle_periph_device::device_add_mconfig(machine_config &config)
+{
+	NVRAM(config, "eagle1_rtc", nvram_device::DEFAULT_ALL_0);
+}
 
 DEFINE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device, "iteagle_periph", "ITEagle Peripheral Controller")
 

@@ -143,6 +143,9 @@ private:
 
 	bool m_ds0;
 	bool m_ds1;
+
+	TIMER_CALLBACK_MEMBER(motor_timeout);
+	emu_timer *m_motor_timer;
 };
 
 // device type definition

@@ -142,8 +142,8 @@ enum mac128model_t
 class mac128_state : public driver_device
 {
 public:
-	mac128_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mac128_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via6522_0"),
 		m_ram(*this, RAM_TAG),
@@ -252,6 +252,8 @@ private:
 #ifndef MAC_USE_EMULATED_KBD
 	TIMER_CALLBACK_MEMBER(kbd_clock);
 	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);
+#else
+	DECLARE_WRITE_LINE_MEMBER(mac_kbd_clk_in);
 #endif
 	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
 	DECLARE_READ8_MEMBER(mac_via_in_a);
@@ -951,8 +953,8 @@ WRITE_LINE_MEMBER(mac128_state::mac_kbd_clk_in)
 
 WRITE_LINE_MEMBER(mac128_state::mac_via_out_cb2)
 {
-	printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
-	m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	printf("Sending %d to kbd (PC=%x)\n", state, m_maincpu->pc());
+	m_mackbd->data_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 #else   // keyboard HLE
@@ -1346,7 +1348,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_screen->set_palette("palette");
 
 	palette_device &palette(PALETTE(config, "palette", 2));
-	palette.set_init(DEVICE_SELF_OWNER, FUNC(mac128_state::palette_init));
+	palette.set_init(DEVICE_SELF, FUNC(mac128_state::palette_init));
 
 	MCFG_VIDEO_START_OVERRIDE(mac128_state,mac)
 
@@ -1363,9 +1365,9 @@ void mac128_state::mac512ke(machine_config &config)
 	IWM(config, m_iwm, 0).set_config(&mac_iwm_interface);
 	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
 
-	scc85c30_device &scc(SCC85C30(config, "scc", C7M));
-	scc.configure_channels(C3_7M, 0, C3_7M, 0);
-	scc.out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
+	SCC85C30(config, m_scc, C7M);
+	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
+	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
 
 	VIA6522(config, m_via, 1000000);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));

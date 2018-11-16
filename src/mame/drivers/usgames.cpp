@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_DEVICE_PROGRAM_MAP(usgames_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(usgames_state, irq0_line_hold, 5*60) /* ?? */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -247,8 +247,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8912(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(usgames_state::usg185)

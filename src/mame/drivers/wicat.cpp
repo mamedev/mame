@@ -392,7 +392,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,0,m_maincpu->get_fc());
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,true,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -403,7 +403,7 @@ WRITE16_MEMBER( wicat_state::invalid_w )
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,1,m_maincpu->get_fc());
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,false,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -489,16 +489,16 @@ READ8_MEMBER(wicat_state::fdc_r)
 	switch(offset)
 	{
 	case 0x00:
-		ret = m_fdc->status_r(space,0);
+		ret = m_fdc->status_r();
 		break;
 	case 0x01:
-		ret = m_fdc->track_r(space,0);
+		ret = m_fdc->track_r();
 		break;
 	case 0x02:
-		ret = m_fdc->sector_r(space,0);
+		ret = m_fdc->sector_r();
 		break;
 	case 0x03:
-		ret = m_fdc->data_r(space,0);
+		ret = m_fdc->data_r();
 		break;
 	case 0x08:
 		// Interrupt status (TODO, not part of the FD1795)
@@ -513,16 +513,16 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_fdc->cmd_w(space,0,data);
+		m_fdc->cmd_w(data);
 		break;
 	case 0x01:
-		m_fdc->track_w(space,0,data);
+		m_fdc->track_w(data);
 		break;
 	case 0x02:
-		m_fdc->sector_w(space,0,data);
+		m_fdc->sector_w(data);
 		break;
 	case 0x03:
-		m_fdc->data_w(space,0,data);
+		m_fdc->data_w(data);
 		break;
 	case 0x08:
 		// Interrupt disable / Drive select (TODO, not part of the FD1795)

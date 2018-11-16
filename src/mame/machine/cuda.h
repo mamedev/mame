@@ -59,6 +59,12 @@ class cuda_device :  public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
+	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, int type)
+		: cuda_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_type(type);
+	}
+
 	cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers

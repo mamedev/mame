@@ -20,10 +20,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_slapstic_device(*this, "slapstic"),
+		m_slapstic(*this, "slapstic"),
 		m_videoram(*this, "videoram")
 		{ }
 
+	void atetris_base(machine_config &config);
 	void atetris(machine_config &config);
 	void atetrisb2(machine_config &config);
 
@@ -37,7 +38,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	optional_device<atari_slapstic_device> m_slapstic_device;
+	optional_device<atari_slapstic_device> m_slapstic;
 
 	required_shared_ptr<uint8_t> m_videoram;
 

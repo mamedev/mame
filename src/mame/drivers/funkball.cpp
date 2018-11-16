@@ -775,15 +775,10 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, funkball_state, voodoo_0_pci_r, voodoo_0_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, funkball_state, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "flashbank").set_map(&funkball_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("voodoo_0", VOODOO_1, STD_VOODOO_1_CLOCK)
@@ -811,9 +806,9 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	rs232.dsr_handler().set("uart", FUNC(ns16550_device::dsr_w));
 	rs232.cts_handler().set("uart", FUNC(ns16550_device::cts_w));
 
-	MCFG_INTEL_28F320J5_ADD("u29")
-	MCFG_INTEL_28F320J5_ADD("u30")
-	MCFG_INTEL_28F320J5_ADD("u3")
+	INTEL_28F320J5(config, "u29");
+	INTEL_28F320J5(config, "u30");
+	INTEL_28F320J5(config, "u3");
 MACHINE_CONFIG_END
 
 ROM_START( funkball )

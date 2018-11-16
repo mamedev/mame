@@ -374,14 +374,14 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	MCFG_K053936_WRAP(1)
 	MCFG_K053936_OFFSETS(-46, -16)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 16000000/2)
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, dbz_state, dbz_irq2_ack_w))
+	K053252(config, m_k053252, 16000000/2);
+	m_k053252->int1_ack().set(FUNC(dbz_state::dbz_irq2_ack_w));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

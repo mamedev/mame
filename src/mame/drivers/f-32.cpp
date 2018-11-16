@@ -175,9 +175,9 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	MCFG_DEVICE_IO_MAP(mosaicf2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
+	EEPROM_93C46_16BIT(config, "eeprom")
+		.erase_time(attotime::from_usec(1))
+		.write_time(attotime::from_usec(1));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -254,9 +254,9 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	MCFG_DEVICE_IO_MAP(royalpk2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
+	EEPROM_93C46_16BIT(config, "eeprom")
+		.erase_time(attotime::from_usec(1))
+		.write_time(attotime::from_usec(1));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

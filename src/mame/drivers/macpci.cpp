@@ -132,8 +132,8 @@ void macpci_state::pippin(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(macpci_state::mac_adb_via_out_cb2));
 	m_via1->irq_handler().set(FUNC(macpci_state::mac_via_irq));
 
-	//MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	//MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(*this, macpci_state, set_scc_interrupt))
+	//scc8530_t &scc(SCC8530(config, "scc", C7M));
+	//scc.intrq_callback().set(FUNC(macpci_state::set_scc_interrupt));
 	CUDA(config, m_cuda, 0);
 	m_cuda->set_type(CUDA_341S0060);
 	m_cuda->reset_callback().set(FUNC(macpci_state::cuda_reset_w));

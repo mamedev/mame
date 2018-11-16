@@ -467,7 +467,6 @@ void xexex_state::machine_reset()
 	m_suspension_active = 0;
 	m_resume_trigger = 1000;
 	m_frame = -1;
-	m_k054539->init_flags(k054539_device::REVERSE_STEREO);
 }
 
 MACHINE_CONFIG_START(xexex_state::xexex)
@@ -482,7 +481,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -521,7 +520,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'000'000)/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "filter1_l", 0.50)

@@ -194,21 +194,19 @@ MACHINE_CONFIG_START(exp85_state::exp85)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8155_TAG, I8155, 6.144_MHz_XTAL/2)
+	I8155(config, I8155_TAG, 6.144_MHz_XTAL/2);
 
-	MCFG_DEVICE_ADD(I8355_TAG, I8355, 6.144_MHz_XTAL/2)
-	MCFG_I8355_IN_PA_CB(READ8(*this, exp85_state, i8355_a_r))
-	MCFG_I8355_OUT_PA_CB(WRITE8(*this, exp85_state, i8355_a_w))
+	i8355_device &i8355(I8355(config, I8355_TAG, 6.144_MHz_XTAL/2));
+	i8355.in_pa().set(FUNC(exp85_state::i8355_a_r));
+	i8355.out_pa().set(FUNC(exp85_state::i8355_a_w));
+
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, "rs232", default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
-	MCFG_RAM_EXTRA_OPTIONS("4K")
+	RAM(config, RAM_TAG).set_default_size("256").set_extra_options("4K");
 MACHINE_CONFIG_END
 
 /* ROMs */

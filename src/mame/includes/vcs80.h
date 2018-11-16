@@ -34,7 +34,7 @@ public:
 	void vcs80(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_ioport m_y0;
 	required_ioport m_y1;

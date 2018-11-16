@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
 
+#include "machine/74259.h"
 #include "sound/sn76496.h"
 #include "emupal.h"
 
@@ -10,6 +11,7 @@ public:
 	spcforce_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainlatch(*this, "mainlatch"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -51,6 +53,7 @@ private:
 	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_mainlatch;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

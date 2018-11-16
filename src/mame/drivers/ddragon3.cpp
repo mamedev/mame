@@ -20,7 +20,7 @@ Double Dragon 3 PCB Layout
 --------------------------
 
 TA-0030-P1-03 (early version with EPROMs)
-TA-0030-P1-04 (later version with MASKROMs)
+TA-0030-P1-04 (later version with mask ROMs)
 |----------------------------------------------|
 |VOL M51516 YM3012 YM2151     3.579545MHz IC15 |
 |     MB3615 1.056MHz   Z80               IC14|-|
@@ -847,8 +847,8 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -924,8 +924,8 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1179,7 +1179,7 @@ ROM_START( ctribeua )
 	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
 ROM_END
 
-ROM_START( ctribeu1 ) // only main program code differs from ctribe1 set
+ROM_START( ctribeu1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-1.ic26", 0x00001, 0x20000, CRC(d108f36f) SHA1(af53fa441b9ddfc639abb573864a9b351633c6b7) )
 	ROM_LOAD16_BYTE( "28a15-1.ic25", 0x00000, 0x20000, CRC(3f5693a3) SHA1(2d4516506ad1d68ac45242fe149bba1b4b53eb45) )
@@ -1391,7 +1391,7 @@ ROM_START( wwfwfestu1 )
 	ROM_LOAD16_BYTE( "31a14-0.ic18", 0x00000, 0x40000, CRC(30824d0b) SHA1(54281c76f380225516877648645a619d8417816e) ) /* label had a blue stripe down the side */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
-	ROM_LOAD( "31a11-0.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) ) /* labeled as 31A11-0 but same data 31A11-2 */
+	ROM_LOAD( "31a11-0.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) ) /* == 31a11-2.ic42 */
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
@@ -1510,10 +1510,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",       "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",                         "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ctribeua,  ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 2)", MACHINE_SUPPORTS_SAVE )

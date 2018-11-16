@@ -446,10 +446,11 @@ element's coordinate system are computed as the union of the bounds of the
 individual components it's composed of.
 
 Every element must have a ``name`` attribute specifying its name.  Elements are
-referred to by name when instantiated in groups or views.  Elements may
-optionally supply a default state value with a ``defstate`` attribute, to be
-used if not connected to an emulated output or I/O port.  If present, the
-``defstate`` attribute must be a non-negative integer.
+referred to by name when instantiated in groups or views.  It is an error for a
+layout file to contain multiple elements with identical ``name`` attributes.
+Elements may optionally supply a default state value with a ``defstate``
+attribute, to be used if not connected to an emulated output or I/O port.  If
+present, the ``defstate`` attribute must be a non-negative integer.
 
 Child elements of the ``element`` element instantiate components, which are
 drawn in reading order from first to last (components draw on top of components
@@ -640,10 +641,13 @@ values from the end of the ``mamelayout`` element.
 The following child elements are allowed inside a ``view`` element:
 
 bounds
-    Sets the origin and size of the view if present.  If absent, the bounds of
-    the view are computed as the union of the bounds of all screens and elements
-    within the view.  See :ref:`layout-concepts-coordinates` for details.  It
-    only makes sense to have one ``bounds`` as a direct child of a view element.
+    Sets the origin and size of the view's internal coordinate system if
+    present.  See :ref:`layout-concepts-coordinates` for details.  If absent,
+    the bounds of the view are computed as the union of the bounds of all
+    screens and elements within the view.  It only makes sense to have one
+    ``bounds`` as a direct child of a view element.  Any content outside the
+    view's bounds is cropped, and the view is scaled proportionally to fit the
+    output window or screen.
 param
     Defines or reassigns a value parameter in the view's scope.  See
     :ref:`layout-concepts-params` for details.
@@ -774,6 +778,106 @@ to provide visible feedback.
 When handling mouse input, MAME treats all layout elements as being rectangular,
 and only activates the frontmost element whose area includes the location of the
 mouse pointer.
+
+
+.. _layout-parts-groups:
+
+Reusable groups
+~~~~~~~~~~~~~~~
+
+Groups allow an arrangement of screens and/or layout elements to be used
+multiple times in views or other groups.  Groups can be beneficial even if you
+only use the arrangement once, as they can be used to encapsulate part of a
+complex layout.  Groups are defined using ``group`` elements inside the
+top-level ``mamelayout`` element, and instantiated using ``group`` elements
+inside ``view`` and other ``group`` elements.
+
+Each group definition element must have a ``name`` attribute providing a unique
+identifier.  It is an error if a layout file contains multiple group definitions
+with identical ``name`` attributes.  The value of the ``name`` attribute is used
+when instantiating the group from a view or another group.  This is an example
+opening tag for a group definition element inside the top-level ``mamelayout``
+element::
+
+    <group name="panel">
+
+This group may then be instantiated in a view or another group element using a
+group reference element, optionally supplying destination bounds, orientation,
+and/or modifier colour.  The ``ref`` attribute identifies the group to
+instantiate -- in this example, destination bounds are supplied::
+
+    <group ref="panel"><bounds x="87" y="58" width="23" height="23.5" /></group>
+
+Group definition elements allow all the same child elements as views.
+Positioning and orienting screens, layout elements and nested groups works the
+same way as for views.  See :ref:`layout-parts-views` for details.  A group may
+instantiate other groups, but recursive loops are not permitted.  It is an error
+if a group directly or indirectly instantiates itself.
+
+Groups have their own internal coordinate systems.  If a group definition
+element has no ``bounds`` element as a direct child, its bounds are computed as
+the union of the bounds of all the screens, layout elements and/or nested groups
+it instantiates.  A ``bounds`` child element may be used to explicitly specify
+group bounds (see :ref:`layout-concepts-coordinates` for details).  Note that
+groups' bounds are only used for the purpose of calculating the coordinate
+transform when instantiating a group.  A group may position screens and/or
+elements outside its bounds, and they will not be cropped.
+
+To demonstrate how bounds calculation works, consider this example::
+
+    <group name="autobounds">
+        <!-- bounds automatically calculated with origin at (5,10), width 30, and height 15 -->
+        <cpanel element="topleft"><bounds x="5" y="10" width="10" height="10" /></cpanel>
+        <cpanel element="bottomright"><bounds x="25" y="15" width="10" height="10" /></cpanel>
+    </group>
+
+    <view name="Test">
+        <!--
+            group bounds translated and scaled to fit - 2/3 scale horizontally and double vertically
+            element topleft positioned at (0,0) with width 6.67 and height 20
+            element bottomright positioned at (13.33,10) with width 6.67 and height 20
+            view bounds calculated with origin at (0,0), width 20, and height 30
+        -->
+        <group ref="autobounds"><bounds x="0" y="0" width="20" height="30" /></group>
+    </view>
+
+This is relatively straightforward, as all elements inherently fall within the
+group's automatically computed bounds.  Now consider what happens if a group
+positions elements outside its explicit bounds::
+
+    <group name="periphery">
+        <!-- elements are above the top edge and to the right of the right edge of the bounds -->
+        <bounds x="10" y="10" width="20" height="25" />
+        <cpanel element="topleft"><bounds x="10" y="0" width="10" height="10" /></cpanel>
+        <cpanel element="bottomright"><bounds x="30" y="20" width="10" height="10" /></cpanel>
+    </group>
+
+    <view name="Test">
+        <!--
+            group bounds translated and scaled to fit - 3/2 scale horizontally and unity vertically
+            element topleft positioned at (5,-5) with width 15 and height 10
+            element bottomright positioned at (35,15) with width 15 and height 10
+            view bounds calculated with origin at (5,-5), width 45, and height 30
+        -->
+        <group ref="periphery"><bounds x="5" y="5" width="30" height="25" /></group>
+    </view>
+
+The group's elements are translated and scaled as necessary to distort the
+group's internal bounds to the destination bounds in the view.  The group's
+content is not restricted to its bounds.  The view considers the bounds of the
+actual layout elements when computing its bounds, not the destination bounds
+specified for the group.
+
+When a group is instantiated, it creates a nested parameter scope.  The logical
+parent scope is the parameter scope of the view, group or repeating block where
+the group is instantiated (*not* its lexical parent, the top-level
+``mamelayout`` element).  Any ``param`` elements inside the group definition
+element set parameters in the local scope for the group instantiation.  Local
+parameters do not persist across multiple instantiations.  See
+:ref:`layout-concepts-params` for more detail on parameters.  (Note that the
+group's name is not part of its content, and any parameter references in the
+``name`` attribute itself will be substituted at the point where the group
+definition appears in the top-level ``mamelayout`` element's scope.)
 
 
 .. _layout-parts-repeats:
@@ -951,6 +1055,12 @@ The following views will be automatically generated:
   play games that don't automatically rotate the display for the second player.
   The screen will be displayed at its physical aspect ratio, with rotation
   applied.
+* If the system has exactly two emulated screens, MAME will generate a view
+  showing the second screen above the first screen with a small gap between
+  them.  The second screen will be rotated by 180 degrees.  This view can be
+  used to play a dual-screen two-player game on a "cocktail table" cabinet with
+  a single screen.  The screens will be displayed at their physical aspect
+  ratios, with rotation applied.
 * If the system has exactly two emulated screens and no view in the internal or
   external layouts shows all screens, or if the system has more than two
   emulated screens, MAME will generate views with the screens arranged

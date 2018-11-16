@@ -182,7 +182,7 @@ public:
 	// configuration readers
 	screen_type_enum screen_type() const { return m_type; }
 	int orientation() const { assert(configured()); return m_orientation; }
-	std::pair<unsigned, unsigned> physical_aspect() const { assert(configured()); return m_phys_aspect; }
+	std::pair<unsigned, unsigned> physical_aspect() const;
 	int width() const { return m_width; }
 	int height() const { return m_height; }
 	const rectangle &visible_area() const { return m_visarea; }
@@ -195,7 +195,7 @@ public:
 	float yoffset() const { return m_yoffset; }
 	float xscale() const { return m_xscale; }
 	float yscale() const { return m_yscale; }
-	bool have_screen_update() const { return !m_screen_update_ind16.isnull() && !m_screen_update_rgb32.isnull(); }
+	bool has_screen_update() const { return !m_screen_update_ind16.isnull() || !m_screen_update_rgb32.isnull(); }
 
 	// inline configuration helpers
 	void set_type(screen_type_enum type) { assert(!configured()); m_type = type; }
@@ -268,6 +268,7 @@ public:
 	bitmap_ind8 &priority() { return m_priority; }
 	device_palette_interface &palette() const { assert(m_palette != nullptr); return *m_palette; }
 	bool has_palette() const { return m_palette != nullptr; }
+	screen_bitmap &curbitmap() { return m_bitmap[m_curtexture]; }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -289,6 +290,10 @@ public:
 	attotime scan_period() const { return attotime(0, m_scantime); }
 	attotime frame_period() const { return attotime(0, m_frame_period); }
 	u64 frame_number() const { return m_frame_number; }
+
+	// pixel-level access
+	u32 pixel(s32 x, s32 y);
+	void pixels(u32* buffer);
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }
@@ -341,7 +346,7 @@ private:
 	// inline configuration data
 	screen_type_enum    m_type;                     // type of screen
 	int                 m_orientation;              // orientation flags combined with system flags
-	std::pair<unsigned, unsigned> m_phys_aspect;	// physical aspect ratio
+	std::pair<unsigned, unsigned> m_phys_aspect;    // physical aspect ratio
 	bool                m_oldstyle_vblank_supplied; // MCFG_SCREEN_VBLANK_TIME macro used
 	attoseconds_t       m_refresh;                  // default refresh period
 	attoseconds_t       m_vblank;                   // duration of a VBLANK

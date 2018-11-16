@@ -92,21 +92,21 @@ class save_manager
 	template <typename T> struct array_unwrap
 	{
 		using underlying_type = T;
-		static constexpr std::size_t COUNT = 1U;
+		static constexpr std::size_t SAVE_COUNT = 1U;
 		static constexpr std::size_t SIZE = sizeof(underlying_type);
 		static underlying_type *ptr(T &value) { return &value; }
 	};
 	template <typename T, std::size_t N> struct array_unwrap<T[N]>
 	{
 		using underlying_type = typename array_unwrap<T>::underlying_type;
-		static constexpr std::size_t COUNT = N * array_unwrap<T>::COUNT;
+		static constexpr std::size_t SAVE_COUNT = N * array_unwrap<T>::SAVE_COUNT;
 		static constexpr std::size_t SIZE = sizeof(underlying_type);
 		static underlying_type *ptr(T (&value)[N]) { return array_unwrap<T>::ptr(value[0]); }
 	};
 	template <typename T, std::size_t N> struct array_unwrap<std::array<T, N> >
 	{
 		using underlying_type = typename array_unwrap<T>::underlying_type;
-		static constexpr std::size_t COUNT = N * array_unwrap<T>::COUNT;
+		static constexpr std::size_t SAVE_COUNT = N * array_unwrap<T>::SAVE_COUNT;
 		static constexpr std::size_t SIZE = sizeof(underlying_type);
 		static underlying_type *ptr(std::array<T, N> &value) { return array_unwrap<T>::ptr(value[0]); }
 	};
@@ -151,7 +151,7 @@ public:
 			throw emu_fatalerror("Called save_item on a pointer with no count!");
 		if (!type_checker<typename array_unwrap<ItemType>::underlying_type>::is_atom)
 			throw emu_fatalerror("Called save_item on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::COUNT);
+		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT);
 	}
 
 	// templatized wrapper for pointers
@@ -160,7 +160,7 @@ public:
 	{
 		if (!type_checker<typename array_unwrap<ItemType>::underlying_type>::is_atom)
 			throw emu_fatalerror("Called save_item on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::COUNT * count);
+		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT * count);
 	}
 
 	// templatized wrapper for std::unique_ptr
@@ -169,7 +169,7 @@ public:
 	{
 		if (!type_checker<typename array_unwrap<ItemType>::underlying_type>::is_atom)
 			throw emu_fatalerror("Called save_item on a non-fundamental type!");
-		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::COUNT * count);
+		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT * count);
 	}
 
 	// global memory registration

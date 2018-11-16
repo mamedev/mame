@@ -5,30 +5,6 @@
 
 #include "cpu/m68000/m68000.h" // The FGA002 is designed for the 68K interrupt PL0-PL2 signalling, however used on SPARC and x86 boards too
 
-#define MCFG_FGA002_ADD(_tag, _clock)   MCFG_DEVICE_ADD(_tag, FGA002, _clock)
-
-// LOCAL IRQ callbacks
-#define MCFG_FGA002_OUT_INT_CB(_devcb)                              \
-	downcast<fga002_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-#define MCFG_FGA002_OUT_LIACK4_CB(_devcb)                               \
-	downcast<fga002_device &>(*device).set_liack4_callback(DEVCB_##_devcb);
-
-#define MCFG_FGA002_OUT_LIACK5_CB(_devcb)                               \
-	downcast<fga002_device &>(*device).set_liack5_callback(DEVCB_##_devcb);
-
-#define MCFG_FGA002_OUT_LIACK6_CB(_devcb)                               \
-	downcast<fga002_device &>(*device).set_liack6_callback(DEVCB_##_devcb);
-
-#define MCFG_FGA002_OUT_LIACK7_CB(_devcb)                               \
-	downcast<fga002_device &>(*device).set_liack7_callback(DEVCB_##_devcb);
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> fga002_device
-
 class fga002_device :  public device_t
 //      ,public device_z80daisy_interface
 {
@@ -53,11 +29,11 @@ class fga002_device :  public device_t
 	int acknowledge();
 	int get_irq_level();
 
-	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_liack4_callback(Object &&cb) { return m_liack4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_liack5_callback(Object &&cb) { return m_liack5_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_liack6_callback(Object &&cb) { return m_liack6_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_liack7_callback(Object &&cb) { return m_liack7_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_int() { return m_out_int_cb.bind(); }
+	auto liack4() { return m_liack4_cb.bind(); }
+	auto liack5() { return m_liack5_cb.bind(); }
+	auto liack6() { return m_liack6_cb.bind(); }
+	auto liack7() { return m_liack7_cb.bind(); }
 
  protected:
 	// type for array of mapping of FGA registers that assembles an IRQ source

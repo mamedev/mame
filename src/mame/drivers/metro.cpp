@@ -1142,12 +1142,6 @@ void metro_state::mouja_okimap(address_map &map)
                                 Puzzlet
 ***************************************************************************/
 
-#define MCFG_PUZZLET_IO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PUZZLET_IO, 0)
-
-#define MCFG_PUZZLET_IO_DATA_CALLBACK(_devcb) \
-	puzzlet_io_device::set_data_cb(*device, DEVCB_##_devcb);
-
 class puzzlet_io_device : public device_t {
 public:
 	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -1155,7 +1149,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
 
-	template <class Object> static devcb_base &set_data_cb(device_t &device, Object &&cb) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(std::forward<Object>(cb)); }
+	auto data_callback() { return data_cb.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -3258,7 +3252,7 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
@@ -3298,7 +3292,7 @@ MACHINE_CONFIG_START(metro_state::dharma)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3325,7 +3319,7 @@ MACHINE_CONFIG_START(metro_state::karatour)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3353,7 +3347,7 @@ MACHINE_CONFIG_START(metro_state::sankokushi)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3381,7 +3375,7 @@ MACHINE_CONFIG_START(metro_state::lastfort)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3407,7 +3401,7 @@ MACHINE_CONFIG_START(metro_state::lastforg)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3446,9 +3440,9 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	MCFG_DEVICE_PROGRAM_MAP(dokyusp_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config_384x224(config);
@@ -3474,9 +3468,9 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	MCFG_DEVICE_PROGRAM_MAP(gakusai_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config_320x240(config);
@@ -3503,9 +3497,9 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config_320x240(config);
@@ -3542,7 +3536,7 @@ MACHINE_CONFIG_START(metro_state::pangpoms)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3570,7 +3564,7 @@ MACHINE_CONFIG_START(metro_state::poitto)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3598,7 +3592,7 @@ MACHINE_CONFIG_START(metro_state::pururun)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)  /* Confirmed match to reference video */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
@@ -3626,7 +3620,7 @@ MACHINE_CONFIG_START(metro_state::skyalert)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3654,7 +3648,7 @@ MACHINE_CONFIG_START(metro_state::toride2g)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
@@ -3671,7 +3665,7 @@ MACHINE_CONFIG_START(metro_state::mouja)
 	MCFG_DEVICE_PROGRAM_MAP(mouja_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	i4300_config(config);
@@ -3762,8 +3756,8 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16_MHz_XTAL/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3805,8 +3799,8 @@ MACHINE_CONFIG_START(metro_state::puzzlet)
 	MCFG_DEVICE_IO_MAP(puzzlet_io_map)
 
 	/* Coins/service */
-	MCFG_PUZZLET_IO_ADD("coins")
-	MCFG_PUZZLET_IO_DATA_CALLBACK(WRITELINE("maincpu:sci1", h8_sci_device, rx_w))
+	puzzlet_io_device &coins(PUZZLET_IO(config, "coins", 0));
+	coins.data_callback().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
 	MCFG_DEVICE_MODIFY("maincpu:sci1")
 	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("coins", puzzlet_io_device, ce_w))
 	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("coins", puzzlet_io_device, clk_w))

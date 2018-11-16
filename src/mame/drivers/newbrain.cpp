@@ -837,12 +837,11 @@ MACHINE_CONFIG_START(newbrain_state::newbrain)
 	MCFG_CASSETTE_ADD(CASSETTE2_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_DEVICE_ADD(RS232_V24_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_DEVICE_ADD(RS232_PRN_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, RS232_V24_TAG, default_rs232_devices, nullptr);
+	RS232_PORT(config, RS232_PRN_TAG, default_rs232_devices, nullptr);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
+	RAM(config, RAM_TAG).set_default_size("32K");
 MACHINE_CONFIG_END
 
 

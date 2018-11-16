@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(spy_state::spy)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(spy_sound_map) /* nmi by the sound chip */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -531,7 +531,7 @@ MACHINE_CONFIG_START(spy_state::spy)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

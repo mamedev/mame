@@ -61,18 +61,14 @@ void concept_state::video_start()
 {
 }
 
-uint32_t concept_state::screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t concept_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* resolution is 720*560 */
-	uint16_t *videoram = m_videoram;
-	int x, y;
-	uint16_t *line;
-
-	for (y = 0; y < 560; y++)
+	for (int y = 0; y < 560; y++)
 	{
-		line = &bitmap.pix16(560-1-y);
-		for (x = 0; x < 720; x++)
-			line[720-1-x] = (videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 1 : 0;
+		uint16_t *line = &bitmap.pix16(560-1-y);
+		for (int x = 0; x < 720; x++)
+			line[720-1-x] = (m_videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 1 : 0;
 	}
 	return 0;
 }

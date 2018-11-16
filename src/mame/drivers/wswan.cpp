@@ -62,6 +62,11 @@ void wswan_state::wswan_io(address_map &map)
 	map(0x00, 0xff).rw(FUNC(wswan_state::port_r), FUNC(wswan_state::port_w));   // I/O ports
 }
 
+void wswan_state::wswan_snd(address_map &map)
+{
+	map(0x00000, 0x03fff).r(m_vdp, FUNC(wswan_video_device::vram_r));
+}
+
 static INPUT_PORTS_START( wswan )
 	PORT_START("CURSX")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("X1 - Up")
@@ -136,7 +141,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wswan)
 	MCFG_PALETTE_ADD("palette", 16)
@@ -145,7 +150,8 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD(m_sound, WSWAN_SND, 0)
+	MCFG_DEVICE_ADD(m_sound, WSWAN_SND, 3.072_MHz_XTAL)
+	MCFG_DEVICE_ADDRESS_MAP(0, wswan_snd)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -187,12 +193,12 @@ MACHINE_CONFIG_END
 
 ROM_START( wswan )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-//  ROM_LOAD_OPTIONAL( "ws_bios.bin", 0x0000, 0x0001, NO_DUMP )
+//  ROM_LOAD( "ws_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
 ROM_START( wscolor )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-//  ROM_LOAD_OPTIONAL( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
+//  ROM_LOAD( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY   FULLNAME

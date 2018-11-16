@@ -330,6 +330,7 @@ struct sdl_joystick_state
 struct sdl_api_state
 {
 	SDL_Joystick *device;
+	SDL_Haptic *hapdevice;
 	SDL_JoystickID joystick_id;
 };
 
@@ -350,6 +351,11 @@ public:
 	{
 		if (sdl_state.device != nullptr)
 		{
+			if (sdl_state.hapdevice != nullptr)
+			{
+				SDL_HapticClose(sdl_state.hapdevice);
+				sdl_state.hapdevice = nullptr;
+			}
 			SDL_JoystickClose(sdl_state.device);
 			sdl_state.device = nullptr;
 		}
@@ -735,14 +741,14 @@ public:
 	{
 		sdl_input_module::exit();
 
-		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+		SDL_QuitSubSystem(SDL_INIT_JOYSTICK|SDL_INIT_HAPTIC);
 	}
 
 	virtual void input_init(running_machine &machine) override
 	{
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
-		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK))
+		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK|SDL_INIT_HAPTIC))
 		{
 			osd_printf_error("Could not initialize SDL Joystick: %s.\n", SDL_GetError());
 			return;
@@ -775,10 +781,19 @@ public:
 			SDL_Joystick *joy = SDL_JoystickOpen(physical_stick);
 			devinfo->sdl_state.device = joy;
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
+			devinfo->sdl_state.hapdevice = SDL_HapticOpenFromJoystick(joy);
 
 			osd_printf_verbose("Joystick: %s\n", SDL_JoystickNameForIndex(physical_stick));
 			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
 			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
+			if (devinfo->sdl_state.hapdevice != nullptr)
+			{
+				osd_printf_verbose("Joystick:   ...  Has haptic capability\n");
+			}
+			else
+			{
+				osd_printf_verbose("Joystick:   ...  Does not have haptic capability\n");
+			}
 
 			// loop over all axes
 			for (int axis = 0; axis < SDL_JoystickNumAxes(joy); axis++)

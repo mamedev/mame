@@ -158,10 +158,10 @@ MACHINE_CONFIG_START(sys2900_state::sys2900)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 0)
-	MCFG_DEVICE_ADD("pio", Z80PIO, 0)
-	MCFG_DEVICE_ADD("sio1", Z80SIO, 0)
-	MCFG_DEVICE_ADD("sio2", Z80SIO, 0)
+	Z80CTC(config, "ctc", 0);
+	Z80PIO(config, "pio", 0);
+	Z80SIO(config, "sio1", 0);
+	Z80SIO(config, "sio2", 0);
 MACHINE_CONFIG_END
 
 /* ROM definition */

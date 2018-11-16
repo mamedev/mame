@@ -6,7 +6,7 @@
 
  - Microprocessor based control logic for increased capacity and flexibility, plus provision for implementation of additional features.
  - Advanced servo design for improved efficiency and performance.
- - Rigid one piece cast aluminum frame to better maintain print quality, and reduce maintenance requirements.
+ - Rigid one piece cast aluminium frame to better maintain print quality, and reduce maintenance requirements.
  - Rugged highly stable carriage assembly for enhanced print position accuracy and reduced maintenance.
  - Plug-in interchangeable printed pircuit boards (PCB's), readily accessible for ease and simplicity of service, and implementation
    of options and interfaces.
@@ -96,7 +96,7 @@ The board is marked 40510 and has no connectors except the 56 signal bus edge co
  4 74S289        4x16 bit RAM
  1 74107         Dual J-K M/S flip flops w clear
  1 74LS155  7731 1/2/3 to 4/8 lines decoder nwih totem pole ouputs
- 2 74161    7904 synchronous binary 4 bit counter
+ 2 74161    7904 Synchronous binary 4 bit counter
  4 74LS259  7906 8 bit addressable latches
  4 74298    7849 Quad 2 input mux with storage
  1 74367    7840 Non inverted 3 state outputs, 2 and 4 line enabled inputs
@@ -117,7 +117,7 @@ The serial interface card is z80 based and marked DIABLO-1300-V24
  3 7432N   7832 QUAD OR gates
  1 1489    7841 Quad line receivers
  1 1488    7823 Quad line tranceivers
- 1 74163   7827 Synchrounous 4 bit counters
+ 1 74163   7827 Synchronous 4 bit counters
  2 7493    7822 4 bit binary counters
  2 7404    7849 Hex inverters
  1 7410    7849 Tripple 3-input NAND gates

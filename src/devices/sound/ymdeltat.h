@@ -6,6 +6,8 @@
 #pragma once
 
 
+typedef uint8_t (*FM_READBYTE)(device_t *device, offs_t offset);
+typedef void (*FM_WRITEBYTE)(device_t *device, offs_t offset, uint8_t data);
 typedef void (*STATUS_CHANGE_HANDLER)(void *chip, uint8_t status_bits);
 
 
@@ -14,7 +16,8 @@ struct YM_DELTAT {     /* AT: rearranged and tightened structure */
 	static constexpr int EMULATION_MODE_NORMAL = 0;
 	static constexpr int EMULATION_MODE_YM2610 = 1;
 
-	uint8_t   *memory;
+	FM_READBYTE read_byte;
+	FM_WRITEBYTE write_byte;
 	int32_t   *output_pointer;/* pointer of output pointers   */
 	int32_t   *pan;           /* pan : &output_pointer[pan]   */
 	double  freqbase;

@@ -318,13 +318,13 @@ MACHINE_CONFIG_START(malzak_state::malzak)
 	MCFG_PALETTE_ADD(m_palette, 128)
 	MCFG_PALETTE_INIT_OWNER(malzak_state, malzak)
 
-	MCFG_DEVICE_ADD(m_s2636[0], S2636, 0)
-	MCFG_S2636_OFFSETS(0, -16)  // -8, -16
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[0], 0);
+	m_s2636[0]->set_offsets(0, -16);  // -8, -16
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(m_s2636[1], S2636, 0)
-	MCFG_S2636_OFFSETS(0, -16)  // -9, -16
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[1], 0);
+	m_s2636[1]->set_offsets(0, -16);  // -9, -16
+	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_DEVICE_ADD(m_trom, SAA5050, 6000000)
 	MCFG_SAA5050_D_CALLBACK(READ8(*this, malzak_state, videoram_r))
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(malzak_state::malzak2)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(malzak2_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START( malzak )

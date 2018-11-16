@@ -1763,7 +1763,7 @@ void seta_state::calibr50_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).rom();                             // ROM
 	map(0x100000, 0x100001).r(FUNC(seta_state::ipl2_ack_r));
-	map(0x200000, 0x200fff).ram();                             // NVRAM
+	map(0x200000, 0x200fff).ram().share("nvram");              // NVRAM (battery backed)
 	map(0x300000, 0x300001).rw(FUNC(seta_state::ipl1_ack_r), FUNC(seta_state::ipl1_ack_w));
 	map(0x400000, 0x400001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x500000, 0x500001).nopw();                        // ?
@@ -1782,8 +1782,8 @@ void seta_state::calibr50_map(address_map &map)
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xb00001, 0xb00001).r("soundlatch2", FUNC(generic_latch_8_device::read)); // From Sub CPU
-	map(0xb00001, 0xb00001).w("soundlatch1", FUNC(generic_latch_8_device::write)); // To Sub CPU
+	map(0xb00001, 0xb00001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)); // From Sub CPU
+	map(0xb00001, 0xb00001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // To Sub CPU
 	map(0xc00000, 0xc00001).ram();                             // ? $4000
 
 	map(0xff0000, 0xffffff).ram();                             // RAM
@@ -1831,7 +1831,7 @@ WRITE8_MEMBER(seta_state::usclssic_lockout_w)
 		machine().tilemap().mark_all_dirty();
 	m_tiles_offset = tiles_offset;
 
-	seta_coin_lockout_w(space, 0, data);
+	seta_coin_lockout_w(data);
 }
 
 
@@ -1848,7 +1848,7 @@ void seta_state::usclssic_map(address_map &map)
 	map(0xb40001, 0xb40001).w(FUNC(seta_state::usclssic_lockout_w));  // Coin Lockout + Tiles Banking
 	map(0xb4000a, 0xb4000b).w(FUNC(seta_state::ipl1_ack_w));
 	map(0xb40010, 0xb40011).portr("COINS");                  // Coins
-	map(0xb40011, 0xb40011).w("soundlatch1", FUNC(generic_latch_8_device::write)); // To Sub CPU
+	map(0xb40011, 0xb40011).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // To Sub CPU
 	map(0xb40018, 0xb4001f).r(FUNC(seta_state::usclssic_dsw_r));                // 2 DSWs
 	map(0xb40018, 0xb40019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0xb80000, 0xb80001).r(FUNC(seta_state::ipl2_ack_r));
@@ -1969,7 +1969,7 @@ void seta_state::blandiap_map(address_map &map)
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
-ADC083X_INPUT_CB(seta_state::zombraid_adc_cb)
+double seta_state::zombraid_adc_cb(uint8_t input)
 {
 	if (input == ADC083X_AGND)
 		return 0.0;
@@ -2955,9 +2955,9 @@ void seta_state::thunderlbl_map(address_map &map)
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
 	map(0xb00002, 0xb00003).portr("P2");                 // P2
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
-//  map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));   // Protection (not in wits)
+	map(0xb0000c, 0xb0000d).w(m_seta001, FUNC(seta001_device::spritectrl_w8)).umask16(0xff00); // the bootleg is modified to write the first byte of spritectrl here, rather than the usual address
 	map(0xb00008, 0xb00009).portr("P3"); // P3 (wits)
-	map(0xb00008, 0xb00008).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xb00008, 0xb00008).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
 	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
@@ -2986,7 +2986,7 @@ void seta_state::wiggie_map(address_map &map)
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
 	map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));     // Protection (not in wits)
 	map(0xb00008, 0xb00009).portr("P3");                 // P3 (wits)
-	map(0xb00008, 0xb00008).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xb00008, 0xb00008).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
 	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
@@ -3000,7 +3000,7 @@ void seta_state::wiggie_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa000, 0xa000).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xa000, 0xa000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
 
@@ -3059,7 +3059,7 @@ void seta_state::utoukond_map(address_map &map)
 	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xc00001, 0xc00001).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xc00001, 0xc00001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xe00000, 0xe00001).nopw();                        // ? ack
 }
 
@@ -3417,15 +3417,15 @@ void jockeyc_state::inttoote_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(seta_state::sub_bankswitch_w)
+void seta_state::sub_bankswitch_w(u8 data)
 {
 	m_subbank->set_entry(data >> 4);
 }
 
-WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)
+void seta_state::sub_bankswitch_lockout_w(u8 data)
 {
-	m_subbank->set_entry(data >> 4);
-	seta_coin_lockout_w(space, 0, data);
+	sub_bankswitch_w(data);
+	seta_coin_lockout_w(data);
 }
 
 
@@ -3439,8 +3439,8 @@ void seta_state::tndrcade_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                             // RAM
 	map(0x0800, 0x0800).r(FUNC(seta_state::ff_r));                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
-	//AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)             //
-	//AM_RANGE(0x0801, 0x0801) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)            //
+	//AM_RANGE(0x0800, 0x0800) AM_DEVREAD(m_soundlatch[0], generic_latch_8_device, read)             //
+	//AM_RANGE(0x0801, 0x0801) AM_DEVREAD(m_soundlatch[1], generic_latch_8_device, read)            //
 	map(0x1000, 0x1000).portr("P1");                 // P1
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");                 // P2
@@ -3461,8 +3461,8 @@ void seta_state::tndrcade_sub_map(address_map &map)
 void seta_state::twineagl_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r("soundlatch1", FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r("soundlatch2", FUNC(generic_latch_8_device::read));            //
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("P1");             // P1
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");             // P2
@@ -3504,8 +3504,8 @@ READ8_MEMBER(seta_state::downtown_ip_r)
 void seta_state::downtown_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r("soundlatch1", FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r("soundlatch2", FUNC(generic_latch_8_device::read));            //
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1007).r(FUNC(seta_state::downtown_ip_r));         // Input Ports
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
@@ -3528,7 +3528,7 @@ MACHINE_RESET_MEMBER(seta_state,calibr50)
 WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 {
 	// Bits 7-4: BK3-BK0
-	sub_bankswitch_w(space, 0, data);
+	sub_bankswitch_w(data);
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
@@ -3539,6 +3539,7 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 
 	// Bit 1: PCMMUTE
+	m_x1->set_output_gain(ALL_OUTPUTS, BIT(data, 0) ? 0.0f : 1.0f);
 }
 
 WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
@@ -3549,8 +3550,10 @@ WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
 
 void seta_state::calibr50_sub_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(m_x1, FUNC(x1_010_device::read), FUNC(x1_010_device::write)); // Sound
-	map(0x4000, 0x4000).r("soundlatch1", FUNC(generic_latch_8_device::read));             // From Main CPU
+	map(0x0000, 0x1fff).lrw8("x1_soundram_rw",
+								 [this](offs_t offset) { return m_x1->read(offset ^ 0x1000); },
+								 [this](offs_t offset, u8 data) { m_x1->write(offset ^ 0x1000, data); }); // Sound
+	map(0x4000, 0x4000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             // From Main CPU
 	map(0x4000, 0x4000).w(FUNC(seta_state::calibr50_sub_bankswitch_w));        // Bankswitching
 	map(0x8000, 0xbfff).bankr("subbank");                        // Banked ROM
 	map(0xc000, 0xffff).rom();                             // ROM
@@ -3565,8 +3568,8 @@ void seta_state::calibr50_sub_map(address_map &map)
 void seta_state::metafox_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r("soundlatch1", FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r("soundlatch2", FUNC(generic_latch_8_device::read));            //
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("COINS");          // Coins
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1002, 0x1002).portr("P1");             // P1
@@ -3595,7 +3598,7 @@ void seta_state::utoukond_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0x80, 0x80).w(FUNC(seta_state::utoukond_sound_control_w));
-	map(0xc0, 0xc0).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
 
@@ -6066,17 +6069,6 @@ static INPUT_PORTS_START( thunderl )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( thunderlbl )
-	PORT_INCLUDE(thunderl)
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
 /***************************************************************************
                                 Thundercade (US)
 ***************************************************************************/
@@ -7888,11 +7880,11 @@ MACHINE_CONFIG_START(seta_state::tndrcade)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 16000000/4)   /* 4 MHz */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, seta_state, dsw1_r))     /* input A: DSW 1 */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seta_state, dsw2_r))     /* input B: DSW 2 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	ym2203_device &ym1(YM2203(config, "ym1", 16000000/4));   /* 4 MHz */
+	ym1.port_a_read_callback().set(FUNC(seta_state::dsw1_r));     /* input A: DSW 1 */
+	ym1.port_b_read_callback().set(FUNC(seta_state::dsw2_r));     /* input B: DSW 2 */
+	ym1.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	ym1.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
 	MCFG_DEVICE_ADD("ym2", YM3812, 16000000/4)   /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -7927,7 +7919,7 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(57.42) // Possibly lower than 60Hz, Correct?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
@@ -7942,8 +7934,8 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -7988,8 +7980,8 @@ MACHINE_CONFIG_START(seta_state::downtown)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -8030,15 +8022,16 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(usclssic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX")
-	MCFG_UPD4701_PORTY("TRACKY")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("TRACKX");
+	m_upd4701->set_porty_tag("TRACKY");
 
 	HC157(config, m_buttonmux, 0);
 	m_buttonmux->out_callback().set(m_upd4701, FUNC(upd4701_device::middle_w)).bit(0);
@@ -8072,12 +8065,11 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8097,15 +8089,18 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+
+	WATCHDOG_TIMER(config, "watchdog");
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("ROT1")
-	MCFG_UPD4701_PORTY("ROT2")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("ROT1");
+	m_upd4701->set_porty_tag("ROT2");
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
@@ -8130,14 +8125,13 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -8180,8 +8174,8 @@ MACHINE_CONFIG_START(seta_state::metafox)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8362,7 +8356,7 @@ void seta_state::blockcarb_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 //  AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD(m_soundlatch[0], generic_latch_8_device, read)
 }
 
 MACHINE_CONFIG_START(seta_state::blockcarb)
@@ -8563,7 +8557,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(setaroul_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
 	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
@@ -8572,10 +8566,10 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
+	UPD4992(config, m_rtc); // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
@@ -8618,7 +8612,7 @@ MACHINE_CONFIG_START(seta_state::eightfrc)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8662,7 +8656,7 @@ MACHINE_CONFIG_START(seta_state::extdwnhl)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(extdwnhl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8726,7 +8720,7 @@ MACHINE_CONFIG_START(seta_state::gundhara)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 #endif  // __uPD71054_TIMER
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 #if __uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
@@ -8775,10 +8769,10 @@ MACHINE_CONFIG_START(seta_state::zombraid)
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state, zombraid)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("adc", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CB(seta_state, zombraid_adc_cb)
+	adc0834_device &adc(ADC0834(config, "adc", 0));
+	adc.set_input_callback(FUNC(seta_state::zombraid_adc_cb));
 
 	MCFG_DEVICE_MODIFY("x1snd")
 	MCFG_DEVICE_ADDRESS_MAP(0, zombraid_x1_map)
@@ -8798,7 +8792,7 @@ MACHINE_CONFIG_START(seta_state::jjsquawk)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8874,11 +8868,11 @@ MACHINE_CONFIG_START(seta_state::kamenrid)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kamenrid_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9004,13 +8998,13 @@ MACHINE_CONFIG_START(seta_state::krzybowl)
 	MCFG_DEVICE_PROGRAM_MAP(krzybowl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	upd4701_device &upd1(UPD4701A(config, "upd1"));
+	upd1.set_portx_tag("TRACK1_X");
+	upd1.set_porty_tag("TRACK1_Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK2_X")
-	MCFG_UPD4701_PORTY("TRACK2_Y")
+	upd4701_device &upd2(UPD4701A(config, "upd2"));
+	upd2.set_portx_tag("TRACK2_X");
+	upd2.set_porty_tag("TRACK2_Y");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9050,15 +9044,15 @@ MACHINE_CONFIG_START(seta_state::madshark)
 	MCFG_DEVICE_PROGRAM_MAP(madshark_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9098,13 +9092,13 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 	MCFG_DEVICE_PROGRAM_MAP(magspeed_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state, magspeed)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9145,9 +9139,9 @@ MACHINE_CONFIG_START(seta_state::msgundam)
 	MCFG_DEVICE_PROGRAM_MAP(msgundam_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9262,15 +9256,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::kiwame)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kiwame_map)
 	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta_state, kiwame_row_select_w))
+	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
+	tmp68301.set_cputag(m_maincpu);
+	tmp68301.out_parallel_callback().set(FUNC(seta_state::kiwame_row_select_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9313,7 +9307,7 @@ MACHINE_CONFIG_START(seta_state::rezon)
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9394,7 +9388,7 @@ void seta_state::thunderlbl_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xc0, 0xc0).mirror(0x3f).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
 
@@ -9416,8 +9410,8 @@ MACHINE_CONFIG_START(seta_state::thunderlbl)
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 10000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
 MACHINE_CONFIG_END
 
 
@@ -9455,8 +9449,8 @@ MACHINE_CONFIG_START(seta_state::wiggie)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta_state::superbar)
@@ -9572,9 +9566,9 @@ MACHINE_CONFIG_START(seta_state::utoukond)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -9602,7 +9596,7 @@ MACHINE_CONFIG_START(seta_state::wrofaero)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 #endif  // __uPD71054_TIMER
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 #if __uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
@@ -9656,7 +9650,7 @@ MACHINE_CONFIG_START(seta_state::zingzip)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9826,18 +9820,17 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // TMP68000N-8
 	MCFG_DEVICE_PROGRAM_MAP(jockeyc_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jockeyc_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2.0)) // jockeyc: watchdog test error if over 2.5s
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2.0)); // jockeyc: watchdog test error if over 2.5s
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
+	UPD4992(config, m_rtc); // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
@@ -12112,7 +12105,7 @@ GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     init_down
 
 GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
-GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50" , 0) // Country/License: DSW
+GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
 GAME( 1989, arbalest,  0,        metafox,   arbalest,  seta_state,     init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
 
@@ -12127,7 +12120,7 @@ GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_ini
 GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
 GAME( 1990, thunderl,  0,        thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderlbl,seta_state,     empty_init,     ROT90,  "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderl,  seta_state,     empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
 GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
@@ -12167,9 +12160,9 @@ GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_ini
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, jjsquawko, jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers (older)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
 

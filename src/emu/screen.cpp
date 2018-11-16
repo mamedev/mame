@@ -656,19 +656,32 @@ void screen_device::device_config_complete()
 {
 	// combine orientation with machine orientation
 	m_orientation = orientation_add(m_orientation, mconfig().gamedrv().flags & machine_flags::MASK_ORIENTATION);
+}
+
+
+//-------------------------------------------------
+//  physical_aspect - determine the physical
+//  aspect ratio to be used for rendering
+//-------------------------------------------------
+
+std::pair<unsigned, unsigned> screen_device::physical_aspect() const
+{
+	assert(configured());
+
+	std::pair<unsigned, unsigned> phys_aspect = m_phys_aspect;
 
 	// physical aspect ratio unconfigured
-	if (!m_phys_aspect.first || !m_phys_aspect.second)
+	if (!phys_aspect.first || !phys_aspect.second)
 	{
 		switch (m_type)
 		{
 		case SCREEN_TYPE_RASTER:
 		case SCREEN_TYPE_VECTOR:
-			m_phys_aspect = std::make_pair(4, 3); // assume standard CRT
+			phys_aspect = std::make_pair(4, 3); // assume standard CRT
 			break;
 		case SCREEN_TYPE_LCD:
 		case SCREEN_TYPE_SVG:
-			m_phys_aspect = std::make_pair(~0U, ~0U); // assume square pixels
+			phys_aspect = std::make_pair(~0U, ~0U); // assume square pixels
 			break;
 		case SCREEN_TYPE_INVALID:
 		default:
@@ -677,16 +690,17 @@ void screen_device::device_config_complete()
 	}
 
 	// square pixels?
-	if ((~0U == m_phys_aspect.first) && (~0U == m_phys_aspect.second))
+	if ((~0U == phys_aspect.first) && (~0U == phys_aspect.second))
 	{
-		m_phys_aspect.first = visible_area().width();
-		m_phys_aspect.second = visible_area().height();
+		phys_aspect.first = visible_area().width();
+		phys_aspect.second = visible_area().height();
 	}
 
 	// always keep this in reduced form
-	util::reduce_fraction(m_phys_aspect.first, m_phys_aspect.second);
-}
+	util::reduce_fraction(phys_aspect.first, phys_aspect.second);
 
+	return phys_aspect;
+}
 
 
 //-------------------------------------------------
@@ -750,9 +764,9 @@ void screen_device::device_start()
 
 	// allocate raw textures
 	m_texture[0] = machine().render().texture_alloc();
-	m_texture[0]->set_osd_data(u64((m_unique_id << 1) | 0));
+	m_texture[0]->set_id(u64(m_unique_id) << 57);
 	m_texture[1] = machine().render().texture_alloc();
-	m_texture[1]->set_osd_data(u64((m_unique_id << 1) | 1));
+	m_texture[1]->set_id((u64(m_unique_id) << 57) | 1);
 
 	// configure the default cliparea
 	render_container::user_settings settings;
@@ -1245,6 +1259,96 @@ void screen_device::reset_partial_updates()
 	m_partial_scan_hpos = 0;
 	m_partial_updates_this_frame = 0;
 	m_scanline0_timer->adjust(time_until_pos(0));
+}
+
+
+//-------------------------------------------------
+//  pixel - returns the RGB value of the specified
+//  pixel location
+//-------------------------------------------------
+
+u32 screen_device::pixel(s32 x, s32 y)
+{
+	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	if (!curbitmap.valid())
+		return 0;
+
+	const int srcwidth = curbitmap.width();
+	const int srcheight = curbitmap.height();
+
+	if (x < 0 || y < 0 || x >= srcwidth || y >= srcheight)
+		return 0;
+
+	switch (curbitmap.format())
+	{
+		case BITMAP_FORMAT_IND16:
+		{
+			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
+			const u16 src = srcbitmap.pix(y, x);
+			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+			return (u32)palette[src];
+		}
+
+		case BITMAP_FORMAT_RGB32:
+		{
+			// iterate over rows in the destination
+			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
+			return (u32)srcbitmap.pix(y, x);
+		}
+
+		default:
+			return 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  pixels - fills the specified buffer with the
+//  RGB values of each pixel in the screen.
+//-------------------------------------------------
+
+void screen_device::pixels(u32 *buffer)
+{
+	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	if (!curbitmap.valid())
+		return;
+
+	const rectangle &visarea = visible_area();
+
+	switch (curbitmap.format())
+	{
+		case BITMAP_FORMAT_IND16:
+		{
+			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
+			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+			for (int y = visarea.min_y; y <= visarea.max_y; y++)
+			{
+				const u16 *src = &srcbitmap.pix(y, visarea.min_x);
+				for (int x = visarea.min_x; x <= visarea.max_x; x++)
+				{
+					*buffer++ = palette[*src++];
+				}
+			}
+			break;
+		}
+
+		case BITMAP_FORMAT_RGB32:
+		{
+			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
+			for (int y = visarea.min_y; y <= visarea.max_y; y++)
+			{
+				const u32 *src = &srcbitmap.pix(y, visarea.min_x);
+				for (int x = visarea.min_x; x <= visarea.max_x; x++)
+				{
+					*buffer++ = *src++;
+				}
+			}
+			break;
+		}
+
+		default:
+			break;
+	}
 }
 
 

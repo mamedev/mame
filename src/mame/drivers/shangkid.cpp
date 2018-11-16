@@ -424,10 +424,10 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/12) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shangkid_state, chinhero_ay8910_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shangkid_state, ay8910_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	AY8910(config, m_aysnd, XTAL(18'432'000)/12); /* verified on pcb */
+	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::chinhero_ay8910_porta_w));
+	m_aysnd->port_b_write_callback().set(FUNC(shangkid_state::ay8910_portb_w));
+	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.1);
 MACHINE_CONFIG_END
 
 
@@ -452,9 +452,7 @@ MACHINE_CONFIG_START(shangkid_state::shangkid)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shangkid)
 
-	MCFG_DEVICE_MODIFY("aysnd")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shangkid_state, shangkid_ay8910_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shangkid_state, ay8910_portb_w))
+	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::shangkid_ay8910_porta_w));
 MACHINE_CONFIG_END
 
 
@@ -488,10 +486,10 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	MCFG_DEVICE_PROGRAM_MAP(dynamski_map)
 	MCFG_DEVICE_IO_MAP(dynamski_portmap)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, shangkid_state, int_enable_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // screen flip?
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // screen flip?
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(shangkid_state::int_enable_1_w));
+	mainlatch.q_out_cb<1>().set_nop(); // screen flip?
+	mainlatch.q_out_cb<2>().set_nop(); // screen flip?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -511,8 +509,7 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	AY8910(config, m_aysnd, 2000000).add_route(ALL_OUTPUTS, "speaker", 0.1);
 MACHINE_CONFIG_END
 
 /***************************************************************************************/

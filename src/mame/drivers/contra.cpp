@@ -86,11 +86,11 @@ void contra_state::contra_map(address_map &map)
 	map(0x2400, 0x27ff).w(FUNC(contra_state::contra_fg_vram_w)).share("fg_vram");
 	map(0x2800, 0x2bff).w(FUNC(contra_state::contra_text_cram_w)).share("tx_cram");
 	map(0x2c00, 0x2fff).w(FUNC(contra_state::contra_text_vram_w)).share("tx_vram");
-	map(0x3000, 0x37ff).writeonly().share("spriteram");/* 2nd bank is at 0x5000 */
-	map(0x3800, 0x3fff).writeonly(); // second sprite buffer
+	map(0x3000, 0x3fff).ram().share("spriteram");
 	map(0x4000, 0x43ff).w(FUNC(contra_state::contra_bg_cram_w)).share("bg_cram");
 	map(0x4400, 0x47ff).w(FUNC(contra_state::contra_bg_vram_w)).share("bg_vram");
-	map(0x4800, 0x5fff).writeonly();
+	map(0x4800, 0x4fff).ram();
+	map(0x5000, 0x5fff).ram().share("spriteram_2");
 
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x7000, 0x7000).w(FUNC(contra_state::contra_bankswitch_w));
@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(contra_state::contra)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)

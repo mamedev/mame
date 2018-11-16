@@ -18,7 +18,7 @@ Supported games:
 Notes:
         Basically the same video and machine hardware as Flying Shark,
           except for the Main CPU which is a Z80 here.
-        See twincobr.c machine and video drivers to complete the
+        See twincobr.cpp machine and video drivers to complete the
           hardware setup.
         To enter the "test mode", press START1 when the grid is displayed.
         Press 0 (actually P1 button 3) on startup to skip some video RAM tests
@@ -151,6 +151,10 @@ public:
 
 	void init_wardner();
 
+protected:
+	virtual void driver_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<address_map_bank_device> m_membank;
 
@@ -163,9 +167,6 @@ private:
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
-
-	virtual void driver_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -367,7 +368,7 @@ GFXDECODE_END
 
 void wardner_state::driver_start()
 {
-	/* Save-State stuff in src/machine/twincobr.c */
+	/* Save-State stuff in src/machine/twincobr.cpp */
 	twincobr_driver_savestate();
 }
 
@@ -385,12 +386,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 
-	MCFG_DEVICE_ADD("membank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(main_bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "membank").set_map(&wardner_state::main_bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x8000);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'000'000)/4)     /* 3.5MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
@@ -404,19 +400,19 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wardner_state, int_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, wardner_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, wardner_state, bg_ram_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wardner_state, fg_rom_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wardner_state, display_on_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<2>().set(FUNC(wardner_state::int_enable_w));
+	mainlatch.q_out_cb<3>().set(FUNC(wardner_state::flipscreen_w));
+	mainlatch.q_out_cb<4>().set(FUNC(wardner_state::bg_ram_bank_w));
+	mainlatch.q_out_cb<5>().set(FUNC(wardner_state::fg_rom_bank_w));
+	mainlatch.q_out_cb<6>().set(FUNC(wardner_state::display_on_w));
 
-	MCFG_DEVICE_ADD("coinlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wardner_state, dsp_int_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, wardner_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wardner_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wardner_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, wardner_state, coin_lockout_2_w))
+	ls259_device &coinlatch(LS259(config, "coinlatch"));
+	coinlatch.q_out_cb<0>().set(FUNC(wardner_state::dsp_int_w));
+	coinlatch.q_out_cb<4>().set(FUNC(wardner_state::coin_counter_1_w));
+	coinlatch.q_out_cb<5>().set(FUNC(wardner_state::coin_counter_2_w));
+	coinlatch.q_out_cb<6>().set(FUNC(wardner_state::coin_lockout_1_w));
+	coinlatch.q_out_cb<7>().set(FUNC(wardner_state::coin_lockout_2_w));
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(14'000'000)/4) /* 3.5MHz measured on CLKin */
@@ -436,7 +432,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
-	MCFG_PALETTE_ADD("palette", 1792)
+	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)

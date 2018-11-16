@@ -224,7 +224,7 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 		m_samples = 0;
 		m_sample_byte = 0;
 		m_isa->drq7_w(ASSERT_LINE);
-		attotime rate = attotime::from_ticks((double)(1 << ((m_mode >> 5) & 3)), 44100.0); // TODO : Unknown clock
+		attotime rate = attotime::from_ticks(1 << ((m_mode >> 5) & 3), 44100); // TODO : Unknown clock
 		m_pcm->adjust(rate, 0, rate);
 	}
 	else if(!(m_mode & 0x10))
@@ -391,6 +391,7 @@ void vis_vga_device::device_start()
 	m_isa->install_memory(0x0a0000, 0x0bffff, read8_delegate(FUNC(vis_vga_device::visvgamem_r), this), write8_delegate(FUNC(vis_vga_device::visvgamem_w), this));
 	svga_device::device_start();
 	vga.svga_intf.seq_regcount = 0x2d;
+	save_pointer(m_crtc_regs,"VIS CRTC",0x32);
 }
 
 void vis_vga_device::device_reset()
@@ -511,6 +512,7 @@ WRITE8_MEMBER(vis_vga_device::vga_w)
 					{
 						vga.gc.shift256 = 1;
 						vga.crtc.dw = 1;
+						vga.crtc.no_wrap = 1;
 						if(m_8bit_640)
 							svga.rgb8_en = 1;
 						else
@@ -520,6 +522,7 @@ WRITE8_MEMBER(vis_vga_device::vga_w)
 					{
 						vga.gc.shift256 = m_shift256;
 						vga.crtc.dw = m_dw;
+						vga.crtc.no_wrap = 0;
 						svga.rgb8_en = 0;
 					}
 					break;
@@ -883,9 +886,9 @@ static void vis_cards(device_slot_interface &device)
 static INPUT_PORTS_START(vis)
 	PORT_START("PAD")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)

@@ -58,10 +58,9 @@ To Do / Status:
 --------------
 
 trs80m3:   works
-           floppy not working
 
 trs80m4:   works
-           floppy not working
+           will boot model 3 floppies, but not model 4 ones
 
 trs80m4p:  floppy not working, so machine is useless
 
@@ -336,14 +335,14 @@ static void trs80_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(trs80m3_state::model3)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20.2752_MHz_XTAL / 10)
+	MCFG_DEVICE_ADD("maincpu", Z80, 20.2752_MHz_XTAL / 10) // FIXME: actual Model III XTAL is 10.1376 MHz
 	MCFG_DEVICE_PROGRAM_MAP(m3_mem)
 	MCFG_DEVICE_IO_MAP(m3_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80m3_state, rtc_interrupt, 20.2752_MHz_XTAL / 10 / 67584)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12.672_MHz_XTAL, 800, 0, 640, 264, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(12.672_MHz_XTAL, 800, 0, 640, 264, 0, 240) // FIXME: these are Model 4 80-column parameters
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m3_state, screen_update_trs80m3)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -362,9 +361,9 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80m3_state, trs80_cmd, "cmd", 1.0)
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, trs80m3_state, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, trs80m3_state, drq_w))
+	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(trs80m3_state::intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(trs80m3_state::drq_w));
 
 	// Internal drives
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80m3_state::floppy_formats)
@@ -382,16 +381,16 @@ MACHINE_CONFIG_START(trs80m3_state::model3)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	COM8116(config, m_brg, 5.0688_MHz_XTAL);   // BR1943 (or BR1941L)
+	COM8116(config, m_brg, 20.2752_MHz_XTAL / 4);   // BR1943 (or BR1941L)
 	m_brg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
 	m_brg->ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
 
-	MCFG_DEVICE_ADD("uart", AY31015, 0)
-	MCFG_AY31015_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	AY31015(config, m_uart);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
-	MCFG_AY31015_AUTO_RDAV(true)
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	m_uart->set_auto_rdav(true);
+	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80m3_state::model4)

@@ -93,9 +93,9 @@ READ8_MEMBER(scramble_state::cavelon_banksw_r )
 	cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		return m_ppi8255_0->read(space, offset - 0x0100);
+		return m_ppi8255_0->read(offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return m_ppi8255_1->read(space, offset - 0x0200);
+		return m_ppi8255_1->read(offset - 0x0200);
 
 	return 0xff;
 }
@@ -105,9 +105,9 @@ WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
 	cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		m_ppi8255_0->write(space, offset - 0x0100, data);
+		m_ppi8255_0->write(offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		m_ppi8255_1->write(space, offset - 0x0200, data);
+		m_ppi8255_1->write(offset - 0x0200, data);
 }
 
 
@@ -156,8 +156,23 @@ void scramble_state::init_tazmani2()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb002, 0xb002, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
-void scramble_state::init_ckongs()
+void scramble_state::init_tazmaniet()
 {
+	init_tazmani2();
+
+	uint8_t* romdata = memregion("maincpu")->base();
+	uint8_t buf[0x6000];
+	memcpy(buf, romdata, 0x6000);
+
+	// some sort of weak protection?
+	for (int i = 0; i < 0x1000; i++)
+		romdata[i] = buf[i^0x3ff];
+
+	for (int i = 0x2000; i < 0x3000; i++)
+		romdata[i] = buf[i^0x3ff];
+
+	for (int i = 0x4000; i < 0x5000; i++)
+		romdata[i] = buf[i^0x3ff];
 }
 
 void scramble_state::init_mariner()

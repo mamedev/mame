@@ -11,6 +11,7 @@
 #pragma once
 
 #include "audio/trackfld.h"
+#include "machine/74259.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
@@ -30,6 +31,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
+		m_mainlatch(*this, "mainlatch"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundbrd(*this, "trackfld_audio"),
 		m_sn(*this, "snsnd"),
@@ -86,6 +88,7 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	optional_device<ls259_device> m_mainlatch;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<trackfld_audio_device> m_soundbrd;
 	optional_device<sn76496_device> m_sn;

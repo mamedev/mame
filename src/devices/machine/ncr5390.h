@@ -22,6 +22,9 @@ public:
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
+	auto irq_handler_cb() { return m_irq_handler.bind(); }
+	auto drq_handler_cb() { return m_drq_handler.bind(); }
+
 	virtual void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(tcounter_lo_r);
@@ -32,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fifo_w);
 	DECLARE_READ8_MEMBER(command_r);
 	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_READ8_MEMBER(status_r);
+	virtual DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(bus_id_w);
 	DECLARE_READ8_MEMBER(istatus_r);
 	DECLARE_WRITE8_MEMBER(timeout_w);
@@ -44,6 +47,9 @@ public:
 	DECLARE_WRITE8_MEMBER(conf_w);
 	DECLARE_WRITE8_MEMBER(test_w);
 	DECLARE_WRITE8_MEMBER(clock_w);
+
+	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
 
 	virtual void scsi_ctrl_changed() override;
 
@@ -230,7 +236,7 @@ protected:
 	void check_irq();
 
 protected:
-	void reset_soft();
+	virtual void reset_soft();
 
 private:
 	void reset_disconnect();
@@ -256,16 +262,19 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_READ8_MEMBER(status_r);
+	virtual DECLARE_READ8_MEMBER(status_r) override;
 
 	DECLARE_READ8_MEMBER(conf2_r) { return config2; };
 	DECLARE_WRITE8_MEMBER(conf2_w) { config2 = data; };
+
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	void reset_soft();
+	virtual void reset_soft() override;
 
 	virtual bool check_valid_command(uint8_t cmd) override;
 
@@ -289,9 +298,12 @@ public:
 	DECLARE_WRITE8_MEMBER(conf3_w) { config3 = data; };
 	DECLARE_WRITE8_MEMBER(fifo_align_w) { fifo_align = data; };
 
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
 protected:
 	virtual void device_start() override;
-	void reset_soft();
+	virtual void reset_soft() override;
 
 private:
 	u8 config3;

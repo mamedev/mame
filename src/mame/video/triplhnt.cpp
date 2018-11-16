@@ -126,8 +126,7 @@ uint32_t triplhnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	draw_sprites(bitmap, cliprect);
 
-	address_space &space = machine().dummy_space();
-	m_discrete->write(space, TRIPLHNT_BEAR_ROAR_DATA, m_playfield_ram[0xfa] & 15);
-	m_discrete->write(space, TRIPLHNT_SHOT_DATA, m_playfield_ram[0xfc] & 15);
+	m_discrete->write(TRIPLHNT_BEAR_ROAR_DATA, m_playfield_ram[0xfa] & 15);
+	m_discrete->write(TRIPLHNT_SHOT_DATA, m_playfield_ram[0xfc] & 15);
 	return 0;
 }

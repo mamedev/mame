@@ -276,7 +276,7 @@ static uint8_t to7_5p14_select;
 READ8_MEMBER( thomson_state::to7_5p14_r )
 {
 	if ( offset < 4 )
-		return m_wd2793_fdc->read(space, offset );
+		return m_wd2793_fdc->read(offset);
 	else if ( offset == 8 )
 		return to7_5p14_select;
 	else
@@ -289,7 +289,7 @@ READ8_MEMBER( thomson_state::to7_5p14_r )
 WRITE8_MEMBER( thomson_state::to7_5p14_w )
 {
 	if ( offset < 4 )
-		m_wd2793_fdc->write(space, offset, data );
+		m_wd2793_fdc->write(offset, data );
 	else if ( offset == 8 )
 	{
 		/* drive select */

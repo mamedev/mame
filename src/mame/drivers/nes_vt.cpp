@@ -1075,23 +1075,23 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_sp69_w)
 
 READ8_MEMBER(nes_vt_state::psg1_4014_r)
 {
-	//return m_apu->read(space, 0x14);
+	//return m_apu->read(0x14);
 	return 0x00;
 }
 
 READ8_MEMBER(nes_vt_state::psg1_4015_r)
 {
-	return m_apu->read(space, 0x15);
+	return m_apu->read(0x15);
 }
 
 WRITE8_MEMBER(nes_vt_state::psg1_4015_w)
 {
-	m_apu->write(space, 0x15, data);
+	m_apu->write(0x15, data);
 }
 
 WRITE8_MEMBER(nes_vt_state::psg1_4017_w)
 {
-	m_apu->write(space, 0x17, data);
+	m_apu->write(0x17, data);
 }
 
 WRITE8_MEMBER(nes_vt_state::nes_vh_sprite_dma_w)
@@ -1367,12 +1367,7 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	MCFG_PPU_VT03_READ_BG_CB(READ8(*this, nes_vt_state,chr_r))
 	MCFG_PPU_VT03_READ_SP_CB(READ8(*this, nes_vt_state,spr_r))
 
-	MCFG_DEVICE_ADD("prg", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(prg_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "prg").set_map(&nes_vt_state::prg_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x8000);
 
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", nes_control_port1_devices, "joypad")
 	//MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
@@ -1692,6 +1687,12 @@ ROM_START( sy888b )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "sy888b_f25q32.bin", 0x00000, 0x400000, CRC(a8298c33) SHA1(7112dd13d5fb5f9f9d496816758defd22773ec6e) )
 ROM_END
+
+ROM_START( ddrdismx )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "disney-ddr.bin", 0x00000, 0x200000, CRC(17fb3abb) SHA1(4d0eda4069ff46173468e579cdf9cc92b350146a) ) // 29LV160 Flash
+ROM_END
+
 #if 0
 ROM_START( mc_15kin1 )
 	ROM_REGION( 0x200000, "mainrom", 0 )
@@ -1840,6 +1841,13 @@ CONS( 201?, cbrs8,      0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_ini
 
 CONS( 200?, gprnrs1,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, gprnrs16,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
+
+// Notes:
+// * Seems to have missing a few PCM sounds.
+// * Console has stereo output (dual RCA connectors).
+// * It hangs when reset (F3) on a MAME debug build.
+CONS( 2001, ddrdismx,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+		
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
 CONS( 200?, mc_aa2,     0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )

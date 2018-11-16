@@ -433,9 +433,9 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gp)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
+	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 1000000)); // guessed
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
@@ -477,9 +477,9 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -507,9 +507,9 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gpb)
 	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
+	m_acia->txd_handler().set("acia", FUNC(acia6850_device::write_rxd)); // loopback for now
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 1000000)); // guessed
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));

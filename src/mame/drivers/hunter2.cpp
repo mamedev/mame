@@ -414,30 +414,16 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_NSC810_TIMER0_OUT(WRITELINE(*this, hunter2_state,timer0_out))
 	MCFG_NSC810_TIMER1_OUT(WRITELINE(*this, hunter2_state,timer1_out))
 
-	MCFG_DEVICE_ADD("serial",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, hunter2_state,cts_w))
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, hunter2_state,rxd_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->cts_handler().set(FUNC(hunter2_state::cts_w));
+	m_rs232->rxd_handler().set(FUNC(hunter2_state::rxd_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank2").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank3").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank4").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
 MACHINE_CONFIG_END
 
 /* ROM definition */

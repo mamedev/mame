@@ -212,15 +212,15 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	MCFG_DEVICE_ADD("maincpu", KONAMI1, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
 	MCFG_DEVICE_PROGRAM_MAP(rocnrope_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, rocnrope_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, rocnrope_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, rocnrope_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, rocnrope_state, irq_mask_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // B2
+	mainlatch.q_out_cb<0>().set(FUNC(rocnrope_state::flip_screen_w));
+	mainlatch.q_out_cb<1>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w));
+	mainlatch.q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
+	mainlatch.q_out_cb<3>().set(FUNC(rocnrope_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set(FUNC(rocnrope_state::coin_counter_2_w));
+	mainlatch.q_out_cb<7>().set(FUNC(rocnrope_state::irq_mask_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

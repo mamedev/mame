@@ -2,12 +2,12 @@
 // copyright-holders:Robbbert
 /*******************************************************************************
 
-        6809 Portable
+Dunfield 6809 Portable
 
-        12/05/2009 Skeleton driver.
-        21/09/2011 connected to terminal, notes added [Robbbert]
+2009-05-12 Skeleton driver.
+2011-09-21 connected to terminal, notes added [Robbbert]
 
-Chips used:
+Chips used (planned?):
 - 6809E CPU
 - 6845 CRTC
 - 6840 CTC
@@ -80,11 +80,29 @@ devices.
 'maincpu' (FA6E): unmapped program memory read from 00F0 & FF <-- now it gives up & prints an error
 
 
+Layout of devices differences:
+                  Schematic       Actual
+6551 1              0000           0000
+6551 2              0100           0004
+Disk status         0400           00F0
+Disk commands       0401           00F0-00F7
+Parallel terminal   not there      00FF
+CE on UPD765        0400           0200
+TC on UPD765        0500           0300
+
+Also, pins 16,17,18 on the UPD765 are incorrect in the schematic.
+
+
+ToDo:
+- Need better documentation
+- Need a boot disk image
+
 **********************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/mos6551.h"
+#include "machine/upd765.h"
 #include "machine/terminal.h"
 
 
@@ -95,6 +113,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "terminal")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
 	{ }
 
 	void d6809(machine_config &config);
@@ -110,6 +130,8 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
 };
 
 READ8_MEMBER( d6809_state::term_r )
@@ -131,7 +153,11 @@ void d6809_state::mem_map(address_map &map)
 	// 00-FF is for various devices.
 	map(0x0000, 0x0003).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x0004, 0x0007).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x00f0, 0x00f7).ram(); // for now
+	//map(0x00f0, 0x00f0).r(m_fdc, FUNC(upd765a_device::msr_r));
 	map(0x00ff, 0x00ff).rw(FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
+	map(0x0200, 0x0201).mirror(0xfe).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x0300, 0x0300).mirror(0xff).lw8("tc", [this](u8 data){ m_fdc->tc_w(1); m_fdc->tc_w(0); } );
 	map(0x1000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom().region("roms", 0);
 }
@@ -149,6 +175,16 @@ void d6809_state::kbd_put(u8 data)
 
 void d6809_state::machine_reset()
 {
+	m_fdc->set_ready_line_connected(1);
+	m_fdc->set_unscaled_clock(8_MHz_XTAL / 2); // 4MHz for minifloppy
+	floppy_image_device *floppy = m_floppy0->get_device();
+	m_fdc->set_floppy(floppy);
+	floppy->mon_w(0);
+}
+
+static void floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
 }
 
 
@@ -161,8 +197,14 @@ MACHINE_CONFIG_START(d6809_state::d6809)
 	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(d6809_state, kbd_put))
+
+	// Floppy
+	UPD765A(config, m_fdc, true, true);
+	//m_fdc->drq_wr_callback().set(m_fdc, FUNC(upd765a_device::dack_w));   // pin not emulated
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 /* ROM definition */

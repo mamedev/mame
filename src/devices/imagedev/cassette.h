@@ -43,16 +43,18 @@ enum cassette_state
 // ======================> cassette_image_device
 
 class cassette_image_device :   public device_t,
-								public device_image_interface
+								public device_image_interface,
+								public device_sound_interface
 {
 public:
 	// construction/destruction
-	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~cassette_image_device();
 
 	void set_formats(const struct CassetteFormat*  const *formats) { m_formats = formats; }
 	void set_create_opts(const struct CassetteOptions  *create_opts) { m_create_opts = create_opts; }
 	void set_default_state(cassette_state default_state) { m_default_state = default_state; }
+	void set_default_state(int default_state) { m_default_state = (cassette_state)default_state; }
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
@@ -89,6 +91,10 @@ public:
 	void go_reverse();
 	void seek(double time, int origin);
 
+	// sound stream update overrides
+	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	device_sound_interface& set_stereo() { m_stereo = true; return *this; }
+
 protected:
 	bool is_motor_on();
 	void update();
@@ -114,6 +120,7 @@ private:
 	const char *                    m_interface;
 
 	image_init_result internal_load(bool is_create);
+	bool            m_stereo;
 };
 
 // device type definition

@@ -697,6 +697,8 @@ void i386_device::i386_mov_cr_r32()        // Opcode 0x0f 22
 		case 0:
 			data &= 0xfffeffff; // wp not supported on 386
 			CYCLES(CYCLES_MOV_REG_CR0);
+			if (PROTECTED_MODE != BIT(data, 0))
+				debugger_privilege_hook();
 			break;
 		case 2: CYCLES(CYCLES_MOV_REG_CR2); break;
 		case 3:

@@ -685,8 +685,8 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 
 	pcat_common(config);
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, calchase_state, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -695,10 +695,9 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 	/* video hardware */
 	pcvideo_trident_vga(config);
 
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config.replace(), "rtc"));
+	rtc.irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -718,8 +717,8 @@ MACHINE_CONFIG_START(calchase_state::hostinv)
 
 	pcat_common(config);
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "cdrom", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "cdrom", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, calchase_state, intel82439tx_pci_r, intel82439tx_pci_w)

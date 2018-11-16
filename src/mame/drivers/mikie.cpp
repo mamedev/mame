@@ -267,15 +267,15 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	MCFG_DEVICE_ADD("audiocpu", Z80, CLK) // 4E (surface scratched)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 6I
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mikie_state, coin_counter_1_w)) // COIN1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mikie_state, coin_counter_2_w)) // COIN2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mikie_state, sh_irqtrigger_w)) // SOUNDON
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // END (not used?)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mikie_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mikie_state, irq_mask_w)) // INT
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 6I
+	mainlatch.q_out_cb<0>().set(FUNC(mikie_state::coin_counter_1_w)); // COIN1
+	mainlatch.q_out_cb<1>().set(FUNC(mikie_state::coin_counter_2_w)); // COIN2
+	mainlatch.q_out_cb<2>().set(FUNC(mikie_state::sh_irqtrigger_w)); // SOUNDON
+	mainlatch.q_out_cb<3>().set_nop(); // END (not used?)
+	mainlatch.q_out_cb<6>().set(FUNC(mikie_state::flipscreen_w)); // FLIP
+	mainlatch.q_out_cb<7>().set(FUNC(mikie_state::irq_mask_w)); // INT
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -362,6 +362,32 @@ ROM_START( mikiej )
 	ROM_LOAD( "d18.f9",  0x0400, 0x0100, CRC(7396b374) SHA1(fedcc421a61d6623dc9c41b0a3e164efeb50ec7c) ) // sprite lookup table
 ROM_END
 
+ROM_START( mikiek )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "n14.11c", 0x6000, 0x2000, CRC(f698e6dd) SHA1(99220eeee4e7b88caa26f2d08502689e1f1fcdf8) )
+	ROM_LOAD( "o13.12a", 0x8000, 0x4000, CRC(826e7035) SHA1(bd62783cb1ba4e7f0196f337280461bb7627f70f) )
+	ROM_LOAD( "o17.12d", 0xc000, 0x4000, CRC(161c25c8) SHA1(373a92b8412676ad9870cb562c73e47db7b40bea) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "n10.6e",  0x0000, 0x2000, CRC(2cf9d670) SHA1(b324b92aff70d7878160128611dd5fdec6949659) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "q11.8i",  0x0000, 0x4000, CRC(29286fce) SHA1(699706cf7300c98352e355f81ba40635b4380d7a) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "q01.f1",  0x0000, 0x4000, CRC(31551987) SHA1(b6cbdb8b511d99b27546a6c4d01f2948d5ad3a42) )
+	ROM_LOAD( "q03.f3",  0x4000, 0x4000, CRC(707cc98e) SHA1(850c973053f3ae8a93e7c630d69298f25708941e) )
+	ROM_LOAD( "q05.h1",  0x8000, 0x4000, CRC(f9e1ebb1) SHA1(c88c1fc22f21b3e7d558c47de2716dac01fdd621) )
+	ROM_LOAD( "q07.h3",  0xc000, 0x4000, CRC(44502ca9) SHA1(452e38512a4463602d98301f660dc7bf662e49f4) )
+
+	ROM_REGION( 0x500, "proms", 0 )
+	ROM_LOAD( "d19.1i",  0x0000, 0x0100, CRC(8b83e7cf) SHA1(4fce779947f9f318023c7c54a71a4751f6bb8eb1) ) // red component
+	ROM_LOAD( "d21.3i",  0x0100, 0x0100, CRC(3556304a) SHA1(6f4fc3ef6b1b44278e7c8c1034ee4fbef90cf85a) ) // green component
+	ROM_LOAD( "d20.2i",  0x0200, 0x0100, CRC(676a0669) SHA1(14236a831204d52cdf8c2ef318a565d6c5587ce0) ) // blue component
+	ROM_LOAD( "d22.12h", 0x0300, 0x0100, CRC(872be05c) SHA1(1525303589d7ed909bc6e2827fbaa2c16ad4030b) ) // character lookup table
+	ROM_LOAD( "d18.f9",  0x0400, 0x0100, CRC(7396b374) SHA1(fedcc421a61d6623dc9c41b0a3e164efeb50ec7c) ) // sprite lookup table
+ROM_END
+
 ROM_START( mikiehs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "l14.11c", 0x6000, 0x2000, CRC(633f3a6d) SHA1(9255e0cb8d53773a52cade2fbd2e4c1968164313) )
@@ -394,6 +420,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, empty_init, ROT270, "Konami", "Mikie",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami", "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami", "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Mikie",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiek,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "bootleg", "Shin Ib Sa Won - Seok Dol I",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )

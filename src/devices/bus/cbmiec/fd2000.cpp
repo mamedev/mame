@@ -215,36 +215,32 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(fd2000_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(G65SC02PI2_TAG, M65C02, XTAL(24'000'000)/12)
-	MCFG_DEVICE_PROGRAM_MAP(fd2000_mem)
+void fd2000_device::add_common_devices(machine_config &config)
+{
+	M65C02(config, m_maincpu, XTAL(24'000'000)/12);
 
-	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL(24'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, fd2000_device, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, fd2000_device, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, fd2000_device, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, fd2000_device, via_pb_w))
+	via6522_device &via(VIA6522(config, G65SC22P2_TAG, XTAL(24'000'000)/12));
+	via.readpa_handler().set(FUNC(fd2000_device::via_pa_r));
+	via.readpb_handler().set(FUNC(fd2000_device::via_pb_r));
+	via.writepa_handler().set(FUNC(fd2000_device::via_pa_w));
+	via.writepb_handler().set(FUNC(fd2000_device::via_pb_w));
+}
 
-	MCFG_DP8473_ADD(DP8473V_TAG)
+void fd2000_device::device_add_mconfig(machine_config &config)
+{
+	add_common_devices(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fd2000_device::fd2000_mem);
+	DP8473(config, m_fdc, 0);
+	FLOPPY_CONNECTOR(config, DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
+}
 
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(fd4000_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(R65C02P4_TAG, M65C02, XTAL(24'000'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(fd4000_mem)
-
-	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL(24'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, fd2000_device, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, fd2000_device, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, fd2000_device, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, fd2000_device, via_pb_w))
-
-	MCFG_PC8477A_ADD(PC8477AV1_TAG)
-
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
-MACHINE_CONFIG_END
+void fd4000_device::device_add_mconfig(machine_config &config)
+{
+	add_common_devices(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fd4000_device::fd4000_mem);
+	PC8477A(config, m_fdc, 0);
+	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
+}
 
 
 //**************************************************************************

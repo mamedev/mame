@@ -535,12 +535,12 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
 	MCFG_MOS6530n_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
 #else
-	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_NTSC / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, a2600_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, a2600_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(*this, a2600_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
+	RIOT6532(config, m_riot, MASTER_CLOCK_NTSC / 3);
+	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->in_pb_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
@@ -583,12 +583,12 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
 	MCFG_MOS6530n_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
 #else
-	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_PAL / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(*this, a2600_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, a2600_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(*this, a2600_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
+	RIOT6532(config, m_riot, MASTER_CLOCK_PAL / 3);
+	m_riot->in_pa_callback().set(FUNC(a2600_state::switch_A_r));
+	m_riot->out_pa_callback().set(FUNC(a2600_state::switch_A_w));
+	m_riot->in_pb_callback().set(FUNC(a2600_state::riot_input_port_8_r));
+	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
+	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")

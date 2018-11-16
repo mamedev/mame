@@ -35,7 +35,7 @@ void igs017_igs031_device::map(address_map &map)
 READ8_MEMBER(igs017_igs031_device::i8255_r)
 {
 	if (m_i8255)
-		return m_i8255->read(space, offset);
+		return m_i8255->read(offset);
 
 	logerror("igs017_igs031_device::i8255_r(%02x) with no 8255 device\n", offset);
 	return 0;

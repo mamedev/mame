@@ -393,8 +393,7 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10) // assuming it's the same as champbas
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 0x10); // assuming it's the same as champbas
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -411,8 +410,7 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 

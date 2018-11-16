@@ -122,8 +122,7 @@ MACHINE_CONFIG_START(vt520_state::vt520)
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, RAM_TAG).set_default_size("256K");
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

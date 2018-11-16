@@ -1724,10 +1724,10 @@ void cli_frontend::display_help(const char *exename)
 					"other media which run on that hardware are also required.\n\n");
 	osd_printf_info("Usage:  %s [machine] [media] [software] [options]",exename);
 	osd_printf_info("\n\n"
-			"        %s -showusage    for a brief list of options\n"
-			"        %s -showconfig   for a list of configuration options\n"
+			"        %s -showusage    for a list of options\n"
+			"        %s -showconfig   to show your current %s.ini\n"
 			"        %s -listmedia    for a full list of supported media\n"
 			"        %s -createconfig to create a %s.ini\n\n"
 			"For usage instructions, please consult the files config.txt and windows.txt.\n",exename,
-			exename,exename,exename,emulator_info::get_configname());
+			exename,emulator_info::get_configname(),exename,exename,emulator_info::get_configname());
 }

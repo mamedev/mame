@@ -106,7 +106,7 @@ READ8_MEMBER( tiki100_state::iorq_r )
 		break;
 
 	case 0x04: // FLOP
-		data = m_fdc->read(space, offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 		break;
 
 	case 0x05: // VIPS
@@ -149,7 +149,7 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 		break;
 
 	case 0x04: // FLOP
-		m_fdc->write(space, offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 		break;
 
 	case 0x05: // VIPS
@@ -702,10 +702,10 @@ void tiki100_state::machine_reset()
 
 MACHINE_CONFIG_START(tiki100_state::tiki100)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tiki100_mem)
-	MCFG_DEVICE_IO_MAP(tiki100_io)
-	MCFG_Z80_DAISY_CHAIN(tiki100_daisy_chain)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tiki100_state::tiki100_mem);
+	m_maincpu->set_addrmap(AS_IO, &tiki100_state::tiki100_io);
+	m_maincpu->set_daisy_config(tiki100_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -724,39 +724,39 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 	MCFG_TIKI100_BUS_SLOT_ADD("slot3", nullptr)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, 8_MHz_XTAL / 4)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80DART(config, m_dart, 8_MHz_XTAL / 4);
+	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_dart->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 8_MHz_XTAL / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8("cent_data_in", input_buffer_device, bus_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, tiki100_state, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, tiki100_state, pio_pb_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 4);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set("cent_data_in", FUNC(input_buffer_device::bus_r));
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pb_callback().set(FUNC(tiki100_state::pio_pb_r));
+	m_pio->out_pb_callback().set(FUNC(tiki100_state::pio_pb_w));
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, tiki100_state, bar0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, tiki100_state, bar2_w))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(tiki100_state::bar0_w));
+	m_ctc->zc_callback<1>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	m_ctc->zc_callback<2>().set(FUNC(tiki100_state::bar2_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 4))
 
-	MCFG_DEVICE_ADD(FD1797_TAG, FD1797, 8_MHz_XTAL / 8) // FD1767PL-02 or FD1797-PL
+	FD1797(config, m_fdc, 8_MHz_XTAL / 8); // FD1767PL-02 or FD1797-PL
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->set_data_input_buffer("cent_data_in");
@@ -774,14 +774,13 @@ MACHINE_CONFIG_START(tiki100_state::tiki100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8912_TAG, AY8912, 8_MHz_XTAL / 4)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tiki100_state, video_scroll_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_psg, 8_MHz_XTAL / 4);
+	m_psg->set_flags(AY8910_SINGLE_OUTPUT);
+	m_psg->port_a_write_callback().set(FUNC(tiki100_state::video_scroll_w));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tiki100")

@@ -30,7 +30,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "bus/rs232/rs232.h"
-#include "machine/adc0844.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
 #include "machine/nvram.h"
@@ -270,7 +269,7 @@ void micro3d_state::drmath_data(address_map &map)
 	map(0x01400000, 0x01400003).rw(FUNC(micro3d_state::micro3d_pipe_r), FUNC(micro3d_state::micro3d_fifo_w));
 	map(0x01600000, 0x01600003).w(FUNC(micro3d_state::drmath_intr2_ack));
 	map(0x01800000, 0x01800003).w(FUNC(micro3d_state::micro3d_alt_fifo_w));
-	map(0x03fffff0, 0x03fffff7).rw("scc", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
+	map(0x03fffff0, 0x03ffffff).rw("scc", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
 }
 
 /*************************************
@@ -319,12 +318,8 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_DEVICE_PROGRAM_MAP(drmath_prg)
 	MCFG_DEVICE_DATA_MAP(drmath_data)
 
-	MCFG_DEVICE_ADD("scc", SCC8530N, 32_MHz_XTAL / 2 / 2)
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("monitor_drmath", rs232_port_device, write_txd))
-
-	rs232_port_device &monitor_drmath(RS232_PORT(config, "monitor_drmath", default_rs232_devices, nullptr));
-	monitor_drmath.rxd_handler().set("scc", FUNC(z80scc_device::rxb_w));
-	monitor_drmath.dcd_handler().set("scc", FUNC(z80scc_device::dcdb_w)).exor(1);
+	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
+	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("audiocpu", I8051, 11.0592_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
@@ -352,7 +347,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	//mfp.out_tao_cb().append("mfp", FUNC(mc68901_device::tc_w));
 	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::tbi_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -363,46 +358,50 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("uart", MC2661, 40_MHz_XTAL / 8) // actually SCN2651
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("monitor_vgb", rs232_port_device, write_txd))
+	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
+	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("monitor_vgb", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", mc2661_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", mc2661_device, dsr_w))
+	rs232_port_device &monitor_host(RS232_PORT(config, "monitor_host", default_rs232_devices, nullptr)); // J2 (4-pin molex)
+	monitor_host.rxd_handler().set("duart", FUNC(mc68681_device::rx_a_w));
 
-	MCFG_DEVICE_ADD("monitor_host", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", mc68681_device, rx_a_w))
+	rs232_port_device &monitor_drmath(RS232_PORT(config, "monitor_drmath", default_rs232_devices, nullptr)); // J4 (4-pin molex)
+	monitor_drmath.rxd_handler().set("scc", FUNC(z80scc_device::rxb_w));
+	monitor_drmath.dcd_handler().set("scc", FUNC(z80scc_device::dcdb_w));
 
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(WRITELINE("mfp", mc68901_device, i3_w))
-	MCFG_ADC0844_CH1_CB(IOPORT("THROTTLE"))
-	MCFG_ADC0844_CH2_CB(READ8(*this, micro3d_state, adc_volume_r))
+	rs232_port_device &monitor_vgb(RS232_PORT(config, "monitor_vgb", default_rs232_devices, nullptr)); // J3 (4-pin molex)
+	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(mc2661_device::rx_w));
+	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(mc2661_device::dsr_w));
+
+	ADC0844(config, m_adc, 0);
+	m_adc->intr_callback().set("mfp", FUNC(mc68901_device::i3_w));
+	m_adc->ch1_callback().set_ioport("THROTTLE");
+	m_adc->ch2_callback().set(FUNC(micro3d_state::adc_volume_r));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	UPD7759(config, m_upd7759)
-			.add_route(ALL_OUTPUTS, "lspeaker", 0.35)
-			.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
-	YM2151(config, "ym2151", 3.579545_MHz_XTAL)
-			.add_route(0, "lspeaker", 0.35)
-			.add_route(1, "rspeaker", 0.35);
+	ym2151_device &ym2151(YM2151(config, "ym2151", 3.579545_MHz_XTAL));
+	ym2151.add_route(0, "lspeaker", 0.35);
+	ym2151.add_route(1, "rspeaker", 0.35);
 
-	MICRO3D_SOUND(config, m_noise_1)
-			.add_route(0, "lspeaker", 1.0)
-			.add_route(1, "rspeaker", 1.0);
+	MICRO3D_SOUND(config, m_noise_1);
+	m_noise_1->add_route(0, "lspeaker", 1.0);
+	m_noise_1->add_route(1, "rspeaker", 1.0);
 
-	MICRO3D_SOUND(config, m_noise_2)
-			.add_route(0, "lspeaker", 1.0)
-			.add_route(1, "rspeaker", 1.0);
+	MICRO3D_SOUND(config, m_noise_2);
+	m_noise_2->add_route(0, "lspeaker", 1.0);
+	m_noise_2->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(micro3d_state::botss11)
+void micro3d_state::botss11(machine_config &config)
+{
 	micro3d(config);
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0844_CH1_CB(CONSTANT(0))
-MACHINE_CONFIG_END
+	m_adc->ch1_callback().set_constant(0);
+}
 
 
 /*************************************

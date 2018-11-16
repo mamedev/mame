@@ -430,24 +430,24 @@ WRITE16_MEMBER(dec0_state::midres_sound_w)
 void dec0_state::dec0_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0x240000, 0x240007).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
-	map(0x240010, 0x240017).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x242000, 0x24207f).rw(m_tilegen1, FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x242400, 0x2427ff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x240000, 0x240007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
+	map(0x240010, 0x240017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x242000, 0x24207f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x242400, 0x2427ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
 	map(0x242800, 0x243fff).ram();                                                     /* Robocop only */
-	map(0x244000, 0x245fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x244000, 0x245fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 
-	map(0x246000, 0x246007).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_0_w));                                  /* first tile layer */
-	map(0x246010, 0x246017).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x248000, 0x24807f).rw(m_tilegen2, FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x248400, 0x2487ff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x24a000, 0x24a7ff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x246000, 0x246007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));                                  /* first tile layer */
+	map(0x246010, 0x246017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x248000, 0x24807f).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x248400, 0x2487ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x24a000, 0x24a7ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 
-	map(0x24c000, 0x24c007).w(m_tilegen3, FUNC(deco_bac06_device::pf_control_0_w));                              /* second tile layer */
-	map(0x24c010, 0x24c017).w(m_tilegen3, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x24c800, 0x24c87f).rw(m_tilegen3, FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x24cc00, 0x24cfff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x24d000, 0x24d7ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x24c000, 0x24c007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_0_w));                              /* second tile layer */
+	map(0x24c010, 0x24c017).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x24c800, 0x24c87f).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x24cc00, 0x24cfff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x24d000, 0x24d7ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
@@ -461,27 +461,36 @@ void dec0_state::dec0_map(address_map &map)
 	map(0xffc000, 0xffc7ff).ram().share("spriteram");                               /* Sprites */
 }
 
+void dec0_state::robocop_map(address_map &map)
+{
+	dec0_map(map);
+	map(0x180000, 0x180fff).rw(FUNC(dec0_state::robocop_68000_share_r), FUNC(dec0_state::robocop_68000_share_w));
+}
+
 void dec0_state::robocop_sub_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x1f0000, 0x1f1fff).ram();                                 /* Main ram */
 	map(0x1f2000, 0x1f3fff).ram().share("robocop_shared");  /* Shared ram */
-	map(0x1ff400, 0x1ff403).w(m_subcpu, FUNC(h6280_device::irq_status_w));
+}
+
+void dec0_state::hippodrm_map(address_map &map)
+{
+	dec0_map(map);
+	map(0x180000, 0x18003f).rw(FUNC(dec0_state::hippodrm_68000_share_r), FUNC(dec0_state::hippodrm_68000_share_w));
+	map(0xffc800, 0xffcfff).w(FUNC(dec0_state::sprite_mirror_w));
 }
 
 void dec0_state::hippodrm_sub_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x180000, 0x18001f).ram().share("hippodrm_shared");
-	map(0x1a0000, 0x1a0007).w(m_tilegen3, FUNC(deco_bac06_device::pf_control0_8bit_packed_w));
-	map(0x1a0010, 0x1a001f).w(m_tilegen3, FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
-	map(0x1a1000, 0x1a17ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
+	map(0x1a0000, 0x1a0007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control0_8bit_packed_w));
+	map(0x1a0010, 0x1a001f).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control1_8bit_swap_w));
+	map(0x1a1000, 0x1a17ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_8bit_swap_r), FUNC(deco_bac06_device::pf_data_8bit_swap_w));
 	map(0x1d0000, 0x1d00ff).rw(FUNC(dec0_state::hippodrm_prot_r), FUNC(dec0_state::hippodrm_prot_w));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8"); /* Main ram */
-	map(0x1ff400, 0x1ff403).w(m_subcpu, FUNC(h6280_device::irq_status_w));
-	map(0x1ff402, 0x1ff403).portr("VBLANK");
+	map(0x1f0000, 0x1f1fff).ram(); /* Main ram */
 }
-
 
 
 READ16_MEMBER(dec0_state::slyspy_controls_r)
@@ -576,26 +585,26 @@ void dec0_state::slyspy_protection_map(address_map &map)
 	map(0x04000, 0x04001).mirror(0x30000).r(FUNC(dec0_state::slyspy_state_r)).nopw();
 	map(0x0a000, 0x0a001).mirror(0x30000).w(FUNC(dec0_state::slyspy_state_w));
 	// Default state (called by Traps 1, 3, 4, 7, C)
-	map(0x00000, 0x00007).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x00010, 0x00017).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x02000, 0x0207f).w(m_tilegen2, FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x02400, 0x027ff).w(m_tilegen2, FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x06000, 0x07fff).w(m_tilegen2, FUNC(deco_bac06_device::pf_data_w));
-	map(0x08000, 0x08007).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x08010, 0x08017).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x0c000, 0x0c07f).w(m_tilegen1, FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x0c400, 0x0c7ff).w(m_tilegen1, FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x0e000, 0x0ffff).w(m_tilegen1, FUNC(deco_bac06_device::pf_data_w));
+	map(0x00000, 0x00007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));
+	map(0x00010, 0x00017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x02000, 0x0207f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x02400, 0x027ff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x06000, 0x07fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
+	map(0x08000, 0x08007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));
+	map(0x08010, 0x08017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x0c000, 0x0c07f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x0c400, 0x0c7ff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x0e000, 0x0ffff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
 	// State 1 (Called by Trap 9)
-	map(0x18000, 0x19fff).w(m_tilegen1, FUNC(deco_bac06_device::pf_data_w));
-	map(0x1c000, 0x1dfff).w(m_tilegen2, FUNC(deco_bac06_device::pf_data_w));
+	map(0x18000, 0x19fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	map(0x1c000, 0x1dfff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
 	// State 2 (Called by Trap A)
-	map(0x20000, 0x21fff).w(m_tilegen2, FUNC(deco_bac06_device::pf_data_w));
-	map(0x22000, 0x23fff).w(m_tilegen1, FUNC(deco_bac06_device::pf_data_w));
-	map(0x2e000, 0x2ffff).w(m_tilegen1, FUNC(deco_bac06_device::pf_data_w));
+	map(0x20000, 0x21fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
+	map(0x22000, 0x23fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	map(0x2e000, 0x2ffff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
 	// State 3 (Called by Trap B)
-	map(0x30000, 0x31fff).w(m_tilegen1, FUNC(deco_bac06_device::pf_data_w));
-	map(0x38000, 0x39fff).w(m_tilegen2, FUNC(deco_bac06_device::pf_data_w));
+	map(0x30000, 0x31fff).w(m_tilegen[0], FUNC(deco_bac06_device::pf_data_w));
+	map(0x38000, 0x39fff).w(m_tilegen[1], FUNC(deco_bac06_device::pf_data_w));
 }
 
 void dec0_state::slyspy_map(address_map &map)
@@ -606,11 +615,11 @@ void dec0_state::slyspy_map(address_map &map)
 	map(0x240000, 0x24ffff).m(m_pfprotect, FUNC(address_map_bank_device::amap16));
 
 	/* Pf3 is unaffected by protection */
-	map(0x300000, 0x300007).w(m_tilegen3, FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x300010, 0x300017).w(m_tilegen3, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x300800, 0x30087f).rw(m_tilegen3, FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x300c00, 0x300fff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
-	map(0x301000, 0x3017ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x300000, 0x300007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_0_w));
+	map(0x300010, 0x300017).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x300800, 0x30087f).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x300c00, 0x300fff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x301000, 0x3017ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 
 	map(0x304000, 0x307fff).ram().share("ram"); /* Sly spy main ram */
 	map(0x308000, 0x3087ff).ram().share("spriteram");   /* Sprites */
@@ -633,24 +642,24 @@ void dec0_state::midres_map(address_map &map)
 	map(0x180008, 0x18000f).nopw(); /* ?? watchdog ?? */
 	map(0x1a0001, 0x1a0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	map(0x200000, 0x200007).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x200010, 0x200017).w(m_tilegen2, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x220000, 0x2207ff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-	map(0x220800, 0x220fff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w)); /* mirror address used in end sequence */
-	map(0x240000, 0x24007f).rw(m_tilegen2, FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x240400, 0x2407ff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x200000, 0x200007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));
+	map(0x200010, 0x200017).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x220000, 0x2207ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x220800, 0x220fff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w)); /* mirror address used in end sequence */
+	map(0x240000, 0x24007f).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x240400, 0x2407ff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
 
-	map(0x280000, 0x280007).w(m_tilegen3, FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x280010, 0x280017).w(m_tilegen3, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x2a0000, 0x2a07ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-	map(0x2c0000, 0x2c007f).rw(m_tilegen3, FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x2c0400, 0x2c07ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x280000, 0x280007).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_0_w));
+	map(0x280010, 0x280017).w(m_tilegen[2], FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x2a0000, 0x2a07ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x2c0000, 0x2c007f).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x2c0400, 0x2c07ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
 
-	map(0x300000, 0x300007).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_0_w));
-	map(0x300010, 0x300017).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x320000, 0x321fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
-	map(0x340000, 0x34007f).rw(m_tilegen1, FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
-	map(0x340400, 0x3407ff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
+	map(0x300000, 0x300007).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_0_w));
+	map(0x300010, 0x300017).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x320000, 0x321fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x340000, 0x34007f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
+	map(0x340400, 0x3407ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
 }
 
 void dec0_state::midresb_map(address_map &map)
@@ -682,8 +691,7 @@ void dec0_state::slyspy_s_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x080000, 0x0fffff).m(m_sndprotect, FUNC(address_map_bank_device::amap8));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
 }
 
 // sly spy sound state protection machine emulation
@@ -742,18 +750,16 @@ void dec0_state::midres_s_map(address_map &map)
 	map(0x118000, 0x118001).w("ym1", FUNC(ym2203_device::write));
 	map(0x130000, 0x130001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x138000, 0x138001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
 }
 
 
 
 void dec0_automat_state::machine_start()
 {
-	m_adpcm_toggle1 = false;
-	m_adpcm_toggle2 = false;
-	save_item(NAME(m_adpcm_toggle1));
-	save_item(NAME(m_adpcm_toggle2));
+	m_adpcm_toggle[0] = false;
+	m_adpcm_toggle[1] = false;
+	save_item(NAME(m_adpcm_toggle));
 	save_item(NAME(m_automat_scroll_regs));
 
 	m_soundbank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
@@ -785,19 +791,19 @@ void dec0_automat_state::automat_map(address_map &map)
 	map(0x242000, 0x24207f).ram();
 	map(0x242400, 0x2427ff).ram();
 	map(0x242800, 0x243fff).ram();
-	map(0x244000, 0x245fff).ram().rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x244000, 0x245fff).ram().rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 
 	map(0x246000, 0x246007).ram();         /* first tile layer */
 	map(0x246010, 0x246017).ram();
 	map(0x248000, 0x24807f).ram();
 	map(0x248400, 0x2487ff).ram();
-	map(0x24a000, 0x24a7ff).ram().rw(m_tilegen2, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x24a000, 0x24a7ff).ram().rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 
 	map(0x24c000, 0x24c007).ram();         /* second tile layer */
 	map(0x24c010, 0x24c017).ram();
 	map(0x24c800, 0x24c87f).ram();
 	map(0x24cc00, 0x24cfff).ram();
-	map(0x24d000, 0x24d7ff).ram().rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x24d000, 0x24d7ff).ram().rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
@@ -821,13 +827,13 @@ void dec0_automat_state::secretab_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 //  AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_0_w)
 //  AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_1_w)
-	map(0x246000, 0x247fff).rw(m_tilegen2, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x246000, 0x247fff).rw(m_tilegen[1], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 //  AM_RANGE(0x240000, 0x24007f) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_colscroll_r, pf_colscroll_w)
 //  AM_RANGE(0x240400, 0x2407ff) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
 
 //  AM_RANGE(0x200000, 0x300007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)
 //  AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
-	map(0x24e000, 0x24ffff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x24e000, 0x24ffff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 //  AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_colscroll_r, pf_colscroll_w)
 //  AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
 
@@ -838,7 +844,7 @@ void dec0_automat_state::secretab_map(address_map &map)
 	map(0x300010, 0x300017).ram();
 	map(0x300800, 0x30087f).ram();
 	map(0x300c00, 0x300fff).ram();
-	map(0x301000, 0x3017ff).rw(m_tilegen3, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x301000, 0x3017ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x301800, 0x307fff).ram().share("ram"); /* Sly spy main ram */
 	map(0x310000, 0x3107ff).rw(FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
 	map(0xb08000, 0xb08fff).ram().share("spriteram"); /* Sprites */
@@ -853,9 +859,9 @@ void dec0_automat_state::automat_s_map(address_map &map)
 	map(0xc800, 0xc801).rw("2203a", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd000, 0xd001).rw("2203b", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe000, 0xe000).w(m_adpcm_select2, FUNC(ls157_device::ba_w));
+	map(0xe000, 0xe000).w(m_adpcm_select[1], FUNC(ls157_device::ba_w));
 	map(0xe800, 0xe800).w(FUNC(dec0_automat_state::sound_bankswitch_w));
-	map(0xf000, 0xf000).w(m_adpcm_select1, FUNC(ls157_device::ba_w));
+	map(0xf000, 0xf000).w(m_adpcm_select[0], FUNC(ls157_device::ba_w));
 }
 
 void dec0_automat_state::secretab_s_map(address_map &map)
@@ -866,9 +872,9 @@ void dec0_automat_state::secretab_s_map(address_map &map)
 	map(0xc800, 0xc801).rw("2203a", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd000, 0xd001).rw("ym3812", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe000, 0xe000).w(m_adpcm_select2, FUNC(ls157_device::ba_w));
+	map(0xe000, 0xe000).w(m_adpcm_select[1], FUNC(ls157_device::ba_w));
 	map(0xe800, 0xe800).w(FUNC(dec0_automat_state::sound_bankswitch_w));
-	map(0xf000, 0xf000).w(m_adpcm_select1, FUNC(ls157_device::ba_w));
+	map(0xf000, 0xf000).w(m_adpcm_select[0], FUNC(ls157_device::ba_w));
 }
 
 /******************************************************************************/
@@ -1252,9 +1258,6 @@ static INPUT_PORTS_START( hippodrm )
 	PORT_DIPSETTING(      0x0000, "3 Dots" )    // 3 Dots less
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" ) // Always OFF
 
-	PORT_START("VBLANK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
 	PORT_INCLUDE( rotary_null )
 INPUT_PORTS_END
 
@@ -1274,6 +1277,9 @@ static INPUT_PORTS_START( ffantasybl )
 	PORT_DIPNAME( 0x4000, 0x4000, "Enemy Power Decrease on Continue" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, "2 Dots" )    // 2 Dots less
 	PORT_DIPSETTING(      0x0000, DEF_STR( None ) ) // 0 Dot less
+
+	PORT_START("VBLANK")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Game does not want vblank here
@@ -1578,10 +1584,6 @@ static GFXDECODE_START( gfx_midres )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,   0, 16 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-
-
-
-
 static GFXDECODE_START( gfx_automat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, automat_tilelayout3, 512, 16 )  /* Tiles 16x16 */
@@ -1635,8 +1637,8 @@ MACHINE_CONFIG_START(dec0_state::dec0_base)
 	MCFG_DECO_MXC06_GFX_REGION(3)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dec0_state::dec0)
@@ -1705,8 +1707,8 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(dec0_automat_state::sound_bankswitch_w)
 {
-	m_msm1->reset_w(BIT(data, 3));
-	m_msm2->reset_w(BIT(data, 4));
+	m_msm[0]->reset_w(BIT(data, 3));
+	m_msm[1]->reset_w(BIT(data, 4));
 
 	m_soundbank->set_entry(data & 7);
 }
@@ -1716,9 +1718,9 @@ WRITE_LINE_MEMBER(dec0_automat_state::msm1_vclk_cb)
 	if (!state)
 		return;
 
-	m_adpcm_toggle1 = !m_adpcm_toggle1;
-	m_adpcm_select1->select_w(m_adpcm_toggle1);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_adpcm_toggle1);
+	m_adpcm_toggle[0] = !m_adpcm_toggle[0];
+	m_adpcm_select[0]->select_w(m_adpcm_toggle[0]);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_adpcm_toggle[0]);
 }
 
 WRITE_LINE_MEMBER(dec0_automat_state::msm2_vclk_cb)
@@ -1726,8 +1728,8 @@ WRITE_LINE_MEMBER(dec0_automat_state::msm2_vclk_cb)
 	if (!state)
 		return;
 
-	m_adpcm_toggle2 = !m_adpcm_toggle2;
-	m_adpcm_select2->select_w(m_adpcm_toggle2);
+	m_adpcm_toggle[1] = !m_adpcm_toggle[1];
+	m_adpcm_select[1]->select_w(m_adpcm_toggle[1]);
 }
 
 
@@ -1773,8 +1775,8 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("2203a", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -1788,11 +1790,11 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm1", msm5205_device, data_w))
+	LS157(config, m_adpcm_select[0], 0);
+	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm2", msm5205_device, data_w))
+	LS157(config, m_adpcm_select[1], 0);
+	m_adpcm_select[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dec0_automat_state, msm1_vclk_cb))
@@ -1848,8 +1850,8 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("2203a", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -1860,11 +1862,11 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 	MCFG_DEVICE_ADD("ym3812", YM3812, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm1", msm5205_device, data_w))
+	LS157(config, m_adpcm_select[0], 0);
+	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm2", msm5205_device, data_w))
+	LS157(config, m_adpcm_select[1], 0);
+	m_adpcm_select[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dec0_automat_state, msm1_vclk_cb))
@@ -1927,8 +1929,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::robocop)
 	dec0(config);
 
-	MCFG_DEVICE_ADD("sub", H6280, XTAL(21'477'272) / 16)
-	MCFG_DEVICE_PROGRAM_MAP(robocop_sub_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(robocop_map)
+
+	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
+	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::robocop_sub_map);
+	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))  /* Interleave between HuC6280 & 68000 */
 
@@ -1948,21 +1954,27 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::hippodrm)
 	dec0(config);
 
-	MCFG_DEVICE_ADD("sub", H6280, XTAL(21'477'272) / 16)
-	MCFG_DEVICE_PROGRAM_MAP(hippodrm_sub_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hippodrm_map)
+
+	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
+	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
+	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("sub", 1)) /* VBL */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dec0_state::ffantasybl)
 	dec0(config);
 
-//  MCFG_DEVICE_ADD("sub", H6280, XTAL(21'477'272) / 16)
-//  MCFG_DEVICE_PROGRAM_MAP(hippodrm_sub_map)
+//  H6280(config, m_subcpu, XTAL(21'477'272) / 16);
+//  m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
+//  m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
 
@@ -1989,23 +2001,12 @@ MACHINE_CONFIG_START(dec0_state::slyspy)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold) /* VBL, apparently it auto-acks */
 
 	// TODO: both games doesn't like /3 here, MT #06740
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(12'000'000)/2/2) /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
-	MCFG_DEVICE_PROGRAM_MAP(slyspy_s_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(12'000'000)/2/2)); /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
+	audiocpu.set_addrmap(AS_PROGRAM, &dec0_state::slyspy_s_map);
+	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DEVICE_ADD("pfprotect", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(slyspy_protection_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-
-	MCFG_DEVICE_ADD("sndprotect", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(slyspy_sound_protection_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000)
-
+	ADDRESS_MAP_BANK(config, "pfprotect").set_map(&dec0_state::slyspy_protection_map).set_options(ENDIANNESS_BIG, 16, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "sndprotect").set_map(&dec0_state::slyspy_sound_protection_map).set_options(ENDIANNESS_LITTLE, 8, 21, 0x80000);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2022,8 +2023,9 @@ MACHINE_CONFIG_START(dec0_state::midres)
 	MCFG_DEVICE_PROGRAM_MAP(midres_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(24'000'000)/4/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(midres_s_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(24'000'000)/4/3)); /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
+	audiocpu.set_addrmap(AS_PROGRAM, &dec0_state::midres_s_map);
+	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2361,7 +2363,7 @@ ROM_START( drgninjab2 )
 	ROM_LOAD( "a15.7b",   0x8000, 0x8000, CRC(82007af2) SHA1(f0db1b1dab199df402a7590e56d4d5ab4baca803) ) // 99.612427%
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* 68705 microcontroller */
-	ROM_LOAD( "mc68705r3p",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "68705r3.0m",     0x0000, 0x1000, CRC(34bc5e7f) SHA1(7231dd7eb9b5152a287e1bcceb3c3a0b35f441af) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "a22.9m",  0x00000, 0x08000, CRC(6791bc20) SHA1(7240b2688cda04ee9ea331472a84fbffc85b8e90) ) // 99.996948%
@@ -3763,11 +3765,11 @@ GAME( 1987, hbarrelw,   hbarrel,  hbarrel,    hbarrel,    dec0_state, init_hbarr
 GAME( 1988, baddudes,   0,        baddudes,   baddudes,   dec0_state, init_hbarrel,    ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, drgninja,   baddudes, baddudes,   drgninja,   dec0_state, init_hbarrel,    ROT0,   "Data East Corporation", "Dragonninja (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, birdtry,    0,        birdtry,    birdtry,    dec0_state, init_birdtry,    ROT270, "Data East Corporation", "Birdie Try (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protection controls game related data, impossible to emulate without a working PCB
-GAME( 1988, robocop,    0,        robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopw,   robocop,  robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopj,   robocop,  robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopu,   robocop,  robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    dec0_state, init_robocop,    ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocop,    0,        robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopw,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopj,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopu,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East USA",         "Robocop (US revision 0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hippodrm,   0,        hippodrm,   hippodrm,   dec0_state, init_hippodrm,   ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasy,   hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasyj,  hippodrm, hippodrm,   ffantasy,   dec0_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
@@ -3787,7 +3789,7 @@ GAME( 1990, bouldashj,  bouldash, slyspy,     bouldash,   dec0_state, init_slysp
 // bootlegs
 
 // more or less just an unprotected versions of the game, everything intact
-GAME( 1988, robocopb,   robocop,  robocopb,   robocop,    dec0_state, init_robocop,    ROT0, "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robocopb,   robocop,  robocopb,   robocop,    dec0_state, empty_init,      ROT0, "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 
@@ -3795,8 +3797,8 @@ GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, init_drgni
 GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
 GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, init_ffantasybl, ROT0, "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
-GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
+GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text), 68705 dumped but not hooked up
 
 // these are different to the above but quite similar to each other
-GAME( 1988, automat,    robocop,  automat,    robocop,    dec0_automat_state, init_robocop, ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
+GAME( 1988, automat,    robocop,  automat,    robocop,    dec0_automat_state, empty_init,   ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
 GAME( 1989, secretab,   secretag, secretab,   slyspy,     dec0_automat_state, empty_init,   ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

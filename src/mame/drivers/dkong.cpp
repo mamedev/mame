@@ -1701,13 +1701,13 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
 
-	MCFG_DEVICE_ADD("dma8257", I8257, CLOCK_1H)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, dkong_state, busreq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, dkong_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, dkong_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_1_CB(READ8(*this, dkong_state, p8257_ctl_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, dkong_state, p8257_ctl_w))
-	MCFG_I8257_REVERSE_RW_MODE(1) // why?
+	I8257(config, m_dma8257, CLOCK_1H);
+	m_dma8257->out_hrq_cb().set(FUNC(dkong_state::busreq_w));
+	m_dma8257->in_memr_cb().set(FUNC(dkong_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(dkong_state::memory_write_byte));
+	m_dma8257->in_ior_cb<1>().set(FUNC(dkong_state::p8257_ctl_r));
+	m_dma8257->out_iow_cb<0>().set(FUNC(dkong_state::p8257_ctl_w));
+	m_dma8257->set_reverse_rw_mode(1); // why?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -1761,32 +1761,36 @@ MACHINE_CONFIG_START(dkong_state::dkong2b)
 	/* sound hardware */
 	dkong2b_audio(config);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dkong_state::dk_braze)
+void dkong_state::dk_braze(machine_config &config)
+{
 	dkong2b(config);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
 
-MACHINE_CONFIG_START(dkong_state::dkj_braze)
+void dkong_state::dkj_braze(machine_config &config)
+{
 	dkongjr(config);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
 
-MACHINE_CONFIG_START(dkong_state::ddk_braze)
+void dkong_state::ddk_braze(machine_config &config)
+{
 	dkj_braze(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,ddk)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::dk3_braze)
+void dkong_state::dk3_braze(machine_config &config)
+{
 	dkong3(config);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
 
 MACHINE_CONFIG_START(dkong_state::dkong3)
 
@@ -1797,10 +1801,10 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
 
-	MCFG_DEVICE_ADD("z80dma", Z80DMA, CLOCK_1H)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, dkong_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, dkong_state, memory_write_byte))
+	Z80DMA(config, m_z80dma, CLOCK_1H);
+	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_z80dma->in_mreq_callback().set(FUNC(dkong_state::memory_read_byte));
+	m_z80dma->out_mreq_callback().set(FUNC(dkong_state::memory_write_byte));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1830,7 +1834,7 @@ MACHINE_CONFIG_START(dkong_state::dkongjr)
 	/* sound hardware */
 	dkongjr_audio(config);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::pestplce)
@@ -1869,9 +1873,8 @@ MACHINE_CONFIG_START(dkong_state::s2650)
 
 	m_screen->screen_vblank().set(FUNC(dkong_state::s2650_interrupt));
 
-	MCFG_DEVICE_MODIFY("dma8257")
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, dkong_state, hb_dma_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, dkong_state, hb_dma_write_byte))
+	m_dma8257->in_memr_cb().set(FUNC(dkong_state::hb_dma_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(dkong_state::hb_dma_write_byte));
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
 MACHINE_CONFIG_END

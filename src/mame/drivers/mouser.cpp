@@ -202,13 +202,12 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	MCFG_DEVICE_IO_MAP(mouser_sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mouser_state, mouser_sound_nmi_assert,  4*60) /* ??? This controls the sound tempo */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // type unconfirmed
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mouser_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mouser_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mouser_state, flip_screen_y_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // type unconfirmed
+	mainlatch.q_out_cb<0>().set(FUNC(mouser_state::nmi_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mouser_state::flip_screen_x_w));
+	mainlatch.q_out_cb<2>().set(FUNC(mouser_state::flip_screen_y_w));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -227,11 +226,9 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 4000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay1", 4000000/2).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 4000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay2", 4000000/2).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

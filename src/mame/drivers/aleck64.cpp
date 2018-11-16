@@ -80,7 +80,7 @@ Notes:
 The cart contains:
                    CIC-NUS-5101: Boot protection chip
                    BK4D-NUS    : Similar to the save chip used in N64 console carts
-                   NUS-ZHAJ.U3 : 64Mbit 28 pin DIP serial MASKROM
+                   NUS-ZHAJ.U3 : 64Mbit 28 pin DIP serial mask ROM
 
       - RCA audio plugs output stereo sound. Regular mono sound is output
         via the standard JAMMA connector also.
@@ -150,7 +150,7 @@ PCB Layout
 Notes:
       Hsync      : 15.73kHz
       VSync      : 60Hz
-      *          : Unpopulated socket for 8M - 32M 42 pin DIP MASKROM
+      *          : Unpopulated socket for 8M - 32M 42 pin DIP mask ROM
       O          : Push-button reset switch
       X          : Connectors for special (Aleck64?) digital joysticks
       CPU-NUS A  : Labelled on the PCB as "VR4300"
@@ -158,8 +158,8 @@ Notes:
 
       ROMs
       ----
-      TET-01M.U5 : 8Mbit 42 pin MASKROM
-      NUS-CZAJ.U4: 128Mbit 28 pin DIP serial MASKROM
+      TET-01M.U5 : 8Mbit 42 pin mask ROM
+      NUS-CZAJ.U4: 128Mbit 28 pin DIP serial mask ROM
       AT24C01.U34: 128bytes x 8 bit serial EEPROM
 
       - RCA audio plugs output stereo sound. Regular mono sound is output
@@ -169,7 +169,7 @@ Notes:
         logic devices that most people need not be concerned about :-)
 
       - The Seta/N64 Aleck64 hardware is similar also, but instead of the high capacity
-        serial MASKROM being on the main board, it's in a cart that plugs into a slot.
+        serial mask ROM being on the main board, it's in a cart that plugs into a slot.
 
 */
 

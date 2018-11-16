@@ -445,8 +445,8 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 
 	/* devices */
 
-	MCFG_DEVICE_ADD("uic", AM9519, 0)
-	MCFG_AM9519_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	AM9519(config, m_uic, 0);
+	m_uic->out_int_callback().set_inputline("maincpu", 0);
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w)).invert();
@@ -454,14 +454,14 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	FLOPPY_CONNECTOR(config, m_fdd0, bosscd_floppies, "525qd", floppy_image_device::default_floppy_formats);
 	m_fdd0->enable_sound(true);
 
-	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, olyboss_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, olyboss_state, dma_mem_r))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, olyboss_state, dma_mem_w))
-	MCFG_I8257_IN_IOR_0_CB(READ8(*this, olyboss_state, fdcdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, olyboss_state, fdcdma_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, olyboss_state, crtcdma_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, olyboss_state, tc_w))
+	I8257(config, m_dma, XTAL(4'000'000));
+	m_dma->out_hrq_cb().set(FUNC(olyboss_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(olyboss_state::dma_mem_r));
+	m_dma->out_memw_cb().set(FUNC(olyboss_state::dma_mem_w));
+	m_dma->in_ior_cb<0>().set(FUNC(olyboss_state::fdcdma_r));
+	m_dma->out_iow_cb<0>().set(FUNC(olyboss_state::fdcdma_w));
+	m_dma->out_iow_cb<2>().set(FUNC(olyboss_state::crtcdma_w));
+	m_dma->out_tc_cb().set(FUNC(olyboss_state::tc_w));
 
 	UPD3301(config, m_crtc, XTAL(14'318'181));
 	m_crtc->set_character_width(8);
@@ -470,9 +470,9 @@ MACHINE_CONFIG_START( olyboss_state::olybossd )
 	m_crtc->int_wr_callback().set(m_uic, FUNC(am9519_device::ireq0_w)).invert();
 	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, olyboss_state, keyboard_read))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, olyboss_state, ppic_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(olyboss_state::keyboard_read));
+	m_ppi->out_pc_callback().set(FUNC(olyboss_state::ppic_w));
 
 	/* keyboard */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
@@ -511,30 +511,30 @@ MACHINE_CONFIG_START( olyboss_state::bossb85 )
 
 	/* devices */
 
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq0_w))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bossb_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, olyboss_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, olyboss_state, dma_mem_r))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, olyboss_state, dma_mem_w))
-	MCFG_I8257_IN_IOR_0_CB(READ8(*this, olyboss_state, fdcdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, olyboss_state, fdcdma_w))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, olyboss_state, crtcdma_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, olyboss_state, tc_w))
+	I8257(config, m_dma, XTAL(4'000'000));
+	m_dma->out_hrq_cb().set(FUNC(olyboss_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(olyboss_state::dma_mem_r));
+	m_dma->out_memw_cb().set(FUNC(olyboss_state::dma_mem_w));
+	m_dma->in_ior_cb<0>().set(FUNC(olyboss_state::fdcdma_r));
+	m_dma->out_iow_cb<0>().set(FUNC(olyboss_state::fdcdma_w));
+	m_dma->out_iow_cb<2>().set(FUNC(olyboss_state::crtcdma_w));
+	m_dma->out_tc_cb().set(FUNC(olyboss_state::tc_w));
 
 	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
 	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(olyboss_state, olyboss_display_pixels)
-	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
+	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(m_dma, i8257_device, dreq2_w))
 	MCFG_UPD3301_INT_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 

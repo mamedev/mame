@@ -89,7 +89,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 {
 	// bits 3-5 = ROM bank select
-	m_upd7759->set_bank_base(((data & 0x38) >> 3) * 0x20000);
+	m_upd7759->set_rom_bank((data & 0x38) >> 3);
 
 	// bit 2 = SSG-C rc filter enable
 	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -353,16 +353,15 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD(m_upd7759, UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(m_upd7759, upd775x_device, port_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bladestl_state, bladestl_port_B_w))
-	MCFG_SOUND_ROUTE(0, "filter1", 0.45)
-	MCFG_SOUND_ROUTE(1, "filter2", 0.45)
-	MCFG_SOUND_ROUTE(2, "filter3", 0.45)
-	MCFG_SOUND_ROUTE(3, "mono", 0.45)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(24'000'000) / 8));
+	ymsnd.port_a_write_callback().set(m_upd7759, FUNC(upd775x_device::port_w));
+	ymsnd.port_b_write_callback().set(FUNC(bladestl_state::bladestl_port_B_w));
+	ymsnd.add_route(0, "filter1", 0.45);
+	ymsnd.add_route(1, "filter2", 0.45);
+	ymsnd.add_route(2, "filter3", 0.45);
+	ymsnd.add_route(3, "mono", 0.45);
 
 	MCFG_DEVICE_ADD(m_filter1, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

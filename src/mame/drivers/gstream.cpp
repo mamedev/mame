@@ -837,7 +837,7 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -869,7 +869,7 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 	MCFG_DEVICE_IO_MAP(x2222_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
-//  MCFG_NVRAM_ADD_1FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

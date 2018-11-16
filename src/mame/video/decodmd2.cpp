@@ -149,8 +149,7 @@ MACHINE_CONFIG_START(decodmd_type2_device::device_add_mconfig)
 	screen.set_screen_update("dmd6845", FUNC(mc6845_device::screen_update));
 	screen.set_refresh_hz(60);
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("12K")
+	RAM(config, RAM_TAG).set_default_size("12K");
 MACHINE_CONFIG_END
 
 

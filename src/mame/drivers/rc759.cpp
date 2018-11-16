@@ -540,21 +540,21 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(*this, rc759_state, i186_timer1_w))
 
 	// interrupt controller
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
 	// nvram
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", rc759_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(rc759_state::nvram_init));
 
 	// ppi
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, rc759_state, ppi_porta_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, rc759_state, ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, rc759_state, ppi_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(rc759_state::ppi_porta_r));
+	m_ppi->in_pb_callback().set(FUNC(rc759_state::ppi_portb_r));
+	m_ppi->out_pc_callback().set(FUNC(rc759_state::ppi_portc_w));
 
 	// rtc
 	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE("pic", pic8259_device, ir3_w))
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(m_pic, pic8259_device, ir3_w))
 
 	// video
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_I82730_ADD("txt", "maincpu", 1250000)
 	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_I82730_UPDATE_ROW_CB(rc759_state, txt_update_row)
-	MCFG_I82730_SINT_HANDLER(WRITELINE("pic", pic8259_device, ir4_w))
+	MCFG_I82730_SINT_HANDLER(WRITELINE(m_pic, pic8259_device, ir4_w))
 
 	// keyboard
 	MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)
@@ -596,9 +596,9 @@ MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
 
 	// floppy disk controller
-	MCFG_DEVICE_ADD("fdc", WD2797, 1000000)
-//  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic", pic8259_device, ir0_w))
-//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
+	WD2797(config, m_fdc, 1000000);
+//  m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir0_w));
+//  m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
 	// floppy drives
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", rc759_floppies, "hd", floppy_image_device::default_floppy_formats)

@@ -211,6 +211,7 @@ public:
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_sync_timer(nullptr),
+		m_sync_period(attotime::zero),
 		m_key(0),
 		m_sync(0),
 		m_graphic(0),
@@ -1640,7 +1641,8 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 
 	m_ieee->host_ren_w(0);
 
-	m_sync_timer->adjust(machine().time() + m_sync_period, 0, m_sync_period);
+	if (m_sync_period != attotime::zero)
+		m_sync_timer->adjust(machine().time() + m_sync_period, 0, m_sync_period);
 }
 
 
@@ -1766,9 +1768,9 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	PET_DATASSETTE_PORT(config, PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c2n").read_handler().set(M6520_1_TAG, FUNC(pia6821_device::ca1_w));
 	PET_DATASSETTE_PORT(config, PET_DATASSETTE_PORT2_TAG, cbm_datassette_devices, nullptr).read_handler().set(M6522_TAG, FUNC(via6522_device::write_cb1));
 
-	pet_expansion_slot_device &exp(PET_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/16, pet_expansion_cards, nullptr));
-	exp.dma_read_callback().set(FUNC(pet_state::read));
-	exp.dma_write_callback().set(FUNC(pet_state::write));
+	PET_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/16, pet_expansion_cards, nullptr);
+	m_exp->dma_read_callback().set(FUNC(pet_state::read));
+	m_exp->dma_write_callback().set(FUNC(pet_state::write));
 
 	PET_USER_PORT(config, m_user, pet_user_port_cards, nullptr);
 	m_user->pb_handler().set(m_via, FUNC(via6522_device::write_ca1));
@@ -1786,10 +1788,10 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pet_state, cbm_pet), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
 	quickload.set_interface("cbm_quik");
 
-	SOFTWARE_LIST(config, "cass_list").set_type("pet_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "flop_list").set_type("pet_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "hdd_list").set_type("pet_hdd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "quik_list").set_type("pet_quik", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cass_list").set_original("pet_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("pet_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("pet_hdd");
+	SOFTWARE_LIST(config, "quik_list").set_original("pet_quik");
 }
 
 void pet_state::pet(machine_config &config)
@@ -1838,7 +1840,7 @@ void pet_state::pet2001n(machine_config &config, bool with_b000)
 	if (with_b000)
 		GENERIC_CARTSLOT(config, "cart_b000", generic_linear_slot, "pet_b000_rom", "bin,rom");
 
-	SOFTWARE_LIST(config, "rom_list").set_type("pet_rom", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "rom_list").set_original("pet_rom");
 }
 
 
@@ -2101,7 +2103,7 @@ void pet80_state::pet80(machine_config &config)
 	GENERIC_CARTSLOT(config, "cart_a000", generic_linear_slot, "pet_a000_rom", "bin,rom");
 
 	// software lists
-	SOFTWARE_LIST(config, "rom_list").set_type("pet_rom", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "rom_list").set_original("pet_rom");
 }
 
 void pet80_state::pet8032(machine_config &config)
@@ -2114,7 +2116,7 @@ void superpet_state::superpet(machine_config &config)
 {
 	pet8032(config);
 	m_exp->set_default_option("superpet");
-	SOFTWARE_LIST(config, "flop_list2").set_type("superpet_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list2").set_original("superpet_flop");
 }
 
 void cbm8096_state::cbm8096(machine_config &config)
@@ -2125,7 +2127,7 @@ void cbm8096_state::cbm8096(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("96K");
 
-	SOFTWARE_LIST(config, "flop_list2").set_type("cbm8096_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list2").set_original("cbm8096_flop");
 }
 
 void cbm8296_state::cbm8296(machine_config &config)
@@ -2150,7 +2152,7 @@ void cbm8296_state::cbm8296(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("128K");
 
-	SOFTWARE_LIST(config, "flop_list2").set_type("cbm8296_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list2").set_original("cbm8296_flop");
 }
 
 void cbm8296_state::cbm8296d(machine_config &config)

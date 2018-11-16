@@ -344,14 +344,14 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3B
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tp84_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tp84_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tp84_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tp84_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tp84_state, flip_screen_y_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch", 0)); // 3B
+	mainlatch.q_out_cb<0>().set(FUNC(tp84_state::irq_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(tp84_state::coin_counter_2_w));
+	mainlatch.q_out_cb<2>().set(FUNC(tp84_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set(FUNC(tp84_state::flip_screen_x_w));
+	mainlatch.q_out_cb<5>().set(FUNC(tp84_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,7 +371,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("y2404_1", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)

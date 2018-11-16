@@ -135,6 +135,13 @@ public:
 	template<class Object> devcb_base &set_write_sk_callback(Object &&cb) { return m_write_sk.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_read_cko_callback(Object &&cb) { return m_read_cko.set_callback(std::forward<Object>(cb)); }
 
+	void set_config(cop400_cki_bond cki, cop400_cko_bond cko, bool has_microbus)
+	{
+		set_cki(cki);
+		set_cko(cko);
+		set_microbus(has_microbus);
+	}
+
 	void set_cki(cop400_cki_bond cki) { m_cki = cki; }
 	void set_cko(cop400_cko_bond cko) { m_cko = cko; }
 	void set_microbus(bool has_microbus) { m_has_microbus = has_microbus; }

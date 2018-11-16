@@ -15,22 +15,31 @@
 
 #include "ataintf.h"
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_IDE_CONTROLLER_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
-	MCFG_DEVICE_MODIFY(_tag ":0") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag ":1") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
-
 class ide_controller_device : public abstract_ata_interface_device
 {
 public:
 	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	template <typename T> ide_controller_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::master(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> ide_controller_device &slave(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::slave(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> ide_controller_device &options(T &&opts, const char *master_default = nullptr, const char *slave_default = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::options(std::forward<T>(opts), master_default, slave_default, fixed);
+		return *this;
+	}
+	template <typename T> ide_controller_device &set_slot_options(int index, T &&opts, const char *dflt, bool fixed)
+	{
+		abstract_ata_interface_device::set_slot_options(index, std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
 
 	uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t read_cs1(offs_t offset, uint16_t mem_mask = 0xffff);
@@ -49,18 +58,31 @@ protected:
 DECLARE_DEVICE_TYPE(IDE_CONTROLLER, ide_controller_device)
 
 
-#define MCFG_IDE_CONTROLLER_32_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER_32, 0) \
-	MCFG_DEVICE_MODIFY(_tag ":0") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag ":1") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
-
 class ide_controller_32_device : public abstract_ata_interface_device
 {
 public:
-	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	template <typename T> ide_controller_32_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::master(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> ide_controller_32_device &slave(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::slave(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> ide_controller_32_device &options(T &&opts, const char *master_default = nullptr, const char *slave_default = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::options(std::forward<T>(opts), master_default, slave_default, fixed);
+		return *this;
+	}
+	template <typename T> ide_controller_32_device &set_slot_options(int index, T &&opts, const char *dflt, bool fixed)
+	{
+		abstract_ata_interface_device::set_slot_options(index, std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
 
 	uint32_t read_cs0(offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t read_cs1(offs_t offset, uint32_t mem_mask = 0xffffffff);
@@ -79,22 +101,32 @@ protected:
 DECLARE_DEVICE_TYPE(IDE_CONTROLLER_32, ide_controller_32_device)
 
 
-#define MCFG_BUS_MASTER_IDE_CONTROLLER_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, BUS_MASTER_IDE_CONTROLLER, 0) \
-	MCFG_DEVICE_MODIFY(_tag ":0") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag ":1") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
-
-#define MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(bmcpu, bmspace) \
-	downcast<bus_master_ide_controller_device &>(*device).set_bus_master_space(bmcpu, bmspace);
-
 class bus_master_ide_controller_device : public ide_controller_32_device
 {
 public:
-	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void set_bus_master_space(const char *bmcpu, uint32_t bmspace) { m_bmcpu = bmcpu; m_bmspace = bmspace; }
+
+	template <typename T> bus_master_ide_controller_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::master(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> bus_master_ide_controller_device &slave(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::slave(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> bus_master_ide_controller_device &options(T &&opts, const char *master_default = nullptr, const char *slave_default = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::options(std::forward<T>(opts), master_default, slave_default, fixed);
+		return *this;
+	}
+	template <typename T> bus_master_ide_controller_device &set_slot_options(int index, T &&opts, const char *dflt, bool fixed)
+	{
+		abstract_ata_interface_device::set_slot_options(index, std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
 
 	DECLARE_READ32_MEMBER( bmdma_r );
 	DECLARE_WRITE32_MEMBER( bmdma_w );

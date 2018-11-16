@@ -301,11 +301,11 @@ MACHINE_CONFIG_START(shootout_state::shootout)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); // 1.5 MHz
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 
@@ -331,13 +331,13 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shootout_state, bankswitch_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shootout_state, flipscreen_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
+	ymsnd.irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	ymsnd.port_a_write_callback().set(FUNC(shootout_state::bankswitch_w));
+	ymsnd.port_b_write_callback().set(FUNC(shootout_state::flipscreen_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(shootout_state::shootouk)

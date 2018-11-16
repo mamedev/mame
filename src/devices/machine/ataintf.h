@@ -42,32 +42,7 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-#define MCFG_ATA_INTERFACE_IRQ_HANDLER(_devcb) \
-	downcast<abstract_ata_interface_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_ATA_INTERFACE_DMARQ_HANDLER(_devcb) \
-	downcast<abstract_ata_interface_device &>(*device).set_dmarq_handler(DEVCB_##_devcb);
-
-#define MCFG_ATA_INTERFACE_DASP_HANDLER(_devcb) \
-	downcast<abstract_ata_interface_device &>(*device).set_dasp_handler(DEVCB_##_devcb);
-
 void ata_devices(device_slot_interface &device);
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_ATA_INTERFACE_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, ATA_INTERFACE, 0) \
-	MCFG_DEVICE_MODIFY(_tag ":0") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag ":1") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -85,6 +60,32 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto dmarq_handler() { return m_dmarq_handler.bind(); }
 	auto dasp_handler() { return m_dasp_handler.bind(); }
+
+	template <typename T> abstract_ata_interface_device &set_slot_options(int index, T &&opts, const char *dflt, bool fixed)
+	{
+		ata_slot_device &dev = slot(index);
+		dev.option_reset();
+		opts(dev);
+		dev.set_default_option(dflt);
+		dev.set_fixed(fixed);
+		return *this;
+	}
+	template <typename T> abstract_ata_interface_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		set_slot(0, std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> abstract_ata_interface_device &slave(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		set_slot(1, std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> abstract_ata_interface_device &options(T &&opts, const char *master_default = nullptr, const char *slave_default = nullptr, bool fixed = false)
+	{
+		set_slot_options(0, std::forward<T>(opts), master_default, fixed);
+		set_slot_options(1, std::forward<T>(opts), slave_default, fixed);
+		return *this;
+	}
 
 	ata_slot_device &slot(int index);
 	virtual void set_default_ata_devices(const char* _master, const char* _slave);
@@ -142,7 +143,28 @@ private:
 class ata_interface_device : public abstract_ata_interface_device
 {
 public:
-	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	template <typename T> ata_interface_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::master(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> ata_interface_device &slave(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::slave(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> ata_interface_device &options(T &&opts, const char *master_default = nullptr, const char *slave_default = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::options(std::forward<T>(opts), master_default, slave_default, fixed);
+		return *this;
+	}
+	template <typename T> ata_interface_device &set_slot_options(int index, T &&opts, const char *dflt, bool fixed)
+	{
+		abstract_ata_interface_device::set_slot_options(index, std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
 
 	uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff) { return internal_read_cs0(offset, mem_mask); }
 	uint16_t read_cs1(offs_t offset, uint16_t mem_mask = 0xffff) { return internal_read_cs1(offset, mem_mask); }

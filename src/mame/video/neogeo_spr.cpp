@@ -177,6 +177,7 @@ void neosprite_base_device::neogeo_set_fixed_layer_source(uint8_t data)
 
 void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 {
+	assert((m_fixed_layer_source && m_region_fixed != nullptr) || (m_region_fixedbios != nullptr));
 	int x;
 
 	uint8_t* gfx_base = m_fixed_layer_source ? m_region_fixed : m_region_fixedbios->base();

@@ -135,8 +135,7 @@ void ms6102_state::ms6102_mem(address_map &map)
 void ms6102_state::ms6102_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_i8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0f).rw("589wa1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
@@ -312,10 +311,10 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_I8085A_INTE(WRITELINE("i8214", i8214_device, inte_w))
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms6102_state, ms6102_int_ack)
 
-	MCFG_DEVICE_ADD("i8214", I8214, XTAL(18'432'000) / 9)
-	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, ms6102_state, irq_w))
+	I8214(config, m_pic, XTAL(18'432'000) / 9);
+	m_pic->int_wr_callback().set(FUNC(ms6102_state::irq_w));
 
-	MCFG_DEVICE_ADD("earom", KR1601RR1, 0)
+	KR1601RR1(config, m_earom, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -324,10 +323,10 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms6102)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(18'432'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, ms6102_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, ms6102_state, memory_read_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(*this, ms6102_state, vdack_w))
+	I8257(config, m_dma8257, XTAL(18'432'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(ms6102_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(ms6102_state::memory_read_byte));
+	m_dma8257->out_iow_cb<2>().set(FUNC(ms6102_state::vdack_w));
 
 	MCFG_DEVICE_ADD("i8275_1", I8275, XTAL(16'400'000) / 8) // XXX
 	MCFG_I8275_CHARACTER_WIDTH(8)
@@ -342,9 +341,9 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// keyboard
-	MCFG_DEVICE_ADD("589wa1", AY31015, 0)
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(*this, ms6102_state, irq<1>))
-	MCFG_AY31015_AUTO_RDAV(true)
+	AY31015(config, m_kbd_uart);
+	m_kbd_uart->write_dav_callback().set(FUNC(ms6102_state::irq<1>));
+	m_kbd_uart->set_auto_rdav(true);
 
 	ripple_counter_device &ie5(RIPPLE_COUNTER(config, "ie5", XTAL(16'400'000) / 30));
 	ie5.set_stages(2);
@@ -360,11 +359,11 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->rxd_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'400'000) / 9)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("i8251", i8251_device, write_txc))
-	MCFG_PIT8253_CLK1(XTAL(16'400'000) / 9)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("i8251", i8251_device, write_rxc))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(XTAL(16'400'000) / 9);
+	pit8253.out_handler<0>().set(m_i8251, FUNC(i8251_device::write_txc));
+	pit8253.set_clk<1>(XTAL(16'400'000) / 9);
+	pit8253.out_handler<1>().set(m_i8251, FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 ROM_START( ms6102 )

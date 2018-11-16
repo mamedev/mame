@@ -197,20 +197,6 @@ void baraduke_state::mcu_map(address_map &map)
 }
 
 
-READ8_MEMBER(baraduke_state::readFF)
-{
-	return 0xff;
-}
-
-void baraduke_state::mcu_port_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).r(FUNC(baraduke_state::inputport_r));         /* input ports read */
-	map(M6801_PORT1, M6801_PORT1).w(FUNC(baraduke_state::inputport_select_w)); /* input port select */
-	map(M6801_PORT2, M6801_PORT2).r(FUNC(baraduke_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(FUNC(baraduke_state::baraduke_lamps_w));       /* lamps */
-}
-
-
 
 static INPUT_PORTS_START( baraduke )
 	PORT_START("DSWA")
@@ -384,13 +370,16 @@ MACHINE_CONFIG_START(baraduke_state::baraduke)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) // 68A09E
 	MCFG_DEVICE_PROGRAM_MAP(baraduke_map)
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	hd63701_cpu_device &mcu(HD63701(config, m_mcu, XTAL(49'152'000)/8));
+	mcu.set_addrmap(AS_PROGRAM, &baraduke_state::mcu_map);
+	mcu.in_p1_cb().set(FUNC(baraduke_state::inputport_r));         /* input ports read */
+	mcu.out_p1_cb().set(FUNC(baraduke_state::inputport_select_w)); /* input port select */
+	mcu.in_p2_cb().set_constant(0xff);                             /* leds won't work otherwise */
+	mcu.out_p2_cb().set(FUNC(baraduke_state::baraduke_lamps_w));   /* lamps */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* we need heavy synch */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

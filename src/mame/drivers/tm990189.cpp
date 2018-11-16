@@ -67,7 +67,6 @@
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #include "speaker.h"
@@ -824,8 +823,10 @@ void tm990189_state::tm990_189_cru_map(address_map &map)
 
 MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, tm990189_state, external_operation) )
+	TMS9980A(config, m_tms9980a, 8_MHz_XTAL); // clock divided by 4 internally
+	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_memmap);
+	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
+	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
 
 	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189 )
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189 )
@@ -835,42 +836,42 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(TMS9901_0_TAG, TMS9901, 2000000)
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, tm990189_state, usr9901_led0_w) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( *this, tm990189_state, usr9901_led1_w) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, tm990189_state, usr9901_led2_w) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, tm990189_state, usr9901_led3_w) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, tm990189_state, usr9901_interrupt_callback) )
+	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
+	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
+	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
+	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
+	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
+	m_tms9901_usr->intlevel_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
-	MCFG_DEVICE_ADD(TMS9901_1_TAG, TMS9901, 2000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, tm990189_state, sys9901_r) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, tm990189_state, sys9901_digitsel0_w) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( *this, tm990189_state, sys9901_digitsel1_w) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, tm990189_state, sys9901_digitsel2_w) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, tm990189_state, sys9901_digitsel3_w) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment0_w) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment1_w) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment2_w) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment3_w) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment4_w) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment5_w) )
-	MCFG_TMS9901_P10_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment6_w) )
-	MCFG_TMS9901_P11_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment7_w) )
-	MCFG_TMS9901_P12_HANDLER( WRITELINE( *this, tm990189_state, sys9901_dsplytrgr_w) )
-	MCFG_TMS9901_P13_HANDLER( WRITELINE( *this, tm990189_state, sys9901_shiftlight_w) )
-	MCFG_TMS9901_P14_HANDLER( WRITELINE( *this, tm990189_state, sys9901_spkrdrive_w) )
-	MCFG_TMS9901_P15_HANDLER( WRITELINE( *this, tm990189_state, sys9901_tapewdata_w) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, tm990189_state, sys9901_interrupt_callback) )
+	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
+	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
+	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
+	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
+	m_tms9901_sys->p_out_cb(2).set(FUNC(tm990189_state::sys9901_digitsel2_w));
+	m_tms9901_sys->p_out_cb(3).set(FUNC(tm990189_state::sys9901_digitsel3_w));
+	m_tms9901_sys->p_out_cb(4).set(FUNC(tm990189_state::sys9901_segment0_w));
+	m_tms9901_sys->p_out_cb(5).set(FUNC(tm990189_state::sys9901_segment1_w));
+	m_tms9901_sys->p_out_cb(6).set(FUNC(tm990189_state::sys9901_segment2_w));
+	m_tms9901_sys->p_out_cb(7).set(FUNC(tm990189_state::sys9901_segment3_w));
+	m_tms9901_sys->p_out_cb(8).set(FUNC(tm990189_state::sys9901_segment4_w));
+	m_tms9901_sys->p_out_cb(9).set(FUNC(tm990189_state::sys9901_segment5_w));
+	m_tms9901_sys->p_out_cb(10).set(FUNC(tm990189_state::sys9901_segment6_w));
+	m_tms9901_sys->p_out_cb(11).set(FUNC(tm990189_state::sys9901_segment7_w));
+	m_tms9901_sys->p_out_cb(12).set(FUNC(tm990189_state::sys9901_dsplytrgr_w));
+	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
+	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
+	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
+	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	MCFG_DEVICE_ADD(m_tms9902, TMS9902, 2000000) // MZ: needs to be fixed once the RS232 support is complete
-	MCFG_TMS9902_XMIT_CB(WRITE8(*this, tm990189_state, xmit_callback))         /* called when a character is transmitted */
-	MCFG_DEVICE_ADD("rs232", TM990_189_RS232, 0, m_tms9902)
+	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
+	TM990_189_RS232(config, "rs232", 0, m_tms9902);
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
 	// Need to delay the timer, or it will spoil the initial LOAD
 	// TODO: Fix this, probably inside CPU
@@ -879,56 +880,60 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, tm990189_state, external_operation) )
+	TMS9980A(config, m_tms9980a, 8_MHz_XTAL);
+	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_v_memmap);
+	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
+	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
 
 	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189_v )
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189_v )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9918", TMS9918, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918_device, screen_update )
+	tms9918_device &vdp(TMS9918(config, "tms9918", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
 	config.set_default_layout(layout_tm990189v);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);   /* one two-level buzzer */
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_DEVICE_ADD(TMS9901_0_TAG, TMS9901, 2000000)
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, tm990189_state, usr9901_led0_w) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( *this, tm990189_state, usr9901_led1_w) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, tm990189_state, usr9901_led2_w) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, tm990189_state, usr9901_led3_w) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, tm990189_state, usr9901_interrupt_callback) )
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(TMS9901_1_TAG, TMS9901, 2000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, tm990189_state, sys9901_r) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, tm990189_state, sys9901_digitsel0_w) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( *this, tm990189_state, sys9901_digitsel1_w) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, tm990189_state, sys9901_digitsel2_w) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, tm990189_state, sys9901_digitsel3_w) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment0_w) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment1_w) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment2_w) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment3_w) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment4_w) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment5_w) )
-	MCFG_TMS9901_P10_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment6_w) )
-	MCFG_TMS9901_P11_HANDLER( WRITELINE( *this, tm990189_state, sys9901_segment7_w) )
-	MCFG_TMS9901_P12_HANDLER( WRITELINE( *this, tm990189_state, sys9901_dsplytrgr_w) )
-	MCFG_TMS9901_P13_HANDLER( WRITELINE( *this, tm990189_state, sys9901_shiftlight_w) )
-	MCFG_TMS9901_P14_HANDLER( WRITELINE( *this, tm990189_state, sys9901_spkrdrive_w) )
-	MCFG_TMS9901_P15_HANDLER( WRITELINE( *this, tm990189_state, sys9901_tapewdata_w) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, tm990189_state, sys9901_interrupt_callback) )
+	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
+	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
+	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
+	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
+	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
+	m_tms9901_usr->intlevel_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
-	MCFG_DEVICE_ADD(m_tms9902, TMS9902, 2000000) // MZ: needs to be fixed once the RS232 support is complete
-	MCFG_TMS9902_XMIT_CB(WRITE8(*this, tm990189_state, xmit_callback))         /* called when a character is transmitted */
-	MCFG_DEVICE_ADD("rs232", TM990_189_RS232, 0, m_tms9902)
+	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
+	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
+	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
+	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
+	m_tms9901_sys->p_out_cb(2).set(FUNC(tm990189_state::sys9901_digitsel2_w));
+	m_tms9901_sys->p_out_cb(3).set(FUNC(tm990189_state::sys9901_digitsel3_w));
+	m_tms9901_sys->p_out_cb(4).set(FUNC(tm990189_state::sys9901_segment0_w));
+	m_tms9901_sys->p_out_cb(5).set(FUNC(tm990189_state::sys9901_segment1_w));
+	m_tms9901_sys->p_out_cb(6).set(FUNC(tm990189_state::sys9901_segment2_w));
+	m_tms9901_sys->p_out_cb(7).set(FUNC(tm990189_state::sys9901_segment3_w));
+	m_tms9901_sys->p_out_cb(8).set(FUNC(tm990189_state::sys9901_segment4_w));
+	m_tms9901_sys->p_out_cb(9).set(FUNC(tm990189_state::sys9901_segment5_w));
+	m_tms9901_sys->p_out_cb(10).set(FUNC(tm990189_state::sys9901_segment6_w));
+	m_tms9901_sys->p_out_cb(11).set(FUNC(tm990189_state::sys9901_segment7_w));
+	m_tms9901_sys->p_out_cb(12).set(FUNC(tm990189_state::sys9901_dsplytrgr_w));
+	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
+	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
+	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
+	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
+
+	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;
+	TM990_189_RS232(config, "rs232", 0, m_tms9902);
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
 MACHINE_CONFIG_END

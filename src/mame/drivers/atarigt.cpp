@@ -800,14 +800,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16) // should be 447 kHz according to schematics, but that fails the self-test
-	MCFG_ADC0808_IN2_CB(IOPORT("AN4"))
-	MCFG_ADC0808_IN3_CB(IOPORT("AN1"))
-	MCFG_ADC0808_IN6_CB(IOPORT("AN2"))
-	MCFG_ADC0808_IN7_CB(IOPORT("AN3"))
-
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigt)
@@ -832,6 +825,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarigt_state::tmek)
 	atarigt(config);
+
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16); // should be 447 kHz according to schematics, but that fails the self-test
+	m_adc->in_callback<2>().set_ioport("AN4");
+	m_adc->in_callback<3>().set_ioport("AN1");
+	m_adc->in_callback<6>().set_ioport("AN2");
+	m_adc->in_callback<7>().set_ioport("AN3");
+
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x4fad)
@@ -840,20 +840,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarigt_state::primrage)
 	atarigt(config);
+
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
-	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarigt_state::primrage20)
 	atarigt(config);
+
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(*this, atarigt_state,cage_irq_callback))
-	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 /*************************************

@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -99,6 +99,9 @@
 
 #define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580))
 
+#define MAC_MAIN_SND_BUF_OFFSET 0x0300
+#define MAC_ALT_SND_BUF_OFFSET  0x5F00
+
 #ifdef MAME_DEBUG
 #define LOG_ADB         0
 #define LOG_VIA         0
@@ -2354,7 +2357,23 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 			mouse_callback();
 	}
 
-	m_scanline_timer->adjust(m_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
+	if (m_dac)
+	{
+		uint16_t *snd_buf_ptr;
+		if (m_main_buffer)
+		{
+			snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
+		}
+		else
+		{
+			snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
+		}
+
+		m_dac->write(snd_buf_ptr[scanline] >> 8);
+	}
+
+	int next_scanline = (scanline+1) % MAC_V_TOTAL;
+	m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 }
 
 WRITE_LINE_MEMBER(mac_state::nubus_irq_9_w)

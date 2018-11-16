@@ -36,6 +36,7 @@ public:
 		m_mixerregs(*this, "mixerregs")
 	{ }
 
+	void base(machine_config &config);
 	void twc94(machine_config &config);
 	void gstriker(machine_config &config);
 	void vgoal(machine_config &config);

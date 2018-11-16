@@ -73,13 +73,13 @@ MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("hc55516_bg", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.5)
 
-	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11c_bg_device, pia40_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE("ym2151", ym2151_device, reset_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11c_bg_device, pia40_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("bgcpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("bgcpu", INPUT_LINE_NMI))
+	PIA6821(config, m_pia40, 0);
+	m_pia40->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pia40->writepb_handler().set(FUNC(s11c_bg_device::pia40_pb_w));
+	m_pia40->ca2_handler().set("ym2151", FUNC(ym2151_device::reset_w));
+	m_pia40->cb2_handler().set(FUNC(s11c_bg_device::pia40_cb2_w));
+	m_pia40->irqa_handler().set_inputline("bgcpu", M6809_FIRQ_LINE);
+	m_pia40->irqb_handler().set_inputline("bgcpu", INPUT_LINE_NMI);
 MACHINE_CONFIG_END
 
 void s11c_bg_device::device_start()

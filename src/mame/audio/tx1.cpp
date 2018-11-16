@@ -558,22 +558,22 @@ MACHINE_CONFIG_START(tx1_sound_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(tx1_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, tx1_sound_device, z80_irq,  TX1_PIXEL_CLOCK / 4 / 2048 / 2)
 
-	MCFG_DEVICE_ADD(m_ppi, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, tx1_sound_device, tx1_ppi_porta_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, tx1_sound_device, tx1_ppi_portb_r))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tx1_sound_device, tx1_coin_cnt_w))
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(tx1_sound_device::tx1_ppi_porta_r));
+	m_ppi->in_pb_callback().set(FUNC(tx1_sound_device::tx1_ppi_portb_r));
+	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
+	m_ppi->out_pc_callback().set(FUNC(tx1_sound_device::tx1_coin_cnt_w));
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
 //  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
 //  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, TX1_PIXEL_CLOCK / 8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tx1_sound_device, ay8910_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tx1_sound_device, ay8910_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.1)
+	ay8910_device &aysnd(AY8910(config, "aysnd", TX1_PIXEL_CLOCK / 8));
+	aysnd.port_a_write_callback().set(FUNC(tx1_sound_device::ay8910_a_w));
+	aysnd.port_b_write_callback().set(FUNC(tx1_sound_device::ay8910_b_w));
+	aysnd.add_route(ALL_OUTPUTS, "frontleft", 0.1);
+	aysnd.add_route(ALL_OUTPUTS, "frontright", 0.1);
 
 	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
@@ -1065,25 +1065,25 @@ MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, buggyboy_sound_device, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
 	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
 
-	MCFG_DEVICE_ADD(m_ppi, I8255A, 0)
+	I8255A(config, m_ppi);
 	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("PPI_PORTA"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, buggyboy_sound_device, bb_coin_cnt_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
+	m_ppi->in_pa_callback().set_ioport("PPI_PORTA");
+	m_ppi->out_pb_callback().set(FUNC(buggyboy_sound_device::bb_coin_cnt_w));
+	m_ppi->in_pc_callback().set_ioport("PPI_PORTC");
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
 //  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
 //  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
-	MCFG_DEVICE_ADD(m_ym[0], YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym1_a_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
+	YM2149(config, m_ym[0], BUGGYBOY_ZCLK / 4);
+	m_ym[0]->port_a_write_callback().set(FUNC(buggyboy_sound_device::ym1_a_w));
+	m_ym[0]->add_route(ALL_OUTPUTS, "frontleft", 0.15);
 
-	MCFG_DEVICE_ADD(m_ym[1], YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
+	YM2149(config, m_ym[1], BUGGYBOY_ZCLK / 4);
+	m_ym[1]->port_a_write_callback().set(FUNC(buggyboy_sound_device::ym2_a_w));
+	m_ym[1]->port_b_write_callback().set(FUNC(buggyboy_sound_device::ym2_b_w));
+	m_ym[1]->add_route(ALL_OUTPUTS, "frontright", 0.15);
 
 	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
@@ -1101,15 +1101,15 @@ MACHINE_CONFIG_START(buggyboyjr_sound_device::device_add_mconfig)
 //  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5);
 //  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
-	MCFG_DEVICE_ADD(m_ym[0], YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC19 */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2149_IC19_A"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM2149_IC19_B"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
+	YM2149(config, m_ym[0], BUGGYBOY_ZCLK / 4); /* YM2149 IC19 */
+	m_ym[0]->port_a_read_callback().set_ioport("YM2149_IC19_A");
+	m_ym[0]->port_b_read_callback().set_ioport("YM2149_IC19_B");
+	m_ym[0]->add_route(ALL_OUTPUTS, "frontleft", 0.15);
 
-	MCFG_DEVICE_ADD(m_ym[1], YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC24 */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggyboy_sound_device, ym2_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
+	YM2149(config, m_ym[1], BUGGYBOY_ZCLK / 4); /* YM2149 IC24 */
+	m_ym[1]->port_a_write_callback().set(FUNC(buggyboy_sound_device::ym2_a_w));
+	m_ym[1]->port_b_write_callback().set(FUNC(buggyboy_sound_device::ym2_b_w));
+	m_ym[1]->add_route(ALL_OUTPUTS, "frontright", 0.15);
 
 	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)

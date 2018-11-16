@@ -373,9 +373,8 @@ WRITE8_MEMBER( trs80m3_state::port_ec_w )
     d0 1=select drive 0 */
 WRITE8_MEMBER( trs80m3_state::port_f4_w )
 {
-	if (BIT(data ,6))
+	if (BIT(data, 6))
 	{
-		
 		if (m_drq_off && m_intrq_off)
 		{
 			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
@@ -443,16 +442,16 @@ INTERRUPT_GEN_MEMBER(trs80m3_state::rtc_interrupt)
 	}
 	// Also, if cpu is in wait, unlock it and trigger NMI
 	// Don't, it breaks disk loading
-//	if (m_wait)
-//	{
-//		m_wait = false;
-//		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
-//		if (BIT(m_nmi_mask, 6))
-//		{
-//			m_nmi_data |= 0x40;
-//			m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
-//		}
-//	}
+//  if (m_wait)
+//  {
+//      m_wait = false;
+//      m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+//      if (BIT(m_nmi_mask, 6))
+//      {
+//          m_nmi_data |= 0x40;
+//          m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
+//      }
+//  }
 }
 
 // The floppy sector has been read. Enable CPU and NMI.
@@ -494,7 +493,7 @@ READ8_MEMBER( trs80m3_state::wd179x_r )
 {
 	uint8_t data = 0xff;
 	if (BIT(m_io_config->read(), 7))
-		data = m_fdc->status_r(space, offset);
+		data = m_fdc->status_r();
 
 	return data;
 }

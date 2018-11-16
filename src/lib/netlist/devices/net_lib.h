@@ -35,6 +35,7 @@
 
 #include "nld_2102A.h"
 #include "nld_2716.h"
+#include "nld_tms4800.h"
 #include "nld_4020.h"
 #include "nld_4066.h"
 #include "nld_7448.h"
@@ -69,6 +70,7 @@
 #include "nld_9322.h"
 
 #include "nld_am2847.h"
+#include "nld_dm9314.h"
 #include "nld_dm9334.h"
 
 #include "nld_ne555.h"

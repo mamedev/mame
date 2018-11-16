@@ -23,7 +23,7 @@
  DEVICE INTERFACE
  *****************************************************************************/
 
-DEFINE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device, "vr0video", "VRender0 Video")
+DEFINE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device, "vr0video", "MagicEyes VRender0 Video Engine")
 
 vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIDEO_VRENDER0, tag, owner, clock)

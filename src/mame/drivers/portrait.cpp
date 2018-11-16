@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(portrait_state::portrait)
 	MCFG_DEVICE_PROGRAM_MAP(portrait_sound_map)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(portrait_state::portrait)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("tms", TMS5200, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

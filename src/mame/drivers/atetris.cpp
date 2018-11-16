@@ -118,8 +118,8 @@ void atetris_state::machine_start()
 void atetris_state::machine_reset()
 {
 	/* reset the slapstic */
-	m_slapstic_device->slapstic_reset();
-	m_current_bank = m_slapstic_device->slapstic_bank() & 1;
+	m_slapstic->slapstic_reset();
+	m_current_bank = m_slapstic->slapstic_bank() & 1;
 	reset_bank();
 
 	/* start interrupts going (32V clocked by 16V) */
@@ -137,7 +137,7 @@ void atetris_state::machine_reset()
 READ8_MEMBER(atetris_state::slapstic_r)
 {
 	int result = m_slapstic_base[0x2000 + offset];
-	int new_bank = m_slapstic_device->slapstic_tweak(space, offset) & 1;
+	int new_bank = m_slapstic->slapstic_tweak(space, offset) & 1;
 
 	/* update for the new bank */
 	if (new_bank != m_current_bank)
@@ -239,7 +239,7 @@ void atetris_mcu_state::atetrisb3_map(address_map &map)
 
 READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 {
-	switch (m_mcu->p2_r(space, 0) & 0xf0)
+	switch (m_mcu->p2_r() & 0xf0)
 	{
 	case 0x40:
 		return m_soundlatch[1]->read(space, 0);
@@ -255,7 +255,7 @@ READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 WRITE8_MEMBER(atetris_mcu_state::mcu_p2_w)
 {
 	if ((data & 0xc0) == 0x80)
-		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r(space, 0));
+		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r());
 }
 
 WRITE8_MEMBER(atetris_mcu_state::mcu_reg_w)
@@ -341,103 +341,88 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(atetris_state::atetris)
-
+void atetris_state::atetris_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,MASTER_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_state::main_map);
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 101, false)
+	SLAPSTIC(config, m_slapstic, 101, false);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_PARALLEL_2804, 0)
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atetris)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_atetris);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRGGGBB)
+	PALETTE(config, "palette", 256).set_format(PALETTE_FORMAT_RRRGGGBB);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(atetris_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
+	m_screen->set_raw(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(atetris_state::screen_update));
+	m_screen->set_palette("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+}
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+void atetris_state::atetris(machine_config &config)
+{
+	atetris_base(config);
 
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
+
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/8));
+	pokey1.allpot_r().set_ioport("IN0");
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/8));
+	pokey2.allpot_r().set_ioport("IN1");
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
-MACHINE_CONFIG_START(atetris_state::atetrisb2)
-	atetris(config);
+void atetris_state::atetrisb2(machine_config &config)
+{
+	atetris_base(config);
+
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(BOOTLEG_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(atetrisb2_map)
+	m_maincpu->set_clock(BOOTLEG_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_state::atetrisb2_map);
 
-	MCFG_DEVICE_REMOVE("pokey1")
-	MCFG_DEVICE_REMOVE("pokey2")
-
-	MCFG_DEVICE_ADD("sn1", SN76489A, BOOTLEG_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn2", SN76489A, BOOTLEG_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn3", SN76489, BOOTLEG_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn1", BOOTLEG_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, "sn2", BOOTLEG_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn3", BOOTLEG_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
-MACHINE_CONFIG_START(atetris_mcu_state::atetrisb3)
-	atetris(config);
+void atetris_mcu_state::atetrisb3(machine_config &config)
+{
+	atetris_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(atetrisb3_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_mcu_state::atetrisb3_map);
 
-	MCFG_DEVICE_REPLACE("eeprom", EEPROM_PARALLEL_2816, 0)
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_DEVICE_REMOVE("pokey1")
-	MCFG_DEVICE_REMOVE("pokey2")
+	I8749(config, m_mcu, 10_MHz_XTAL);
+	m_mcu->bus_in_cb().set(FUNC(atetris_mcu_state::mcu_bus_r));
+	m_mcu->bus_out_cb().set(m_soundlatch[0], FUNC(generic_latch_8_device::acknowledge_w));
+	m_mcu->p2_out_cb().set(FUNC(atetris_mcu_state::mcu_p2_w));
 
-	MCFG_DEVICE_ADD("mcu", I8749, 10_MHz_XTAL)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, atetris_mcu_state, mcu_bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8("soundlatch1", generic_latch_8_device, acknowledge_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, atetris_mcu_state, mcu_p2_w))
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_mcu, MCS48_INPUT_IRQ);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mcu", MCS48_INPUT_IRQ))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-
-	MCFG_DEVICE_ADD("sn1", SN76489A, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn2", SN76489A, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn3", SN76489A, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn4", SN76489A, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	for (int i = 0; i < 4; i++)
+	{
+		SN76489A(config, m_sn[i], 4000000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	}
+}
 
 
 
@@ -483,22 +468,26 @@ ROM_END
 
 
 ROM_START( atetrisb2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "k1-01",    0x10000, 0x8000, CRC(fa056809) SHA1(e4ccccdf9b04b68127c7b03ae263519cf00f94cb) )
+	ROM_REGION( 0x18000, "maincpu", 0 ) // Some bootleg PCBs uses unmodified Atari ROMs
+	ROM_LOAD( "k1-01",    0x10000, 0x8000, CRC(fa056809) SHA1(e4ccccdf9b04b68127c7b03ae263519cf00f94cb) ) // 27512
 	ROM_CONTINUE(         0x08000, 0x8000 )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "136066-1101.35a", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
+	ROM_REGION( 0x10000, "gfx1", 0 ) // Some bootleg PCBs uses unmodified Atari ROMs
+	ROM_LOAD( "136066-1101.35a", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) ) // 27512
 
 	ROM_REGION( 0x0020, "proms", 0 ) // currently unused
-	ROM_LOAD( "m3-7603-5.prom1", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) )
+	ROM_LOAD( "m3-7603-5.prom1", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) ) // 82s123 or TBP18S030
 
-	ROM_REGION( 0xa00, "plds", 0 ) // all protected
-	ROM_LOAD( "tibpal16r4-25cn.pal1", 0x000, 0x104, NO_DUMP ) // sub PCB
-	ROM_LOAD( "tibpal16r4-25cn.pal3", 0x200, 0x104, NO_DUMP ) // sub PCB
-	ROM_LOAD( "tibpal16l8-25cn.pal2", 0x400, 0x104, NO_DUMP ) // sub PCB
-	ROM_LOAD( "tibpal16l8-25cn.pal4", 0x600, 0x104, NO_DUMP ) // main PCB
-	ROM_LOAD( "tibpal16l8-25cn.pal5", 0x800, 0x104, NO_DUMP ) // main PCB
+	/* Unused. It's usual to find PLDs with different hashes, but defining equivalent equations */
+	ROM_REGION( 0x859, "plds", 0 )
+	ROM_LOAD( "a-gal16v8-b.bin", 0x000, 0x117, CRC(b1dfab0f) SHA1(e9e4db5459617a35a13df4b7a4586dd1b7be04ac) ) // sub PCB - Same content as "b"
+	ROM_LOAD( "b-gal16v8-b.bin", 0x117, 0x117, CRC(b1dfab0f) SHA1(e9e4db5459617a35a13df4b7a4586dd1b7be04ac) ) // sub PCB - Same content as "a"
+	ROM_LOAD( "c-gal16v8-b.bin", 0x22e, 0x117, CRC(e1a9db0b) SHA1(5bbac24e37a4d9b8a1387054722fa35478ca7941) ) // sub PCB
+	ROM_LOAD( "1-pal16l8-a.3g" , 0x345, 0x104, CRC(dcf0d2fe) SHA1(0496acaa605ec5008b110c387136bbc714441384) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "2-pal16r4-a.3r" , 0x449, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) ) // main PCB
+	ROM_LOAD( "3-pal16r4-a.8p" , 0x54D, 0x104, CRC(e007edf2) SHA1(4f1bc31abd64e402edb4c900ddb21f258d6782c8) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "4-pal16l8-a.9n" , 0x651, 0x104, CRC(3630e734) SHA1(a29dc202ffc75ac48815115b85e984fc0c9d5b59) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "5-pal16l8-a.9m" , 0x755, 0x104, CRC(53b64be1) SHA1(2bf712b766541c90c38c0810ee16848e448c5205) ) // main PCB - Found also as GAL16v8 on some PCBs
 ROM_END
 
 
@@ -557,6 +546,61 @@ ROM_START( atetrisb3 )
 	ROM_LOAD( "pal16r4b-2cn.6",    0xa00, 0x104, NO_DUMP )
 ROM_END
 
+/*
+atetb3482: Atari Tetris bootleg with additional UM3482 and Z80 (with its ROM)
+  __________________________________________________________________
+  |                                                                 |
+A | ?????             74LS06   74LS197  74LS374             74LS04  |
+  |                                                                 |
+B |                   74LS08    74LS74  74LS374    74LS374          |
+  |                                                                 |
+C |                   74LS32    74LS27  74LS357    74LS374 XTAL     |
+  |                                                          74LS10 |
+D |                   74LS04   74LS273   74LS74    74LS374          |
+  | ?? ??  74LS393   UM6116K    74LS74  74LS257      ______  74LS27 |
+E |                                                  | D2  |        |
+  |                   74LS245      74LS245 _______   |     | 74LS74 |
+F |UM3482  74LS139    PAL16L8              |      |  |27PC |74LS161 |
+  |______           __________     74LS245 | MS   |  | 512 |        |
+G ||DIPS | PAL16R4  |UNPOPULAT|            | 6264 |  |_____|74LS161 |
+  ||_____|          |_________|    74LS245 | L-10 |  _______        |
+H |74LS04  PAL16R8  ___________            |      |  | UN  |74LS161 |
+  |                 |D1 27PC512|   74LS00  |______|  | PO  |        |
+I |74LS32  74LS373  |__________|   74LS32            | PU  |PAL16L8 |
+  |                  __________              74LS04  | LA  |        |
+J |74LS374 74LS357   | X2804AP |   74LS257   74LS138 | TED |PAL16?? |
+  |____________      |_________|   74LS257   74LS257 |     |        |
+K ||D3 27PC256 |                                     |_____|74LS161 |
+  ||___________|     74LS245   74LS245                              |
+L |________________  _______________         74LS257 74LS74 74LS161 |
+  ||SHARP LH0080B  | |   UM6502A    |                               |
+M ||_______________| |______________|      74LS00    74LS74 74LS161 |
+  |                                                                 |
+N |PAL16R4 74LS??? 4017 74LS08 74LS32 74LS04 PAL16R4 82S123 74LS32  |
+  |_________________________________________________________________|
+    1      2      3       4       5       6       7      8      9
+*/
+ROM_START( atetb3482 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "i4-d1.bin", 0x10000, 0x8000, CRC(2acbdb09) SHA1(5e1189227f26563fd3e5372121ea5c915620f892) )
+	ROM_CONTINUE(          0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "f8-d2.bin", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
+
+	ROM_REGION( 0x08000, "tunes", 0 ) // Not hooked up. Same 8K repeated four times
+	ROM_LOAD( "k1-d3.bin", 0x00000, 0x08000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) )
+
+	/* Not dumped, unused */
+	ROM_REGION( 0x71c, "plds", 0 )
+	ROM_LOAD( "pal16r4.1n" , 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r4.7n" , 0x104, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.9j" , 0x208, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.9i" , 0x30c, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r8.2h" , 0x410, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r4.2g" , 0x514, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.4f" , 0x618, 0x104, NO_DUMP )
+ROM_END
 
 ROM_START( atetrisc )
 	ROM_REGION( 0x18000, "maincpu", 0 )
@@ -589,7 +633,7 @@ void atetris_state::init_atetris()
 {
 	uint8_t *rgn = memregion("maincpu")->base();
 
-	m_slapstic_device->slapstic_init();
+	m_slapstic->slapstic_init();
 	m_slapstic_source = &rgn[0x10000];
 	m_slapstic_base = &rgn[0x04000];
 }
@@ -607,5 +651,6 @@ GAME( 1988, atetrisa,  atetris, atetris,   atetris,  atetris_state,     init_ate
 GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_mcu_state, init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 4, with UM3482)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )

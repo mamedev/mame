@@ -241,25 +241,25 @@ MACHINE_CONFIG_START(kopunch_state::kopunch)
 	MCFG_DEVICE_IO_MAP(kopunch_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kopunch_state, vblank_interrupt)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// $30 - always $9b (PPI mode 0, ports A & B & C as input)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, kopunch_state, sensors1_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, kopunch_state, sensors2_r))
+	ppi0.in_pa_callback().set_ioport("P1");
+	ppi0.in_pb_callback().set(FUNC(kopunch_state::sensors1_r));
+	ppi0.in_pc_callback().set(FUNC(kopunch_state::sensors2_r));
 
-	i8255_device &ppi1(I8255A(config, "ppi8255_1", 0));
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
 	// $34 - always $80 (PPI mode 0, ports A & B & C as output)
 	ppi1.out_pa_callback().set(FUNC(kopunch_state::coin_w));
 	ppi1.out_pb_callback().set_log("PPI8255 - unmapped write port B");
 	ppi1.out_pc_callback().set_log("PPI8255 - unmapped write port C");
 
-	i8255_device &ppi2(I8255A(config, "ppi8255_2", 0));
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
 	// $38 - always $89 (PPI mode 0, ports A & B as output, port C as input)
 	ppi2.out_pa_callback().set(FUNC(kopunch_state::lamp_w));
 	ppi2.out_pb_callback().set_log("PPI8255 - unmapped write port B");
 	ppi2.in_pc_callback().set_ioport("DSW");
 
-	i8255_device &ppi3(I8255A(config, "ppi8255_3", 0));
+	i8255_device &ppi3(I8255A(config, "ppi8255_3"));
 	// $3c - always $88 (PPI mode 0, ports A & B & lower C as output, upper C as input)
 	ppi3.out_pa_callback().set(FUNC(kopunch_state::scroll_x_w));
 	ppi3.out_pb_callback().set(FUNC(kopunch_state::scroll_y_w));

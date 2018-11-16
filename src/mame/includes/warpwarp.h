@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
 
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "audio/geebee.h"
 #include "audio/warpwarp.h"
@@ -19,6 +20,7 @@ public:
 		m_geebee_videoram(*this, "geebee_videoram"),
 		m_videoram(*this, "videoram"),
 		m_palette(*this, "palette"),
+		m_latch(*this, "latch"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -53,6 +55,7 @@ private:
 	optional_shared_ptr<uint8_t> m_geebee_videoram;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_device<palette_device> m_palette;
+	optional_device<ls259_device> m_latch;
 	optional_ioport m_in0;
 	optional_ioport m_in1;
 	optional_ioport m_in2;

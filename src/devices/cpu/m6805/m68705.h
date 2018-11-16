@@ -52,6 +52,13 @@ public:
 	// configuration helpers
 	template<std::size_t N, typename Object> devcb_base &set_port_cb_r(Object &&obj) { return m_port_cb_r[N].set_callback(std::forward<Object>(obj)); }
 	template<std::size_t N, typename Object> devcb_base &set_port_cb_w(Object &&obj) { return m_port_cb_w[N].set_callback(std::forward<Object>(obj)); }
+	auto porta_r_cb() { return m_port_cb_r[0].bind(); }
+	auto portb_r_cb() { return m_port_cb_r[1].bind(); }
+	auto portc_r_cb() { return m_port_cb_r[2].bind(); }
+	auto portd_r_cb() { return m_port_cb_r[3].bind(); }
+	auto porta_w_cb() { return m_port_cb_w[0].bind(); }
+	auto portb_w_cb() { return m_port_cb_w[1].bind(); }
+	auto portc_w_cb() { return m_port_cb_w[2].bind(); }
 
 protected:
 	// state index constants

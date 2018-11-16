@@ -14,6 +14,9 @@
 
 // ======================> dio16_98544_device
 
+namespace bus {
+	namespace hp_dio {
+
 class dio16_98544_device :
 	public device_t,
 	public device_dio16_card_interface,
@@ -41,17 +44,24 @@ public:
 	virtual space_config_vector memory_space_config() const override;
 private:
 
+	WRITE_LINE_MEMBER(vblank_w);
+	WRITE_LINE_MEMBER(int_w);
+
 	static constexpr int m_v_pix = 768;
 	static constexpr int m_h_pix = 1024;
 
 	const address_space_config m_space_config;
 	void map(address_map &map);
-
 	required_region_ptr<uint8_t> m_rom;
 	required_shared_ptr<uint8_t> m_vram;
+
+	uint8_t m_intreg;
 };
 
+} // namespace bus::hp_dio
+} // namespace bus
+
 // device type definition
-DECLARE_DEVICE_TYPE(HPDIO_98544, dio16_98544_device)
+DECLARE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device)
 
 #endif // MAME_BUS_HPDIO_98544_H

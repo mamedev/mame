@@ -235,8 +235,7 @@ void segam1_state::segam1_comms_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa7ff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
-	map(0xc000, 0xc000).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc001, 0xc001).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc000, 0xc001).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xe003, 0xe003).nopw(); // ???
 }
 
@@ -393,8 +392,7 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

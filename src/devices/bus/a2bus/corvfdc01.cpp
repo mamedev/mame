@@ -83,15 +83,16 @@ enum
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_corvfdc01_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(FDC01_FDC_TAG, FD1793, 16_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":3", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-MACHINE_CONFIG_END
+void a2bus_corvfdc01_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_wdfdc, 16_MHz_XTAL / 8);
+	m_wdfdc->intrq_wr_callback().set(FUNC(a2bus_corvfdc01_device::intrq_w));
+	m_wdfdc->drq_wr_callback().set(FUNC(a2bus_corvfdc01_device::drq_w));
+	FLOPPY_CONNECTOR(config, m_con1, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con2, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con3, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con4, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -159,16 +160,16 @@ uint8_t a2bus_corvfdc01_device::read_c0nx(uint8_t offset)
 			return m_fdc_local_status | LS_8IN_mask;
 
 		case  8:    // WD1793 at 8-11
-			return m_wdfdc->read_status();
+			return m_wdfdc->status_r();
 
 		case  9:
-			return m_wdfdc->read_track();
+			return m_wdfdc->track_r();
 
 		case 10:
-			return m_wdfdc->read_sector();
+			return m_wdfdc->sector_r();
 
 		case 11:
-			return m_wdfdc->read_data();
+			return m_wdfdc->data_r();
 	}
 
 	return 0xff;
@@ -226,19 +227,19 @@ void a2bus_corvfdc01_device::write_c0nx(uint8_t offset, uint8_t data)
 			break;
 
 		case  8:    // FDC COMMAMD REG
-			m_wdfdc->write_cmd(data);
+			m_wdfdc->cmd_w(data);
 			break;
 
 		case  9:    // FDC TRACK REG
-			m_wdfdc->write_track(data);
+			m_wdfdc->track_w(data);
 			break;
 
 		case 10:    // FDC SECTOR REG
-			m_wdfdc->write_sector(data);
+			m_wdfdc->sector_w(data);
 			break;
 
 		case 11:    // FDC DATA REG
-			m_wdfdc->write_data(data);
+			m_wdfdc->data_w(data);
 			break;
 	}
 }

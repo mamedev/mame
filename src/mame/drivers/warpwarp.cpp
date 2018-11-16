@@ -138,7 +138,6 @@ Notes:
 #include "includes/warpwarp.h"
 
 #include "cpu/i8085/i8085.h"
-#include "machine/74259.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -291,14 +290,14 @@ void warpwarp_state::geebee_map(address_map &map)
 	map(0x4000, 0x40ff).ram();
 	map(0x5000, 0x53ff).r(FUNC(warpwarp_state::geebee_in_r));
 	map(0x6000, 0x6fff).w(FUNC(warpwarp_state::geebee_out6_w));
-	map(0x7000, 0x7007).mirror(0x0ff8).w("latch", FUNC(ls259_device::write_d0));
+	map(0x7000, 0x7007).mirror(0x0ff8).w(m_latch, FUNC(ls259_device::write_d0));
 }
 
 void warpwarp_state::geebee_port_map(address_map &map)
 {
 	map(0x50, 0x53).r(FUNC(warpwarp_state::geebee_in_r));
 	map(0x60, 0x6f).w(FUNC(warpwarp_state::geebee_out6_w));
-	map(0x70, 0x77).mirror(0x08).w("latch", FUNC(ls259_device::write_d0));
+	map(0x70, 0x77).mirror(0x08).w(m_latch, FUNC(ls259_device::write_d0));
 }
 
 
@@ -311,7 +310,7 @@ void warpwarp_state::bombbee_map(address_map &map)
 	map(0x6000, 0x600f).rw(FUNC(warpwarp_state::warpwarp_sw_r), FUNC(warpwarp_state::warpwarp_out0_w));
 	map(0x6010, 0x601f).r(FUNC(warpwarp_state::warpwarp_vol_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music1_w));
 	map(0x6020, 0x602f).r(FUNC(warpwarp_state::warpwarp_dsw1_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music2_w));
-	map(0x6030, 0x6037).mirror(0x0008).w("latch", FUNC(ls259_device::write_d0));
+	map(0x6030, 0x6037).mirror(0x0008).w(m_latch, FUNC(ls259_device::write_d0));
 }
 
 void warpwarp_state::warpwarp_map(address_map &map)
@@ -323,7 +322,7 @@ void warpwarp_state::warpwarp_map(address_map &map)
 	map(0xc000, 0xc00f).rw(FUNC(warpwarp_state::warpwarp_sw_r), FUNC(warpwarp_state::warpwarp_out0_w));
 	map(0xc010, 0xc01f).r(FUNC(warpwarp_state::warpwarp_vol_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music1_w));
 	map(0xc020, 0xc02f).r(FUNC(warpwarp_state::warpwarp_dsw1_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music2_w));
-	map(0xc030, 0xc037).mirror(0x0008).w("latch", FUNC(ls259_device::write_d0));
+	map(0xc030, 0xc037).mirror(0x0008).w(m_latch, FUNC(ls259_device::write_d0));
 }
 
 
@@ -720,15 +719,15 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_DEVICE_PROGRAM_MAP(geebee_map)
 	MCFG_DEVICE_IO_MAP(geebee_port_map)
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 5N
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // LAMP 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) // LAMP 2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) // LAMP 3
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, warpwarp_state, counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, warpwarp_state, lock_out_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, warpwarp_state, geebee_bgw_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, warpwarp_state, ball_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, warpwarp_state, inv_w))
+	LS259(config, m_latch); // 5N
+	m_latch->q_out_cb<0>().set_output("led0"); // LAMP 1
+	m_latch->q_out_cb<1>().set_output("led1"); // LAMP 2
+	m_latch->q_out_cb<2>().set_output("led2"); // LAMP 3
+	m_latch->q_out_cb<3>().set(FUNC(warpwarp_state::counter_w));
+	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
+	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::geebee_bgw_w));
+	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -750,11 +749,11 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(warpwarp_state::geebeeb)
+void warpwarp_state::geebeeb(machine_config &config)
+{
 	geebee(config);
-	MCFG_DEVICE_MODIFY("latch")
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // remove coin lockout
-MACHINE_CONFIG_END
+	m_latch->q_out_cb<4>().set_nop(); // remove coin lockout
+}
 
 MACHINE_CONFIG_START(warpwarp_state::navarone)
 	geebee(config);
@@ -786,17 +785,17 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/9)
 	MCFG_DEVICE_PROGRAM_MAP(bombbee_map)
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 6L on Warp Warp
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // LAMP 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) // LAMP 2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) // LAMP 3
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, warpwarp_state, lock_out_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, warpwarp_state, counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, warpwarp_state, ball_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, warpwarp_state, inv_w))
+	LS259(config, m_latch); // 6L on Warp Warp
+	m_latch->q_out_cb<0>().set_output("led0"); // LAMP 1
+	m_latch->q_out_cb<1>().set_output("led1"); // LAMP 2
+	m_latch->q_out_cb<2>().set_output("led2"); // LAMP 3
+	m_latch->q_out_cb<3>().set_nop(); // n.c.
+	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
+	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::counter_w));
+	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

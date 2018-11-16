@@ -487,25 +487,21 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
-	//MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("laserdisc", sony_ldp1000_device, write))
-	//MCFG_ACIA6850_RXD_HANDLER(READLINE("laserdisc", sony_ldp1000_device, read))
+	//ACIA6850(config, m_acia, 0);
+	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
+	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
 
 	/* sound hardware */
 	/* TODO: mixing */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

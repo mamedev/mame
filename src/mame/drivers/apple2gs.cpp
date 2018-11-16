@@ -149,6 +149,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2GS_CPU_TAG),
 		m_screen(*this, "screen"),
+		m_scantimer(*this, "scantimer"),
 		m_adbmicro(*this, A2GS_ADBMCU_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
@@ -205,6 +206,7 @@ public:
 
 	required_device<g65816_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<timer_device> m_scantimer;
 	required_device<m5074x_device> m_adbmicro;
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_rom;
@@ -2225,16 +2227,16 @@ READ8_MEMBER(apple2gs_state::c000_r)
 			return m_speed;
 
 		case 0x38:  // SCCBREG
-			return m_scc->cb_r(space, 0);
+			return m_scc->cb_r(0);
 
 		case 0x39:  // SCCAREG
-			return m_scc->ca_r(space, 0);
+			return m_scc->ca_r(0);
 
 		case 0x3a:  // SCCBDATA
-			return m_scc->db_r(space, 0);
+			return m_scc->db_r(0);
 
 		case 0x3b:  // SCCADATA
-			return m_scc->da_r(space, 0);
+			return m_scc->da_r(0);
 
 		case 0x3c:  // SOUNDCTL
 			return m_sndglu_ctrl;
@@ -2547,19 +2549,19 @@ WRITE8_MEMBER(apple2gs_state::c000_w)
 			break;
 
 		case 0x38:  // SCCBREG
-			m_scc->cb_w(space, 0, data);
+			m_scc->cb_w(0, data);
 			break;
 
 		case 0x39:  // SCCAREG
-			m_scc->ca_w(space, 0, data);
+			m_scc->ca_w(0, data);
 			break;
 
 		case 0x3a:  // SCCBDATA
-			m_scc->db_w(space, 0, data);
+			m_scc->db_w(0, data);
 			break;
 
 		case 0x3b:  // SCCADATA
-			m_scc->da_w(space, 0, data);
+			m_scc->da_w(0, data);
 			break;
 
 		case 0x3c:  // SOUNDCTL
@@ -4532,11 +4534,12 @@ static void apple2_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", G65816, A2GS_MASTER_CLOCK/10)
-	MCFG_DEVICE_PROGRAM_MAP(apple2gs_map)
-	MCFG_DEVICE_ADDRESS_MAP(g65816_device::AS_VECTORS, vectors_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2gs_state, apple2_interrupt, "screen", 0, 1)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	G65816(config, m_maincpu, A2GS_MASTER_CLOCK/10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
+	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
+	TIMER(config, m_scantimer, 0);
+	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_DEVICE_ADD(A2GS_ADBMCU_TAG, M50741, A2GS_MASTER_CLOCK/8)
 	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))
@@ -4550,28 +4553,28 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 
 #if !RUN_ADB_MICRO
 	/* keyboard controller */
-	MCFG_DEVICE_ADD("ay3600", AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(*this, apple2gs_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(*this, apple2gs_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple2gs_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(*this, apple2gs_state, ay3600_ako_w))
+	AY3600(config, m_ay3600, 0);
+	m_ay3600->x0().set_ioport("X0");
+	m_ay3600->x1().set_ioport("X1");
+	m_ay3600->x2().set_ioport("X2");
+	m_ay3600->x3().set_ioport("X3");
+	m_ay3600->x4().set_ioport("X4");
+	m_ay3600->x5().set_ioport("X5");
+	m_ay3600->x6().set_ioport("X6");
+	m_ay3600->x7().set_ioport("X7");
+	m_ay3600->x8().set_ioport("X8");
+	m_ay3600->shift().set(FUNC(apple2gs_state::ay3600_shift_r));
+	m_ay3600->control().set(FUNC(apple2gs_state::ay3600_control_r));
+	m_ay3600->data_ready().set(FUNC(apple2gs_state::ay3600_data_ready_w));
+	m_ay3600->ako().set(FUNC(apple2gs_state::ay3600_ako_w));
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2gs_state, ay3600_repeat, attotime::from_hz(15))
 #endif
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD(A2GS_VIDEO_TAG, APPLE2_VIDEO, A2GS_14M)
+	APPLE2_VIDEO(config, m_video, A2GS_14M);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -4579,13 +4582,12 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	MCFG_SCREEN_VISIBLE_AREA(0,703,0,230)
 	MCFG_SCREEN_UPDATE_DRIVER(apple2gs_state, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs)
+	palette_device &palette(PALETTE(config, "palette", 256));
+	palette.set_init(DEVICE_SELF, FUNC(apple2gs_state::palette_init_apple2gs));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(A2GS_SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER_SOUND(config, A2GS_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -4599,180 +4601,93 @@ MACHINE_CONFIG_START( apple2gs_state::apple2gs )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* RAM */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,3M,4M,5M,6M,7M,8M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
 
 	/* C100 banking */
-	MCFG_DEVICE_ADD(A2GS_C100_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(c100bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200)
+	ADDRESS_MAP_BANK(config, A2GS_C100_TAG).set_map(&apple2gs_state::c100bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
 
 	/* C300 banking */
-	MCFG_DEVICE_ADD(A2GS_C300_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(c300bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
+	ADDRESS_MAP_BANK(config, A2GS_C300_TAG).set_map(&apple2gs_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
 
 	/* C400 banking */
-	MCFG_DEVICE_ADD(A2GS_C400_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(c400bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+	ADDRESS_MAP_BANK(config, A2GS_C400_TAG).set_map(&apple2gs_state::c400bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x400);
 
 	/* C800 banking */
-	MCFG_DEVICE_ADD(A2GS_C800_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(c800bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
+	ADDRESS_MAP_BANK(config, A2GS_C800_TAG).set_map(&apple2gs_state::c800bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x800);
 
 	/* built-in language card emulation */
-	MCFG_DEVICE_ADD(A2GS_LCBANK_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(lcbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2GS_LCBANK_TAG).set_map(&apple2gs_state::lcbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* aux bank language card emulation */
-	MCFG_DEVICE_ADD(A2GS_LCAUX_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(lcaux_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2GS_LCAUX_TAG).set_map(&apple2gs_state::lcaux_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* bank 00 language card emulation */
-	MCFG_DEVICE_ADD(A2GS_LC00_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(lc00_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2GS_LC00_TAG).set_map(&apple2gs_state::lc00_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* bank 01 language card emulation */
-	MCFG_DEVICE_ADD(A2GS_LC01_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(lc01_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2GS_LC01_TAG).set_map(&apple2gs_state::lc01_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* /INH banking */
-	MCFG_DEVICE_ADD(A2GS_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2GS_UPPERBANK_TAG).set_map(&apple2gs_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* /INH banking - aux bank */
-	MCFG_DEVICE_ADD(A2GS_AUXUPPER_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inhaux_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2GS_AUXUPPER_TAG).set_map(&apple2gs_state::inhaux_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* /INH banking - bank 00 */
-	MCFG_DEVICE_ADD(A2GS_00UPPER_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inh00_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2GS_00UPPER_TAG).set_map(&apple2gs_state::inh00_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* /INH banking - bank 01 */
-	MCFG_DEVICE_ADD(A2GS_01UPPER_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inh01_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+	ADDRESS_MAP_BANK(config, A2GS_01UPPER_TAG).set_map(&apple2gs_state::inh01_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* Bank 0 - I/O and LC area */
-	MCFG_DEVICE_ADD(A2GS_B0CXXX_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank0_iolc_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, A2GS_B0CXXX_TAG).set_map(&apple2gs_state::bank0_iolc_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* Bank 1 - lower 48K */
-	MCFG_DEVICE_ADD(A2GS_B01_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank1_lower48_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0xc000)
+	ADDRESS_MAP_BANK(config, A2GS_B01_TAG).set_map(&apple2gs_state::bank1_lower48_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0xc000);
 
 	/* Bank 1 - I/O and LC area */
-	MCFG_DEVICE_ADD(A2GS_B1CXXX_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank1_iolc_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, A2GS_B1CXXX_TAG).set_map(&apple2gs_state::bank1_iolc_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* Bank 0 0000 banking */
-	MCFG_DEVICE_ADD(A2GS_B00000_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rb0000bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200)
+	ADDRESS_MAP_BANK(config, A2GS_B00000_TAG).set_map(&apple2gs_state::rb0000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
 
 	/* Bank 0 0200 banking */
-	MCFG_DEVICE_ADD(A2GS_B00200_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rb0200bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200)
+	ADDRESS_MAP_BANK(config, A2GS_B00200_TAG).set_map(&apple2gs_state::rb0200bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
 
 	/* Bank 0 0400 banking */
-	MCFG_DEVICE_ADD(A2GS_B00400_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rb0400bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+	ADDRESS_MAP_BANK(config, A2GS_B00400_TAG).set_map(&apple2gs_state::rb0400bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x400);
 
 	/* Bank 0 0800 banking */
-	MCFG_DEVICE_ADD(A2GS_B00800_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rb0800bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, A2GS_B00800_TAG).set_map(&apple2gs_state::rb0800bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	/* Bank 0 2000 banking */
-	MCFG_DEVICE_ADD(A2GS_B02000_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rb2000bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, A2GS_B02000_TAG).set_map(&apple2gs_state::rb2000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 
 	/* Bank 0 4000 banking */
-	MCFG_DEVICE_ADD(A2GS_B04000_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rb4000bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, A2GS_B04000_TAG).set_map(&apple2gs_state::rb4000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x8000);
 
 	/* serial */
-	MCFG_DEVICE_ADD(SCC_TAG, SCC85C30, A2GS_14M/2)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, apple2gs_state, scc_irq_w))
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	SCC85C30(config, m_scc, A2GS_14M/2);
+	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
+	m_scc->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
-	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple2gs_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple2gs_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple2gs_state, a2bus_inh_w))
+	A2BUS(config, m_a2bus, 0);
+	m_a2bus->set_cputag("maincpu");
+	m_a2bus->irq_w().set(FUNC(apple2gs_state::a2bus_irq_w));
+	m_a2bus->nmi_w().set(FUNC(apple2gs_state::a2bus_nmi_w));
+	m_a2bus->inh_w().set(FUNC(apple2gs_state::a2bus_inh_w));
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
@@ -4790,10 +4705,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( apple2gs_state::apple2gsr1 )
 	apple2gs(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1280K")  // 256K on board + 1M in the expansion slot was common for ROM 01
-	MCFG_RAM_EXTRA_OPTIONS("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M,8M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+
+	// 256K on board + 1M in the expansion slot was common for ROM 01
+	m_ram->set_default_size("1280K").set_extra_options("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
 
 	MCFG_DEVICE_REPLACE(A2GS_ADBMCU_TAG, M50740, A2GS_MASTER_CLOCK/8)
 	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(*this, apple2gs_state, adbmicro_p0_in))

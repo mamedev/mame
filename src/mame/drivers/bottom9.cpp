@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, bottom9_state, volume_callback0))

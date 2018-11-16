@@ -775,14 +775,14 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	m_pic_s->out_int_callback().set(m_pic_m, FUNC(pic8259_device::ir7_w));
 	m_pic_s->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD("upd7201", UPD7201, MAIN_CLK/4) // channel b clock set by pit2 channel 2
+	UPD7201(config, m_scc, MAIN_CLK/4); // channel b clock set by pit2 channel 2
 	// Channel A: Keyboard
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("kbd", rs232_port_device, write_txd))
+	m_scc->out_txda_callback().set(m_kbd, FUNC(rs232_port_device::write_txd));
 	// Channel B: RS232
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, qx10_state, keyboard_irq))
+	m_scc->out_txdb_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtrb_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsb_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_scc->out_int_callback().set(FUNC(qx10_state::keyboard_irq));
 
 	AM9517A(config, m_dma_1, MAIN_CLK/4);
 	m_dma_1->out_hreq_callback().set(FUNC(qx10_state::dma_hrq_changed));
@@ -806,7 +806,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq_callback().set(m_pic_s, FUNC(pic8259_device::ir2_w));
+	m_rtc->irq().set(m_pic_s, FUNC(pic8259_device::ir2_w));
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(qx10_state::qx10_upd765_interrupt));
@@ -814,15 +814,14 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	FLOPPY_CONNECTOR(config, m_floppy[0], qx10_floppies, "525dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], qx10_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("upd7201", upd7201_device, rxb_w))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_scc, FUNC(upd7201_device::rxb_w));
 
-	MCFG_DEVICE_ADD("kbd", RS232_PORT, keyboard, "qx10")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("upd7201", z80dart_device, rxa_w))
+	RS232_PORT(config, m_kbd, keyboard, "qx10");
+	m_kbd->rxd_handler().set(m_scc, FUNC(upd7201_device::rxa_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, RAM_TAG).set_default_size("256K");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "qx10_flop")

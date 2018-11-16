@@ -246,14 +246,14 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bsktball_state, bsktball_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // M6
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // Coin Counter
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led0")) // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // LED 2
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bsktball_state, ld1_w)) // LD 1
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, bsktball_state, ld2_w)) // LD 2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<BSKTBALL_NOISE_EN>)) // Noise Reset
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, bsktball_state, nmion_w)) // NMI On
+	f9334_device &outlatch(F9334(config, "outlatch")); // M6
+	outlatch.q_out_cb<1>().set_nop(); // Coin Counter
+	outlatch.q_out_cb<2>().set_output("led0"); // LED 1
+	outlatch.q_out_cb<3>().set_output("led1"); // LED 2
+	outlatch.q_out_cb<4>().set(FUNC(bsktball_state::ld1_w)); // LD 1
+	outlatch.q_out_cb<5>().set(FUNC(bsktball_state::ld2_w)); // LD 2
+	outlatch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<BSKTBALL_NOISE_EN>)); // Noise Reset
+	outlatch.q_out_cb<7>().set(FUNC(bsktball_state::nmion_w)); // NMI On
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

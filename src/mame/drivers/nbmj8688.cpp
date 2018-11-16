@@ -2460,7 +2460,7 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8688_state, irq0_line_hold)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2479,10 +2479,10 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("psg", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nbmj8688_state, dipsw1_r))     // DIPSW-A read
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, nbmj8688_state, dipsw2_r))     // DIPSW-B read
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
+	ay8910_device &psg(AY8910(config, "psg", 1250000));
+	psg.port_a_read_callback().set(FUNC(nbmj8688_state::dipsw1_r));     // DIPSW-A read
+	psg.port_b_read_callback().set(FUNC(nbmj8688_state::dipsw2_r));     // DIPSW-B read
+	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -2629,7 +2629,7 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	MCFG_DEVICE_IO_MAP(p16bit_LCD_io_map)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 65536)
@@ -2676,10 +2676,10 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("psg", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nbmj8688_state, dipsw1_r))     // DIPSW-A read
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, nbmj8688_state, dipsw2_r))     // DIPSW-B read
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
+	ay8910_device &psg(AY8910(config, "psg", 1250000));
+	psg.port_a_read_callback().set(FUNC(nbmj8688_state::dipsw1_r));     // DIPSW-A read
+	psg.port_b_read_callback().set(FUNC(nbmj8688_state::dipsw2_r));     // DIPSW-B read
+	psg.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

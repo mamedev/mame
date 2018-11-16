@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	MCFG_DEVICE_ADD("maincpu", MC6809, MASTER_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(mpu12wbk_map)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -519,8 +519,7 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, "ay8910", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.00);   /* clock guessed */
 
 MACHINE_CONFIG_END
 

@@ -15,12 +15,9 @@ zooming might be wrong (only used on title logo?)
 #include "screen.h"
 
 /* sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers */
-WRITE16_MEMBER(taotaido_state::sprite_character_bank_select_w)
+WRITE8_MEMBER(taotaido_state::spritebank_w)
 {
-	if(ACCESSING_BITS_8_15)
-		m_sprite_character_bank_select[offset*2] = data >> 8;
-	if(ACCESSING_BITS_0_7)
-		m_sprite_character_bank_select[offset*2+1] = data &0xff;
+	m_spritebank[offset] = data;
 }
 
 /* sprites are like the other video system / psikyo games, we can merge this with aerofgt and plenty of other
@@ -46,9 +43,9 @@ WRITE16_MEMBER(taotaido_state::tileregs_w)
 		case 6:
 		case 7:
 			if(ACCESSING_BITS_8_15)
-				m_video_bank_select[(offset-4)*2] = data >> 8;
+				m_bgbank[(offset - 4) << 1] = data >> 8;
 			if(ACCESSING_BITS_0_7)
-				m_video_bank_select[(offset-4)*2+1] = data &0xff;
+				m_bgbank[((offset - 4) << 1) + 1] = data & 0xff;
 			m_bg_tilemap->mark_all_dirty();
 			break;
 	}
@@ -62,34 +59,31 @@ WRITE16_MEMBER(taotaido_state::bgvideoram_w)
 
 TILE_GET_INFO_MEMBER(taotaido_state::bg_tile_info)
 {
-	int code = m_bgram[tile_index]&0x01ff;
-	int bank = (m_bgram[tile_index]&0x0e00)>>9;
-	int col  = (m_bgram[tile_index]&0xf000)>>12;
+	int code = m_bgram[tile_index] & 0x01ff;
+	int bank =(m_bgram[tile_index] & 0x0e00) >> 9;
+	int col  =(m_bgram[tile_index] & 0xf000) >> 12;
 
-	code |= m_video_bank_select[bank]*0x200;
+	code |= m_bgbank[bank] << 9;
 
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			col,
-			0);
+	SET_TILE_INFO_MEMBER(1, code, col, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(taotaido_state::tilemap_scan_rows)
 {
 	/* logical (col,row) -> memory offset */
-	return row*0x40 + (col&0x3f) + ((col&0x40)<<6);
+	return (col & 0x3f) | ((row & 0x3f) << 6) | ((col & 0x40) << 6);
 }
 
 
 uint32_t taotaido_state::tile_callback( uint32_t code )
 {
-	code = m_spriteram2_older[code&0x7fff];
+	code = m_spriteram2_older[code & 0x7fff];
 
 	if (code > 0x3fff)
 	{
-		int block = (code & 0x3800)>>11;
+		int block = (code & 0x3800) >> 11;
 		code &= 0x07ff;
-		code |= m_sprite_character_bank_select[block] * 0x800;
+		code |= m_spritebank[block] << 11;
 	}
 
 	return code;
@@ -106,8 +100,11 @@ void taotaido_state::video_start()
 	m_spriteram2_old = std::make_unique<uint16_t[]>(0x10000/2);
 	m_spriteram2_older = std::make_unique<uint16_t[]>(0x10000/2);
 
-	save_item(NAME(m_sprite_character_bank_select));
-	save_item(NAME(m_video_bank_select));
+	save_item(NAME(m_bgbank));
+	save_pointer(NAME(m_spriteram_old), 0x2000/2);
+	save_pointer(NAME(m_spriteram_older), 0x2000/2);
+	save_pointer(NAME(m_spriteram2_old), 0x10000/2);
+	save_pointer(NAME(m_spriteram2_older), 0x10000/2);
 }
 
 
@@ -117,23 +114,19 @@ uint32_t taotaido_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //  m_bg_tilemap->set_scrolly(0,(m_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
 
 	/* not amazingly efficient however it should be functional for row select and linescroll */
-	int line;
-	rectangle clip;
+	rectangle clip = cliprect;
 
-	const rectangle &visarea = screen.visible_area();
-	clip = visarea;
-
-	for (line = 0; line < 224;line++)
+	for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 	{
 		clip.min_y = clip.max_y = line;
 
-		m_bg_tilemap->set_scrollx(0,((m_scrollram[(0x00+4*line)/2])>>4)+30);
-		m_bg_tilemap->set_scrolly(0,((m_scrollram[(0x02+4*line)/2])>>4)-line);
+		m_bg_tilemap->set_scrollx(0, ((m_scrollram[(0x00 + 4 * line) / 2]) >> 4) + 30);
+		m_bg_tilemap->set_scrolly(0, ((m_scrollram[(0x02 + 4 * line) / 2]) >> 4) - line);
 
 		m_bg_tilemap->draw(screen, bitmap, clip, 0,0);
 	}
 
-	m_spr->draw_sprites(m_spriteram_older.get(), m_spriteram.bytes(), screen, bitmap,cliprect);
+	m_spr->draw_sprites(m_spriteram_older.get(), m_spriteram.bytes(), screen, bitmap, cliprect);
 	return 0;
 }
 

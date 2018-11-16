@@ -193,8 +193,8 @@ READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)
 WRITE8_MEMBER(cliffhgr_state::cliff_sound_overlay_w)
 {
 	/* audio */
-	m_discrete->write(space, CLIFF_ENABLE_SND_1, data & 1);
-	m_discrete->write(space, CLIFF_ENABLE_SND_2, (data >> 1) & 1);
+	m_discrete->write(CLIFF_ENABLE_SND_1, data & 1);
+	m_discrete->write(CLIFF_ENABLE_SND_2, (data >> 1) & 1);
 
 	// bit 4 (data & 0x10) is overlay related?
 }
@@ -695,16 +695,16 @@ MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
 	MCFG_DEVICE_IO_MAP(mainport)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DEVICE(tms9928a_device::TOTAL_HORZ, tms9928a_device::TOTAL_VERT_NTSC, "tms9928a", tms9928a_device, screen_update)
 	MCFG_LASERDISC_OVERLAY_CLIP(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1)
 
 	/* start with the TMS9928a video configuration */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL(10'738'635) / 2 )   /* TMS9128NL on the board */
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	tms9128_device &vdp(TMS9128(config, "tms9928a", XTAL(10'738'635)));   /* TMS9128NL on the board */
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* override video rendering and raw screen info */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

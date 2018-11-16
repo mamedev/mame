@@ -152,10 +152,9 @@ MACHINE_CONFIG_START(su2000_state::su2000)
 
 	pcat_common(config);
 
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	DS12885(config.replace(), m_mc146818); // TODO: Rename m_mc146818 to m_rtc
+	m_mc146818->irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
+	m_mc146818->set_century_index(0x32);
 MACHINE_CONFIG_END
 
 

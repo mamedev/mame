@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", orbit_state, nmi_32v, "screen", 0, 32)
 
-	MCFG_DEVICE_ADD(m_latch, F9334, 0) // M6
+	F9334(config, m_latch); // M6
 	/* BIT0 => UNUSED       */
 	/* BIT1 => LOCKOUT      */
 	/* BIT2 => NMI ENABLE   */
@@ -283,12 +283,12 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	/* BIT5 => PANEL STROBE */
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, orbit_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0"))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led1"))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m_discrete, discrete_device, write_line<ORBIT_WARNING_EN>))
+	m_latch->q_out_cb<1>().set(FUNC(orbit_state::coin_lockout_w));
+	m_latch->q_out_cb<3>().set_output("led0");
+	m_latch->q_out_cb<6>().set_output("led1");
+	m_latch->q_out_cb<7>().set(m_discrete, FUNC(discrete_device::write_line<ORBIT_WARNING_EN>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

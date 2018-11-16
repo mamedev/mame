@@ -234,6 +234,6 @@ void c64_currah_speech_cartridge_device::c64_cd_w(address_space &space, offs_t o
 
 		set_osc1(voice, intonation);
 
-		m_nsp->ald_w(space, 0, data & 0x3f);
+		m_nsp->ald_w(data & 0x3f);
 	}
 }
