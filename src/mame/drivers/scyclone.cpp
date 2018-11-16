@@ -622,7 +622,7 @@ MACHINE_CONFIG_START(scyclone_state::scyclone)
 	// no idea, but it does wait on an irq in places, irq0 increases a register checked in the wait loop so without it sound dies after a while
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(scyclone_state, irq0_line_hold, 400*60)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* add shifter */
 	MB14241(config, "mb14241");

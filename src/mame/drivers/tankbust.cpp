@@ -366,13 +366,12 @@ MACHINE_CONFIG_START(tankbust_state::tankbust)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tankbust_state, soundlatch_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tankbust_state, soundtimer_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(14'318'181)/16));  /* Verified on PCB */
+	ay1.port_a_read_callback().set(FUNC(tankbust_state::soundlatch_r));
+	ay1.port_b_read_callback().set(FUNC(tankbust_state::soundtimer_r));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	AY8910(config, "ay2", XTAL(14'318'181)/16).add_route(ALL_OUTPUTS, "mono", 0.10);  /* Verified on PCB */
 MACHINE_CONFIG_END
 
 

@@ -10,7 +10,6 @@ Skeleton driver for M6800-based display terminals by Qume.
 #include "cpu/m6800/m6800.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/6850acia.h"
-#include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "video/mc6845.h"
@@ -80,12 +79,10 @@ MACHINE_CONFIG_START(qvt6800_state::qvt102)
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'669'800) / 9));
+	ctc.set_clk<0>(16.6698_MHz_XTAL / 18); // OR of CRTC CLK and ϕ1
+	ctc.set_clk<1>(16.6698_MHz_XTAL / 18); // OR of CRTC CLK and ϕ1
 	ctc.zc_callback<0>().set("acia", FUNC(acia6850_device::write_txc));
 	ctc.zc_callback<1>().set("acia", FUNC(acia6850_device::write_rxc));
-
-	clock_device &ctcclk(CLOCK(config, "ctcclk", 16.6698_MHz_XTAL / 18)); // OR of CRTC CLK and ϕ1
-	ctcclk.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
-	ctcclk.signal_handler().append("ctc", FUNC(z80ctc_device::trg1));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'669'800), 882, 0, 720, 315, 0, 300)

@@ -151,7 +151,7 @@ std::vector<std::pair<int, const address_space_config *>> m37710_cpu_device::mem
 
 /* interrupt control mapping */
 
-const int m37710_cpu_device::m37710_irq_levels[M37710_LINE_MAX] =
+const int m37710_cpu_device::m37710_irq_levels[M37710_INTERRUPT_MAX] =
 {
 	// maskable
 	0x6f,   // DMA3          0
@@ -171,7 +171,7 @@ const int m37710_cpu_device::m37710_irq_levels[M37710_LINE_MAX] =
 	0x77,   // Timer A2     14
 	0x76,   // Timer A1     15
 	0x75,   // Timer A0     16
-	0x7f,                                                                                                                                                                                          // IRQ 2         13
+	0x7f,   // IRQ 2        13
 	0x7e,   // IRQ 1        18
 	0x7d,   // IRQ 0        19
 
@@ -183,7 +183,7 @@ const int m37710_cpu_device::m37710_irq_levels[M37710_LINE_MAX] =
 	0,  // reset
 };
 
-const int m37710_cpu_device::m37710_irq_vectors[M37710_LINE_MAX] =
+const int m37710_cpu_device::m37710_irq_vectors[M37710_INTERRUPT_MAX] =
 {
 	// maskable
 	0xffce, // DMA3
@@ -375,20 +375,31 @@ void m37710_cpu_device::m37710_external_tick(int timer, int state)
 		return;
 	}
 
-	// check if enabled
+	// check if enabled and in event counter mode
 	if (m_m37710_regs[0x40] & (1<<timer))
 	{
 		if ((m_m37710_regs[0x56+timer] & 0x3) == 1)
 		{
-			if (m_m37710_regs[0x46+(timer*2)] == 0xff)
+			int upcount = 0;
+
+			// timer b always counts down
+			if (timer <= 4)
 			{
-				m_m37710_regs[0x46+(timer*2)] = 0;
-				m_m37710_regs[0x46+(timer*2)+1]++;
+				if (m_m37710_regs[0x56+timer] & 0x10)
+				{
+					// up/down determined by timer out pin
+					upcount = m_timer_out[timer];
+				}
+				else
+					upcount = m_m37710_regs[0x44] >> timer & 1;
 			}
-			else
-			{
-				m_m37710_regs[0x46+(timer*2)]++;
-			}
+
+			int incval = (upcount) ? 1 : -1;
+			int edgeval = (upcount) ? 0xff : 0x00;
+
+			if (m_m37710_regs[0x46+(timer*2)] == edgeval)
+				m_m37710_regs[0x46+(timer*2)+1] += incval;
+			m_m37710_regs[0x46+(timer*2)] += incval;
 		}
 		else
 		{
@@ -756,7 +767,7 @@ void m37710_cpu_device::m37710i_update_irqs()
 	int wantedIRQ = -1;
 	int curpri = 0;
 
-	for (curirq = M37710_LINE_MAX - 1; curirq >= 0; curirq--)
+	for (curirq = M37710_INTERRUPT_MAX - 1; curirq >= 0; curirq--)
 	{
 		if ((pending & (1 << curirq)))
 		{
@@ -1014,6 +1025,7 @@ void m37710_cpu_device::device_start()
 	{
 		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m37710_cpu_device::m37710_timer_cb), this));
 		m_reload[i] = attotime::never;
+		m_timer_out[i] = 0;
 	}
 
 	save_item(NAME(m_a));
@@ -1058,6 +1070,7 @@ void m37710_cpu_device::device_start()
 	save_item(NAME(m_reload[5]));
 	save_item(NAME(m_reload[6]));
 	save_item(NAME(m_reload[7]));
+	save_item(NAME(m_timer_out));
 
 	machine().save().register_postload(save_prepost_delegate(save_prepost_delegate(FUNC(m37710_cpu_device::m37710_restore_state), this)));
 
@@ -1178,15 +1191,26 @@ void m37710_cpu_device::execute_set_input(int inputnum, int state)
 			m37710_set_irq_line(inputnum, state);
 			break;
 
-		case M37710_LINE_TIMERA0TICK:
-		case M37710_LINE_TIMERA1TICK:
-		case M37710_LINE_TIMERA2TICK:
-		case M37710_LINE_TIMERA3TICK:
-		case M37710_LINE_TIMERA4TICK:
-		case M37710_LINE_TIMERB0TICK:
-		case M37710_LINE_TIMERB1TICK:
-		case M37710_LINE_TIMERB2TICK:
-			m37710_external_tick(inputnum - M37710_LINE_TIMERA0TICK, state);
+		case M37710_LINE_TIMERA0IN:
+		case M37710_LINE_TIMERA1IN:
+		case M37710_LINE_TIMERA2IN:
+		case M37710_LINE_TIMERA3IN:
+		case M37710_LINE_TIMERA4IN:
+		case M37710_LINE_TIMERB0IN:
+		case M37710_LINE_TIMERB1IN:
+		case M37710_LINE_TIMERB2IN:
+			m37710_external_tick(inputnum - M37710_LINE_TIMERA0IN, state);
+			break;
+
+		case M37710_LINE_TIMERA0OUT:
+		case M37710_LINE_TIMERA1OUT:
+		case M37710_LINE_TIMERA2OUT:
+		case M37710_LINE_TIMERA3OUT:
+		case M37710_LINE_TIMERA4OUT:
+		case M37710_LINE_TIMERB0OUT:
+		case M37710_LINE_TIMERB1OUT:
+		case M37710_LINE_TIMERB2OUT:
+			m_timer_out[inputnum - M37710_LINE_TIMERA0OUT] = state ? 1 : 0;
 			break;
 	}
 }

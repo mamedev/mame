@@ -1263,6 +1263,96 @@ void screen_device::reset_partial_updates()
 
 
 //-------------------------------------------------
+//  pixel - returns the RGB value of the specified
+//  pixel location
+//-------------------------------------------------
+
+u32 screen_device::pixel(s32 x, s32 y)
+{
+	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	if (!curbitmap.valid())
+		return 0;
+
+	const int srcwidth = curbitmap.width();
+	const int srcheight = curbitmap.height();
+
+	if (x < 0 || y < 0 || x >= srcwidth || y >= srcheight)
+		return 0;
+
+	switch (curbitmap.format())
+	{
+		case BITMAP_FORMAT_IND16:
+		{
+			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
+			const u16 src = srcbitmap.pix(y, x);
+			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+			return (u32)palette[src];
+		}
+
+		case BITMAP_FORMAT_RGB32:
+		{
+			// iterate over rows in the destination
+			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
+			return (u32)srcbitmap.pix(y, x);
+		}
+
+		default:
+			return 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  pixels - fills the specified buffer with the
+//  RGB values of each pixel in the screen.
+//-------------------------------------------------
+
+void screen_device::pixels(u32 *buffer)
+{
+	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	if (!curbitmap.valid())
+		return;
+
+	const rectangle &visarea = visible_area();
+
+	switch (curbitmap.format())
+	{
+		case BITMAP_FORMAT_IND16:
+		{
+			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
+			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+			for (int y = visarea.min_y; y <= visarea.max_y; y++)
+			{
+				const u16 *src = &srcbitmap.pix(y, visarea.min_x);
+				for (int x = visarea.min_x; x <= visarea.max_x; x++)
+				{
+					*buffer++ = palette[*src++];
+				}
+			}
+			break;
+		}
+
+		case BITMAP_FORMAT_RGB32:
+		{
+			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
+			for (int y = visarea.min_y; y <= visarea.max_y; y++)
+			{
+				const u32 *src = &srcbitmap.pix(y, visarea.min_x);
+				for (int x = visarea.min_x; x <= visarea.max_x; x++)
+				{
+					*buffer++ = *src++;
+				}
+			}
+			break;
+		}
+
+		default:
+			break;
+	}
+}
+
+
+//-------------------------------------------------
 //  vpos - returns the current vertical position
 //  of the beam
 //-------------------------------------------------

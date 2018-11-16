@@ -177,7 +177,7 @@ ROM Daughterboard PCBs
 This PCB holds all the ROMs.
 There are three known types of ROM daughterboards used on S10 games (so far).
 All of the PCBs are the same size (approx 5" x 5") containing one custom connector surface-mounted to the underside of
-the PCB, some MASKROMs/FlashROMs, a CPLD (which seems to be the customary 'KEYCUS' chip. On the 2nd type a RAM
+the PCB, some mask ROMs/flash ROMs, a CPLD (which seems to be the customary 'KEYCUS' chip. On the 2nd type a RAM
 chip is also present. The 3rd type has additional hardware to decode MP3 audio and a ROMless Microcontroller.
 
 ********
@@ -209,7 +209,7 @@ System10 MEM(M) PCB 8906961000 (8906970700)
 Notes:
       CY37128VP160: CY37128VP160 Cypress Complex Programmable Logic Device (TQFP160)
       1A - 5A     : Intel Flash DA28F640J5 64MBit Flash EEPROM (SSOP56)
-      1D - 7E     : Samsung Electronics K3N9V1000A-YC 128MBit MASK ROM (TSOP48) (see note 3)
+      1D - 7E     : Samsung Electronics K3N9V1000A-YC 128MBit mask ROM (TSOP48) (see note 3)
       J1          : 6 pin header for programming the CPLD via JTAG
 
 This PCB is used on:
@@ -926,7 +926,7 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 	MCFG_DEVICE_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
 	MCFG_DEVICE_PROGRAM_MAP( namcos10_memm_map )
 
-	// The bios first configures the rom window as 80000-big, then
+	// The bios first configures the ROM window as 80000-big, then
 	// switches to 400000.  If berr is active, the first configuration
 	// wipes all handlers after 1fc80000, which kills the system
 	// afterwards
@@ -953,7 +953,7 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 	MCFG_DEVICE_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
 	MCFG_DEVICE_PROGRAM_MAP( namcos10_memn_map )
 
-	// The bios first configures the rom window as 80000-big, then
+	// The bios first configures the ROM window as 80000-big, then
 	// switches to 400000.  If berr is active, the first configuration
 	// wipes all handlers after 1fc80000, which kills the system
 	// afterwards

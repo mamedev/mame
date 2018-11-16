@@ -435,8 +435,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(19'968'000)/16)  /* ? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	AY8910(config, "aysnd", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.33);  /* ? */
 MACHINE_CONFIG_END
 
 ROM_START( sbowling )

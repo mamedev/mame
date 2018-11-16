@@ -271,7 +271,7 @@ GFXDECODE_END
  *  Video emulation
  *
  *************************************/
-	
+
 uint32_t mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return m_video->draw(screen, bitmap, cliprect);

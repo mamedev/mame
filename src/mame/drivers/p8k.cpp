@@ -455,9 +455,9 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	sio.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
 
 	z80sio_device& sio1(Z80SIO(config, "sio1", XTAL(4'000'000)));
 	sio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -472,8 +472,8 @@ MACHINE_CONFIG_START(p8k_state::p8k)
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio2->in_pa_callback().set_ioport("DSW");
 
-	MCFG_I8272A_ADD("i8272", true)
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	I8272A(config, m_i8272, true);
+	m_i8272->drq_wr_callback().set("dma", FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
@@ -512,9 +512,9 @@ MACHINE_CONFIG_START(p8k_state::p8k_16)
 	sio.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	sio.out_int_callback().set(FUNC(p8k_state::p8k_16_daisy_interrupt));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
 
 	z80sio_device& sio1(Z80SIO(config, "sio1", XTAL(4'000'000)));
 	sio1.out_int_callback().set(FUNC(p8k_state::p8k_16_daisy_interrupt));

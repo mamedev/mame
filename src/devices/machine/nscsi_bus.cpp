@@ -9,7 +9,7 @@
 #define LOG_DATA    (1U << 3)
 
 //#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL | LOG_DATA)
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE 0
 
 #include "logmacro.h"
 

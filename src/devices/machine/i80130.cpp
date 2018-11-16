@@ -100,18 +100,19 @@ const tiny_rom_entry *i80130_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(i80130_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, i80130_device, irq_w))
+void i80130_device::device_add_mconfig(machine_config &config)
+{
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set(FUNC(i80130_device::irq_w));
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, i80130_device, systick_w))
-	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, i80130_device, delay_w))
-	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, i80130_device, baud_w))
-MACHINE_CONFIG_END
+	PIT8254(config, m_pit, 0);
+	m_pit->set_clk<0>(0);
+	m_pit->out_handler<0>().set(FUNC(i80130_device::systick_w));
+	m_pit->set_clk<1>(0);
+	m_pit->out_handler<1>().set(FUNC(i80130_device::delay_w));
+	m_pit->set_clk<2>(0);
+	m_pit->out_handler<2>().set(FUNC(i80130_device::baud_w));
+}
 
 
 

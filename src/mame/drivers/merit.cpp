@@ -1440,9 +1440,9 @@ MACHINE_CONFIG_START(merit_state::pitboss)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, CRTC_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, merit_state, led2_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8912_device &aysnd(AY8912(config, "aysnd", CRTC_CLOCK));
+	aysnd.port_a_write_callback().set(FUNC(merit_state::led2_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::casino5)

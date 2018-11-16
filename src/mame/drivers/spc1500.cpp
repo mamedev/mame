@@ -912,10 +912,10 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(4'000'000) / 2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1500_state, psga_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, spc1500_state, psgb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_sound, XTAL(4'000'000) / 2);
+	m_sound->port_a_read_callback().set(FUNC(spc1500_state::psga_r));
+	m_sound->port_b_write_callback().set(FUNC(spc1500_state::psgb_w));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")

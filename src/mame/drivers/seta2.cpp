@@ -89,8 +89,8 @@ deerhunt,wschamp:
   in to the deer. In wschamp intro the GPS unit should zoom to the high scores.
 
 wschampb:
-- dumps of the program roms matched the hand written checksum for each chip, but
-  the boot screen reports NG for both roms. - Is this correct and a bug from the
+- dumps of the program ROMs matched the hand written checksum for each chip, but
+  the boot screen reports NG for both ROMs. - Is this correct and a bug from the
   original release? Is that why the next bug fix release is v1.01? IE: such a
   a minor increase in the version number.
 
@@ -2575,13 +2575,13 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 }
 
 MACHINE_CONFIG_START(seta2_state::seta2)
-	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_ADD(m_maincpu, M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
 	MCFG_DEVICE_PROGRAM_MAP(mj4simai_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -2613,9 +2613,8 @@ MACHINE_CONFIG_START(seta2_state::gundamex)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gundamex_map)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, seta2_state, gundamex_eeprom_r))
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, gundamex_eeprom_w))
+	m_tmp68301->in_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_r));
+	m_tmp68301->out_parallel_callback().set(FUNC(seta2_state::gundamex_eeprom_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -2697,8 +2696,7 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(reelquak_map)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, reelquak_leds_w))
+	m_tmp68301->out_parallel_callback().set(FUNC(seta2_state::reelquak_leds_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2717,8 +2715,7 @@ MACHINE_CONFIG_START(seta2_state::samshoot)
 	MCFG_DEVICE_PROGRAM_MAP(samshoot_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("DSW2"))
+	m_tmp68301->in_parallel_callback().set_ioport("DSW2");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2750,8 +2747,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(telpacfl_map)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("KNOB"))
+	m_tmp68301->in_parallel_callback().set_ioport("KNOB");
 
 	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
@@ -2859,13 +2855,13 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seta2_state::namcostr)
-	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_ADD(m_maincpu, M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
 	MCFG_DEVICE_PROGRAM_MAP(namcostr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)  // does this have a ticket dispenser?
-	MCFG_TMP68301_CPU("maincpu")
+	TMP68301(config, m_tmp68301, 0);  // does this have a ticket dispenser?
+	m_tmp68301->set_cputag(m_maincpu);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3012,7 +3008,7 @@ SW4  - Single position slider switch
 
 U3  - Is a 27C4002 EPROM
 U49 - Is a 27C1001 EPROM
-U42, U43 & U47 are MASK ROMs read as 27C322
+U42, U43 & U47 are mask ROMs read as 27C322
 
 The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 
@@ -3176,13 +3172,14 @@ PCB Number: P-FG01-1
   |            |DX |       3  50MHz 32MHz*                  |
   |            |102|       8                                |
 +-+            +---+                    M  M   +---+        |
-|              D D                      4  4   |DX |        |
+|       SW1*   D D                      4  4   |DX |        |
 |              S S                             |102|        |
 |              W W                             +---+        |
 |              2 1                                          |
 +-----------------------------------------------------------+
 
 U56 is unpopulated 93C45 EEPROM
+SW1 is unpopulated Reset push button
 CN4 - 96 pin connector (3 rows by 32 pins)
 * Denotes not populated.
 
@@ -3212,6 +3209,7 @@ There is known to exist an undumped version of Guardians on the
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz, 32.530MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         93C46 EEPROM
 
 Memory:
@@ -3250,7 +3248,7 @@ PCB Number: P0-113A  BP49KA
   |                    P P                     |      U21*     ||
 +-+  C                 A A       M M           +---------------+|
 |    N    DSW1         L L       3 3                            |
-|    1    DSW2                                                  |
+|    1    DSW2 SW1                                              |
 +---------------------------------------------------------------+
 
 U2 is KA2 001 001 EPROM
@@ -3339,6 +3337,7 @@ This game runs on Seta/Allumer hardware
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz, 32.530MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         93C46 EEPROM
 
 Memory:
@@ -3377,7 +3376,7 @@ PCB Number: P0-113A  BP49KA
   |                    P P                     |KA-001-006 U21||
 +-+  C                 A A       M M           +--------------+|
 |    N    DSW1         L L       3 3                           |
-|    1    DSW2                                                 |
+|    1    DSW2 SW1                                             |
 +--------------------------------------------------------------+
 
 U28 is KA-001-015 mask ROM (silkscreened SOUND ROM)
@@ -3456,13 +3455,70 @@ ROM_END
 Kosodate Quiz My Angel (JPN Ver.)
 (c)1996 Namco
 
-Board:  KE (Namco) ; P0-125A (Seta)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP, @ U10)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz
+ Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
+        GAL 16V8 at U38
 
-CPU:    TMP68301 (68000 core)
-OSC:    50.0000MHz
-        32.5304MHz
+Memory:
+M1 are HM628128LFP-10L at U42 & U43
+M2 is  W2465K-70LL at U27
+M3 are LH5168D-10L at U8 & U9 (unpopulated)
+M4 are CXK58257AM-10L at U6, U7, U13 & U14
 
-Sound:  X1-010
+PCB Number:  namco KE / P0-125A
++-----------------------------------------------------------+
+|             +------+      U  U             CN4*           |
+| VOL         |Seta  |   M  5  5            +--------------+|
+|             |X1-010|   2  8  7    +-+  M  | KQ1 CG0  U16 ||
+|             +------+      *  *    | |  1  +--------------+|
++-+                                 |U|     +--------------+|
+  |  +-++-++-++-+            BT1*   |3|     | KQ1 CG2  U20 ||
++-+  | || || || |      M            |2|  M  +--------------+|
+|    |U||U||U||U| M M  4            | |  1  +--------------+|
+|J   |3||5||2||4| 3 3               +-+     | KQ1 CG1  U15 ||
+|A   | || || || | * *  M                    +--------------+|
+|M   +-++-++-++-+      4                    +--------------+|
+|M  C                                       | KQ1 CG3  U19 ||
+|A  N                                       +--------------+|
+|   1                                       +--------------+|
+|C  *                                       | KQ1 CG4  U18 ||
+|o                           +----------+   +--------------+|
+|n  C       +-------+        |          |   +--------------+|
+|n  N       |Toshiba|        |   NEC    |   | KQ1 CG6  U22 ||
+|e  2       |  TMP  |        |  DX-101  |   +--------------+|
+|c  *       | 68301 |        |          |   +--------------+|
+|t        U +-------+        |          |   | KQ1 CG5  U17 ||
+|e  C     5                  +----------+   +--------------+|
+|r  N     6                                 +--------------+|
+|   3     *                                 | KQ1 CG7  U21 ||
++-+ * +---+    +---+       U                +--------------+|
+  |   |DX |  S |DX |       3  50MHz 32MHz*                  |
+  |   |102|  W |102|       8                                |
++-+   +---+  1 +---+                    M  M   +---+        |
+|              D D                      4  4   |DX |        |
+|              S S                             |102|        |
+|              W W                             +---+        |
+|              2 1                                          |
++-----------------------------------------------------------+
+
+U2 is KQ1 PRG E EPROM
+U3 is KQ1 PRG O EPROM
+U4 is KQ1 TBL E EPROM
+U5 is KQ1 TBL O EPROM
+U32 is KG SND mask ROM (silkscreened SOUND ROM)
+
+CN1 unpopulated 7 pin header
+CN2 unpopulated 5 pin header
+CN3 unpopulated 10 pin header
+BT1 is unpopulated battery
+U56 is unpopulated 93C45 EEPROM
+CN4 - 96 pin connector (3 rows by 32 pins)
+* Denotes not populated.
 
 ***************************************************************************/
 
@@ -3567,6 +3623,7 @@ ROM_END
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
    OSC: 50MHz & 32.53047MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         Lattice ispLSI2032 - stamped "KUDEC"
 
 PCB Number: P0-142A
@@ -3655,6 +3712,7 @@ Penguin Brothers / 轟天雷 (A-Blast)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP)
    OSC: 50MHz, 32.53047MHz & 28MHz
  Other: 8 Position Dipswitch x 2
+        Reset Push Button at SW1
         Lattice ispLSI2032
 
 PCB Number: P0-142A
@@ -3700,8 +3758,9 @@ Notes:  pzlbowl PCB with these extra parts:
         2x 62256 SRAM
         74HC00
 
-U50*  Unpopulated 93LC46BX EEPROM
-BAT1* Unpopulated CR2032 3Volt battery
+U50  Unpopulated 93LC46BX EEPROM
+BAT1 Unpopulated CR2032 3 Volt battery
+* Denotes not populated.
 
 Ram M1 are NEC D43001GU-70LL
 Ram M2 are LGS GM76C8128ALLFW70
@@ -3764,11 +3823,11 @@ Reel'N Quake!
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP, @ U10)
-        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Push Button SW1
+        Reset Push Button at SW1
         3.6V Battery at BT1
         GAL 16V8 - labeled "KF-001" at U38
 
@@ -3805,9 +3864,9 @@ PCB Number: P-FG-02
 |r N      6                                                 |
 |  3      *                                        U21*     |
 +-+   +---+    +---+       U  50MHz 32MHz*                  |
-  |   |DX | S  |DX |       3                                |
-  |   |102| W  |102|       8                   +---+   28MHz|
-+-+   +---+ 1  +---+                    M  M   |DX |        |
+  |   |DX |  S |DX |       3                                |
+  |   |102|  W |102|       8                   +---+   28MHz|
++-+   +---+  1 +---+                    M  M   |DX |        |
 |              D D                      4  4   |102|        |
 |              S S                             +---+        |
 |              W W                                          |
@@ -3819,7 +3878,8 @@ CN2-1 - 3 Pin connector
 CN2-2 - 3 Pin connector
 CN3   - 10 Pin connector (used for extra buttons)
 
-* Denotes not populated. U56 is unpopulated 93C45 EEPROM
+U56 is unpopulated 93C45 EEPROM
+* Denotes not populated.
 
     U3-U5 silkscreened 27C4001
   U57-U58 silkscreened 23C8001E
@@ -3872,11 +3932,11 @@ Endless Riches
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP, @ U10)
-        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+        NEC DX-102 (52 Pin PQFP x3, @ U28, U30 & U45)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Push Button SW1
+        Reset Push Button at SW1
         3.6V Battery at BT1
         GAL 16V8 - labeled "KF-001" at U38
 
@@ -3912,27 +3972,29 @@ PCB Number: P-FG-03
 |e C      5                  +----------+   +---------------+|
 |c N      6                                                  |
 |t 2      *                                        U21*      |
-|e  +---+    +---+       U  50MHz 28MHz                      |
-|r    |DX | S  |DX |       3                                 |
-|     |102| W  |102|       8                   +---+    OSC2*|
-|     +---+ 1  +---+                    M  M   |DX |         |
+|e    +---+    +---+       U  50MHz 28MHz                    |
+|r    |DX |  S |DX |       3                                 |
+|     |102|  W |102|       8                   +---+    OSC2*|
+|     +---+  1 +---+                    M  M   |DX |         |
 +-+            D D                      4  4   |102|         |
   |            S S                             +---+         |
 +-+            W W                                           |
 |              2 1                                           |
 +------------------------------------------------------------+
 
-CN1   - 7 Pin connector
-CN2   - 8 Pin connector
+CN1 - 7 Pin connector
+CN2 - 8 Pin connector
 
+U56 is unpopulated 93C45 EEPROM
+DSW2 is unpopulated
 * Denotes not populated.
-  U56 is unpopulated 93C45 EEPROM
-  DSW2 is unpopulated
 
     U3-U5 silkscreened 27C4001
   U57-U58 silkscreened 23C8001E
   U15-U22 silkscreened 23C32000
       U32 silkscreened 23C32000
+
+KFP is Program, KFC is Character Graphics and KFS is Sound
 
 Note:
   8-Liner version of P-FG-02 (see Reel'N Quake! above)
@@ -3953,7 +4015,7 @@ ROM_START( endrichs )
 	ROM_LOAD( "kfc-u17-c00.u17", 0x600000, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) ) // Yes, it's actually "KFS" here
+	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
@@ -4196,7 +4258,7 @@ PCB Number: P0-145-1
 
 Differences from PCB B0-003A (or B0-003B):
 
-CN1 is populated - unknown use
+CN1 is 8 pin header - unknown use
 CN3 Female 3 row, 96 pin connection populated on the underside to connect to the P1-115A flash ROM PCB
 CN5 is labeled pins 1-4 and silkscreened GUN1
 CN6 is labeled pins 1-4 and silkscreened GUN2
@@ -4408,7 +4470,7 @@ ROM_START( wschampb ) /* Wing Shooting Championship V1.00, dumps match listed ch
 	ROM_LOAD( "as1005m01.u18", 0x000000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
 
-ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all MASK ROMs */
+ROM_START( trophyh ) /* Version 1.00 - v: Thu Mar 28 12:35:50 2002 JST-9 - on a B0-010A PCB with all mask ROMs */
 	ROM_REGION( 0x200000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "as1106e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) ) /* also commonly labeled as: Trophy U6 Ver. 1.00 D8DA */
 	ROM_LOAD16_BYTE( "as1107e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) ) /* also commonly labeled as: Trophy U7 Ver. 1.00 CEEF */
@@ -4451,7 +4513,7 @@ ROM_START( trophyht ) /* V1.00 Location Test - v: Tue Feb 26 18:18:43 2002 JST-9
 	ROM_LOAD( "as1104m01.u41",   0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) ) /* Load these in until the flash ROMs are dumped */
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  // Samples
-	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 MASK rom */
+	ROM_LOAD( "as1105m01.u18", 0x000000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) ) /* unlabeled 27C322 with same data as AS1105M01 mask ROM */
 ROM_END
 
 /***************************************************************************
@@ -4459,21 +4521,77 @@ ROM_END
  TelePachi Fever Lion
  (C) 1996 Sunsoft
 
- PCB: Sunsoft 2MP1-E00 (P0-121A, serial 0503), similar to Reel'N Quake.
-
-   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP @ U1)
- Video: Allumer X1-020 9426HK003 (@ U9 - Same as DX-101?)
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: Allumer X1-020 9426HK003 (@ U9)
         NEC DX-102               (52 Pin PQFP @ U8)
         Allumer X1-007 505100    (SDIP42 @ U110 - Feeds RGB DACs)
  Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
 Inputs: Allumer X1-004 546100    (SDIP52)
-   OSC: 50.0000 MHz (@ X1) & 32.5304 MHz (@ X2)
- Other: 8 Position Dipswitch x 2 (@ DSW1, DSW2)
-        Push Button
-        Battery (@ BT1)
+   OSC: 50.0000MHz (@ X1), 32.5304MHz (@ X2) & 32.768kHz (@ X3)
+ Other: 8 Position Dipswitch x 2
+        Ricoh RP5C62 RTC (@ U128)
+        3.6v Battery (@ BT1)
         93C46 EEPROM (@ U101)
-        Jamma Connector
-        GALs - labeled "KC-001C", "KC-002C" (@ U51, U52)
+        SW1 Push Button Reset
+
+Memory:
+M1 are TC551001BFL-70L at U56 & U57
+M2 is  W2465K-70LL at U27
+M3 are HM62256BLSP-7
+M4 is LH5168D-80L
+
+PCB Number: P0-121A / Sunsoft 2MP1-E00 (serial 0503)
++--------------------------------------------------------------+
+|             +------+       +---++---+           CN3*         |
+| VOL         |Seta  |   M   |   ||   |        +--------------+|
+|             |X1-010|   2   | U || U |        |      U19*    ||
+|             +------+       | 1 || 1 |        +--------------+|
++-+           U52  U51  BT1  | 1 || 1 |        +--------------+|
+  |  +-++-+   +-++-+         | 2 || 1 |        |      U17*    ||
++-+  | || |   | || |         +---++---+   M M  +--------------+|
+|    |U||U| M |U||U| M M  32.768kHz       1 1  +--------------+|
+|J   |3||5| 3 |2||4| 3 4 RP5C62                | MP3 CG-1 U15 ||
+|A   | ||*|   | ||*|                           +--------------+|
+|M   +-++-+   +-++-+                           +--------------+|
+|M                                             |      U20*    ||
+|A                              +----------+   +--------------+|
+|                               |          |   +--------------+|
+|C                              | ALLUMER  |   |      U18*    ||
+|o                              | X1-020   |   +--------------+|
+|n          +-------+           |          |   +--------------+|
+|n          |Toshiba|           | 9426HK003|   | MP3 CG-0 U16 ||
+|e          |  TMP  |           +----------+   +--------------+|
+|c          | 68301 |                          +--------------+|
+|t          +-------+                          |      U23*    ||
+|e         93C46                               +--------------+|
+|r              D                              +--------------+|
+|               S                              |      U22*    ||
++-+         X   W  +---+     50MHz 32.5304MHz  +--------------+|
+  |         1   2  |DX |                       +--------------+|
+  |  C      |   D  |102|                       | MP3 CG-2 U21 ||
++-+  N C    0   S  +---+         M M           +--------------+|
+|    7 N    0   W        SW1     3 3                           |
+|      6    4   1                                 X1-007 R G B |
++--------------------------------------------------------------+
+
+U2 ST M27C4001 EPROM  MP3prgEVEN  U2 V1.0
+U3 ST M27C4001 EPROM  MP3 prgODD  U3 V1.0
+U4 unpopulated silkscreened 27C4001 TBL EVEN
+U5 unpopulated silkscreened 27C4001 TBL ODD
+U15 ST M27C160 EPROM  MP3 CG-1  U15 V1.0
+U16 ST M27C160 EPROM  MP3 CG-0  U16 V1.0
+U21 ST M27C160 EPROM  MP3 CG-2  U21 V1.0
+U51 GAL KC-001C
+U52 GAL KC-002C
+U111 ST M27C4001 EPROM  MP3 SOUND0  U111 V1.0
+U112 ST M27C4001 EPROM  MP3 SOUND1  U112 V1.0
+U17, U18, U19, U20, U22 & U23 silkscreened 23C16000
+* Denotes not populated.
+
+R, G & B are resistor packs
+CN3 - 96 pin connector (3 rows by 32 pins)
+CN6 - Dual row 10 pin header
+CN7 - 12 pin header
 
 ***************************************************************************/
 
@@ -4481,14 +4599,12 @@ ROM_START( telpacfl )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "mp3_prgeven__u2_v1.0.u2", 0x000000, 0x080000, CRC(9ab450c5) SHA1(57d9118df8a444e295cbda453a7c3238bd672ddd) )
 	ROM_LOAD16_BYTE( "mp3_prgodd__u3_v1.0.u3",  0x000001, 0x080000, CRC(2a324139) SHA1(1812a7a8a2c4e222a1e5c7cb6d39cf7bf7f037db) )
-	// Empty sockets: 27C4001 TBL EVEN (@ U4) & 27C4001 TBL ODD (@ U5)
 
 	ROM_REGION( 0x800000, "sprites", ROMREGION_ERASE00 )    // Sprites
 	ROM_LOAD( "mp3_cg-0__u16_v1.0.u16", 0x000000, 0x200000, CRC(9d8453ba) SHA1(d97240ce68d6e64527930e919710764a7b669cdf) )
 	ROM_LOAD( "mp3_cg-1__u15_v1.0.u15", 0x200000, 0x200000, CRC(8ab83f38) SHA1(5ebc682b80d0d97025a97824a899946712e7acd4) )
 	ROM_LOAD( "mp3_cg-2__u21_v1.0.u21", 0x400000, 0x200000, BAD_DUMP CRC(54dc430b) SHA1(a2e55866249d01f6f2f2dd998421baf9fe0c6972) ) // physically damaged eprom
 	ROM_FILL (                          0x400000, 0x200000, 0 ) // wipe out the bad rom
-	// Empty sockets: 23C16000 (@ U17-20, U22-23)
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  // Samples
 	ROM_LOAD( "mp3_sound0__u111_v1.0.u111", 0x000000, 0x080000, CRC(711c915e) SHA1(d654a0c158cf54aab5faca913583c5620388aa46) )

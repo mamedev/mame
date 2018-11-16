@@ -232,7 +232,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(msx_cart_fsfd1a_device::device_add_mconfig)
-	MCFG_TC8566AF_ADD("fdc")
+	TC8566AF(config, m_fdc);
 
 	// Double sided 3.5" floppy drive
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats)

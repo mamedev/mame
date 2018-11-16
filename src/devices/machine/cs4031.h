@@ -35,27 +35,19 @@ class cs4031_device : public device_t
 {
 public:
 	// construction/destruction
-	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *cputag, const char *isatag, const char *biostag, const char *keybctag)
+	template <typename T, typename U, typename V, typename W>
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag, U &&isatag, V &&biostag, W &&keybctag)
 		: cs4031_device(mconfig, tag, owner, clock)
 	{
-		set_cputag(cputag);
-		set_isatag(isatag);
-		set_biostag(biostag);
-		set_keybctag(keybctag);
+		set_cputag(std::forward<T>(cputag));
+		set_isatag(std::forward<U>(isatag));
+		set_biostag(std::forward<V>(biostag));
+		set_keybctag(std::forward<W>(keybctag));
 	}
 
 	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Obj> devcb_base &set_ior_callback(Obj &&ior) { return m_read_ior.set_callback(std::forward<Obj>(ior)); }
-	template <class Obj> devcb_base &set_iow_callback(Obj &&iow) { return m_write_iow.set_callback(std::forward<Obj>(iow)); }
-	template <class Obj> devcb_base &set_tc_callback(Obj &&tc) { return m_write_tc.set_callback(std::forward<Obj>(tc)); }
-	template <class Obj> devcb_base &set_hold_callback(Obj &&hold) { return m_write_hold.set_callback(std::forward<Obj>(hold)); }
-	template <class Obj> devcb_base &set_cpureset_callback(Obj &&cpureset) { return m_write_cpureset.set_callback(std::forward<Obj>(cpureset)); }
-	template <class Obj> devcb_base &set_nmi_callback(Obj &&nmi) { return m_write_nmi.set_callback(std::forward<Obj>(nmi)); }
-	template <class Obj> devcb_base &set_intr_callback(Obj &&intr) { return m_write_intr.set_callback(std::forward<Obj>(intr)); }
-	template <class Obj> devcb_base &set_a20m_callback(Obj &&a20m) { return m_write_a20m.set_callback(std::forward<Obj>(a20m)); }
-	template <class Obj> devcb_base &set_spkr_callback(Obj &&spkr) { return m_write_spkr.set_callback(std::forward<Obj>(spkr)); }
 	auto ior() { return m_read_ior.bind(); }
 	auto iow() { return m_write_iow.bind(); }
 	auto tc() { return m_write_tc.bind(); }
@@ -114,10 +106,10 @@ public:
 	IRQ_CALLBACK_MEMBER(int_ack_r) { return m_intc1->acknowledge(); }
 
 	// inline configuration
-	void set_cputag(const char *tag) { m_cputag = tag; }
-	void set_isatag(const char *tag) { m_isatag = tag; }
-	void set_biostag(const char *tag) { m_biostag = tag; }
-	void set_keybctag(const char *tag) { m_keybctag = tag; }
+	template <typename T> void set_cputag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_isatag(T &&tag) { m_isa.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_biostag(T &&tag) { m_bios.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_keybctag(T &&tag) { m_keybc.set_tag(std::forward<T>(tag)); }
 
 protected:
 	// device-level overrides
@@ -156,15 +148,13 @@ private:
 	void update_write_regions();
 
 	// internal state
-	const char *m_cputag;
-	const char *m_isatag;
-	const char *m_biostag;
-	const char *m_keybctag;
+	required_device<device_memory_interface> m_cpu;
+	required_device<at_kbc_device_base> m_keybc;
+	required_region_ptr<uint8_t> m_isa;
+	required_region_ptr<uint8_t> m_bios;
 
 	address_space *m_space;
 	address_space *m_space_io;
-	uint8_t *m_isa;
-	uint8_t *m_bios;
 	uint8_t *m_ram;
 
 	// ipc core devices
@@ -186,7 +176,6 @@ private:
 	int m_nmi_mask;
 
 	// keyboard
-	at_keyboard_controller_device *m_keybc;
 	int m_cpureset;
 	int m_kbrst;
 	int m_ext_gatea20;

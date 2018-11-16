@@ -339,10 +339,10 @@ MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// sound hardware
-	MCFG_DEVICE_ADD(AY8912_TAG, AY8912, 1000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dragon_alpha_state, psg_porta_read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, dragon_alpha_state, psg_porta_write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
+	ay8912_device &ay8912(AY8912(config, AY8912_TAG, 1000000));
+	ay8912.port_a_read_callback().set(FUNC(dragon_alpha_state::psg_porta_read));
+	ay8912.port_a_write_callback().set(FUNC(dragon_alpha_state::psg_porta_write));
+	ay8912.add_route(ALL_OUTPUTS, "speaker", 0.75);
 
 	// pia 2
 	pia6821_device &pia2(PIA6821(config, PIA2_TAG, 0));

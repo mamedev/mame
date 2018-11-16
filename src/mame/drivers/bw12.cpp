@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
-	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
+	UPD765A(config, m_fdc, false, true);
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));
@@ -598,13 +598,13 @@ MACHINE_CONFIG_START(bw12_state::common)
 	m_sio->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(1'843'200))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, bw12_state, pit_out0_w))
-	MCFG_PIT8253_CLK1(XTAL(1'843'200))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
-	MCFG_PIT8253_CLK2(XTAL(1'843'200))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, bw12_state, pit_out2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(1'843'200));
+	m_pit->out_handler<0>().set(FUNC(bw12_state::pit_out0_w));
+	m_pit->set_clk<1>(XTAL(1'843'200));
+	m_pit->out_handler<1>().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
+	m_pit->set_clk<2>(XTAL(1'843'200));
+	m_pit->out_handler<2>().set(FUNC(bw12_state::pit_out2_w));
 
 	AY3600(config, m_kbc, 0);
 	m_kbc->x0().set_ioport("X0");
@@ -620,15 +620,15 @@ MACHINE_CONFIG_START(bw12_state::common)
 	m_kbc->control().set(FUNC(bw12_state::ay3600_control_r));
 	m_kbc->data_ready().set(FUNC(bw12_state::ay3600_data_ready_w));
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_sio, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_sio, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_sio, FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80dart_device::rxb_w));
+	rs232b.dcd_handler().set(m_sio, FUNC(z80dart_device::dcdb_w));
+	rs232b.cts_handler().set(m_sio, FUNC(z80dart_device::ctsb_w));
 
 	/* printer */
 	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")

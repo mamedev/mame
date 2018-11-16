@@ -508,18 +508,18 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, lockon_state, ym2203_irq))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2203"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lockon_state, ym2203_out_b))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "f2203.1l", 1.0)
-	MCFG_SOUND_ROUTE(1, "f2203.1r", 1.0)
-	MCFG_SOUND_ROUTE(2, "f2203.2l", 1.0)
-	MCFG_SOUND_ROUTE(2, "f2203.2r", 1.0)
-	MCFG_SOUND_ROUTE(3, "f2203.3l", 1.0)
-	MCFG_SOUND_ROUTE(3, "f2203.3r", 1.0)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.irq_handler().set(FUNC(lockon_state::ym2203_irq));
+	ymsnd.port_a_read_callback().set_ioport("YM2203");
+	ymsnd.port_b_write_callback().set(FUNC(lockon_state::ym2203_out_b));
+	ymsnd.add_route(0, "lspeaker", 0.40);
+	ymsnd.add_route(0, "rspeaker", 0.40);
+	ymsnd.add_route(1, "f2203.1l", 1.0);
+	ymsnd.add_route(1, "f2203.1r", 1.0);
+	ymsnd.add_route(2, "f2203.2l", 1.0);
+	ymsnd.add_route(2, "f2203.2r", 1.0);
+	ymsnd.add_route(3, "f2203.3l", 1.0);
+	ymsnd.add_route(3, "f2203.3r", 1.0);
 
 	FILTER_VOLUME(config, "f2203.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "f2203.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);

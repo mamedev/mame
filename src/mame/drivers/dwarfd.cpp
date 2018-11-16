@@ -760,10 +760,10 @@ MACHINE_CONFIG_START(dwarfd_state::dwarfd)
 	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	aysnd.port_a_read_callback().set_ioport("IN2");
+	aysnd.port_b_read_callback().set_ioport("IN1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dwarfd_state::pokeresp)

@@ -387,9 +387,9 @@ uint32_t cococart_slot_device::get_cart_size()
 {
 	if (m_cart != nullptr)
 		return m_cart->get_cart_size();
-	return 0;
-}
 
+	return 0x8000;
+}
 
 //-------------------------------------------------
 //  set_cart_base_update
@@ -410,20 +410,24 @@ image_init_result cococart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length;
+		memory_region *cart_mem = m_cart->get_cart_memregion();
+		uint8_t *base = cart_mem->base();
+		offs_t read_length, cart_legnth = cart_mem->bytes();;
+
 		if (!loaded_through_softlist())
 		{
-			read_length = fread(m_cart->get_cart_base(), m_cart->get_cart_size());
+			read_length = fread(base, cart_legnth);
 		}
 		else
 		{
 			read_length = get_software_region_length("rom");
-			memcpy(m_cart->get_cart_base(), get_software_region("rom"), read_length);
+			memcpy(base, get_software_region("rom"), read_length);
 		}
-		while(read_length < m_cart->get_cart_size())
+
+		while (read_length < cart_legnth)
 		{
 			offs_t len = std::min(read_length, m_cart->get_cart_size() - read_length);
-			memcpy(m_cart->get_cart_base() + read_length, m_cart->get_cart_base(), len);
+			memcpy(base + read_length, base, len);
 			read_length += len;
 		}
 	}
@@ -565,8 +569,22 @@ void device_cococart_interface::cart_base_changed(void)
 {
 	if (!m_update.isnull())
 		m_update(get_cart_base());
+	else
+	{
+		// propagate up to host interface
+		device_cococart_interface *host = dynamic_cast<device_cococart_interface*>(m_host);
+		host->cart_base_changed();
+	}
 }
 
+/*-------------------------------------------------
+    get_cart_memregion
+-------------------------------------------------*/
+
+memory_region* device_cococart_interface::get_cart_memregion()
+{
+	return 0;
+}
 
 //-------------------------------------------------
 //  cartridge_space

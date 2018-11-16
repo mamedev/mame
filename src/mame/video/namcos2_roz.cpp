@@ -17,20 +17,34 @@
 #include "emu.h"
 #include "namcos2_roz.h"
 
+static const gfx_layout layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8*8*8
+};
+
+GFXDECODE_START( namcos2_roz_device::gfxinfo )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout, 0, 16 )
+GFXDECODE_END
+
 DEFINE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device, "namcos2_roz", "Namco Sysem 2 ROZ (C102)")
 
 namcos2_roz_device::namcos2_roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCOS2_ROZ, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_rozram(*this, finder_base::DUMMY_TAG),
-	m_roz_ctrl(*this, finder_base::DUMMY_TAG),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, finder_base::DUMMY_TAG)
+	m_roz_ctrl(*this, finder_base::DUMMY_TAG)
 {
 }
 
 void namcos2_roz_device::device_start()
 {
-	m_tilemap_roz = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_roz_device::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
+	m_tilemap_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namcos2_roz_device::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 }
 
@@ -38,7 +52,7 @@ void namcos2_roz_device::device_start()
 TILE_GET_INFO_MEMBER(namcos2_roz_device::roz_tile_info)
 {
 	int tile = m_rozram[tile_index];
-	SET_TILE_INFO_MEMBER(3, tile, 0/*color*/, 0);
+	SET_TILE_INFO_MEMBER(0, tile, 0/*color*/, 0);
 }
 
 struct roz_param

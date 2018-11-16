@@ -1719,8 +1719,8 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
+	GENERIC_LATCH_16(config, m_soundlatch);
+	GENERIC_LATCH_16(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, megasys1_state,sound_irq))
@@ -1953,7 +1953,7 @@ MACHINE_CONFIG_START(megasys1_state::system_Z)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch_z")
+	GENERIC_LATCH_8(config, m_soundlatch_z);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

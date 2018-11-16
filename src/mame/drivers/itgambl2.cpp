@@ -1102,6 +1102,55 @@ ROM_START( granfrat )
 	ROM_LOAD( "gra.frat.msg0.u8", 0x00000, 0x40000, CRC(1c58d0e8) SHA1(69c125775f7b9a2e4db6aa942d8a7b099ea19c36) )
 ROM_END
 
+/*
+Top T. Cash
+
+CPUs
+1x 	H8/3337 			32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x 	D7759 			ADPCM Speech Synthesizer LSIs - sound
+1x 	TDA2003 			Audio Amplifier - sound
+1x 	oscillator 	14.318181MHz 		
+1x 	oscillator 	16.000MHz 		
+
+ROMs
+5x 	M27C4001 	0,1,2,3,4 	dumped
+
+RAMs
+3x 	YY628100BllG-70 	
+PLDs
+1x 	ispLSI1032E-70LJ 		read protected
+
+Others
+1x 28x2 JAMMA edge connector
+1x 14 pins flat cable connector
+1x 34 pins flat cable connector
+1x RS232 male connector
+2x trimmer (volume)
+2x 8 DIP switches banks
+1x battery 3.6V
+
+Notes
+
+PCB is marked: "VideoIdea - Via Turati,2 - 40026 Imola (BO)" and "2-0257/V" on component side
+PCB is marked: "TE 1100 CE" on solder side
+PCB is labeled: "BACCHI 1883 - 21/02/02 - Rip[] RiProg[X]" on component side 
+*/
+
+ROM_START( toptcash )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "top t. cash_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "top t. cash ep1.bin", 0x000000, 0x80000, CRC(95f449e1) SHA1(97eecb438e6896085247b53bf7947b2b0054768f) )
+	ROM_LOAD( "top t. cash ep2.bin", 0x080000, 0x80000, CRC(a89a207d) SHA1(deac27e5dba1ae8e12db05d8383d9d961adcbcd9) )
+	ROM_LOAD( "top t. cash ep3.bin", 0x100000, 0x80000, CRC(ccf13921) SHA1(4bc7ff81aae1034549cd1a406e17ed097f2c2b47) )
+	ROM_LOAD( "top t. cash ep4.bin", 0x180000, 0x80000, CRC(8a229c4d) SHA1(9188d74595fea900fba4e176beed23cbbb5d89c4) )
+
+	ROM_REGION( 0x80000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "top t. cash msg0.bin", 0x00000, 0x80000, CRC(babe87c7) SHA1(7ed226224c03a094844e838aebaead67e9ae9a2d) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
+
 /*************************
 *      Game Drivers      *
 *************************/
@@ -1127,3 +1176,4 @@ GAME( 200?, thedrink, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, 
 GAME( 200?, unkh8gam, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "unknown H8 Italian Gambling game",      MACHINE_IS_SKELETON )
 GAME( 200?, eurodsr,  0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Euro Double Star Record (ver.1.2)",     MACHINE_IS_SKELETON )
 GAME( 200?, granfrat, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "<unknown>", "Grande Fratello (Ver. 1.7)",            MACHINE_IS_SKELETON )
+GAME( 2002, toptcash, 0,        itgambl2, itgambl2, itgambl2_state, empty_init, ROT0, "VideoIdea", "Top T. Cash",                           MACHINE_IS_SKELETON )

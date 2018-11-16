@@ -1091,9 +1091,9 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	m_uart_sio->rxrdy_handler().set(FUNC(v1050_state::sio_rxrdy_w));
 	m_uart_sio->txrdy_handler().set(FUNC(v1050_state::sio_txrdy_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_SIO_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart_sio, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_uart_sio, FUNC(i8251_device::write_dsr));
 
 	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, 16_MHz_XTAL/4)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_sio_clock))

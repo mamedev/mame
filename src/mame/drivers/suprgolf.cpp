@@ -531,13 +531,13 @@ MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK/4) /* guess */
-	//MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suprgolf_state, writeA))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suprgolf_state, writeB))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK/4)); /* guess */
+	//ymsnd.irq_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	ymsnd.port_a_read_callback().set_ioport("DSW0");
+	ymsnd.port_b_read_callback().set_ioport("DSW1");
+	ymsnd.port_a_write_callback().set(FUNC(suprgolf_state::writeA));
+	ymsnd.port_b_write_callback().set(FUNC(suprgolf_state::writeB));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* guess */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, suprgolf_state, adpcm_int))      /* interrupt function */

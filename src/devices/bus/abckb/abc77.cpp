@@ -564,7 +564,7 @@ WRITE8_MEMBER( abc77_device::p2_w )
 	}
 
 	// beep
-	m_discrete->write(space, NODE_01, BIT(data, 4));
+	m_discrete->write(NODE_01, BIT(data, 4));
 
 	// transmit data
 	serial_output(BIT(data, 5));

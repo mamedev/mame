@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "nereid.h"
 
-//#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEREID, nereid_device, "nereid", "HP Nereid ASIC")

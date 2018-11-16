@@ -193,8 +193,8 @@ READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)
 WRITE8_MEMBER(cliffhgr_state::cliff_sound_overlay_w)
 {
 	/* audio */
-	m_discrete->write(space, CLIFF_ENABLE_SND_1, data & 1);
-	m_discrete->write(space, CLIFF_ENABLE_SND_2, (data >> 1) & 1);
+	m_discrete->write(CLIFF_ENABLE_SND_1, data & 1);
+	m_discrete->write(CLIFF_ENABLE_SND_2, (data >> 1) & 1);
 
 	// bit 4 (data & 0x10) is overlay related?
 }

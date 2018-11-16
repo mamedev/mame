@@ -35,6 +35,7 @@ public:
 	// construction/destruction
 	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	void reset() { device_reset(); }
 	void set_keyboard_type(kbdc8042_type_t keybtype) { m_keybtype = keybtype; }
 	auto system_reset_callback() { return m_system_reset_cb.bind(); }
 	auto gate_a20_callback() { return m_gate_a20_cb.bind(); }

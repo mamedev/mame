@@ -210,10 +210,10 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	mpu4_common(config);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(820, 0, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
+	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8913->set_resistors_load(820, 0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

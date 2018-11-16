@@ -873,11 +873,11 @@ MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 	// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
 	RST_NEG_BUFFER(config, m_soundirq, 0).int_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ym2149", YM2149, YM2149_CLOCK)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, kurukuru_state, ym2149_aout_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kurukuru_state, ym2149_bout_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2149_device &ym2149(YM2149(config, "ym2149", YM2149_CLOCK));
+	ym2149.port_b_read_callback().set_ioport("DSW2");
+	ym2149.port_a_write_callback().set(FUNC(kurukuru_state::ym2149_aout_w));
+	ym2149.port_b_write_callback().set(FUNC(kurukuru_state::ym2149_bout_w));
+	ym2149.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("adpcm", MSM5205, M5205_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kurukuru_state, kurukuru_msm5205_vck))

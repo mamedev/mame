@@ -369,22 +369,6 @@ WRITE8_MEMBER(nevada_state::rtc_w)
 	m_rtc->write(space, offset >> 3, data);
 }
 
-/***************************************************************************/
-/*********************    SOUND SECTION     ********************************/
-/***************************************************************************/
-#if 0
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-//  DEVCB_INPUT_PORT("DSW1"),  /* not used */
-//  DEVCB_INPUT_PORT("DSW2"),  /* not used */
-	DEVCB_NOOP, /* callback for display state changes */
-	DEVCB_NOOP, /* callback for cursor state changes */
-	DEVCB_NOOP,
-	DEVCB_NOOP
-};
-#endif
 
 /***************************************************************************/
 READ16_MEMBER(nevada_state::io_board_r)
@@ -616,8 +600,7 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	AY8912(config, "aysnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	MCFG_DEVICE_ADD("duart18", MC68681, XTAL(3'686'400))  // UARTA = Modem 1200Baud
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))

@@ -36,21 +36,11 @@
       1  | xxx----- -------- | not used?
 */
 
-TILE_GET_INFO_MEMBER(wrally_state::get_tile_info_screen0)
+template<int Layer>
+TILE_GET_INFO_MEMBER(wrally_state::get_tile_info)
 {
-	int data = m_videoram[tile_index << 1];
-	int data2 = m_videoram[(tile_index << 1) + 1];
-	int code = data & 0x3fff;
-
-	tileinfo.category = (data2 >> 5) & 0x01;
-
-	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
-}
-
-TILE_GET_INFO_MEMBER(wrally_state::get_tile_info_screen1)
-{
-	int data = m_videoram[(0x2000/2) + (tile_index << 1)];
-	int data2 = m_videoram[(0x2000/2) + (tile_index << 1) + 1];
+	int data = m_videoram[(Layer * 0x2000/2) + (tile_index << 1)];
+	int data2 = m_videoram[(Layer * 0x2000/2) + (tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
 	tileinfo.category = (data2 >> 5) & 0x01;
@@ -66,8 +56,8 @@ TILE_GET_INFO_MEMBER(wrally_state::get_tile_info_screen1)
 
 void wrally_state::video_start()
 {
-	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wrally_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	m_pant[0]->set_transmask(0,0xff01,0x00ff); /* this layer is split in two (pens 1..7, pens 8-15) */
 	m_pant[1]->set_transparent_pen(0);

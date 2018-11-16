@@ -949,9 +949,9 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("ay", AY8912, 16_MHz_XTAL / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay, 16_MHz_XTAL / 16);
+	m_ay->port_a_read_callback().set(FUNC(amstrad_state::amstrad_psg_porta_read));
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, amstrad_centronics_devices, "printer")
@@ -984,7 +984,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::cpc664)
 	amstrad_base(config);
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
@@ -1002,7 +1002,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::cpc6128)
 	amstrad_base(config);
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
@@ -1070,9 +1070,9 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("ay", AY8912, 40_MHz_XTAL / 40)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay, 40_MHz_XTAL / 40);
+	m_ay->port_a_read_callback().set(FUNC(amstrad_state::amstrad_psg_porta_read));
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
@@ -1087,7 +1087,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_CASSETTE_INTERFACE("cpc_cass")
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, m_fdc, true, true);
 
 	cpcplus_cartslot(config);
 
@@ -1147,9 +1147,9 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay", AY8912, 40_MHz_XTAL / 40)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay, 40_MHz_XTAL / 40);
+	m_ay->port_a_read_callback().set(FUNC(amstrad_state::amstrad_psg_porta_read));
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	cpcplus_cartslot(config);
 
@@ -1163,9 +1163,9 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,aleste)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
 
-	MCFG_DEVICE_REPLACE("ay", AY8912, 16_MHz_XTAL / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config.replace(), m_ay, 16_MHz_XTAL / 16);
+	m_ay->port_a_read_callback().set(FUNC(amstrad_state::amstrad_psg_porta_read));
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64)
@@ -1173,8 +1173,7 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 
 	MCFG_DEVICE_ADD("rtc", MC146818, 4.194304_MHz_XTAL)
 
-	MCFG_DEVICE_REMOVE("upd765")
-	MCFG_I8272A_ADD("upd765", true)
+	I8272A(config.replace(), m_fdc, true);
 
 	MCFG_DEVICE_REMOVE("exp")
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)

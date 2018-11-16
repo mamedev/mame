@@ -309,13 +309,13 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	m_ppi->in_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz80_state, pit_out0_changed))
-	MCFG_PIT8253_CLK1(XTAL(8'000'000)/256)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
-	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mz80_state, pit_out2_changed))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(8'000'000)/4);
+	m_pit->out_handler<0>().set(FUNC(mz80_state::pit_out0_changed));
+	m_pit->set_clk<1>(XTAL(8'000'000)/256);
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
+	m_pit->set_clk<2>(0);
+	m_pit->out_handler<2>().set(FUNC(mz80_state::pit_out2_changed));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tempo", mz80_state, ne555_tempo_callback, attotime::from_hz(34))
 	MCFG_CASSETTE_ADD( "cassette" )

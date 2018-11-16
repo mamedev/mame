@@ -21,8 +21,8 @@ public:
 	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t ctx_mask, uint8_t pmeg_mask)
 		: sun4c_mmu_device(mconfig, tag, owner, clock)
 	{
-		m_ctx_mask = ctx_mask;
-		m_pmeg_mask = pmeg_mask;
+		set_ctx_mask(ctx_mask);
+		set_pmeg_mask(pmeg_mask);
 	}
 
 	sun4c_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -34,6 +34,9 @@ public:
 
 	auto type1_r() { return m_type1_r.bind(); }
 	auto type1_w() { return m_type1_w.bind(); }
+
+	void set_ctx_mask(uint8_t ctx_mask) { m_ctx_mask = ctx_mask; }
+	void set_pmeg_mask(uint8_t pmeg_mask) { m_pmeg_mask = pmeg_mask; }
 
 	enum insn_data_mode
 	{
@@ -128,6 +131,7 @@ protected:
 	uint32_t m_ram_size_words;
 	uint32_t m_context;
 	uint32_t m_context_masked;
+	uint32_t m_cache_context;
 	uint8_t m_system_enable;
 	bool m_fetch_bootrom;
 	uint32_t m_buserr[4];
@@ -139,8 +143,11 @@ protected:
 	bool m_page_valid[16384];
 
 	// Internal MAME device state
-	uint8_t m_ctx_mask;   // SS2 is sun4c but has 16 contexts; most have 8
-	uint8_t m_pmeg_mask;  // SS2 is sun4c but has 16384 PTEs; most have 8192
+	uint8_t m_ctx_mask;         // SS2 is sun4c but has 16 contexts; most have 8
+	uint8_t m_pmeg_mask;        // SS2 is sun4c but has 16384 PTEs; most have 8192
+	uint32_t m_ram_set_mask[4]; // Used for mirroring within 4 megabyte sets
+	uint32_t m_ram_set_base[4];
+	uint32_t m_populated_ram_words;
 	emu_timer *m_reset_timer;
 };
 

@@ -18,6 +18,13 @@ ToDo:
 
 #include "emu.h"
 #include "includes/mbc55x.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
+//#include "bus/pc_joy/pc_joy.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/clock.h"
+#include "machine/input_merger.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -61,16 +68,20 @@ void mbc55x_state::mbc55x_mem(address_map &map)
 
 void mbc55x_state::mbc55x_io(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x0000, 0x0003).rw(FUNC(mbc55x_state::mbcpic8259_r), FUNC(mbc55x_state::mbcpic8259_w));
-	map(0x0008, 0x000F).rw(FUNC(mbc55x_state::mbc55x_disk_r), FUNC(mbc55x_state::mbc55x_disk_w));
-	map(0x0010, 0x0010).rw(FUNC(mbc55x_state::vram_page_r), FUNC(mbc55x_state::vram_page_w));
-	map(0x0018, 0x001F).rw(FUNC(mbc55x_state::ppi8255_r), FUNC(mbc55x_state::ppi8255_w));
-	map(0x0020, 0x0027).rw(FUNC(mbc55x_state::mbcpit8253_r), FUNC(mbc55x_state::mbcpit8253_w));
-	map(0x0028, 0x002B).rw(FUNC(mbc55x_state::mbc55x_usart_r), FUNC(mbc55x_state::mbc55x_usart_w));
-	map(0x0030, 0x0031).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x0032, 0x0033).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0038, 0x003B).rw(FUNC(mbc55x_state::mbc55x_kb_usart_r), FUNC(mbc55x_state::mbc55x_kb_usart_w));
+	map(0x0000, 0x0000).select(0x003e).rw(FUNC(mbc55x_state::iodecode_r), FUNC(mbc55x_state::iodecode_w));
+}
+
+void mbc55x_state::mbc55x_iodecode(address_map &map)
+{
+	map(0x00, 0x01).mirror(0x02).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x04, 0x07).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x08, 0x08).mirror(0x03).rw(FUNC(mbc55x_state::vram_page_r), FUNC(mbc55x_state::vram_page_w));
+	map(0x0c, 0x0f).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x14, 0x15).mirror(0x02).rw("sio", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x18, 0x18).mirror(0x02).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x19, 0x19).mirror(0x02).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x1c, 0x1d).mirror(0x02).r(FUNC(mbc55x_state::mbc55x_kb_usart_r)).w(m_kb_uart, FUNC(i8251_device::write));
 }
 
 static INPUT_PORTS_START( mbc55x )
@@ -138,7 +149,7 @@ static INPUT_PORTS_START( mbc55x )
 
 	PORT_START("KEY6") /* Key row 6 scancodes 30..37 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE")  PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                     PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(0x08)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -243,21 +254,26 @@ static void mbc55x_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU_TAG, I8088, 3600000)
-	MCFG_DEVICE_PROGRAM_MAP(mbc55x_mem)
-	MCFG_DEVICE_IO_MAP(mbc55x_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(PIC8259_TAG, pic8259_device, inta_cb)
+	I8088(config, m_maincpu, 14.318181_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbc55x_state::mbc55x_io);
+	m_maincpu->set_irq_acknowledge_callback(PIC8259_TAG, FUNC(pic8259_device::inta_cb));
+
+	ADDRESS_MAP_BANK(config, m_iodecode);
+	m_iodecode->endianness(ENDIANNESS_LITTLE);
+	m_iodecode->data_width(8);
+	m_iodecode->addr_width(5);
+	m_iodecode->set_addrmap(0, &mbc55x_state::mbc55x_iodecode);
+
+	I8049(config, "kbdc", 6_MHz_XTAL).set_disable();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(14.318181_MHz_XTAL, 896, 0, 300, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DEVICE(VID_MC6845_NAME, mc6845_device, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mbc55x_state, screen_vblank_mbc55x))
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(14.318181_MHz_XTAL, 896, 0, 640, 262, 0, 200);
+	screen.set_screen_update(VID_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
 	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS * 3)
 	MCFG_PALETTE_INIT_OWNER(mbc55x_state, mbc55x)
-//  MCFG_SCREEN_SIZE(650, 260)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("128K,192K,256K,320K,384K,448K,512K,576K,640K");
 
@@ -266,29 +282,36 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
 	/* Devices */
-	I8251(config, m_kb_uart, 0);
-	m_kb_uart->rxrdy_handler().set(PIC8259_TAG, FUNC(pic8259_device::ir3_w));
+	I8251(config, m_kb_uart, 14.318181_MHz_XTAL / 8);
+	m_kb_uart->txd_handler().set("speaker", FUNC(speaker_sound_device::level_w)).invert();
+	m_kb_uart->rts_handler().set(m_printer, FUNC(centronics_device::write_init)).invert();
+	m_kb_uart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIT_C0_CLOCK)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(PIT_C1_CLOCK)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(PIC8259_TAG, pic8259_device, ir1_w))
-	MCFG_PIT8253_CLK2(PIT_C2_CLOCK)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mbc55x_state, pit8253_t2))
+	PIT8253(config, m_pit, 0);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->out_handler<0>().append(m_pit, FUNC(pit8253_device::write_clk1));
+	m_pit->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_pit->set_clk<2>(14.318181_MHz_XTAL / 8);
+	m_pit->out_handler<2>().set("sio", FUNC(i8251_device::write_txc));
+	m_pit->out_handler<2>().append("sio", FUNC(i8251_device::write_rxc));
+	m_pit->out_handler<2>().append("line", FUNC(rs232_port_device::write_etc));
 
-	MCFG_DEVICE_ADD(PIC8259_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_IRQ0))
+	clock_device &clk_78_6khz(CLOCK(config, "clk_78.6khz", 14.318181_MHz_XTAL / 14 / 13));
+	clk_78_6khz.signal_handler().set(m_pit, FUNC(pit8253_device::write_clk0));
+	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_txc));
+	clk_78_6khz.signal_handler().append(m_kb_uart, FUNC(i8251_device::write_rxc));
+
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	I8255(config, m_ppi);
-	m_ppi->in_pa_callback().set(FUNC(mbc55x_state::mbc55x_ppi_porta_r));
-	m_ppi->out_pa_callback().set(FUNC(mbc55x_state::mbc55x_ppi_porta_w));
-	m_ppi->in_pb_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portb_r));
-	m_ppi->out_pb_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portb_w));
-	m_ppi->in_pc_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portc_r));
-	m_ppi->out_pc_callback().set(FUNC(mbc55x_state::mbc55x_ppi_portc_w));
+	m_ppi->in_pa_callback().set(FUNC(mbc55x_state::game_io_r));
+	m_ppi->out_pa_callback().set(FUNC(mbc55x_state::game_io_w));
+	m_ppi->out_pb_callback().set(FUNC(mbc55x_state::printer_data_w));
+	m_ppi->in_pc_callback().set(FUNC(mbc55x_state::printer_status_r));
+	m_ppi->out_pc_callback().set(FUNC(mbc55x_state::disk_select_w));
 
-	MCFG_MC6845_ADD(VID_MC6845_NAME, MC6845, SCREEN_TAG, 14.318181_MHz_XTAL / 8)
+	MCFG_MC6845_ADD(VID_MC6845_NAME, HD6845, SCREEN_TAG, 14.318181_MHz_XTAL / 8) // HD46505SP-1
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbc55x_state, crtc_update_row)
@@ -296,25 +319,56 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, mbc55x_state, vid_vsync_changed))
 
 	/* Backing storage */
-	FD1793(config, m_fdc, 1_MHz_XTAL);
+	FD1793(config, m_fdc, 14.318181_MHz_XTAL / 14); // M5W1793-02P (clock is nominally 1 MHz)
+	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":2", mbc55x_floppies, "", mbc55x_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", mbc55x_floppies, "", mbc55x_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy[2], mbc55x_floppies, "", mbc55x_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy[3], mbc55x_floppies, "", mbc55x_state::floppy_formats)
 
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")
+
+	isa8_device &isa(ISA8(config, "isa", 0));
+	isa.set_cputag(m_maincpu);
+	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
+	//isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI));
+
+	ISA8_SLOT(config, "external", 0, "isa", pc_isa8_cards, nullptr, false);
+
+	i8251_device &sio(I8251(config, "sio", 14.318181_MHz_XTAL / 8)); // on separate board, through 20-pin header
+	sio.dtr_handler().set("line", FUNC(rs232_port_device::write_dtr));
+	sio.txd_handler().set("line", FUNC(rs232_port_device::write_txd));
+	sio.rts_handler().set("line", FUNC(rs232_port_device::write_rts));
+	sio.rxrdy_handler().set("sioint", FUNC(input_merger_device::in_w<0>));
+	sio.txrdy_handler().set("sioint", FUNC(input_merger_device::in_w<1>));
+
+	rs232_port_device &serial(RS232_PORT(config, "line", default_rs232_devices, nullptr));
+	serial.rxd_handler().set("sio", FUNC(i8251_device::write_rxd));
+	serial.dsr_handler().set("sio", FUNC(i8251_device::write_dsr));
+	serial.cts_handler().set("sio", FUNC(i8251_device::write_cts));
+
+	INPUT_MERGER_ANY_HIGH(config, "sioint").output_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
+
+	CENTRONICS(config, m_printer, centronics_devices, nullptr);
+	m_printer->busy_handler().set(FUNC(mbc55x_state::printer_busy_w)).invert(); // LS14 Schmitt trigger
+	m_printer->busy_handler().append(m_pic, FUNC(pic8259_device::ir4_w)).invert();
+	m_printer->perror_handler().set(FUNC(mbc55x_state::printer_paper_end_w));
+	m_printer->select_handler().set(FUNC(mbc55x_state::printer_select_w));
 MACHINE_CONFIG_END
 
 
 ROM_START( mbc55x )
-	ROM_REGION( 0x4000, MAINCPU_TAG, 0 )
+	ROM_REGION(0x4000, MAINCPU_TAG, 0)
 
 	ROM_SYSTEM_BIOS(0, "v120", "mbc55x BIOS v1.20 (1983)")
-	ROMX_LOAD("mbc55x-v120.rom", 0x0000, 0x2000, CRC(b439b4b8) SHA1(6e8df0f3868e3fd0229a5c2720d6c01e46815cab), ROM_BIOS(0)  )
+	ROMX_LOAD("mbc55x-v120.rom", 0x0000, 0x2000, CRC(b439b4b8) SHA1(6e8df0f3868e3fd0229a5c2720d6c01e46815cab), ROM_BIOS(0))
+
+	ROM_REGION(0x0800, "kbdc", 0)
+	ROM_LOAD("d8049hc.m1", 0x0000, 0x0800, NO_DUMP)
 ROM_END
 
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
-COMP( 1983, mbc55x, 0,      0,      mbc55x,  mbc55x, mbc55x_state, empty_init, "Sanyo", "MBC-55x", 0 /*MACHINE_NO_SOUND*/)
+COMP( 1983, mbc55x, 0,      0,      mbc55x,  mbc55x, mbc55x_state, empty_init, "Sanyo", "MBC-55x", 0 )

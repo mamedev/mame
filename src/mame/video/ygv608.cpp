@@ -30,7 +30,7 @@
  *    Split-screen scrolling by row (by column supported) (see test mode)
  *    Everything else! :)
  *
- *    TODO (2017 edition):
+ *    TODO (2017-2018 edition):
  *    - move ports into device_address_map (done);
  *    - add registers into own space, improve naming and variable usage;
  *    - remove code repetition in tilemap drawing functions;
@@ -38,6 +38,7 @@
  *    - fix garbage tiles in Mappy Arrange (done)
  *    - fix tile encryption for Abnormal Check (sets extra bit in cuskey);
  *      nopping bit 0 writes to 0x40081e makes gfxs to draw better!?
+ *    - fix Gynotai row scroll glitches;
  *    - fix attract mode garbage for Namco Collection Vol. 2 (either transparent or page banking select registers) (done);
  *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
  *    - DMA from/to ROM;
@@ -887,10 +888,97 @@ void ygv608_device::register_state_save()
 	save_item(NAME(m_sprite_attribute_table.b));
 	save_item(NAME(m_scroll_data_table));
 	save_item(NAME(m_colour_palette));
-//  save_item(NAME(register_state_save));
 	save_item(NAME(m_color_state_r));
 	save_item(NAME(m_color_state_w));
-	// TODO: register save for the newly added variables
+	save_item(NAME(m_bits16));
+	save_item(NAME(m_page_x));
+	save_item(NAME(m_page_y));
+	save_item(NAME(m_pny_shift));
+	save_item(NAME(m_na8_mask));
+	save_item(NAME(m_col_shift));
+	save_item(NAME(m_base_addr));
+	save_item(NAME(m_base_y_shift));
+	save_item(NAME(m_screen_resize));
+	save_item(NAME(m_tilemap_resize));
+	save_item(NAME(m_p0_state));
+	save_item(NAME(m_pattern_name_base_r));
+	save_item(NAME(m_pattern_name_base_w));
+	save_item(NAME(m_screen_status));
+	save_item(NAME(m_dma_status));
+	save_item(NAME(m_register_address));
+	save_item(NAME(m_register_autoinc_r));
+	save_item(NAME(m_register_autoinc_w));
+	save_item(NAME(m_raster_irq_mask));
+	save_item(NAME(m_vblank_irq_mask));
+	save_item(NAME(m_raster_irq_hpos));
+	save_item(NAME(m_raster_irq_vpos));
+	save_item(NAME(m_raster_irq_mode));
+	save_item(NAME(m_scroll_address));
+	save_item(NAME(m_palette_address));
+	save_item(NAME(m_sprite_address));
+	save_item(NAME(m_sprite_bank));
+	save_item(NAME(m_xtile_ptr));
+	save_item(NAME(m_ytile_ptr));
+	save_item(NAME(m_xtile_autoinc));
+	save_item(NAME(m_ytile_autoinc));
+	save_item(NAME(m_plane_select_access));
+	save_item(NAME(m_mosaic_aplane));
+	save_item(NAME(m_mosaic_bplane));
+	save_item(NAME(m_sprite_disable));
+	save_item(NAME(m_sprite_aux_mode));
+	save_item(NAME(m_sprite_aux_reg));
+	save_item(NAME(m_border_color));
+	save_item(NAME(m_saar));
+	save_item(NAME(m_saaw));
+	save_item(NAME(m_scar));
+	save_item(NAME(m_scaw));
+	save_item(NAME(m_cpar));
+	save_item(NAME(m_cpaw));
+	save_item(NAME(m_ba_plane_scroll_select));
+	save_item(NAME(m_dspe));
+	save_item(NAME(m_md));
+	save_item(NAME(m_zron));
+	save_item(NAME(m_flip));
+	save_item(NAME(m_dckm));
+	save_item(NAME(m_page_size));
+	save_item(NAME(m_h_display_size));
+	save_item(NAME(m_v_display_size));
+	save_item(NAME(m_roz_wrap_disable));
+	save_item(NAME(m_scroll_wrap_disable));
+	save_item(NAME(m_pattern_size));
+	save_item(NAME(m_h_div_size));
+	save_item(NAME(m_v_div_size));
+	save_item(NAME(m_planeA_trans_enable));
+	save_item(NAME(m_planeB_trans_enable));
+	save_item(NAME(m_priority_mode));
+	save_item(NAME(m_cbdr));
+	save_item(NAME(m_yse));
+	save_item(NAME(m_scm));
+	save_item(NAME(m_planeA_color_fetch));
+	save_item(NAME(m_planeB_color_fetch));
+	save_item(NAME(m_sprite_color_fetch));
+	save_item(NAME(m_crtc.htotal));
+	save_item(NAME(m_crtc.vtotal));
+	save_item(NAME(m_crtc.display_hstart));
+	save_item(NAME(m_crtc.display_vstart));
+	save_item(NAME(m_crtc.display_width));
+	save_item(NAME(m_crtc.display_height));
+	save_item(NAME(m_crtc.display_hsync));
+	save_item(NAME(m_crtc.display_vsync));
+	save_item(NAME(m_crtc.border_width));
+	save_item(NAME(m_crtc.border_height));
+	save_item(NAME(m_ax));
+	save_item(NAME(m_dx));
+	save_item(NAME(m_dxy));
+	save_item(NAME(m_ay));
+	save_item(NAME(m_dy));
+	save_item(NAME(m_dyx));
+	save_item(NAME(m_raw_ax));
+	save_item(NAME(m_raw_dx));
+	save_item(NAME(m_raw_dxy));
+	save_item(NAME(m_raw_ay));
+	save_item(NAME(m_raw_dy));
+	save_item(NAME(m_raw_dyx));
 }
 
 
@@ -1260,20 +1348,20 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 {
 	int pn = 0;
 
-	switch (p0_state)
+	switch (m_p0_state)
 	{
 		case 0:
 			/* Are we reading from plane B? */
 			if (!(m_md & MD_1PLANE) && (m_plane_select_access == true))
-				pattern_name_base_r = ((m_page_y << m_pny_shift) << m_bits16);
+				m_pattern_name_base_r = ((m_page_y << m_pny_shift) << m_bits16);
 
 			/* read character from ram */
-			pn = pattern_name_base_r + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16);
+			pn = m_pattern_name_base_r + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16);
 			break;
 
 		case 1:
 			/* read character from ram */
-			pn = pattern_name_base_r + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16) + 1;
+			pn = m_pattern_name_base_r + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16) + 1;
 			break;
 	}
 
@@ -1281,26 +1369,26 @@ READ8_MEMBER( ygv608_device::pattern_name_table_r )
 	{
 		logerror( "attempt (%d) to read pattern name %d\n"
 			"mode = %d, pgs = %d (%dx%d)\n"
-			"pattern_name_base_r = %d\n"
+			"m_pattern_name_base_r = %d\n"
 			"pnx = %d, pny = %d, pny_shift = %d, bits16 = %d\n",
-			p0_state,
+			m_p0_state,
 			pn, m_md, m_page_size,
 			m_page_x, m_page_y,
-			pattern_name_base_r,
+			m_pattern_name_base_r,
 			m_xtile_ptr, m_ytile_ptr, m_pny_shift,
 			m_bits16 );
 		pn = 0;
 	}
 
-	p0_state++;
+	m_p0_state++;
 	if (m_md == MD_2PLANE_8BIT )
-		p0_state++;
+		m_p0_state++;
 
-	if (p0_state == 2)
+	if (m_p0_state == 2)
 	{
 		pattern_name_autoinc_check();
-		p0_state = 0;
-		pattern_name_base_r = 0;
+		m_p0_state = 0;
+		m_pattern_name_base_r = 0;
 	}
 
 	return m_pattern_name_table[pn];
@@ -1398,20 +1486,20 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 {
 	int pn = 0;
 
-	switch (p0_state)
+	switch (m_p0_state)
 	{
 		case 0:
 			/* Are we reading from plane B? */
 			if (!(m_md & MD_1PLANE) && (m_plane_select_access == true))
-				pattern_name_base_w = ((m_page_y << m_pny_shift) << m_bits16);
+				m_pattern_name_base_w = ((m_page_y << m_pny_shift) << m_bits16);
 
 			/* read character from ram */
-			pn = pattern_name_base_w + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16);
+			pn = m_pattern_name_base_w + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16);
 			break;
 
 		case 1:
 			/* read character from ram */
-			pn = pattern_name_base_w + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16) + 1;
+			pn = m_pattern_name_base_w + (((m_ytile_ptr << m_pny_shift) + m_xtile_ptr) << m_bits16) + 1;
 			break;
 	}
 
@@ -1419,12 +1507,12 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 	{
 		logerror( "attempt (%d) to write pattern name %d\n"
 			"mode = %d, pgs = %d (%dx%d)\n"
-			"pattern_name_base_w = %d\n"
+			"m_pattern_name_base_w = %d\n"
 			"pnx = %d, pny = %d, pny_shift = %d, bits16 = %d\n",
-			p0_state,
+			m_p0_state,
 			pn, m_md, m_page_size,
 			m_page_x, m_page_y,
-			pattern_name_base_w,
+			m_pattern_name_base_w,
 			m_xtile_ptr, m_ytile_ptr, m_pny_shift,
 			m_bits16 );
 		pn = 0;
@@ -1432,15 +1520,15 @@ WRITE8_MEMBER(ygv608_device::pattern_name_table_w)
 
 	m_pattern_name_table[pn] = data;
 
-	p0_state++;
+	m_p0_state++;
 	if (m_md == MD_2PLANE_8BIT )
-		p0_state++;
+		m_p0_state++;
 
-	if (p0_state == 2)
+	if (m_p0_state == 2)
 	{
 		pattern_name_autoinc_check();
-		p0_state = 0;
-		pattern_name_base_w = 0;
+		m_p0_state = 0;
+		m_pattern_name_base_w = 0;
 	}
 }
 
@@ -1586,8 +1674,8 @@ void ygv608_device::HandleReset()
 	/* Clear ports #0-7 */
 	//memset( &m_ports.b[0], 0, 8 );
 	// most likely variables to be reset here from ports, there might be more
-	pattern_name_base_w = 0;
-	pattern_name_base_r = 0;
+	m_pattern_name_base_w = 0;
+	m_pattern_name_base_r = 0;
 	m_register_address = 0;
 	m_register_autoinc_r = false;
 	m_register_autoinc_w = false;
@@ -1830,7 +1918,7 @@ WRITE8_MEMBER( ygv608_device::screen_ctrl_7_w )
 	m_na8_mask = ((m_flip == true) ? 0x03 : 0x0f );
 
 	// changing mode resets the pattern name table states (Mappy Arrange)
-	p0_state = 0;
+	m_p0_state = 0;
 	pattern_mode_setup();
 // TODO: add dot clock into CRTC
 //  screen_configure();

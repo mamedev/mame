@@ -70,7 +70,7 @@
         - port C, open drain output bit PC1 (RTC/NVRAM data)
     - hard disk
         - 4105 SASI interface card
-        - SASI interface (scsibus.c)
+        - SASI interface (scsibus.cpp)
     - connect RS-232 port A
 
 */
@@ -537,7 +537,7 @@ void abc1600_state::mac_mem(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( abc1600 )
-	// inputs defined in machine/abc99.c
+	// inputs defined in machine/abc99.cpp
 INPUT_PORTS_END
 
 
@@ -886,7 +886,9 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	MCFG_ABC1600_MOVER_ADD()
 
 	// devices
-	MCFG_ABC1600_MAC_ADD(MC68008P8_TAG, mac_mem)
+	abc1600_mac_device &mac(ABC1600_MAC(config, "mac", 0));
+	mac.set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
+	mac.set_cpu_tag(m_maincpu);
 
 	Z80DMA(config, m_dma0, 64_MHz_XTAL / 16);
 	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
@@ -941,10 +943,10 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr);
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_dart, z80dart_device, rxa_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
 
 	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, "abc99")
 	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))

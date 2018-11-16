@@ -145,12 +145,12 @@ static INPUT_PORTS_START( kingpin )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(kingpin_state::kingpin)
-
+void kingpin_state::kingpin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(kingpin_program_map)
-	MCFG_DEVICE_IO_MAP(kingpin_io_map)
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &kingpin_state::kingpin_program_map);
+	m_maincpu->set_addrmap(AS_IO, &kingpin_state::kingpin_io_map);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// PORT A read = watchdog?
@@ -164,9 +164,9 @@ MACHINE_CONFIG_START(kingpin_state::kingpin)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(kingpin_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(kingpin_state, irq0_line_hold,  1000) // unknown freq
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kingpin_state::kingpin_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(kingpin_state::irq0_line_hold), attotime::from_hz(1000)); // unknown freq
 
 	/* video hardware */
 	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
@@ -178,17 +178,16 @@ MACHINE_CONFIG_START(kingpin_state::kingpin)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8912(config, "aysnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(kingpin_state::dealracl)
+void kingpin_state::dealracl(machine_config &config)
+{
 	kingpin(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dealracl_program_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &kingpin_state::dealracl_program_map);
+}
 
 
 

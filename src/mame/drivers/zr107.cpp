@@ -79,7 +79,7 @@ Notes:
      403GA: clock 32.000MHz (64/2)
      68000: clock 8.000MHz (64/8)
     TSOP56: Unpopulated position for 2Mx8 TSOP56 FlashROM
-     DIP42: Unpopulated position for 2Mx8 DIP42 MASKROM
+     DIP42: Unpopulated position for 2Mx8 DIP42 mask ROM
      DIP32: Unpopulated position for 512kx8 EPROM
      SOJ40: Unpopulated position for DRAM 814260-70
      QFP44: Unpopulated position for MB89371FL
@@ -148,7 +148,7 @@ Notes:
       CY7C199 : 32kx8 SRAM
       CY7C109 : 128kx8 SRAM
       62256   : 32kx8 SRAM
-      DIP42   : Unpopulated position for 1Mx8 DIP42 MASKROM
+      DIP42   : Unpopulated position for 1Mx8 DIP42 mask ROM
       MC88916 : Motorola MC88916 Low Skew CMOS PLL Clock Driver
 
 ROM Usage

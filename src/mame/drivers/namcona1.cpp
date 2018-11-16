@@ -603,7 +603,7 @@ void xday2_namcona2_state::xday2_main_map(address_map &map)
 
 READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 {
-	uint16_t data = flipendian_int16(m_workram[offset]);
+	uint16_t data = swapendian_int16(m_workram[offset]);
 
 #if 0
 	if (offset >= 0x70000/2)
@@ -616,8 +616,8 @@ READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 
 WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 {
-	mem_mask = flipendian_int16(mem_mask);
-	data = flipendian_int16(data);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 
 	COMBINE_DATA(&m_workram[offset]);
 }

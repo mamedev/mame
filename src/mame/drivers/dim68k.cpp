@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_UPD765A_ADD("fdc", true, true) // these options unknown
+	UPD765A(config, "fdc", true, true); // these options unknown
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 

@@ -376,10 +376,10 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(3'579'545)/2)); // ??? AY-3-8914
+	ay8910.port_a_read_callback().set_ioport("RIGHT");
+	ay8910.port_b_read_callback().set_ioport("LEFT");
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )

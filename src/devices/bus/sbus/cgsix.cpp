@@ -36,6 +36,128 @@ sbus_cgsix_device::sbus_cgsix_device(const machine_config &mconfig, device_type 
 void sbus_cgsix_device::device_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(m_vram_size / 4);
+
+	save_pointer(NAME(m_vram), m_vram_size / 4);
+	save_item(NAME(m_vram_size));
+
+	save_item(NAME(m_fbc.m_clip_check));
+	save_item(NAME(m_fbc.m_status));
+	save_item(NAME(m_fbc.m_draw_status));
+	save_item(NAME(m_fbc.m_blit_status));
+	save_item(NAME(m_fbc.m_font));
+
+	save_item(NAME(m_fbc.m_x0));
+	save_item(NAME(m_fbc.m_y0));
+	save_item(NAME(m_fbc.m_z0));
+	save_item(NAME(m_fbc.m_color0));
+	save_item(NAME(m_fbc.m_x1));
+	save_item(NAME(m_fbc.m_y1));
+	save_item(NAME(m_fbc.m_z1));
+	save_item(NAME(m_fbc.m_color1));
+	save_item(NAME(m_fbc.m_x2));
+	save_item(NAME(m_fbc.m_y2));
+	save_item(NAME(m_fbc.m_z2));
+	save_item(NAME(m_fbc.m_color2));
+	save_item(NAME(m_fbc.m_x3));
+	save_item(NAME(m_fbc.m_y3));
+	save_item(NAME(m_fbc.m_z3));
+	save_item(NAME(m_fbc.m_color3));
+
+	save_item(NAME(m_fbc.m_raster_offx));
+	save_item(NAME(m_fbc.m_raster_offy));
+
+	save_item(NAME(m_fbc.m_autoincx));
+	save_item(NAME(m_fbc.m_autoincy));
+
+	save_item(NAME(m_fbc.m_clip_minx));
+	save_item(NAME(m_fbc.m_clip_miny));
+
+	save_item(NAME(m_fbc.m_clip_maxx));
+	save_item(NAME(m_fbc.m_clip_maxy));
+
+	save_item(NAME(m_fbc.m_fcolor));
+	save_item(NAME(m_fbc.m_bcolor));
+
+	save_item(NAME(m_fbc.m_rasterop));
+
+	save_item(NAME(m_fbc.m_plane_mask));
+	save_item(NAME(m_fbc.m_pixel_mask));
+
+	save_item(NAME(m_fbc.m_patt_align));
+	save_item(NAME(m_fbc.m_pattern));
+
+	save_item(NAME(m_fbc.m_ipoint_absx));
+	save_item(NAME(m_fbc.m_ipoint_absy));
+	save_item(NAME(m_fbc.m_ipoint_absz));
+	save_item(NAME(m_fbc.m_ipoint_relx));
+	save_item(NAME(m_fbc.m_ipoint_rely));
+	save_item(NAME(m_fbc.m_ipoint_relz));
+	save_item(NAME(m_fbc.m_ipoint_r));
+	save_item(NAME(m_fbc.m_ipoint_g));
+	save_item(NAME(m_fbc.m_ipoint_b));
+	save_item(NAME(m_fbc.m_ipoint_a));
+
+	save_item(NAME(m_fbc.m_iline_absx));
+	save_item(NAME(m_fbc.m_iline_absy));
+	save_item(NAME(m_fbc.m_iline_absz));
+	save_item(NAME(m_fbc.m_iline_relx));
+	save_item(NAME(m_fbc.m_iline_rely));
+	save_item(NAME(m_fbc.m_iline_relz));
+	save_item(NAME(m_fbc.m_iline_r));
+	save_item(NAME(m_fbc.m_iline_g));
+	save_item(NAME(m_fbc.m_iline_b));
+	save_item(NAME(m_fbc.m_iline_a));
+
+	save_item(NAME(m_fbc.m_itri_absx));
+	save_item(NAME(m_fbc.m_itri_absy));
+	save_item(NAME(m_fbc.m_itri_absz));
+	save_item(NAME(m_fbc.m_itri_relx));
+	save_item(NAME(m_fbc.m_itri_rely));
+	save_item(NAME(m_fbc.m_itri_relz));
+	save_item(NAME(m_fbc.m_itri_r));
+	save_item(NAME(m_fbc.m_itri_g));
+	save_item(NAME(m_fbc.m_itri_b));
+	save_item(NAME(m_fbc.m_itri_a));
+
+	save_item(NAME(m_fbc.m_iquad_absx));
+	save_item(NAME(m_fbc.m_iquad_absy));
+	save_item(NAME(m_fbc.m_iquad_absz));
+	save_item(NAME(m_fbc.m_iquad_relx));
+	save_item(NAME(m_fbc.m_iquad_rely));
+	save_item(NAME(m_fbc.m_iquad_relz));
+	save_item(NAME(m_fbc.m_iquad_r));
+	save_item(NAME(m_fbc.m_iquad_g));
+	save_item(NAME(m_fbc.m_iquad_b));
+	save_item(NAME(m_fbc.m_iquad_a));
+
+	save_item(NAME(m_fbc.m_irect_absx));
+	save_item(NAME(m_fbc.m_irect_absy));
+	save_item(NAME(m_fbc.m_irect_absz));
+	save_item(NAME(m_fbc.m_irect_relx));
+	save_item(NAME(m_fbc.m_irect_rely));
+	save_item(NAME(m_fbc.m_irect_relz));
+	save_item(NAME(m_fbc.m_irect_r));
+	save_item(NAME(m_fbc.m_irect_g));
+	save_item(NAME(m_fbc.m_irect_b));
+	save_item(NAME(m_fbc.m_irect_a));
+
+	save_item(NAME(m_fbc.m_vertex_count));
+
+	for (int i = 0; i < 0x1000; i++)
+	{
+		save_item(NAME(m_fbc.m_prim_buf[i].m_absx), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_absy), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_absz), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_relx), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_rely), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_relz), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_r), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_g), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_b), i);
+		save_item(NAME(m_fbc.m_prim_buf[i].m_a), i);
+	}
+
+	save_item(NAME(m_fbc.m_curr_prim_type));
 }
 
 void sbus_cgsix_device::device_reset()
@@ -129,6 +251,35 @@ uint8_t sbus_cgsix_device::perform_rasterop(uint8_t src, uint8_t dst)
 	return result;
 }
 
+void sbus_cgsix_device::handle_font_poke()
+{
+	if (fbc_misc_draw() != FBC_MISC_DRAW_RENDER)
+	{
+		logerror("handle_font_poke: Unsupported font draw mode %d, abandoning draw\n", fbc_misc_draw());
+		return;
+	}
+
+	const uint32_t daddr = m_fbc.m_y0 * 1152;
+	uint8_t *vram = (uint8_t*)&m_vram[0];
+	vram += daddr;
+	const int width = (int)m_fbc.m_x1 - (int)m_fbc.m_x0;
+	const uint32_t font = m_fbc.m_font;
+	uint32_t x = m_fbc.m_x0;
+	logerror("Width: %d, bits %d to %d\n", width, 31, 31 - width);
+	for (int bit = 31; bit >= (31 - width); bit--)
+	{
+		const uint8_t src = BIT(font, bit) ? 0xff : 0x00;
+		const uint8_t dst = vram[BYTE4_XOR_BE(x)];
+		vram[BYTE4_XOR_BE(x)]= perform_rasterop(src, dst);
+		x++;
+		if (x >= 1152) break;
+	}
+	m_fbc.m_x0 += m_fbc.m_autoincx;
+	m_fbc.m_x1 += m_fbc.m_autoincx;
+	m_fbc.m_y0 += m_fbc.m_autoincy;
+	m_fbc.m_y1 += m_fbc.m_autoincy;
+}
+
 // NOTE: This is basically untested, and probably full of bugs!
 void sbus_cgsix_device::handle_draw_command()
 {
@@ -158,15 +309,15 @@ void sbus_cgsix_device::handle_draw_command()
 		vertex_t &v0 = m_fbc.m_prim_buf[vindex++];
 		vertex_t &v1 = m_fbc.m_prim_buf[vindex++];
 
-		for (uint32_t y = v0.m_absy; y < v1.m_absy; y++)
+		for (uint32_t y = v0.m_absy; y <= v1.m_absy; y++)
 		{
-			const uint32_t line = y * (m_fbc.m_clip_maxx + 1);
-			for (uint32_t x = v0.m_absx; x < v1.m_absx; x++)
+			uint8_t *line = &vram[y * 1152];
+			for (uint32_t x = v0.m_absx; x <= v1.m_absx; x++)
 			{
-				const uint8_t src = vram[line + x];
+				const uint32_t native_x = BYTE4_XOR_BE(x);
+				const uint8_t src = line[native_x];
 				const uint8_t dst = src;
-				const uint8_t result = perform_rasterop(src, dst);
-				vram[line + x] = result;
+				line[native_x] = perform_rasterop(src, dst);
 			}
 		}
 	}
@@ -177,7 +328,7 @@ void sbus_cgsix_device::handle_draw_command()
 void sbus_cgsix_device::handle_blit_command()
 {
 	uint8_t *vram = (uint8_t*)&m_vram[0];
-	const uint32_t fbw = (m_fbc.m_clip_maxx + 1);
+	const uint32_t fbw = 1152;//(m_fbc.m_clip_maxx + 1);
 	logerror("Copying from %d,%d-%d,%d to %d,%d-%d,%d, width %d, height %d\n"
 		, m_fbc.m_x0, m_fbc.m_y0
 		, m_fbc.m_x1, m_fbc.m_y1
@@ -188,17 +339,18 @@ void sbus_cgsix_device::handle_blit_command()
 	uint32_t dsty = m_fbc.m_y2;
 	for (; srcy < m_fbc.m_y1; srcy++, dsty++)
 	{
-		uint32_t srcy_index = srcy * fbw;
-		uint32_t dsty_index = dsty * fbw;
+		uint8_t *srcline = &vram[srcy * fbw];
+		uint8_t *dstline = &vram[dsty * fbw];
 		uint32_t srcx = m_fbc.m_x0;
 		uint32_t dstx = m_fbc.m_x2;
 		for (; srcx < m_fbc.m_x1; srcx++, dstx++)
 		{
-			const uint8_t src = vram[srcy_index + srcx];
-			const uint8_t dst = vram[dsty_index + dstx];
+			const uint32_t native_dstx = BYTE4_XOR_BE(dstx);
+			const uint8_t src = srcline[BYTE4_XOR_BE(srcx)];
+			const uint8_t dst = dstline[native_dstx];
 			const uint8_t result = perform_rasterop(src, dst);
 			//logerror("vram[%d] = %02x\n", result);
-			vram[dsty_index + dstx] = result;
+			dstline[native_dstx] = result;
 		}
 	}
 }
@@ -565,9 +717,12 @@ WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
 			//COMBINE_DATA(&m_fbc.m_blit_status);
 			break;
 		case FBC_FONT:
+		{
 			logerror("fbc_w: FONT = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_font);
+			handle_font_poke();
 			break;
+		}
 
 		case FBC_X0:
 			logerror("fbc_w: X0 = %08x & %08x\n", data, mem_mask);

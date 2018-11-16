@@ -578,10 +578,10 @@ MACHINE_CONFIG_START(ep64_state::ep64)
 
 	// video hardware
 	MCFG_NICK_ADD(NICK_TAG, SCREEN_TAG, XTAL(8'000'000))
-	MCFG_NICK_VIRQ_CALLBACK(WRITELINE(DAVE_TAG, dave_device, int1_w))
+	MCFG_NICK_VIRQ_CALLBACK(WRITELINE(m_dave, dave_device, int1_w))
 
 	// sound hardware
-	MCFG_DAVE_ADD(DAVE_TAG, XTAL(8'000'000), dave_64k_mem, dave_io)
+	MCFG_DAVE_ADD(m_dave, XTAL(8'000'000), dave_64k_mem, dave_io)
 	MCFG_DAVE_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	// devices
@@ -595,8 +595,8 @@ MACHINE_CONFIG_START(ep64_state::ep64)
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, ep64_state, write_centronics_busy))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(DAVE_TAG, dave_device, int2_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_dave, FUNC(dave_device::int2_w));
 
 	MCFG_CASSETTE_ADD(CASSETTE1_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)

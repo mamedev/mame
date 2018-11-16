@@ -204,11 +204,11 @@ MACHINE_CONFIG_START(gizmondo_state::gizmondo)
 
 	MCFG_GF4500_ADD("gf4500")
 
-	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
-	MCFG_S3C2440_PALETTE("palette")
-	MCFG_S3C2440_SCREEN("screen")
-	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(*this, gizmondo_state, s3c2440_gpio_port_r))
-	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(*this, gizmondo_state, s3c2440_gpio_port_w))
+	S3C2440(config, m_s3c2440, 12000000);
+	m_s3c2440->set_palette_tag("palette");
+	m_s3c2440->set_screen_tag("screen");
+	m_s3c2440->gpio_port_r_callback().set(FUNC(gizmondo_state::s3c2440_gpio_port_r));
+	m_s3c2440->gpio_port_w_callback().set(FUNC(gizmondo_state::s3c2440_gpio_port_w));
 
 	MCFG_DISKONCHIP_G3_ADD("diskonchip", 64)
 

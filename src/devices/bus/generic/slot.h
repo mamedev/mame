@@ -208,13 +208,14 @@ class generic_cartslot_device : public generic_slot_device
 {
 public:
 	template <typename T>
-	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *intf, const char *exts)
+	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *intf, const char *exts = nullptr)
 		: generic_cartslot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		opts(*this);
 		set_fixed(false);
 		set_interface(intf);
-		set_extensions(exts);
+		if (exts)
+			set_extensions(exts);
 	}
 
 	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);

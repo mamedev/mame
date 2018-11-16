@@ -7,10 +7,9 @@
 #pragma once
 
 #include "screen.h"
-#include "emupal.h"
 
 
-class namcos2_roz_device : public device_t
+class namcos2_roz_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
@@ -18,8 +17,6 @@ public:
 
 	template <typename T> void set_rozram_tag(T &&tag) { m_rozram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_rozctrl_tag(T &&tag) { m_roz_ctrl.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_WRITE16_MEMBER( rozram_word_w );
 
@@ -39,8 +36,7 @@ private:
 
 	required_shared_ptr<uint16_t> m_rozram;
 	required_shared_ptr<uint16_t> m_roz_ctrl;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 };
 
 // device type definition

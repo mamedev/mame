@@ -585,9 +585,9 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, multi8_state, ym2203_porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8912(config, m_aysnd, 1500000); //unknown clock / divider
+	m_aysnd->port_a_write_callback().set(FUNC(multi8_state::ym2203_porta_w));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.50);
 	MCFG_DEVICE_ADD("beeper", BEEP, 1200) // guesswork
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
@@ -608,11 +608,11 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("uart", I8251, 0) // for cassette
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	I8251(config, "uart", 0); // for cassette
+	PIT8253(config, "pit", 0);
+	PIC8259(config, "pic", 0);
 
-	//MCFG_UPD765A_ADD("fdc", false, true)
+	//UPD765A(config, "fdc", false, true);
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 

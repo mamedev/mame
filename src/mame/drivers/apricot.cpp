@@ -370,8 +370,8 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_DEVICE_PROGRAM_MAP(apricot_mem)
 	MCFG_DEVICE_IO_MAP(apricot_io)
 	MCFG_I8089_DATA_WIDTH(16)
-	MCFG_I8089_SINTR1(WRITELINE("ic31", pic8259_device, ir0_w))
-	MCFG_I8089_SINTR2(WRITELINE("ic31", pic8259_device, ir1_w))
+	MCFG_I8089_SINTR1(WRITELINE(m_pic, pic8259_device, ir0_w))
+	MCFG_I8089_SINTR2(WRITELINE(m_pic, pic8259_device, ir1_w))
 
 	// ram
 	RAM(config, RAM_TAG).set_default_size("256K");
@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(4_MHz_XTAL / 16);
-	m_pit->out_handler<0>().set("ic31", FUNC(pic8259_device::ir6_w));
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir6_w));
 	m_pit->set_clk<1>(4_MHz_XTAL / 2);
 	m_pit->out_handler<1>().set("ic14", FUNC(ttl153_device::i0a_w));
 	m_pit->set_clk<2>(4_MHz_XTAL / 2);

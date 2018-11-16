@@ -139,9 +139,9 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 
 		/* CS6 */
 		case 4:
-			m_discrete->write(space, NODE_05, (offset & 0x20) >> 5);
-			m_discrete->write(space, NODE_06, (offset & 0x18) >> 3);
-			m_discrete->write(space, NODE_07, (offset & 0x40) >> 6);
+			m_discrete->write(NODE_05, (offset & 0x20) >> 5);
+			m_discrete->write(NODE_06, (offset & 0x18) >> 3);
+			m_discrete->write(NODE_07, (offset & 0x40) >> 6);
 			break;
 	}
 }
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(circusc_state::circusc)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("sn1", SN76496, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(0, "fltdisc", 1.0, 0)

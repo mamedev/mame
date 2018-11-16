@@ -395,13 +395,13 @@ MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, write_usart_clock))
 
-	MCFG_DEVICE_ADD("d8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(4'000'000) / 8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, d8253_out0))
-	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, d8253_out1))
-	MCFG_PIT8253_CLK2(XTAL(4'000'000) / 2)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("d8253", pit8253_device, write_clk1))
+	PIT8253(config, m_d8253, 0);
+	m_d8253->set_clk<0>(XTAL(4'000'000) / 8);
+	m_d8253->out_handler<0>().set(FUNC(isa8_ibm_mfc_device::d8253_out0));
+	m_d8253->set_clk<1>(0);
+	m_d8253->out_handler<1>().set(FUNC(isa8_ibm_mfc_device::d8253_out1));
+	m_d8253->set_clk<2>(XTAL(4'000'000) / 2);
+	m_d8253->out_handler<2>().set(m_d8253, FUNC(pit8253_device::write_clk1));
 
 	SPEAKER(config, "ymleft").front_left();
 	SPEAKER(config, "ymright").front_right();

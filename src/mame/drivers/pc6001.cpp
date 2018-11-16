@@ -1522,10 +1522,10 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	MCFG_GENERIC_EXTENSIONS("cas,p6")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910_device &ay8910(AY8910(config, "ay8910", PC6001_MAIN_CLOCK/4));
+	ay8910.port_a_read_callback().set_ioport("P1");
+	ay8910.port_b_read_callback().set_ioport("P2");
+	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
 //  WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* TODO: accurate timing on this */

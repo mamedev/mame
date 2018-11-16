@@ -47,7 +47,8 @@ void i82371sb_isa_device::internal_io_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
+void i82371sb_isa_device::device_add_mconfig(machine_config &config)
+{
 	PIT8254(config, m_pit8254, 0);
 	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit8254->out_handler<0>().set(FUNC(i82371sb_isa_device::at_pit8254_out0_changed));
@@ -102,27 +103,27 @@ MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("isabus", ISA16, 0)
-	MCFG_ISA16_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq7_w))
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq9_w))
-	MCFG_ISA_OUT_IRQ10_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq10_w))
-	MCFG_ISA_OUT_IRQ11_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq11_w))
-	MCFG_ISA_OUT_IRQ12_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq12m_w))
-	MCFG_ISA_OUT_IRQ14_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq14_w))
-	MCFG_ISA_OUT_IRQ15_CB(WRITELINE(*this, i82371sb_isa_device, pc_irq15_w))
-	MCFG_ISA_OUT_DRQ0_CB(WRITELINE("dma8237_1", am9517a_device, dreq0_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
-	MCFG_ISA_OUT_DRQ5_CB(WRITELINE("dma8237_2", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ6_CB(WRITELINE("dma8237_2", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("dma8237_2", am9517a_device, dreq3_w))
-MACHINE_CONFIG_END
+	ISA16(config, m_isabus, 0);
+	m_isabus->set_cputag(":maincpu");
+	m_isabus->irq3_callback().set(FUNC(i82371sb_isa_device::pc_irq3_w));
+	m_isabus->irq4_callback().set(FUNC(i82371sb_isa_device::pc_irq4_w));
+	m_isabus->irq5_callback().set(FUNC(i82371sb_isa_device::pc_irq5_w));
+	m_isabus->irq6_callback().set(FUNC(i82371sb_isa_device::pc_irq6_w));
+	m_isabus->irq7_callback().set(FUNC(i82371sb_isa_device::pc_irq7_w));
+	m_isabus->irq2_callback().set(FUNC(i82371sb_isa_device::pc_irq9_w));
+	m_isabus->irq10_callback().set(FUNC(i82371sb_isa_device::pc_irq10_w));
+	m_isabus->irq11_callback().set(FUNC(i82371sb_isa_device::pc_irq11_w));
+	m_isabus->irq12_callback().set(FUNC(i82371sb_isa_device::pc_irq12m_w));
+	m_isabus->irq14_callback().set(FUNC(i82371sb_isa_device::pc_irq14_w));
+	m_isabus->irq15_callback().set(FUNC(i82371sb_isa_device::pc_irq15_w));
+	m_isabus->drq0_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
+}
 
 i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pci_device(mconfig, I82371SB_ISA, tag, owner, clock),

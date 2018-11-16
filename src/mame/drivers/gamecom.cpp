@@ -10,16 +10,22 @@ Todo:
 - RS232 port
 - Sound ports 1,2 do not sound anything like the real thing
 - Sound port 3 (noise channel)
-- Sound dac port (mostly works but is the wrong speed in some places)
+- Sound dac port (mostly works but is the wrong speed in some places).
+  dac pitch is controlled by how often TIM1_INT occurs. This same
+  interrupt also controls the seconds countdown in some games, such as
+  Quiz Wiz and Scrabble. Currently this countdown goes twice as fast
+  as it should. If the INT is slowed down to compensate, the dac sound
+  is so slow as to be unintelligible. Need to find a way to keep both happy.
+- System seems slower than it should. Probably wrong cycle count in the CPU.
+  What we have there is a guess as the real info has not been found.
+  -speed 1.2 makes the sound more natural
+  -speed 1.7 if TIM1_INT is slowed to fix the countdown.
 
 Game Status:
 - Inbuilt ROM and PDA functions all work
-- On the screen where the cart goes into the slot, there are vertical bands of randomness
 - Due to an irritating message, the NVRAM is commented out in the machine config
-- All carts appear to work except:
-- - Henry: crash just after "HENRY" button clicked
-- - Lost World: freeze just after entering Stage 2 (the nest)
-- Weblink and Internet are of no use as there is nothing to connect to.
+- All carts appear to work, from my limited testing.
+-- indy500 skips some speech just before the trial race starts.
 
 ***************************************************************************/
 
@@ -47,7 +53,7 @@ void gamecom_state::gamecom_mem_map(address_map &map)
 	map(0x4000, 0x5FFF).bankr("bank2");                                   /* External ROM/Flash. Controlled by MMU2 */
 	map(0x6000, 0x7FFF).bankr("bank3");                                   /* External ROM/Flash. Controlled by MMU3 */
 	map(0x8000, 0x9FFF).bankr("bank4");                                   /* External ROM/Flash. Controlled by MMU4 */
-	map(0xA000, 0xDFFF).ram().share("videoram");             /* VRAM */
+	map(0xA000, 0xDFFF).writeonly().share("videoram").nopr();             /* VRAM - writeonly, returns 0 on read, as expected by lostwrld */
 	map(0xE000, 0xFFFF).ram().share("nvram");           /* Extended I/O, Extended RAM */
 }
 
@@ -71,6 +77,7 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Button D" ) PORT_CODE( KEYCODE_D ) PORT_CODE( KEYCODE_LSHIFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( "Stylus press" ) PORT_CODE( KEYCODE_Z ) PORT_CODE( MOUSECODE_BUTTON1 )
 
+	// These are used by the "Default Grid" artwork to detect mouse clicks
 	PORT_START("GRID.0")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_OTHER)
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_OTHER)

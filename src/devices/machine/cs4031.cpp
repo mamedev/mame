@@ -173,6 +173,13 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 	m_write_cpureset(*this),
 	m_write_a20m(*this),
 	m_write_spkr(*this),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_keybc(*this, finder_base::DUMMY_TAG),
+	m_isa(*this, finder_base::DUMMY_TAG),
+	m_bios(*this, finder_base::DUMMY_TAG),
+	m_space(nullptr),
+	m_space_io(nullptr),
+	m_ram(nullptr),
 	m_dma1(*this, "dma1"),
 	m_dma2(*this, "dma2"),
 	m_intc1(*this, "intc1"),
@@ -239,13 +246,8 @@ void cs4031_device::device_start()
 	save_item(NAME(m_address_valid));
 	save_item(NAME(m_registers));
 
-	device_t *cpu = machine().device(m_cputag);
-	m_space = &cpu->memory().space(AS_PROGRAM);
-	m_space_io = &cpu->memory().space(AS_IO);
-
-	m_isa = machine().root_device().memregion(m_isatag)->base();
-	m_bios = machine().root_device().memregion(m_biostag)->base();
-	m_keybc = downcast<at_keyboard_controller_device *>(machine().device(m_keybctag));
+	m_space = &m_cpu->memory().space(AS_PROGRAM);
+	m_space_io = &m_cpu->memory().space(AS_IO);
 
 	m_ram = ram_dev->pointer();
 	uint32_t ram_size = ram_dev->size();

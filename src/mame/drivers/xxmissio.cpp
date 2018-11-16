@@ -294,21 +294,21 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 12000000/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", 12000000/8));
+	ym1.port_a_read_callback().set_ioport("DSW1");
+	ym1.port_b_read_callback().set_ioport("DSW2");
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 12000000/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, xxmissio_state, scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, xxmissio_state, scroll_y_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym2(YM2203(config, "ym2", 12000000/8));
+	ym2.port_a_write_callback().set(FUNC(xxmissio_state::scroll_x_w));
+	ym2.port_b_write_callback().set(FUNC(xxmissio_state::scroll_y_w));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.40);
 MACHINE_CONFIG_END
 
 /****************************************************************************/

@@ -895,10 +895,10 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	pio.in_pb_callback().set(FUNC(mz2000_state::mz2000_pio1_portb_r));
 
 	/* TODO: clocks aren't known */
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(31250)
-	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
-	MCFG_PIT8253_CLK2(31250)
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(31250);
+	m_pit8253->set_clk<1>(31250); /* needed by "Art Magic" to boot */
+	m_pit8253->set_clk<2>(31250);
 
 	MB8877(config, m_mb8877a, 1_MHz_XTAL);
 

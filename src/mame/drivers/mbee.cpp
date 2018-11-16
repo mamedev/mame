@@ -128,8 +128,6 @@ from Brett Selwood and Andrew Davies.
 #include "formats/mbee_cas.h"
 #include "speaker.h"
 
-#define XTAL_13_5MHz 13500000
-
 /********** NOTE !!! ***********************************************************
     The microbee uses lots of bankswitching and the memory maps are still
     being determined. Please don't merge memory maps !!
@@ -704,14 +702,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbeeic)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL_13_5MHz / 4);         /* 3.37500 MHz */
+	Z80(config, m_maincpu, 13.5_MHz_XTAL / 4);         /* 3.37500 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeeic_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeeic_io);
 	m_maincpu->set_daisy_config(mbee_daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
-	Z80PIO(config, m_pio, 3375000);
+	Z80PIO(config, m_pio, 13.5_MHz_XTAL / 4);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	m_pio->out_ardy_callback().set(FUNC(mbee_state::pio_ardy));
@@ -738,7 +736,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 13.5_MHz_XTAL / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)

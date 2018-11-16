@@ -1,5 +1,6 @@
 3do.cpp
 4004clk.cpp
+4d20.cpp
 4dpi.cpp
 68ksbc.cpp
 a2600.cpp
@@ -25,6 +26,7 @@ agat.cpp
 aim65.cpp
 aim65_40.cpp
 akaiax80.cpp
+alcat7100.cpp
 alesis.cpp
 alesis_qs.cpp
 alphasma.cpp
@@ -152,6 +154,7 @@ cortex.cpp
 cosmicos.cpp
 cp1.cpp
 craft.cpp
+crimson.cpp
 crvision.cpp
 ct486.cpp
 cvicny.cpp
@@ -222,6 +225,7 @@ excali64.cpp
 exelv.cpp
 exp85.cpp
 facit4440.cpp
+falco5220.cpp
 fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
@@ -290,6 +294,7 @@ hp48.cpp
 hp49gp.cpp
 hp64k.cpp
 hp700.cpp
+hp9825.cpp
 hp9845.cpp
 hp9k.cpp
 hp9k_3xx.cpp
@@ -329,10 +334,12 @@ iq151.cpp
 iqunlim.cpp
 iris3130.cpp
 irisha.cpp
+is48x.cpp
 isbc.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
+itt1700.cpp
 itt3030.cpp
 jade.cpp
 jazz.cpp
@@ -422,6 +429,7 @@ minicom.cpp
 miniforce.cpp
 miniframe.cpp
 minitel_2_rpic.cpp
+mips.cpp
 mits680b.cpp
 mk1.cpp
 mk14.cpp
@@ -467,6 +475,7 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
+ncd17c.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
@@ -482,7 +491,9 @@ novag6502.cpp
 novag68k.cpp
 novagf8.cpp
 novagmcs48.cpp
+o2.cpp
 ob68k1a.cpp
+octane.cpp
 octopus.cpp
 odyssey2.cpp
 okean240.cpp
@@ -635,6 +646,7 @@ sc2.cpp
 scopus.cpp
 scorpion.cpp
 scv.cpp
+sdk51.cpp
 sdk80.cpp
 sdk85.cpp
 sdk86.cpp
@@ -645,6 +657,7 @@ segapm.cpp
 selz80.cpp
 sg1000.cpp
 sh4robot.cpp
+si5500.cpp
 sitcom.cpp
 sk1.cpp
 slc1.cpp
@@ -715,6 +728,7 @@ ti630.cpp
 ti74.cpp
 ti85.cpp
 ti89.cpp
+ti931.cpp
 ti99_2.cpp
 ti99_4p.cpp
 ti99_4x.cpp
@@ -795,7 +809,6 @@ vixen.cpp
 vk100.cpp
 votrpss.cpp
 votrtnt.cpp
-vp122.cpp
 vp415.cpp
 vp60.cpp
 vsmilepro.cpp
@@ -814,6 +827,8 @@ wangpc.cpp
 wicat.cpp
 wswan.cpp
 wy100.cpp
+wy50.cpp
+wy85.cpp
 wyse.cpp
 x07.cpp
 x1.cpp

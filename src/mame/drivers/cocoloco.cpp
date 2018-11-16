@@ -527,13 +527,13 @@ MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
+	ay8910_device &ay8910(AY8910(config, "ay8910", SND_CLOCK));
+	ay8910.port_a_read_callback().set_ioport("DSW1");
+	ay8910.port_b_read_callback().set_ioport("DSW2");
+	ay8910.set_flags(AY8910_RESISTOR_OUTPUT);
+	ay8910.add_route(0, "snd_nl", 1.0, 0);
+	ay8910.add_route(1, "snd_nl", 1.0, 1);
+	ay8910.add_route(2, "snd_nl", 1.0, 2);
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 

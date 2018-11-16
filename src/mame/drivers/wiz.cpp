@@ -267,15 +267,15 @@ DISCRETE_SOUND_END
 WRITE8_MEMBER(wiz_state::stinger_explosion_w)
 {
 	// explosion sound trigger(analog?)
-	m_discrete->write(space, STINGER_BOOM_EN1, m_dsc1);
-	m_discrete->write(space, STINGER_BOOM_EN2, m_dsc1^=1);
+	m_discrete->write(STINGER_BOOM_EN1, m_dsc1);
+	m_discrete->write(STINGER_BOOM_EN2, m_dsc1^=1);
 }
 
 WRITE8_MEMBER(wiz_state::stinger_shot_w)
 {
 	// player shot sound trigger(analog?)
-	m_discrete->write(space, STINGER_SHOT_EN1, m_dsc0);
-	m_discrete->write(space, STINGER_SHOT_EN2, m_dsc0^=1);
+	m_discrete->write(STINGER_SHOT_EN1, m_dsc0);
+	m_discrete->write(STINGER_SHOT_EN2, m_dsc0^=1);
 }
 
 
@@ -817,16 +817,13 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("8910.1", AY8910, 18432000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	AY8910(config, "8910.1", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("8910.2", AY8910, 18432000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	AY8910(config, "8910.2", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("8910.3", AY8910, 18432000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	AY8910(config, "8910.3", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wiz_state::wiz)

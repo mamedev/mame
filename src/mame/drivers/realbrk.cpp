@@ -770,13 +770,13 @@ WRITE_LINE_MEMBER(realbrk_state::vblank_irq)
 MACHINE_CONFIG_START(realbrk_state::realbrk)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(32'000'000) / 2)          /* !! TMP68301 !! */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(32'000'000) / 2)          /* !! TMP68301 !! */
 	MCFG_DEVICE_PROGRAM_MAP(realbrk_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, realbrk_state,realbrk_flipscreen_w))
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
+	m_tmp68301->out_parallel_callback().set(FUNC(realbrk_state::realbrk_flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -810,8 +810,7 @@ MACHINE_CONFIG_START(realbrk_state::pkgnsh)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(pkgnsh_mem)
 
-	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_OUT_PARALLEL_CB(NOOP)
+	m_tmp68301->out_parallel_callback().set_nop();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(realbrk_state::pkgnshdx)

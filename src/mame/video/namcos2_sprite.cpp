@@ -26,7 +26,6 @@ DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device, "namcos2_sprite", "Nam
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCOS2_SPRITE, tag, owner, clock),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, finder_base::DUMMY_TAG),
 	m_spriteram(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -50,8 +49,9 @@ void namcos2_sprite_device::zdrawgfxzoom(
 	{
 		if( gfx )
 		{
-			int shadow_offset = (m_palette->shadows_enabled())?m_palette->entries():0;
-			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			device_palette_interface &palette = m_gfxdecode->palette();
+			int shadow_offset = (palette.shadows_enabled())?palette.entries():0;
+			const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
@@ -343,7 +343,7 @@ void namcos2_sprite_device::draw_sprites_metalhawk(screen_device &screen, bitmap
 			int scaley = (sizey<<16)/(bBigSprite?0x20:0x10);
 
 			/* swap xy */
-			int rgn = (flags&0x01) ? 3 : 0;
+			int rgn = (flags&0x01);
 
 			gfx_element *gfx = m_gfxdecode->gfx(rgn);
 

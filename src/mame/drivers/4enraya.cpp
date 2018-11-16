@@ -493,8 +493,7 @@ MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
+	AY8910(config, m_ay, MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
 MACHINE_CONFIG_END
 
 
@@ -509,9 +508,9 @@ MACHINE_CONFIG_START(unk_gambl_state::unkpacg)
 
 	/* sound hardware */
 //  SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_REPLACE("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config.replace(), m_ay, MAIN_CLOCK/4); /* guess */
+	m_ay->port_a_read_callback().set_ioport("DSW2");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

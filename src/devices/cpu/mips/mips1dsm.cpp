@@ -9,9 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "r3kdasm.h"
+#include "mips1dsm.h"
 
-const char *const r3000_disassembler::reg[32] =
+const char *const mips1_disassembler::reg[32] =
 {
 	"0",    "r1",   "r2",   "r3",   "r4",   "r5",   "r6",   "r7",
 	"r8",   "r9",   "r10",  "r11",  "r12",  "r13",  "r14",  "r15",
@@ -20,7 +20,7 @@ const char *const r3000_disassembler::reg[32] =
 };
 
 
-const char *const r3000_disassembler::cpreg[4][32] =
+const char *const mips1_disassembler::cpreg[4][32] =
 {
 	{
 		"Index","Random","EntryLo","cpr3",  "Context",  "cpr5", "cpr6", "cpr7",
@@ -49,7 +49,7 @@ const char *const r3000_disassembler::cpreg[4][32] =
 };
 
 
-const char *const r3000_disassembler::ccreg[4][32] =
+const char *const mips1_disassembler::ccreg[4][32] =
 {
 	{
 		"ccr0", "ccr1", "ccr2", "ccr3", "ccr4", "ccr5", "ccr6", "ccr7",
@@ -82,7 +82,7 @@ const char *const r3000_disassembler::ccreg[4][32] =
     CODE CODE
 ***************************************************************************/
 
-std::string r3000_disassembler::signed_16bit(int16_t val)
+std::string mips1_disassembler::signed_16bit(int16_t val)
 {
 	if (val < 0)
 		return util::string_format("-$%x", -val);
@@ -90,7 +90,7 @@ std::string r3000_disassembler::signed_16bit(int16_t val)
 		return util::string_format("$%x", val);
 }
 
-uint32_t r3000_disassembler::dasm_cop(uint32_t pc, int cop, uint32_t op, std::ostream &stream)
+uint32_t mips1_disassembler::dasm_cop(uint32_t pc, int cop, uint32_t op, std::ostream &stream)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -150,7 +150,7 @@ uint32_t r3000_disassembler::dasm_cop(uint32_t pc, int cop, uint32_t op, std::os
 	return flags;
 }
 
-uint32_t r3000_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
+uint32_t mips1_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &stream)
 {
 	static const char *const format_table[] =
 	{
@@ -233,7 +233,7 @@ uint32_t r3000_disassembler::dasm_cop1(uint32_t pc, uint32_t op, std::ostream &s
 	return flags;
 }
 
-offs_t r3000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t mips1_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t op = opcodes.r32(pc);
 	int rs = (op >> 21) & 31;
@@ -376,7 +376,7 @@ offs_t r3000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	return 4 | flags | SUPPORTED;
 }
 
-uint32_t r3000_disassembler::opcode_alignment() const
+uint32_t mips1_disassembler::opcode_alignment() const
 {
 	return 4;
 }

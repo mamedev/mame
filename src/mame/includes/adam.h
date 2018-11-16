@@ -115,7 +115,6 @@ public:
 	void adam(machine_config &config);
 	void adam_io(address_map &map);
 	void adam_mem(address_map &map);
-	void m6801_io(address_map &map);
 	void m6801_mem(address_map &map);
 };
 

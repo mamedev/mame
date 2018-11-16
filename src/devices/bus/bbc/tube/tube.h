@@ -103,10 +103,10 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_SLOT, bbc_tube_slot_device)
 
+void bbc_tube_devices(device_slot_interface &device);
 void bbc_extube_devices(device_slot_interface &device);
 void bbc_intube_devices(device_slot_interface &device);
 void electron_tube_devices(device_slot_interface &device);
-//void bbc_x25tube_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_TUBE_TUBE_H

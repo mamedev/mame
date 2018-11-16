@@ -900,7 +900,7 @@ void ql_state::machine_reset()
 
 MACHINE_CONFIG_START(ql_state::ql)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M68008_TAG, M68008, X1/2)
+	MCFG_DEVICE_ADD(m_maincpu, M68008, X1/2)
 	MCFG_DEVICE_PROGRAM_MAP(ql_mem)
 
 	MCFG_DEVICE_ADD(I8749_TAG, I8749, X4)
@@ -925,35 +925,34 @@ MACHINE_CONFIG_START(ql_state::ql)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_DEVICE_ADD(ZX8301_TAG, ZX8301, X1, M68008_TAG)
-	MCFG_ZX8301_VSYNC_CALLBACK(WRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
+	ZX8301(config, m_zx8301, X1, m_maincpu);
+	m_zx8301->vsync_wr_callback().set(m_zx8302, FUNC(zx8302_device::vsync_w));
+	m_zx8301->set_screen(SCREEN_TAG);
 
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-
-	MCFG_DEVICE_ADD(ZX8302_TAG, ZX8302, X1)
-	MCFG_ZX8302_RTC_CLOCK(X2)
-	MCFG_ZX8302_OUT_IPL1L_CB(INPUTLINE(M68008_TAG, M68K_IRQ_2))
-	MCFG_ZX8302_OUT_BAUDX4_CB(WRITELINE(*this, ql_state, ql_baudx4_w))
-	MCFG_ZX8302_OUT_COMDATA_CB(WRITELINE(*this, ql_state, ql_comdata_w))
+	ZX8302(config, m_zx8302, X1);
+	m_zx8302->set_rtc_clock(X2);
+	m_zx8302->out_ipl1l_callback().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_zx8302->out_baudx4_callback().set(FUNC(ql_state::ql_baudx4_w));
+	m_zx8302->out_comdata_callback().set(FUNC(ql_state::ql_comdata_w));
 	// TXD1
-	MCFG_ZX8302_OUT_TXD2_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	m_zx8302->out_txd2_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	// NETOUT
-	MCFG_ZX8302_OUT_MDSELCK_CB(WRITELINE(*this, ql_state, zx8302_mdselck_w))
-	MCFG_ZX8302_OUT_MDSELD_CB(WRITELINE(MDV_1, microdrive_image_device, comms_in_w))
-	MCFG_ZX8302_OUT_MDRDW_CB(WRITELINE(*this, ql_state, zx8302_mdrdw_w))
-	MCFG_ZX8302_OUT_ERASE_CB(WRITELINE(*this, ql_state, zx8302_erase_w))
-	MCFG_ZX8302_OUT_RAW1_CB(WRITELINE(*this, ql_state, zx8302_raw1_w))
-	MCFG_ZX8302_IN_RAW1_CB(READLINE(*this, ql_state, zx8302_raw1_r))
-	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(*this, ql_state, zx8302_raw2_w))
-	MCFG_ZX8302_IN_RAW2_CB(READLINE(*this, ql_state, zx8302_raw2_r))
+	m_zx8302->out_mdselck_callback().set(FUNC(ql_state::zx8302_mdselck_w));
+	m_zx8302->out_mdseld_callback().set(m_mdv1, FUNC(microdrive_image_device::comms_in_w));
+	m_zx8302->out_mdrdw_callback().set(FUNC(ql_state::zx8302_mdrdw_w));
+	m_zx8302->out_erase_callback().set(FUNC(ql_state::zx8302_erase_w));
+	m_zx8302->out_raw1_callback().set(FUNC(ql_state::zx8302_raw1_w));
+	m_zx8302->in_raw1_callback().set(FUNC(ql_state::zx8302_raw1_r));
+	m_zx8302->out_raw2_callback().set(FUNC(ql_state::zx8302_raw2_w));
+	m_zx8302->in_raw2_callback().set(FUNC(ql_state::zx8302_raw2_r));
 
 	MCFG_MICRODRIVE_ADD(MDV_1)
 	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(WRITELINE(MDV_2, microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD(MDV_2)
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DCE
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DTE
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
+	RS232_PORT(config, m_ser1, default_rs232_devices, nullptr); // wired as DCE
+	RS232_PORT(config, m_ser2, default_rs232_devices, nullptr); // wired as DTE
+	m_ser2->cts_handler().set(m_zx8302, FUNC(zx8302_device::write_cts2));
 
 	MCFG_DEVICE_ADD("exp", QL_EXPANSION_SLOT, 0, ql_expansion_cards, nullptr) // FIXME: what's the clock on the slot?
 	//MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK()

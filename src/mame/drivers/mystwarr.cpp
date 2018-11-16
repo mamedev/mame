@@ -925,8 +925,6 @@ MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 	int i;
 	k054539_device *k054539 = subdevice<k054539_device>("k054539");
 
-	k054539->init_flags(k054539_device::REVERSE_STEREO);
-
 	// boost voice(chip 0 channel 4-7)
 	for (i=4; i<=7; i++) k054539->set_gain(i, 1.4);
 }

@@ -268,6 +268,7 @@ public:
 	bitmap_ind8 &priority() { return m_priority; }
 	device_palette_interface &palette() const { assert(m_palette != nullptr); return *m_palette; }
 	bool has_palette() const { return m_palette != nullptr; }
+	screen_bitmap &curbitmap() { return m_bitmap[m_curtexture]; }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -289,6 +290,10 @@ public:
 	attotime scan_period() const { return attotime(0, m_scantime); }
 	attotime frame_period() const { return attotime(0, m_frame_period); }
 	u64 frame_number() const { return m_frame_number; }
+
+	// pixel-level access
+	u32 pixel(s32 x, s32 y);
+	void pixels(u32* buffer);
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }

@@ -112,9 +112,9 @@ WRITE8_MEMBER(piggypas_state::lcd_control_w)
 	if (BIT(data, 0))
 	{
 		if (BIT(data, 2))
-			m_lcd_latch = m_hd44780->read(space, BIT(data, 1));
+			m_lcd_latch = m_hd44780->read(BIT(data, 1));
 		else
-			m_hd44780->write(space, BIT(data, 1), m_lcd_latch);
+			m_hd44780->write(BIT(data, 1), m_lcd_latch);
 	}
 
 	// T0 (P3.4) = output shift clock (serial data present at P1.0)

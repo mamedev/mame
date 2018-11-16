@@ -48,6 +48,12 @@ public:
 	{ }
 
 	void init_by6803();
+	void by6803(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+
+private:
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_READ8_MEMBER(port2_r);
@@ -62,13 +68,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
-	void by6803(machine_config &config);
-	void by6803_io(address_map &map);
+
 	void by6803_map(address_map &map);
-private:
+
 	uint8_t m_pia0_a;
 	uint8_t m_pia0_b;
 	uint8_t m_pia1_a;
@@ -99,12 +102,6 @@ void by6803_state::by6803_map(address_map &map)
 	map(0x0040, 0x0043).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x17ff).ram().share("nvram"); // 6116 ram
 	map(0x8000, 0xffff).rom();
-}
-
-void by6803_state::by6803_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(by6803_state::port1_r), FUNC(by6803_state::port1_w)); // P10-P17
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(by6803_state::port2_r), FUNC(by6803_state::port2_w)); // P20-P24
 }
 
 static INPUT_PORTS_START( by6803 )
@@ -380,9 +377,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
 
 MACHINE_CONFIG_START(by6803_state::by6803)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(by6803_map)
-	MCFG_DEVICE_IO_MAP(by6803_io)
+	M6803(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &by6803_state::by6803_map);
+	m_maincpu->in_p1_cb().set(FUNC(by6803_state::port1_r)); // P10-P17
+	m_maincpu->out_p1_cb().set(FUNC(by6803_state::port1_w)); // P10-P17
+	m_maincpu->in_p2_cb().set(FUNC(by6803_state::port2_r)); // P20-P24
+	m_maincpu->out_p2_cb().set(FUNC(by6803_state::port2_w)); // P20-P24
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -611,6 +611,15 @@ ROM_START(hvymetap)
 	ROM_LOAD16_BYTE("u11.rom", 0x00000, 0x10000, CRC(b7e4de7d) SHA1(bcc89e10c368cdbc5137d8f585e109c0be25522d))
 ROM_END
 
+ROM_START(hvymetapg)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "u2g.rom", 0x8000, 0x4000, CRC(e50b500a) SHA1(c4f3502bf8afaa94610e008ce6b719ab4c4be712))
+	ROM_LOAD( "u3g.rom", 0xc000, 0x4000, CRC(7d018d0d) SHA1(07ba3bd5c15b96d6fc72e0a1de3b5d8defcc53b9))
+	ROM_REGION(0x01000000, "cpu2", 0)
+	ROM_LOAD16_BYTE("u12.rom", 0x00001, 0x10000, CRC(77933258) SHA1(42a01e97440dbb7d3da92dbfbad2516f4b553a5f))
+	ROM_LOAD16_BYTE("u11.rom", 0x00000, 0x10000, CRC(b7e4de7d) SHA1(bcc89e10c368cdbc5137d8f585e109c0be25522d))
+ROM_END
+
 /*------------------------------------
 / Lady Luck #OE34
 /------------------------------------*/
@@ -760,6 +769,7 @@ GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, init_by6803, ROT0
 GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1987, hvymetapg, hvymetap, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Heavy Metal Meltdown (German)",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Escape from the Lost World",            MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Escape from the Lost World (German)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Dungeons & Dragons",                    MACHINE_IS_SKELETON_MECHANICAL)

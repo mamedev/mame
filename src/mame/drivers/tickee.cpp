@@ -786,15 +786,15 @@ MACHINE_CONFIG_START(tickee_state::tickee)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2149, VIDEO_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2149_device &ym1(YM2149(config, "ym1", VIDEO_CLOCK/8));
+	ym1.port_a_read_callback().set_ioport("DSW");
+	ym1.port_b_read_callback().set_ioport("IN1");
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM2149, VIDEO_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2149_device &ym2(YM2149(config, "ym2", VIDEO_CLOCK/8));
+	ym2.port_a_read_callback().set_ioport("IN0");
+	ym2.port_b_read_callback().set_ioport("IN2");
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 
@@ -867,10 +867,10 @@ MACHINE_CONFIG_START(tickee_state::mouseatk)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym", YM2149, OKI_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2149_device &ym(YM2149(config, "ym", OKI_CLOCK));
+	ym.port_a_read_callback().set_ioport("DSW");
+	ym.port_b_read_callback().set_ioport("IN1");
+	ym.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

@@ -784,7 +784,7 @@ function cheatfind.startplugin()
 						local json = require("json")
 						cheat.desc = "%s"
 						cheat_save.json = json.stringify({[1] = cheat}, {indent = true})
-						cheat_save.xml = string.format("<mamecheat version=1>\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
+						cheat_save.xml = string.format("<mamecheat version="1">\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
 						cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, match.newval)
 						manager:machine():popmessage(string.format(_("Default name is %s"), cheat_save.name))
 						return true

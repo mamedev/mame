@@ -198,15 +198,15 @@ MACHINE_CONFIG_START(supstarf_state::supstarf)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("psg1", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, supstarf_state, lights_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, supstarf_state, lights_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_psg[0], XTAL(5'068'800) / 6); // from 8035 pin 1 (T0)
+	m_psg[0]->port_a_write_callback().set(FUNC(supstarf_state::lights_a_w));
+	m_psg[0]->port_b_write_callback().set(FUNC(supstarf_state::lights_b_w));
+	m_psg[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("psg2", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JO"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("I1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_psg[1],  XTAL(5'068'800) / 6); // from 8035 pin 1 (T0)
+	m_psg[1]->port_a_read_callback().set_ioport("JO");
+	m_psg[1]->port_b_read_callback().set_ioport("I1");
+	m_psg[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START(supstarf)

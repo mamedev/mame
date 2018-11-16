@@ -1085,7 +1085,7 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.85)
@@ -1174,7 +1174,7 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
@@ -1297,7 +1297,7 @@ ROM_END
 
 ROM_START( weclemanb )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
-	// I doubt these labels are correct, or one set of roms is bad (17h and 23h differ slightly from parent)
+	// This set has been hacked, set was provided using same labels as weclemana
 	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(43241265) SHA1(3da1ed0d15b03845c07f07ec6838ce160d81633d) ) // sldh
 	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(3ea7dae0) SHA1(d33d67f4cc65a7680e5f43407136b75512a10230) ) // sldh
 	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
@@ -1750,8 +1750,8 @@ void wecleman_state::init_hotchase()
 ***************************************************************************/
 
 GAMEL( 1986, wecleman,  0,        wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.01)", 0, layout_wecleman )
-GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 1)", 0, layout_wecleman )
-GAMEL( 1986, weclemanb, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 2)", 0, layout_wecleman ) // 1988 release (maybe date hacked?)
+GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00)", 0, layout_wecleman )
+GAMEL( 1988, weclemanb, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "hack",   "WEC Le Mans 24 (v2.00, hack)", 0, layout_wecleman ) // small section of code inserted, year changed to 1988
 GAMEL( 1986, weclemanc, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, layout_wecleman )
 // a version 1.21 is known to exist too, see https://www.youtube.com/watch?v=4l8vYJi1OeU
 

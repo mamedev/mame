@@ -1,19 +1,26 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /***********************************************************************************************************************************
 
-Skeleton driver for VT220-compatible terminals by C. Itoh/CIE Terminals.
+Skeleton driver for VT220-compatible terminals by C. Itoh/CIE Terminals and similar terminals by ADDS.
 
 The CIT-220+ Video Terminal was introduced as a direct competitor to DEC's VT220. It copied the design of the VT220 closely
 enough to provoke a lawsuit, which led to its eventual withdrawal in favor of its successor, the CIT224.
 
+"COPYRIGHT MICROWEST 1984" can be found in the program ROMs of both the CIT-220+ and Viewpoint 122. The code is clearly similar,
+and the SCN2674 video timing parameters appear to be identical.
+
 ************************************************************************************************************************************/
 
 #include "emu.h"
+//#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
+//#include "machine/eeprompar.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
+#include "machine/nvram.h"
+#include "machine/pit8253.h"
 #include "video/scn2674.h"
 #include "screen.h"
 
@@ -25,18 +32,23 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		//, m_p_chargen(*this, "chargen")
+		, m_avdc(*this, "avdc")
+		, m_chargen(*this, "chargen")
 	{ }
 
 	void cit220p(machine_config &config);
+	void vp122(machine_config &config);
+
 private:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void cit220p_mem_map(address_map &map);
+	void cit220p_io_map(address_map &map);
+	void vp122_mem_map(address_map &map);
+	void vp122_io_map(address_map &map);
 	void char_map(address_map &map);
 	void attr_map(address_map &map);
 	void keyboard_map(address_map &map);
@@ -44,7 +56,8 @@ private:
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	//required_region_ptr<u8> m_p_chargen;
+	required_device<scn2674_device> m_avdc;
+	required_region_ptr<u8> m_chargen;
 };
 
 
@@ -59,7 +72,7 @@ WRITE_LINE_MEMBER(cit220_state::sod_w)
 	// probably asserts PBREQ on SCN2674 to access memory at Exxx
 }
 
-void cit220_state::mem_map(address_map &map)
+void cit220_state::cit220p_mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x87ff).ram();
@@ -67,13 +80,30 @@ void cit220_state::mem_map(address_map &map)
 	map(0xe000, 0xe7ff).ram(); // ???
 }
 
-void cit220_state::io_map(address_map &map)
+void cit220_state::cit220p_io_map(address_map &map)
 {
 	map(0x00, 0x0f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
 	map(0x10, 0x11).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x20, 0x27).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
-	map(0xa0, 0xa0).rw("avdc", FUNC(scn2674_device::attr_buffer_r), FUNC(scn2674_device::attr_buffer_w));
-	map(0xc0, 0xc0).rw("avdc", FUNC(scn2674_device::buffer_r), FUNC(scn2674_device::buffer_w));
+	map(0x20, 0x27).rw(m_avdc, FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0xa0, 0xa0).rw(m_avdc, FUNC(scn2674_device::attr_buffer_r), FUNC(scn2674_device::attr_buffer_w));
+	map(0xc0, 0xc0).rw(m_avdc, FUNC(scn2674_device::buffer_r), FUNC(scn2674_device::buffer_w));
+}
+
+void cit220_state::vp122_mem_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom().region("maincpu", 0);
+	map(0xa000, 0xa7ff).ram().share("nvram");
+	map(0xe000, 0xe7ff).noprw();
+}
+
+void cit220_state::vp122_io_map(address_map &map)
+{
+	map(0x00, 0x07).rw(m_avdc, FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0x10, 0x1f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x20, 0x21).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x50, 0x50).rw(m_avdc, FUNC(scn2674_device::buffer_r), FUNC(scn2674_device::buffer_w));
+	map(0x60, 0x60).rw(m_avdc, FUNC(scn2674_device::attr_buffer_r), FUNC(scn2674_device::attr_buffer_w));
+	map(0x70, 0x73).w("pit", FUNC(pit8253_device::write));
 }
 
 
@@ -107,33 +137,67 @@ INPUT_PORTS_END
 
 void cit220_state::cit220p(machine_config &config)
 {
-	I8085A(config, m_maincpu, 6000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cit220_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &cit220_state::io_map);
+	I8085A(config, m_maincpu, 8'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cit220_state::cit220p_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cit220_state::cit220p_io_map);
 	m_maincpu->out_sod_func().set(FUNC(cit220_state::sod_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(24553200, 1580, 0, 1320, 259, 0, 240); // dot clock guessed
+	//m_screen->set_raw(14'916'000, 960, 0, 800, 259, 0, 240);
+	m_screen->set_raw(22'096'000, 1422, 0, 1188, 259, 0, 240);
 	m_screen->set_screen_update("avdc", FUNC(scn2674_device::screen_update));
 
-	scn2674_device &avdc(SCN2674(config, "avdc", 24553200 / 10));
-	avdc.intr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
-	avdc.set_character_width(10);
-	avdc.set_display_callback(FUNC(cit220_state::draw_character));
-	avdc.set_addrmap(0, &cit220_state::char_map);
-	avdc.set_addrmap(1, &cit220_state::attr_map);
-	avdc.set_screen(m_screen);
+	SCN2674(config, m_avdc, 22'096'000 / 9);
+	m_avdc->intr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
+	m_avdc->set_character_width(9); // 10 in 80-column mode
+	m_avdc->set_display_callback(FUNC(cit220_state::draw_character));
+	m_avdc->set_addrmap(0, &cit220_state::char_map);
+	m_avdc->set_addrmap(1, &cit220_state::attr_map);
+	m_avdc->set_screen(m_screen);
 
-	scn2681_device &duart(SCN2681(config, "duart", 3686400));
+	scn2681_device &duart(SCN2681(config, "duart", 3'686'400));
 	duart.irq_cb().set_inputline("maincpu", I8085_RST55_LINE);
 	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3); // 9600 baud?
 	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 
-	I8251(config, "usart", 3000000);
+	I8251(config, "usart", 4'000'000);
 
-	mcs48_cpu_device &kbdmcu(I8035(config, "kbdmcu", 4608000));
+	mcs48_cpu_device &kbdmcu(I8035(config, "kbdmcu", 4'608'000));
 	kbdmcu.set_addrmap(AS_PROGRAM, &cit220_state::keyboard_map);
 	kbdmcu.set_addrmap(AS_IO, &cit220_state::kbd_io_map);
+}
+
+void cit220_state::vp122(machine_config &config)
+{
+	I8085A(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cit220_state::vp122_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cit220_state::vp122_io_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(14.916_MHz_XTAL, 960, 0, 800, 259, 0, 240);
+	//m_screen->set_raw(22.096_MHz_XTAL, 1422, 0, 1188, 259, 0, 240);
+	m_screen->set_screen_update("avdc", FUNC(scn2674_device::screen_update));
+
+	SCN2674(config, m_avdc, 14.916_MHz_XTAL / 10);
+	m_avdc->intr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
+	m_avdc->set_character_width(10); // 9 in 132-column modes
+	m_avdc->set_display_callback(FUNC(cit220_state::draw_character));
+	m_avdc->set_addrmap(0, &cit220_state::char_map);
+	m_avdc->set_addrmap(1, &cit220_state::attr_map);
+	m_avdc->set_screen("screen");
+
+	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL));
+	duart.irq_cb().set_inputline("maincpu", I8085_RST55_LINE);
+	duart.outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
+	duart.outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
+	// OP7 = 0 for 80-column modes, 1 for 132-column modes
+
+	I8251(config, "usart", 8_MHz_XTAL / 2);
+
+	PIT8253(config, "pit", 0);
+	// Input clocks are video-related and should differ for 80-column and 132-column modes
 }
 
 
@@ -152,4 +216,23 @@ ROM_START( cit220p )
 	ROM_LOAD( "v00_kbd.bin",   0x0000, 0x1000, CRC(f9d24190) SHA1(c4e9ef8188afb18de373f2a537ca9b7a315bfb76) )
 ROM_END
 
+/**************************************************************************************************************
+
+ADDS Viewpoint 122 (VPT-122).
+Chips: D8085AC-2, SCN2674B, SCB2675T, D8251AFC, SCN2681A, D8253C-2, 5x MB8128-15, MK48Z02B-20
+Crystals: 22.096, 14.916, 3.6864, 8.000
+
+***************************************************************************************************************/
+
+ROM_START( vp122 )
+	ROM_REGION(0xc000, "maincpu", 0)
+	ROM_LOAD( "223-48600.uj1", 0x0000, 0x4000, CRC(4d140c69) SHA1(04aa5a4f0c0e0d07b9dc983a6d626ee88ef8b8ba) )
+	ROM_LOAD( "223-48500.ug1", 0x4000, 0x4000, CRC(4e98554d) SHA1(0cbb9cb7efd02a3209caed410ccc8495a5ec1772) )
+	ROM_LOAD( "223-49400.uj2", 0x8000, 0x4000, CRC(447d90d3) SHA1(f8c0db824198b5a571eef80cc3eaf1e829aa2c2a) )
+
+	ROM_REGION(0x2000, "chargen", 0)
+	ROM_LOAD( "223-48700.uk4", 0x0000, 0x2000, CRC(4dbab4bd) SHA1(18e9a23ba22e2096fa529541fa329f5a56740e62) )
+ROM_END
+
 COMP( 1984, cit220p, 0, 0, cit220p, cit220p, cit220_state, empty_init, "C. Itoh Electronics", "CIT-220+ Video Terminal", MACHINE_IS_SKELETON )
+COMP( 1985, vp122, 0, 0, vp122, cit220p, cit220_state, empty_init, "ADDS", "Viewpoint 122", MACHINE_IS_SKELETON )

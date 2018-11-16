@@ -1007,15 +1007,15 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_MSM6585_PRESCALER_SELECTOR(S48_4B)         /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("ym1", YM2203, YM2203_CLOCK)     /* 3 MHz */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM_PortA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM_PortB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ym2203_device &ym1(YM2203(config, "ym1", YM2203_CLOCK));     /* 3 MHz */
+	ym1.port_a_read_callback().set_ioport("YM_PortA");
+	ym1.port_b_read_callback().set_ioport("YM_PortB");
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, YM2203_CLOCK)     /* 3 MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, witch_state, xscroll_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, witch_state, yscroll_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ym2203_device &ym2(YM2203(config, "ym2", YM2203_CLOCK));     /* 3 MHz */
+	ym2.port_a_write_callback().set(FUNC(witch_state::xscroll_w));
+	ym2.port_b_write_callback().set(FUNC(witch_state::yscroll_w));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(keirinou_state::keirinou)
@@ -1036,15 +1036,15 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	// Keirin Ou does have two individual PPIs (NEC D8255AC-2)
 	m_ppi[0]->out_pc_callback().set(FUNC(keirinou_state::write_keirinou_a002));
 
-	MCFG_DEVICE_ADD("ay1", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM_PortA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM_PortB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &ay1(AY8910(config, "ay1", AY8910_CLOCK));
+	ay1.port_a_read_callback().set_ioport("YM_PortA");
+	ay1.port_b_read_callback().set_ioport("YM_PortB");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, witch_state, xscroll_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, witch_state, yscroll_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &ay2(AY8910(config, "ay2", AY8910_CLOCK));
+	ay2.port_a_write_callback().set(FUNC(witch_state::xscroll_w));
+	ay2.port_b_write_callback().set(FUNC(witch_state::yscroll_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	MCFG_DEVICE_REMOVE("essnd")
 	MCFG_DEVICE_REMOVE("msm")
@@ -1172,8 +1172,8 @@ void witch_state::init_witch()
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 }
 
-GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System",     "Keirin Ou", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch (With ranking)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System", "Keirin Ou", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch (with ranking)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Sega license)", "Witch (Sega license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pbchmp95, witch, witch,    witch,    witch_state,    init_witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", MACHINE_SUPPORTS_SAVE )

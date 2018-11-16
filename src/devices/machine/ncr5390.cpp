@@ -407,10 +407,15 @@ void ncr5390_device::step(bool timeout)
 
 	case DISC_SEL_ARBITRATION_INIT:
 		// wait until a command is in the fifo
-		if (!fifo_pos && dma_command && !(status & S_TC0))
+		if (!fifo_pos && dma_command && !(status & S_TC0)) {
+			// dma starts after bus arbitration/selection is complete
+			dma_set(DMA_OUT);
+			step(false);
 			break;
+		}
 
-		command_length = derive_msg_size(fifo[0]);
+		// "with atn" variants have a message byte before the command descriptor
+		command_length = (c == CD_SELECT) ? derive_msg_size(fifo[0]) : 1;
 		state = DISC_SEL_ARBITRATION;
 		step(false);
 		break;
@@ -850,6 +855,12 @@ void ncr5390_device::start_command()
 	case CM_RESET_BUS:
 		LOGMASKED(LOG_COMMAND, "Reset SCSI bus\n");
 		reset_soft();
+		// FIXME: this interrupt should be generated when the reset is reflected
+		// back into the device, and not when the device starts the scsi reset
+		if (!(config & 0x40)) {
+			istatus = I_SCSI_RESET;
+			check_irq();
+		}
 		break;
 
 	case CD_RESELECT:
@@ -867,7 +878,6 @@ void ncr5390_device::start_command()
 			"Select with ATN and stop sequence\n");
 		seq = 0;
 		state = DISC_SEL_ARBITRATION_INIT;
-		dma_set(dma_command ? DMA_OUT : DMA_NONE);
 		arbitrate();
 		break;
 
