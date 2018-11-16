@@ -73,6 +73,7 @@ void lb4_state::mem_map(address_map &map)
 	map(0x8000, 0x8000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x8001, 0x8001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x9800, 0x9801).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xa000, 0xa000).lr8("unk", [] (u8 data) { return 0xff; });   // needs to be negative
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -143,6 +144,7 @@ void lb4_state::lb4(machine_config &config)
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
