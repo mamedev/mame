@@ -2186,7 +2186,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<!-- Notes:
-		This game is compatible with the Nintendo VRS [NUS-020(JPN)], a voice recognition system that connects
+		This game is compatible with the Nintendo VRSユニット [NUS-020(JPN)], a voice recognition unit that connects
 		to controller 2 port and has the following hardware inside:
 			pcb: NUS-VRU-01
 			u1: Nintendo VRD-NUS 215 9915J3001
@@ -7614,7 +7614,7 @@ patched out (+ a fix for internal checksum)
 	</software>
 
 	<!-- Notes:
-		This game requires the Nintendo VRS [NUS-020(JPN)], a voice recognition unit that connects
+		This game requires the Nintendo VRSユニット [NUS-020(JPN)], a voice recognition unit that connects
 		to controller 2 port and has the following hardware inside:
 			pcb: NUS-VRU-01
 			u1: Nintendo VRD-NUS 215 9915J3001
