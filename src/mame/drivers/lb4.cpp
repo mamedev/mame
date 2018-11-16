@@ -140,6 +140,7 @@ void lb4_state::lb4(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(lb4_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, M6800_IRQ_LINE);
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
