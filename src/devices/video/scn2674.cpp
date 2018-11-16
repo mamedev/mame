@@ -14,7 +14,7 @@
 #define LOG_COMMAND (1 << 1)
 #define LOG_INTR    (1 << 2)
 #define LOG_READ    (1 << 3)
-#define VERBOSE     (1)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 
@@ -25,20 +25,20 @@ DEFINE_DEVICE_TYPE(SCN2674, scn2674_device, "scn2674", "Signetics SCN2674 AVDC")
 // default address map
 void scn2674_device::scn2674_vram(address_map &map)
 {
-	map(0x0000, 0xffff).noprw();
+	map(0x0000, (1 << space_config(0)->addr_width()) - 1).noprw();
 }
 
 scn2672_device::scn2672_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: scn2674_device(mconfig, SCN2672, tag, owner, clock)
+	: scn2674_device(mconfig, SCN2672, tag, owner, clock, false)
 {
 }
 
 scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: scn2674_device(mconfig, SCN2674, tag, owner, clock)
+	: scn2674_device(mconfig, SCN2674, tag, owner, clock, true)
 {
 }
 
-scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extend_addressing)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
@@ -84,8 +84,8 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, m_linecounter(0), m_address(0), m_start1change(0)
 	, m_scanline_timer(nullptr)
 	, m_char_space(nullptr), m_attr_space(nullptr)
-	, m_char_space_config("charram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
-	, m_attr_space_config("attrram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_char_space_config("charram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
+	, m_attr_space_config("attrram", ENDIANNESS_LITTLE, 8, extend_addressing ? 16 : 14, 0, address_map_constructor(), address_map_constructor(FUNC(scn2674_device::scn2674_vram), this))
 {
 }
 
