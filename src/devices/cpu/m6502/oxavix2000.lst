@@ -175,21 +175,25 @@ stam_imp
 ldaj_imp
 	read_pc_noinc();
 	A = m_j; // TODO: flags
+	set_nz(A);
 	prefetch();
 
 ldak_imp
 	read_pc_noinc();
 	A = m_k; // TODO: flags
+	set_nz(A);
 	prefetch();
 
 ldal_imp
 	read_pc_noinc();
 	A = m_l; // TODO: flags
+	set_nz(A);
 	prefetch();
 
 ldam_imp
 	read_pc_noinc();
 	A = m_m; // TODO: flags
+	set_nz(A);
 	prefetch();
 
 cmpj_imp
@@ -240,6 +244,7 @@ spa0_imp
 lpa0_imp
 	read_pc_noinc();
 	A = (m_pa & 0x0000ff) >> 0; // TODO: Flags?
+	set_nz(A);
 	prefetch();
 
 spa1_imp
@@ -250,6 +255,7 @@ spa1_imp
 lpa1_imp
 	read_pc_noinc();
 	A = (m_pa & 0x00ff00) >> 8; // TODO: Flags?
+	set_nz(A);
 	prefetch();
 
 spa2_imp
@@ -260,36 +266,40 @@ spa2_imp
 lpa2_imp
 	read_pc_noinc();
 	A = (m_pa & 0xff0000) >> 16; // TODO: Flags?
+	set_nz(A);
 	prefetch();
 
 spb0_imp
 	read_pc_noinc();
-	m_pb = (m_pb & 0xffff00) | A; // TODO: Flags?
+	m_pb = (m_pb & 0xffff00) | A;
 	prefetch();
 
 lpb0_imp
 	read_pc_noinc();
 	A = (m_pb & 0x0000ff) >> 0; // TODO: Flags?
+	set_nz(A);
 	prefetch();
 
 spb1_imp
 	read_pc_noinc();
-	m_pb = (m_pb & 0xff00ff) | (A << 8); // TODO: Flags?
+	m_pb = (m_pb & 0xff00ff) | (A << 8);
 	prefetch();
 
 lpb1_imp
 	read_pc_noinc();
 	A = (m_pb & 0x00ff00) >> 8; // TODO: Flags?
+	set_nz(A);
 	prefetch();
 
 spb2_imp
 	read_pc_noinc();
-	m_pb = (m_pb & 0x00ffff) | (A << 16); // TODO: Flags?
+	m_pb = (m_pb & 0x00ffff) | (A << 16);
 	prefetch();
 
 lpb2_imp
 	read_pc_noinc();
 	A = (m_pb & 0xff0000) >> 16; // TODO: Flags?
+	set_nz(A);
 	prefetch();
 
 incpa_imp
@@ -341,6 +351,7 @@ stapa_imp
 
 ldapa_imp
 	A = read_full_data_sp(m_pa);
+	set_nz(A);
 	prefetch();
 
 cmppa_imp
@@ -377,6 +388,7 @@ stapb_imp
 
 ldapb_imp
 	A = read_full_data_sp(m_pb);
+	set_nz(A);
 	prefetch();
 
 cmppb_imp
