@@ -18028,6 +18028,9 @@ medlanes                        // [1977?]
 @source:lb186.cpp
 lb186                           // Ampro Little Board/186
 
+@source:lb4.cpp
+lb4                             // Liberty Electronics LB-4
+
 @source:lbeach.cpp
 lbeach                          // (c) 1979 Olympia / Seletron
 
