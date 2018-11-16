@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz, Robbbert
+// copyright-holders:Robbbert
 /****************************************************************************
 
     Liberty Electronics LB-4 serial terminal
@@ -117,31 +117,28 @@ static GFXDECODE_START(chars)
 	GFXDECODE_ENTRY("chargen", 0, char_layout, 0, 1)
 GFXDECODE_END
 
-//void lb4_state::lb4(machine_config &config)
-//{
-MACHINE_CONFIG_START(lb4_state::lb4)
-
+void lb4_state::lb4(machine_config &config)
+{
 	// All dividers unknown/guessed
 	M6800(config, m_maincpu, MASTER_CLOCK / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lb4_state::mem_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	//PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", chars)
-	//GFXDECODE(config, m_gfxdecode, m_palette, chars);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	//H46505(config, m_crtc, MASTER_CLOCK / 10);
-	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK / 10)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(lb4_state, crtc_update_row)
+	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	GFXDECODE(config, m_gfxdecode, m_palette, chars);
+
+	H46505(config, m_crtc, MASTER_CLOCK / 10);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(lb4_state::crtc_update_row), this);
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -155,8 +152,7 @@ MACHINE_CONFIG_START(lb4_state::lb4)
 	m_ctc->set_clk<0>(MASTER_CLOCK / 18);
 	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_txc));
 	m_ctc->zc_callback<0>().append(m_acia, FUNC(acia6850_device::write_rxc));
-//}
-MACHINE_CONFIG_END
+}
 
 
 static INPUT_PORTS_START( lb4 )
