@@ -65,7 +65,6 @@ private:
 
 void lb4_state::mem_map(address_map &map)
 {
-	// There are what look like RAM reads/writes from 0000-03ff, but also accesses which look like attempts to talk to a device.
 	map(0x0000, 0x03ff).ram();
 	map(0x2800, 0x2803).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	//map(0x3800, 0x3800).w    // many writes of 43 and C3
