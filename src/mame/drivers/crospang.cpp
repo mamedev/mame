@@ -458,7 +458,7 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

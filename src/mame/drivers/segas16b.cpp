@@ -3850,7 +3850,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b_split)
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
 	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 void segas16b_state::tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram)
@@ -3893,8 +3893,8 @@ MACHINE_CONFIG_START(segas16b_state::fpointbl)
 	MCFG_DEVICE_PROGRAM_MAP(fpointbl_sound_map)
 	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
 	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(75) // these align the pieces with the playfield
@@ -3947,8 +3947,8 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) // ??
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
@@ -9796,7 +9796,7 @@ MACHINE_CONFIG_START(isgsm_state::isgsm)
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
 	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 void isgsm_state::init_isgsm()

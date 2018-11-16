@@ -9838,6 +9838,7 @@ cit101                          // (c) 1980 C. Itoh
 
 @source:cit220.cpp
 cit220p                         // (c) 1984 C. Itoh
+vp122                           //
 
 @source:citycon.cpp
 citycon                         // (c) 1985 Jaleco
@@ -38523,9 +38524,6 @@ jnero                           // (c) 2004 ICE/Play Mechanix
 specfrce                        // (c) 2002 ICE/Play Mechanix
 specfrceo                       // (c) 2002 ICE/Play Mechanix
 zoofari                         // (c) 2006 ICE/Play Mechanix
-
-@source:vp122.cpp
-vp122                           //
 
 @source:vp415.cpp
 vp415                           // (c) 1983 Philips

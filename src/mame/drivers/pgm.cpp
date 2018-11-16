@@ -544,9 +544,9 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	/*sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
+	GENERIC_LATCH_8(config, m_soundlatch3);
 
 	MCFG_ICS2115_ADD("ics", 0)
 	MCFG_ICS2115_IRQ_CB(INPUTLINE("soundcpu", 0))

@@ -3529,7 +3529,7 @@ MACHINE_CONFIG_START(royalmah_state::jansou)
 	MCFG_DEVICE_IO_MAP(jansou_sub_iomap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(royalmah_state, irq0_line_hold, 4000000/512)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

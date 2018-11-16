@@ -653,10 +653,10 @@ MACHINE_CONFIG_START(mario_state::mario_audio)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
+	GENERIC_LATCH_8(config, m_soundlatch3);
+	GENERIC_LATCH_8(config, m_soundlatch4);
 
 #if OLD_SOUND
 	MCFG_DEVICE_ADD("discrete", DISCRETE)

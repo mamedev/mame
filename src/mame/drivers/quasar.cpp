@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(quasar_state::quasar)
 	MCFG_VIDEO_START_OVERRIDE(quasar_state,quasar)
 
 	/* sound hardware */
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC

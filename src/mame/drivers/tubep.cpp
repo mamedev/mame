@@ -909,8 +909,7 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	MCFG_DEVICE_PROGRAM_MAP(rjammer_sound_map)
 	MCFG_DEVICE_IO_MAP(rjammer_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
 	MCFG_DEVICE_PROGRAM_MAP(nsc_map)

@@ -368,7 +368,7 @@ MACHINE_CONFIG_START(go2000_state::go2000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.25) // unknown DAC

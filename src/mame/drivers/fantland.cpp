@@ -839,7 +839,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.35)
@@ -884,7 +884,7 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, fantland_state, galaxygn_sound_irq))
@@ -961,7 +961,7 @@ MACHINE_CONFIG_START(borntofi_state::borntofi)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
 	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
@@ -1013,7 +1013,7 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(14'000'000)/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))

@@ -1010,7 +1010,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 

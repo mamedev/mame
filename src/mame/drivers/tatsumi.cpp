@@ -1048,8 +1048,8 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-//  MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+//  m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))

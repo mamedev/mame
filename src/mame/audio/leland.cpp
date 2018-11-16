@@ -179,7 +179,7 @@ MACHINE_CONFIG_START(leland_80186_sound_device::device_add_mconfig)
 	m_pit[1]->set_clk<2>(4000000);
 	m_pit[1]->out_handler<2>().set(FUNC(leland_80186_sound_device::pit1_2_w));
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redline_80186_sound_device::device_add_mconfig)
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(redline_80186_sound_device::device_add_mconfig)
 	m_pit[2]->set_clk<1>(7000000);
 	m_pit[2]->set_clk<2>(7000000);
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ataxx_80186_sound_device::device_add_mconfig)
@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(ataxx_80186_sound_device::device_add_mconfig)
 	m_pit[0]->set_clk<2>(4000000);
 	m_pit[0]->out_handler<2>().set(FUNC(leland_80186_sound_device::pit0_2_w));
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
 	m_pit[0]->set_clk<2>(4000000);
 	m_pit[0]->out_handler<2>().set(FUNC(leland_80186_sound_device::pit0_2_w));
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 MACHINE_CONFIG_END
 
 

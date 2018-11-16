@@ -624,8 +624,8 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(8'000'000)/2) /* verified on pcb  */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

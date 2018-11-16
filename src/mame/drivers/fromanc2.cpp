@@ -551,8 +551,8 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -611,8 +611,8 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -672,8 +672,8 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

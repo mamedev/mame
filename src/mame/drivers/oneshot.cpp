@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(oneshot_state::oneshot)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 3500000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

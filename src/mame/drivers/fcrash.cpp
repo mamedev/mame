@@ -1692,8 +1692,7 @@ MACHINE_CONFIG_START(cps_state::fcrash)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 24000000/6)   /* ? */
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
@@ -1757,7 +1756,7 @@ MACHINE_CONFIG_START(cps_state::kodb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
 
 	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1798,8 +1797,8 @@ MACHINE_CONFIG_START(cps_state::mtwinsb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1839,8 +1838,7 @@ MACHINE_CONFIG_START(cps_state::sf2mdt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("2151", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
@@ -1899,8 +1897,7 @@ MACHINE_CONFIG_START(cps_state::knightsb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(HOLDLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("2151", YM2151, 29821000 / 8)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2261,7 +2258,7 @@ MACHINE_CONFIG_START(cps_state::dinopic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -2449,8 +2446,8 @@ MACHINE_CONFIG_START(cps_state::sgyxz)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2572,7 +2569,7 @@ MACHINE_CONFIG_START(cps_state::punipic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -2760,12 +2757,15 @@ MACHINE_CONFIG_START(cps_state::sf2m1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
+
 	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
+
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -3233,8 +3233,8 @@ MACHINE_CONFIG_START(cps_state::varthb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -911,8 +911,8 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_DEVICE_PROGRAM_MAP(nekkyoku_sub_map)
 	MCFG_DEVICE_IO_MAP(nekkyoku_sub_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("sublatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_sublatch);
+	m_sublatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
@@ -956,8 +956,8 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
 	MCFG_DEVICE_IO_MAP(idolmj_sub_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("sublatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_sublatch);
+	m_sublatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
@@ -1001,8 +1001,8 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
 	MCFG_DEVICE_IO_MAP(fromance_sub_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("sublatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_sublatch);
+	m_sublatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)

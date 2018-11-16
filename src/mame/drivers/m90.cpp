@@ -760,9 +760,9 @@ MACHINE_CONFIG_START(m90_state::m90)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
 
@@ -876,9 +876,9 @@ MACHINE_CONFIG_START(m90_state::dynablsb)
 	MCFG_DEVICE_REMOVE("m72")
 	MCFG_DEVICE_REMOVE("soundirq")
 
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(false)
+	auto &soundlatch(*subdevice<generic_latch_8_device>("soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+	soundlatch.set_separate_acknowledge(false);
 
 	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_YM2151_IRQ_HANDLER(NOOP) /* this bootleg polls the YM2151 instead of taking interrupts from it */

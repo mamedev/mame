@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_DEVICE_IO_MAP(audio_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

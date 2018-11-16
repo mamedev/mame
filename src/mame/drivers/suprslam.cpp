@@ -312,9 +312,9 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

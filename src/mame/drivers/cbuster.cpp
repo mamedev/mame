@@ -362,8 +362,8 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */

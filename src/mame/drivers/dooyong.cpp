@@ -1434,7 +1434,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
 	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
@@ -1450,7 +1450,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579'545_MHz_XTAL)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1464,7 +1464,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 16_MHz_XTAL/4)  /* 4MHz (16MHz/4 for most, 8Mhz/2 for Super-X) */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1515,7 +1515,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL/4));  /* 4MHz verified for Last Day / D-day */
 	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));

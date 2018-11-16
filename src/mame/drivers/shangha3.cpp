@@ -513,8 +513,8 @@ MACHINE_CONFIG_START(shangha3_state::heberpop)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -557,8 +557,8 @@ MACHINE_CONFIG_START(shangha3_state::blocken)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

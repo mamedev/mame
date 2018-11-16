@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)

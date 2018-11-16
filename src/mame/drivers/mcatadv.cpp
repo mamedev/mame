@@ -466,10 +466,9 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

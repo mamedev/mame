@@ -1994,8 +1994,8 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
+	GENERIC_LATCH_16(config, m_soundlatch);
+	GENERIC_LATCH_16(config, m_soundlatch2);
 
 	// TODO: all sound frequencies unverified (assume same as Mega System 1)
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 7000000/2)

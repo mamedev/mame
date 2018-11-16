@@ -421,6 +421,23 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 	}	
 }
 
+uint8_t xavix_i2c_lotr_state::read_io1(uint8_t direction)
+{
+	uint8_t ret = m_in1->read();
+	
+	// some kind of comms with the IR sensor?
+	ret ^= (machine().rand() & 0x02);
+	ret ^= (machine().rand() & 0x04);
+
+	if (!(direction & 0x08))
+	{
+		ret &= ~0x08;
+		ret |= (m_i2cmem->read_sda() & 1) << 3;
+	}
+
+	return ret;
+}
+
 uint8_t xavix_ekara_state::read_io1(uint8_t direction)
 {
 	uint8_t extrainlatch0 = 0x00;

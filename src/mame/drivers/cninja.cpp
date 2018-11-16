@@ -1039,8 +1039,8 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))

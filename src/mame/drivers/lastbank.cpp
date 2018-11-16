@@ -552,8 +552,8 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch1");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

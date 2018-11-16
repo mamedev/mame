@@ -799,7 +799,7 @@ MACHINE_CONFIG_START(m63_state::m63)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); /* ????? */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, m_ay1, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 
@@ -848,7 +848,7 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, m_ay1, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 1.0);
 

@@ -793,8 +793,7 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -873,8 +872,7 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -1033,8 +1031,7 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	// YM2203 clocks chosen by analogy with Automat; actual rate unknown, but 4 MHz is obviously too fast
 	MCFG_DEVICE_ADD("ym1", YM2203, 1250000)

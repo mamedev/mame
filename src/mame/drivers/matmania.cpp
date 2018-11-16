@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(matmania_state::maniach)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, 3600000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))

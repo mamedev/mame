@@ -531,7 +531,7 @@ MACHINE_CONFIG_START(spy_state::spy)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

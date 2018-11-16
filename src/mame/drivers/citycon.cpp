@@ -222,8 +222,8 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	AY8910(config, "aysnd", MASTER_CLOCK / 16).add_route(ALL_OUTPUTS, "mono", 0.40); // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
 

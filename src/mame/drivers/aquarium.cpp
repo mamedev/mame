@@ -320,9 +320,9 @@ MACHINE_CONFIG_START(aquarium_state::aquarium)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) // clock not verified on pcb
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

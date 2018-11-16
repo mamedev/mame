@@ -1806,9 +1806,9 @@ MACHINE_CONFIG_START(m72_state::m72_audio_chips)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
 
@@ -1871,9 +1871,9 @@ MACHINE_CONFIG_START(m72_state::m72_8751)
 	//m_dpram->intl_callback().set(m_upd71059c, FUNC(pic8259_device::ir3_w)); // not actually used?
 	m_dpram->intr_callback().set_inputline("mcu", MCS51_INT0_LINE);
 
-	MCFG_GENERIC_LATCH_8_ADD("mculatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mcu", MCS51_INT1_LINE))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &mculatch(GENERIC_LATCH_8(config, "mculatch"));
+	mculatch.data_pending_callback().set_inputline(m_mcu, MCS51_INT1_LINE);
+	mculatch.set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000)) /* Uses its own XTAL */
 	MCFG_DEVICE_IO_MAP(mcu_io_map)

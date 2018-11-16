@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(redalert_state::redalert_audio_voice)
 	MCFG_I8085A_SID(READLINE(*this, redalert_state,sid_callback))
 	MCFG_I8085A_SOD(WRITELINE(*this, redalert_state,sod_callback))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("cvsd", HC55516, REDALERT_HC55516_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

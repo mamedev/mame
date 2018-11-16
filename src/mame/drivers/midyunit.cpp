@@ -1278,7 +1278,7 @@ MACHINE_CONFIG_START(midyunit_state::mkyawdim)
 
 	/* sound hardware */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

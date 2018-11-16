@@ -2012,7 +2012,7 @@ MACHINE_CONFIG_START(tmnt_state::mia)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
@@ -2078,7 +2078,7 @@ MACHINE_CONFIG_START(tmnt_state::tmnt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
@@ -2411,9 +2411,9 @@ MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
+	GENERIC_LATCH_8(config, "soundlatch3");
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

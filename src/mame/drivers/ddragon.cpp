@@ -974,8 +974,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
@@ -1047,8 +1047,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
@@ -1100,8 +1100,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

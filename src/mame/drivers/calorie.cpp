@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 

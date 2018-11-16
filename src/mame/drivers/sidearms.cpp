@@ -631,7 +631,7 @@ MACHINE_CONFIG_START(sidearms_state::sidearms)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -680,7 +680,7 @@ MACHINE_CONFIG_START(sidearms_state::turtship)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -732,7 +732,7 @@ MACHINE_CONFIG_START(sidearms_state::whizz)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

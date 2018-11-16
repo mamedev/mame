@@ -9961,8 +9961,8 @@ MACHINE_CONFIG_START(ddenlovr_state::mmpanic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
 

@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

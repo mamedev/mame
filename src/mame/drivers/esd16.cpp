@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

@@ -501,8 +501,8 @@ MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
 	MCFG_TIMER_DEVICE_ADD("adsp_reg_timer0", DEVICE_SELF, acclaim_rax_device, adsp_irq0)
 	MCFG_TIMER_DEVICE_ADD("adsp_dma_timer", DEVICE_SELF, acclaim_rax_device, dma_timer_callback)
 
-	MCFG_GENERIC_LATCH_16_ADD("data_in")
-	MCFG_GENERIC_LATCH_16_ADD("data_out")
+	GENERIC_LATCH_16(config, m_data_in);
+	GENERIC_LATCH_16(config, m_data_out);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -700,8 +700,8 @@ MACHINE_CONFIG_START(dacholer_state::dacholer)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	AY8910(config, "ay1", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
 

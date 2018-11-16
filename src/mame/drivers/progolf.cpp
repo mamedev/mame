@@ -428,9 +428,9 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);
+	soundlatch.set_separate_acknowledge(true);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1247,7 +1247,7 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

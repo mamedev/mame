@@ -988,8 +988,8 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	AY8910(config, "ay1", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
 
