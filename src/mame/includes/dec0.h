@@ -4,6 +4,7 @@
 #include "cpu/h6280/h6280.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "video/bufsprite.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
 #include "sound/msm5205.h"
@@ -71,7 +72,7 @@ protected:
 
 	DECLARE_READ16_MEMBER(dec0_controls_r);
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
-	DECLARE_WRITE16_MEMBER(dec0_priority_w);
+	DECLARE_WRITE16_MEMBER(priority_w);
 
 private:
 	enum class mcu_type {
@@ -85,7 +86,7 @@ private:
 	optional_device<address_map_bank_device> m_pfprotect;
 	optional_device<address_map_bank_device> m_sndprotect;
 	required_shared_ptr<uint16_t> m_ram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
 
@@ -116,7 +117,6 @@ private:
 	DECLARE_WRITE16_MEMBER(sprite_mirror_w);
 	DECLARE_READ16_MEMBER(robocop_68000_share_r);
 	DECLARE_WRITE16_MEMBER(robocop_68000_share_w);
-	DECLARE_WRITE16_MEMBER(dec0_update_sprites_w);
 	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
 
 	DECLARE_READ8_MEMBER(slyspy_sound_state_r);
