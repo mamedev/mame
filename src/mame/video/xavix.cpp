@@ -532,30 +532,14 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 
 		// taito nost attr1 is 84 / 80 / 88 / 8c for the various elements of the xavix logo.  monster truck uses ec / fc / dc / 4c / 5c / 6c (final 6 sprites ingame are 00 00 f0 f0 f0 f0, radar?)
 
-		if ((attr1 & 0x0c) == 0x0c)
-		{
-			drawheight = 16;
-			drawwidth = 16;
-		}
-		else if ((attr1 & 0x0c) == 0x08)
-		{
-			drawheight = 16;
-			drawwidth = 8;
-			xpos_adjust += 4;
-		}
-		else if ((attr1 & 0x0c) == 0x04)
-		{
-			drawheight = 8;
-			drawwidth = 16;
-			ypos_adjust -= 4;
-		}
-		else if ((attr1 & 0x0c) == 0x00)
-		{
-			drawheight = 8;
-			drawwidth = 8;
-			xpos_adjust += 4;
-			ypos_adjust -= 4;
-		}
+		drawheight = 8;
+		drawwidth = 8;
+
+		if (attr1 & 0x04) drawwidth = 16;
+		if (attr1 & 0x08) drawheight = 16;
+
+		xpos_adjust = -(drawwidth/2);
+		ypos_adjust = -(drawheight/2);
 
 		ypos ^= 0xff;
 
@@ -568,9 +552,9 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 			ypos &= 0x7f;
 		}
 
-		ypos += 128 - 15 - 8;
+		ypos += 128 + 1;
 
-		ypos -= ypos_adjust;
+		ypos += ypos_adjust;
 
 		int spritelowy = ypos;
 		int spritehighy = ypos + drawheight;
@@ -624,7 +608,13 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 						xpos += 0x80;
 			}
 
-			xpos += 128 - 8;
+			xpos += 128;
+
+			xpos += xpos_adjust;
+
+			// galplus phalanx beam (sprite wraparound)
+			if (xpos<-0x80)
+				xpos += 256+128;
 
 			int bpp = 1;
 
@@ -656,7 +646,7 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 				tile += gfxbase;
 			}
 
-			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
+			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos , line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
 
 			/*
 			if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
