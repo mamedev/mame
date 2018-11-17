@@ -3733,6 +3733,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/excali64.cpp",
 	MAME_DIR .. "src/mame/drivers/facit4440.cpp",
 	MAME_DIR .. "src/mame/drivers/falco5220.cpp",
+	MAME_DIR .. "src/mame/drivers/falcots.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucs15.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",
