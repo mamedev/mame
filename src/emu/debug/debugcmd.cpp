@@ -657,6 +657,18 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 					param++;
 					params--;
 					break;
+				case 'C':
+				case 'c':
+					if (params == 0)
+					{
+						m_console.printf("Not enough parameters for format!\n");
+						return 0;
+					}
+					p += sprintf(p, "%c", char(*param));
+					param++;
+					params--;
+					break;
+
 			}
 		}
 
