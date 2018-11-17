@@ -12,10 +12,8 @@
     - 16.6698MHz Crystal
 
     Not sure what's going on here... the ACIA only has one serial channel,
-    is it for the host, the printer, or the keyboard? There's no real
-    evidence of a keyboard in the photos, so perhaps it's a display-only
-    unit with printer. If so, then Rx is from the host, and Tx is to the
-    printer.
+    is it for the host, the printer, or the keyboard?
+
     If baudrate == 9600, then MASTER_CLOCK / 18 goes to CTC, it divides by
     6 to the ACIA, which divides by 16, to give roughly 9600.
 
@@ -30,7 +28,7 @@
 #include "emupal.h"
 #include "bus/rs232/rs232.h"
 
-#define MASTER_CLOCK	16.6698_MHz_XTAL
+#define MASTER_CLOCK         16.6698_MHz_XTAL
 
 class lb4_state : public driver_device
 {
@@ -67,8 +65,9 @@ void lb4_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x2800, 0x2803).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	//map(0x3800, 0x3800).w    // many writes of 43 and C3
-	map(0x4000, 0x47ff).ram().share("videoram");
+	map(0x3000, 0x3000).nopr();
+	map(0x3800, 0x3800).nopw();    // many writes of 43 and 4B
+	map(0x4000, 0x47ff).ram().share("videoram").mirror(0x3800);
 	map(0x8000, 0x8000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x8001, 0x8001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x9800, 0x9801).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
@@ -86,7 +85,7 @@ MC6845_UPDATE_ROW(lb4_state::crtc_update_row)
 	{
 		uint16_t mem = (ma + x) & 0x7ff;
 		uint8_t chr = m_p_videoram[mem];
-		uint16_t gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0x1ff : 0);
+		uint16_t gfx = m_p_chargen[(chr<<4) | ra] ^ (((x == cursor_x) ^ (BIT(chr, 7))) ? 0x1ff : 0);
 
 		/* Display a scanline of a character (9 pixels) */
 		*p++ = palette[BIT(gfx, 8)];
@@ -142,7 +141,7 @@ void lb4_state::lb4(machine_config &config)
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
@@ -166,4 +165,4 @@ ROM_START( lb4 )
 ROM_END
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT    CLASS      INIT        COMPANY                FULLNAME  FLAGS
-COMP( 197?, lb4,  0,      0,      lb4,     lb4,     lb4_state, empty_init, "Liberty Electronics", "LB-4",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 197?, lb4,  0,      0,      lb4,     lb4,     lb4_state, empty_init, "Liberty Electronics", "LB-4",   MACHINE_NO_SOUND_HW )
