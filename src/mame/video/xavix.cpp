@@ -83,6 +83,29 @@ WRITE8_MEMBER(xavix_state::bmp_palram_l_w)
 }
 
 
+WRITE8_MEMBER(xavix_state::spriteram_w)
+{
+	if (offset < 0x100)
+	{
+		m_fragment_sprite[offset] = data;
+		m_fragment_sprite[offset + 0x400] = data & 0x01;
+	}
+	else if (offset < 0x400)
+	{
+		m_fragment_sprite[offset] = data;
+	}
+	else if (offset < 0x500)
+	{
+		m_fragment_sprite[offset] = data & 1;
+		m_fragment_sprite[offset - 0x400] = (m_fragment_sprite[offset - 0x400] & 0xfe) | (data & 0x01);
+		m_sprite_xhigh_ignore_hack = false; // still doesn't help monster truck test mode case, which writes here, but still expects values to be ignored
+	}
+	else
+	{
+		m_fragment_sprite[offset] = data;
+	}
+}
+
 double xavix_state::hue2rgb(double p, double q, double t)
 {
 	if (t < 0) t += 1;
@@ -310,11 +333,6 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 				tile &= 0xffff;
 				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 				tile += gfxbase;
-			}
-			else if (alt_tileaddressing2 == 2)
-			{
-				// 24-bit addressing (check if this is still needed)
-				//tile |= 0x800000;
 			}
 
 			// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
@@ -567,15 +585,21 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 			   this makes the calculation a bit more annoying in terms of knowing when to apply offsets, when to wrap etc.
 			   this is likely still incorrect
 
+			   -- NOTE! HACK!
+
 			   Use of additional x-bit is very confusing rad_snow, taitons1 (ingame) etc. clearly need to use it
 			   but the taitons1 xavix logo doesn't even initialize the RAM for it and behavior conflicts with ingame?
 			   maybe only works with certain tile sizes?
 
 			   some code even suggests this should be bit 0 of attr0, but it never gets set there
+			   (I'm mirroring the bits in the write handler at the moment)
 
 			   there must be a register somewhere (or a side-effect of another mode) that enables / disables this
 			   behavior, as we need to make use of xposh for the left side in cases that need it, but that
 			   completely breaks the games that never set it at all (monster truck, xavix logo on taitons1)
+
+			   monster truck hidden service mode ends up writing to the RAM, breaking the 'clock' display if
+			   we use the values for anything.. again suggesting there must be a way to ignore it entirely?
 
 			 */
 
@@ -585,13 +609,19 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				xpos &= 0x7f;
 				xpos = -0x80 + xpos;
+
+				if (!m_sprite_xhigh_ignore_hack)
+					if (!xposh)
+						xpos -= 0x80;
+
 			}
 			else // right side of center
 			{
 				xpos &= 0x7f;
 
-				if (xposh)
-					xpos += 0x80;
+				if (!m_sprite_xhigh_ignore_hack)
+					if (xposh)
+						xpos += 0x80;
 			}
 
 			xpos += 128 - 8;
@@ -834,7 +864,8 @@ WRITE8_MEMBER(xavix_state::spritefragment_dma_trg_w)
 		{
 			//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
 			uint8_t dat = read_full_data_sp_bypass(src + i);
-			m_fragment_sprite[(dst + i) & 0x7ff] = dat;
+			//m_fragment_sprite[(dst + i) & 0x7ff] = dat;
+			spriteram_w(space, (dst + i) & 0x7ff, dat);
 		}
 	}
 }

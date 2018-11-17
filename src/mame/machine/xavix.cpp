@@ -924,6 +924,8 @@ void xavix_state::machine_reset()
 	m_sound_regbase = 0x00;
 
 	m_adc_control = 0x00;
+
+	m_sprite_xhigh_ignore_hack = true;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;

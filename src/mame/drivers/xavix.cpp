@@ -275,7 +275,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x4000, 0x4fff).rw(FUNC(xavix_state::xavix_memoryemu_txarray_r), FUNC(xavix_state::xavix_memoryemu_txarray_w));
 
 	// Sprite RAM (aka Fragment RAM)
-	map(0x6000, 0x67ff).ram().share("fragment_sprite");
+	map(0x6000, 0x67ff).ram().w(FUNC(xavix_state::spriteram_w)).share("fragment_sprite");
 
 	// Palette RAM
 	map(0x6800, 0x68ff).ram().w(FUNC(xavix_state::palram_sh_w)).share("palram_sh");
