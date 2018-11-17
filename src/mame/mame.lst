@@ -18031,9 +18031,6 @@ medlanes                        // [1977?]
 @source:lb186.cpp
 lb186                           // Ampro Little Board/186
 
-@source:lb4.cpp
-lb4                             // Liberty Electronics LB-4
-
 @source:lbeach.cpp
 lbeach                          // (c) 1979 Olympia / Seletron
 
@@ -32920,6 +32917,9 @@ quizshow                        // 005464           1976/04 [2650]
 @source:qvt70.cpp
 qvt70                           //
 
+@source:qvt102.cpp
+qvt102                          // (c) 1983 Qume Corp.
+
 @source:qvt103.cpp
 qvt103                          // (c) 1983 Qume Corp.
 
@@ -32927,7 +32927,6 @@ qvt103                          // (c) 1983 Qume Corp.
 qvt201                          // (c) 1986 Qume Corp.
 
 @source:qvt6800.cpp
-qvt102                          //
 qvt190                          //
 
 @source:qx10.cpp

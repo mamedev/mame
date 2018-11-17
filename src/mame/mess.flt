@@ -366,7 +366,6 @@ krz2000.cpp
 kyocera.cpp
 laser3k.cpp
 lb186.cpp
-lb4.cpp
 lc80.cpp
 lcmate2.cpp
 leapster.cpp
@@ -605,6 +604,7 @@ pyl601.cpp
 ql.cpp
 qtsbc.cpp
 qvt70.cpp
+qvt102.cpp
 qvt103.cpp
 qvt201.cpp
 qvt6800.cpp
