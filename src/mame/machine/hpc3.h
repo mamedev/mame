@@ -151,10 +151,8 @@ protected:
 	uint32_t m_pio_config[10];
 
 	address_space *m_cpu_space;
-
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
 
 DECLARE_DEVICE_TYPE(SGI_HPC3, hpc3_device)
 
-#endif // MAME_MACHINE_HAL2_H
+#endif // MAME_MACHINE_HPC3_H

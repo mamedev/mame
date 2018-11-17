@@ -3020,6 +3020,8 @@ files {
 	MAME_DIR .. "src/mame/machine/sgi.h",
 	MAME_DIR .. "src/mame/machine/hal2.cpp",
 	MAME_DIR .. "src/mame/machine/hal2.h",
+	MAME_DIR .. "src/mame/machine/hpc1.cpp",
+	MAME_DIR .. "src/mame/machine/hpc1.h",
 	MAME_DIR .. "src/mame/machine/hpc3.cpp",
 	MAME_DIR .. "src/mame/machine/hpc3.h",
 	MAME_DIR .. "src/mame/machine/ioc2.cpp",
