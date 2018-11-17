@@ -76,21 +76,20 @@ void lb4_state::mem_map(address_map &map)
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
+// identical to esprit.cpp
 MC6845_UPDATE_ROW(lb4_state::crtc_update_row)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	u8 chr,gfx,inv;
-	u16 mem,x;
-	u32 *p = &bitmap.pix32(y);
+	uint32_t *p = &bitmap.pix32(y);
 
-	for (x = 0; x < x_count; x++)
+	for (int x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) & 0x7ff;
-		chr = m_p_videoram[mem];
-		inv = ((x == cursor_x) ^ BIT(chr, 7)) ? 0xff : 0;
-		gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
+		uint16_t mem = (ma + x) & 0x7ff;
+		uint8_t chr = m_p_videoram[mem];
+		uint16_t gfx = m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0x1ff : 0);
 
-		/* Display a scanline of a character (8 pixels) */
+		/* Display a scanline of a character (9 pixels) */
+		*p++ = palette[BIT(gfx, 8)];
 		*p++ = palette[BIT(gfx, 7)];
 		*p++ = palette[BIT(gfx, 6)];
 		*p++ = palette[BIT(gfx, 5)];
@@ -119,26 +118,22 @@ GFXDECODE_END
 
 void lb4_state::lb4(machine_config &config)
 {
-	// All dividers unknown/guessed
-	M6800(config, m_maincpu, MASTER_CLOCK / 16);
+	M6800(config, m_maincpu, MASTER_CLOCK / 18);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lb4_state::mem_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_raw(MASTER_CLOCK, 882, 9, 729, 315, 0, 300); // 80x25
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 	GFXDECODE(config, m_gfxdecode, m_palette, chars);
 
-	H46505(config, m_crtc, MASTER_CLOCK / 10);
+	H46505(config, m_crtc, MASTER_CLOCK / 9);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(8);
+	m_crtc->set_char_width(9);
 	m_crtc->set_update_row_callback(FUNC(lb4_state::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, M6800_IRQ_LINE);
 
@@ -151,8 +146,9 @@ void lb4_state::lb4(machine_config &config)
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
-	Z80CTC(config, m_ctc, MASTER_CLOCK / 4);
+	Z80CTC(config, m_ctc, MASTER_CLOCK / 4); // divider?
 	m_ctc->set_clk<0>(MASTER_CLOCK / 18);
+	m_ctc->set_clk<1>(MASTER_CLOCK / 18);
 	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_txc));
 	m_ctc->zc_callback<0>().append(m_acia, FUNC(acia6850_device::write_rxc));
 }
