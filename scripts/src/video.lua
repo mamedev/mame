@@ -1106,6 +1106,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/catseye.h,VIDEOS["CATSEYE"] = true
+--------------------------------------------------
+if (VIDEOS["CATSEYE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/catseye.cpp",
+		MAME_DIR .. "src/devices/video/catseye.h",
+	}
+end
+
+
+--------------------------------------------------
+--
 --@src/devices/video/nereid.h,VIDEOS["NEREID"] = true
 --------------------------------------------------
 if (VIDEOS["NEREID"]~=null) then

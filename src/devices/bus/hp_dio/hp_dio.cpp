@@ -11,6 +11,7 @@
 #include "hp98265a.h"
 #include "hp98543.h"
 #include "hp98544.h"
+#include "hp98550.h"
 #include "hp98603a.h"
 #include "hp98603b.h"
 #include "hp98620.h"
@@ -365,6 +366,8 @@ void dio16_cards(device_slot_interface & device)
 
 void dio32_cards(device_slot_interface & device)
 {
+	dio16_cards(device);
 	device.option_add("98265a", HPDIO_98265A);
 	device.option_add("98620", HPDIO_98620);
+	device.option_add("98550", HPDIO_98550);
 }
