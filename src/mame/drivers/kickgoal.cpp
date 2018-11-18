@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)  /* 3MHz ? */
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
 	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, kickgoal_state, soundio_port_a_w))
 	MCFG_PIC16C5x_READ_B_CB(READ8(*this, kickgoal_state, soundio_port_b_r))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, kickgoal_state, soundio_port_b_w))
