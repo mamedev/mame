@@ -175,8 +175,9 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("m5000",      BBC_M5000);           /* Hybrid Music 5000 Synthesiser */
 	//device.option_add("m87",        BBC_M87);             /* Peartree Music 87 Synthesiser */
 	//device.option_add("multiform",  BBC_MULTIFORM);       /* Technomatic Multiform Z80 */
-	//device.option_add("opusa",      BBC_OPUSA);           /* Opus Challenger ADFS */
+	device.option_add("opusa",      BBC_OPUSA);           /* Opus Challenger ADFS */
 	//device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
+	//device.option_add("graduate",   BBC_GRADUATE);        /* The Torch Graduate G400/G800 */
 	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
 	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
 	device.option_add("cfa3000opt", CFA3000_OPT);         /* Henson CFA 3000 Option Board */
