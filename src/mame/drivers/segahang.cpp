@@ -914,10 +914,10 @@ MACHINE_CONFIG_START(segahang_state::sound_board_2151)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK_8MHz/2)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK_8MHz/2));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.43);
+	ymsnd.add_route(1, "rspeaker", 0.43);
 
 	MCFG_DEVICE_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz/2)
 	MCFG_SEGAPCM_BANK(BANK_512)

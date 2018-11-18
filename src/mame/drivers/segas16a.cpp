@@ -2016,9 +2016,9 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, segas16a_state, n7751_control_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.43)
+	YM2151(config, m_ymsnd, 4000000);
+	m_ymsnd->irq_handler().set(FUNC(segas16a_state::n7751_control_w));
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.43);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -2077,8 +2077,8 @@ MACHINE_CONFIG_START(segas16a_state::system16a_no7751)
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM2151(config.replace(), m_ymsnd, 4000000);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_no7751p)
@@ -2111,8 +2111,8 @@ MACHINE_CONFIG_START(segas16a_state::system16a_fd1089a_no7751)
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM2151(config.replace(), m_ymsnd, 4000000);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b_no7751)
@@ -2124,8 +2124,8 @@ MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b_no7751)
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM2151(config.replace(), m_ymsnd, 4000000);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1094_no7751)
@@ -2137,8 +2137,8 @@ MACHINE_CONFIG_START(segas16a_state::system16a_fd1094_no7751)
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM2151(config.replace(), m_ymsnd, 4000000);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 

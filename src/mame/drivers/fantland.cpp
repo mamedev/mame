@@ -841,9 +841,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
-	MCFG_SOUND_ROUTE(0, "speaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.35)
+	YM2151(config, "ymsnd", 3000000).add_route(0, "speaker", 0.35).add_route(1, "speaker", 0.35);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -886,10 +884,10 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, fantland_state, galaxygn_sound_irq))
-	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "speaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3000000));
+	ymsnd.irq_handler().set(FUNC(fantland_state::galaxygn_sound_irq));
+	ymsnd.add_route(0, "speaker", 1.0);
+	ymsnd.add_route(1, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 

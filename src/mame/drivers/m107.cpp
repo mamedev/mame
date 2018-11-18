@@ -773,10 +773,10 @@ MACHINE_CONFIG_START(m107_state::firebarr)
 
 	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set(m_upd71059c, FUNC(pic8259_device::ir3_w));
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, NEC_INPUT_LINE_INTP0);
+	ymsnd.add_route(0, "lspeaker", 0.40);
+	ymsnd.add_route(1, "rspeaker", 0.40);
 
 	iremga20_device &ga20(IREMGA20(config, "irem", XTAL(14'318'181)/4));
 	ga20.add_route(0, "lspeaker", 1.0);

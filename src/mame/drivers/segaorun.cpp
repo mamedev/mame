@@ -1190,9 +1190,7 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	YM2151(config, "ymsnd", SOUND_CLOCK/4).add_route(0, "lspeaker", 0.43).add_route(1, "rspeaker", 0.43);
 
 	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)

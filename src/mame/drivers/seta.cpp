@@ -9405,10 +9405,9 @@ MACHINE_CONFIG_START(seta_state::thunderlbl)
 	MCFG_DEVICE_IO_MAP(thunderlbl_sound_portmap)
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
-	MCFG_DEVICE_REMOVE("x1snd")
+	config.device_remove("x1snd");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 10000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2151(config, "ymsnd", 10000000/2).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);

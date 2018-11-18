@@ -295,10 +295,10 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.80)
-	MCFG_SOUND_ROUTE(1, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.80);
+	ymsnd.add_route(1, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

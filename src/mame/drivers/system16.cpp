@@ -2070,9 +2070,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
+	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
@@ -2091,9 +2089,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
+	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
 	MCFG_DEVICE_ADD("7759", UPD7759)
 	MCFG_UPD7759_MD(0)
@@ -2115,9 +2111,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_ym2151_msm5205)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
+	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
 	MCFG_DEVICE_ADD("5205", MSM5205, 220000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, segas1x_bootleg_state, tturfbl_msm5205_callback))

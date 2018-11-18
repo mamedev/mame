@@ -247,9 +247,7 @@ MACHINE_CONFIG_START(contra_state::contra)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
 MACHINE_CONFIG_END
 
 

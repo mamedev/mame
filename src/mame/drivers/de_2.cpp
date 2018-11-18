@@ -535,9 +535,9 @@ MACHINE_CONFIG_START(de_2_state::de_bg_audio)
 
 	SPEAKER(config, "bg").front_center();
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, de_2_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	YM2151(config, m_ym2151, XTAL(3'579'545));
+	m_ym2151->irq_handler().set(FUNC(de_2_state::ym2151_irq_w));
+	m_ym2151->add_route(ALL_OUTPUTS, "bg", 0.50);
 
 	MCFG_DEVICE_ADD("msm5205", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, de_2_state, msm5205_irq_w))

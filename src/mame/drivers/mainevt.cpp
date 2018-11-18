@@ -513,9 +513,7 @@ MACHINE_CONFIG_START(mainevt_state::devstors)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3.579545_MHz_XTAL)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, mainevt_state, volume_callback))

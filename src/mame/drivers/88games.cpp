@@ -348,9 +348,7 @@ MACHINE_CONFIG_START(_88games_state::_88games)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "mono", 0.75)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "mono", 0.75).add_route(1, "mono", 0.75);
 
 	MCFG_DEVICE_ADD("upd1", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

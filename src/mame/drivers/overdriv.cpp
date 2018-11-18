@@ -384,9 +384,7 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);
 
 	MCFG_K053260_ADD("k053260_1", XTAL(3'579'545))
 	MCFG_DEVICE_ADDRESS_MAP(0, overdriv_k053260_map)

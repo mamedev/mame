@@ -465,9 +465,9 @@ MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("sub", 1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline(m_subcpu, 1);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000/16/16*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.57)

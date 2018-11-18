@@ -1338,10 +1338,10 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/8)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/8));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.43);
+	ymsnd.add_route(1, "rspeaker", 0.43);
 
 	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/8)
 	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)

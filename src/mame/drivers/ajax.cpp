@@ -219,9 +219,7 @@ MACHINE_CONFIG_START(ajax_state::ajax)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, ajax_state, volume_callback0))

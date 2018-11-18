@@ -1236,9 +1236,9 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu").int_callback().set_nop();
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, m_ym2151, SOUND_CLOCK/4);
+	m_ym2151->add_route(0, "lspeaker", 0.60);
+	m_ym2151->add_route(1, "rspeaker", 0.60);
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, SOUND_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))

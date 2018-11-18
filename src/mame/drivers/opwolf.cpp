@@ -979,11 +979,11 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)  /* 4 MHz */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));  /* 4 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set(FUNC(opwolf_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("msm0", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<0>))
@@ -1054,11 +1054,11 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set(FUNC(opwolf_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("msm0", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<0>))
