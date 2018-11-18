@@ -5,7 +5,7 @@
 
 #pragma once
 
-class nereid_device : public device_t
+class nereid_device : public device_t, public device_palette_interface
 {
 public:
 	nereid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -19,6 +19,7 @@ protected:
 	nereid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual u32 palette_entries() const override { return 0x200; }
 
 private:
 	static constexpr int NEREID_BUSY=1;
@@ -37,10 +38,6 @@ private:
 	static constexpr int NEREID_REV=0x5f;
 	static constexpr int NEREID_WRITE_STROBE=0x78;
 	static constexpr int NEREID_READ_STROBE=0x7c;
-
-
-	std::array<rgb_t, 256> m_video_palette;
-	std::array<rgb_t, 256> m_overlay_palette;
 
 	/* registers */
 	uint8_t m_red;
