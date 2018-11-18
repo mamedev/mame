@@ -67,6 +67,7 @@
 #include "cpu/mips/mips3.h"
 
 #include "machine/ds1386.h"
+#include "machine/eepromser.h"
 #include "machine/hal2.h"
 #include "machine/hpc3.h"
 #include "machine/ioc2.h"
@@ -91,6 +92,7 @@ public:
 		, m_mainram(*this, "mainram")
 		, m_mem_ctrl(*this, "memctrl")
 		, m_scsi_ctrl(*this, "wd33c93")
+		, m_eeprom(*this, "eeprom")
 		, m_ldac(*this, "ldac")
 		, m_rdac(*this, "rdac")
 		, m_newport(*this, "newport")
@@ -108,6 +110,8 @@ public:
 protected:
 	virtual void machine_reset() override;
 
+	DECLARE_READ32_MEMBER(eeprom_r);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(enet_r);
 	DECLARE_WRITE32_MEMBER(enet_w);
 	DECLARE_READ32_MEMBER(eisa_io_r);
@@ -127,6 +131,7 @@ protected:
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
 	required_device<wd33c93_device> m_scsi_ctrl;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 	required_device<newport_video_device> m_newport;
@@ -135,7 +140,7 @@ protected:
 	required_device<ioc2_device> m_ioc2;
 	required_device<ds1386_device> m_rtc;
 
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
+	uint32_t m_cpu_aux_ctrl;
 };
 
 /*static*/ char const *const ip22_state::HAL2_TAG = "hal2";
@@ -160,19 +165,21 @@ private:
 	required_device<wd33c93_device> m_scsi_ctrl2;
 };
 
-#define VERBOSE_LEVEL ( 0 )
-
-inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_fmt, ... )
+READ32_MEMBER(ip22_state::eeprom_r)
 {
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%08x: %s", m_maincpu->pc(), buf);
-	}
+	// Disabled - we don't have a dump from real hardware, and IRIX 5.x freaks out with default contents.
+	uint32_t ret = (m_cpu_aux_ctrl & ~0x10);// | m_eeprom->do_read() << 4;
+	logerror("%s: HPC Serial EEPROM Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
+	return ret;
+}
+
+WRITE32_MEMBER(ip22_state::eeprom_w)
+{
+	m_cpu_aux_ctrl = data;
+	logerror("%s: HPC Serial EEPROM Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	m_eeprom->di_write(BIT(data, 3));
+	m_eeprom->cs_write(BIT(data, 1));
+	m_eeprom->clk_write(BIT(data, 2));
 }
 
 READ32_MEMBER(ip22_state::enet_r)
@@ -232,7 +239,7 @@ void ip22_state::ip22_map(address_map &map)
 
 	map(0x1fb80000, 0x1fb8ffff).rw(m_hpc3, FUNC(hpc3_device::pbusdma_r), FUNC(hpc3_device::pbusdma_w));
 	map(0x1fb90000, 0x1fb9ffff).rw(m_hpc3, FUNC(hpc3_device::hd_enet_r), FUNC(hpc3_device::hd_enet_w));
-	map(0x1fbb0000, 0x1fbb0003).ram();   /* unknown, but read a lot and discarded */
+	map(0x1fbb0008, 0x1fbb000b).rw(FUNC(ip22_state::eeprom_r), FUNC(ip22_state::eeprom_w));
 	map(0x1fbc0000, 0x1fbc7fff).rw(m_hpc3, FUNC(hpc3_device::hd_r<0>), FUNC(hpc3_device::hd_w<0>));
 	map(0x1fbd4000, 0x1fbd44ff).rw(FUNC(ip22_state::enet_r), FUNC(ip22_state::enet_w));
 	map(0x1fbd8000, 0x1fbd83ff).rw(m_hal2, FUNC(hal2_device::read), FUNC(hal2_device::write));
@@ -291,7 +298,7 @@ void ip22_state::ip22_base(machine_config &config)
 
 	NEWPORT_VIDEO(config, m_newport, m_maincpu, m_ioc2);
 
-	SGI_MC(config, m_mem_ctrl);
+	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -323,6 +330,8 @@ void ip22_state::ip22_base(machine_config &config)
 	SGI_IOC2_GUINNESS(config, m_ioc2, m_maincpu);
 
 	DS1386_8K(config, m_rtc, 32768);
+
+	EEPROM_93C56_16BIT(config, m_eeprom);
 }
 
 void ip22_state::ip225015(machine_config &config)

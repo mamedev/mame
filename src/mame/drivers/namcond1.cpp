@@ -537,11 +537,8 @@ ROM_START( abcheck )
 	ROM_LOAD( "an1sub.1d",    0x000000, 0x080000, CRC(50de9130) SHA1(470b3977f4bf12ca65bc42631ccdf81753ef56fd) )
 
 	ROM_REGION( 0x800000, "ygv608", 0 )    /* 4MB character generator */
-	// TODO: gynotai proves these might be underdumped, please check.
-	ROM_LOAD( "an1cg0.10e",   0x000000, 0x200000, BAD_DUMP CRC(6dae0531) SHA1(2f4a4a22d461eb9a5bb88bdfccc3aff44cd3faee) )
-	ROM_RELOAD(               0x200000, 0x200000 )
-	ROM_LOAD( "an1cg1.10f",   0x400000, 0x200000, BAD_DUMP CRC(8485607a) SHA1(1b9a1950c6db61a2b546fe2f5e56333593e93fb4) )
-	ROM_RELOAD(               0x600000, 0x200000 )
+	ROM_LOAD( "an1cg0.10e",   0x000000, 0x400000, CRC(14425378) SHA1(c690bd0f48fa2bc285b63e6bc379d2b345eafc7b) )
+	ROM_LOAD( "an1cg1.10f",   0x400000, 0x400000, CRC(0428d718) SHA1(4b4dca7196b9ba1a01558f41c761d3211be67fb0) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "an1voice.7c",  0x000000, 0x200000, CRC(d2bfa453) SHA1(6b7d6bb4d65290d8fd3df5d12b41ae7dce5f3f1c) )
@@ -571,4 +568,4 @@ GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90,
 GAME( 1996, gynotai,   0, namcond1, gynotai,  namcond1_state, empty_init, ROT0,  "Namco", "Gynotai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // 1.04
 GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // 1.10
 GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM
+GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // 1.20EM

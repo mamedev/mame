@@ -41,6 +41,7 @@ protected:
 
 void o2_state::mem_map(address_map &map)
 {
+	map(0x00000000, 0x00000fff).ram();
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
 }
 
