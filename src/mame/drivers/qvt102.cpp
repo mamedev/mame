@@ -8,11 +8,12 @@
     - Motorola 6800 CPU
     - Hitachi HD46505 (Motorola 6845-compatible) CRTC
     - Hitachi HD46850 (Motorola 6850-compatible) ACIA
-    - M58725P-15 (16k RAM)
+    - M58725P-15 (6116-compatible) (2k x 8bit RAM)
     - Zilog Z8430 CTC
     - 16.6698MHz Crystal
+    - 2x TC5514-APL + 3V battery, functioning as NVRAM
 
-    Keyboard: D8748D, 6.000, Beeper
+    Keyboard: D8748D, 6.000MHz Crystal, Beeper
 
     Not sure what's going on here... the ACIA only has one serial channel,
     is it for the host, the printer, or the keyboard?
@@ -47,6 +48,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_nvram(*this, "nvram")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 	{ }
@@ -64,6 +66,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_nvram;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
@@ -99,23 +102,20 @@ MC6845_UPDATE_ROW( qvt102_state::crtc_update_row )
 		if (chr >= 0x90 && chr <= 0x9f)
 			attr = chr;
 
+		int half = BIT(chr, 7);
+
+		// apply attributes
+		if (BIT(attr, 2)) gfx = ~gfx; // reverse
+		if (BIT(attr, 1) && (m_screen->frame_number() & 32)) gfx = 0; // blink (frequency?)
+		if (BIT(attr, 0)) gfx = 0; // blank
+		if (BIT(attr, 3) && ra == 11) gfx = 0x1ff; // underline
+
+		// cursor active?
+		if (x == cursor_x) gfx = ~gfx;
+
 		// draw 9 pixels of the character
 		for (int i = 0; i < 9; i++)
-		{
-			int pixel = BIT(gfx, i);
-			int half = BIT(chr, 7);
-
-			// apply attributes
-			if (BIT(attr, 2)) pixel ^= 1; // reverse
-			if (BIT(attr, 1) && (m_screen->frame_number() & 32)) pixel ^= 1; // blink (frequency?)
-			if (BIT(attr, 0)) pixel = 0; // blank
-			if (BIT(attr, 3) && ra == 11) pixel = 1; // underline
-
-			 // cursor active?
-			if (x == cursor_x) pixel ^= 1;
-
-			bitmap.pix32(y, x*9 + (8-i)) = palette[pixel ? 2 - half : 0];
-		}
+			bitmap.pix32(y, x*9 + (8-i)) = palette[BIT(gfx, i) ? 2 - half : 0];
 	}
 }
 
@@ -147,7 +147,7 @@ void qvt102_state::qvt102(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK, 882, 9, 729, 315, 0, 300); // 80x24+1
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, m_palette, 3).set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
 	GFXDECODE(config, m_gfxdecode, m_palette, chars);
 
 	H46505(config, m_crtc, MASTER_CLOCK / 9);
