@@ -56,7 +56,7 @@ void octane_state::octane(machine_config &config)
 }
 
 ROM_START( octane )
-	ROM_REGION32_BE( 0x100000, "user1", 0 )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	ROMX_LOAD( "ip30prom.rev4.9.bin", 0x000000, 0x100000, CRC(10bafb52) SHA1(de250875c608add63749d3f9fb81a82cb58c3586), ROM_GROUPDWORD )
 ROM_END
 

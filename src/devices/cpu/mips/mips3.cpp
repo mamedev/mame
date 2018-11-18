@@ -425,7 +425,7 @@ void mips3_device::device_start()
 
 	uint32_t flags = 0;
 	/* initialize the UML generator */
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, m_data_bits, 2);
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
@@ -5020,6 +5020,10 @@ void mips3_device::burn_cycles(int32_t cycles)
 	execute_burn(cycles);
 }
 
+#if ENABLE_O2_DPRINTF
+#include "o2dprintf.hxx"
+#endif
+
 void mips3_device::execute_run()
 {
 	if (m_isdrc)
@@ -5110,7 +5114,9 @@ void mips3_device::execute_run()
 				break;
 
 			case 0x02:  /* J */         ABSPC(LIMMVAL);                                                         break;
-			case 0x03:  /* JAL */       ABSPCL(LIMMVAL,31);                                                     break;
+			case 0x03:  /* JAL */
+				ABSPCL(LIMMVAL,31);
+				break;
 			case 0x04:  /* BEQ */       if (RSVAL64 == RTVAL64) ADDPC(SIMMVAL);                                 break;
 			case 0x05:  /* BNE */       if (RSVAL64 != RTVAL64) ADDPC(SIMMVAL);                                 break;
 			case 0x06:  /* BLEZ */      if ((int64_t)RSVAL64 <= 0) ADDPC(SIMMVAL);                                break;
@@ -5256,6 +5262,13 @@ void mips3_device::execute_run()
 		/* Clear this flag once instruction execution is finished, will interfere with interrupt exceptions otherwise */
 		m_delayslot = false;
 		m_core->icount--;
+
+#if ENABLE_O2_DPRINTF
+		if (m_core->pc == 0xbfc04d74)
+		{
+			do_o2_dprintf((uint32_t)m_core->r[4], (uint32_t)m_core->r[5], (uint32_t)m_core->r[6], (uint32_t)m_core->r[7], (uint32_t)m_core->r[29] + 16);
+		}
+#endif
 
 #if ENABLE_EE_ELF_LOADER
 		static bool elf_loaded = false;

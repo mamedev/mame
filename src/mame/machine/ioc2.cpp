@@ -118,13 +118,7 @@ ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const 
 	, m_dma_sel(0)
 	, m_reset_reg(0)
 	, m_write_reg(0)
-	, m_int3_local0_status_reg(0)
-	, m_int3_local0_mask_reg(0)
-	, m_int3_local1_status_reg(0)
-	, m_int3_local1_mask_reg(0)
 	, m_int3_map_status_reg(0)
-	, m_int3_map_mask0_reg(0)
-	, m_int3_map_mask1_reg(0)
 	, m_int3_map_pol_reg(0)
 	, m_int3_err_status_reg(0)
 	, m_par_read_cnt(0)
@@ -146,13 +140,10 @@ void ioc2_device::device_start()
 	save_item(NAME(m_reset_reg));
 	save_item(NAME(m_write_reg));
 
-	save_item(NAME(m_int3_local0_status_reg));
-	save_item(NAME(m_int3_local0_mask_reg));
-	save_item(NAME(m_int3_local1_status_reg));
-	save_item(NAME(m_int3_local1_mask_reg));
+	save_item(NAME(m_int3_local_status_reg));
+	save_item(NAME(m_int3_local_mask_reg));
 	save_item(NAME(m_int3_map_status_reg));
-	save_item(NAME(m_int3_map_mask0_reg));
-	save_item(NAME(m_int3_map_mask1_reg));
+	save_item(NAME(m_int3_map_mask_reg));
 	save_item(NAME(m_int3_map_pol_reg));
 	save_item(NAME(m_int3_err_status_reg));
 }
@@ -171,39 +162,24 @@ void ioc2_device::device_reset()
 	m_reset_reg = 0;
 	m_write_reg = 0;
 
-	m_int3_local0_status_reg = 0;
-	m_int3_local0_mask_reg = 0;
-	m_int3_local1_status_reg = 0;
-	m_int3_local1_mask_reg = 0;
+	memset(m_int3_local_status_reg, 0, sizeof(uint8_t) * 2);
+	memset(m_int3_local_mask_reg, 0, sizeof(uint8_t) * 2);
 	m_int3_map_status_reg = 0;
-	m_int3_map_mask0_reg = 0;
-	m_int3_map_mask1_reg = 0;
+	memset(m_int3_map_mask_reg, 0, sizeof(uint8_t) * 2);
 	m_int3_map_pol_reg = 0;
 	m_int3_err_status_reg = 0;
 }
 
-void ioc2_device::raise_local0_irq(uint8_t source_mask)
+void ioc2_device::raise_local_irq(int channel, uint8_t mask)
 {
-	m_int3_local0_status_reg |= source_mask;
-	m_maincpu->set_input_line(MIPS3_IRQ0, (m_int3_local0_mask_reg & m_int3_local0_status_reg) ? ASSERT_LINE : CLEAR_LINE);
+	m_int3_local_status_reg[channel] |= mask;
+	m_maincpu->set_input_line(MIPS3_IRQ0 + channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void ioc2_device::lower_local0_irq(uint8_t source_mask)
+void ioc2_device::lower_local_irq(int channel, uint8_t mask)
 {
-	m_int3_local0_status_reg &= ~source_mask;
-	m_maincpu->set_input_line(MIPS3_IRQ0, (m_int3_local0_mask_reg & m_int3_local0_status_reg) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void ioc2_device::raise_local1_irq(uint8_t source_mask)
-{
-	m_int3_local1_status_reg |= source_mask;
-	m_maincpu->set_input_line(MIPS3_IRQ1, (m_int3_local1_mask_reg & m_int3_local1_status_reg) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void ioc2_device::lower_local1_irq(uint8_t source_mask)
-{
-	m_int3_local1_status_reg &= ~source_mask;
-	m_maincpu->set_input_line(MIPS3_IRQ1, (m_int3_local1_mask_reg & m_int3_local1_status_reg) ? ASSERT_LINE : CLEAR_LINE);
+	m_int3_local_status_reg[channel] &= ~mask;
+	m_maincpu->set_input_line(MIPS3_IRQ0 + channel, (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(ioc2_device::timer0_int)
@@ -235,15 +211,15 @@ void ioc2_device::set_mappable_int(uint8_t mask, bool state)
 	else
 		m_int3_map_status_reg &= ~mask;
 
-	if (m_int3_map_mask0_reg & m_int3_map_status_reg)
-		raise_local0_irq(INT3_LOCAL0_MAPPABLE0);
+	if (m_int3_map_mask_reg[0] & m_int3_map_status_reg)
+		raise_local_irq(0, INT3_LOCAL0_MAPPABLE0);
 	else
-		lower_local0_irq(INT3_LOCAL0_MAPPABLE0);
+		lower_local_irq(0, INT3_LOCAL0_MAPPABLE0);
 
-	if (m_int3_map_mask1_reg & m_int3_map_status_reg)
-		raise_local1_irq(INT3_LOCAL1_MAPPABLE1);
+	if (m_int3_map_mask_reg[1] & m_int3_map_status_reg)
+		raise_local_irq(1, INT3_LOCAL1_MAPPABLE1);
 	else
-		lower_local1_irq(INT3_LOCAL1_MAPPABLE1);
+		lower_local_irq(1, INT3_LOCAL1_MAPPABLE1);
 }
 
 READ32_MEMBER(ioc2_device::read)
@@ -374,26 +350,26 @@ READ32_MEMBER(ioc2_device::read)
 
 		case INT3_LOCAL0_STATUS_REG:
 		{
-			LOGMASKED(LOG_INT3, "%s: Read Interrupt Local0 Status Register: %02x\n", machine().describe_context(), m_int3_local0_status_reg);
-			return m_int3_local0_status_reg;
+			LOGMASKED(LOG_INT3, "%s: Read Interrupt Local0 Status Register: %02x\n", machine().describe_context(), m_int3_local_status_reg[0]);
+			return m_int3_local_status_reg[0];
 		}
 
 		case INT3_LOCAL0_MASK_REG:
 		{
-			LOGMASKED(LOG_INT3, "%s: Read Interrupt Local0 Mask Register: %02x\n", machine().describe_context(), m_int3_local0_mask_reg);
-			return m_int3_local0_mask_reg;
+			LOGMASKED(LOG_INT3, "%s: Read Interrupt Local0 Mask Register: %02x\n", machine().describe_context(), m_int3_local_mask_reg[0]);
+			return m_int3_local_mask_reg[0];
 		}
 
 		case INT3_LOCAL1_STATUS_REG:
 		{
-			LOGMASKED(LOG_INT3, "%s: Read Interrupt Local1 Status Register: %02x\n", machine().describe_context(), m_int3_local1_status_reg);
-			return m_int3_local1_status_reg;
+			LOGMASKED(LOG_INT3, "%s: Read Interrupt Local1 Status Register: %02x\n", machine().describe_context(), m_int3_local_status_reg[1]);
+			return m_int3_local_status_reg[1];
 		}
 
 		case INT3_LOCAL1_MASK_REG:
 		{
-			LOGMASKED(LOG_INT3, "%s: Read Interrupt Local1 Mask Register: %02x\n", machine().describe_context(), m_int3_local1_mask_reg);
-			return m_int3_local1_mask_reg;
+			LOGMASKED(LOG_INT3, "%s: Read Interrupt Local1 Mask Register: %02x\n", machine().describe_context(), m_int3_local_mask_reg[1]);
+			return m_int3_local_mask_reg[1];
 		}
 
 		case INT3_MAP_STATUS_REG:
@@ -404,14 +380,14 @@ READ32_MEMBER(ioc2_device::read)
 
 		case INT3_MAP_MASK0_REG:
 		{
-			LOGMASKED(LOG_INT3, "%s: Read Interrupt Map Mask0 Register: %02x\n", machine().describe_context(), m_int3_map_mask0_reg);
-			return m_int3_map_mask0_reg;
+			LOGMASKED(LOG_INT3, "%s: Read Interrupt Map Mask0 Register: %02x\n", machine().describe_context(), m_int3_map_mask_reg[0]);
+			return m_int3_map_mask_reg[0];
 		}
 
 		case INT3_MAP_MASK1_REG:
 		{
-			LOGMASKED(LOG_INT3, "%s: Read Interrupt Map Mask1 Register: %02x\n", machine().describe_context(), m_int3_map_mask1_reg);
-			return m_int3_map_mask1_reg;
+			LOGMASKED(LOG_INT3, "%s: Read Interrupt Map Mask1 Register: %02x\n", machine().describe_context(), m_int3_map_mask_reg[1]);
+			return m_int3_map_mask_reg[1];
 		}
 
 		case INT3_MAP_POLARITY_REG:
@@ -530,7 +506,7 @@ WRITE32_MEMBER( ioc2_device::write )
 			LOGMASKED(LOG_PANEL, "%s: Write Front Panel Register: %02x\n", machine().describe_context(), (uint8_t)data);
 			m_front_panel_reg &= ~(data & (FRONT_PANEL_VOL_UP_INT | FRONT_PANEL_VOL_DOWN_INT | FRONT_PANEL_POWER_BUTTON_INT));
 			if (!(m_front_panel_reg & FRONT_PANEL_INT_MASK))
-				lower_local1_irq(INT3_LOCAL1_PANEL);
+				lower_local_irq(1, INT3_LOCAL1_PANEL);
 			return;
 
 		case DMA_SEL_REG:
@@ -577,27 +553,27 @@ WRITE32_MEMBER( ioc2_device::write )
 		case INT3_LOCAL0_MASK_REG:
 		{
 			LOGMASKED(LOG_INT3, "%s: Write Interrupt Local0 Mask Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			set_local0_int_mask(data);
+			set_local_int_mask(0, data);
 			return;
 		}
 
 		case INT3_LOCAL1_MASK_REG:
 		{
 			LOGMASKED(LOG_INT3, "%s: Write Interrupt Local1 Mask Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			set_local1_int_mask(data);
+			set_local_int_mask(1, data);
 			return;
 		}
 
 		case INT3_MAP_MASK0_REG:
 			// TODO: Implement mappable interrupts
 			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Mask0 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			set_map0_int_mask(data);
+			set_map_int_mask(0, data);
 			return;
 
 		case INT3_MAP_MASK1_REG:
 			// TODO: Implement mappable interrupts
 			LOGMASKED(LOG_INT3, "%s: Write Interrupt Map Mask1 Register: %02x\n", machine().describe_context(), (uint8_t)data);
-			set_map1_int_mask(data);
+			set_map_int_mask(1, data);
 			return;
 
 		case INT3_MAP_POLARITY_REG:
@@ -632,40 +608,22 @@ WRITE32_MEMBER( ioc2_device::write )
 	}
 }
 
-void ioc2_device::set_local0_int_mask(uint32_t data)
+void ioc2_device::set_local_int_mask(int channel, uint32_t mask)
 {
-	uint8_t old = m_int3_local0_mask_reg;
-	m_int3_local0_mask_reg = (uint8_t)data;
-	bool old_line = (old & m_int3_local0_status_reg) != 0;
-	bool new_line = (m_int3_local0_mask_reg & m_int3_local0_status_reg) != 0;
+	uint8_t old = m_int3_local_mask_reg[channel];
+	m_int3_local_mask_reg[channel] = (uint8_t)mask;
+	bool old_line = (old & m_int3_local_status_reg[channel]) != 0;
+	bool new_line = (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]) != 0;
 	if (old_line != new_line)
 	{
-		const uint32_t int_bits = (m_int3_local1_mask_reg & m_int3_local1_status_reg) | (m_int3_local0_mask_reg & m_int3_local0_status_reg);
-		m_maincpu->set_input_line(MIPS3_IRQ0, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
+		const uint32_t int_bits = (m_int3_local_mask_reg[channel] & m_int3_local_status_reg[channel]);
+		m_maincpu->set_input_line(MIPS3_IRQ0 + channel, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
-void ioc2_device::set_local1_int_mask(uint32_t data)
+void ioc2_device::set_map_int_mask(int channel, uint32_t mask)
 {
-	uint8_t old = m_int3_local1_mask_reg;
-	m_int3_local1_mask_reg = (uint8_t)data;
-	bool old_line = (old & m_int3_local1_status_reg) != 0;
-	bool new_line = (m_int3_local1_mask_reg & m_int3_local1_status_reg) != 0;
-	if (old_line != new_line)
-	{
-		const uint32_t int_bits = (m_int3_local1_mask_reg & m_int3_local1_status_reg) | (m_int3_local0_mask_reg & m_int3_local0_status_reg);
-		m_maincpu->set_input_line(MIPS3_IRQ0, int_bits != 0 ? ASSERT_LINE : CLEAR_LINE);
-	}
-}
-
-void ioc2_device::set_map0_int_mask(uint32_t data)
-{
-	m_int3_map_mask0_reg = (uint8_t)data;
-}
-
-void ioc2_device::set_map1_int_mask(uint32_t data)
-{
-	m_int3_map_mask1_reg = (uint8_t)data;
+	m_int3_map_mask_reg[channel] = (uint8_t)mask;
 }
 
 void ioc2_device::set_timer_int_clear(uint32_t data)
@@ -694,7 +652,7 @@ INPUT_CHANGED_MEMBER( ioc2_device::power_button )
 		m_front_panel_reg &= ~FRONT_PANEL_POWER_BUTTON_INT;
 
 	if (m_front_panel_reg & FRONT_PANEL_INT_MASK)
-		raise_local1_irq(INT3_LOCAL1_PANEL);
+		raise_local_irq(1, INT3_LOCAL1_PANEL);
 }
 
 INPUT_CHANGED_MEMBER( ioc2_device::volume_up )
@@ -710,7 +668,7 @@ INPUT_CHANGED_MEMBER( ioc2_device::volume_up )
 	}
 
 	if (m_front_panel_reg & FRONT_PANEL_INT_MASK)
-		raise_local1_irq(INT3_LOCAL1_PANEL);
+		raise_local_irq(1, INT3_LOCAL1_PANEL);
 }
 
 INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
@@ -726,5 +684,5 @@ INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
 	}
 
 	if (m_front_panel_reg & FRONT_PANEL_INT_MASK)
-		raise_local1_irq(INT3_LOCAL1_PANEL);
+		raise_local_irq(1, INT3_LOCAL1_PANEL);
 }
