@@ -10,7 +10,7 @@ driver by David Haywood
 
 todo:
 
-Sound - need PIC dumps to replace simulation code (the PIC is protected)
+PIC from Action Hollywood still needs deprotecting + dumping
 
 Both games have problems with the Eeprom (settings are not saved)
 
@@ -40,61 +40,7 @@ lev 7 : 0x7c : 0000 0000 - x
 #include "screen.h"
 #include "speaker.h"
 
-
-/**************************************************************************
-   This table converts commands sent from the main CPU, into sample numbers
-   played back by the sound processor.
-   All commentry and most sound effects are correct, however the music
-   tracks may be playing at the wrong times.
-   Accordingly, the commands for playing the below samples is just a guess:
-   1A, 1B, 1C, 1D, 1E, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 6A, 6B, 6C
-   Note: that samples 60, 61 and 62 combine to form a music track.
-   Ditto for samples 65, 66, 67 and 68.
-*/
-
-#ifdef UNUSED_DEFINITION
-static const uint8_t kickgoal_cmd_snd[128] =
-{
-/*00*/  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-/*08*/  0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x70, 0x71,
-/*10*/  0x72, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
-/*18*/  0x15, 0x16, 0x17, 0x18, 0x19, 0x73, 0x74, 0x75,
-/*20*/  0x76, 0x1a, 0x1b, 0x1c, 0x1d, 0x00, 0x1f, 0x6c,
-/*28*/  0x1e, 0x65, 0x00, 0x00, 0x60, 0x20, 0x69, 0x65,
-/*30*/  0x00, 0x00, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
-/*38*/  0x29, 0x2a, 0x2b, 0x00, 0x6b, 0x00, 0x00, 0x00
-};
-#endif
-
-/* Sound numbers in the sample ROM
-01 Melody A     Bank 0
-02 Melody B     Bank 0
-03 Melody C     Bank 1
-04 Melody D     Bank 1
-05 Melody E     Bank 2
-06 Melody F     Bank 2
-
-20 Kick
-21 Kick (loud)
-22 Bounce
-23 Bounce (loud)
-24 Hit post
-25 Close door
-26 Gunshot
-27 "You've scored!"
-28 "Goal"
-29 "Goal" (loud)
-2a Kick (loud)
-2b Throw ball
-2c Coin
-2d Crowd
-2e Crowd (loud)
-2f 27 - 29
-30 Goal (in room?)
-31 2B - 2D
-32 2D - 2E
-33 Crowd (short)
-34 Crowd (shortest)
+/*
 
 ****************************************************************
 Hollywood Action
@@ -106,101 +52,6 @@ Hollywood Action
 
 */
 
-
-#define oki_time_base 0x08
-
-
-#ifdef UNUSED_FUNCTION
-
-//static int kickgoal_sound;
-//static int kickgoal_melody;
-//static int kickgoal_snd_bank;
-
-void ::kickgoal_play(okim6295_device *oki, int melody, int data)
-{
-	int status = oki->read(0);
-
-	logerror("Playing sample %01x:%02x from command %02x\n",kickgoal_snd_bank,kickgoal_sound,data);
-	if (kickgoal_sound == 0) popmessage("Unknown sound command %02x",kickgoal_sound);
-
-	if (melody) {
-		if (m_melody != kickgoal_sound) {
-			m_melody      = kickgoal_sound;
-			m_melody_loop = kickgoal_sound;
-			if (status & 0x08)
-				oki->write(0,0x40);
-			oki->write(0,(0x80 | m_melody));
-			oki->write(0,0x81);
-		}
-	}
-	else {
-		if ((status & 0x01) == 0) {
-		oki->write(0,(0x80 | kickgoal_sound));
-			oki->write(0,0x11);
-		}
-		else if ((status & 0x02) == 0) {
-		oki->write(0,(0x80 | kickgoal_sound));
-			oki->write(0,0x21);
-		}
-		else if ((status & 0x04) == 0) {
-		oki->write(0,(0x80 | kickgoal_sound));
-			oki->write(0,0x41);
-		}
-	}
-}
-
-WRITE16_MEMBER(kickgoal_state::kickgoal_snd_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		logerror("PC:%06x Writing %04x to Sound CPU\n",m_maincpu->pcbase(),data);
-		if (data >= 0x40) {
-			if (data == 0xfe) {
-				m_oki->write(0,0x40); /* Stop playing the melody */
-				m_melody      = 0x00;
-				m_melody_loop = 0x00;
-			}
-			else {
-				logerror("Unknown command (%02x) sent to the Sound controller\n",data);
-			}
-		}
-		else if (data == 0) {
-			m_oki->write(0,0x38);     /* Stop playing effects */
-		}
-		else {
-			kickgoal_sound = kickgoal_cmd_snd[data];
-
-			if (kickgoal_sound >= 0x70) {
-				if (kickgoal_snd_bank != 1)
-					m_oki->set_bank_base((1 * 0x40000));
-				kickgoal_snd_bank = 1;
-				kickgoal_play(m_oki, 0, data);
-			}
-			else if (kickgoal_sound >= 0x69) {
-				if (kickgoal_snd_bank != 2)
-					m_oki->set_bank_base((2 * 0x40000));
-				kickgoal_snd_bank = 2;
-				kickgoal_play(m_oki, 4, data);
-			}
-			else if (kickgoal_sound >= 0x65) {
-				if (kickgoal_snd_bank != 1)
-					m_oki->set_bank_base((1 * 0x40000));
-				kickgoal_snd_bank = 1;
-				kickgoal_play(m_oki, 4, data);
-			}
-			else if (kickgoal_sound >= 0x60) {
-				kickgoal_snd_bank = 0;
-					m_oki->set_bank_base(device, (0 * 0x40000));
-				kickgoal_snd_bank = 0;
-				kickgoal_play(m_oki, 4, data);
-			}
-			else {
-				kickgoal_play(m_oki, 0, data);
-			}
-		}
-	}
-}
-#endif
 
 WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 {
@@ -289,143 +140,6 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 }
 
 
-INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
-{
-	if ((m_oki->read_status() & 0x08) == 0)
-	{
-		switch(m_melody_loop)
-		{
-			case 0x060: m_melody_loop = 0x061; break;
-			case 0x061: m_melody_loop = 0x062; break;
-			case 0x062: m_melody_loop = 0x060; break;
-
-			case 0x065: m_melody_loop = 0x165; break;
-			case 0x165: m_melody_loop = 0x265; break;
-			case 0x265: m_melody_loop = 0x365; break;
-			case 0x365: m_melody_loop = 0x066; break;
-			case 0x066: m_melody_loop = 0x067; break;
-			case 0x067: m_melody_loop = 0x068; break;
-			case 0x068: m_melody_loop = 0x065; break;
-
-			case 0x063: m_melody_loop = 0x063; break;
-			case 0x064: m_melody_loop = 0x064; break;
-			case 0x069: m_melody_loop = 0x069; break;
-			case 0x06a: m_melody_loop = 0x06a; break;
-			case 0x06b: m_melody_loop = 0x06b; break;
-			case 0x06c: m_melody_loop = 0x06c; break;
-
-			default:    m_melody_loop = 0x00; break;
-		}
-
-		if (m_melody_loop)
-		{
-//          logerror("Changing to sample %02x\n", m_melody_loop);
-			m_oki->write_command((0x80 | m_melody_loop) & 0xff);
-			m_oki->write_command(0x81);
-		}
-	}
-	if (machine().input().code_pressed_once(KEYCODE_PGUP))
-	{
-		if (m_m6295_key_delay >= (0x60 * oki_time_base))
-		{
-			m_m6295_bank += 0x01;
-			m_m6295_bank &= 0x03;
-			if (m_m6295_bank == 0x03)
-				m_m6295_bank = 0x00;
-			popmessage("Changing Bank to %02x", m_m6295_bank);
-			m_okibank->set_entry(m_m6295_bank);
-
-			if (m_m6295_key_delay == 0xffff)
-				m_m6295_key_delay = 0x00;
-			else
-				m_m6295_key_delay = (0x30 * oki_time_base);
-		}
-		else
-			m_m6295_key_delay += (0x01 * oki_time_base);
-	}
-	else if (machine().input().code_pressed_once(KEYCODE_PGDN))
-	{
-		if (m_m6295_key_delay >= (0x60 * oki_time_base))
-		{
-			m_m6295_bank -= 0x01;
-			m_m6295_bank &= 0x03;
-			if (m_m6295_bank == 0x03)
-				m_m6295_bank = 0x02;
-			popmessage("Changing Bank to %02x", m_m6295_bank);
-			m_okibank->set_entry(m_m6295_bank);
-
-			if (m_m6295_key_delay == 0xffff)
-				m_m6295_key_delay = 0x00;
-			else
-				m_m6295_key_delay = (0x30 * oki_time_base);
-		}
-		else
-			m_m6295_key_delay += (0x01 * oki_time_base);
-	}
-	else if (machine().input().code_pressed_once(KEYCODE_INSERT))
-	{
-		if (m_m6295_key_delay >= (0x60 * oki_time_base))
-		{
-			m_m6295_comm += 1;
-			m_m6295_comm &= 0x7f;
-			if (m_m6295_comm == 0x00) { m_okibank->set_entry(0); m_m6295_bank = 0; }
-			if (m_m6295_comm == 0x60) { m_okibank->set_entry(0); m_m6295_bank = 0; }
-			if (m_m6295_comm == 0x65) { m_okibank->set_entry(1); m_m6295_bank = 1; }
-			if (m_m6295_comm == 0x69) { m_okibank->set_entry(2); m_m6295_bank = 2; }
-			if (m_m6295_comm == 0x70) { m_okibank->set_entry(1); m_m6295_bank = 1; }
-			popmessage("Sound test command %02x on Bank %02x", m_m6295_comm, m_m6295_bank);
-
-			if (m_m6295_key_delay == 0xffff)
-				m_m6295_key_delay = 0x00;
-			else
-				m_m6295_key_delay = (0x5d * oki_time_base);
-		}
-		else
-			m_m6295_key_delay += (0x01 * oki_time_base);
-	}
-	else if (machine().input().code_pressed_once(KEYCODE_DEL))
-	{
-		if (m_m6295_key_delay >= (0x60 * oki_time_base))
-		{
-			m_m6295_comm -= 1;
-			m_m6295_comm &= 0x7f;
-			if (m_m6295_comm == 0x2b) { m_okibank->set_entry(0); m_m6295_bank = 0; }
-			if (m_m6295_comm == 0x64) { m_okibank->set_entry(0); m_m6295_bank = 0; }
-			if (m_m6295_comm == 0x68) { m_okibank->set_entry(1); m_m6295_bank = 1; }
-			if (m_m6295_comm == 0x6c) { m_okibank->set_entry(2); m_m6295_bank = 2; }
-			if (m_m6295_comm == 0x76) { m_okibank->set_entry(1); m_m6295_bank = 1; }
-			popmessage("Sound test command %02x on Bank %02x", m_m6295_comm, m_m6295_bank);
-
-			if (m_m6295_key_delay == 0xffff)
-				m_m6295_key_delay = 0x00;
-			else
-				m_m6295_key_delay = (0x5d * oki_time_base);
-		}
-		else
-			m_m6295_key_delay += (0x01 * oki_time_base);
-	}
-	else if (machine().input().code_pressed_once(KEYCODE_Z))
-	{
-		if (m_m6295_key_delay >= (0x80 * oki_time_base))
-		{
-			m_oki->write_command(0x78);
-			m_oki->write_command(0x80 | m_m6295_comm);
-			m_oki->write_command(0x11);
-
-			popmessage("Playing sound %02x on Bank %02x", m_m6295_comm, m_m6295_bank);
-
-			if (m_m6295_key_delay == 0xffff)
-				m_m6295_key_delay = 0x00;
-			else
-				m_m6295_key_delay = (0x60 * oki_time_base);
-		}
-		else
-			m_m6295_key_delay += (0x01 * oki_time_base);
-//      logerror("Sending %02x to the sound CPU\n", m_m6295_comm);
-	}
-	else
-		m_m6295_key_delay = 0xffff;
-}
 
 
 static const uint16_t kickgoal_default_eeprom_type1[64] = {
@@ -476,13 +190,19 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_eeprom_w)
 void kickgoal_state::kickgoal_program_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-/// AM_RANGE(0x30001e, 0x30001f) AM_WRITE(kickgoal_snd_w)
+
+	map(0x800000, 0x800fff).nopw(); // during startup
+
 	map(0x800000, 0x800001).portr("P1_P2");
 	map(0x800002, 0x800003).portr("SYSTEM");
-/// AM_RANGE(0x800004, 0x800005) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)
-	map(0x800004, 0x800005).w(FUNC(kickgoal_state::actionhw_snd_w));
+	map(0x800004, 0x800005).w(FUNC(kickgoal_state::to_pic_w));
+
+	map(0x880000, 0x89ffff).nopw(); // during startup
+
+	map(0x900000, 0x90ffff).nopw(); // during startup
 	map(0x900000, 0x900005).w(FUNC(kickgoal_state::kickgoal_eeprom_w));
 	map(0x900006, 0x900007).r(FUNC(kickgoal_state::kickgoal_eeprom_r));
+	
 	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::kickgoal_fgram_w)).share("fgram"); /* FG Layer */
 	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::kickgoal_bgram_w)).share("bgram"); /* Higher BG Layer */
 	map(0xa08000, 0xa0bfff).ram().w(FUNC(kickgoal_state::kickgoal_bg2ram_w)).share("bg2ram"); /* Lower BG Layer */
@@ -603,11 +323,7 @@ GFXDECODE_END
 void kickgoal_state::machine_start()
 {
 	save_item(NAME(m_snd_sam));
-	save_item(NAME(m_melody_loop));
 	save_item(NAME(m_snd_new));
-	save_item(NAME(m_m6295_comm));
-	save_item(NAME(m_m6295_bank));
-	save_item(NAME(m_m6295_key_delay));
 
 	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
 	m_okibank->set_entry(1);
@@ -615,15 +331,15 @@ void kickgoal_state::machine_start()
 
 void kickgoal_state::machine_reset()
 {
-	m_melody_loop = 0;
 	m_snd_new = 0;
 	m_snd_sam[0] = 0;
 	m_snd_sam[1] = 0;
 	m_snd_sam[2] = 0;
 	m_snd_sam[3] = 0;
-	m_m6295_comm = 0;
-	m_m6295_bank = 0;
-	m_m6295_key_delay = 0;
+
+	m_pic_portc = 0x00;
+	m_pic_portb = 0x00;
+	m_sound_command_sent = 0x00;
 }
 
 
@@ -633,17 +349,83 @@ void kickgoal_state::oki_map(address_map &map)
 	map(0x20000, 0x3ffff).bankr("okibank");
 }
 
+
+WRITE8_MEMBER(kickgoal_state::soundio_port_a_w)
+{
+	// only time this ever gets a different value is the high score name entry
+	m_okibank->set_entry(data & 0x3);
+}
+
+READ8_MEMBER(kickgoal_state::soundio_port_b_r)
+{
+	return m_pic_portb;
+}
+
+WRITE8_MEMBER(kickgoal_state::soundio_port_b_w)
+{
+	m_pic_portb = data;
+}
+
+READ8_MEMBER(kickgoal_state::soundio_port_c_r)
+{
+	// 0x20 = sound command ready?
+	return (m_pic_portc & ~0x20) | m_sound_command_sent;
+}
+
+WRITE8_MEMBER(kickgoal_state::soundio_port_c_w)
+{
+	if ((data & 0x10) != (m_pic_portc & 0x10))
+	{
+		if (!(data & 0x10))
+		{
+			m_pic_portb = m_soundlatch->read(space, 0);
+			m_sound_command_sent = 0x00;
+		}
+	}
+
+	if ((data & 0x01) != (m_pic_portc & 0x01))
+	{
+		if (!(data & 0x01))
+		{
+			m_pic_portb = m_oki->read_status();
+		}
+	}
+
+	if ((data & 0x02) != (m_pic_portc & 0x02))
+	{
+		if (!(data & 0x02))
+		{
+			m_oki->write_command(m_pic_portb);
+		}
+	}
+
+	m_pic_portc = data;
+}
+
+
+WRITE16_MEMBER(kickgoal_state::to_pic_w)
+{
+	m_soundlatch->write(space, 0, data);
+	m_sound_command_sent = 0x20;
+}
+
+
+
 MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kickgoal_program_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kickgoal_state,  irq6_line_hold)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(kickgoal_state, kickgoal_interrupt,  240)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
-	MCFG_DEVICE_DISABLE()   /* Disabled since the internal rom isn't dumped */
-	/* Program and Data Maps are internal to the MCU */
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)  /* 3MHz ? */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, kickgoal_state, soundio_port_a_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, kickgoal_state, soundio_port_b_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, kickgoal_state, soundio_port_b_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, kickgoal_state, soundio_port_c_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, kickgoal_state, soundio_port_c_w))
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
@@ -665,7 +447,7 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	//GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/8, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
@@ -703,7 +485,7 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	//GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
@@ -720,8 +502,7 @@ ROM_START( kickgoal )
 	ROM_LOAD16_BYTE( "ic5",   0x000001, 0x40000, CRC(d528740a) SHA1(d56a71004aabc839b0833a6bf383e5ef9d4948fa) )
 
 	ROM_REGION( 0x2000, "audiocpu", 0 ) /* sound */
-	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
-	ROM_LOAD( "pic16c57-xt-p_protected.ic18",     0x0000, 0x1fff, BAD_DUMP CRC(9e678719) SHA1(ff8edf149e4c12de620e40eaa42161cd1d08bad0) )
+	ROM_LOAD( "pic16c57",     0x0000, 0x1007, CRC(65dda03d) SHA1(ffe16cfc7dea6cb4cad6765b855a0039a4a7e120) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46_16bit.ic12",     0x00, 0x80, CRC(58f512ff) SHA1(67ffb7e2d817087d8158ee53974e46ec85a3e1ed) )
@@ -742,8 +523,7 @@ ROM_START( kickgoala )
 	ROM_LOAD16_BYTE( "tch__1.am27c020.ic5",   0x000001, 0x40000, CRC(d7d7f83c) SHA1(4ee66a379a0c7ecb15ee4923ac98ba28bfb1e4bd) )
 
 	ROM_REGION( 0x2000, "audiocpu", 0 ) /* sound */
-	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
-	ROM_LOAD( "pic16c57-xt-p_protected.ic18",     0x0000, 0x1fff, BAD_DUMP CRC(9e678719) SHA1(ff8edf149e4c12de620e40eaa42161cd1d08bad0) )
+	ROM_LOAD( "pic16c57",     0x0000, 0x1007, CRC(65dda03d) SHA1(ffe16cfc7dea6cb4cad6765b855a0039a4a7e120) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46_16bit.ic12",     0x00, 0x80, CRC(58f512ff) SHA1(67ffb7e2d817087d8158ee53974e46ec85a3e1ed) )
@@ -794,8 +574,14 @@ void kickgoal_state::init_kickgoal()
 #endif
 }
 
+void kickgoal_state::init_actionhw()
+{
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16_delegate(FUNC(kickgoal_state::actionhw_snd_w),this));
+}
 
-GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+// sound banking might be incorrect, there's clearly more music present in the ROM than the game attempts to use
+GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, actionhw,  0,        actionhw, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, actionhw,  0,        actionhw, kickgoal, kickgoal_state, init_actionhw, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
