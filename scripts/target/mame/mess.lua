@@ -2573,6 +2573,7 @@ files {
 createMESSProjects(_target, _subtarget, "ncd")
 files {
 	MAME_DIR .. "src/mame/drivers/ncd17c.cpp",
+	MAME_DIR .. "src/mame/drivers/ncdmips.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ne")

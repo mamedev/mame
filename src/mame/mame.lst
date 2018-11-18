@@ -29841,6 +29841,9 @@ nc200                           // 1993 NC200
 ncd17c                          // 1990 Network Computing Devices
 ncd19                           // 1990 Network Computing Devices
 
+@source:ncdmips.cpp
+hmxpro                          // 1994 Network Computing Devices
+
 @source:nds.cpp
 nds                             // 2004 Nintendo
 
