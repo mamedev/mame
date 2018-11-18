@@ -52,7 +52,7 @@ ROM_END
 
 ROM_START( saa5051 )
 	ROM_REGION( 0x500, "chargen", 0 )
-	ROM_LOAD("saa5051", 0x0140, 0x03c0, BAD_DUMP CRC(a770611c) SHA1(9ab9d24b845fe2964fba2f4770d54025d2c8026a))
+	ROM_LOAD("saa5051", 0x0140, 0x03c0, BAD_DUMP CRC(0e55088b) SHA1(07cd9b7edbed6ef7b527622533d6957f5d56aa91)) // verified from datasheet listing
 ROM_END
 
 
