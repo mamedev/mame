@@ -83,6 +83,29 @@ WRITE8_MEMBER(xavix_state::bmp_palram_l_w)
 }
 
 
+WRITE8_MEMBER(xavix_state::spriteram_w)
+{
+	if (offset < 0x100)
+	{
+		m_fragment_sprite[offset] = data;
+		m_fragment_sprite[offset + 0x400] = data & 0x01;
+	}
+	else if (offset < 0x400)
+	{
+		m_fragment_sprite[offset] = data;
+	}
+	else if (offset < 0x500)
+	{
+		m_fragment_sprite[offset] = data & 1;
+		m_fragment_sprite[offset - 0x400] = (m_fragment_sprite[offset - 0x400] & 0xfe) | (data & 0x01);
+		m_sprite_xhigh_ignore_hack = false; // still doesn't help monster truck test mode case, which writes here, but still expects values to be ignored
+	}
+	else
+	{
+		m_fragment_sprite[offset] = data;
+	}
+}
+
 double xavix_state::hue2rgb(double p, double q, double t)
 {
 	if (t < 0) t += 1;
@@ -311,11 +334,6 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
 				tile += gfxbase;
 			}
-			else if (alt_tileaddressing2 == 2)
-			{
-				// 24-bit addressing (check if this is still needed)
-				//tile |= 0x800000;
-			}
 
 			// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
 			if (tileregs[0x7] & 0x08)
@@ -514,30 +532,14 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 
 		// taito nost attr1 is 84 / 80 / 88 / 8c for the various elements of the xavix logo.  monster truck uses ec / fc / dc / 4c / 5c / 6c (final 6 sprites ingame are 00 00 f0 f0 f0 f0, radar?)
 
-		if ((attr1 & 0x0c) == 0x0c)
-		{
-			drawheight = 16;
-			drawwidth = 16;
-		}
-		else if ((attr1 & 0x0c) == 0x08)
-		{
-			drawheight = 16;
-			drawwidth = 8;
-			xpos_adjust += 4;
-		}
-		else if ((attr1 & 0x0c) == 0x04)
-		{
-			drawheight = 8;
-			drawwidth = 16;
-			ypos_adjust -= 4;
-		}
-		else if ((attr1 & 0x0c) == 0x00)
-		{
-			drawheight = 8;
-			drawwidth = 8;
-			xpos_adjust += 4;
-			ypos_adjust -= 4;
-		}
+		drawheight = 8;
+		drawwidth = 8;
+
+		if (attr1 & 0x04) drawwidth = 16;
+		if (attr1 & 0x08) drawheight = 16;
+
+		xpos_adjust = -(drawwidth/2);
+		ypos_adjust = -(drawheight/2);
 
 		ypos ^= 0xff;
 
@@ -550,9 +552,9 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 			ypos &= 0x7f;
 		}
 
-		ypos += 128 - 15 - 8;
+		ypos += 128 + 1;
 
-		ypos -= ypos_adjust;
+		ypos += ypos_adjust;
 
 		int spritelowy = ypos;
 		int spritehighy = ypos + drawheight;
@@ -567,15 +569,21 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 			   this makes the calculation a bit more annoying in terms of knowing when to apply offsets, when to wrap etc.
 			   this is likely still incorrect
 
+			   -- NOTE! HACK!
+
 			   Use of additional x-bit is very confusing rad_snow, taitons1 (ingame) etc. clearly need to use it
 			   but the taitons1 xavix logo doesn't even initialize the RAM for it and behavior conflicts with ingame?
 			   maybe only works with certain tile sizes?
 
 			   some code even suggests this should be bit 0 of attr0, but it never gets set there
+			   (I'm mirroring the bits in the write handler at the moment)
 
 			   there must be a register somewhere (or a side-effect of another mode) that enables / disables this
 			   behavior, as we need to make use of xposh for the left side in cases that need it, but that
 			   completely breaks the games that never set it at all (monster truck, xavix logo on taitons1)
+
+			   monster truck hidden service mode ends up writing to the RAM, breaking the 'clock' display if
+			   we use the values for anything.. again suggesting there must be a way to ignore it entirely?
 
 			 */
 
@@ -585,16 +593,28 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				xpos &= 0x7f;
 				xpos = -0x80 + xpos;
+
+				if (!m_sprite_xhigh_ignore_hack)
+					if (!xposh)
+						xpos -= 0x80;
+
 			}
 			else // right side of center
 			{
 				xpos &= 0x7f;
 
-				if (xposh)
-					xpos += 0x80;
+				if (!m_sprite_xhigh_ignore_hack)
+					if (xposh)
+						xpos += 0x80;
 			}
 
-			xpos += 128 - 8;
+			xpos += 128;
+
+			xpos += xpos_adjust;
+
+			// galplus phalanx beam (sprite wraparound)
+			if (xpos<-0x80)
+				xpos += 256+128;
 
 			int bpp = 1;
 
@@ -626,7 +646,7 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_ind16 &bitmap,
 				tile += gfxbase;
 			}
 
-			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos + xpos_adjust, line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
+			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos , line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
 
 			/*
 			if ((spr_ypos[i] != 0x81) && (spr_ypos[i] != 0x80) && (spr_ypos[i] != 0x00))
@@ -834,7 +854,8 @@ WRITE8_MEMBER(xavix_state::spritefragment_dma_trg_w)
 		{
 			//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
 			uint8_t dat = read_full_data_sp_bypass(src + i);
-			m_fragment_sprite[(dst + i) & 0x7ff] = dat;
+			//m_fragment_sprite[(dst + i) & 0x7ff] = dat;
+			spriteram_w(space, (dst + i) & 0x7ff, dat);
 		}
 	}
 }

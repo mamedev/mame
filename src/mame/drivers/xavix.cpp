@@ -275,7 +275,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x4000, 0x4fff).rw(FUNC(xavix_state::xavix_memoryemu_txarray_r), FUNC(xavix_state::xavix_memoryemu_txarray_w));
 
 	// Sprite RAM (aka Fragment RAM)
-	map(0x6000, 0x67ff).ram().share("fragment_sprite");
+	map(0x6000, 0x67ff).ram().w(FUNC(xavix_state::spriteram_w)).share("fragment_sprite");
 
 	// Palette RAM
 	map(0x6800, 0x68ff).ram().w(FUNC(xavix_state::palram_sh_w)).share("palram_sh");
@@ -654,6 +654,13 @@ static INPUT_PORTS_START( rad_ping )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rad_pingp )
+	PORT_INCLUDE(rad_ping)
+
+	PORT_MODIFY("REGION") // PAL/NTSC flag
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( namcons2 )
 	PORT_INCLUDE(xavix)
 
@@ -1000,6 +1007,11 @@ ROM_START( rad_ping )
 	ROM_LOAD( "pingpong.bin", 0x000000, 0x100000, CRC(629f7f47) SHA1(2bb19fd202f1e6c319d2f7d18adbfed8a7669235) )
 ROM_END
 
+ROM_START( rad_pingp )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "pingpong.bin", 0x000000, 0x100000, CRC(629f7f47) SHA1(2bb19fd202f1e6c319d2f7d18adbfed8a7669235) )
+ROM_END
+
 ROM_START( rad_crdn )
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "cardnight.bin", 0x000000, 0x100000, CRC(d19eba08) SHA1(cedb9fe785f2a559f518a1d8ecf80d500ddc63c7) )
@@ -1072,7 +1084,8 @@ CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_st
 
 CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04,  namcons2, xavix_i2c_state, init_xavix,    "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-CONS( 2000, rad_ping,  0,          0,  xavix,  rad_ping, xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2000, rad_ping,  0,          0,  xavix,  rad_ping, xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2000, rad_pingp, rad_ping,   0,  xavixp, rad_pingp,xavix_state, init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "ConnecTV Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 CONS( 2003, rad_mtrk,  0,          0,  xavix_mtrk,  rad_mtrk, xavix_mtrk_state, init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavix_mtrkp, rad_mtrkp,xavix_mtrk_state, init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

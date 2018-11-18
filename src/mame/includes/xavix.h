@@ -68,6 +68,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
+		m_sprite_xhigh_ignore_hack(true),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
@@ -345,7 +346,8 @@ private:
 	DECLARE_WRITE8_MEMBER(colmix_l_w);
 	DECLARE_WRITE8_MEMBER(bmp_palram_sh_w);
 	DECLARE_WRITE8_MEMBER(bmp_palram_l_w);
-
+	DECLARE_WRITE8_MEMBER(spriteram_w);
+	bool m_sprite_xhigh_ignore_hack;
 
 	DECLARE_WRITE8_MEMBER(tmap1_regs_w);
 	DECLARE_WRITE8_MEMBER(tmap2_regs_w);
