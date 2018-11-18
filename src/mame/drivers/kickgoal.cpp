@@ -352,8 +352,13 @@ void kickgoal_state::oki_map(address_map &map)
 
 WRITE8_MEMBER(kickgoal_state::soundio_port_a_w)
 {
-	// only time this ever gets a different value is the high score name entry
-	m_okibank->set_entry(data & 0x3);
+	// only time this ever gets a different value is the high score name entry, these banks are correct based on sample positions
+	switch (data)
+	{
+	case 0x02: m_okibank->set_entry(1); break;
+	case 0x01: m_okibank->set_entry(3); break;
+	default: m_okibank->set_entry(2); break; // not used
+	}	
 }
 
 READ8_MEMBER(kickgoal_state::soundio_port_b_r)
@@ -579,7 +584,6 @@ void kickgoal_state::init_actionhw()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16_delegate(FUNC(kickgoal_state::actionhw_snd_w),this));
 }
 
-// sound banking might be incorrect, there's clearly more music present in the ROM than the game attempts to use
 GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_SUPPORTS_SAVE )
 
