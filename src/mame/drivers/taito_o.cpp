@@ -265,10 +265,7 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 2000000)); /* ?? MHz */
 	ymsnd.port_a_read_callback().set_ioport("DSWA");
 	ymsnd.port_b_read_callback().set_ioport("DSWB");
-	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(1, "mono", 1.0);
-	ymsnd.add_route(2, "mono", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 ROM_START( parentj )
