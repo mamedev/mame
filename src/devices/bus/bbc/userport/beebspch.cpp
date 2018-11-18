@@ -107,7 +107,7 @@ WRITE8_MEMBER(bbc_beebspch_device::pb_w)
 	}
 
 	// allophone
-	m_nsp->ald_w(space, 0, data & 0x3f);
+	m_nsp->ald_w(data & 0x3f);
 }
 
 WRITE_LINE_MEMBER(bbc_beebspch_device::cb1_w)

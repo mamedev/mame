@@ -567,12 +567,12 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 3579545/2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(2.2), 0, 0)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mc1000_state, keydata_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mc1000_state, keylatch_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay8910(AY8910(config, AY8910_TAG, 3579545/2));
+	ay8910.set_flags(AY8910_SINGLE_OUTPUT);
+	ay8910.set_resistors_load(RES_K(2.2), 0, 0);
+	ay8910.port_b_read_callback().set(FUNC(mc1000_state::keydata_r));
+	ay8910.port_a_write_callback().set(FUNC(mc1000_state::keylatch_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_CASSETTE_ADD("cassette")
@@ -587,9 +587,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("48K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("48K");
 MACHINE_CONFIG_END
 
 /* ROMs */

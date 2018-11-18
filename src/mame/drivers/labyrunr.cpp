@@ -171,7 +171,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_DEVICE_PROGRAM_MAP(labyrunr_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -196,20 +196,20 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
+	ym1.port_a_read_callback().set_ioport("DSW1");
+	ym1.port_b_read_callback().set_ioport("DSW2");
+	ym1.add_route(0, "mono", 0.40);
+	ym1.add_route(1, "mono", 0.40);
+	ym1.add_route(2, "mono", 0.40);
+	ym1.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 3000000)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym2(YM2203(config, "ym2", 3000000));
+	ym2.port_b_read_callback().set_ioport("DSW3");
+	ym2.add_route(0, "mono", 0.40);
+	ym2.add_route(1, "mono", 0.40);
+	ym2.add_route(2, "mono", 0.40);
+	ym2.add_route(3, "mono", 0.80);
 MACHINE_CONFIG_END
 
 

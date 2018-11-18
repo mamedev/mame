@@ -145,8 +145,7 @@ radionic:  works
            floppy not working (@6C0, DRQ never gets set)
            add colour
            expansion-box?
-           uart?
-           add i8255
+           uart
 
 lnw80:     works
            add 1.77 / 4 MHz switch
@@ -261,6 +260,16 @@ void trs80_state::lnw80_io(address_map &map)
 	map(0xfe, 0xfe).rw(FUNC(trs80_state::lnw80_fe_r), FUNC(trs80_state::lnw80_fe_w));
 }
 
+void trs80_state::radionic_mem(address_map &map)
+{
+	m1_mem(map);
+	// Optional external RS232 module with 8251
+	//map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	// Internal colour controls (need details)
+	//map(0x3500, 0x35ff).w(FUNC(trs80_state::colour_w));
+	// Internal interface to external slots
+	map(0x3600, 0x3603).mirror(0xfc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 /**************************************************************************
    w/o SHIFT                             with SHIFT
@@ -527,8 +536,8 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 1.0)
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4) // todo: should be fd1771
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, trs80_state, intrq_w))
+	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
+	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -553,12 +562,12 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	m_brg->fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
 	m_brg->ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
 
-	MCFG_DEVICE_ADD("uart", AY31015, 0)
-	MCFG_AY31015_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	AY31015(config, m_uart);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
-	MCFG_AY31015_AUTO_RDAV(true)
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	m_uart->set_auto_rdav(true);
+	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::sys80)
@@ -577,10 +586,9 @@ MACHINE_CONFIG_START(trs80_state::ht1080z)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ht1080z)
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1'500'000) // guess of clock
-	//MCFG_AY8910_PORT_A_READ_CB(...)  // ports are some kind of expansion slot
-	//MCFG_AY8910_PORT_B_READ_CB(...)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
+	//ay1.port_a_read_callback(FUNC(trs80_state::...);  // ports are some kind of expansion slot
+	//ay1.port_b_read_callback(FUNC(trs80_state::...);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::lnw80)
@@ -618,11 +626,19 @@ MACHINE_CONFIG_START(trs80_state::radionic)
 	// whose master clock was approximately 11.8005 MHz (6 times ~1.966 MHz and 750 times 15.734 kHz). Though the schematics
 	// provide the main XTAL frequency as 12 MHz, that they also include a 3.579 MHz XTAL suggests this possibility.
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, nmi_line_pulse, 12_MHz_XTAL / 12 / 16384)
+	MCFG_DEVICE_PROGRAM_MAP(radionic_mem)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, 768, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_radionic)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_radionic)
+
+	// Interface to external circuits
+	I8255(config, m_ppi);
+	//m_ppi->in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));      // Sensing from external and printer status
+	//m_ppi->out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));    // Data for external plugin printer module
+	//m_ppi->out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));    // Control data to external
+	//m_ppi->out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));    // Printer strobe
 MACHINE_CONFIG_END
 
 
@@ -658,7 +674,7 @@ ROM_END
 
 
 ROM_START(radionic)
-	ROM_REGION(0x4000, "maincpu",0)
+	ROM_REGION(0x3800, "maincpu",0)
 	ROM_LOAD("ep1.bin",      0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59))
 	ROM_LOAD("ep2.bin",      0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
 	ROM_LOAD("ep3.bin",      0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))

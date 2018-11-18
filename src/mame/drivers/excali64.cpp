@@ -136,8 +136,7 @@ void excali64_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).r(FUNC(excali64_state::port00_r));
-	map(0x10, 0x10).mirror(0x0e).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).mirror(0x0e).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x20, 0x23).mirror(0x0c).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).mirror(0x0e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -560,22 +559,22 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 
 	MCFG_MACHINE_RESET_OVERRIDE(excali64_state, excali64)
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, "uart", 0);
+	//uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(16_MHz_XTAL / 16) /* Timer 0: tone gen for speaker */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
-	//MCFG_PIT8253_CLK1(16_MHz_XTAL / 16) /* Timer 1: baud rate gen for 8251 */
-	//MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, excali64_state, write_uart_clock))
-	//MCFG_PIT8253_CLK2(16_MHz_XTAL / 16) /* Timer 2: not used */
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(16_MHz_XTAL / 16); /* Timer 0: tone gen for speaker */
+	pit.out_handler<0>().set("speaker", FUNC(speaker_sound_device::level_w));
+	//pit.set_clk<1>(16_MHz_XTAL / 16); /* Timer 1: baud rate gen for 8251 */
+	//pit.out_handler<1>().set(FUNC(excali64_state::write_uart_clock));
+	//pit.set_clk<2>(16_MHz_XTAL / 16); /* Timer 2: not used */
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w)) // parallel port
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, excali64_state, ppib_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, excali64_state, ppic_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, excali64_state, ppic_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w)); // parallel port
+	ppi.out_pb_callback().set(FUNC(excali64_state::ppib_w));
+	ppi.in_pc_callback().set(FUNC(excali64_state::ppic_r));
+	ppi.out_pc_callback().set(FUNC(excali64_state::ppic_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -602,28 +601,28 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_DEVICE_ADD("fdc", WD2793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	WD2793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525qd", excali64_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, 16_MHz_XTAL / 4)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, excali64_state, busreq_w))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, excali64_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, excali64_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, excali64_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, excali64_state, io_write_byte))
+	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
+	m_dma->out_busreq_callback().set(FUNC(excali64_state::busreq_w));
+	m_dma->in_mreq_callback().set(FUNC(excali64_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(excali64_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(excali64_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(excali64_state::io_write_byte));
 
-	MCFG_DEVICE_ADD("u12", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* Hook up type (no idea what this means) */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(100))               /* resistor connected between RCext & 5v */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(100))               /* capacitor connected between Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(0)                  /* A pin - grounded */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - driven by port e4 bit 5 */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, excali64_state, motor_w))
+	TTL74123(config, m_u12, 0);
+	m_u12->set_connection_type(TTL74123_GROUNDED);  /* Hook up type (no idea what this means) */
+	m_u12->set_resistor_value(RES_K(100));          /* resistor connected between RCext & 5v */
+	m_u12->set_capacitor_value(CAP_U(100));         /* capacitor connected between Cext and RCext */
+	m_u12->set_a_pin_value(0);                      /* A pin - grounded */
+	m_u12->set_b_pin_value(1);                      /* B pin - driven by port e4 bit 5 */
+	m_u12->set_clear_pin_value(1);                  /* Clear pin - pulled high */
+	m_u12->out_cb().set(FUNC(excali64_state::motor_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, excali64_state, cent_busy_w))

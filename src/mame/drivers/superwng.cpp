@@ -507,12 +507,11 @@ MACHINE_CONFIG_START(superwng_state::superwng)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, superwng_state, superwng_sound_byte_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay1(AY8910(config, "ay1", MASTER_CLOCK/12));
+	ay1.port_a_read_callback().set(FUNC(superwng_state::superwng_sound_byte_r));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MASTER_CLOCK/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay2", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 ROM_START( superwng )

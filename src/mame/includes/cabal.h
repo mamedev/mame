@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE16_MEMBER(text_videoram_w);
 
 	// cabal specific
-	DECLARE_WRITE16_MEMBER(sound_irq_trigger_word_w);
+	void sound_irq_trigger_word_w(offs_t, u16 data, u16 mem_mask);
 
 	// cabalbl specific
 	DECLARE_WRITE16_MEMBER(cabalbl_sndcmd_w);

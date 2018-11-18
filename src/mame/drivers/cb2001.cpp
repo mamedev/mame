@@ -828,15 +828,15 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_DEVICE_IO_MAP(cb2001_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cb2001_state,  vblank_irq)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
+	ppi1.in_pb_callback().set_ioport("DSW2");
+	ppi1.in_pc_callback().set_ioport("DSW3");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb2001)
 
@@ -852,10 +852,10 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) // wrong
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000)); // wrong
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW5");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

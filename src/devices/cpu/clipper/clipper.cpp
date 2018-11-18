@@ -31,25 +31,22 @@
 #define R1 (m_info.r1)
 #define R2 (m_info.r2)
 
-// macros for setting psw condition codes
+#define BIT31(x) BIT(x, 31)
+#define BIT63(x) BIT(x, 63)
+
+// macros for computing and setting condition codes
 #define FLAGS(C,V,Z,N) \
-	m_psw = (m_psw & ~(PSW_C | PSW_V | PSW_Z | PSW_N)) | (((C) << 3) | ((V) << 2) | ((Z) << 1) | ((N) << 0));
-#define FLAGS_CV(C,V) \
-	m_psw = (m_psw & ~(PSW_C | PSW_V)) | (((C) << 3) | ((V) << 2));
-#define FLAGS_ZN(Z,N) \
-	m_psw = (m_psw & ~(PSW_Z | PSW_N)) | (((Z) << 1) | ((N) << 0));
+	m_psw = (m_psw & ~(PSW_C | PSW_V | PSW_Z | PSW_N)) | (((C) << 3) | ((V) << 2) | ((Z) << 1) | ((N) << 0))
 
-// over/underflow for addition/subtraction from here: http://stackoverflow.com/questions/199333/how-to-detect-integer-overflow-in-c-c
-#define OF_ADD(a, b) ((b > 0) && (a > INT32_MAX - b))
-#define UF_ADD(a, b) ((b < 0) && (a < INT32_MIN - b))
-#define OF_SUB(a, b) ((b < 0) && (a > INT32_MAX + b))
-#define UF_SUB(a, b) ((b > 0) && (a < INT32_MIN + b))
+#define FLAGS_ADD(op2, op1, result) FLAGS(                                        \
+	(BIT31(op2) && BIT31(op1)) || (!BIT31(result) && (BIT31(op2) || BIT31(op1))), \
+	(BIT31(op2) == BIT31(op1)) && (BIT31(result) != BIT31(op2)),                  \
+	result == 0, BIT31(result))
 
-// CLIPPER logic for carry and overflow flags
-#define C_ADD(a, b) (u32(a) + u32(b) < u32(a))
-#define V_ADD(a, b) (OF_ADD(s32(a), s32(b)) || UF_ADD(s32(a), s32(b)))
-#define C_SUB(a, b) (u32(a) < u32(b))
-#define V_SUB(a, b) (OF_SUB(s32(a), s32(b)) || UF_SUB(s32(a), s32(b)))
+#define FLAGS_SUB(op2, op1, result) FLAGS(                                         \
+	(!BIT31(op2) && BIT31(op1)) || (BIT31(result) && (!BIT31(op2) || BIT31(op1))), \
+	(BIT31(op2) != BIT31(op1)) && (BIT31(result) != BIT31(op2)),                   \
+	result == 0, BIT31(result))
 
 DEFINE_DEVICE_TYPE(CLIPPER_C100, clipper_c100_device, "clipper_c100", "C100 CLIPPER")
 DEFINE_DEVICE_TYPE(CLIPPER_C300, clipper_c300_device, "clipper_c300", "C300 CLIPPER")
@@ -114,12 +111,9 @@ inline u64 rotr64(u64 x, u8 shift)
 
 void clipper_device::device_start()
 {
-	// map spaces to system tags
-	std::vector<address_space *> spaces = { &space(0), &space(0), &space(0), &space(0), &space(1), &space(2), &space(0), &machine().dummy_space() };
-
 	// configure the cammu address spaces
-	get_icammu().set_spaces(spaces);
-	get_dcammu().set_spaces(spaces);
+	get_dcammu().set_spaces(space(0), space(1), space(2));
+	get_icammu().set_spaces(space(0), space(1), space(2));
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -580,7 +574,7 @@ void clipper_device::execute_instruction()
 		break;
 	case 0x25:
 		// cmps: compare single floating
-		FLAGS(0, 0, float32_eq(get_fp32(R2), get_fp32(R1)), float32_lt(get_fp32(R2), get_fp32(R1)))
+		FLAGS(0, 0, float32_eq(get_fp32(R2), get_fp32(R1)), float32_lt(get_fp32(R2), get_fp32(R1)));
 		// flag unordered
 		if (float_exception_flags & float_flag_invalid)
 			m_psw |= PSW_Z | PSW_N;
@@ -592,7 +586,7 @@ void clipper_device::execute_instruction()
 		break;
 	case 0x27:
 		// cmpd: compare double floating
-		FLAGS(0, 0, float64_eq(get_fp64(R2), get_fp64(R1)), float64_lt(get_fp64(R2), get_fp64(R1)))
+		FLAGS(0, 0, float64_eq(get_fp64(R2), get_fp64(R1)), float64_lt(get_fp64(R2), get_fp64(R1)));
 		// flag unordered
 		if (float_exception_flags & float_flag_invalid)
 			m_psw |= PSW_Z | PSW_N;
@@ -636,7 +630,7 @@ void clipper_device::execute_instruction()
 		break;
 	case 0x30:
 		// shaw: shift arithmetic word
-		if (s32(m_r[R1]) > 0)
+		if (!BIT31(m_r[R1]))
 		{
 			// save the bits that will be shifted out plus new sign bit
 			const s32 v = s32(m_r[R2]) >> (31 - m_r[R1]);
@@ -644,18 +638,18 @@ void clipper_device::execute_instruction()
 			m_r[R2] <<= m_r[R1];
 
 			// overflow is set if sign changes during shift
-			FLAGS(0, v != 0 && v != -1, m_r[R2] == 0, s32(m_r[R2]) < 0)
+			FLAGS(0, v != 0 && v != -1, m_r[R2] == 0, BIT31(m_r[R2]));
 		}
 		else
 		{
 			m_r[R2] = s32(m_r[R2]) >> -m_r[R1];
-			FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+			FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		}
 		// FLAGS: 0VZN
 		break;
 	case 0x31:
 		// shal: shift arithmetic longword
-		if (s32(m_r[R1]) > 0)
+		if (!BIT31(m_r[R1]))
 		{
 			// save the bits that will be shifted out plus new sign bit
 			const s64 v = s64(get_64(R2)) >> (63 - m_r[R1]);
@@ -663,55 +657,55 @@ void clipper_device::execute_instruction()
 			set_64(R2, get_64(R2) << m_r[R1]);
 
 			// overflow is set if sign changes during shift
-			FLAGS(0, v != 0 && v != -1, get_64(R2) == 0, s64(get_64(R2)) < 0)
+			FLAGS(0, v != 0 && v != -1, get_64(R2) == 0, BIT63(get_64(R2)));
 		}
 		else
 		{
 			set_64(R2, s64(get_64(R2)) >> -m_r[R1]);
-			FLAGS(0, 0, get_64(R2) == 0, s64(get_64(R2)) < 0)
+			FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		}
 		// FLAGS: 0VZN
 		break;
 	case 0x32:
 		// shlw: shift logical word
-		if (s32(m_r[R1]) > 0)
+		if (!BIT31(m_r[R1]))
 			m_r[R2] <<= m_r[R1];
 		else
 			m_r[R2] >>= -m_r[R1];
 		// FLAGS: 00ZN
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0);
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		break;
 	case 0x33:
 		// shll: shift logical longword
-		if (s32(m_r[R1]) > 0)
+		if (!BIT31(m_r[R1]))
 			set_64(R2, get_64(R2) << m_r[R1]);
 		else
 			set_64(R2, get_64(R2) >> -m_r[R1]);
 		// FLAGS: 00ZN
-		FLAGS(0, 0, get_64(R2) == 0, s64(get_64(R2)) < 0);
+		FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		break;
 	case 0x34:
 		// rotw: rotate word
-		if (s32(m_r[R1]) > 0)
+		if (!BIT31(m_r[R1]))
 			m_r[R2] = rotl32(m_r[R2], m_r[R1]);
 		else
 			m_r[R2] = rotr32(m_r[R2], -m_r[R1]);
 		// FLAGS: 00ZN
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0);
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		break;
 	case 0x35:
 		// rotl: rotate longword
-		if (s32(m_r[R1]) > 0)
+		if (!BIT31(m_r[R1]))
 			set_64(R2, rotl64(get_64(R2), m_r[R1]));
 		else
 			set_64(R2, rotr64(get_64(R2), -m_r[R1]));
 		// FLAGS: 00ZN
-		FLAGS(0, 0, get_64(R2) == 0, s64(get_64(R2)) < 0);
+		FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		break;
 
 	case 0x38:
 		// shai: shift arithmetic immediate
-		if (s32(m_info.imm) > 0)
+		if (!BIT31(m_info.imm))
 		{
 			// save the bits that will be shifted out plus new sign bit
 			const s32 v = s32(m_r[R2]) >> (31 - m_info.imm);
@@ -719,19 +713,19 @@ void clipper_device::execute_instruction()
 			m_r[R2] <<= m_info.imm;
 
 			// overflow is set if sign changes during shift
-			FLAGS(0, v != 0 && v != -1, m_r[R2] == 0, s32(m_r[R2]) < 0)
+			FLAGS(0, v != 0 && v != -1, m_r[R2] == 0, BIT31(m_r[R2]));
 		}
 		else
 		{
 			m_r[R2] = s32(m_r[R2]) >> -m_info.imm;
-			FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+			FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		}
 		// FLAGS: 0VZN
 		// TRAPS: I
 		break;
 	case 0x39:
 		// shali: shift arithmetic longword immediate
-		if (s32(m_info.imm) > 0)
+		if (!BIT31(m_info.imm))
 		{
 			// save the bits that will be shifted out plus new sign bit
 			const s64 v = s64(get_64(R2)) >> (63 - m_info.imm);
@@ -739,53 +733,53 @@ void clipper_device::execute_instruction()
 			set_64(R2, get_64(R2) << m_info.imm);
 
 			// overflow is set if sign changes during shift
-			FLAGS(0, v != 0 && v != -1, get_64(R2) == 0, s64(get_64(R2)) < 0)
+			FLAGS(0, v != 0 && v != -1, get_64(R2) == 0, BIT63(get_64(R2)));
 		}
 		else
 		{
 			set_64(R2, s64(get_64(R2)) >> -m_info.imm);
-			FLAGS(0, 0, get_64(R2) == 0, s64(get_64(R2)) < 0)
+			FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		}
 		// FLAGS: 0VZN
 		// TRAPS: I
 		break;
 	case 0x3a:
 		// shli: shift logical immediate
-		if (s32(m_info.imm) > 0)
+		if (!BIT31(m_info.imm))
 			m_r[R2] <<= m_info.imm;
 		else
 			m_r[R2] >>= -m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0);
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x3b:
 		// shlli: shift logical longword immediate
-		if (s32(m_info.imm) > 0)
+		if (!BIT31(m_info.imm))
 			set_64(R2, get_64(R2) << m_info.imm);
 		else
 			set_64(R2, get_64(R2) >> -m_info.imm);
-		FLAGS(0, 0, get_64(R2) == 0, s64(get_64(R2)) < 0);
+		FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x3c:
 		// roti: rotate immediate
-		if (s32(m_info.imm) > 0)
+		if (!BIT31(m_info.imm))
 			m_r[R2] = rotl32(m_r[R2], m_info.imm);
 		else
 			m_r[R2] = rotr32(m_r[R2], -m_info.imm);
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0);
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x3d:
 		// rotli: rotate longword immediate
-		if (s32(m_info.imm) > 0)
+		if (!BIT31(m_info.imm))
 			set_64(R2, rotl64(get_64(R2), m_info.imm));
 		else
 			set_64(R2, rotr64(get_64(R2), -m_info.imm));
-		FLAGS(0, 0, get_64(R2) == 0, s64(get_64(R2)) < 0);
+		FLAGS(0, 0, get_64(R2) == 0, BIT63(get_64(R2)));
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
@@ -924,95 +918,123 @@ void clipper_device::execute_instruction()
 
 	case 0x80:
 		// addw: add word
-		FLAGS_CV(C_ADD(m_r[R2], m_r[R1]), V_ADD(m_r[R2], m_r[R1]))
-		m_r[R2] += m_r[R1];
-		FLAGS_ZN(m_r[R2] == 0, s32(m_r[R2]) < 0)
+		{
+			const u32 result = m_r[R2] + m_r[R1];
+
+			FLAGS_ADD(m_r[R2], m_r[R1], result);
+
+			m_r[R2] = result;
+		}
 		// FLAGS: CVZN
 		break;
 
 	case 0x82:
 		// addq: add quick
-		FLAGS_CV(C_ADD(m_r[R2], R1), V_ADD(m_r[R2], R1))
-		m_r[R2] += R1;
-		FLAGS_ZN(m_r[R2] == 0, s32(m_r[R2]) < 0)
+		{
+			const u32 result = m_r[R2] + m_info.r1;
+
+			FLAGS_ADD(m_r[R2], m_info.r1, result);
+
+			m_r[R2] = result;
+		}
 		// FLAGS: CVZN
 		break;
 	case 0x83:
 		// addi: add immediate
-		FLAGS_CV(C_ADD(m_r[R2], m_info.imm), V_ADD(m_r[R2], m_info.imm))
-		m_r[R2] += m_info.imm;
-		FLAGS_ZN(m_r[R2] == 0, s32(m_r[R2]) < 0)
+		{
+			const u32 result = m_r[R2] + m_info.imm;
+
+			FLAGS_ADD(m_r[R2], m_info.imm, result);
+
+			m_r[R2] = result;
+		}
 		// FLAGS: CVZN
 		// TRAPS: I
 		break;
 	case 0x84:
 		// movw: move word
 		m_r[R2] = m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		break;
 
 	case 0x86:
 		// loadq: load quick
-		m_r[R2] = R1;
-		FLAGS(0, 0, m_r[R2] == 0, 0)
+		m_r[R2] = m_info.r1;
+		FLAGS(0, 0, m_r[R2] == 0, 0);
 		// FLAGS: 00Z0
 		break;
 	case 0x87:
 		// loadi: load immediate
 		m_r[R2] = m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x88:
 		// andw: and word
 		m_r[R2] &= m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		break;
 
 	case 0x8b:
 		// andi: and immediate
 		m_r[R2] &= m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x8c:
 		// orw: or word
 		m_r[R2] |= m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		break;
 
 	case 0x8f:
 		// ori: or immediate
 		m_r[R2] |= m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x90:
 		// addwc: add word with carry
-		FLAGS_CV(C_ADD(m_r[R2], (m_r[R1] + (PSW(C) ? 1 : 0))), V_ADD(m_r[R2], (m_r[R1] + (PSW(C) ? 1 : 0))))
-		m_r[R2] += m_r[R1] + (PSW(C) ? 1 : 0);
-		FLAGS_ZN(m_r[R2] == 0, s32(m_r[R2]) < 0)
+		{
+			const u32 result = m_r[R2] + m_r[R1] + (PSW(C) ? 1 : 0);
+
+			FLAGS_ADD(m_r[R2], m_r[R1], result);
+
+			m_r[R2] = result;
+		}
 		// FLAGS: CVZN
 		break;
 	case 0x91:
 		// subwc: subtract word with carry
-		FLAGS_CV(C_SUB(m_r[R2], (m_r[R1] + (PSW(C) ? 1 : 0))), V_SUB(m_r[R2], (m_r[R1] + (PSW(C) ? 1 : 0))))
-		m_r[R2] -= m_r[R1] + (PSW(C) ? 1 : 0);
-		FLAGS_ZN(m_r[R2] == 0, s32(m_r[R2]) < 0)
+		{
+			const u32 result = m_r[R2] - m_r[R1] - (PSW(C) ? 1 : 0);
+
+			FLAGS_SUB(m_r[R2], m_r[R1], result);
+
+			m_r[R2] = result;
+		}
 		// FLAGS: CVZN
 		break;
 
 	case 0x93:
 		// negw: negate word
-		FLAGS_CV(m_r[R1] != 0, s32(m_r[R1]) == INT32_MIN)
-		m_r[R2] = -m_r[R1];
-		FLAGS_ZN(m_r[R2] == 0, s32(m_r[R2]) < 0)
+		{
+			const u32 result = -m_r[R1];
+
+			FLAGS(
+				m_r[R1] != 0,
+				s32(m_r[R1]) == INT32_MIN,
+				result == 0,
+				BIT31(result));
+
+			m_r[R2] = result;
+		}
 		// FLAGS: CVZN
 		break;
 
@@ -1021,7 +1043,7 @@ void clipper_device::execute_instruction()
 		{
 			const s64 product = mul_32x32(m_r[R1], m_r[R2]);
 			m_r[R2] = s32(product);
-			FLAGS(0, (u64(product) >> 32) != (BIT(product, 31) ? ~u32(0) : 0), 0, 0)
+			FLAGS(0, (u64(product) >> 32) != (BIT31(product) ? ~u32(0) : 0), 0, 0);
 			// FLAGS: 0V00
 		}
 		break;
@@ -1030,7 +1052,7 @@ void clipper_device::execute_instruction()
 		{
 			const s64 product = mul_32x32(m_r[R1], m_r[R2]);
 			set_64(R2, product);
-			FLAGS(0, (u64(product) >> 32) != (BIT(product, 31) ? ~u32(0) : 0), 0, 0)
+			FLAGS(0, (u64(product) >> 32) != (BIT31(product) ? ~u32(0) : 0), 0, 0);
 			// FLAGS: 0V00
 		}
 		break;
@@ -1039,7 +1061,7 @@ void clipper_device::execute_instruction()
 		{
 			const u64 product = mulu_32x32(m_r[R1], m_r[R2]);
 			m_r[R2] = u32(product);
-			FLAGS(0, (product >> 32) != 0, 0, 0)
+			FLAGS(0, (product >> 32) != 0, 0, 0);
 			// FLAGS: 0V00
 		}
 		break;
@@ -1048,7 +1070,7 @@ void clipper_device::execute_instruction()
 		{
 			const u64 product = mulu_32x32(m_r[R1], m_r[R2]);
 			set_64(R2, product);
-			FLAGS(0, (product >> 32) != 0, 0, 0)
+			FLAGS(0, (product >> 32) != 0, 0, 0);
 			// FLAGS: 0V00
 		}
 		break;
@@ -1057,7 +1079,7 @@ void clipper_device::execute_instruction()
 		if (m_r[R1] != 0)
 		{
 			// FLAGS: 0V00
-			FLAGS(0, s32(m_r[R2]) == INT32_MIN && s32(m_r[R1]) == -1, 0, 0)
+			FLAGS(0, s32(m_r[R2]) == INT32_MIN && s32(m_r[R1]) == -1, 0, 0);
 			m_r[R2] = s32(m_r[R2]) / s32(m_r[R1]);
 		}
 		else
@@ -1069,7 +1091,7 @@ void clipper_device::execute_instruction()
 		if (m_r[R1] != 0)
 		{
 			// FLAGS: 0V00
-			FLAGS(0, s32(m_r[R2]) == INT32_MIN && s32(m_r[R1]) == -1, 0, 0)
+			FLAGS(0, s32(m_r[R2]) == INT32_MIN && s32(m_r[R1]) == -1, 0, 0);
 			m_r[R2] = s32(m_r[R2]) % s32(m_r[R1]);
 		}
 		else
@@ -1082,7 +1104,7 @@ void clipper_device::execute_instruction()
 		{
 			m_r[R2] = m_r[R2] / m_r[R1];
 			// FLAGS: 0000
-			FLAGS(0, 0, 0, 0)
+			FLAGS(0, 0, 0, 0);
 		}
 		else
 			// TRAPS: D
@@ -1094,7 +1116,7 @@ void clipper_device::execute_instruction()
 		{
 			m_r[R2] = m_r[R2] % m_r[R1];
 			// FLAGS: 0000
-			FLAGS(0, 0, 0, 0)
+			FLAGS(0, 0, 0, 0);
 		}
 		else
 			// TRAPS: D
@@ -1102,69 +1124,93 @@ void clipper_device::execute_instruction()
 		break;
 	case 0xa0:
 		// subw: subtract word
-		FLAGS_CV(C_SUB(m_r[R2], m_r[R1]), V_SUB(m_r[R2], m_r[R1]))
-		m_r[R2] -= m_r[R1];
-		FLAGS_ZN(m_r[R2] == 0, s32(m_r[R2]) < 0)
+		{
+			const u32 result = m_r[R2] - m_r[R1];
+
+			FLAGS_SUB(m_r[R2], m_r[R1], result);
+
+			m_r[R2] = result;
+		}
 		// FLAGS: CVZN
 		break;
 
 	case 0xa2:
 		// subq: subtract quick
-		FLAGS_CV(C_SUB(m_r[R2], R1), V_SUB(m_r[R2], R1))
-		m_r[R2] -= R1;
-		FLAGS_ZN(m_r[R2] == 0, s32(m_r[R2]) < 0)
+		{
+			const u32 result = m_r[R2] - m_info.r1;
+
+			FLAGS_SUB(m_r[R2], m_info.r1, result);
+
+			m_r[R2] = result;
+		}
 		// FLAGS: CVZN
 		break;
 	case 0xa3:
 		// subi: subtract immediate
-		FLAGS_CV(C_SUB(m_r[R2], m_info.imm), V_SUB(m_r[R2], m_info.imm))
-		m_r[R2] -= m_info.imm;
-		FLAGS_ZN(m_r[R2] == 0, s32(m_r[R2]) < 0)
+		{
+			const u32 result = m_r[R2] - m_info.imm;
+
+			FLAGS_SUB(m_r[R2], m_info.imm, result);
+
+			m_r[R2] = result;
+		}
 		// FLAGS: CVZN
 		// TRAPS: I
 		break;
 	case 0xa4:
 		// cmpw: compare word
-		FLAGS(C_SUB(m_r[R2], m_r[R1]), V_SUB(m_r[R2], m_r[R1]), m_r[R2] == m_r[R1], s32(m_r[R2]) < s32(m_r[R1]))
+		{
+			const u32 result = m_r[R2] - m_r[R1];
+
+			FLAGS_SUB(m_r[R2], m_r[R1], result);
+		}
 		// FLAGS: CVZN
 		break;
 
 	case 0xa6:
 		// cmpq: compare quick
-		FLAGS(C_SUB(m_r[R2], R1), V_SUB(m_r[R2], R1), m_r[R2] == R1, s32(m_r[R2]) < s32(R1))
+		{
+			const u32 result = m_r[R2] - m_info.r1;
+
+			FLAGS_SUB(m_r[R2], m_info.r1, result);
+		}
 		// FLAGS: CVZN
 		break;
 	case 0xa7:
 		// cmpi: compare immediate
-		FLAGS(C_SUB(m_r[R2], m_info.imm), V_SUB(m_r[R2], m_info.imm), m_r[R2] == m_info.imm, s32(m_r[R2]) < s32(m_info.imm))
+		{
+			const u32 result = m_r[R2] - m_info.imm;
+
+			FLAGS_SUB(m_r[R2], m_info.imm, result);
+		}
 		// FLAGS: CVZN
 		// TRAPS: I
 		break;
 	case 0xa8:
 		// xorw: exclusive or word
 		m_r[R2] ^= m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		break;
 
 	case 0xab:
 		// xori: exclusive or immediate
 		m_r[R2] ^= m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0xac:
 		// notw: not word
 		m_r[R2] = ~m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, s32(m_r[R2]) < 0)
+		FLAGS(0, 0, m_r[R2] == 0, BIT31(m_r[R2]));
 		// FLAGS: 00ZN
 		break;
 
 	case 0xae:
 		// notq: not quick
 		m_r[R2] = ~R1;
-		FLAGS(0, 0, 0, 1)
+		FLAGS(0, 0, 0, 1);
 		// FLAGS: 0001
 		break;
 
@@ -1229,10 +1275,15 @@ void clipper_device::execute_instruction()
 			while (m_r[0])
 			{
 				// read and compare bytes (as signed 32 bit integers)
-				get_dcammu().load<s8>(m_ssw, m_r[1], [this](s32 byte1) {
-					get_dcammu().load<s8>(m_ssw, m_r[2], [this, byte1](s32 byte2) {
-						if (byte1 != byte2)
-							FLAGS(C_SUB(byte2, byte1), V_SUB(byte2, byte1), byte2 == byte1, byte2 < byte1); }); });
+				get_dcammu().load<s8>(m_ssw, m_r[1], [this](s32 byte1)
+				{
+					get_dcammu().load<s8>(m_ssw, m_r[2], [this, byte1](s32 byte2)
+					{
+						const s32 result = byte2 - byte1;
+
+						FLAGS_SUB(byte2, byte1, result);
+					});
+				});
 
 				// abort on exception or mismatch
 				if (m_exception || !PSW(Z))
@@ -1424,14 +1475,14 @@ void clipper_device::execute_instruction()
 			case 0x00:
 				// movus: move user to supervisor
 				m_rs[m_info.macro & 0xf] = m_ru[(m_info.macro >> 4) & 0xf];
-				FLAGS(0, 0, m_rs[m_info.macro & 0xf] == 0, s32(m_rs[m_info.macro & 0xf]) < 0)
+				FLAGS(0, 0, m_rs[m_info.macro & 0xf] == 0, BIT31(m_rs[m_info.macro & 0xf]));
 				// FLAGS: 00ZN
 				// TRAPS: S
 				break;
 			case 0x01:
 				// movsu: move supervisor to user
 				m_ru[m_info.macro & 0xf] = m_rs[(m_info.macro >> 4) & 0xf];
-				FLAGS(0, 0, m_ru[m_info.macro & 0xf] == 0, s32(m_ru[m_info.macro & 0xf]) < 0)
+				FLAGS(0, 0, m_ru[m_info.macro & 0xf] == 0, BIT31(m_ru[m_info.macro & 0xf]));
 				// FLAGS: 00ZN
 				// TRAPS: S
 				break;

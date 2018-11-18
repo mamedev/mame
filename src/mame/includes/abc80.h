@@ -95,7 +95,7 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<sn76477_device> m_csg;
 	required_device<cassette_image_device> m_cassette;

@@ -303,6 +303,12 @@ uint32_t mips3_device::compute_prid_register()
 {
 	switch (m_flavor)
 	{
+		case MIPS3_TYPE_R4000:
+			return 0x0400;
+
+		case MIPS3_TYPE_R4400:
+			return 0x0440;
+
 		case MIPS3_TYPE_VR4300:
 			return 0x0b00;
 
@@ -320,8 +326,10 @@ uint32_t mips3_device::compute_prid_register()
 			return 0x2d23;
 
 		case MIPS3_TYPE_R5000:
-		case MIPS3_TYPE_QED5271:
 			return 0x2300;
+
+		case MIPS3_TYPE_QED5271:
+			return 0x2800;
 
 		case MIPS3_TYPE_RM7000:
 			return 0x2700;

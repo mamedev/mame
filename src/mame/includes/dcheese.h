@@ -15,8 +15,10 @@
 class dcheese_state : public driver_device
 {
 public:
-	dcheese_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dcheese_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_palrom(*this, "palrom"),
+		m_gfxrom(*this, "gfx"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
@@ -34,6 +36,9 @@ private:
 		TIMER_BLITTER_SCANLINE,
 		TIMER_SIGNAL_IRQ
 	};
+
+	required_region_ptr<uint16_t> m_palrom;
+	required_region_ptr<uint8_t> m_gfxrom;
 
 	/* video-related */
 	uint16_t   m_blitter_color[2];
@@ -61,12 +66,12 @@ private:
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_WRITE8_MEMBER(bsmt_data_w);
-	DECLARE_WRITE16_MEMBER(madmax_blitter_color_w);
-	DECLARE_WRITE16_MEMBER(madmax_blitter_xparam_w);
-	DECLARE_WRITE16_MEMBER(madmax_blitter_yparam_w);
-	DECLARE_WRITE16_MEMBER(madmax_blitter_vidparam_w);
-	DECLARE_WRITE16_MEMBER(madmax_blitter_unknown_w);
-	DECLARE_READ16_MEMBER(madmax_blitter_vidparam_r);
+	DECLARE_WRITE16_MEMBER(blitter_color_w);
+	DECLARE_WRITE16_MEMBER(blitter_xparam_w);
+	DECLARE_WRITE16_MEMBER(blitter_yparam_w);
+	DECLARE_WRITE16_MEMBER(blitter_vidparam_w);
+	DECLARE_WRITE16_MEMBER(blitter_unknown_w);
+	DECLARE_READ16_MEMBER(blitter_vidparam_r);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dcheese);

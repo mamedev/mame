@@ -683,15 +683,13 @@ MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// coin, fire, lift-off
-	MCFG_DEVICE_ADD("ay1", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	YM2149(config, "ay1", 3000000).add_route(ALL_OUTPUTS, "mono", 0.25); // YM2149 clock ??, pin 26 ??
 
 	// lift-off, explosion (saucers), boss alarm
-	MCFG_DEVICE_ADD("ay2", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	YM2149(config, "ay2", 3000000).add_route(ALL_OUTPUTS, "mono", 0.25); // YM2149 clock ??, pin 26 ??
 
 	// music
 	MCFG_DEVICE_ADD("msm", MSM5232, 2000000) // ?

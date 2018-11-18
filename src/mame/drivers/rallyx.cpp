@@ -821,17 +821,17 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	MCFG_DEVICE_PROGRAM_MAP(rallyx_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 259 at 12M or 4099 at 11M on Logic Board I
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, rallyx_state, bang_w)) // BANG
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, rallyx_state, irq_mask_w)) // INT ON
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, rallyx_state, sound_on_w)) // SOUND ON
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, rallyx_state, flip_screen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, rallyx_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, rallyx_state, coin_counter_1_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 259 at 12M or 4099 at 11M on Logic Board I
+	mainlatch.q_out_cb<0>().set(FUNC(rallyx_state::bang_w)); // BANG
+	mainlatch.q_out_cb<1>().set(FUNC(rallyx_state::irq_mask_w)); // INT ON
+	mainlatch.q_out_cb<2>().set(FUNC(rallyx_state::sound_on_w)); // SOUND ON
+	mainlatch.q_out_cb<3>().set(FUNC(rallyx_state::flip_screen_w)); // FLIP
+	mainlatch.q_out_cb<4>().set_output("led0");
+	mainlatch.q_out_cb<5>().set_output("led1");
+	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_lockout_w));
+	mainlatch.q_out_cb<7>().set(FUNC(rallyx_state::coin_counter_1_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 
@@ -873,17 +873,17 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(jungler_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1C on Loco-Motion
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)) // SOUNDON
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, rallyx_state, nmi_mask_w)) // INTST
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w)) // MUT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, rallyx_state, flip_screen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, rallyx_state, coin_counter_1_w)) // OUT1
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // OUT2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, rallyx_state, coin_counter_2_w)) // OUT3
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, rallyx_state, stars_enable_w)) // STARSON
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1C on Loco-Motion
+	mainlatch.q_out_cb<0>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w)); // SOUNDON
+	mainlatch.q_out_cb<1>().set(FUNC(rallyx_state::nmi_mask_w)); // INTST
+	mainlatch.q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w)); // MUT
+	mainlatch.q_out_cb<3>().set(FUNC(rallyx_state::flip_screen_w)); // FLIP
+	mainlatch.q_out_cb<4>().set(FUNC(rallyx_state::coin_counter_1_w)); // OUT1
+	mainlatch.q_out_cb<5>().set_nop(); // OUT2
+	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_counter_2_w)); // OUT3
+	mainlatch.q_out_cb<7>().set(FUNC(rallyx_state::stars_enable_w)); // STARSON
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 

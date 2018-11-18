@@ -254,12 +254,12 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 
 READ8_MEMBER( trs80m2_state::fdc_r )
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER( trs80m2_state::fdc_w )
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER( trs80m16_state::tcl_w )
@@ -709,10 +709,10 @@ void trs80m2_state::machine_reset()
 
 MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 8_MHz_XTAL / 2)
-	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(z80_io)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_daisy_config(trs80m2_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m2_state::z80_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80m2_state::z80_io);
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
@@ -732,42 +732,42 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_DEVICE_ADD(FD1791_TAG, FD1791, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(Z80PIO_TAG, z80pio_device, pa_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
+	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pa_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
+	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, 8_MHz_XTAL / 2)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, trs80m2_state, read))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, trs80m2_state, write))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, trs80m2_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, trs80m2_state, io_write_byte))
+	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dmac->in_mreq_callback().set(FUNC(trs80m2_state::read));
+	m_dmac->out_mreq_callback().set(FUNC(trs80m2_state::write));
+	m_dmac->in_iorq_callback().set(FUNC(trs80m2_state::io_read_byte));
+	m_dmac->out_iorq_callback().set(FUNC(trs80m2_state::io_write_byte));
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, trs80m2_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, trs80m2_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, trs80m2_state, strobe_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
+	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80sio0_device& sio(Z80SIO0(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
@@ -779,9 +779,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")
@@ -794,11 +792,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 8_MHz_XTAL / 2)
-	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
-	MCFG_DEVICE_IO_MAP(m16_z80_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(AM9519A_TAG, am9519_device, iack_cb)
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_daisy_config(trs80m2_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trs80m16_state::z80_mem);
+	m_maincpu->set_addrmap(AS_IO, &trs80m16_state::m16_z80_io);
+	m_maincpu->set_irq_acknowledge_callback(AM9519A_TAG, FUNC(am9519_device::iack_cb));
 
 	MCFG_DEVICE_ADD(M68000_TAG, M68000, 24_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(m68000_mem)
@@ -822,45 +820,45 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, trs80m2_state, vsync_w))
 
 	// devices
-	MCFG_DEVICE_ADD(FD1791_TAG, FD1791, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(Z80PIO_TAG, z80pio_device, pa_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
+	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pa_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 8_MHz_XTAL / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80dart_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80dart_device::rxca_w));
+	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
+	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, 8_MHz_XTAL / 2)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, trs80m2_state, read))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, trs80m2_state, write))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, trs80m2_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, trs80m2_state, io_write_byte))
+	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dmac->in_mreq_callback().set(FUNC(trs80m2_state::read));
+	m_dmac->out_mreq_callback().set(FUNC(trs80m2_state::write));
+	m_dmac->in_iorq_callback().set(FUNC(trs80m2_state::io_read_byte));
+	m_dmac->out_iorq_callback().set(FUNC(trs80m2_state::io_write_byte));
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, trs80m2_state, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, trs80m2_state, pio_pa_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(*this, trs80m2_state, strobe_w))
+	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(trs80m2_state::pio_pa_r));
+	m_pio->out_pa_callback().set(FUNC(trs80m2_state::pio_pa_w));
+	m_pio->out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_brdy_callback().set(FUNC(trs80m2_state::strobe_w));
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, 8_MHz_XTAL / 2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80sio0_device& sio(Z80SIO0(config, Z80SIO_TAG, 8_MHz_XTAL / 2));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(AM9519A_TAG, AM9519, 0)
-	MCFG_AM9519_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_5))
+	AM9519(config, m_uic, 0);
+	m_uic->out_int_callback().set_inputline(M68000_TAG, M68K_IRQ_5);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_b))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, trs80m2_state, write_centronics_perror))
@@ -872,9 +870,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,768K,1M")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,768K,1M");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "trs80m2")

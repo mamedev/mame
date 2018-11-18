@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)

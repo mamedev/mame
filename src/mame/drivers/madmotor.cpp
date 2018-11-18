@@ -104,8 +104,6 @@ void madmotor_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -267,8 +265,9 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_DEVICE_PROGRAM_MAP(madmotor_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", madmotor_state,  irq6_line_hold)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, 8053000/2); /* Custom chip 45, Crystal near CPU is 8.053 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &madmotor_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -301,8 +300,7 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 21470000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

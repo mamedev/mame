@@ -96,16 +96,17 @@ DEVICE_INPUT_DEFAULTS_END
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ss50_mps_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, ss50_mps_device, reader_control_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, ss50_mps_device, acia_irq_w))
+void ss50_mps_device::device_add_mconfig(machine_config &config)
+{
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set(FUNC(ss50_mps_device::reader_control_w));
+	m_acia->irq_handler().set(FUNC(ss50_mps_device::acia_irq_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+}
 
 
 //-------------------------------------------------

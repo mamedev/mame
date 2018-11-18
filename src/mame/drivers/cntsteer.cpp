@@ -962,12 +962,11 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	ay8910_device &ay1(AY8910(config, "ay1", 1500000));
+	ay1.port_a_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -979,11 +978,9 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)      /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_DEVICE_ADD("subcpu", MC6809E, 2000000)       /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)        /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -1002,6 +999,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // ?
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zerotrgt)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -1012,13 +1010,11 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 /***************************************************************************/

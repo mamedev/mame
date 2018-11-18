@@ -256,7 +256,7 @@ READ8_MEMBER( trs80_state::wd179x_r )
 {
 	uint8_t data = 0xff;
 	if (BIT(m_io_config->read(), 7))
-		data = m_fdc->status_r(space, offset);
+		data = m_fdc->status_r();
 
 	return data;
 }

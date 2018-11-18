@@ -206,6 +206,8 @@ private:
 
 	stream_sample_t *m_bufferl;
 	stream_sample_t *m_bufferr;
+	stream_sample_t *m_exts0;
+	stream_sample_t *m_exts1;
 
 	int m_length;
 

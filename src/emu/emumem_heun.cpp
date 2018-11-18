@@ -5,7 +5,7 @@
 #include "emumem_hea.h"
 #include "emumem_heun.h"
 
-template<int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX handler_entry_read_unmapped<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
+template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_unmapped<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
 	if (inh::m_space->log_unmap() && !inh::m_space->m_manager.machine().side_effects_disabled())
 		inh::m_space->device().logerror(inh::m_space->is_octal()
@@ -43,7 +43,7 @@ template<int Width, int AddrShift, int Endian> std::string handler_entry_write_u
 
 
 
-template<int Width, int AddrShift, int Endian> typename handler_entry_size<Width>::uX handler_entry_read_nop<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
+template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_nop<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
 	return inh::m_space->unmap();
 }

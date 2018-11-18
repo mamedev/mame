@@ -102,6 +102,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -125,7 +126,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_B_8);
 	TILE_GET_INFO_MEMBER(get_tile_info_A_16);
 	TILE_GET_INFO_MEMBER(get_tile_info_B_16);
-	void postload();
+
 	void register_state_save();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap);
@@ -174,14 +175,14 @@ private:
 	uint32_t m_base_addr[2][8];
 	uint32_t m_base_y_shift;    // for extracting pattern y coord 'base'
 
-	uint8_t m_screen_resize;  // screen requires resize
-	uint8_t m_tilemap_resize; // tilemap requires resize
+	bool m_screen_resize;  // screen requires resize
+	bool m_tilemap_resize; // tilemap requires resize
 
 	/* These were statically allocated in the r/w routines */
 	int m_color_state_r;
 	int m_color_state_w;
-	int p0_state;
-	int pattern_name_base_r,pattern_name_base_w;     /* pattern name table base address */
+	int m_p0_state;
+	int m_pattern_name_base_r,m_pattern_name_base_w;     /* pattern name table base address */
 
 	// === new variable handling starts here ===
 	uint8_t m_screen_status;    /**< port #6: status port r/w */

@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_DEVICE_ADD(m_maincpu, SH2, 42000000/2) /* 21 MHz clock confirmed on real board */
 	MCFG_DEVICE_PROGRAM_MAP(avengrgs_map)
 
-	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C46_16BIT) /* Actually 93c45 */
+	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
 
 	MCFG_TIMER_DRIVER_ADD(m_raster_irq_timer, deco_mlc_state, interrupt_gen)
 
@@ -546,7 +546,7 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_DEVICE_ADD(m_maincpu, ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
 	MCFG_DEVICE_PROGRAM_MAP(decomlc_map)
 
-	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C46_16BIT) /* Actually 93c45 */
+	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
 
 	MCFG_TIMER_DRIVER_ADD(m_raster_irq_timer, deco_mlc_state, interrupt_gen)
 
@@ -603,7 +603,7 @@ custom DE156 encrypted CPU.
 Notes:
       - SH2 (QFP144) clock: 21.000MHz (42 / 2)
       - All ROMs SD* are 4M x 16bit EPROMS (27C4096)
-      - All MCG* ROMs are surface mounted 16M MASK ROMs
+      - All MCG* ROMs are surface mounted 16M mask ROMs
       - (mcg-01.1d read in 8 bit mode because this ROM had fixed bits when read in 16 bit
         mode, reading as 8 bit gave a good read. Others read in 16 bit mode)
 */

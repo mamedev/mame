@@ -183,8 +183,3 @@ void mbc55x_state::video_reset()
 
 	logerror("Video reset\n");
 }
-
-WRITE_LINE_MEMBER(mbc55x_state::screen_vblank_mbc55x)
-{
-//  logerror("screen_vblank_mbc55x\n");
-}

@@ -550,17 +550,17 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	MCFG_DEVICE_PROGRAM_MAP(slotcarn_map)
 	MCFG_DEVICE_IO_MAP(spielbud_io_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set_ioport("IN3");
+	ppi2.in_pb_callback().set_ioport("IN4");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -581,9 +581,9 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd",AY8910, SND_CLOCK)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);   
 MACHINE_CONFIG_END
 
 

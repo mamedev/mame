@@ -13,18 +13,6 @@
 
 #pragma once
 
-#define MCFG_1MB5_IRL_HANDLER(_devcb)                                   \
-	downcast<hp_1mb5_device &>(*device).set_irl_handler(DEVCB_##_devcb);
-
-#define MCFG_1MB5_HALT_HANDLER(_devcb)                                  \
-	downcast<hp_1mb5_device &>(*device).set_halt_handler(DEVCB_##_devcb);
-
-#define MCFG_1MB5_RESET_HANDLER(_devcb)                                 \
-	downcast<hp_1mb5_device &>(*device).set_reset_handler(DEVCB_##_devcb);
-
-#define MCFG_1MB5_INT_HANDLER(_devcb)                                   \
-	downcast<hp_1mb5_device &>(*device).set_int_handler(DEVCB_##_devcb);
-
 class hp_1mb5_device : public device_t
 {
 public:
@@ -32,10 +20,10 @@ public:
 	hp_1mb5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template <class Object> devcb_base &set_irl_handler(Object &&cb) { return m_irl_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_halt_handler(Object &&cb) { return m_halt_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_reset_handler(Object &&cb) { return m_reset_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
+	auto irl_handler() { return m_irl_handler.bind(); }
+	auto halt_handler() { return m_halt_handler.bind(); }
+	auto reset_handler() { return m_reset_handler.bind(); }
+	auto int_handler() { return m_int_handler.bind(); }
 
 	// CPU access
 	DECLARE_READ8_MEMBER(cpu_r);

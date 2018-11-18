@@ -176,14 +176,9 @@ MACHINE_CONFIG_START(surpratk_state::surpratk)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, surpratk_state, banking_callback))
 
-	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
+	ADDRESS_MAP_BANK(config, "bank0000").set_map(&surpratk_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

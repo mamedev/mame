@@ -96,6 +96,7 @@ READ8_MEMBER( microdec_state::portf6_r )
 READ8_MEMBER( microdec_state::portf7_r )
 {
 	m_fdc->tc_w(1);
+	m_fdc->tc_w(0);
 	return 0xff;
 }
 
@@ -141,10 +142,8 @@ void microdec_state::microdec_io(address_map &map)
 	map(0xf7, 0xf7).rw(FUNC(microdec_state::portf7_r), FUNC(microdec_state::portf7_w));
 	map(0xf8, 0xf8).w(FUNC(microdec_state::portf8_w));
 	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
-	map(0xfc, 0xfc).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfd, 0xfd).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfe, 0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff, 0xff).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc, 0xfd).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfe, 0xff).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// AM_RANGE(0xf0, 0xf3) 8253 PIT (md3 only) used as a baud rate generator for serial ports
 	// AM_RANGE(0xf4, 0xf4) Centronics data
 	// AM_RANGE(0xf5, 0xf5) motor check (md1/2)
@@ -188,6 +187,8 @@ void microdec_state::init_microdec()
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x1000]);
 	membank("bankw0")->configure_entry(0, &main[0x1000]);
+	m_fdc->set_ready_line_connected(1);
+	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy
 }
 
 void microdec_state::microdec(machine_config &config)

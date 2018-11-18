@@ -294,7 +294,7 @@ void menu_autofire::populate(float &customtop, float &custombottom)
 				}
 
 				/* add an autofire item */
-				item_append_on_off(field.name(), settings.autofire, (autofire_toggle ? FLAG_DISABLE : FLAG_INVERT), (void *)&field);
+				item_append_on_off(field.name(), settings.autofire, (autofire_toggle ? FLAG_DISABLE | FLAG_INVERT : 0), (void *)&field);
 			}
 		}
 	}

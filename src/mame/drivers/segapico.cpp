@@ -304,9 +304,9 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 	{
 		case 0x10/2:
 			if (mem_mask & 0xFF00)
-				m_sega_315_5641_pcm->port_w(space, 0, (data >> 8) & 0xFF);
+				m_sega_315_5641_pcm->port_w((data >> 8) & 0xFF);
 			if (mem_mask & 0x00FF)
-				m_sega_315_5641_pcm->port_w(space, 0, (data >> 0) & 0xFF);
+				m_sega_315_5641_pcm->port_w((data >> 0) & 0xFF);
 			break;
 		case 0x12/2: // guess
 			// Note about uPD7759 lines:
@@ -318,17 +318,17 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 				// value 8000 resets the FIFO? (always used with low reset line)
 				// value 0800 maps to the uPD7759's reset line (0 = reset, 1 = normal)
 				// value 4000 maps to the uPD7759's start line (0->1 = start)
-				m_sega_315_5641_pcm->reset_w((data >> 8) & 0x08);
-				m_sega_315_5641_pcm->start_w((data >> 8) & 0x40);
-				if (data & 0x4000)
+				m_sega_315_5641_pcm->reset_w(BIT(data, 11));
+				m_sega_315_5641_pcm->start_w(BIT(data, 14));
+				if (BIT(data, 14))
 				{
 					// Somewhere between "Reset Off" and the first sample data,
 					// we need to send a few commands to make the sample stream work.
 					// Doing that when rising the "start" line seems to work fine.
-					m_sega_315_5641_pcm->port_w(space, 0, 0xFF);    // "Last Sample" value (must be >= 0x10)
-					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Dummy 1
-					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Addr MSB
-					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Addr LSB
+					m_sega_315_5641_pcm->port_w(0xFF);    // "Last Sample" value (must be >= 0x10)
+					m_sega_315_5641_pcm->port_w(0x00);    // Dummy 1
+					m_sega_315_5641_pcm->port_w(0x00);    // Addr MSB
+					m_sega_315_5641_pcm->port_w(0x00);    // Addr LSB
 				}
 			}
 

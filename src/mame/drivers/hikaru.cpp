@@ -110,7 +110,7 @@ ROM usage -                                                   CRC (from ROM test
            Game       Sega Part No.     ROM Type              Byte   Word
            --------------------------------------------------------------
            Air Trix -
-                      MPR-23573.IC37    128M TSOP48 MASKROM   B9A5   9E67
+                      MPR-23573.IC37    128M TSOP48 mask ROM  B9A5   9E67
                       MPR-23577.IC38    "                     A52A   BCE0
                       MPR-23574.IC41    "                     DABB   B621
                       MPR-23578.IC42    "                     4BD4   5E6B
@@ -133,7 +133,7 @@ ROM usage -                                                   CRC (from ROM test
            Game       Sega Part No.     ROM Type              Byte   Word
            --------------------------------------------------------------
            Planet Harriers -
-                      MPR-23549.IC37    128M TSOP48 MASKROM   7F16   2C37
+                      MPR-23549.IC37    128M TSOP48 mask ROM  7F16   2C37
                       MPR-23553.IC38    "                     1F9F   AAE5
                       MPR-23550.IC41    "                     986C   8D7A
                       MPR-23554.IC42    "                     BD1D   5304
@@ -186,7 +186,7 @@ ROM usage -                                                   CRC (from ROM test
            Game       Sega Part No.     ROM Type              Byte   Word
            --------------------------------------------------------------
            Star Wars Racer Arcade
-                      MPR-23086.IC37    64M SOP44 MASKROM     7993  8E18
+                      MPR-23086.IC37    64M SOP44 mask ROM    7993  8E18
                       MPR-23087.IC38    "                     4D44  D239
                       MPR-23088.IC39    "                     4135  BEAB
                       MPR-23089.IC40    "                     F0C8  04E2
@@ -552,10 +552,13 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr23400" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-23400.ic94",   0x000000, 0x200000, CRC(3d557104) SHA1(d39879f5a1acbd54ad8ee4fbd412f870c9ff4aa5) ) \
 	ROM_SYSTEM_BIOS( 2, "bios2", "epr21904" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21904.ic94",   0x000000, 0x200000, CRC(d96298b6) SHA1(d10d837bc7d68eb7125c34beffe21a91305627b0) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21904.ic94",   0x000000, 0x200000, CRC(d96298b6) SHA1(d10d837bc7d68eb7125c34beffe21a91305627b0) ) \
+	ROM_SYSTEM_BIOS( 3, "bios3", "Development / prototype" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "prot_bot.ic94",    0x000000, 0x200000, CRC(7cbf2fb6) SHA1(7384e3c9314add7d61f93c9edd9fb7788d08f423) )
 // bios 0 is SAMURAI boot rom 0.96 / 2000/8/10
 // bios 1 is SAMURAI boot rom 0.92 / 1999/7/2
 // bios 2 is SAMURAI boot rom 0.84 / 1999/7/22
+// bios 3 is SAMURAI boot rom 0.74 / 1999/5/01 Development version, have options to change country, SCSI ID, boot into debugger mode (will wait for commands from host via SCSI).
 
 
 ROM_START( hikaru )
@@ -580,7 +583,7 @@ ROM_START( airtrix )
 	/* ic35 unpopulated */
 	/* ic36 unpopulated */
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", 0)
 	ROM_LOAD32_WORD( "mpr-23573.ic37" , 0x0000000, 0x1000000, CRC(e22a0734) SHA1(fc06d5972d285d09473874aaeb1efed2d19c8f36) )
 	ROM_LOAD32_WORD( "mpr-23577.ic38" , 0x0000002, 0x1000000, CRC(d007680d) SHA1(a795057c40b1851adb0e19e5dfb39e16206215bf) )
@@ -611,7 +614,7 @@ ROM_START( airtrixo )
 	ROM_LOAD32_WORD( "epr-23601.ic29", 0x0000000, 0x0400000, CRC(e0c642cb) SHA1(f04f8e13cc46d462c79ecebcded7dee9b3500bdc) )
 	ROM_LOAD32_WORD( "epr-23602.ic30", 0x0000002, 0x0400000, CRC(fac11d21) SHA1(70b48a7e1ac4268fc09d96d6845c5a5099d4e301) )
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", 0)
 	ROM_LOAD32_WORD( "mpr-23573.ic37" , 0x0000000, 0x1000000, CRC(e22a0734) SHA1(fc06d5972d285d09473874aaeb1efed2d19c8f36) )
 	ROM_LOAD32_WORD( "mpr-23577.ic38" , 0x0000002, 0x1000000, CRC(d007680d) SHA1(a795057c40b1851adb0e19e5dfb39e16206215bf) )
@@ -641,7 +644,7 @@ ROM_START( pharrier )
 	ROM_LOAD32_WORD("epr-23571.ic35",  0x1800000, 0x0400000, CRC(5a75fa92) SHA1(b5e0c8c995ecc954b74d5eb36f3ae2a732a5986b) )
 	ROM_LOAD32_WORD("epr-23572.ic36",  0x1800002, 0x0400000, CRC(46054067) SHA1(449800bdc2c40c76aed9bc5e7e8831d8f03ef286) )
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", 0)
 	ROM_LOAD32_WORD( "mpr-23549.ic37", 0x0000000, 0x1000000, CRC(ed764200) SHA1(ad840a40347345f72a443f284b1bb0ae2b37f7ac) )
 	ROM_LOAD32_WORD( "mpr-23553.ic38", 0x0000002, 0x1000000, CRC(5e70ae78) SHA1(2ae6bdb5aa1434bb60b2b9bca7af12d6476cd35f) )
@@ -678,7 +681,7 @@ ROM_START( swracer )
 	/* ic35 unpopulated */
 	/* ic36 unpopulated */
 
-	/* ROM board using 64M SOP44 MASKROM */
+	/* ROM board using 64M SOP44 mask ROM */
 	ROM_REGION( 0x10000000, "user2", 0)
 	ROM_LOAD32_WORD("mpr-23086.ic37" ,  0x0000000, 0x0800000, CRC(ef6f20f1) SHA1(11fb66bf71223b4c6650d3adaea21e8709b8d67b))
 	ROM_LOAD32_WORD("mpr-23087.ic38" ,  0x0000002, 0x0800000, CRC(54389822) SHA1(6357f0aa77ef0a5a08a751e085fa026d26ba47d1))
@@ -731,7 +734,7 @@ ROM_START( braveff )
 	/* ic35 unpopulated */
 	/* ic36 unpopulated */
 
-	/* ROM board using 64M SOP44 MASKROM */
+	/* ROM board using 64M SOP44 mask ROM */
 	ROM_REGION( 0xc000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-22000.ic37",  0x0000000, 0x800000, CRC(53d641d6) SHA1(f47d7c77d0e36c4ec3b7171fd7a017f9f58ca5a0) )
 	ROM_LOAD32_WORD( "mpr-22001.ic38",  0x0000002, 0x800000, CRC(234bc48f) SHA1(177c46884de0ba4bac1f9b778f99c905410a9345) )
@@ -769,7 +772,7 @@ ROM_START( sgnascar )
 	ROM_LOAD32_WORD( "epr-23485a.ic35", 0x000000, 0x400000, CRC(1072f531) SHA1(ca07a8bfb7247e4aec57e18cb091d24dcef666c1) )
 	ROM_LOAD32_WORD( "epr-23486a.ic36", 0x000002, 0x400000, CRC(02d4aab6) SHA1(b1b0e07dc71dc124177e27dfd8b459444e8ae4d3) )
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-23469.ic19", 0x0000000, 0x1000000, CRC(89cbad8d) SHA1(e4f103b96a3a842a90182172ddcf3bc5dfe6cca8) )
 	ROM_LOAD32_WORD( "mpr-23473.ic20", 0x0000002, 0x1000000, CRC(977b87d6) SHA1(079eeebc6f9c60d0a016a46386bbe846d8a354da) )
@@ -801,7 +804,7 @@ ROM_START( sgnascaro )
 	ROM_LOAD32_WORD( "epr-23485.ic35", 0x000000, 0x400000, CRC(13b44fbf) SHA1(73416fa7b671ec5c96f0b084a427ff701bf6c399) )
 	ROM_LOAD32_WORD( "epr-23486.ic36", 0x000002, 0x400000, CRC(ac3acd19) SHA1(1ec96be0bfceb2f1f808d78b07425d32056fbde0) )
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-23469.ic19", 0x0000000, 0x1000000, CRC(89cbad8d) SHA1(e4f103b96a3a842a90182172ddcf3bc5dfe6cca8) )
 	ROM_LOAD32_WORD( "mpr-23473.ic20", 0x0000002, 0x1000000, CRC(977b87d6) SHA1(079eeebc6f9c60d0a016a46386bbe846d8a354da) )

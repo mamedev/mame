@@ -11,9 +11,7 @@
     TODO:
 
     - cursor timer
-    - interrupts
-        - light pen
-        - frame timer
+    - light pen
     - non-DMA mode
     - DMA mode
     - cursor/blank skew
@@ -206,7 +204,7 @@ enum
 // interrupt enable register bits
 const int IE_VERTICAL_RETRACE           = 0x40;
 //const int IE_LIGHT_PEN                  = 0x20;
-//const int IE_FRAME_TIMER                = 0x01;
+const int IE_FRAME_TIMER                = 0x01;
 
 // status register bits
 const int STATUS_INTERRUPT_PENDING      = 0x80;
@@ -249,11 +247,13 @@ inline uint8_t crt9007_device::readbyte(offs_t address)
 
 inline void crt9007_device::trigger_interrupt(int line)
 {
+	int status = m_status;
+
+	m_status |= line;
+
 	if (INTERRUPT_ENABLE & line)
 	{
-		int status = m_status;
-
-		m_status |= STATUS_INTERRUPT_PENDING | line;
+		m_status |= STATUS_INTERRUPT_PENDING;
 
 		if (!(status & STATUS_INTERRUPT_PENDING))
 		{
@@ -403,11 +403,11 @@ inline void crt9007_device::recompute_parameters()
 	if (!HAS_VALID_PARAMETERS) return;
 
 	// screen dimensions
-	//int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * m_hpixels_per_column;
-	//int vert_pix_total = SCAN_LINES_PER_FRAME;
+	int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * m_hpixels_per_column;
+	int vert_pix_total = SCAN_LINES_PER_FRAME;
 
 	// refresh rate
-	//attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * horiz_pix_total * vert_pix_total;
+	attotime refresh = clocks_to_attotime(CHARACTERS_PER_HORIZONTAL_PERIOD * vert_pix_total);
 
 	// horizontal sync
 	m_hsync_start = 0;
@@ -426,19 +426,21 @@ inline void crt9007_device::recompute_parameters()
 	m_vsync_end = VERTICAL_SYNC_WIDTH;
 
 	// visible area
-	//rectangle visarea;
+	rectangle visarea(m_hsync_end, horiz_pix_total - 1, m_vsync_end, vert_pix_total - 1);
 
-	//visarea.set(m_hsync_end, horiz_pix_total - 1, m_vsync_end, vert_pix_total - 1);
+	LOG("CRT9007 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, refresh.as_hz());
+	LOG("CRT9007 Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 
-	//LOG("CRT9007 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-	//LOG("CRT9007 Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-
-	//screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+	//screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
+	(void)visarea;
 
 	m_hsync_timer->adjust(screen().time_until_pos(0, 0));
 	m_vsync_timer->adjust(screen().time_until_pos(0, 0));
 	m_vlt_timer->adjust(screen().time_until_pos(0, m_vlt_start), 1);
 	m_drb_timer->adjust(screen().time_until_pos(0, 0));
+
+	int frame_timer_line = m_drb_bottom - (OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
+	m_frame_timer->adjust(screen().time_until_pos(frame_timer_line, 0), 0, refresh);
 }
 
 
@@ -508,6 +510,7 @@ void crt9007_device::device_start()
 	m_curs_timer = timer_alloc(TIMER_CURS);
 	m_drb_timer = timer_alloc(TIMER_DRB);
 	m_dma_timer = timer_alloc(TIMER_DMA);
+	m_frame_timer = timer_alloc(TIMER_FRAME);
 
 	// save state
 	save_item(NAME(m_reg));
@@ -536,6 +539,7 @@ void crt9007_device::device_reset()
 {
 	m_disp = false;
 	m_cblank = false;
+	m_status = 0;
 
 	// HS = 1
 	m_hs = true;
@@ -632,7 +636,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		if (m_vs)
 		{
 			// reset all other bits except Light Pen Update to logic 0
-			m_status &= STATUS_LIGHT_PEN_UPDATE;
+			m_status &= (STATUS_LIGHT_PEN_UPDATE | STATUS_INTERRUPT_PENDING);
 		}
 		else
 		{
@@ -689,6 +693,10 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		update_dma_timer();
 		break;
+
+	case TIMER_FRAME:
+		trigger_interrupt(IE_FRAME_TIMER);
+		break;
 	}
 }
 
@@ -743,7 +751,7 @@ READ8_MEMBER( crt9007_device::read )
 	case 0x3a:
 		data = m_status;
 
-		if (!machine().side_effects_disabled())
+		if (!machine().side_effects_disabled() && (m_status & STATUS_INTERRUPT_PENDING))
 		{
 			// reset interrupt pending bit
 			m_status &= ~STATUS_INTERRUPT_PENDING;
@@ -964,5 +972,6 @@ void crt9007_device::set_character_width(unsigned value)
 {
 	m_hpixels_per_column = value;
 
-	recompute_parameters();
+	if (started())
+		recompute_parameters();
 }

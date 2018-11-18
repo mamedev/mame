@@ -1604,8 +1604,9 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
-	MCFG_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/6/2) /* 1.536 MHz */
-	MCFG_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/6/2) /* 1.536 MHz */
+	NAMCO_50XX(config, "50xx_1", MASTER_CLOCK/6/2); /* 1.536 MHz */
+	NAMCO_50XX(config, "50xx_2", MASTER_CLOCK/6/2); /* 1.536 MHz */
+
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_51XX_SCREEN("screen")
 	MCFG_NAMCO_51XX_INPUT_0_CB(IOPORT("IN0L"))
@@ -1649,8 +1650,7 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	//m_videolatch->q_out_cb<7>().set("50xx_2", FUNC(namco_50xx_device::reset_w));
 	//m_videolatch->q_out_cb<7>().append("52xx", FUNC(namco_52xx_device, reset_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
@@ -1722,8 +1722,7 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	// Q0-Q5 to 05XX for starfield control
 	m_videolatch->q_out_cb<7>().set(FUNC(galaga_state::flip_screen_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
@@ -1779,8 +1778,8 @@ MACHINE_CONFIG_START(galaga_state::gatsbee)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gatsbee_main_map)
 
-	MCFG_DEVICE_ADD("extralatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, galaga_state, gatsbee_bank_w))
+	ls259_device &extralatch(LS259(config, "extralatch"));
+	extralatch.q_out_cb<0>().set(FUNC(galaga_state::gatsbee_bank_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xevious_state::xevious)
@@ -1802,7 +1801,7 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
 
-	MCFG_NAMCO_50XX_ADD("50xx", MASTER_CLOCK/6/2)   /* 1.536 MHz */
+	NAMCO_50XX(config, "50xx", MASTER_CLOCK/6/2);   /* 1.536 MHz */
 
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_51XX_SCREEN("screen")
@@ -1826,8 +1825,7 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_NAMCO_06XX_WRITE_2_CB(WRITE8("50xx", namco_50xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_3_CB(WRITE8("54xx", namco_54xx_device, write))
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
@@ -1943,7 +1941,7 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 
 	MCFG_DEVICE_ADD("earom", ER2055)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

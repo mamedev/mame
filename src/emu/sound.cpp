@@ -53,7 +53,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	: m_device(device),
 		m_next(nullptr),
 		m_sample_rate(sample_rate),
-		m_new_sample_rate(0),
+		m_new_sample_rate(0xffffffff),
 		m_attoseconds_per_sample(0),
 		m_max_samples_per_update(0),
 		m_input(inputs),
@@ -430,13 +430,13 @@ void sound_stream::update_with_accounting(bool second_tick)
 void sound_stream::apply_sample_rate_changes()
 {
 	// skip if nothing to do
-	if (m_new_sample_rate == 0)
+	if (m_new_sample_rate == 0xffffffff)
 		return;
 
 	// update to the new rate and remember the old rate
 	u32 old_rate = m_sample_rate;
 	m_sample_rate = m_new_sample_rate;
-	m_new_sample_rate = 0;
+	m_new_sample_rate = 0xffffffff;
 
 	// recompute all the data
 	recompute_sample_rate_data();
@@ -449,15 +449,16 @@ void sound_stream::apply_sample_rate_changes()
 	}
 	else
 	{
-		m_output_sampindex = m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample;
+		m_output_sampindex = m_attoseconds_per_sample ? m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample : 0;
 		m_output_update_sampindex = m_output_sampindex;
 	}
 
 	m_output_base_sampindex = m_output_sampindex - m_max_samples_per_update;
 
 	// clear out the buffer
-	for (auto & elem : m_output)
-		memset(&elem.m_buffer[0], 0, m_max_samples_per_update * sizeof(elem.m_buffer[0]));
+	if (m_max_samples_per_update)
+		for (auto & elem : m_output)
+			memset(&elem.m_buffer[0], 0, m_max_samples_per_update * sizeof(elem.m_buffer[0]));
 }
 
 
@@ -540,8 +541,13 @@ void sound_stream::recompute_sample_rate_data()
 	if (m_synchronous)
 	{
 		attotime time = m_device.machine().time();
-		attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds() % m_attoseconds_per_sample);
-		m_sync_timer->adjust(attotime(0, next_edge));
+		if (m_attoseconds_per_sample)
+		{
+			attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds() % m_attoseconds_per_sample);
+			m_sync_timer->adjust(attotime(0, next_edge));
+		}
+		else
+			m_sync_timer->adjust(attotime::never);
 	}
 }
 
@@ -610,7 +616,7 @@ void sound_stream::postload()
 		memset(&elem.m_buffer[0], 0, m_output_bufalloc * sizeof(elem.m_buffer[0]));
 
 	// recompute the sample indexes to make sense
-	m_output_sampindex = m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample;
+	m_output_sampindex = m_attoseconds_per_sample ? m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample : 0;
 	m_output_update_sampindex = m_output_sampindex;
 	m_output_base_sampindex = m_output_sampindex - m_max_samples_per_update;
 }
@@ -676,7 +682,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, u32 
 {
 	// if we don't have an output to pull data from, generate silence
 	stream_sample_t *dest = &input.m_resample[0];
-	if (input.m_source == nullptr || input.m_source->m_buffer.size() == 0)
+	if (input.m_source == nullptr || input.m_source->m_stream->m_attoseconds_per_sample == 0)
 	{
 		memset(dest, 0, numsamples * sizeof(*dest));
 		return &input.m_resample[0];

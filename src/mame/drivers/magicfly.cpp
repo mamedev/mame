@@ -946,7 +946,7 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(magicfly_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

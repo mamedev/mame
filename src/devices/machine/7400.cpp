@@ -13,10 +13,7 @@ DEFINE_DEVICE_TYPE(TTL7400, ttl7400_device, "7400", "7400 Quad 2-Input NAND Gate
 
 ttl7400_device::ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL7400, tag, owner, clock)
-	, m_y1_func(*this)
-	, m_y2_func(*this)
-	, m_y3_func(*this)
-	, m_y4_func(*this)
+	, m_y_func{{*this}, {*this}, {*this}, {*this}}
 	, m_a(0)
 	, m_b(0)
 	, m_y(0)
@@ -25,24 +22,15 @@ ttl7400_device::ttl7400_device(const machine_config &mconfig, const char *tag, d
 
 void ttl7400_device::device_start()
 {
-	init();
-
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
 	save_item(NAME(m_y));
 
-	m_y1_func.resolve_safe();
-	m_y2_func.resolve_safe();
-	m_y3_func.resolve_safe();
-	m_y4_func.resolve_safe();
+	for (std::size_t bit = 0; bit < 4; bit++)
+		m_y_func[bit].resolve_safe();
 }
 
 void ttl7400_device::device_reset()
-{
-	init();
-}
-
-void ttl7400_device::init()
 {
 	m_a = 0;
 	m_b = 0;
@@ -57,18 +45,12 @@ void ttl7400_device::update()
 
 	if (m_y != last_y)
 	{
-		for (int bit = 0; bit < 4; bit++)
+		for (std::size_t bit = 0; bit < 4; bit++)
 		{
 			if (BIT(m_y, bit) == BIT(last_y, bit))
 				continue;
 
-			switch(bit)
-			{
-				case 0: m_y1_func(BIT(m_y, bit)); break;
-				case 1: m_y2_func(BIT(m_y, bit)); break;
-				case 2: m_y3_func(BIT(m_y, bit)); break;
-				case 3: m_y4_func(BIT(m_y, bit)); break;
-			}
+			m_y_func[bit](BIT(m_y, bit));
 		}
 	}
 }

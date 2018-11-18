@@ -264,18 +264,17 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rgum)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "aysnd", 24000000/16).add_route(ALL_OUTPUTS, "mono", 0.50); /* guessed to use the same xtal as the crtc */
 MACHINE_CONFIG_END
 
 

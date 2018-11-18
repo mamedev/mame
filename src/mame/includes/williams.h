@@ -7,15 +7,16 @@
 **************************************************************************/
 
 
-#include "cpu/m6809/m6809.h"
+#include "audio/williams.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/hc55516.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
+#include "machine/74157.h"
+#include "machine/bankdev.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "machine/6821pia.h"
-#include "machine/bankdev.h"
-#include "audio/williams.h"
+#include "sound/hc55516.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -29,6 +30,11 @@ public:
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_mux(*this, "mux"),
+		m_mux0(*this, "mux_0"),
+		m_mux1(*this, "mux_1"),
+		m_muxa(*this, "mux_a"),
+		m_muxb(*this, "mux_b"),
 		m_bankc000(*this, "bankc000"),
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
@@ -125,6 +131,11 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	optional_device<ls157_device> m_mux;
+	optional_device<ls157_device> m_mux0;
+	optional_device<ls157_device> m_mux1;
+	optional_device<ls157_x2_device> m_muxa;
+	optional_device<ls157_device> m_muxb;
 	optional_device<address_map_bank_device> m_bankc000;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;

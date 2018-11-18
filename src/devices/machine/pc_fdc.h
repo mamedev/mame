@@ -13,22 +13,11 @@
 
 #include "machine/upd765.h"
 
-#define MCFG_PC_FDC_XT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PC_FDC_XT, 0)
-
-#define MCFG_PC_FDC_AT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PC_FDC_AT, 0)
-
-#define MCFG_PC_FDC_INTRQ_CALLBACK(_write) \
-	downcast<pc_fdc_family_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
-
-#define MCFG_PC_FDC_DRQ_CALLBACK(_write) \
-	downcast<pc_fdc_family_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 class pc_fdc_family_device : public pc_fdc_interface {
 public:
-	template <class Object> devcb_base &set_intrq_wr_callback(Object &&cb) { return intrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
+	auto intrq_wr_callback() { return intrq_cb.bind(); }
+	auto drq_wr_callback() { return drq_cb.bind(); }
 
 	virtual void map(address_map &map) override;
 

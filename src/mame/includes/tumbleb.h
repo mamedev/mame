@@ -26,6 +26,7 @@ public:
 	{ }
 
 	void tumblepb(machine_config &config);
+	void tumblepba(machine_config &config);
 	void bcstory(machine_config &config);
 	void pangpang(machine_config &config);
 	void semibase(machine_config &config);
@@ -163,4 +164,5 @@ private:
 	void suprtrio_main_map(address_map &map);
 	void suprtrio_sound_map(address_map &map);
 	void tumblepopb_main_map(address_map &map);
+	void tumblepopba_main_map(address_map &map);
 };

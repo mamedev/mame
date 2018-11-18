@@ -482,6 +482,7 @@ public:
 	void rsc(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
 
+	void eas_base(machine_config &config);
 	void eas(machine_config &config);
 	void eag(machine_config &config);
 	void pc(machine_config &config);
@@ -1833,140 +1834,142 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fidel6502_state::rsc)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1800000) // measured approx 1.81MHz
-	MCFG_DEVICE_PROGRAM_MAP(rsc_map)
+	M6502(config, m_maincpu, 1800000); // measured approx 1.81MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::rsc_map);
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(546)) // from 555 timer, measured
 	MCFG_TIMER_START_DELAY(attotime::from_hz(546) - attotime::from_usec(38)) // active for 38us
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(546))
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0) // MOS 6520
-	MCFG_PIA_READPA_HANDLER(READ8(*this, fidel6502_state, csc_pia1_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0)); // MOS 6520
+	pia.readpa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_r));
+	pia.readca1_handler().set(FUNC(fidel6502_state::csc_pia1_ca1_r));
+	pia.readcb1_handler().set(FUNC(fidel6502_state::csc_pia1_cb1_r));
+	pia.writepa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_w));
+	pia.writepb_handler().set(FUNC(fidel6502_state::csc_pia1_pb_w));
+	pia.ca2_handler().set(FUNC(fidel6502_state::csc_pia1_ca2_w));
+	pia.cb2_handler().set(FUNC(fidel6502_state::csc_pia1_cb2_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_rsc_v2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::csc)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // from 3.9MHz resonator
-	MCFG_DEVICE_PROGRAM_MAP(csc_map)
+	M6502(config, m_maincpu, 3.9_MHz_XTAL/2); // from 3.9MHz resonator
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::csc_map);
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(38.4_kHz_XTAL/64)) // through 4060 IC, 600Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)) // edge!
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(38.4_kHz_XTAL/64))
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, fidel6502_state, csc_pia0_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia0_ca2_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpb_handler().set(FUNC(fidel6502_state::csc_pia0_pb_r));
+	pia0.writepa_handler().set(FUNC(fidel6502_state::csc_pia0_pa_w));
+	pia0.writepb_handler().set(FUNC(fidel6502_state::csc_pia0_pb_w));
+	pia0.ca2_handler().set(FUNC(fidel6502_state::csc_pia0_ca2_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, fidel6502_state, csc_pia1_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_r));
+	pia1.readca1_handler().set(FUNC(fidel6502_state::csc_pia1_ca1_r));
+	pia1.readcb1_handler().set(FUNC(fidel6502_state::csc_pia1_cb1_r));
+	pia1.writepa_handler().set(FUNC(fidel6502_state::csc_pia1_pa_w));
+	pia1.writepb_handler().set(FUNC(fidel6502_state::csc_pia1_pb_w));
+	pia1.ca2_handler().set(FUNC(fidel6502_state::csc_pia1_ca2_w));
+	pia1.cb2_handler().set(FUNC(fidel6502_state::csc_pia1_cb2_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_csc);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
+	s14001a_device &speech(S14001A(config, "speech", 25000)); // R/C circuit, around 25khz
+	speech.ext_read().set(FUNC(fidel6502_state::csc_speech_r));
+	speech.add_route(ALL_OUTPUTS, "speaker", 0.75);
 
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(fidel6502_state::su9)
+void fidel6502_state::su9(machine_config &config)
+{
 	csc(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(su9_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::su9_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, su9)
 
 	config.set_default_layout(layout_fidel_su9);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(fidel6502_state::eas)
-
+MACHINE_CONFIG_START(fidel6502_state::eas_base)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R65C02, 3_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(div_trampoline)
+	R65C02(config, m_maincpu, 3_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fidel6502_state::div_trampoline);
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(38.4_kHz_XTAL/64)) // through 4060 IC, 600Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(38.4_kHz_XTAL/64) - attotime::from_hz(38.4_kHz_XTAL*2)) // edge!
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(38.4_kHz_XTAL/64))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(38.4_kHz_XTAL/64))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(3_MHz_XTAL))
 
-	MCFG_DEVICE_ADD("mainmap", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(eas_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0) // port B: input, port A & C: output
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fidel6502_state, eas_ppi_porta_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, fidel6502_state, eas_ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidel6502_state, eas_ppi_portc_w))
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&fidel6502_state::eas_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_eas);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
+	s14001a_device &speech(S14001A(config, "speech", 25000)); // R/C circuit, around 25khz
+	speech.ext_read().set(FUNC(fidel6502_state::csc_speech_r));
+	speech.add_route(ALL_OUTPUTS, "speaker", 0.75);
 
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
-	MCFG_GENERIC_EXTENSIONS("bin,dat")
-	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc", "bin,dat"));
+	cartslot.set_device_load(device_image_load_delegate(&fidelbase_state::device_image_load_scc_cartridge, this));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 MACHINE_CONFIG_END
 
+void fidel6502_state::eas(machine_config &config)
+{
+	eas_base(config);
+
+	I8255(config, m_ppi8255); // port B: input, port A & C: output
+	m_ppi8255->out_pa_callback().set(FUNC(fidel6502_state::eas_ppi_porta_w));
+	m_ppi8255->tri_pa_callback().set_constant(0);
+	m_ppi8255->in_pb_callback().set(FUNC(fidel6502_state::eas_ppi_portb_r));
+	m_ppi8255->out_pc_callback().set(FUNC(fidel6502_state::eas_ppi_portc_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
 MACHINE_CONFIG_START(fidel6502_state::pc)
-	eas(config);
+	eas_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(4_MHz_XTAL) // R65C02P4
+	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
+
 	MCFG_DEVICE_REMOVE("dummy_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(4_MHz_XTAL))
 
-	MCFG_DEVICE_MODIFY("mainmap")
-	MCFG_DEVICE_PROGRAM_MAP(pc_map)
-
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_REMOVE("nvram")
+	m_mainmap->set_addrmap(AS_PROGRAM, &fidel6502_state::pc_map);
 
 	config.set_default_layout(layout_fidel_pc);
 MACHINE_CONFIG_END
@@ -1975,13 +1978,12 @@ MACHINE_CONFIG_START(fidel6502_state::eag)
 	eas(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(5_MHz_XTAL) // R65C02P4
+	m_maincpu->set_clock(5_MHz_XTAL); // R65C02P4
+
 	MCFG_DEVICE_REMOVE("dummy_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(5_MHz_XTAL))
 
-	MCFG_DEVICE_MODIFY("mainmap")
-	MCFG_DEVICE_PROGRAM_MAP(eag_map)
+	m_mainmap->set_addrmap(AS_PROGRAM, &fidel6502_state::eag_map);
 
 	config.set_default_layout(layout_fidel_eag);
 MACHINE_CONFIG_END
@@ -2047,11 +2049,7 @@ MACHINE_CONFIG_START(fidel6502_state::sc12)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(3_MHz_XTAL))
 
-	MCFG_DEVICE_ADD("mainmap", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(sc12_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
+	ADDRESS_MAP_BANK(config, "mainmap").set_map(&fidel6502_state::sc12_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_sc12);

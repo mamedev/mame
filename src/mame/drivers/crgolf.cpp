@@ -478,25 +478,20 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1H
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, crgolf_state, color_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, crgolf_state, screen_flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, crgolf_state, screen_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, crgolf_state, screenb_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, crgolf_state, screena_enable_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1H
+	mainlatch.q_out_cb<3>().set(FUNC(crgolf_state::color_select_w));
+	mainlatch.q_out_cb<4>().set(FUNC(crgolf_state::screen_flip_w));
+	mainlatch.q_out_cb<5>().set(FUNC(crgolf_state::screen_select_w));
+	mainlatch.q_out_cb<6>().set(FUNC(crgolf_state::screenb_enable_w));
+	mainlatch.q_out_cb<7>().set(FUNC(crgolf_state::screena_enable_w));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch1").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000) /* technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
+
+	/* stride is technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&crgolf_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(crgolf_state, crgolf)
@@ -512,8 +507,7 @@ MACHINE_CONFIG_START(crgolf_state::crgolf)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, "aysnd", MASTER_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

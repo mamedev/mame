@@ -239,9 +239,9 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(m_buffered_spriteram_2.get(), m_spriteram + 0x2800, 0x800);
+			memcpy(m_buffered_spriteram_2.get(), m_spriteram_2 + 0x800, 0x800);
 		else
-			memcpy(m_buffered_spriteram_2.get(), m_spriteram + 0x2000, 0x800);
+			memcpy(m_buffered_spriteram_2.get(), m_spriteram_2 + 0x000, 0x800);
 	}
 	if (offset == 6)
 	{

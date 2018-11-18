@@ -30,35 +30,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define CPD1862_CLOCK   XTAL(7'159'090)
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CDP1861_RD_CALLBACK(_read) \
-	downcast<cdp1862_device &>(*device).set_rd_rd_callback(DEVCB_##_read);
-
-#define MCFG_CDP1861_BD_CALLBACK(_read) \
-	downcast<cdp1862_device &>(*device).set_bd_rd_callback(DEVCB_##_read);
-
-#define MCFG_CDP1861_GD_CALLBACK(_read) \
-	downcast<cdp1862_device &>(*device).set_gd_rd_callback(DEVCB_##_read);
-
-#define MCFG_CDP1862_LUMINANCE(_r, _b, _g, _bkg) \
-	downcast<cdp1862_device &>(*device).set_luminance(_r, _b, _g, _bkg);
-
-#define MCFG_CDP1862_CHROMINANCE(_r, _b, _g, _bkg) \
-	downcast<cdp1862_device &>(*device).set_chrominance(_r, _b, _g, _bkg);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -71,9 +42,9 @@ public:
 	// construction/destruction
 	cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_rd_rd_callback(Object &&cb) { return m_read_rd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_bd_rd_callback(Object &&cb) { return m_read_bd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_gd_rd_callback(Object &&cb) { return m_read_gd.set_callback(std::forward<Object>(cb)); }
+	auto rdata_cb() { return m_read_rd.bind(); }
+	auto bdata_cb() { return m_read_bd.bind(); }
+	auto gdata_cb() { return m_read_gd.bind(); }
 
 	void set_luminance(double r, double b, double g, double bkg) { m_lum_r = r; m_lum_b = b; m_lum_g = g; m_lum_bkg = bkg; }
 	void set_chrominance(double r, double b, double g, double bkg) { m_chr_r = r; m_chr_b = b; m_chr_g = g; m_chr_bkg = bkg; }

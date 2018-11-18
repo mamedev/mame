@@ -4,8 +4,19 @@
 
     okiadpcm.h
 
-    OKI ADCPM emulation.
+    OKI ADPCM emulation.
 
+    See the following patents/applications:
+    (Note: if not registered, the application below was not actually granted, and is effectively abandoned)
+    Application JP,1980-109800 (Unexamined Publication JP,S57-035434,A) (Examined Publication JP,S61-024850,B) (Registration number JP,1356613,B) https://patents.google.com/patent/JPS5735434A/en
+    Application JP,1981-185490 (Unexamined Publication JP,S58-088926,A) (Not examined or registered) https://patents.google.com/patent/JPS5888926A/en
+    Application JP,1982-213971 (Unexamined Publication JP,S59-104699,A) (Not examined or registered) https://patents.google.com/patent/JPS59104699A/en <- this one goes into a bit more detail/better arranged diagrams, and shows a Q table with entries 0-63 rather than 0-48 of the real msm5205
+
+    Application JP,1987-184421 (Unexamined Publication JP,S64-028700,A) (Not examined) (Registration number JP,2581696,B) https://patents.google.com/patent/JPS6428700A/en <- quad band coding system for adpcm?
+    Application JP,1994-039523 (Unexamined Publication JP,H07-248798,A) (Not examined) (Registration number JP,3398457,B) https://patents.google.com/patent/JP3398457B2/en <- this may cover the 'adpcm2' method
+    Application JP,1995-104333 (Unexamined Publication JP,H08-307371,A) (Not examined or registered) https://patents.google.com/patent/JPH08307371A/en <- something unrelated to adpcm, wireless transmission error detection related?
+    Application JP,1995-162009 (Unexamined Publication JP,H09-018425,A) (Not examined or registered) https://patents.google.com/patent/JPH0918425A/en <- looks like ADPCM2 maybe?
+        Application JP,1988-176215 (Unexamined Publication JP,H02-026426,A) (Not examined or registered) https://patents.google.com/patent/JPH0226426A/en <- Fujitsu variant on (G.726/727?) SB-ADPCM, cited by above
 ***************************************************************************/
 
 #include "emu.h"

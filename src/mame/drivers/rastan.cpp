@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -414,8 +414,8 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_DEVICE_ADD("adpcm_sel", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_sel, 0);
+	m_adpcm_sel->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")

@@ -117,8 +117,15 @@ void pc080sn_device::device_start()
 
 	save_pointer(NAME(m_ram), PC080SN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
-	machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_device::restore_scroll), this));
+}
 
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
+
+void pc080sn_device::device_post_load()
+{
+	restore_scroll();
 }
 
 /*****************************************************************************

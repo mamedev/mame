@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, irq_scanline, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_audio_map)
@@ -544,16 +544,16 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
-	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
+	TC0091LVC(config, m_vdp, 0);
+	m_vdp->set_gfxdecode_tag("gfxdecode");
 
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch1");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

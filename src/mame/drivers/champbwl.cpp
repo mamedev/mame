@@ -478,7 +478,7 @@ uint32_t champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_in
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800, 1 );
+	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
 
@@ -497,7 +497,7 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	MCFG_DEVICE_PROGRAM_MAP(champbwl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(champbwl_state,champbwl)
 	MCFG_MACHINE_RESET_OVERRIDE(champbwl_state,champbwl)
@@ -539,7 +539,7 @@ uint32_t champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_in
 	m_seta001->set_bg_yoffsets( 0x00, 0x01 );
 	m_seta001->set_fg_yoffsets( 0x00, 0x10 );
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800, 1 );
+	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x800);
 	return 0;
 }
 
@@ -563,7 +563,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	MCFG_DEVICE_PROGRAM_MAP(doraemon_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )

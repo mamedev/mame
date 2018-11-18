@@ -74,8 +74,8 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 	// d5: d7756 reset pin(?)
 	if (m_d7756 != nullptr)
 	{
-		m_d7756->reset_w(~data & 0x20);
-		m_d7756->start_w(~data & 0x10);
+		m_d7756->reset_w(!BIT(data, 5));
+		m_d7756->start_w(!BIT(data, 4));
 	}
 	if (m_samples != nullptr)
 	{
@@ -100,7 +100,7 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 	m_sample = data;
 
 	if (m_d7756 != nullptr)
-		m_d7756->port_w(space, 0, data);
+		m_d7756->port_w(data);
 }
 
 void homerun_state::homerun_memmap(address_map &map)
@@ -358,10 +358,10 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	MCFG_DEVICE_IO_MAP(homerun_iomap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, homerun_state, homerun_scrollhi_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, homerun_state, homerun_scrolly_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, homerun_state, homerun_scrollx_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(homerun_state::homerun_scrollhi_w));
+	ppi.out_pb_callback().set(FUNC(homerun_state::homerun_scrolly_w));
+	ppi.out_pc_callback().set(FUNC(homerun_state::homerun_scrollx_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -378,10 +378,10 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(20'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, homerun_state, homerun_banking_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(20'000'000)/8));
+	ymsnd.port_a_read_callback().set_ioport("DSW");
+	ymsnd.port_b_write_callback().set(FUNC(homerun_state::homerun_banking_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homerun_state::homerun)

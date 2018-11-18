@@ -151,10 +151,9 @@ MACHINE_CONFIG_START(subhuntr_state::subhuntr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subhuntr_state, subhuntr_interrupt)
 	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
 
-//  MCFG_DEVICE_ADD("s2636", S2636, 0)
-//  MCFG_S2636_WORKRAM_SIZE(0x100)
-//  MCFG_S2636_OFFSETS(3, -21)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	s2636_device &s2636(S2636(config, "s2636", 0));
+	s2636.set_offsets(3, -21);
+	s2636.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

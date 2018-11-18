@@ -752,6 +752,8 @@ MACHINE_CONFIG_START(taitoh_state::tetristh)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(tetristh_map)
+
+	m_palette->set_entries(0x800/2);
 MACHINE_CONFIG_END
 
 

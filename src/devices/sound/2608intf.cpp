@@ -85,8 +85,6 @@ void ym2608_device::device_start()
 	ay8910_device::device_start();
 
 	int rate = clock()/72;
-	void *pcmbufa;
-	int  pcmsizea;
 
 	m_irq_handler.resolve();
 
@@ -96,14 +94,12 @@ void ym2608_device::device_start()
 
 	/* stream system initialize */
 	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(&ym2608_device::stream_generate,this));
-	/* setup adpcm buffers */
-	pcmbufa  = m_region->base();
-	pcmsizea = m_region->bytes();
 
 	/* initialize YM2608 */
 	m_chip = ym2608_init(this,clock(),rate,
-					pcmbufa,pcmsizea,
-					&ym2608_device::static_timer_handler,&ym2608_device::static_irq_handler,&psgintf);
+		&ym2608_device::static_internal_read_byte,
+		&ym2608_device::static_external_read_byte, &ym2608_device::static_external_write_byte,
+		&ym2608_device::static_timer_handler,&ym2608_device::static_irq_handler,&psgintf);
 	assert_always(m_chip != nullptr, "Error creating YM2608 chip");
 }
 
@@ -135,6 +131,15 @@ void ym2608_device::device_reset()
 	ym2608_reset_chip(m_chip);
 }
 
+//-------------------------------------------------
+//  rom_bank_updated
+//-------------------------------------------------
+
+void ym2608_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
 
 READ8_MEMBER( ym2608_device::read )
 {
@@ -150,16 +155,17 @@ DEFINE_DEVICE_TYPE(YM2608, ym2608_device, "ym2608", "YM2608 OPNA")
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM2608, tag, owner, clock, PSG_TYPE_YM, 1, 2)
+	, device_rom_interface(mconfig, *this, 21)
 	, m_stream(nullptr)
 	, m_timer{ nullptr, nullptr }
 	, m_chip(nullptr)
 	, m_irq_handler(*this)
-	, m_region(*this, DEVICE_SELF)
+	, m_internal(*this, "internal")
 {
 }
 
 ROM_START( ym2608 )
-	ROM_REGION( 0x2000, "ym2608", 0 )
+	ROM_REGION( 0x2000, "internal", 0 )
 	/*
 	This data is derived from the chip's output - internal ROM can't be read.
 	It was verified, using real YM2608, that this ADPCM stream produces 100% correct output signal.

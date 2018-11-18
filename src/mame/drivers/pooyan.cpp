@@ -199,16 +199,16 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pooyan_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pooyan_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, pooyan_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // PAY OUT - not used
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pooyan_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // B2
+	mainlatch.q_out_cb<0>().set(FUNC(pooyan_state::irq_enable_w));
+	mainlatch.q_out_cb<1>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w));
+	mainlatch.q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
+	mainlatch.q_out_cb<3>().set(FUNC(pooyan_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set(FUNC(pooyan_state::coin_counter_2_w));
+	mainlatch.q_out_cb<5>().set_nop(); // PAY OUT - not used
+	mainlatch.q_out_cb<7>().set(FUNC(pooyan_state::flipscreen_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

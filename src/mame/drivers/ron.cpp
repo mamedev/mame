@@ -518,9 +518,9 @@ MACHINE_CONFIG_START(ron_state::ron)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 0) // T0 CLK from I8035 (not verified)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ron_state, ay_pa_w))
+	AY8910(config, m_ay, 0); // T0 CLK from I8035 (not verified)
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.30);
+	m_ay->port_a_write_callback().set(FUNC(ron_state::ay_pa_w));
 MACHINE_CONFIG_END
 
 

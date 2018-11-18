@@ -267,6 +267,7 @@ cultures.cpp
 cupidon.cpp
 cv1k.cpp
 cvs.cpp
+cwheel.cpp
 cyberbal.cpp
 cybertnk.cpp
 cybstorm.cpp
@@ -816,6 +817,8 @@ namcos11.cpp
 namcos12.cpp
 namcos2.cpp
 namcos21.cpp
+namcos21_c67.cpp
+namcos21_de.cpp
 namcos22.cpp
 namcos23.cpp
 namcos86.cpp
@@ -836,6 +839,7 @@ nexus3d.cpp
 nibble.cpp
 nichild.cpp
 nightgal.cpp
+nightmare.cpp
 ninjakd2.cpp
 ninjaw.cpp
 nitedrvr.cpp
@@ -1313,8 +1317,10 @@ vendetta.cpp
 vertigo.cpp
 vicdual.cpp
 victory.cpp
+video21.cpp
 videopin.cpp
 videopkr.cpp
+videosaa.cpp
 vigilant.cpp
 vindictr.cpp
 viper.cpp

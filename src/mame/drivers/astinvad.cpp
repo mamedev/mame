@@ -340,9 +340,9 @@ READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= m_ppi8255_0->read(space, offset);
+		result &= m_ppi8255_0->read(offset);
 	if (!(offset & 8))
-		result &= m_ppi8255_1->read(space, offset);
+		result &= m_ppi8255_1->read(offset);
 	return result;
 }
 
@@ -351,9 +351,9 @@ WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		m_ppi8255_0->write(space, offset, data);
+		m_ppi8255_0->write(offset, data);
 	if (!(offset & 8))
-		m_ppi8255_1->write(space, offset, data);
+		m_ppi8255_1->write(offset, data);
 }
 
 
@@ -678,14 +678,14 @@ MACHINE_CONFIG_START(astinvad_state::kamikaze)
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, kamikaze)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, kamikaze)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	I8255A(config, m_ppi8255_0);
+	m_ppi8255_0->in_pa_callback().set_ioport("IN0");
+	m_ppi8255_0->in_pb_callback().set_ioport("IN1");
+	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, astinvad_state, kamikaze_sound1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, astinvad_state, kamikaze_sound2_w))
+	I8255A(config, m_ppi8255_1);
+	m_ppi8255_1->out_pa_callback().set(FUNC(astinvad_state::kamikaze_sound1_w));
+	m_ppi8255_1->out_pb_callback().set(FUNC(astinvad_state::kamikaze_sound2_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -708,10 +708,9 @@ MACHINE_CONFIG_START(astinvad_state::spcking2)
 	kamikaze(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, astinvad_state, spcking2_sound1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, astinvad_state, spcking2_sound2_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, astinvad_state, spcking2_sound3_w))
+	m_ppi8255_1->out_pa_callback().set(FUNC(astinvad_state::spcking2_sound1_w));
+	m_ppi8255_1->out_pb_callback().set(FUNC(astinvad_state::spcking2_sound2_w));
+	m_ppi8255_1->out_pc_callback().set(FUNC(astinvad_state::spcking2_sound3_w));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -854,6 +853,8 @@ void astinvad_state::init_spcking2()
 {
 	/* don't have the schematics, but the blanking must center the screen here */
 	m_flip_yoffs = 0;
+
+	save_item(NAME(m_player));
 }
 
 

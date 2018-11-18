@@ -1060,9 +1060,8 @@ MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 	MCFG_DEVICE_PROGRAM_MAP(cxhumax_map)
 
 
-	MCFG_INTEL_28F320J3D_ADD("flash")
-	MCFG_I2CMEM_ADD("eeprom")
-	MCFG_I2CMEM_DATA_SIZE(0x2000)
+	INTEL_28F320J3D(config, "flash");
+	I2CMEM(config, "eeprom", 0).set_data_size(0x2000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1074,7 +1073,7 @@ MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 MACHINE_CONFIG_END
 
 ROM_START( hxhdci2k )

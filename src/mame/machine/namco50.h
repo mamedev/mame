@@ -7,10 +7,6 @@
 
 #include "cpu/mb88xx/mb88xx.h"
 
-#define MCFG_NAMCO_50XX_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_50XX, _clock)
-
-
 /* device get info callback */
 class namco_50xx_device : public device_t
 {
@@ -20,11 +16,6 @@ public:
 	WRITE8_MEMBER( write );
 	WRITE_LINE_MEMBER(read_request);
 	READ8_MEMBER( read );
-
-	READ8_MEMBER( K_r );
-	READ8_MEMBER( R0_r );
-	READ8_MEMBER( R2_r );
-	WRITE8_MEMBER( O_w );
 
 protected:
 	// device-level overrides
@@ -36,12 +27,19 @@ protected:
 	TIMER_CALLBACK_MEMBER( readrequest_callback );
 	TIMER_CALLBACK_MEMBER( irq_clear );
 	void irq_set();
+
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
 	uint8_t                   m_latched_cmd;
 	uint8_t                   m_latched_rw;
 	uint8_t                   m_portO;
+	emu_timer * m_irq_cleared_timer;
+
+	READ8_MEMBER( K_r );
+	READ8_MEMBER( R0_r );
+	READ8_MEMBER( R2_r );
+	WRITE8_MEMBER( O_w );
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_50XX, namco_50xx_device)

@@ -105,9 +105,7 @@ MACHINE_CONFIG_START(ps2_state::ps2m30286)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
+	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ps2_state::ps2386)
@@ -134,9 +132,7 @@ MACHINE_CONFIG_START(ps2_state::ps2386)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M,128M,256M")
+	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M,16M,32M,64M,128M,256M");
 MACHINE_CONFIG_END
 
 ROM_START( i8530286 )

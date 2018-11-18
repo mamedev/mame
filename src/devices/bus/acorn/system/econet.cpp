@@ -23,18 +23,22 @@ DEFINE_DEVICE_TYPE(ACORN_ECONET, acorn_econet_device, "acorn_econet", "Acorn Eco
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(acorn_econet_device::device_add_mconfig)
+void acorn_econet_device::device_add_mconfig(machine_config &config)
+{
 	/* econet */
-	MCFG_DEVICE_ADD(m_adlc, MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(WRITELINE(m_econet, econet_device, host_data_w))
-	MCFG_MC6854_OUT_IRQ_CB(WRITELINE(*this, acorn_econet_device, bus_irq_w))
+	MC6854(config, m_adlc);
+	m_adlc->out_txd_cb().set(m_econet, FUNC(econet_device::host_data_w));
+	m_adlc->out_irq_cb().set(FUNC(acorn_econet_device::bus_irq_w));
 
 	ECONET(config, m_econet, 0);
 	m_econet->clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	m_econet->clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	m_econet->data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
-	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
-MACHINE_CONFIG_END
+
+	econet_slot_device &slot(ECONET_SLOT(config, "econet254", 0));
+	econet_devices(slot);
+	slot.set_slot(254);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

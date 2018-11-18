@@ -45,11 +45,11 @@ public:
 	auto data_request_callback() { return m_drq_cb.bind(); }
 	auto standby_callback() { return m_sby_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER(ald_w);
+	void ald_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER(lrq_r);
 	DECLARE_READ_LINE_MEMBER(sby_r);
-	DECLARE_READ16_MEMBER(spb640_r);
-	DECLARE_WRITE16_MEMBER(spb640_w);
+	uint16_t spb640_r(offs_t offset);
+	void spb640_w(offs_t offset, uint16_t data);
 
 	TIMER_CALLBACK_MEMBER(set_lrq_timer_proc);
 	void set_clock(int clock);

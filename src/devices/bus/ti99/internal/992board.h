@@ -48,6 +48,11 @@ public:
 	// Video enable
 	DECLARE_WRITE_LINE_MEMBER( videna );
 
+	// Callbacks
+	auto readmem_cb() { return m_mem_read_cb.bind(); }
+	auto hold_cb() { return m_hold_cb.bind(); }
+	auto int_cb() { return m_int_cb.bind(); }
+
 protected:
 	video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	int     m_beol;
@@ -105,8 +110,8 @@ public:
 	DECLARE_READ8_MEMBER( cruread );
 	DECLARE_WRITE8_MEMBER( cruwrite );
 	void device_start() override;
-	template <class Object> devcb_base &set_rombank_callback(Object &&cb) { return m_set_rom_bank.set_callback(std::forward<Object>(cb)); }
 	ioport_constructor device_input_ports() const override;
+	auto rombank_cb() { return m_set_rom_bank.bind(); }
 
 protected:
 	io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -137,6 +142,9 @@ private:
 
 	// Hexbus inhibit. This prevents the incoming latches to store the data.
 	bool m_communication_disable;
+
+	// Bit 6. It is not documented, but likely to indicate the response phase.
+	bool m_response_phase;
 };
 
 
@@ -155,24 +163,6 @@ public:
 };
 
 } } } // end namespace bus::ti99::internal
-
-#define MCFG_VIDEO992_SCREEN_ADD(_screen_tag) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_SCREEN_ADD( _screen_tag, RASTER ) \
-	MCFG_SCREEN_RAW_PARAMS( XTAL(10'738'635) / 2, bus::ti99::internal::video992_device::TOTAL_HORZ, bus::ti99::internal::video992_device::HORZ_DISPLAY_START-12, bus::ti99::internal::video992_device::HORZ_DISPLAY_START + 256 + 12, \
-			bus::ti99::internal::video992_device::TOTAL_VERT_NTSC, bus::ti99::internal::video992_device::VERT_DISPLAY_START_NTSC - 12, bus::ti99::internal::video992_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
-
-#define MCFG_VIDEO992_MEM_ACCESS_CB(_devcb) \
-	downcast<bus::ti99::internal::video992_device &>(*device).set_readmem_callback(DEVCB_##_devcb);
-
-#define MCFG_VIDEO992_HOLD_CB(_devcb) \
-	downcast<bus::ti99::internal::video992_device &>(*device).set_hold_callback(DEVCB_##_devcb);
-
-#define MCFG_VIDEO992_INT_CB(_devcb) \
-	downcast<bus::ti99::internal::video992_device &>(*device).set_int_callback(DEVCB_##_devcb);
-
-#define MCFG_SET_ROMBANK_HANDLER( _devcb ) \
-	downcast<bus::ti99::internal::io992_device &>(*device).set_rombank_callback(DEVCB_##_devcb);
 
 DECLARE_DEVICE_TYPE_NS(VIDEO99224, bus::ti99::internal, video992_24_device)
 DECLARE_DEVICE_TYPE_NS(VIDEO99232, bus::ti99::internal, video992_32_device)

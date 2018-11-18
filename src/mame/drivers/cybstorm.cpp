@@ -227,10 +227,9 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
@@ -239,11 +238,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	MCFG_ATARI_VAD_ALPHA(cybstorm_state, "gfxdecode", get_alpha_tile_info)
 	MCFG_ATARI_VAD_MOB(cybstorm_state::s_mob_config, "gfxdecode")
 
-	MCFG_DEVICE_ADD("vadbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vadbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x90000)
+	ADDRESS_MAP_BANK(config, "vadbank").set_map(&cybstorm_state::vadbank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x90000);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cybstorm)
 	MCFG_PALETTE_ADD("palette", 32768)

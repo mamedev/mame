@@ -435,8 +435,8 @@ void spectrum_state::spectrum_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
 	map(0x4000, 0x5aff).ram().share("video_ram");
-//  AM_RANGE(0x5b00, 0x7fff) AM_RAM
-//  AM_RANGE(0x8000, 0xffff) AM_RAM
+	//  AM_RANGE(0x5b00, 0x7fff) AM_RAM
+	//  AM_RANGE(0x8000, 0xffff) AM_RAM
 }
 
 /* ports are not decoded full.
@@ -613,10 +613,13 @@ void spectrum_state::init_spectrum()
 	switch (m_ram->size())
 	{
 		case 48*1024:
-		space.install_ram(0x8000, 0xffff, nullptr); // Fall through
+			space.install_ram(0x8000, 0xffff, nullptr); // Fall through
 		case 16*1024:
-		space.install_ram(0x5b00, 0x7fff, nullptr);
+			space.install_ram(0x5b00, 0x7fff, nullptr);
 	}
+
+	// setup expansion slot
+	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum)
@@ -668,27 +671,26 @@ INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, X1 / 4)        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
-	MCFG_DEVICE_PROGRAM_MAP(spectrum_mem)
-	MCFG_DEVICE_IO_MAP(spectrum_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	Z80(config, m_maincpu, X1 / 4);        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_mem);
+	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_io);
+	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(X1 / 2, 448, 0, 352, 312, 0, 296);
+	m_screen->set_screen_update(FUNC(spectrum_state::screen_update_spectrum));
+	m_screen->screen_vblank().set(FUNC(spectrum_state::screen_vblank_spectrum));
+	m_screen->set_palette("palette");
 
-	MCFG_SCREEN_RAW_PARAMS(X1 / 2, 448, 0, 352,  312, 0, 296)
+	palette_device &palette(PALETTE(config, "palette", 16));
+	palette.set_init(palette_init_delegate(FUNC(spectrum_state::palette_init_spectrum), this));
 
-	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_spectrum))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(spectrum_state, spectrum )
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spectrum)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_spectrum);
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum )
 
 	/* sound hardware */
@@ -697,28 +699,35 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* expansion port */
-	MCFG_SPECTRUM_EXPANSION_SLOT_ADD("exp", spectrum_expansion_devices, "kempjoy")
+	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, "kempjoy");
+	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* devices */
-	MCFG_SNAPSHOT_ADD("snapshot", spectrum_state, spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
-	MCFG_QUICKLOAD_ADD("quickload", spectrum_state, spectrum, "raw,scr", 2) // The delay prevents the screen from being cleared by the RAM test at boot
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("spectrum_cass")
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(spectrum_state, spectrum), this), "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(spectrum_state, spectrum), this), "raw,scr", 2); // The delay prevents the screen from being cleared by the RAM test at boot
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "spectrum_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tzx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("spectrum_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("spectrum_cass");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(spectrum_state::spectrum)
+void spectrum_state::spectrum(machine_config &config)
+{
 	spectrum_common(config);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)               // This configuration is verified only for the original ZX Spectrum.
-	MCFG_RAM_DEFAULT_SIZE("48K")        // It's likely, but still to be checked, that many clones were produced only
-	MCFG_RAM_EXTRA_OPTIONS("16K")       // in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
-	MCFG_RAM_DEFAULT_VALUE(0xff)        // available via bankswitching.
-MACHINE_CONFIG_END
+	RAM(config, m_ram).set_default_size("48K").set_extra_options("16K").set_default_value(0xff);
+	// This configuration is verified only for the original ZX Spectrum.
+	// It's likely, but still to be checked, that many clones were produced only
+	// in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
+	// available via bankswitching.
+}
 
 /***************************************************************************
 
@@ -905,6 +914,12 @@ ROM_END
 
 /* Russian clones */
 
+ROM_START( bk08 )
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "right.bin", 0x0000, 0x2000, CRC(fb253544) SHA1(6b79487e3013d0acdea8d224b21c937e88105a2f) )
+	ROM_LOAD( "left.bin",  0x2000, 0x2000, CRC(a092b5f3) SHA1(06b8d98a398f61daf6604c68bcee4596c283c2cd) )
+ROM_END
+
 ROM_START(blitzs)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("blitz.rom",0x0000,0x4000, CRC(91e535a8) SHA1(14f09d45dc3803cbdb05c33adb28eb12dbad9dd0))
@@ -940,6 +955,11 @@ ROM_START(spektrbk)
 	ROM_LOAD("spektr-bk001.rom", 0x0000, 0x4000, CRC(c011eecc) SHA1(35fdc8cd083e50452655997a997873627b131520))
 ROM_END
 
+ROM_START(sintez2)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "sntez2.bin",   0x000000, 0x004000, CRC(490ded3a) SHA1(a1c6c18e1d93761c0891291ec75191f54929ed7b) )
+ROM_END
+
 ROM_START(zvezda)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD( "2764-near-cpu_red.bin", 0x0000, 0x2000, CRC(a4ae4938) SHA1(ea1763b9dee29381ddcf882fbc4e404ba5366942))
@@ -971,6 +991,7 @@ COMP( 1992, didakm92, spectrum, 0,      spectrum, spec_plus, spectrum_state, ini
 COMP( 1992, didaktk,  spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Kompakt",      0 )
 COMP( 1993, didakm93, spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik M 93",         0 )
 COMP( 1988, mistrum,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Amaterske RADIO",       "Mistrum",               0 )  // keyboard could be spectrum in some models (since it was a build-yourself design)
+COMP( 198?, bk08,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Orel",                  "BK-08",                 0 )
 COMP( 1990, blitzs,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Blic",                  0 )  // no keyboard images found
 COMP( 1990, byte,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Byte",                  0 )  // no keyboard images found
 COMP( 199?, orizon,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Orizon-Micro",          0 )  // no keyboard images found
@@ -978,4 +999,5 @@ COMP( 1993, quorum48, spectrum, 0,      spectrum, spectrum,  spectrum_state, ini
 COMP( 1993, magic6,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Magic 6",               MACHINE_NOT_WORKING )   // keyboard should be spectrum, but image was not clear
 COMP( 1990, compani1, spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Kompanion 1",           0 )  // no keyboard images found
 COMP( 1990, spektrbk, spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Spektr BK-001",         0 )
+COMP( 1989, sintez2,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Signal",                "Sintez 2",              0 )
 COMP( 1990, zvezda,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Zvezda",                0 )

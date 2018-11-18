@@ -4,6 +4,7 @@
 #include "cpu/h6280/h6280.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "video/bufsprite.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
 #include "sound/msm5205.h"
@@ -12,15 +13,14 @@
 class dec0_state : public driver_device
 {
 public:
-	dec0_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dec0_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
-		m_tilegen1(*this, "tilegen1"),
-		m_tilegen2(*this, "tilegen2"),
-		m_tilegen3(*this, "tilegen3"),
+		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
+		m_spriteram(*this, "spriteram"),
 		m_palette(*this, "palette"),
 		m_paletteram(*this, "palette"),
 		m_subcpu(*this, "sub"),
@@ -28,9 +28,9 @@ public:
 		m_pfprotect(*this, "pfprotect"),
 		m_sndprotect(*this, "sndprotect"),
 		m_ram(*this, "ram"),
-		m_spriteram(*this, "spriteram"),
 		m_robocop_shared_ram(*this, "robocop_shared"),
-		m_hippodrm_shared_ram(*this, "hippodrm_shared") { }
+		m_hippodrm_shared_ram(*this, "hippodrm_shared")
+	{ }
 
 	void dec0_base(machine_config &config);
 	void dec0(machine_config &config);
@@ -48,7 +48,6 @@ public:
 	void robocopb(machine_config &config);
 	void hippodrm(machine_config &config);
 
-	void init_robocop();
 	void init_hippodrm();
 	void init_hbarrel();
 	void init_slyspy();
@@ -63,10 +62,9 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
-	optional_device<deco_bac06_device> m_tilegen1;
-	optional_device<deco_bac06_device> m_tilegen2;
-	optional_device<deco_bac06_device> m_tilegen3;
+	optional_device_array<deco_bac06_device, 3> m_tilegen;
 	optional_device<deco_mxc06_device> m_spritegen;
+	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_paletteram;
 
@@ -75,7 +73,7 @@ protected:
 
 	DECLARE_READ16_MEMBER(dec0_controls_r);
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
-	DECLARE_WRITE16_MEMBER(dec0_priority_w);
+	DECLARE_WRITE16_MEMBER(priority_w);
 
 private:
 	enum class mcu_type {
@@ -89,7 +87,6 @@ private:
 	optional_device<address_map_bank_device> m_pfprotect;
 	optional_device<address_map_bank_device> m_sndprotect;
 	required_shared_ptr<uint16_t> m_ram;
-	required_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
 
@@ -120,7 +117,6 @@ private:
 	DECLARE_WRITE16_MEMBER(sprite_mirror_w);
 	DECLARE_READ16_MEMBER(robocop_68000_share_r);
 	DECLARE_WRITE16_MEMBER(robocop_68000_share_w);
-	DECLARE_WRITE16_MEMBER(dec0_update_sprites_w);
 	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
 
 	DECLARE_READ8_MEMBER(slyspy_sound_state_r);
@@ -145,10 +141,12 @@ private:
 	void h6280_decrypt(const char *cputag);
 	void dec0_map(address_map &map);
 	void dec0_s_map(address_map &map);
+	void hippodrm_map(address_map &map);
 	void hippodrm_sub_map(address_map &map);
 	void midres_map(address_map &map);
 	void midres_s_map(address_map &map);
 	void midresb_map(address_map &map);
+	void robocop_map(address_map &map);
 	void robocop_sub_map(address_map &map);
 	void slyspy_map(address_map &map);
 	void slyspy_protection_map(address_map &map);
@@ -160,12 +158,10 @@ private:
 class dec0_automat_state : public dec0_state
 {
 public:
-	dec0_automat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dec0_state(mconfig, type, tag),
-		m_msm1(*this, "msm1"),
-		m_msm2(*this, "msm2"),
-		m_adpcm_select1(*this, "adpcm_select1"),
-		m_adpcm_select2(*this, "adpcm_select2"),
+	dec0_automat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		dec0_state(mconfig, type, tag),
+		m_msm(*this, "msm%u", 1U),
+		m_adpcm_select(*this, "adpcm_select%u", 1U),
 		m_soundbank(*this, "soundbank")
 	{
 	}
@@ -174,14 +170,11 @@ public:
 	void automat(machine_config &config);
 
 private:
-	required_device<msm5205_device> m_msm1;
-	required_device<msm5205_device> m_msm2;
-	required_device<ls157_device> m_adpcm_select1;
-	required_device<ls157_device> m_adpcm_select2;
+	required_device_array<msm5205_device, 2> m_msm;
+	required_device_array<ls157_device, 2> m_adpcm_select;
 	required_memory_bank m_soundbank;
 
-	bool m_adpcm_toggle1;
-	bool m_adpcm_toggle2;
+	bool m_adpcm_toggle[2];
 	uint16_t m_automat_scroll_regs[4];
 
 	DECLARE_WRITE16_MEMBER(automat_control_w);

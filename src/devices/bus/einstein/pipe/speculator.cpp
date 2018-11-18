@@ -26,23 +26,23 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SPECULATOR, einstein_speculator_device, "einstein_sp
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ic5a", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(47))
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_P(560))
-	MCFG_TTL74123_A_PIN_VALUE(1)
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(0)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, einstein_speculator_device, ic5a_q_w))
+	TTL74123(config, m_ic5a, 0);
+	m_ic5a->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_ic5a->set_resistor_value(RES_K(47));
+	m_ic5a->set_capacitor_value(CAP_P(560));
+	m_ic5a->set_a_pin_value(1);
+	m_ic5a->set_b_pin_value(1);
+	m_ic5a->set_clear_pin_value(0);
+	m_ic5a->out_cb().set(FUNC(einstein_speculator_device::ic5a_q_w));
 
-	MCFG_DEVICE_ADD("ic5b", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(47))
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_P(560))
-	MCFG_TTL74123_A_PIN_VALUE(1)
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(0)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, einstein_speculator_device, ic5b_q_w))
+	TTL74123(config, m_ic5b, 0);
+	m_ic5b->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_ic5b->set_resistor_value(RES_K(47));
+	m_ic5b->set_capacitor_value(CAP_P(560));
+	m_ic5b->set_a_pin_value(1);
+	m_ic5b->set_b_pin_value(1);
+	m_ic5b->set_clear_pin_value(0);
+	m_ic5b->out_cb().set(FUNC(einstein_speculator_device::ic5b_q_w));
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);

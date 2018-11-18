@@ -232,17 +232,17 @@ MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* 1.5 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // C3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tutankhm_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // PAY OUT - not used
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tutankhm_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tutankhm_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // starfield?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, tutankhm_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tutankhm_state, flip_screen_y_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // C3
+	mainlatch.q_out_cb<0>().set(FUNC(tutankhm_state::irq_enable_w));
+	mainlatch.q_out_cb<1>().set_nop(); // PAY OUT - not used
+	mainlatch.q_out_cb<2>().set(FUNC(tutankhm_state::coin_counter_2_w));
+	mainlatch.q_out_cb<3>().set(FUNC(tutankhm_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set_nop(); // starfield?
+	mainlatch.q_out_cb<5>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
+	mainlatch.q_out_cb<6>().set(FUNC(tutankhm_state::flip_screen_x_w));
+	mainlatch.q_out_cb<7>().set(FUNC(tutankhm_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

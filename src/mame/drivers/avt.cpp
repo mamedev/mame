@@ -439,7 +439,7 @@ class avt_state : public driver_device
 public:
 	avt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this,"maincpu")
+		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_pio0(*this, "pio0")
 		, m_pio1(*this, "pio1")
@@ -470,7 +470,7 @@ private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;
@@ -963,10 +963,10 @@ WRITE_LINE_MEMBER( avt_state::avtbingo_w )
 
 MACHINE_CONFIG_START(avt_state::avt)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(avt_map)
-	MCFG_DEVICE_IO_MAP(avt_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK); /* guess */
+	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &avt_state::avt_map);
+	m_maincpu->set_addrmap(AS_IO, &avt_state::avt_portmap);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -990,24 +990,23 @@ MACHINE_CONFIG_START(avt_state::avt)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK/2)    /* 1.25 MHz.?? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, "aysnd", CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.00);    /* 1.25 MHz.?? */
 
 	// device never addressed by cpu
-	MCFG_DEVICE_ADD("ctc0", Z80CTC, CPU_CLOCK) // U27
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc0", z80ctc_device, trg1))
+	z80ctc_device& ctc(Z80CTC(config, "ctc0", CPU_CLOCK)); // U27
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("ctc0", FUNC(z80ctc_device::trg1));
 	// ZC1 not connected
 	// TRG2 to TP18; ZC2 to TP9; TRG3 to VSYNC; TRG0 to cpu_clock/4
 
-	MCFG_DEVICE_ADD("pio0", Z80PIO, CPU_CLOCK) // U23
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("IN0"))
+	Z80PIO(config, m_pio0, CPU_CLOCK); // U23
+	m_pio0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio0->in_pb_callback().set_ioport("IN0");
 	// PORT A appears to be lamp drivers
 	// PORT B d0-d5 = muxed inputs; d6 = SW2 pushbutton; d7 = ?
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, CPU_CLOCK) // U22
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio1, CPU_CLOCK); // U22
+	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// PORT A d0-d7 = TP13,TP12,TP11,TP10,TP8,TP7,TP5,TP3
 	// PORT B d0-d7 = "Player2", DCOM, CCOM, BCOM, ACOM, LOCKOUT/TP6, TP4, 50/60HZ (held high, jumper on JP13 grounds it)
 	// DCOM,CCOM,BCOM,ACOM appear to be muxes

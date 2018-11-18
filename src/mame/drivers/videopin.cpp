@@ -182,7 +182,7 @@ WRITE8_MEMBER(videopin_state::out1_w)
 	machine().bookkeeping().coin_lockout_global_w(~data & 0x08);
 
 	/* Convert octave data to divide value and write to sound */
-	m_discrete->write(space, VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
+	m_discrete->write(VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
 }
 
 
@@ -199,17 +199,17 @@ WRITE8_MEMBER(videopin_state::out2_w)
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 
-	m_discrete->write(space, VIDEOPIN_BELL_EN, data & 0x40); // Bell
-	m_discrete->write(space, VIDEOPIN_BONG_EN, data & 0x20); // Bong
-	m_discrete->write(space, VIDEOPIN_ATTRACT_EN, data & 0x80);  // Attract
-	m_discrete->write(space, VIDEOPIN_VOL_DATA, data & 0x07);        // Vol0,1,2
+	m_discrete->write(VIDEOPIN_BELL_EN, data & 0x40); // Bell
+	m_discrete->write(VIDEOPIN_BONG_EN, data & 0x20); // Bong
+	m_discrete->write(VIDEOPIN_ATTRACT_EN, data & 0x80);  // Attract
+	m_discrete->write(VIDEOPIN_VOL_DATA, data & 0x07);        // Vol0,1,2
 }
 
 
 WRITE8_MEMBER(videopin_state::note_dvsr_w)
 {
 	/* note data */
-	m_discrete->write(space, VIDEOPIN_NOTE_DATA, ~data &0xff);
+	m_discrete->write(VIDEOPIN_NOTE_DATA, ~data &0xff);
 }
 
 
@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

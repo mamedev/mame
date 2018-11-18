@@ -1513,9 +1513,8 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL(7'372'800) / 2 / 6))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64k")
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	RAM(config, RAM_TAG).set_default_size("64K");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	// centronics printer
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
@@ -1536,11 +1535,11 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_EPSON_SIO_PIN(WRITELINE(*this, px4_state, sio_pin_w))
 
 	// rs232 port
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, px4_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, px4_state, rs232_dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, px4_state, rs232_dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, px4_state, rs232_cts_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(px4_state::rs232_rx_w));
+	m_rs232->dcd_handler().set(FUNC(px4_state::rs232_dcd_w));
+	m_rs232->dsr_handler().set(FUNC(px4_state::rs232_dsr_w));
+	m_rs232->cts_handler().set(FUNC(px4_state::rs232_cts_w));
 
 	// rom capsules
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px4_cart")
@@ -1556,7 +1555,7 @@ MACHINE_CONFIG_START(px4p_state::px4p)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(px4p_io)
 
-	MCFG_NVRAM_ADD_0FILL("rdnvram")
+	NVRAM(config, "rdnvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(px4p_state, px4p)

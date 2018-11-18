@@ -395,8 +395,8 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

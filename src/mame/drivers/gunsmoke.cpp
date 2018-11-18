@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(gunsmoke_state, irq0_line_hold,  4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(gunsmoke_state::gunsmoke)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.22)

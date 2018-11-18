@@ -14,15 +14,18 @@
         Intel Pentium Pro
         Intel Pentium II
         Intel Pentium III
+        Amd Athlon XP
         Intel Pentium 4
 */
 
 #include "emu.h"
 #include "i386.h"
+#include "i386priv.h"
+#include "x87priv.h"
+#include "cycles.h"
+#include "i386ops.h"
 
 #include "debugger.h"
-#include "i386priv.h"
-
 #include "debug/debugcpu.h"
 
 /* seems to be defined on mingw-gcc */
@@ -33,11 +36,12 @@ DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX
 DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
 DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
 DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
+DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
 DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
 DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentium Pro")
-DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
 DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
 DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
+DEFINE_DEVICE_TYPE(ATHLONXP,    athlonxp_device,    "athlonxp",    "Amd Athlon XP")
 DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Intel Pentium 4")
 
 
@@ -50,14 +54,11 @@ i386_device::i386_device(const machine_config &mconfig, const char *tag, device_
 i386_device::i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
-	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
+	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
 {
-	m_program_config.m_logaddr_width = 32;
-	m_program_config.m_page_shift = 12;
-
 	// 32 unified
 	set_vtlb_dynamic_entries(32);
 }
@@ -100,7 +101,12 @@ mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, d
 }
 
 pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM_PRO, tag, owner, clock)
+	: pentium_pro_device(mconfig, PENTIUM_PRO, tag, owner, clock)
+{
+}
+
+pentium_pro_device::pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pentium_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -112,17 +118,24 @@ pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char
 }
 
 pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM2, tag, owner, clock)
+	: pentium_pro_device(mconfig, PENTIUM2, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
 pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM3, tag, owner, clock)
+	: pentium_pro_device(mconfig, PENTIUM3, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
+}
+
+athlonxp_device::athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pentium_device(mconfig, ATHLONXP, tag, owner, clock)
+{
+	// TODO: put correct value
+	set_vtlb_dynamic_entries(256);
 }
 
 pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -143,10 +156,166 @@ device_memory_interface::space_config_vector i386_device::memory_space_config() 
 int i386_parity_table[256];
 MODRM_TABLE i386_MODRM_table[256];
 
-#define FAULT(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,0,error); return;}
-#define FAULT_EXP(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,trap_level+1,error); return;}
-
 /*************************************************************************/
+
+uint32_t i386_device::i386_translate(int segment, uint32_t ip, int rwn)
+{
+	// TODO: segment limit access size, execution permission, handle exception thrown from exception handler
+	if (PROTECTED_MODE && !V8086_MODE && (rwn != -1))
+	{
+		if (!(m_sreg[segment].valid))
+			FAULT_THROW((segment == SS) ? FAULT_SS : FAULT_GP, 0);
+		if (i386_limit_check(segment, ip))
+			FAULT_THROW((segment == SS) ? FAULT_SS : FAULT_GP, 0);
+		if ((rwn == 0) && ((m_sreg[segment].flags & 8) && !(m_sreg[segment].flags & 2)))
+			FAULT_THROW(FAULT_GP, 0);
+		if ((rwn == 1) && ((m_sreg[segment].flags & 8) || !(m_sreg[segment].flags & 2)))
+			FAULT_THROW(FAULT_GP, 0);
+	}
+	return m_sreg[segment].base + ip;
+}
+
+vtlb_entry i386_device::get_permissions(uint32_t pte, int wp)
+{
+	vtlb_entry ret = VTLB_READ_ALLOWED | ((pte & 4) ? VTLB_USER_READ_ALLOWED : 0);
+	if (!wp)
+		ret |= VTLB_WRITE_ALLOWED;
+	if (pte & 2)
+		ret |= VTLB_WRITE_ALLOWED | ((pte & 4) ? VTLB_USER_WRITE_ALLOWED : 0);
+	return ret;
+}
+
+bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_entry *entry)
+{
+	uint32_t a = *address;
+	uint32_t pdbr = m_cr[3] & 0xfffff000;
+	uint32_t directory = (a >> 22) & 0x3ff;
+	uint32_t table = (a >> 12) & 0x3ff;
+	vtlb_entry perm = 0;
+	bool ret;
+	bool user = (intention & TRANSLATE_USER_MASK) ? true : false;
+	bool write = (intention & TRANSLATE_WRITE) ? true : false;
+	bool debug = (intention & TRANSLATE_DEBUG_MASK) ? true : false;
+
+	if (!(m_cr[0] & 0x80000000))
+	{
+		if (entry)
+			*entry = 0x77;
+		return true;
+	}
+
+	uint32_t page_dir = m_program->read_dword(pdbr + directory * 4);
+	if (page_dir & 1)
+	{
+		if ((page_dir & 0x80) && (m_cr[4] & 0x10))
+		{
+			a = (page_dir & 0xffc00000) | (a & 0x003fffff);
+			if (debug)
+			{
+				*address = a;
+				return true;
+			}
+			perm = get_permissions(page_dir, WP);
+			if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+				ret = false;
+			else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+				ret = false;
+			else
+			{
+				if (write)
+					perm |= VTLB_FLAG_DIRTY;
+				if (!(page_dir & 0x40) && write)
+					m_program->write_dword(pdbr + directory * 4, page_dir | 0x60);
+				else if (!(page_dir & 0x20))
+					m_program->write_dword(pdbr + directory * 4, page_dir | 0x20);
+				ret = true;
+			}
+		}
+		else
+		{
+			uint32_t page_entry = m_program->read_dword((page_dir & 0xfffff000) + (table * 4));
+			if (!(page_entry & 1))
+				ret = false;
+			else
+			{
+				a = (page_entry & 0xfffff000) | (a & 0xfff);
+				if (debug)
+				{
+					*address = a;
+					return true;
+				}
+				perm = get_permissions(page_entry, WP);
+				if (write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+					ret = false;
+				else if (user && !(perm & VTLB_USER_READ_ALLOWED))
+					ret = false;
+				else
+				{
+					if (write)
+						perm |= VTLB_FLAG_DIRTY;
+					if (!(page_dir & 0x20))
+						m_program->write_dword(pdbr + directory * 4, page_dir | 0x20);
+					if (!(page_entry & 0x40) && write)
+						m_program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x60);
+					else if (!(page_entry & 0x20))
+						m_program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x20);
+					ret = true;
+				}
+			}
+		}
+	}
+	else
+		ret = false;
+	if (entry)
+		*entry = perm;
+	if (ret)
+		*address = a;
+	return ret;
+}
+
+//#define TEST_TLB
+
+bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
+{
+	if (!(m_cr[0] & 0x80000000)) // Some (very few) old OS's won't work with this
+		return true;
+
+	const vtlb_entry *table = vtlb_table();
+	uint32_t index = *address >> 12;
+	vtlb_entry entry = table[index];
+	if (type == TRANSLATE_FETCH)
+		type = TRANSLATE_READ;
+	if (pl == 3)
+		type |= TRANSLATE_USER_MASK;
+#ifdef TEST_TLB
+	uint32_t test_addr = *address;
+#endif
+
+	if (!(entry & VTLB_FLAG_VALID) || ((type & TRANSLATE_WRITE) && !(entry & VTLB_FLAG_DIRTY)))
+	{
+		if (!i386_translate_address(type, address, &entry))
+		{
+			*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
+			if (entry)
+				*error |= 1;
+			return false;
+		}
+		vtlb_dynload(index, *address, entry);
+		return true;
+	}
+	if (!(entry & (1 << type)))
+	{
+		*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0) | 1;
+		return false;
+	}
+	*address = (entry & 0xfffff000) | (*address & 0xfff);
+#ifdef TEST_TLB
+	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
+	if (!test_ret || (test_addr != *address))
+		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
+#endif
+	return true;
+}
 
 uint32_t i386_device::i386_load_protected_mode_segment(I386_SREG *seg, uint64_t *desc )
 {
@@ -248,11 +417,15 @@ void i386_device::i386_load_segment_descriptor(int segment )
 {
 	if (PROTECTED_MODE)
 	{
+		uint16_t old_flags = m_sreg[segment].flags;
 		if (!V8086_MODE)
 		{
-			i386_load_protected_mode_segment(&m_sreg[segment], nullptr );
-			if(m_sreg[segment].selector)
+			i386_load_protected_mode_segment(&m_sreg[segment], nullptr);
+			if (m_sreg[segment].selector)
+			{
 				i386_set_descriptor_accessed(m_sreg[segment].selector);
+				m_sreg[segment].flags |= 0x0001;
+			}
 		}
 		else
 		{
@@ -262,6 +435,8 @@ void i386_device::i386_load_segment_descriptor(int segment )
 			m_sreg[segment].d = 0;
 			m_sreg[segment].valid = true;
 		}
+		if (segment == CS && m_sreg[segment].flags != old_flags)
+			debugger_privilege_hook();
 	}
 	else
 	{
@@ -269,11 +444,11 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		m_sreg[segment].d = 0;
 		m_sreg[segment].valid = true;
 
-		if( segment == CS )
+		if (segment == CS)
 		{
-			if( !m_performed_intersegment_jump )
+			if (!m_performed_intersegment_jump)
 				m_sreg[segment].base |= 0xfff00000;
-			if(m_cpu_version < 0x500)
+			if (m_cpu_version < 0x500)
 				m_sreg[segment].flags = 0x93;
 		}
 	}
@@ -2813,48 +2988,6 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	CHANGE_PC(m_eip);
 }
 
-#include "cycles.h"
-
-#define CYCLES_NUM(x)   (m_cycles -= (x))
-
-void i386_device::CYCLES(int x)
-{
-	if (PROTECTED_MODE)
-	{
-		m_cycles -= m_cycle_table_pm[x];
-	}
-	else
-	{
-		m_cycles -= m_cycle_table_rm[x];
-	}
-}
-
-void i386_device::CYCLES_RM(int modrm, int r, int m)
-{
-	if (modrm >= 0xc0)
-	{
-		if (PROTECTED_MODE)
-		{
-			m_cycles -= m_cycle_table_pm[r];
-		}
-		else
-		{
-			m_cycles -= m_cycle_table_rm[r];
-		}
-	}
-	else
-	{
-		if (PROTECTED_MODE)
-		{
-			m_cycles -= m_cycle_table_pm[m];
-		}
-		else
-		{
-			m_cycles -= m_cycle_table_rm[m];
-		}
-	}
-}
-
 void i386_device::build_cycle_table()
 {
 	int i, j;
@@ -2904,7 +3037,6 @@ void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 #include "i486ops.hxx"
 #include "pentops.hxx"
 #include "x87ops.hxx"
-#include "i386ops.h"
 
 void i386_device::i386_decode_opcode()
 {
@@ -4033,6 +4165,24 @@ std::unique_ptr<util::disasm_interface> i386_device::create_disassembler()
 	return std::make_unique<i386_disassembler>(this);
 }
 
+void i386_device::opcode_cpuid()
+{
+	logerror("CPUID called with unsupported EAX=%08x at %08x!\n", REG32(EAX), m_eip);
+}
+
+uint64_t i386_device::opcode_rdmsr(bool &valid_msr)
+{
+	valid_msr = false;
+	logerror("RDMSR called with unsupported ECX=%08x at %08x!\n", REG32(ECX), m_eip);
+	return -1;
+}
+
+void i386_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
+{
+	valid_msr = false;
+	logerror("WRMSR called with unsupported ECX=%08x (%08x%08x) at %08x!\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_eip);
+}
+
 /*****************************************************************************/
 /* Intel 486 */
 
@@ -4171,6 +4321,98 @@ void pentium_device::device_reset()
 	CHANGE_PC(m_eip);
 }
 
+uint64_t pentium_device::opcode_rdmsr(bool &valid_msr)
+{
+	uint32_t offset = REG32(ECX);
+
+	switch (offset)
+	{
+		// Machine Check Exception (TODO)
+	case 0x00:
+		valid_msr = true;
+		popmessage("RDMSR: Reading P5_MC_ADDR");
+		return 0;
+	case 0x01:
+		valid_msr = true;
+		popmessage("RDMSR: Reading P5_MC_TYPE");
+		return 0;
+		// Time Stamp Counter
+	case 0x10:
+		valid_msr = true;
+		popmessage("RDMSR: Reading TSC");
+		return m_tsc;
+		// Event Counters (TODO)
+	case 0x11:  // CESR
+		valid_msr = true;
+		popmessage("RDMSR: Reading CESR");
+		return 0;
+	case 0x12:  // CTR0
+		valid_msr = true;
+		return m_perfctr[0];
+	case 0x13:  // CTR1
+		valid_msr = true;
+		return m_perfctr[1];
+	default:
+		if (!(offset & ~0xf)) // 2-f are test registers
+		{
+			valid_msr = true;
+			logerror("RDMSR: Reading test MSR %x", offset);
+			return 0;
+		}
+		logerror("RDMSR: invalid P5 MSR read %08x at %08x\n", offset, m_pc - 2);
+		valid_msr = false;
+		return 0;
+	}
+	return -1;
+}
+
+void pentium_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
+{
+	uint32_t offset = REG32(ECX);
+
+	switch (offset)
+	{
+		// Machine Check Exception (TODO)
+	case 0x00:
+		popmessage("WRMSR: Writing P5_MC_ADDR");
+		valid_msr = true;
+		break;
+	case 0x01:
+		popmessage("WRMSR: Writing P5_MC_TYPE");
+		valid_msr = true;
+		break;
+		// Time Stamp Counter
+	case 0x10:
+		m_tsc = data;
+		popmessage("WRMSR: Writing to TSC");
+		valid_msr = true;
+		break;
+		// Event Counters (TODO)
+	case 0x11:  // CESR
+		popmessage("WRMSR: Writing to CESR");
+		valid_msr = true;
+		break;
+	case 0x12:  // CTR0
+		m_perfctr[0] = data;
+		valid_msr = true;
+		break;
+	case 0x13:  // CTR1
+		m_perfctr[1] = data;
+		valid_msr = true;
+		break;
+	default:
+		if (!(offset & ~0xf)) // 2-f are test registers
+		{
+			valid_msr = true;
+			logerror("WRMSR: Writing test MSR %x", offset);
+			break;
+		}
+		logerror("WRMSR: invalid MSR write %08x (%08x%08x) at %08x\n", offset, (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
+		valid_msr = false;
+		break;
+	}
+}
+
 
 /*****************************************************************************/
 /* Cyrix MediaGX */
@@ -4306,6 +4548,69 @@ void pentium_pro_device::device_reset()
 	m_feature_flags = 0x000081bf;
 
 	CHANGE_PC(m_eip);
+}
+
+uint64_t pentium_pro_device::opcode_rdmsr(bool &valid_msr)
+{
+	uint32_t offset = REG32(ECX);
+
+	switch (offset)
+	{
+		// Machine Check Exception (TODO)
+	case 0x00:
+		valid_msr = true;
+		popmessage("RDMSR: Reading P5_MC_ADDR");
+		return 0;
+	case 0x01:
+		valid_msr = true;
+		popmessage("RDMSR: Reading P5_MC_TYPE");
+		return 0;
+		// Time Stamp Counter
+	case 0x10:
+		valid_msr = true;
+		popmessage("RDMSR: Reading TSC");
+		return m_tsc;
+		// Performance Counters (TODO)
+	case 0xc1:  // PerfCtr0
+		valid_msr = true;
+		return m_perfctr[0];
+	case 0xc2:  // PerfCtr1
+		valid_msr = true;
+		return m_perfctr[1];
+	default:
+		logerror("RDMSR: unimplemented register called %08x at %08x\n", offset, m_pc - 2);
+		valid_msr = true;
+		return 0;
+	}
+	return -1;
+}
+
+void pentium_pro_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
+{
+	uint32_t offset = REG32(ECX);
+
+	switch (offset)
+	{
+		// Time Stamp Counter
+	case 0x10:
+		m_tsc = data;
+		popmessage("WRMSR: Writing to TSC");
+		valid_msr = true;
+		break;
+		// Performance Counters (TODO)
+	case 0xc1:  // PerfCtr0
+		m_perfctr[0] = data;
+		valid_msr = true;
+		break;
+	case 0xc2:  // PerfCtr1
+		m_perfctr[1] = data;
+		valid_msr = true;
+		break;
+	default:
+		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", offset, (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
+		valid_msr = true;
+		break;
+	}
 }
 
 
@@ -4513,6 +4818,76 @@ void pentium3_device::device_reset()
 }
 
 /*****************************************************************************/
+/* AMD Athlon XP
+   Model: Athlon XP 2400+
+   Part number: AXDA2400DKV3C
+   Stepping code: AIUCP
+   Date code: 0240MPMW
+*/
+
+void athlonxp_device::device_start()
+{
+	i386_common_init();
+	register_state_i386_x87_xmm();
+
+	build_x87_opcode_table();
+	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_PENTIUM].get();  // TODO: generate own cycle tables
+}
+
+void athlonxp_device::device_reset()
+{
+	zero_state();
+
+	m_sreg[CS].selector = 0xf000;
+	m_sreg[CS].base = 0xffff0000;
+	m_sreg[CS].limit = 0xffff;
+	m_sreg[CS].flags = 0x0093;
+
+	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
+	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
+
+	m_idtr.base = 0;
+	m_idtr.limit = 0x3ff;
+
+	m_a20_mask = ~0;
+
+	m_cr[0] = 0x60000010;
+	m_eflags = 0x00200000;
+	m_eflags_mask = 0x00277fd7; /* TODO: is this correct? */
+	m_eip = 0xfff0;
+	m_mxcsr = 0x1f80;
+	m_smm = false;
+	m_smi_latched = false;
+	m_smbase = 0x30000;
+	m_nmi_masked = false;
+	m_nmi_latched = false;
+
+	x87_reset();
+
+	// [11:8] Family
+	// [ 7:4] Model
+	// [ 3:0] Stepping ID
+	// Family 6, Model 8, Stepping 1
+	REG32(EAX) = 0;
+	REG32(EDX) = (6 << 8) | (8 << 4) | (1);
+
+	m_cpuid_id0 = ('h' << 24) | ('t' << 16) | ('u' << 8) | 'A';   // Auth
+	m_cpuid_id1 = ('i' << 24) | ('t' << 16) | ('n' << 8) | 'e';   // enti
+	m_cpuid_id2 = ('D' << 24) | ('M' << 16) | ('A' << 8) | 'c';   // cAMD
+
+	m_cpuid_max_input_value_eax = 0x01;
+	m_cpu_version = REG32(EDX);
+
+	// see FEATURE_FLAGS enum for bit names
+	m_feature_flags = 0x0383fbff;
+
+	CHANGE_PC(m_eip);
+}
+
+/*****************************************************************************/
 /* Intel Pentium 4 */
 
 void pentium4_device::device_start()
@@ -4578,4 +4953,27 @@ void pentium4_device::device_reset()
 	m_feature_flags = 0x00000001;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
+}
+
+uint64_t pentium4_device::opcode_rdmsr(bool &valid_msr)
+{
+	switch (REG32(ECX))
+	{
+	default:
+		logerror("RDMSR: unimplemented register called %08x at %08x\n", REG32(ECX), m_pc - 2);
+		valid_msr = true;
+		return 0;
+	}
+	return -1;
+}
+
+void pentium4_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
+{
+	switch (REG32(ECX))
+	{
+	default:
+		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);
+		valid_msr = true;
+		break;
+	}
 }

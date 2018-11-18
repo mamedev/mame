@@ -245,11 +245,11 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, compgolf_state, compgolf_scrollx_lo_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, compgolf_state, compgolf_scrolly_lo_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ymsnd.irq_handler().set_inputline(m_maincpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(compgolf_state::compgolf_scrollx_lo_w));
+	ymsnd.port_b_write_callback().set(FUNC(compgolf_state::compgolf_scrolly_lo_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

@@ -255,8 +255,7 @@ void decwriter_state::la120_mem(address_map &map)
 void decwriter_state::la120_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).mirror(0x7C).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)); // 8251 Data
-	map(0x01, 0x01).mirror(0x7C).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)); // 8251 Status/Control
+	map(0x00, 0x01).mirror(0x7C).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // 8251 Status/Control
 	//map(0x02, 0x02).mirror(0x7D); // other io ports, serial loopback etc, see table 4-9 in TM
 	// 0x80-0xff are reserved for expansion (i.e. unused, open bus)
 	map.global_mask(0xff);
@@ -447,22 +446,22 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* i8251 */
-	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'000'000) / 9)
+	I8251(config, "usart", XTAL(18'000'000) / 9);
 	/*
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainint", input_merger_device, in_w<1>))
+	usart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	usart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	usart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	usart.rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<1>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("usart", FUNC(i8251_device::write_dsr));
 	*/
 
-	MCFG_DEVICE_ADD("nvm", ER1400, 0)
+	ER1400(config, m_nvm);
 MACHINE_CONFIG_END
 
 

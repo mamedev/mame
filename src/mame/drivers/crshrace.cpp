@@ -444,9 +444,9 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -553,5 +553,5 @@ void crshrace_state::init_crshrace2()
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

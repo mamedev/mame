@@ -160,7 +160,7 @@ void wrally_state::wrally_map(address_map &map)
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
-	map(0x70000c, 0x70000d).w(FUNC(wrally_state::okim6295_bankswitch_w));                                /* OKI6295 bankswitch */
+	map(0x70000d, 0x70000d).w(FUNC(wrally_state::okim6295_bankswitch_w));                                /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  /* OKI6295 status/data register */
 	map(0xfec000, 0xfeffff).ram().share("shareram");                                        /* Work RAM (shared with DS5002FP) */
 }
@@ -253,10 +253,8 @@ static const gfx_layout wrally_tilelayout16 =
 	RGN_FRAC(1,2),                          /* number of tiles */
 	4,                                      /* 4 bpp */
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-		16*16+0, 16*16+1, 16*16+2, 16*16+3, 16*16+4, 16*16+5, 16*16+6, 16*16+7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(0,1), STEP8(16*16,1) },
+	{ STEP16(0,16) },
 	64*8
 };
 
@@ -287,15 +285,15 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	MCFG_PALETTE_ADD("palette", 1024*8)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wrally_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wrally_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wrally_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, wrally_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)                                                  /* Sound muting */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wrally_state, flipscreen_w))                 /* Flip screen */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)                                                  /* ??? */
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)                                                  /* ??? */
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set(FUNC(wrally_state::coin1_lockout_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(wrally_state::coin2_lockout_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(wrally_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(wrally_state::coin2_counter_w));
+	m_outlatch->q_out_cb<4>().set_nop();                                /* Sound muting */
+	m_outlatch->q_out_cb<5>().set(FUNC(wrally_state::flipscreen_w));    /* Flip screen */
+	m_outlatch->q_out_cb<6>().set_nop();                                /* ??? */
+	m_outlatch->q_out_cb<7>().set_nop();                                /* ??? */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

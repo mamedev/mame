@@ -32,7 +32,6 @@ private:
 	DECLARE_WRITE8_MEMBER(skykid_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(skykid_irq_1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(skykid_irq_2_ctrl_w);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_READ8_MEMBER(skykid_videoram_r);
 	DECLARE_WRITE8_MEMBER(skykid_videoram_w);
 	DECLARE_READ8_MEMBER(skykid_textram_r);
@@ -48,7 +47,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 	void skykid_map(address_map &map);
 
 	virtual void machine_start() override;

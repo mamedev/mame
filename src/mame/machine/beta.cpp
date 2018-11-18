@@ -72,7 +72,7 @@ void beta_disk_device::disable()
 READ8_MEMBER(beta_disk_device::status_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->status_r(space, 0);
+		return m_wd179x->status_r();
 	} else {
 		return 0xff;
 	}
@@ -81,7 +81,7 @@ READ8_MEMBER(beta_disk_device::status_r)
 READ8_MEMBER(beta_disk_device::track_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->track_r(space, 0);
+		return m_wd179x->track_r();
 	} else {
 		return 0xff;
 	}
@@ -90,7 +90,7 @@ READ8_MEMBER(beta_disk_device::track_r)
 READ8_MEMBER(beta_disk_device::sector_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->sector_r(space, 0);
+		return m_wd179x->sector_r();
 	} else {
 		return 0xff;
 	}
@@ -99,7 +99,7 @@ READ8_MEMBER(beta_disk_device::sector_r)
 READ8_MEMBER(beta_disk_device::data_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->data_r(space, 0);
+		return m_wd179x->data_r();
 	} else {
 		return 0xff;
 	}
@@ -146,28 +146,28 @@ WRITE8_MEMBER(beta_disk_device::param_w)
 WRITE8_MEMBER(beta_disk_device::command_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->cmd_w(space, 0, data);
+		m_wd179x->cmd_w(data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::track_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->track_w(space, 0, data);
+		m_wd179x->track_w(data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::sector_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->sector_w(space, 0, data);
+		m_wd179x->sector_w(data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::data_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->data_w(space, 0, data);
+		m_wd179x->data_w(data);
 	}
 }
 
@@ -267,17 +267,14 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(beta_disk_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("wd179x", KR1818VG93, 8_MHz_XTAL / 8)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void beta_disk_device::device_add_mconfig(machine_config &config)
+{
+	KR1818VG93(config, m_wd179x, 8_MHz_XTAL / 8);
+	FLOPPY_CONNECTOR(config, m_floppy0, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy2, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy3, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+}
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

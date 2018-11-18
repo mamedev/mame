@@ -615,10 +615,11 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, pinball2k_state, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	RAMDAC(config, m_ramdac, 0, m_palette);
+	m_ramdac->set_addrmap(0, &pinball2k_state::ramdac_map);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

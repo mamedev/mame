@@ -380,7 +380,7 @@ void peplus_state::load_superdata(const char *bank_name)
 
 WRITE8_MEMBER(peplus_state::bgcolor_w)
 {
-	for (int i = 0; i < m_palette->entries(); i++)
+	for (int i = 0; i < m_palette->entries() / 16; i++)
 	{
 		/* red component */
 		int bit0 = (~data >> 0) & 0x01;
@@ -1376,7 +1376,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, peplus_state, paldata_w<0>))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, peplus_state, paldata_w<1>))
 
-	MCFG_NVRAM_ADD_0FILL("cmos")
+	NVRAM(config, "cmos", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -1401,8 +1401,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(20'000'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	AY8912(config, "aysnd", XTAL(20'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.75);
 MACHINE_CONFIG_END
 
 
@@ -1480,7 +1479,7 @@ ROM_END
 
 ROM_START( peset004 ) /* Normal board : Set Chip (Set004) - PE+ Set Denomination / Enable Validator */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "set004.u68",   0x00000, 0x10000, CRC(b5729571) SHA1(fa3bb1fec81692a898213f9521ac0b2a4d1a8968) )
+	ROM_LOAD( "set004.u68",   0x00000, 0x10000, CRC(b5729571) SHA1(fa3bb1fec81692a898213f9521ac0b2a4d1a8968) ) /*  09/17/93   @ IGT  L93-1722  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) ) /*  08/12/87   @ IGT  L87-2243  */
@@ -1520,7 +1519,19 @@ ROM_START( peset022 ) /* Normal board : Set Chip (Set022) - PE+ Set Denomination
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
-/* Known to exsist SET033 - PE+ Set Denomination / Enable Validator / SAS 4.0 */
+ROM_START( peset033 ) /* Normal board : Set Chip (Set033) - PE+ Set Denomination / Enable Validator / SAS 4.0 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "set033.u68",   0x00000, 0x10000, CRC(de9a5cc8) SHA1(7fab3334f212d9db78e9e348790dfaa0c9c5ec66) ) /*  02/04/97   @ IGT  NV  */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) ) /*  08/12/87   @ IGT  L87-2243  */
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+ROM_END
 
 ROM_START( peset038 ) /* Normal board : Set Chip (Set038) - PE+ Set Denomination / Enable Validator */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -14262,6 +14273,7 @@ GAMEL( 1987, peset001, 0,         peplus, peplus_schip,  peplus_state, init_pepl
 GAMEL( 1987, peset004, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET004) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
 GAMEL( 1987, peset012, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET012) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
 GAMEL( 1987, peset022, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET022) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
+GAMEL( 1987, peset033, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET033) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
 GAMEL( 1987, peset038, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET038) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
 GAMEL( 1987, peset100, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET100) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )
 GAMEL( 1987, peset117, 0,         peplus, peplus_schip,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (SET117) Set Chip",                      MACHINE_SUPPORTS_SAVE,   layout_pe_schip )

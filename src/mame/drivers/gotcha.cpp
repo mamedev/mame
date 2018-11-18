@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

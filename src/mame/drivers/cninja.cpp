@@ -315,8 +315,6 @@ void cninja_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void cninja_state::sound_map_mutantf(address_map &map)
@@ -328,8 +326,6 @@ void cninja_state::sound_map_mutantf(address_map &map)
 	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void cninja_state::stoneage_s_map(address_map &map)
@@ -801,8 +797,9 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(cninja_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1042,8 +1039,8 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
@@ -1061,8 +1058,9 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(edrandy_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1148,8 +1146,10 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(robocop2_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1246,8 +1246,10 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_DEVICE_PROGRAM_MAP(mutantf_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cninja_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map_mutantf)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map_mutantf);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -45,11 +45,11 @@
 
 		<!-- DL1414 left/right -->
 		<repeat count="2">
-			<param name="digitno" start="3" increment="4" />
-			<param name="digitx" start="65" increment="139" />
+			<param name="moduleno" start="3" increment="4" />
+			<param name="modulex" start="65" increment="139" />
 			<repeat count="4">
-				<param name="digitno" start="~digitno~" increment="-1" />
-				<param name="digitx" start="~digitx~" increment="34" />
+				<param name="digitno" start="~moduleno~" increment="-1" />
+				<param name="digitx" start="~modulex~" increment="34" />
 				<bezel name="digit~digitno~" element="a_digit">
 					<bounds x="~digitx~" y="70" width="25" height="50" />
 				</bezel>

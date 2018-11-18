@@ -399,11 +399,11 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD(m_nmi_timer, exterm_state, master_sound_nmi_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048+32768)

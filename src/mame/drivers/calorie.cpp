@@ -494,16 +494,13 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("ay3", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(calorie_state::caloriee)

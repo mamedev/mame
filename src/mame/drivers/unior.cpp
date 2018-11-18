@@ -110,8 +110,7 @@ void unior_state::unior_io(address_map &map)
 	map(0x50, 0x50).w(FUNC(unior_state::scroll_w));
 	map(0x60, 0x61).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0xdc, 0xdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xec, 0xec).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xed, 0xed).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xec, 0xed).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */
@@ -409,24 +408,24 @@ MACHINE_CONFIG_START(unior_state::unior)
 	m_pit->set_clk<2>(16_MHz_XTAL / 9 / 64); // unknown frequency
 	m_pit->out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 
-	MCFG_DEVICE_ADD("ppi0", I8255, 0)
+	i8255_device &ppi0(I8255(config, "ppi0"));
 	// ports a & c connect to an external slot
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, unior_state, ppi0_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, unior_state, ppi0_b_w))
+	ppi0.in_pb_callback().set(FUNC(unior_state::ppi0_b_r));
+	ppi0.out_pb_callback().set(FUNC(unior_state::ppi0_b_w));
 
-	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	i8255_device &ppi1(I8255(config, "ppi1"));
 	// ports a & b are for the keyboard
 	// port c operates various control lines for mostly unknown purposes
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, unior_state, ppi1_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, unior_state, ppi1_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, unior_state, ppi1_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, unior_state, ppi1_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, unior_state, ppi1_c_w))
+	ppi1.in_pa_callback().set(FUNC(unior_state::ppi1_a_r));
+	ppi1.in_pb_callback().set(FUNC(unior_state::ppi1_b_r));
+	ppi1.in_pc_callback().set(FUNC(unior_state::ppi1_c_r));
+	ppi1.out_pa_callback().set(FUNC(unior_state::ppi1_a_w));
+	ppi1.out_pc_callback().set(FUNC(unior_state::ppi1_c_w));
 
-	MCFG_DEVICE_ADD("dma", I8257, XTAL(20'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, unior_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, unior_state, dma_r))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8("crtc", i8275_device, dack_w))
+	I8257(config, m_dma, XTAL(20'000'000) / 9);
+	m_dma->out_hrq_cb().set(FUNC(unior_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(unior_state::dma_r));
+	m_dma->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
 
 	MCFG_DEVICE_ADD("crtc", I8275, XTAL(20'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)

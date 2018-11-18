@@ -38,6 +38,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
+		, m_ppi(*this, "ppi%u", 1U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_gfx0_vram(*this, "gfx0_vram")
 		, m_gfx0_cram(*this, "gfx0_cram")
@@ -77,6 +78,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device_array<i8255_device, 2> m_ppi;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint8_t> m_gfx0_vram;

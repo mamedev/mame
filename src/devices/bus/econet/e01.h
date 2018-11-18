@@ -92,8 +92,7 @@ private:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<input_buffer_device> m_scsi_ctrl_in;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
 

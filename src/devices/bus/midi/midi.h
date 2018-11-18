@@ -21,11 +21,12 @@ class midi_port_device : public device_t,
 	friend class device_midi_port_interface;
 
 public:
-	midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~midi_port_device();
 
 	// static configuration helpers
 	template <class Object> devcb_base &set_rx_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	auto rxd_handler() { return m_rxd_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 
@@ -61,7 +62,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(MIDI_PORT, midi_port_device)
 
-void midiin_slot(device_slot_interface &device);
-void midiout_slot(device_slot_interface &device);
+device_slot_interface &midiin_slot(device_slot_interface &device);
+device_slot_interface &midiout_slot(device_slot_interface &device);
 
 #endif // MAME_BUS_MIDI_MIDI_H

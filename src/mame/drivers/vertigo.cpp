@@ -113,11 +113,11 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	MCFG_DEVICE_PROGRAM_MAP(vertigo_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
 
-	MCFG_DEVICE_ADD("adc", ADC0808, 24_MHz_XTAL / 30) // E clock from 68000
-	MCFG_ADC0808_EOC_FF_CB(WRITELINE(*this, vertigo_state, adc_eoc_w))
-	MCFG_ADC0808_IN0_CB(IOPORT("P1X"))
-	MCFG_ADC0808_IN1_CB(IOPORT("P1Y"))
-	MCFG_ADC0808_IN2_CB(IOPORT("PADDLE"))
+	ADC0808(config, m_adc, 24_MHz_XTAL / 30); // E clock from 68000
+	m_adc->eoc_ff_callback().set(FUNC(vertigo_state::adc_eoc_w));
+	m_adc->in_callback<0>().set_ioport("P1X");
+	m_adc->in_callback<1>().set_ioport("P1Y");
+	m_adc->in_callback<2>().set_ioport("PADDLE");
 	// IN3-IN7 tied to Vss
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -127,20 +127,20 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(24_MHz_XTAL / 100)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vertigo_state, v_irq4_w))
-	MCFG_PIT8253_CLK1(24_MHz_XTAL / 100)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, vertigo_state, v_irq3_w))
-	MCFG_PIT8253_CLK2(24_MHz_XTAL / 100)
+	pit8254_device &pit(PIT8254(config, "pit", 0));
+	pit.set_clk<0>(24_MHz_XTAL / 100);
+	pit.out_handler<0>().set(FUNC(vertigo_state::v_irq4_w));
+	pit.set_clk<1>(24_MHz_XTAL / 100);
+	pit.out_handler<1>().set(FUNC(vertigo_state::v_irq3_w));
+	pit.set_clk<2>(24_MHz_XTAL / 100);
 
-	MCFG_DEVICE_ADD("74148", TTL74148, 0)
-	MCFG_74148_OUTPUT_CB(vertigo_state, update_irq)
+	TTL74148(config, m_ttl74148, 0);
+	m_ttl74148->out_cb().set(FUNC(vertigo_state::update_irq));
 
 	/* motor controller */
-	MCFG_DEVICE_ADD("motorcpu", M68705P3, 24_MHz_XTAL / 6)
+	M68705P3(config, "motorcpu", 24_MHz_XTAL / 6);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

@@ -1809,12 +1809,12 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	device = &YM2149(config, m_ym2149[0], 1000000);
+	YM2149(config, m_ym2149[0], 1000000);
 	m_ym2149[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	m_ym2149[0]->port_a_read_callback().set_ioport("DSW1");
+	m_ym2149[0]->port_b_read_callback().set_ioport("DSW2");
 
-	MCFG_DEVICE_ADD(m_ym2149[1], YM2149, 1000000)
+	YM2149(config, m_ym2149[1], 1000000);
 	m_ym2149[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	OKIM6295(config, m_oki[0], 12000000/6, okim6295_device::PIN7_LOW);
@@ -1841,7 +1841,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
-	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1881,10 +1881,10 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	YM2149(config, m_ym2149[0], XTAL(12'000'000)/6); /* verified on pcb */
 	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	device = &YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
+	YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
 	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
+	m_ym2149[1]->port_a_read_callback().set(FUNC(kaneko16_state::eeprom_r));    /* inputs  A:  0,EEPROM bit read */
+	m_ym2149[1]->port_b_write_callback().set(FUNC(kaneko16_state::eeprom_w)); /* outputs B:  0,EEPROM reset */
 
 	OKIM6295(config, m_oki[0], XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH); /* verified on pcb */
 	m_oki[0]->set_addrmap(0, &kaneko16_state::bakubrkr_oki1_map);
@@ -1949,8 +1949,8 @@ MACHINE_CONFIG_START(kaneko16_state::blazeon)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD(m_ymsnd, YM2151, 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2004,8 +2004,8 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	YM2151(config, m_ymsnd, XTAL(16'000'000)/4);
 	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.4);
@@ -2050,7 +2050,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2159,7 +2159,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2199,10 +2199,10 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	YM2149(config, m_ym2149[0], XTAL(12'000'000)/6); /* verified on pcb */
 	m_ym2149[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	device = &YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
+	YM2149(config, m_ym2149[1], XTAL(12'000'000)/6); /* verified on pcb */
 	m_ym2149[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
+	m_ym2149[1]->port_a_read_callback().set(FUNC(kaneko16_state::eeprom_r));    /* inputs  A:  0,EEPROM bit read */
+	m_ym2149[1]->port_b_write_callback().set(FUNC(kaneko16_state::eeprom_w)); /* outputs B:  0,EEPROM reset */
 
 	OKIM6295(config, m_oki[0], XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH); /* verified on pcb */
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -2278,8 +2278,7 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
-	m_eeprom->set_default_data(shogwarr_default_eeprom, 128);
+	EEPROM_93C46_16BIT(config, m_eeprom).default_data(shogwarr_default_eeprom, 128);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2346,12 +2345,13 @@ void kaneko16_shogwarr_state::brapboys_oki2_map(address_map &map)
 	map(0x20000, 0x3ffff).bankr("okibank2");
 }
 
-MACHINE_CONFIG_START(kaneko16_shogwarr_state::brapboys)
+void kaneko16_shogwarr_state::brapboys(machine_config &config)
+{
 	shogwarr(config);
 	m_oki[1]->set_addrmap(0, &kaneko16_shogwarr_state::brapboys_oki2_map);
 	m_kaneko_hit->set_type(2);
-	m_eeprom->set_default_data(brapboys_default_eeprom, 128);
-MACHINE_CONFIG_END
+	m_eeprom->default_data(brapboys_default_eeprom, 128);
+}
 
 /***************************************************************************
 
@@ -3575,7 +3575,7 @@ Notes:
             M2B0X0.U93     27C010 (1M)           |
             M2B1X0.U94     27C010 (1M)           /
 
-            M2-100-00.U48  8M MASKROM (32-Pin)   \
+            M2-100-00.U48  8M mask ROM (32-Pin)  \
             M2W1A1.U47     27C040 (4M)           /  Oki Samples
 
 ***************************************************************************/

@@ -24,6 +24,9 @@ INPUT_PORTS_EXTERN(matrix_ch);
 INPUT_PORTS_EXTERN(matrix_no);
 INPUT_PORTS_EXTERN(matrix_gb);
 
+INPUT_PORTS_EXTERN(a1000_keypad);
+INPUT_PORTS_EXTERN(remove_keypad);
+
 } } } // namespace bus::amiga::keyboard
 
 #endif // MAME_BUS_AMIGA_KEYBOARD_MATRIX_H

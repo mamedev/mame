@@ -51,6 +51,22 @@ void device_video_interface::set_screen(const char *tag)
 
 
 //-------------------------------------------------
+//  interface_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void device_video_interface::interface_config_complete()
+{
+	// find the screen if explicitly configured
+	if (m_screen_tag && strcmp(m_screen_tag, s_unconfigured_screen_tag) != 0)
+		m_screen = m_screen_base->subdevice<screen_device>(m_screen_tag);
+
+	// device_config_complete may now do whatever it needs to with the screen
+}
+
+
+//-------------------------------------------------
 //  interface_validity_check - validation for a
 //  device after the configuration has been
 //  constructed

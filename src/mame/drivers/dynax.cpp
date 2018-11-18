@@ -4203,7 +4203,7 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")    // no battery
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);    // no battery
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4256,7 +4256,7 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4296,14 +4296,14 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 
 	AY8912(config, "aysnd", 22000000 / 8).add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ym2203", YM2203, 22000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW0"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym2203(YM2203(config, "ym2203", 22000000 / 8));
+	ym2203.irq_handler().set("mainirq", FUNC(rst_pos_buffer_device::rst1_w));
+	ym2203.port_a_read_callback().set_ioport("DSW1");
+	ym2203.port_b_read_callback().set_ioport("DSW0");
+	ym2203.add_route(0, "mono", 0.20);
+	ym2203.add_route(1, "mono", 0.20);
+	ym2203.add_route(2, "mono", 0.20);
+	ym2203.add_route(3, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int))          /* IRQ handler */
@@ -4328,13 +4328,9 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hnoridur_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::hnoridur_banked_map).set_data_width(8).set_addr_width(20).set_stride(0x8000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4371,12 +4367,11 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(22'000'000) / 16)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8912_device &ay8912(AY8912(config, "aysnd", XTAL(22'000'000) / 16));
+	ay8912.port_a_read_callback().set_ioport("DSW0");
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int))          /* IRQ handler */
@@ -4400,13 +4395,9 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hjingi)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hjingi_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::hjingi_banked_map).set_data_width(8).set_addr_width(20).set_stride(0x8000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4445,12 +4436,11 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(22'000'000) / 16)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8912_device &ay8912(AY8912(config, "aysnd", XTAL(22'000'000) / 16));
+	ay8912.port_a_read_callback().set_ioport("DSW0");
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(3'579'545) )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ym2413", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000) )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int))          /* IRQ handler */
@@ -4474,7 +4464,7 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4509,14 +4499,14 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2203", YM2203, 22000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("mainirq", rst_pos_buffer_device, rst1_w))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
+	ym2203_device &ym2203(YM2203(config, "ym2203", 22000000 / 8));
+	ym2203.irq_handler().set("mainirq", FUNC(rst_pos_buffer_device::rst1_w));
+	ym2203.port_a_read_callback().set_ioport("DSW0");
+	ym2203.port_b_read_callback().set_ioport("DSW1");
+	ym2203.add_route(0, "mono", 0.20);
+	ym2203.add_route(1, "mono", 0.20);
+	ym2203.add_route(2, "mono", 0.20);
+	ym2203.add_route(3, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -4540,7 +4530,7 @@ MACHINE_CONFIG_START(dynax_state::mjfriday)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	LS259(config, m_mainlatch); // IC15
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::mjdialq2_blit_dest1_w));
@@ -4576,8 +4566,7 @@ MACHINE_CONFIG_START(dynax_state::mjfriday)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 24000000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ym2413", 24000000/6).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -4609,8 +4598,6 @@ MACHINE_CONFIG_START(dynax_state::yarunara)
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(yarunara_banked_map)
 
-	MCFG_NVRAM_REPLACE_0FILL("nvram")
-
 	MCFG_DEVICE_REMOVE("outlatch") // ???
 
 	m_screen->set_visarea(0, 336-1, 8, 256-1-8-1);
@@ -4622,8 +4609,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dynax_state::mjangels)
 	yarunara(config);
 	MCFG_DEVICE_MODIFY("bankdev")
-	MCFG_DEVICE_PROGRAM_MAP(mjangels_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
+	m_bankdev->set_map(&dynax_state::mjangels_banked_map).set_addr_width(21);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dynax_state::quiztvqq)
@@ -4698,7 +4684,7 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,jantouki)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	RST_POS_BUFFER(config, m_mainirq, 0).int_callback().set_inputline(m_maincpu, 0);
 
@@ -4756,12 +4742,12 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 
 	AY8912(config, "aysnd", 22000000 / 8).add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ym2203", YM2203, 22000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", rst_pos_buffer_device, rst1_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym2203(YM2203(config, "ym2203", 22000000 / 8));
+	ym2203.irq_handler().set("soundirq", FUNC(rst_pos_buffer_device::rst1_w));
+	ym2203.add_route(0, "mono", 0.20);
+	ym2203.add_route(1, "mono", 0.20);
+	ym2203.add_route(2, "mono", 0.20);
+	ym2203.add_route(3, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dynax_state, adpcm_int_cpu1))         /* IRQ handler */
@@ -4877,16 +4863,12 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	MCFG_TLCS90_PORT_P8_READ_CB(READ8(*this, dynax_state, tenkai_p8_r))
 	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(*this, dynax_state, tenkai_p8_w))
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(tenkai_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::tenkai_banked_map).set_data_width(8).set_addr_width(20).set_stride(0x8000);
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	LS259(config, m_mainlatch); // 10C on Ougon no Hai
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)).invert();
@@ -4919,13 +4901,12 @@ MACHINE_CONFIG_START(dynax_state::tenkai)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 22000000 / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dynax_state, tenkai_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, dynax_state, tenkai_dswsel_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &ay8910(AY8910(config, "aysnd", 22000000 / 16));
+	ay8910.port_a_read_callback().set(FUNC(dynax_state::tenkai_dsw_r));
+	ay8910.port_b_write_callback().set(FUNC(dynax_state::tenkai_dswsel_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* devices */
 	MSM6242(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
@@ -4938,11 +4919,11 @@ MACHINE_CONFIG_START(dynax_state::majrjhdx)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dynax_state::mjreach)
+void dynax_state::mjreach(machine_config &config)
+{
 	tenkai(config);
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, dynax_state, flipscreen_w)) // not inverted
-MACHINE_CONFIG_END
+	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)); // not inverted
+}
 
 /***************************************************************************
                                 Mahjong Gekisha
@@ -4955,16 +4936,12 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 	MCFG_DEVICE_PROGRAM_MAP(gekisha_map)
 	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, dynax_state, gekisha_p4_w))
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(gekisha_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&dynax_state::gekisha_banked_map).set_data_width(8).set_addr_width(17).set_stride(0x8000);
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::mjdialq2_blit_dest1_w));
@@ -4998,13 +4975,12 @@ MACHINE_CONFIG_START(dynax_state::gekisha)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000) / 16)    // ?
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, dynax_state, tenkai_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, dynax_state, tenkai_dswsel_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &ay8910(AY8910(config, "aysnd", XTAL(24'000'000) / 16));    // ?
+	ay8910.port_a_read_callback().set(FUNC(dynax_state::tenkai_dsw_r));
+	ay8910.port_b_write_callback().set(FUNC(dynax_state::tenkai_dswsel_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(24'000'000) / 8) // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ym2413", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0); // ?
 MACHINE_CONFIG_END
 
 
@@ -6816,8 +6792,8 @@ Notes:
       ROMs          - Filename           Device
                       ----------------------------------------------------
                       TAICOM-00.2C     - ST M27C2001 256K x8 EPROM (DIP32)
-                      TAICOM-01.15B    - 4MBit MASKROM (DIP32)
-                      TAICOM-02.11B    - 4MBit MASKROM (DIP32)
+                      TAICOM-01.15B    - 4MBit mask ROM (DIP32)
+                      TAICOM-02.11B    - 4MBit mask ROM (DIP32)
                       TAICOM-03.13B    - AMD AM27C040 512K x8 EPROM (DIP32)
                       TMP91P640N-10.5B - Internal 16K ROM from MCU
 

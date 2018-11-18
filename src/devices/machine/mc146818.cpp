@@ -556,7 +556,7 @@ READ8_MEMBER( mc146818_device::read_direct )
 		break;
 
 	default:
-		data = m_data[m_index];
+		data = m_data[offset];
 		break;
 	}
 
@@ -617,7 +617,7 @@ WRITE8_MEMBER( mc146818_device::write_direct )
 		break;
 
 	default:
-		m_data[m_index] = data;
+		m_data[offset] = data;
 		break;
 	}
 }

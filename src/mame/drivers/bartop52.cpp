@@ -162,7 +162,6 @@ MACHINE_CONFIG_START(bartop52_state::a5200)
 	MCFG_POKEY_INTERRUPT_CB(bartop52_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
 MACHINE_CONFIG_END
 
 ROM_START(barbball)

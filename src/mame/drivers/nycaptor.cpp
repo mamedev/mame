@@ -769,23 +769,23 @@ MACHINE_CONFIG_START(nycaptor_state::nycaptor)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay1(AY8910(config, "ay1", 8000000/4));
+	ay1.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay2(AY8910(config, "ay2", 8000000/4));
+	ay2.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */
@@ -843,23 +843,23 @@ MACHINE_CONFIG_START(nycaptor_state::cyclshtg)
 
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay1(AY8910(config, "ay1", 8000000/4));
+	ay1.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay2(AY8910(config, "ay2", 8000000/4));
+	ay2.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */
@@ -912,23 +912,23 @@ MACHINE_CONFIG_START(nycaptor_state::bronx)
 
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay1(AY8910(config, "ay1", 8000000/4));
+	ay1.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay2(AY8910(config, "ay2", 8000000/4));
+	ay2.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */

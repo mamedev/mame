@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	MCFG_DEVICE_PROGRAM_MAP(triplhnt_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // battery-backed 74C89 at J5
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // battery-backed 74C89 at J5
 
 	F9334(config, m_latch); // J7
 	m_latch->q_out_cb<0>().set_nop(); // unused
@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	m_latch->q_out_cb<7>().set([this] (int state) { m_sprite_bank = state; });
 	m_latch->q_out_cb<7>().append(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_BEAR_EN>)); // bear
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

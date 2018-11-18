@@ -97,19 +97,6 @@ void adam_fdc_device::adam_fdc_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( fdc6801_io )
-//-------------------------------------------------
-
-void adam_fdc_device::adam_fdc_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(adam_fdc_device::p1_r), FUNC(adam_fdc_device::p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_fdc_device::p2_r), FUNC(adam_fdc_device::p2_w));
-	map(M6801_PORT3, M6801_PORT3);
-	map(M6801_PORT4, M6801_PORT4);
-}
-
-
-//-------------------------------------------------
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
@@ -127,16 +114,20 @@ static void adam_fdc_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(adam_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6801_TAG, M6801, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(adam_fdc_mem)
-	MCFG_DEVICE_IO_MAP(adam_fdc_io)
+void adam_fdc_device::device_add_mconfig(machine_config &config)
+{
+	M6801(config, m_maincpu, 4_MHz_XTAL),
+	m_maincpu->set_addrmap(AS_PROGRAM, &adam_fdc_device::adam_fdc_mem);
+	m_maincpu->in_p1_cb().set(FUNC(adam_fdc_device::p1_r));
+	m_maincpu->out_p1_cb().set(FUNC(adam_fdc_device::p1_w));
+	m_maincpu->in_p2_cb().set(FUNC(adam_fdc_device::p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(adam_fdc_device::p2_w));
 
-	MCFG_DEVICE_ADD(WD2793_TAG, WD2793, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6801_TAG, INPUT_LINE_NMI))
+	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_connector, adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats);
+}
 
 
 //-------------------------------------------------
@@ -210,7 +201,7 @@ void adam_fdc_device::adamnet_reset_w(int state)
 
 READ8_MEMBER( adam_fdc_device::data_r )
 {
-	uint8_t data = m_fdc->read_data();
+	uint8_t data = m_fdc->data_r();
 
 	m_ram[offset & 0x3ff] = data;
 

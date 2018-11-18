@@ -61,16 +61,7 @@ DEFINE_DEVICE_TYPE(TTL74145, ttl74145_device, "ttl74145", "TTL74145")
 
 ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL74145, tag, owner, clock)
-	, m_output_line_0_cb(*this)
-	, m_output_line_1_cb(*this)
-	, m_output_line_2_cb(*this)
-	, m_output_line_3_cb(*this)
-	, m_output_line_4_cb(*this)
-	, m_output_line_5_cb(*this)
-	, m_output_line_6_cb(*this)
-	, m_output_line_7_cb(*this)
-	, m_output_line_8_cb(*this)
-	, m_output_line_9_cb(*this)
+	, m_output_line_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_number(0)
 {
 }
@@ -83,16 +74,8 @@ ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag,
 void ttl74145_device::device_start()
 {
 	/* resolve callbacks */
-	m_output_line_0_cb.resolve_safe();
-	m_output_line_1_cb.resolve_safe();
-	m_output_line_2_cb.resolve_safe();
-	m_output_line_3_cb.resolve_safe();
-	m_output_line_4_cb.resolve_safe();
-	m_output_line_5_cb.resolve_safe();
-	m_output_line_6_cb.resolve_safe();
-	m_output_line_7_cb.resolve_safe();
-	m_output_line_8_cb.resolve_safe();
-	m_output_line_9_cb.resolve_safe();
+	for (std::size_t bit = 0; bit < 10; bit++)
+		m_output_line_cb[bit].resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_number));
@@ -119,16 +102,8 @@ void ttl74145_device::write(uint8_t data)
 	/* call output callbacks if the number changed */
 	if (new_number != m_number)
 	{
-		m_output_line_0_cb(new_number == 0);
-		m_output_line_1_cb(new_number == 1);
-		m_output_line_2_cb(new_number == 2);
-		m_output_line_3_cb(new_number == 3);
-		m_output_line_4_cb(new_number == 4);
-		m_output_line_5_cb(new_number == 5);
-		m_output_line_6_cb(new_number == 6);
-		m_output_line_7_cb(new_number == 7);
-		m_output_line_8_cb(new_number == 8);
-		m_output_line_9_cb(new_number == 9);
+		for (std::size_t bit = 0; bit < 10; bit++)
+			m_output_line_cb[bit](new_number == bit);
 	}
 
 	/* update state */

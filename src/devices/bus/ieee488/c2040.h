@@ -66,6 +66,7 @@ protected:
 		LED_ERR
 	};
 
+	void add_common_devices(machine_config &config);
 	inline void update_ieee_signals();
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

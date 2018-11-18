@@ -325,10 +325,9 @@ MACHINE_CONFIG_START(sparkz_state::sparkz)
 	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arcadecl)

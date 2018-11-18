@@ -121,9 +121,9 @@ ROMs -
        1.U23 - Main Program, ST 27C4002 EPROM (DIP40)
        2.U22 /
 
-       The remaining ROMs are surface mounted TSOP48 Type II MASKROMs,
+       The remaining ROMs are surface mounted TSOP48 Type II mask ROMs,
        either OKI MSM27C3252 (32MBit) or OKI MSM27C1652 (16MBit).
-       These MASKROMs are non-standard and require a custom adapter
+       These mask ROMs are non-standard and require a custom adapter
        to read them. Not all positions are populated for each game. See
        the source below for specifics.
 
@@ -658,9 +658,7 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 	MCFG_DEVICE_PROGRAM_MAP(ps4_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
 
-
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_8BIT)
-	MCFG_EEPROM_DEFAULT_VALUE(0)
+	EEPROM_93C56_8BIT(config, "eeprom").default_value(0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_ps4)

@@ -163,11 +163,11 @@ READ8_MEMBER( trs80m3_state::cp500_port_f4_r )
 
 WRITE8_MEMBER( trs80m3_state::port_84_w ) // Model 4 & 4P only
 {
-/* Hi-res graphics control - d6..d4 not emulated
-    d7 Page Control
-    d6 Fix upper memory
-    d5 Memory bit 1
-    d4 Memory bit 0
+/* Memory banking control, video mode control
+    d7 Video Page Control
+    d6 Despage (see p129 of service manual)
+    d5 Enable page mapping (1=enabled)
+    d4 Srcpage (see p129 of service manual)
     d3 Invert Video
     d2 80/64 width
     d1 Select bit 1
@@ -196,12 +196,9 @@ WRITE8_MEMBER( trs80m3_state::port_84_w ) // Model 4 & 4P only
 
 	if (BIT(m_model4, 2)) // Model 4P
 	{
-		if (m_mainram->size() >= (64 * 1024))
-		{
-			m_32kbanks[0]->set_entry((data >> 4) & 0x07);
-			m_32kbanks[1]->set_entry((data >> 4) & 0x07);
-			m_16kbank->set_entry((data >> 4) & 0x07);
-		}
+		m_32kbanks[0]->set_entry((data >> 4) & 0x07);
+		m_32kbanks[1]->set_entry((data >> 4) & 0x07);
+		m_16kbank->set_entry((data >> 4) & 0x07);
 		m_vidbank->set_entry(BIT(data, 7));
 
 		switch (data & 3)
@@ -376,8 +373,19 @@ WRITE8_MEMBER( trs80m3_state::port_ec_w )
     d0 1=select drive 0 */
 WRITE8_MEMBER( trs80m3_state::port_f4_w )
 {
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
-	m_wait = BIT(data, 6);
+	if (BIT(data, 6))
+	{
+		if (m_drq_off && m_intrq_off)
+		{
+			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			m_wait = true;
+		}
+	}
+	else
+	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+		m_wait = false;
+	}
 
 	m_floppy = nullptr;
 
@@ -433,21 +441,23 @@ INTERRUPT_GEN_MEMBER(trs80m3_state::rtc_interrupt)
 				m_floppy->mon_w(1);  // motor off
 	}
 	// Also, if cpu is in wait, unlock it and trigger NMI
-	if (m_wait)
-	{
-		m_wait = false;
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
-		if (BIT(m_nmi_mask, 6))
-		{
-			m_nmi_data |= 0x40;
-			m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
-		}
-	}
+	// Don't, it breaks disk loading
+//  if (m_wait)
+//  {
+//      m_wait = false;
+//      m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+//      if (BIT(m_nmi_mask, 6))
+//      {
+//          m_nmi_data |= 0x40;
+//          m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
+//      }
+//  }
 }
 
 // The floppy sector has been read. Enable CPU and NMI.
 WRITE_LINE_MEMBER(trs80m3_state::intrq_w)
 {
+	m_intrq_off = state ? false : true;
 	if (state)
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
@@ -464,6 +474,7 @@ WRITE_LINE_MEMBER(trs80m3_state::intrq_w)
 // The next byte from floppy is available. Enable CPU so it can get the byte.
 WRITE_LINE_MEMBER(trs80m3_state::drq_w)
 {
+	m_drq_off = state ? false : true;
 	if (state)
 	{
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
@@ -482,7 +493,7 @@ READ8_MEMBER( trs80m3_state::wd179x_r )
 {
 	uint8_t data = 0xff;
 	if (BIT(m_io_config->read(), 7))
-		data = m_fdc->status_r(space, offset);
+		data = m_fdc->status_r();
 
 	return data;
 }
@@ -575,6 +586,8 @@ void trs80m3_state::machine_reset()
 	m_a11_flipflop = 0; // for cp500
 	m_cassette_data = 0;
 	m_size_store = 0xff;
+	m_drq_off = true;
+	m_intrq_off = true;
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	if (m_model4 & 4)

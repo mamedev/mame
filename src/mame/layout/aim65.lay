@@ -33,11 +33,11 @@
 
 		<repeat count="4">
 			<param name="xl" start="63" increment="173" />
-			<param name="xs" start="97.6" increment="173" />
+			<param name="xsbase" start="97.6" increment="173" />
 			<bezel element="static_white"><bounds x="~xl~" y="129" width="2" height="10" /></bezel>
 			<repeat count="4">
-				<param name="xs" start="~xs~" increment="34.6" />
-				<bezel element="static_white"><bounds x="~xs~"  y="135" width="2" height="4" /></bezel>
+				<param name="xs" start="~xsbase~" increment="34.6" />
+				<bezel element="static_white"><bounds x="~xs~" y="135" width="2" height="4" /></bezel>
 			</repeat>
 		</repeat>
 
@@ -48,12 +48,12 @@
 
 		<!-- DL1416A DS1/DS2/DS3/DS4/DS5 -->
 		<repeat count="5">
-			<param name="x" start="65" increment="139" />
-			<param name="digitno" start="0" increment="4" />
+			<param name="modulex" start="65" increment="139" />
+			<param name="moduleno" start="0" increment="4" />
 			<repeat count="4">
-				<param name="digitno" start="~digitno~" increment="1" />
-				<param name="x" start="~x~" increment="34" />
-				<bezel name="digit~digitno~" element="digit"><bounds x="~x~" y="80" width="25" height="40" /></bezel>
+				<param name="digitno" start="~moduleno~" increment="1" />
+				<param name="digitx" start="~modulex~" increment="34" />
+				<bezel name="digit~digitno~" element="digit"><bounds x="~digitx~" y="80" width="25" height="40" /></bezel>
 			</repeat>
 		</repeat>
 	</view>

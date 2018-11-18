@@ -112,16 +112,48 @@ public:
 		texinfo ti;
 	};
 
-	struct receiveddata {
-		vert verts[65536];
-		strip strips[65536];
+	static const unsigned MAX_VERTS = 65536;
+	static const unsigned MAX_STRIPS = 65536;
 
-		int verts_size, strips_size;
+	/*
+	 * There are five polygon lists:
+	 *
+	 * Opaque
+	 * Punch-through polygon
+	 * Opaque/punch-through modifier volume
+	 * Translucent
+	 * Translucent modifier volume
+	 *
+	 * They are rendered in that order.  List indices are are three bits, so
+	 * technically there are 8 polygon lists, but only the first 5 are valid.
+	 */
+	enum {
+		DISPLAY_LIST_OPAQUE,
+		DISPLAY_LIST_OPAQUE_MOD,
+		DISPLAY_LIST_TRANS,
+		DISPLAY_LIST_TRANS_MOD,
+		DISPLAY_LIST_PUNCH_THROUGH,
+		DISPLAY_LIST_LAST,
+
+		DISPLAY_LIST_COUNT,
+
+		DISPLAY_LIST_NONE = -1
+	};
+
+	struct poly_group {
+		strip strips[MAX_STRIPS];
+		int strips_size;
+	};
+
+	struct receiveddata {
+		vert verts[MAX_VERTS];
+		struct poly_group groups[DISPLAY_LIST_COUNT];
 		uint32_t ispbase;
 		uint32_t fbwsof1;
 		uint32_t fbwsof2;
 		int busy;
 		int valid;
+		int verts_size;
 	};
 
 	enum {
@@ -305,6 +337,13 @@ public:
 	void pvr_scanline_timer(int vpos);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	typedef uint32_t(powervr2_device::*pix_sample_fn)(texinfo*,float,float,uint32_t,uint32_t);
+
+	inline uint32_t sample_nontextured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color);
+
+	template <int tsinst, bool bilinear>
+		inline uint32_t sample_textured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -462,24 +501,42 @@ private:
 	uint32_t tex_r_default(texinfo *t, float x, float y);
 	void tex_get_info(texinfo *t);
 
-	void render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr, float const bl[4], float const br[4], float const offl[4], float const offr[4]);
-	void render_span(bitmap_rgb32 &bitmap, texinfo *ti,
-						float y0, float y1,
-						float xl, float xr,
-						float ul, float ur,
-						float vl, float vr,
-						float wl, float wr,
-						float const bl[4], float const br[4],
-						float const offl[4], float const offr[4],
-						float dxldy, float dxrdy,
-						float duldy, float durdy,
-						float dvldy, float dvrdy,
-						float dwldy, float dwrdy,
-						float const dbldy[4], float const dbrdy[4],
-						float const doldy[4], float const dordy[4]);
+	template <pix_sample_fn sample_fn, int group_no>
+		inline void render_hline(bitmap_rgb32 &bitmap, texinfo *ti,
+									int y, float xl, float xr,
+									float ul, float ur, float vl, float vr,
+									float wl, float wr,
+									float const bl[4], float const br[4],
+									float const offl[4], float const offr[4]);
+
+	template <pix_sample_fn sample_fn, int group_no>
+		inline void render_span(bitmap_rgb32 &bitmap, texinfo *ti,
+								float y0, float y1,
+								float xl, float xr,
+								float ul, float ur,
+								float vl, float vr,
+								float wl, float wr,
+								float const bl[4], float const br[4],
+								float const offl[4], float const offr[4],
+								float dxldy, float dxrdy,
+								float duldy, float durdy,
+								float dvldy, float dvrdy,
+								float dwldy, float dwrdy,
+								float const dbldy[4], float const dbrdy[4],
+								float const doldy[4], float const dordy[4]);
+
+	template <pix_sample_fn sample_fn, int group_no>
+		inline void render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti,
+										const vert *v0,
+										const vert *v1, const vert *v2);
+
+	template <int group_no>
+		void render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v);
+
+	template <int group_no>
+		void render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void sort_vertices(const vert *v, int *i0, int *i1, int *i2);
-	void render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2);
-	void render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v);
 	void render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void pvr_accumulationbuffer_to_framebuffer(address_space &space, int x, int y);
 	void pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &cliprect);

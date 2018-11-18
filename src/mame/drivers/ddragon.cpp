@@ -574,11 +574,6 @@ void ddragon_state::dd2_sub_map(address_map &map)
 	map(0xe000, 0xe000).w(FUNC(ddragon_state::ddragon2_sub_irq_w));
 }
 
-void ddragon_state::ddragonba_sub_portmap(address_map &map)
-{
-	map(0x0000, 0x01ff).w(FUNC(ddragon_state::ddragonba_port_w));
-}
-
 
 /*************************************
  *
@@ -966,7 +961,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 384)
+	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -979,8 +974,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
@@ -1008,14 +1003,15 @@ MACHINE_CONFIG_START(ddragon_state::ddragonb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(ddragon_state::ddragonba)
+void ddragon_state::ddragonba(machine_config &config)
+{
 	ddragon(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
-	MCFG_DEVICE_PROGRAM_MAP(ddragonba_sub_map)
-	MCFG_DEVICE_IO_MAP(ddragonba_sub_portmap)
-MACHINE_CONFIG_END
+	m6803_cpu_device &sub(M6803(config.replace(), "sub", MAIN_CLOCK / 2));  // 6MHz / 4 internally
+	sub.set_addrmap(AS_PROGRAM, &ddragon_state::ddragonba_sub_map);
+	sub.out_p2_cb().set(FUNC(ddragon_state::ddragonba_port_w));
+}
 
 
 MACHINE_CONFIG_START(ddragon_state::ddragon6809)
@@ -1038,7 +1034,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 384)
+	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1051,8 +1047,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
 	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
@@ -1091,7 +1087,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
-	MCFG_PALETTE_ADD("palette", 384)
+	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1104,8 +1100,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -1127,12 +1123,7 @@ MACHINE_CONFIG_START(darktowr_state::darktowr)
 	MCFG_DEVICE_ADD("mcu", M68705P3, XTAL(4'000'000))
 	MCFG_M68705_PORTA_W_CB(WRITE8(*this, darktowr_state, mcu_port_a_w))
 
-	MCFG_DEVICE_ADD("darktowr_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(darktowr_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "darktowr_bank").set_map(&darktowr_state::darktowr_banked_map).set_options(ENDIANNESS_BIG, 8, 17, 0x4000);
 
 	/* video hardware */
 MACHINE_CONFIG_END

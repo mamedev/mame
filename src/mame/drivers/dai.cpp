@@ -195,15 +195,15 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch0))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch2))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(2000000);
+	m_pit->out_handler<0>().set(m_sound, FUNC(dai_sound_device::set_input_ch0));
+	m_pit->set_clk<1>(2000000);
+	m_pit->out_handler<1>().set(m_sound, FUNC(dai_sound_device::set_input_ch1));
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set(m_sound, FUNC(dai_sound_device::set_input_ch2));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	I8255(config, "ppi8255");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DAI_SOUND(config, "custom").add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
+	DAI_SOUND(config, m_sound).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -232,14 +232,13 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_CASSETTE_INTERFACE("dai_cass")
 
 	/* tms5501 */
-	MCFG_DEVICE_ADD("tms5501", TMS5501, 2000000)
-	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
-	MCFG_TMS5501_XI_CALLBACK(READ8(*this, dai_state, dai_keyboard_r))
-	MCFG_TMS5501_XO_CALLBACK(WRITE8(*this, dai_state, dai_keyboard_w))
+	TMS5501(config, m_tms5501, 2000000);
+	m_tms5501->int_callback().set_inputline("maincpu", I8085_INTR_LINE);
+	m_tms5501->xi_callback().set(FUNC(dai_state::dai_keyboard_r));
+	m_tms5501->xo_callback().set(FUNC(dai_state::dai_keyboard_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
+	RAM(config, RAM_TAG).set_default_size("48K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "dai_cass")

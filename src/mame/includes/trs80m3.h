@@ -101,6 +101,8 @@ private:
 	void cp500_io(address_map &map);
 	void m3_io(address_map &map);
 	void m3_mem(address_map &map);
+	void m4_mem(address_map &map);
+	void m4p_mem(address_map &map);
 	void m4_io(address_map &map);
 	void m4p_io(address_map &map);
 	void m4_banked_mem(address_map &map);
@@ -123,6 +125,8 @@ private:
 	bool m_a11_flipflop;
 	uint16_t m_timeout;
 	bool m_wait;
+	bool m_drq_off;
+	bool m_intrq_off;
 	floppy_image_device *m_floppy;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -93,17 +93,15 @@
 #include "machine/terminal.h"
 #include "machine/rx01.h"
 
-#define TERMINAL_TAG "terminal"
 
 class pdp11_state : public driver_device
 {
 public:
 	pdp11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
 	void pdp11ub2(machine_config &config);
 	void pdp11(machine_config &config);
@@ -363,7 +361,7 @@ MACHINE_CONFIG_START(pdp11_state::pdp11)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pdp11_state, kbd_put))
 
 	MCFG_RX01_ADD("rx01")

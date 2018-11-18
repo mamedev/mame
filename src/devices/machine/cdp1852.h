@@ -26,15 +26,6 @@
 
 #pragma once
 
-
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> cdp1852_device
-
 class cdp1852_device : public device_t
 {
 public:
@@ -81,8 +72,6 @@ private:
 	emu_timer *m_update_sr_timer;
 };
 
-
-// device type definition
 DECLARE_DEVICE_TYPE(CDP1852, cdp1852_device)
 
 #endif // MAME_MACHINE_CDP1852_H

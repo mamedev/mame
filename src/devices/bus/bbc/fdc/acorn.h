@@ -25,7 +25,6 @@
 class bbc_acorn8271_device :
 	public device_t,
 	public device_bbc_fdc_interface
-
 {
 public:
 	// construction/destruction
@@ -42,6 +41,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
@@ -56,7 +58,6 @@ private:
 class bbc_acorn1770_device :
 	public device_t,
 	public device_bbc_fdc_interface
-
 {
 public:
 	// construction/destruction
@@ -71,9 +72,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
 private:
-	DECLARE_READ8_MEMBER(wd1770l_read);
-	DECLARE_WRITE8_MEMBER(wd1770l_write);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
@@ -83,6 +85,7 @@ private:
 	optional_device<floppy_connector> m_floppy1;
 
 	int m_drive_control;
+	int m_fdc_ie;
 };
 
 

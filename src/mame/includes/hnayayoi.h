@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "machine/74259.h"
 #include "sound/msm5205.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -20,6 +21,7 @@ public:
 	hnayayoi_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainlatch(*this, "mainlatch"),
 		m_msm(*this, "msm"),
 		m_palette(*this, "palette")
 	{ }
@@ -64,6 +66,7 @@ private:
 	void draw_layer_interleaved(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t row, uint16_t y, uint8_t x_count, int left_pixmap, int right_pixmap, int palbase, bool transp);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_mainlatch;
 	required_device<msm5205_device> m_msm;
 	required_device<palette_device> m_palette;
 	void hnayayoi_io_map(address_map &map);

@@ -742,11 +742,11 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_DEVICE_ADD("adc", ADC0808, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(WRITELINE(*this, wheelfir_state, adc_eoc_w))
-	MCFG_ADC0808_IN0_CB(IOPORT("STEERING"))
-	MCFG_ADC0808_IN1_CB(IOPORT("ACCELERATOR"))
-	MCFG_ADC0808_IN2_CB(IOPORT("BRAKE"))
+	adc0808_device &adc(ADC0808(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));
+	adc.in_callback<0>().set_ioport("STEERING");
+	adc.in_callback<1>().set_ioport("ACCELERATOR");
+	adc.in_callback<2>().set_ioport("BRAKE");
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", wheelfir_state, scanline_timer_callback, "screen", 0, 1)
 
@@ -759,11 +759,12 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", NUM_COLORS)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &wheelfir_state::ramdac_map);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, "soundlatch");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -637,7 +637,7 @@ WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 
 WRITE8_MEMBER( geneve_state::external_operation )
 {
-	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP)
 		LOGMASKED(LOG_WARN, "External operation %s not implemented on Geneve board\n", extop[offset]);
 }
@@ -696,88 +696,95 @@ void geneve_state::machine_reset()
 
 MACHINE_CONFIG_START(geneve_state::geneve)
 	geneve_common(config);
-	// Mapper
-	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENEVE_MAPPER, 0)
-	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
-	// Peripheral expansion box (Geneve composition)
-	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_GEN, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, geneve_state, inta) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, geneve_state, intb) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
 
+	// Mapper
+	GENEVE_MAPPER(config, m_mapper, 0);
+	m_mapper->ready_cb().set(FUNC(geneve_state::mapper_ready));
+
+	// Peripheral expansion box (Geneve composition)
+	TI99_PERIBOX_GEN(config, m_peribox, 0);
+	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
+	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
+	m_peribox->ready_cb().set(FUNC(geneve_state::ext_ready));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(geneve_state::genmod)
 	geneve_common(config);
+
 	// Mapper
-	MCFG_DEVICE_ADD(GENEVE_MAPPER_TAG, GENMOD_MAPPER, 0)
-	MCFG_GENEVE_READY_HANDLER( WRITELINE(*this, geneve_state, mapper_ready) )
+	GENMOD_MAPPER(config, m_mapper, 0);
+	m_mapper->ready_cb().set(FUNC(geneve_state::mapper_ready));
+
 	// Peripheral expansion box (Geneve composition with Genmod and plugged-in Memex)
-	MCFG_DEVICE_ADD( TI_PERIBOX_TAG, TI99_PERIBOX_GENMOD, 0)
-	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(*this, geneve_state, inta) )
-	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(*this, geneve_state, intb) )
-	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
+	TI99_PERIBOX_GENMOD(config, m_peribox, 0);
+	m_peribox->inta_cb().set(FUNC(geneve_state::inta));
+	m_peribox->intb_cb().set(FUNC(geneve_state::intb));
+	m_peribox->ready_cb().set(FUNC(geneve_state::ext_ready));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(geneve_state::geneve_common)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)
-	MCFG_DEVICE_ADDRESS_MAP(tms9995_device::AS_SETOFFSET, memmap_setoffset)
-	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(*this, geneve_state, external_operation) )
-	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(*this, geneve_state, clock_out) )
-	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(*this, geneve_state, dbin_line) )
+	TMS9995(config, m_cpu, 12000000);
+	m_cpu->set_addrmap(AS_PROGRAM, &geneve_state::memmap);
+	m_cpu->set_addrmap(AS_IO, &geneve_state::crumap);
+	m_cpu->set_addrmap(tms9995_device::AS_SETOFFSET, &geneve_state::memmap_setoffset);
+	m_cpu->extop_cb().set(FUNC(geneve_state::external_operation));
+	m_cpu->clkout_cb().set(FUNC(geneve_state::clock_out));
+	m_cpu->dbin_cb().set(FUNC(geneve_state::dbin_line));
 
 	// Video hardware
-	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL(21'477'272))  /* typical 9938 clock, not verified */
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, geneve_state, set_tms9901_INT2_from_v9938))
-	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL(21'477'272))
+	v99x8_device& video(V9938(config, TI_VDP_TAG, XTAL(21'477'272))); // typical 9938 clock, not verified
+	video.set_vram_size(0x20000);
+	video.int_cb().set(FUNC(geneve_state::set_tms9901_INT2_from_v9938));
+	video.set_screen(TI_SCREEN_TAG);
+	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(21'477'272), \
+		v99x8_device::HTOTAL, \
+		0, \
+		v99x8_device::HVISIBLE - 1, \
+		v99x8_device::VTOTAL_NTSC * 2, \
+		v99x8_device::VERTICAL_ADJUST * 2, \
+		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
+	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
 
 	// Main board components
-	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, geneve_state, read_by_9901) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, geneve_state, peripheral_bus_reset) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( *this, geneve_state, VDP_reset) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, geneve_state, joystick_select) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_lsb) )  // new for PFM
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_output_enable) )  // new for PFM
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( GENEVE_KEYBOARD_TAG, bus::ti99::internal::geneve_keyboard_device, reset_line) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, geneve_state, extbus_wait_states) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, geneve_state, video_wait_states) )
-	MCFG_TMS9901_P13_HANDLER( WRITELINE( GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, pfm_select_msb) )   // new for PFM
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, geneve_state, tms9901_interrupt) )
+	TMS9901(config, m_tms9901, 3000000);
+	m_tms9901->read_cb().set(FUNC(geneve_state::read_by_9901));
+	m_tms9901->p_out_cb(0).set(FUNC(geneve_state::peripheral_bus_reset));
+	m_tms9901->p_out_cb(1).set(FUNC(geneve_state::VDP_reset));
+	m_tms9901->p_out_cb(2).set(FUNC(geneve_state::joystick_select));
+	m_tms9901->p_out_cb(4).set(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::pfm_select_lsb));
+	m_tms9901->p_out_cb(5).set(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::pfm_output_enable));
+	m_tms9901->p_out_cb(6).set(GENEVE_KEYBOARD_TAG, FUNC(bus::ti99::internal::geneve_keyboard_device::reset_line));
+	m_tms9901->p_out_cb(7).set(FUNC(geneve_state::extbus_wait_states));
+	m_tms9901->p_out_cb(9).set(FUNC(geneve_state::video_wait_states));
+	m_tms9901->p_out_cb(13).set(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::pfm_select_msb));
+	m_tms9901->intlevel_cb().set(FUNC(geneve_state::tms9901_interrupt));
 
 	// Clock
-	MCFG_DEVICE_ADD(GENEVE_CLOCK_TAG, MM58274C, 0)
-	MCFG_MM58274C_MODE24(1) // 24 hour
-	MCFG_MM58274C_DAY1(0)   // sunday
+	MM58274C(config, GENEVE_CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
+	sn76496_device& soundgen(SN76496(config, TI_SOUNDCHIP_TAG, 3579545));
+	soundgen.ready_cb().set(FUNC(geneve_state::ext_ready));
+	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// User interface devices
-	MCFG_DEVICE_ADD( GENEVE_KEYBOARD_TAG, GENEVE_KEYBOARD, 0 )
-	MCFG_GENEVE_KBINT_HANDLER( WRITELINE(*this, geneve_state, keyboard_interrupt) )
-	MCFG_GENEVE_JOYPORT_ADD( TI_JOYPORT_TAG )
-	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
+	GENEVE_KEYBOARD(config, m_keyboard, 0).int_cb().set(FUNC(geneve_state::keyboard_interrupt));
+	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
+	TI99_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, "busmouse");
 
 	// PFM expansion
-	MCFG_AT29C040_ADD( GENEVE_PFM512_TAG )
-	MCFG_AT29C040A_ADD( GENEVE_PFM512A_TAG )
+	AT29C040(config, GENEVE_PFM512_TAG);
+	AT29C040A(config, GENEVE_PFM512A_TAG);
 
 	// DRAM 512K
-	MCFG_RAM_ADD(GENEVE_DRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, GENEVE_DRAM_TAG).set_default_size("512K").set_default_value(0);
 
 	// SRAM 384K (max; stock Geneve: 32K, but later MDOS releases require 64K)
-	MCFG_RAM_ADD(GENEVE_SRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("384K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
+	RAM(config, GENEVE_SRAM_TAG).set_default_size("384K").set_default_value(0);
 MACHINE_CONFIG_END
 
 /*

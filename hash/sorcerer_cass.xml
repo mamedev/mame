@@ -4,6 +4,10 @@
 <softwarelist name="sorcerer_cass" description="Exidy Sorcerer cassettes">
 
 <!--
+Compiled by Robbbert
+-->
+
+<!--
      These come from tapes.
      Load the Basic ROM PAC, then from within it type CLOAD. When it has finished loading, type RUN.
  -->
@@ -777,7 +781,8 @@
 	<software name="interceptor">
 		<description>Interceptor</description>
 		<year>1983</year>
-		<publisher>Blair Rideout</publisher>
+		<publisher>System Software</publisher>
+		<info name="developer" value="Blair Rideout"/>
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="7201560">
@@ -1034,7 +1039,7 @@
 	<software name="grotnik">
 		<description>Grotnik Wars</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>System Software</publisher>
 		<info name="developer" value="Ross Williams" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1052,6 +1057,32 @@
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="3032962">
 				<rom name="nike2.wav" size="3032962" crc="de304e7c" sha1="88f4ee50e1537ffb0d35c1edc7732681c792a6b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<!-- Added 2018-10-13 -->
+	<software name="crash">
+		<description>Head-on Collision</description>
+		<year>1980</year>
+		<publisher>Quality Software</publisher>
+		<info name="developer" value="Lee Anders" />
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="7824984">
+				<rom name="crash.wav" size="7824984" crc="f6a54d3f" sha1="6fff752fa4f2f1056a05e1d7d3368ec31828e9d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<!-- Added 2018-10-22 -->
+	<software name="landarc">
+		<description>Lander Arcade</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Jeffrey A Bell" />
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="14521900">
+				<rom name="luna.wav" size="14521900" crc="8240d8fc" sha1="78c7a2060bcadf2325112a93f452e964fe45e3e1" offset="0" />
 			</dataarea>
 		</part>
 	</software>

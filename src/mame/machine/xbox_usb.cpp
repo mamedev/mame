@@ -2,6 +2,8 @@
 // copyright-holders:Samuele Zannoli
 
 #include "emu.h"
+#include "machine/pci.h"
+#include "includes/xbox_pci.h"
 #include "includes/xbox_usb.h"
 #include "includes/xbox.h"
 

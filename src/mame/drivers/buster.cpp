@@ -346,8 +346,7 @@ MACHINE_CONFIG_START(buster_state::buster)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "aysnd", 1500000/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 

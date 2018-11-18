@@ -43,7 +43,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( gromclk_in );
 
-	template <class Object> devcb_base &set_ready_callback(Object &&cb) { return m_ready.set_callback(std::forward<Object>(cb)); }
+	auto ready_cb() { return m_ready.bind(); }
 
 protected:
 	/* Constructor */
@@ -139,9 +139,6 @@ private:
 };
 
 /******************************************************************************/
-
-#define MCFG_DMUX_READY_HANDLER( _intcallb ) \
-	downcast<bus::ti99::internal::datamux_device &>(*device).set_ready_callback(DEVCB_##_intcallb);
 
 } } } // end namespace bus::ti99::internal
 

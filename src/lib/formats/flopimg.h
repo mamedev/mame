@@ -735,7 +735,7 @@ public:
 	  @param head head number
 	  @return a pointer to the data buffer for this track and head
 	*/
-	std::vector<uint32_t> &get_buffer(int track, int head, int subtrack = 0) { return track_array[track*4+subtrack][head].cell_data; }
+	std::vector<uint32_t> &get_buffer(int track, int head, int subtrack = 0) { assert(track < tracks && head < heads); return track_array[track*4+subtrack][head].cell_data; }
 
 	//! Sets the write splice position.
 	//! The "track splice" information indicates where to start writing
@@ -749,9 +749,9 @@ public:
 	    @param head
 	    @param pos the position
 	*/
-	void set_write_splice_position(int track, int head, uint32_t pos, int subtrack = 0) { track_array[track*4+subtrack][head].write_splice = pos; }
+	void set_write_splice_position(int track, int head, uint32_t pos, int subtrack = 0) { assert(track < tracks && head < heads); track_array[track*4+subtrack][head].write_splice = pos; }
 	//! @return the current write splice position.
-	uint32_t get_write_splice_position(int track, int head, int subtrack = 0) const { return track_array[track*4+subtrack][head].write_splice; }
+	uint32_t get_write_splice_position(int track, int head, int subtrack = 0) const { assert(track < tracks && head < heads); return track_array[track*4+subtrack][head].write_splice; }
 	//! @return the maximal geometry supported by this format.
 	void get_maximal_geometry(int &tracks, int &heads) const;
 

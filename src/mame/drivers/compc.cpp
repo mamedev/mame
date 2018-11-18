@@ -200,13 +200,13 @@ MACHINE_CONFIG_START(compc_state::compc)
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_REMOVE("mb:pit8253")
-	MCFG_DEVICE_ADD("mb:pit8253", FE2010_PIT, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12.0) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("mb:pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12.0) /* dram refresh */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("mb", ibm5160_mb_device, pc_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12.0) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("mb", ibm5160_mb_device, pc_pit8253_out2_changed))
+	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253", 0));
+	pit.set_clk<0>(XTAL(14'318'181)/12.0); /* heartbeat IRQ */
+	pit.out_handler<0>().set("mb:pic8259", FUNC(pic8259_device::ir0_w));
+	pit.set_clk<1>(XTAL(14'318'181)/12.0); /* dram refresh */
+	pit.out_handler<1>().set(m_mb, FUNC(ibm5160_mb_device::pc_pit8253_out1_changed));
+	pit.set_clk<2>(XTAL(14'318'181)/12.0); /* pio port c pin 4, and speaker polling enough */
+	pit.out_handler<2>().set(m_mb, FUNC(ibm5160_mb_device::pc_pit8253_out2_changed));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "mda", false)
@@ -217,9 +217,7 @@ MACHINE_CONFIG_START(compc_state::compc)
 	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K, 640K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K, 640K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")

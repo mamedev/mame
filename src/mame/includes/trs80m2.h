@@ -104,7 +104,7 @@ protected:
 
 	virtual void video_start() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dma_device> m_dmac;
 	required_device<z80pio_device> m_pio;

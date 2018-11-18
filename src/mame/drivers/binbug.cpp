@@ -86,7 +86,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// needed by dg680 class
-	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu; // S2650 or Z80
 	required_device<cassette_image_device> m_cass;
 
 	void binbug(machine_config &config);
@@ -320,8 +320,7 @@ MACHINE_CONFIG_START(binbug_state::binbug)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard").set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -537,10 +536,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 
 MACHINE_CONFIG_START(dg680_state::dg680)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(dg680_mem)
-	MCFG_DEVICE_IO_MAP(dg680_io)
-	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
+	z80_device& maincpu(Z80(config, m_maincpu, XTAL(8'000'000) / 4));
+	maincpu.set_addrmap(AS_PROGRAM, &dg680_state::dg680_mem);
+	maincpu.set_addrmap(AS_IO, &dg680_state::dg680_io);
+	maincpu.set_daisy_config(dg680_daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
@@ -564,16 +563,16 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(8'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(8'000'000) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, dg680_state, porta_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000) / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio.in_pa_callback().set(FUNC(dg680_state::porta_r));
 	// OUT_ARDY - this activates to ask for kbd data but not known if actually used
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, dg680_state, portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, dg680_state, portb_w))
+	pio.in_pb_callback().set(FUNC(dg680_state::portb_r));
+	pio.out_pb_callback().set(FUNC(dg680_state::portb_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc0", dg680_state, time_tick, attotime::from_hz(200))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc3", dg680_state, uart_tick, attotime::from_hz(4800))

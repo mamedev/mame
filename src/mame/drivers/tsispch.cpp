@@ -19,12 +19,12 @@
 *
 *  DONE:
 *  Skeleton Written
-*  Load cpu and dsp roms and mapper proms
+*  Load cpu and dsp ROMs and mapper PROMs
 *  Successful compile
 *  Successful run
-*  Correctly Interleave 8086 CPU roms
+*  Correctly Interleave 8086 CPU ROMs
 *  Debug LEDs hooked to popmessage
-*  Correctly load UPD7720 roms as UPD7725 data - done; this is utterly disgusting code, but appears to work.
+*  Correctly load UPD7720 ROMs as UPD7725 data - done; this is utterly disgusting code, but appears to work.
 *  Attached i8251a uart at u15
 *  Added dipswitch array S4
 *  Attached 8259 PIC
@@ -41,7 +41,7 @@
 *  UPD7720: hook up serial output and SCK, and hook SO to the DAC; this requires fixing the upd7725 core to actually support SCK and serial output/SO!
 *  Attach the other i8251a uart (assuming it is hooked to the main hardware at all!)
 *  Correctly implement UPD7720 cpu core to avoid needing revolting conversion code; this probably involves overriding and duplicating much of the exec_xx sections of the 7725 core
-*  Correct memory maps and io maps, and figure out what all the proms do - mostly done
+*  Correct memory maps and io maps, and figure out what all the PROMs do - mostly done
 *  8259 PIC: figure out where IR4-7 come from, if anywhere.
 *  UPD7720 and 8259: hook up p0 and p1 as outputs, and figure out how 8259 IR0 is masked from 7720 p0.
 *  Add other dipswitches and jumpers (these may actually just control clock dividers for the two 8251s)
@@ -49,7 +49,7 @@
 *  Everything else
 *
 *  Notes:
-*  Text in rom indicates there is a test mode 'activated by switch s4 dash 7'
+*  Text in ROM indicates there is a test mode 'activated by switch s4 dash 7'
 *  When switch s4-7 is switched on, the hardware says, over and over:
 *  "This is version 3.4.1 test mode, activated by switch s4 dash 7"
 *
@@ -94,7 +94,7 @@
 *      check if bp was 1 and jump to D318F if it was
 *      write 0x14 (0 0 0 [1 0 1 0] 0) to 3401
 *      call E3987: initialize UPD7720, return
-*    D33D2: checksum the roms in 5? passes, loop at D33DA, test at D33E6 (which passes)
+*    D33D2: checksum the ROMs in 5? passes, loop at D33DA, test at D33E6 (which passes)
 *      if test DID fail: write 0x10 (0 0 0 [1 0 0 0] 0) to 3401
 *        more stuff
 *        write 0xFF to 3401
@@ -113,7 +113,9 @@
 #include "emu.h"
 #include "includes/tsispch.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -286,7 +288,7 @@ void tsispch_state::init_prose2k()
 /******************************************************************************
  Address Maps
 ******************************************************************************/
-/* The address map of the prose 2020 is controlled by 2 proms, see the rom section
+/* The address map of the prose 2020 is controlled by 2 PROMs, see the ROM section
    for details on those.
    (x = ignored; * = selects address within this range; s = selects one of a pair of chips)
    A19 A18 A17 A16  A15 A14 A13 A12  A11 A10 A9 A8  A7 A6 A5 A4  A3 A2 A1 A0
@@ -306,9 +308,8 @@ void tsispch_state::init_prose2k()
 void tsispch_state::i8086_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x02FFF).mirror(0x34000).ram(); // verified; 6264*2 sram, only first 3/4 used
-	map(0x03000, 0x03000).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x03002, 0x03002).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00000, 0x02FFF).mirror(0x34000).ram(); // verified; 6264*2 SRAM, only first 3/4 used
+	map(0x03000, 0x03003).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x03200, 0x03203).mirror(0x341FC).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
 	map(0x03400, 0x03400).mirror(0x341FE).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
 	map(0x03401, 0x03401).mirror(0x341FE).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
@@ -371,10 +372,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
-	MCFG_DEVICE_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
-	MCFG_DEVICE_PROGRAM_MAP(i8086_mem)
-	MCFG_DEVICE_IO_MAP(i8086_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, 8000000); /* VERIFIED clock, unknown divider */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tsispch_state::i8086_mem);
+	m_maincpu->set_addrmap(AS_IO, &tsispch_state::i8086_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
@@ -386,15 +387,21 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	MCFG_NECDSP_OUT_P1_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p1_w))
 
 	/* PIC 8259 */
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* uarts */
-	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)
-	// (todo: proper hookup, currently using hack w/i8251_receive_character())
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_rxrdy_int))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txrdy_int))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txempty_int))
+	i8251_device &u15(I8251(config, "i8251a_u15", 0));
+	u15.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	u15.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	u15.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	u15.rxrdy_handler().set(FUNC(tsispch_state::i8251_rxrdy_int));
+	u15.txrdy_handler().set(FUNC(tsispch_state::i8251_txrdy_int));
+	u15.txempty_handler().set(FUNC(tsispch_state::i8251_txempty_int));
+
+	clock_device &clock(CLOCK(config, "baudclock", 153600));
+	clock.signal_handler().set("i8251a_u15", FUNC(i8251_device::write_txc));
+	clock.signal_handler().append("i8251a_u15", FUNC(i8251_device::write_rxc));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -402,8 +409,10 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("i8251a_u15", i8251_device, receive_character))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("i8251a_u15", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("i8251a_u15", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("i8251a_u15", FUNC(i8251_device::write_cts));
 MACHINE_CONFIG_END
 
 /******************************************************************************
@@ -424,7 +433,7 @@ ROM_START( prose2k )
 	ROM_REGION( 0x400, "dspdata", 0)
 	ROM_LOAD( "v3.12__8-9-88__dsp_data.u29", 0x0000, 0x0400, CRC(f4e4dd16) SHA1(6e184747db2f26e45d0e02907105ff192e51baba))
 
-	// mapping proms:
+	// mapping PROMs:
 	// All are am27s19 32x8 TriState PROMs (equivalent to 82s123/6331)
 	// L - always low; H - always high
 	// U77: unknown (what does this do? likely as to do with multibus and possibly waitstates?)
@@ -443,7 +452,7 @@ ROM_START( prose2k )
 	//      bits 7-4 are always low, bits 2 and 1 are always high.
 	//      SRAMS are only populated in U61 and U64.
 	//      On the Prose 2000 earlier board dumped, bits 3,2,1,0 are all used;
-	//      bits 7-4 are always low. sram is in 6 6116s, mapped the same as the 2 6264s on the later board.
+	//      bits 7-4 are always low. SRAM is in 6 6116s, mapped the same as the 2 6264s on the later board.
 	//      output bits 0bLLLL3210
 	//      7,6,5,4 - seem unconnected?
 	//      3 - to /EN3 (pin 4) of 74S138N at U80
@@ -465,7 +474,7 @@ ROM_START( prose2k )
 	//              /Y0 - ?
 	//              /Y1 - ?
 	//              /Y2 - ?
-	//              /Y3 - connects somewhere, only active when A18 and A19 are high, possibly a rom bus buffer enable? (TODO: figure out what this does)
+	//              /Y3 - connects somewhere, only active when A18 and A19 are high, possibly a ROM bus buffer enable? (TODO: figure out what this does)
 	//              /Y4-/Y7 - never used since S2 is pulled to GND
 	//      2 - to /CS1 on 6264 SRAMs at U63 and U66
 	//      1 - to /CS1 on 6264 SRAMs at U62 and U65
@@ -473,9 +482,9 @@ ROM_START( prose2k )
 	//
 	// U81: (OPTIONAL) maps ROMS: input is A19-A15 for I4,3,2,1,0
 	//      On the Prose 2000 board dumped, only bits 6 and 5 are used,
-	//      the rest are always high; maps roms 0,1,2,3 to C0000-FFFFF.
-	//      The Prose 2000 board has empty unpopulated sockets for roms 4-15;
-	//      if present these would be driven by a different prom in this location.
+	//      the rest are always high; maps ROMs 0,1,2,3 to C0000-FFFFF.
+	//      The Prose 2000 board has empty unpopulated sockets for ROMs 4-15;
+	//      if present these would be driven by a different PROM in this location.
 	//      bit - function
 	//      7 - to /CE of ROMs 14(U28) and 15(U51)
 	//      6 - to /CE of ROMs 0(U21) and 1(U44)
@@ -486,8 +495,8 @@ ROM_START( prose2k )
 	//      1 - to /CE of ROMs 10(U26) and 11(U49)
 	//      0 - to /CE of ROMs 12(U27) and 13(U50)
 	//
-	// Note U81 is optional; it can be replaced by a 74s138 instead of a prom,
-	// with A19, A18, A17 as inputs, for decoding the roms as:
+	// Note U81 is optional; it can be replaced by a 74s138 instead of a PROM,
+	// with A19, A18, A17 as inputs, for decoding the ROMs as:
 	//      7 - to /CE of ROMs 0(U21) and 1(U44)   (0xE0000-0xE3FFF)
 	//      6 - to /CE of ROMs 2(U22) and 3(U45)   (0xE4000-0xE7FFF)
 	//      5 - to /CE of ROMs 4(U23) and 5(U46)   (0xE8000-0xEBFFF)
@@ -519,7 +528,7 @@ ROM_START( prose2ko )
 	ROMX_LOAD( "v1.1__15__speech__plus__=c=1983.am2764.15.u51", 0xfc001, 0x2000, CRC(beb1fa19) SHA1(72130fe45c3fd3de7cf794936dc68ed2d4193daf),ROM_SKIP(1))
 
 	// TSI/Speech plus DSP firmware v?.? (no sticker, but S140025 printed on chip), unlabeled chip, but clearly a NEC UPD7720C ceramic
-	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder, since the dsp on the older board is MASK ROM and doesn't dump easily
+	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder, since the dsp on the older board is mask ROM and doesn't dump easily
 	ROM_REGION( 0x600, "dspprgload", 0) // packed 24 bit data
 	ROM_LOAD( "s140025__dsp_prog.u29", 0x0000, 0x0600, NO_DUMP)
 	ROM_LOAD( "v3.12__8-9-88__dsp_prog.u29", 0x0000, 0x0600, CRC(9e46425a) SHA1(80a915d731f5b6863aeeb448261149ff15e5b786)) // temp placeholder
@@ -531,7 +540,7 @@ ROM_START( prose2ko )
 	ROM_REGION(0x1000, "proms", 0)
 	ROM_LOAD( "dm74s288n.u77", 0x0000, 0x0020, CRC(a88757fc) SHA1(9066d6dbc009d7a126d75b8461ca464ddf134412)) // == am27s19.u77
 	ROM_LOAD( "dm74s288n.whitespot.u79", 0x0020, 0x0020, CRC(7faee6cb) SHA1(b6dd2a6909dac9e89e7317c006a013ff0866382d))
-	// no third prom in this set, a 74S138 is used instead for e0000-fffff rom mapping
+	// no third PROM in this set, a 74S138 is used instead for e0000-fffff ROM mapping
 	ROM_END
 
 /******************************************************************************

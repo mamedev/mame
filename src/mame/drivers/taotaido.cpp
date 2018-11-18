@@ -80,7 +80,7 @@ zooming might be wrong
 
 void taotaido_state::machine_start()
 {
-	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
+	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 }
 
 
@@ -111,7 +111,7 @@ void taotaido_state::main_map(address_map &map)
 	map(0xffff00, 0xffff0f).w(FUNC(taotaido_state::tileregs_w));
 	map(0xffff10, 0xffff11).nopw();                        // unknown
 	map(0xffff20, 0xffff21).nopw();                        // unknown - flip screen related
-	map(0xffff40, 0xffff47).w(FUNC(taotaido_state::sprite_character_bank_select_w));
+	map(0xffff40, 0xffff47).w(FUNC(taotaido_state::spritebank_w)).share("spritebank");
 	map(0xffffc1, 0xffffc1).w(m_soundlatch, FUNC(generic_latch_8_device::write));        // seems right
 	map(0xffffe0, 0xffffe1).r(FUNC(taotaido_state::pending_command_r)); // guess - seems to be needed for all the sounds to work
 }
@@ -121,7 +121,7 @@ void taotaido_state::main_map(address_map &map)
 
 WRITE8_MEMBER(taotaido_state::sh_bankswitch_w)
 {
-	membank("soundbank")->set_entry(data & 0x03);
+	m_soundbank->set_entry(data & 0x03);
 }
 
 void taotaido_state::sound_map(address_map &map)
@@ -397,9 +397,9 @@ MACHINE_CONFIG_START(taotaido_state::taotaido)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

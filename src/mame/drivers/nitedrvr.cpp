@@ -147,8 +147,7 @@ MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 	MCFG_DEVICE_PROGRAM_MAP(nitedrvr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nitedrvr_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 3)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 3);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("crash_timer", nitedrvr_state, nitedrvr_crash_toggle_callback, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)))
 
@@ -188,8 +187,8 @@ ROM_END
 
 ROM_START( nitedrvr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "006569-01.d2", 0x9000, 0x0800, CRC(7afa7542) SHA1(81018e25ebdeae1daf1308676661063b6fd7fd22) ) // MASK ROM 1
-	ROM_LOAD( "006570-01.f2", 0x9800, 0x0800, CRC(bf5d77b1) SHA1(6f603f8b0973bd89e0e721b66944aac8e9f904d9) ) // MASK ROM 2
+	ROM_LOAD( "006569-01.d2", 0x9000, 0x0800, CRC(7afa7542) SHA1(81018e25ebdeae1daf1308676661063b6fd7fd22) ) // mask ROM 1
+	ROM_LOAD( "006570-01.f2", 0x9800, 0x0800, CRC(bf5d77b1) SHA1(6f603f8b0973bd89e0e721b66944aac8e9f904d9) ) // mask ROM 2
 	ROM_RELOAD(               0xf800, 0x0800 ) // vectors
 
 	ROM_REGION( 0x200, "gfx1", 0 )

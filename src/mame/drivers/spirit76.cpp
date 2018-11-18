@@ -131,15 +131,15 @@ MACHINE_CONFIG_START(spirit76_state::spirit76)
 	//MCFG_DEFAULT_LAYOUT()
 
 	//6821pia
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, spirit76_state, porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, spirit76_state, portb_w))
-	MCFG_PIA_READPA_HANDLER(READ8(*this, spirit76_state, porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, spirit76_state, portb_r))
-//  MCFG_PIA_CA2_HANDLER(WRITELINE(*this, spirit76_state, pia22_ca2_w))
-//  MCFG_PIA_CB2_HANDLER(WRITELINE(*this, spirit76_state, pia22_cb2_w))
-//  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-//  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set(FUNC(spirit76_state::porta_w));
+	pia.writepb_handler().set(FUNC(spirit76_state::portb_w));
+	pia.readpa_handler().set(FUNC(spirit76_state::porta_r));
+	pia.readpb_handler().set(FUNC(spirit76_state::portb_r));
+//  pia.ca2_handler().set(FUNC(spirit76_state::pia22_ca2_w));
+//  pia.cb2_handler().set(FUNC(spirit76_state::pia22_cb2_w));
+//  pia.irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+//  pia.irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	/* sound hardware */
 	genpin_audio(config);

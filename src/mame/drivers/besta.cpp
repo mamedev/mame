@@ -25,28 +25,26 @@
 		} \
 	} while (0)
 
-#define TERMINAL_TAG "terminal"
 
 class besta_state : public driver_device
 {
 public:
 	besta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pit1 (*this, "pit1"),
-		m_pit2 (*this, "pit2"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_p_ram(*this, "p_ram")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pit1 (*this, "pit1")
+		, m_pit2 (*this, "pit2")
+		, m_terminal(*this, "terminal")
+		, m_p_ram(*this, "p_ram")
+	{ }
 
+	void besta(machine_config &config);
+
+protected:
+	void besta_mem(address_map &map);
 	DECLARE_READ8_MEMBER( mpcc_reg_r );
 	DECLARE_WRITE8_MEMBER( mpcc_reg_w );
 	void kbd_put(u8 data);
-
-	void besta(machine_config &config);
-	void besta_mem(address_map &map);
-protected:
 	virtual void machine_reset() override;
 
 	uint8_t m_term_data;
@@ -145,7 +143,7 @@ MACHINE_CONFIG_START(besta_state::besta)
 
 	MCFG_DEVICE_ADD ("pit2", PIT68230, 16670000 / 2)    // XXX verify clock
 
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(besta_state, kbd_put))
 MACHINE_CONFIG_END
 

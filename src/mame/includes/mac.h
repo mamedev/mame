@@ -99,19 +99,34 @@ public:
 	{
 	}
 
+	void add_mackbd(machine_config &config);
+	void add_scsi(machine_config &config, bool cdrom = false);
+	void add_base_devices(machine_config &config, bool rtc = true, bool super_woz = false);
+	void add_asc(machine_config &config, asc_device::asc_type type = asc_device::asc_type::ASC);
+	void add_macplus_additions(machine_config &config);
+	void add_nubus(machine_config &config, bool bank1 = true, bool bank2 = true);
+	template <typename T> void add_nubus_pds(machine_config &config, const char *slot_tag, T &&opts);
+	void add_via1_adb(machine_config &config, bool macii);
+	void add_via2(machine_config &config);
+	void add_pb1xx_vias(machine_config &config);
+	void add_pb1xx_screen(machine_config &config);
+	void add_egret(machine_config &config, int type);
+	void add_cuda(machine_config &config, int type);
+
+	void mac512ke_base(machine_config &config);
 	void mac512ke(machine_config &config);
 	void macplus(machine_config &config);
-	void maclc(machine_config &config);
+	void maclc(machine_config &config, bool cpu = true, bool egret = true, asc_device::asc_type asc_type = asc_device::asc_type::V8);
 	void macpb170(machine_config &config);
 	void macclasc(machine_config &config);
 	void maciisi(machine_config &config);
-	void maclc2(machine_config &config);
+	void maclc2(machine_config &config, bool egret = true);
 	void macse(machine_config &config);
-	void maclc3(machine_config &config);
+	void maclc3(machine_config &config, bool egret = true);
 	void macpd210(machine_config &config);
 	void maciici(machine_config &config);
 	void macprtb(machine_config &config);
-	void maciix(machine_config &config);
+	void maciix(machine_config &config, bool nubus_bank1 = true, bool nubus_bank2 = true);
 	void maclc520(machine_config &config);
 	void pwrmac(machine_config &config);
 	void maciivx(machine_config &config);
@@ -127,7 +142,8 @@ public:
 	void maciifx(machine_config &config);
 	void macpb140(machine_config &config);
 	void macclas2(machine_config &config);
-	void macii(machine_config &config);
+	void macii(machine_config &config, bool cpu = true, asc_device::asc_type asc_type = asc_device::asc_type::ASC,
+		bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true);
 	void maciihmu(machine_config &config);
 
 	void init_maclc2();
@@ -287,7 +303,6 @@ private:
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
 	DECLARE_READ32_MEMBER(rom_switch_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
 	bool m_snd_enable;
 	bool m_main_buffer;
 	int m_snd_vol;
@@ -514,10 +529,11 @@ private:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
 
+	void palette_init_mac(palette_device &palette);
+	void palette_init_macgsc(palette_device &palette);
+
 	DECLARE_VIDEO_START(mac);
-	DECLARE_PALETTE_INIT(mac);
 	DECLARE_VIDEO_START(macprtb);
-	DECLARE_PALETTE_INIT(macgsc);
 	DECLARE_VIDEO_START(macsonora);
 	DECLARE_VIDEO_RESET(macrbv);
 	DECLARE_VIDEO_START(macdafb);

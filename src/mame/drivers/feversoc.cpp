@@ -311,11 +311,11 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom");
 
-	MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
+	JRC6355E(config, m_rtc, XTAL(32'768));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 MACHINE_CONFIG_END

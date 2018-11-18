@@ -28,6 +28,7 @@
     rabbitpk |  clone   |  Rabbit Poker / Arizona Poker 1.1? (with PIC)
     sigmapkr |  parent  |  Sigma Poker.
     sigma2k  |  parent  |  Sigma Poker 2000.
+    arizna10 |  clone   |  Arizona Poker 1.1? (with PIC)
 
 
 *********************************************************************************
@@ -80,7 +81,6 @@ PALETTE_INIT_MEMBER(ampoker2_state, ampoker2)
       76543210
       RRRGGGBB
 */
-	int i;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
@@ -91,42 +91,38 @@ PALETTE_INIT_MEMBER(ampoker2_state, ampoker2)
 			2,  resistances_b,  weights_b,  0,  0);
 
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
-
 		/* blue component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		int bit0 = (color_prom[i] >> 0) & 0x01;
+		int bit1 = (color_prom[i] >> 1) & 0x01;
+		int b = combine_2_weights(weights_b, bit0, bit1);
 		/* green component */
 		bit0 = (color_prom[i] >> 2) & 0x01;
 		bit1 = (color_prom[i] >> 3) & 0x01;
-		bit2 = (color_prom[i] >> 4) & 0x01;
-		g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		int bit2 = (color_prom[i] >> 4) & 0x01;
+		int g = combine_3_weights(weights_g, bit0, bit1, bit2);
 		/* red component */
 		bit0 = (color_prom[i] >> 5) & 0x01;
 		bit1 = (color_prom[i] >> 6) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
-		r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		int r = combine_3_weights(weights_r, bit0, bit1, bit2);
 
 		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_videoram_w)
+WRITE8_MEMBER(ampoker2_state::videoram_w)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
 {
-	uint8_t *videoram = m_videoram;
 	int offs = tile_index * 2;
-	int attr = videoram[offs + 1];
-	int code = videoram[offs];
+	int attr = m_videoram[offs + 1];
+	int code = m_videoram[offs];
 	int color = attr;
 	code = code + (256 * (color & 0x03));   /* code = color.bit1 + color.bit0 + code */
 	color = color >> 1;                     /* color = color - bit0 (bit1..bit7) */
@@ -136,10 +132,9 @@ TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
 {
-	uint8_t *videoram = m_videoram;
 	int offs = tile_index * 2;
-	int attr = videoram[offs + 1];
-	int code = videoram[offs];
+	int attr = m_videoram[offs + 1];
+	int code = m_videoram[offs];
 	int color = attr;
 	code = code + (256 * (color & 0x0f));   /* the game uses 2 extra bits */
 	color = color >> 1;
@@ -159,7 +154,7 @@ VIDEO_START_MEMBER(ampoker2_state,sigma2k)
 			8, 8, 64, 32);
 }
 
-uint32_t ampoker2_state::screen_update_ampoker2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ampoker2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

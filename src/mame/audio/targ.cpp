@@ -63,15 +63,15 @@ WRITE8_MEMBER( exidy_state::targ_audio_1_w )
 
 	/* shot */
 	if (FALLING_EDGE(0x02) && !m_samples->playing(0))  m_samples->start(0,1);
-	if (RISING_EDGE(0x02)) m_samples->stop(0);
+	if (RISING_EDGE(0x02)) m_samples->start(0,1);
 
 	/* crash */
 	if (RISING_EDGE(0x20))
 	{
 		if (data & 0x40)
-			m_samples->start(1,2);
-		else
 			m_samples->start(1,0);
+		else
+			m_samples->start(1,2);
 	}
 
 	/* Sspec */
@@ -135,6 +135,7 @@ static const char *const sample_names[] =
 	"spfast",
 	nullptr
 };
+
 
 
 void exidy_state::common_audio_start(int freq)

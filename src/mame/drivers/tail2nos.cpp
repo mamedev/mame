@@ -244,10 +244,10 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	MCFG_DEVICE_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2608 */
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_3))
-	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("link", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_3);
+	//m_acia->txd_handler().set("link", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set("link", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -269,23 +269,23 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	MCFG_K051316_WRAP(1)
 	MCFG_K051316_CB(tail2nos_state, zoom_callback)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
-	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tail2nos_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000)));  /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_b_write_callback().set(FUNC(tail2nos_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

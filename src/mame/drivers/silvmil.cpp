@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

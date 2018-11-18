@@ -95,6 +95,12 @@ public:
 		m_first_vpos = first_vpos;
 		m_increment = increment;
 	}
+	template <class FunctionClass> void configure_scanline(void (FunctionClass::*callback)(timer_device &, void *, s32),
+		const char *name, const char *screen, int first_vpos, int increment)
+	{
+		configure_scanline(expired_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), screen, first_vpos, increment);
+	}
+
 	template <typename Object> void set_callback(Object &&cb) { m_callback = std::forward<Object>(cb); }
 	void set_start_delay(const attotime &delay) { m_start_delay = delay; }
 	void config_param(int param) { m_param = param; }

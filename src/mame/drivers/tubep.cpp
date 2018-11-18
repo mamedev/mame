@@ -840,13 +840,13 @@ MACHINE_CONFIG_START(tubep_state::tubep)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tubep_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tubep_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) //something...
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tubep_state, screen_flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, tubep_state, background_romselect_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tubep_state, colorproms_A4_line_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(tubep_state::coin1_counter_w));
+	mainlatch.q_out_cb<1>().set(FUNC(tubep_state::coin2_counter_w));
+	mainlatch.q_out_cb<5>().set_nop(); //something...
+	mainlatch.q_out_cb<5>().set(FUNC(tubep_state::screen_flip_w));
+	mainlatch.q_out_cb<6>().set(FUNC(tubep_state::background_romselect_w));
+	mainlatch.q_out_cb<7>().set(FUNC(tubep_state::colorproms_A4_line_w));
 
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,tubep)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,tubep)
@@ -866,20 +866,20 @@ MACHINE_CONFIG_START(tubep_state::tubep)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_0_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_0_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay1(AY8910(config, "ay1", 19968000 / 8 / 2));
+	ay1.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_0_w));
+	ay1.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_0_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_1_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_1_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay2(AY8910(config, "ay2", 19968000 / 8 / 2));
+	ay2.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_1_w));
+	ay2.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_1_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_2_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_2_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay3(AY8910(config, "ay3", 19968000 / 8 / 2));
+	ay3.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_2_w));
+	ay3.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_2_w));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.10);
 MACHINE_CONFIG_END
 
 
@@ -909,16 +909,15 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	MCFG_DEVICE_PROGRAM_MAP(rjammer_sound_map)
 	MCFG_DEVICE_IO_MAP(rjammer_sound_portmap)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("mcu",NSC8105,6000000) /* 6 MHz Xtal - divided internally ??? */
 	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 3A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tubep_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tubep_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, tubep_state, screen_flip_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 3A
+	mainlatch.q_out_cb<0>().set(FUNC(tubep_state::coin1_counter_w));
+	mainlatch.q_out_cb<1>().set(FUNC(tubep_state::coin2_counter_w));
+	mainlatch.q_out_cb<5>().set(FUNC(tubep_state::screen_flip_w));
 
 	MCFG_MACHINE_START_OVERRIDE(tubep_state,rjammer)
 	MCFG_MACHINE_RESET_OVERRIDE(tubep_state,rjammer)
@@ -939,25 +938,26 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_0_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_0_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay1(AY8910(config, "ay1", 19968000 / 8 / 2));
+	ay1.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_0_w));
+	ay1.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_0_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_1_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_1_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay2(AY8910(config, "ay2", 19968000 / 8 / 2));
+	ay2.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_1_w));
+	ay2.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_1_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_2_w)) /* write port A */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portB_2_w)) /* write port B */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay3(AY8910(config, "ay3", 19968000 / 8 / 2));
+	ay3.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_2_w));
+	ay3.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_2_w));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tubep_state, rjammer_adpcm_vck))          /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz (changes at run time) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 

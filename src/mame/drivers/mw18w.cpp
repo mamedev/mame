@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(mw18w_state::mw18w)
 	MCFG_DEVICE_PROGRAM_MAP(mw18w_map)
 	MCFG_DEVICE_IO_MAP(mw18w_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* no video! */
 

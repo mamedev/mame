@@ -21,7 +21,7 @@
 		</text>
 		<disk state="1">
 			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.5" green="0.5" blue="0.5" />
 		</disk>
 	</element>
 	<element name="hlb" defstate="0">
@@ -202,77 +202,30 @@
 
 	<!-- chessboard sensors -->
 
-		<bezel element="hl" inputtag="board:IN.7" inputmask="0x01"><bounds x="3"  y="3" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.7" inputmask="0x02"><bounds x="13" y="3" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.7" inputmask="0x04"><bounds x="23" y="3" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.7" inputmask="0x08"><bounds x="33" y="3" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.7" inputmask="0x10"><bounds x="43" y="3" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.7" inputmask="0x20"><bounds x="53" y="3" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.7" inputmask="0x40"><bounds x="63" y="3" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.7" inputmask="0x80"><bounds x="73" y="3" width="10" height="10" /><color alpha="0.2" /></bezel>
-
-		<bezel element="hl" inputtag="board:IN.6" inputmask="0x01"><bounds x="3"  y="13" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.6" inputmask="0x02"><bounds x="13" y="13" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.6" inputmask="0x04"><bounds x="23" y="13" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.6" inputmask="0x08"><bounds x="33" y="13" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.6" inputmask="0x10"><bounds x="43" y="13" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.6" inputmask="0x20"><bounds x="53" y="13" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.6" inputmask="0x40"><bounds x="63" y="13" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.6" inputmask="0x80"><bounds x="73" y="13" width="10" height="10" /><color alpha="0.4" /></bezel>
-
-		<bezel element="hl" inputtag="board:IN.5" inputmask="0x01"><bounds x="3"  y="23" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.5" inputmask="0x02"><bounds x="13" y="23" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.5" inputmask="0x04"><bounds x="23" y="23" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.5" inputmask="0x08"><bounds x="33" y="23" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.5" inputmask="0x10"><bounds x="43" y="23" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.5" inputmask="0x20"><bounds x="53" y="23" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.5" inputmask="0x40"><bounds x="63" y="23" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.5" inputmask="0x80"><bounds x="73" y="23" width="10" height="10" /><color alpha="0.2" /></bezel>
-
-		<bezel element="hl" inputtag="board:IN.4" inputmask="0x01"><bounds x="3"  y="33" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.4" inputmask="0x02"><bounds x="13" y="33" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.4" inputmask="0x04"><bounds x="23" y="33" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.4" inputmask="0x08"><bounds x="33" y="33" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.4" inputmask="0x10"><bounds x="43" y="33" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.4" inputmask="0x20"><bounds x="53" y="33" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.4" inputmask="0x40"><bounds x="63" y="33" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.4" inputmask="0x80"><bounds x="73" y="33" width="10" height="10" /><color alpha="0.4" /></bezel>
-
-		<bezel element="hl" inputtag="board:IN.3" inputmask="0x01"><bounds x="3"  y="43" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.3" inputmask="0x02"><bounds x="13" y="43" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.3" inputmask="0x04"><bounds x="23" y="43" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.3" inputmask="0x08"><bounds x="33" y="43" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.3" inputmask="0x10"><bounds x="43" y="43" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.3" inputmask="0x20"><bounds x="53" y="43" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.3" inputmask="0x40"><bounds x="63" y="43" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.3" inputmask="0x80"><bounds x="73" y="43" width="10" height="10" /><color alpha="0.2" /></bezel>
-
-		<bezel element="hl" inputtag="board:IN.2" inputmask="0x01"><bounds x="3"  y="53" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.2" inputmask="0x02"><bounds x="13" y="53" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.2" inputmask="0x04"><bounds x="23" y="53" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.2" inputmask="0x08"><bounds x="33" y="53" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.2" inputmask="0x10"><bounds x="43" y="53" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.2" inputmask="0x20"><bounds x="53" y="53" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.2" inputmask="0x40"><bounds x="63" y="53" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.2" inputmask="0x80"><bounds x="73" y="53" width="10" height="10" /><color alpha="0.4" /></bezel>
-
-		<bezel element="hl" inputtag="board:IN.1" inputmask="0x01"><bounds x="3"  y="63" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.1" inputmask="0x02"><bounds x="13" y="63" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.1" inputmask="0x04"><bounds x="23" y="63" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.1" inputmask="0x08"><bounds x="33" y="63" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.1" inputmask="0x10"><bounds x="43" y="63" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.1" inputmask="0x20"><bounds x="53" y="63" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.1" inputmask="0x40"><bounds x="63" y="63" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.1" inputmask="0x80"><bounds x="73" y="63" width="10" height="10" /><color alpha="0.2" /></bezel>
-
-		<bezel element="hl" inputtag="board:IN.0" inputmask="0x01"><bounds x="3"  y="73" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.0" inputmask="0x02"><bounds x="13" y="73" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.0" inputmask="0x04"><bounds x="23" y="73" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.0" inputmask="0x08"><bounds x="33" y="73" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.0" inputmask="0x10"><bounds x="43" y="73" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.0" inputmask="0x20"><bounds x="53" y="73" width="10" height="10" /><color alpha="0.4" /></bezel>
-		<bezel element="hl" inputtag="board:IN.0" inputmask="0x40"><bounds x="63" y="73" width="10" height="10" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="board:IN.0" inputmask="0x80"><bounds x="73" y="73" width="10" height="10" /><color alpha="0.4" /></bezel>
+		<repeat count="4">
+			<param name="pairy" start="3" increment="20" />
+			<param name="pairno" start="7" increment="-2" />
+			<repeat count="2">
+				<param name="rowy" start="~pairy~" increment="10" />
+				<param name="rowno" start="~pairno~" increment="-1" />
+				<param name="lalpha" start="0.2" increment="0.3" />
+				<param name="ralpha" start="0.5" increment="-0.3" />
+				<repeat count="4">
+					<param name="lx" start="3" increment="20" />
+					<param name="rx" start="13" increment="20" />
+					<param name="lmask" start="0x01" lshift="2" />
+					<param name="rmask" start="0x02" lshift="2" />
+					<bezel element="hl" inputtag="board:IN.~rowno~" inputmask="~lmask~">
+						<bounds x="~lx~" y="~rowy~" width="10" height="10" />
+						<color alpha="~lalpha~" />
+					</bezel>
+					<bezel element="hl" inputtag="board:IN.~rowno~" inputmask="~rmask~">
+						<bounds x="~rx~" y="~rowy~" width="10" height="10" />
+						<color alpha="~ralpha~" />
+					</bezel>
+				</repeat>
+			</repeat>
+		</repeat>
 
 	<!-- LCD panel -->
 		<group ref="panel"><bounds x="87" y="58" width="23" height="23.5" /></group>

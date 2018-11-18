@@ -15,7 +15,8 @@ Skeleton driver for Visual 102 display terminal.
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/z80sio.h"
-//#include "video/crt9007.h"
+//#include "video/crt9006.h"
+#include "video/crt9007.h"
 //#include "video/crt9021.h"
 #include "screen.h"
 
@@ -60,14 +61,11 @@ void v102_state::mem_map(address_map &map)
 void v102_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0x3f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
-	map(0x18, 0x19).nopw();
+	map(0x00, 0x3f).rw("vpac", FUNC(crt9007_device::read), FUNC(crt9007_device::write));
 	map(0x40, 0x43).rw("mpsc", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w));
-	map(0x60, 0x60).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x61, 0x61).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x60, 0x61).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x80, 0x83).w("pit", FUNC(pit8253_device::write));
 	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	//AM_RANGE(0xbf, 0xbf) ???
 }
 
 void v102_state::kbd_map(address_map &map)
@@ -75,40 +73,41 @@ void v102_state::kbd_map(address_map &map)
 	map(0x000, 0x7ff).rom().region("keyboard", 0);
 }
 
-static INPUT_PORTS_START( v102 )
+static INPUT_PORTS_START(v102)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(v102_state::v102)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void v102_state::v102(machine_config &config)
+{
+	Z80(config, m_maincpu, 18.575_MHz_XTAL / 5); // divider not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &v102_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &v102_state::io_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'575'000), 970, 0, 800, 319, 0, 300)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(18'575'000), 948, 0, 792, 319, 0, 300)
-	MCFG_SCREEN_UPDATE_DRIVER(v102_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(18.575_MHz_XTAL, 970, 0, 800, 319, 0, 300);
+	//screen.set_raw(18.575_MHz_XTAL, 948, 0, 792, 319, 0, 300);
+	screen.set_screen_update(FUNC(v102_state::screen_update));
 
-	//MCFG_DEVICE_ADD("vpac", CRT9007, CRTC_CLOCK)
-	//MCFG_CRT9007_CHARACTER_WIDTH(6 or 10)
+	crt9007_device &vpac(CRT9007(config, "vpac", 18.575_MHz_XTAL / 10));
+	vpac.set_character_width(10); // 6 in 132-column mode
+	vpac.int_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	MCFG_EEPROM_2804_ADD("eeprom")
+	EEPROM_2804(config, "eeprom");
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	upd7201_new_device &mpsc(UPD7201_NEW(config, "mpsc", 18.575_MHz_XTAL / 5)); // divider not verified
+	mpsc.out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	i8251_device &usart(I8251(config, "usart", 18.575_MHz_XTAL / 5)); // divider not verified
+	usart.rxrdy_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	PIT8253(config, "pit", 0);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	I8255(config, "ppi");
 
-	MCFG_DEVICE_ADD("kbdcpu", I8039, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(kbd_map)
-MACHINE_CONFIG_END
+	mcs48_cpu_device &kbdcpu(I8039(config, "kbdcpu", 11000000));
+	kbdcpu.set_addrmap(AS_PROGRAM, &v102_state::kbd_map);
+}
 
 
 /**************************************************************************************************************

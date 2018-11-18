@@ -34,6 +34,7 @@
 #include "machine/genpc.h"
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
+#include "machine/ram.h"
 
 #include "coreutil.h"
 
@@ -46,6 +47,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
 		m_keyboard(*this, "pc_keyboard"),
+		m_ram(*this, RAM_TAG),
 		m_jim_state(0),
 		m_port61(0)
 	{ }
@@ -60,6 +62,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
+	required_device<ram_device> m_ram;
 
 	DECLARE_WRITE8_MEMBER( europc_pio_w );
 	DECLARE_READ8_MEMBER( europc_pio_r );
@@ -538,29 +541,30 @@ MACHINE_CONFIG_START(europc_pc_state::europc)
 	MCFG_SLOT_FIXED(true)
 	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
-	MCFG_NVRAM_ADD_0FILL("nvram");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);;
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 640K") // Machine came with 512K standard, 640K via expansion card, but BIOS offers 256K as well
+	// Machine came with 512K standard, 640K via expansion card, but BIOS offers 256K as well
+	RAM(config, m_ram).set_default_size("512K").set_extra_options("256K, 640K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
 MACHINE_CONFIG_END
 
 //Euro PC II
-MACHINE_CONFIG_START(europc_pc_state::europc2)
+void europc_pc_state::europc2(machine_config &config)
+{
 	europc(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K") // could be configured by the BIOS as 640K, 640K+128K EMS or 512K+256K EMS
-MACHINE_CONFIG_END
+	// could be configured by the BIOS as 640K, 640K+128K EMS or 512K+256K EMS
+	m_ram->set_default_size("768K");
+}
 
 //Euro XT
 MACHINE_CONFIG_START(europc_pc_state::euroxt)
 	europc(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K")
+
+	m_ram->set_default_size("768K");
+
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "xtide", false) // FIXME: determine ISA bus clock

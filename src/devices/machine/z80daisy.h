@@ -23,17 +23,6 @@ const uint8_t Z80_DAISY_INT = 0x01;       // interrupt request mask
 const uint8_t Z80_DAISY_IEO = 0x02;       // interrupt disable mask (IEO)
 
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-// configure devices
-#define MCFG_Z80_DAISY_CHAIN(_config) \
-	dynamic_cast<z80_daisy_chain_interface &>(*device).set_daisy_config(_config);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

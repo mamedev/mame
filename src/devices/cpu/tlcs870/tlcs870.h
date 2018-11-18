@@ -8,6 +8,7 @@
 class tlcs870_device : public cpu_device
 {
 public:
+
 	auto p0_in_cb() { return m_port_in_cb[0].bind(); }
 	auto p1_in_cb() { return m_port_in_cb[1].bind(); }
 	auto p2_in_cb() { return m_port_in_cb[2].bind(); }
@@ -25,6 +26,19 @@ public:
 	auto p5_out_cb() { return m_port_out_cb[5].bind(); }
 	auto p6_out_cb() { return m_port_out_cb[6].bind(); }
 	auto p7_out_cb() { return m_port_out_cb[7].bind(); }
+
+	auto an0_in_cb() { return m_port_analog_in_cb[0].bind(); }
+	auto an1_in_cb() { return m_port_analog_in_cb[1].bind(); }
+	auto an2_in_cb() { return m_port_analog_in_cb[2].bind(); }
+	auto an3_in_cb() { return m_port_analog_in_cb[3].bind(); }
+	auto an4_in_cb() { return m_port_analog_in_cb[4].bind(); }
+	auto an5_in_cb() { return m_port_analog_in_cb[5].bind(); }
+	auto an6_in_cb() { return m_port_analog_in_cb[6].bind(); }
+	auto an7_in_cb() { return m_port_analog_in_cb[7].bind(); }
+
+	auto serial0_out_cb() { return m_serial_out_cb[0].bind(); }
+	auto serial1_out_cb() { return m_serial_out_cb[1].bind(); }
+
 
 protected:
 	// construction/destruction
@@ -56,6 +70,26 @@ protected:
 	void tmp87ph40an_mem(address_map &map);
 
 	uint32_t m_debugger_temp;
+
+	enum _tlcs870interrupts
+	{
+		TLCS870_IRQ_INT5, // FFE0 INT5    (External Interrupt 5) - priority 15 (lowest)
+		TLCS870_IRQ_INTTC2,       // FFE2 INTTC2  (16-bit TC2 Interrupt)
+		TLCS870_IRQ_INTSIO2,      // FFE4 INTSIO2 (Serial Interface 2 Interrupt)
+		TLCS870_IRQ_INT4,         // FFE6 INT4    (External Interrupt 4)
+		TLCS870_IRQ_INT3,         // FFE8 INT3    (External Interrupt 3)
+		TLCS870_IRQ_INTTC4,       // FFEA INTTC4  (8-bit TC4 Interrupt)
+		TLCS870_IRQ_INTSIO1,      // FFEC INTSIO1 (Serial Interface 1 Interrupt)
+		TLCS870_IRQ_INTTC3,       // FFEE INTTC3  (8-bit TC3 Interrupt)
+		TLCS870_IRQ_INT2,         // FFF0 INT2    (External Interrupt 2)
+		TLCS870_IRQ_INTTBT,       // FFF2 INTTBT  (Time Base Timer Interrupt)
+		TLCS870_IRQ_INT1,         // FFF4 INT1    (External Interrupt 1)
+		TLCS870_IRQ_INTTC1,       // FFF6 INTTC1  (16-bit TC1 Interrupt)
+		TLCS870_IRQ_INT0,         // FFF8 INT0    (External Interrupt 0)
+		TLCS870_IRQ_INTWDT,       // FFFA INTWDT  (Watchdog Timer Interrupt)
+		TLCS870_IRQ_INTSW,        // FFFC INTSW   (Software Interrupt)
+		TLCS870_IRQ_RESET,        // FFFE RESET   (Reset Interrupt) - priority 0 (highest)
+	};
 
 private:
 
@@ -92,7 +126,8 @@ private:
 		DEBUGGER_REG_WA,
 		DEBUGGER_REG_BC,
 		DEBUGGER_REG_DE,
-		DEBUGGER_REG_HL
+		DEBUGGER_REG_HL,
+		DEBUGGER_REG_RB
 	};
 
 	enum _conditions
@@ -122,6 +157,7 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 	required_shared_ptr<uint8_t> m_intram;
+	required_shared_ptr<uint8_t> m_dbr;
 
 	PAIR        m_prvpc, m_pc, m_sp;
 
@@ -131,6 +167,10 @@ private:
 
 	devcb_read8   m_port_in_cb[8];
 	devcb_write8  m_port_out_cb[8];
+	devcb_read8   m_port_analog_in_cb[8];
+	devcb_write_line m_serial_out_cb[2];
+
+
 	uint8_t m_port_out_latch[8];
 	int m_read_input_port;
 	uint8_t m_port0_cr, m_port1_cr, m_port6_cr, m_port7_cr;
@@ -158,6 +198,65 @@ private:
 	DECLARE_WRITE8_MEMBER(p6cr_w);
 	DECLARE_WRITE8_MEMBER(p7cr_w);
 
+	DECLARE_READ8_MEMBER(eir_l_r);
+	DECLARE_READ8_MEMBER(eir_h_r);
+	DECLARE_READ8_MEMBER(il_l_r);
+	DECLARE_READ8_MEMBER(il_h_r);
+
+	DECLARE_WRITE8_MEMBER(eir_l_w);
+	DECLARE_WRITE8_MEMBER(eir_h_w);
+	DECLARE_WRITE8_MEMBER(il_l_w);
+	DECLARE_WRITE8_MEMBER(il_h_w);
+
+	DECLARE_READ8_MEMBER(eintcr_r);
+
+	DECLARE_WRITE8_MEMBER(eintcr_w);
+
+	DECLARE_WRITE8_MEMBER(treg1a_l_w);
+	DECLARE_WRITE8_MEMBER(treg1a_h_w);
+	DECLARE_WRITE8_MEMBER(treg1b_l_w);
+	DECLARE_WRITE8_MEMBER(treg1b_h_w);
+	DECLARE_WRITE8_MEMBER(tc1cr_w);
+	DECLARE_WRITE8_MEMBER(tc2cr_w);
+	DECLARE_WRITE8_MEMBER(treg2_l_w);
+	DECLARE_WRITE8_MEMBER(treg2_h_w);
+	DECLARE_WRITE8_MEMBER(treg3a_w);
+	DECLARE_WRITE8_MEMBER(tc3cr_w);
+	DECLARE_WRITE8_MEMBER(tc4cr_w);
+
+	DECLARE_READ8_MEMBER(treg1b_l_r);
+	DECLARE_READ8_MEMBER(treg1b_h_r);
+	DECLARE_READ8_MEMBER(treg3a_r);
+	DECLARE_READ8_MEMBER(treg3b_r);
+	DECLARE_WRITE8_MEMBER(treg4_w);
+
+
+	DECLARE_WRITE8_MEMBER(sio1cr1_w);
+	DECLARE_WRITE8_MEMBER(sio1cr2_w);
+	DECLARE_WRITE8_MEMBER(sio2cr1_w);
+	DECLARE_WRITE8_MEMBER(sio2cr2_w);
+	DECLARE_READ8_MEMBER(sio2sr_r);
+	DECLARE_READ8_MEMBER(sio1sr_r);
+
+	DECLARE_WRITE8_MEMBER(wdtcr1_w);
+	DECLARE_WRITE8_MEMBER(wdtcr2_w);
+
+	DECLARE_WRITE8_MEMBER(tbtcr_w);
+
+	DECLARE_READ8_MEMBER(tbtcr_r);
+
+	DECLARE_WRITE8_MEMBER(syscr1_w);
+	DECLARE_WRITE8_MEMBER(syscr2_w);
+	DECLARE_READ8_MEMBER(syscr1_r);
+	DECLARE_READ8_MEMBER(syscr2_r);
+	DECLARE_WRITE8_MEMBER(rbs_w);
+	DECLARE_READ8_MEMBER(psw_r);
+
+	DECLARE_READ8_MEMBER(adccr_r);
+	DECLARE_READ8_MEMBER(adcdr_r);
+
+	DECLARE_WRITE8_MEMBER(adccr_w);
+
 	// Work registers
 	uint8_t m_cycles;
 	uint16_t m_tmppc;
@@ -167,6 +266,58 @@ private:
 
 	/* CPU registers */
 	uint8_t m_RBS; // register base (4-bits)
+
+	uint16_t m_IL; // 3D / 3C
+	uint16_t m_EIR; // 3B / 3A
+	uint8_t m_EINTCR;
+	uint8_t m_ADCCR;
+	uint8_t m_ADCDR;
+	uint8_t m_SYSCR1;
+	uint8_t m_SYSCR2;
+	uint8_t m_TBTCR;
+	uint16_t m_TREG1A;
+	uint16_t m_TREG1B;
+	uint8_t m_TC1CR;
+	uint16_t m_TREG2;
+	uint8_t m_TC2CR;
+	uint8_t m_TREG3A;
+	uint8_t m_TREG3B;
+	uint8_t m_TC3CR;
+	uint8_t m_TREG4;
+	uint8_t m_TC4CR;
+	uint8_t m_SIOCR1[2];
+	uint8_t m_SIOCR2[2];
+	uint8_t m_WDTCR1;
+
+	uint16_t m_irqstate;
+
+	// serial stuff
+	TIMER_CALLBACK_MEMBER(sio0_transmit_cb);
+	TIMER_CALLBACK_MEMBER(sio1_transmit_cb);
+	uint8_t m_transfer_numbytes[2];
+	uint8_t m_transfer_pos[2];
+	uint8_t m_transfer_shiftreg[2];
+	uint8_t m_transfer_shiftpos[2];
+	uint8_t m_transfer_mode[2];
+	int m_transmit_bits[2];
+	int m_receive_bits[2];
+
+	emu_timer *m_serial_transmit_timer[2];
+
+	TIMER_CALLBACK_MEMBER(tc1_cb);
+	TIMER_CALLBACK_MEMBER(tc2_cb);
+	TIMER_CALLBACK_MEMBER(tc3_cb);
+	TIMER_CALLBACK_MEMBER(tc4_cb);
+
+	void tc2_reload();
+	void tc2_cancel();
+
+	emu_timer *m_tcx_timer[4];
+
+
+	void set_irq_line(int irqline, int state);
+	void check_interrupts();
+	void take_interrupt(int priority);
 
 	uint8_t  RM8(const uint32_t a) { return m_program->read_byte(a); }
 	uint16_t RM16(const uint32_t a) { return RM8(a) | (RM8((a + 1) & 0xffff) << 8); }
@@ -308,8 +459,6 @@ private:
 	void do_CALL_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr);
 	void do_JP_insrc(const uint8_t opbyte0, const uint8_t opbyte1, const uint16_t srcaddr);
 
-	uint16_t do_alu(int op, uint16_t param1, uint16_t param2);
-
 	// tlcs870_ops_dst.cpp
 	void do_dstprefixtype_opcode(const uint8_t opbyte0);
 
@@ -362,17 +511,32 @@ private:
 	void do_CALL_gg(const uint8_t opbyte0, const uint8_t opbyte1);
 	void do_JP_gg(const uint8_t opbyte0, const uint8_t opbyte1);
 
+
+	// ALU related
+	uint16_t do_or(uint16_t param1, uint16_t param2);
+	uint16_t do_xor(uint16_t param1, uint16_t param2);
+	uint16_t do_and(uint16_t param1, uint16_t param2);
+
+	uint8_t do_add_8bit(uint16_t param1, uint16_t param2);
+	uint8_t do_sub_8bit(uint16_t param1, uint16_t param2);
+	void do_cmp_8bit(uint16_t param1, uint16_t param2);
+	uint8_t do_alu_8bit(int op, uint16_t param1, uint16_t param2);
+
+	uint16_t do_add_16bit(uint32_t param1, uint32_t param2);
+	uint16_t do_sub_16bit(uint32_t param1, uint32_t param2);
+	void do_cmp_16bit(uint32_t param1, uint32_t param2);
+	uint16_t do_alu_16bit(int op, uint32_t param1, uint32_t param2);
+
+	// Generic opcode helpers
 	void handle_div(const int reg);
 	void handle_mul(const int reg);
 	void handle_swap(const int reg);
-
 	uint8_t handle_SHLC(uint8_t val);
 	uint8_t handle_SHRC(uint8_t val);
 	uint8_t handle_DAS(uint8_t val);
 	uint8_t handle_DAA(uint8_t val);
 	uint8_t handle_ROLC(uint8_t val);
 	uint8_t handle_RORC(uint8_t val);
-	void handle_take_interrupt(int level);
 
 	const bool check_jump_condition(int param1);
 

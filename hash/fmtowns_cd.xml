@@ -50,7 +50,6 @@ Birdy Soft Best Characters                                    Birdy Soft        
 Bohemia no Inori                                              Fujitsu                           1993/5     CD
 Bomber Quest                                                  Mink                              1995/6     CD
 Brain Builder                                                 Ritex                             1993/8     CD×05
-* Branmarker 2                                                D.O.                              1995/10    CD×02
 Business Houritsu Yougo no Kiso Chishiki                      Fujitsu                           1993/8     CD
 Butoukai no Yoru                                              Fujitsu                           ?          CD
 ByHAND V1.1                                                   Fujitsu                           1992/1     CD
@@ -647,7 +646,6 @@ Suisai Graphic Art Software                                   NTT Data Tsuushin 
 Sunshine 1-nen                                                Uchida Youkou                     1993/7     CD
 Sunshine 2-nen                                                Uchida Youkou                     1993/7     CD
 Super Kakitaoshi                                              Nikkonren Kikaku                  1993/?     SET(CD+FD)
-Super Real Mahjong PII & PIII +                               Ving                              1993/3     CD
 Super Zurukamashi                                             Nikkonren Kikaku                  1993/?     SET(CD+FD)
 Suzaku                                                        Wolf Team                         1992/10    SET(CD+FD)
 Tactical Tank Corps DX                                        GAM                               1995/2     SET(CD+FD)
@@ -659,9 +657,7 @@ Tania                                                         Tips              
 Tankyuu-kun                                                   Fujitsu                           1996/11    CD
 Tanoshii Sansuu Set 1-2-nen                                   Dainippon Tosho                   1994/3     SET(CD+FD)
 Teata -vision- (V1.0-1.3)                                     Nanken Koubou                     1995/6     SET(CD+FD)
-Teito Taisen                                                  Chouonsoku                        1989/12    CD
 Teitoku no Ketsudan                                           Koei                              1990/4     SET(CD+FD)
-Teitoku no Ketsudan 2                                         Koei                              1994/6     SET(CD+FD)
 Tender Light Vol. 1                                           Fujitsu                           1994/3     CD
 Tenjin Ranma                                                  Elf                               1992/5     SET(CD+FD)
 Tensai Kyuutei Ongaku no Kanade                               Fujitsu                           1992/12    CD
@@ -680,7 +676,7 @@ The Lost Secret                                               DynEd Japan       
 The Manhole 2                                                 Sun Denshi                        1993/5     ?
 The Playroom                                                  Fujitsu                           1995/2     CD
 The Sea in Your Eyes: Umi wo Mitsumete                        Inter Limited Logic               1995/4     CD
-The Visitor                                                   Fujitsu                           1989/9     CD
+* The Visitor                                                   Fujitsu                           1989/9     CD
 The Yachtman                                                  Raison                            1989/11    CD
 Theme Park                                                    Electronic Arts Victor            1995/9     CD
 Think Read: Chuugaku Series                                   Catena                            ?          SET(CD+FD)
@@ -768,7 +764,6 @@ Youki de Cool na LA Towns                                     Media Art         
 Yubiwa Monogatari Daiikkan: Tabi no Nakama                    Starcraft                         1992/3     CD
 Yubiwa Monogatari Dainikan: Futatsu no Tou                    Starcraft                         1993/4     SET(CD+FD)
 Yumeutsutsu                                                   Megami                            1992/5     CD
-Zoku Youjuu Senki: Suna no Mokushiroku                        D.O.                              1994/2     CD
 Z's Staff Pro Towns                                           Zeit                              1991/7     CD
 Z's Triphony DigitalCraft Towns                               Zeit                              1990/12    CD
 
@@ -2405,21 +2400,29 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="branmar2">
 		<!--
-		Origin: Neo Kobe Collection
+		Origin: Neo Kobe Collection (Game Disc), DamienD / Tokugawa Corporate Forums (Extra Disc)
 		<rom name="Branmarker 2 (Game disc).ccd" size="1152" crc="5a5c5567" sha1="9201413c9a0109f0ebe03a99e35e01d18c9a09a5"/>
 		<rom name="Branmarker 2 (Game disc).cue" size="166" crc="760286da" sha1="961a4db20766d03f437819c33849c90370b9edf5"/>
 		<rom name="Branmarker 2 (Game disc).img" size="479575152" crc="8e722dbd" sha1="1bfa442a34d21ae2d37ca33d6a703a754e77cdb5"/>
 		<rom name="Branmarker 2 (Game disc).sub" size="19574496" crc="51b2a7ea" sha1="e527977f203bbe6f2b9ea25a617d450521e2bc2d"/>
+		<rom name="ブランマーカー2・エクストラディスク.img" size="726325824" crc="b9324800" sha1="295e3206778ab260c41478339cf8d4c3c981b980"/>
+		<rom name="ブランマーカー2・エクストラディスク.cue" size="206" crc="dc15aca7" sha1="9c4796da1de799894e9df7bd2a9985ffa370cc52"/>
 		-->
 		<description>Branmarker 2</description>
 		<year>1995</year>
 		<publisher>ディー・オー (D.O.)</publisher>
-		<part name="cdrom" interface="fmt_cdrom">
+		<part name="cdrom1" interface="fmt_cdrom">
+			<feature name="part_id" value="Game Disc" />
 			<diskarea name="cdrom">
 				<disk name="branmarker 2" sha1="b7a41a36bf83c293defa929dd8b2daea961cd3aa" />
 			</diskarea>
 		</part>
-		<!-- We are missing the Extra Disk! -->
+		<part name="cdrom2" interface="fmt_cdrom">
+			<feature name="part_id" value="Extra Disc" />
+			<diskarea name="cdrom">
+				<disk name="branmarker 2 extra disc" sha1="8845dd975d20f8d9756b0c5d1859ef7bfd79b21d" />
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="bublbobl">
@@ -8749,6 +8752,24 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="srmp23p">
+		<!--
+		Origin: Tokugawa Corporate Forums (DamienD)
+		<rom name="スーパーリアル麻雀PII＆PIII＋.cue" size="1759" crc="445c6d63" sha1="430b421997422953dd0336eec5b96a20c69ddae2"/>
+		<rom name="スーパーリアル麻雀PII＆PIII＋.img" size="422125200" crc="fc6e20b7" sha1="8a389d9d58cc774e15366194f56260be5ea313a3"/>
+		-->
+		<description>Super Real Mahjong PII &amp; PIII +</description>
+		<year>1993</year>
+		<publisher>ビング (Ving)</publisher>
+		<info name="release" value="199303xx" />
+		<info name="alt_title" value="スーパーリアル麻雀PII＆PIII＋" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="super real mahjong pii &amp; piii +" sha1="771be8adecbb5798bb1cd79942854937c337c262" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="srmp4">
 		<!--
 		Origin: Neo Kobe Collection
@@ -9141,6 +9162,61 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tdf - terrestrial defense force" sha1="584ac4f25e5cc1f38857d26b5dc988219ae5646b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="teikets2">
+		<!--
+		Origin: redump.org / private dump (r09)
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 01).bin" size="20462400" crc="4004e7cc" sha1="f189d5d179d938e15c17a09e37afd722d98f9223"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 02).bin" size="36385440" crc="336d138c" sha1="17c9eb69308b1d04c4365ce7055f396dbd89c306"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 03).bin" size="34367424" crc="f2caee14" sha1="573027cce1f15e98f57fe1e6e227e13e088b84f0"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 04).bin" size="30877056" crc="cfbf4b3f" sha1="a11b46ec5c777dcd7d2b7e372cb8234b5f754fd4"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 05).bin" size="31387440" crc="4c586655" sha1="91319186ace1ede151f75d07f013e4a4fb168a0d"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 06).bin" size="36726480" crc="5202d2fb" sha1="f12506be68bfb3921cab200538d9302aabdfec0c"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 07).bin" size="35456400" crc="f83feecf" sha1="31c2afa8af49e5f4e2cb548e822832cefebb6a12"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 08).bin" size="35990304" crc="f99079ae" sha1="236e814cc4f7750899b5848d51da3b243d370f27"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 09).bin" size="41425776" crc="398bd472" sha1="840a79503795eb043dbe104f15f79822f0c6243e"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 10).bin" size="38784480" crc="9502a827" sha1="3793885e14f6f8bc022aa67eb8a0e3bee6ce7ec6"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 11).bin" size="22755600" crc="4cd72fc6" sha1="92d276853bf634589bc39254b74a98a4ed92e99a"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 12).bin" size="34597920" crc="fba864cc" sha1="8df9c4d53a8a1bb168a039c416f6877334d225d1"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 13).bin" size="34562640" crc="2a914e64" sha1="8c833bf1f804111fabd164e54475979252ebf815"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 14).bin" size="39348960" crc="b0de224b" sha1="cf7e0c6d7074c20fd06a6b8448fe9e2b3ddeeab9"/>
+		<rom name="Teitoku no Ketsudan II (Japan) (Track 15).bin" size="26118960" crc="d637ce20" sha1="ba71c375a08a892f6f5609410286db0a5afbfc75"/>
+		<rom name="Teitoku no Ketsudan II (Japan).cue" size="1857" crc="9b03cca2" sha1="897d13d36a43d4c74fe05ab799c563e2326a5d90"/>
+		-->
+		<description>Teitoku no Ketsudan II</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="提督の決断II" />
+		<info name="release" value="199406xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="teitoku no ketsudan ii.hdm" size="1261568" crc="aabcd4f9" sha1="5079e129b96836f6d19503528633ee66e29cfebc" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="teitoku no ketsudan ii (japan)" sha1="1dc21e612ccec83fb48e0c3452f1c5251c1d3023" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="teitotai">
+		<!--
+		Origin: redump.org
+		<rom name="Teito Taisen (Japan).bin" size="105487200" crc="9409bd29" sha1="73d1d34a9fd009e80cc41a054b92f6c686087a93"/>
+		<rom name="Teito Taisen (Japan).cue" size="86" crc="1ba10a5d" sha1="785147ee5fd380f40d9df097e88de7fe962f2fb4"/>
+		-->
+		<description>Teito Taisen</description>
+		<year>1989</year>
+		<publisher>超音速 (Super Sonic)</publisher>
+		<info name="alt_title" value="帝都大戦" />
+		<info name="release" value="198912xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="teito taisen (japan)" sha1="324eb4c855cf9b27ead9dc2f8706f8c0f23f06f4" />
 			</diskarea>
 		</part>
 	</software>
@@ -9888,6 +9964,38 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!-- iso + mp3 source, needs to be replaced with a proper dump -->
+	<software name="visitor">
+		<!--
+		Origin: Tokugawa Corporate Forums (DamienD)
+		<rom name="01-VISITOR.iso" size="19662848" crc="5f2f4bf9" sha1="360e1a4ccc267793fca2cee1787b77dbd7a44049"/>
+		<rom name="02-.mp3" size="1662976" crc="5a24da9c" sha1="879f65eb11b76355f8a07e5050ac10bca503664a"/>
+		<rom name="03-.mp3" size="583680" crc="46db53e6" sha1="5caff118126ac9d91e1ee81a879548650152a6b6"/>
+		<rom name="04-.mp3" size="454656" crc="2bfa0360" sha1="35ac0d9d937b936fbe46eb4ea39653b97b5c729f"/>
+		<rom name="05-.mp3" size="1273856" crc="59b5a2b2" sha1="371a0e18287c17c6157b9fa5f8b8d0dc8c8d3a4d"/>
+		<rom name="06-.mp3" size="835584" crc="d89c63ed" sha1="b98100d058d0ae24d3854b002eb8fc0555a68e54"/>
+		<rom name="07-.mp3" size="1167360" crc="267f39e2" sha1="a2e936180c57a17e581d6d14e8456d959f9f503b"/>
+		<rom name="08-.mp3" size="3223552" crc="beb2c596" sha1="c9cebb94441fb1c00e4e82bd9e0b85f07ac35dba"/>
+		<rom name="09-.mp3" size="4745216" crc="6e9cbd57" sha1="3be0b8033fc7bec633bb1f28e2ef9545c857c6a7"/>
+		<rom name="10-.mp3" size="892928" crc="0fe4ac83" sha1="5dc546baefed73d23a1f336e49c084ab2bd38d4b"/>
+		<rom name="11-.mp3" size="514048" crc="98f7a283" sha1="9cb3a1c9620c994c45416423d5be883079788988"/>
+		<rom name="12-.mp3" size="933888" crc="216032c7" sha1="d79f981eb7cd8f223e6d693933609d04ef65cf7d"/>
+		<rom name="13-.mp3" size="1378304" crc="fe8ce1e5" sha1="f9275c3a0b56b7d45a169c0d4974e521804d2756"/>
+		<rom name="14-.mp3" size="571392" crc="16b7345e" sha1="6e8a1bf598a33b16356802384641e3e15749a40d"/>
+		<rom name="15-.mp3" size="835584" crc="1f46762c" sha1="e76c192d23fb380af997280bb9f8502a2245055d"/>
+		<rom name="16-.mp3" size="860160" crc="a8c4e968" sha1="c1b4a36175d1fdd554a1e3f5db870dccc76b2a54"/>
+		-->
+		<description>The Visitor</description>
+		<year>1989</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="release" value="198909xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="visitor" sha1="18f43caaf537a305004b5c2e8a4d032d98055966" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="volfied">
 		<!--
 		Origin: Neo Kobe Collection
@@ -10489,6 +10597,24 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="zoku dungeon master - chaos no gyakushuu" sha1="a4010dad3499bc7d87806a12e270890b1154032e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="zyojusen">
+		<!--
+		Origin: redump.org
+		<rom name="Zoku Youjuu Senki - Suna no Mokushiroku (Japan).bin" size="207065376" crc="723a0084" sha1="08efb9c1ca6eb163d63eba9d8b22cbc4585e1a85"/>
+		<rom name="Zoku Youjuu Senki - Suna no Mokushiroku (Japan).cue" size="113" crc="3ac9ac7d" sha1="2be5b5683dcc5b2558bf4e5ba749d1efb0b663d5"/>
+		-->
+		<description>Zoku Youjuu Senki - Suna no Mokushiroku</description>
+		<year>1994</year>
+		<publisher>ディー・オー (D.O.)</publisher>
+		<info name="alt_title" value="続妖獣戦記 ―砂塵の黙示録―" />
+		<info name="release" value="199402xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zoku youjuu senki - suna no mokushiroku (japan)" sha1="91e09f83c7c0439131290d9d7783566b5e085d85" />
 			</diskarea>
 		</part>
 	</software>

@@ -749,7 +749,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// Speech
 		if (m_vaquerro->sprd_out()==ASSERT_LINE)
 		{
-			value = m_speech->status_r(space, 0) & 0xff;
+			value = m_speech->status_r() & 0xff;
 			what = "speech";
 			goto readdone;
 		}
@@ -947,7 +947,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 	if (m_vaquerro->spwt_out()==ASSERT_LINE)
 	{
 		LOGMASKED(LOG_MEM, "Write %04x (speech) <- %02x\n", m_logical_address, data);
-		m_speech->data_w(space, 0, data);
+		m_speech->data_w(data);
 		m_pending_write = false;
 	}
 
@@ -1070,12 +1070,13 @@ void mainboard8_device::device_reset()
 	m_space = &m_maincpu->space(AS_PROGRAM);
 }
 
-MACHINE_CONFIG_START(mainboard8_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(TI998_VAQUERRO_TAG, TI99_VAQUERRO, 0)
-	MCFG_DEVICE_ADD(TI998_MOFETTA_TAG, TI99_MOFETTA, 0)
-	MCFG_DEVICE_ADD(TI998_AMIGO_TAG, TI99_AMIGO, 0)
-	MCFG_DEVICE_ADD(TI998_OSO_TAG, TI99_OSO, 0)
-MACHINE_CONFIG_END
+void mainboard8_device::device_add_mconfig(machine_config &config)
+{
+	TI99_VAQUERRO(config, TI998_VAQUERRO_TAG, 0);
+	TI99_MOFETTA(config, TI998_MOFETTA_TAG, 0);
+	TI99_AMIGO(config, TI998_AMIGO_TAG, 0);
+	TI99_OSO(config, TI998_OSO_TAG, 0);
+}
 
 /***************************************************************************
   ===== VAQUERRO: Logical Address Space decoder =====

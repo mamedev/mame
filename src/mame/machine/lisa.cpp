@@ -389,7 +389,6 @@ TIMER_CALLBACK_MEMBER(lisa_state::handle_mouse)
 TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 {
 	int command;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_COPS_Ready = 0;
 	m_via0->write_pb6(m_COPS_Ready);
@@ -398,7 +397,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 	COPS_send_data_if_possible();
 
 	/* some pull-ups allow the COPS to read 1s when the VIA port is not set as output */
-	command = (m_COPS_command | (~ m_via0->read(space, via6522_device::VIA_DDRA))) & 0xff;
+	command = (m_COPS_command | (~ m_via0->read(via6522_device::VIA_DDRA))) & 0xff;
 
 //    printf("Dropping Ready, command = %02x\n", command);
 
@@ -675,7 +674,7 @@ WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
 WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 {
 	/* pull-up */
-	data |= (~ m_via0->read(space, via6522_device::VIA_DDRA)) & 0x01;
+	data |= (~ m_via0->read(via6522_device::VIA_DDRA)) & 0x01;
 
 	if (data & 0x01)
 	{
@@ -1721,13 +1720,13 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 			case 2: /* parallel port */
 				/* 1 VIA located at 0xD901 */
 				if (ACCESSING_BITS_0_7)
-					answer = m_via1->read(space, (offset >> 2) & 0xf);
+					answer = m_via1->read((offset >> 2) & 0xf);
 				break;
 
 			case 3: /* keyboard/mouse cops via */
 				/* 1 VIA located at 0xDD81 */
 				if (ACCESSING_BITS_0_7)
-					answer = m_via0->read(space, offset & 0xf);
+					answer = m_via0->read(offset & 0xf);
 				break;
 			}
 		}
@@ -1844,12 +1843,12 @@ WRITE16_MEMBER(lisa_state::lisa_IO_w)
 
 			case 2: /* paralel port */
 				if (ACCESSING_BITS_0_7)
-					m_via1->write(space, (offset >> 2) & 0xf, data & 0xff);
+					m_via1->write((offset >> 2) & 0xf, data & 0xff);
 				break;
 
 			case 3: /* keyboard/mouse cops via */
 				if (ACCESSING_BITS_0_7)
-					m_via0->write(space, offset & 0xf, data & 0xff);
+					m_via0->write(offset & 0xf, data & 0xff);
 				break;
 			}
 		}

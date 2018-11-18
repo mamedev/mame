@@ -13,12 +13,12 @@ class zerozone_state : public driver_device
 {
 public:
 	zerozone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_soundlatch(*this, "soundlatch"),
-			m_vram(*this, "videoram"),
-			m_gfxdecode(*this, "gfxdecode")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundlatch(*this, "soundlatch")
+		, m_vram(*this, "videoram")
+		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	void zerozone(machine_config &config);
@@ -26,6 +26,7 @@ public:
 private:
 	// in drivers/zerozone.c
 	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	// in video/zerozone.c
 	DECLARE_WRITE16_MEMBER(tilemap_w);

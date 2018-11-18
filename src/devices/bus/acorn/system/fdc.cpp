@@ -42,14 +42,12 @@ static void acorn_floppies(device_slot_interface &device)
 
 void acorn_fdc_device::device_add_mconfig(machine_config &config)
 {
-	I8271(config, m_fdc, 0);
+	I8271(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(acorn_fdc_device::bus_nmi_w));
 	m_fdc->hdl_wr_callback().set(FUNC(acorn_fdc_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(acorn_fdc_device::side_w));
-	FLOPPY_CONNECTOR(config, m_floppy[0], acorn_floppies, "525qd", acorn_fdc_device::floppy_formats);
-	m_floppy[0]->enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], acorn_floppies, "525qd", acorn_fdc_device::floppy_formats);
-	m_floppy[1]->enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], acorn_floppies, "525qd", acorn_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], acorn_floppies, "525qd", acorn_fdc_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -99,6 +97,7 @@ WRITE_LINE_MEMBER(acorn_fdc_device::motor_w)
 {
 	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
 	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
+	m_fdc->ready_w(!state);
 }
 
 WRITE_LINE_MEMBER(acorn_fdc_device::side_w)

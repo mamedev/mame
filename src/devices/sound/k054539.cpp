@@ -535,6 +535,11 @@ void k054539_device::device_start()
 	init_chip();
 }
 
+void k054539_device::device_clock_changed()
+{
+	stream->set_sample_rate(clock() / 384);
+}
+
 void k054539_device::device_reset()
 {
 	regs[0x22c] = 0;

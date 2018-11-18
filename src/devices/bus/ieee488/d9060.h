@@ -65,8 +65,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
 	DECLARE_WRITE8_MEMBER( scsi_data_w );
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_hdccpu;
+	required_device<m6502_device> m_maincpu;
+	required_device<m6502_device> m_hdccpu;
 	required_device<mos6532_new_device> m_riot0;
 	required_device<mos6532_new_device> m_riot1;
 	required_device<via6522_device> m_via;
@@ -86,8 +86,8 @@ private:
 	uint8_t m_data;
 
 	int m_variant;
-	void d9060_hdc_mem(address_map &map);
-	void d9060_main_mem(address_map &map);
+	void hdc_mem(address_map &map);
+	void main_mem(address_map &map);
 };
 
 

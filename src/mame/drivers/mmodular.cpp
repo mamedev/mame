@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(mmodular_state::alm32)
 	MCFG_DEVICE_PROGRAM_MAP(alm32_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(mmodular_state::gen32)
 	MCFG_DEVICE_PROGRAM_MAP(gen32_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(berlinp_state::berlinp)
 	MCFG_DEVICE_PROGRAM_MAP(berlinp_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")

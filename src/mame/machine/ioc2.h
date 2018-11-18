@@ -59,6 +59,23 @@ public:
 		INT3_LOCAL1_RETRACE   = 0x80,
 	};
 
+	uint32_t get_local0_int_status() const { return m_int3_local0_status_reg; }
+	uint32_t get_local0_int_mask() const { return m_int3_local0_mask_reg; }
+	uint32_t get_local1_int_status() const { return m_int3_local1_status_reg; }
+	uint32_t get_local1_int_mask() const { return m_int3_local1_mask_reg; }
+	uint32_t get_map_int_status() const { return m_int3_map_status_reg; }
+	uint32_t get_map0_int_mask() const { return m_int3_map_mask0_reg; }
+	uint32_t get_map1_int_mask() const { return m_int3_map_mask1_reg; }
+
+	void set_local0_int_mask(const uint32_t data);
+	void set_local1_int_mask(const uint32_t data);
+	void set_map0_int_mask(const uint32_t data);
+	void set_map1_int_mask(const uint32_t data);
+	void set_timer_int_clear(const uint32_t data);
+
+	uint8_t get_pit_reg(uint32_t offset) { return m_pit->read(offset); }
+	void set_pit_reg(uint32_t offset, uint8_t data) { return m_pit->write(offset, data); }
+
 protected:
 	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -66,6 +83,13 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	DECLARE_WRITE_LINE_MEMBER(timer0_int);
+	DECLARE_WRITE_LINE_MEMBER(timer1_int);
+	DECLARE_WRITE_LINE_MEMBER(kbdc_int_w);
+	DECLARE_WRITE_LINE_MEMBER(duart_int_w);
+
+	void set_mappable_int(uint8_t mask, bool state);
 
 	enum
 	{
@@ -123,6 +147,10 @@ protected:
 		FRONT_PANEL_VOL_DOWN_HOLD    = 0x20,
 		FRONT_PANEL_VOL_UP_INT       = 0x40,
 		FRONT_PANEL_VOL_UP_HOLD      = 0x80,
+
+		FRONT_PANEL_INT_MASK         = FRONT_PANEL_POWER_BUTTON_INT |
+                                       FRONT_PANEL_VOL_DOWN_INT |
+                                       FRONT_PANEL_VOL_UP_INT
 	};
 
 	enum
@@ -160,19 +188,18 @@ protected:
 	uint8_t m_int3_map_mask0_reg;
 	uint8_t m_int3_map_mask1_reg;
 	uint8_t m_int3_map_pol_reg;
-	uint8_t m_int3_timer_clear_reg;
 	uint8_t m_int3_err_status_reg;
 
 	uint32_t    m_par_read_cnt;
 	uint32_t    m_par_cntl;
 	uint8_t m_system_id;
 
-	static const char *SCC_TAG;
-	static const char *PI1_TAG;
-	static const char *KBDC_TAG;
-	static const char *PIT_TAG;
-	static const char *RS232A_TAG;
-	static const char *RS232B_TAG;
+	static char const *const SCC_TAG;
+	static char const *const PI1_TAG;
+	static char const *const KBDC_TAG;
+	static char const *const PIT_TAG;
+	static char const *const RS232A_TAG;
+	static char const *const RS232B_TAG;
 
 	static const XTAL SCC_PCLK;
 	static const XTAL SCC_RXA_CLK;
@@ -185,8 +212,8 @@ class ioc2_guinness_device : public ioc2_device
 {
 public:
 	template <typename T>
-	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: ioc2_guinness_device(mconfig, tag, owner, clock)
+	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: ioc2_guinness_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
@@ -201,8 +228,8 @@ class ioc2_full_house_device : public ioc2_device
 {
 public:
 	template <typename T>
-	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: ioc2_full_house_device(mconfig, tag, owner, clock)
+	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: ioc2_full_house_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}

@@ -4,21 +4,13 @@
 #include "machine/msm6242.h"
 #include "machine/timer.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/nec/v53.h"
+#include "cpu/nec/v5x.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/poly.h"
 #include "cpu/tlcs870/tlcs870.h"
+#include "machine/mb8421.h"
 #include "emupal.h"
 #include "screen.h"
-
-enum
-{
-	FIGHT_MCU = 1,
-	SHOOT_MCU,
-	RACING_MCU,
-	SAMSHO_MCU,
-	BURIKI_MCU
-};
 
 enum hng64trans_t
 {
@@ -134,6 +126,31 @@ private:
 };
 
 
+// TODO, this could become the IO board device emulation
+class hng64_lamps_device : public device_t
+{
+public:
+	hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto lamps0_out_cb() { return m_lamps_out_cb[0].bind(); }
+	auto lamps1_out_cb() { return m_lamps_out_cb[1].bind(); }
+	auto lamps2_out_cb() { return m_lamps_out_cb[2].bind(); }
+	auto lamps3_out_cb() { return m_lamps_out_cb[3].bind(); }
+	auto lamps4_out_cb() { return m_lamps_out_cb[4].bind(); }
+	auto lamps5_out_cb() { return m_lamps_out_cb[5].bind(); }
+	auto lamps6_out_cb() { return m_lamps_out_cb[6].bind(); }
+	auto lamps7_out_cb() { return m_lamps_out_cb[7].bind(); }
+
+	DECLARE_WRITE8_MEMBER(lamps_w) { m_lamps_out_cb[offset](data); }
+
+protected:
+	virtual void device_start() override;
+
+private:
+	devcb_write8  m_lamps_out_cb[8];
+};
+
+
 class hng64_state : public driver_device
 {
 public:
@@ -144,49 +161,67 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_iomcu(*this, "iomcu"),
+		m_lamps(*this, "lamps"),
+		m_dt71321_dpram(*this, "dt71321_dpram"),
 		m_dsp(*this, "l7a1045"),
 		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
 		m_cart(*this, "cart"),
 		m_sysregs(*this, "sysregs"),
-		m_dualport(*this, "dualport"),
 		m_rombase(*this, "rombase"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteregs(*this, "spriteregs"),
 		m_videoram(*this, "videoram"),
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
-		m_3dregs(*this, "3dregs"),
-		m_3d_1(*this, "3d_1"),
-		m_3d_2(*this, "3d_2"),
-		m_com_ram(*this, "com_ram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_fbtable(*this, "fbtable"),
+		m_comhack(*this, "comhack"),
+		m_fbram1(*this, "fbram1"),
+		m_fbram2(*this, "fbram2"),
+		m_idt7133_dpram(*this, "com_ram"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_in(*this, "IN%u", 0U),
+		m_an_in(*this, "AN%u", 0U),
+		m_samsho64_3d_hack(0),
+		m_roadedge_3d_hack(0)
 	{}
 
 	void hng64(machine_config &config);
+	void hng64_default(machine_config &config);
+	void hng64_drive(machine_config &config);
+	void hng64_shoot(machine_config &config);
+	void hng64_fight(machine_config &config);
 
-	void init_hng64_race();
-	void init_fatfurwa();
-	void init_buriki();
+	void init_roadedge();
+	void init_hng64_drive();
 	void init_hng64();
 	void init_hng64_shoot();
 	void init_ss64();
 	void init_hng64_fght();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
 
 	uint8_t *m_texturerom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 private:
+	/* TODO: NOT measured! */
+	const int PIXEL_CLOCK = (HNG64_MASTER_CLOCK*2)/4; // x 2 is due to the interlaced screen ...
+
+	const int HTOTAL = 0x200+0x100;
+	const int HBEND = 0;
+	const int HBSTART = 0x200;
+
+	const int VTOTAL = 264*2;
+	const int VBEND = 0;
+	const int VBSTART = 224*2;
+
+
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
 	required_device<tmp87ph40an_device> m_iomcu;
+	required_device<hng64_lamps_device> m_lamps;
+	required_device<idt71321_device> m_dt71321_dpram;
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;
@@ -194,7 +229,6 @@ private:
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_cart;
 	required_shared_ptr<uint32_t> m_sysregs;
-	required_shared_ptr<uint32_t> m_dualport;
 	required_shared_ptr<uint32_t> m_rombase;
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_spriteregs;
@@ -203,16 +237,42 @@ private:
 	required_shared_ptr<uint32_t> m_tcram;
 
 	std::unique_ptr<uint16_t[]> m_dl;
-	required_shared_ptr<uint32_t> m_3dregs;
-	required_shared_ptr<uint32_t> m_3d_1;
-	required_shared_ptr<uint32_t> m_3d_2;
+	required_shared_ptr<uint32_t> m_fbtable;
+	required_shared_ptr<uint32_t> m_comhack;
+	required_shared_ptr<uint32_t> m_fbram1;
+	required_shared_ptr<uint32_t> m_fbram2;
 
-	required_shared_ptr<uint32_t> m_com_ram;
+	required_shared_ptr<uint32_t> m_idt7133_dpram;
 	//required_shared_ptr<uint8_t> m_com_mmu_mem;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	int m_mcu_type;
+	required_ioport_array<8> m_in;
+	required_ioport_array<8> m_an_in;
+
+
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps0_w) { logerror("lamps0 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps1_w) { logerror("lamps1 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps2_w) { logerror("lamps2 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps3_w) { logerror("lamps3 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps4_w) { logerror("lamps4 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps5_w) { logerror("lamps5 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps6_w) { logerror("lamps6 %02x\n", data); }
+	DECLARE_WRITE8_MEMBER(hng64_default_lamps7_w) { logerror("lamps7 %02x\n", data); }
+
+	DECLARE_WRITE8_MEMBER(hng64_drive_lamps7_w);
+	DECLARE_WRITE8_MEMBER(hng64_drive_lamps6_w);
+	DECLARE_WRITE8_MEMBER(hng64_drive_lamps5_w);
+
+	DECLARE_WRITE8_MEMBER(hng64_shoot_lamps7_w);
+	DECLARE_WRITE8_MEMBER(hng64_shoot_lamps6_w);
+
+	DECLARE_WRITE8_MEMBER(hng64_fight_lamps6_w);
+
+	int m_samsho64_3d_hack;
+	int m_roadedge_3d_hack;
+
+	uint8_t m_fbcontrol[4];
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -226,7 +286,6 @@ private:
 	int32_t m_dma_dst;
 	int32_t m_dma_len;
 
-	uint32_t m_mcu_fake_time;
 	uint16_t m_mcu_en;
 
 	uint32_t m_activeDisplayList;
@@ -270,23 +329,44 @@ private:
 	DECLARE_READ8_MEMBER(hng64_com_share_mips_r);
 	DECLARE_READ32_MEMBER(hng64_sysregs_r);
 	DECLARE_WRITE32_MEMBER(hng64_sysregs_w);
-	DECLARE_READ32_MEMBER(fight_io_r);
-	DECLARE_READ32_MEMBER(samsho_io_r);
-	DECLARE_READ32_MEMBER(shoot_io_r);
-	DECLARE_READ32_MEMBER(racing_io_r);
-	DECLARE_READ32_MEMBER(hng64_dualport_r);
-	DECLARE_WRITE32_MEMBER(hng64_dualport_w);
-	DECLARE_READ32_MEMBER(hng64_3d_1_r);
-	DECLARE_READ32_MEMBER(hng64_3d_2_r);
-	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
-	DECLARE_WRITE32_MEMBER(hng64_3d_2_w);
+	DECLARE_READ32_MEMBER(hng64_rtc_r);
+	DECLARE_WRITE32_MEMBER(hng64_rtc_w);
+	DECLARE_READ32_MEMBER(hng64_dmac_r);
+	DECLARE_WRITE32_MEMBER(hng64_dmac_w);
+	DECLARE_READ32_MEMBER(hng64_irqc_r);
+	DECLARE_WRITE32_MEMBER(hng64_irqc_w);
+	DECLARE_WRITE32_MEMBER(hng64_mips_to_iomcu_irq_w);
+
+	DECLARE_READ8_MEMBER(hng64_dualport_r);
+	DECLARE_WRITE8_MEMBER(hng64_dualport_w);
+
+	DECLARE_READ8_MEMBER(hng64_fbcontrol_r);
+	DECLARE_WRITE8_MEMBER(hng64_fbcontrol_w);
+
+	DECLARE_WRITE16_MEMBER(hng64_fbunkpair_w);
+	DECLARE_WRITE16_MEMBER(hng64_fbscroll_w);
+
+	DECLARE_WRITE8_MEMBER(hng64_fbunkbyte_w);
+
+	DECLARE_READ32_MEMBER(hng64_fbtable_r);
+	DECLARE_WRITE32_MEMBER(hng64_fbtable_w);
+
+	DECLARE_READ32_MEMBER(hng64_fbram1_r);
+	DECLARE_WRITE32_MEMBER(hng64_fbram1_w);
+
+	DECLARE_READ32_MEMBER(hng64_fbram2_r);
+	DECLARE_WRITE32_MEMBER(hng64_fbram2_w);
+
 	DECLARE_WRITE16_MEMBER(dl_w);
 	//DECLARE_READ32_MEMBER(dl_r);
 	DECLARE_WRITE32_MEMBER(dl_control_w);
 	DECLARE_WRITE32_MEMBER(dl_upload_w);
+	DECLARE_WRITE32_MEMBER(dl_unk_w);
+	DECLARE_READ32_MEMBER(dl_vreg_r);
+
 	DECLARE_WRITE32_MEMBER(tcram_w);
 	DECLARE_READ32_MEMBER(tcram_r);
-	DECLARE_READ32_MEMBER(unk_vreg_r);
+
 	DECLARE_WRITE32_MEMBER(hng64_soundram_w);
 	DECLARE_READ32_MEMBER(hng64_soundram_r);
 	DECLARE_WRITE32_MEMBER(hng64_vregs_w);
@@ -305,23 +385,42 @@ private:
 	DECLARE_READ8_MEMBER(hng64_comm_mmu_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_mmu_w);
 
+	// shared ram access
 	DECLARE_READ8_MEMBER(ioport0_r);
-	DECLARE_READ8_MEMBER(ioport1_r);
-	DECLARE_READ8_MEMBER(ioport2_r);
-	DECLARE_READ8_MEMBER(ioport3_r);
-	DECLARE_READ8_MEMBER(ioport4_r);
-	DECLARE_READ8_MEMBER(ioport5_r);
-	DECLARE_READ8_MEMBER(ioport6_r);
-	DECLARE_READ8_MEMBER(ioport7_r);
-
 	DECLARE_WRITE8_MEMBER(ioport0_w);
-	DECLARE_WRITE8_MEMBER(ioport1_w);
-	DECLARE_WRITE8_MEMBER(ioport2_w);
-	DECLARE_WRITE8_MEMBER(ioport3_w);
-	DECLARE_WRITE8_MEMBER(ioport4_w);
-	DECLARE_WRITE8_MEMBER(ioport5_w);
-	DECLARE_WRITE8_MEMBER(ioport6_w);
 	DECLARE_WRITE8_MEMBER(ioport7_w);
+
+	// input port access
+	DECLARE_READ8_MEMBER(ioport3_r);
+	DECLARE_WRITE8_MEMBER(ioport3_w);
+	DECLARE_WRITE8_MEMBER(ioport1_w);
+
+	// unknown access
+	DECLARE_WRITE8_MEMBER(ioport4_w);
+
+	// analog input access
+	DECLARE_READ8_MEMBER(anport0_r);
+	DECLARE_READ8_MEMBER(anport1_r);
+	DECLARE_READ8_MEMBER(anport2_r);
+	DECLARE_READ8_MEMBER(anport3_r);
+	DECLARE_READ8_MEMBER(anport4_r);
+	DECLARE_READ8_MEMBER(anport5_r);
+	DECLARE_READ8_MEMBER(anport6_r);
+	DECLARE_READ8_MEMBER(anport7_r);
+
+	DECLARE_WRITE_LINE_MEMBER( sio0_w );
+
+	uint8_t m_port7;
+	uint8_t m_port1;
+
+	int m_ex_ramaddr;
+	int m_ex_ramaddr_upper;
+
+	TIMER_CALLBACK_MEMBER(tempio_irqon_callback);
+	TIMER_CALLBACK_MEMBER(tempio_irqoff_callback);
+	emu_timer *m_tempio_irqon_timer;
+	emu_timer *m_tempio_irqoff_timer;
+	void init_io();
 
 	void init_hng64_reorder_gfx();
 
@@ -334,6 +433,10 @@ private:
 	uint16_t m_mmub[6];
 	uint8_t read_comm_data(uint32_t offset);
 	void write_comm_data(uint32_t offset,uint8_t data);
+	TIMER_CALLBACK_MEMBER(comhack_callback);
+	emu_timer *m_comhack_timer;
+
+
 	int m_irq_level;
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile0_16x16_info);

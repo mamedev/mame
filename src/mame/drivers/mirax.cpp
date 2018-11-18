@@ -490,14 +490,14 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_DEVICE_PROGRAM_MAP(mirax_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // R10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mirax_state, coin_counter0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mirax_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mirax_state, coin_counter1_w)) // only used in 'miraxa' - see notes
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // R10
+	mainlatch.q_out_cb<0>().set(FUNC(mirax_state::coin_counter0_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mirax_state::nmi_mask_w));
+	mainlatch.q_out_cb<2>().set(FUNC(mirax_state::coin_counter1_w)); // only used in 'miraxa' - see notes
 	// One address flips X, the other flips Y, but I can't tell which is which
 	// Since the value is the same for the 2 addresses, it doesn't really matter
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_y_w))
+	mainlatch.q_out_cb<6>().set(FUNC(mirax_state::flip_screen_x_w));
+	mainlatch.q_out_cb<7>().set(FUNC(mirax_state::flip_screen_y_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -515,13 +515,11 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 12000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	AY8912(config, m_ay[0], 12000000/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, 12000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	AY8912(config, m_ay[1], 12000000/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 MACHINE_CONFIG_END
 
 

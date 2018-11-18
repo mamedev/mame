@@ -10,7 +10,7 @@ Skeleton driver for Data General Dasher 400 series terminals.
 #include "cpu/m6809/m6809.h"
 #include "machine/mc68681.h"
 #include "machine/x2212.h"
-//#include "video/crt9007.h"
+#include "video/crt9007.h"
 #include "screen.h"
 
 class d400_state : public driver_device
@@ -62,7 +62,7 @@ READ8_MEMBER(d400_state::novram_store_r)
 void d400_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	//AM_RANGE(0x4000, 0x403f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
+	map(0x4000, 0x403f).rw("vpac", FUNC(crt9007_device::read), FUNC(crt9007_device::write));
 	map(0x4800, 0x48ff).ram();
 	map(0x5000, 0x50ff).ram();
 	map(0x6000, 0x6fff).ram();
@@ -74,23 +74,29 @@ void d400_state::mem_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
 }
 
-static INPUT_PORTS_START( d461 )
+static INPUT_PORTS_START(d461)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(d400_state::d461)
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 4'000'000) // HD68B09EP
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+void d400_state::d461(machine_config &config)
+{
+	MC6809E(config, m_maincpu, 59.292_MHz_XTAL / 30); // HD68B09EP (clock not verified)
+	m_maincpu->set_addrmap(AS_PROGRAM, &d400_state::mem_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(59'292'000) / 3, 1080, 0, 810, 305, 0, 300) // yes, 81 columns
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(59'292'000) / 2, 1620, 0, 1215, 305, 0, 300) // for 135-column mode
-	MCFG_SCREEN_UPDATE_DRIVER(d400_state, screen_update)
+	X2210(config, "novram");
 
-	MCFG_DEVICE_ADD("novram", X2210, 0)
+	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL));
+	duart.irq_cb().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(59.292_MHz_XTAL / 3, 1080, 0, 810, 305, 0, 300); // yes, 81 columns
+	//screen.set_raw(59.292_MHz_XTAL / 2, 1620, 0, 1215, 305, 0, 300); // for 135-column mode
+	screen.set_screen_update(FUNC(d400_state::screen_update));
+
+	crt9007_device &vpac(CRT9007(config, "vpac", 59.292_MHz_XTAL / 30));
+	vpac.set_screen("screen");
+	vpac.set_character_width(10); // 9 in 135-column mode
+	vpac.int_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
+}
 
 
 

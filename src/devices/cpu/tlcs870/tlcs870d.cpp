@@ -1469,7 +1469,7 @@ void tlcs870_disassembler::decode_register_prefix(uint8_t b0)
 	case 0xae:
 	case 0xaf:
 		// XCH r,g
-		m_op = XCH;  
+		m_op = XCH;
 
 		//m_flagsaffected |= FLAG_J | FLAG_Z;
 

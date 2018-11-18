@@ -162,7 +162,7 @@ INPUT_PORTS_END
 READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_a )
 {
 	// Read data from the Z80 PIU
-	return m_d71055c_1->read_pa();
+	return m_d71055c_1->pa_r();
 }
 
 WRITE8_MEMBER( isa8_ibm_mfc_device::ppi0_o_b )
@@ -210,7 +210,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_a )
 READ8_MEMBER( isa8_ibm_mfc_device::ppi1_i_b )
 {
 	// Read data from the PC PIU
-	return m_d71055c_0->read_pb();
+	return m_d71055c_0->pb_r();
 }
 
 WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_c )
@@ -285,7 +285,7 @@ READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
 		case 0x2:
 		case 0x3:
 		{
-			val = m_d71055c_0->read(space, offset);
+			val = m_d71055c_0->read(offset);
 			break;
 		}
 
@@ -317,7 +317,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
 		case 0x3:
 		{
 			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(1000));
-			m_d71055c_0->write(space, offset, data);
+			m_d71055c_0->write(offset, data);
 			break;
 		}
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
 		case 0x6:
 		case 0x7:
 		{
-			m_d8253->write(space, offset & 3, data);
+			m_d8253->write(offset & 3, data);
 			break;
 		}
 
@@ -379,29 +379,29 @@ MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(prg_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("d71055c_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, isa8_ibm_mfc_device, ppi0_i_a))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi0_o_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, isa8_ibm_mfc_device, ppi0_i_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi0_o_c))
+	I8255(config, m_d71055c_0);
+	m_d71055c_0->in_pa_callback().set(FUNC(isa8_ibm_mfc_device::ppi0_i_a));
+	m_d71055c_0->out_pb_callback().set(FUNC(isa8_ibm_mfc_device::ppi0_o_b));
+	m_d71055c_0->in_pc_callback().set(FUNC(isa8_ibm_mfc_device::ppi0_i_c));
+	m_d71055c_0->out_pc_callback().set(FUNC(isa8_ibm_mfc_device::ppi0_o_c));
 
-	MCFG_DEVICE_ADD("d71055c_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi1_o_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, isa8_ibm_mfc_device, ppi1_i_b))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isa8_ibm_mfc_device, ppi1_o_c))
+	I8255(config, m_d71055c_1);
+	m_d71055c_1->out_pa_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_o_a));
+	m_d71055c_1->in_pb_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_i_b));
+	m_d71055c_1->out_pc_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_o_c));
 
-	MCFG_DEVICE_ADD("d71051", I8251, 0)
+	I8251(config, "d71051", 0);
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, write_usart_clock))
 
-	MCFG_DEVICE_ADD("d8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(4'000'000) / 8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, d8253_out0))
-	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, d8253_out1))
-	MCFG_PIT8253_CLK2(XTAL(4'000'000) / 2)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("d8253", pit8253_device, write_clk1))
+	PIT8253(config, m_d8253, 0);
+	m_d8253->set_clk<0>(XTAL(4'000'000) / 8);
+	m_d8253->out_handler<0>().set(FUNC(isa8_ibm_mfc_device::d8253_out0));
+	m_d8253->set_clk<1>(0);
+	m_d8253->out_handler<1>().set(FUNC(isa8_ibm_mfc_device::d8253_out1));
+	m_d8253->set_clk<2>(XTAL(4'000'000) / 2);
+	m_d8253->out_handler<2>().set(m_d8253, FUNC(pit8253_device::write_clk1));
 
 	SPEAKER(config, "ymleft").front_left();
 	SPEAKER(config, "ymright").front_right();

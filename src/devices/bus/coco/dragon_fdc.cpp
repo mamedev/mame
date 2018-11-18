@@ -299,7 +299,7 @@ READ8_MEMBER(dragon_fdc_device_base::scs_read)
 	case 1:
 	case 2:
 	case 3:
-		result = m_wd2797->read(space, offset & 0xef);
+		result = m_wd2797->read(offset & 0xef);
 		break;
 	}
 	return result;
@@ -315,7 +315,7 @@ READ8_MEMBER(premier_fdc_device_base::scs_read)
 	case 1:
 	case 2:
 	case 3:
-		result = m_wd2791->read(space, offset);
+		result = m_wd2791->read(offset);
 		break;
 	}
 	return result;
@@ -334,7 +334,7 @@ WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
 	case 1:
 	case 2:
 	case 3:
-		m_wd2797->write(space, offset & 0xef, data);
+		m_wd2797->write(offset & 0xef, data);
 		break;
 	case 8: case 9: case 10: case 11:
 	case 12: case 13: case 14: case 15:
@@ -352,7 +352,7 @@ WRITE8_MEMBER(premier_fdc_device_base::scs_write)
 	case 1:
 	case 2:
 	case 3:
-		m_wd2791->write(space, offset, data);
+		m_wd2791->write(offset, data);
 		break;
 	case 4:
 		dskreg_w(data);
@@ -367,7 +367,7 @@ WRITE8_MEMBER(premier_fdc_device_base::scs_write)
 
 ROM_START(dragon_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("ddos10.rom", 0x0000, 0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
+	ROM_LOAD("ddos10.rom", 0x0000, 0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
 ROM_END
 
 namespace
@@ -399,7 +399,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_FDC, device_cococart_interface, dragon_fdc_dev
 
 ROM_START(premier_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("deltados.rom", 0x0000, 0x2000, CRC(149eb4dd) SHA1(eb686ce6afe63e4d4011b333a882ca812c69307f))
+	ROM_LOAD("deltados.rom", 0x0000, 0x2000, CRC(149eb4dd) SHA1(eb686ce6afe63e4d4011b333a882ca812c69307f))
 ROM_END
 
 namespace
@@ -431,7 +431,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(PREMIER_FDC, device_cococart_interface, premier_fdc_d
 
 ROM_START(sdtandy_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("sdtandy.rom", 0x0000, 0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
+	ROM_LOAD("sdtandy.rom", 0x0000, 0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
 ROM_END
 
 namespace

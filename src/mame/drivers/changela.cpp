@@ -428,14 +428,14 @@ MACHINE_CONFIG_START(changela_state::changela)
 	MCFG_M68705_PORTC_W_CB(WRITE8(*this, changela_state, changela_68705_port_c_w))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U44 on Sound I/O Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, changela_state, collision_reset_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, changela_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, changela_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, changela_state, mcu_pc_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, changela_state, collision_reset_1_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // U44 on Sound I/O Board
+	outlatch.q_out_cb<0>().set(FUNC(changela_state::collision_reset_0_w));
+	outlatch.q_out_cb<1>().set(FUNC(changela_state::coin_counter_1_w));
+	outlatch.q_out_cb<2>().set(FUNC(changela_state::coin_counter_2_w));
+	outlatch.q_out_cb<4>().set(FUNC(changela_state::mcu_pc_0_w));
+	outlatch.q_out_cb<5>().set(FUNC(changela_state::collision_reset_1_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -449,15 +449,15 @@ MACHINE_CONFIG_START(changela_state::changela)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay1(AY8910(config, "ay1", 1250000));
+	ay1.port_a_read_callback().set_ioport("DSWA");
+	ay1.port_b_read_callback().set_ioport("DSWB");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWC"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWD"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay2(AY8910(config, "ay2", 1250000));
+	ay2.port_a_read_callback().set_ioport("DSWC");
+	ay2.port_b_read_callback().set_ioport("DSWD");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

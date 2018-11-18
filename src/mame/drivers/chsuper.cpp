@@ -381,12 +381,13 @@ MACHINE_CONFIG_START(chsuper_state::chsuper)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chsuper)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

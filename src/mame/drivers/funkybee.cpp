@@ -293,13 +293,13 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funkybee_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, funkybee_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, funkybee_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, funkybee_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, funkybee_state, gfx_bank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(funkybee_state::flipscreen_w));
+	mainlatch.q_out_cb<2>().set(FUNC(funkybee_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(funkybee_state::coin_counter_2_w));
+	mainlatch.q_out_cb<5>().set(FUNC(funkybee_state::gfx_bank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -317,9 +317,9 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) // AY-3-8912 verified for Sky Lancer
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8912_device &ay8912(AY8912(config, "aysnd", 1500000)); // AY-3-8912 verified for Sky Lancer
+	ay8912.port_a_read_callback().set_ioport("DSW");
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

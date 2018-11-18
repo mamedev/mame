@@ -96,7 +96,7 @@ Notes:
 
       - CXD2922 and CXD2925 are SPU's.
 
-      - The BIOS on ZV610 and GV999 is identical. It's a 4M MASK ROM, compatible with 27C040.
+      - The BIOS on ZV610 and GV999 is identical. It's a 4M mask ROM, compatible with 27C040.
 
       - The CD contains one MODE 1 data track and several Redbook audio tracks which are streamed to the speaker via CN8.
 
@@ -135,6 +135,7 @@ Notes:
 #include "sound/cdda.h"
 #include "sound/spu.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 #include "cdrom.h"
 
@@ -228,8 +229,8 @@ void konamigv_state::btchamp_map(address_map &map)
 	konamigv_map(map);
 
 	map(0x1f380000, 0x1f3fffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
-	map(0x1f680080, 0x1f680087).r("upd1", FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
-	map(0x1f680080, 0x1f680087).r("upd2", FUNC(upd4701_device::read_xy)).umask32(0x00ff00ff);
+	map(0x1f680080, 0x1f680087).r(m_btc_trackball[0], FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
+	map(0x1f680080, 0x1f680087).r(m_btc_trackball[1], FUNC(upd4701_device::read_xy)).umask32(0x00ff00ff);
 	map(0x1f680088, 0x1f680089).w(FUNC(konamigv_state::btc_trackball_w));
 	map(0x1f6800e0, 0x1f6800e3).nopw();
 }
@@ -358,25 +359,27 @@ MACHINE_CONFIG_START(konamigv_state::konamigv)
 	MCFG_DEVICE_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
 	MCFG_DEVICE_PROGRAM_MAP( konamigv_map )
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	subdevice<ram_device>("maincpu:ram")->set_default_size("2M");
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this ) )
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_4)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
-	MCFG_DEVICE_ADD("am53cf96", AM53CF96, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_AM53CF96_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
+	AM53CF96(config, m_am53cf96, 0);
+	m_am53cf96->set_scsi_port("scsi");
+	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL(53'693'175) )
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -510,14 +513,14 @@ MACHINE_CONFIG_START(simpbowl_state::simpbowl)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP( simpbowl_map )
 
-	MCFG_FUJITSU_29F016A_ADD("flash0")
-	MCFG_FUJITSU_29F016A_ADD("flash1")
-	MCFG_FUJITSU_29F016A_ADD("flash2")
-	MCFG_FUJITSU_29F016A_ADD("flash3")
+	FUJITSU_29F016A(config, "flash0");
+	FUJITSU_29F016A(config, "flash1");
+	FUJITSU_29F016A(config, "flash2");
+	FUJITSU_29F016A(config, "flash3");
 
-	MCFG_DEVICE_ADD("upd", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	upd4701_device &upd(UPD4701A(config, "upd"));
+	upd.set_portx_tag("TRACK0_X");
+	upd.set_porty_tag("TRACK0_Y");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( simpbowl )
@@ -550,15 +553,15 @@ MACHINE_CONFIG_START(konamigv_state::btchamp)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP( btchamp_map )
 
-	MCFG_SHARP_LH28F400_ADD("flash")
+	SHARP_LH28F400(config, "flash");
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	UPD4701A(config, m_btc_trackball[0]);
+	m_btc_trackball[0]->set_portx_tag("TRACK0_X");
+	m_btc_trackball[0]->set_porty_tag("TRACK0_Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	UPD4701A(config, m_btc_trackball[1]);
+	m_btc_trackball[1]->set_portx_tag("TRACK1_X");
+	m_btc_trackball[1]->set_porty_tag("TRACK1_Y");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( btchamp )
@@ -624,7 +627,7 @@ MACHINE_CONFIG_START(konamigv_state::kdeadeye)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP( kdeadeye_map )
 
-	MCFG_SHARP_LH28F400_ADD("flash")
+	SHARP_LH28F400(config, "flash");
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kdeadeye )
@@ -702,13 +705,13 @@ INPUT_PORTS_END
 ROM_START( konamigv )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", ROMREGION_ERASE00 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", ROMREGION_ERASE00 ) /* default EEPROM */
 ROM_END
 
 ROM_START( lacrazyc )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "lacrazyc.25c",   0x000000, 0x000080, CRC(e20e5730) SHA1(066b49236c658a4ef2930f7bacc4b2354dd7f240) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -718,7 +721,7 @@ ROM_END
 ROM_START( susume )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "susume.25c",   0x000000, 0x000080, CRC(52f17df7) SHA1(b8ad7787b0692713439d7d9bebfa0c801c806006) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -728,7 +731,7 @@ ROM_END
 ROM_START( hyperath )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "hyperath.25c", 0x000000, 0x000080, CRC(20a8c435) SHA1(a0f203a999757fba68b391c525ac4b9684a57ba9) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -738,7 +741,7 @@ ROM_END
 ROM_START( powyak96 )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "powyak96.25c", 0x000000, 0x000080, CRC(405a7fc9) SHA1(e2d978f49748ba3c4a425188abcd3d272ec23907) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -748,7 +751,7 @@ ROM_END
 ROM_START( weddingr )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "weddingr.25c", 0x000000, 0x000080, CRC(b90509a0) SHA1(41510a0ceded81dcb26a70eba97636d38d3742c3) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -758,7 +761,7 @@ ROM_END
 ROM_START( simpbowl )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "simpbowl.25c", 0x000000, 0x000080, CRC(2c61050c) SHA1(16ae7f81cbe841c429c5c7326cf83e87db1782bf) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -768,7 +771,7 @@ ROM_END
 ROM_START( btchamp )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "btchmp.25c", 0x000000, 0x000080, CRC(6d02ea54) SHA1(d3babf481fd89db3aec17f589d0d3d999a2aa6e1) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -778,7 +781,7 @@ ROM_END
 ROM_START( kdeadeye )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "kdeadeye.25c", 0x000000, 0x000080, CRC(3935d2df) SHA1(cbb855c475269077803c380dbc3621e522efe51e) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -788,7 +791,7 @@ ROM_END
 ROM_START( nagano98 )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "nagano98.25c",  0x000000, 0x000080, CRC(b64b7451) SHA1(a77a37e0cc580934d1e7e05d523bae0acd2c1480) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -798,7 +801,7 @@ ROM_END
 ROM_START( naganoj )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "720ja.25c",  0x000000, 0x000080, CRC(34c473ba) SHA1(768225b04a293bdbc114a092d14dee28d52044e9) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -808,7 +811,7 @@ ROM_END
 ROM_START( tmosh )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "tmosh.25c", 0x000000, 0x000080, NO_DUMP )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -818,7 +821,7 @@ ROM_END
 ROM_START( tmoshs )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "tmoshs.25c", 0x000000, 0x000080, CRC(e57b833f) SHA1(f18a0974a6be69dc179706643aab837ff61c2738) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -828,7 +831,7 @@ ROM_END
 ROM_START( tmoshsp )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "tmoshsp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -838,7 +841,7 @@ ROM_END
 ROM_START( tmoshspa )
 	GV_BIOS
 
-	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default EEPROM */
 	ROM_LOAD( "tmoshsp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
@@ -848,17 +851,17 @@ ROM_END
 /* BIOS placeholder */
 GAME( 1995, konamigv, 0,        konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Baby Phoenix/GV System", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, powyak96, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  konamigv_state, empty_init, ROT0, "Konami", "Beat the Champ (GV053 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, empty_init, ROT0, "Konami", "Dead Eye (GV054 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, weddingr, konamigv, konamigv, weddingr, konamigv_state, empty_init, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, tmosh,    konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, tmoshs,   konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, tmoshsp,  konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, tmoshspa, tmoshsp,  tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl_state, empty_init, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1996, powyak96, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", MACHINE_IMPERFECT_SOUND )
+GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  konamigv_state, empty_init, ROT0, "Konami", "Beat the Champ (GV053 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, empty_init, ROT0, "Konami", "Dead Eye (GV054 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, weddingr, konamigv, konamigv, weddingr, konamigv_state, empty_init, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, tmosh,    konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, tmoshs,   konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, tmoshsp,  konamigv, tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, tmoshspa, tmoshsp,  tmosh,    konamigv, konamigv_state, empty_init, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, empty_init, ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl_state, empty_init, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

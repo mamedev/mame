@@ -1260,17 +1260,17 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_DEVICE_PROGRAM_MAP(coinmstr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("PIA0.A"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("PIA0.B"))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set_ioport("PIA0.A");
+	pia0.readpb_handler().set_ioport("PIA0.B");
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("PIA1.A"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("PIA1.B"))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("PIA1.A");
+	pia1.readpb_handler().set_ioport("PIA1.B");
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("PIA2.A"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("PIA2.B"))
+	pia6821_device &pia2(PIA6821(config, "pia2", 0));
+	pia2.readpa_handler().set_ioport("PIA2.A");
+	pia2.readpb_handler().set_ioport("PIA2.B");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1291,9 +1291,9 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coinmstr_state::quizmstr)
@@ -1325,7 +1325,7 @@ MACHINE_CONFIG_START(coinmstr_state::jpcoin)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(jpcoin_map)
 	MCFG_DEVICE_IO_MAP(jpcoin_io_map)
-//  MCFG_NVRAM_ADD_0FILL("attr_ram3")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 /*

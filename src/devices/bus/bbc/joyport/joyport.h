@@ -34,20 +34,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BBC_JOYPORT_ADD( _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, BBC_JOYPORT_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_BBC_JOYPORT_CB1_HANDLER(_devcb) \
-	downcast<bbc_joyport_slot_device &>(*device).set_cb1_handler(DEVCB_##_devcb);
-
-#define MCFG_BBC_JOYPORT_CB2_HANDLER(_devcb) \
-	downcast<bbc_joyport_slot_device &>(*device).set_cb2_handler(DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -59,11 +45,21 @@ class bbc_joyport_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	bbc_joyport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
+		: bbc_joyport_slot_device(mconfig, tag, owner)
+	{
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
+
+	bbc_joyport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
-	template <class Object> devcb_base &set_cb1_handler(Object &&cb) { return m_cb1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cb2_handler(Object &&cb) { return m_cb2_handler.set_callback(std::forward<Object>(cb)); }
+	auto cb1_handler() { return m_cb1_handler.bind(); }
+	auto cb2_handler() { return m_cb2_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(cb1_w) { m_cb1_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(cb2_w) { m_cb2_handler(state); }
@@ -90,9 +86,6 @@ private:
 class device_bbc_joyport_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	virtual ~device_bbc_joyport_interface();
-
 	virtual DECLARE_READ8_MEMBER(pb_r) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(pb_w) { }
 
