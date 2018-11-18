@@ -2017,7 +2017,7 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	YM2151(config, m_ymsnd, 4000000);
-	m_ymsnd->irq_handler().set(FUNC(segas16a_state::n7751_control_w));
+	m_ymsnd->port_write_handler().set(FUNC(segas16a_state::n7751_control_w));
 	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.43);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC

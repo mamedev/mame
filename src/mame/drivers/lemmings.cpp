@@ -261,7 +261,7 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.45);
 	ymsnd.add_route(1, "rspeaker", 0.45);
 
