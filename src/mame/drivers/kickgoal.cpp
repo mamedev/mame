@@ -324,6 +324,9 @@ void kickgoal_state::machine_start()
 {
 	save_item(NAME(m_snd_sam));
 	save_item(NAME(m_snd_new));
+	save_item(NAME(m_pic_portc));
+	save_item(NAME(m_pic_portb));
+	save_item(NAME(m_sound_command_sent));
 
 	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
 	m_okibank->set_entry(1);
