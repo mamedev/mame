@@ -457,11 +457,12 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(r2dtank_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE("74123", ttl74123_device, a_w))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(r2dtank_state::crtc_update_row), this);
+	crtc.out_de_callback().set("74123", FUNC(ttl74123_device::a_w));
 
 	/* 74LS123 */
 

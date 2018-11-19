@@ -270,9 +270,10 @@ MACHINE_CONFIG_START(murogem_state::murogem)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(murogem_state, murogem)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 750000) /* ? MHz */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", 750000)); /* ? MHz */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

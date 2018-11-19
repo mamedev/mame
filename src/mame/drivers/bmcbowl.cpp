@@ -24,9 +24,9 @@ BMC Bowling (c) 1994.05 BMC, Ltd
         BET(B)+START(1) - other tests
         START(1) - next test
 
- press START(1)+HP(S) durning boot to see stats
+ press START(1)+HP(S) during boot to see stats
 
- press CONFIRM(N) durning boot, to enter    settings
+ press CONFIRM(N) during boot, to enter    settings
         BET(B) - change page
         STOP1(X)/STOP3(V) - modify
         START(1)/SMALL(F) - move
@@ -63,7 +63,7 @@ GREAT1 21.47727
 
 DIPS:
 Place for 4 8 switch dips
-dips 1 & 3 are all connected via resitors
+dips 1 & 3 are all connected via resistors
 dips 2 & 4 are standard 8 switch dips
 
 EEPROM       Label         Use

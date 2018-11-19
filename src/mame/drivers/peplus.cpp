@@ -1390,11 +1390,12 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	MCFG_PALETTE_ADD(m_palette, 16*16*2)
 	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
-	MCFG_MC6845_ADD(m_crtc, R6545_1, "screen", XTAL(20'000'000)/8/3)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_ADDR_CHANGED_CB(peplus_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, peplus_state, crtc_vsync))
+	R6545_1(config, m_crtc, XTAL(20'000'000)/8/3);
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_on_update_addr_change_callback(FUNC(peplus_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(peplus_state::crtc_vsync));
 
 	MCFG_X2404P_ADD(m_i2cmem)
 

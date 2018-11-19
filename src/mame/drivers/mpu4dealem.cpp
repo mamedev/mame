@@ -230,10 +230,11 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", MPU4_MASTER_CLOCK / 4 / 8) /* HD68B45 */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mpu4dealem_state, dealem_vsync_changed))
+	hd6845_device &crtc(HD6845(config, "crtc", MPU4_MASTER_CLOCK / 4 / 8)); /* HD68B45 */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set(FUNC(mpu4dealem_state::dealem_vsync_changed));
 MACHINE_CONFIG_END
 
 

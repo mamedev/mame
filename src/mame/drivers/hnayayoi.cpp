@@ -567,12 +567,12 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	MCFG_DEVICE_ADD("crtc", HD6845, 20_MHz_XTAL / 8)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
-	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, hnayayoi_update_row)
+	hd6845_device &crtc(HD6845(config, "crtc", 20_MHz_XTAL / 8));
+	crtc.set_screen("screen");
+	crtc.set_char_width(4);
+	crtc.set_show_border_area(false);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
+	crtc.set_update_row_callback(FUNC(hnayayoi_state::hnayayoi_update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -612,8 +612,7 @@ MACHINE_CONFIG_START(hnayayoi_state::untoucha)
 	m_mainlatch->q_out_cb<3>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
 	m_mainlatch->q_out_cb<4>().set_nop(); // ?
 
-	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, untoucha_update_row)
+	subdevice<hd6845_device>("crtc")->set_update_row_callback(FUNC(hnayayoi_state::untoucha_update_row), this);
 
 	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
 MACHINE_CONFIG_END

@@ -447,9 +447,10 @@ MACHINE_CONFIG_START(truco_state::truco)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(truco_state, truco)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* Identified as UM6845 */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* Identified as UM6845 */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

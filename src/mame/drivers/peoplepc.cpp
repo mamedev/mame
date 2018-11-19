@@ -275,10 +275,11 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD("h46505", H46505, "screen", XTAL(22'000'000)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(peoplepc_state, update_row)
+	h46505_device &crtc(H46505(config, "h46505", XTAL(22'000'000)/8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(peoplepc_state::update_row), this);
 
 	I8257(config, m_dmac, XTAL(14'745'600)/3);
 	m_dmac->out_hrq_cb().set(FUNC(peoplepc_state::hrq_w));

@@ -1284,9 +1284,10 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coinmstr)
 	MCFG_PALETTE_ADD("palette", 46*32*4)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 14000000 / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	h46505_device &crtc(H46505(config, "crtc", 14000000 / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

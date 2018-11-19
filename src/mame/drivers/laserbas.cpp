@@ -393,10 +393,11 @@ MACHINE_CONFIG_START(laserbas_state::laserbas)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 3000000/4) /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(laserbas_state, crtc_update_row)
+	h46505_device &crtc(H46505(config, "crtc", 3000000/4)); /* unknown clock, hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(laserbas_state::crtc_update_row), this);
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(RRRGGGBB)

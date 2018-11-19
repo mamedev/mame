@@ -281,9 +281,10 @@ MACHINE_CONFIG_START(b16_state::b16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD(m_mc6845, H46505, "screen", XTAL(14'318'181)/5)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_mc6845, XTAL(14'318'181)/5);    /* unknown clock, hand tuned to get ~60 fps */
+	m_mc6845->set_screen("screen");
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
 
 	AM9517A(config, m_dma8237, XTAL(14'318'181)/2);
 	m_dma8237->in_memr_callback().set(FUNC(b16_state::memory_read_byte));

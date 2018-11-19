@@ -240,9 +240,10 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_PALETTE_ADD("palette", 2*256)
 	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 18_MHz_XTAL / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", 18_MHz_XTAL / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -436,7 +436,7 @@ MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(m_sti, z80sti_device, i1_w))
 	MCFG_MC6845_OUT_CUR_CB(WRITELINE(m_sti, z80sti_device, i1_w))
 
-//  MCFG_MC6845_ADD(HD6345_TAG, HD6345, SCREEN_TAG, XTAL(16'000'000)/4)
+//  HD6345(config, HD6345_TAG, XTAL(16'000'000)/4).set_screen(SCREEN_TAG);
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(ecb_grip21_device::ppi_pa_r));

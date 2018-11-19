@@ -566,11 +566,12 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssingles)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, ssingles_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", 1000000 /* ? MHz */));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(ssingles_state::ssingles_update_row), this);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -592,13 +593,9 @@ MACHINE_CONFIG_START(ssingles_state::atamanot)
 	MCFG_DEVICE_PROGRAM_MAP(atamanot_map)
 	MCFG_DEVICE_IO_MAP(atamanot_io_map)
 
-	MCFG_DEVICE_REMOVE("crtc")
-
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, atamanot_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, ssingles_state, atamanot_irq))
+	mc6845_device &crtc(*subdevice<mc6845_device>("crtc"));
+	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row), this);
+	crtc.out_vsync_callback().set(FUNC(ssingles_state::atamanot_irq));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atamanot)
 MACHINE_CONFIG_END

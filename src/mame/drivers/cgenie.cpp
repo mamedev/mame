@@ -449,11 +449,12 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470) / 2, 568, 32, 416, 312, 28, 284)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(17'734'470) / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(cgenie_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(cgenie_state, crtc_update_row)
+	HD6845(config, m_crtc, XTAL(17'734'470) / 16);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_begin_update_callback(FUNC(cgenie_state::crtc_begin_update), this);
+	m_crtc->set_update_row_callback(FUNC(cgenie_state::crtc_update_row), this);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
