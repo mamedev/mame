@@ -44,7 +44,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_hpc(*this, "hpc")
 		, m_eeprom(*this, "eeprom")
-		, m_share1(*this, "share1")
 		, m_palette(*this, "palette")
 	{
 	}
@@ -142,7 +141,6 @@ protected:
 
 	required_device<hpc1_device> m_hpc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_shared_ptr<uint64_t> m_share1;
 	required_device<palette_device> m_palette;
 	std::unique_ptr<uint32_t[]> m_dsp_ram;
 
@@ -176,6 +174,7 @@ public:
 		: indigo_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mem_ctrl(*this, "memctrl")
+		, m_share1(*this, "share1")
 	{
 	}
 
@@ -190,6 +189,7 @@ protected:
 
 	required_device<r4000be_device> m_maincpu;
 	required_device<sgi_mc_device> m_mem_ctrl;
+	required_shared_ptr<uint64_t> m_share1;
 };
 
 void indigo_state::machine_start()
