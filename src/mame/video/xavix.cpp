@@ -175,6 +175,227 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 }
 
+void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &pal, int debug_packets)
+{
+	// there seems to be a packet stored before the tile?!
+		// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
+	uint8_t byte1 = 0;
+	int done = 0;
+	int skip = 0;
+
+	flipx = 0;
+	flipy = 0;
+	test = 0;
+
+	int packets[16];
+	const int max_packets = 16;
+	for (int i = 0; i < max_packets; i++)
+		packets[i] = -1;
+
+	int current_packet_pos = 0;
+
+	// this is incorrect, so ignore most of it, we look up flips in a table instead for now
+	do
+	{
+		byte1 = get_next_byte();
+
+		if (current_packet_pos < max_packets)
+		{
+			packets[current_packet_pos] = byte1 & 0xf;
+			current_packet_pos++;
+		}
+
+		//if (debug_packets) LOG(", %02x ", byte1);
+
+		if (skip == 1)
+		{
+			skip = 0;
+			//test = 1;
+			//if (debug_packets) LOG(" (skipped)");
+		}
+		else if ((byte1 & 0x0f) == 0x01)
+		{
+			// frequently used with 0x06 alone, mud bubbles in puddles? (flip not obvious)
+			//if (debug_packets) LOG(" (unk)");
+		}
+		else if ((byte1 & 0x0f) == 0x03)
+		{
+			// causes next byte to be skipped??
+			skip = 1;
+			//if (debug_packets) LOG(" (skip?)");
+		}
+		else if ((byte1 & 0x0f) == 0x05)
+		{
+			// the upper bits are often 0x00, 0x10, 0x20, 0x30, why?
+			//flipx = 1;
+			//if (debug_packets) LOG(" (set flipx?)");
+		}
+		else if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
+		{
+			// tile data will follow after this, always?
+			pal = (byte1 & 0xf0) >> 4;
+			done = 1;
+			//if (debug_packets) LOG(" (setting palette)");
+		}
+		else if ((byte1 & 0x0f) == 0x07)
+		{
+			// causes next byte to be skipped??
+			skip = 1;
+			//if (debug_packets) LOG(" (skip?)");
+		}
+		else if ((byte1 & 0x0f) == 0x09)
+		{
+			// used, most stuff looks like it needs y flipping
+			//flipy = 1;
+			//if (debug_packets) LOG(" (alt flipy)");
+		}
+		else if ((byte1 & 0x0f) == 0x0a)
+		{
+			// not seen
+			//if (debug_packets) LOG(" (UNKNOWN)");
+		}
+		else if ((byte1 & 0x0f) == 0x0b)
+		{
+			skip = 1;
+			//if (debug_packets) LOG(" (skip?)");
+			// used
+		}
+		else if ((byte1 & 0x0f) == 0x0c)
+		{
+			// not seen
+			//if (debug_packets) LOG(" (UNKNOWN)");
+		}
+		else if ((byte1 & 0x0f) == 0x0d)
+		{
+			// used
+			//if (debug_packets) LOG(" (UNKNOWN)");
+		}
+		else if ((byte1 & 0x0f) == 0x0e)
+		{
+			// not seen
+			//if (debug_packets) LOG(" (UNKNOWN)");
+		}
+		else if ((byte1 & 0x0f) == 0x0f)
+		{
+			//flipx = 1;
+			//flipy = 1;
+			//if (debug_packets) LOG(" (flipxy)");
+			// used
+		}
+
+	} while (done == 0);
+	//if (debug_packets) LOG("\n");
+
+	struct header_inline
+	{
+		int packets[16];
+		int flipx;
+		int flipy;
+		int test;
+	};
+
+	// this must be controlling other stuff too? priority? but difficult to tell from only use case (monster truck)
+	// palette is set in the upper nibble (filtered out of this table) does it also depend on control code? deep freeze still has some bad colours
+	// sequences are intentionally this long, not an alignment problem
+	static const header_inline header_inlines[] =
+	{
+		{ {                                     0x06, -1 }, 0, 0, 0 }, // common, no flips, confirmed
+		{ {                                0x01,0x06, -1 }, 0, 0, 0 }, // dirt dash tiny mud, deep freeze, banner, no flip, confirmed
+		{ {                                0x05,0x06, -1 }, 1, 0, 0 }, // common, flipx, confirmed
+		{ {                                0x09,0x06, -1 }, 0, 1, 0 }, // common, flipy, confirmed
+		{ {                                0x0d,0x06, -1 }, 1, 1, 0 }, // dirt dash, small piece of mud, flipx&y, confirmed
+		{ {                           0x03,0x05,0x06, -1 }, 0, 0, 0 }, // dirt dash, common, no flip, confirmed
+		{ {                           0x07,0x09,0x06, -1 }, 1, 0, 0 }, // dirt dash, mud patches, flipx, confirmed
+		{ {                           0x0f,0x05,0x06, -1 }, 0, 0, 0 }, // midnight run, scenary, looks like no-flip                     UNCONFIRMED
+		{ {                           0x0f,0x09,0x06, -1 }, 0, 0, 0 }, // midnight run, plants,                                         UNCONFIRMED
+		{ {                           0x07,0x05,0x06, -1 }, 1, 0, 0 }, // deep freeze, flipx, confirmed
+		{ {                      0x03,0x0f,0x05,0x06, -1 }, 0, 0, 0 }, // dirt dash, blank tile,                                        UNCONFIRMED
+		{ {                      0x07,0x03,0x05,0x06, -1 }, 1, 0, 0 }, // dirt dash, corner of track before start, flipx, confirmed
+		{ {                      0x0b,0x03,0x05,0x06, -1 }, 0, 1, 0 }, // deep freeze, flipy, confirmed
+		{ {                      0x0f,0x07,0x09,0x06, -1 }, 1, 1, 0 }, // dirt dash, start line, flip x&y, confirmed
+		{ {                 0x0b,0x0f,0x07,0x09,0x06, -1 }, 0, 1, 0 }, // dirt dash, corner of mud patch near start                     UNCONFIRMED
+		{ {                 0x07,0x0b,0x03,0x05,0x06, -1 }, 1, 0, 0 }, // deep freeze, flipx, confirmed
+		{ {                 0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 0, 0 }, // dirt dash, mud patches, no flip, confirmed
+		{ {            0x07,0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 0, 0 }, // dirt dash, edge of mud patches at start                       UNCONFIRMED
+		{ {            0x0f,0x0b,0x0f,0x07,0x09,0x06, -1 }, 1, 1, 0 }, // dirt dash, edge of mud patches, flip x&y, confirmed
+		{ {            0x0f,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 1, 0 }, // dirt dash, mud patches, flipx&y, confirmed
+		{ {            0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 1, 0 }, // dirt dash, edge of mud patch, flipy, confirmed
+		{ {       0x07,0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 0, 0 }, // dirt dash, edge of first mud patch, flipx confirmed
+		{ {  0x0f,0x07,0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 1, 0 }, // dirt daah, edge of first mud patch, flipx&y confirmed
+		{ { -1 }, 0, 0 }
+	};
+
+	int matched_to = -1;
+	done = 0;
+	int i = 0;
+
+	do
+	{
+		if (header_inlines[i].packets[0] == -1) // got to the end
+		{
+			done = 1;
+			matched_to = -1;
+		}
+		else
+		{
+			int match = 1;
+
+			for (int j = 0; j < max_packets; j++)
+			{
+				if (header_inlines[i].packets[j] == -1)
+					break;
+
+				if (header_inlines[i].packets[j] != packets[j])
+				{
+					match = 0;
+					break;
+				}
+			}
+
+			if (match == 1)
+			{
+				//LOG("matched to sequence %02x\n", i);
+				matched_to = i;
+				done = 1;
+			}
+		}
+
+		i++;
+
+	} while (done == 0);
+
+	if (matched_to != -1)
+	{
+		flipx = header_inlines[matched_to].flipx;
+		flipy = header_inlines[matched_to].flipy;
+		test = header_inlines[matched_to].test;
+	}
+	else
+	{
+		popmessage("unhandled inline header");
+	}
+
+	if ((debug_packets) && (matched_to == -1))
+	{
+		LOG("{ {  ");
+
+		for (int i = 0; i < max_packets; i++)
+		{
+			if (packets[i] == -1)
+			{
+				break;
+			}
+			else
+			{
+				if (i != 0) LOG(",");
+				LOG("0x%02x", packets[i]);
+
+			}
+		}
+
+		LOG(", -1 }, 0, 0, 0 },\n");
+	}
+}
 
 void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line)
 {
@@ -309,7 +530,10 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 			continue;
 		}
 
-		const int debug_packets = 0;
+		int debug_packets = 1;
+		//if (line==128) debug_packets = 1;
+		//else debug_packets = 0;
+
 		int test = 0;
 
 		if (!alt_tileaddressing)
@@ -350,8 +574,7 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			// Addressing Mode 2 (plus Inline Header)
 
-			if (debug_packets) LOG("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
-
+			//if (debug_packets) LOG("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
 
 			basereg = (tile & 0xf000) >> 12;
 			tile &= 0x0fff;
@@ -359,84 +582,16 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 
 			tile += gfxbase;
 			set_data_address(tile, 0);
-
-			// there seems to be a packet stored before the tile?!
-			// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
-			uint8_t byte1 = 0;
-			int done = 0;
-			int skip = 0;
-
-			do
-			{
-				byte1 = get_next_byte();
-
-				if (debug_packets) LOG(" %02x, ", byte1);
-
-				if (skip == 1)
-				{
-					skip = 0;
-					//test = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x01)
-				{
-					// used
-				}
-				else if ((byte1 & 0x0f) == 0x03)
-				{
-					// causes next byte to be skipped??
-					skip = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x05)
-				{
-					// the upper bits are often 0x00, 0x10, 0x20, 0x30, why?
-					flipx = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
-				{
-					// tile data will follow after this, always?
-					pal = (byte1 & 0xf0) >> 4;
-					done = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x07)
-				{
-					// causes next byte to be skipped??
-					skip = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x09)
-				{
-					// used
-				}
-				else if ((byte1 & 0x0f) == 0x0a)
-				{
-					// not seen
-				}
-				else if ((byte1 & 0x0f) == 0x0b)
-				{
-					// used
-				}
-				else if ((byte1 & 0x0f) == 0x0c)
-				{
-					// not seen
-				}
-				else if ((byte1 & 0x0f) == 0x0d)
-				{
-					// used
-				}
-				else if ((byte1 & 0x0f) == 0x0e)
-				{
-					// not seen
-				}
-				else if ((byte1 & 0x0f) == 0x0f)
-				{
-					// used
-				}
-
-			} while (done == 0);
-			if (debug_packets) LOG("\n");
+			
+			decode_inline_header(flipx, flipy, test, pal, debug_packets);
+	
 			tile = get_current_address_byte();
 		}
 
-		if (test == 1) pal = machine().rand() & 0xf;
+		if (test == 1)
+		{
+			pal = machine().rand() & 0xf;
+		}
 
 		draw_tile_line(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, line, ytilesize, xtilesize, flipx, flipy, pal, zval, yyline);
 		draw_tile_line(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, line, ytilesize, xtilesize, flipx, flipy, pal, zval, yyline); // wrap-x
