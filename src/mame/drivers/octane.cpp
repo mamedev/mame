@@ -14,12 +14,10 @@
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 
-#define ENABLE_ENTRY_GFX	(1)
-
 #define LOG_UNKNOWN		(1 << 0)
 #define LOG_ALL			(LOG_UNKNOWN)
 
-#define VERBOSE			(LOG_UNKNOWN)
+#define VERBOSE			(0)
 #include "logmacro.h"
 
 class octane_state : public driver_device

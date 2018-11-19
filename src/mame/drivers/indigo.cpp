@@ -45,7 +45,6 @@ public:
 		, m_hpc(*this, "hpc")
 		, m_eeprom(*this, "eeprom")
 		, m_share1(*this, "share1")
-		, m_dsp_ram(*this, "dspram")
 		, m_palette(*this, "palette")
 	{
 	}
@@ -143,9 +142,9 @@ protected:
 
 	required_device<hpc1_device> m_hpc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_shared_ptr<uint32_t> m_share1;
-	required_shared_ptr<uint32_t> m_dsp_ram;
+	required_shared_ptr<uint64_t> m_share1;
 	required_device<palette_device> m_palette;
+	std::unique_ptr<uint32_t[]> m_dsp_ram;
 
 	address_space *m_space;
 
@@ -187,7 +186,7 @@ protected:
 
 	void mem_map(address_map &map);
 
-	DECLARE_WRITE32_MEMBER(write_ram);
+	DECLARE_WRITE64_MEMBER(write_ram);
 
 	required_device<r4000be_device> m_maincpu;
 	required_device<sgi_mc_device> m_mem_ctrl;
@@ -195,6 +194,7 @@ protected:
 
 void indigo_state::machine_start()
 {
+	m_dsp_ram = std::make_unique<uint32_t[]>(0x8000);
 	m_framebuffer = std::make_unique<uint8_t[]>(1024*768);
 
 	save_item(NAME(m_lg1.m_config_sel));
@@ -218,6 +218,7 @@ void indigo_state::machine_start()
 	save_item(NAME(m_lg1.m_palette_entry));
 	save_item(NAME(m_lg1.m_pix_read_mask));
 
+	save_pointer(NAME(&m_dsp_ram[0]), 0x8000);
 	save_pointer(NAME(&m_framebuffer[0]), 1024*768);
 }
 
@@ -255,7 +256,7 @@ READ32_MEMBER(indigo_state::dsp_ram_r)
 WRITE32_MEMBER(indigo_state::dsp_ram_w)
 {
 	LOGMASKED(LOG_DSP, "%s: DSP RAM Write: %08x = %08x & %08x\n", machine().describe_context(), 0x1fbe0000 + offset*4, data, mem_mask);
-	COMBINE_DATA(&m_dsp_ram[offset]);
+	m_dsp_ram[offset] = data;
 }
 
 READ32_MEMBER(indigo_state::entry_r)
@@ -516,7 +517,7 @@ void indigo_state::indigo_map(address_map &map)
 	map(0x1f3f0000, 0x1f3fffff).rw(FUNC(indigo_state::entry_r), FUNC(indigo_state::entry_w));
 	map(0x1fb80000, 0x1fb8ffff).rw(m_hpc, FUNC(hpc1_device::read), FUNC(hpc1_device::write));
 	map(0x1fbd9000, 0x1fbd903f).rw(FUNC(indigo_state::int_r), FUNC(indigo_state::int_w));
-	map(0x1fbe0000, 0x1fbfffff).rw(FUNC(indigo_state::dsp_ram_r), FUNC(indigo_state::dsp_ram_w)).share("dspram");
+	map(0x1fbe0000, 0x1fbfffff).rw(FUNC(indigo_state::dsp_ram_r), FUNC(indigo_state::dsp_ram_w));
 }
 
 void indigo3k_state::mem_map(address_map &map)
@@ -525,23 +526,22 @@ void indigo3k_state::mem_map(address_map &map)
 	map(0x1fc00000, 0x1fc3ffff).rom().share("share10").region("user1", 0);
 }
 
-WRITE32_MEMBER(indigo4k_state::write_ram)
+WRITE64_MEMBER(indigo4k_state::write_ram)
 {
-	// if banks 2 or 3 are enabled, kill it, we only want 128MB
-	if (m_mem_ctrl->read(space, 0xc8/4, 0xffffffff) & 0x10001000)
+	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
+	if (m_mem_ctrl->get_mem_config(1) & 0x10001000)
 	{
 		// a random perturbation so the memory test fails
-		data ^= 0xffffffff;
+		data ^= 0xffffffffffffffffULL;
 	}
 
-	// if banks 0 or 1 have 2 membanks, also kill it, we only want 128MB
-	if (m_mem_ctrl->read(space, 0xc0/4, 0xffffffff) & 0x40004000)
+	// if banks 0 or 1 have 2 membanks, also kill it, we only want 128 MB
+	if (m_mem_ctrl->get_mem_config(0) & 0x40004000)
 	{
 		// a random perturbation so the memory test fails
-		data ^= 0xffffffff;
+		data ^= 0xffffffffffffffffULL;
 	}
-
-	COMBINE_DATA(&m_share1[offset & 0x03ffffff]);
+	COMBINE_DATA(&m_share1[offset]);
 }
 
 void indigo4k_state::mem_map(address_map &map)
@@ -605,7 +605,7 @@ ROM_START( indigo3k )
 ROM_END
 
 ROM_START( indigo4k )
-	ROM_REGION32_BE( 0x80000, "user1", 0 )
+	ROM_REGION64_BE( 0x80000, "user1", 0 )
 	ROMX_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c), ROM_GROUPDWORD | ROM_REVERSE )
 ROM_END
 

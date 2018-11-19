@@ -14,12 +14,10 @@
 #include "emu.h"
 #include "cpu/mips/mips1.h"
 
-#define ENABLE_ENTRY_GFX	(1)
-
 #define LOG_UNKNOWN		(1 << 0)
 #define LOG_ALL			(LOG_UNKNOWN)
 
-#define VERBOSE			(LOG_UNKNOWN)
+#define VERBOSE			(0)
 #include "logmacro.h"
 
 class ip15_state : public driver_device

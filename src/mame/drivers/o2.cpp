@@ -71,6 +71,7 @@ void o2_state::o2(machine_config &config)
 	m_maincpu->set_icache_size(32768);
 	m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &o2_state::mem_map);
+	m_maincpu->set_force_no_drc(true);
 
 	SGI_MACE(config, m_mace, m_maincpu);
 

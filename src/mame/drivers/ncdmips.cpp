@@ -108,7 +108,7 @@ void ncd_mips_state::hmxpro_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram();  // VRAM
 	map(0x10000000, 0x103fffff).ram();
-	map(0x18000028, 0x1900002b).r(FUNC(ncd_mips_state::unk_r));
+	map(0x18000028, 0x1800002b).r(FUNC(ncd_mips_state::unk_r));
 	map(0x18000058, 0x1800005b).w(FUNC(ncd_mips_state::tty_w));
 	map(0x19000010, 0x19000013).r(FUNC(ncd_mips_state::unk_r));
 	map(0x1b000000, 0x1b00007f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
