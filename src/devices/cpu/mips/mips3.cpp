@@ -18,7 +18,7 @@
 
 #define ENABLE_OVERFLOWS        (0)
 #define ENABLE_EE_ELF_LOADER    (0)
-#define ENABLE_EE_DECI2         (1)
+#define ENABLE_EE_DECI2         (0)
 
 /***************************************************************************
     HELPER MACROS
@@ -134,6 +134,8 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_core(nullptr)
+	, m_dcache(nullptr)
+	, m_icache(nullptr)
 	, m_program_config("program", endianness, data_bits, 32, 0, 32, MIPS3_MIN_PAGE_SHIFT)
 	, m_flavor(flavor)
 	, m_ppc(0)
@@ -164,11 +166,11 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, c_dcache_size(0)
 	, m_fastram_select(0)
 	, m_debugger_temp(0)
-	, m_cache(CACHE_SIZE + sizeof(internal_mips3_state))
+	, m_drc_cache(CACHE_SIZE + sizeof(internal_mips3_state) + 0x80000)
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
-	, m_cache_dirty(0)
+	, m_drc_cache_dirty(0)
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
 	, m_out_of_cycles(nullptr)
@@ -363,11 +365,15 @@ void mips3_device::invalid_instruction(uint32_t op)
 
 void mips3_device::check_irqs()
 {
-	bool ie = (SR & SR_IE) && ((SR & SR_EIE) || m_flavor != MIPS3_TYPE_R5900);
-	if ((CAUSE & SR & 0xfc00) && ie && !(SR & SR_EXL) && !(SR & SR_ERL))
+	if ((CAUSE & SR & 0xfc00) && (SR & SR_IE) && !(SR & (SR_EXL | SR_ERL)))
 		generate_exception(EXCEPTION_INTERRUPT, 0);
 }
 
+void r5900le_device::check_irqs()
+{
+	if ((CAUSE & SR & 0xfc00) && (SR & SR_IE) && (SR & SR_EIE) && !(SR & (SR_EXL | SR_ERL)))
+		generate_exception(EXCEPTION_INTERRUPT, 0);
+}
 
 
 /***************************************************************************
@@ -379,7 +385,9 @@ void mips3_device::device_start()
 	m_isdrc = allow_drc();
 
 	/* allocate the implementation-specific state from the full cache */
-	m_core = (internal_mips3_state *)m_cache.alloc_near(sizeof(internal_mips3_state));
+	m_core = (internal_mips3_state *)m_drc_cache.alloc_near(sizeof(internal_mips3_state));
+	m_icache = (uint8_t *)m_drc_cache.alloc_near(c_dcache_size);
+	m_dcache = (uint8_t *)m_drc_cache.alloc_near(c_icache_size);
 
 	/* initialize based on the config */
 	memset(m_core, 0, sizeof(internal_mips3_state));
@@ -425,7 +433,7 @@ void mips3_device::device_start()
 
 	uint32_t flags = 0;
 	/* initialize the UML generator */
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2);
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_drc_cache, flags, 8, 32, 2);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
@@ -507,7 +515,7 @@ void mips3_device::device_start()
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = true;
+	m_drc_cache_dirty = true;
 
 
 	/* register for save states */
@@ -1105,7 +1113,7 @@ void mips3_device::device_reset()
 		vtlb_load(2 * m_tlbentries + 2, (0xff200000 - 0xff1f0000) >> MIPS3_MIN_PAGE_SHIFT, 0xff1f0000, 0xff1f0000 | VTLB_READ_ALLOWED | VTLB_WRITE_ALLOWED | VTLB_FETCH_ALLOWED | VTLB_FLAG_VALID);
 
 	m_core->mode = (MODE_KERNEL << 1) | 0;
-	m_cache_dirty = true;
+	m_drc_cache_dirty = true;
 	m_interrupt_cycles = 0;
 
 	m_core->vfr[0][3] = 1.0f;
@@ -1213,7 +1221,7 @@ inline bool mips3_device::RHALF(offs_t address, uint32_t *result)
 	return true;
 }
 
-inline bool mips3_device::RWORD(offs_t address, uint32_t *result)
+inline bool mips3_device::RWORD(offs_t address, uint32_t *result, bool insn)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1574,14 +1582,14 @@ inline bool r5900le_device::RHALF(offs_t address, uint32_t *result)
 	return mips3_device::RHALF(address, result);
 }
 
-inline bool r5900le_device::RWORD(offs_t address, uint32_t *result)
+inline bool r5900le_device::RWORD(offs_t address, uint32_t *result, bool insn)
 {
 	if (address >= 0x70000000 && address < 0x70004000)
 	{
 		*result = (*m_memory.read_dword)(*m_program, address);
 		return true;
 	}
-	return mips3_device::RWORD(address, result);
+	return mips3_device::RWORD(address, result, insn);
 }
 
 inline bool r5900le_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask)
@@ -3436,6 +3444,34 @@ void mips3_device::handle_regimm(uint32_t op)
 	}
 }
 
+void mips3_device::handle_mult(uint32_t op)
+{
+	uint64_t temp64 = (int64_t)(int32_t)RSVAL32 * (int64_t)(int32_t)RTVAL32;
+	LOVAL64 = (int32_t)temp64;
+	HIVAL64 = (int32_t)(temp64 >> 32);
+	m_core->icount -= 3;
+}
+
+void r5900le_device::handle_mult(uint32_t op)
+{
+	mips3_device::handle_mult(op);
+	if (RDREG) RDVAL64 = LOVAL64;
+}
+
+void mips3_device::handle_multu(uint32_t op)
+{
+	uint64_t temp64 = (uint64_t)RSVAL32 * (uint64_t)RTVAL32;
+	LOVAL64 = (int32_t)temp64;
+	HIVAL64 = (int32_t)(temp64 >> 32);
+	m_core->icount -= 3;
+}
+
+void r5900le_device::handle_multu(uint32_t op)
+{
+	mips3_device::handle_multu(op);
+	if (RDREG) RDVAL64 = LOVAL64;
+}
+
 void mips3_device::handle_special(uint32_t op)
 {
 	switch (op & 63)
@@ -3460,27 +3496,9 @@ void mips3_device::handle_special(uint32_t op)
 		case 0x13:  /* MTLO */      LOVAL64 = RSVAL64;                                              break;
 		case 0x14:  /* DSLLV */     if (RDREG) RDVAL64 = RTVAL64 << (RSVAL32 & 63);                 break;
 		case 0x16:  /* DSRLV */     if (RDREG) RDVAL64 = RTVAL64 >> (RSVAL32 & 63);                 break;
-		case 0x17:  /* DSRAV */     if (RDREG) RDVAL64 = (int64_t)RTVAL64 >> (RSVAL32 & 63);          break;
-		case 0x18:  /* MULT */
-		{
-			uint64_t temp64 = (int64_t)(int32_t)RSVAL32 * (int64_t)(int32_t)RTVAL32;
-			LOVAL64 = (int32_t)temp64;
-			HIVAL64 = (int32_t)(temp64 >> 32);
-			m_core->icount -= 3;
-			if (m_flavor == MIPS3_TYPE_R5900 && RDREG)
-				RDVAL64 = LOVAL64;
-			break;
-		}
-		case 0x19:  /* MULTU */
-		{
-			uint64_t temp64 = (uint64_t)RSVAL32 * (uint64_t)RTVAL32;
-			LOVAL64 = (int32_t)temp64;
-			HIVAL64 = (int32_t)(temp64 >> 32);
-			m_core->icount -= 3;
-			if (m_flavor == MIPS3_TYPE_R5900 && RDREG)
-				RDVAL64 = LOVAL64;
-			break;
-		}
+		case 0x17:  /* DSRAV */     if (RDREG) RDVAL64 = (int64_t)RTVAL64 >> (RSVAL32 & 63);        break;
+		case 0x18:  /* MULT */      handle_mult(op);                                                break;
+		case 0x19:  /* MULTU */     handle_multu(op);                                               break;
 		case 0x1a:  /* DIV */
 			if (RTVAL32)
 			{
@@ -5031,9 +5049,9 @@ void mips3_device::execute_run()
 		int execute_result;
 
 		/* reset the cache if dirty */
-		if (m_cache_dirty)
+		if (m_drc_cache_dirty)
 			code_flush_cache();
-		m_cache_dirty = false;
+		m_drc_cache_dirty = false;
 
 		/* execute */
 		do
@@ -5082,7 +5100,7 @@ void mips3_device::execute_run()
 		debugger_instruction_hook(m_core->pc);
 
 		/* instruction fetch */
-		if(!RWORD(m_core->pc, &op))
+		if(!RWORD(m_core->pc, &op, true))
 		{
 			continue;
 		}
@@ -5146,10 +5164,10 @@ void mips3_device::execute_run()
 				else
 					handle_cop1x_fr1(op);
 				break;
-			case 0x14:  /* BEQL */      if (RSVAL64 == RTVAL64) ADDPC(SIMMVAL); else m_core->pc += 4;                break;
-			case 0x15:  /* BNEL */      if (RSVAL64 != RTVAL64) ADDPC(SIMMVAL); else m_core->pc += 4;                break;
-			case 0x16:  /* BLEZL */     if ((int64_t)RSVAL64 <= 0) ADDPC(SIMMVAL); else m_core->pc += 4;           break;
-			case 0x17:  /* BGTZL */     if ((int64_t)RSVAL64 > 0) ADDPC(SIMMVAL); else m_core->pc += 4;                break;
+			case 0x14:  /* BEQL */      if (RSVAL64 == RTVAL64) ADDPC(SIMMVAL); else m_core->pc += 4;             break;
+			case 0x15:  /* BNEL */      if (RSVAL64 != RTVAL64) ADDPC(SIMMVAL); else m_core->pc += 4;             break;
+			case 0x16:  /* BLEZL */     if ((int64_t)RSVAL64 <= 0) ADDPC(SIMMVAL); else m_core->pc += 4;          break;
+			case 0x17:  /* BGTZL */     if ((int64_t)RSVAL64 > 0) ADDPC(SIMMVAL); else m_core->pc += 4;           break;
 			case 0x18:  /* DADDI */
 				if (ENABLE_OVERFLOWS && (int64_t)RSVAL64 > ~SIMMVAL) generate_exception(EXCEPTION_OVERFLOW, 1);
 				else if (RTREG) RTVAL64 = RSVAL64 + (int64_t)SIMMVAL;
@@ -5168,14 +5186,14 @@ void mips3_device::execute_run()
 			case 0x25:  /* LHU */       if (RHALF(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (uint16_t)temp;     break;
 			case 0x26:  /* LWR */       (this->*m_lwr)(op);                                                       break;
 			case 0x27:  /* LWU */       if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (uint32_t)temp;     break;
-			case 0x28:  /* SB */        WBYTE(SIMMVAL+RSVAL32, RTVAL32);                                        break;
-			case 0x29:  /* SH */        WHALF(SIMMVAL+RSVAL32, RTVAL32);                                        break;
+			case 0x28:  /* SB */        WBYTE(SIMMVAL+RSVAL32, RTVAL32);                                          break;
+			case 0x29:  /* SH */        WHALF(SIMMVAL+RSVAL32, RTVAL32);                                          break;
 			case 0x2a:  /* SWL */       (this->*m_swl)(op);                                                       break;
-			case 0x2b:  /* SW */        WWORD(SIMMVAL+RSVAL32, RTVAL32);                                        break;
+			case 0x2b:  /* SW */        WWORD(SIMMVAL+RSVAL32, RTVAL32);                                          break;
 			case 0x2c:  /* SDL */       (this->*m_sdl)(op);                                                       break;
 			case 0x2d:  /* SDR */       (this->*m_sdr)(op);                                                       break;
 			case 0x2e:  /* SWR */       (this->*m_swr)(op);                                                       break;
-			case 0x2f:  /* CACHE */     /* effective no-op */                                                   break;
+			case 0x2f:  /* CACHE */     handle_cache(op);                                                         break;
 			case 0x30:  /* LL */        if (RWORD(SIMMVAL+RSVAL32, &temp) && RTREG) RTVAL64 = (uint32_t)temp; m_ll_value = RTVAL32;       break;
 			case 0x31:  /* LWC1 */
 				if (!(SR & SR_COP1))
@@ -5478,4 +5496,9 @@ void mips3_device::load_elf()
 	m_ppc = entry_point;
 
 	delete [] buf;
+}
+
+void r5000be_device::handle_cache(uint32_t op)
+{
+	// Handle as a no-op for now
 }

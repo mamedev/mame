@@ -346,7 +346,7 @@ protected:
 
 	virtual bool RBYTE(offs_t address, uint32_t *result);
 	virtual bool RHALF(offs_t address, uint32_t *result);
-	virtual bool RWORD(offs_t address, uint32_t *result);
+	virtual bool RWORD(offs_t address, uint32_t *result, bool insn = false);
 	virtual bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask);
 	virtual bool RDOUBLE(offs_t address, uint64_t *result);
 	virtual bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask);
@@ -401,6 +401,8 @@ protected:
 
 	/* core state */
 	internal_mips3_state *m_core;
+	uint8_t *m_dcache;
+	uint8_t *m_icache;
 
 	address_space_config m_program_config;
 	mips3_flavor    m_flavor;
@@ -468,13 +470,13 @@ protected:
 	uint32_t        m_debugger_temp;
 
 	/* core state */
-	drc_cache       m_cache;                    /* pointer to the DRC code cache */
+	drc_cache       m_drc_cache;                /* pointer to the DRC code cache */
 	std::unique_ptr<drcuml_state>      m_drcuml;/* DRC UML generator state */
 	std::unique_ptr<mips3_frontend>    m_drcfe; /* pointer to the DRC front-end state */
 	uint32_t        m_drcoptions;               /* configurable DRC options */
 
 												/* internal stuff */
-	uint8_t         m_cache_dirty;              /* true if we need to flush the cache */
+	uint8_t         m_drc_cache_dirty;          /* true if we need to flush the cache */
 
 												/* tables */
 	uint8_t         m_fpmode[4];                /* FPU mode table */
@@ -515,7 +517,10 @@ protected:
 
 	void generate_exception(int exception, int backup);
 	void generate_tlb_exception(int exception, offs_t address);
-	void check_irqs();
+	virtual void check_irqs();
+	virtual void handle_mult(uint32_t op);
+	virtual void handle_multu(uint32_t op);
+
 public:
 	void mips3com_update_cycle_counting();
 	void mips3com_asid_changed();
@@ -566,6 +571,7 @@ private:
 	virtual void handle_sdc2(uint32_t op);
 	virtual void handle_dmfc2(uint32_t op);
 	virtual void handle_dmtc2(uint32_t op);
+	virtual void handle_cache(uint32_t op) { /* Handle as a no-op in most implementations */ }
 
 	void lwl_be(uint32_t op);
 	void lwr_be(uint32_t op);
@@ -595,7 +601,8 @@ public:
 	void func_unimplemented();
 private:
 	/* internal compiler state */
-	struct compiler_state {
+	struct compiler_state
+	{
 		compiler_state &operator=(compiler_state &) = delete;
 
 		uint32_t         cycles;                     /* accumulated cycles */
@@ -795,13 +802,16 @@ public:
 		: mips3_device(mconfig, R5000BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 64)
 	{
 	}
+
+protected:
+	void handle_cache(uint32_t op) override;
 };
 
 class r5000le_device : public mips3_device {
 public:
 	// construction/destruction
 	r5000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, R5000LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
+		: mips3_device(mconfig, R5000LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // FIXME: Should be 64 bits, Galileo blows up though
 	{
 	}
 };
@@ -848,7 +858,7 @@ protected:
 
 	bool RBYTE(offs_t address, uint32_t *result) override;
 	bool RHALF(offs_t address, uint32_t *result) override;
-	bool RWORD(offs_t address, uint32_t *result) override;
+	bool RWORD(offs_t address, uint32_t *result, bool insn = false) override;
 	bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask) override;
 	bool RDOUBLE(offs_t address, uint64_t *result) override;
 	bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask) override;
@@ -874,6 +884,8 @@ protected:
 	void handle_extra_cop1(uint32_t op) override;
 	void handle_extra_cop2(uint32_t op) override;
 	void handle_idt(uint32_t op) override;
+	void handle_mult(uint32_t op) override;
+	void handle_multu(uint32_t op) override;
 	void handle_mmi0(uint32_t op);
 	void handle_mmi1(uint32_t op);
 	void handle_mmi2(uint32_t op);
@@ -882,6 +894,8 @@ protected:
 	void handle_sdc2(uint32_t op) override;
 	void handle_dmfc2(uint32_t op) override;
 	void handle_dmtc2(uint32_t op) override;
+
+	void check_irqs() override;
 
 	required_device<sonyvu0_device> m_vu0;
 };
