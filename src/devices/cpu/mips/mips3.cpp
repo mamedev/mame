@@ -80,7 +80,7 @@
 #define IS_FR1      (SR & SR_FR)
 
 /* size of the execution code cache */
-#define CACHE_SIZE                      (32 * 1024 * 1024)
+#define DRC_CACHE_SIZE				(32 * 1024 * 1024)
 
 
 
@@ -166,7 +166,7 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, c_dcache_size(0)
 	, m_fastram_select(0)
 	, m_debugger_temp(0)
-	, m_drc_cache(CACHE_SIZE + sizeof(internal_mips3_state) + 0x80000)
+	, m_drc_cache(DRC_CACHE_SIZE + sizeof(internal_mips3_state) + 0x80000)
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
@@ -5500,5 +5500,94 @@ void mips3_device::load_elf()
 
 void r5000be_device::handle_cache(uint32_t op)
 {
-	// Handle as a no-op for now
+	if ((SR & SR_KSU_MASK) != SR_KSU_KERNEL && !(SR & SR_COP0))
+	{
+		m_badcop_value = 0;
+		generate_exception(EXCEPTION_BADCOP, 1);
+		return;
+	}
+
+	const uint32_t vaddr = RSVAL32 + SIMMVAL;
+
+	switch (CACHE_TYPE)
+	{
+	case 0: // Primary Instruction
+		switch (CACHE_OP)
+		{
+		case 0: // Index Invalidate
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, I-Cache Index Invalidate\n", machine().describe_context(), vaddr);
+			break;
+		case 1: // Index Load Tag
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, I-Cache Index Load Tag\n", machine().describe_context(), vaddr);
+			break;
+		case 2: // Index Store Tag
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, I-Cache Index Store Tag\n", machine().describe_context(), vaddr);
+			break;
+		case 4: // Hit Invalidate
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, I-Cache Hit Invalidate\n", machine().describe_context(), vaddr);
+			break;
+		case 5: // Fill
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, I-Cache Fill \n", machine().describe_context(), vaddr);
+			break;
+		case 6: // Hit WriteBack
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, I-Cache Hit WriteBack\n", machine().describe_context(), vaddr);
+			break;
+		default:
+			logerror("%s: MIPS3: %08x specifies invalid I-Cache op %d, vaddr %08x\n", machine().describe_context(), op, CACHE_OP, vaddr);
+			break;
+		}
+		break;
+	case 1: // Primary Data
+		switch (CACHE_OP)
+		{
+		case 0: // Index WriteBack Invalidate
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, D-Cache Index WriteBack Invalidate\n", machine().describe_context(), vaddr);
+			break;
+		case 1: // Index Load Tag
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, D-Cache Index Load Tag\n", machine().describe_context(), vaddr);
+			break;
+		case 2: // Index Store Tag
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, D-Cache Index Store Tag\n", machine().describe_context(), vaddr);
+			break;
+		case 3: // Create Dirty Exclusive
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, D-Cache Create Dirty Exclusive\n", machine().describe_context(), vaddr);
+			break;
+		case 4: // Hit Invalidate
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, D-Cache Hit Invalidate\n", machine().describe_context(), vaddr);
+			break;
+		case 5: // Hit WriteBack Invalidate
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, D-Cache Hit WriteBack Invalidate\n", machine().describe_context(), vaddr);
+			break;
+		case 6: // Hit WriteBack
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, D-Cache Hit WriteBack\n", machine().describe_context(), vaddr);
+			break;
+		default:
+			logerror("%s: MIPS3: %08x specifies invalid D-Cache op %d, vaddr %08x\n", machine().describe_context(), op, CACHE_OP, vaddr);
+			break;
+		}
+		break;
+	case 3: // Secondary Cache
+		switch (CACHE_OP)
+		{
+		case 0:     // Cache Clear
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, SC Cache Clear\n", machine().describe_context(), vaddr);
+			break;
+		case 1:     // Index Load Tag
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, SC Index Load Tag\n", machine().describe_context(), vaddr);
+			break;
+		case 2:     // Index Store Tag
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, SC Index Store Tag\n", machine().describe_context(), vaddr);
+			break;
+		case 5:     // Cache Page Invalidate
+			logerror("%s: MIPS3: Not yet implemented: cache: vaddr %08x, SC Cache Page Invalidate\n", machine().describe_context(), vaddr);
+			break;
+		default:
+			logerror("%s: MIPS3: %08x specifies invalid SC cache op %d, vaddr %08x\n", machine().describe_context(), op, CACHE_OP, vaddr);
+			break;
+		}
+		break;
+	default:
+		logerror("%s: MIPS3: %08x specifies invalid cache type %d, vaddr %08x\n", machine().describe_context(), op, CACHE_TYPE, vaddr);
+		break;
+	}
 }
