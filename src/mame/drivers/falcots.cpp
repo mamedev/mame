@@ -69,8 +69,8 @@ u8 falcots_state::key_status_r()
 {
 	u8 status = m_crtc->vsync_r() ? 0x00 : 0x02;
 
-	u8 i = m_key_scan & 0x07;
-	u8 j = (m_key_scan & 0x78) >> 3;
+	u8 i = (m_key_scan & 0x70) >> 4;
+	u8 j = m_key_scan & 0x0f;
 	if (j < 12 && BIT(m_keys[j]->read(), i) == BIT(m_key_scan, 7))
 		status |= 0x01;
 
