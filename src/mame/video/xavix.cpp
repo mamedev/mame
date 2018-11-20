@@ -181,148 +181,171 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 		// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
 	uint8_t byte1 = 0;
 	int done = 0;
-	int skip = 0;
 
 	flipx = 0;
 	flipy = 0;
 	test = 0;
 
+#ifdef PACKET_DEBUGGER
 	int packets[16];
 	const int max_packets = 16;
 	for (int i = 0; i < max_packets; i++)
 		packets[i] = -1;
-
 	int current_packet_pos = 0;
+#endif
 
-	// this is incorrect, so ignore most of it, we look up flips in a table instead for now
+	int first = 1;
+
 	do
 	{
 		byte1 = get_next_byte();
 
+		if (first == 1) // ? some headers have varying values in upper bits, only the first byte pointed to seems to matter?!
+		{
+			pal = (byte1 & 0xf0) >> 4;
+
+			int cmd = (byte1 & 0x0f);
+
+			switch (cmd)
+			{
+			case 0x0:  // not seen
+			case 0x2:  // not seen
+			case 0x4:  // not seen
+			case 0x8:  // not seen
+			case 0xa:  // not seen
+			case 0xc:  // not seen
+			case 0xe:  // not seen
+
+			case 0x6:  // this is just the end command, changes nothing, can be pointed at directly tho
+				break;
+
+			// does bit 0x02 have a meaning here, we have 2 values for each case
+
+			case 0x1:  // applies no flip?
+			case 0x3:  // applies no flip?
+				flipx = 0; flipy = 0;
+				break;
+
+			case 0x5:
+			case 0x7:
+				flipx = 1; flipy = 0;
+				break;
+
+			case 0x9:
+			case 0xb:
+				flipx = 0; flipy = 1;
+				break;
+
+			case 0xd:
+			case 0xf:
+				flipx = 1; flipy = 1;
+				break;
+			}
+
+			first = 0;
+		}
+
+#ifdef PACKET_DEBUGGER
 		if (current_packet_pos < max_packets)
 		{
-			packets[current_packet_pos] = byte1 & 0xf;
+			packets[current_packet_pos] = byte1;
 			current_packet_pos++;
 		}
+#endif
 
-		//if (debug_packets) LOG(", %02x ", byte1);
-
-		if (skip == 1)
-		{
-			skip = 0;
-			//test = 1;
-			//if (debug_packets) LOG(" (skipped)");
-		}
-		else if ((byte1 & 0x0f) == 0x01)
-		{
-			// frequently used with 0x06 alone, mud bubbles in puddles? (flip not obvious)
-			//if (debug_packets) LOG(" (unk)");
-		}
-		else if ((byte1 & 0x0f) == 0x03)
-		{
-			// causes next byte to be skipped??
-			skip = 1;
-			//if (debug_packets) LOG(" (skip?)");
-		}
-		else if ((byte1 & 0x0f) == 0x05)
-		{
-			// the upper bits are often 0x00, 0x10, 0x20, 0x30, why?
-			//flipx = 1;
-			//if (debug_packets) LOG(" (set flipx?)");
-		}
-		else if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
+		if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
 		{
 			// tile data will follow after this, always?
-			pal = (byte1 & 0xf0) >> 4;
 			done = 1;
 			//if (debug_packets) LOG(" (setting palette)");
 		}
-		else if ((byte1 & 0x0f) == 0x07)
-		{
-			// causes next byte to be skipped??
-			skip = 1;
-			//if (debug_packets) LOG(" (skip?)");
-		}
-		else if ((byte1 & 0x0f) == 0x09)
-		{
-			// used, most stuff looks like it needs y flipping
-			//flipy = 1;
-			//if (debug_packets) LOG(" (alt flipy)");
-		}
-		else if ((byte1 & 0x0f) == 0x0a)
-		{
-			// not seen
-			//if (debug_packets) LOG(" (UNKNOWN)");
-		}
-		else if ((byte1 & 0x0f) == 0x0b)
-		{
-			skip = 1;
-			//if (debug_packets) LOG(" (skip?)");
-			// used
-		}
-		else if ((byte1 & 0x0f) == 0x0c)
-		{
-			// not seen
-			//if (debug_packets) LOG(" (UNKNOWN)");
-		}
-		else if ((byte1 & 0x0f) == 0x0d)
-		{
-			// used
-			//if (debug_packets) LOG(" (UNKNOWN)");
-		}
-		else if ((byte1 & 0x0f) == 0x0e)
-		{
-			// not seen
-			//if (debug_packets) LOG(" (UNKNOWN)");
-		}
-		else if ((byte1 & 0x0f) == 0x0f)
-		{
-			//flipx = 1;
-			//flipy = 1;
-			//if (debug_packets) LOG(" (flipxy)");
-			// used
-		}
-
 	} while (done == 0);
 	//if (debug_packets) LOG("\n");
 
+// Research into header
+#ifdef PACKET_DEBUGGER
 	struct header_inline
 	{
 		int packets[16];
 		int flipx;
 		int flipy;
+		int colour;
 		int test;
 	};
 
 	// this must be controlling other stuff too? priority? but difficult to tell from only use case (monster truck)
-	// palette is set in the upper nibble (filtered out of this table) does it also depend on control code? deep freeze still has some bad colours
-	// sequences are intentionally this long, not an alignment problem
+	// palette is set in the upper nibble (seems to always be taken from first byte in header, ignoring others?)
+	// sequences are intentionally this long, not an alignment problem with the pointers (maybe there is an alignment requirement on the actual tile data?)
 	static const header_inline header_inlines[] =
 	{
-		{ {                                     0x06, -1 }, 0, 0, 0 }, // common, no flips, confirmed
-		{ {                                0x01,0x06, -1 }, 0, 0, 0 }, // dirt dash tiny mud, deep freeze, banner, no flip, confirmed
-		{ {                                0x05,0x06, -1 }, 1, 0, 0 }, // common, flipx, confirmed
-		{ {                                0x09,0x06, -1 }, 0, 1, 0 }, // common, flipy, confirmed
-		{ {                                0x0d,0x06, -1 }, 1, 1, 0 }, // dirt dash, small piece of mud, flipx&y, confirmed
-		{ {                           0x03,0x05,0x06, -1 }, 0, 0, 0 }, // dirt dash, common, no flip, confirmed
-		{ {                           0x07,0x09,0x06, -1 }, 1, 0, 0 }, // dirt dash, mud patches, flipx, confirmed
-		{ {                           0x0f,0x05,0x06, -1 }, 0, 0, 0 }, // midnight run, scenary, looks like no-flip                     UNCONFIRMED
-		{ {                           0x0f,0x09,0x06, -1 }, 0, 0, 0 }, // midnight run, plants,                                         UNCONFIRMED
-		{ {                           0x07,0x05,0x06, -1 }, 1, 0, 0 }, // deep freeze, flipx, confirmed
-		{ {                      0x03,0x0f,0x05,0x06, -1 }, 0, 0, 0 }, // dirt dash, blank tile,                                        UNCONFIRMED
-		{ {                      0x07,0x03,0x05,0x06, -1 }, 1, 0, 0 }, // dirt dash, corner of track before start, flipx, confirmed
-		{ {                      0x0b,0x03,0x05,0x06, -1 }, 0, 1, 0 }, // deep freeze, flipy, confirmed
-		{ {                      0x0f,0x07,0x09,0x06, -1 }, 1, 1, 0 }, // dirt dash, start line, flip x&y, confirmed
-		{ {                 0x0b,0x0f,0x07,0x09,0x06, -1 }, 0, 1, 0 }, // dirt dash, corner of mud patch near start                     UNCONFIRMED
-		{ {                 0x07,0x0b,0x03,0x05,0x06, -1 }, 1, 0, 0 }, // deep freeze, flipx, confirmed
-		{ {                 0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 0, 0 }, // dirt dash, mud patches, no flip, confirmed
-		{ {            0x07,0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 0, 0 }, // dirt dash, edge of mud patches at start                       UNCONFIRMED
-		{ {            0x0f,0x0b,0x0f,0x07,0x09,0x06, -1 }, 1, 1, 0 }, // dirt dash, edge of mud patches, flip x&y, confirmed
-		{ {            0x0f,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 1, 0 }, // dirt dash, mud patches, flipx&y, confirmed
-		{ {            0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 1, 0 }, // dirt dash, edge of mud patch, flipy, confirmed
-		{ {       0x07,0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 0, 0 }, // dirt dash, edge of first mud patch, flipx confirmed
-		{ {  0x0f,0x07,0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 1, 0 }, // dirt daah, edge of first mud patch, flipx&y confirmed
-		{ { -1 }, 0, 0 }
+		 // common, no flips, confirmed
+		{ {                                     0x06, -1 }, 0, 0, -1,  0 },
+		{ {                                     0x16, -1 }, 0, 0, 0x1, 0 },
+		{ {                                     0x26, -1 }, 0, 0, 0x2, 0 },	
+		{ {                                     0x36, -1 }, 0, 0, 0x3, 0 },
+		// dirt dash tiny mud, deep freeze, banner, no flip, confirmed
+	    { {                                0x01,0x06, -1 }, 0, 0, -1,  0 },
+		{ {                                0x41,0x36, -1 }, 0, 0, 0x4, 0 }, // deep freeze NOTE: multiple palette values
+		// common, flipx, confirmed
+	    { {                                0x05,0x06, -1 }, 1, 0, -1,  0 },
+		{ {                                0x15,0x16, -1 }, 1, 0, 0x1, 0 },
+		{ {                                0x25,0x26, -1 }, 1, 0, 0x2, 0 },
+		{ {                                0x35,0x36, -1 }, 1, 0, 0x3, 0 },
+		{ {                                0x35,0x26, -1 }, 1, 0, 0x3, 0 }, // deep freeze NOTE: multiple palette values
+		// common, flipy, confirmed
+		{ {                                0x09,0x06, -1 }, 0, 1, -1,  0 },
+     	{ {                                0x19,0x16, -1 }, 0, 1, 0x1, 0 },
+		// dirt dash, small piece of mud, flipx&y, confirmed
+	    { {                                0x0d,0x06, -1 }, 1, 1, -1,  0 }, 
+        // dirt dash, common, no flip, confirmed
+	    { {                           0x03,0x05,0x06, -1 }, 0, 0, -1,  0 }, 
+        { {                           0x13,0x15,0x16, -1 }, 0, 0, 0x1, 0 },
+		{ {                           0x33,0x25,0x26, -1 }, 0, 0, 0x3, 0 }, // deep freeze NOTE: needs palette 3 (the first one specified, not palette 2, specified in later bytes)
+		{ {                           0x43,0x35,0x36, -1 }, 0, 0, 0x4, 0 }, // deep freeze NOTE: multiple palette values
+		// dirt dash, mud patches, flipx, confirmed
+     	{ {                           0x07,0x09,0x06, -1 }, 1, 0, -1,  0 }, 
+		{ {                           0x17,0x19,0x16, -1 }, 1, 0, 0x1, 0 },		
+		// midnight run, scenary, looks like no-flip                     UNCONFIRMED
+	    { {                           0x0f,0x05,0x06, -1 }, 0, 0, -1,  0 }, 
+		{ {                           0x1f,0x15,0x16, -1 }, 0, 0, 0x1, 0 }, // deep freeze
+		// midnight run, plants,                                         UNCONFIRMED
+	    { {                           0x0f,0x09,0x06, -1 }, 0, 0, -1,  0 }, 
+		// deep freeze, flipx, confirmed
+	    { {                           0x07,0x05,0x06, -1 }, 1, 0, -1,  0 }, 
+		{ {                           0x37,0x25,0x26, -1 }, 1, 0, 0x3, 0 }, // deep freeze NOTE: multiple palette values
+		// dirt dash, blank tile,                                        UNCONFIRMED
+	    { {                      0x03,0x0f,0x05,0x06, -1 }, 0, 0, -1,  0 }, 
+		// dirt dash, corner of track before start, flipx, confirmed
+	    { {                      0x07,0x03,0x05,0x06, -1 }, 1, 0, -1,  0 }, 
+		{ {                      0x37,0x33,0x25,0x26, -1 }, 1, 0, 0x3, 0 }, // note, multiple palette values
+		{ {                      0x47,0x43,0x35,0x36, -1 }, 1, 0, 0x4, 0 }, // deep freeze NOTE: multiple palette values
+		// deep freeze, flipy, confirmed
+	    { {                      0x0b,0x03,0x05,0x06, -1 }, 0, 1, -1,  0 }, 
+		{ {                      0x4b,0x43,0x35,0x36, -1 }, 0, 1, 0x4, 0 }, // deep freeze NOTE: multiple palette value
+		// dirt dash, start line, flip x&y, confirmed
+	    { {                      0x0f,0x07,0x09,0x06, -1 }, 1, 1, -1,  0 }, 
+		{ {                      0x1f,0x17,0x19,0x16, -1 }, 1, 1, 0x1, 0 },
+		// dirt dash, corner of mud patch near start                     UNCONFIRMED
+	    { {                 0x0b,0x0f,0x07,0x09,0x06, -1 }, 0, 1, -1,  0 }, 
+		// deep freeze, flipx, confirmed
+	    { {                 0x07,0x0b,0x03,0x05,0x06, -1 }, 1, 0, -1,  0 }, 
+		{ {                 0x47,0x4b,0x43,0x35,0x36, -1 }, 1, 0, 0x4, 0 }, // deep freeze NOTE: multiple palette values
+		// dirt dash, mud patches, no flip, confirmed
+	    { {                 0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 0, -1,  0 }, 
+		// dirt dash, edge of mud patches at start                       UNCONFIRMED
+	    { {            0x07,0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 0, -1,  0 }, 
+		// dirt dash, edge of mud patches, flip x&y, confirmed
+	    { {            0x0f,0x0b,0x0f,0x07,0x09,0x06, -1 }, 1, 1, -1,  0 }, 
+		// dirt dash, mud patches, flipx&y, confirmed
+	    { {            0x0f,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 1, -1,  0 }, 
+		// dirt dash, edge of mud patch, flipy, confirmed
+	    { {            0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 1, -1,  0 }, 
+		// dirt dash, edge of first mud patch, flipx confirmed
+	    { {       0x07,0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 0, -1,  0 }, 
+		// dirt daah, edge of first mud patch, flipx&y confirmed
+	    { {  0x0f,0x07,0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 1, -1,  0 }, 
+		
+	    { { -1 }, 0, 0 }
 	};
 
 	int matched_to = -1;
@@ -369,6 +392,9 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 		flipx = header_inlines[matched_to].flipx;
 		flipy = header_inlines[matched_to].flipy;
 		test = header_inlines[matched_to].test;
+
+		if (header_inlines[matched_to].colour != -1)
+			pal = header_inlines[matched_to].colour;
 	}
 	else
 	{
@@ -393,8 +419,9 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 			}
 		}
 
-		LOG(", -1 }, 0, 0, 0 },\n");
+		LOG(", -1 }, 0, 0, 0x%01x, 0 },\n", pal);
 	}
+#endif
 }
 
 void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line)
