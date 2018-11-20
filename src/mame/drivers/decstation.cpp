@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 	BT459(config, m_bt459, 83'020'800);
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
-	m_lance->irq_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
+	m_lance->intr_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
 
 	DECSTATION_IOGA(config, m_ioga, XTAL(12'500'000));
 	m_ioga->irq_out().set(FUNC(decstation_state::ioga_irq_w));

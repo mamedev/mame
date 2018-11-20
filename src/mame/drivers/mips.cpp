@@ -443,7 +443,7 @@ void rx2030_state::rx2030(machine_config &config)
 
 	// ethernet
 	AM7990(config, m_net);
-	m_net->irq_out().set_inputline(m_iop, INPUT_LINE_IRQ5);
+	m_net->intr_out().set_inputline(m_iop, INPUT_LINE_IRQ5);
 	//m_net->dma_in().set(FUNC(rx2030_state::mmu_r));
 	//m_net->dma_out().set(FUNC(rx2030_state::mmu_w));
 
