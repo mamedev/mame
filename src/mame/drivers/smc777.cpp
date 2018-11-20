@@ -1045,9 +1045,10 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, MASTER_CLOCK/2);    /* unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
 
 	// floppy controller
 	MB8876(config, m_fdc, 1_MHz_XTAL);

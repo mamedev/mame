@@ -361,10 +361,11 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(tavernie_state, kbd_put))
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // unknown clock
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(tavernie_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // unknown clock
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(tavernie_state::crtc_update_row), this);
 
 	PIA6821(config, m_pia_ivg, 0);
 	m_pia_ivg->readpb_handler().set(FUNC(tavernie_state::pb_ivg_r));

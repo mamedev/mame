@@ -54,25 +54,26 @@ void qvt6800_state::qvt190_mem_map(address_map &map)
 static INPUT_PORTS_START( qvt6800 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(qvt6800_state::qvt190)
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(16'669'800) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(qvt190_mem_map)
+void qvt6800_state::qvt190(machine_config &config)
+{
+	M6800(config, m_maincpu, XTAL(16'669'800) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qvt6800_state::qvt190_mem_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // V61C16P55L + battery
 
-	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
+	ACIA6850(config, "acia1", 0);
 
-	MCFG_DEVICE_ADD("acia2", ACIA6850, 0)
+	ACIA6850(config, "acia2", 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'669'800), 882, 0, 720, 315, 0, 300)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(16'669'800), 882, 0, 720, 315, 0, 300);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_DEVICE_ADD("crtc", MC6845, XTAL(16'669'800) / 9)
-	MCFG_MC6845_CHAR_WIDTH(9)
-	MCFG_MC6845_UPDATE_ROW_CB(qvt6800_state, update_row)
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL(16'669'800) / 9));
+	crtc.set_screen("screen");
+	crtc.set_char_width(9);
+	crtc.set_update_row_callback(FUNC(qvt6800_state::update_row), this);
+}
 
 /**************************************************************************************************************
 

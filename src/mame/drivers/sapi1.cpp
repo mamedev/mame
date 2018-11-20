@@ -671,10 +671,11 @@ MACHINE_CONFIG_START(sapi1_state::sapi3b)
 	MCFG_DEVICE_PROGRAM_MAP(sapi3b_mem)
 	MCFG_DEVICE_IO_MAP(sapi3b_io)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // guess
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(6)
-	MCFG_MC6845_UPDATE_ROW_CB(sapi1_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // guess
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(6);
+	crtc.set_update_row_callback(FUNC(sapi1_state::crtc_update_row), this);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)

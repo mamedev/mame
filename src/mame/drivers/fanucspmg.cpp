@@ -1004,23 +1004,20 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000), 640, 0, 512, 390, 0, 384 )
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL(8'000'000)/2)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fanucspmg_state, vsync_w))
+	HD6845(config, m_crtc, XTAL(8'000'000)/2);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(fanucspmg_state::vsync_w));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(fanucspmg_state::fanucspmgm)
+void fanucspmg_state::fanucspmgm(machine_config &config)
+{
 	fanucspmg(config);
-	MCFG_DEVICE_REMOVE( CRTC_TAG )
 
-	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL(8'000'000)/2)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(fanucspmg_state, crtc_update_row_mono)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fanucspmg_state, vsync_w))
-MACHINE_CONFIG_END
+	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row_mono), this);
+}
 
 /* ROM definition */
 ROM_START( fanucspg )

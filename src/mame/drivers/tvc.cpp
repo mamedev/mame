@@ -783,11 +783,12 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(tvc_state, tvc)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3125000/2) // clk taken from schematics
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
-	MCFG_MC6845_UPDATE_ROW_CB(tvc_state, crtc_update_row)
-	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, tvc_state, int_ff_set))
+	mc6845_device &crtc(MC6845(config, "crtc", 3125000/2)); // clk taken from schematics
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8); /*?*/
+	crtc.set_update_row_callback(FUNC(tvc_state::crtc_update_row), this);
+	crtc.out_cur_callback().set(FUNC(tvc_state::int_ff_set));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K");

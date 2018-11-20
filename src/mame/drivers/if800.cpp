@@ -98,9 +98,9 @@ MACHINE_CONFIG_START(if800_state::if800)
 
 
 //  PIC8259(config, "pic8259", 0);
-	MCFG_DEVICE_ADD("upd7220", UPD7220, 8000000/4)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(if800_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc, 8000000/4);
+	m_hgdc->set_addrmap(0, &if800_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(if800_state::hgdc_display_pixels), this);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

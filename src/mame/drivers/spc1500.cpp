@@ -895,11 +895,13 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
-	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
+	MC6845(config, m_vdg, (VDP_CLOCK/48)); //unknown divider
+	m_vdg->set_screen("screen");
+	m_vdg->set_show_border_area(false);
+	m_vdg->set_char_width(8);
+	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row), this);
+	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig), this);
+
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
 	I8255(config, m_pio);

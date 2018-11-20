@@ -799,11 +799,11 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 
 	I8255(config, m_ppi, 0);
 
-	MCFG_DEVICE_ADD("upd7220", UPD7220, MAIN_CLK/6) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(qx10_state, hgdc_display_pixels)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(qx10_state, hgdc_draw_text)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	UPD7220(config, m_hgdc, MAIN_CLK/6); // unk clock
+	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(qx10_state::hgdc_display_pixels), this);
+	m_hgdc->set_draw_text_callback(FUNC(qx10_state::hgdc_draw_text), this);
+	m_hgdc->set_screen("screen");
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_pic_s, FUNC(pic8259_device::ir2_w));

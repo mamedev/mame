@@ -2235,9 +2235,10 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(x1_state, screen_update_x1)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
 
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1_state,x1)

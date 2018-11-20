@@ -3240,12 +3240,13 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	// *************************** COLOR GRAPHICS (OPTION) **************************************
 	// While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).
-	MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 32) // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
-	MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(*this, rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
+	UPD7220(config, m_hgdc, 31188000 / 32); // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
+	m_hgdc->vsync_wr_callback().set(FUNC(rainbow_state::GDC_vblank_irq)); // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(rainbow_state, hgdc_display_pixels)
-	MCFG_VIDEO_SET_SCREEN("screen2") // SET_SCREEN needs to be added after 7720 device in the machine config, not after the screen.
+	m_hgdc->set_addrmap(0, &rainbow_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(rainbow_state::hgdc_display_pixels), this);
+	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7720 device in the machine config, not after the screen.
+
 	MCFG_PALETTE_ADD("palette2", 32)
 
 	MCFG_SCREEN_ADD("screen2", RASTER)

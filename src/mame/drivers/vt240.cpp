@@ -674,12 +674,12 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vt240)
 
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(16'097'280) / 16) // actually /8?
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(vt240_state, hgdc_draw)
-	MCFG_UPD7220_VSYNC_CALLBACK(INPUTLINE("charcpu", I8085_RST75_LINE))
-	MCFG_UPD7220_BLANK_CALLBACK(INPUTLINE("charcpu", I8085_RST55_LINE))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	UPD7220(config, m_hgdc, XTAL(16'097'280) / 16); // actually /8?
+	m_hgdc->set_addrmap(0, &vt240_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(vt240_state::hgdc_draw), this);
+	m_hgdc->vsync_wr_callback().set_inputline(m_i8085, I8085_RST75_LINE);
+	m_hgdc->blank_wr_callback().set_inputline(m_i8085, I8085_RST55_LINE);
+	m_hgdc->set_screen("screen");
 
 	MCFG_DEVICE_ADD(m_duart, SCN2681, XTAL(7'372'800) / 2)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, vt240_state, irq13_w))

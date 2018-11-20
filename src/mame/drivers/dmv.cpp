@@ -801,10 +801,10 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	config.set_default_layout(layout_dmv);
 
 	// devices
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(5'000'000)/2) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(dmv_state, hgdc_display_pixels)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(dmv_state, hgdc_draw_text)
+	UPD7220(config, m_hgdc, XTAL(5'000'000)/2); // unk clock
+	m_hgdc->set_addrmap(0, &dmv_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(dmv_state::hgdc_display_pixels), this);
+	m_hgdc->set_draw_text_callback(FUNC(dmv_state::hgdc_draw_text), this);
 
 	AM9517A(config, m_dmac, 4_MHz_XTAL);
 	m_dmac->out_hreq_callback().set(FUNC(dmv_state::dma_hrq_changed));

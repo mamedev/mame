@@ -131,10 +131,11 @@ MACHINE_CONFIG_START(m3_state::m3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2'000'000) // clk unknown
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(7)
-	MCFG_MC6845_UPDATE_ROW_CB(m3_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 2'000'000)); // clk unknown
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(7);
+	crtc.set_update_row_callback(FUNC(m3_state::crtc_update_row), this);
 MACHINE_CONFIG_END
 
 ROM_START( m3 )

@@ -303,10 +303,11 @@ MACHINE_CONFIG_START(d64plus_state::d64plus)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// crtc
-	MCFG_MC6845_ADD("crtc", HD6845, "plus_screen", 14.218_MHz_XTAL / 4 / 2)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(d64plus_state, crtc_update_row)
+	HD6845(config, m_crtc, 14.218_MHz_XTAL / 4 / 2);
+	m_crtc->set_screen("plus_screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(d64plus_state::crtc_update_row), this);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragon_alpha_state::dgnalpha)
