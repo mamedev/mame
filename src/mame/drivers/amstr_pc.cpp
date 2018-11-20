@@ -95,6 +95,7 @@ private:
 
 	int m_dipstate;
 	static void cfg_com(device_t *device);
+	static void cfg_fdc(device_t *device);
 
 	void pc200_io(address_map &map);
 	void pc2086_map(address_map &map);
@@ -484,25 +485,37 @@ INPUT_PORTS_END
 	// GFXDECODE_ENTRY( "gfx1", 0x0000, pc200_charlayout, 3, 1 )
 // GFXDECODE_END
 
-// has it's own mouse
 void amstrad_pc_state::cfg_com(device_t *device)
 {
+	/* has it's own mouse */
 	device = device->subdevice("serport0");
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 }
 
+void amstrad_pc_state::cfg_fdc(device_t *device)
+{
+	/* all machines have an internal 3.5" drive */
+	auto fdc0 = dynamic_cast<device_slot_interface *>(device->subdevice("fdc:0"));
+	fdc0->set_default_option("35dd");
+	fdc0->set_fixed(true);
+
+	auto fdc1 = dynamic_cast<device_slot_interface *>(device->subdevice("fdc:1"));
+	fdc1->set_default_option("35dd");
+}
+
 MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(ppc640_map)
-	MCFG_DEVICE_IO_MAP(pc200_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, amstrad_pc_state::ppc640_map);
+	m_maincpu->set_addrmap(AS_IO, amstrad_pc_state::pc200_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("aga", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "aga_pc200", true)
 	MCFG_DEVICE_ADD("fdc", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc)
 	MCFG_DEVICE_ADD("com", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("com", cfg_com)
 
@@ -527,24 +540,25 @@ MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(amstrad_pc_state::pc2086)
+void amstrad_pc_state::pc2086(machine_config &config)
+{
 	pc200(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pc2086_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_pc_state::pc2086_map);
+}
 
-MACHINE_CONFIG_START(amstrad_pc_state::ppc640)
+void amstrad_pc_state::ppc640(machine_config &config)
+{
 	pc200(config);
-	MCFG_DEVICE_REPLACE("maincpu", V30, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(ppc640_map)
-	MCFG_DEVICE_IO_MAP(ppc512_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	config.device_replace("maincpu", V30, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, amstrad_pc_state::ppc640_map);
+	m_maincpu->set_addrmap(AS_IO, amstrad_pc_state::ppc512_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_REMOVE("isa1")
-	MCFG_DEVICE_REMOVE("isa2")
+	config.device_remove("isa1");
+	config.device_remove("isa2");
 
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-MACHINE_CONFIG_END
+	MC146818(config, "rtc", 32.768_kHz_XTAL);
+}
 
 void amstrad_pc_state::ppc512(machine_config &config)
 {
