@@ -186,14 +186,6 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 	flipy = 0;
 	test = 0;
 
-#ifdef PACKET_DEBUGGER
-	int packets[16];
-	const int max_packets = 16;
-	for (int i = 0; i < max_packets; i++)
-		packets[i] = -1;
-	int current_packet_pos = 0;
-#endif
-
 	int first = 1;
 
 	do
@@ -245,14 +237,6 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 			first = 0;
 		}
 
-#ifdef PACKET_DEBUGGER
-		if (current_packet_pos < max_packets)
-		{
-			packets[current_packet_pos] = byte1;
-			current_packet_pos++;
-		}
-#endif
-
 		if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
 		{
 			// tile data will follow after this, always?
@@ -261,167 +245,6 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 		}
 	} while (done == 0);
 	//if (debug_packets) LOG("\n");
-
-// Research into header
-#ifdef PACKET_DEBUGGER
-	struct header_inline
-	{
-		int packets[16];
-		int flipx;
-		int flipy;
-		int colour;
-		int test;
-	};
-
-	// this must be controlling other stuff too? priority? but difficult to tell from only use case (monster truck)
-	// palette is set in the upper nibble (seems to always be taken from first byte in header, ignoring others?)
-	// sequences are intentionally this long, not an alignment problem with the pointers (maybe there is an alignment requirement on the actual tile data?)
-	static const header_inline header_inlines[] =
-	{
-		 // common, no flips, confirmed
-		{ {                                     0x06, -1 }, 0, 0, -1,  0 },
-		{ {                                     0x16, -1 }, 0, 0, 0x1, 0 },
-		{ {                                     0x26, -1 }, 0, 0, 0x2, 0 },	
-		{ {                                     0x36, -1 }, 0, 0, 0x3, 0 },
-		// dirt dash tiny mud, deep freeze, banner, no flip, confirmed
-	    { {                                0x01,0x06, -1 }, 0, 0, -1,  0 },
-		{ {                                0x41,0x36, -1 }, 0, 0, 0x4, 0 }, // deep freeze NOTE: multiple palette values
-		// common, flipx, confirmed
-	    { {                                0x05,0x06, -1 }, 1, 0, -1,  0 },
-		{ {                                0x15,0x16, -1 }, 1, 0, 0x1, 0 },
-		{ {                                0x25,0x26, -1 }, 1, 0, 0x2, 0 },
-		{ {                                0x35,0x36, -1 }, 1, 0, 0x3, 0 },
-		{ {                                0x35,0x26, -1 }, 1, 0, 0x3, 0 }, // deep freeze NOTE: multiple palette values
-		// common, flipy, confirmed
-		{ {                                0x09,0x06, -1 }, 0, 1, -1,  0 },
-     	{ {                                0x19,0x16, -1 }, 0, 1, 0x1, 0 },
-		// dirt dash, small piece of mud, flipx&y, confirmed
-	    { {                                0x0d,0x06, -1 }, 1, 1, -1,  0 }, 
-        // dirt dash, common, no flip, confirmed
-	    { {                           0x03,0x05,0x06, -1 }, 0, 0, -1,  0 }, 
-        { {                           0x13,0x15,0x16, -1 }, 0, 0, 0x1, 0 },
-		{ {                           0x33,0x25,0x26, -1 }, 0, 0, 0x3, 0 }, // deep freeze NOTE: needs palette 3 (the first one specified, not palette 2, specified in later bytes)
-		{ {                           0x43,0x35,0x36, -1 }, 0, 0, 0x4, 0 }, // deep freeze NOTE: multiple palette values
-		// dirt dash, mud patches, flipx, confirmed
-     	{ {                           0x07,0x09,0x06, -1 }, 1, 0, -1,  0 }, 
-		{ {                           0x17,0x19,0x16, -1 }, 1, 0, 0x1, 0 },		
-		// midnight run, scenary, looks like no-flip                     UNCONFIRMED
-	    { {                           0x0f,0x05,0x06, -1 }, 0, 0, -1,  0 }, 
-		{ {                           0x1f,0x15,0x16, -1 }, 0, 0, 0x1, 0 }, // deep freeze
-		// midnight run, plants,                                         UNCONFIRMED
-	    { {                           0x0f,0x09,0x06, -1 }, 0, 0, -1,  0 }, 
-		// deep freeze, flipx, confirmed
-	    { {                           0x07,0x05,0x06, -1 }, 1, 0, -1,  0 }, 
-		{ {                           0x37,0x25,0x26, -1 }, 1, 0, 0x3, 0 }, // deep freeze NOTE: multiple palette values
-		// dirt dash, blank tile,                                        UNCONFIRMED
-	    { {                      0x03,0x0f,0x05,0x06, -1 }, 0, 0, -1,  0 }, 
-		// dirt dash, corner of track before start, flipx, confirmed
-	    { {                      0x07,0x03,0x05,0x06, -1 }, 1, 0, -1,  0 }, 
-		{ {                      0x37,0x33,0x25,0x26, -1 }, 1, 0, 0x3, 0 }, // note, multiple palette values
-		{ {                      0x47,0x43,0x35,0x36, -1 }, 1, 0, 0x4, 0 }, // deep freeze NOTE: multiple palette values
-		// deep freeze, flipy, confirmed
-	    { {                      0x0b,0x03,0x05,0x06, -1 }, 0, 1, -1,  0 }, 
-		{ {                      0x4b,0x43,0x35,0x36, -1 }, 0, 1, 0x4, 0 }, // deep freeze NOTE: multiple palette value
-		// dirt dash, start line, flip x&y, confirmed
-	    { {                      0x0f,0x07,0x09,0x06, -1 }, 1, 1, -1,  0 }, 
-		{ {                      0x1f,0x17,0x19,0x16, -1 }, 1, 1, 0x1, 0 },
-		// dirt dash, corner of mud patch near start                     UNCONFIRMED
-	    { {                 0x0b,0x0f,0x07,0x09,0x06, -1 }, 0, 1, -1,  0 }, 
-		// deep freeze, flipx, confirmed
-	    { {                 0x07,0x0b,0x03,0x05,0x06, -1 }, 1, 0, -1,  0 }, 
-		{ {                 0x47,0x4b,0x43,0x35,0x36, -1 }, 1, 0, 0x4, 0 }, // deep freeze NOTE: multiple palette values
-		// dirt dash, mud patches, no flip, confirmed
-	    { {                 0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 0, -1,  0 }, 
-		// dirt dash, edge of mud patches at start                       UNCONFIRMED
-	    { {            0x07,0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 0, -1,  0 }, 
-		// dirt dash, edge of mud patches, flip x&y, confirmed
-	    { {            0x0f,0x0b,0x0f,0x07,0x09,0x06, -1 }, 1, 1, -1,  0 }, 
-		// dirt dash, mud patches, flipx&y, confirmed
-	    { {            0x0f,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 1, -1,  0 }, 
-		// dirt dash, edge of mud patch, flipy, confirmed
-	    { {            0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 0, 1, -1,  0 }, 
-		// dirt dash, edge of first mud patch, flipx confirmed
-	    { {       0x07,0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 0, -1,  0 }, 
-		// dirt daah, edge of first mud patch, flipx&y confirmed
-	    { {  0x0f,0x07,0x0b,0x03,0x0f,0x07,0x09,0x06, -1 }, 1, 1, -1,  0 }, 
-		
-	    { { -1 }, 0, 0 }
-	};
-
-	int matched_to = -1;
-	done = 0;
-	int i = 0;
-
-	do
-	{
-		if (header_inlines[i].packets[0] == -1) // got to the end
-		{
-			done = 1;
-			matched_to = -1;
-		}
-		else
-		{
-			int match = 1;
-
-			for (int j = 0; j < max_packets; j++)
-			{
-				if (header_inlines[i].packets[j] == -1)
-					break;
-
-				if (header_inlines[i].packets[j] != packets[j])
-				{
-					match = 0;
-					break;
-				}
-			}
-
-			if (match == 1)
-			{
-				//LOG("matched to sequence %02x\n", i);
-				matched_to = i;
-				done = 1;
-			}
-		}
-
-		i++;
-
-	} while (done == 0);
-
-	if (matched_to != -1)
-	{
-		flipx = header_inlines[matched_to].flipx;
-		flipy = header_inlines[matched_to].flipy;
-		test = header_inlines[matched_to].test;
-
-		if (header_inlines[matched_to].colour != -1)
-			pal = header_inlines[matched_to].colour;
-	}
-	else
-	{
-		popmessage("unhandled inline header");
-	}
-
-	if ((debug_packets) && (matched_to == -1))
-	{
-		LOG("{ {  ");
-
-		for (int i = 0; i < max_packets; i++)
-		{
-			if (packets[i] == -1)
-			{
-				break;
-			}
-			else
-			{
-				if (i != 0) LOG(",");
-				LOG("0x%02x", packets[i]);
-
-			}
-		}
-
-		LOG(", -1 }, 0, 0, 0x%01x, 0 },\n", pal);
-	}
-#endif
 }
 
 void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line)
