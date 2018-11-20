@@ -114,6 +114,13 @@
  *   intp5 <- LANCE
  *   intp6 <- floppy?
  *   intp7 <- SCSI
+ *
+ * R2000 interrupts:
+ *   int0 <- ?
+ *   int1 <- iop keyboard
+ *   int2 <- ?
+ *   int4 <- iop clock
+ *   int5 <- vblank
  */
 
 #include "emu.h"
@@ -194,9 +201,6 @@ void rx2030_state::iop_program_map(address_map &map)
 
 void rx2030_state::iop_io_map(address_map &map)
 {
-	// 0x180-18a ? .umask16(0xff)
-	// 0x040, 0x044
-
 	map(0x0000, 0x003f).lrw16("mmu",
 		[this](offs_t offset, u16 mem_mask)
 		{
@@ -206,9 +210,11 @@ void rx2030_state::iop_io_map(address_map &map)
 		{
 			m_mmu[offset] = data;
 		});
-
-	//map(0x0040, 0x0041).r(m_fdc, FUNC(wd37c65c_device::msr_r)).umask16(0xff);
-	//map(0x0044, 0x0045).w(m_fdc, FUNC(wd37c65c_device::dor_w)).umask16(0xff);
+	
+	map(0x0040, 0x0043).m(m_fdc, FUNC(wd37c65c_device::map)).umask16(0xff);
+	map(0x0044, 0x0045).w(m_fdc, FUNC(wd37c65c_device::dor_w)).umask16(0xff);
+	map(0x0048, 0x0049).w(m_fdc, FUNC(wd37c65c_device::ccr_w)).umask16(0xff);
+	//map(0x004c, 0x004d).r(m_fdc, FUNC(?)).umask16(0xff);
 
 	map(0x0080, 0x0083).rw(m_scsi, FUNC(aic6250_device::read), FUNC(aic6250_device::write)).umask16(0xff);
 
@@ -218,6 +224,14 @@ void rx2030_state::iop_io_map(address_map &map)
 	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask16(0xff);
 
 	map(0x0140, 0x0143).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
+
+	map(0x0180, 0x018b).lr8("mac", [this](offs_t offset)
+	{
+		// Ethernet MAC address (LSB first)
+		static const u8 mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56 };
+
+		return mac[offset];
+	}).umask16(0xff);
 
 	// iop tests bits 0x04, 0x10 and 0x20
 	map(0x01c0, 0x01c1).lr8("?", [this]() { return m_iop_interface; }); // maybe?
@@ -289,6 +303,11 @@ void rx2030_state::rx2030_map(address_map &map)
 						"SCSI1",   "SCSI2", "SCSI3", "SCSI4", "SCSI5", "SCSI6",  "SCSI7", "FLOPPY0",
 						"FLOPPY1", "LANCE", "PP",    "KYBD",  "MOUSE", "BUZZER", "UNK22", "UNK23"
 					};
+					static char const *const iop_lance[] =
+					{
+						"", "PROBE", "INIT", "STOP", "STRT", "RECV", "XMIT", "XMIT_DONE",
+						"STAT", "INIT_DONE", "RESET",  "DBG_ON",  "DBG_OFF", "MISS"
+					};
 
 					for (int iocb = 0; iocb < 24; iocb++)
 					{
@@ -302,8 +321,33 @@ void rx2030_state::rx2030_map(address_map &map)
 
 							u16 const iop_cmd = m_ram->read(0x1000 + iocb_cmdparam + 2) | (m_ram->read(0x1000 + iocb_cmdparam + 3) << 8);
 
-							LOGMASKED(LOG_IOCB, "iocb %s command 0x%04x (%s)\n",
-								iop_commands[iocb], iop_cmd, machine().describe_context());
+							switch (iocb)
+							{
+							case 5: // clock
+								LOGMASKED(LOG_IOCB, "iocb %s command 0x%04x (%s)\n",
+									iop_commands[iocb], m_ram->read(0x1000 + iocb_cmdparam + 6) | (m_ram->read(0x1000 + iocb_cmdparam + 7) << 8), 
+									machine().describe_context());
+								break;
+
+							case 17: // lance
+								LOGMASKED(LOG_IOCB, "iocb %s command %s (%s)\n",
+									iop_commands[iocb], iop_lance[iocb_cmdparam],
+									machine().describe_context());
+								break;
+
+							case 19: // keyboard
+								LOGMASKED(LOG_IOCB, "iocb %s command 0x%04x data 0x%02x (%s)\n",
+									iop_commands[iocb], iop_cmd,
+									m_ram->read(0x1000 + iocb_cmdparam + 6),
+									machine().describe_context());
+								break;
+
+							default:
+								LOGMASKED(LOG_IOCB, "iocb %s command 0x%04x (%s)\n",
+									iop_commands[iocb], iop_cmd,
+									machine().describe_context());
+								break;
+							}
 						}
 					}
 				}
@@ -334,6 +378,24 @@ void rx2030_state::rs2030_map(address_map &map)
 	map(0x01ffff00, 0x01ffffff).m(m_ramdac, FUNC(bt458_device::map)).umask32(0xff);
 }
 
+u16 rx2030_state::lance_r(offs_t offset, u16 mem_mask)
+{
+	u16 const data =
+		(m_ram->read(BYTE4_XOR_BE(offset + 1)) << 8) |
+		m_ram->read(BYTE4_XOR_BE(offset + 0));
+
+	return data;
+}
+
+void rx2030_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_ram->write(BYTE4_XOR_BE(offset + 0), data);
+
+	if (ACCESSING_BITS_8_15)
+		m_ram->write(BYTE4_XOR_BE(offset + 1), data >> 8);
+}
+
 static void rx2030_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
@@ -344,7 +406,7 @@ void rx2030_state::rx2030(machine_config &config)
 {
 	R2000A(config, m_cpu, 33.333_MHz_XTAL / 2, 32768, 32768);
 	m_cpu->set_fpurev(0x0315); // 0x0315 == R2010A v1.5
-	m_cpu->in_brcond<0>().set([this]() { logerror("brcond0 sampled (%s)\n", machine().describe_context()); return ASSERT_LINE; });
+	m_cpu->in_brcond<0>().set([]() { return 1; }); // logerror("brcond0 sampled (%s)\n", machine().describe_context());
 
 	V50(config, m_iop, 20_MHz_XTAL / 2);
 	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
@@ -408,7 +470,7 @@ void rx2030_state::rx2030(machine_config &config)
 
 	// floppy controller and drive
 	WD37C65C(config, m_fdc, 16_MHz_XTAL);
-	//m_fdc->intrq_wr_callback().set_inputline(m_iop, INPUT_LINE_IRQ6);
+	m_fdc->intrq_wr_callback().set_inputline(m_iop, INPUT_LINE_IRQ6);
 	//m_fdc->drq_wr_callback().set();
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, &FLOPPY_PC_FORMAT).enable_sound(false);
 
@@ -437,15 +499,15 @@ void rx2030_state::rx2030(machine_config &config)
 
 		adapter.set_clock(10_MHz_XTAL); // clock assumed
 
-		adapter.int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7).invert();
+		adapter.int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7);
 		adapter.breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
 	});
 
 	// ethernet
 	AM7990(config, m_net);
-	m_net->intr_out().set_inputline(m_iop, INPUT_LINE_IRQ5);
-	//m_net->dma_in().set(FUNC(rx2030_state::mmu_r));
-	//m_net->dma_out().set(FUNC(rx2030_state::mmu_w));
+	m_net->intr_out().set_inputline(m_iop, INPUT_LINE_IRQ5).invert();
+	m_net->dma_in().set(FUNC(rx2030_state::lance_r));
+	m_net->dma_out().set(FUNC(rx2030_state::lance_w));
 
 	// buzzer
 	SPEAKER(config, "mono").front_center();

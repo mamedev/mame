@@ -84,6 +84,9 @@ protected:
 	u16 mmu_r(offs_t offset, u16 mem_mask = 0xffff);
 	void mmu_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 
+	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
+	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
