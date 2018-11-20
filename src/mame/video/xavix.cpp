@@ -177,8 +177,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &pal, int debug_packets)
 {
-	// there seems to be a packet stored before the tile?!
-		// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
 	uint8_t byte1 = 0;
 	int done = 0;
 
@@ -192,25 +190,28 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 	{
 		byte1 = get_next_byte();
 
-		if (first == 1) // ? some headers have varying values in upper bits, only the first byte pointed to seems to matter?!
+		// only the first byte matters when it comes to setting palette / flips, the rest are just ignored until we reach a 0x6 command, after which there is the tile data
+		if (first == 1) 
 		{
 			pal = (byte1 & 0xf0) >> 4;
-
 			int cmd = (byte1 & 0x0f);
 
 			switch (cmd)
 			{
-			case 0x0:  // not seen
-			case 0x2:  // not seen
-			case 0x4:  // not seen
-			case 0x8:  // not seen
-			case 0xa:  // not seen
-			case 0xc:  // not seen
-			case 0xe:  // not seen
+			// these cases haven't been seen
+			case 0x0:
+			case 0x2:
+			case 0x4:
+			case 0x8:
+			case 0xa:
+			case 0xc:
+			case 0xe:
 
-			case 0x6:  // this is just the end command, changes nothing, can be pointed at directly tho
+			// this is just the end command, changes nothing, can be pointed at directly tho
+			case 0x6:  
 				break;
 
+			// flip cases
 			// does bit 0x02 have a meaning here, we have 2 values for each case
 
 			case 0x1:
@@ -237,7 +238,7 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 			first = 0;
 		}
 
-		if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
+		if ((byte1 & 0x0f) == 0x06)
 		{
 			// tile data will follow after this, always?
 			done = 1;
