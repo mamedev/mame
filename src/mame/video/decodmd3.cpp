@@ -141,6 +141,7 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 	TIMER(config, "irq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(decodmd_type3_device::dmd_irq), this), attotime::from_hz(150));
 
 	MC6845(config, m_mc6845, XTAL(12'000'000) / 4);  // TODO: confirm clock speed
+	m_mc6845->set_screen(nullptr);
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(16);
 	m_mc6845->set_update_row_callback(FUNC(decodmd_type3_device::crtc_update_row), this);

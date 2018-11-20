@@ -937,6 +937,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_cpc)
 
 	HD6845(config, m_crtc, 16_MHz_XTAL / 16);
+	m_crtc->set_screen(nullptr);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(16);
 	m_crtc->out_de_callback().set(FUNC(amstrad_state::amstrad_de_changed));
@@ -1059,6 +1060,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
 	AMS40489(config, m_crtc, 40_MHz_XTAL / 40);
+	m_crtc->set_screen(nullptr);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(16);
 	m_crtc->out_de_callback().set(FUNC(amstrad_state::amstrad_plus_de_changed));
@@ -1137,6 +1139,7 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
 	AMS40489(config, m_crtc, 40_MHz_XTAL / 40);
+	m_crtc->set_screen(nullptr);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(16);
 	m_crtc->out_de_callback().set(FUNC(amstrad_state::amstrad_plus_de_changed));
