@@ -89,8 +89,8 @@ casanova                        //
 fieldday                        // A23 (c) 1984 Taito
 undoukai                        // A17 (c) 1984 Taito
 
-@source:4d20.cpp
-4d20                            // (c) SGI 1991
+@source:iris_power.cpp
+4d410                           // (c) SGI 1991
 
 @source:4dpi.cpp
 sgi_ip6                         // IP6: 4D/PI, R2000, 20MHz

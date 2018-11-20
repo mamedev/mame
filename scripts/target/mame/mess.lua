@@ -3014,7 +3014,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "sgi")
 files {
-	MAME_DIR .. "src/mame/drivers/4d20.cpp",
+	MAME_DIR .. "src/mame/drivers/iris_power.cpp",
 	MAME_DIR .. "src/mame/drivers/crimson.cpp",
 	MAME_DIR .. "src/mame/drivers/o2.cpp",
 	MAME_DIR .. "src/mame/drivers/octane.cpp",

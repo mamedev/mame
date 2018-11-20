@@ -1,6 +1,5 @@
 3do.cpp
 4004clk.cpp
-4d20.cpp
 4dpi.cpp
 68ksbc.cpp
 a2600.cpp
@@ -335,6 +334,7 @@ iq151.cpp
 iqunlim.cpp
 iris3130.cpp
 irisha.cpp
+iris_power.cpp
 is48x.cpp
 isbc.cpp
 isbc8010.cpp
