@@ -288,13 +288,16 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 template<uint32_t index>
 READ32_MEMBER(hpc3_device::hd_r)
 {
+	if (index && !m_wd33c93_2)
+		return 0;
+
 	switch (offset)
 	{
 	case 0x0000/4:
 	case 0x4000/4:
 		if (ACCESSING_BITS_0_7)
 		{
-			const uint8_t ret = index && m_wd33c93_2 ? m_wd33c93_2->read(space, 0) : m_wd33c93->read(space, 0);
+			const uint8_t ret = index ? m_wd33c93_2->read(space, 0) : m_wd33c93->read(space, 0);
 			LOGMASKED(LOG_SCSI, "%s: SCSI%d Read 0: %02x\n", machine().describe_context(), index, ret);
 			return ret;
 		}
@@ -303,7 +306,7 @@ READ32_MEMBER(hpc3_device::hd_r)
 	case 0x4004/4:
 		if (ACCESSING_BITS_0_7)
 		{
-			const uint8_t ret = index && m_wd33c93_2 ? m_wd33c93_2->read(space, 1) : m_wd33c93->read(space, 1);
+			const uint8_t ret = index ? m_wd33c93_2->read(space, 1) : m_wd33c93->read(space, 1);
 			LOGMASKED(LOG_SCSI, "%s: SCSI%d Read 1: %02x\n", machine().describe_context(), index, ret);
 			return ret;
 		}
@@ -319,20 +322,23 @@ READ32_MEMBER(hpc3_device::hd_r)
 template<uint32_t index>
 WRITE32_MEMBER(hpc3_device::hd_w)
 {
+	if (index && !m_wd33c93_2)
+		return;
+
 	switch (offset)
 	{
 	case 0x0000:
 		if (ACCESSING_BITS_0_7)
 		{
 			LOGMASKED(LOG_SCSI, "%s: SCSI%d Write 0 = %02x\n", machine().describe_context(), index, (uint8_t)data);
-			index && m_wd33c93_2 ? m_wd33c93_2->write(space, 0, data & 0xff) : m_wd33c93->write(space, 0, data & 0xff);
+			index ? m_wd33c93_2->write(space, 0, data & 0xff) : m_wd33c93->write(space, 0, data & 0xff);
 		}
 		break;
 	case 0x0001:
 		if (ACCESSING_BITS_0_7)
 		{
 			LOGMASKED(LOG_SCSI, "%s: SCSI%d Write 1 = %02x\n", machine().describe_context(), index, (uint8_t)data);
-			index && m_wd33c93_2 ? m_wd33c93_2->write(space, 1, data & 0xff) : m_wd33c93->write(space, 1, data & 0xff);
+			index ? m_wd33c93_2->write(space, 1, data & 0xff) : m_wd33c93->write(space, 1, data & 0xff);
 		}
 		break;
 	default:
