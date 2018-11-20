@@ -175,6 +175,78 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 }
 
+void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &pal, int debug_packets)
+{
+	uint8_t byte1 = 0;
+	int done = 0;
+
+	flipx = 0;
+	flipy = 0;
+	test = 0;
+
+	int first = 1;
+
+	do
+	{
+		byte1 = get_next_byte();
+
+		// only the first byte matters when it comes to setting palette / flips, the rest are just ignored until we reach a 0x6 command, after which there is the tile data
+		if (first == 1) 
+		{
+			pal = (byte1 & 0xf0) >> 4;
+			int cmd = (byte1 & 0x0f);
+
+			switch (cmd)
+			{
+			// these cases haven't been seen
+			case 0x0:
+			case 0x2:
+			case 0x4:
+			case 0x8:
+			case 0xa:
+			case 0xc:
+			case 0xe:
+
+			// this is just the end command, changes nothing, can be pointed at directly tho
+			case 0x6:  
+				break;
+
+			// flip cases
+			// does bit 0x02 have a meaning here, we have 2 values for each case
+
+			case 0x1:
+			case 0x3:
+				flipx = 0; flipy = 0;
+				break;
+
+			case 0x5:
+			case 0x7:
+				flipx = 1; flipy = 0;
+				break;
+
+			case 0x9:
+			case 0xb:
+				flipx = 0; flipy = 1;
+				break;
+
+			case 0xd:
+			case 0xf:
+				flipx = 1; flipy = 1;
+				break;
+			}
+
+			first = 0;
+		}
+
+		if ((byte1 & 0x0f) == 0x06)
+		{
+			// tile data will follow after this, always?
+			done = 1;
+			//if (debug_packets) LOG(" (setting palette)");
+		}
+	} while (done == 0);
+	//if (debug_packets) LOG("\n");
+}
 
 void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int line)
 {
@@ -309,7 +381,10 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 			continue;
 		}
 
-		const int debug_packets = 0;
+		int debug_packets = 1;
+		//if (line==128) debug_packets = 1;
+		//else debug_packets = 0;
+
 		int test = 0;
 
 		if (!alt_tileaddressing)
@@ -350,8 +425,7 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			// Addressing Mode 2 (plus Inline Header)
 
-			if (debug_packets) LOG("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
-
+			//if (debug_packets) LOG("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
 
 			basereg = (tile & 0xf000) >> 12;
 			tile &= 0x0fff;
@@ -359,84 +433,16 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_ind16 &bitmap,
 
 			tile += gfxbase;
 			set_data_address(tile, 0);
-
-			// there seems to be a packet stored before the tile?!
-			// the offset used for flipped sprites seems to specifically be changed so that it picks up an extra byte which presumably triggers the flipping
-			uint8_t byte1 = 0;
-			int done = 0;
-			int skip = 0;
-
-			do
-			{
-				byte1 = get_next_byte();
-
-				if (debug_packets) LOG(" %02x, ", byte1);
-
-				if (skip == 1)
-				{
-					skip = 0;
-					//test = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x01)
-				{
-					// used
-				}
-				else if ((byte1 & 0x0f) == 0x03)
-				{
-					// causes next byte to be skipped??
-					skip = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x05)
-				{
-					// the upper bits are often 0x00, 0x10, 0x20, 0x30, why?
-					flipx = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x06) // there must be other finish conditions too because sometimes this fails..
-				{
-					// tile data will follow after this, always?
-					pal = (byte1 & 0xf0) >> 4;
-					done = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x07)
-				{
-					// causes next byte to be skipped??
-					skip = 1;
-				}
-				else if ((byte1 & 0x0f) == 0x09)
-				{
-					// used
-				}
-				else if ((byte1 & 0x0f) == 0x0a)
-				{
-					// not seen
-				}
-				else if ((byte1 & 0x0f) == 0x0b)
-				{
-					// used
-				}
-				else if ((byte1 & 0x0f) == 0x0c)
-				{
-					// not seen
-				}
-				else if ((byte1 & 0x0f) == 0x0d)
-				{
-					// used
-				}
-				else if ((byte1 & 0x0f) == 0x0e)
-				{
-					// not seen
-				}
-				else if ((byte1 & 0x0f) == 0x0f)
-				{
-					// used
-				}
-
-			} while (done == 0);
-			if (debug_packets) LOG("\n");
+			
+			decode_inline_header(flipx, flipy, test, pal, debug_packets);
+	
 			tile = get_current_address_byte();
 		}
 
-		if (test == 1) pal = machine().rand() & 0xf;
+		if (test == 1)
+		{
+			pal = machine().rand() & 0xf;
+		}
 
 		draw_tile_line(screen, bitmap, cliprect, tile, bpp, (x * xtilesize) + scrollx, line, ytilesize, xtilesize, flipx, flipy, pal, zval, yyline);
 		draw_tile_line(screen, bitmap, cliprect, tile, bpp, ((x * xtilesize) + scrollx) - 256, line, ytilesize, xtilesize, flipx, flipy, pal, zval, yyline); // wrap-x
