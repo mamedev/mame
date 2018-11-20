@@ -302,6 +302,8 @@ void aic6250_device::int_msk_reg_0_w(u8 data)
 	}
 
 	m_int_msk_reg_0 = data;
+
+	int_check();
 }
 
 void aic6250_device::offset_cntrl_w(u8 data)
@@ -373,6 +375,8 @@ void aic6250_device::int_msk_reg_1_w(u8 data)
 		m_status_reg_0 &= ~R07R_BUS_FREE_DETECT;
 
 	m_int_msk_reg_1 = data;
+
+	int_check();
 }
 
 u8 aic6250_device::status_reg_0_r()
@@ -487,6 +491,9 @@ void aic6250_device::scsi_signal_reg_w(u8 data)
 
 	if (!(m_control_reg_0 & R07W_TARGET_MODE) && phase_match(data, scsi_bus->ctrl_r()))
 		m_status_reg_0 &= ~R07R_PHASE_MISMATCH_ERR;
+
+	if (!(m_control_reg_0 & R07W_TARGET_MODE) && (data & R09W_SCSI_ACK_OUT))
+		m_status_reg_0 &= ~R07R_SCSI_REQ_ON;
 
 	m_scsi_signal_reg = data;
 
@@ -774,6 +781,7 @@ int aic6250_device::state_step()
 			u8 const data = scsi_bus->data_r();
 			LOGMASKED(LOG_STATE, "dma in 0x%02x\n", data);
 
+			m_status_reg_0 &= ~R07R_SCSI_REQ_ON;
 			m_dma_count--;
 			m_fifo.enqueue(data);
 
@@ -827,6 +835,7 @@ int aic6250_device::state_step()
 			u8 const data = m_fifo.dequeue();
 			LOGMASKED(LOG_STATE, "dma out 0x%02x\n", data);
 
+			m_status_reg_0 &= ~R07R_SCSI_REQ_ON;
 			m_dma_count--;
 
 			m_state = DMA_OUT_NEXT;
@@ -879,13 +888,18 @@ int aic6250_device::state_step()
 
 	case AUTO_PIO_IN:
 		m_state = AUTO_PIO_DONE;
+
+		m_status_reg_0 &= ~R07R_SCSI_REQ_ON;
 		m_scsi_latch_data = scsi_bus->data_r();
+
 		LOGMASKED(LOG_STATE, "auto pio in 0x%02x\n", m_scsi_latch_data);
 		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
 		break;
 
 	case AUTO_PIO_OUT:
 		LOGMASKED(LOG_STATE, "auto pio out 0x%02x\n", m_scsi_id_data);
+		m_status_reg_0 &= ~R07R_SCSI_REQ_ON;
+
 		m_state = AUTO_PIO_DONE;
 
 		scsi_bus->data_w(scsi_refid, m_scsi_id_data);
