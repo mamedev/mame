@@ -213,8 +213,8 @@ void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &p
 
 			// does bit 0x02 have a meaning here, we have 2 values for each case
 
-			case 0x1:  // applies no flip?
-			case 0x3:  // applies no flip?
+			case 0x1:
+			case 0x3:
 				flipx = 0; flipy = 0;
 				break;
 
