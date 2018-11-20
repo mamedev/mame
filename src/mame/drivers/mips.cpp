@@ -210,7 +210,7 @@ void rx2030_state::iop_io_map(address_map &map)
 		{
 			m_mmu[offset] = data;
 		});
-	
+
 	map(0x0040, 0x0043).m(m_fdc, FUNC(wd37c65c_device::map)).umask16(0xff);
 	map(0x0044, 0x0045).w(m_fdc, FUNC(wd37c65c_device::dor_w)).umask16(0xff);
 	map(0x0048, 0x0049).w(m_fdc, FUNC(wd37c65c_device::ccr_w)).umask16(0xff);
@@ -325,7 +325,7 @@ void rx2030_state::rx2030_map(address_map &map)
 							{
 							case 5: // clock
 								LOGMASKED(LOG_IOCB, "iocb %s command 0x%04x (%s)\n",
-									iop_commands[iocb], m_ram->read(0x1000 + iocb_cmdparam + 6) | (m_ram->read(0x1000 + iocb_cmdparam + 7) << 8), 
+									iop_commands[iocb], m_ram->read(0x1000 + iocb_cmdparam + 6) | (m_ram->read(0x1000 + iocb_cmdparam + 7) << 8),
 									machine().describe_context());
 								break;
 
