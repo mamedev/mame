@@ -22439,7 +22439,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="ppersia2">
 		<description>Prince of Persia 2 - The Shadow and the Flame (Euro, Prototype)</description>
-		<year>199?</year>
+		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
