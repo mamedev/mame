@@ -142,8 +142,8 @@ void ps2_timer_device::update_hold()
 
 void ps2_timer_device::set_mode(uint32_t data)
 {
-	static const char *clks_names[4] = { "BUSCLK", "BUSCLK/16", "BUSCLK/256", "HBLNK" };
-	static const char *gatm_names[4] = { "low", "reset+rising", "reset+falling", "reset+both" };
+	static char const *const clks_names[4] = { "BUSCLK", "BUSCLK/16", "BUSCLK/256", "HBLNK" };
+	static char const *const gatm_names[4] = { "low", "reset+rising", "reset+falling", "reset+both" };
 	logerror("%s:          CLKS=%s, GATE=%d, GATS=%cBLNK\n", machine().describe_context(), clks_names[data & 3], BIT(data, 2), BIT(data, 3) ? 'V' : 'H');
 	logerror("%s:          GATM=%s, ZRET=%d, CUE=%d\n", machine().describe_context(), gatm_names[(data >> 4) & 3], BIT(data, 6), BIT(data, 7));
 	logerror("%s:          CMPE=%d, OVFE=%d, %s, %s\n", machine().describe_context(), BIT(data, 8), BIT(data, 9), BIT(data, 10) ? "Clear Equal" : "", BIT(data, 11) ? "Clear Overflow" : "");

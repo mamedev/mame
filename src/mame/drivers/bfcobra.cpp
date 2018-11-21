@@ -1661,13 +1661,13 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
-	MCFG_RAMDAC_SPLIT_READ(1)
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac.set_addrmap(0, &bfcobra_state::ramdac_map);
+	ramdac.set_split_read(1);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, M6809_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	AY8910(config, "aysnd", M6809_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

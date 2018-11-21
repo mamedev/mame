@@ -462,13 +462,13 @@ MACHINE_CONFIG_START(mexico86_state::mexico86)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
-	MCFG_SOUND_ROUTE(2, "mono", 0.30)
-	MCFG_SOUND_ROUTE(3, "mono", 1.00)
+	YM2203(config, m_ymsnd, 3000000);
+	m_ymsnd->port_a_read_callback().set_ioport("DSW0");
+	m_ymsnd->port_b_read_callback().set_ioport("DSW1");
+	m_ymsnd->add_route(0, "mono", 0.30);
+	m_ymsnd->add_route(1, "mono", 0.30);
+	m_ymsnd->add_route(2, "mono", 0.30);
+	m_ymsnd->add_route(3, "mono", 1.00);
 MACHINE_CONFIG_END
 
 

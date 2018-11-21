@@ -211,8 +211,7 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	/* video hardware */
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 4, toobin_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
@@ -220,7 +219,7 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", toobin_state::s_mob_config)
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_DRIVER(toobin_state, screen_update)

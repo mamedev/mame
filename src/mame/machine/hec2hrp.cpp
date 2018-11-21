@@ -376,7 +376,7 @@ WRITE8_MEMBER(hec2hrp_state::color_b_w)
 	if (data & 0x40) m_hector_color[2] |= 8; else m_hector_color[2] &= 7;
 
 	/* Play bit*/
-	m_discrete->write(space, NODE_01,  (data & 0x80) ? 0:1 );
+	m_discrete->write(NODE_01,  (data & 0x80) ? 0:1 );
 }
 
 

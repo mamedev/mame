@@ -1,5 +1,10 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller, David Haywood
+#ifndef MAME_INCLUDES_DECOCASS_H
+#define MAME_INCLUDES_DECOCASS_H
+
+#pragma once
+
 #ifdef MAME_DEBUG
 #define LOGLEVEL  5
 #else
@@ -24,24 +29,24 @@ class decocass_state : public driver_device
 {
 public:
 	decocass_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_mcu(*this, "mcu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_watchdog(*this, "watchdog"),
-			m_cassette(*this, "cassette"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_soundlatch(*this, "soundlatch"),
-			m_soundlatch2(*this, "soundlatch2"),
-			m_rambase(*this, "rambase"),
-			m_charram(*this, "charram"),
-			m_fgvideoram(*this, "fgvideoram"),
-			m_colorram(*this, "colorram"),
-			m_tileram(*this, "tileram"),
-			m_objectram(*this, "objectram"),
-			m_paletteram(*this, "paletteram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mcu(*this, "mcu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_watchdog(*this, "watchdog")
+		, m_cassette(*this, "cassette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_soundlatch2(*this, "soundlatch2")
+		, m_rambase(*this, "rambase")
+		, m_charram(*this, "charram")
+		, m_fgvideoram(*this, "fgvideoram")
+		, m_colorram(*this, "colorram")
+		, m_tileram(*this, "tileram")
+		, m_objectram(*this, "objectram")
+		, m_paletteram(*this, "paletteram")
 	{
 	}
 
@@ -427,7 +432,6 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-
 	DECLARE_READ8_MEMBER(decocass_widel_r);
 	DECLARE_WRITE8_MEMBER(decocass_widel_w);
 
@@ -436,3 +440,4 @@ private:
 	int32_t     m_widel_latch;        /* latched enable PROM (1100xxxx written to E5x1) */
 };
 
+#endif // MAME_INCLUDES_DECOCASS_H

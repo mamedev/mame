@@ -254,12 +254,11 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 
 	switch( offset )
 	{
-		case 0:
-			if ( m_screen->vpos() >= 240) return 0;
-			else return 1;
+	case 0:
+		return (m_screen->vpos() >= 240) ? 0 : 1;
 
-		default:
-			return 0;
+	default:
+		return 0;
 	}
 }
 
@@ -459,8 +458,7 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 400) // guess
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 400); // guess
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2 )
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -470,7 +468,7 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 
 	EEPROM_93C46_16BIT(config, "eeprom", eeprom_serial_streaming::ENABLE);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(57.4458)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
@@ -485,8 +483,8 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

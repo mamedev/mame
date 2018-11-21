@@ -56,7 +56,6 @@ private:
 
 	void alice32_mem(address_map &map);
 	void alice90_mem(address_map &map);
-	void mc10_io(address_map &map);
 	void mc10_mem(address_map &map);
 
 	// device-level overrides
@@ -306,12 +305,6 @@ void mc10_state::mc10_mem(address_map &map)
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
 }
 
-void mc10_state::mc10_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(mc10_state::mc10_port1_r), FUNC(mc10_state::mc10_port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(mc10_state::mc10_port2_r), FUNC(mc10_state::mc10_port2_w));
-}
-
 void mc10_state::alice32_mem(address_map &map)
 {
 	map(0x0100, 0x2fff).noprw(); /* unused */
@@ -512,9 +505,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mc10_state::mc10)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545))  /* 0,894886 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mc10_mem)
-	MCFG_DEVICE_IO_MAP(mc10_io)
+	M6803(config, m_maincpu, XTAL(3'579'545));  /* 0,894886 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mc10_state::mc10_mem);
+	m_maincpu->in_p1_cb().set(FUNC(mc10_state::mc10_port1_r));
+	m_maincpu->out_p1_cb().set(FUNC(mc10_state::mc10_port1_w));
+	m_maincpu->in_p2_cb().set(FUNC(mc10_state::mc10_port2_r));
+	m_maincpu->out_p2_cb().set(FUNC(mc10_state::mc10_port2_w));
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
@@ -545,10 +541,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mc10_state::alice32)
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(alice32_mem)
-	MCFG_DEVICE_IO_MAP(mc10_io)
+	M6803(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mc10_state::alice32_mem);
+	m_maincpu->in_p1_cb().set(FUNC(mc10_state::mc10_port1_r));
+	m_maincpu->out_p1_cb().set(FUNC(mc10_state::mc10_port1_w));
+	m_maincpu->in_p2_cb().set(FUNC(mc10_state::mc10_port2_r));
+	m_maincpu->out_p2_cb().set(FUNC(mc10_state::mc10_port2_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -586,8 +584,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mc10_state::alice90)
 	alice32(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(alice90_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mc10_state::alice90_mem);
 
 	m_ram->set_default_size("32K");
 

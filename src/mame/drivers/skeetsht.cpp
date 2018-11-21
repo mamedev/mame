@@ -260,8 +260,7 @@ MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000) // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay, 2000000).add_route(ALL_OUTPUTS, "mono", 0.50); // ?
 MACHINE_CONFIG_END
 
 

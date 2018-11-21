@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Phil Stroffolino, Mirko Buffoni
+#ifndef MAME_INCLUDES_SYSTEM16_H
+#define MAME_INCLUDES_SYSTEM16_H
+
+#pragma once
 
 #include "video/sega16sp.h"
 #include "machine/74157.h"
@@ -299,3 +303,5 @@ private:
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 	output_finder<2> m_leds;
 };
+
+#endif // MAME_INCLUDES_SYSTEM16_H

@@ -406,8 +406,7 @@ MACHINE_CONFIG_START(play_2_state::zira)
 	MCFG_COP400_WRITE_L_CB(WRITE8(*this, play_2_state, psg_w))
 	MCFG_COP400_READ_IN_CB(READ8(*this, play_2_state, sound_in_r))
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, 2_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_aysnd1, 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 void play_2_state::init_zira()

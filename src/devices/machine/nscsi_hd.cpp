@@ -6,8 +6,9 @@
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
+#define LOG_DATA    (1U << 2)
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE 0
 
 #include "logmacro.h"
 
@@ -60,21 +61,30 @@ MACHINE_CONFIG_END
 
 uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 {
+	uint8_t data = 0;
 	if(id != 2)
-		return nscsi_full_device::scsi_get_data(id, pos);
-	int clba = lba + pos / bytes_per_sector;
-	if(clba != cur_lba) {
-		cur_lba = clba;
-		if(!hard_disk_read(harddisk, cur_lba, block)) {
-			LOG("HD READ ERROR !\n");
-			memset(block, 0, sizeof(block));
-		}
+	{
+		data = nscsi_full_device::scsi_get_data(id, pos);
 	}
-	return block[pos % bytes_per_sector];
+	else
+	{
+		int clba = lba + pos / bytes_per_sector;
+		if(clba != cur_lba) {
+			cur_lba = clba;
+			if(!hard_disk_read(harddisk, cur_lba, block)) {
+				LOG("HD READ ERROR !\n");
+				memset(block, 0, sizeof(block));
+			}
+		}
+		data = block[pos % bytes_per_sector];
+	}
+	LOGMASKED(LOG_DATA, "nscsi_hd: scsi_get_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
+	return data;
 }
 
 void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 {
+	LOGMASKED(LOG_DATA, "nscsi_hd: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 	if(id != 2) {
 		nscsi_full_device::scsi_put_data(id, pos, data);
 		return;
@@ -328,7 +338,7 @@ void nscsi_harddisk_device::scsi_command()
 	}
 
 	case SC_START_STOP_UNIT:
-		LOG("command START STOP UNIT\n");
+		LOG("command %s UNIT\n", (scsi_cmdbuf[4] & 0x1) ? "START" : "STOP");
 		scsi_status_complete(SS_GOOD);
 		break;
 

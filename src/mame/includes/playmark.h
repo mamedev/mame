@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
+#ifndef MAME_INCLUDES_PLAYMARK_H
+#define MAME_INCLUDES_PLAYMARK_H
+
+#pragma once
+
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
@@ -9,8 +14,8 @@
 class playmark_state : public driver_device
 {
 public:
-	playmark_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	playmark_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
@@ -25,7 +30,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_ticket(*this, "ticket"),
-		m_token(*this, "token") { }
+		m_token(*this, "token")
+	{ }
 
 	void wbeachvl(machine_config &config);
 	void hrdtimes(machine_config &config);
@@ -142,3 +148,5 @@ protected:
 	void oki_map(address_map &map);
 	void wbeachvl_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PLAYMARK_H

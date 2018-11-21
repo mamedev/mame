@@ -10,7 +10,7 @@
   Notes:
 
   - Very similar to merit.c
-  - We're using the MC6845 drawing code from merit.c, but it will need
+  - We're using the MC6845 drawing code from merit.cpp, but it will need
     modifications to support the reels and proper colors.
 
 
@@ -550,30 +550,31 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	MCFG_DEVICE_PROGRAM_MAP(slotcarn_map)
 	MCFG_DEVICE_IO_MAP(spielbud_io_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
+	i8255_device &ppi2(I8255A(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set_ioport("IN3");
+	ppi2.in_pb_callback().set_ioport("IN4");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(slotcarn_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(slotcarn_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, slotcarn_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_begin_update_callback(FUNC(slotcarn_state::crtc_begin_update), this);
+	crtc.set_update_row_callback(FUNC(slotcarn_state::crtc_update_row), this);
+	crtc.out_hsync_callback().set(FUNC(slotcarn_state::hsync_changed));
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slotcarn)
 	MCFG_PALETTE_ADD("palette", 0x400)
@@ -581,9 +582,9 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd",AY8910, SND_CLOCK)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);   
 MACHINE_CONFIG_END
 
 

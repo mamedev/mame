@@ -653,15 +653,15 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun2_state::sun2mbus)
@@ -706,17 +706,17 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
+	MM58167(config, "rtc", 32.768_kHz_XTAL);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -733,10 +733,10 @@ ROM_START( sun2_120 ) // ROMs are located on the '501-1007' CPU PCB at locations
 	//ROM_SYSTEM_BIOS( 8, "revq", "Bootrom Rev Q")
 	// ROMX_LOAD( "520-1104-02.b11", 0x0000, 0x4000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8))
 	// ROMX_LOAD( "520-1103-02.b10", 0x0001, 0x4000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8))
-	ROM_SYSTEM_BIOS(2, "revn", "Bootrom Rev N") // SunOS 2.0 requires this bootrom version at a minimum
+	ROM_SYSTEM_BIOS( 2, "revn", "Bootrom Rev N") // SunOS 2.0 requires this bootrom version at a minimum; this version supports the sun-2 keyboard
 	ROMX_LOAD("revn.b11", 0x0000, 0x4000, CRC(b1e70965) SHA1(726b3ed9323750a1ae238cf6dccaed6ff5981ad1), ROM_SKIP(1) | ROM_BIOS(2)) // actual rom stickers had fallen off
 	ROMX_LOAD("revn.b10", 0x0001, 0x4000, CRC(95fd9242) SHA1(1eee2d291f4b18f6aafdde1a9521d88e454843b9), ROM_SKIP(1) | ROM_BIOS(2)) // "
-	ROM_SYSTEM_BIOS(3, "revm", "Bootrom Rev M") // SunOS 1.0 apparently requires this bootrom revision?
+	ROM_SYSTEM_BIOS( 3, "revm", "Bootrom Rev M") // SunOS 1.0 apparently requires this bootrom revision; this version might only support the sun-1 keyboard?
 	ROMX_LOAD("sun2-revm-8.b11", 0x0000, 0x4000, CRC(98b8ae55) SHA1(55485f4d8fd1ebc218aa8527c8bb62752c34abf7), ROM_SKIP(1) | ROM_BIOS(3)) // handwritten label: "SUN2-RevM-8"
 	ROMX_LOAD("sun2-revm-0.b10", 0x0001, 0x4000, CRC(5117f431) SHA1(fce85c11ada1614152dde35bb329350f6fb2ecd9), ROM_SKIP(1) | ROM_BIOS(3)) // handwritten label: "SUN2-RevM-0"
 

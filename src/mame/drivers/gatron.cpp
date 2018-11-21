@@ -572,10 +572,10 @@ MACHINE_CONFIG_START(gatron_state::gat)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gatron_state, output_port_1_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.out_pc_callback().set(FUNC(gatron_state::output_port_1_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

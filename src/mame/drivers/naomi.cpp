@@ -327,6 +327,7 @@ Crazy Taxi                                    840-0002C  ?       13 (64Mb)   ?  
 Ferrari F355 Challenge (twin/deluxe, preview)   no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * other ROM board we've seen had 2x flashroms PCB instead of IC22 EEPROM, contents is the same.
 /Ferrari F355 Challenge 2 - International
 \Course Edition (twin/deluxe, prototype)        no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
+Mushiking (MUSHIUSA '04 1ST, Prototype)       no sticker none    11*(64Mb)   present  315-6206  not present   * only first 7 flash roms contain game data, PCB have label 840-0150B-FLS.
 Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
 Samba de Amigo (prototype)                      no cart  *       21*(64Mb)   present  315-6206  317-0270-COM  * only first 14 flash roms contain game data, instead of EPROM have tiny PCB with 2 flashroms on it
 Shootout Pool Prize Ver.B -P                  840-0136C  **      21*(64Mb)   present  317-6206  not present   * only first 4 flash roms contain game data, ** instead of EPROM have tiny PCB with 2 flashroms on it
@@ -360,7 +361,7 @@ PFSB 64M Mask ROM board
 |----------------------------------------------------------|
 Notes:
       The other side of the cart PCB just has more locations for
-      SOP44 MASKROMs... IC12S to IC21S (ROM12 to ROM21)
+      SOP44 mask ROMs... IC12S to IC21S (ROM12 to ROM21)
 
   IC1-IC21S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated
       IC22  - EPROM (DIP42), either 27C160 or 27C322
@@ -373,7 +374,7 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
-                                                Sticker      EPROM   MASKROMs    X76F100     XC9536    315-5881
+                                                Sticker      EPROM   mask ROMs   X76F100     XC9536    315-5881
 Game                                            on cart      IC22#   # of SOP44  IC37#       IC41#     IC42#          Notes
 ------------------------------------------------------------------------------------------------------------------------------
 18 Wheeler (deluxe) (Rev A)                     840-0023C    22185A  20 (64Mb)   present     315-6213  317-0273-COM
@@ -537,7 +538,7 @@ from NAOMI side it read as X76F100-type, probably simulated by ACTEL FPGA.
 Actual data is shuffled, address bits 3 to 6 have reversed order, i.e. 8 7 3 4 5 6 2 1 0.
 
 Games known to use this PCB include....
-                                                             Sticker      EPROM   MASKROMs    25LC040  A54SX32
+                                                             Sticker      EPROM   mask ROMs   25LC040  A54SX32
 Game                                                         on cart      IC11#   # of SOP44  IC13S#   IC1#          Notes
 -----------------------------------------------------------------------------------------------------------------------------------------------
 Club Kart: European Session (2003, Rev A)                    840-0139C    24173A  18 (64Mb)   present  317-0382-COM
@@ -590,7 +591,7 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                                                Sticker    EPROM   MASKROMs    EPM7032    XC9536    315-5881      X76F100
+                                                Sticker    EPROM   mask ROMs   EPM7032    XC9536    315-5881      X76F100
 Game                                            on cart    IC22#   # of SOP44  IC27#      IC41#     IC42#         IC46#        Notes
 -----------------------------------------------------------------------------------------------------------------------------------------
 Alien Front (Rev A)                             840-0048C  23586A   5 (128Mb)  315-6319A  315-6213  317-0293-COM  present
@@ -722,7 +723,7 @@ Notes:
               Silkscreened VOYAGER64. Looks like the equivalent of IC11/22 on Sega carts
          2K - NAODEC1B (QFP100) Altera MAX EPM7064S. Silkscreened NAODEC1A
          3J - oscillator 28.000MHz
-4B-4N,6B-6P - MASKROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
+4B-4N,6B-6P - mask ROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
       4P,5P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
    CN1/2/3  - connectors joining to main board
 
@@ -778,7 +779,7 @@ Notes:
               On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
 2B,2C,2D,2F - DA28F640J5 FlashROM (SSOP56), either 32Mb or 64Mb. Not all positions are populated.
               Silkscreened VOYAGER64. Looks like the equivalent of IC11/22 on Sega carts
-4B-4M,6B-6N - MASKROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
+4B-4M,6B-6N - mask ROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
       4N,4P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
    CN1/2/3  - connectors joining to main board
 
@@ -1287,7 +1288,7 @@ Notes:
       XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
                game code. This code is different for each different game.
                The last 3 digits seems to be for the usage.
-               F01 = CPLD/protection device and M01 = MASKROM
+               F01 = CPLD/protection device and M01 = mask ROM
 
                Game (sorted by code)                 Code
                -----------------------------------------------
@@ -1369,7 +1370,7 @@ Notes:
    XCR3128XL - Xilinx XCR3128XL in-system programmable 128 Macro-cell CPLD (TQFP100)
                stamped with a game code. This code is different for each different game.
                The last 3 digits seems to be for the usage.
-               F01 = CPLD/protection device and M01 = MASKROM
+               F01 = CPLD/protection device and M01 = mask ROM
 
                Game (sorted by code)                 Code
                -----------------------------------------------
@@ -1441,6 +1442,7 @@ Notes:
                Animal Basket                         VM2001F01  -
                Block Pong-Pong                       VM2001F01  -
                WaiWai Drive                          VM2001F01  -
+               Faster Than Speed 837-14681           315-6248   -         (not dumped, known to exists)
 
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
                (configured as 16Mbytes x8bit or 8Mwords x16bit)
@@ -2954,7 +2956,7 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
-	MCFG_X76F100_ADD("naomibd_eeprom")
+	X76F100(config, "naomibd_eeprom");
 	MCFG_M3COMM_ADD("comm_board")
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
@@ -3088,7 +3090,7 @@ MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(aw_map)
 	MCFG_DEVICE_IO_MAP(aw_port)
-	MCFG_MACRONIX_29L001MC_ADD("awflash")
+	MACRONIX_29L001MC(config, "awflash");
 	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
@@ -3424,8 +3426,8 @@ EPR-23608C - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
 USA, Korea and Australia is missing.
 
 EPR-21604  - No known dumps (Development BOOT ROM)
-EPR-21609  - No known dumps (Korea)
-EPR-21610  - No known dumps (Australia)
+EPR-?????  - No known dumps (Korea)
+EPR-?????  - No known dumps (Australia)
 
 EPR-23605B, EPR-23607B & EPR-23608B all differ by 8 bytes:
 
@@ -4799,6 +4801,32 @@ ROM_START( mushike )
 
 	// 840-0150    2003     317-0394-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
+ROM_END
+
+// Prototype or location test version. Cartridge case have no game name sticker, PCB have label 840-0150B-FLS
+// Built about month before final ver, have no Management Chip protection, supports 6x less Beetle cards, uses License cards from Japan ver.
+ROM_START( mushikep )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x6000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "rom1.ic1s",    0x0800000, 0x800000, CRC(9cdc8dcb) SHA1(78da615a061487efbb0d641f52cf5b01447abec9) )
+	ROM_LOAD( "rom2.ic2s",    0x1000000, 0x800000, CRC(7b637bb6) SHA1(55d34fbe9fd202a34df72ee258492778f399b50a) )
+	ROM_LOAD( "rom3.ic3s",    0x1800000, 0x800000, CRC(6c6ddfbf) SHA1(3a3abe42b84cb3cefc4a59353cab770c11a703a7) )
+	ROM_LOAD( "rom4.ic4s",    0x2000000, 0x800000, CRC(a427002d) SHA1(7a058955a60e045e0434b9bf467a37ebcc7947f1) )
+	ROM_LOAD( "rom5.ic5s",    0x2800000, 0x800000, CRC(7076a50e) SHA1(555239e162acfd61f3ddfc5fd56d11ab6ae129e2) )
+	ROM_LOAD( "rom6.ic6s",    0x3000000, 0x800000, CRC(d7143066) SHA1(427d28630461664cd927a4fa5f3b847acf492d7b) )
+	ROM_LOAD( "rom7.ic7s",    0x3800000, 0x800000, CRC(98839bab) SHA1(314bd59c4c735a38f0ab6b23beb039121a05463c) )
+	// not used, contain random garbage
+	// ROM_LOAD( "rom8.ic8s",    0x4000000, 0x800000, CRC(a1d1339e) SHA1(2f5dd8472c3b983bce7d14e076c8cb7b6bd535ff) )
+	// ROM_LOAD( "rom9.ic9s",    0x4800000, 0x800000, CRC(a1d1339e) SHA1(2f5dd8472c3b983bce7d14e076c8cb7b6bd535ff) )
+	// ROM_LOAD( "rom10.ic10s",  0x5000000, 0x800000, CRC(a1d1339e) SHA1(2f5dd8472c3b983bce7d14e076c8cb7b6bd535ff) )
+	// ROM_LOAD( "rom11.ic11s",  0x5800000, 0x800000, CRC(a1d1339e) SHA1(2f5dd8472c3b983bce7d14e076c8cb7b6bd535ff) )
+
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD("sflash.ic37", 0x000000, 0x000084, CRC(88f1db52) SHA1(5ebfa6c45abf2fa6f560832f366ed03ca91709a5) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
 ROM_START( mushi2k4 )
@@ -10867,6 +10895,7 @@ ROM_END
 /* 0136    */ GAME( 2004, shootplmp, shootplm, naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B (prototype)", GAME_FLAGS ) // Build: 15 Dec 2003
 /* 0140    */ GAME( 2004, kick4csh,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Kick '4' Cash (Export)", GAME_FLAGS )
 /* 0150    */ GAME( 2004, mushike,   naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND, World)", GAME_FLAGS ) // not for Japan
+/* 0150-FLS*/ GAME( 2004, mushikep,  mushike,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (MUSHIUSA '04 1ST, Prototype)", GAME_FLAGS )
 /* 0152    */ GAME( 2004, mushi2k4,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2004 Second (Japan)", GAME_FLAGS )
 /* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2005 First (Japan)", GAME_FLAGS )
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.

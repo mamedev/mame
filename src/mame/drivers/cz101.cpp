@@ -325,7 +325,7 @@ READ8_MEMBER( cz101_state::keys_r )
 READ8_MEMBER( cz101_state::port_a_r )
 {
 	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 1))
-		return m_hd44780->read(space, BIT(m_port_c, 5));
+		return m_hd44780->read(BIT(m_port_c, 5));
 
 	return 0xff;
 }
@@ -333,7 +333,7 @@ READ8_MEMBER( cz101_state::port_a_r )
 WRITE8_MEMBER( cz101_state::port_a_w )
 {
 	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 0))
-		m_hd44780->write(space, BIT(m_port_c, 5), data);
+		m_hd44780->write(BIT(m_port_c, 5), data);
 }
 
 // 7-------  nmi output

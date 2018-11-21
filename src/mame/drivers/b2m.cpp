@@ -42,8 +42,7 @@ void b2m_state::b2m_io(address_map &map)
 	map(0x0c, 0x0c).rw(FUNC(b2m_state::b2m_localmachine_r), FUNC(b2m_state::b2m_localmachine_w));
 	map(0x10, 0x13).rw(FUNC(b2m_state::b2m_palette_r), FUNC(b2m_state::b2m_palette_w));
 	map(0x14, 0x15).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x1c, 0x1f).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 }
 
@@ -56,8 +55,7 @@ void b2m_state::b2m_rom_io(address_map &map)
 	map(0x0c, 0x0c).rw(FUNC(b2m_state::b2m_localmachine_r), FUNC(b2m_state::b2m_localmachine_w));
 	map(0x10, 0x13).rw(FUNC(b2m_state::b2m_palette_r), FUNC(b2m_state::b2m_palette_w));
 	map(0x14, 0x15).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 
@@ -209,30 +207,30 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(b2m_state, b2m)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, b2m_state,bm2_pit_out1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk0))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(0);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_pit->set_clk<1>(2000000);
+	m_pit->out_handler<1>().set(FUNC(b2m_state::bm2_pit_out1));
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set(m_pit, FUNC(pit8253_device::write_clk0));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, b2m_state, b2m_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, b2m_state, b2m_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, b2m_state, b2m_8255_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, b2m_state, b2m_8255_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(b2m_state::b2m_8255_porta_w));
+	ppi1.in_pb_callback().set(FUNC(b2m_state::b2m_8255_portb_r));
+	ppi1.out_pb_callback().set(FUNC(b2m_state::b2m_8255_portb_w));
+	ppi1.out_pc_callback().set(FUNC(b2m_state::b2m_8255_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, b2m_state, b2m_ext_8255_portc_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.out_pc_callback().set(FUNC(b2m_state::b2m_ext_8255_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, b2m_state, b2m_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, b2m_state, b2m_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, b2m_state, b2m_romdisk_portc_w))
+	i8255_device &ppi3(I8255(config, "ppi8255_3"));
+	ppi3.in_pa_callback().set(FUNC(b2m_state::b2m_romdisk_porta_r));
+	ppi3.out_pb_callback().set(FUNC(b2m_state::b2m_romdisk_portb_w));
+	ppi3.out_pc_callback().set(FUNC(b2m_state::b2m_romdisk_portc_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
@@ -242,8 +240,8 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
-	MCFG_DEVICE_ADD("fd1793", FD1793, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, b2m_state, b2m_fdc_drq))
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->drq_wr_callback().set(FUNC(b2m_state::b2m_fdc_drq));
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)

@@ -5,7 +5,7 @@
     Sega Model 1 I/O Board (Advanced)
 
     Used by:
-    - Wing War (R360) (837-10859)
+    - Wing War/Wing War R360 (837-10859)
     - NetMerc (837-11659)
     - Virtua Cop (837-11130 with 837-11131)
 
@@ -112,7 +112,7 @@ ioport_constructor model1io2_device::device_input_ports() const
 ROM_START( model1io2 )
 	ROM_REGION(0x10000, "iocpu", 0)
 
-	// Wing War (taken from R360 version, is it the same for the regular version?)
+	// Wing War/Wing War R360
 	ROM_SYSTEM_BIOS(0, "epr16891", "EPR-16891")
 	ROMX_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0), ROM_BIOS(0))
 
@@ -355,7 +355,7 @@ WRITE8_MEMBER( model1io2_device::io_pf_w )
 	m_eeprom->cs_write(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (BIT(data, 3) == 0 && BIT(data, 2) == 1 && BIT(data, 1) == 0)
-		m_lcd->write(space, BIT(data, 0), m_lcd_data);
+		m_lcd->write(BIT(data, 0), m_lcd_data);
 }
 
 WRITE8_MEMBER( model1io2_device::io_pg_w )

@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	// other ports unknown
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

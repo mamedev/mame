@@ -369,13 +369,13 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy1_state::via_pa_w)
 {
-	m_tms->data_w(space, 0, data);
+	m_tms->data_w(data);
 }
 
 
 READ8_MEMBER(atarisy1_state::via_pa_r)
 {
-	return m_tms->status_r(space, 0);
+	return m_tms->status_r();
 }
 
 
@@ -745,7 +745,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	m_outlatch->q_out_cb<6>().set(FUNC(atarisy1_state::coin_counter_right_w));
 	m_outlatch->q_out_cb<7>().set(FUNC(atarisy1_state::coin_counter_left_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", atarisy1_state, atarisy1_int3_callback)
 	MCFG_TIMER_DRIVER_ADD("int3off_timer", atarisy1_state, atarisy1_int3off_callback)
@@ -780,10 +780,10 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", ATARI_CLOCK_14MHz/4));
+	ymsnd.irq_handler().set(m_soundcomm, FUNC(atari_sound_comm_device::ym2151_irq_gen));
+	ymsnd.add_route(0, "lspeaker", 0.80);
+	ymsnd.add_route(1, "rspeaker", 0.80);
 
 	MCFG_DEVICE_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)

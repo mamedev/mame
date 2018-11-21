@@ -5,9 +5,10 @@
  * includes/lviv.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_LVIV_H
 #define MAME_INCLUDES_LVIV_H
+
+#pragma once
 
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"

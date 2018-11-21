@@ -533,15 +533,15 @@ MACHINE_CONFIG_START(vp415_state::vp415)
 	i8155.in_pb_callback().set(FUNC(vp415_state::drive_i8155_pb_r));
 	i8155.in_pc_callback().set(FUNC(vp415_state::drive_i8155_pc_r));
 
-	MCFG_DEVICE_ADD(I8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vp415_state, drive_i8255_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vp415_state, drive_i8255_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, vp415_state, drive_i8255_pc_r))
+	i8255_device &ppi(I8255(config, I8255_TAG));
+	ppi.out_pa_callback().set(FUNC(vp415_state::drive_i8255_pa_w));
+	ppi.out_pb_callback().set(FUNC(vp415_state::drive_i8255_pb_w));
+	ppi.in_pc_callback().set(FUNC(vp415_state::drive_i8255_pc_r));
 
 	MCFG_DEVICE_ADD(CHARGEN_TAG, MB88303, 0)
 
-	MCFG_DEVICE_ADD(SYNCGEN_TAG, SAA1043, XTAL(5'000'000))
-	MCFG_SAA1043_V2_CALLBACK(WRITELINE(*this, vp415_state, refv_w))
+	saa1043_device &saa1043(SAA1043(config, SYNCGEN_TAG, XTAL(5'000'000)));
+	saa1043.v2_callback().set(FUNC(vp415_state::refv_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

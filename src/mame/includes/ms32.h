@@ -13,10 +13,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
 		m_roz_ctrl(*this, "roz_ctrl"),
 		m_tx_scroll(*this, "tx_scroll"),
@@ -66,13 +66,13 @@ protected:
 	int m_reverse_sprite_order;
 	int m_flipscreen;
 
+	required_device<cpu_device> m_audiocpu;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
 private:
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	optional_device<screen_device> m_screen;
-	optional_device<generic_latch_8_device> m_soundlatch;
-
 	optional_shared_ptr<uint32_t> m_mainram;
 	optional_shared_ptr<uint32_t> m_roz_ctrl;
 	optional_shared_ptr<uint32_t> m_tx_scroll;

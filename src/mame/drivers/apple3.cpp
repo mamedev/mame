@@ -78,19 +78,19 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_PALETTE_INIT_OWNER(apple3_state, apple3 )
 
 	/* keyboard controller */
-	MCFG_DEVICE_ADD("ay3600", AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(*this, apple3_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(*this, apple3_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple3_state, ay3600_data_ready_w))
+	AY3600(config, m_ay3600, 0);
+	m_ay3600->x0().set_ioport("X0");
+	m_ay3600->x1().set_ioport("X1");
+	m_ay3600->x2().set_ioport("X2");
+	m_ay3600->x3().set_ioport("X3");
+	m_ay3600->x4().set_ioport("X4");
+	m_ay3600->x5().set_ioport("X5");
+	m_ay3600->x6().set_ioport("X6");
+	m_ay3600->x7().set_ioport("X7");
+	m_ay3600->x8().set_ioport("X8");
+	m_ay3600->shift().set(FUNC(apple3_state::ay3600_shift_r));
+	m_ay3600->control().set(FUNC(apple3_state::ay3600_control_r));
+	m_ay3600->data_ready().set(FUNC(apple3_state::ay3600_data_ready_w));
 
 	/* slot bus */
 	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
@@ -121,11 +121,11 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
-	// TODO: remove cts kludge from machine/apple3.c and come up with a good way of coping with pull up resistors.
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	// TODO: remove cts kludge from machine/apple3.cpp and come up with a good way of coping with pull up resistors.
 
 	/* paddle */
 	MCFG_TIMER_DRIVER_ADD("pdltimer", apple3_state, paddle_timer);

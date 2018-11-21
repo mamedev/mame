@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(aliens_state::aliens)
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&aliens_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 11, 0x400);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -234,12 +234,12 @@ MACHINE_CONFIG_START(aliens_state::aliens)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state,aliens_snd_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));  /* verified on pcb */
+	ymsnd.port_write_handler().set(FUNC(aliens_state::aliens_snd_bankswitch_w));
+	ymsnd.add_route(0, "mono", 0.60);
+	ymsnd.add_route(1, "mono", 0.60);
 
 	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state, volume_callback))

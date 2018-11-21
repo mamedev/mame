@@ -16,31 +16,31 @@
 class raiden2_state : public driver_device
 {
 public:
-	raiden2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram") ,
-		m_maincpu(*this, "maincpu"),
-		m_seibu_sound(*this, "seibu_sound"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen"),
-		m_mainbank(*this, "mainbank%u", 1U),
-		m_raiden2cop(*this, "raiden2cop"),
+	raiden2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram") 
+		, m_maincpu(*this, "maincpu")
+		, m_seibu_sound(*this, "seibu_sound")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_mainbank(*this, "mainbank%u", 1U)
+		, m_raiden2cop(*this, "raiden2cop")
 
-		m_sprite_prot_x(0),
-		m_sprite_prot_y(0),
-		m_dst1(0),
-		m_cop_spr_maxx(0),
-		m_cop_spr_off(0),
+		, m_sprite_prot_x(0)
+		, m_sprite_prot_y(0)
+		, m_dst1(0)
+		, m_cop_spr_maxx(0)
+		, m_cop_spr_off(0)
 
-		m_bg_bank(0),
-		m_fg_bank(0),
-		m_mid_bank(0),
-		m_tx_bank(0),
-		m_tilemap_enable(0),
+		, m_bg_bank(0)
+		, m_fg_bank(0)
+		, m_mid_bank(0)
+		, m_tx_bank(0)
+		, m_tilemap_enable(0)
 
-		m_prg_bank(0),
-		m_cop_bank(0)
+		, m_prg_bank(0)
+		, m_cop_bank(0)
 	{
 		std::fill(std::begin(m_sprite_prot_src_addr), std::end(m_sprite_prot_src_addr), 0);
 		std::fill(std::begin(m_scrollvals), std::end(m_scrollvals), 0);

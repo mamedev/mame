@@ -799,13 +799,11 @@ MACHINE_CONFIG_START(m63_state::m63)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); /* ????? */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay1, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* ????? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_ay2, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 1.00); /* ????? */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m63_state::atomboy)
@@ -850,10 +848,9 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, m_ay1, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)

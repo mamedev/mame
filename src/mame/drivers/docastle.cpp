@@ -623,22 +623,23 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	m_inp[1]->read_port5_callback().set_ioport("BUTTONS").rshift(4);
 	m_inp[1]->read_port7_callback().set_ioport("SYSTEM").rshift(4);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(9'828'000) / 16)
+	H46505(config, m_crtc, XTAL(9'828'000) / 16);
 	/*
 	The games program the CRTC for a width of 32 characters (256 pixels).
 	However, the DE output from the CRTC is first ANDed with the NAND of
 	MA1 through MA4, and then delayed by 8 pixel clocks; this effectively
 	blanks the first 8 pixels and last 8 pixels of each line.
 	*/
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_VISAREA_ADJUST(8,-8,0,0)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, docastle_state, docastle_tint))
-	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, docastle_state, stx_on_w))
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, docastle_state, stx_off_w))
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_visarea_adjust(8,-8,0,0);
+	m_crtc->set_char_width(8);
+	m_crtc->out_hsync_callback().set(FUNC(docastle_state::docastle_tint));
+	m_crtc->out_cur_callback().set(FUNC(docastle_state::stx_on_w));
+	m_crtc->out_de_callback().set(FUNC(docastle_state::stx_off_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc

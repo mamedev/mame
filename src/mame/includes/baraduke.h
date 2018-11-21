@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+#ifndef MAME_INCLUDES_BARADUKE_H
+#define MAME_INCLUDES_BARADUKE_H
+
+#pragma once
+
 #include "sound/namco.h"
 #include "emupal.h"
 
 class baraduke_state : public driver_device
 {
 public:
-	baraduke_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	baraduke_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_textram(*this, "textram"),
@@ -24,7 +29,6 @@ public:
 	DECLARE_WRITE8_MEMBER(baraduke_lamps_w);
 	DECLARE_WRITE8_MEMBER(baraduke_irq_ack_w);
 	DECLARE_READ8_MEMBER(soundkludge_r);
-	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_READ8_MEMBER(baraduke_videoram_r);
 	DECLARE_WRITE8_MEMBER(baraduke_videoram_w);
 	DECLARE_READ8_MEMBER(baraduke_textram_r);
@@ -48,7 +52,6 @@ public:
 	void baraduke(machine_config &config);
 	void baraduke_map(address_map &map);
 	void mcu_map(address_map &map);
-	void mcu_port_map(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -70,3 +73,5 @@ protected:
 	int m_copy_sprites;
 	output_finder<2> m_lamps;
 };
+
+#endif // MAME_INCLUDES_BARADUKE_H

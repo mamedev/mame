@@ -104,6 +104,11 @@ public:
 	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_inh_callback(Object &&cb) { return m_out_inh_cb.set_callback(std::forward<Object>(cb)); }
 
+	// devcb3
+	auto irq_w() { return m_out_irq_cb.bind(); }
+	auto nmi_w() { return m_out_nmi_cb.bind(); }
+	auto inh_w() { return m_out_inh_cb.bind(); }
+
 	void add_a2bus_card(int slot, device_a2bus_card_interface *card);
 	device_a2bus_card_interface *get_a2bus_card(int slot);
 	uint8_t get_a2bus_irq_mask();

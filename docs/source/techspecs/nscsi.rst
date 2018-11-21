@@ -1,12 +1,14 @@
 The new SCSI subsystem
 ======================
 
-1. Introduction
+Introduction
+------------
 
 The **nscsi** subsystem was created to allow an implementation to be closer to the physical reality, making it easier (hopefully) to implement new controller chips from the documentations.
 
 
-2. Global structure
+Global structure
+----------------
 
 Parallel SCSI is built around a symmetric bus to which a number of devices are connected.  The bus is composed of 9 control lines (for
 now, later SCSI versions may have more) and up to 32 data lines (but currently implemented chips only handle 8).  All the lines are open
@@ -18,7 +20,8 @@ devices.
 Structurally, the implementation is done around two main classes: **nscsi_bus_devices** represents the bus, and **nscsi_device** represents an individual device.  A device only communicate with the bus, and the bus takes care of transparently handling the device discovery and communication.  In addition the **nscsi_full_device** class proposes a SCSI device with the SCSI protocol implemented making building generic SCSI devices like hard drives or CD-ROM readers easier.
 
 
-3. Plugging in a SCSI bus in a driver
+Plugging in a SCSI bus in a driver
+----------------------------------
 
 The nscsi subsystem leverages the slot interfaces and the device naming to allow for a configurable yet simple bus implementation.
 
@@ -63,7 +66,8 @@ The full device name, for mapping purposes, will be **bus-tag:scsi-id:device-typ
 controller here.
 
 
-4. Creating a new SCSI device using nscsi_device
+Creating a new SCSI device using nscsi_device
+---------------------------------------------
 
 The base class "**nscsi_device**" is to be used for down-to-the-metal devices, i.e. SCSI controller chips.  The class provides three
 variables and one method.  The first variable, **scsi_bus**, is a pointer to the **nscsi_bus_device**. The second, **scsi_refid**, is an opaque reference to pass to the bus on some operations. Finally, **scsi_id** gives the SCSI ID as per the device tag. It's written once at startup and never written or read afterwards, the device can do whatever it wants with the value or the variable.
@@ -111,7 +115,8 @@ to annoy you. The de-assert is called a disconnect.
 The **ncr5390** is an example of how to use a two-level state machine to handle all the events.
 
 
-5. Creating a new SCSI device using **nscsi_full_device**
+Creating a new SCSI device using **nscsi_full_device**
+------------------------------------------------------
 
 The base class "**nscsi_full_device**" is used to create HLE-d SCSI devices intended for generic uses, like hard drives, CD-ROMs, perhaps scanners, etc.  The class provides the SCSI protocol handling, leaving only the command handling and (optionally) the message handling to the implementation.
 
@@ -139,9 +144,9 @@ The **scsi_data_\*** and **scsi_status_complete** commands are queued, the comma
 
 *buffer-id* identifies a buffer.  0, aka **SBUF_MAIN**, targets the **scsi_cmdbuf** buffer. Other acceptable values are 2 or more. 2+ ids are handled through the **scsi_get_data** method for read and **scsi_put_data** for write.
 
-**UINT8 device::scsi_get_data(int id, int pos)** must return byte pos of buffer id, upcalling in nscsi_full_device for id < 2.
+**UINT8 device::scsi_get_data(int id, int pos)** must return byte pos of buffer id, upcalling in **nscsi_full_device** for id < 2.
 
-**void device::scsi_put_data(int id, int pos, UINT8 data)** must write byte pos in buffer id, upcalling in nscsi_full_device for id < 2.
+**void device::scsi_put_data(int id, int pos, UINT8 data)** must write byte pos in buffer id, upcalling in **nscsi_full_device** for id < 2.
 
 **scsi_get_data** and **scsi_put_data** should do the external reads/writes when needed.
 
@@ -150,21 +155,20 @@ The device can also override **scsi_message** to handle SCSI messages other than
 A number of enums are defined to make things easier. The **SS_\*** enum gives status returns (with **SS_GOOD** for all's well).  The **SC_\*** enum gives the scsi commands.  The **SM_\*** enum gives the SCSI messages, with the exception of identify (which is **80-ff**, doesn't really fit in an enum).
 
 
-6. What's missing
-6.1. What's missing in **scsi_full_device**
+What's missing in **scsi_full_device**
+--------------------------------------
 
-Initiator support - we have no initiator device to HLE at that point.
+- **Initiator support** We have no initiator device to HLE at that point.
 
-Delays - a scsi_delay command would help giving more realistic timings to the CD-ROM reader in particular.
+- **Delays** A scsi_delay command would help giving more realistic timings to the CD-ROM reader in particular.
 
-Disconnected operation - would first require delays and in addition an emulated OS that can handle it.
+- **Disconnected operation** Would first require delays and in addition an emulated OS that can handle it.
 
-16-bits wide operation - needs an OS and an initiator that can handle it.
+- **16-bits wide operation** needs an OS and an initiator that can handle it.
 
 
-6.2. What's missing in the ncr5390 (and probably future other controllers)
+What's missing in the ncr5390 (and probably future other controllers)
+---------------------------------------------------------------------
 
-Bus free detection.  Right now the bus is considered free if the controllers isn't using it, which is true. This may change once
-disconnected operation is in.
-
-Target commands, we don't emulate (vs. HLE) any target yet.
+- **Bus free detection** Right now the bus is considered free if the controllers isn't using it, which is true. This may change once disconnected operation is in.
+- **Target commands** We don't emulate (vs. HLE) any target yet.

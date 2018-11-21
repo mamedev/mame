@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -427,10 +427,10 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000) / 12)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seicross_state, portB_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, seicross_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000) / 12));
+	aysnd.port_b_read_callback().set(FUNC(seicross_state::portB_r));
+	aysnd.port_b_write_callback().set(FUNC(seicross_state::portB_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

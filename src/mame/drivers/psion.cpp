@@ -199,7 +199,7 @@ WRITE8_MEMBER( psion_state::io_w )
 	switch (offset & 0x0ffc0)
 	{
 	case 0x80:
-		m_lcdc->write(space, offset & 0x01, data);
+		m_lcdc->write(offset & 0x01, data);
 		break;
 	default:
 		io_rw(space, offset);
@@ -211,7 +211,7 @@ READ8_MEMBER( psion_state::io_r )
 	switch (offset & 0xffc0)
 	{
 	case 0x80:
-		return m_lcdc->read(space, offset & 0x01);
+		return m_lcdc->read(offset & 0x01);
 	default:
 		io_rw(space, offset);
 	}

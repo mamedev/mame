@@ -1611,25 +1611,25 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 //  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc88va)
 
-	MCFG_DEVICE_ADD("d8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2s", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_2s", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, cpu_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, cpu_8255_c_w))
+	i8255_device &d8255_2(I8255(config, "d8255_2"));
+	d8255_2.in_pa_callback().set("d8255_2s", FUNC(i8255_device::pb_r));
+	d8255_2.in_pb_callback().set("d8255_2s", FUNC(i8255_device::pa_r));
+	d8255_2.in_pc_callback().set(FUNC(pc88va_state::cpu_8255_c_r));
+	d8255_2.out_pc_callback().set(FUNC(pc88va_state::cpu_8255_c_w));
 
-	MCFG_DEVICE_ADD("d8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pc88va_state, r232_ctrl_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc88va_state, r232_ctrl_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pc88va_state, r232_ctrl_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc88va_state, r232_ctrl_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, r232_ctrl_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, r232_ctrl_portc_w))
+	i8255_device &d8255_3(I8255(config, "d8255_3"));
+	d8255_3.in_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_r));
+	d8255_3.out_pa_callback().set(FUNC(pc88va_state::r232_ctrl_porta_w));
+	d8255_3.in_pb_callback().set(FUNC(pc88va_state::r232_ctrl_portb_r));
+	d8255_3.out_pb_callback().set(FUNC(pc88va_state::r232_ctrl_portb_w));
+	d8255_3.in_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_r));
+	d8255_3.out_pc_callback().set(FUNC(pc88va_state::r232_ctrl_portc_w));
 
-	MCFG_DEVICE_ADD("d8255_2s", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(READ8("d8255_2", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, fdc_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, fdc_8255_c_w))
+	i8255_device &d8255_2s(I8255(config, "d8255_2s"));
+	d8255_2s.in_pa_callback().set("d8255_2", FUNC(i8255_device::pb_r));
+	d8255_2s.in_pb_callback().set("d8255_2", FUNC(i8255_device::pa_r));
+	d8255_2s.in_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_r));
+	d8255_2s.out_pc_callback().set(FUNC(pc88va_state::fdc_8255_c_w));
 
 	PIC8259(config, m_pic1, 0);
 	m_pic1->out_int_callback().set_inputline(m_maincpu, 0);
@@ -1648,18 +1648,18 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	m_dmac->in_memr_callback().set(FUNC(pc88va_state::dma_memr_cb));
 	m_dmac->out_memw_callback().set(FUNC(pc88va_state::dma_memw_cb));
 
-	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_irq))
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_drq))
+	UPD765A(config, m_fdc, false, true);
+	m_fdc->intrq_wr_callback().set(FUNC(pc88va_state::fdc_irq));
+	m_fdc->drq_wr_callback().set(FUNC(pc88va_state::fdc_drq));
 	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_fdd[1], pc88va_floppies, "525hd", pc88va_state::floppy_formats);
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(8000000) /* general purpose timer 1 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pc88va_state, pc88va_pit_out0_changed))
-	MCFG_PIT8253_CLK1(8000000) /* BEEP frequency setting */
-	MCFG_PIT8253_CLK2(8000000) /* RS232C baud rate setting */
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(8000000); /* general purpose timer 1 */
+	pit8253.out_handler<0>().set(FUNC(pc88va_state::pc88va_pit_out0_changed));
+	pit8253.set_clk<1>(8000000); /* BEEP frequency setting */
+	pit8253.set_clk<2>(8000000); /* RS232C baud rate setting */
 
 	ADDRESS_MAP_BANK(config, "sysbank").set_map(&pc88va_state::sysbank_map).set_options(ENDIANNESS_LITTLE, 16, 18+4, 0x40000);
 

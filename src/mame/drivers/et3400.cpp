@@ -234,8 +234,7 @@ MACHINE_CONFIG_START(et3400_state::et3400)
 	m_pia->readpa_handler().set(FUNC(et3400_state::pia_ar));
 	m_pia->readpb_handler().set(FUNC(et3400_state::pia_br));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	for (std::size_t i = 0; i < 6; i++)
 		LS259(config, m_displatch[i]);

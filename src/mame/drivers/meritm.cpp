@@ -197,6 +197,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_z80pio(*this, "z80pio%u", 0U),
 			m_ds1204(*this, "ds1204"),
+			m_ppi(*this, "ppi8255"),
 			m_v9938(*this, "v9938_%u", 0U),
 			m_microtouch(*this, "microtouch") ,
 			m_uart(*this, "ns16550"),
@@ -220,6 +221,7 @@ protected:
 private:
 	required_device_array<z80pio_device, 2> m_z80pio;
 	required_device<ds1204_device> m_ds1204;
+	required_device<i8255_device> m_ppi;
 	required_device_array<v9938_device, 2> m_v9938;
 	optional_device<microtouch_device> m_microtouch;
 	optional_device<ns16550_device> m_uart;
@@ -1100,15 +1102,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 	m_z80pio[0]->port_a_write(m_vint);
 }
 
-MACHINE_CONFIG_START(meritm_state::crt250)
+void meritm_state::crt250(machine_config &config)
+{
 	Z80(config, m_maincpu, SYSTEM_CLK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::crt250_map);
 	m_maincpu->set_addrmap(AS_IO, &meritm_state::crt250_io_map);
 	m_maincpu->set_daisy_config(meritm_daisy_chain);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, meritm_state, crt250_port_b_w))   // used LMP x DRIVE
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, _8255_port_c_r))
+	I8255(config, m_ppi);
+	m_ppi->out_pb_callback().set(FUNC(meritm_state::crt250_port_b_w));   // used LMP x DRIVE
+	m_ppi->in_pc_callback().set(FUNC(meritm_state::_8255_port_c_r));
 
 	Z80PIO(config, m_z80pio[0], SYSTEM_CLK/6);
 	m_z80pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1124,29 +1127,32 @@ MACHINE_CONFIG_START(meritm_state::crt250)
 	m_z80pio[1]->in_pb_callback().set_ioport("PIO1_PORTB");
 	m_z80pio[1]->out_pb_callback().set(FUNC(meritm_state::io_pio_port_b_w));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_start", meritm_state, vblank_start_tick, "screen", 259, 262)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_end", meritm_state, vblank_end_tick, "screen", 262, 262)
+	TIMER(config, "vblank_start", 0).configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
+	TIMER(config, "vblank_end", 0).configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DS1204_ADD(m_ds1204)
+	DS1204(config, m_ds1204);
 
-	MCFG_V9938_ADD(m_v9938[0], "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state, vdp0_interrupt))
+	V9938(config, m_v9938[0], SYSTEM_CLK);
+	m_v9938[0]->set_screen_ntsc("screen");
+	m_v9938[0]->set_vram_size(0x20000);
+	m_v9938[0]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
 
-	MCFG_V9938_ADD(m_v9938[1], "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state, vdp1_interrupt))
+	V9938(config, m_v9938[1], SYSTEM_CLK);
+	m_v9938[1]->set_screen_ntsc("screen");
+	m_v9938[1]->set_vram_size(0x20000);
+	m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
 
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938_0", SYSTEM_CLK)
-	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_screen_update(FUNC(meritm_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8930, SYSTEM_CLK/12)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) /* Port A read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, meritm_state, ay8930_port_b_w))  /* Port B write */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ay8930_device &aysnd(AY8930(config, "aysnd", SYSTEM_CLK/12));
+	aysnd.port_a_read_callback().set_ioport("DSW");
+	aysnd.port_b_write_callback().set(FUNC(meritm_state::ay8930_port_b_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 MACHINE_CONFIG_START(meritm_state::crt250_questions)
 	crt250(config);
@@ -1163,8 +1169,9 @@ MACHINE_CONFIG_START(meritm_state::crt250_crt252_crt258)
 
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt250_crt252_crt258)
 
-	MCFG_DEVICE_ADD(m_uart, NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(m_microtouch, microtouch_device, rx))
+	NS16550(config, m_uart, UART_CLK);
+	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
+
 	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
 MACHINE_CONFIG_END
@@ -1175,16 +1182,14 @@ MACHINE_CONFIG_START(meritm_state::crt260)
 	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::map);
 	m_maincpu->set_addrmap(AS_IO, &meritm_state::io_map);
 
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, _8255_port_c_r))
+	m_ppi->out_pb_callback().set_nop();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1200));  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt260)
 
-	MCFG_DEVICE_ADD(m_uart, NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(m_microtouch, microtouch_device, rx))
+	NS16550(config, m_uart, UART_CLK);
+	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
+
 	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
 MACHINE_CONFIG_END

@@ -993,7 +993,7 @@ MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)       /* verified */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

@@ -2154,7 +2154,7 @@ MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
@@ -2194,8 +2194,7 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	YM2151(config, "ymsnd", 32220000/9).add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2254,12 +2253,12 @@ MACHINE_CONFIG_START(tumbleb_state::htchctch)
 	/* sound hardware - same as hyperpac */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* on at least hatch catch, cookie & bibi and choky choky the YM2151 clock is connected directly to the Z80 clock so the speed should match */
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 15000000/4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 15000000/4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	/* correct for cookie & bibi and hatch catch, (4096000/4) */
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1024000, okim6295_device::PIN7_HIGH)
@@ -2300,9 +2299,7 @@ MACHINE_CONFIG_START(tumbleb_state::bcstory)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_bcstory)
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 3427190)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	subdevice<ym2151_device>("ymsnd")->set_clock(3427190);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tumbleb_state::semibase)
@@ -2324,9 +2321,7 @@ MACHINE_CONFIG_START(tumbleb_state::metlsavr)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 3427190)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	subdevice<ym2151_device>("ymsnd")->set_clock(3427190);
 MACHINE_CONFIG_END
 
 
@@ -2368,7 +2363,7 @@ MACHINE_CONFIG_START(tumbleb_state::suprtrio)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 875000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -2444,7 +2439,7 @@ ROM_START( tumbleb2 )
 
 	ROM_REGION( 0x100000, "sprgfx", 0 ) // in the 0.35 beta cycle this bootleg was added with the same sprite ROMs as the original, but a PCB was found with the following 27c208 ROMs
 	ROM_LOAD16_BYTE( "wj-6", 0x00000, 0x40000, CRC(ee91db18) SHA1(06a2f15228a8233b685506077ed1248cd5fc3bb3) ) // map-01.rom   [even]     IDENTICAL
-	ROM_LOAD16_BYTE( "wj-7", 0x00001, 0x40000, CRC(87cffb06) SHA1(db3adbbf33cdbff72b6c5ee1228c760cc4897ad0) ) // map-01.rom   [odd]      IDENTICAL 
+	ROM_LOAD16_BYTE( "wj-7", 0x00001, 0x40000, CRC(87cffb06) SHA1(db3adbbf33cdbff72b6c5ee1228c760cc4897ad0) ) // map-01.rom   [odd]      IDENTICAL
 	ROM_LOAD16_BYTE( "wj-4", 0x80000, 0x40000, CRC(79a29725) SHA1(c47366dedaf821f452d8e5394d426f18a79d615e) ) // map-00.rom   [even]     IDENTICAL
 	ROM_LOAD16_BYTE( "wj-5", 0x80001, 0x40000, CRC(dda8932e) SHA1(bd20806916cc5774a5cc70907d88c7ab4eb7ac14) ) // map-00.rom   [odd]      IDENTICAL
 	//ROM_LOAD( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )

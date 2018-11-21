@@ -26,7 +26,7 @@
 
 WRITE8_MEMBER(avalnche_state::avalnche_noise_amplitude_w)
 {
-	m_discrete->write(space, AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
+	m_discrete->write(AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
 }
 
 

@@ -895,7 +895,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	adc.in_callback<6>().set_constant(0); // RPSNC
 	adc.in_callback<7>().set_constant(0); // LPSNC
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	I8255(config, "ppi");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -920,10 +920,10 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	YM2151(config, m_ym2151, CLOCK_1 / 4);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ym2151->add_route(0, "lspeaker", 0.45);
+	m_ym2151->add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
@@ -945,10 +945,10 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, roundup5_state, output_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.out_pc_callback().set(FUNC(roundup5_state::output_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -967,10 +967,10 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	YM2151(config, m_ym2151, CLOCK_1 / 4);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ym2151->add_route(0, "lspeaker", 0.45);
+	m_ym2151->add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
@@ -1048,13 +1048,13 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-//  MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+//  m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	YM2151(config, m_ym2151, CLOCK_1 / 4);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_ym2151->add_route(0, "lspeaker", 0.45);
+	m_ym2151->add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)

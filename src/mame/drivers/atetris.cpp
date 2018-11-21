@@ -239,7 +239,7 @@ void atetris_mcu_state::atetrisb3_map(address_map &map)
 
 READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 {
-	switch (m_mcu->p2_r(space, 0) & 0xf0)
+	switch (m_mcu->p2_r() & 0xf0)
 	{
 	case 0x40:
 		return m_soundlatch[1]->read(space, 0);
@@ -255,7 +255,7 @@ READ8_MEMBER(atetris_mcu_state::mcu_bus_r)
 WRITE8_MEMBER(atetris_mcu_state::mcu_p2_w)
 {
 	if ((data & 0xc0) == 0x80)
-		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r(space, 0));
+		m_sn[(data >> 4) & 3]->write(m_mcu->p1_r());
 }
 
 WRITE8_MEMBER(atetris_mcu_state::mcu_reg_w)
@@ -468,22 +468,26 @@ ROM_END
 
 
 ROM_START( atetrisb2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "k1-01",    0x10000, 0x8000, CRC(fa056809) SHA1(e4ccccdf9b04b68127c7b03ae263519cf00f94cb) )
+	ROM_REGION( 0x18000, "maincpu", 0 ) // Some bootleg PCBs uses unmodified Atari ROMs
+	ROM_LOAD( "k1-01",    0x10000, 0x8000, CRC(fa056809) SHA1(e4ccccdf9b04b68127c7b03ae263519cf00f94cb) ) // 27512
 	ROM_CONTINUE(         0x08000, 0x8000 )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "136066-1101.35a", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
+	ROM_REGION( 0x10000, "gfx1", 0 ) // Some bootleg PCBs uses unmodified Atari ROMs
+	ROM_LOAD( "136066-1101.35a", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) ) // 27512
 
 	ROM_REGION( 0x0020, "proms", 0 ) // currently unused
-	ROM_LOAD( "m3-7603-5.prom1", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) )
+	ROM_LOAD( "m3-7603-5.prom1", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) ) // 82s123 or TBP18S030
 
-	ROM_REGION( 0xa00, "plds", 0 ) // all protected
-	ROM_LOAD( "tibpal16r4-25cn.pal1", 0x000, 0x104, NO_DUMP ) // sub PCB
-	ROM_LOAD( "tibpal16r4-25cn.pal3", 0x200, 0x104, NO_DUMP ) // sub PCB
-	ROM_LOAD( "tibpal16l8-25cn.pal2", 0x400, 0x104, NO_DUMP ) // sub PCB
-	ROM_LOAD( "tibpal16l8-25cn.pal4", 0x600, 0x104, NO_DUMP ) // main PCB
-	ROM_LOAD( "tibpal16l8-25cn.pal5", 0x800, 0x104, NO_DUMP ) // main PCB
+	/* Unused. It's usual to find PLDs with different hashes, but defining equivalent equations */
+	ROM_REGION( 0x859, "plds", 0 )
+	ROM_LOAD( "a-gal16v8-b.bin", 0x000, 0x117, CRC(b1dfab0f) SHA1(e9e4db5459617a35a13df4b7a4586dd1b7be04ac) ) // sub PCB - Same content as "b"
+	ROM_LOAD( "b-gal16v8-b.bin", 0x117, 0x117, CRC(b1dfab0f) SHA1(e9e4db5459617a35a13df4b7a4586dd1b7be04ac) ) // sub PCB - Same content as "a"
+	ROM_LOAD( "c-gal16v8-b.bin", 0x22e, 0x117, CRC(e1a9db0b) SHA1(5bbac24e37a4d9b8a1387054722fa35478ca7941) ) // sub PCB
+	ROM_LOAD( "1-pal16l8-a.3g" , 0x345, 0x104, CRC(dcf0d2fe) SHA1(0496acaa605ec5008b110c387136bbc714441384) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "2-pal16r4-a.3r" , 0x449, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) ) // main PCB
+	ROM_LOAD( "3-pal16r4-a.8p" , 0x54D, 0x104, CRC(e007edf2) SHA1(4f1bc31abd64e402edb4c900ddb21f258d6782c8) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "4-pal16l8-a.9n" , 0x651, 0x104, CRC(3630e734) SHA1(a29dc202ffc75ac48815115b85e984fc0c9d5b59) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "5-pal16l8-a.9m" , 0x755, 0x104, CRC(53b64be1) SHA1(2bf712b766541c90c38c0810ee16848e448c5205) ) // main PCB - Found also as GAL16v8 on some PCBs
 ROM_END
 
 
@@ -526,7 +530,7 @@ ROM_START( atetrisb3 )
 
 	// 8749 (10 MHz OSC) emulates POKEYs
 	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "8749h.bin",    0x0000, 0x0800, CRC(a66a9c47) SHA1(fbebd755a5e826c7d94ebcafdff2f9a01c9fd1a5) BAD_DUMP )
+	ROM_LOAD( "8749h.bin",    0x0000, 0x0800, CRC(a66a9c47) SHA1(fbebd755a5e826c7d94ebcafdff2f9a01c9fd1a5) ) // dumped via normal methods and confirmed good via decap
 	ROM_FILL( 0x06e2, 1, 0x96 ) // patch illegal opcode
 
 	// currently unused
@@ -542,6 +546,61 @@ ROM_START( atetrisb3 )
 	ROM_LOAD( "pal16r4b-2cn.6",    0xa00, 0x104, NO_DUMP )
 ROM_END
 
+/*
+atetb3482: Atari Tetris bootleg with additional UM3482 and Z80 (with its ROM)
+  __________________________________________________________________
+  |                                                                 |
+A | ?????             74LS06   74LS197  74LS374             74LS04  |
+  |                                                                 |
+B |                   74LS08    74LS74  74LS374    74LS374          |
+  |                                                                 |
+C |                   74LS32    74LS27  74LS357    74LS374 XTAL     |
+  |                                                          74LS10 |
+D |                   74LS04   74LS273   74LS74    74LS374          |
+  | ?? ??  74LS393   UM6116K    74LS74  74LS257      ______  74LS27 |
+E |                                                  | D2  |        |
+  |                   74LS245      74LS245 _______   |     | 74LS74 |
+F |UM3482  74LS139    PAL16L8              |      |  |27PC |74LS161 |
+  |______           __________     74LS245 | MS   |  | 512 |        |
+G ||DIPS | PAL16R4  |UNPOPULAT|            | 6264 |  |_____|74LS161 |
+  ||_____|          |_________|    74LS245 | L-10 |  _______        |
+H |74LS04  PAL16R8  ___________            |      |  | UN  |74LS161 |
+  |                 |D1 27PC512|   74LS00  |______|  | PO  |        |
+I |74LS32  74LS373  |__________|   74LS32            | PU  |PAL16L8 |
+  |                  __________              74LS04  | LA  |        |
+J |74LS374 74LS357   | X2804AP |   74LS257   74LS138 | TED |PAL16?? |
+  |____________      |_________|   74LS257   74LS257 |     |        |
+K ||D3 27PC256 |                                     |_____|74LS161 |
+  ||___________|     74LS245   74LS245                              |
+L |________________  _______________         74LS257 74LS74 74LS161 |
+  ||SHARP LH0080B  | |   UM6502A    |                               |
+M ||_______________| |______________|      74LS00    74LS74 74LS161 |
+  |                                                                 |
+N |PAL16R4 74LS??? 4017 74LS08 74LS32 74LS04 PAL16R4 82S123 74LS32  |
+  |_________________________________________________________________|
+    1      2      3       4       5       6       7      8      9
+*/
+ROM_START( atetb3482 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "i4-d1.bin", 0x10000, 0x8000, CRC(2acbdb09) SHA1(5e1189227f26563fd3e5372121ea5c915620f892) )
+	ROM_CONTINUE(          0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "f8-d2.bin", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
+
+	ROM_REGION( 0x08000, "tunes", 0 ) // Not hooked up. Same 8K repeated four times
+	ROM_LOAD( "k1-d3.bin", 0x00000, 0x08000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) )
+
+	/* Not dumped, unused */
+	ROM_REGION( 0x71c, "plds", 0 )
+	ROM_LOAD( "pal16r4.1n" , 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r4.7n" , 0x104, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.9j" , 0x208, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.9i" , 0x30c, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r8.2h" , 0x410, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r4.2g" , 0x514, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.4f" , 0x618, 0x104, NO_DUMP )
+ROM_END
 
 ROM_START( atetrisc )
 	ROM_REGION( 0x18000, "maincpu", 0 )
@@ -592,5 +651,6 @@ GAME( 1988, atetrisa,  atetris, atetris,   atetris,  atetris_state,     init_ate
 GAME( 1988, atetrisb,  atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetrisb2, atetris, atetrisb2, atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetrisb3, atetris, atetrisb3, atetris,  atetris_mcu_state, init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, atetb3482, atetris, atetris,   atetris,  atetris_state,     init_atetris, ROT0,   "bootleg",     "Tetris (bootleg set 4, with UM3482)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, atetrisc,  atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisc2, atetris, atetris,   atetrisc, atetris_state,     init_atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", MACHINE_SUPPORTS_SAVE )

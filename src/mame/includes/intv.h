@@ -5,9 +5,10 @@
  * includes/intv.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_INTV_H
 #define MAME_INCLUDES_INTV_H
+
+#pragma once
 
 #include "sound/ay8910.h"
 #include "video/stic.h"
@@ -30,8 +31,8 @@
 class intv_state : public driver_device
 {
 public:
-	intv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	intv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "ay8914"),
 		m_stic(*this, "stic"),

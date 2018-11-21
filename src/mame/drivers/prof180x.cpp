@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	/* devices */
-	MCFG_UPD765A_ADD(FDC9268_TAG, false, true)
+	UPD765A(config, FDC9268_TAG, false, true);
 	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)

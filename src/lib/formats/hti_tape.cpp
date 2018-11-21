@@ -10,8 +10,6 @@
 #include "imageutl.h"
 
 static constexpr uint32_t FILE_MAGIC =  0x5441434f;      // Magic value at start of image file: "TACO"
-static constexpr hti_format_t::tape_pos_t ZERO_BIT_LEN = 619;   // Length of 0 bits at slow tape speed: 1/(35200 Hz)
-static constexpr hti_format_t::tape_pos_t ONE_BIT_LEN = 1083;   // Length of 1 bits at slow tape speed: 1.75 times ZERO_BIT_LEN
 
 // *** Position of tape holes ***
 // At beginning of tape:

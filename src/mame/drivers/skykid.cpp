@@ -135,20 +135,6 @@ void skykid_state::mcu_map(address_map &map)
 }
 
 
-READ8_MEMBER(skykid_state::readFF)
-{
-	return 0xff;
-}
-
-void skykid_state::mcu_port_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).r(FUNC(skykid_state::inputport_r));         /* input ports read */
-	map(M6801_PORT1, M6801_PORT1).w(FUNC(skykid_state::inputport_select_w)); /* input port select */
-	map(M6801_PORT2, M6801_PORT2).r(FUNC(skykid_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(FUNC(skykid_state::skykid_led_w));           /* lamps */
-}
-
-
 
 static INPUT_PORTS_START( skykid )
 	PORT_START("DSWA")  /* DSW A */
@@ -441,13 +427,16 @@ MACHINE_CONFIG_START(skykid_state::skykid)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
 	MCFG_DEVICE_PROGRAM_MAP(skykid_map)
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* or compatible 6808 with extra instructions */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	HD63701(config, m_mcu, XTAL(49'152'000)/8); /* or compatible 6808 with extra instructions */
+	m_mcu->set_addrmap(AS_PROGRAM, &skykid_state::mcu_map);
+	m_mcu->in_p1_cb().set(FUNC(skykid_state::inputport_r));         /* input ports read */
+	m_mcu->out_p1_cb().set(FUNC(skykid_state::inputport_select_w)); /* input port select */
+	m_mcu->in_p2_cb().set_constant(0xff);                           /* leds won't work otherwise */
+	m_mcu->out_p2_cb().set(FUNC(skykid_state::skykid_led_w));       /* lamps */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

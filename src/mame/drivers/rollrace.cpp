@@ -286,16 +286,13 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	AY8910(config, "ay1", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay2", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	AY8910(config, "ay2", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay3", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
+	AY8910(config, "ay3", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "lspeaker", 0.10); /* verified on pcb */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rollrace_state::rollace2)

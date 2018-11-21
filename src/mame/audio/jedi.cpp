@@ -146,6 +146,6 @@ MACHINE_CONFIG_START(jedi_state::jedi_audio)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch") // 5E (LS374) + 3E (LS279) pins 13-15
-	MCFG_GENERIC_LATCH_8_ADD("sacklatch") // 4E (LS374) + 3E (LS279) pins 1-4
+	GENERIC_LATCH_8(config, m_soundlatch); // 5E (LS374) + 3E (LS279) pins 13-15
+	GENERIC_LATCH_8(config, m_sacklatch); // 4E (LS374) + 3E (LS279) pins 1-4
 MACHINE_CONFIG_END

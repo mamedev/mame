@@ -361,9 +361,9 @@ WRITE8_MEMBER(replicator_state::port_w)
 
 					if (enable && RW==0){
 						if (RS==0){
-							m_lcdc->control_write(space, 0, lcd_data);
+							m_lcdc->control_write(lcd_data);
 						} else {
-							m_lcdc->data_write(space, 0, lcd_data);
+							m_lcdc->data_write(lcd_data);
 						}
 					}
 				}

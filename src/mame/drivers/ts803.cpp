@@ -436,11 +436,12 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* crtc */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 13608000 / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(ts803_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(ts803_state, crtc_update_addr)
+	sy6545_1_device &crtc(SY6545_1(config, "crtc", 13608000 / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(ts803_state::crtc_update_row), this);
+	crtc.set_on_update_addr_change_callback(FUNC(ts803_state::crtc_update_addr), this);
 
 	clock_device &sti_clock(CLOCK(config, "sti_clock", 16_MHz_XTAL / 13));
 	sti_clock.signal_handler().set("sti", FUNC(z80sti_device::tc_w));
@@ -458,12 +459,12 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("dart", FUNC(z80dart_device::rxa_w));
 
 	/* floppy disk */
-	MCFG_DEVICE_ADD("fdc", FD1793, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("sti", z80sti_device, i7_w))
+	FD1793(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set("sti", FUNC(z80sti_device::i7_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)

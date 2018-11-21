@@ -181,7 +181,7 @@ WRITE_LINE_MEMBER(sauro_state::flip_screen_w)
 
 WRITE8_MEMBER(sauro_state::adpcm_w)
 {
-	m_sp0256->ald_w(space, 0, data);
+	m_sp0256->ald_w(data);
 }
 
 void sauro_state::sauro_map(address_map &map)
@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(sauro_state::tecfri)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(sauro_state::sauro)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_DEVICE_CLOCK(XTAL(20'000'000) / 5)     /* verified on pcb */

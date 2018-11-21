@@ -10,7 +10,7 @@
  YM2419s and even AY8930s.
 
  some of the sound roms we have look more like uPD7749 ones? did some
- ROM boards use that instead?
+ third party ROM boards use that instead?
 
  typically games with a single sound rom appear to be uPD7749 whereas
  the ones with a u2/u3 combo are MSM6376

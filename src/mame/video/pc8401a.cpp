@@ -72,7 +72,9 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8401a_lcdc)
+	SED1330(config, m_lcdc, 0);
+	m_lcdc->set_screen(SCREEN_TAG);
+	m_lcdc->set_addrmap(0, &pc8401a_state::pc8401a_lcdc);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8500_state::pc8500_video)
@@ -89,7 +91,9 @@ MACHINE_CONFIG_START(pc8500_state::pc8500_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8500_lcdc)
+	SED1330(config, m_lcdc, 0);
+	m_lcdc->set_screen(SCREEN_TAG);
+	m_lcdc->set_addrmap(0, &pc8500_state::pc8500_lcdc);
 
 	/* PC-8441A CRT */
 	MCFG_SCREEN_ADD(CRT_SCREEN_TAG, RASTER)
@@ -100,7 +104,8 @@ MACHINE_CONFIG_START(pc8500_state::pc8500_video)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, CRT_SCREEN_TAG, 400000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(6)
+	MC6845(config, m_crtc, 400000);
+	m_crtc->set_screen(CRT_SCREEN_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(6);
 MACHINE_CONFIG_END

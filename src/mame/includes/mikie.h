@@ -5,21 +5,26 @@
     Mikie
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MIKIE_H
+#define MAME_INCLUDES_MIKIE_H
+
+#pragma once
 
 #include "emupal.h"
 
 class mikie_state : public driver_device
 {
 public:
-	mikie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mikie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void mikie(machine_config &config);
 
@@ -60,3 +65,5 @@ private:
 	void mikie_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MIKIE_H

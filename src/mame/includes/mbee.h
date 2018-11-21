@@ -5,9 +5,10 @@
  * includes/mbee.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_MBEE_H
 #define MAME_INCLUDES_MBEE_H
+
+#pragma once
 
 #include "bus/centronics/ctronics.h"
 

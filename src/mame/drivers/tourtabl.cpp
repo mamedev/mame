@@ -170,7 +170,7 @@ MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	riot2.in_pb_callback().set_ioport("RIOT1_SWB");
 	riot2.out_pb_callback().set(FUNC(tourtabl_state::tourtabl_led_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")

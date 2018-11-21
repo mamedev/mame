@@ -5,6 +5,10 @@
     Combat School
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_COMBATSC_H
+#define MAME_INCLUDES_COMBATSC_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/upd7759.h"
@@ -16,8 +20,8 @@
 class combatsc_state : public driver_device
 {
 public:
-	combatsc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	combatsc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
@@ -122,3 +126,5 @@ public:
 	void combatscb_map(address_map &map);
 	void combatscb_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_COMBATSC_H

@@ -515,13 +515,11 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 12000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	AY8912(config, m_ay[0], 12000000/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, 12000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	AY8912(config, m_ay[1], 12000000/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 MACHINE_CONFIG_END
 
 

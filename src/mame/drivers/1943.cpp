@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(_1943_state::_1943)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1943_state, irq0_line_hold, 4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -341,7 +341,7 @@ MACHINE_CONFIG_START(_1943_state::_1943)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)

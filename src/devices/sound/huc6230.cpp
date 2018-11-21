@@ -18,16 +18,10 @@ constexpr int clamp(int val, int min, int max) { return std::min(max, std::max(m
 
 void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	int frq = (1 << m_adpcm_freq);
 	for (int i = 0; i < samples; i++)
 	{
 		outputs[0][i] = inputs[0][i];
 		outputs[1][i] = inputs[1][i];
-
-		int cdda_l = inputs[2][i];
-		int cdda_r = inputs[3][i];
-		outputs[0][i] = clamp(outputs[0][i] + ((cdda_l * m_cdda_lvol) >> 6), -32768, 32767);
-		outputs[1][i] = clamp(outputs[1][i] + ((cdda_r * m_cdda_rvol) >> 6), -32768, 32767);
 
 		for (int adpcm = 0; adpcm < 2; adpcm++)
 		{
@@ -36,25 +30,8 @@ void huc6230_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (!channel->m_playing)
 				continue;
 
-			int32_t sample;
-
-			channel->m_pos++;
-			channel->m_input = m_adpcm_update_cb[adpcm]();
-
-			if (channel->m_pos > frq)
-			{
-				channel->m_pos = 0;
-				channel->m_prev_sample = channel->m_curr_sample;
-				channel->m_curr_sample = channel->m_adpcm.clock(channel->m_input & 0xf);
-			}
-			if (!channel->m_interpolate)
-				sample = channel->m_curr_sample;
-			else
-				sample = ((channel->m_prev_sample * (frq - channel->m_pos)) +
-					(channel->m_curr_sample * channel->m_pos)) >> m_adpcm_freq;
-
-			outputs[0][i] = clamp(outputs[0][i] + ((sample * channel->m_lvol) >> 2), -32768, 32767);
-			outputs[1][i] = clamp(outputs[1][i] + ((sample * channel->m_rvol) >> 2), -32768, 32767);
+			outputs[0][i] = clamp(outputs[0][i] + ((channel->m_output * channel->m_lvol) >> 2), -32768, 32767);
+			outputs[1][i] = clamp(outputs[1][i] + ((channel->m_output * channel->m_rvol) >> 2), -32768, 32767);
 		}
 	}
 }
@@ -84,6 +61,7 @@ WRITE8_MEMBER( huc6230_device::write )
 				m_adpcm_channel[i].m_playing = 0;
 				m_adpcm_channel[i].m_prev_sample = 0;
 				m_adpcm_channel[i].m_curr_sample = 0;
+				m_adpcm_channel[i].m_output = 0;
 				m_adpcm_channel[i].m_pos = 0;
 			}
 			else
@@ -101,9 +79,57 @@ WRITE8_MEMBER( huc6230_device::write )
 			m_adpcm_channel[offset >> 1].m_rvol = data & 0x3f;
 	}
 	else if (offset < 0x16)
+	{
 		m_cdda_lvol = data & 0x3f;
+		m_cdda_cb(0, m_cdda_lvol);
+	}
 	else if (offset < 0x17)
+	{
 		m_cdda_rvol = data & 0x3f;
+		m_cdda_cb(1, m_cdda_rvol);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(huc6230_device::adpcm_timer)
+{
+	int frq = (1 << m_adpcm_freq);
+	for (int adpcm = 0; adpcm < 2; adpcm++)
+	{
+		adpcm_channel *channel = &m_adpcm_channel[adpcm];
+
+		if (!channel->m_playing)
+		{
+			if (channel->m_output != 0)
+			{
+				m_stream->update();
+				channel->m_output = 0;
+			}
+			continue;
+		}
+
+		channel->m_pos++;
+		channel->m_input = m_adpcm_update_cb[adpcm]();
+
+		if (channel->m_pos > frq)
+		{
+			channel->m_pos = 0;
+			channel->m_prev_sample = channel->m_curr_sample;
+			channel->m_curr_sample = channel->m_adpcm.clock(channel->m_input & 0xf);
+		}
+
+		int32_t new_output;
+		if (!channel->m_interpolate)
+			new_output = channel->m_curr_sample;
+		else
+			new_output = ((channel->m_prev_sample * (frq - channel->m_pos)) +
+				(channel->m_curr_sample * channel->m_pos)) >> m_adpcm_freq;
+
+		if (channel->m_output != new_output)
+		{
+			m_stream->update();
+			channel->m_output = new_output;
+		}
+	}
 }
 
 DEFINE_DEVICE_TYPE(HuC6230, huc6230_device, "huc6230", "Hudson Soft HuC6230 SoundBox")
@@ -117,6 +143,7 @@ huc6230_device::huc6230_device(const machine_config &mconfig, const char *tag, d
 	, m_cdda_lvol(0)
 	, m_cdda_rvol(0)
 	, m_adpcm_update_cb{{*this}, {*this}}
+	, m_cdda_cb(*this)
 {
 }
 
@@ -139,13 +166,17 @@ void huc6230_device::device_start()
 	for (auto &cb : m_adpcm_update_cb)
 		cb.resolve_safe(0);
 
-	m_stream = machine().sound().stream_alloc(*this, 4, 2, clock() / 682); // or /672?
+	m_cdda_cb.resolve_safe();
+
+	m_stream = machine().sound().stream_alloc(*this, 2, 2, clock() / 96);
+	m_adpcm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(huc6230_device::adpcm_timer),this));
 
 	for (int i = 0; i < 2; i++)
 	{
 		m_adpcm_channel[i].m_playing = 0;
 		m_adpcm_channel[i].m_prev_sample = 0;
 		m_adpcm_channel[i].m_curr_sample = 0;
+		m_adpcm_channel[i].m_output = 0;
 		m_adpcm_channel[i].m_pos = 0;
 		m_adpcm_channel[i].m_input = 0;
 
@@ -157,6 +188,7 @@ void huc6230_device::device_start()
 		save_item(NAME(m_adpcm_channel[i].m_playing), i);
 		save_item(NAME(m_adpcm_channel[i].m_prev_sample), i);
 		save_item(NAME(m_adpcm_channel[i].m_curr_sample), i);
+		save_item(NAME(m_adpcm_channel[i].m_output), i);
 		save_item(NAME(m_adpcm_channel[i].m_pos), i);
 		save_item(NAME(m_adpcm_channel[i].m_input), i);
 	}
@@ -167,5 +199,7 @@ void huc6230_device::device_start()
 
 void huc6230_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / 682);
+	m_stream->set_sample_rate(clock() / 96);
+	attotime adpcm_period = clocks_to_attotime(682);
+	m_adpcm_timer->adjust(adpcm_period, 0, adpcm_period);
 }

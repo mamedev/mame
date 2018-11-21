@@ -497,7 +497,7 @@ void ssv_state::gdfs_map(address_map &map)
     at 0x580000-0x5bffff. The test is skipped and this ram isn't used
     though. I guess it's either a left-over or there are different
     version with some battery backed RAM (which would indeed be on the
-    rom-board, AFAIK)
+    ROM board, AFAIK)
 */
 
 READ16_MEMBER(ssv_state::hypreact_input_r)
@@ -776,7 +776,7 @@ void ssv_state::sxyreact_map(address_map &map)
                                 Twin Eagle II
 ***************************************************************************/
 
-/* comes as either a standalone board or a standard SSV rom board (verified) */
+/* comes as either a standalone board or a standard SSV ROM board (verified) */
 
 void ssv_state::twineag2_map(address_map &map)
 {
@@ -2441,8 +2441,8 @@ static const gfx_layout layout_16x8x6_ram =
 };
 
 static GFXDECODE_START( gfx_eaglshot )
-	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from ram)
-	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x6_ram, 0, 0x8000/64 ) // [1] Sprites (64 colors, decoded from ram)
+	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from RAM)
+	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x6_ram, 0, 0x8000/64 ) // [1] Sprites (64 colors, decoded from RAM)
 GFXDECODE_END
 
 static const gfx_layout layout_16x16x8 =
@@ -2473,7 +2473,7 @@ GFXDECODE_END
 /***************************************************************************
 
     Some games (e.g. hypreac2) oddly map the high bits of the tile code
-    to the gfx roms: arranging the roms accordingly would waste tens of
+    to the gfx ROMs: arranging the ROMs accordingly would waste tens of
     megabytes. So we use a look-up table.
 
     We also need to set up game specific offsets for sprites and layers
@@ -2635,7 +2635,7 @@ MACHINE_CONFIG_START(ssv_state::hypreact)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hypreact_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2650,7 +2650,7 @@ MACHINE_CONFIG_START(ssv_state::hypreac2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(hypreac2_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2693,7 +2693,7 @@ MACHINE_CONFIG_START(ssv_state::meosism)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2721,7 +2721,7 @@ MACHINE_CONFIG_START(ssv_state::ryorioh)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2735,7 +2735,7 @@ MACHINE_CONFIG_START(ssv_state::vasara)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2749,7 +2749,7 @@ MACHINE_CONFIG_START(ssv_state::srmp4)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(srmp4_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2764,7 +2764,7 @@ MACHINE_CONFIG_START(ssv_state::srmp7)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(srmp7_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2800,7 +2800,7 @@ MACHINE_CONFIG_START(ssv_state::survarts)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(survarts_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2827,11 +2827,11 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX")
-	MCFG_UPD4701_PORTY("TRACKY")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("TRACKX");
+	m_upd4701->set_porty_tag("TRACKY");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2852,7 +2852,7 @@ MACHINE_CONFIG_START(ssv_state::sxyreact)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2868,7 +2868,7 @@ MACHINE_CONFIG_START(ssv_state::sxyreac2)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2884,7 +2884,7 @@ MACHINE_CONFIG_START(ssv_state::cairblad)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2904,7 +2904,7 @@ MACHINE_CONFIG_START(ssv_state::twineag2)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2919,7 +2919,7 @@ MACHINE_CONFIG_START(ssv_state::ultrax)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ultrax_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2936,7 +2936,7 @@ MACHINE_CONFIG_START(ssv_state::jsk)
 	MCFG_DEVICE_ADD("sub", V810,25000000)
 	MCFG_DEVICE_PROGRAM_MAP(jsk_v810_mem)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -3191,7 +3191,7 @@ ROMs      : U18 & U20 are used for main program.
             All rest are 16M Mask
             U23 & U24 are sound related, all others for GFX.
 
-Loc  ROMs           Use & eprom type
+Loc  ROMs           Use & EPROM type
 -----------------------------------------
 U18  si003-09.prl - V60 Program (27C4001)
 U20  si003-10.prh /
@@ -3206,7 +3206,7 @@ U10  si003-04.d3 |
 U30  si003-05.d4 |
 U31  si003-06.d5 /
 
-NOTE: The "s" and "d" designations above are silk-screened on the rom PCB.
+NOTE: The "s" and "d" designations above are silk-screened on the ROM PCB.
 
 Chips of note:  mc14584b - Motorola HEX Schmitt Trigger
 
@@ -4288,9 +4288,9 @@ ADC0809CCN: 8bit microprocessor compatible A/D converters with 8-Channel Multipl
 * Denotes unpopulated component
 
 U37, U33 = 27c040
-U22, U41, U35, U25, U21, U11, U7  = 16 MEG MASK ROMS
-U32, U18, U4 = 4 MEG MASK ROMS
-U26 = 8 MEG MASK ROM
+U22, U41, U35, U25, U21, U11, U7  = 16 meg mask ROMS
+U32, U18, U4 = 4 meg mask ROMS
+U26 = 8 meg mask ROM
 
 ***************************************************************************/
 
@@ -4390,7 +4390,7 @@ STS0003 TWIN EAGLE
 
   SX002-13: GAL16V8B (undumped)
 SETA ST010: Custom programmed uPD96050 MCU used for math caculations
-All roms are 16M Mask roms
+All ROMs are 16M mask ROMs
 
 ***************************************************************************/
 
@@ -4512,7 +4512,7 @@ Visco Games, 2000 / 2001
 This is a sub board that fits any standard SSV main board.
 
 There's very little on the ROM board. Just 2x 27C040 EPROMs,
-4x 64Mbit SOP44 MASK ROMs, 3x 16Mbit SOP44 MASK ROMs,
+4x 64Mbit SOP44 mask ROMs, 3x 16Mbit SOP44 mask ROMs,
 some logic and 2 PALs near the PROG & DATA ROMs.
 
 The actual ROM PCB has the capability to accept SOP44 and
@@ -4568,10 +4568,10 @@ File Name     Labeled as        Loc. Printed*      ROM Type
 prg-h.u31     PRG-H U31         U31  PRG H       | 27C040
 prg-l.u30     PRG-L U20         U30  PRG L      /
 s1.u37        C DAT VASARA-1    U37  S1         \
-s0.u36        B DAT VASARA-1    U36  S0          | Surface Mounted 16Mbit SOP44 MASK ROMs
+s0.u36        B DAT VASARA-1    U36  S0          | Surface Mounted 16Mbit SOP44 mask ROMs
 data.u34      A SND 1 VASARA-1  U34  DATA ROM   /
 d0.u4         VASARA-2-D0       U4   D0.D1      \
-c0.u3         VASARA-2-C0       U3   C0.C1       | Surface Mounted 64Mbit SOP44 MASK ROMs
+c0.u3         VASARA-2-C0       U3   C0.C1       | Surface Mounted 64Mbit SOP44 mask ROMs
 b0.u2         VASARA-2-B0       U2   B0.B1       |
 a0.u1         VASARA-2-A0       U1   A0.A1      /
 
@@ -4762,7 +4762,7 @@ GAME( 1993,  dynagear,  0,        dynagear, dynagear, ssv_state, init_dynagear, 
 GAME( 1993,  keithlcy,  0,        keithlcy, keithlcy, ssv_state, init_keithlcy, ROT0,   "Visco",              "Dramatic Adventure Quiz Keith & Lucy (Japan)",                           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993,  srmp4,     0,        srmp4,    srmp4,    ssv_state, init_srmp4,    ROT0,   "Seta",               "Super Real Mahjong PIV (Japan)",                                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993,  srmp4o,    srmp4,    srmp4,    srmp4,    ssv_state, init_srmp4,    ROT0,   "Seta",               "Super Real Mahjong PIV (Japan, older set)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // by the numbering of the program roms this should be older
+GAME( 1993,  srmp4o,    srmp4,    srmp4,    srmp4,    ssv_state, init_srmp4,    ROT0,   "Seta",               "Super Real Mahjong PIV (Japan, older set)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // by the numbering of the program ROMs this should be older
 
 GAME( 1993,  survarts,  0,        survarts, survarts, ssv_state, init_survarts, ROT0,   "Sammy",              "Survival Arts (World)",                                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1993,  survartsu, survarts, survarts, survarts, ssv_state, init_survarts, ROT0,   "American Sammy",     "Survival Arts (USA)",                                                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

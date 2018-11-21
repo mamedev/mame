@@ -1341,8 +1341,7 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, m_aysnd, CPU_CLOCK / 6).add_route(ALL_OUTPUTS, "speaker", 0.3); /* no ports used */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(videopkr_state::fortune1)
@@ -1365,11 +1364,11 @@ MACHINE_CONFIG_START(videopkr_state::bpoker)
 	MCFG_MCS51_PORT_P1_IN_CB(CONSTANT(0)) // ???
 	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // ???
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	//MCFG_I8255_OUT_PORTA_CB()
-	//MCFG_I8255_IN_PORTB_CB()
-	//MCFG_I8255_OUT_PORTC_CB()
-	//MCFG_I8255_IN_PORTC_CB()
+	I8255A(config, "ppi");
+	//ppi.out_pa_callback()
+	//ppi.in_pb_callback()
+	//ppi.out_pc_callback()
+	//ppi.in_pc_callback()
 MACHINE_CONFIG_END
 
 

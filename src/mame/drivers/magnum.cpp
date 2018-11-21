@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 
 	//MCFG_DEVICE_ADD("crtc", I8275, 3000000) // unknown clock
 
-	//MCFG_DEVICE_ADD("fdc", WD1793, 1000000) // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
+	//WD1793(config, "fdc", 1000000); // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
 
 	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 

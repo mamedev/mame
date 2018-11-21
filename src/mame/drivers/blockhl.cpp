@@ -289,7 +289,7 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -317,11 +317,9 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
 MACHINE_CONFIG_END
 
 

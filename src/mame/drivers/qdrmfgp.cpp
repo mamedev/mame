@@ -555,8 +555,8 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16)
+	K053252(config, m_k053252, XTAL(32'000'000)/4);
+	m_k053252->set_offsets(40, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -601,8 +601,8 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16)
+	K053252(config, m_k053252, XTAL(32'000'000)/4);
+	m_k053252->set_offsets(40, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

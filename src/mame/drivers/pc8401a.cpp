@@ -361,8 +361,7 @@ void pc8401a_state::pc8500_io(address_map &map)
 	map(0x08, 0x08).portr("Y.8");
 	map(0x09, 0x09).portr("Y.9");
 	map(0x10, 0x10).w(FUNC(pc8401a_state::rtc_cmd_w));
-	map(0x20, 0x20).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x21).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x30, 0x30).rw(FUNC(pc8401a_state::mmr_r), FUNC(pc8401a_state::mmr_w));
 //  AM_RANGE(0x31, 0x31)
 	map(0x40, 0x40).rw(FUNC(pc8401a_state::rtc_r), FUNC(pc8401a_state::rtc_ctrl_w));
@@ -581,20 +580,20 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8401a_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8401a_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(pc8401a_state::ppi_pc_w));
 
 	i8251_device &uart(I8251(config, I8251_TAG, 0));
 	uart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
 
 	/* video hardware */
 	pc8401a_video(config);
@@ -621,20 +620,20 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8401a_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8401a_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pc_callback().set(FUNC(pc8401a_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(pc8401a_state::ppi_pc_w));
 
 	i8251_device &uart(I8251(config, I8251_TAG, 0));
 	uart.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
 
 	/* video hardware */
 	pc8500_video(config);

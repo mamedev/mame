@@ -187,5 +187,7 @@
 #define UIMMVAL         ((uint16_t)op)
 #define LIMMVAL         (op & 0x03ffffff)
 
+#define CACHE_TYPE      ((op >> 16) & 3)
+#define CACHE_OP        ((op >> 18) & 7)
 
 #endif // MAME_CPU_MIPS_MIPS3COM_H

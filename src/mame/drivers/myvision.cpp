@@ -229,12 +229,12 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)  /* Exact model and clock not verified */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, myvision_state, ay_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, myvision_state, ay_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, myvision_state, ay_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, myvision_state, ay_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(10'738'635)/3/2));  /* Exact model and clock not verified */
+	ay8910.port_a_read_callback().set(FUNC(myvision_state::ay_port_a_r));
+	ay8910.port_b_read_callback().set(FUNC(myvision_state::ay_port_b_r));
+	ay8910.port_a_write_callback().set(FUNC(myvision_state::ay_port_a_w));
+	ay8910.port_b_write_callback().set(FUNC(myvision_state::ay_port_b_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "myvision_cart")

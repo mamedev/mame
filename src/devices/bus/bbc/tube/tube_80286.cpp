@@ -47,7 +47,7 @@ void bbc_tube_80286_device::tube_80286_io(address_map &map)
 //  ROM( tube_80286 )
 //-------------------------------------------------
 
-ROM_START( tube_80286 )
+ROM_START(tube_80286)
 	ROM_REGION(0x4000, "bootstrap", 0)
 	ROM_LOAD16_BYTE("m512_lo.ic31", 0x0000, 0x2000, CRC(c0df8707) SHA1(7f6d843d5aea6bdb36cbd4623ae942b16b96069d)) // 2201,287-02
 	ROM_LOAD16_BYTE("m512_hi.ic32", 0x0001, 0x2000, CRC(e47f10b2) SHA1(45dc8d7e7936afbec6de423569d9005a1c350316)) // 2201,288-02
@@ -57,22 +57,23 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bbc_tube_80286_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("i80286", I80286, XTAL(12'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tube_80286_mem)
-	MCFG_DEVICE_IO_MAP(tube_80286_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_80286_device, irq_callback)
+void bbc_tube_80286_device::device_add_mconfig(machine_config &config)
+{
+	I80286(config, m_i80286, 12_MHz_XTAL / 2);
+	m_i80286->set_addrmap(AS_PROGRAM, &bbc_tube_80286_device::tube_80286_mem);
+	m_i80286->set_addrmap(AS_IO, &bbc_tube_80286_device::tube_80286_io);
+	m_i80286->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bbc_tube_80286_device::irq_callback), this));
 
-	MCFG_TUBE_ADD("ula")
-	MCFG_TUBE_PNMI_HANDLER(INPUTLINE("i80286", INPUT_LINE_NMI))
-	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("i80286", INPUT_LINE_INT0))
+	TUBE(config, m_ula);
+	m_ula->pnmi_handler().set_inputline(m_i80286, INPUT_LINE_NMI);
+	m_ula->pirq_handler().set_inputline(m_i80286, INPUT_LINE_INT0);
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("1M");
+	RAM(config, m_ram).set_default_size("1M");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_80186", "bbc_flop_80186")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_ls_80186").set_original("bbc_flop_80186");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -117,6 +118,10 @@ void bbc_tube_80286_device::device_start()
 void bbc_tube_80286_device::device_reset()
 {
 	m_ula->reset();
+
+	address_space &program = m_i80286->space(AS_PROGRAM);
+
+	program.install_rom(0xc0000, 0xc3fff, 0x3c000, m_bootstrap->base());
 }
 
 

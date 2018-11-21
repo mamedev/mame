@@ -71,6 +71,7 @@
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
+ *MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
   M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
@@ -135,7 +136,6 @@
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. tc4/h2hfootb(offense), bankshot(cue ball), f3in1(ball), ...
-  - stopthiep: unable to start a game (may be intentional?)
   - 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
   - arrball: shot button is unresponsive sometimes, maybe BTANB? no video of game on Youtube
     ROM is good, PLAs are good, input mux is good
@@ -4726,11 +4726,11 @@ MACHINE_CONFIG_START(ginv2000_state::ginv2000)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ginv2000_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ginv2000_state, write_o))
 
-	MCFG_DEVICE_ADD("expander", TMS1024, 0)
-	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, ginv2000_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, ginv2000_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, ginv2000_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, ginv2000_state, expander_w))
+	TMS1024(config, m_expander);
+	m_expander->write_port4_callback().set(FUNC(ginv2000_state::expander_w));
+	m_expander->write_port5_callback().set(FUNC(ginv2000_state::expander_w));
+	m_expander->write_port6_callback().set(FUNC(ginv2000_state::expander_w));
+	m_expander->write_port7_callback().set(FUNC(ginv2000_state::expander_w));
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -7219,6 +7219,7 @@ MACHINE_CONFIG_END
   Stop Thief is actually a board game, the electronic device emulated here
   (called Electronic Crime Scanner) is an accessory. To start a game, press
   the ON button. Otherwise, it is in test-mode where you can hear all sounds.
+  For the patent romset, it needs to be turned off and on to exit test mode.
 
 ***************************************************************************/
 
@@ -8882,7 +8883,7 @@ public:
 		m_expander(*this, "expander")
 	{ }
 
-	required_device<tms1024_device> m_expander;
+	required_device<tms1025_device> m_expander;
 	u8 m_exp_port[7];
 	DECLARE_WRITE8_MEMBER(expander_w);
 
@@ -9019,14 +9020,14 @@ MACHINE_CONFIG_START(tbreakup_state::tbreakup)
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tbreakup_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tbreakup_state, write_o))
 
-	MCFG_DEVICE_ADD("expander", TMS1025, 0)
-	MCFG_TMS1025_WRITE_PORT_CB(PORT1, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT2, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT3, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, tbreakup_state, expander_w))
-	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, tbreakup_state, expander_w))
+	TMS1025(config, m_expander);
+	m_expander->write_port1_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port2_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port3_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port4_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port5_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port6_callback().set(FUNC(tbreakup_state::expander_w));
+	m_expander->write_port7_callback().set(FUNC(tbreakup_state::expander_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_tbreakup);
@@ -10079,7 +10080,7 @@ ROM_END
 
 ROM_START( stopthief )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(8bde5bb4) SHA1(8c318fcce67acc24c7ae361f575f28ec6f94665a) )
+	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(b9c9d64a) SHA1(481f8653064c142fe5d9314b750bcd73797b92b2) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
@@ -10374,7 +10375,7 @@ CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  emp
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE ) // ***
-CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
+CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE ) // ***
 CONS( 1980, bankshot,   0,         0, bankshot,  bankshot,  bankshot_state,  empty_init, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splitsec,   0,         0, splitsec,  splitsec,  splitsec_state,  empty_init, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, mmerlin,    0,         0, mmerlin,   mmerlin,   mmerlin_state,   empty_init, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

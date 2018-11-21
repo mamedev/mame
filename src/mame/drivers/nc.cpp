@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol, Kevin Thacker
 /******************************************************************************
 
-        nc.c
+        nc.cpp
 
         NC100/NC150/NC200 Notepad computer
 
@@ -18,7 +18,7 @@
             NC100 I/O Specification by Cliff Lawson,
             NC100EM by Russell Marks
         NC200:
-            Dissassembly of the NC200 ROM + e-mail
+            Disassembly of the NC200 ROM + e-mail
             exchange with Russell Marks
 
 
@@ -26,7 +26,7 @@
 
         Hardware:
             - Z80 CPU, 6 MHz
-            - memory powered by lithium batterys!
+            - memory powered by lithium batteries!
             - 2 channel tone (programmable frequency beep's)
             - LCD screen
             - laptop/portable computer
@@ -855,8 +855,7 @@ void nc100_state::nc100_io(address_map &map)
 	map(0x91, 0x9f).r(FUNC(nc100_state::nc_irq_status_r));
 	map(0xa0, 0xaf).r(FUNC(nc100_state::nc100_card_battery_status_r));
 	map(0xb0, 0xb9).r(FUNC(nc100_state::nc_key_data_in_r));
-	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xdf).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 }
 
@@ -1259,10 +1258,9 @@ void nc200_state::nc200_io(address_map &map)
 	map(0x90, 0x90).rw(FUNC(nc200_state::nc_irq_status_r), FUNC(nc200_state::nc200_irq_status_w));
 	map(0xa0, 0xa0).r(FUNC(nc200_state::nc200_card_battery_status_r));
 	map(0xb0, 0xb9).r(FUNC(nc200_state::nc_key_data_in_r));
-	map(0xc0, 0xc0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc1, 0xc1).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xd1).rw("mc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
-	map(0xe0, 0xe1).m("upd765", FUNC(upd765a_device::map));
+	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 }
 
 static INPUT_PORTS_START(nc200)
@@ -1445,8 +1443,8 @@ MACHINE_CONFIG_START(nc100_state::nc100)
 	m_uart->txrdy_handler().set(FUNC(nc100_state::nc100_txrdy_callback));
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", TC8521, 32.768_kHz_XTAL)
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, nc100_state, nc100_tc8521_alarm_callback))
+	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
+	rtc.out_alarm_callback().set(FUNC(nc100_state::nc100_tc8521_alarm_callback));
 MACHINE_CONFIG_END
 
 static const floppy_format_type ibmpc_floppy_formats[] = {
@@ -1484,8 +1482,8 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	m_uart->rxrdy_handler().set(FUNC(nc200_state::nc200_rxrdy_callback));
 	m_uart->txrdy_handler().set(FUNC(nc200_state::nc200_txrdy_callback));
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, nc200_state, nc200_fdc_interrupt))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 

@@ -604,7 +604,7 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
-//  MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
+//  MACRONIX_29LV160TMC(config, "dcflash");
 
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")

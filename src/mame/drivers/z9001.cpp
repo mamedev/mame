@@ -242,10 +242,10 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(9'830'400) / 4)); // keyboard PIO
 	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(9'830'400) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, z9001_state, cass_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(9'830'400) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(z9001_state::cass_w));
+	ctc.zc_callback<2>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END

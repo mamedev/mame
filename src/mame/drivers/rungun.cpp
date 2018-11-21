@@ -378,18 +378,14 @@ void rungun_state::machine_start()
 	m_pal_ram = make_unique_clear<uint16_t[]>(0x800*2);
 	membank("spriteram_bank")->configure_entries(0,2,&m_banked_ram[0],0x2000);
 
-
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sound_nmi_clk));
 	//save_item(NAME(m_ttl_vram));
-
 }
 
 void rungun_state::machine_reset()
 {
-	m_k054539_1->init_flags(k054539_device::REVERSE_STEREO);
-
 	memset(m_sysreg, 0, 0x20);
 	//memset(m_ttl_vram, 0, 0x1000 * sizeof(uint16_t));
 
@@ -438,9 +434,9 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	MCFG_K055673_PALETTE("palette")
 	MCFG_K055673_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(9*8, 24)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	K053252(config, m_k053252, 16000000/2);
+	m_k053252->set_offsets(9*8, 24);
+	m_k053252->set_screen("screen");
 
 	MCFG_PALETTE_ADD("palette2", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -451,20 +447,20 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	// SFX
 	MCFG_DEVICE_ADD("k054539_1", K054539, 18.432_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, rungun_state, k054539_nmi_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 
 	// BGM, volumes handtuned to make SFXs audible (still not 100% right tho)
 	MCFG_DEVICE_ADD("k054539_2", K054539, 18.432_MHz_XTAL)
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.6)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.6)
 MACHINE_CONFIG_END
 
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.
@@ -484,9 +480,7 @@ MACHINE_CONFIG_START(rungun_state::rng_dual)
 	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_right)
 	MCFG_SCREEN_PALETTE("palette2")
 
-
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_SET_SLAVE_SCREEN("demultiplex2")
+	m_k053252->set_slave_screen("demultiplex2");
 MACHINE_CONFIG_END
 
 

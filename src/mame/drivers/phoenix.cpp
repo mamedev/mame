@@ -437,7 +437,6 @@ GFXDECODE_END
 
 MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 {
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
 }
 
 
@@ -539,9 +538,10 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	SPEAKER(config, "mono").front_center();
 
 	/* FIXME: check clock */
-	MCFG_DEVICE_ADD("aysnd", AY8910, 11000000/4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, phoenix_state, survival_protection_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 11000000/4));
+	aysnd.port_b_read_callback().set(FUNC(phoenix_state::survival_protection_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+
 MACHINE_CONFIG_END
 
 
@@ -868,7 +868,31 @@ ROM_START( phoenixc4 ) // verified main and ROMs PCBs and 2 PROMs
 	ROM_RELOAD(               0x0000, 0x0100 )  /* the dump had 2 identical proms with different names */
 ROM_END
 
-ROM_START( phoenixha ) // verified 2 PROMs, numer of boards unknown (probably 2)
+ROM_START( phoenixgu ) // verified 2 PCBs, 2 PROMs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "phoenix.45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "phoenix.46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
+	ROM_LOAD( "phoenix.47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "48.bin",       0x1800, 0x0800, CRC(75623a06) SHA1(f12cf24287cd8e78218b0fb2862e9d6f84797fbc) )
+	ROM_LOAD( "phoenixc.49",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "h6-ic50.6a",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "h7-ic51.7a",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "phoenixc.52",  0x3800, 0x0800, CRC(8424d7c4) SHA1(1b5fa7d8be9e8750a4148dfefc17e96c86ed084d) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "ic23.3d",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "ic24.4d",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "phoenixc.39",  0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+ROM_END
+
+ROM_START( phoenixha ) // verified 2 PROMs, number of boards unknown (probably 2)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic45",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) ) // sldh
 	ROM_LOAD( "ic46",  0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) ) // sldh
@@ -913,6 +937,30 @@ ROM_START( phoenixi ) // verified single PCB, single PROM
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
+ROM_END
+
+ROM_START( fenixn ) // Fenix, bootleg from the Spanish company Niemer
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2201.bin", 0x0000, 0x0800, CRC(2afa8e2c) SHA1(e9cd02b730912365aae4172da881bddb7c7b16aa) )
+	ROM_LOAD( "1202.bin", 0x0800, 0x0800, CRC(6527395e) SHA1(13799da4b5c4118b3fafe7b6145b0ebca89b9f00) )
+	ROM_LOAD( "1203.bin", 0x1000, 0x0800, CRC(868e69ba) SHA1(bef3173f1c978a9b9d1597439d272186b466e069) )
+	ROM_LOAD( "1204.bin", 0x1800, 0x0800, CRC(85d96d7c) SHA1(19bb1d0a6764b6982d3cb29e2681dee8648d5fda) )
+	ROM_LOAD( "1205.bin", 0x2000, 0x0800, CRC(a105e4e7) SHA1(b35142a91b6b7fdf7535202671793393c9f4685f) )
+	ROM_LOAD( "1206.bin", 0x2800, 0x0800, CRC(249a6f21) SHA1(1c83d9883120796cf3bf775ab6620c4850f52d3c) )
+	ROM_LOAD( "1207.bin", 0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "1208.bin", 0x3800, 0x0800, CRC(b90efc28) SHA1(61956880f64ae50c4796d4cf60a49c44a81aaa31) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "1211.bin", 0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "1212.bin", 0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "1209.bin", 0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "1210.bin", 0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom1.bin", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "prom2.bin", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
 ROM_START( condor )
@@ -1582,7 +1630,9 @@ GAME( 1981, phoenixc,   phoenix, phoenix,  phoenixt, phoenix_state, empty_init, 
 GAME( 1981, phoenixc2,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc3,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc4,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixgu,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg? (G. Universal Video)",     "Phoenix (G. Universal Video bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixi,   phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (IDI)",                     "Phoenix (IDI bootleg)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Needs correct color PROM decode
+GAME( 1980, fenixn,     phoenix, phoenix,  phoenix,  phoenix_state, empty_init,      ROT90, "bootleg (Niemer)",                  "Fenix (Niemer bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, condor,     phoenix, condor,   condor,   phoenix_state, init_coindsw,         ROT90, "bootleg (Sidam)",                   "Condor (Sidam bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, condorn,    phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (S C Novar)",               "Condor (S C Novar bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 // the following 2 were common bootlegs in England & France respectively
@@ -1595,8 +1645,8 @@ GAME( 1980, vautourza,  phoenix, condor ,  phoenixt, phoenix_state, init_oneprom
 // German bootlegs
 GAME( 1981, phoenixha,  phoenix, phoenix,  phoenixt, phoenix_state, empty_init,      ROT90, "bootleg (Hellomat Automaten)",      "Phoenix (Hellomat Automaten bootleg)", MACHINE_SUPPORTS_SAVE )
 
-// fenix is an Italian bootleg based on vautourz
-GAME( 1980, fenix,      phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Orio)",                    "Fenix (bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// fenix is an Italian bootleg based on vautourz (also an unrelated Spanish bootleg from Niemer)
+GAME( 1980, fenix,      phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Orio)",                    "Fenix (Orio bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, griffon,    phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Videotron)",               "Griffon (Videotron bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, griffono,   phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Olympia)",                 "Griffon (Olympia bootleg of Phoenix)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // nextfase is a Spanish bootleg

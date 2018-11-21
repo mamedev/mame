@@ -615,8 +615,7 @@ MACHINE_CONFIG_START(route16_state::route16)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, 10000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, "ay8910", 10000000/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -645,8 +644,7 @@ MACHINE_CONFIG_START(route16_state::stratvox)
 	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_jongpute)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8910")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, route16_state, stratvox_sn76477_w))  /* SN76477 commands (not used in Route 16?) */
+	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(route16_state::stratvox_sn76477_w));  /* SN76477 commands (not used in Route 16?) */
 
 	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(150), CAP_U(0.001)) // noise + filter
@@ -1043,7 +1041,7 @@ ROM_START( jongpute )
 	ROM_REGION( 0x10000, "cpu2", 0 )
 	ROM_LOAD( "j6",           0x0000, 0x1000, CRC(54b349b0) SHA1(e5620b85a24a35d995860c7121f1ddf16f7ea168) )
 
-    /* maybe used for pseudo sampling voice, "reach", that is not emulated yet */
+	/* maybe used for pseudo sampling voice, "reach", that is not emulated yet */
 	ROM_REGION( 0x1000, "unknown", 0 )
 	ROM_LOAD( "j1",           0x0000, 0x1000, CRC(6d6ba272) SHA1(a4efd8daddbbf595ee46484578f544d7ed84e090) )
 
@@ -1107,5 +1105,5 @@ GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, empty_init,  
 GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )  // sampling voice is not emulated
+GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
 GAME( 1981, ttmahjng, jongpute, jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

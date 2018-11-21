@@ -1463,7 +1463,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 
 	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 117, true)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	ADC0809(config, m_adc8, 1000000); // unknown clock
 	m_adc8->in_callback<0>().set_ioport("8BADC.0");
@@ -1496,8 +1496,8 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, harddriv_state, harddriv_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE ("rs232", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE ("duartn68681", mc68681_device, rx_a_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("duartn68681", FUNC(mc68681_device::rx_a_w));
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)

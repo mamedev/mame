@@ -116,42 +116,46 @@ void pc_t1t_device::vram_map(address_map &map)
 	map(0x20000, 0x3ffff).noprw();
 }
 
-MACHINE_CONFIG_START(pcvideo_t1000_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181),912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE_DEVICE( T1000_MC6845_NAME, mc6845_device, screen_update )
+void pcvideo_t1000_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'318'181),912,0,640,262,0,200);
+	screen.set_screen_update(T1000_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
-	MCFG_PALETTE_ADD( "palette", 32 )
-	MCFG_PALETTE_INIT_OWNER(pc_t1t_device, pcjr)
+	palette_device &palette(PALETTE(config, "palette", 32));
+	palette.set_init(palette_init_delegate(FUNC(pc_t1t_device::palette_init_pcjr), this));
 
-	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL(14'318'181)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pc_t1t_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, pc_t1t_device, t1000_de_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, pcvideo_t1000_device, t1000_vsync_changed))
-
-	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(pcvideo_pcjr_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), 912, 0, 640, 262, 0, 200)
-	MCFG_SCREEN_UPDATE_DEVICE( T1000_MC6845_NAME, mc6845_device, screen_update )
-
-	MCFG_PALETTE_ADD( "palette", 32 )
-	MCFG_PALETTE_INIT_OWNER(pc_t1t_device, pcjr)
-
-	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL(14'318'181)/16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pcvideo_pcjr_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, pc_t1t_device, t1000_de_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, pcvideo_pcjr_device, pcjr_vsync_changed))
+	MC6845(config, m_mc6845, XTAL(14'318'181)/8);
+	m_mc6845->set_screen(T1000_SCREEN_NAME);
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
+	m_mc6845->set_update_row_callback(FUNC(pc_t1t_device::crtc_update_row), this);
+	m_mc6845->out_de_callback().set(FUNC(pc_t1t_device::t1000_de_changed));
+	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_t1000_device::t1000_vsync_changed));
 
 	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
-MACHINE_CONFIG_END
+}
+
+
+void pcvideo_pcjr_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
+	screen.set_screen_update(T1000_MC6845_NAME, FUNC(mc6845_device::screen_update));
+
+	palette_device &palette(PALETTE(config, "palette", 32));
+	palette.set_init(palette_init_delegate(FUNC(pc_t1t_device::palette_init_pcjr), this));
+
+	MC6845(config, m_mc6845, XTAL(14'318'181)/16);
+	m_mc6845->set_screen(T1000_SCREEN_NAME);
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
+	m_mc6845->set_update_row_callback(FUNC(pcvideo_pcjr_device::crtc_update_row), this);
+	m_mc6845->out_de_callback().set(FUNC(pc_t1t_device::t1000_de_changed));
+	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_pcjr_device::pcjr_vsync_changed));
+
+	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+}
 
 
 /***************************************************************************

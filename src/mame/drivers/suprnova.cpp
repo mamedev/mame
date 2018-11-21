@@ -89,9 +89,9 @@ NEP-16
  \-                                                    \-
 
  Notes:
-       *: unpopulated position for surface mounted 16MBit SOP44 MASK ROM
+       *: unpopulated position for surface mounted 16MBit SOP44 mask ROM
        U8 and U10 are socketed 27C040 EPROM
-       All other ROMs are surface mounted SOP44 MASK ROM
+       All other ROMs are surface mounted SOP44 mask ROM
 
 Cart Layout
 -----------
@@ -1036,7 +1036,7 @@ void skns_state::init_galpans3()   { m_spritegen->skns_sprite_kludge(-1,-1); ini
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
- /* NOTE: The Euro BIOS rom has been found labeled SKNSE1 and SKNSE2 but the data is the same */
+ /* NOTE: The Euro BIOS ROM has been found labeled SKNSE1 and SKNSE2 but the data is the same */
 #define SKNS_BIOS \
 	ROM_REGION( 0x0100000, "maincpu", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "japan", "Japan" ) \
@@ -1140,7 +1140,35 @@ ROM_START( cyvernj )
 	ROM_LOAD( "cv300-00.u4", 0x000000, 0x400000, CRC(fbeda465) SHA1(4d5066a22f4589b6b7f85b3e77c348d900ac4bdd) )
 ROM_END
 
-ROM_START( galpani4 )
+ROM_START( galpani4 ) // only main CPU and plds dumps were provided
+	SKNS_EUROPE
+
+	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
+	ROM_LOAD16_BYTE( "gp4-000-e0.u10", 0x000000, 0x080000, CRC(7464cc28) SHA1(4ea6185b62d3e25efdaafb91397b51bc8f12fdee) ) // Hitachi HN27C4001G-10
+	ROM_LOAD16_BYTE( "gp4-001-e0.u8",  0x000001, 0x080000, CRC(8d162069) SHA1(1bd0181a9c9f37c8e8c9d6f75f045d76dffcd903) ) // Hitachi HN27C4001G-10
+
+	ROM_REGION( 0x400000, "spritegen", 0 )
+	ROM_LOAD( "gp4-100-00.u24", 0x000000, 0x200000, CRC(1df61f01) SHA1(a9e95bbb3013e8f2fd01243b1b392ff07b4f7d02) )
+	ROM_LOAD( "gp4-101-00.u20", 0x200000, 0x100000, CRC(8e2c9349) SHA1(a58fa9bcc9684ed4558e3395d592b64a1978a902) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD( "gp4-200-00.u16", 0x000000, 0x200000, CRC(f0781376) SHA1(aeab9553a9af922524e528eb2d019cf36b6e2094) )
+	ROM_LOAD( "gp4-201-00.u18", 0x200000, 0x200000, CRC(10c4b183) SHA1(80e05f3932495ad4fc9bf928fa66e6d2931bbb06) )
+
+	ROM_REGION( 0x800000, "gfx3", ROMREGION_ERASE00 ) /* Tiles Plane B */
+	/* First 0x040000 bytes (0x03ff Tiles) are RAM Based Tiles */
+	/* 0x040000 - 0x3fffff empty? */
+
+	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
+	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) ) /* Doesn't seem to use these samples at all */
+	ROM_LOAD( "gp4-301-00.u7", 0x200000, 0x200000, NO_DUMP ) /* Different then GP4-301-01 - Changed some samples when compared to U4 ROM */
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "skns-r09.u9",  0x000, 0x117, CRC(b02058d9) SHA1(77d07e0f329fb1969aa4543cd124e36ad34b07ba) ) // Atmel ATF16V8B
+	ROM_LOAD( "skns-r11.u11", 0x200, 0x117, CRC(a9f05af4) SHA1(018684c1f9f7c2e1c86f0cb2db2ec7fb02e35cd8) ) // Atmel ATF16V8B
+ROM_END
+
+ROM_START( galpani4j )
 	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
@@ -1163,7 +1191,7 @@ ROM_START( galpani4 )
 	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) )
 ROM_END
 
-ROM_START( galpani4k ) /* ROM-BOARD NEP-16 part number GP04K00372 with extra sound sample rom at U7 */
+ROM_START( galpani4k ) /* ROM-BOARD NEP-16 part number GP04K00372 with extra sound sample ROM at U7 */
 	SKNS_KOREA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
@@ -1184,7 +1212,7 @@ ROM_START( galpani4k ) /* ROM-BOARD NEP-16 part number GP04K00372 with extra sou
 
 	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
 	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) ) /* Doesn't seem to use these samples at all */
-	ROM_LOAD( "gp4-301-01.u7", 0x200000, 0x200000, CRC(886ef77f) SHA1(047d5fecf2034339c69b2cb605b623a814a18f0d) ) /* Changed some samples when compared to U4 rom  */
+	ROM_LOAD( "gp4-301-01.u7", 0x200000, 0x200000, CRC(886ef77f) SHA1(047d5fecf2034339c69b2cb605b623a814a18f0d) ) /* Changed some samples when compared to U4 ROM  */
 ROM_END
 
 ROM_START( galpanidx )
@@ -1208,7 +1236,7 @@ ROM_START( galpanidx )
 
 	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
 	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) ) /* Doesn't seem to use these samples at all */
-	ROM_LOAD( "gp4-301-01.u7", 0x200000, 0x200000, CRC(886ef77f) SHA1(047d5fecf2034339c69b2cb605b623a814a18f0d) ) /* Changed some samples when compared to U4 rom  */
+	ROM_LOAD( "gp4-301-01.u7", 0x200000, 0x200000, CRC(886ef77f) SHA1(047d5fecf2034339c69b2cb605b623a814a18f0d) ) /* Changed some samples when compared to U4 ROM  */
 ROM_END
 
 ROM_START( galpanis )
@@ -1239,8 +1267,8 @@ ROM_START( galpanise )
 	SKNS_EUROPE
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
-	ROM_LOAD16_BYTE( "u10", 0x000000, 0x100000, CRC(e78e1623) SHA1(f68346b65d2613c8515894d9a239fcbb0b5cb52d) ) /* MASK rom with no labels */
-	ROM_LOAD16_BYTE( "u8",  0x000001, 0x100000, CRC(098eff7c) SHA1(3cac22cbb11905a46afaa62c0470624b3b554fc0) ) /* MASK rom with no labels */
+	ROM_LOAD16_BYTE( "u10", 0x000000, 0x100000, CRC(e78e1623) SHA1(f68346b65d2613c8515894d9a239fcbb0b5cb52d) ) /* mask ROM with no labels */
+	ROM_LOAD16_BYTE( "u8",  0x000001, 0x100000, CRC(098eff7c) SHA1(3cac22cbb11905a46afaa62c0470624b3b554fc0) ) /* mask ROM with no labels */
 
 	ROM_REGION( 0x1000000, "spritegen", 0 )
 	ROM_LOAD( "gps10000.u24", 0x000000, 0x400000, CRC(a1a7acf2) SHA1(52c86ae907f0c0236808c19f652955b09e90ec5a) )
@@ -1410,7 +1438,7 @@ ROM_START( galpansu )
 	ROM_LOAD16_BYTE( "su.u10", 0x000000, 0x100000, CRC(5ae66218) SHA1(c3f32603e1da945efb984ff99e1a30202e535773) )
 	ROM_LOAD16_BYTE( "su.u8",  0x000001, 0x100000, CRC(10977a03) SHA1(2ab95398d6b88d8819f368ee6104d7f8b485778d) )
 
-	/* the rest of the roms match Gals Panic S2, but are in different locations */
+	/* the rest of the ROMs match Gals Panic S2, but are in different locations */
 	ROM_REGION( 0x1000000, "spritegen", 0 )
 	ROM_LOAD( "24", 0x000000, 0x400000, CRC(294b2f14) SHA1(90cbd0acdaa2d89d208c28aae33ab57c03624089) )
 	ROM_LOAD( "20", 0x400000, 0x400000, CRC(f75c5a9a) SHA1(3919643cee6c88185a1aa3c58c5bc80599bf734e) )
@@ -1892,9 +1920,10 @@ ROM_END
 
 GAME( 1996, skns,      0,        skns,  skns,     skns_state, empty_init,     ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, galpani4,  skns,     sknsj, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, galpani4k, galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, galpanidx, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic DX (Asia)", MACHINE_IMPERFECT_GRAPHICS ) // copyright 2001, re-release for the Asian market?
+GAME( 1996, galpani4,  skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // 2nd sound ROM wasn't dumped, it's different than GP4-301-01
+GAME( 1996, galpani4j, galpani4, sknsj, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, galpani4k, galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, galpanidx, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic DX (Asia)",  MACHINE_IMPERFECT_GRAPHICS ) // copyright 2001, re-release for the Asian market?
 // there is a Gals Panic 4 version with 'Gals Panic SU' title as well, seen for sale in Korea (different to the Gals Panic SU clone of galpans2)
 
 GAME( 1996, jjparads,  skns,     sknsj, skns_1p,  skns_state, init_jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", MACHINE_IMPERFECT_GRAPHICS )

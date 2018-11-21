@@ -219,12 +219,10 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	m_pdr1_write(*this),
 	m_pdr2_write(*this),
 	m_irq_line(*this),
-	m_ctrl1(nullptr),
-	m_ctrl2(nullptr),
+	m_ctrl1(*this, finder_base::DUMMY_TAG),
+	m_ctrl2(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG)
 {
-	m_ctrl1 = nullptr;
-	m_ctrl2 = nullptr;
 	m_has_ctrl_ports = false;
 }
 
@@ -299,13 +297,6 @@ void smpc_hle_device::device_start()
 	m_rtc_data[4] = DectoBCD(systime.local_time.hour);
 	m_rtc_data[5] = DectoBCD(systime.local_time.minute);
 	m_rtc_data[6] = DectoBCD(systime.local_time.second);
-
-	if (m_has_ctrl_ports)
-	{
-		m_ctrl1 = downcast<saturn_control_port_device *>(machine().device(m_ctrl1_tag));
-		m_ctrl2 = downcast<saturn_control_port_device *>(machine().device(m_ctrl2_tag));
-	}
-//  m_has_ctrl_ports = (m_ctrl1 != nullptr && m_ctrl2 != nullptr);
 }
 
 

@@ -5,6 +5,10 @@
     Galaxian hardware family
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_GALAXIAN_H
+#define MAME_INCLUDES_GALAXIAN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
@@ -16,27 +20,41 @@
 #include "emupal.h"
 #include "screen.h"
 
-/* we scale horizontally by 3 to render stars correctly */
-#define GALAXIAN_XSCALE         3
+namespace {
 
 /* master clocks */
-#define GALAXIAN_MASTER_CLOCK   (XTAL(18'432'000))
-#define GALAXIAN_PIXEL_CLOCK    (GALAXIAN_XSCALE*GALAXIAN_MASTER_CLOCK/3)
+static constexpr XTAL GALAXIAN_MASTER_CLOCK(18.432_MHz_XTAL);
+static constexpr XTAL KONAMI_SOUND_CLOCK(14.318181_MHz_XTAL);
+static constexpr XTAL SIDAM_MASTER_CLOCK(12_MHz_XTAL);
+
+/* we scale horizontally by 3 to render stars correctly */
+static constexpr int GALAXIAN_XSCALE = 3;
+/* the Sidam bootlegs have a 12 MHz XTAL instead */
+static constexpr int SIDAM_XSCALE    = 2;
+
+static constexpr XTAL GALAXIAN_PIXEL_CLOCK(GALAXIAN_XSCALE*GALAXIAN_MASTER_CLOCK / 3);
+static constexpr XTAL SIDAM_PIXEL_CLOCK(SIDAM_XSCALE*SIDAM_MASTER_CLOCK / 2);
 
 /* H counts from 128->511, HBLANK starts at 130 and ends at 250 */
 /* we normalize this here so that we count 0->383 with HBLANK */
 /* from 264-383 */
-#define GALAXIAN_HTOTAL         (384*GALAXIAN_XSCALE)
-#define GALAXIAN_HBEND          (0*GALAXIAN_XSCALE)
-//#define GALAXIAN_H0START      (6*GALAXIAN_XSCALE)
-//#define GALAXIAN_HBSTART      (264*GALAXIAN_XSCALE)
-#define GALAXIAN_H0START        (0*GALAXIAN_XSCALE)
-#define GALAXIAN_HBSTART        (256*GALAXIAN_XSCALE)
+static constexpr int GALAXIAN_HTOTAL  = (384 * GALAXIAN_XSCALE);
+static constexpr int GALAXIAN_HBEND   = (0 * GALAXIAN_XSCALE);
+//static constexpr int GALAXIAN_H0START = (6*GALAXIAN_XSCALE)
+//static constexpr int GALAXIAN_HBSTART = (264*GALAXIAN_XSCALE)
+static constexpr int GALAXIAN_H0START = (0 * GALAXIAN_XSCALE);
+static constexpr int GALAXIAN_HBSTART = (256 * GALAXIAN_XSCALE);
 
-#define GALAXIAN_VTOTAL         (264)
-#define GALAXIAN_VBEND          (16)
-#define GALAXIAN_VBSTART        (224+16)
+static constexpr int GALAXIAN_VTOTAL  = (264);
+static constexpr int GALAXIAN_VBEND   = (16);
+static constexpr int GALAXIAN_VBSTART = (224 + 16);
 
+static constexpr int SIDAM_HTOTAL     = (384 * SIDAM_XSCALE);
+static constexpr int SIDAM_HBEND      = (0 * SIDAM_XSCALE);
+static constexpr int SIDAM_H0START    = (0 * SIDAM_XSCALE);
+static constexpr int SIDAM_HBSTART    = (256 * SIDAM_XSCALE);
+
+} // anonymous namespace
 
 class galaxian_state : public driver_device
 {
@@ -81,7 +99,6 @@ public:
 	DECLARE_WRITE8_MEMBER(scramble_background_green_w);
 	DECLARE_WRITE8_MEMBER(scramble_background_blue_w);
 	DECLARE_WRITE8_MEMBER(galaxian_gfxbank_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(scramble_protection_alt_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gmgalax_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(azurian_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kingball_muxbit_r);
@@ -97,6 +114,9 @@ public:
 	DECLARE_WRITE8_MEMBER(konami_sound_filter_w);
 	DECLARE_READ8_MEMBER(theend_ppi8255_r);
 	DECLARE_WRITE8_MEMBER(theend_ppi8255_w);
+	DECLARE_WRITE8_MEMBER(theend_protection_w);
+	DECLARE_READ8_MEMBER(theend_protection_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(theend_protection_alt_r);
 	DECLARE_WRITE8_MEMBER(explorer_sound_control_w);
 	DECLARE_READ8_MEMBER(sfx_sample_io_r);
 	DECLARE_WRITE8_MEMBER(sfx_sample_io_w);
@@ -144,8 +164,6 @@ public:
 	DECLARE_WRITE8_MEMBER(konami_portc_0_w);
 	DECLARE_WRITE8_MEMBER(konami_portc_1_w);
 	DECLARE_WRITE8_MEMBER(theend_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(scramble_protection_w);
-	DECLARE_READ8_MEMBER(scramble_protection_r);
 	DECLARE_READ8_MEMBER(explorer_sound_latch_r);
 	DECLARE_WRITE8_MEMBER(sfx_sample_control_w);
 	DECLARE_WRITE8_MEMBER(monsterz_porta_1_w);
@@ -187,7 +205,9 @@ public:
 	void init_scorpnmc();
 	void init_theend();
 	void init_scramble();
+	void init_sidam();
 	void init_explorer();
+	void init_amigo2();
 	void init_mandinga();
 	void init_sfx();
 	void init_atlantis();
@@ -215,8 +235,8 @@ public:
 	DECLARE_PALETTE_INIT(moonwar);
 	void tenspot_set_game_bank(int bank, int from_game);
 	uint32_t screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt_gen);
-	INTERRUPT_GEN_MEMBER(fakechange_interrupt_gen);
+	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
+	DECLARE_WRITE_LINE_MEMBER(tenspot_interrupt_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
@@ -226,6 +246,7 @@ public:
 	void stars_init();
 	void stars_update_origin();
 	void stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs, uint8_t starmask);
+	void null_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void background_draw_colorsplit(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t color, int split, int split_flipped);
 	void scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx);
@@ -233,8 +254,8 @@ public:
 	void anteater_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void turtles_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void frogger_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void quaak_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void galaxian_draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, rgb_t color);
 	void galaxian_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void mshuttle_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
@@ -273,6 +294,7 @@ public:
 	void common_init(galaxian_draw_bullet_func draw_bullet,galaxian_draw_background_func draw_background,
 					 galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);
 	void galaxian_base(machine_config &config);
+	void sidam_bootleg_base(machine_config &config);
 	void konami_base(machine_config &config);
 	void konami_sound_1x_ay8910(machine_config &config);
 	void konami_sound_2x_ay8910(machine_config &config);
@@ -292,6 +314,7 @@ public:
 	void gmgalax(machine_config &config);
 	void tenspot(machine_config &config);
 	void froggers(machine_config &config);
+	void froggervd(machine_config &config);
 	void mshuttle(machine_config &config);
 	void anteateruk(machine_config &config);
 	void monsterz(machine_config &config);
@@ -323,9 +346,6 @@ public:
 	void kong(machine_config &config);
 	void scorpnmc(machine_config &config);
 
-	void galaxian_audio(machine_config &config);
-	void mooncrst_audio(machine_config &config);
-
 protected:
 	void amigo2_map(address_map &map);
 	void anteaterg_map(address_map &map);
@@ -339,6 +359,7 @@ protected:
 	void frogf_map(address_map &map);
 	void frogg_map(address_map &map);
 	void frogger_map(address_map &map);
+	void froggervd_map(address_map &map);
 	void frogger_sound_map(address_map &map);
 	void frogger_sound_portmap(address_map &map);
 	void froggeram_map(address_map &map);
@@ -378,7 +399,6 @@ protected:
 	void tenspot_select_map(address_map &map);
 	void theend_map(address_map &map);
 	void thepitm_map(address_map &map);
-	void timefgtr_map(address_map &map);
 	void turpins_map(address_map &map);
 	void turpins_sound_map(address_map &map);
 	void turtles_map(address_map &map);
@@ -429,6 +449,8 @@ protected:
 	int m_irq_line;
 	int m_tenspot_current_game;
 	uint8_t m_frogger_adjust;
+	uint8_t m_x_scale;
+	uint8_t m_h0_start;
 	uint8_t m_sfx_tilemap;
 
 	galaxian_extend_tile_info_func m_extend_tile_info_ptr;
@@ -452,3 +474,5 @@ protected:
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5];
 };
+
+#endif // MAME_INCLUDES_GALAXIAN_H

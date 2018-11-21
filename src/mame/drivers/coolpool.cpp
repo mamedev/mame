@@ -17,6 +17,8 @@
     The second CPU in Cool Pool and 9 Ball Shootout is a TMS320C26; the code
     is the same in the two games.
 
+    The audio DAC is a Micro Power Systems MP1210HN.
+
     Cool Pool:
     - The checksum test routine is wrong, e.g. when it says to be testing
       4U/8U it is actually reading 4U/8U/3U/7U, when testing 3U/7U it
@@ -730,9 +732,9 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, coolpool_state, amerdart_dsp_bio_line_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
 
-	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
-	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
+	GENERIC_LATCH_16(config, m_main2dsp);
+	GENERIC_LATCH_16(config, m_dsp2main);
+	m_dsp2main->data_pending_callback().set_inputline(m_maincpu, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -746,7 +748,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -764,20 +766,20 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
 
-	MCFG_DEVICE_ADD("dsp", TMS32026,XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(coolpool_dsp_pgm_map)
-	MCFG_DEVICE_IO_MAP(coolpool_dsp_io_map)
-	MCFG_TMS32025_BIO_IN_CB(READ16(*this, coolpool_state, dsp_bio_line_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, coolpool_state, dsp_hold_line_r))
-//  MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, coolpool_state, dsp_HOLDA_signal_w))
+	tms32026_device& dsp(TMS32026(config, m_dsp, XTAL(40'000'000)));
+	dsp.set_addrmap(AS_PROGRAM, &coolpool_state::coolpool_dsp_pgm_map);
+	dsp.set_addrmap(AS_IO, &coolpool_state::coolpool_dsp_io_map);
+	dsp.bio_in_cb().set(FUNC(coolpool_state::dsp_bio_line_r));
+	dsp.hold_in_cb().set(FUNC(coolpool_state::dsp_hold_line_r));
+//  dsp.hold_ack_out_cb().set(FUNC(coolpool_state::dsp_HOLDA_signal_w));
 
-	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("dsp", 0)) /* ???  I have no idea who should generate this! */
+	GENERIC_LATCH_16(config, m_main2dsp);
+	m_main2dsp->data_pending_callback().set_inputline(m_dsp, 0); /* ???  I have no idea who should generate this! */
 															/* the DSP polls the status bit so it isn't strictly */
 															/* necessary to also have an IRQ */
 
-	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
+	GENERIC_LATCH_16(config, m_dsp2main);
+	m_dsp2main->data_pending_callback().set_inputline(m_maincpu, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -793,7 +795,7 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -805,8 +807,7 @@ MACHINE_CONFIG_START(coolpool_state::_9ballsht)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(nballsht_map)
 
-	MCFG_DEVICE_MODIFY("dsp")
-	MCFG_DEVICE_IO_MAP(nballsht_dsp_io_map)
+	subdevice<tms32026_device>("dsp")->set_addrmap(AS_IO, &coolpool_state::nballsht_dsp_io_map);
 MACHINE_CONFIG_END
 
 

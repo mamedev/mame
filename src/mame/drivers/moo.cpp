@@ -509,8 +509,8 @@ MACHINE_CONFIG_START(moo_state::moo)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) // 8MHz
-	MCFG_K053252_OFFSETS(40, 16)
+	K053252(config, m_k053252, XTAL(32'000'000)/4); // 8MHz
+	m_k053252->set_offsets(40, 16);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -546,15 +546,13 @@ MACHINE_CONFIG_START(moo_state::moo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'000'000)/8) // 4MHz verified
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50); // 4MHz verified
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(moo_state::moobl)

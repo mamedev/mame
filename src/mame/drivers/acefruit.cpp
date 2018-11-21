@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 	MCFG_DEVICE_IO_MAP(acefruit_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acefruit)
 

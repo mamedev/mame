@@ -22,27 +22,26 @@
 #include "video/seta001.h"
 #include "emupal.h"
 
-#define __uPD71054_TIMER    1
-
-struct uPD71054_state
-{
-	emu_timer *timer[3];            // Timer
-	uint16_t  max[3];             // Max counter
-	uint16_t  write_select;       // Max counter write select
-	uint8_t   reg[4];             //
-};
-
-struct game_offset
-{
-	/* 2 values, for normal and flipped */
-	const char *gamename;
-	int sprite_offs[2];
-	int tilemap_offs[2];
-};
 
 class seta_state : public driver_device
 {
 public:
+	struct uPD71054_state
+	{
+		emu_timer *timer[3];            // Timer
+		uint16_t  max[3];             // Max counter
+		uint16_t  write_select;       // Max counter write select
+		uint8_t   reg[4];             //
+	};
+
+	struct game_offset
+	{
+		/* 2 values, for normal and flipped */
+		const char *gamename;
+		int sprite_offs[2];
+		int tilemap_offs[2];
+	};
+
 	seta_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
@@ -304,7 +303,7 @@ protected:
 	void set_pens();
 	void usclssic_set_pens();
 	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen);
-	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac );
+	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size);
 	void rearrange_gfx();
 	void uPD71054_timer_init(  );
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);

@@ -76,8 +76,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(sod_led)                      { output().set_value("sod_led", state); }
 	DECLARE_READ_LINE_MEMBER(sid_line)                      { return m_rxd ? 1 : 0; }
 
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pa);
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pb);
+	virtual DECLARE_WRITE8_MEMBER(update_ppi_pa);
+	virtual DECLARE_WRITE8_MEMBER(update_ppi_pb);
 
 	void sitcom_bank(address_map &map);
 	void sitcom_io(address_map &map);
@@ -107,7 +107,7 @@ public:
 	sitcom_timer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sitcom_state(mconfig, type, tag)
 		, m_speed(*this, "SPEED")
-		, m_pia(*this, "pia")
+		, m_ppi(*this, "ppi")
 		, m_ds2(*this, "ds2")
 		, m_shutter_timer(nullptr)
 		, m_shutter(false)
@@ -123,8 +123,8 @@ public:
 	void sitcomtmr(machine_config &config);
 
 protected:
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pa) override;
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pb) override;
+	virtual DECLARE_WRITE8_MEMBER(update_ppi_pa) override;
+	virtual DECLARE_WRITE8_MEMBER(update_ppi_pb) override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -134,7 +134,7 @@ protected:
 	void update_dac(uint8_t value);
 
 	required_ioport                 m_speed;
-	required_device<i8255_device>   m_pia;
+	required_device<i8255_device>   m_ppi;
 	required_device<dl1414_device>  m_ds2;
 	emu_timer                       *m_shutter_timer;
 
@@ -161,7 +161,7 @@ void sitcom_state::sitcom_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x03).mirror(0x1c).rw("pia", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x00, 0x03).mirror(0x1c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc0, 0xc3).mirror(0x1c).w("ds0", FUNC(dl1414_device::bus_w));
 	map(0xe0, 0xe3).mirror(0x1c).w("ds1", FUNC(dl1414_device::bus_w));
 }
@@ -224,13 +224,13 @@ void sitcom_state::machine_reset()
 	m_bank->set_bank(0);
 }
 
-WRITE8_MEMBER( sitcom_state::update_pia_pa )
+WRITE8_MEMBER( sitcom_state::update_ppi_pa )
 {
 	for (int i = 0; 8 > i; ++i)
 		m_leds[0][i] = BIT(data, i);
 }
 
-WRITE8_MEMBER( sitcom_state::update_pia_pb )
+WRITE8_MEMBER( sitcom_state::update_ppi_pb )
 {
 	for (int i = 0; 8 > i; ++i)
 		m_leds[1][i] = BIT(data, i);
@@ -250,7 +250,7 @@ INPUT_CHANGED_MEMBER( sitcom_state::update_buttons )
 }
 
 
-WRITE8_MEMBER( sitcom_timer_state::update_pia_pa )
+WRITE8_MEMBER( sitcom_timer_state::update_ppi_pa )
 {
 	if (!m_dac_cs && !m_dac_wr)
 		update_dac(data);
@@ -258,10 +258,10 @@ WRITE8_MEMBER( sitcom_timer_state::update_pia_pa )
 	m_ds2->data_w(data & 0x7f);
 }
 
-WRITE8_MEMBER( sitcom_timer_state::update_pia_pb )
+WRITE8_MEMBER( sitcom_timer_state::update_ppi_pb )
 {
 	if (!m_dac_cs && !BIT(data, 0))
-		update_dac(m_pia->read_pa());
+		update_dac(m_ppi->pa_r());
 	m_dac_wr = BIT(data, 0);
 	m_dac_cs = BIT(data, 1);
 
@@ -360,10 +360,10 @@ MACHINE_CONFIG_START(sitcom_state::sitcom)
 	MCFG_CLOCK_ADD("100hz", 100)
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
 
-	MCFG_DEVICE_ADD("pia", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sitcom_state, update_pia_pa))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sitcom_state, update_pia_pb))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("PORTC"))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(sitcom_state::update_ppi_pa));
+	ppi.out_pb_callback().set(FUNC(sitcom_state::update_ppi_pb));
+	ppi.in_pc_callback().set_ioport("PORTC");
 
 	// video hardware
 	MCFG_DEVICE_ADD("ds0", DL1414T, u32(0)) // left display
@@ -372,8 +372,8 @@ MACHINE_CONFIG_START(sitcom_state::sitcom)
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_state, update_ds<1>))
 
 	// host interface
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, sitcom_state, update_rxd))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
+	rs232.rxd_handler().set(FUNC(sitcom_state::update_rxd));
 
 	MCFG_SOFTWARE_LIST_ADD("bitb_list", "sitcom")
 	config.set_default_layout(layout_sitcom);

@@ -143,6 +143,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
+#include "bus/sunmouse/sunmouse.h"
 
 #include "screen.h"
 
@@ -156,6 +157,7 @@
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define KEYBOARD_TAG    "keyboard"
+#define MOUSE_TAG       "mouseport"
 
 class sun3x_state : public driver_device
 {
@@ -597,22 +599,24 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
 	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
@@ -621,7 +625,7 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	MCFG_DEVICE_ADD(ESP_TAG, NCR539X, 20000000/2)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 
-	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
+	N82077AA(config, m_fdc, n82077aa_device::MODE_PS2);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun3x_state::floppy_formats)
 
 	// the timekeeper has no interrupt output, so 3/80 includes a dedicated timer circuit
@@ -634,28 +638,29 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	MCFG_SCREEN_REFRESH_RATE(72)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sun3x_state::sun3_460)
+void sun3x_state::sun3_460(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68030, 33000000)
-	MCFG_DEVICE_PROGRAM_MAP(sun3_460_mem)
+	M68030(config, m_maincpu, 33000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun3x_state::sun3_460_mem);
 
-	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
+	M48T02(config, TIMEKEEPER_TAG, 0);
 
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
 	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
+}
 
 /* ROM definition */
 

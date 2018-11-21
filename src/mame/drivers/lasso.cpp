@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(lasso_state::base)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("sn76489.1", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -609,11 +609,9 @@ MACHINE_CONFIG_START(lasso_state::pinbo)
 	MCFG_DEVICE_REMOVE("sn76489.1")
 	MCFG_DEVICE_REMOVE("sn76489.2")
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
+	AY8910(config, "ay1", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'000'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
+	AY8910(config, "ay2", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);
 MACHINE_CONFIG_END
 
 

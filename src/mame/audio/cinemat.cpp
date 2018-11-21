@@ -1392,37 +1392,34 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_START(demon_state::demon_sound)
-
+void demon_state::demon_sound(machine_config &config)
+{
 	/* basic machine hardware */
 	z80_device& audiocpu(Z80(config, "audiocpu", 3579545));
 	audiocpu.set_daisy_config(daisy_chain);
 	audiocpu.set_addrmap(AS_PROGRAM, &demon_state::demon_sound_map);
 	audiocpu.set_addrmap(AS_IO, &demon_state::demon_sound_ports);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 3579545 /* same as "audiocpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", 3579545 /* same as "audiocpu" */));
+	ctc.intr_callback().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
 	m_outlatch->q_out_cb<4>().set(FUNC(demon_state::demon_sound4_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 3579545)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, demon_state, sound_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, demon_state, sound_portb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, demon_state, sound_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay1, 3579545);
+	m_ay1->port_a_read_callback().set(FUNC(demon_state::sound_porta_r));
+	m_ay1->port_b_read_callback().set(FUNC(demon_state::sound_portb_r));
+	m_ay1->port_b_write_callback().set(FUNC(demon_state::sound_portb_w));
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", 3579545).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, 3579545)
-
-
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, demon_state, sound_output_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	ay8910_device &ay3(AY8910(config, "ay3", 3579545));
+	ay3.port_b_write_callback().set(FUNC(demon_state::sound_output_w));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

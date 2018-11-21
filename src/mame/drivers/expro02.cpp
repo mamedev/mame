@@ -950,8 +950,7 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 
 
 	/* arm watchdog */
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -976,8 +975,7 @@ MACHINE_CONFIG_START(expro02_state::comad)
 	MCFG_KANEKO_TMAP_INVERT_FLIP(1)
 	MCFG_KANEKO_TMAP_OFFSET(-256, -216, 256, 224)
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(0));  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(expro02_state::comad_noview2)

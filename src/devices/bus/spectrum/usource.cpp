@@ -60,7 +60,6 @@ spectrum_usource_device::spectrum_usource_device(const machine_config &mconfig, 
 
 void spectrum_usource_device::device_start()
 {
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
 }
 
 

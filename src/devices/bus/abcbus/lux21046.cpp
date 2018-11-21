@@ -290,8 +290,9 @@ static const z80_daisy_config z80_daisy_chain[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(luxor_55_21046_device::device_add_mconfig)
- 	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+void luxor_55_21046_device::device_add_mconfig(machine_config & config)
+{
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
 	m_maincpu->set_daisy_config(z80_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luxor_55_21046_device::luxor_55_21046_mem);
 	m_maincpu->set_addrmap(AS_IO, &luxor_55_21046_device::luxor_55_21046_io);
@@ -304,40 +305,45 @@ MACHINE_CONFIG_START(luxor_55_21046_device::device_add_mconfig)
 	m_dma->in_iorq_callback().set(FUNC(luxor_55_21046_device::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(luxor_55_21046_device::io_write_byte));
 
-	MCFG_DEVICE_ADD(SAB1793_TAG, FD1793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, luxor_55_21046_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(m_dma, z80dma_device, rdy_w))
-MACHINE_CONFIG_END
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(luxor_55_21046_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
+}
 
-MACHINE_CONFIG_START(abc830_device::device_add_mconfig)
+void abc830_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(abc832_device::device_add_mconfig)
+void abc832_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(abc834_device::device_add_mconfig)
+void abc834_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(abc838_device::device_add_mconfig)
+void abc838_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(abc850_floppy_device::device_add_mconfig)
+void abc850_floppy_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, nullptr, luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, nullptr, luxor_55_21046_device::floppy_formats);
+}
 
 
 //-------------------------------------------------
@@ -708,11 +714,11 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
+	m_floppy0(*this, SAB1793_TAG":0"),
+	m_floppy1(*this, SAB1793_TAG":1"),
 	m_maincpu(*this, Z80_TAG),
 	m_dma(*this, Z80DMA_TAG),
 	m_fdc(*this, SAB1793_TAG),
-	m_floppy0(*this, SAB1793_TAG":0"),
-	m_floppy1(*this, SAB1793_TAG":1"),
 	m_floppy(nullptr),
 	m_sw1(*this, "SW1"),
 	m_sw2(*this, "SW2"),

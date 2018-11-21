@@ -170,10 +170,10 @@ private:
 		DMA_BUSEXC       = 0x10
 	};
 
-	static const char *dma_targets[0x20];
-	static const int dma_irqs[0x20];
-	static const bool dma_has_saved[0x20];
-	static const int scsi_clocks[4];
+	static char const *const dma_targets[0x20];
+	static int const dma_irqs[0x20];
+	static bool const dma_has_saved[0x20];
+	static int const scsi_clocks[4];
 
 	dma_slot dma_slots[0x20];
 	uint32_t esp;

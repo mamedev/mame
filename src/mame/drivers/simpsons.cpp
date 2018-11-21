@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(simpsons_state::simpsons)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -369,11 +369,11 @@ MACHINE_CONFIG_START(simpsons_state::simpsons)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)    /* only left channel is connected */
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.add_route(0, "lspeaker", 1.0);    /* only left channel is connected */
+	ymsnd.add_route(0, "rspeaker", 1.0);
+	ymsnd.add_route(1, "lspeaker", 0.0);
+	ymsnd.add_route(1, "rspeaker", 0.0);
 
 	MCFG_DEVICE_ADD("k053260", K053260, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
@@ -416,7 +416,7 @@ ROM_START( simpsons ) /* World 4 Player */
 	ROM_LOAD( "simpsons.12c.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
 ROM_END
 
-ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
+ROM_START( simpsons4pe ) /* World 4 Player, later? (by use of later leters) */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "072-g02.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
 	ROM_LOAD( "072-g01.17c", 0x20000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )
@@ -425,6 +425,35 @@ ROM_START( simpsons4pa ) /* World 4 Player, later? (by use of later leters) */
 
 	ROM_REGION( 0x28000, "audiocpu", 0 ) /* Z80 code + banks */
 	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
+	ROM_CONTINUE(       0x10000, 0x18000 )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )
+	ROM_LOAD32_WORD( "072-b06.16h", 0x000002, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics */
+	ROM_LOAD64_WORD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) ) /* sprites */
+	ROM_LOAD64_WORD( "072-b09.8n",  0x000002, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
+	ROM_LOAD64_WORD( "072-b10.12n", 0x000004, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
+	ROM_LOAD64_WORD( "072-b11.16l", 0x000006, 0x100000, CRC(55fab05d) SHA1(54db8559d71ed257de9a29c8808654eaea0df9e2) )
+
+	ROM_REGION( 0x140000, "k053260", 0 ) /* samples for the 053260 */
+	ROM_LOAD( "072-d05.1f", 0x000000, 0x100000, CRC(1397a73b) SHA1(369422c84cca5472967af54b8351e29fcd69f621) )
+	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "simpsons4pe.12c.nv", 0x0000, 0x080, CRC(ec3f0449) SHA1(da35b98cd10bfabe9df3ede05462fabeb0e01ca9) )
+ROM_END
+
+ROM_START( simpsons4pa ) /* Asia 4 Player */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "072-v02.16c", 0x00000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
+	ROM_LOAD( "072-v01.17c", 0x20000, 0x20000, CRC(effd6c09) SHA1(e5bcdb753bccdd76de18ad6ff7346f74fd02a78f) )
+	ROM_LOAD( "072-x13.13c", 0x40000, 0x20000, CRC(3304abb9) SHA1(8f23160077f30d76c0c73e0b3f20996826433566) )
+	ROM_LOAD( "072-x12.15c", 0x60000, 0x20000, CRC(fa4fca12) SHA1(3b52a8a52bddfa73d8577315b655eb57ac758326) )
+
+	ROM_REGION( 0x28000, "audiocpu", 0 ) /* Z80 code + banks */
+	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
 	ROM_CONTINUE(       0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
@@ -601,7 +630,8 @@ ROM_END
 
 // the region warning, if one exists, is shown after the high-score screen in attract mode
 GAME( 1991, simpsons,    0,        simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pe, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, simpsons4pa, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (4 Players Asia)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1991, simpsons2p,  simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, simpsons2p2, simpsons, simpsons, simpsons, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, simpsons2p3, simpsons, simpsons, simpsn2p, simpsons_state, empty_init, ROT0, "Konami", "The Simpsons (2 Players World, set 3)", MACHINE_SUPPORTS_SAVE )

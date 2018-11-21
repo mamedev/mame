@@ -852,15 +852,15 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* 3x 8255 */
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amaticmg_state, out_a_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SW1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amaticmg_state, out_c_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(amaticmg_state::out_a_w));
+	ppi1.in_pb_callback().set_ioport("SW1");
+	ppi1.out_pc_callback().set(FUNC(amaticmg_state::out_c_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -871,10 +871,11 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // no NMI mask?
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // no NMI mask?
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amaticmg)
 
@@ -902,13 +903,12 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(amaticmg2_portmap)
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
+	I8255A(config, "ppi8255_2"); // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
-	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
+	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")
@@ -923,13 +923,12 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(amaticmg4_portmap)
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
+	I8255A(config, "ppi8255_2"); // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
-	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
+	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")

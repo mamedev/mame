@@ -111,7 +111,6 @@ public:
 	void granny_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
 	void video_map(address_map &map);
 private:
 	uint8_t m_mpu_to_vid;
@@ -190,12 +189,6 @@ void by133_state::granny_map(address_map &map)
 void by133_state::sound_map(address_map &map)
 { // U27 Vidiot
 	map(0xc000, 0xffff).rom();
-}
-
-void by133_state::sound_portmap(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).w("dac", FUNC(dac_byte_interface::data_w)); // P10-P17
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(by133_state::m6803_port2_r), FUNC(by133_state::m6803_port2_w)); // P20-P24 sound command in
 }
 
 
@@ -761,9 +754,11 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	MCFG_DEVICE_ADD("videocpu", MC6809, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(video_map)
 
-	MCFG_DEVICE_ADD("audiocpu", M6803, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	M6803(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &by133_state::sound_map);
+	m_audiocpu->out_p1_cb().set("dac", FUNC(dac_byte_interface::data_w)); // P10-P17
+	m_audiocpu->in_p2_cb().set(FUNC(by133_state::m6803_port2_r)); // P20-P24 sound command in
+	m_audiocpu->out_p2_cb().set(FUNC(by133_state::m6803_port2_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -394,10 +394,10 @@ MACHINE_CONFIG_START(poker72_state::poker72)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay", AY8910, 8000000/8) /* ? Mhz */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay(AY8910(config, "ay", 8000000/8)); /* ? Mhz */
+	ay.port_a_read_callback().set_ioport("SW2");
+	ay.port_b_read_callback().set_ioport("SW3");
+	ay.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 
