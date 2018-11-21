@@ -342,6 +342,31 @@ ROM_START( klax2bl ) // derived from 'klax2' set
 	ROM_LOAD( "8.bin", 0x10000, 0x10000, CRC(36764bbc) SHA1(5762996a327b5f7f93f42dad7eccb6297b3e4c0b) )
 ROM_END
 
+ROM_START( klax2bl2 ) // derived from 'klax2' set, closer than klax2bl
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
+	ROM_LOAD16_BYTE( "3.ic31", 0x00000, 0x10000, CRC(e43699f3) SHA1(2a78959ad065e1c0f69cc2ba4146a50102ccfd7e) )
+	ROM_LOAD16_BYTE( "1.ic13", 0x00001, 0x10000, CRC(dc67f13a) SHA1(6021f48b53f9000983bcd786b8366ba8638174de) )
+	ROM_LOAD16_BYTE( "4.ic30", 0x20000, 0x10000, CRC(f1b8e588) SHA1(080511f90aecb7526ab2107c196e73cb881a2bb5) )
+	ROM_LOAD16_BYTE( "2.ic12", 0x20001, 0x10000, CRC(adbe33a8) SHA1(c6c4f9ea5224169dbf4dda1062954563ebab18d4) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )
+	ROM_LOAD( "6.ic22", 0x00000, 0x10000, CRC(edd4c42c) SHA1(22f992615afa24a7a671ed2f5cf08f25965d5b3a) )
+	ROM_LOAD( "5.ic23", 0x10000, 0x10000, CRC(a245e005) SHA1(8843edfa9deec405f491647d40007d0a38c25262) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "8.ic116",  0x00000, 0x10000, CRC(ebe4bd96) SHA1(31f941e39aeaed6a64b35827df4d234cd641b47d) )
+	ROM_LOAD( "7.ic117",  0x10000, 0x10000, CRC(3b79c0d3) SHA1(f6910f2526e1d92eae260b5eb73b1672db891f4b) )
+	ROM_LOAD( "12.ic134", 0x20000, 0x10000, CRC(ef7712fd) SHA1(9308b37a8b024837b32d10e358a5205fdc582214) )
+	ROM_LOAD( "11.ic135", 0x30000, 0x10000, CRC(c2d8ce0c) SHA1(6b2f3c3f5f238dc00501646230dc8787dd862ed4) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "10.ic101", 0x00000, 0x10000, CRC(5c551e92) SHA1(cbff8fc4f4d370b6db2b4953ecbedd249916b891) )
+	ROM_LOAD( "9.ic102",  0x10000, 0x10000, CRC(29708e34) SHA1(6bea1527ad941fbb1abfad59ef3d78900dcd7f27) )
+
+	ROM_REGION( 0x400, "plds", 0) // protected
+	ROM_LOAD( "palce16v8.ic67", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8.ic91", 0x200, 0x117, NO_DUMP )
+ROM_END
 
 ROM_START( klax3 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
@@ -446,4 +471,5 @@ GAME( 1989, klax3,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari G
 GAME( 1989, klaxj,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Japan)", 0 )
 GAME( 1989, klaxd,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Germany)", 0 )
 
-GAME( 1989, klax2bl, klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (set 2, bootleg)", MACHINE_NOT_WORKING )
+GAME( 1989, klax2bl, klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (set 2, bootleg set 1)", MACHINE_NOT_WORKING )
+GAME( 1989, klax2bl2,klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (set 2, bootleg set 2)", MACHINE_NOT_WORKING )
