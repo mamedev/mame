@@ -337,8 +337,13 @@ void am7990_device_base::transmit()
 			else
 			{
 				// buffer error
+				m_tx_md[1] |= TMD1_ERR;
 				m_tx_md[3] |= TMD3_BUFF | TMD3_UFLO;
 				m_dma_out_cb(ring_address | 6, m_tx_md[3]);
+
+				// turn off the transmitter
+				m_csr[0] &= ~CSR0_TXON;
+				m_transmit_poll->enable(false);
 				break;
 			}
 		}
@@ -368,12 +373,22 @@ void am7990_device_base::transmit()
 	// handle internal loopback
 	if ((m_mode & MODE_LOOP) && (m_mode & MODE_INTL))
 	{
+		// forced collision
+		if (m_mode & MODE_COLL)
+		{
+			send_complete_cb(-1);
+			return;
+		}
+
 		int const fcs_length = add_fcs ? 4 : 0;
 
 		if ((length - fcs_length) < 8 || (length - fcs_length) > 32)
 		{
 			logerror("transmit invalid loopback packet length %d\n", length - fcs_length);
-			length = 0;
+
+			// FIXME: don't know what to do, so just drop the packet
+			send_complete_cb(-2);
+			return;
 		}
 
 		memcpy(m_lb_buf, buf, length);
@@ -389,9 +404,23 @@ void am7990_device_base::send_complete_cb(int result)
 {
 	u32 const ring_address = (m_tx_ring_base + (m_tx_ring_pos << 3)) & RING_ADDR_MASK;
 
-	// FIXME: flag a loss of carrier on error
-	if (!result)
+	// update tmd3 on error
+	switch (result)
+	{
+	case -2: // invalid internal loopback packet
+		m_tx_md[1] |= TMD1_ERR;
+		break;
+
+	case -1: // forced collision
+		m_tx_md[1] |= TMD1_ERR;
+		m_dma_out_cb(ring_address | 6, m_tx_md[3] | TMD3_RTRY);
+		break;
+
+	case 0: // failure to transmit (assume loss of carrier)
+		m_tx_md[1] |= TMD1_ERR;
 		m_dma_out_cb(ring_address | 6, m_tx_md[3] | TMD3_LCAR);
+		break;
+	}
 
 	// release the current descriptor
 	m_dma_out_cb(ring_address | 2, m_tx_md[1] & ~TMD1_OWN);
