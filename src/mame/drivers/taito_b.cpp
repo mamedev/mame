@@ -1762,14 +1762,14 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x40)
-	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
-	MCFG_TC0180VCU_FG_COLORBASE(0x80)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_2))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x40);
+	m_tc0180vcu->set_bg_colorbase(0xc0);
+	m_tc0180vcu->set_fg_colorbase(0x80);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1819,14 +1819,14 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x10)
-	MCFG_TC0180VCU_BG_COLORBASE(0x30)
-	MCFG_TC0180VCU_FG_COLORBASE(0x20)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x10);
+	m_tc0180vcu->set_bg_colorbase(0x30);
+	m_tc0180vcu->set_fg_colorbase(0x20);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1897,14 +1897,14 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x40)
-	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
-	MCFG_TC0180VCU_FG_COLORBASE(0x80)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_2))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x40);
+	m_tc0180vcu->set_bg_colorbase(0xc0);
+	m_tc0180vcu->set_fg_colorbase(0x80);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1954,14 +1954,14 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x80)
-	MCFG_TC0180VCU_BG_COLORBASE(0x00)
-	MCFG_TC0180VCU_FG_COLORBASE(0x40)
-	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x80);
+	m_tc0180vcu->set_bg_colorbase(0x00);
+	m_tc0180vcu->set_fg_colorbase(0x40);
+	m_tc0180vcu->set_tx_colorbase(0xc0);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_3, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2013,14 +2013,14 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,hitice)
 	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4) // nominally "6.6 MHZ"
-	MCFG_TC0180VCU_FB_COLORBASE(0x40)
-	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
-	MCFG_TC0180VCU_FG_COLORBASE(0x80)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4); // nominally "6.6 MHZ"
+	m_tc0180vcu->set_fb_colorbase(0x40);
+	m_tc0180vcu->set_bg_colorbase(0xc0);
+	m_tc0180vcu->set_fg_colorbase(0x80);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2075,14 +2075,14 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x40)
-	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
-	MCFG_TC0180VCU_FG_COLORBASE(0x80)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_1))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x40);
+	m_tc0180vcu->set_bg_colorbase(0xc0);
+	m_tc0180vcu->set_fg_colorbase(0x80);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_1, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2133,14 +2133,14 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x10)
-	MCFG_TC0180VCU_BG_COLORBASE(0x30)
-	MCFG_TC0180VCU_FG_COLORBASE(0x20)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_1))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x10);
+	m_tc0180vcu->set_bg_colorbase(0x30);
+	m_tc0180vcu->set_fg_colorbase(0x20);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_1, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2196,14 +2196,14 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x80)
-	MCFG_TC0180VCU_BG_COLORBASE(0x00)
-	MCFG_TC0180VCU_FG_COLORBASE(0x40)
-	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x80);
+	m_tc0180vcu->set_bg_colorbase(0x00);
+	m_tc0180vcu->set_fg_colorbase(0x40);
+	m_tc0180vcu->set_tx_colorbase(0xc0);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_3, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2259,14 +2259,14 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x80)
-	MCFG_TC0180VCU_BG_COLORBASE(0x00)
-	MCFG_TC0180VCU_FG_COLORBASE(0x40)
-	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x80);
+	m_tc0180vcu->set_bg_colorbase(0x00);
+	m_tc0180vcu->set_fg_colorbase(0x40);
+	m_tc0180vcu->set_tx_colorbase(0xc0);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_3, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2316,14 +2316,14 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x10)
-	MCFG_TC0180VCU_BG_COLORBASE(0x30)
-	MCFG_TC0180VCU_FG_COLORBASE(0x20)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x10);
+	m_tc0180vcu->set_bg_colorbase(0x30);
+	m_tc0180vcu->set_fg_colorbase(0x20);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2379,14 +2379,14 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x80)
-	MCFG_TC0180VCU_BG_COLORBASE(0x00)
-	MCFG_TC0180VCU_FG_COLORBASE(0x40)
-	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x80);
+	m_tc0180vcu->set_bg_colorbase(0x00);
+	m_tc0180vcu->set_fg_colorbase(0x40);
+	m_tc0180vcu->set_tx_colorbase(0xc0);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_3, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2436,14 +2436,14 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x10)
-	MCFG_TC0180VCU_BG_COLORBASE(0x30)
-	MCFG_TC0180VCU_FG_COLORBASE(0x20)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_1))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x10);
+	m_tc0180vcu->set_bg_colorbase(0x30);
+	m_tc0180vcu->set_fg_colorbase(0x20);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_1, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2498,14 +2498,14 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x10)
-	MCFG_TC0180VCU_BG_COLORBASE(0x30)
-	MCFG_TC0180VCU_FG_COLORBASE(0x20)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x10);
+	m_tc0180vcu->set_bg_colorbase(0x30);
+	m_tc0180vcu->set_fg_colorbase(0x20);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2555,14 +2555,14 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x10)
-	MCFG_TC0180VCU_BG_COLORBASE(0x30)
-	MCFG_TC0180VCU_FG_COLORBASE(0x20)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x10);
+	m_tc0180vcu->set_bg_colorbase(0x30);
+	m_tc0180vcu->set_fg_colorbase(0x20);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2621,14 +2621,14 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x10)
-	MCFG_TC0180VCU_BG_COLORBASE(0x30)
-	MCFG_TC0180VCU_FG_COLORBASE(0x20)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x10);
+	m_tc0180vcu->set_bg_colorbase(0x30);
+	m_tc0180vcu->set_fg_colorbase(0x20);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2685,14 +2685,14 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_core)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x40)
-	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
-	MCFG_TC0180VCU_FG_COLORBASE(0x80)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_4))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_5))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x40);
+	m_tc0180vcu->set_bg_colorbase(0xc0);
+	m_tc0180vcu->set_fg_colorbase(0x80);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_4, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_5, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2743,14 +2743,14 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	MCFG_HD63484_ADD("hd63484", 0, realpunc_hd63484_map)
 	MCFG_HD63484_AUTO_CONFIGURE_SCREEN(false)
 
-	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 27.164_MHz_XTAL / 4)
-	MCFG_TC0180VCU_FB_COLORBASE(0x40)
-	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
-	MCFG_TC0180VCU_FG_COLORBASE(0x80)
-	MCFG_TC0180VCU_TX_COLORBASE(0x00)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_TC0180VCU_INTH_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_2))
-	MCFG_TC0180VCU_INTL_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_3))
+	TC0180VCU(config, m_tc0180vcu, 27.164_MHz_XTAL / 4);
+	m_tc0180vcu->set_fb_colorbase(0x40);
+	m_tc0180vcu->set_bg_colorbase(0xc0);
+	m_tc0180vcu->set_fg_colorbase(0x80);
+	m_tc0180vcu->set_tx_colorbase(0x00);
+	m_tc0180vcu->set_palette(m_palette);
+	m_tc0180vcu->inth_callback().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
+	m_tc0180vcu->intl_callback().set_inputline(m_maincpu, M68K_IRQ_3, HOLD_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

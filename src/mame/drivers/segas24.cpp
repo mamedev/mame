@@ -1945,10 +1945,9 @@ MACHINE_CONFIG_START(segas24_state::system24)
 	MCFG_TIMER_ADD_NONE("frc_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_frc", segas24_state, irq_frc_cb, attotime::from_hz(FRC_CLOCK_MODE1))
 
-	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0xfff)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_DEVICE_ADD("sprite", S24SPRITE, 0)
-	MCFG_DEVICE_ADD("mixer", S24MIXER, 0)
+	S24TILE(config, m_vtile, 0, 0xfff).set_palette("palette");
+	S24SPRITE(config, m_vsprite, 0);
+	S24MIXER(config, m_vmixer, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

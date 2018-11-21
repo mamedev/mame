@@ -542,10 +542,9 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_bloodbro)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, bloodbro_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, bloodbro_state, layer_scroll_w))
-
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(bloodbro_state::layer_en_w));
+	crtc.layer_scroll_callback().set(FUNC(bloodbro_state::layer_scroll_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bloodbro)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -589,7 +588,7 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(59)    /* verified on PCB */
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_weststry)
-	MCFG_DEVICE_REMOVE("crtc")
+	config.device_remove("crtc");
 
 	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
 

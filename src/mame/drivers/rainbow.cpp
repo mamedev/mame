@@ -3231,12 +3231,11 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_rainbow)
 
-	MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, 24.0734_MHz_XTAL)
-
-	MCFG_VT_SET_SCREEN("screen")
-	MCFG_VT_CHARGEN("chargen")
-	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(*this, rainbow_state, read_video_ram_r))
-	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(*this, rainbow_state, video_interrupt))
+	RAINBOW_VIDEO(config, m_crtc, 24.0734_MHz_XTAL);
+	m_crtc->set_screen("screen");
+	m_crtc->set_chargen("chargen");
+	m_crtc->ram_rd_callback().set(FUNC(rainbow_state::read_video_ram_r));
+	m_crtc->vert_freq_intr_wr_callback().set(FUNC(rainbow_state::video_interrupt));
 
 	// *************************** COLOR GRAPHICS (OPTION) **************************************
 	// While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).

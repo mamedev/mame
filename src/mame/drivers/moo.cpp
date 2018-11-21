@@ -538,9 +538,9 @@ MACHINE_CONFIG_START(moo_state::moo)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	K054338(config, m_k054338, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -593,9 +593,9 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	K054338(config, m_k054338, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

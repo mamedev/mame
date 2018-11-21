@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	K054338(config, m_k054338, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

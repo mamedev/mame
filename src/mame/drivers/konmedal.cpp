@@ -562,9 +562,9 @@ MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(konmedal_state, shuriboy_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback), this);
 
 	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
 

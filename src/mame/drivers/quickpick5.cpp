@@ -424,10 +424,10 @@ MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(-(44+80), 20)
-	MCFG_K05324X_CB(quickpick5_state, sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_offsets(-(44+80), 20);
+	m_k053245->set_sprite_callback(FUNC(quickpick5_state::sprite_callback), this);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 

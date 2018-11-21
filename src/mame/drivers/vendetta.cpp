@@ -459,9 +459,9 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(vendetta_state, vendetta_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback), this);
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(vendetta_state, sprite_callback)
@@ -498,9 +498,9 @@ MACHINE_CONFIG_START(vendetta_state::esckids)
 	MCFG_DEVICE_REMOVE("k054000")
 	MCFG_DEVICE_REMOVE("k052109")
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(vendetta_state, esckids_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback), this);
 
 	MCFG_DEVICE_MODIFY("k053246")
 	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 101, 6)

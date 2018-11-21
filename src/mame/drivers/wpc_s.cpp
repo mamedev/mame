@@ -1982,8 +1982,7 @@ MACHINE_CONFIG_START(wpc_s_state::wpc_s)
 	MCFG_DEVICE_ADD("pic", WPC_PIC, 0)
 	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
 	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 5)
-	MCFG_DEVICE_ADD("dmd", WPC_DMD, 0)
-	MCFG_WPC_DMD_SCANLINE_CALLBACK(WRITELINE(*this, wpc_s_state, scanline_irq))
+	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_s_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)

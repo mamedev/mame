@@ -1222,10 +1222,10 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_legionna)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_legionna)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
@@ -1276,11 +1276,10 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_heatbrl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
@@ -1333,11 +1332,11 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_BASE_CB(WRITE16(*this, legionna_state, tile_scroll_base_w))
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
+	m_crtc->layer_scroll_base_callback().set(FUNC(legionna_state::tile_scroll_base_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
@@ -1391,11 +1390,10 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1445,11 +1443,10 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grainbow)
 
@@ -1502,11 +1499,10 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cupsoc)
 

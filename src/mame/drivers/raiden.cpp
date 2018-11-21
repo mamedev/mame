@@ -430,9 +430,9 @@ MACHINE_CONFIG_START(raiden_state::raidenb)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(raiden_state,raidenb)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden_state, raidenb_layer_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden_state, raidenb_layer_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(raiden_state::raidenb_layer_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raiden_state::raidenb_layer_scroll_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raidenb)
