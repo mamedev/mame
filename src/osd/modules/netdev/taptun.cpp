@@ -28,8 +28,8 @@
 // for some reason this isn't defined in the header, and presumably it changes
 // with major? versions of the driver - perhaps it should be configurable?
 #define PRODUCT_TAP_WIN_COMPONENT_ID "tap0901"
-
 #endif
+
 // Ethernet minimum frame length
 static constexpr int ETHERNET_MIN_FRAME = 64;
 
