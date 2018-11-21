@@ -70,13 +70,5 @@ private:
 
 DECLARE_DEVICE_TYPE(ST0020_SPRITES, st0020_device)
 
-#define MCFG_ST0020_SPRITES_PALETTE(_palette_tag) \
-	MCFG_GFX_PALETTE(_palette_tag)
-
-#define MCFG_ST0020_IS_ST0032(_st0032) \
-	downcast<st0020_device &>(*device).set_is_st0032(_st0032);
-
-#define MCFG_ST0020_IS_JCLUB2(_jclub2) \
-	downcast<st0020_device &>(*device).set_is_jclub2(_jclub2);
 
 #endif // MAME_VIDEO_ST0020_H

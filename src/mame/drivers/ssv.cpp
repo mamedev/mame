@@ -2620,8 +2620,8 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_gdfs)
 
-	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
-	MCFG_ST0020_SPRITES_PALETTE("palette")
+	ST0020_SPRITES(config, m_gdfs_st0020, 0);
+	m_gdfs_st0020->set_palette(m_palette);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gdfs)
 	MCFG_VIDEO_START_OVERRIDE(ssv_state,gdfs)
