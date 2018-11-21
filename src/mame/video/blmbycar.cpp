@@ -80,83 +80,8 @@ void blmbycar_state::video_start()
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 
-	m_tilemap[0]->set_scroll_rows(1);
-	m_tilemap[0]->set_scroll_cols(1);
-
-	m_tilemap[1]->set_scroll_rows(1);
-	m_tilemap[1]->set_scroll_cols(1);
+	m_tilemap[0]->set_transmask(0,0xff01,0x00ff); /* this layer is split in two (pens 1..7, pens 8-15) */
 	m_tilemap[1]->set_transparent_pen(0);
-}
-
-
-/***************************************************************************
-
-
-                                Sprites Drawing
-
-    Offset:     Bits:                   Value:
-
-        0.w     f--- ---- ---- ----     End Of Sprites
-                -edc ba9- ---- ----
-                ---- ---8 7654 3210     Y (Signed)
-
-        2.w                             Code
-
-        4.w     f--- ---- ---- ----     Flip Y
-                -e-- ---- ---- ----     Flip X
-                --dc ba98 7654 ----
-                ---- ---- ---- 3210     Color (Bit 3 = Priority)
-
-        6.w     f--- ---- ---- ----     ? Is this ever used ?
-                -e-- ---- ---- ----     ? 1 = Don't Draw ?
-                --dc ba9- ---- ----
-                ---- ---8 7654 3210     X (Signed)
-
-
-***************************************************************************/
-
-void blmbycar_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	uint16_t *source, *finish;
-
-	source = m_spriteram + 0x6 / 2;              // !
-	finish = m_spriteram + m_spriteram.bytes() / 2 - 8 / 2;
-
-	/* Find "the end of sprites" marker */
-
-	for ( ; source < finish; source += 8 / 2 )
-		if (source[0] & 0x8000) break;
-
-	/* Draw sprites in reverse order for pdrawfgfx */
-
-	source -= 8 / 2;
-	finish = m_spriteram;
-
-	for ( ; source >= finish; source -= 8 / 2 )
-	{
-		int y       = source[0];
-		int code        = source[1];
-		int attr        = source[2];
-		int x       = source[3];
-
-		int flipx       = attr & 0x4000;
-		int flipy       = attr & 0x8000;
-		int pri     = (~attr >> 3) & 0x1;       // Priority (1 = Low)
-		int pri_mask    = ~((1 << (pri+1)) - 1);    // Above the first "pri" levels
-
-		if (x & 0x4000) continue;   // ? To get rid of the "shadow" blocks
-
-		x   = (x & 0x1ff) - 0x10;
-		y   = 0xf0 - ((y & 0xff)  - (y & 0x100));
-
-		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
-					code,
-					0x20 + (attr & 0xf),
-					flipx, flipy,
-					x, y,
-					screen.priority(),
-					pri_mask,0);
-	}
 }
 
 
@@ -170,41 +95,25 @@ void blmbycar_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 uint32_t blmbycar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i, layers_ctrl = -1;
-
 	m_tilemap[0]->set_scrolly(0, m_scroll[0][0]);
 	m_tilemap[0]->set_scrollx(0, m_scroll[0][1]);
 
 	m_tilemap[1]->set_scrolly(0, m_scroll[1][0] + 1);
 	m_tilemap[1]->set_scrollx(0, m_scroll[1][1] + 5);
 
-#ifdef MAME_DEBUG
-if (machine().input().code_pressed(KEYCODE_Z))
-{
-	int msk = 0;
+	/* draw tilemaps + sprites */
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER0,0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER1,0);
 
-	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
-//  if (machine().input().code_pressed(KEYCODE_E))    msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
-	if (msk != 0) layers_ctrl &= msk;
-}
-#endif
+	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
 
-	screen.priority().fill(0, cliprect);
+	m_sprites->draw_sprites(bitmap,cliprect,m_spriteram,flip_screen(),0);
 
-	if (layers_ctrl & 1)
-		for (i = 0; i <= 1; i++)
-			m_tilemap[0]->draw(screen, bitmap, cliprect, i, i);
-	else
-		bitmap.fill(0, cliprect);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
 
-	if (layers_ctrl & 2)
-		for (i = 0; i <= 1; i++)
-			m_tilemap[1]->draw(screen, bitmap, cliprect, i, i);
-
-	if (layers_ctrl & 8)
-		draw_sprites(screen, bitmap, cliprect);
+	m_sprites->draw_sprites(bitmap,cliprect,m_spriteram,flip_screen(),1);
 
 	return 0;
 }

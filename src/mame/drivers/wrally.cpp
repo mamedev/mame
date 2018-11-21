@@ -187,6 +187,7 @@ static INPUT_PORTS_START( wrally )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0010, "Pot Wheel" )
 	PORT_DIPSETTING(      0x0000, "Optical Wheel" )
+	PORT_DIPSETTING(      0x0008, "invalid" )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -284,6 +285,9 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wrally)
 	MCFG_PALETTE_ADD("palette", 1024*8)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+
+	GAELCO_WRALLY_SPRITES(config, m_sprites, 0);
+	m_sprites->set_gfxdecode_tag("gfxdecode");
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(wrally_state::coin1_lockout_w));
