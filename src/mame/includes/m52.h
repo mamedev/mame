@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_M52_H
+#define MAME_INCLUDES_M52_H
+
+#pragma once
 
 #include "emupal.h"
 #include "screen.h"
@@ -92,3 +96,5 @@ protected:
 	DECLARE_WRITE8_MEMBER(alpha1v_flipscreen_w);
 
 };
+
+#endif // MAME_INCLUDES_M52_H

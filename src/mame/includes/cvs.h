@@ -5,6 +5,10 @@
     Century CVS System
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_CVS_H
+#define MAME_INCLUDES_CVS_H
+
+#pragma once
 
 #include "sound/dac.h"
 #include "sound/tms5110.h"
@@ -153,3 +157,5 @@ protected:
 	                                           by allocating twice the amount,
 	                                           we can use the same gfx_layout */
 };
+
+#endif // MAME_INCLUDES_CVS_H

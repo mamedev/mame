@@ -11,6 +11,8 @@
 #ifndef MAME_INCLUDES_APPLE3_H
 #define MAME_INCLUDES_APPLE3_H
 
+#pragma once
+
 #include "cpu/m6502/m6502.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -38,8 +40,8 @@
 class apple3_state : public driver_device
 {
 public:
-	apple3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apple3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_via(*this, "via6522_%u", 0),

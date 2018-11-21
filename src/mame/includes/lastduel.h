@@ -5,6 +5,10 @@
     Last Duel
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_LASTDUEL_H
+#define MAME_INCLUDES_LASTDUEL_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -74,9 +78,11 @@ private:
 	uint32_t screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(lastduel_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(madgear_timer_cb);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void lastduel_map(address_map &map);
 	void madgear_map(address_map &map);
 	void madgear_sound_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LASTDUEL_H

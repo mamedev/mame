@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski
+#ifndef MAME_INCLUDES_TOKI_H
+#define MAME_INCLUDES_TOKI_H
+
+#pragma once
 
 #include "audio/seibu.h"
 #include "machine/gen_latch.h"
@@ -11,8 +15,8 @@
 class toki_state : public driver_device
 {
 public:
-	toki_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	toki_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_audiocpu_rom(*this, "audiocpu"),
@@ -26,7 +30,8 @@ public:
 		m_background1_videoram(*this, "bg1_vram"),
 		m_background2_videoram(*this, "bg2_vram"),
 		m_videoram(*this, "videoram"),
-		m_scrollram(*this, "scrollram") { }
+		m_scrollram(*this, "scrollram")
+	{ }
 
 	void toki(machine_config &config);
 	void jujuba(machine_config &config);
@@ -91,3 +96,5 @@ private:
 	void tokib_audio_map(address_map &map);
 	void tokib_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TOKI_H

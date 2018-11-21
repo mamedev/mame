@@ -5,6 +5,11 @@
     88 Games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_88GAMES_H
+#define MAME_INCLUDES_88GAMES_H
+
+#pragma once
+
 #include "sound/upd7759.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
@@ -14,8 +19,8 @@
 class _88games_state : public driver_device
 {
 public:
-	_88games_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	_88games_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k052109(*this, "k052109"),
@@ -24,7 +29,8 @@ public:
 		m_upd7759(*this, "upd%d", 1),
 		m_bank0000(*this, "bank0000"),
 		m_bank1000(*this, "bank1000"),
-		m_ram(*this, "ram") { }
+		m_ram(*this, "ram")
+	{ }
 
 	void _88games(machine_config &config);
 
@@ -70,3 +76,5 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_88GAMES_H

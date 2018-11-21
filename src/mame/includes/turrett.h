@@ -22,12 +22,14 @@ class turrett_state : public driver_device
 {
 public:
 	turrett_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ata(*this, "ata"),
-			m_bank_a(*this, "bank_a"),
-			m_bank_b(*this, "bank_b"),
-			m_screen(*this, "screen") {}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ata(*this, "ata")
+		, m_bank_a(*this, "bank_a")
+		, m_bank_b(*this, "bank_b")
+		, m_screen(*this, "screen")
+	{
+	}
 
 	void turrett(machine_config &config);
 

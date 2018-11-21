@@ -1396,7 +1396,9 @@ Note: on screen copyright is (c)1998 Coinmaster.
 
 #include <algorithm>
 
-#if __uPD71054_TIMER
+#define USE_uPD71054_TIMER 1
+
+#if USE_uPD71054_TIMER
 // this mess should be replaced with pit8254, see madshark
 
 #define USED_TIMER_NUM  1
@@ -1490,7 +1492,7 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 		break;
 	}
 }
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
 
 
@@ -2032,7 +2034,7 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
 	map(0xd00000, 0xd00007).nopw();                        // ?
@@ -2091,7 +2093,7 @@ void seta_state::zingzipbl_map(address_map &map)
 	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
 	map(0xc00000, 0xc03fff).ram(); // soundram on original
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
 	map(0xd00000, 0xd00007).nopw();                        // ?
@@ -2126,7 +2128,7 @@ void seta_state::jjsquawb_map(address_map &map)
 //  AM_RANGE(0xa80000, 0xa80001) AM_RAM                              // ? 0x4000
 	map(0xb0c000, 0xb0ffff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // RZ: Sprites Code + X + Attr
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
 	map(0xd00000, 0xd00007).nopw();                        // ?
@@ -8692,14 +8694,14 @@ MACHINE_CONFIG_END
 /***************************************************************************
                                 Gundhara
 ***************************************************************************/
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 INTERRUPT_GEN_MEMBER(seta_state::wrofaero_interrupt)
 {
 	device.execute().set_input_line(2, HOLD_LINE );
 }
 
 MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
 
 
@@ -8714,17 +8716,17 @@ MACHINE_CONFIG_START(seta_state::gundhara)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 #else
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9589,17 +9591,17 @@ MACHINE_CONFIG_START(seta_state::wrofaero)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
 #else
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")

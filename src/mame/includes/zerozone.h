@@ -5,6 +5,10 @@
     Zero Zone
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ZEROZONE_H
+#define MAME_INCLUDES_ZEROZONE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "cpu/z80/z80.h"
@@ -59,3 +63,5 @@ private:
 	virtual void video_start() override;
 	TILE_GET_INFO_MEMBER(get_zerozone_tile_info);
 };
+
+#endif // MAME_INCLUDES_ZEROZONE_H

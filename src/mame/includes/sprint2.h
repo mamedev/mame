@@ -34,8 +34,8 @@
 class sprint2_state : public driver_device
 {
 public:
-	sprint2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sprint2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
@@ -43,7 +43,8 @@ public:
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void sprint1(machine_config &config);
 	void sprint2(machine_config &config);
