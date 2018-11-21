@@ -131,8 +131,17 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 					/* pens 8..15 are used to select a palette */
 					if ((gfx_pen < 8) || (gfx_pen >= 16)) continue;
 
-					/* modify the color of the tile */
-					*pixel = src_color |= ((gfx_pen - 8) << 12) | (high_priority << 8) | 0x200;
+					// if there's already a sprite pixel use the existing priority value? (or you get a glitch against the start line arch at the start of a night stage) possibly because existing priority scheme is bogus?
+					// this causes a slight shadow of your car to be visible as you pass through the arch instead, but looking at 14:01 in this video seems to show the same on a PCB https://www.youtube.com/watch?v=vZUUK8c-GZ0
+					if (src_color != 0) 
+					{
+						*pixel = src_color |= ((gfx_pen - 8) << 12) | 0x200;
+					}
+					else
+					{
+						/* modify the color of the tile - the pen modifier can be applied over existing sprite pixels, so we store it in the upper bits that we send to the mixer */
+						*pixel = (src_color &0xff) | ((gfx_pen - 8) << 12) | (high_priority << 8) | 0x200;
+					}
 				}
 			}
 		}
