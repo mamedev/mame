@@ -69,7 +69,7 @@ void gaelco_wrally_sprites_device::get_sprites_info(uint16_t* spriteram, int& sx
 
 void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint16_t* spriteram, int flip_screen)
 {
-	m_temp_bitmap_sprites.fill(0xffff, cliprect);
+	m_temp_bitmap_sprites.fill(0, cliprect);
 
 	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
@@ -87,17 +87,63 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 		int yflip = attr & 0x40;
 		color = color & 0x0f;
 
-		if (flip_screen) {
+		if (flip_screen)
+		{
 			sy = sy + 248;
 		}
 
-		// store these bits with the written data so that we can use them in mixing later
-		color |= (high_priority << 4);
-		color |= (color_effect << 5);
+		// wrally adjusts sx by 0x0f, blmbycar implementation was 0x10
+		const uint8_t *gfx_src = gfx->get_data(number % gfx->elements());
 
-		gfx->transpen(m_temp_bitmap_sprites, cliprect, number,
-			color, xflip, yflip,
-			sx - 0x0f, sy, 0);  // wrally adjusts sx by 0x0f, blmbycar implementation was 0x10
+		for (int py = 0; py < gfx->height(); py++)
+		{
+			/* get a pointer to the current line in the screen bitmap */
+			int ypos = ((sy + py) & 0x1ff);
+			uint16_t *srcy = &m_temp_bitmap_sprites.pix16(ypos);
+
+			int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
+
+			if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y)) continue;
+
+			for (int px = 0; px < gfx->width(); px++)
+			{
+				/* get current pixel */
+				int xpos = (((sx + px) & 0x3ff) - 0x0f) & 0x3ff;
+				uint16_t *pixel = srcy + xpos;
+
+				if (!color_effect)
+				{
+					int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
+
+					/* get asociated pen for the current sprite pixel */
+					int gfx_pen = gfx_src[gfx->rowbytes()*gfx_py + gfx_px];
+
+					if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x)) continue;
+
+					if (gfx_pen)
+					{
+						*pixel = gfx_pen | (color << 4) | (high_priority << 8);
+					}
+				}
+				else
+				{
+					int src_color = *pixel;
+
+					int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
+
+					/* get asociated pen for the current sprite pixel */
+					int gfx_pen = gfx_src[gfx->rowbytes()*gfx_py + gfx_px];
+
+					/* pens 8..15 are used to select a palette */
+					if ((gfx_pen < 8) || (gfx_pen >= 16)) continue;
+
+					if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x)) continue;
+
+					/* modify the color of the tile */
+					*pixel = src_color |= ((gfx_pen - 8) << 12) | (high_priority << 8) | 0x200;
+				}
+			}
+		}
 	}
 }
 
@@ -110,8 +156,11 @@ void gaelco_wrally_sprites_device::mix_sprites(bitmap_ind16 &bitmap, const recta
 
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
-			if (spriteptr[x] != 0xffff)
+			if (spriteptr[x] != 0)
 			{
+				// this is how we've packed the bits here
+				// ssss --ez PPPP pppp  s = shadow multiplier e = shadow enabled, z = priority, P = palette select, p = pen
+
 				const int pridat = (spriteptr[x] & 0x100) >> 8;
 
 				if (pridat == priority)
@@ -126,15 +175,20 @@ void gaelco_wrally_sprites_device::mix_sprites(bitmap_ind16 &bitmap, const recta
 					else
 					{
 						const uint16_t pendat = (spriteptr[x] & 0xff);
+						const int shadowlevel = (spriteptr[x] & 0xf000) >> 12;
 
-						if ((pendat & 0xf) >= 8)
+						if (pendat != 0)
 						{
-							uint16_t srcdat = (dstptr[x] & 0x3ff);	
-							dstptr[x] = srcdat + ((pendat & 0xf)-8) * 0x400;
+							dstptr[x] = (pendat + 0x200) + (shadowlevel * 0x400);
+						}
+						else
+						{
+							dstptr[x] = (dstptr[x]&0x3ff) + (shadowlevel * 0x400);
 						}
 					}
 				}
 			}
+
 		}
 	}
 }
