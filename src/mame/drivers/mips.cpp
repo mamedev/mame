@@ -8,25 +8,27 @@
  *
  * This driver is intended to eventually cover the following models:
  *
- *   Name        CPU      Clock  Slots    Disk  Package       Other
- *   M/500       R2000     5MHz  VME      ESDI
- *   M/800       R2000     8MHz  VME      ESDI
- *   M/1000      R2000    10MHz  VME      ESDI
- *   M/120-3     R2000    12MHz  PC-AT    SCSI  Deskside
- *   M/120-5     R2000    16MHz  PC-AT    SCSI  Deskside
- *   M/2000-6    R3000    20MHz  VMEx13   SMD   Rack Cabinet
- *   M/2000-8    R3000    25MHz  VMEx13   SMD   Rack Cabinet
- *   RC2030      R2000    16MHz           SCSI  Desktop
- *   RS2030      R2000    16MHz           SCSI  Desktop       aka M/12
- *   RC3230      R3000    25MHz  PC-ATx1  SCSI  Desktop
- *   RS3230      R3000    25MHz  PC-ATx1  SCSI  Desktop       aka M/20, Magnum 3000
- *   RC3240      R3000    20MHz  PC-ATx4  SCSI  Deskside      M/120 with CPU-board upgrade
- *   RC3330      R3000    33MHz  PC-AT    SCSI  Desktop
- *   RS3330      R3000    33MHz  PC-AT    SCSI  Desktop
- *   RC3260      R3000    25MHz  VMEx7    SCSI  Pedestal
- *   RC3360      R3000    33MHz  VME      SCSI  Pedestal
- *   RC6260      R6000    66MHz  VME      SCSI  Pedestal
- *   RC6280      R6000    66MHz  VMEx6    SMD   Data Center
+ *   Model       Board    CPU      Clock  Slots    Disk  Package       Other
+ *   M/500       R2300    R2000     5MHz  VME      ESDI
+ *   M/800       R2600    R2000     8MHz  VME      ESDI
+ *   M/1000      R2800    R2000    10MHz  VME      ESDI
+ *   M/120-3     R2400?   R2000    12MHz  PC-AT    SCSI  Deskside      aka Intrepid?
+ *   M/120-5     R2400?   R2000    16MHz  PC-AT    SCSI  Deskside
+ *   M/180       R2400
+ *   M/2000-6    R3200    R3000    20MHz  VMEx13   SMD   Rack Cabinet
+ *   M/2000-8    R3200    R3000    25MHz  VMEx13   SMD   Rack Cabinet
+ *   RC2030      I2000    R2000    16MHz           SCSI  Desktop       aka M/12, Jupiter
+ *   RS2030      I2000    R2000    16MHz           SCSI  Desktop       aka M/12, Jupiter
+ *   RC3230      R3030    R3000    25MHz  PC-ATx1  SCSI  Desktop
+ *   RS3230      R3030    R3000    25MHz  PC-ATx1  SCSI  Desktop       aka M/20, Magnum 3000, Pizazz
+ *   RC3240               R3000    20MHz  PC-ATx4  SCSI  Deskside      M/120 with CPU-board upgrade
+ *   RC3330               R3000    33MHz  PC-AT    SCSI  Desktop
+ *   RS3330               R3000    33MHz  PC-AT    SCSI  Desktop
+ *   RC3260               R3000    25MHz  VMEx7    SCSI  Pedestal
+ *   RC3360      RB3133   R3000    33MHz  VME      SCSI  Pedestal
+ *   RC3370      RB3133
+ *   RC6260      R6300    R6000    66MHz  VME      SCSI  Pedestal
+ *   RC6280      R6300    R6000    66MHz  VMEx6    SMD   Data Center
  *   RC6380-100  R6000x1  66MHz  VME      SMD   Data Center
  *   RC6380-200  R6000x2  66MHz  VME      SMD   Data Center
  *   RC6380-400  R6000x4  66MHz  VME      SMD   Data Center
@@ -37,13 +39,16 @@
  *   http://www.geekdot.com/the-mips-rs2030/
  *   http://www.jp.netbsd.org/ports/mipsco/models.html
  *
- * TODO
- *   - implement cpu tlb
+ * TODO (rx2030)
  *   - remaining iop interface
  *   - figure out the brcond0 signal
  *   - keyboard controller and keyboard
- *   - floppy drive
  *   - buzzer
+ *
+ * TODO (rx3230)
+ *   - verify/complete address maps
+ *   - idprom
+ *   - rambo device
  *
  *   Ref   Part                      Function
  *
@@ -228,7 +233,7 @@ void rx2030_state::iop_io_map(address_map &map)
 	map(0x0180, 0x018b).lr8("mac", [this](offs_t offset)
 	{
 		// Ethernet MAC address (LSB first)
-		static const u8 mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56 };
+		static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56 };
 
 		return mac[offset];
 	}).umask16(0xff);
@@ -396,7 +401,7 @@ void rx2030_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
 		m_ram->write(BYTE4_XOR_BE(offset + 1), data >> 8);
 }
 
-static void rx2030_scsi_devices(device_slot_interface &device)
+static void mips_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("cdrom", NSCSI_CDROM);
@@ -478,15 +483,15 @@ void rx2030_state::rx2030(machine_config &config)
 	NSCSI_BUS(config, m_scsibus, 0);
 
 	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0", 0));
-	rx2030_scsi_devices(harddisk);
+	mips_scsi_devices(harddisk);
 	harddisk.set_default_option("harddisk");
 
-	rx2030_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
-	rx2030_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
-	rx2030_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
-	rx2030_scsi_devices(NSCSI_CONNECTOR(config, "scsi:4", 0));
-	rx2030_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
-	rx2030_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:4", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6", 0));
 
 	// scsi host adapter
 	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
@@ -536,7 +541,7 @@ void rx2030_state::rs2030(machine_config &config)
 	m_kbd->set_default_option(STR_KBD_MICROSOFT_NATURAL);
 
 	// video hardware (1280x1024x8bpp @ 60Hz), 40 parts vram
-	const u32 pixclock = 108'189'000;
+	u32 const pixclock = 108'189'000;
 
 	// timing from VESA 1280x1024 @ 60Hz
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -547,7 +552,7 @@ void rx2030_state::rs2030(machine_config &config)
 	BT458(config, m_ramdac, pixclock);
 }
 
-u32 rx2030_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 rx2030_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
 	/*
 	 * The graphics board has 1280KiB of video ram fitted, which is organised
@@ -571,6 +576,185 @@ u32 rx2030_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		// compensate by 2048 - 1280 pixels per line
 		pixel_pointer += 0xc0;
 	}
+
+	return 0;
+}
+
+void rx3230_state::rx3230_map(address_map &map)
+{
+	map(0x00000000, 0x07ffffff).noprw(); // silence ram
+
+	map(0x18000000, 0x1800003f).m(m_scsi, FUNC(ncr53c94_device::map)).umask32(0xff);
+	map(0x19000000, 0x19000003).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask32(0xff);
+	map(0x19000004, 0x19000007).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask32(0xff);
+	map(0x1a000000, 0x1a000007).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff);
+	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff); // TODO: order?
+
+	map(0x1c000000, 0x1c000fff).ram(); // MIPS RAMBO DMA engine
+
+	map(0x1d000000, 0x1d001fff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask32(0xff);
+	map(0x1e000000, 0x1e000007).m(m_fdc, FUNC(i82072_device::map)).umask32(0xff);
+	//map(0x1e800000, 0x1e800003).umask32(0xff); // fdc tc
+
+	map(0x1ff00000, 0x1ff00003).lr8("boardtype", []() { return 0xa; }).umask32(0xff); // r? idprom boardtype?
+	//map(0x1ff00018, 0x1ff0001b).umask32(0x0000ff00); // r? idprom?
+
+	map(0x1fc00000, 0x1fc3ffff).rom().region("rx3230", 0);
+}
+
+void rx3230_state::rs3230_map(address_map &map)
+{
+	rx3230_map(map);
+
+	map(0x10000000, 0x103fffff); // frame buffer, 4M?
+
+	map(0x14000000, 0x14000003).rw(m_ramdac, FUNC(bt459_device::address_lo_r), FUNC(bt459_device::address_lo_w)).umask32(0xff);
+	map(0x14080000, 0x14080003).rw(m_ramdac, FUNC(bt459_device::address_hi_r), FUNC(bt459_device::address_hi_w)).umask32(0xff);
+	map(0x14100000, 0x14100003).rw(m_ramdac, FUNC(bt459_device::register_r), FUNC(bt459_device::register_w)).umask32(0xff);
+	map(0x14180000, 0x14180003).rw(m_ramdac, FUNC(bt459_device::palette_r), FUNC(bt459_device::palette_w)).umask32(0xff);
+}
+
+void rx3230_state::machine_start()
+{
+}
+
+void rx3230_state::machine_reset()
+{
+}
+
+void rx3230_state::rx3230_init()
+{
+	// map the configured ram
+	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
+}
+
+void rx3230_state::rx3230(machine_config &config)
+{
+	R3000A(config, m_cpu, 50_MHz_XTAL / 2, 32768, 32768);
+	m_cpu->set_fpurev(0x0340); // 0x0340 == R3010A v4.0?
+	m_cpu->in_brcond<0>().set([]() { return 1; });
+
+	// 32 SIMM slots, 8-128MB memory, banks of 8 1MB or 4MB SIMMs
+	RAM(config, m_ram);
+	m_ram->set_default_size("16M");
+	m_ram->set_extra_options("32M,64M,128M");
+	m_ram->set_default_value(0);
+
+	// scsi bus and devices
+	NSCSI_BUS(config, m_scsibus, 0);
+
+	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0", 0));
+	mips_scsi_devices(harddisk);
+	harddisk.set_default_option("harddisk");
+
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:4", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
+	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6", 0));
+
+	// scsi host adapter
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
+	adapter.option_add_internal("ncr53c94", NCR53C94);
+	adapter.set_default_option("ncr53c94");
+	adapter.set_fixed(true);
+	adapter.set_option_machine_config("ncr53c94", [this](device_t *device)
+	{
+		ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
+
+		adapter.set_clock(24_MHz_XTAL);
+
+		adapter.irq_handler_cb().set_inputline(m_cpu, INPUT_LINE_IRQ1);
+		//adapter.breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
+	});
+
+	// ethernet
+	AM7990(config, m_net);
+	//m_net->intr_out().set_inputline(m_iop, INPUT_LINE_IRQ5).invert(); // -> rambo
+	//m_net->dma_in().set(FUNC(rx3230_state::lance_r));
+	//m_net->dma_out().set(FUNC(rx3230_state::lance_w));
+
+	SCC85C30(config, m_scc, 1.8432_MHz_XTAL); // TODO: clock
+	//m_scc->configure_channels(m_scc->clock(), m_scc->clock(), m_scc->clock(), m_scc->clock());
+	//m_scc->out_int_callback().set_inputline(m_iop, INPUT_LINE_IRQ3); // -> rambo
+
+	// scc channel A (tty0)
+	RS232_PORT(config, m_tty[0], default_rs232_devices, nullptr);
+	m_tty[0]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
+	m_tty[0]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
+	m_tty[0]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
+	m_scc->out_rtsa_callback().set(m_tty[0], FUNC(rs232_port_device::write_rts));
+	m_scc->out_txda_callback().set(m_tty[0], FUNC(rs232_port_device::write_txd));
+
+	// scc channel B (tty1)
+	RS232_PORT(config, m_tty[1], default_rs232_devices, nullptr);
+	m_tty[1]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
+	m_tty[1]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
+	m_tty[1]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
+	m_scc->out_rtsb_callback().set(m_tty[1], FUNC(rs232_port_device::write_rts));
+	m_scc->out_txdb_callback().set(m_tty[1], FUNC(rs232_port_device::write_txd));
+
+	M48T02(config, m_rtc);
+
+	// floppy controller and drive
+	I82072(config, m_fdc, 16_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ4);
+	//m_fdc->drq_wr_callback().set();
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, &FLOPPY_PC_FORMAT).enable_sound(false);
+
+	// keyboard
+	pc_kbdc_device &kbdc(PC_KBDC(config, "pc_kbdc", 0));
+	kbdc.out_clock_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	kbdc.out_data_cb().set(m_kbdc, FUNC(at_keyboard_controller_device::kbd_data_w));
+
+	PC_KBDC_SLOT(config, m_kbd, 0);
+	pc_at_keyboards(*m_kbd);
+	m_kbd->set_pc_kbdc_slot(&kbdc);
+
+	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL); // TODO: confirm
+	//m_kbdc->hot_res().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+	//m_kbdc->kbd_irq().set(); // -> rambo
+}
+
+void rx3230_state::rc3230(machine_config &config)
+{
+	rx3230(config);
+
+	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rx3230_map);
+
+	m_tty[1]->set_default_option("terminal");
+}
+
+void rx3230_state::rs3230(machine_config &config)
+{
+	rx3230(config);
+
+	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rs3230_map);
+
+	m_kbd->set_default_option(STR_KBD_MICROSOFT_NATURAL);
+
+	// video hardware (1280x1024x8bpp @ 60Hz), 16 parts vram
+	u32 const pixclock = 108'180'000;
+
+	// timing from VESA 1280x1024 @ 60Hz
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(pixclock, 1688, 248, 1528, 1066, 38, 1062);
+	m_screen->set_screen_update(FUNC(rx3230_state::screen_update));
+	//m_screen->screen_vblank().set_inputline(m_cpu, INPUT_LINE_IRQ5);
+
+	BT459(config, m_ramdac, pixclock);
+
+	RAM(config, m_vram);
+	m_vram->set_default_size("2M");
+	m_vram->set_default_value(0);
+}
+
+u32 rx3230_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+{
+	m_ramdac->screen_update(screen, bitmap, cliprect, m_vram->pointer());
 
 	return 0;
 }
@@ -619,6 +803,27 @@ ROM_END
 #define rom_rc2030 rom_rx2030
 #define rom_rs2030 rom_rx2030
 
+ROM_START(rx3230)
+	ROM_REGION32_BE(0x40000, "rx3230", 0)
+	ROM_SYSTEM_BIOS(0, "v5.40", "Rx3230 v5.40, Jun 1990")
+	ROMX_LOAD("50-314-003__3230_left.bin",  0x00002, 0x20000, CRC(77ce42c9) SHA1(b2d5e5a386ed0ff840646647ba90b3c36732a7fe), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
+	ROMX_LOAD("50-314-003__3230_right.bin", 0x00000, 0x20000, CRC(5bc1ce2f) SHA1(38661234bf40b76395393459de49e48619b2b454), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
+
+	ROM_SYSTEM_BIOS(1, "v5.42", "Rx3230 v5.42, Mar 1991")
+	ROMX_LOAD("unknown.bin", 0x00002, 0x20000, NO_DUMP, ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
+	ROMX_LOAD("unknown.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
+
+	//ROM_REGION(0x800, "i8042", 0)
+	//ROM_LOAD("unknown.bin", 0x000, 0x800, NO_DUMP)
+
+	//ROM_REGION(0x800, "rtc", 0)
+	//ROM_LOAD("m48t02.bin", 0x000, 0x800, NO_DUMP)
+ROM_END
+#define rom_rc3230 rom_rx3230
+#define rom_rs3230 rom_rx3230
+
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME  FLAGS */
 COMP(1989,  rc2030,    0,      0,      rc2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RC2030", MACHINE_NOT_WORKING)
 COMP(1989,  rs2030,    0,      0,      rs2030,    0,     rx2030_state, rx2030_init, "MIPS",  "RS2030", MACHINE_NOT_WORKING)
+COMP(1990,  rc3230,    0,      0,      rc3230,    0,     rx3230_state, rx3230_init, "MIPS",  "RC3230", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1990,  rs3230,    0,      0,      rs3230,    0,     rx3230_state, rx3230_init, "MIPS",  "RS3230", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
