@@ -390,6 +390,7 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 
 	BLMBYCAR_SPRITES(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag("gfxdecode");
+	m_sprites->set_screen_tag("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

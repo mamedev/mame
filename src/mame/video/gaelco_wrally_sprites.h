@@ -5,17 +5,22 @@
 
 #pragma once
 
+#include "screen.h"
+
 class gaelco_wrally_sprites_device : public device_t
 {
 public:
 	gaelco_wrally_sprites_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	gaelco_wrally_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int flip_screen, int priority);
+	void draw_sprites(const rectangle &cliprect, uint16_t* spriteram, int flip_screen);
+	void mix_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 
 protected:
+	gaelco_wrally_sprites_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -23,6 +28,9 @@ protected:
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+
+	bitmap_ind16 m_temp_bitmap_sprites;
 };
 
 class blmbycar_sprites_device : public gaelco_wrally_sprites_device

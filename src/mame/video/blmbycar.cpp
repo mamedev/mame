@@ -79,11 +79,8 @@ void blmbycar_state::video_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
-
-	m_tilemap[0]->set_transmask(0,0xff01,0x00ff); /* this layer is split in two (pens 1..7, pens 8-15) */
 	m_tilemap[1]->set_transparent_pen(0);
 }
-
 
 /***************************************************************************
 
@@ -95,25 +92,27 @@ void blmbycar_state::video_start()
 
 uint32_t blmbycar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_sprites->draw_sprites(cliprect,m_spriteram,flip_screen());
+
 	m_tilemap[0]->set_scrolly(0, m_scroll[0][0]);
 	m_tilemap[0]->set_scrollx(0, m_scroll[0][1]);
 
 	m_tilemap[1]->set_scrolly(0, m_scroll[1][0] + 1);
 	m_tilemap[1]->set_scrollx(0, m_scroll[1][1] + 5);
 
-	/* draw tilemaps + sprites */
-	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER0,0);
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER1,0);
+	screen.priority().fill(0, cliprect);
 
-	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
+	bitmap.fill(0, cliprect);
 
-	m_sprites->draw_sprites(bitmap,cliprect,m_spriteram,flip_screen(),0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
+	m_sprites->mix_sprites(bitmap, cliprect, 0);
 
-	m_sprites->draw_sprites(bitmap,cliprect,m_spriteram,flip_screen(),1);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 1, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 1, 1);
+
+	m_sprites->mix_sprites(bitmap, cliprect, 1);
 
 	return 0;
 }

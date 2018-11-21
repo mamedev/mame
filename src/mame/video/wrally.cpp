@@ -71,6 +71,8 @@ void wrally_state::video_start()
 
 uint32_t wrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_sprites->draw_sprites(cliprect,m_spriteram,flip_screen());
+
 	/* set scroll registers */
 	if (!flip_screen()) {
 		m_tilemap[0]->set_scrolly(0, m_vregs[0]);
@@ -92,11 +94,11 @@ uint32_t wrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
 	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
 
-	m_sprites->draw_sprites(bitmap,cliprect,m_spriteram,flip_screen(),0);
+	m_sprites->mix_sprites(bitmap, cliprect, 0);
 
 	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
 
-	m_sprites->draw_sprites(bitmap,cliprect,m_spriteram,flip_screen(),1);
+	m_sprites->mix_sprites(bitmap, cliprect, 1);
 
 	return 0;
 }

@@ -288,6 +288,7 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 
 	GAELCO_WRALLY_SPRITES(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag("gfxdecode");
+	m_sprites->set_screen_tag("screen");
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(wrally_state::coin1_lockout_w));
