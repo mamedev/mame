@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(isa8_cga_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
 
 	MC6845(config, m_crtc, XTAL(14'318'181)/16);
-	m_crtc->set_screen(m_screen);
+	m_crtc->set_screen(nullptr);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(isa8_cga_device::crtc_update_row), this);
