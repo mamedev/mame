@@ -129,16 +129,15 @@ private:
 	bitmap_ind16 m_secondary_render_bitmap;
 
 	tilemap_t *m_tx_tilemap;    /* Tilemap for extra-text-layer */
-	DECLARE_READ16_MEMBER(video_count_r);
-	DECLARE_WRITE8_MEMBER(toaplan2_coin_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_coin_word_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_v25_coin_word_w);
-	DECLARE_WRITE16_MEMBER(shippumd_coin_word_w);
-	DECLARE_READ16_MEMBER(shared_ram_r);
-	DECLARE_WRITE16_MEMBER(shared_ram_w);
+	u16 video_count_r();
+	void coin_w(u8 data);
+	void v25_reset_w(u8 data);
+	void coin_v25_reset_w(u8 data);
+	void shippumd_coin_w(u8 data);
+	u8 shared_ram_r(offs_t offset);
+	void shared_ram_w(offs_t offset, u8 data);
 	DECLARE_READ16_MEMBER(ghox_p1_h_analog_r);
 	DECLARE_READ16_MEMBER(ghox_p2_h_analog_r);
-	DECLARE_WRITE16_MEMBER(fixeight_subcpu_ctrl_w);
 	DECLARE_WRITE8_MEMBER(fixeightbl_oki_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(raizing_z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);
@@ -153,7 +152,7 @@ private:
 	DECLARE_WRITE8_MEMBER(batrider_sndirq_w);
 	DECLARE_WRITE8_MEMBER(batrider_clear_nmi_w);
 	DECLARE_READ16_MEMBER(bbakraid_eeprom_r);
-	DECLARE_WRITE16_MEMBER(bbakraid_eeprom_w);
+	DECLARE_WRITE8_MEMBER(bbakraid_eeprom_w);
 	DECLARE_WRITE16_MEMBER(tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(tx_linescroll_w);
 	DECLARE_WRITE16_MEMBER(tx_gfxram_w);
@@ -168,7 +167,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(toaplan2);
-	DECLARE_VIDEO_START(toaplan2);
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(ghox);
 	DECLARE_VIDEO_START(truxton2);
 	DECLARE_VIDEO_START(fixeightbl);
@@ -190,8 +189,8 @@ private:
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 
-	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
-	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
+	void pwrkick_coin_w(u8 data);
+	void pwrkick_coin_lockout_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
 
