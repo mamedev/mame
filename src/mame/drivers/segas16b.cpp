@@ -7762,6 +7762,8 @@ ROM_END
 //
 // Game Number and ROM board NOT verified
 //
+//  Same version as shinobi4 below except with a standard Z80 sound CPU and sound program ROM
+//
 ROM_START( shinobi6 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-11360.a7", 0x00000, 0x20000, CRC(b1f67ab9) SHA1(83eddd1ef3fbe58f1f8e8d57229fabf1907fc371) )
@@ -9269,7 +9271,7 @@ GAME( 1987, sdib,       sdi,      system16b_fd1089a,     sdi,      segas16b_stat
 GAME( 1987, sdibl,      sdi,      system16b,             sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, original hardware)", 0 ) // seems to be a bootleg of an older version of the game than any supported original sets
 
 GAME( 1987, shinobi6,   shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5521,       ROT0,   "Sega", "Shinobi (set 6, System 16B) (unprotected)", 0 )
-GAME( 1987, shinobi5,   shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5521,       ROT0,   "Sega", "Shinobi (set 5, System 16B) (unprotected)", 0 )
+GAME( 1987, shinobi5,   shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5358,       ROT0,   "Sega", "Shinobi (set 5, System 16B) (unprotected)", 0 )
 GAME( 1987, shinobi4,   shinobi,  system16b_mc8123,      shinobi,  segas16b_state, init_shinobi4_5521,      ROT0,   "Sega", "Shinobi (set 4, System 16B) (MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi3,   shinobi,  system16b_mc8123,      shinobi,  segas16b_state, init_shinobi3_5358,      ROT0,   "Sega", "Shinobi (set 3, System 16B) (MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi2,   shinobi,  system16b_fd1094,      shinobi,  segas16b_state, init_generic_5358,       ROT0,   "Sega", "Shinobi (set 2, System 16B) (FD1094 317-0049)", 0 )
