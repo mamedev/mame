@@ -110,16 +110,15 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 				/* get current pixel */
 				int xpos = (((sx + px) & 0x3ff) - 0x0f) & 0x3ff;
 				uint16_t *pixel = srcy + xpos;
+				int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
+
+				/* get asociated pen for the current sprite pixel */
+				int gfx_pen = gfx_src[gfx->rowbytes()*gfx_py + gfx_px];
+
+				if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x)) continue;
 
 				if (!color_effect)
 				{
-					int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
-
-					/* get asociated pen for the current sprite pixel */
-					int gfx_pen = gfx_src[gfx->rowbytes()*gfx_py + gfx_px];
-
-					if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x)) continue;
-
 					if (gfx_pen)
 					{
 						*pixel = gfx_pen | (color << 4) | (high_priority << 8);
@@ -129,15 +128,8 @@ void gaelco_wrally_sprites_device::draw_sprites(const rectangle &cliprect, uint1
 				{
 					int src_color = *pixel;
 
-					int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
-
-					/* get asociated pen for the current sprite pixel */
-					int gfx_pen = gfx_src[gfx->rowbytes()*gfx_py + gfx_px];
-
 					/* pens 8..15 are used to select a palette */
 					if ((gfx_pen < 8) || (gfx_pen >= 16)) continue;
-
-					if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x)) continue;
 
 					/* modify the color of the tile */
 					*pixel = src_color |= ((gfx_pen - 8) << 12) | (high_priority << 8) | 0x200;
