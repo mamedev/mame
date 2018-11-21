@@ -476,7 +476,6 @@ void microtan_state::machine_start()
 {
 	m_led.resolve();
 
-	save_item(NAME(m_chunky_graphics));
 	save_item(NAME(m_keypad_column));
 	save_item(NAME(m_keyboard_ascii));
 	save_item(NAME(m_keyrows));
@@ -751,11 +750,11 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 
 		/* first set of VIA6522 registers */
 		for (int i = 0; i < 16; i++ )
-			m_via6522[0]->write(space, i, snapshot_buff[base++]);
+			m_via6522[0]->write(i, snapshot_buff[base++]);
 
 		/* second set of VIA6522 registers */
 		for (int i = 0; i < 16; i++ )
-			m_via6522[1]->write(space, i, snapshot_buff[base++]);
+			m_via6522[1]->write(i, snapshot_buff[base++]);
 
 		/* microtan IO bff0-bfff */
 		for (int i = 0; i < 16; i++ )

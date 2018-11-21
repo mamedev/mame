@@ -325,16 +325,11 @@ MACHINE_CONFIG_START(chqflag_state::chqflag)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(chqflag_sound_map)
 
-	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank1000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "bank1000").set_map(&chqflag_state::bank1000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -374,14 +369,13 @@ MACHINE_CONFIG_START(chqflag_state::chqflag)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ymsnd.add_route(0, "lspeaker", 1.00);
+	ymsnd.add_route(1, "rspeaker", 1.00);
 
 	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, chqflag_state, volume_callback0))

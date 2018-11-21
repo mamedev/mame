@@ -8,6 +8,7 @@
 
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "emupal.h"
 
 class kickgoal_state : public driver_device
@@ -22,15 +23,19 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_eeprom(*this, "eeprom") ,
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
 		m_okibank(*this, "okibank"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") 
+	{ }
 
 	void kickgoal(machine_config &config);
 	void actionhw(machine_config &config);
 
 	void init_kickgoal();
+	void init_actionhw();
 
 private:
 	DECLARE_READ16_MEMBER(kickgoal_eeprom_r);
@@ -39,6 +44,13 @@ private:
 	DECLARE_WRITE16_MEMBER(kickgoal_bgram_w);
 	DECLARE_WRITE16_MEMBER(kickgoal_bg2ram_w);
 	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
+
+	DECLARE_WRITE8_MEMBER(soundio_port_a_w);
+	DECLARE_READ8_MEMBER(soundio_port_b_r);
+	DECLARE_WRITE8_MEMBER(soundio_port_b_w);
+	DECLARE_READ8_MEMBER(soundio_port_c_r);
+	DECLARE_WRITE8_MEMBER(soundio_port_c_w);
+	DECLARE_WRITE16_MEMBER(to_pic_w);
 
 	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_kickgoal_bg_tile_info);
@@ -66,12 +78,12 @@ private:
 	tilemap_t     *m_bg2tm;
 
 	/* misc */
-	int         m_melody_loop;
 	int         m_snd_new;
 	int         m_snd_sam[4];
-	int         m_m6295_comm;
-	int         m_m6295_bank;
-	uint16_t      m_m6295_key_delay;
+
+	uint8_t m_pic_portc;
+	uint8_t m_pic_portb;
+	int m_sound_command_sent;
 
 	int m_fg_base;
 
@@ -96,8 +108,10 @@ private:
 	/* devices */
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
 	required_memory_bank m_okibank;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };

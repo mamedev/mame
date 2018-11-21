@@ -85,6 +85,14 @@ public:
 		m_step20_with_old_real3d = false;
 	}
 
+	void add_cpu_66mhz(machine_config &config);
+	void add_cpu_100mhz(machine_config &config);
+	void add_cpu_166mhz(machine_config &config);
+
+	void add_base_devices(machine_config &config);
+	void add_scsi_devices(machine_config &config);
+	void add_crypt_devices(machine_config &config);
+
 	void model3_21_5881(machine_config &config);
 	void model3_20_5881(machine_config &config);
 	void model3_15(machine_config &config);
@@ -110,6 +118,7 @@ public:
 	void init_scud();
 	void init_harley();
 	void init_swtrilga();
+	void init_swtrilgp();
 	void init_vs29815();
 	void init_model3_10();
 	void init_vs215();
@@ -153,6 +162,7 @@ private:
 	int m_sound_irq_enable;
 	emu_timer *m_sound_timer;
 	emu_timer *m_real3d_dma_timer;
+	emu_timer *m_scan_timer;
 	uint8_t m_irq_enable;
 	uint8_t m_irq_state;
 	uint8_t m_scsi_irq_state;
@@ -294,12 +304,13 @@ private:
 	DECLARE_MACHINE_RESET(model3_21);
 	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
 	TIMER_CALLBACK_MEMBER(real3d_dma_timer_callback);
+	TIMER_CALLBACK_MEMBER(model3_scan_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
 	DECLARE_WRITE8_MEMBER(scsp_irq);
-	LSI53C810_DMA_CB(real3d_dma_callback);
-	LSI53C810_FETCH_CB(scsi_fetch);
-	LSI53C810_IRQ_CB(scsi_irq_callback);
+	void real3d_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap);
+	uint32_t scsi_fetch(uint32_t dsp);
+	void scsi_irq_callback(int state);
 	void update_irq_state();
 	void set_irq_line(uint8_t bit, int line);
 	void model3_init(int step);
@@ -357,6 +368,8 @@ private:
 	void model3_10_mem(address_map &map);
 	void model3_mem(address_map &map);
 	void model3_snd(address_map &map);
+	void scsp1_map(address_map &map);
+	void scsp2_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MODEL3_H

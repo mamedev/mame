@@ -481,16 +481,14 @@ MACHINE_CONFIG_START(msisaac_state::msisaac)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
 	// port A/B likely to be TA7630 filters
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.15);
 	// port A/B likely to be TA7630 filters
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */

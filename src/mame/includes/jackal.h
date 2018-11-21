@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 // thanks-to:Kenneth Lin (original driver author)
+#ifndef MAME_INCLUDES_JACKAL_H
+#define MAME_INCLUDES_JACKAL_H
+
+#pragma once
 
 #include "emupal.h"
 
@@ -12,14 +16,15 @@
 class jackal_state : public driver_device
 {
 public:
-	jackal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jackal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoctrl(*this, "videoctrl"),
-		m_dials(*this, {"DIAL0", "DIAL1"}),
+		m_dials(*this, "DIAL%u", 0U),
 		m_mastercpu(*this, "master"),
 		m_slavecpu(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void jackal(machine_config &config);
 
@@ -66,3 +71,5 @@ private:
 	void master_map(address_map &map);
 	void slave_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_JACKAL_H

@@ -128,8 +128,6 @@ from Brett Selwood and Andrew Davies.
 #include "formats/mbee_cas.h"
 #include "speaker.h"
 
-#define XTAL_13_5MHz 13500000
-
 /********** NOTE !!! ***********************************************************
     The microbee uses lots of bankswitching and the memory maps are still
     being determined. Please don't merge memory maps !!
@@ -647,19 +645,19 @@ static void mbee_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(mbee_state::mbee)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL / 6)         /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mbee_mem)
-	MCFG_DEVICE_IO_MAP(mbee_io)
-	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
+	Z80(config, m_maincpu, 12_MHz_XTAL / 6);         /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee_io);
+	m_maincpu->set_daisy_config(mbee_daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 12_MHz_XTAL / 6)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, mbee_state, pio_ardy))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mbee_state, pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mbee_state, pio_port_b_w))
+	Z80PIO(config, m_pio, 12_MHz_XTAL / 6);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_ardy_callback().set(FUNC(mbee_state::pio_ardy));
+	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
+	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -681,12 +679,13 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 12_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mbee_state, crtc_vs))
+	SY6545_1(config, m_crtc, 12_MHz_XTAL / 8);
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mbee_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 3)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 3)
@@ -704,19 +703,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbeeic)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mbeeic_mem)
-	MCFG_DEVICE_IO_MAP(mbeeic_io)
-	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
+	Z80(config, m_maincpu, 13.5_MHz_XTAL / 4);         /* 3.37500 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeeic_mem);
+	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeeic_io);
+	m_maincpu->set_daisy_config(mbee_daisy_chain);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3375000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, mbee_state, pio_ardy))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mbee_state, pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mbee_state, pio_port_b_w))
+	Z80PIO(config, m_pio, 13.5_MHz_XTAL / 4);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->out_ardy_callback().set(FUNC(mbee_state::pio_ardy));
+	m_pio->in_pb_callback().set(FUNC(mbee_state::pio_port_b_r));
+	m_pio->out_pb_callback().set(FUNC(mbee_state::pio_port_b_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -738,18 +737,19 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mbee_state, crtc_vs))
+	SY6545_1(config, m_crtc, 13.5_MHz_XTAL / 8);
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mbee_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("z80pio", z80pio_device, strobe_a))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(m_pio, z80pio_device, strobe_a))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -775,8 +775,8 @@ MACHINE_CONFIG_START(mbee_state::mbeeppc)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
 
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, mbee_state, rtc_irq_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbee56)
@@ -803,8 +803,8 @@ MACHINE_CONFIG_START(mbee_state::mbee128)
 	MCFG_DEVICE_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 
-	MCFG_DEVICE_ADD("rtc", MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, mbee_state, rtc_irq_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbee128p)
@@ -847,7 +847,7 @@ MACHINE_CONFIG_START(mbee_state::mbeett)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett)
 	MCFG_DEVICE_REMOVE("quickload")
 	MCFG_DEVICE_REMOVE("quickload2")
-	MCFG_DEVICE_ADD("scc", SCC8530, 4000000) // clock unknown
+	SCC8530(config, "scc", 4000000); // clock unknown
 MACHINE_CONFIG_END
 
 /* Unused roms:

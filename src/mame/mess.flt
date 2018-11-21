@@ -25,6 +25,7 @@ agat.cpp
 aim65.cpp
 aim65_40.cpp
 akaiax80.cpp
+alcat7100.cpp
 alesis.cpp
 alesis_qs.cpp
 alphasma.cpp
@@ -40,6 +41,7 @@ altos8600.cpp
 amico2k.cpp
 amiga.cpp
 ampex.cpp
+ampex210.cpp
 ampro.cpp
 ampscarp.cpp
 amstr_pc.cpp
@@ -94,6 +96,7 @@ bigbord2.cpp
 binbug.cpp
 bitgraph.cpp
 bk.cpp
+blw700i.cpp
 bmjr.cpp
 bml3.cpp
 bob85.cpp
@@ -150,6 +153,7 @@ cortex.cpp
 cosmicos.cpp
 cp1.cpp
 craft.cpp
+crimson.cpp
 crvision.cpp
 ct486.cpp
 cvicny.cpp
@@ -193,12 +197,15 @@ e100.cpp
 eacc.cpp
 ec184x.cpp
 ec65.cpp
+ec7915.cpp
 einstein.cpp
 electron.cpp
 elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
+emate.cpp
+emma2.cpp
 enmirage.cpp
 ep64.cpp
 esprit.cpp
@@ -216,6 +223,9 @@ evmbug.cpp
 excali64.cpp
 exelv.cpp
 exp85.cpp
+facit4440.cpp
+falco5220.cpp
+falcots.cpp
 fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
@@ -261,6 +271,7 @@ h8.cpp
 h89.cpp
 harriet.cpp
 hazeltin.cpp
+hazl1420.cpp
 hec2hrp.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
@@ -283,6 +294,7 @@ hp48.cpp
 hp49gp.cpp
 hp64k.cpp
 hp700.cpp
+hp9825.cpp
 hp9845.cpp
 hp9k.cpp
 hp9k_3xx.cpp
@@ -301,9 +313,9 @@ ibm6580.cpp
 ibmpc.cpp
 ibmpcjr.cpp
 icatel.cpp
+icebox.cpp
 ie15.cpp
 if800.cpp
-imds.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -322,12 +334,16 @@ iq151.cpp
 iqunlim.cpp
 iris3130.cpp
 irisha.cpp
+iris_power.cpp
+is48x.cpp
 isbc.cpp
 isbc8010.cpp
 isbc8030.cpp
 iskr103x.cpp
+itt1700.cpp
 itt3030.cpp
 jade.cpp
+jazz.cpp
 jonos.cpp
 jr100.cpp
 jr200.cpp
@@ -354,6 +370,7 @@ lc80.cpp
 lcmate2.cpp
 leapster.cpp
 learnwin.cpp
+lee1214.cpp
 lft.cpp
 lg-dvd.cpp
 lilith.cpp
@@ -400,6 +417,7 @@ microkit.cpp
 micronic.cpp
 microtan.cpp
 microterm.cpp
+microterm_f8.cpp
 microvsn.cpp
 mikro80.cpp
 mikromik.cpp
@@ -412,6 +430,7 @@ minicom.cpp
 miniforce.cpp
 miniframe.cpp
 minitel_2_rpic.cpp
+mips.cpp
 mits680b.cpp
 mk1.cpp
 mk14.cpp
@@ -426,6 +445,7 @@ modellot.cpp
 modena.cpp
 molecular.cpp
 monty.cpp
+mpc3000.cpp
 mpf1.cpp
 mps1230.cpp
 mpz80.cpp
@@ -456,12 +476,15 @@ nakajies.cpp
 nanos.cpp
 nascom1.cpp
 nc.cpp
+ncd17c.cpp
+ncdmips.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp
 newbrain.cpp
 next.cpp
+nforcepc.cpp
 ngen.cpp
 ngp.cpp
 nokia_3310.cpp
@@ -470,7 +493,9 @@ novag6502.cpp
 novag68k.cpp
 novagf8.cpp
 novagmcs48.cpp
+o2.cpp
 ob68k1a.cpp
+octane.cpp
 octopus.cpp
 odyssey2.cpp
 okean240.cpp
@@ -580,6 +605,7 @@ pyl601.cpp
 ql.cpp
 qtsbc.cpp
 qvt70.cpp
+qvt102.cpp
 qvt103.cpp
 qvt201.cpp
 qvt6800.cpp
@@ -623,6 +649,7 @@ sc2.cpp
 scopus.cpp
 scorpion.cpp
 scv.cpp
+sdk51.cpp
 sdk80.cpp
 sdk85.cpp
 sdk86.cpp
@@ -633,6 +660,7 @@ segapm.cpp
 selz80.cpp
 sg1000.cpp
 sh4robot.cpp
+si5500.cpp
 sitcom.cpp
 sk1.cpp
 slc1.cpp
@@ -693,14 +721,17 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 terco.cpp
+terminal.cpp
 test_t400.cpp
 testconsole.cpp
+textelcomp.cpp
 tg100.cpp
 thomson.cpp
 ti630.cpp
 ti74.cpp
 ti85.cpp
 ti89.cpp
+ti931.cpp
 ti99_2.cpp
 ti99_4p.cpp
 ti99_4x.cpp
@@ -764,6 +795,7 @@ vax11.cpp
 vboy.cpp
 vc4000.cpp
 vcs80.cpp
+vdm7932x.cpp
 vector06.cpp
 vector4.cpp
 vectrex.cpp
@@ -780,7 +812,6 @@ vixen.cpp
 vk100.cpp
 votrpss.cpp
 votrtnt.cpp
-vp122.cpp
 vp415.cpp
 vp60.cpp
 vsmilepro.cpp
@@ -798,6 +829,9 @@ vtech_unk2.cpp
 wangpc.cpp
 wicat.cpp
 wswan.cpp
+wy100.cpp
+wy50.cpp
+wy85.cpp
 wyse.cpp
 x07.cpp
 x1.cpp
@@ -810,6 +844,7 @@ xor100.cpp
 ymmu100.cpp
 z100.cpp
 z1013.cpp
+z29.cpp
 z80dev.cpp
 z80ne.cpp
 z88.cpp

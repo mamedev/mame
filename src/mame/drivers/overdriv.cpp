@@ -345,8 +345,7 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_16BIT)
-	MCFG_EEPROM_DATA(overdriv_default_eeprom, 128)
+	EEPROM_ER5911_16BIT(config, "eeprom").default_data(overdriv_default_eeprom, 128);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -378,16 +377,14 @@ MACHINE_CONFIG_START(overdriv_state::overdriv)
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)
 	MCFG_K053250_ADD("k053250_2", "palette", "screen", 0, 0)
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(24'000'000)/4)
-	MCFG_K053252_OFFSETS(13*8, 2*8)
+	K053252(config, m_k053252, XTAL(24'000'000)/4);
+	m_k053252->set_offsets(13*8, 2*8);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);
 
 	MCFG_K053260_ADD("k053260_1", XTAL(3'579'545))
 	MCFG_DEVICE_ADDRESS_MAP(0, overdriv_k053260_map)

@@ -756,18 +756,18 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_DEVICE_IO_MAP(avigo_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, avigo_state, com_interrupt))
+	NS16550(config, m_uart, XTAL(1'843'200));
+	m_uart->out_tx_callback().set(m_serport, FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set(m_serport, FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set(m_serport, FUNC(rs232_port_device::write_rts));
+	m_uart->out_int_callback().set(FUNC(avigo_state::com_interrupt));
 
-	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
+	RS232_PORT(config, m_serport, default_rs232_devices, nullptr);
+	m_serport->rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	m_serport->dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	m_serport->dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	m_serport->ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	m_serport->cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -790,31 +790,21 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, avigo_state, tc8521_alarm_int))
+	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
+	rtc.out_alarm_callback().set(FUNC(avigo_state::tc8521_alarm_int));
 
 	/* flash ROMs */
-	MCFG_AMD_29F080_ADD("flash0")
-	MCFG_AMD_29F080_ADD("flash1")
-	MCFG_AMD_29F080_ADD("flash2")
+	AMD_29F080(config, "flash0");
+	AMD_29F080(config, "flash1");
+	AMD_29F080(config, "flash2");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
-	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(avigo_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "bank0").set_map(&avigo_state::avigo_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&avigo_state::avigo_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(avigo_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", avigo_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(avigo_state::nvram_init));
 
 	// IRQ 1 is used for scan the pen and for cursor blinking
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scan_timer", avigo_state, avigo_scan_timer, attotime::from_hz(50))

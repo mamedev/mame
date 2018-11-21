@@ -152,6 +152,7 @@ public:
 	}
 
 	void to9(machine_config &config);
+	void to7_base(machine_config &config);
 	void to7(machine_config &config);
 	void mo5e(machine_config &config);
 	void to770a(machine_config &config);
@@ -374,7 +375,7 @@ private:
 	int m_centronics_busy;
 	int m_centronics_perror;
 
-	MC6854_OUT_FRAME_CB(to7_network_got_frame);
+	void to7_network_got_frame(uint8_t *data, int length);
 
 	void mo5(address_map &map);
 	void mo5nr(address_map &map);

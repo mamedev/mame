@@ -160,17 +160,17 @@ MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("riot1", RIOT6532, MASTER_CLOCK / 3)
-	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT0_SWA"))
-	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT0_SWB"))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
+	riot6532_device &riot1(RIOT6532(config, "riot1", MASTER_CLOCK / 3));
+	riot1.in_pa_callback().set_ioport("RIOT0_SWA");
+	riot1.in_pb_callback().set_ioport("RIOT0_SWB");
+	riot1.out_pb_callback().set("watchdog", FUNC(watchdog_timer_device::reset_w));
 
-	MCFG_DEVICE_ADD("riot2", RIOT6532, MASTER_CLOCK / 3)
-	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT1_SWA"))
-	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT1_SWB"))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, tourtabl_state, tourtabl_led_w))
+	riot6532_device &riot2(RIOT6532(config, "riot2", MASTER_CLOCK / 3));
+	riot2.in_pa_callback().set_ioport("RIOT1_SWA");
+	riot2.in_pb_callback().set_ioport("RIOT1_SWB");
+	riot2.out_pb_callback().set(FUNC(tourtabl_state::tourtabl_led_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")

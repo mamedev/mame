@@ -331,9 +331,9 @@ static INPUT_PORTS_START( canvas )
 	PORT_DIPSETTING(    0x10, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x08, "Infinite Lives (Cheat)" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -401,15 +401,13 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
 MACHINE_CONFIG_END
 
 
@@ -479,5 +477,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT180, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )

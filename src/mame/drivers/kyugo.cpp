@@ -554,19 +554,18 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(18'432'000)/12));  /* verified on pcb */
+	ay1.port_a_read_callback().set_ioport("DSW1");
+	ay1.port_b_read_callback().set_ioport("DSW2");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30);  /* verified on pcb */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kyugo_state::gyrodine)
 	kyugo_base(config);
 	/* add watchdog */
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gyrodine_main_map)
 MACHINE_CONFIG_END

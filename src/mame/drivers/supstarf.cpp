@@ -187,26 +187,26 @@ MACHINE_CONFIG_START(supstarf_state::supstarf)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, supstarf_state, port2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, supstarf_state, phase_detect_r))
 
-	MCFG_DEVICE_ADD("soundlatch1", I8212, 0)
-	MCFG_I8212_MD_CALLBACK(CONSTANT(0))
-	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	I8212(config, m_soundlatch[0], 0);
+	m_soundlatch[0]->md_rd_callback().set_constant(0);
+	m_soundlatch[0]->int_wr_callback().set_inputline("maincpu", I8085_RST55_LINE);
 
-	MCFG_DEVICE_ADD("soundlatch2", I8212, 0)
-	MCFG_I8212_MD_CALLBACK(CONSTANT(0))
-	MCFG_I8212_INT_CALLBACK(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
+	I8212(config, m_soundlatch[1], 0);
+	m_soundlatch[1]->md_rd_callback().set_constant(0);
+	m_soundlatch[1]->int_wr_callback().set_inputline("soundcpu", MCS48_INPUT_IRQ);
 	//MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("maincpu", I8085_READY_LINE))
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("psg1", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, supstarf_state, lights_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, supstarf_state, lights_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_psg[0], XTAL(5'068'800) / 6); // from 8035 pin 1 (T0)
+	m_psg[0]->port_a_write_callback().set(FUNC(supstarf_state::lights_a_w));
+	m_psg[0]->port_b_write_callback().set(FUNC(supstarf_state::lights_b_w));
+	m_psg[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("psg2", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JO"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("I1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_psg[1],  XTAL(5'068'800) / 6); // from 8035 pin 1 (T0)
+	m_psg[1]->port_a_read_callback().set_ioport("JO");
+	m_psg[1]->port_b_read_callback().set_ioport("I1");
+	m_psg[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START(supstarf)

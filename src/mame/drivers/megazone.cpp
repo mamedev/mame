@@ -312,13 +312,13 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(900))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 13A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, megazone_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, megazone_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, megazone_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, megazone_state, irq_mask_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 13A
+	mainlatch.q_out_cb<0>().set(FUNC(megazone_state::coin_counter_2_w));
+	mainlatch.q_out_cb<1>().set(FUNC(megazone_state::coin_counter_1_w));
+	mainlatch.q_out_cb<5>().set(FUNC(megazone_state::flipscreen_w));
+	mainlatch.q_out_cb<7>().set(FUNC(megazone_state::irq_mask_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -338,14 +338,14 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(14'318'181)/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, megazone_state, megazone_port_a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, megazone_state, megazone_port_b_w))
-	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.30)
-	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
-	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(14'318'181)/8));
+	aysnd.port_a_read_callback().set(FUNC(megazone_state::megazone_port_a_r));
+	aysnd.port_b_write_callback().set(FUNC(megazone_state::megazone_port_b_w));
+	aysnd.add_route(0, "filter.0.0", 0.30);
+	aysnd.add_route(1, "filter.0.1", 0.30);
+	aysnd.add_route(2, "filter.0.2", 0.30);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

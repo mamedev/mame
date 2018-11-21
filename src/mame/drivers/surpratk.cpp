@@ -176,14 +176,9 @@ MACHINE_CONFIG_START(surpratk_state::surpratk)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, surpratk_state, banking_callback))
 
-	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x800)
+	ADDRESS_MAP_BANK(config, "bank0000").set_map(&surpratk_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -213,10 +208,10 @@ MACHINE_CONFIG_START(surpratk_state::surpratk)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.irq_handler().set_inputline(m_maincpu, KONAMI_FIRQ_LINE);
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 /***************************************************************************

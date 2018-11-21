@@ -81,7 +81,7 @@ MACHINE_CONFIG_START(system_board_y2_state::system_board_y2)
 	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
-ROM_START( kof2002um )
+ROM_START( kof2002um ) // The King of Fighters 复仇之路/Fùchóu zhī lù/Road to Revenge
 	ROM_REGION( 0x8000000, "boot", 0 ) // sound program only? or boot too?
 	ROM_LOAD( "s29gl01gp11fcr2.u103", 0x0000000, 0x8000000, CRC(722cbad1) SHA1(0292be12255ee4bd586166a3f5cd108c5453295b) )
 
@@ -104,5 +104,5 @@ ROM_END
 
 /* The title screen shows "The King of Fighters - Road to Revenge" (Chinese / English) while the speech on the title screen announcer says "The King of Fighters 2002 Unlimited Match"
    There is a PS2 version with the Unlimited Match title screen, but unless it's used for a different region the arcade doesn't show that title, only announces it. */
-GAME( 2009, kof2002um,  0,         system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SNK Playmore / New Channel", "The King of Fighters - Road to Revenge / The King of Fighters 2002 Unlimited Match (China)", MACHINE_IS_SKELETON ) // also Export?
-GAME( 2009, kof2002umj, kof2002um, system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SNK Playmore / New Channel", "The King of Fighters - Road to Revenge / The King of Fighters 2002 Unlimited Match (Japan)", MACHINE_IS_SKELETON )
+GAME( 2009, kof2002um,  0,         system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SNK Playmore / New Channel", "The King of Fighters - Fuchou Zhi Lu/Road to Revenge / The King of Fighters 2002 Unlimited Match (China)", MACHINE_IS_SKELETON ) // also Export?
+GAME( 2009, kof2002umj, kof2002um, system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SNK Playmore",               "The King of Fighters 2002 Unlimited Match (Japan)",                                                        MACHINE_IS_SKELETON )

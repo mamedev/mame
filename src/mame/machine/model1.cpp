@@ -1723,7 +1723,7 @@ void model1_state::copro_hle_swa()
 	}
 }
 
-MACHINE_START_MEMBER(model1_state,model1)
+void model1_state::machine_start()
 {
 	m_digits.resolve();
 	m_copro_ram_data = std::make_unique<u32[]>(0x8000);

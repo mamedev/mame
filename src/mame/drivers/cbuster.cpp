@@ -161,8 +161,6 @@ void cbuster_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -308,8 +306,9 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_DEVICE_PROGRAM_MAP(twocrude_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_assert)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45, 6MHz Verified */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45, 6MHz Verified */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cbuster_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -363,16 +362,16 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9) /* 3.58MHz Verified */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000)/9)); /* 3.58MHz Verified */
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.45);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH) /* 1.0068MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

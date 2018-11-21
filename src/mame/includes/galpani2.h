@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_GALPANI2_H
+#define MAME_INCLUDES_GALPANI2_H
+
+#pragma once
+
 #include "video/kaneko_spr.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
@@ -9,8 +14,8 @@
 class galpani2_state : public driver_device
 {
 public:
-	galpani2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galpani2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"sub"),
 		m_kaneko_spr(*this, "kan_spr"),
@@ -78,3 +83,5 @@ private:
 	void galpani2_mem1(address_map &map);
 	void galpani2_mem2(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALPANI2_H

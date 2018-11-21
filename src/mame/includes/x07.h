@@ -165,16 +165,16 @@ class x07_state : public driver_device
 {
 public:
 	x07_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_printer(*this, "printer"),
-			m_beep(*this, "beeper"),
-			m_ram(*this, RAM_TAG),
-			m_nvram1(*this, "nvram1"),
-			m_nvram2(*this, "nvram2"),
-			m_cassette(*this, "cassette"),
-			m_card(*this, "cardslot"),
-			m_warm_start(1)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_printer(*this, "printer")
+		, m_beep(*this, "beeper")
+		, m_ram(*this, RAM_TAG)
+		, m_nvram1(*this, "nvram1")
+		, m_nvram2(*this, "nvram2")
+		, m_cassette(*this, "cassette")
+		, m_card(*this, "cardslot")
+		, m_warm_start(1)
 	{ }
 
 	void x07(machine_config &config);

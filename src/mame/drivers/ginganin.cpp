@@ -256,9 +256,9 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, SOUND_CLOCK/2)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, ginganin_state, ptm_irq))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", SOUND_CLOCK/2));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.o1_callback().set(FUNC(ginganin_state::ptm_irq));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -276,10 +276,9 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("psg", YM2149, SOUND_CLOCK / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	YM2149(config, "psg", SOUND_CLOCK / 2).add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	MCFG_DEVICE_ADD("ymsnd", Y8950, SOUND_CLOCK) /* The Y8950 is basically a YM3526 with ADPCM built in */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

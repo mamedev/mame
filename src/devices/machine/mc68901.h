@@ -42,47 +42,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MC68901_TIMER_CLOCK(_clk) \
-	downcast<mc68901_device &>(*device).set_timer_clock(_clk);
-
-#define MCFG_MC68901_RX_CLOCK(_clk) \
-	downcast<mc68901_device &>(*device).set_rx_clock(_clk);
-
-#define MCFG_MC68901_TX_CLOCK(_clk) \
-	downcast<mc68901_device &>(*device).set_tx_clock(_clk);
-
-#define MCFG_MC68901_OUT_IRQ_CB(_devcb) \
-	downcast<mc68901_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68901_OUT_GPIO_CB(_devcb) \
-	downcast<mc68901_device &>(*device).set_out_gpio_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68901_OUT_TAO_CB(_devcb) \
-	downcast<mc68901_device &>(*device).set_out_tao_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68901_OUT_TBO_CB(_devcb) \
-	downcast<mc68901_device &>(*device).set_out_tbo_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68901_OUT_TCO_CB(_devcb) \
-	downcast<mc68901_device &>(*device).set_out_tco_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68901_OUT_TDO_CB(_devcb) \
-	downcast<mc68901_device &>(*device).set_out_tdo_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68901_OUT_SO_CB(_devcb) \
-	downcast<mc68901_device &>(*device).set_out_so_callback(DEVCB_##_devcb);
-
-/*#define MCFG_MC68901_OUT_RR_CB(_devcb) \
-    downcast<mc68901_device &>(*device).set_out_rr_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68901_OUT_TR_CB(_devcb) \
-    downcast<mc68901_device &>(*device).set_out_tr_callback(DEVCB_##_devcb);*/
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -102,15 +61,16 @@ public:
 	void set_timer_clock(const XTAL &xtal) { set_timer_clock(xtal.value()); }
 	void set_rx_clock(const XTAL &xtal) { set_rx_clock(xtal.value()); }
 	void set_tx_clock(const XTAL &xtal) { set_tx_clock(xtal.value()); }
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_gpio_callback(Object &&cb) { return m_out_gpio_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_tao_callback(Object &&cb) { return m_out_tao_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_tbo_callback(Object &&cb) { return m_out_tbo_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_tco_callback(Object &&cb) { return m_out_tco_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_tdo_callback(Object &&cb) { return m_out_tdo_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_so_callback(Object &&cb) { return m_out_so_cb.set_callback(std::forward<Object>(cb)); }
-	//template <class Object> devcb_base &set_rr_callback(Object &&cb) { return m_out_rr_cb.set_callback(std::forward<Object>(cb)); }
-	//template <class Object> devcb_base &set_tr_callback(Object &&cb) { return m_out_tr_cb.set_callback(std::forward<Object>(cb)); }
+
+	auto out_irq_cb() { return m_out_irq_cb.bind(); }
+	auto out_gpio_cb() { return m_out_gpio_cb.bind(); }
+	auto out_tao_cb() { return m_out_tao_cb.bind(); }
+	auto out_tbo_cb() { return m_out_tbo_cb.bind(); }
+	auto out_tco_cb() { return m_out_tco_cb.bind(); }
+	auto out_tdo_cb() { return m_out_tdo_cb.bind(); }
+	auto out_so_cb() { return m_out_so_cb.bind(); }
+	//auto out_rr_cb() { return m_out_rr_cb.bind(); }
+	//auto out_tr_cb() { return m_out_tr_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

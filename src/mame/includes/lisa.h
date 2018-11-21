@@ -11,6 +11,7 @@
 #ifndef MAME_INCLUDES_LISA_H
 #define MAME_INCLUDES_LISA_H
 
+#include "cpu/m6502/m6504.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"
@@ -104,8 +105,8 @@ struct lisa_features_t
 class lisa_state : public driver_device
 {
 public:
-	lisa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lisa_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via0(*this, "via6522_0"),
 		m_via1(*this, "via6522_1"),
@@ -114,6 +115,7 @@ public:
 		m_speaker(*this, "speaker"),
 		m_nvram(*this, "nvram"),
 		m_latch(*this, "latch"),
+		m_fdc_cpu(*this,"fdccpu"),
 		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram"),
 		m_io_line0(*this, "LINE0"),
@@ -147,6 +149,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
 	required_device<ls259_device> m_latch;
+	required_device<m6504_device> m_fdc_cpu;
 
 	required_shared_ptr<uint8_t> m_fdc_rom;
 	required_shared_ptr<uint8_t> m_fdc_ram;

@@ -38,6 +38,7 @@ Notes:
 #include "cpu/cosmac/cosmac.h"
 #include "machine/7474.h"
 #include "machine/clock.h"
+#include "machine/ripple_counter.h"
 #include "sound/ay8910.h"
 #include "sound/cdp1863.h"
 #include "speaker.h"
@@ -53,6 +54,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_4013a(*this, "4013a")
 		, m_4013b(*this, "4013b")
+		, m_4020(*this, "4020")
 		, m_1863(*this, "1863")
 		, m_aysnd1(*this, "aysnd1")
 		, m_keyboard(*this, "X.%u", 0)
@@ -75,8 +77,7 @@ private:
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_READ_LINE_MEMBER(ef1_r);
 	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE_LINE_MEMBER(q4013a_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	DECLARE_WRITE16_MEMBER(clockcnt_w);
 	DECLARE_WRITE_LINE_MEMBER(clock2_w);
 	// Zira
 	DECLARE_WRITE8_MEMBER(sound_d_w);
@@ -89,7 +90,6 @@ private:
 	void play_2_map(address_map &map);
 	void zira_sound_map(address_map &map);
 
-	uint16_t m_clockcnt;
 	uint16_t m_resetcnt;
 	uint8_t m_kbdrow;
 	uint8_t m_segment[5];
@@ -102,6 +102,7 @@ private:
 	required_device<cosmac_device> m_maincpu;
 	required_device<ttl7474_device> m_4013a;
 	required_device<ttl7474_device> m_4013b;
+	required_device<ripple_counter_device> m_4020;
 	optional_device<cdp1863_device> m_1863;
 	optional_device<ay8910_device> m_aysnd1;
 	required_ioport_array<8> m_keyboard;
@@ -209,7 +210,6 @@ INPUT_PORTS_END
 
 void play_2_state::machine_reset()
 {
-	m_clockcnt = 0;
 	m_resetcnt = 0;
 	m_4013b->d_w(1);
 	m_kbdrow = 0;
@@ -292,7 +292,7 @@ READ_LINE_MEMBER( play_2_state::clear_r )
 
 READ_LINE_MEMBER( play_2_state::ef1_r )
 {
-	return (!BIT(m_clockcnt, 10)); // inverted
+	return (!BIT(m_4020->count(), 10)); // inverted
 }
 
 READ_LINE_MEMBER( play_2_state::ef4_r )
@@ -300,28 +300,16 @@ READ_LINE_MEMBER( play_2_state::ef4_r )
 	return BIT(m_keyboard[7]->read(), 0); // inverted test button - doesn't seem to do anything
 }
 
-WRITE_LINE_MEMBER( play_2_state::clock_w )
+WRITE16_MEMBER( play_2_state::clockcnt_w )
 {
-	m_4013a->clock_w(state);
-
-	if (!state)
-	{
-		m_clockcnt++;
-		// simulate 4020 chip
-		if ((m_clockcnt & 0x3ff) == 0)
-			m_4013b->preset_w(BIT(m_clockcnt, 10)); // Q10 output
-	}
+	if ((data & 0x3ff) == 0)
+		m_4013b->preset_w(BIT(data, 10)); // Q10 output
 }
 
 WRITE_LINE_MEMBER( play_2_state::clock2_w )
 {
 	m_4013b->clock_w(state);
 	m_maincpu->ef3_w(state); // inverted
-}
-
-WRITE_LINE_MEMBER( play_2_state::q4013a_w )
-{
-	m_clockcnt = 0;
 }
 
 // *********** Zira Sound handlers ***************** (same as cidelsa.cpp)
@@ -374,10 +362,11 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	m_maincpu->clear_cb().set(FUNC(play_2_state::clear_r));
 	m_maincpu->ef1_cb().set(FUNC(play_2_state::ef1_r));
 	m_maincpu->ef4_cb().set(FUNC(play_2_state::ef4_r));
-	m_maincpu->q_cb().set("4013a", FUNC(ttl7474_device::clear_w));
-	m_maincpu->tpb_cb().set(FUNC(play_2_state::clock_w));
+	m_maincpu->q_cb().set(m_4013a, FUNC(ttl7474_device::clear_w));
+	m_maincpu->tpb_cb().set(m_4013a, FUNC(ttl7474_device::clock_w));
+	m_maincpu->tpb_cb().append(m_4020, FUNC(ripple_counter_device::clock_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_play_2);
@@ -388,11 +377,15 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	// This is actually a 4013 chip (has 2 RS flipflops)
 	TTL7474(config, m_4013a, 0);
 	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
-	m_4013a->output_cb().set(FUNC(play_2_state::q4013a_w));
+	m_4013a->output_cb().set(m_4020, FUNC(ripple_counter_device::reset_w)); // TODO: also CKD for display
 
 	TTL7474(config, m_4013b, 0);
 	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w));
 	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // int is reversed in mame
+
+	RIPPLE_COUNTER(config, m_4020);
+	m_4020->set_stages(14); // only Q10 is actually used
+	m_4020->count_out_cb().set(FUNC(play_2_state::clockcnt_w));
 
 	/* Sound */
 	genpin_audio(config);
@@ -413,8 +406,7 @@ MACHINE_CONFIG_START(play_2_state::zira)
 	MCFG_COP400_WRITE_L_CB(WRITE8(*this, play_2_state, psg_w))
 	MCFG_COP400_READ_IN_CB(READ8(*this, play_2_state, sound_in_r))
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, 2_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_aysnd1, 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 void play_2_state::init_zira()

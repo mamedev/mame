@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(asterix_state::asterix)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // 8MHz Z80E ??
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -301,9 +301,7 @@ MACHINE_CONFIG_START(asterix_state::asterix)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'000'000)/8) // 4MHz
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); // 4MHz
 
 	MCFG_K053260_ADD("k053260", XTAL(32'000'000)/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)

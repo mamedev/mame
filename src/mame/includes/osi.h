@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Robbbert, Wilbert Pol
-#pragma once
-
 #ifndef MAME_INCLUDES_OSI_H
 #define MAME_INCLUDES_OSI_H
+
+#pragma once
 
 
 #include "cpu/m6502/m6502.h"
@@ -43,7 +43,7 @@ public:
 		, m_io_keyboard(*this, "ROW%u", 0)
 		, m_io_sound(*this, "Sound")
 		, m_io_reset(*this, "Reset")
-		{ }
+	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( keyboard_r );

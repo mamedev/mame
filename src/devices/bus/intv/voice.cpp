@@ -98,7 +98,7 @@ const tiny_rom_entry *intv_voice_device::device_rom_region() const
 READ16_MEMBER(intv_voice_device::read_speech)
 {
 	if (ACCESSING_BITS_0_7)
-		return m_speech->spb640_r(space, offset, mem_mask);
+		return m_speech->spb640_r(offset);
 	else
 		return 0xff;
 }
@@ -110,7 +110,7 @@ READ16_MEMBER(intv_voice_device::read_speech)
 WRITE16_MEMBER(intv_voice_device::write_speech)
 {
 	if (ACCESSING_BITS_0_7)
-		return m_speech->spb640_w(space, offset, data, mem_mask);
+		return m_speech->spb640_w(offset, data);
 }
 
 

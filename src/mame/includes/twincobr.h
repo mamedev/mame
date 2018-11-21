@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "machine/74259.h"
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
 #include "video/toaplan_scu.h"
@@ -28,7 +29,9 @@ public:
 		m_spritegen(*this, "scu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_mainlatch(*this, "mainlatch"),
+		m_coinlatch(*this, "coinlatch")
 	{ }
 
 	void twincobr(machine_config &config);
@@ -136,6 +139,8 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_mainlatch;
+	required_device<ls259_device> m_coinlatch;
 
 	void DSP_io_map(address_map &map);
 	void DSP_program_map(address_map &map);

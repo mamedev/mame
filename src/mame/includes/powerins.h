@@ -16,7 +16,8 @@ public:
 		m_vctrl_0(*this, "vctrl_0"),
 		m_vram(*this, "vram_%u", 0U),
 		m_spriteram(*this, "spriteram"),
-		m_okibank(*this, "okibank") { }
+		m_okibank(*this, "okibank")
+	{ }
 
 	void powerinsa(machine_config &config);
 	void powerinsb(machine_config &config);

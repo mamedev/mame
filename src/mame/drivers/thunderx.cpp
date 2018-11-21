@@ -648,14 +648,9 @@ MACHINE_CONFIG_START(thunderx_state::scontra)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(scontra_sound_map)
 
-	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(scontra_bank5800_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+	ADDRESS_MAP_BANK(config, m_bank5800).set_map(&thunderx_state::scontra_bank5800_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -682,11 +677,9 @@ MACHINE_CONFIG_START(thunderx_state::scontra)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);  /* verified on pcb */
 
 	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, thunderx_state, volume_callback))
@@ -712,9 +705,7 @@ MACHINE_CONFIG_START(thunderx_state::thunderx)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(thunderx_sound_map)
 
-	MCFG_DEVICE_MODIFY("bank5800")
-	MCFG_DEVICE_PROGRAM_MAP(thunderx_bank5800_map)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
+	m_bank5800->set_map(&thunderx_state::thunderx_bank5800_map).set_addr_width(13);
 
 	MCFG_DEVICE_REMOVE("k007232")
 MACHINE_CONFIG_END

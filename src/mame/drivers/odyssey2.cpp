@@ -113,7 +113,10 @@ private:
 	DECLARE_WRITE8_MEMBER(p2_write);
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_WRITE8_MEMBER(i8243_port_w);
+	void i8243_p4_w(uint8_t data);
+	void i8243_p5_w(uint8_t data);
+	void i8243_p6_w(uint8_t data);
+	void i8243_p7_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
 	void g7400_io(address_map &map);
@@ -555,7 +558,7 @@ WRITE8_MEMBER(odyssey2_state::p2_write)
 WRITE8_MEMBER(g7400_state::p2_write)
 {
 	m_p2 = data;
-	m_i8243->p2_w( space, 0, m_p2 & 0x0f );
+	m_i8243->p2_w(m_p2 & 0x0f);
 }
 
 
@@ -587,43 +590,47 @@ WRITE8_MEMBER(odyssey2_state::bus_write)
     i8243 in the g7400
 */
 
-WRITE8_MEMBER(g7400_state::i8243_port_w)
+void g7400_state::i8243_p4_w(uint8_t data)
 {
-	switch ( offset & 3 )
-	{
-		case 0: // "port 4"
-logerror("setting ef-port4 to %02x\n", data);
-			m_ic674_decode[4] = BIT(data,0);
-			m_ic674_decode[5] = BIT(data,1);
-			m_ic674_decode[6] = BIT(data,2);
-			m_ic674_decode[7] = BIT(data,3);
-			break;
+	// "port 4"
+	logerror("setting ef-port4 to %02x\n", data);
+	m_ic674_decode[4] = BIT(data,0);
+	m_ic674_decode[5] = BIT(data,1);
+	m_ic674_decode[6] = BIT(data,2);
+	m_ic674_decode[7] = BIT(data,3);
+}
 
-		case 1: // "port 5"
-logerror("setting ef-port5 to %02x\n", data);
-			m_ic674_decode[0] = BIT(data,0);
-			m_ic674_decode[1] = BIT(data,1);
-			m_ic674_decode[2] = BIT(data,2);
-			m_ic674_decode[3] = BIT(data,3);
-			break;
 
-		case 2: // "port 6"
-logerror("setting vdc-port6 to %02x\n", data);
-			m_ic678_decode[4] = BIT(data,0);
-			m_ic678_decode[5] = BIT(data,1);
-			m_ic678_decode[6] = BIT(data,2);
-			m_ic678_decode[7] = BIT(data,3);
-			break;
+void g7400_state::i8243_p5_w(uint8_t data)
+{
+	// "port 5"
+	logerror("setting ef-port5 to %02x\n", data);
+	m_ic674_decode[0] = BIT(data,0);
+	m_ic674_decode[1] = BIT(data,1);
+	m_ic674_decode[2] = BIT(data,2);
+	m_ic674_decode[3] = BIT(data,3);
+}
 
-		case 3: // "port 7"
-logerror("setting vdc-port7 to %02x\n", data);
-			m_ic678_decode[0] = BIT(data,0);
-			m_ic678_decode[1] = BIT(data,1);
-			m_ic678_decode[2] = BIT(data,2);
-			m_ic678_decode[3] = BIT(data,3);
-			break;
 
-	}
+void g7400_state::i8243_p6_w(uint8_t data)
+{
+	// "port 6"
+	logerror("setting vdc-port6 to %02x\n", data);
+	m_ic678_decode[4] = BIT(data,0);
+	m_ic678_decode[5] = BIT(data,1);
+	m_ic678_decode[6] = BIT(data,2);
+	m_ic678_decode[7] = BIT(data,3);
+}
+
+
+void g7400_state::i8243_p7_w(uint8_t data)
+{
+	// "port 7"
+	logerror("setting vdc-port7 to %02x\n", data);
+	m_ic678_decode[0] = BIT(data,0);
+	m_ic678_decode[1] = BIT(data,1);
+	m_ic678_decode[2] = BIT(data,2);
+	m_ic678_decode[3] = BIT(data,3);
 }
 
 
@@ -753,12 +760,12 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, g7400_state, bus_write))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	MCFG_SCREEN_RAW_PARAMS(3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -766,12 +773,16 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
-	MCFG_I8243_ADD( "i8243", CONSTANT(0), WRITE8(*this, g7400_state,i8243_port_w))
+	I8243(config, m_i8243);
+	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_p4_w));
+	m_i8243->p5_out_cb().set(FUNC(g7400_state::i8243_p5_w));
+	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_p6_w));
+	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_p7_w));
 
-	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
+	MCFG_EF9340_1_ADD("ef9340_1", 3540000, "screen")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, g7400_state, scanline_postprocess ) )
+	MCFG_I8245_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);
@@ -794,12 +805,12 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, g7400_state, bus_write))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	MCFG_SCREEN_RAW_PARAMS(3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -807,12 +818,16 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
-	MCFG_I8243_ADD( "i8243", CONSTANT(0), WRITE8(*this, g7400_state,i8243_port_w))
+	I8243(config, m_i8243);
+	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_p4_w));
+	m_i8243->p5_out_cb().set(FUNC(g7400_state::i8243_p5_w));
+	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_p6_w));
+	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_p7_w));
 
-	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
+	MCFG_EF9340_1_ADD("ef9340_1", 3540000, "screen")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_I8244_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, g7400_state, scanline_postprocess ) )
+	MCFG_I8244_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);

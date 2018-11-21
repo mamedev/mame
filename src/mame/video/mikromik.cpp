@@ -67,7 +67,7 @@ void mm1_state::mm1_upd7220_map(address_map &map)
 
 
 //-------------------------------------------------
-//  UPD7220_INTERFACE( hgdc_intf )
+//  UPD7220 callbacks
 //-------------------------------------------------
 
 UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
@@ -148,8 +148,8 @@ MACHINE_CONFIG_START(mm1_state::mm1m6_video)
 	MCFG_I8275_VRTC_CALLBACK(WRITELINE(UPD7220_TAG, upd7220_device, ext_sync_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, XTAL(18'720'000)/8)
-	MCFG_DEVICE_ADDRESS_MAP(0, mm1_upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mm1_state, hgdc_display_pixels)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD7220(config, m_hgdc, XTAL(18'720'000)/8);
+	m_hgdc->set_addrmap(0, &mm1_state::mm1_upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(mm1_state::hgdc_display_pixels), this);
+	m_hgdc->set_screen(SCREEN_TAG);
 MACHINE_CONFIG_END

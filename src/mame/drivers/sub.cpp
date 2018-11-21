@@ -316,13 +316,13 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_DEVICE_IO_MAP(subm_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(sub_state, sound_irq,  120) //???
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sub_state, int_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sub_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // same as Q0?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(sub_state::int_mask_w));
+	mainlatch.q_out_cb<1>().set(FUNC(sub_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set_nop(); // same as Q0?
+	mainlatch.q_out_cb<5>().set_nop();
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -342,16 +342,14 @@ MACHINE_CONFIG_START(sub_state::sub)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	AY8910(config, "ay1", MASTER_CLOCK/6/2).add_route(ALL_OUTPUTS, "mono", 0.23); /* ? Mhz */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	AY8910(config, "ay2", MASTER_CLOCK/6/2).add_route(ALL_OUTPUTS, "mono", 0.23); /* ? Mhz */
 MACHINE_CONFIG_END
 
 

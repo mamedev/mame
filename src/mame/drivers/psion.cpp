@@ -199,7 +199,7 @@ WRITE8_MEMBER( psion_state::io_w )
 	switch (offset & 0x0ffc0)
 	{
 	case 0x80:
-		m_lcdc->write(space, offset & 0x01, data);
+		m_lcdc->write(offset & 0x01, data);
 		break;
 	default:
 		io_rw(space, offset);
@@ -211,7 +211,7 @@ READ8_MEMBER( psion_state::io_r )
 	switch (offset & 0xffc0)
 	{
 	case 0x80:
-		return m_lcdc->read(space, offset & 0x01);
+		return m_lcdc->read(offset & 0x01);
 	default:
 		io_rw(space, offset);
 	}
@@ -594,8 +594,8 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", psion_state, nvram_init)     // sys_regs
-	MCFG_NVRAM_ADD_0FILL("nvram2")                                      // RAM
+	NVRAM(config, "nvram1").set_custom_handler(FUNC(psion_state::nvram_init)); // sys_regs
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
 
@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(psion_state::psionp350)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psionp350_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
+	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion_state::psionlz)
@@ -677,7 +677,7 @@ MACHINE_CONFIG_START(psion_state::psionlz)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psionlz_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
+	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
 MACHINE_CONFIG_END
 
 /* ROM definition */

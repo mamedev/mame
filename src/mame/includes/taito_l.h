@@ -126,6 +126,7 @@ public:
 	void raimais_2_map(address_map &map);
 	void raimais_3_map(address_map &map);
 	void raimais_map(address_map &map);
+
 protected:
 	virtual void state_register() override;
 	virtual void taito_machine_reset() override;
@@ -223,6 +224,8 @@ public:
 	DECLARE_MACHINE_RESET(palamed);
 	DECLARE_MACHINE_RESET(cachat);
 
+	void base(machine_config &config);
+	void add_muxes(machine_config &config);
 	void palamed(machine_config &config);
 	void plotting(machine_config &config);
 	void puzznici(machine_config &config);

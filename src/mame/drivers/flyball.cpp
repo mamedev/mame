@@ -465,13 +465,13 @@ MACHINE_CONFIG_START(flyball_state::flyball)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16)
 	MCFG_DEVICE_PROGRAM_MAP(flyball_map)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F7
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, flyball_state, lamp_w)) // 1 player lamp
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // crowd very loud
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // footstep off-on
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // crowd off-on
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // crowd soft-loud
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // bat hit
+	F9334(config, m_outlatch); // F7
+	m_outlatch->q_out_cb<2>().set_nop(); // bat hit
+	m_outlatch->q_out_cb<3>().set_nop(); // crowd soft-loud
+	m_outlatch->q_out_cb<4>().set_nop(); // crowd off-on
+	m_outlatch->q_out_cb<5>().set_nop(); // footstep off-on
+	m_outlatch->q_out_cb<6>().set_nop(); // crowd very loud
+	m_outlatch->q_out_cb<7>().set(FUNC(flyball_state::lamp_w)); // 1 player lamp
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -222,23 +222,6 @@ READ16_MEMBER(taitob_state::trackx_lo_r)
 	return (m_tracky_io[Player]->read() & 0xff) << 8;
 }
 
-WRITE16_MEMBER(taitob_state::gain_control_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		if (offset == 0)
-		{
-			m_mb87078->data_w(data >> 8, 0);
-				//logerror("MB87078 dsel=0 data=%4x\n", data);
-		}
-		else
-		{
-			m_mb87078->data_w(data >> 8, 1);
-				//logerror("MB87078 dsel=1 data=%4x\n", data);
-		}
-	}
-}
-
 INPUT_CHANGED_MEMBER(taitob_c_state::realpunc_sensor)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE);
@@ -427,7 +410,7 @@ void taitob_state::pbobble_map(address_map &map)
 	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
 	map(0x500028, 0x500029).w(FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
 	map(0x50002e, 0x50002f).portr("P3_P4_B");        /* shown in service mode, game omits to read it */
-	map(0x600000, 0x600003).w(FUNC(taitob_state::gain_control_w));
+	map(0x600000, 0x600003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0xff00);
 	map(0x700000, 0x700001).nopr();
 	map(0x700000, 0x700000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x700002, 0x700002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -445,7 +428,7 @@ void taitob_state::spacedx_map(address_map &map)
 	map(0x500026, 0x500027).rw(FUNC(taitob_state::eep_latch_r), FUNC(taitob_state::eeprom_w));
 	map(0x500028, 0x500029).w(FUNC(taitob_state::player_34_coin_ctrl_w));    /* simply locks coins 3&4 out */
 	map(0x50002e, 0x50002f).portr("P3_P4_B");
-	map(0x600000, 0x600003).w(FUNC(taitob_state::gain_control_w));
+	map(0x600000, 0x600003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0xff00);
 	map(0x700000, 0x700001).nopr();
 	map(0x700000, 0x700000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x700002, 0x700002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
@@ -483,7 +466,7 @@ void taitob_state::qzshowby_map(address_map &map)
 	map(0x600000, 0x600001).nopr();
 	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x700000, 0x700003).w(FUNC(taitob_state::gain_control_w));
+	map(0x700000, 0x700003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0xff00);
 	map(0x800000, 0x801fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x900000, 0x90ffff).ram(); /* Main RAM */
 }
@@ -1772,7 +1755,6 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -1830,7 +1812,6 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -1909,7 +1890,6 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -1967,7 +1947,6 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2026,7 +2005,6 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2090,7 +2068,6 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2149,7 +2126,6 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2193,7 +2169,7 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
@@ -2203,8 +2179,8 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	m_tc0640fio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
 	m_tc0640fio->read_7_callback().set_ioport("P1_P2_B");
 
-	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
-	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taitob_state, mb87078_gain_changed))
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(taitob_state::mb87078_gain_changed));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2213,7 +2189,6 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2257,7 +2232,7 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
@@ -2267,8 +2242,8 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	m_tc0640fio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
 	m_tc0640fio->read_7_callback().set_ioport("P1_P2_B");
 
-	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
-	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taitob_state, mb87078_gain_changed))
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(taitob_state::mb87078_gain_changed));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2277,7 +2252,6 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2335,7 +2309,6 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2379,7 +2352,7 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
@@ -2389,8 +2362,8 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	m_tc0640fio->write_4_callback().set(FUNC(taitob_state::player_12_coin_ctrl_w));
 	m_tc0640fio->read_7_callback().set_ioport("P1_P2_B");
 
-	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
-	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taitob_state, mb87078_gain_changed))
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(taitob_state::mb87078_gain_changed));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2399,7 +2372,6 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2457,7 +2429,6 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2520,7 +2491,6 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2578,7 +2548,6 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2645,7 +2614,6 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2710,7 +2678,6 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2767,7 +2734,6 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_c_state, screen_update_realpunc)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("tc0180vcu", tc0180vcu_device, screen_vblank))
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)

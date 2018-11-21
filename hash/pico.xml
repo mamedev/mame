@@ -26,7 +26,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * ドラえもん のびたの まちなか ドキドキ たんけん!<10th> - Doraemon - Nobita no Machinaka Dokidoki Tanken! ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6126) [reprint HPC-6009]
 * トイストーリー2 ウッディ そうさく だいさくせん!!<10th> - Toy Story 2 - Woody Sousaku Daisakusen!! ~10th Anniversary Edition~ (Sega Toys - 20030714 - HPC-6127) [reprint HPC-6090]
 * ミッキーと大きな古時計<10th> - Mickey To Ooki na Furudokei ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6129) [reprint HPC-6023]
-* おりょうりだいすき! キッチンピコ - Oryouri Daisuki! Kitchen Pico (Sega Toys - 20030718 - HPC-6132)
 * それいけ!アンパンマン はじめてあそぶピコソフト アンパンマンのいろ･かず･かたち ぬりえもできちゃうぞ! - Soreike! Anpanman Hajimete Asobu Pico Soft - Anpanman Noiro-Kazu-Katachi Nuriemo Dekichauzo! (Sega Toys - ???? - HPC-????)
 * ディズニープリンセス 白雪姫 ～しらゆきひめ～ <Best> - Disney Princesses - Shirayukihime Best Selection (Sega Toys - 20040426 - HPC-6139)
 
@@ -3352,6 +3351,26 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-18792 J43" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-18792 j43.ic1" size="1048576" crc="287e866f" sha1="28c9dc463534e7e152890e0c2a105f149dca34cd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kitchenp">
+		<description>Oryouri Daisuki! Kitchen Pico (Jpn)</description>
+		<year>2003</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6132"/>
+		<info name="release" value="20030718"/>
+		<info name="alt_title" value="おりょうりだいすき! キッチンピコ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="SHP03001_R3" />
+			<feature name="u1" value="EPOXY BLOCK U1" />
+			<feature name="u2" value="MM74HC" />
+			<feature name="u3" value="MM74HC" />
+			<feature name="u4" value="MM74HC" />
+			<feature name="u5" value="(unpopulated, marked as 74HC08)" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.u1" size="2097152" crc="9a74e63f" sha1="3525ca7bba4e2c747734ae5cf0d4673052c3874c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

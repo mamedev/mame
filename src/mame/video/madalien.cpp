@@ -377,8 +377,9 @@ MACHINE_CONFIG_START(madalien_state::madalien_video)
 	MCFG_PALETTE_INIT_OWNER(madalien_state,madalien)
 	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 MACHINE_CONFIG_END

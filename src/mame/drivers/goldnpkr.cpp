@@ -1300,6 +1300,7 @@ public:
 	goldnpkr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_pia(*this, "pia%u", 0U),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_discrete(*this, "discrete"),
@@ -1354,6 +1355,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device_array<pia6821_device, 2> m_pia;
 
 	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
 	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
@@ -1397,7 +1399,6 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-
 	optional_device<discrete_device> m_discrete;
 	optional_device<ay8910_device> m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -1802,8 +1803,8 @@ WRITE8_MEMBER(goldnpkr_state::sound_w)
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
-	m_discrete->write(space, NODE_01, data >> 3 & 0x01);
-	m_discrete->write(space, NODE_10, data & 0x07);
+	m_discrete->write(NODE_01, data >> 3 & 0x01);
+	m_discrete->write(NODE_10, data & 0x07);
 }
 
 WRITE8_MEMBER(goldnpkr_state::pia0_a_w)
@@ -4320,16 +4321,16 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(goldnpkr_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, goldnpkr_mux_port_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, goldnpkr_state, lamps_a_w))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::goldnpkr_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::lamps_a_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, goldnpkr_state, mux_w))
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::sound_w));
+	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4340,10 +4341,11 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK) /* 68B45 or 6845s @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 68B45 or 6845s @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -4368,9 +4370,8 @@ MACHINE_CONFIG_START(goldnpkr_state::pottnpkr)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(pottnpkr_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4386,9 +4387,8 @@ MACHINE_CONFIG_START(goldnpkr_state::witchcrd)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(witchcrd_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -4408,11 +4408,8 @@ MACHINE_CONFIG_START(goldnpkr_state::wcfalcon)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(witchcrd_falcon_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
-
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, wcfalcon_snd_w)) /* port A out, custom handler due to address + data are muxed */
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w)); /* port A out, custom handler due to address + data are muxed */
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -4420,8 +4417,7 @@ MACHINE_CONFIG_START(goldnpkr_state::wcfalcon)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);    /* guess, seems ok */
 MACHINE_CONFIG_END
 
 
@@ -4432,9 +4428,8 @@ MACHINE_CONFIG_START(goldnpkr_state::wildcard)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(wildcard_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
 //  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
@@ -4456,9 +4451,8 @@ MACHINE_CONFIG_START(goldnpkr_state::wcrdxtnd)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(wcrdxtnd_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wcrdxtnd)
@@ -4484,11 +4478,8 @@ MACHINE_CONFIG_START(goldnpkr_state::wildcrdb)
 	MCFG_DEVICE_PROGRAM_MAP(wildcrdb_mcu_map)
 	MCFG_DEVICE_IO_MAP(wildcrdb_mcu_io_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
-
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, wcfalcon_snd_w))
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w));
 
 	/* video hardware */
 //  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
@@ -4498,8 +4489,7 @@ MACHINE_CONFIG_START(goldnpkr_state::wildcrdb)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);    /* guess, seems ok */
 MACHINE_CONFIG_END
 
 
@@ -4510,9 +4500,8 @@ MACHINE_CONFIG_START(goldnpkr_state::genie)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(genie_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -4532,9 +4521,8 @@ MACHINE_CONFIG_START(goldnpkr_state::geniea)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(goldnpkr_map)
 
-//  MCFG_DEVICE_MODIFY("pia0")
-//  MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pottnpkr_mux_port_r))
-//  MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
+//  m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+//  m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -4570,17 +4558,15 @@ MACHINE_CONFIG_START(goldnpkr_state::bchancep)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bchancep_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pia0_a_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, goldnpkr_state, pia0_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, pia0_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, goldnpkr_state, pia0_b_w))
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pia0_a_r));
+	m_pia[0]->readpb_handler().set(FUNC(goldnpkr_state::pia0_b_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::pia0_a_w));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::pia0_b_w));
 
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pia1_a_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, goldnpkr_state, pia1_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, pia1_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, goldnpkr_state, pia1_b_w))
+	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::pia1_a_r));
+	m_pia[1]->readpb_handler().set(FUNC(goldnpkr_state::pia1_b_r));
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::pia1_a_w));
+	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::pia1_b_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4718,11 +4704,7 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(megadpkr_map)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(megadpkr_banked_map)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&blitz_state::megadpkr_banked_map).set_data_width(8).set_addr_width(16).set_stride(0x4000);
 
 	MCFG_DEVICE_ADD("mcu", M68705P5, CPU_CLOCK) /* unknown */
 	MCFG_M68705_PORTB_W_CB(WRITE8(*this, blitz_state, mcu_portb_w))
@@ -4730,14 +4712,14 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 
 	MCFG_DEVICE_ADD("timekpr", M48T02, 0)
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, goldnpkr_state, lamps_a_w))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::lamps_a_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, goldnpkr_state, mux_w))
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::sound_w));
+	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4748,10 +4730,11 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)

@@ -517,14 +517,14 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(miniboy7_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("INPUT1"))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, miniboy7_state, pia_pb_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, miniboy7_state, pia_ca2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", 0))
+	pia6821_device &pia(PIA6821(config, "pia0", 0));
+	pia.readpa_handler().set_ioport("INPUT1");
+	pia.readpb_handler().set(FUNC(miniboy7_state::pia_pb_r));
+	pia.ca2_handler().set(FUNC(miniboy7_state::pia_ca2_w));
+	pia.irqa_handler().set_inputline("maincpu", 0);
+	pia.irqb_handler().set_inputline("maincpu", 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -539,18 +539,19 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 12) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(miniboy7_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("pia0", pia6821_device, ca1_w))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 12)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(miniboy7_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set("pia0", FUNC(pia6821_device::ca1_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK / 8)    /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, miniboy7_state, ay_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, miniboy7_state, ay_pb_w))
+	ay8910_device &ay8910(AY8910(config, "ay8910", MASTER_CLOCK / 8));    /* guess */
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
+	ay8910.port_a_write_callback().set(FUNC(miniboy7_state::ay_pa_w));
+	ay8910.port_b_write_callback().set(FUNC(miniboy7_state::ay_pb_w));
 
 MACHINE_CONFIG_END
 

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "sound/c6280.h"
 
 #define H6280_LAZY_FLAGS  0
 
@@ -27,7 +28,7 @@
 // ======================> h6280_device
 
 // Used by core CPU interface
-class h6280_device : public cpu_device
+class h6280_device : public cpu_device, public device_mixer_interface
 {
 public:
 	// construction/destruction
@@ -36,11 +37,9 @@ public:
 	// public interfaces
 	void set_irq_line(int irqline, int state);
 
-	DECLARE_READ8_MEMBER( irq_status_r );
-	DECLARE_WRITE8_MEMBER( irq_status_w );
-
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
+	// configuration
+	auto port_in_cb() { return m_port_in_cb.bind(); } // K0-7 at Pinout
+	auto port_out_cb() { return m_port_out_cb.bind(); } // O0-7 at Pinout
 
 	/* functions for use by the PSG and joypad port only! */
 	uint8_t io_get_buffer();
@@ -73,6 +72,7 @@ protected:
 	};
 
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_stop() override;
@@ -351,6 +351,25 @@ protected:
 	int32_t m_nz;         /* last value (lazy N and Z flag) */
 #endif
 	uint8_t m_io_buffer;  /* last value written to the PSG, timer, and interrupt pages */
+
+	// internal registers
+	void internal_map(address_map &map);
+	DECLARE_READ8_MEMBER( irq_status_r );
+	DECLARE_WRITE8_MEMBER( irq_status_w );
+
+	DECLARE_READ8_MEMBER( timer_r );
+	DECLARE_WRITE8_MEMBER( timer_w );
+
+	DECLARE_READ8_MEMBER( port_r );
+	DECLARE_WRITE8_MEMBER( port_w );
+
+	DECLARE_READ8_MEMBER( io_buffer_r );
+	DECLARE_WRITE8_MEMBER( psg_w );
+
+	devcb_read8 m_port_in_cb;
+	devcb_write8 m_port_out_cb;
+
+	required_device<c6280_device> m_psg;
 
 	// other internal states
 	int m_icount;

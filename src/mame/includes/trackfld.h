@@ -11,6 +11,7 @@
 #pragma once
 
 #include "audio/trackfld.h"
+#include "machine/74259.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
@@ -21,8 +22,8 @@
 class trackfld_state : public driver_device
 {
 public:
-	trackfld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	trackfld_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram2(*this, "spriteram2"),
 		m_scroll(*this, "scroll"),
 		m_spriteram(*this, "spriteram"),
@@ -30,6 +31,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
+		m_mainlatch(*this, "mainlatch"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundbrd(*this, "trackfld_audio"),
 		m_sn(*this, "snsnd"),
@@ -37,7 +39,8 @@ public:
 		m_dac(*this, "dac"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void reaktor(machine_config &config);
 	void atlantol(machine_config &config);
@@ -86,6 +89,7 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	optional_device<ls259_device> m_mainlatch;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<trackfld_audio_device> m_soundbrd;
 	optional_device<sn76496_device> m_sn;

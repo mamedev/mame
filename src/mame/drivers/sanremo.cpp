@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 	MCFG_DEVICE_IO_MAP(sanremo_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sanremo_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -373,13 +373,14 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 	MCFG_SCREEN_UPDATE_DRIVER(sanremo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
 	// *** MC6845 init ***
 	//
 	// Register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
 	// Value:     0x45  0x30  0x36  0x0A  0x28  0x00  0x26  0x27  0x00  0x07  0x20  0x0B  0x00  0x00  0x00  0x00  0x00  0x00.
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sanremo)
 	MCFG_PALETTE_ADD("palette", 0x10)
@@ -387,9 +388,9 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910_device &ay8910(AY8910(config, "ay8910", SND_CLOCK));
+	ay8910.port_a_read_callback().set_ioport("DSW");
+	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 

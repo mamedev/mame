@@ -544,6 +544,18 @@
 		</part>
 	</software>
 
+	<software name="sairraid">
+		<description>Super Air Raid</description>
+		<year>1983</year>
+		<publisher>Perry Dyball</publisher>
+		<info name="usage" value="LOAD &quot;SUPER AIR RAID&quot;" />
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12626">
+				<rom name="Super Air Raid (1983)(Perry Dyball).tap" size="12626" crc="911ee3ab" sha1="2f8251f69e9ab2c1cd42195997064f558b053015" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="treasisld">
 		<description>Treasure Island</description>
 		<year>1983</year>

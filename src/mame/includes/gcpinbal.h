@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, R. Belmont
+#ifndef MAME_INCLUDES_GCPINBAL_H
+#define MAME_INCLUDES_GCPINBAL_H
+
+#pragma once
 
 #include "machine/eepromser.h"
 #include "machine/mb3773.h"
@@ -88,3 +92,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_GCPINBAL_H

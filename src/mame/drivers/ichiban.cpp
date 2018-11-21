@@ -145,8 +145,7 @@ MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", YM2149, MAIN_CLOCK/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2149(config, "aysnd", MAIN_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, MAIN_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

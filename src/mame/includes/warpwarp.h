@@ -1,6 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+#ifndef MAME_INCLUDES_WARPWARP_H
+#define MAME_INCLUDES_WARPWARP_H
 
+#pragma once
+
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "audio/geebee.h"
 #include "audio/warpwarp.h"
@@ -9,8 +14,8 @@
 class warpwarp_state : public driver_device
 {
 public:
-	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -19,6 +24,7 @@ public:
 		m_geebee_videoram(*this, "geebee_videoram"),
 		m_videoram(*this, "videoram"),
 		m_palette(*this, "palette"),
+		m_latch(*this, "latch"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -53,6 +59,7 @@ private:
 	optional_shared_ptr<uint8_t> m_geebee_videoram;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_device<palette_device> m_palette;
+	optional_device<ls259_device> m_latch;
 	optional_ioport m_in0;
 	optional_ioport m_in1;
 	optional_ioport m_in2;
@@ -116,3 +123,5 @@ private:
 	void geebee_port_map(address_map &map);
 	void warpwarp_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_WARPWARP_H

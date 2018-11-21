@@ -478,17 +478,17 @@ MACHINE_CONFIG_START(lvcards_state::lvcards)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12) // unknown frequency, assume same as tehkanwc.cpp
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 18432000/12)); // unknown frequency, assume same as tehkanwc.cpp
+	aysnd.port_a_read_callback().set_ioport("DSW0");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lvcards_state::lvpoker)
 	lvcards(config);
 
 	// basic machine hardware
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(lvpoker_map)
 	MCFG_MACHINE_START_OVERRIDE(lvcards_state,lvpoker)
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(lvcards_state::ponttehk)
 	lvcards(config);
 
 	// basic machine hardware
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ponttehk_map)
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)

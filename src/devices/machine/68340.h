@@ -61,6 +61,10 @@ public:
 	template <class Object> devcb_base &set_pa_out_callback(Object &&cb){ return m_pa_out_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pb_in_callback(Object &&cb){ return m_pb_in_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_pb_out_callback(Object &&cb){ return m_pb_out_cb.set_callback (std::forward<Object>(cb)); }
+	auto pa_in_callback() { return m_pa_in_cb.bind(); }
+	auto pa_out_callback() { return m_pa_out_cb.bind(); }
+	auto pb_in_callback() { return m_pb_in_cb.bind(); }
+	auto pb_out_callback() { return m_pb_out_cb.bind(); }
 
 	template <class Object> devcb_base &set_tout1_out_callback(Object &&cb){ return m_timer1->m_tout_out_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tin1_in_callback(Object &&cb)  { return m_timer1->m_tin_in_cb.set_callback (std::forward<Object>(cb)); }
@@ -68,6 +72,12 @@ public:
 	template <class Object> devcb_base &set_tout2_out_callback(Object &&cb){ return m_timer2->m_tout_out_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tin2_in_callback(Object &&cb)  { return m_timer2->m_tin_in_cb.set_callback (std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tgate2_in_callback(Object &&cb){ return m_timer2->m_tgate_in_cb.set_callback (std::forward<Object>(cb)); }
+	auto tout1_out_callback() { return m_timer1->m_tout_out_cb.bind(); }
+	auto tin1_in_callback() { return m_timer1->m_tin_in_cb.bind(); }
+	auto tgate1_in_callback() { return m_timer1->m_tgate_in_cb.bind(); }
+	auto tout2_out_callback() { return m_timer2->m_tout_out_cb.bind(); }
+	auto tin2_in_callback() { return m_timer2->m_tin_in_cb.bind(); }
+	auto tgate2_in_callback() { return m_timer2->m_tgate_in_cb.bind(); }
 
 	uint16_t get_cs(offs_t address);
 

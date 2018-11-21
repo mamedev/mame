@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
+#ifndef MAME_INCLUDES_SSPEEDR_H
+#define MAME_INCLUDES_SSPEEDR_H
+
+#pragma once
 
 #include "emupal.h"
 
@@ -12,7 +16,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
 	void sspeedr(machine_config &config);
 
@@ -62,3 +66,5 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<26> m_digits;
 };
+
+#endif // MAME_INCLUDES_SSPEEDR_H

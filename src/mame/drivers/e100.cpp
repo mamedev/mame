@@ -10,7 +10,7 @@
  * extended with commands suitable for educational experiments using the exapansion bus and its built in
  * io control capabilities.
  *
- * The Esselte 1000 was an educational package based on Apple II plus software and litterature but the relation
+ * The Esselte 1000 was an educational package based on Apple II plus software and literature but the relation
  * to Didact is at this point unknown so it is probably a pure Esselte software production. If this branded
  * distribution is recovered it will be added as a clone of the Apple II driver or just as softlist item.
  *
@@ -97,7 +97,7 @@
  * |DIDACT ESS 100 CPU                         +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----++                            |
  * |___________________________________________________________________________________________________________+----+__+----+__+----+_____+----
  *
- * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the rev1 piggy back on righ most 2716) with funny address decoding.
+ * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the rev1 piggyback on rightmost 2716) with funny address decoding.
  * Once we get a rom dump for rev 1 the driver need to accomodate another keymap too so probably needs to be splitted somehow.
  *  __________________________________________________________________________________________________________________________________________
  * | The Didact Esselte 100 CPU board rev2, 15/4 1983                                                                     in-PCB coil     +----
@@ -344,7 +344,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
   PB4-PB5 together with CA1, CA2, CB1 and CB2 are used for the printer interface
   PB6-PB7 forms the cassette interface
 
-  The serial bitbanging perform enreliable atm, can be poor original code or inexact CPU timing.
+  The serial bitbanging performs unreliably atm, can be poor original code or inexact CPU timing.
   Best results is achieved with 8 bit at 9600 baud as follows:
 
     mame e100 -window -rs232 null_modem -bitbngr socket.127.0.0.1:4321
@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(e100_state::e100)
 	MCFG_DEVICE_PROGRAM_MAP(e100_map)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kbd_74145", TTL74145, 0)
+	TTL74145(config, m_kbd_74145, 0);
 
 	/* --PIA inits----------------------- */
 	/* 0xF883 0xC818 (PIA1 DDR A)     = 0x00 - Port A all inputs */
@@ -560,22 +560,22 @@ MACHINE_CONFIG_START(e100_state::e100)
 	/* 0xF894 0xC818 (PIA2 Control A) = 0x34 - CA2 is low and lock DDRA */
 	/* 0xF896 0xC818 (PIA1 Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xF896 0xC818 (PIA2 Control B) = 0x34 - CB2 is low and lock DDRB */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, e100_state, pia1_kbA_w))
-	MCFG_PIA_READPA_HANDLER(READ8(*this, e100_state, pia1_kbA_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, e100_state, pia1_kbB_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, e100_state, pia1_kbB_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, e100_state, pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, e100_state, pia1_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, e100_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, e100_state, pia1_cb2_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->writepa_handler().set(FUNC(e100_state::pia1_kbA_w));
+	m_pia1->readpa_handler().set(FUNC(e100_state::pia1_kbA_r));
+	m_pia1->writepb_handler().set(FUNC(e100_state::pia1_kbB_w));
+	m_pia1->readpb_handler().set(FUNC(e100_state::pia1_kbB_r));
+	m_pia1->readca1_handler().set(FUNC(e100_state::pia1_ca1_r));
+	m_pia1->readcb1_handler().set(FUNC(e100_state::pia1_cb1_r));
+	m_pia1->ca2_handler().set(FUNC(e100_state::pia1_ca2_w));
+	m_pia1->cb2_handler().set(FUNC(e100_state::pia1_cb2_w));
 
 	/* The optional second PIA enables the expansion port on CA1 and a software RTC with 50Hz resolution */
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	/* Serial port support */
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
 	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active

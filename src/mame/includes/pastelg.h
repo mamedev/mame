@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+#ifndef MAME_INCLUDES_PASTELG_H
+#define MAME_INCLUDES_PASTELG_H
+
+#pragma once
+
 #include "machine/nb1413m3.h"
 #include "emupal.h"
 #include "screen.h"
@@ -12,12 +17,13 @@ public:
 		TIMER_BLITTER
 	};
 
-	pastelg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	pastelg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_nb1413m3(*this, "nb1413m3"),
 		m_screen(*this, "screen"),
-		m_clut(*this, "clut") { }
+		m_clut(*this, "clut")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
@@ -71,3 +77,5 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_PASTELG_H

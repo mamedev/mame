@@ -438,7 +438,7 @@ MACHINE_CONFIG_START(wpc_dcs_state::wpc_dcs)
 	MCFG_DEVICE_ADD("dmd", WPC_DMD, 0)
 	MCFG_WPC_DMD_SCANLINE_CALLBACK(WRITELINE(*this, wpc_dcs_state, scanline_irq))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
 MACHINE_CONFIG_END
 

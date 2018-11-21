@@ -240,21 +240,10 @@ MACHINE_CONFIG_START(parodius_state::parodius)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(parodius_sound_map)    /* NMIs are triggered by the 053260 */
 
-	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+	ADDRESS_MAP_BANK(config, "bank0000").set_map(&parodius_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
+	ADDRESS_MAP_BANK(config, "bank2000").set_map(&parodius_state::bank2000_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
 
-	MCFG_DEVICE_ADD("bank2000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank2000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -284,9 +273,7 @@ MACHINE_CONFIG_START(parodius_state::parodius)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
 	MCFG_K053260_ADD("k053260", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)

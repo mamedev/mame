@@ -767,8 +767,7 @@ void pgm2_state::pgm2(machine_config &config)
 	TIMER(config, m_mcu_timer, 0);
 	m_mcu_timer->configure_generic(timer_device::expired_delegate(FUNC(pgm2_state::igs_interrupt), nullptr, (pgm2_state *)nullptr));
 
-	ARM_AIC(config, m_arm_aic, 100000000); // TODO : Unknown clock source/divider
-	m_arm_aic->irq_out().set_inputline(m_maincpu, ARM7_IRQ_LINE);
+	ARM_AIC(config, "arm_aic", 0).irq_callback().set_inputline(m_maincpu, ARM7_IRQ_LINE); // TODO : Unknown clock source/divider
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

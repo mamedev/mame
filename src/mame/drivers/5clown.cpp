@@ -1033,18 +1033,18 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_DEVICE_ADD("audiocpu", M6502, MASTER_CLOCK/8) /* guess, seems ok */
 	MCFG_DEVICE_PROGRAM_MAP(fcaudio_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, _5clown_state, mux_port_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, _5clown_state, pia0_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, _5clown_state, counters_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set(FUNC(_5clown_state::mux_port_r));
+	pia0.readpb_handler().set(FUNC(_5clown_state::pia0_b_r));
+	pia0.writepb_handler().set(FUNC(_5clown_state::counters_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW4"))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, _5clown_state, pia1_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, _5clown_state, trigsnd_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, _5clown_state, mux_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("SW4");
+	pia1.readpb_handler().set(FUNC(_5clown_state::pia1_b_r));
+	pia1.writepa_handler().set(FUNC(_5clown_state::trigsnd_w));
+	pia1.writepb_handler().set(FUNC(_5clown_state::mux_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1059,16 +1059,16 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(_5clown_state, _5clown)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_ay8910, MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.00);        /* guess, seems ok */
 
 	MCFG_DEVICE_ADD("oki6295", OKIM6295, MASTER_CLOCK/12, okim6295_device::PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)

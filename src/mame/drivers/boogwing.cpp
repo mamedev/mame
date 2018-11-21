@@ -174,8 +174,6 @@ void boogwing_state::audio_map(address_map &map)
 	map(0x130000, 0x130001).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_deco104, FUNC(deco104_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 
@@ -346,8 +344,10 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, SOUND_XTAL/4)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	H6280(config, m_audiocpu, SOUND_XTAL/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &boogwing_state::audio_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -413,11 +413,11 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_XTAL/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, boogwing_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_XTAL/9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ymsnd.port_write_handler().set(FUNC(boogwing_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.80);
+	ymsnd.add_route(1, "rspeaker", 0.80);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_XTAL/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)

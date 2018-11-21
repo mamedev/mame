@@ -217,10 +217,10 @@ MACHINE_CONFIG_START(jeutel_state::jeutel)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 639450)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, jeutel_state,porta_w))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jeutel_state,portb_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 639450));
+	aysnd.port_a_write_callback().set(FUNC(jeutel_state::porta_w));
+	aysnd.port_b_read_callback().set(FUNC(jeutel_state::portb_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	MCFG_DEVICE_ADD("tms", TMS5110A, 640000)
 	//MCFG_TMS5110_M0_CB(WRITELINE("tmsprom", tmsprom_device, m0_w))
@@ -228,29 +228,29 @@ MACHINE_CONFIG_START(jeutel_state::jeutel)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	//MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jeutel_state, ppi0a_w))
-	//MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jeutel_state, ppi0b_w))
-	//MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jeutel_state, ppi0c_w))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	//ppi0.in_pa_callback().set_ioport("P1");
+	ppi0.out_pa_callback().set(FUNC(jeutel_state::ppi0a_w));
+	//ppi0.in_pb_callback().set_ioport("P2");
+	ppi0.out_pb_callback().set(FUNC(jeutel_state::ppi0b_w));
+	//ppi0.in_pc_callback().set_ioport("EXTRA");
+	//ppi0.out_pc_callback().set(FUNC(jeutel_state::ppi0c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	//MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jeutel_state, ppi1a_w))
-	//MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jeutel_state, ppi1b_w))
-	//MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jeutel_state, ppi1c_w))
+	I8255A(config, "ppi8255_1");
+	//ppi1.in_pa_callback().set_ioport("P1");
+	//ppi1.out_pa_callback().set(FUNC(jeutel_state::ppi1a_w));
+	//ppi1.in_pb_callback().set_ioport("P2");
+	//ppi1.out_pb_callback().set(FUNC(jeutel_state::ppi1b_w));
+	//ppi1.in_pc_callback().set_ioport("EXTRA");
+	//ppi1.out_pc_callback().set(FUNC(jeutel_state::ppi1c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	//MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jeutel_state, ppi2a_w))
-	//MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jeutel_state, ppi2b_w))
-	//MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jeutel_state, ppi2c_w))
+	I8255A(config, "ppi8255_2");
+	//ppi2.in_pa_callback().set_ioport("P1");
+	//ppi2.out_pa_callback().set(FUNC(jeutel_state::ppi2a_w));
+	//ppi2.in_pb_callback().set_ioport("P2");
+	//ppi2.out_pb_callback().set(FUNC(jeutel_state::ppi2b_w));
+	//ppi2.in_pc_callback().set_ioport("EXTRA");
+	//ppi2.out_pc_callback().set(FUNC(jeutel_state::ppi2c_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", jeutel_state, timer_a, attotime::from_hz(120))
 MACHINE_CONFIG_END

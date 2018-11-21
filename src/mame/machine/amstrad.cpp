@@ -1923,7 +1923,7 @@ b9 b8 | PPI Function Read/Write status
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
-			data = m_ppi->read(space, r1r0);
+			data = m_ppi->read(r1r0);
 		if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // Plus systems return the data written to port C (I/O status is ignored)
 			if(r1r0 == 0x02)
 				data = m_last_write;
@@ -2128,7 +2128,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	{
 		unsigned int idx = ((offset & 0x0300) >> 8);
 
-		m_ppi->write(space, idx, data);
+		m_ppi->write(idx, data);
 		if(idx == 0x02)
 			m_last_write = data;
 	}
@@ -2311,11 +2311,11 @@ void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 	m_gate_array.upper_bank = pSnapshot[0x055];
 
 	/* PPI */
-	m_ppi->write(space, 3, pSnapshot[0x059] & 0x0ff);
+	m_ppi->write(3, pSnapshot[0x059] & 0x0ff);
 
-	m_ppi->write(space, 0, pSnapshot[0x056] & 0x0ff);
-	m_ppi->write(space, 1, pSnapshot[0x057] & 0x0ff);
-	m_ppi->write(space, 2, pSnapshot[0x058] & 0x0ff);
+	m_ppi->write(0, pSnapshot[0x056] & 0x0ff);
+	m_ppi->write(1, pSnapshot[0x057] & 0x0ff);
+	m_ppi->write(2, pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)

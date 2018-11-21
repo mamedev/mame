@@ -415,17 +415,17 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(jokrwild_map)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, jokrwild_state, testa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, jokrwild_state, testb_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set_ioport("IN0");
+	pia0.readpb_handler().set_ioport("IN1");
+	pia0.writepa_handler().set(FUNC(jokrwild_state::testa_w));
+	pia0.writepb_handler().set(FUNC(jokrwild_state::testb_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN3"))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("IN2");
+	pia1.readpb_handler().set_ioport("IN3");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -440,10 +440,12 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(jokrwild_state, jokrwild)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
 MACHINE_CONFIG_END
 
 

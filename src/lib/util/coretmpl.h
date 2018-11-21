@@ -885,6 +885,17 @@ public:
 	bool full() const { return !m_empty && (m_head == m_tail); }
 	bool empty() const { return m_empty; }
 
+	// number of currently enqueued elements
+	std::size_t queue_length() const
+	{
+		if (m_empty)
+			return 0;
+
+		auto const distance = std::distance(m_head, m_tail);
+
+		return (distance > 0) ? distance : (N + distance);
+	}
+
 	void enqueue(T const &v)
 	{
 		if (WriteWrap || m_empty || (m_head != m_tail))

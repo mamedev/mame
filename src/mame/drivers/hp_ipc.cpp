@@ -210,7 +210,7 @@ ROM board (Operating System ROM PCA. Assembly# HP82991A or HP82995A)
 Notes:
       J1/J2 - 20 pin connector joining to 'Option ROM PCA'
       J3/J4 - 20 pin connector joining to 'LOGIC A PCA'
-      U1-U4 - 28 pin EPROM/MASKROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
+      U1-U4 - 28 pin EPROM/mask ROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
 
 
 ROM board (Option ROM PCA)
@@ -229,7 +229,7 @@ Note this PCB plugs in upside-down on top of the Operating System ROM PCB
 Notes:
       J1/J2 - 20 pin connector joining to 'Operating System ROM PCA'
       J3/J4 - 20 pin connector joining to 'LOGIC A PCA'
-      U1-U4 - 28 pin EPROM/MASKROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
+      U1-U4 - 28 pin EPROM/mask ROM 0L/1L/0H/1H (note 1Mbit: 128Kx8 28 pin)
 
 
 Physical Memory Map
@@ -387,6 +387,7 @@ public:
 		, m_bankdev(*this, "bankdev")
 		, m_fdc(*this, "fdc")
 		, m_ram(*this, RAM_TAG)
+		, m_gpu(*this , "gpu")
 		, m_screen(*this, "screen")
 	{ }
 
@@ -431,6 +432,7 @@ private:
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<wd2797_device> m_fdc;
 	required_device<ram_device> m_ram;
+	required_device<hp1ll3_device> m_gpu;
 	required_device<screen_device> m_screen;
 
 	uint32_t m_mmu[4], m_lowest_ram_addr;
@@ -455,7 +457,7 @@ void hp_ipc_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	m_bus_error = false;
 }
 
-void hp_ipc_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
+void hp_ipc_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
 	if (m_bus_error)
 	{
@@ -466,7 +468,7 @@ void hp_ipc_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask
 		address++;
 	}
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
+	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
@@ -485,7 +487,7 @@ void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 	map(0x1000000, 0x17FFFFF).rw(FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
 	map(0x1800000, 0x187FFFF).rom().region("maincpu", 0);
 	map(0x1E00000, 0x1E0FFFF).rw(FUNC(hp_ipc_state::mmu_r), FUNC(hp_ipc_state::mmu_w));
-	map(0x1E20000, 0x1E2000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
+	map(0x1E20000, 0x1E2000F).rw(m_gpu, FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
 	map(0x1E40000, 0x1E4002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 
 // supervisor mode
@@ -495,7 +497,7 @@ void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 	map(0x0600000, 0x060FFFF).rw(FUNC(hp_ipc_state::mmu_r), FUNC(hp_ipc_state::mmu_w));
 	map(0x0610000, 0x0610007).rw(FUNC(hp_ipc_state::floppy_id_r), FUNC(hp_ipc_state::floppy_id_w)).umask16(0x00ff);
 	map(0x0610008, 0x061000F).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
-	map(0x0620000, 0x062000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
+	map(0x0620000, 0x0620007).rw(m_gpu, FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
 	map(0x0630000, 0x063FFFF).mask(0xf).rw("hpib" , FUNC(tms9914_device::reg8_r) , FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
 	map(0x0640000, 0x064002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0660000, 0x06600FF).rw("mlc", FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write)).umask16(0x00ff);  // 'caravan', scrn/caravan.h
@@ -560,14 +562,14 @@ WRITE16_MEMBER(hp_ipc_state::mem_w)
 
 READ16_MEMBER(hp_ipc_state::trap_r)
 {
-	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 0, mem_mask);
+	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
 
 	return 0xffff;
 }
 
 WRITE16_MEMBER(hp_ipc_state::trap_w)
 {
-	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, 1, mem_mask);
+	if (!machine().side_effects_disabled()) set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
 }
 
 
@@ -738,14 +740,12 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_DEVICE_ADD("maincpu", M68000, 15.92_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_outer)
 
-	MCFG_HP1LL3_ADD("gpu")
-//  MCFG_HP1LL3_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_4))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	HP1LL3(config , m_gpu , 24_MHz_XTAL / 8).set_screen("screen");
 
 	// XXX actual clock is 1MHz; remove this workaround (and change 2000 to 100 in hp_ipc_dsk.cpp)
 	// XXX when floppy code correctly handles 600 rpm drives.
-	MCFG_DEVICE_ADD("fdc", WD2797, 2_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_5))
+	WD2797(config, m_fdc, 2_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(hp_ipc_state::irq_5));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","hp_ipc")
@@ -754,22 +754,25 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_1))
 //  MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_6))
 
-	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, 15.92_MHz_XTAL / 2)
-	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_2))
-	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_7))
-	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
+	hp_hil_mlc_device &mlc(HP_HIL_MLC(config, "mlc", XTAL(15'920'000)/2));
+	mlc.int_callback().set(FUNC(hp_ipc_state::irq_2));
+	mlc.nmi_callback().set(FUNC(hp_ipc_state::irq_7));
 
-	MCFG_DEVICE_ADD("hpib", TMS9914, 4_MHz_XTAL)
-	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp_ipc_state, irq_3))
-	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , host_dio_w))
-	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_eoi_w))
-	MCFG_TMS9914_DAV_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_dav_w))
-	MCFG_TMS9914_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_nrfd_w))
-	MCFG_TMS9914_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ndac_w))
-	MCFG_TMS9914_IFC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ifc_w))
-	MCFG_TMS9914_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_srq_w))
-	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_atn_w))
-	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , host_ren_w))
+	HP_HIL_SLOT(config, "hil1", "mlc", hp_hil_devices, "hp_ipc_kbd");
+	HP_HIL_SLOT(config, "hil2", "mlc", hp_hil_devices, "hp_46060b");
+
+	tms9914_device &hpib(TMS9914(config, "hpib", 4_MHz_XTAL));
+	hpib.int_write_cb().set(FUNC(hp_ipc_state::irq_3));
+	hpib.dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	hpib.dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
+	hpib.eoi_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	hpib.dav_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
+	hpib.nrfd_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
+	hpib.ndac_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
+	hpib.ifc_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
+	hpib.srq_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
+	hpib.atn_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	hpib.ren_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("hpib" , tms9914_device , eoi_w))
 	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("hpib" , tms9914_device , dav_w))
@@ -781,49 +784,45 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib" , tms9914_device , ren_w))
 	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	hp_ipc_base(config);
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_inner_9807a)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(25)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&hp_ipc_state::hp_ipc_mem_inner_9807a).set_options(ENDIANNESS_BIG, 16, 25, 0x1000000);
+
+	// 16kw/32kb video RAM
+	m_gpu->set_vram_size(16);
 
 	// horizontal time = 60 us (min)
 	// ver.refresh period = ~300 us
 	// ver.period = 16.7ms (~60 hz)
-	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::amber()) // actually a kind of EL display
-	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 512, 278, 0, 256)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
+	SCREEN(config , m_screen , SCREEN_TYPE_LCD);
+	m_screen->set_color(rgb_t::amber()); // actually a kind of EL display
+	m_screen->set_screen_update("gpu" , FUNC(hp1ll3_device::screen_update));
+	m_screen->set_raw(6_MHz_XTAL * 2 , 720 , 0 , 512 , 261 , 0 , 255);
+	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // XXX actually it's driven by 555 (U59)
+	m_screen->set_palette("palette");
 
-	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 	hp_ipc_base(config);
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_inner_9808a)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(25)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&hp_ipc_state::hp_ipc_mem_inner_9808a).set_options(ENDIANNESS_BIG, 16, 25, 0x1000000);
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::amber()) // actually a kind of EL display
-	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(6_MHz_XTAL * 2, 720, 0, 640, 480, 0, 400)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w))
+	// 64kw/128kb video RAM
+	m_gpu->set_vram_size(64);
 
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config , m_screen , SCREEN_TYPE_LCD);
+	m_screen->set_color(rgb_t::amber()); // actually a kind of EL display
+	m_screen->set_screen_update("gpu" , FUNC(hp1ll3_device::screen_update));
+	m_screen->set_raw(6_MHz_XTAL * 2 , 880 , 0 , 640 , 425 , 0 , 400);
+	m_screen->screen_vblank().set("mlc", FUNC(hp_hil_mlc_device::ap_w)); // XXX actually it's driven by 555 (U59)
+	m_screen->set_palette("palette");
+
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 

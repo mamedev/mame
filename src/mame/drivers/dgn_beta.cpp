@@ -343,38 +343,38 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
 
 	/* PIA 0 at $FC20-$FC23 I46 */
-	MCFG_DEVICE_ADD(PIA_0_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, dgn_beta_state, d_pia0_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, dgn_beta_state, d_pia0_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dgn_beta_state, d_pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, dgn_beta_state, d_pia0_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia0_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia0_irq_b))
+	PIA6821(config, m_pia_0, 0);
+	m_pia_0->readpa_handler().set(FUNC(dgn_beta_state::d_pia0_pa_r));
+	m_pia_0->readpb_handler().set(FUNC(dgn_beta_state::d_pia0_pb_r));
+	m_pia_0->writepa_handler().set(FUNC(dgn_beta_state::d_pia0_pa_w));
+	m_pia_0->writepb_handler().set(FUNC(dgn_beta_state::d_pia0_pb_w));
+	m_pia_0->cb2_handler().set(FUNC(dgn_beta_state::d_pia0_cb2_w));
+	m_pia_0->irqa_handler().set(FUNC(dgn_beta_state::d_pia0_irq_a));
+	m_pia_0->irqb_handler().set(FUNC(dgn_beta_state::d_pia0_irq_b));
 
 	/* PIA 1 at $FC24-$FC27 I63 */
-	MCFG_DEVICE_ADD(PIA_1_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, dgn_beta_state, d_pia1_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, dgn_beta_state, d_pia1_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dgn_beta_state, d_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, dgn_beta_state, d_pia1_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia1_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia1_irq_b))
+	PIA6821(config, m_pia_1, 0);
+	m_pia_1->readpa_handler().set(FUNC(dgn_beta_state::d_pia1_pa_r));
+	m_pia_1->readpb_handler().set(FUNC(dgn_beta_state::d_pia1_pb_r));
+	m_pia_1->writepa_handler().set(FUNC(dgn_beta_state::d_pia1_pa_w));
+	m_pia_1->writepb_handler().set(FUNC(dgn_beta_state::d_pia1_pb_w));
+	m_pia_1->irqa_handler().set(FUNC(dgn_beta_state::d_pia1_irq_a));
+	m_pia_1->irqb_handler().set(FUNC(dgn_beta_state::d_pia1_irq_b));
 
 	/* PIA 2 at FCC0-FCC3 I28 */
 	/* This seems to control the RAM paging system, and have the DRQ */
 	/* from the WD2797 */
-	MCFG_DEVICE_ADD(PIA_2_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, dgn_beta_state, d_pia2_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, dgn_beta_state, d_pia2_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, dgn_beta_state, d_pia2_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, dgn_beta_state, d_pia2_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia2_irq_a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, dgn_beta_state, d_pia2_irq_b))
+	PIA6821(config, m_pia_2, 0);
+	m_pia_2->readpa_handler().set(FUNC(dgn_beta_state::d_pia2_pa_r));
+	m_pia_2->readpb_handler().set(FUNC(dgn_beta_state::d_pia2_pb_r));
+	m_pia_2->writepa_handler().set(FUNC(dgn_beta_state::d_pia2_pa_w));
+	m_pia_2->writepb_handler().set(FUNC(dgn_beta_state::d_pia2_pb_w));
+	m_pia_2->irqa_handler().set(FUNC(dgn_beta_state::d_pia2_irq_a));
+	m_pia_2->irqb_handler().set(FUNC(dgn_beta_state::d_pia2_irq_b));
 
-	MCFG_DEVICE_ADD(FDC_TAG, WD2797, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_drq_w))
+	WD2797(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_drq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -385,16 +385,15 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", 12.288_MHz_XTAL / 16)    //XTAL is guessed
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16) /*?*/
-	MCFG_MC6845_UPDATE_ROW_CB(dgn_beta_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, dgn_beta_state, dgnbeta_vsync_changed))
+	HD6845(config, m_mc6845, 12.288_MHz_XTAL / 16);    //XTAL is guessed
+	m_mc6845->set_screen("screen");
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(16); /*?*/
+	m_mc6845->set_update_row_callback(FUNC(dgn_beta_state::crtc_update_row), this);
+	m_mc6845->out_vsync_callback().set(FUNC(dgn_beta_state::dgnbeta_vsync_changed));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("128K,384K,512K,640K,768K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K,384K,512K,640K,768K");
 	/* Ram size can now be configured, since the machine was known as either the Dragon Beta or */
 	/* the Dragon 128, I have added a config for 128K, however, the only working machine known  */
 	/* to exist was fitted with 256K, so I have made this the default. Also available           */

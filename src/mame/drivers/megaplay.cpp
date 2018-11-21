@@ -676,21 +676,21 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("io1", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("DSW0"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, mplay_state, bios_banksel_w))
-	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mplay_state, bios_6204_r))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mplay_state, bios_width_w))
+	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	io1.in_porta_cb().set_ioport("DSW0");
+	io1.in_portb_cb().set_ioport("DSW1");
+	io1.out_portd_cb().set(FUNC(mplay_state::bios_banksel_w));
+	io1.in_porte_cb().set(FUNC(mplay_state::bios_6204_r));
+	io1.out_porte_cb().set(FUNC(mplay_state::bios_width_w));
 
-	MCFG_DEVICE_ADD("io2", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("TEST"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("COIN"))
-	MCFG_CXD1095_IN_PORTC_CB(READ8(*this, mplay_state, bios_6402_r))
-	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(*this, mplay_state, bios_6402_w))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, mplay_state, bios_gamesel_w))
-	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mplay_state, bios_6404_r))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mplay_state, bios_6404_w))
+	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	io2.in_porta_cb().set_ioport("TEST");
+	io2.in_portb_cb().set_ioport("COIN");
+	io2.in_portc_cb().set(FUNC(mplay_state::bios_6402_r));
+	io2.out_portc_cb().set(FUNC(mplay_state::bios_6402_w));
+	io2.out_portd_cb().set(FUNC(mplay_state::bios_gamesel_w));
+	io2.in_porte_cb().set(FUNC(mplay_state::bios_6404_r));
+	io2.out_porte_cb().set(FUNC(mplay_state::bios_6404_w));
 
 	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */

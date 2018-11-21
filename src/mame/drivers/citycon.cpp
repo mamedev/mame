@@ -222,19 +222,18 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK / 16) // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "aysnd", MASTER_CLOCK / 16).add_route(ALL_OUTPUTS, "mono", 0.40); // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch2", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.20)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 16));
+	ymsnd.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ymsnd.port_b_read_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
+	ymsnd.add_route(0, "mono", 0.40);
+	ymsnd.add_route(1, "mono", 0.40);
+	ymsnd.add_route(2, "mono", 0.40);
+	ymsnd.add_route(3, "mono", 0.20);
 MACHINE_CONFIG_END
 
 
@@ -297,6 +296,20 @@ ROM_START( citycona )
 	ROM_LOAD( "c2",           0x0000, 0x8000, CRC(f2da4f23) SHA1(5ea1a51c3ac283796f7eafb6719d88356767340d) )    /* background maps */
 	ROM_LOAD( "c3",           0x8000, 0x4000, CRC(7ef3ac1b) SHA1(8a0497c4e4733f9c50d576f632210b82497a5e1c) )
 	ROM_LOAD( "c5",           0xc000, 0x2000, CRC(c03d8b1b) SHA1(641c1eba334d36ea64b9293a20320b31c7c88858) )    /* color codes for the background */
+
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "citycon_82s123n.n5",  0x0000, 0x0020, CRC(5ae142a3) SHA1(ba25c9bcbc4936a6b7f402addab50b75dbe519ce) )
+	ROM_LOAD( "citycon_82s123n.r4",  0x0100, 0x0020, CRC(29221e13) SHA1(232fd02811f157197c7ce44716dc495ed49a80cc) )
+	ROM_LOAD( "citycon_82s129.l6",   0x0200, 0x0100, CRC(91a7b6e3) SHA1(6135b264a69978d17aa8636d24eb1eba41d16c89) )
+
+		// Same PROM content on J10 and L6 sockets
+	//ROM_LOAD( "citycon_82s129.j10", 0x0300, 0x0100, CRC(91a7b6e3) SHA1(6135b264a69978d17aa8636d24eb1eba41d16c89) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "citycon_pal16l8a.h7", 0x0000, 0x0104, CRC(24a0f5d4) SHA1(69007ccbe1966b1a1d4378fe06e102598c3cdb09) )
+	ROM_LOAD( "citycon_pal16l8a.l5", 0x0200, 0x0104, CRC(dd0cf771) SHA1(4483da095ce7633d8e0c90f181a54ace19a6e87d) )
+	ROM_LOAD( "citycon_pal16l8a.u7", 0x0400, 0x0104, CRC(08d4ff84) SHA1(10a2b985e0866661c4f0ce4297f728f07540e9b6) )
 ROM_END
 
 ROM_START( cruisin )

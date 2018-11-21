@@ -198,9 +198,9 @@ int uchar_from_utf16f(char32_t *uchar, const char16_t *utf16char, size_t count)
 {
 	char16_t buf[2] = {0};
 	if (count > 0)
-		buf[0] = flipendian_int16(utf16char[0]);
+		buf[0] = swapendian_int16(utf16char[0]);
 	if (count > 1)
-		buf[1] = flipendian_int16(utf16char[1]);
+		buf[1] = swapendian_int16(utf16char[1]);
 	return uchar_from_utf16(uchar, buf, count);
 }
 
@@ -348,9 +348,9 @@ int utf16f_from_uchar(char16_t *utf16string, size_t count, char32_t uchar)
 	rc = utf16_from_uchar(buf, count, uchar);
 
 	if (rc >= 1)
-		utf16string[0] = flipendian_int16(buf[0]);
+		utf16string[0] = swapendian_int16(buf[0]);
 	if (rc >= 2)
-		utf16string[1] = flipendian_int16(buf[1]);
+		utf16string[1] = swapendian_int16(buf[1]);
 	return rc;
 }
 

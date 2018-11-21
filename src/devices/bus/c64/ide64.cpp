@@ -46,12 +46,13 @@ DEFINE_DEVICE_TYPE(C64_IDE64, c64_ide64_cartridge_device, "c64_ide64", "C64 IDE6
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_ide64_cartridge_device::device_add_mconfig)
-	MCFG_ATMEL_29C010_ADD(AT29C010A_TAG)
-	MCFG_DEVICE_ADD(DS1302_TAG, DS1302, 32.768_kHz_XTAL)
+void c64_ide64_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	ATMEL_29C010(config, m_flash_rom);
+	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
-	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+}
 
 
 //-------------------------------------------------

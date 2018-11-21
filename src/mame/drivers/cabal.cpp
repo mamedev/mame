@@ -86,10 +86,10 @@ WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 
 
 
-WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
+void cabal_state::sound_irq_trigger_word_w(offs_t, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_seibu_sound->main_w(space, 4, data & 0x00ff);
+		m_seibu_sound->main_w(4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	m_maincpu->spin_until_time(attotime::from_usec(50));
@@ -537,9 +537,9 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -553,13 +553,13 @@ MACHINE_CONFIG_START(cabal_state::cabalt)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(trackball_main_map)
 
-	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("IN0")
-	MCFG_UPD4701_PORTY("IN1")
+	upd4701_device &upd4701l(UPD4701A(config, "upd4701l"));
+	upd4701l.set_portx_tag("IN0");
+	upd4701l.set_porty_tag("IN1");
 
-	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("IN2")
-	MCFG_UPD4701_PORTY("IN3")
+	upd4701_device &upd4701h(UPD4701A(config, "upd4701h"));
+	upd4701h.set_portx_tag("IN2");
+	upd4701h.set_porty_tag("IN3");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cabal_state::cabalbl2)
@@ -615,13 +615,13 @@ MACHINE_CONFIG_START(cabal_state::cabalbl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
+	GENERIC_LATCH_8(config, "soundlatch3");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator) */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)

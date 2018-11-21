@@ -47,14 +47,14 @@ void prehisle_state::prehisle_map(address_map &map)
 
 WRITE8_MEMBER(prehisle_state::D7759_write_port_0_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
 WRITE8_MEMBER(prehisle_state::D7759_upd_reset_w)
 {
-	m_upd7759->reset_w(data & 0x80);
+	m_upd7759->reset_w(BIT(data, 7));
 }
 
 void prehisle_state::prehisle_sound_map(address_map &map)
@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))  /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -304,7 +304,7 @@ ROM_START( prehislek )
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "chars", 0 )
-	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, BAD_DUMP CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) ) // not dumped, missing korean text
+	ROM_LOAD( "gt15k.b15",   0x000000, 0x08000, CRC(4cad1451) SHA1(5c81240e94f5a38af874b2ec7c65cb0f55d2ba8c) )
 
 	ROM_REGION( 0x040000, "bgtiles", 0 )
 	ROM_LOAD( "pi8914.b14", 0x000000, 0x40000, CRC(207d6187) SHA1(505dfd1424b894e7b898f91b89f021ddde433c48) )

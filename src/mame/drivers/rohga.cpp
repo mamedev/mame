@@ -314,8 +314,6 @@ void rohga_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 
@@ -880,8 +878,10 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	MCFG_DEVICE_PROGRAM_MAP(rohga_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, 32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -948,11 +948,11 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rohga_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.78)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.78)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
+	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.78);
+	ymsnd.add_route(1, "rspeaker", 0.78);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -970,8 +970,10 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_DEVICE_PROGRAM_MAP(wizdfire_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -1043,11 +1045,11 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rohga_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
+	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.80);
+	ymsnd.add_route(1, "rspeaker", 0.80);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -1065,8 +1067,10 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	MCFG_DEVICE_PROGRAM_MAP(nitrobal_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -1139,11 +1143,11 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rohga_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
+	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.80);
+	ymsnd.add_route(1, "rspeaker", 0.80);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -1161,8 +1165,10 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	MCFG_DEVICE_PROGRAM_MAP(schmeisr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rohga_state,  irq6_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, 32220000/4/3); /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rohga_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
@@ -1229,11 +1235,11 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rohga_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
+	ymsnd.port_write_handler().set(FUNC(rohga_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.80);
+	ymsnd.add_route(1, "rspeaker", 0.80);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

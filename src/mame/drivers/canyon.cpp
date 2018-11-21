@@ -244,16 +244,15 @@ MACHINE_CONFIG_START(canyon_state::canyon)
 	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // C7
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led0")) // 1 PLAYER LAMP
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // 2 PLAYER LAMP
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT2_EN>))
+	F9334(config, m_outlatch); // C7
+	m_outlatch->q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<CANYON_WHISTLE1_EN>));
+	m_outlatch->q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<CANYON_WHISTLE2_EN>));
+	m_outlatch->q_out_cb<2>().set_output("led0"); // 1 PLAYER LAMP
+	m_outlatch->q_out_cb<3>().set_output("led1"); // 2 PLAYER LAMP
+	m_outlatch->q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<CANYON_ATTRACT1_EN>));
+	m_outlatch->q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<CANYON_ATTRACT2_EN>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -80,12 +80,12 @@ void mikro80_state::machine_reset()
 
 READ8_MEMBER(mikro80_state::mikro80_keyboard_r)
 {
-	return m_ppi8255->read(space, offset^0x03);
+	return m_ppi8255->read(offset^0x03);
 }
 
 WRITE8_MEMBER(mikro80_state::mikro80_keyboard_w)
 {
-	m_ppi8255->write(space, offset^0x03, data);
+	m_ppi8255->write(offset^0x03, data);
 }
 
 

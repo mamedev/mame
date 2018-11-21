@@ -5,9 +5,10 @@
  * includes/amstrad.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_AMSTRAD_H
 #define MAME_INCLUDES_AMSTRAD_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
@@ -127,8 +128,8 @@ public:
 		TIMER_SET_RESOLUTION
 	};
 
-	amstrad_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	amstrad_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "ay"),
 		m_fdc(*this, "upd765"),
@@ -168,7 +169,8 @@ public:
 		m_io_green_display(*this, "green_display"),
 		m_io_ctrltype(*this,"controller_type"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	required_device<z80_device> m_maincpu;
 	required_device<ay8910_device> m_ay;

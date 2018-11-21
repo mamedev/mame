@@ -340,7 +340,7 @@ private:
 	uint32_t  m_rom_size;
 
 	/* RAM */
-	uint8_t   *m_ram_base;
+	std::unique_ptr<uint8_t[]> m_ram_base;
 	uint32_t  m_ram_size;
 
 	/* Banking */
@@ -364,13 +364,13 @@ void nakajies_state::update_banks()
 		{
 			/* RAM banking */
 			/* Not entirely sure if bank 0x1f refers to first or second ram bank ... */
-			m_bank_base[i] = m_ram_base + ( ( ( ( m_bank[i] & 0x0f ) ^ 0xf ) << 17 ) % m_ram_size );
+			m_bank_base[i] = &m_ram_base[(((m_bank[i] & 0x0f) ^ 0xf) << 17) % m_ram_size];
 		}
 		else
 		{
 			/* ROM banking */
 			/* 0 is last bank, 1 bank before last, etc */
-			m_bank_base[i] = m_rom_base + ( ( ( ( m_bank[i] & 0x0f ) ^ 0xf ) << 17 ) % m_rom_size );
+			m_bank_base[i] = &m_rom_base[(((m_bank[i] & 0x0f) ^ 0xf) << 17) % m_rom_size];
 		}
 	}
 	membank( "bank0" )->set_base( m_bank_base[0] );
@@ -651,7 +651,7 @@ void nakajies_state::machine_start()
 	{
 		m_ram_size = 256 * 1024;
 	}
-	m_ram_base = machine().memory().region_alloc( "mainram", m_ram_size, 1, ENDIANNESS_LITTLE )->base();
+	m_ram_base = make_unique_clear<uint8_t[]>(m_ram_size);
 }
 
 
@@ -667,13 +667,12 @@ void nakajies_state::machine_reset()
 	{
 		elem = 0;
 	}
-	memset(m_ram_base, 0, m_ram_size);
 	update_banks();
 }
 
 uint32_t nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t* lcd_memory_start = m_ram_base + (m_lcd_memory_start<<9);
+	uint8_t* lcd_memory_start = &m_ram_base[m_lcd_memory_start << 9];
 	int height = screen.height();
 
 	for (int y=0; y<height; y++)
@@ -770,7 +769,7 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	RP5C01(config, "rtc", XTAL(32'768));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", nakajies_state, kb_timer, attotime::from_hz(250))
 MACHINE_CONFIG_END

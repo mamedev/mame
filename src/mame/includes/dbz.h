@@ -5,6 +5,10 @@
     Dragon Ball Z
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_DBZ_H
+#define MAME_INCLUDES_DBZ_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/k053252.h"
@@ -18,8 +22,8 @@
 class dbz_state : public driver_device
 {
 public:
-	dbz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dbz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg1_videoram(*this, "bg1_videoram"),
 		m_bg2_videoram(*this, "bg2_videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -31,7 +35,8 @@ public:
 		m_k053936_1(*this, "k053936_1"),
 		m_k053936_2(*this, "k053936_2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void dbz(machine_config &config);
 
@@ -85,3 +90,5 @@ private:
 	void dbz_sound_io_map(address_map &map);
 	void dbz_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DBZ_H

@@ -215,21 +215,21 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_MOS6530n_IN_PB_CB(READ8(*this, aim65_state, aim65_riot_b_r))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, AIM65_CLOCK)
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, aim65_state, aim65_pb_r))
+	via6522_device &via0(VIA6522(config, "via6522_0", AIM65_CLOCK));
+	via0.readpb_handler().set(FUNC(aim65_state::aim65_pb_r));
 	// in CA1 printer ready?
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pb_w))
+	via0.writepb_handler().set(FUNC(aim65_state::aim65_pb_w));
 	// out CB1 printer start
 	// out CA2 cass control (H=in)
 	// out CB2 turn printer on
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	via0.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, AIM65_CLOCK)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	via6522_device &via1(VIA6522(config, "via6522_1", AIM65_CLOCK));
+	via1.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, aim65_state, aim65_pia_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pia_b_w))
+	pia6821_device &pia(PIA6821(config, "pia6821", 0));
+	pia.writepa_handler().set(FUNC(aim65_state::aim65_pia_a_w));
+	pia.writepb_handler().set(FUNC(aim65_state::aim65_pia_b_w));
 
 	// Deck 1 can play and record
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -269,9 +269,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_GENERIC_LOAD(aim65_state, z15_load)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","aim65_cart")

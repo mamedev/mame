@@ -716,7 +716,7 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_PALETTE_INIT_OWNER(geniusiq_state, geniusiq)
 
 	/* internal flash */
-	MCFG_AMD_29F010_ADD("flash")
+	AMD_29F010(config, "flash");
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "iq128_cart")
@@ -727,12 +727,12 @@ MACHINE_CONFIG_START(geniusiq_state::iq128)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq128")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(geniusiq_state::iqtv512)
+void geniusiq_state::iqtv512(machine_config &config)
+{
 	iq128(config);
 	/* internal flash */
-	MCFG_DEVICE_REMOVE("flash")
-	MCFG_AMD_29F040_ADD("flash")
-MACHINE_CONFIG_END
+	AMD_29F040(config.replace(), "flash");
+}
 
 /* ROM definition */
 

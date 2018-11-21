@@ -284,8 +284,7 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 	MCFG_DEVICE_PROGRAM_MAP(magnum_map)
 	MCFG_DEVICE_IO_MAP(magnum_io)
 
-	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
-	MCFG_CDP1879_IRQ_CALLBACK(WRITELINE(*this, magnum_state, rtcirq_w))
+	CDP1879(config, "rtc", XTAL(32'768)).irq_callback().set(FUNC(magnum_state::rtcirq_w));
 
 	MCFG_SCREEN_ADD("screen1", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -311,7 +310,7 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 
 	//MCFG_DEVICE_ADD("crtc", I8275, 3000000) // unknown clock
 
-	//MCFG_DEVICE_ADD("fdc", WD1793, 1000000) // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
+	//WD1793(config, "fdc", 1000000); // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
 
 	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 

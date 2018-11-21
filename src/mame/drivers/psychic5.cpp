@@ -727,12 +727,7 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	MCFG_DEVICE_PROGRAM_MAP(psychic5_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(psychic5_vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&psychic5_state::psychic5_vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 14, 0x2000);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(psychic5_sound_map)
@@ -758,7 +753,7 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -781,12 +776,7 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	MCFG_DEVICE_PROGRAM_MAP(bombsa_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bombsa_vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&psychic5_state::bombsa_vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 14, 0x2000);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) )
 	MCFG_DEVICE_PROGRAM_MAP(bombsa_sound_map)
@@ -810,7 +800,7 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -347,13 +347,14 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8)   /* divisor guessed - result is 56 Hz */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(cardline_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(cardline_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, cardline_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, cardline_state, vsync_changed))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8));   /* divisor guessed - result is 56 Hz */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_begin_update_callback(FUNC(cardline_state::crtc_begin_update), this);
+	crtc.set_update_row_callback(FUNC(cardline_state::crtc_update_row), this);
+	crtc.out_hsync_callback().set(FUNC(cardline_state::hsync_changed));
+	crtc.out_vsync_callback().set(FUNC(cardline_state::vsync_changed));
 
 	config.set_default_layout(layout_cardline);
 

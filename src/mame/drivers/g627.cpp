@@ -302,13 +302,13 @@ MACHINE_CONFIG_START(g627_state::g627)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("i8156", I8156, 14138000/8)
-	MCFG_I8155_IN_PORTA_CB(READ8(*this, g627_state, porta_r))
-	MCFG_I8155_IN_PORTB_CB(READ8(*this, g627_state, portb_r))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, g627_state, portc_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	i8156_device &i8156(I8156(config, "i8156", 14138000/8));
+	i8156.in_pa_callback().set(FUNC(g627_state::porta_r));
+	i8156.in_pb_callback().set(FUNC(g627_state::portb_r));
+	i8156.out_pc_callback().set(FUNC(g627_state::portc_w));
+	i8156.out_to_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Sound */
 	genpin_audio(config);

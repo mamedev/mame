@@ -58,9 +58,9 @@ void cclimber_audio_device::device_start()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(cclimber_audio_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK/2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, cclimber_audio_device, sample_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK/2));
+	aysnd.port_a_write_callback().set(FUNC(cclimber_audio_device::sample_select_w));
+	aysnd.add_route(ALL_OUTPUTS, ":speaker", 0.5);
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)

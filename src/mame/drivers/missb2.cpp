@@ -482,8 +482,7 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128);
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
 
 	MCFG_MACHINE_START_OVERRIDE(missb2_state,missb2)
 	MCFG_MACHINE_RESET_OVERRIDE(missb2_state,missb2)
@@ -511,10 +510,10 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
+	GENERIC_LATCH_8(config, m_main_to_sound);
+	m_main_to_sound->data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
 
-	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+	GENERIC_LATCH_8(config, m_sound_to_main);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, MAIN_XTAL/8)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, missb2_state, irqhandler))

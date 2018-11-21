@@ -382,11 +382,11 @@ MACHINE_CONFIG_START(coleco_state::coleco)
 	MCFG_DEVICE_IO_MAP(coleco_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -404,19 +404,16 @@ MACHINE_CONFIG_START(coleco_state::coleco)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coleco_state::colecop)
+void coleco_state::colecop(machine_config &config)
+{
 	coleco(config);
 
 	/* video hardware */
-	MCFG_DEVICE_REMOVE("tms9928a")
-	MCFG_DEVICE_REMOVE("screen")
-
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
-MACHINE_CONFIG_END
+	tms9929a_device &vdp(TMS9929A(config.replace(), "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+}
 
 MACHINE_CONFIG_START(coleco_state::czz50)
 	coleco(config);
@@ -426,19 +423,16 @@ MACHINE_CONFIG_START(coleco_state::czz50)
 	MCFG_DEVICE_PROGRAM_MAP(czz50_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coleco_state::dina)
+void coleco_state::dina(machine_config &config)
+{
 	czz50(config);
 
 	/* video hardware */
-	MCFG_DEVICE_REMOVE("tms9928a")
-	MCFG_DEVICE_REMOVE("screen")
-
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
-MACHINE_CONFIG_END
+	tms9929a_device &vdp(TMS9929A(config.replace(), "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+}
 
 
 /* ROMs */

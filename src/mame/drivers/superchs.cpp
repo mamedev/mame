@@ -236,13 +236,13 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
-	MCFG_ADC0808_IN0_CB(IOPORT("WHEEL"))
-	MCFG_ADC0808_IN1_CB(IOPORT("ACCEL"))
-	MCFG_ADC0808_IN2_CB(READ8(*this, superchs_state, volume_r))
+	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set_inputline("maincpu", 3);
+	adc.in_callback<0>().set_ioport("WHEEL");
+	adc.in_callback<1>().set_ioport("ACCEL");
+	adc.in_callback<2>().set(FUNC(superchs_state::volume_r));
 
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
 	tc0510nio.read_1_callback().set_ioport("COINS");

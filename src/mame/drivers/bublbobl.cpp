@@ -865,8 +865,7 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // is this necessary?
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, tokio)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, tokio)
@@ -888,10 +887,10 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
+	GENERIC_LATCH_8(config, m_main_to_sound);
+	m_main_to_sound->data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
 
-	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+	GENERIC_LATCH_8(config, m_sound_to_main);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, MAIN_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -909,7 +908,7 @@ MACHINE_CONFIG_START(bublbobl_state::bublboblp)
 	// hooked up wrong in MAME for tokio in general, or is disabled with a wire
 	// jumper under the epoxy
 	MCFG_DEVICE_REMOVE("watchdog")
-	MCFG_WATCHDOG_ADD("watchdog") // this adds back a watchdog, but due to the way MAME handles watchdogs, it will never fire unless it first gets at least one pulse, which it never will.
+	WATCHDOG_TIMER(config, "watchdog"); // this adds back a watchdog, but due to the way MAME handles watchdogs, it will never fire unless it first gets at least one pulse, which it never will.
 
 	MCFG_DEVICE_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
 	MCFG_DEVICE_PROGRAM_MAP(tokio_map) // no mcu or resistors at all
@@ -978,8 +977,7 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, bublbobl)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, bublbobl)
@@ -1004,10 +1002,10 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
+	GENERIC_LATCH_8(config, m_main_to_sound);
+	m_main_to_sound->data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
 
-	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+	GENERIC_LATCH_8(config, m_sound_to_main);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, MAIN_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<0>))

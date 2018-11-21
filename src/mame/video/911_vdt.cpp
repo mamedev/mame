@@ -17,7 +17,6 @@ TODO:
 #include "911_chr.h"
 #include "911_key.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -151,6 +150,8 @@ vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, VDT911, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfx_vdt911, "palette")
 	, m_beeper(*this, "beeper")
+	, m_screen(*this, "screen")
+	, m_keys(*this, "KEY%u", 0U)
 	, m_keyint_line(*this)
 	, m_lineint_line(*this)
 {
@@ -249,7 +250,11 @@ void vdt911_device::device_reset()
 	else
 		m_cursor_address_mask = 0x7ff;   /* 2 kb of RAM */
 
-	m_line_timer->adjust(attotime::from_msec(0), 0, attotime::from_hz(get_refresh_rate()));
+	// European models have 50 Hz
+	int lines = (m_model == model::US) || (m_model == model::Japanese) ? 262 : 314;
+	attotime refresh = attotime::from_hz(11.004_MHz_XTAL / 700 / lines);
+	m_screen->configure(700, lines, m_screen->visible_area(), refresh.as_attoseconds());
+	m_line_timer->adjust(attotime::from_msec(0), 0, refresh);
 }
 
 /*
@@ -461,7 +466,7 @@ WRITE8_MEMBER( vdt911_device::cru_w )
 void vdt911_device::refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y)
 {
 	gfx_element *gfx = this->gfx(unsigned(m_model));
-	int height = (m_screen_size == screen_size::char_960) ? 12 : /*25*/24;
+	int height = (m_screen_size == screen_size::char_960) ? 12 : 24;
 
 	int use_8bit_charcodes = USES_8BIT_CHARCODES();
 	int address = 0;
@@ -550,12 +555,10 @@ void vdt911_device::check_keyboard()
 	modifier_state_t modifier_state;
 	int repeat_mode;
 
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
-
 	/* read current key state */
 	for (i = 0; i < 6; i++)
 	{
-		key_buf[i] = ioport(keynames[i])->read();
+		key_buf[i] = m_keys[i]->read();
 	}
 
 	/* parse modifier keys */
@@ -662,12 +665,6 @@ void vdt911_device::check_keyboard()
 			}
 		}
 	}
-}
-
-int vdt911_device::get_refresh_rate()
-{
-	// European models have 50 Hz
-	return ((m_model == model::US) || (m_model == model::Japanese))? 60 : 50;
 }
 
 uint32_t vdt911_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -803,14 +800,10 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vdt911_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vdt911_device, screen_update)
-
-	MCFG_SCREEN_SIZE(560, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(11.004_MHz_XTAL, 700, 0, 560, 262, 0, 240);
+	screen.set_screen_update(FUNC(vdt911_device::screen_update));
+	screen.set_palette("palette");
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)

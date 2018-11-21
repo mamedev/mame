@@ -74,6 +74,7 @@ public:
 	typedef delegate<uint32_t (bool)> a20_cb;
 	template <typename Object> void set_a20_callback(Object &&cb) { m_a20_callback = std::forward<Object>(cb); }
 	template <class Object> devcb_base &set_shutdown_callback(Object &&cb) { return m_out_shutdown_func.set_callback(std::forward<Object>(cb)); }
+	auto shutdown_callback() { return m_out_shutdown_func.bind(); }
 
 protected:
 	virtual void execute_run() override;

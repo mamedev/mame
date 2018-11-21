@@ -93,7 +93,7 @@ public:
 		m_mainram(*this, "mainram"),
 		m_indersb(*this, "inder_sb"),
 		m_ppi(*this, "ppi8255_0"),
-		m_dsw_shifter{ {*this, "ttl166_1"}, {*this, "ttl166_2"} },
+		m_dsw_shifter(*this, "ttl166_%u", 1U),
 		m_dsw_data(0),
 		m_ppi_to_pic_command(0), m_ppi_to_pic_clock(0), m_ppi_to_pic_data(0),
 		m_pic_to_ppi_clock(0), m_pic_to_ppi_data(0)
@@ -123,7 +123,7 @@ private:
 	required_shared_ptr<uint16_t> m_mainram;
 	required_device<inder_sb_device> m_indersb;
 	required_device<i8255_device> m_ppi;
-	required_device<ttl166_device> m_dsw_shifter[2];
+	required_device_array<ttl166_device, 2> m_dsw_shifter;
 
 	int m_dsw_data;
 	int m_ppi_to_pic_command;
@@ -388,19 +388,19 @@ MACHINE_CONFIG_START(megaphx_state::megaphx)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_DEVICE_ADD("ttl166_1", TTL166)
-	MCFG_TTL166_DATA_CB(IOPORT("DSW1"))
-	MCFG_TTL166_QH_CB(WRITELINE("ttl166_2", ttl166_device, serial_w))
+	TTL166(config, m_dsw_shifter[0]);
+	m_dsw_shifter[0]->data_callback().set_ioport("DSW1");
+	m_dsw_shifter[0]->qh_callback().set(m_dsw_shifter[1], FUNC(ttl166_device::serial_w));
 
-	MCFG_DEVICE_ADD("ttl166_2", TTL166)
-	MCFG_TTL166_DATA_CB(IOPORT("DSW2"))
-	MCFG_TTL166_QH_CB(WRITELINE(*this, megaphx_state, dsw_w))
+	TTL166(config, m_dsw_shifter[1]);
+	m_dsw_shifter[1]->data_callback().set_ioport("DSW2");
+	m_dsw_shifter[1]->qh_callback().set(FUNC(megaphx_state::dsw_w));
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, megaphx_state, ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, megaphx_state, ppi_portc_w))
+	I8255A(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("P1");
+	m_ppi->in_pb_callback().set_ioport("P2");
+	m_ppi->in_pc_callback().set(FUNC(megaphx_state::ppi_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(megaphx_state::ppi_portc_w));
 
 	MCFG_INDER_VIDEO_ADD("inder_vid")
 

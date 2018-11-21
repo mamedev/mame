@@ -890,19 +890,6 @@ void adam_state::m6801_mem(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( m6801_io )
-//-------------------------------------------------
-
-void adam_state::m6801_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).w(FUNC(adam_state::m6801_p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(adam_state::m6801_p2_r), FUNC(adam_state::m6801_p2_w));
-	map(M6801_PORT3, M6801_PORT3).rw(FUNC(adam_state::m6801_p3_r), FUNC(adam_state::m6801_p3_w));
-	map(M6801_PORT4, M6801_PORT4).w(FUNC(adam_state::m6801_p4_w));
-}
-
-
 
 //**************************************************************************
 //  INPUT PORTS
@@ -1045,18 +1032,22 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_DEVICE_PROGRAM_MAP(adam_mem)
 	MCFG_DEVICE_IO_MAP(adam_io)
 
-	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(m6801_mem)
-	MCFG_DEVICE_IO_MAP(m6801_io)
-	MCFG_M6801_SC2(WRITELINE(*this, adam_state, os3_w))
+	M6801(config, m_netcpu, XTAL(4'000'000));
+	m_netcpu->set_addrmap(AS_PROGRAM, &adam_state::m6801_mem);
+	m_netcpu->out_p1_cb().set(FUNC(adam_state::m6801_p1_w));
+	m_netcpu->in_p2_cb().set(FUNC(adam_state::m6801_p2_r));
+	m_netcpu->out_p2_cb().set(FUNC(adam_state::m6801_p2_w));
+	m_netcpu->in_p3_cb().set(FUNC(adam_state::m6801_p3_r));
+	m_netcpu->out_p3_cb().set(FUNC(adam_state::m6801_p3_w));
+	m_netcpu->out_p4_cb().set(FUNC(adam_state::m6801_p4_w));
+	m_netcpu->out_sc2_cb().set(FUNC(adam_state::os3_w));
 	MCFG_QUANTUM_PERFECT_CPU(M6801_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(TMS9928A_TAG, TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, adam_state, vdc_int_w))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC(SCREEN_TAG)
-	MCFG_SCREEN_UPDATE_DEVICE(TMS9928A_TAG, tms9928a_device, screen_update)
+	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");
+	m_vdc->set_vram_size(0x4000);
+	m_vdc->int_callback().set(FUNC(adam_state::vdc_int_w));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1097,8 +1088,7 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(*this, adam_state, joy2_irq_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("colec_cart_list", "coleco")

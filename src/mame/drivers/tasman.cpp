@@ -654,13 +654,13 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_DEVICE_PROGRAM_MAP(kongamaud_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 25000000)
-	MCFG_K053252_OFFSETS(0, 16) // TBD
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, kongambl_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, kongambl_state, hblank_irq_ack_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	K053252(config, m_k053252, 25000000);
+	m_k053252->set_offsets(0, 16); // TBD
+	m_k053252->int1_ack().set(FUNC(kongambl_state::vblank_irq_ack_w));
+	m_k053252->int2_ack().set(FUNC(kongambl_state::hblank_irq_ack_w));
+	m_k053252->set_screen("screen");
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223) // fake, they'll be changed by CCU anyway, TBD

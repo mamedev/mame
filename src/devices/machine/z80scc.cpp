@@ -69,6 +69,26 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
     Improved reg handl       Y             Y          Y         Y
     -------------------------------------------------------------------------
    x/p = Features that has been implemented  n/a = features that will not
+
+
+
+How to calculate the required clock, given the wr contents and the needed
+baud rate:
+
+- let's say B = baud rate (usually 9600).
+- Check wr11
+-- for RX, bits D6,D5 = 1,0
+-- for TX, bits D4,D3 = 1,0
+-- for TRxC, bits D1,D0 = 1,0
+-- let's say T = time constant (wr13 * 256 + wr12) +2. (don't forget the +2)
+-- in the unlikely case of T == 0, pretend T = 1.
+- If the required wr11 bits are set:
+-- let's say M = wr4 D7,D6 if 1,1 M = 64; if 1,0 M = 32; if 0,1 M = 16 else M = 1
+-- so, the required clock on the MCFG_DEVICE_ADD line = 2*T*B*M.
+- If the required wr11 bits are not set:
+-- add a line: MCFG_Z80SCC_OFFSETS(X, 0, Y, 0), where X = channel-A-baud * T,
+   and Y = channel-B-baud * T.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -370,10 +390,11 @@ DEFINE_DEVICE_TYPE(SCC8523L,       scc8523l_device, "scc8523l",       "Zilog Z85
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(z80scc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, Z80SCC_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, Z80SCC_CHANNEL, 0)
-MACHINE_CONFIG_END
+void z80scc_device::device_add_mconfig(machine_config &config)
+{
+	Z80SCC_CHANNEL(config, CHANA_TAG, 0);
+	Z80SCC_CHANNEL(config, CHANB_TAG, 0);
+}
 
 
 //**************************************************************************
@@ -834,31 +855,28 @@ int z80scc_device::m1_r()
 //-------------------------------------------------
 READ8_MEMBER( z80scc_device::zbus_r )
 {
-	int ba = 0;
-	int reg = 0x20; // Default point to a non register number
+	offset &= 31;
+	bool ba = BIT(offset, 4);
+	u8 reg = offset & 15;
 	uint8_t data = 0;
 
-	/* Expell non- Z-Bus variants */
+	/* Expel non- Z-Bus variants */
 	if ( !(m_variant & SET_Z80X30))
 	{
 		logerror(" zbus_r not supported by this device variant, you should probably use the universal bus variants  c*_r/w and d*_r/w (see z80scc.h)\n");
 		return data;
 	}
 
-	switch ((m_chanB->m_wr0) & 7)
+	if ((m_chanB->m_wr0 & 7) == WR0_Z_SEL_SHFT_RIGHT)
 	{
-	case WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
-	case WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
-	default:
-		logerror("Malformed Z-bus SCC read: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
-		LOG("Malformed Z-bus SCC read: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
-		return data;
+		ba = BIT(offset, 0);
+		reg = offset >> 1;
 	}
 
-	if (ba == 0)
-		data = m_chanB->scc_register_read(reg);
-	else
+	if (ba)
 		data = m_chanA->scc_register_read(reg);
+	else
+		data = m_chanB->scc_register_read(reg);
 
 	return data;
 }
@@ -868,29 +886,36 @@ READ8_MEMBER( z80scc_device::zbus_r )
 //-------------------------------------------------
 WRITE8_MEMBER( z80scc_device::zbus_w )
 {
-	int ba = 0;
-	int reg = 0x20; // Default point to a non register number
+	offset &= 31;
+	bool ba = BIT(offset, 4);
+	u8 reg = offset & 15;
 
-	/* Expell non- Z-Bus variants */
+	/* Expel non- Z-Bus variants */
 	if ( !(m_variant & SET_Z80X30))
 	{
 		logerror(" zbus_w not supported by this device variant, you should probably use the universal bus variants  c*_r/w and d*_r/w (see z80scc.h)\n");
 		return;
 	}
 
-	switch ((m_chanB->m_wr0) & 7)
+	if ((m_chanB->m_wr0 & 7) == WR0_Z_SEL_SHFT_RIGHT)
 	{
-	case WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
-	case WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
-	default:
-		logerror("Malformed Z-bus SCC write: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
-		LOG("Malformed Z-bus SCC write: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
+		ba = BIT(offset, 0);
+		reg = offset >> 1;
 	}
 
-	if (ba == 0)
-		m_chanB->scc_register_write(reg, data);
-	else
-		m_chanA->scc_register_write(reg, data);
+	switch (reg)
+	{
+		case 2:
+		case 9:
+			m_chanA->scc_register_write(reg, data);
+			m_chanB->scc_register_write(reg, data);
+			break;
+		default:
+			if (ba)
+				m_chanA->scc_register_write(reg, data);
+			else
+				m_chanB->scc_register_write(reg, data);
+	}
 
 	return;
 }
@@ -1459,13 +1484,15 @@ void z80scc_channel::update_rts()
 		if (m_wr5 & WR5_RTS)
 		{
 				// when the RTS bit is set, the _RTS output goes low
-				set_rts(0);
 				m_rts = 1;
+				set_rts(!m_rts);
 		}
 		else
 		{
 				// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
 				m_rts = 0;
+				if (!(m_wr3 & WR3_AUTO_ENABLES) || (m_rr1 & RR1_ALL_SENT))
+					set_rts(!m_rts);
 		}
 
 		// data terminal ready output follows the state programmed into the DTR bit*/
@@ -2099,6 +2126,8 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 		update_serial();
 		safe_transmit_register_reset();
 		update_rts(); // Will also update DTR accordingly
+
+		check_waitrequest();
 	}
 }
 
@@ -2561,10 +2590,10 @@ void z80scc_channel::m_tx_fifo_rp_step()
 		}
 }
 
-READ8_MEMBER (z80scc_device::da_r)  { return m_chanA->data_read(); }
-WRITE8_MEMBER (z80scc_device::da_w) { m_chanA->data_write(data); }
-READ8_MEMBER (z80scc_device::db_r)  { return m_chanB->data_read(); }
-WRITE8_MEMBER (z80scc_device::db_w) { m_chanB->data_write(data); }
+uint8_t z80scc_device::da_r(offs_t offset)            { return m_chanA->data_read(); }
+void z80scc_device::da_w(offs_t offset, uint8_t data) { m_chanA->data_write(data); }
+uint8_t z80scc_device::db_r(offs_t offset)            { return m_chanB->data_read(); }
+void z80scc_device::db_w(offs_t offset, uint8_t data) { m_chanB->data_write(data); }
 
 //-------------------------------------------------
 //  data_write - write data register
@@ -2621,8 +2650,6 @@ void z80scc_channel::data_write(uint8_t data)
 			LOGTX("- TX FIFO has more room, setting TBE bit\n");
 			m_rr0 |= RR0_TX_BUFFER_EMPTY; // or there is a slot in the FIFO available
 		}
-		LOGTX("- TX FIFO now has data to send, clearing ALL_SENT bit\n");
-		m_rr1 &= ~RR1_ALL_SENT; // All is definitelly not sent anymore
 	}
 
 	check_waitrequest();
@@ -2636,7 +2663,8 @@ void z80scc_channel::data_write(uint8_t data)
 			LOGTX("- Setting up transmitter\n");
 			transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Load the shift register, reload is done in tra_complete()
 			m_tx_fifo_rp_step();
-			m_rr1 |= RR1_ALL_SENT; // Now stuff is on its way again
+			LOGTX("- TX shift register loaded, clearing ALL_SENT bit\n");
+			m_rr1 &= ~RR1_ALL_SENT; // All is definitely not sent anymore
 			m_rr0 |= RR0_TX_BUFFER_EMPTY; // And there is a slot in the FIFO available
 		}
 		else
@@ -2730,7 +2758,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 {
 	LOG("\"%s\"%s: %c : CTS %u\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 
-	if ((m_rr0 & RR0_CTS) != (state ? RR0_CTS : 0)) //  SCC change detection logic
+	if ((m_rr0 & RR0_CTS) != (state ? 0 : RR0_CTS)) //  SCC change detection logic
 	{
 		// enable transmitter if in auto enables mode
 		if (!state)
@@ -2743,7 +2771,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 			}
 		}
 
-		if (state) m_rr0 |= RR0_CTS; else  m_rr0 &= ~RR0_CTS; // Raw pin/status value
+		if (state) m_rr0 &= ~RR0_CTS; else  m_rr0 |= RR0_CTS; // Raw pin/status value
 
 		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_CTS))
 		{
@@ -2767,7 +2795,7 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 {
 	LOGDCD("\"%s\": %c : DCD %u\n", owner()->tag(), 'A' + m_index, state);
 
-	if ((m_rr0 & RR0_DCD) != (state ? RR0_DCD : 0)) //  SCC change detection logic
+	if ((m_rr0 & RR0_DCD) != (state ? 0 : RR0_DCD)) //  SCC change detection logic
 	{
 		// enable transmitter if in auto enables mode
 		if (!state)
@@ -2783,7 +2811,7 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 			}
 		}
 
-		if (state) m_rr0 |= RR0_DCD; else  m_rr0 &= ~RR0_DCD; // Raw pin/status value
+		if (state) m_rr0 &= ~RR0_DCD; else  m_rr0 |= RR0_DCD; // Raw pin/status value
 
 		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_DCD))
 		{
@@ -2799,25 +2827,42 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 	}
 }
 
-
-//-------------------------------------------------
-//  ri_w - ring indicator handler
-//-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::ri_w )
-{
-	LOGINT("\"%s\": %c : RI %u - not implemented\n", owner()->tag(), 'A' + m_index, state);
-}
-
 //-------------------------------------------------
 //  sync_w - sync handler for external sync mode
 //-------------------------------------------------
 WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 {
 	LOGSYNC("\"%s\": %c : SYNC %u\n", owner()->tag(), 'A' + m_index, state);
-	if ((m_rr0 & RR0_SYNC_HUNT) != (state ? RR0_SYNC_HUNT : 0)) //  SCC change detection logic
+
+	/*
+	 * The /SYNC pin is a general purpose input whose state is reported in the
+	 * Sync/Hunt bit in RR0. If the crystal oscillator is enabled, this pin is
+	 * not available and the Sync/Hunt bit is forced to 0. Otherwise, the /SYNC
+	 * pin may be used to carry the Ring Indicator signal.
+	 */
+	if (!(m_wr11 & WR11_RCVCLK_TYPE))
 	{
-		if (state) m_rr0 |= RR0_SYNC_HUNT; else  m_rr0 &= ~RR0_SYNC_HUNT; // Raw pin/status value
+		// check for state change
+		if ((m_rr0 & RR0_SYNC_HUNT) != (state ? 0 : RR0_SYNC_HUNT))
+		{
+			// record pin state (inverted)
+			if (state)
+				m_rr0 &= ~RR0_SYNC_HUNT;
+			else
+				m_rr0 |= RR0_SYNC_HUNT;
+
+			// trigger an external interrupt if enabled
+			if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_SYNC))
+			{
+				m_extint_latch = 1;
+				m_extint_states = m_rr0;
+
+				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
+			}
+		}
 	}
+	else
+		fatalerror("/SYNC cannot be used as an input in RTxC-XTAL clock mode.");
 }
 
 //-------------------------------------------------
@@ -3067,7 +3112,7 @@ void z80scc_channel::check_waitrequest()
 	// if dma request function is enabled
 	if (m_wr1 & WR1_WREQ_FUNCTION)
 	{
-		// assert /W//REQ if transmit buffer is empty, clear if it's not
-		m_uart->m_out_wreq_cb[m_index]((m_rr0 & RR0_TX_BUFFER_EMPTY) ? ASSERT_LINE : CLEAR_LINE);
+		// assert /W//REQ if transmit buffer is empty and transmitter is enabled
+		m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
 	}
 }

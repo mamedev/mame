@@ -207,13 +207,13 @@ WRITE8_MEMBER(sprint4_state::lockout_w)
 
 WRITE8_MEMBER(sprint4_state::bang_w)
 {
-	m_discrete->write(space, SPRINT4_BANG_DATA, data & 0x0f);
+	m_discrete->write(SPRINT4_BANG_DATA, data & 0x0f);
 }
 
 
 WRITE8_MEMBER(sprint4_state::attract_w)
 {
-	m_discrete->write(space, SPRINT4_ATTRACT_EN, data & 1);
+	m_discrete->write(SPRINT4_ATTRACT_EN, data & 1);
 }
 
 
@@ -385,11 +385,10 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_DEVICE_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(sprint4_cpu_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint4_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint4_state, screen_vblank))
@@ -404,15 +403,15 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("latch", F9334, 0) // at E11
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // START LAMP 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) // START LAMP 2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) // START LAMP 3
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led3")) // START LAMP 4
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_1>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_2>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_3>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_4>))
+	f9334_device &latch(F9334(config, "latch")); // at E11
+	latch.q_out_cb<0>().set_output("led0"); // START LAMP 1
+	latch.q_out_cb<1>().set_output("led1"); // START LAMP 2
+	latch.q_out_cb<2>().set_output("led2"); // START LAMP 3
+	latch.q_out_cb<3>().set_output("led3"); // START LAMP 4
+	latch.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<SPRINT4_SCREECH_EN_1>));
+	latch.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<SPRINT4_SCREECH_EN_2>));
+	latch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<SPRINT4_SCREECH_EN_3>));
+	latch.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<SPRINT4_SCREECH_EN_4>));
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint4_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

@@ -222,6 +222,7 @@ Notes:
 #include "emu.h"
 #include "includes/vip.h"
 
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -482,7 +483,7 @@ READ_LINE_MEMBER(vip_state::ef4_r)
 WRITE_LINE_MEMBER(vip_state::q_w)
 {
 	// sound output
-	m_beeper->write(machine().dummy_space(), NODE_01, state);
+	m_beeper->write(NODE_01, state);
 
 	// Q led
 	m_leds[LED_Q] = state ? 1 : 0;
@@ -610,7 +611,7 @@ void vip_state::machine_start()
 	m_leds[LED_POWER] = 1;
 
 	// reset sound
-	m_beeper->write(machine().dummy_space(), NODE_01, 0);
+	m_beeper->write(NODE_01, 0);
 
 	// state saving
 	save_item(NAME(m_8000));
@@ -716,12 +717,13 @@ MACHINE_CONFIG_START(vip_state::vip)
 	m_maincpu->tpb_cb().set(m_exp, FUNC(vip_expansion_slot_device::tpb_w));
 
 	// video hardware
-	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, 3.52128_MHz_XTAL / 2)
-	MCFG_CDP1861_IRQ_CALLBACK(WRITELINE(*this, vip_state, vdc_int_w))
-	MCFG_CDP1861_DMA_OUT_CALLBACK(WRITELINE(*this, vip_state, vdc_dma_out_w))
-	MCFG_CDP1861_EFX_CALLBACK(WRITELINE(*this, vip_state, vdc_ef1_w))
-	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, 3.52128_MHz_XTAL / 2)
-	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
+	CDP1861(config, m_vdc, 3.52128_MHz_XTAL / 2).set_screen(SCREEN_TAG);
+	m_vdc->int_cb().set(FUNC(vip_state::vdc_int_w));
+	m_vdc->dma_out_cb().set(FUNC(vip_state::vdc_dma_out_w));
+	m_vdc->efx_cb().set(FUNC(vip_state::vdc_ef1_w));
+
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(vip_state::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -745,9 +747,7 @@ MACHINE_CONFIG_START(vip_state::vip)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "vip")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("4K")
+	RAM(config, m_ram).set_default_size("2K").set_extra_options("4K");
 MACHINE_CONFIG_END
 
 
@@ -755,13 +755,12 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( vp111 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vip_state::vp111)
+void vip_state::vp111(machine_config &config)
+{
 	vip(config);
 	// internal ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,4K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("1K").set_extra_options("2K,4K");
+}
 
 
 

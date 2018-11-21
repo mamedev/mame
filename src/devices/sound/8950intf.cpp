@@ -84,7 +84,7 @@ void y8950_device::device_start()
 	assert_always(m_chip != nullptr, "Error creating Y8950 chip");
 
 	/* ADPCM ROM data */
-	y8950_set_delta_t_memory(m_chip, m_region->base(), m_region->bytes());
+	y8950_set_delta_t_memory(m_chip, &y8950_device::static_read_byte, &y8950_device::static_write_byte);
 
 	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
 	/* port and keyboard handler */
@@ -98,6 +98,16 @@ void y8950_device::device_start()
 
 	m_timer[0] = timer_alloc(0);
 	m_timer[1] = timer_alloc(1);
+}
+
+//-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+
+void y8950_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 72);
+	y8950_clock_changed(m_chip, clock(), clock() / 72);
 }
 
 //-------------------------------------------------
@@ -116,6 +126,15 @@ void y8950_device::device_stop()
 void y8950_device::device_reset()
 {
 	y8950_reset_chip(m_chip);
+}
+
+//-------------------------------------------------
+//  rom_bank_updated
+//-------------------------------------------------
+
+void y8950_device::rom_bank_updated()
+{
+	m_stream->update();
 }
 
 
@@ -140,6 +159,7 @@ DEFINE_DEVICE_TYPE(Y8950, y8950_device, "y8950", "Y8950 MSX-Audio")
 y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Y8950, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 21)
 	, m_stream(nullptr)
 	, m_timer{ nullptr, nullptr }
 	, m_chip(nullptr)
@@ -148,6 +168,5 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 	, m_keyboard_write_handler(*this)
 	, m_io_read_handler(*this)
 	, m_io_write_handler(*this)
-	, m_region(*this, DEVICE_SELF)
 {
 }

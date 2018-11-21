@@ -303,33 +303,34 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 16_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(v6809_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(v6809_state, crtc_update_addr)
+	SY6545_1(config, m_crtc, 16_MHz_XTAL / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr), this);
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(v6809_state, kbd_put))
 
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, v6809_state, pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, v6809_state, pa_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpb_handler().set(FUNC(v6809_state::pb_r));
+	m_pia0->writepa_handler().set(FUNC(v6809_state::pa_w));
+	m_pia0->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	m_pia0->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
 // no idea what this does
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+	pia1.irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 16_MHz_XTAL / 4)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
-	MCFG_PTM6840_O1_CB(WRITELINE(*this, v6809_state, speaker_w))
-	MCFG_PTM6840_O2_CB(WRITELINE(*this, v6809_state, speaker_en_w))
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	ptm6840_device &ptm(PTM6840(config, "ptm", 16_MHz_XTAL / 4));
+	ptm.set_external_clocks(4000000/14, 4000000/14, 4000000/14/8);
+	ptm.o1_callback().set(FUNC(v6809_state::speaker_w));
+	ptm.o2_callback().set(FUNC(v6809_state::speaker_en_w));
+	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
 	ACIA6850(config, "acia0", 0);
 
@@ -346,7 +347,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_DEVICE_ADD("fdc", MB8876, 16_MHz_XTAL / 16)
+	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

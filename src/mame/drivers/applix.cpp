@@ -887,20 +887,22 @@ MACHINE_CONFIG_START(applix_state::applix)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 30_MHz_XTAL / 16) // MC6545 @ 1.875 MHz
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(applix_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, applix_state, vsync_w))
+	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(applix_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(applix_state::vsync_w));
+ 
 
-	MCFG_DEVICE_ADD("via6522", VIA6522, 30_MHz_XTAL / 4 / 10) // VIA uses 68000 E clock
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, applix_state, applix_pb_r))
+	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
+	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));
 	// in CB1 kbd clk
 	// in CA2 vsync
 	// in CB2 kdb data
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, applix_state, applix_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, applix_state, applix_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
+	m_via->writepa_handler().set(FUNC(applix_state::applix_pa_w));
+	m_via->writepb_handler().set(FUNC(applix_state::applix_pb_w));
+	m_via->irq_handler().set_inputline("maincpu", M68K_IRQ_2);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
@@ -911,7 +913,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2) //connected to Z80H clock pin
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2); //connected to Z80H clock pin
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", applix_floppies, "35dd", applix_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", applix_floppies, "35dd", applix_state::floppy_formats)

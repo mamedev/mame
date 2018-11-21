@@ -188,7 +188,6 @@ MAIN BOARD:
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/74259.h"
 #include "machine/konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -233,7 +232,7 @@ WRITE_LINE_MEMBER(trackfld_state::irq_mask_w)
 void trackfld_state::main_map(address_map &map)
 {
 	map(0x1000, 0x1000).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* AFE */
-	map(0x1080, 0x1087).mirror(0x0078).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1080, 0x1087).mirror(0x0078).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x1100, 0x1100).mirror(0x007f).w("soundlatch", FUNC(generic_latch_8_device::write));  /* 32 */
 	map(0x1200, 0x1200).mirror(0x007f).portr("DSW2");
 	map(0x1280, 0x1280).mirror(0x007c).portr("SYSTEM");
@@ -283,7 +282,7 @@ void trackfld_state::yieartf_map(address_map &map)
 	map(0x0002, 0x0002).w(FUNC(trackfld_state::trackfld_VLM5030_control_w));
 	map(0x0003, 0x0003).w(m_vlm, FUNC(vlm5030_device::data_w));
 	map(0x1000, 0x1000).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* AFE */
-	map(0x1080, 0x1087).mirror(0x0078).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1080, 0x1087).mirror(0x0078).w(m_mainlatch, FUNC(ls259_device::write_d0));
 //  AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)     /* 32 */
 	map(0x1200, 0x1200).mirror(0x007f).portr("DSW2");
 	map(0x1280, 0x1280).mirror(0x007c).portr("SYSTEM");
@@ -308,7 +307,7 @@ void trackfld_state::reaktor_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	/* all usual addresses +0x8000 */
 	map(0x9000, 0x9000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x9080, 0x9087).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x9080, 0x9087).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x9100, 0x9100).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x9200, 0x9200).portr("DSW2");
 	map(0x9280, 0x9280).portr("SYSTEM");
@@ -340,7 +339,7 @@ void trackfld_state::reaktor_io_map(address_map &map)
 void trackfld_state::mastkin_map(address_map &map)
 {
 	map(0x1000, 0x1000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x10b0, 0x10b7).nopr().w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x10b0, 0x10b7).nopr().w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x1100, 0x1100).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1200, 0x1200).portr("DSW2");
 	map(0x1280, 0x1280).portr("SYSTEM");
@@ -365,7 +364,7 @@ void trackfld_state::wizzquiz_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();
 	map(0x1000, 0x1000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
-	map(0x1080, 0x1087).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1080, 0x1087).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x1100, 0x1100).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1200, 0x1200).portr("DSW2");
 	map(0x1280, 0x1280).portr("SYSTEM");
@@ -908,19 +907,19 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1D
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, trackfld_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w)) // 26 = SOUND ON
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // 25 = MUT?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, trackfld_state, coin_counter_1_w)) // 24 = OUT1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, trackfld_state, coin_counter_2_w)) // 23 = OUT2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // CN3.2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // CN3.4
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, trackfld_state, irq_mask_w)) // INT
+	LS259(config, m_mainlatch); // 1D
+	m_mainlatch->q_out_cb<0>().set(FUNC(trackfld_state::flipscreen_w)); // FLIP
+	m_mainlatch->q_out_cb<1>().set("trackfld_audio", FUNC(trackfld_audio_device::sh_irqtrigger_w)); // 26 = SOUND ON
+	m_mainlatch->q_out_cb<2>().set_nop(); // 25 = MUT?
+	m_mainlatch->q_out_cb<3>().set(FUNC(trackfld_state::coin_counter_1_w)); // 24 = OUT1
+	m_mainlatch->q_out_cb<4>().set(FUNC(trackfld_state::coin_counter_2_w)); // 23 = OUT2
+	m_mainlatch->q_out_cb<5>().set_nop(); // CN3.2
+	m_mainlatch->q_out_cb<6>().set_nop(); // CN3.4
+	m_mainlatch->q_out_cb<7>().set(FUNC(trackfld_state::irq_mask_w)); // INT
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -941,7 +940,7 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 
@@ -984,19 +983,19 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, trackfld_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, trackfld_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, trackfld_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, trackfld_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, trackfld_state, irq_mask_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1D
+	mainlatch.q_out_cb<0>().set(FUNC(trackfld_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set("trackfld_audio", FUNC(trackfld_audio_device::sh_irqtrigger_w));
+	mainlatch.q_out_cb<2>().set(FUNC(trackfld_state::nmi_mask_w));
+	mainlatch.q_out_cb<3>().set(FUNC(trackfld_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set(FUNC(trackfld_state::coin_counter_2_w));
+	mainlatch.q_out_cb<5>().set_nop();
+	mainlatch.q_out_cb<6>().set_nop();
+	mainlatch.q_out_cb<7>().set(FUNC(trackfld_state::irq_mask_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -1017,7 +1016,7 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, finder_base::DUMMY_TAG, m_vlm)
 
@@ -1071,7 +1070,7 @@ MACHINE_CONFIG_START(trackfld_state::hyprolyb)
 	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
 	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 
@@ -1095,9 +1094,8 @@ MACHINE_CONFIG_START(trackfld_state::mastkin)
 	MCFG_DEVICE_REPLACE(m_maincpu, MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
 	MCFG_DEVICE_PROGRAM_MAP(mastkin_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // actually not used
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // actually not used
+	m_mainlatch->q_out_cb<3>().set_nop(); // actually not used
+	m_mainlatch->q_out_cb<4>().set_nop(); // actually not used
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trackfld_state::wizzquiz)
@@ -1110,8 +1108,7 @@ MACHINE_CONFIG_START(trackfld_state::wizzquiz)
 
 	m_screen->set_screen_vblank(DEVCB_WRITELINE(*this, trackfld_state, vblank_nmi));
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, trackfld_state, nmi_mask_w))
+	m_mainlatch->q_out_cb<7>().set(FUNC(trackfld_state::nmi_mask_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trackfld_state::reaktor)

@@ -450,42 +450,42 @@ MACHINE_CONFIG_START(s3_state::s3)
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s3_state, sol0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s3_state, sol1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s3_state, pia22_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s3_state, pia22_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia22, 0);
+	m_pia22->writepa_handler().set(FUNC(s3_state::sol0_w));
+	m_pia22->writepb_handler().set(FUNC(s3_state::sol1_w));
+	m_pia22->ca2_handler().set(FUNC(s3_state::pia22_ca2_w));
+	m_pia22->cb2_handler().set(FUNC(s3_state::pia22_cb2_w));
+	m_pia22->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia22->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s3_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s3_state, lamp1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s3_state, pia24_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s3_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia24, 0);
+	m_pia24->writepa_handler().set(FUNC(s3_state::lamp0_w));
+	m_pia24->writepb_handler().set(FUNC(s3_state::lamp1_w));
+	m_pia24->ca2_handler().set(FUNC(s3_state::pia24_ca2_w));
+	m_pia24->cb2_handler().set(FUNC(s3_state::pia24_cb2_w));
+	m_pia24->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia24->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, s3_state, dips_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, s3_state, pia28_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, s3_state, pia28_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s3_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s3_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s3_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s3_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia28, 0);
+	m_pia28->readpa_handler().set(FUNC(s3_state::dips_r));
+	m_pia28->readca1_handler().set(FUNC(s3_state::pia28_ca1_r));
+	m_pia28->readcb1_handler().set(FUNC(s3_state::pia28_cb1_r));
+	m_pia28->writepa_handler().set(FUNC(s3_state::dig0_w));
+	m_pia28->writepb_handler().set(FUNC(s3_state::dig1_w));
+	m_pia28->ca2_handler().set(FUNC(s3_state::pia28_ca2_w));
+	m_pia28->cb2_handler().set(FUNC(s3_state::pia28_cb2_w));
+	m_pia28->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia28->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, s3_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s3_state, switch_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s3_state, pia30_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s3_state, pia30_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia30, 0);
+	m_pia30->readpa_handler().set(FUNC(s3_state::switch_r));
+	m_pia30->writepb_handler().set(FUNC(s3_state::switch_w));
+	m_pia30->ca2_handler().set(FUNC(s3_state::pia30_ca2_w));
+	m_pia30->cb2_handler().set(FUNC(s3_state::pia30_cb2_w));
+	m_pia30->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia30->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(s3_state::s3a)
@@ -500,11 +500,11 @@ MACHINE_CONFIG_START(s3_state::s3a)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, s3_state,sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
+	PIA6821(config, m_pias, 0);
+	m_pias->readpb_handler().set(FUNC(s3_state::sound_r));
+	m_pias->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
+	m_pias->irqb_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 MACHINE_CONFIG_END
 
 

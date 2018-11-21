@@ -369,7 +369,7 @@ static void datach_cart(device_slot_interface &device)
 
 
 MACHINE_CONFIG_START(nes_datach_device::device_add_mconfig)
-	MCFG_BARCODE_READER_ADD("datach")
+	BARCODE_READER(config, "datach", 0);
 	MCFG_DATACH_MINICART_ADD("datach_slot", datach_cart)
 	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END

@@ -74,7 +74,9 @@ void unidisk_t::unidisk_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(unidisk_t::device_add_mconfig)
-	MCFG_TMS99xx_ADD(TMS9995_TAG, TMS9995, 12000000, unidisk_mem, unidisk_io)
+	TMS9995(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unidisk_t::unidisk_mem);
+	m_maincpu->set_addrmap(AS_IO, &unidisk_t::unidisk_io);
 MACHINE_CONFIG_END
 
 

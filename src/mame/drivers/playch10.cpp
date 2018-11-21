@@ -695,13 +695,14 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_RP5H01_ADD("rp5h01")
+	RP5H01(config, m_rp5h01, 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(playch10_state::playchnv)
+void playch10_state::playchnv(machine_config &config)
+{
 	playch10(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(playch10_state::playch10_hboard)
 	playch10(config);

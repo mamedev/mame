@@ -19,7 +19,6 @@
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/6522via.h"
-#include "machine/terminal.h"
 #include "imagedev/harddriv.h"
 #include "machine/idectrl.h"
 #include "machine/bankdev.h"
@@ -48,6 +47,7 @@ public:
 		, m_harddisk(*this, "harddisk")
 		, m_ide(*this, "ide")
 		, m_dat(*this, "dat")
+		, m_bankdev(*this, "bankdev")
 	{ }
 
 	void swtpc09_base(machine_config &config);
@@ -119,7 +119,7 @@ private:
 
 	offs_t dat_translate(offs_t offset) const;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<mc6809_device> m_maincpu;
 	required_device<mc14411_device> m_brg;
 	required_device<pia6821_device> m_pia;
 	required_device<ptm6840_device> m_ptm;
@@ -134,8 +134,8 @@ private:
 	optional_device<device_t> m_harddisk;
 	optional_device<ide_controller_device> m_ide;
 	required_shared_ptr<uint8_t> m_dat;
+	required_device<address_map_bank_device> m_bankdev;
 
-	uint8_t m_term_data;               // terminal keyboard value
 	uint8_t m_pia_counter;             // this is the counter on pia porta
 	uint8_t m_fdc_dma_address_reg;     // dmf2 or dmf3 dma extended address reg
 	uint8_t m_system_type;             // flag to indicate hw and rom combination

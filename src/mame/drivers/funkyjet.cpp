@@ -157,8 +157,6 @@ void funkyjet_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).noprw(); /* This board only has 1 oki chip */
 	map(0x140000, 0x140000).r(m_deco146, FUNC(deco146_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -311,8 +309,10 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_DEVICE_PROGRAM_MAP(funkyjet_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funkyjet_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, XTAL(32'220'000)/4); /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &funkyjet_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -356,10 +356,10 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000)/9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
+	ymsnd.add_route(0, "lspeaker", 0.45);
+	ymsnd.add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

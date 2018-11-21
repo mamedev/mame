@@ -33,11 +33,61 @@ void ncr5390_device::map(address_map &map)
 	map(0x9, 0x9).w(FUNC(ncr5390_device::clock_w));
 }
 
+READ8_MEMBER(ncr5390_device::read)
+{
+	switch (offset)
+	{
+		case 0:  return tcounter_lo_r(space, 0);
+		case 1:  return tcounter_hi_r(space, 0);
+		case 2:  return fifo_r(space, 0);
+		case 3:  return command_r(space, 0);
+		case 4:  return status_r(space, 0);
+		case 5:  return istatus_r(space, 0);
+		case 6:  return seq_step_r(space, 0);
+		case 7:  return fifo_flags_r(space, 0);
+		case 8:  return conf_r(space, 0);
+		default: return 0;
+	}
+}
+
+WRITE8_MEMBER(ncr5390_device::write)
+{
+	switch (offset)
+	{
+		case 0:  tcount_lo_w(space, 0, data); break;
+		case 1:  tcount_hi_w(space, 0, data); break;
+		case 2:  fifo_w(space, 0, data); break;
+		case 3:  command_w(space, 0, data); break;
+		case 4:  bus_id_w(space, 0, data); break;
+		case 5:  timeout_w(space, 0, data); break;
+		case 6:  sync_period_w(space, 0, data); break;
+		case 7:  sync_offset_w(space, 0, data); break;
+		case 8:  conf_w(space, 0, data); break;
+		case 9:  clock_w(space, 0, data); break;
+		case 10: test_w(space, 0, data); break;
+		default: break;
+	}
+}
+
 void ncr53c90a_device::map(address_map &map)
 {
 	ncr5390_device::map(map);
 
 	map(0xb, 0xb).rw(FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
+}
+
+READ8_MEMBER(ncr53c90a_device::read)
+{
+	if (offset == 11)
+		return conf2_r(space, 0);
+	return ncr5390_device::read(space, offset);
+}
+
+WRITE8_MEMBER(ncr53c90a_device::write)
+{
+	if (offset == 11)
+		return conf2_w(space, 0, data);
+	ncr5390_device::write(space, offset, data);
 }
 
 void ncr53c94_device::map(address_map &map)
@@ -46,6 +96,23 @@ void ncr53c94_device::map(address_map &map)
 
 	map(0xc, 0xc).rw(FUNC(ncr53c94_device::conf3_r), FUNC(ncr53c94_device::conf3_w));
 	map(0xf, 0xf).w(FUNC(ncr53c94_device::fifo_align_w));
+}
+
+READ8_MEMBER(ncr53c94_device::read)
+{
+	if (offset == 12)
+		return conf3_r(space, 0);
+	return ncr53c90a_device::read(space, offset);
+}
+
+WRITE8_MEMBER(ncr53c94_device::write)
+{
+	if (offset == 11)
+		conf3_w(space, 0, data);
+	else if (offset == 15)
+		fifo_align_w(space, 0, data);
+	else
+		ncr53c90a_device::write(space, offset, data);
 }
 
 ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -340,10 +407,15 @@ void ncr5390_device::step(bool timeout)
 
 	case DISC_SEL_ARBITRATION_INIT:
 		// wait until a command is in the fifo
-		if (!fifo_pos || (dma_command && !(status & S_TC0)))
+		if (!fifo_pos && dma_command && !(status & S_TC0)) {
+			// dma starts after bus arbitration/selection is complete
+			dma_set(DMA_OUT);
+			step(false);
 			break;
+		}
 
-		command_length = derive_msg_size(fifo[0]);
+		// "with atn" variants have a message byte before the command descriptor
+		command_length = (c == CD_SELECT) ? derive_msg_size(fifo[0]) : 1;
 		state = DISC_SEL_ARBITRATION;
 		step(false);
 		break;
@@ -375,7 +447,7 @@ void ncr5390_device::step(bool timeout)
 	case DISC_SEL_ATN_SEND_BYTE:
 		if(c == CD_SELECT_ATN_STOP) {
 			seq = 1;
-			function_complete();
+			function_bus_complete();
 		} else {
 			command_length = derive_msg_size(fifo[0]);
 			state = DISC_SEL_WAIT_REQ;
@@ -783,6 +855,12 @@ void ncr5390_device::start_command()
 	case CM_RESET_BUS:
 		LOGMASKED(LOG_COMMAND, "Reset SCSI bus\n");
 		reset_soft();
+		// FIXME: this interrupt should be generated when the reset is reflected
+		// back into the device, and not when the device starts the scsi reset
+		if (!(config & 0x40)) {
+			istatus = I_SCSI_RESET;
+			check_irq();
+		}
 		break;
 
 	case CD_RESELECT:
@@ -800,7 +878,6 @@ void ncr5390_device::start_command()
 			"Select with ATN and stop sequence\n");
 		seq = 0;
 		state = DISC_SEL_ARBITRATION_INIT;
-		dma_set(dma_command ? DMA_OUT : DMA_NONE);
 		arbitrate();
 		break;
 
@@ -825,6 +902,7 @@ void ncr5390_device::start_command()
 	case CI_COMPLETE:
 		LOGMASKED(LOG_COMMAND, "Initiator command complete sequence\n");
 		state = INIT_CPT_RECV_BYTE_ACK;
+		dma_set(dma_command ? DMA_IN : DMA_NONE);
 		recv_byte();
 		break;
 

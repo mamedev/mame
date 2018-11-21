@@ -45,8 +45,8 @@
  *---------------------------
  * See fccpu30.cpp
  *
- * Misc links about Force Computes and this board:
- *------------------------------------------------
+ * Misc links about Force Computers and this board:
+ *-------------------------------------------------
  * http://bitsavers.org/pdf/forceComputers/
  *
  * Description, from datasheets etc

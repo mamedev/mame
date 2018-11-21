@@ -697,49 +697,50 @@ WRITE8_MEMBER(gts1_state::gts1_do_w)
 }
 
 
-MACHINE_CONFIG_START(gts1_state::gts1)
+void gts1_state::gts1(machine_config & config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPS4_2, XTAL(3'579'545))  // divided by 18 in the CPU
-	MCFG_DEVICE_PROGRAM_MAP(gts1_map)
-	MCFG_DEVICE_DATA_MAP(gts1_data)
-	MCFG_DEVICE_IO_MAP(gts1_io)
-	MCFG_PPS4_DISCRETE_INPUT_A_CB(READ8(*this, gts1_state, gts1_pa_r))
-	MCFG_PPS4_DISCRETE_OUTPUT_CB(WRITE8(*this, gts1_state, gts1_do_w))
+	pps4_2_device &maincpu(PPS4_2(config, m_maincpu, XTAL(3'579'545)));  // divided by 18 in the CPU
+	maincpu.set_addrmap(AS_PROGRAM, &gts1_state::gts1_map);
+	maincpu.set_addrmap(AS_DATA, &gts1_state::gts1_data);
+	maincpu.set_addrmap(AS_IO, &gts1_state::gts1_io);
+	maincpu.dia_cb().set(FUNC(gts1_state::gts1_pa_r));
+	maincpu.do_cb().set(FUNC(gts1_state::gts1_do_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* A1753CE 2048 x 8 ROM (000-7ff), 128 x 4 RAM (00-7f) and 16 I/O lines (20 ... 2f) */
-	MCFG_DEVICE_ADD( "u5", RA17XX, 0 )
-	MCFG_RA17XX_READ ( READ8 (*this, gts1_state,gts1_switches_r) )
-	MCFG_RA17XX_WRITE( WRITE8(*this, gts1_state,gts1_switches_w) )
-	MCFG_RA17XX_CPU("maincpu")
+	ra17xx_device &u5(RA17XX(config, "u5", 0));
+	u5.iord_cb().set(FUNC(gts1_state::gts1_switches_r));
+	u5.iowr_cb().set(FUNC(gts1_state::gts1_switches_w));
+	u5.set_cpu_tag(m_maincpu);
 
 	/* A1752CF 2048 x 8 ROM (800-fff), 128 x 4 RAM (80-ff) and 16 I/O lines (40 ... 4f) */
-	MCFG_DEVICE_ADD( "u4", RA17XX, 0 )
-	MCFG_RA17XX_READ ( READ8 (*this, gts1_state,gts1_solenoid_r) )
-	MCFG_RA17XX_WRITE( WRITE8(*this, gts1_state,gts1_solenoid_w) )
-	MCFG_RA17XX_CPU("maincpu")
+	ra17xx_device &u4(RA17XX(config, "u4", 0));
+	u4.iord_cb().set(FUNC(gts1_state::gts1_solenoid_r));
+	u4.iowr_cb().set(FUNC(gts1_state::gts1_solenoid_w));
+	u4.set_cpu_tag(m_maincpu);
 
 	/* 10696 General Purpose Input/Output */
-	MCFG_DEVICE_ADD( "u2", R10696, 0 )
-	MCFG_R10696_IO( READ8 (*this, gts1_state,gts1_nvram_r),
-					WRITE8(*this, gts1_state,gts1_nvram_w) )
+	r10696_device &u2(R10696(config, "u2", 0));
+	u2.iord_cb().set(FUNC(gts1_state::gts1_nvram_r));
+	u2.iowr_cb().set(FUNC(gts1_state::gts1_nvram_w));
 
 	/* 10696 General Purpose Input/Output */
-	MCFG_DEVICE_ADD( "u3", R10696, 0 )
-	MCFG_R10696_IO( READ8 (*this, gts1_state,gts1_lamp_apm_r),
-					WRITE8(*this, gts1_state,gts1_lamp_apm_w) )
+	r10696_device &u3(R10696(config, "u3", 0));
+	u3.iord_cb().set(FUNC(gts1_state::gts1_lamp_apm_r));
+	u3.iowr_cb().set(FUNC(gts1_state::gts1_lamp_apm_w));
 
 	/* 10788 General Purpose Display and Keyboard */
-	MCFG_DEVICE_ADD( "u6", R10788, XTAL(3'579'545) / 18 )  // divided in the circuit
-	MCFG_R10788_UPDATE( WRITE8(*this, gts1_state,gts1_display_w) )
+	r10788_device &u6(R10788(config, "u6", XTAL(3'579'545) / 18 ));  // divided in the circuit
+	u6.update_cb().set(FUNC(gts1_state::gts1_display_w));
 
 	/* Video */
 	config.set_default_layout(layout_gts1);
 
 	/* Sound */
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( gts1 )

@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Mark McDougall
+#ifndef MAME_INCLUDES_STFIGHT_H
+#define MAME_INCLUDES_STFIGHT_H
+
+#pragma once
+
 #include "sound/msm5205.h"
 #include "video/stfight_dev.h"
 #include "video/airraid_dev.h"
@@ -101,3 +106,5 @@ private:
 
 	emu_timer   *m_int1_timer;
 };
+
+#endif // MAME_INCLUDES_STFIGHT_H

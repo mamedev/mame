@@ -399,11 +399,11 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD(m_nmi_timer, exterm_state, master_sound_nmi_callback)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048+32768)
@@ -425,8 +425,7 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_DEVICE_ADD(m_ym2151, YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM2151(config, m_ym2151, 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 

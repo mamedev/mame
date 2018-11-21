@@ -816,10 +816,10 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nightgal_state, input_1p_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, nightgal_state, input_2p_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK / 8));
+	aysnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
+	aysnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::sexygal)
@@ -846,10 +846,10 @@ MACHINE_CONFIG_START(nightgal_state::sexygal)
 
 	MCFG_DEVICE_REMOVE("aysnd")
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nightgal_state, input_1p_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, nightgal_state, input_2p_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ymsnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
+	ymsnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::sweetgal)

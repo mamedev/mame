@@ -707,16 +707,17 @@ static const char *const relay_sample_names[] =
 
 MACHINE_CONFIG_START(super80_state::super80)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(super80_map)
-	MCFG_DEVICE_IO_MAP(super80_io)
-	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &super80_state::super80_map);
+	m_maincpu->set_addrmap(AS_IO, &super80_state::super80_io);
+	m_maincpu->set_daisy_config(super80_daisy_chain);
+
 	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, super80_state, pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, super80_state,pio_port_b_r))
+	Z80PIO(config, m_pio, MASTER_CLOCK/6);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set(FUNC(super80_state::pio_port_a_w));
+	m_pio->in_pb_callback().set(FUNC(super80_state::pio_port_b_r));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(48.8)
@@ -794,16 +795,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(super80_state::super80v)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(super80v_map)
-	MCFG_DEVICE_IO_MAP(super80v_io)
-	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &super80_state::super80v_map);
+	m_maincpu->set_addrmap(AS_IO, &super80_state::super80v_io);
+	m_maincpu->set_daisy_config(super80_daisy_chain);
+
 	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80r)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, super80_state, pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, super80_state,pio_port_b_r))
+	Z80PIO(config, m_pio, MASTER_CLOCK/6);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->out_pa_callback().set(FUNC(super80_state::pio_port_a_w));
+	m_pio->in_pb_callback().set(FUNC(super80_state::pio_port_b_r));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -815,10 +817,11 @@ MACHINE_CONFIG_START(super80_state::super80v)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(SUPER80V_DOTS)
-	MCFG_MC6845_UPDATE_ROW_CB(super80_state, crtc_update_row)
+	MC6845(config, m_crtc, MASTER_CLOCK / SUPER80V_DOTS);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(SUPER80V_DOTS);
+	m_crtc->set_update_row_callback(FUNC(super80_state::crtc_update_row), this);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super80v)
 	config.set_default_layout(layout_super80);
@@ -860,17 +863,17 @@ MACHINE_CONFIG_START(super80_state::super80r)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(super80r_io)
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, MASTER_CLOCK/6)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, super80_state, busreq_w))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80DMA(config, m_dma, MASTER_CLOCK/6);
+	m_dma->out_busreq_callback().set(FUNC(super80_state::busreq_w));
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	//ba0 - not connected
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, super80_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, super80_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, super80_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, super80_state, io_write_byte))
+	m_dma->in_mreq_callback().set(FUNC(super80_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(super80_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(super80_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(super80_state::io_write_byte));
 
-	MCFG_DEVICE_ADD("fdc", WD2793, 2_MHz_XTAL)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	WD2793(config, m_fdc, 2_MHz_XTAL);
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)

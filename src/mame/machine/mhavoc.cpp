@@ -314,7 +314,7 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_data_w)
 
 WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
 {
-	m_tms->data_w(space, 0, m_speech_write_buffer);
+	m_tms->data_w(m_speech_write_buffer);
 }
 
 /*************************************

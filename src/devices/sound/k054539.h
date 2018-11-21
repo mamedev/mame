@@ -44,7 +44,7 @@ public:
 	// configuration helpers
 	template <typename Object> void set_analog_callback(Object &&cb) { m_apan_cb = std::forward<Object>(cb); }
 	template <class Object> devcb_base &set_timer_handler(Object &&cb) { return m_timer_handler.set_callback(std::forward<Object>(cb)); }
-
+	auto timer_handler() { return m_timer_handler.bind(); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
@@ -67,6 +67,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

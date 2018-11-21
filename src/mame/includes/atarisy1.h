@@ -113,6 +113,7 @@ public:
 	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
 
 	static const atari_motion_objects_config s_mob_config;
+	void add_adc(machine_config &config);
 	void atarisy1(machine_config &config);
 	void indytemp(machine_config &config);
 	void roadb110(machine_config &config);

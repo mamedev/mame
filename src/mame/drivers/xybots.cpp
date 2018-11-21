@@ -180,12 +180,11 @@ MACHINE_CONFIG_START(xybots_state::xybots)
 	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, true)
+	SLAPSTIC(config, "slapstic", 107, true);
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xybots)

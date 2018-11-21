@@ -19,10 +19,11 @@
 DEFINE_DEVICE_TYPE(CPC_SMARTWATCH, cpc_smartwatch_device, "cpc_smartwatch", "Dobbertin Smartwatch")
 
 
-MACHINE_CONFIG_START(cpc_smartwatch_device::device_add_mconfig)
-	MCFG_DS1315_ADD("rtc")
+void cpc_smartwatch_device::device_add_mconfig(machine_config &config)
+{
+	DS1315(config, m_rtc, 0);
 	// no pass-through (?)
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( cpc_smartwatch )

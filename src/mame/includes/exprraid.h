@@ -12,8 +12,8 @@
 class exprraid_state : public driver_device
 {
 public:
-	exprraid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	exprraid_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slave(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -22,7 +22,8 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram") { }
+		m_colorram(*this, "colorram")
+	{ }
 
 	void exprraid(machine_config &config);
 	void exprboot(machine_config &config);

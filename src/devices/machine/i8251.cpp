@@ -26,7 +26,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(I8251,   i8251_device,  "i8251",    "Intel 8251 USART")
-DEFINE_DEVICE_TYPE(V53_SCU, v53_scu_device, "v63_scu", "NEC V53 SCU")
+DEFINE_DEVICE_TYPE(V5X_SCU, v5x_scu_device, "v5x_scu", "NEC V5X SCU")
 
 
 //-------------------------------------------------
@@ -61,8 +61,8 @@ i8251_device::i8251_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-v53_scu_device::v53_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8251_device(mconfig, V53_SCU, tag, owner, clock)
+v5x_scu_device::v5x_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i8251_device(mconfig, V5X_SCU, tag, owner, clock)
 {
 }
 
@@ -268,8 +268,8 @@ void i8251_device::update_tx_empty()
 {
 	if (m_status & I8251_STATUS_TX_EMPTY)
 	{
-		/* tx is in marking state (high) when tx empty! */
-		m_txd_handler(1);
+		// return TxD to marking state (high) if not sending break character
+		m_txd_handler(!BIT(m_command, 3));
 	}
 
 	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) != 0);
@@ -561,7 +561,7 @@ void i8251_device::mode_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(i8251_device::control_w)
+void i8251_device::control_w(uint8_t data)
 {
 	if (m_flags & I8251_EXPECTING_MODE)
 	{
@@ -599,7 +599,7 @@ WRITE8_MEMBER(i8251_device::control_w)
     status_r
 -------------------------------------------------*/
 
-READ8_MEMBER(i8251_device::status_r)
+uint8_t i8251_device::status_r()
 {
 	uint8_t status = (m_dsr << 7) | m_status;
 
@@ -613,7 +613,7 @@ READ8_MEMBER(i8251_device::status_r)
     data_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER(i8251_device::data_w)
+void i8251_device::data_w(uint8_t data)
 {
 	m_tx_data = data;
 
@@ -666,7 +666,7 @@ void i8251_device::receive_character(uint8_t ch)
     data_r - read data
 -------------------------------------------------*/
 
-READ8_MEMBER(i8251_device::data_r)
+uint8_t i8251_device::data_r()
 {
 	LOG("read data: %02x, STATUS=%02x\n",m_rx_data,m_status);
 	/* reading clears */
@@ -674,6 +674,23 @@ READ8_MEMBER(i8251_device::data_r)
 
 	update_rx_ready();
 	return m_rx_data;
+}
+
+
+uint8_t i8251_device::read(offs_t offset)
+{
+	if (BIT(offset, 0))
+		return status_r();
+	else
+		return data_r();
+}
+
+void i8251_device::write(offs_t offset, uint8_t data)
+{
+	if (BIT(offset, 0))
+		control_w(data);
+	else
+		data_w(data);
 }
 
 
@@ -724,12 +741,43 @@ READ_LINE_MEMBER(i8251_device::txrdy_r)
 	return is_tx_enabled() && (m_status & I8251_STATUS_TX_READY) != 0;
 }
 
-WRITE8_MEMBER(v53_scu_device::command_w)
+void v5x_scu_device::device_start()
 {
-	i8251_device::command_w(data);
+	i8251_device::device_start();
+
+	save_item(NAME(m_simk));
 }
 
-WRITE8_MEMBER(v53_scu_device::mode_w)
+void v5x_scu_device::device_reset()
 {
-	i8251_device::mode_w(data);
+	// FIXME: blindly copied from v53.cpp - not verified
+	m_simk = 0x03;
+
+	i8251_device::device_reset();
+}
+
+u8 v5x_scu_device::read(offs_t offset)
+{
+	u8 data = 0;
+
+	switch (offset)
+	{
+	case 0: data = data_r(); break;
+	case 1: data = status_r(); break;
+	case 2: break;
+	case 3: data = simk_r(); break;
+	}
+
+	return data;
+}
+
+void v5x_scu_device::write(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+	case 0: data_w(data); break;
+	case 1: control_w(data); break;
+	case 2: mode_w(data); break;
+	case 3: simk_w(data); break;
+	}
 }

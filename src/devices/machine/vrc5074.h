@@ -12,12 +12,6 @@
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
 
-#define MCFG_VRC5074_SET_SDRAM(_index, _size) \
-	downcast<vrc5074_device &>(*device).set_sdram_size(_index, _size);
-
-#define MCFG_VRC5074_SET_CS(_cs_num, _map) \
-	downcast<vrc5074_device &>(*device).set_map(_cs_num, address_map_constructor(&_map, #_map, this), this);
-
 class vrc5074_device : public pci_host_device {
 public:
 	template <typename T>
@@ -80,9 +74,6 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	// This value is not verified to be correct
-	static constexpr unsigned SYSTEM_CLOCK = 100000000;
-
 	enum
 	{
 		AS_PCI_MEM = 1,

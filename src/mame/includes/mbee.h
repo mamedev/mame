@@ -5,9 +5,10 @@
  * includes/mbee.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_MBEE_H
 #define MAME_INCLUDES_MBEE_H
+
+#pragma once
 
 #include "bus/centronics/ctronics.h"
 
@@ -180,7 +181,7 @@ private:
 	void oldkb_matrix_r(uint16_t offs);
 	void machine_reset_common();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
 	required_device<wave_device> m_wave;

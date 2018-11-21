@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -260,7 +260,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL(32'768))
+	RP5C15(config, m_rtc, XTAL(32'768));
 MACHINE_CONFIG_END
 
 /* ROM definition */

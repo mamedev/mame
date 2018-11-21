@@ -44,6 +44,7 @@ public:
 	dms86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
 		, m_sio(*this, "sio%u", 1U)
 		, m_ctc(*this, "ctc")
 	{ }
@@ -65,6 +66,7 @@ private:
 	u8 m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 	required_device_array<z80sio_device, 2> m_sio;
 	required_device<z80ctc_device> m_ctc;
 };
@@ -109,12 +111,15 @@ void dms86_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x80, 0x87).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-	map(0x88, 0x8f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
-	map(0x90, 0x97).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-	map(0x9A, 0x9B).r(FUNC(dms86_state::port9a_r)); // parallel SASI port
+	map(0x80, 0x87).rw(m_sio[0], FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
+	map(0x88, 0x8f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
+	map(0x90, 0x97).rw(m_sio[1], FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
+	//map(0x98, 0x99)  // r SASI data read ; w SASI SEL probe
+	map(0x9A, 0x9B).r(FUNC(dms86_state::port9a_r)); // r parallel ports, status byte ; w SASI ACK strobe, SASI data write
+	// 9C,9D - no setup bytes; meant for printer // r Port P data read ; Port P data write
 	map(0x9c, 0x9d).r(FUNC(dms86_state::port9c_r));
-	map(0x9c, 0x9c).w("terminal", FUNC(generic_terminal_device::write));
+	map(0x9c, 0x9c).w(m_terminal, FUNC(generic_terminal_device::write));
+	//map(0x9e, 0x9f)  // r SASI software reset ; w Port P AUX strobe
 }
 
 /* Input ports */
@@ -168,7 +173,7 @@ MACHINE_CONFIG_START(dms86_state::dms86)
 	rs232.dcd_handler().set(m_sio[0], FUNC(z80sio_device::dcdb_w)); // HiNet / Monitor switch
 	rs232.cts_handler().set(m_sio[0], FUNC(z80sio_device::ctsb_w)).invert();
 
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dms86_state, kbd_put))
 MACHINE_CONFIG_END
 

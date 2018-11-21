@@ -285,35 +285,34 @@ void gts3_state::init_gts3()
 {
 }
 
-MACHINE_CONFIG_START(gts3_state::gts3)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(gts3_map)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+void gts3_state::gts3(machine_config &config)
+{
+	M65C02(config, m_maincpu, XTAL(4'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gts3_state::gts3_map);
 
-	/* Video */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	config.set_default_layout(layout_gts3);
 
-	/* Sound */
 	genpin_audio(config);
 
-	MCFG_DEVICE_ADD("u4", VIA6522, XTAL(4'000'000) / 2)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, gts3_state, u4a_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, gts3_state, u4b_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, gts3_state, u4b_w))
-	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gts3_state, u4ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, gts3_state, nmi_w))
+	VIA6522(config, m_u4, XTAL(4'000'000) / 2);
+	m_u4->irq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+	m_u4->readpa_handler().set(FUNC(gts3_state::u4a_r));
+	m_u4->readpb_handler().set(FUNC(gts3_state::u4b_r));
+	m_u4->writepb_handler().set(FUNC(gts3_state::u4b_w));
+	//m_u4->ca2_handler().set(FUNC(gts3_state::u4ca2_w));
+	m_u4->cb2_handler().set(FUNC(gts3_state::nmi_w));
 
-	MCFG_DEVICE_ADD("u5", VIA6522, XTAL(4'000'000) / 2)
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
-	//MCFG_VIA6522_READPA_HANDLER(READ8(*this, gts3_state, u5a_r))
-	//MCFG_VIA6522_READPB_HANDLER(READ8(*this, gts3_state, u5b_r))
-	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, gts3_state, u5b_w))
-	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gts3_state, u5ca2_w))
-	//MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, gts3_state, u5cb1_w))
-	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, gts3_state, u5cb2_w))
-MACHINE_CONFIG_END
+	VIA6522(config, m_u5, XTAL(4'000'000) / 2);
+	m_u5->irq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+	//m_u5->readpa_handler().set(FUNC(gts3_state::u5a_r));
+	//m_u5->readpb_handler().set(FUNC(gts3_state::u5b_r));
+	//m_u5->writepb_handler().set(FUNC(gts3_state::u5b_w));
+	//m_u5->ca2_handler().set(FUNC(gts3_state::u5ca2_w));
+	//m_u5->cb1_handler().set(FUNC(gts3_state::u5cb1_w));
+	//m_u5->cb2_handler().set(FUNC(gts3_state::u5cb2_w));
+}
 
 /*-------------------------------------------------------------------
 / Amazon Hunt III (#684D)

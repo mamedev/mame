@@ -159,8 +159,8 @@ public:
 	auto t1_in_cb() { return m_test_in_cb[1].bind(); }
 	auto prog_out_cb() { return m_prog_out_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_READ8_MEMBER(p2_r);
+	uint8_t p1_r() { return m_p1; }
+	uint8_t p2_r() { return m_p2; }
 
 	void data_6bit(address_map &map);
 	void data_7bit(address_map &map);

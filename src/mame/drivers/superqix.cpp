@@ -1382,10 +1382,10 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, m_ay1, XTAL(12'000'000)/8); // AY-3-8910A
+	m_ay1->port_a_read_callback().set_ioport("BUTTONS");
+	m_ay1->port_b_read_callback().set_ioport("SYSTEM");
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
@@ -1428,18 +1428,18 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3P, analog outputs directly tied together
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2")) /* port Bread */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay1, XTAL(12'000'000)/8); // AY-3-8910A @3P, analog outputs directly tied together
+	m_ay1->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay1->port_a_read_callback().set_ioport("P1");
+	m_ay1->port_b_read_callback().set_ioport("P2");
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3M, analog outputs directly tied together
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, superqix_state, z80_ay2_iob_r)) /* port Bread */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, superqix_state, z80_ay2_iob_w)) /* port Bwrite */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay2, XTAL(12'000'000)/8); // AY-3-8910A @3M, analog outputs directly tied together
+	m_ay2->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay2->port_a_read_callback().set_ioport("DSW2");
+	m_ay2->port_b_read_callback().set(FUNC(superqix_state::z80_ay2_iob_r));
+	m_ay2->port_b_write_callback().set(FUNC(superqix_state::z80_ay2_iob_w));
+	m_ay2->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 
@@ -1481,17 +1481,17 @@ MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay1, 12000000/8);
+	m_ay1->set_flags(AY8910_SINGLE_OUTPUT); // ?
+	m_ay1->port_a_read_callback().set_ioport("P1");
+	m_ay1->port_b_read_callback().set_ioport("P2");
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 12000000/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, superqix_state, bootleg_in0_r)) /* port Bread */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay2, 12000000/8);
+	m_ay2->set_flags(AY8910_SINGLE_OUTPUT); // ?
+	m_ay2->port_a_read_callback().set_ioport("DSW2");
+	m_ay2->port_b_read_callback().set(FUNC(superqix_state::bootleg_in0_r));
+	m_ay2->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 

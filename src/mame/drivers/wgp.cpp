@@ -312,7 +312,7 @@ I haven't tested the LAN stuff for the moment.
 
 Stephh's notes (based on the game M68000 code and some tests) :
 
-1) 'wgp' and 'wgpj'
+1) 'wgp', 'wgpu' and 'wgpj'
 
   - Region stored at 0x03fffe.w and sub-region stored at 0x03fffc.w
   - Sets :
@@ -777,7 +777,7 @@ static INPUT_PORTS_START( wgp_no_joy_generic )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( wgp )
+static INPUT_PORTS_START( wgpu )
 	PORT_INCLUDE(wgp_no_joy_generic)
 
 	/* 0x180000 -> 0x10bf16 and 0x140010 (shared RAM) */
@@ -792,10 +792,17 @@ static INPUT_PORTS_START( wgp )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wgpj )
-	PORT_INCLUDE(wgp)
+	PORT_INCLUDE(wgpu)
 
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_JAPAN_NEW
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wgp )
+	PORT_INCLUDE(wgpu)
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_WORLD
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wgpjoy )
@@ -984,7 +991,59 @@ MACHINE_CONFIG_END
                                    DRIVERS
 ***************************************************************************/
 
-ROM_START( wgp )
+ROM_START( wgp ) // labels actually have the character * instead of +
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 256K for 68000 code (CPU A) */
+	ROM_LOAD16_BYTE( "c32-25++.12",    0x00000, 0x20000, CRC(2c7a863b) SHA1(f1e0d6829e74c6f48c4c5a3230e4bea14dbc3c01) )
+	ROM_LOAD16_BYTE( "c32-31++.13",    0x00001, 0x20000, CRC(42ff25c0) SHA1(42bdbbd24389384b8772edb38cca3a42312bb59c) )
+	ROM_LOAD16_WORD_SWAP( "c32-10.9",  0x80000, 0x80000, CRC(a44c66e9) SHA1(b5fa978e43303003969033b8096fd68885cfc202) ) /* data rom */
+
+	ROM_REGION( 0x40000, "sub", 0 ) /* 256K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "c32-28+.64", 0x00000, 0x20000, CRC(38f3c7bf) SHA1(bfcaa036e5ff23f2bbf74d738498eda7d6ccd554) )
+	ROM_LOAD16_BYTE( "c32-27+.63", 0x00001, 0x20000, CRC(be2397fb) SHA1(605a02d56ae6007b36299a2eceb7ca180cbf6df9) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_LOAD( "c32-24.34",   0x00000, 0x10000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "c32-04.9",  0x000000, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
+	ROM_LOAD32_BYTE( "c32-03.10", 0x000001, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
+	ROM_LOAD32_BYTE( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
+	ROM_LOAD32_BYTE( "c32-01.12", 0x000003, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
+	ROM_LOAD16_BYTE( "c32-06.70", 0x000001, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
+	ROM_LOAD16_BYTE( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
+	ROM_LOAD16_BYTE( "c32-08.68", 0x100001, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "c32-11.8",  0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_LOAD( "c32-12.7",  0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
+
+//  Pals (Guru dump)
+//  ROM_LOAD( "c32-13.14", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-14.19", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-15.52", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-16.54", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-17.53", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-18.64", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-19.27", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-20.67", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-21.85", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-22.24", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-23.13", 0x00000, 0x00???, NO_DUMP )
+
+//  Pals on lan interface board
+//  ROM_LOAD( "c32-34", 0x00000, 0x00???, NO_DUMP )
+//  ROM_LOAD( "c32-35", 0x00000, 0x00???, NO_DUMP )
+ROM_END
+
+ROM_START( wgpu )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 256K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c32-25.12",      0x00000, 0x20000, CRC(0cc81e77) SHA1(435190bc24423e1e34134dff3cd4b79e120852d1) )
 	ROM_LOAD16_BYTE( "c32-29.13",      0x00001, 0x20000, CRC(fab47cf0) SHA1(c0129c0290b48f24c25e4dd7c6c937675e31842a) )
@@ -1200,7 +1259,8 @@ void wgp_state::init_wgp2()
 
 /* Working Games with some graphics problems - e.g. missing rotation */
 
-GAME( 1989, wgp,      0,      wgp,    wgp,    wgp_state, init_wgp,  ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgp,        0,    wgp,    wgp,    wgp_state, init_wgp,  ROT0, "Taito Corporation Japan",   "World Grand Prix (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpu,     wgp,    wgp,    wgpu,   wgp_state, init_wgp,  ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wgpj,     wgp,    wgp,    wgpj,   wgp_state, init_wgp,  ROT0, "Taito Corporation",         "World Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, init_wgp,  ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

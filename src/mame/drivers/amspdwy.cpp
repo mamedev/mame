@@ -277,13 +277,13 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, m_ym2151, 3000000);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ym2151->add_route(0, "lspeaker", 1.0);
+	m_ym2151->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

@@ -38,12 +38,14 @@ protected:
 	virtual DECLARE_READ8_MEMBER( in0_r ) override;
 	virtual DECLARE_READ8_MEMBER( in1_r ) override;
 	virtual void write_ctrlsel(uint8_t data) override;
+	virtual uint8_t read_start_sel() override;
 
 private:
 	required_ioport m_joy1;
 	required_ioport m_joy2;
 	required_ioport m_dial1;
 	required_ioport m_dial2;
+	required_ioport m_ss;
 	uint8_t m_ctrl_sel;
 };
 

@@ -5,6 +5,10 @@
     1942
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_1942_H
+#define MAME_INCLUDES_1942_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -12,8 +16,6 @@
 
 class _1942_state : public driver_device
 {
-	friend class _1942p_state;
-
 public:
 	_1942_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
@@ -24,7 +26,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_soundlatch(*this, "soundlatch") { }
+		, m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void driver_init() override;
 
@@ -97,3 +100,5 @@ protected:
 
 	required_shared_ptr<uint8_t> m_protopal;
 };
+
+#endif // MAME_INCLUDES_1942_H

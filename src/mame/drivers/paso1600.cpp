@@ -325,9 +325,10 @@ MACHINE_CONFIG_START(paso1600_state::paso1600)
 //  MCFG_PALETTE_INIT(black_and_white)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/4)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	h46505_device &crtc(H46505(config, "crtc", 16000000/4));    /* unknown clock, hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);

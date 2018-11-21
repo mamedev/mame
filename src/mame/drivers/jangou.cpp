@@ -900,12 +900,12 @@ MACHINE_CONFIG_START(jangou_state::jangou)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jangou_state, input_mux_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jangou_state, input_system_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK / 16));
+	aysnd.port_a_read_callback().set(FUNC(jangou_state::input_mux_r));
+	aysnd.port_b_read_callback().set(FUNC(jangou_state::input_system_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	MCFG_DEVICE_ADD("cvsd", HC55516, MASTER_CLOCK / 1024)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -968,7 +968,7 @@ MACHINE_CONFIG_START(jangou_state::roylcrdn)
 
 	MCFG_DEVICE_REMOVE("cpu1")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(jangou_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,common)

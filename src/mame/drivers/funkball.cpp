@@ -70,14 +70,15 @@ Notes:
 
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
 #include "machine/bankdev.h"
 #include "machine/idectrl.h"
+#include "machine/ins8250.h"
 #include "machine/intelfsh.h"
 #include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
-#include "machine/terminal.h"
 #include "video/voodoo.h"
 #include "screen.h"
 
@@ -90,7 +91,6 @@ public:
 		, m_voodoo(*this, "voodoo_0")
 		, m_unk_ram(*this, "unk_ram")
 		, m_flashbank(*this, "flashbank")
-		, m_terminal(*this, "terminal")
 		, m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -111,14 +111,11 @@ private:
 
 	required_shared_ptr<uint32_t> m_unk_ram;
 	required_device<address_map_bank_device> m_flashbank;
-	required_device<generic_terminal_device> m_terminal;
 	required_ioport_array<16> m_inputs;
 
 	DECLARE_WRITE32_MEMBER( flash_w );
 //  DECLARE_WRITE8_MEMBER( bios_ram_w );
 	DECLARE_READ8_MEMBER( in_r );
-	DECLARE_READ8_MEMBER( serial_r );
-	DECLARE_WRITE8_MEMBER( serial_w );
 
 	uint8_t funkball_config_reg_r();
 	void funkball_config_reg_w(uint8_t data);
@@ -218,21 +215,6 @@ void funkball_state::cx5510_pci_w(int function, int reg, uint32_t data, uint32_t
 {
 	//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(&m_cx5510_regs[reg/4]);
-}
-
-READ8_MEMBER( funkball_state::serial_r )
-{
-	//printf("%02x\n",offset);
-	if(offset == 5)
-		return 0x20;
-
-	return 0;
-}
-
-WRITE8_MEMBER( funkball_state::serial_w )
-{
-	if(offset == 0)
-		m_terminal->write(space,0,data);
 }
 
 uint8_t funkball_state::funkball_config_reg_r()
@@ -368,7 +350,7 @@ void funkball_state::funkball_io(address_map &map)
 
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
-	map(0x03f8, 0x03ff).rw(FUNC(funkball_state::serial_r), FUNC(funkball_state::serial_w));
+	map(0x03f8, 0x03ff).rw("uart", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
@@ -771,6 +753,16 @@ void funkball_state::machine_reset()
 	m_voodoo_pci_regs.base_addr = 0xff000000;
 }
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_57600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_57600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "TERM_CONF", 0x080, 0x080 ) // Auto LF on CR
+DEVICE_INPUT_DEFAULTS_END
+
 MACHINE_CONFIG_START(funkball_state::funkball)
 	MCFG_DEVICE_ADD("maincpu", MEDIAGX, 66666666*3.5) // 66,6 MHz x 3.5
 	MCFG_DEVICE_PROGRAM_MAP(funkball_map)
@@ -783,15 +775,10 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, funkball_state, voodoo_0_pci_r, voodoo_0_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, funkball_state, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "flashbank").set_map(&funkball_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("voodoo_0", VOODOO_1, STD_VOODOO_1_CLOCK)
@@ -807,11 +794,21 @@ MACHINE_CONFIG_START(funkball_state::funkball)
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
 
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	ns16550_device &uart(NS16550(config, "uart", 1843200)); // exact type unknown
+	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.out_dtr_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_INTEL_28F320J5_ADD("u29")
-	MCFG_INTEL_28F320J5_ADD("u30")
-	MCFG_INTEL_28F320J5_ADD("u3")
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	rs232.rxd_handler().set("uart", FUNC(ns16550_device::rx_w));
+	rs232.dcd_handler().set("uart", FUNC(ns16550_device::dcd_w));
+	rs232.dsr_handler().set("uart", FUNC(ns16550_device::dsr_w));
+	rs232.cts_handler().set("uart", FUNC(ns16550_device::cts_w));
+
+	INTEL_28F320J5(config, "u29");
+	INTEL_28F320J5(config, "u30");
+	INTEL_28F320J5(config, "u3");
 MACHINE_CONFIG_END
 
 ROM_START( funkball )

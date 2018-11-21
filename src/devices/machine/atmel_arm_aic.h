@@ -19,7 +19,8 @@ public:
 	}
 
 	// configuration
-	auto irq_out() { return m_irq_out.bind(); }
+	auto irq_callback() { return m_irq_out.bind(); }
+
 	void regs_map(address_map &map);
 
 	void set_irq(int line, int state);

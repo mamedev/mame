@@ -76,7 +76,7 @@ protected:
 	const u8 m_colmax;    // number of column pins
 
 	int m_cs;       // input pin state
-	int m_clock;    // "
+	int m_pclock;   // "
 	int m_data;     // "
 	int m_count;
 	u8 m_control;

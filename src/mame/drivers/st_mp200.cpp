@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	MCFG_DEVICE_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
 	MCFG_DEVICE_PROGRAM_MAP(st_mp200_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_st_mp200);
@@ -594,25 +594,25 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, st_mp200_state, u10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, st_mp200_state, u10_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, st_mp200_state, u10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, st_mp200_state, u10_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, st_mp200_state, u10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, st_mp200_state, u10_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia_u10, 0);
+	m_pia_u10->readpa_handler().set(FUNC(st_mp200_state::u10_a_r));
+	m_pia_u10->writepa_handler().set(FUNC(st_mp200_state::u10_a_w));
+	m_pia_u10->readpb_handler().set(FUNC(st_mp200_state::u10_b_r));
+	m_pia_u10->writepb_handler().set(FUNC(st_mp200_state::u10_b_w));
+	m_pia_u10->ca2_handler().set(FUNC(st_mp200_state::u10_ca2_w));
+	m_pia_u10->cb2_handler().set(FUNC(st_mp200_state::u10_cb2_w));
+	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", st_mp200_state, timer_x, attotime::from_hz(120)) // mains freq*2
 
-	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, st_mp200_state, u11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, st_mp200_state, u11_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, st_mp200_state, u11_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, st_mp200_state, u11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, st_mp200_state, u11_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia_u11, 0);
+	m_pia_u11->readpa_handler().set(FUNC(st_mp200_state::u11_a_r));
+	m_pia_u11->writepa_handler().set(FUNC(st_mp200_state::u11_a_w));
+	m_pia_u11->writepb_handler().set(FUNC(st_mp200_state::u11_b_w));
+	m_pia_u11->ca2_handler().set(FUNC(st_mp200_state::u11_ca2_w));
+	m_pia_u11->cb2_handler().set(FUNC(st_mp200_state::u11_cb2_w));
+	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp200_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 MACHINE_CONFIG_END
 
@@ -978,4 +978,4 @@ GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state, init_st_m
 // other manufacturer
 GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1978,  blkshpsq,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Astro",     "Black Sheep Squadron",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "<unknown>", "unknown pinball game",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "<unknown>", "unknown MP-200 pinball game", MACHINE_IS_SKELETON_MECHANICAL)

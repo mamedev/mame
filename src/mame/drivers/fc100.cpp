@@ -535,12 +535,12 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
-	MCFG_DEVICE_ADD("psg", AY8910, XTAL(7'159'090)/3/2)  /* AY-3-8910 - clock not verified */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
-	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fc100_state, ay_port_a_w))
-	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fc100_state, ay_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	ay8910_device &psg(AY8910(config, "psg", XTAL(7'159'090)/3/2));  /* AY-3-8910 - clock not verified */
+	psg.port_a_read_callback().set_ioport("JOY0");
+	psg.port_b_read_callback().set_ioport("JOY1");
+	//psg.port_a_write_callback().set(FUNC(fc100_state::ay_port_a_w));
+	//psg.port_b_write_callback().set(FUNC(fc100_state::ay_port_b_w));
+	psg.add_route(ALL_OUTPUTS, "mono", 1.50);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD("cassette")

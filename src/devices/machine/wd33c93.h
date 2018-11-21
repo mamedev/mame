@@ -12,22 +12,24 @@
 
 #include "legscsi.h"
 
-#define MCFG_WD33C93_IRQ_CB(cb) \
-	downcast<wd33c93_device &>(*device).set_irq_callback((DEVCB_##cb));
-
 class wd33c93_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
+	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: wd33c93_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_cb() { return m_irq_cb.bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void dma_read_data( int bytes, uint8_t *pData );
-	void dma_write_data(int bytes, uint8_t *pData);
+	int dma_read_data(int bytes, uint8_t *data);
+	void dma_write_data(int bytes, uint8_t *data);
 	void clear_dma();
 	int get_dma_count();
 
@@ -70,8 +72,8 @@ private:
 		WD_AUXILIARY_STATUS     = 0x1f
 	};
 
-	static constexpr unsigned TEMP_INPUT_LEN  = 262144;
-	static constexpr unsigned FIFO_SIZE       = 12;
+	static constexpr int TEMP_INPUT_LEN  = 262144;
+	static constexpr int FIFO_SIZE       = 12;
 
 	uint8_t getunit();
 	void set_xfer_count(int count);
@@ -89,18 +91,18 @@ private:
 	void xferinfo_cmd();
 	void dispatch_command();
 
-	uint8_t       sasr;
-	uint8_t       regs[WD_AUXILIARY_STATUS+1];
-	uint8_t       fifo[FIFO_SIZE];
-	int         fifo_pos;
-	uint8_t       temp_input[TEMP_INPUT_LEN];
-	int         temp_input_pos;
-	uint8_t       busphase;
-	uint8_t       identify;
-	int         read_pending;
-	emu_timer   *cmd_timer;
-	emu_timer   *service_req_timer;
-	emu_timer   *deassert_cip_timer;
+	uint8_t		m_sasr;
+	uint8_t		m_regs[WD_AUXILIARY_STATUS+1];
+	uint8_t		m_fifo[FIFO_SIZE];
+	int			m_fifo_pos;
+	uint8_t		m_temp_input[TEMP_INPUT_LEN];
+	int			m_temp_input_pos;
+	uint8_t		m_busphase;
+	uint8_t		m_identify;
+	bool		m_read_pending;
+	emu_timer	*m_cmd_timer;
+	emu_timer	*m_service_req_timer;
+	emu_timer	*m_deassert_cip_timer;
 	devcb_write_line m_irq_cb; /* irq callback */
 };
 

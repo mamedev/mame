@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Bryan McPhail
+#ifndef MAME_INCLUDES_TUMBLEB_H
+#define MAME_INCLUDES_TUMBLEB_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
@@ -9,8 +13,8 @@
 class tumbleb_state : public driver_device
 {
 public:
-	tumbleb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tumbleb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_pf1_data(*this, "pf1_data"),
@@ -26,6 +30,7 @@ public:
 	{ }
 
 	void tumblepb(machine_config &config);
+	void tumblepba(machine_config &config);
 	void bcstory(machine_config &config);
 	void pangpang(machine_config &config);
 	void semibase(machine_config &config);
@@ -163,4 +168,7 @@ private:
 	void suprtrio_main_map(address_map &map);
 	void suprtrio_sound_map(address_map &map);
 	void tumblepopb_main_map(address_map &map);
+	void tumblepopba_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TUMBLEB_H

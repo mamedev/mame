@@ -58,7 +58,6 @@ void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 	I80186(config, m_i80186, 20_MHz_XTAL / 2);
 	m_i80186->set_addrmap(AS_PROGRAM, &bbc_tube_80186_device::tube_80186_mem);
 	m_i80186->set_addrmap(AS_IO, &bbc_tube_80186_device::tube_80186_io);
-	//m_i80186->chip_select_callback().set(FUNC(bbc_tube_80186_device::chip_select_cb));
 	m_i80186->tmrout0_handler().set_inputline(m_i80186, INPUT_LINE_HALT).invert();
 	m_i80186->tmrout1_handler().set_inputline(m_i80186, INPUT_LINE_NMI).invert();
 
@@ -67,7 +66,7 @@ void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
 	m_ula->drq_handler().set(m_i80186, FUNC(i80186_cpu_device::drq0_w));
 
 	/* internal ram */
-	RAM(config, m_ram, 0).set_default_size("512K");
+	RAM(config, m_ram).set_default_size("512K");
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_80186").set_original("bbc_flop_80186");
@@ -106,7 +105,6 @@ bbc_tube_80186_device::bbc_tube_80186_device(const machine_config &mconfig, cons
 
 void bbc_tube_80186_device::device_start()
 {
-	m_slot = dynamic_cast<bbc_tube_slot_device *>(owner());
 }
 
 //-------------------------------------------------
@@ -115,8 +113,6 @@ void bbc_tube_80186_device::device_start()
 
 void bbc_tube_80186_device::device_reset()
 {
-	m_ula->reset();
-
 	address_space &program = m_i80186->space(AS_PROGRAM);
 
 	program.install_ram(0x00000, 0x3ffff, m_ram->pointer());

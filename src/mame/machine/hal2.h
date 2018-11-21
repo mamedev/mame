@@ -14,10 +14,15 @@
 class hal2_device : public device_t
 {
 public:
+	hal2_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: hal2_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	hal2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	DECLARE_WRITE32_MEMBER(write);
+	DECLARE_READ32_MEMBER(read);
 
 protected:
 	virtual void device_start() override;
@@ -54,8 +59,6 @@ protected:
 
 	uint32_t m_iar;
 	uint32_t m_idr[4];
-
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
 
 DECLARE_DEVICE_TYPE(SGI_HAL2, hal2_device)

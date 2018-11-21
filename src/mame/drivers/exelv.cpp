@@ -359,9 +359,8 @@ WRITE8_MEMBER(exelv_state::tms7041_portc_w)
 */
 READ8_MEMBER(exelv_state::tms7041_portd_r)
 {
-	uint8_t data = 0xff;
-	data=m_tms5220c->status_r(space, 0, data);
-	logerror("tms7041_portd_r\n");
+	uint8_t data = m_tms5220c->status_r();
+	logerror("tms7041_portd_r: data = 0x%02x\n", data);
 	return data;
 }
 
@@ -370,7 +369,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 {
 	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 
-	m_tms5220c->data_w(space, 0, data);
+	m_tms5220c->data_w(data);
 	m_tms7041_portd = data;
 }
 

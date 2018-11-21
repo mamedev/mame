@@ -447,50 +447,50 @@ MACHINE_CONFIG_START(s7_state::s7)
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(CONSTANT(0xff))
-	MCFG_PIA_READPB_HANDLER(CONSTANT(0x3f))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s7_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s7_state, sol2_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s7_state, pia21_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s7_state, pia21_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s7_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s7_state, pia_irq))
+	PIA6821(config, m_pia21, 0);
+	m_pia21->readpa_handler().set_constant(0xff);
+	m_pia21->readpb_handler().set_constant(0x3f);
+	m_pia21->writepa_handler().set(FUNC(s7_state::sound_w));
+	m_pia21->writepb_handler().set(FUNC(s7_state::sol2_w));
+	m_pia21->ca2_handler().set(FUNC(s7_state::pia21_ca2_w));
+	m_pia21->cb2_handler().set(FUNC(s7_state::pia21_cb2_w));
+	m_pia21->irqa_handler().set(FUNC(s7_state::pia_irq));
+	m_pia21->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s7_state, sol0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s7_state, sol1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s7_state, pia22_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s7_state, pia22_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s7_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s7_state, pia_irq))
+	PIA6821(config, m_pia22, 0);
+	m_pia22->writepa_handler().set(FUNC(s7_state::sol0_w));
+	m_pia22->writepb_handler().set(FUNC(s7_state::sol1_w));
+	m_pia22->ca2_handler().set(FUNC(s7_state::pia22_ca2_w));
+	m_pia22->cb2_handler().set(FUNC(s7_state::pia22_cb2_w));
+	m_pia22->irqa_handler().set(FUNC(s7_state::pia_irq));
+	m_pia22->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s7_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s7_state, lamp1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s7_state, pia24_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s7_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s7_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s7_state, pia_irq))
+	PIA6821(config, m_pia24, 0);
+	m_pia24->writepa_handler().set(FUNC(s7_state::lamp0_w));
+	m_pia24->writepb_handler().set(FUNC(s7_state::lamp1_w));
+	m_pia24->ca2_handler().set(FUNC(s7_state::pia24_ca2_w));
+	m_pia24->cb2_handler().set(FUNC(s7_state::pia24_cb2_w));
+	m_pia24->irqa_handler().set(FUNC(s7_state::pia_irq));
+	m_pia24->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, s7_state, dips_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s7_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s7_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s7_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s7_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s7_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s7_state, pia_irq))
+	PIA6821(config, m_pia28, 0);
+	m_pia28->readpa_handler().set(FUNC(s7_state::dips_r));
+	m_pia28->writepa_handler().set(FUNC(s7_state::dig0_w));
+	m_pia28->writepb_handler().set(FUNC(s7_state::dig1_w));
+	m_pia28->ca2_handler().set(FUNC(s7_state::pia28_ca2_w));
+	m_pia28->cb2_handler().set(FUNC(s7_state::pia28_cb2_w));
+	m_pia28->irqa_handler().set(FUNC(s7_state::pia_irq));
+	m_pia28->irqb_handler().set(FUNC(s7_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, s7_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s7_state, switch_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s7_state, pia30_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s7_state, pia30_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
+	PIA6821(config, m_pia30, 0);
+	m_pia30->readpa_handler().set(FUNC(s7_state::switch_r));
+	m_pia30->writepb_handler().set(FUNC(s7_state::switch_w));
+	m_pia30->ca2_handler().set(FUNC(s7_state::pia30_ca2_w));
+	m_pia30->cb2_handler().set(FUNC(s7_state::pia30_cb2_w));
+	m_pia30->irqa_handler().set_inputline("maincpu", M6808_IRQ_LINE);
+	m_pia30->irqb_handler().set_inputline("maincpu", M6808_IRQ_LINE);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
 	MCFG_DEVICE_ADD("audiocpu", M6808, 3580000)

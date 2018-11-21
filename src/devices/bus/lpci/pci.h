@@ -44,7 +44,7 @@ class pci_connector_device : public device_t,
 						public device_slot_interface
 {
 public:
-	pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~pci_connector_device();
 
 	pci_device_interface *get_device();

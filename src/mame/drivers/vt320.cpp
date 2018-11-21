@@ -111,8 +111,7 @@ MACHINE_CONFIG_START(vt320_state::vt320)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, RAM_TAG).set_default_size("16K");
 MACHINE_CONFIG_END
 
 /* ROM definition */
