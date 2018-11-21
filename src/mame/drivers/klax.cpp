@@ -248,6 +248,7 @@ MACHINE_CONFIG_START(klax_state::klax2bl)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_klax2bl)
 
 	// guess, probably something like this
+	// 2 x msm at least on bootleg set 2 (ic18 and ic19)
 	MCFG_DEVICE_ADD("msm", MSM5205, 375000)    /* ? */
 //  MCFG_MSM5205_VCLK_CB(WRITELINE(*this, klax_state, m5205_int1)) /* interrupt function */
 //  MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
@@ -366,6 +367,8 @@ ROM_START( klax2bl2 ) // derived from 'klax2' set, closer than klax2bl
 	ROM_REGION( 0x400, "plds", 0) // protected
 	ROM_LOAD( "palce16v8.ic67", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "palce16v8.ic91", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.ic24", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.ic29", 0x200, 0x117, NO_DUMP )
 ROM_END
 
 ROM_START( klax3 )
