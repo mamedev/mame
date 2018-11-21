@@ -506,8 +506,8 @@ void amstrad_pc_state::cfg_fdc(device_t *device)
 MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	/* basic machine hardware */
 	I8086(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, amstrad_pc_state::ppc640_map);
-	m_maincpu->set_addrmap(AS_IO, amstrad_pc_state::pc200_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_pc_state::ppc640_map);
+	m_maincpu->set_addrmap(AS_IO, &amstrad_pc_state::pc200_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
@@ -549,9 +549,9 @@ void amstrad_pc_state::pc2086(machine_config &config)
 void amstrad_pc_state::ppc640(machine_config &config)
 {
 	pc200(config);
-	config.device_replace("maincpu", V30, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, amstrad_pc_state::ppc640_map);
-	m_maincpu->set_addrmap(AS_IO, amstrad_pc_state::ppc512_io);
+	V30(config.replace(), m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amstrad_pc_state::ppc640_map);
+	m_maincpu->set_addrmap(AS_IO, &amstrad_pc_state::ppc512_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	config.device_remove("isa1");
