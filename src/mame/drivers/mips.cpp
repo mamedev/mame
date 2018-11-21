@@ -504,7 +504,7 @@ void rx2030_state::rx2030(machine_config &config)
 
 		adapter.set_clock(10_MHz_XTAL); // clock assumed
 
-		adapter.int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7);
+		adapter.int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7).invert();
 		adapter.breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
 	});
 
