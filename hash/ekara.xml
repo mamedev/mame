@@ -262,7 +262,7 @@
 	-->
 	<software name="us_vol1">
 		<description>e-kara US Volume 1 (US-E001)</description>
-		<year>2000</year>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -285,7 +285,7 @@
 	-->
 	<software name="us_vol2">
 		<description>e-kara US Volume 2 (US-E002)</description>
-		<year>2000</year>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -308,7 +308,7 @@
 	-->
 	<software name="us_vol3">
 		<description>e-kara US Volume 3 (US-E003)</description>
-		<year>2000</year>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -331,7 +331,7 @@
 	-->
 	<software name="us_vol4">
 		<description>e-kara US Volume 4 (US-E004)</description>
-		<year>2000</year>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -354,7 +354,7 @@
 	-->	
 	<software name="us_vol5">
 		<description>e-kara US Volume 5 (US-E005)</description>
-		<year>2000</year>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -377,7 +377,7 @@
 	-->
 	<software name="us_vol6">
 		<description>e-kara US Volume 6 (US-E006)</description>
-		<year>2000</year>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -400,7 +400,7 @@
 	-->
 	<software name="us_vol7">
 		<description>e-kara US Volume 7 (US-E007)</description>
-		<year>2002</year>
+		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -423,7 +423,7 @@
 	-->
 	<software name="us_vol8">
 		<description>e-kara US Volume 8 'No Boys Allowed' (US-E008)</description>
-		<year>2002</year>
+		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -446,7 +446,7 @@
 	-->	
 	<software name="us_vol9">
 		<description>e-kara US Volume 9 'No Boys Allowed' (US-E009)</description>
-		<year>2002</year>
+		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
