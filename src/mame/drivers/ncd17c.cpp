@@ -69,6 +69,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(lance_irq_w);
+	DECLARE_READ16_MEMBER(lance_dma_r);
+	DECLARE_WRITE16_MEMBER(lance_dma_w);
 	DECLARE_WRITE32_MEMBER(bt478_palette_w);
 	DECLARE_READ32_MEMBER(from_mcu_r);
 	DECLARE_WRITE32_MEMBER(to_mcu_w);
@@ -86,7 +88,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<scn2681_device> m_duart;
-	required_device<am79c90_device> m_lance;
+	required_device<am7990_device> m_lance;
 
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 
@@ -320,6 +322,25 @@ WRITE_LINE_MEMBER(ncd_020_state::lance_irq_w)
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
+READ16_MEMBER(ncd_020_state::lance_dma_r)
+{
+	// FIXME: ncd19 lance is trying to access 0x80xxxx-0xfxxxxx, which is
+	// not the "mainram" and therefore hates R.Belmont :)
+	u32 const data = m_mainram.target()[offset >> 2];
+
+	return (offset & 2) ? u16(data) : u16(data >> 16);
+}
+
+WRITE16_MEMBER(ncd_020_state::lance_dma_w)
+{
+	u32 const existing = m_mainram.target()[offset >> 2];
+
+	if (offset & 2)
+		m_mainram.target()[offset >> 2] = (existing & (0xffff0000U | ~mem_mask)) | (data & mem_mask);
+	else
+		m_mainram.target()[offset >> 2] = (existing & (0x0000ffffU | ~(mem_mask << 16))) | ((data & mem_mask) << 16);
+}
+
 WRITE32_MEMBER(ncd_020_state::bt478_palette_w)
 {
 	if (mem_mask & 0xff000000)
@@ -372,8 +393,10 @@ void ncd_020_state::ncd_17c(machine_config &config)
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(FUNC(ncd_020_state::duart_irq_handler));
 
-	AM79C90(config, m_lance, XTAL(12'500'000));
-	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w));
+	AM7990(config, m_lance);
+	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w)).invert();
+	m_lance->dma_in().set(FUNC(ncd_020_state::lance_dma_r));
+	m_lance->dma_out().set(FUNC(ncd_020_state::lance_dma_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(77.4144_MHz_XTAL, 1376, 0, 1024, 803, 0, 768); // 56.260 kHz horizontal, 70.06 Hz vertical
@@ -393,8 +416,10 @@ void ncd_020_state::ncd_19(machine_config &config)
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(FUNC(ncd_020_state::duart_irq_handler));
 
-	AM79C90(config, m_lance, XTAL(12'500'000));
-	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w));
+	AM7990(config, m_lance);
+	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w)).invert();
+	m_lance->dma_in().set(FUNC(ncd_020_state::lance_dma_r));
+	m_lance->dma_out().set(FUNC(ncd_020_state::lance_dma_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(72);
