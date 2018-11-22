@@ -546,8 +546,7 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -565,10 +564,9 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -592,8 +590,7 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_DEVICE_PROGRAM_MAP(champbas_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -611,10 +608,9 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -705,8 +701,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -724,20 +719,16 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	/* AY (melody) clock is specified by a VR (0.9 - 3.9 MHz) */
-	MCFG_DEVICE_ADD("ay1", AY8910, 1940000) /* VR has a factory mark and this is the value read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay1", 1940000).add_route(ALL_OUTPUTS, "speaker", 0.08); /* VR has a factory mark and this is the value read */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay2", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay3", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_DEVICE_ADD("ay4", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay4", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
 	MCFG_DEVICE_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
@@ -770,8 +761,7 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // champbasj 8201 on pcb, though unused
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -789,10 +779,9 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

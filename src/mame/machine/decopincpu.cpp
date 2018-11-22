@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(decocpu_type1_device::device_add_mconfig)
 	m_pia34->irqa_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 	m_pia34->irqb_handler().set(FUNC(decocpu_type1_device::cpu_pia_irq));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 MACHINE_CONFIG_END
 
 ioport_constructor decocpu_type1_device::device_input_ports() const

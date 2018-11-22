@@ -564,19 +564,19 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000))
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
-	MCFG_MC6845_UPDATE_ROW_CB(pyl601_state, pyl601_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", XTAL(2'000'000)));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);   /* ? */
+	crtc.set_update_row_callback(FUNC(pyl601_state::pyl601_update_row), this);
 
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("576K") // 64 + 512
+	RAM(config, RAM_TAG).set_default_size("576K"); // 64 + 512
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pyl601_state::pyl601a)
@@ -586,11 +586,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601a)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pyl601a)
 
-	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000))
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)   /* ? */
-	MCFG_MC6845_UPDATE_ROW_CB(pyl601_state, pyl601a_update_row)
+	subdevice<mc6845_device>("crtc")->set_update_row_callback(FUNC(pyl601_state::pyl601a_update_row), this);
 MACHINE_CONFIG_END
 
 /* ROM definition */

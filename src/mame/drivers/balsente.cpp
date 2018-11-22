@@ -304,7 +304,7 @@ void balsente_state::cpu2_map(address_map &map)
 void balsente_state::cpu2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x00, 0x03).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x08, 0x0f).r(FUNC(balsente_state::counter_state_r));
 	map(0x08, 0x09).w(FUNC(balsente_state::counter_control_w));
 	map(0x0a, 0x0b).w(FUNC(balsente_state::dac_data_w));
@@ -1333,16 +1333,16 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 	X2212(config, "nov0").set_auto_save(true); // system NOVRAM
 	X2212(config, "nov1").set_auto_save(true); // cart NOVRAM
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, interrupt_timer)
 	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, clock_counter_0_ff)
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, balsente_state, counter_0_set_out))
-	MCFG_PIT8253_OUT2_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_PIT8253_CLK1(8_MHz_XTAL / 4)
-	MCFG_PIT8253_CLK2(8_MHz_XTAL / 4)
+	PIT8253(config, m_pit, 0);
+	m_pit->out_handler<0>().set(FUNC(balsente_state::counter_0_set_out));
+	m_pit->out_handler<2>().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	m_pit->set_clk<1>(8_MHz_XTAL / 4);
+	m_pit->set_clk<2>(8_MHz_XTAL / 4);
 
 	LS259(config, m_outlatch); // U9H
 	// these outputs are generally used to control the various lamps
@@ -2470,7 +2470,7 @@ GAME( 1984, triviag1,  0,        balsente, triviag1, balsente_state, init_trivia
 GAME( 1984, triviag2,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes, ROT0, "Bally/Sente",  "Trivial Pursuit (Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nametune,  0,        balsente, nametune, balsente_state, init_nametune, ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
 

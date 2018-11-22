@@ -167,14 +167,12 @@ void pg685_state::pg675_mem(address_map &map)
 	map(0xf9f03, 0xf9f03).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xf9f04, 0xf9f04).rw(FUNC(pg685_state::f9f04_r), FUNC(pg685_state::f9f04_w));
 	map(0xf9f06, 0xf9f07).rw("mainpic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xf9f08, 0xf9f08).rw("mainuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf9f09, 0xf9f09).rw("mainuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf9f08, 0xf9f09).rw("mainuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xf9f20, 0xf9f23).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0xf9f24, 0xf9f24).rw(FUNC(pg685_state::f9f24_r), FUNC(pg685_state::f9f24_w));
 	map(0xf9f28, 0xf9f2b).rw("modppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf9f2c, 0xf9f2f).rw("modppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf9f30, 0xf9f30).rw("moduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf9f31, 0xf9f31).rw("moduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf9f30, 0xf9f31).rw("moduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xf9f32, 0xf9f32).w(FUNC(pg685_state::f9f32_w));
 	map(0xf9f33, 0xf9f33).r(FUNC(pg685_state::f9f33_r));
 	map(0xf9f40, 0xf9f5f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
@@ -187,7 +185,7 @@ void pg685_state::pg685_mem(address_map &map)
 {
 	map.unmap_value_high();
 	pg675_mem(map);
-	map(0xf9f34, 0xf9f37).rw("bppit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf9f34, 0xf9f37).rw(m_bppit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf9f3e, 0xf9f3e).w(FUNC(pg685_state::f9f3e_w));
@@ -205,17 +203,15 @@ void pg685_state::pg685oua12_mem(address_map &map)
 	map(0xf9f00, 0xf9f01).rw("kbdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xf9f04, 0xf9f04).rw(FUNC(pg685_state::f9f04_r), FUNC(pg685_state::f9f04_w));
 	map(0xf9f06, 0xf9f07).rw("mainpic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xf9f08, 0xf9f08).rw("mainuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf9f09, 0xf9f09).rw("mainuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf9f08, 0xf9f09).rw("mainuart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xf9f20, 0xf9f23).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0xf9f24, 0xf9f24).rw(FUNC(pg685_state::f9f24_r), FUNC(pg685_state::f9f24_w));
 	map(0xf9f28, 0xf9f2b).rw("modppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf9f2c, 0xf9f2f).rw("modppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf9f30, 0xf9f30).rw("moduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf9f31, 0xf9f31).rw("moduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf9f30, 0xf9f31).rw("moduart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xf9f32, 0xf9f32).w(FUNC(pg685_state::f9f32_w));
 	map(0xf9f33, 0xf9f33).r(FUNC(pg685_state::f9f33_r));
-	map(0xf9f34, 0xf9f37).rw("bppit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xf9f34, 0xf9f37).rw(m_bppit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xf9f38, 0xf9f3b).rw("bpuart", FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf9f3c, 0xf9f3d).rw("bppic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf9f3e, 0xf9f3e).w(FUNC(pg685_state::f9f3e_w));
@@ -399,30 +395,31 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(pg685_state::pg685_backplane)
-	MCFG_DEVICE_ADD("bppit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(12'288'000) / 10) // same input clock as for PC16-11?
-	MCFG_PIT8253_CLK1(XTAL(12'288'000) / 10)
-	MCFG_PIT8253_CLK2(XTAL(12'288'000) / 10)
+void pg685_state::pg685_backplane(machine_config &config)
+{
+	PIT8253(config, m_bppit, 0);
+	m_bppit->set_clk<0>(XTAL(12'288'000) / 10); // same input clock as for PC16-11?
+	m_bppit->set_clk<1>(XTAL(12'288'000) / 10);
+	m_bppit->set_clk<2>(XTAL(12'288'000) / 10);
 
-	MCFG_DEVICE_ADD("bppic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(NOOP) // configured in single 8086 mode?
+	pic8259_device &bppic(PIC8259(config, "bppic", 0));
+	bppic.out_int_callback().set_nop(); // configured in single 8086 mode?
 
-	MCFG_DEVICE_ADD("bpuart", MC2661, 4915200)
-MACHINE_CONFIG_END
+	MC2661(config, "bpuart", 4915200);
+}
 
-MACHINE_CONFIG_START(pg685_state::pg685_module)
-	MCFG_DEVICE_ADD("fdc", FD1797, XTAL(4'000'000) / 2) // divider guessed
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("mainpic", pic8259_device, ir4_w))
+void pg685_state::pg685_module(machine_config &config)
+{
+	FD1797(config, m_fdc, XTAL(4'000'000) / 2); // divider guessed
+	m_fdc->intrq_wr_callback().set("mainpic", FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("modppi1", I8255, 0)
-	MCFG_DEVICE_ADD("modppi2", I8255, 0)
+	I8255(config, "modppi1", 0);
+	I8255(config, "modppi2", 0);
 
-	MCFG_DEVICE_ADD("moduart", I8251, XTAL(4'000'000) / 2) // divider guessed
+	I8251(config, "moduart", XTAL(4'000'000) / 2); // divider guessed
 
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
-
-MACHINE_CONFIG_END
+	MM58167(config, "rtc", XTAL(32'768));
+}
 
 MACHINE_CONFIG_START(pg685_state::pg675)
 	// main cpu
@@ -430,9 +427,9 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	MCFG_DEVICE_PROGRAM_MAP(pg675_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
+	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
+	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
+	mainpic.in_sp_callback().set_constant(1);
 
 	// i/o cpu
 
@@ -443,10 +440,11 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 12288000));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row), this);
 
 	// sound hardware
 
@@ -458,14 +456,14 @@ MACHINE_CONFIG_START(pg685_state::pg675)
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
+	i8279_device &kbdc(I8279(config, "kbdc", XTAL(12'288'000) / 6)); // divider guessed
+	kbdc.out_irq_callback().set("mainpic", FUNC(pic8259_device::ir0_w));
 
 	// printer
 
 	// floppy
-	// MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_intrq_w))
-	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_drq_w))
+	// m_fdc->intrq_wr_callback(FUNC(zorba_state::fdc_intrq_w));
+	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -479,9 +477,9 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	MCFG_DEVICE_PROGRAM_MAP(pg685_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
+	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
+	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
+	mainpic.in_sp_callback().set_constant(1);
 
 	// i/o cpu
 
@@ -492,10 +490,11 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 12288000));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row), this);
 
 	// sound hardware
 
@@ -508,20 +507,20 @@ MACHINE_CONFIG_START(pg685_state::pg685)
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
+	i8279_device &kbdc(I8279(config, "kbdc", XTAL(12'288'000) / 6)); // divider guessed
+	kbdc.out_irq_callback().set("mainpic", FUNC(pic8259_device::ir0_w));
 
 	// printer
 
 	// floppy
 
-	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_drq_w))
+	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
-	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("mainpic", pic8259_device, ir3_w))
+	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed
+	hdc.out_intrq_callback().set("mainpic", FUNC(pic8259_device::ir3_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pg685_state::pg685oua12)
@@ -530,9 +529,9 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	MCFG_DEVICE_PROGRAM_MAP(pg685oua12_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("mainpic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
+	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
+	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
+	mainpic.in_sp_callback().set_constant(1);
 
 	// i/o cpu
 
@@ -543,10 +542,11 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row_oua12)
+	mc6845_device &crtc(MC6845(config, "crtc", 12288000));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row_oua12), this);
 
 	// sound hardware
 
@@ -559,20 +559,19 @@ MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, 12288000 / 6) // wrong
-	MCFG_I8279_OUT_IRQ_CB(WRITELINE("mainpic", pic8259_device, ir0_w))
+	i8279_device &kbdc(I8279(config, "kbdc", 12288000 / 6)); // wrong
+	kbdc.out_irq_callback().set("mainpic", FUNC(pic8259_device::ir0_w));
 
 	// printer
 
 	// floppy
-
-	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, zorba_state, fdc_drq_w))
+	// m_fdc->drq_wr_callback(FUNC(zorba_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
-	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE("mainpic", pic8259_device, ir3_w))
+	wd2010_device& hdc(WD2010(config, "hdc", XTAL(10'000'000) / 2)); // divider guessed
+	hdc.out_intrq_callback().set("mainpic", FUNC(pic8259_device::ir3_w));
 
 MACHINE_CONFIG_END
 

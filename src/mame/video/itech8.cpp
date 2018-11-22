@@ -146,10 +146,6 @@ void itech8_state::video_start()
 	/* reset statics */
 	m_page_select = 0xc0;
 
-	/* fetch the GROM base */
-	m_grom_base = memregion("grom")->base();
-	m_grom_size = memregion("grom")->bytes();
-
 	save_item(NAME(m_blitter_data));
 	save_item(NAME(m_blit_in_progress));
 	save_item(NAME(m_page_select));
@@ -180,7 +176,7 @@ WRITE8_MEMBER(itech8_state::palette_w)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::page_w)
+void itech8_state::page_w(u8 data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	logerror("%04x:display_page = %02X (%d)\n", m_maincpu->pc(), data, m_screen->vpos());
@@ -198,7 +194,7 @@ WRITE8_MEMBER(itech8_state::page_w)
 
 inline uint8_t itech8_state::fetch_next_raw()
 {
-	return m_grom_base[m_fetch_offset++ % m_grom_size];
+	return m_grom[m_fetch_offset++ % m_grom.length()];
 }
 
 
@@ -212,17 +208,17 @@ inline uint8_t itech8_state::fetch_next_rle()
 {
 	if (m_fetch_rle_count == 0)
 	{
-		m_fetch_rle_count = m_grom_base[m_fetch_offset++ % m_grom_size];
+		m_fetch_rle_count = m_grom[m_fetch_offset++ % m_grom.length()];
 		m_fetch_rle_literal = m_fetch_rle_count & 0x80;
 		m_fetch_rle_count &= 0x7f;
 
 		if (!m_fetch_rle_literal)
-			m_fetch_rle_value = m_grom_base[m_fetch_offset++ % m_grom_size];
+			m_fetch_rle_value = m_grom[m_fetch_offset++ % m_grom.length()];
 	}
 
 	m_fetch_rle_count--;
 	if (m_fetch_rle_literal)
-		m_fetch_rle_value = m_grom_base[m_fetch_offset++ % m_grom_size];
+		m_fetch_rle_value = m_grom[m_fetch_offset++ % m_grom.length()];
 
 	return m_fetch_rle_value;
 }
@@ -236,12 +232,12 @@ inline void itech8_state::consume_rle(int count)
 
 		if (m_fetch_rle_count == 0)
 		{
-			m_fetch_rle_count = m_grom_base[m_fetch_offset++ % m_grom_size];
+			m_fetch_rle_count = m_grom[m_fetch_offset++ % m_grom.length()];
 			m_fetch_rle_literal = m_fetch_rle_count & 0x80;
 			m_fetch_rle_count &= 0x7f;
 
 			if (!m_fetch_rle_literal)
-				m_fetch_rle_value = m_grom_base[m_fetch_offset++ % m_grom_size];
+				m_fetch_rle_value = m_grom[m_fetch_offset++ % m_grom.length()];
 		}
 
 		num_to_consume = (count < m_fetch_rle_count) ? count : m_fetch_rle_count;

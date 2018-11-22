@@ -5,6 +5,10 @@
     Time Pilot
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_TIMEPLT_H
+#define MAME_INCLUDES_TIMEPLT_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "sound/tc8830f.h"
@@ -14,8 +18,8 @@
 class timeplt_state : public driver_device
 {
 public:
-	timeplt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	timeplt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tc8830f(*this, "tc8830f"),
 		m_mainlatch(*this, "mainlatch"),
@@ -94,3 +98,5 @@ private:
 	void psurge_main_map(address_map &map);
 	void timeplt_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TIMEPLT_H

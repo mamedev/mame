@@ -251,7 +251,7 @@ uint32_t skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 
 		draw_sprites(bitmap, cliprect);
 
 		// draw the other tiles
-		for (cat = 0; cat < 0xf; cat++)
+		for (cat = 0; cat < 0x10; cat++)
 			if (cat != pri) m_tx_tilemap->draw(screen, bitmap, cliprect, cat, 0);
 	}
 	else

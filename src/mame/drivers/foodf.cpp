@@ -330,8 +330,7 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 
 	X2212(config, "nvram").set_auto_save(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	MCFG_TIMER_DRIVER_ADD(m_scan_timer, foodf_state, scanline_update_timer)
 

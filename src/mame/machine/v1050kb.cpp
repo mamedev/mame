@@ -381,7 +381,7 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
 	m_led = BIT(data, 5);
 
 	// speaker output
-	m_discrete->write(space, NODE_01, BIT(data, 6));
+	m_discrete->write(NODE_01, BIT(data, 6));
 
 	// serial output
 	m_out_tx_handler(BIT(data, 7));

@@ -40,8 +40,6 @@ void tc0110pcr_device::device_start()
 	save_pointer(NAME(m_ram), TC0110PCR_RAM_SIZE);
 	save_item(NAME(m_type));
 	save_item(NAME(m_addr));
-	machine().save().register_postload(save_prepost_delegate(FUNC(tc0110pcr_device::restore_colors), this));
-
 }
 
 //-------------------------------------------------
@@ -51,6 +49,15 @@ void tc0110pcr_device::device_start()
 void tc0110pcr_device::device_reset()
 {
 	m_type = 0;    /* default, xBBBBBGGGGGRRRRR */
+}
+
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
+
+void tc0110pcr_device::device_post_load()
+{
+	restore_colors();
 }
 
 /*****************************************************************************

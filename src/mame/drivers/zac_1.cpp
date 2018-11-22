@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(zac_1_state::zac_1)
 	MCFG_DEVICE_DATA_MAP(zac_1_data)
 	MCFG_S2650_SENSE_INPUT(READLINE(*this, zac_1_state, serial_r))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, zac_1_state, serial_w))
-	MCFG_NVRAM_ADD_0FILL("ram")
+	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_inttimer", zac_1_state, zac_1_inttimer, attotime::from_hz(200))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_outtimer", zac_1_state, zac_1_outtimer, attotime::from_hz(187500))

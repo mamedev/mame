@@ -32,7 +32,6 @@ public:
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
 		m_flash(*this, "flash"),
-		m_rtc(*this, "rtc"),
 		m_dispenser(*this, "dispenser"),
 
 		m_x1_bank(*this,"x1_bank_%u", 1U),
@@ -129,7 +128,6 @@ protected:
 	optional_device<okim9810_device> m_oki;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<intelfsh16_device> m_flash;
-	optional_device<upd4992_device> m_rtc;
 	optional_device<ticket_dispenser_device> m_dispenser;
 
 	optional_memory_bank_array<8> m_x1_bank;
@@ -212,6 +210,7 @@ class staraudi_state : public seta2_state
 public:
 	staraudi_state(const machine_config &mconfig, device_type type, const char *tag) :
 		seta2_state(mconfig, type, tag),
+		m_rtc(*this, "rtc"),
 		m_rgbram(*this, "rgbram", 0)
 	{
 	}
@@ -236,6 +235,7 @@ private:
 
 	void draw_rgbram(bitmap_ind16 &bitmap);
 
+	required_device<upd4992_device> m_rtc;
 	required_shared_ptr<uint16_t> m_rgbram;
 
 	uint16_t m_lamps1 = 0, m_lamps2 = 0, m_cam = 0;

@@ -521,8 +521,8 @@ MACHINE_CONFIG_START(splash_state::splash)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(30'000'000)/8)       /* 3.75MHz (30/8) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -584,9 +584,9 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, splash_state, ym_irq))
@@ -652,7 +652,7 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	MCFG_DEVICE_PROGRAM_MAP(funystrp_sound_map)
 	MCFG_DEVICE_IO_MAP(funystrp_sound_io_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -670,8 +670,8 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(400'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, funystrp_state, adpcm_int1))         /* interrupt function */

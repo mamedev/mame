@@ -374,23 +374,21 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M")
+	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M");
 
 	// RAM/ROM bank
 	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&unixpc_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);
 
 	// floppy
-	MCFG_DEVICE_ADD("wd2797", WD2797, 40_MHz_XTAL / 40) // 1PCK (CPU clock) divided by custom DMA chip
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, unixpc_state, wd2797_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, unixpc_state, wd2797_drq_w))
+	WD2797(config, m_wd2797, 40_MHz_XTAL / 40); // 1PCK (CPU clock) divided by custom DMA chip
+	m_wd2797->intrq_wr_callback().set(FUNC(unixpc_state::wd2797_intrq_w));
+	m_wd2797->drq_wr_callback().set(FUNC(unixpc_state::wd2797_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 19.6608_MHz_XTAL / 8)
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	upd7201_new_device& mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));
+	mpsc.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	mpsc.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	MCFG_DEVICE_ADD("kbc", ACIA6850, 0)
 
@@ -400,10 +398,10 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 	// TODO: RTC
 	//MCFG_DEVICE_ADD("rtc", TC8250, 32.768_kHz_XTAL)
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxa_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("mpsc", upd7201_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("mpsc", FUNC(upd7201_new_device::rxa_w));
+	rs232.dsr_handler().set("mpsc", FUNC(upd7201_new_device::dcda_w));
+	rs232.cts_handler().set("mpsc", FUNC(upd7201_new_device::ctsa_w));
 
 	MCFG_DEVICE_ADD("printer", CENTRONICS, centronics_devices, nullptr)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("printlatch", "printer")

@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 
 	/* sound hardware */

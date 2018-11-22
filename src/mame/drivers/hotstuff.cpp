@@ -115,14 +115,14 @@ MACHINE_CONFIG_START(hotstuff_state::hotstuff)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_DEVICE_ADD("scc1", SCC8530N, 4915200)
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_4))
+	scc8530_device& scc1(SCC8530N(config, "scc1", 4915200));
+	scc1.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	MCFG_DEVICE_ADD("scc2", SCC8530N, 4915200)
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
+	scc8530_device& scc2(SCC8530N(config, "scc2", 4915200));
+	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	MCFG_DEVICE_ADD("rtc", MC146818, XTAL(32'768))
-	MCFG_MC146818_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
+	MC146818(config, m_rtc, XTAL(32'768));
+	m_rtc->irq().set_inputline("maincpu", M68K_IRQ_1);
 MACHINE_CONFIG_END
 
 

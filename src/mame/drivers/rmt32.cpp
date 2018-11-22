@@ -220,7 +220,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
-	void mt32_io(address_map &map);
 	void mt32_map(address_map &map);
 
 	uint8_t lcd_data_buffer[256];
@@ -348,20 +347,14 @@ void mt32_state::mt32_map(address_map &map)
 	map(0xc000, 0xffff).bankrw("fixed");
 }
 
-void mt32_state::mt32_io(address_map &map)
-{
-	map(i8x9x_device::A7, i8x9x_device::A7).portr("A7");
-	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(FUNC(mt32_state::midi_w));
-	map(i8x9x_device::P0, i8x9x_device::P0).r(FUNC(mt32_state::port0_r));
-}
-
 MACHINE_CONFIG_START(mt32_state::mt32)
-	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP( mt32_map )
-	MCFG_DEVICE_IO_MAP( mt32_io )
+	i8x9x_device &maincpu(P8098(config, "maincpu", 12_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &mt32_state::mt32_map);
+	maincpu.ach7_cb().set_ioport("A7");
+	maincpu.serial_tx_cb().set(FUNC(mt32_state::midi_w));
+	maincpu.in_p0_cb().set(FUNC(mt32_state::port0_r));
 
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
+	RAM( config, "ram" ).set_default_size( "32K" );
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE(50)

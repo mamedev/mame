@@ -503,6 +503,7 @@ private:
 
 	void saturn_mem(address_map &map);
 	void sound_mem(address_map &map);
+	void scsp_mem(address_map &map);
 };
 
 
@@ -558,6 +559,11 @@ void sat_console_state::sound_mem(address_map &map)
 	map(0x100000, 0x100fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 }
 
+void sat_console_state::scsp_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sound_ram");
+}
+
 
 INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
 {
@@ -600,8 +606,6 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
 {
-	m_scsp->set_ram_base(m_sound_ram);
-
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
 
@@ -802,32 +806,32 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
 
-	MCFG_SEGA_SCU_ADD("scu")
-	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
+	SEGA_SCU(config, m_scu, 0);
+	m_scu->set_hostcpu(m_maincpu);
 
 //  SH-1
 
 //  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
-	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
-	MCFG_SMPC_HLE_SCREEN("screen")
-	MCFG_SMPC_HLE_CONTROL_PORTS("ctrl1", "ctrl2")
-	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(*this, sat_console_state, saturn_pdr1_direct_r))
-	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(*this, sat_console_state, saturn_pdr2_direct_r))
-	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(*this, sat_console_state, saturn_pdr1_direct_w))
-	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(*this, sat_console_state, saturn_pdr2_direct_w))
-	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(*this, saturn_state, master_sh2_reset_w))
-	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(*this, saturn_state, master_sh2_nmi_w))
-	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(*this, saturn_state, slave_sh2_reset_w))
-	MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(*this, saturn_state, sound_68k_reset_w))
-	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(*this, saturn_state, system_reset_w))
-	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(*this, saturn_state, system_halt_w))
-	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(*this, saturn_state, dot_select_w))
-	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE("scu", sega_scu_device, smpc_irq_w))
+	SMPC_HLE(config, m_smpc_hle, XTAL(4'000'000));
+	m_smpc_hle->set_screen_tag("screen");
+	m_smpc_hle->set_control_port_tags("ctrl1", "ctrl2");
+	m_smpc_hle->pdr1_in_handler().set(FUNC(sat_console_state::saturn_pdr1_direct_r));
+	m_smpc_hle->pdr2_in_handler().set(FUNC(sat_console_state::saturn_pdr2_direct_r));
+	m_smpc_hle->pdr1_out_handler().set(FUNC(sat_console_state::saturn_pdr1_direct_w));
+	m_smpc_hle->pdr2_out_handler().set(FUNC(sat_console_state::saturn_pdr2_direct_w));
+	m_smpc_hle->master_reset_handler().set(FUNC(saturn_state::master_sh2_reset_w));
+	m_smpc_hle->master_nmi_handler().set(FUNC(saturn_state::master_sh2_nmi_w));
+	m_smpc_hle->slave_reset_handler().set(FUNC(saturn_state::slave_sh2_reset_w));
+	m_smpc_hle->sound_reset_handler().set(FUNC(saturn_state::sound_68k_reset_w));
+	m_smpc_hle->system_reset_handler().set(FUNC(saturn_state::system_reset_w));
+	m_smpc_hle->system_halt_handler().set(FUNC(saturn_state::system_halt_w));
+	m_smpc_hle->dot_select_handler().set(FUNC(saturn_state::dot_select_w));
+	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(sega_scu_device::smpc_irq_w));
 
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(sat_console_state::nvram_init));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -843,8 +847,9 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD(m_scsp, SCSP)
+	MCFG_DEVICE_ADDRESS_MAP(0, scsp_mem)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(m_scu, sega_scu_device, sound_req_w))
 	MCFG_SCSP_EXTS_CB(READ16("stvcd", stvcd_device, channel_volume_r))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

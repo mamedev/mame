@@ -348,11 +348,11 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	MCFG_DEVICE_IO_MAP(main_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", iqblock_state, irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, iqblock_state, port_C_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("P1");
+	ppi.in_pb_callback().set_ioport("P2");
+	ppi.in_pc_callback().set_ioport("EXTRA");
+	ppi.out_pc_callback().set(FUNC(iqblock_state::port_C_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

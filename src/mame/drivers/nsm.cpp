@@ -126,7 +126,8 @@ void nsm_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(nsm_state::nsm)
+void nsm_state::nsm(machine_config &config)
+{
 	// CPU TMS9995, standard variant; no line connection
 	TMS9995(config, m_maincpu, 11052000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsm_state::nsm_map);
@@ -138,11 +139,9 @@ MACHINE_CONFIG_START(nsm_state::nsm)
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ay1", AY8912, 11052000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_DEVICE_ADD("ay2", AY8912, 11052000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	AY8912(config, "ay1", 11052000/8).add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	AY8912(config, "ay2", 11052000/8).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+}
 
 /*-------------------------------------------------------------------
 / Cosmic Flash (1985)

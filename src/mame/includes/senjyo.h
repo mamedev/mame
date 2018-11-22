@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
+#ifndef MAME_INCLUDES_SENJYO_H
+#define MAME_INCLUDES_SENJYO_H
+
+#pragma once
+
 #include "sound/dac.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
@@ -9,8 +14,8 @@
 class senjyo_state : public driver_device
 {
 public:
-	senjyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	senjyo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pio(*this, "z80pio"),
 		m_dac(*this, "dac"),
@@ -32,7 +37,8 @@ public:
 		m_bg3videoram(*this, "bg3videoram"),
 		m_radarram(*this, "radarram"),
 		m_bgstripesram(*this, "bgstripesram"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	void senjyox_e(machine_config &config);
 	void senjyo(machine_config &config);
@@ -125,3 +131,5 @@ private:
 
 /*----------- defined in audio/senjyo.c -----------*/
 extern const z80_daisy_config senjyo_daisy_chain[];
+
+#endif // MAME_INCLUDES_SENJYO_H

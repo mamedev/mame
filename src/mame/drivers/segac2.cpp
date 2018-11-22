@@ -1551,7 +1551,7 @@ MACHINE_CONFIG_START(segac2_state::segac)
 
 	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
-	MCFG_NVRAM_ADD_1FILL("nvram") // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", XL2_CLOCK/6)); // clock divider guessed
 	io.in_pa_callback().set_ioport("P1");
@@ -1697,7 +1697,7 @@ ROM_START( tantrbl3 ) /* Tant-R (Puzzle & Action) (Alt Bootleg Running on C Boar
 ROM_END
 
 
-ROM_START( ichirjbl ) /* Ichident-R (Puzzle & Action 2) (Bootleg Running on C Board?, No Samples) */
+ROM_START( ichirjbl ) /* Ichidant-R (Puzzle & Action 2) (Bootleg Running on C Board?, No Samples) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "27c4000.2",0x000000, 0x080000, CRC(5a194f44) SHA1(67a4d21b91704f8c2210b5106e82e22ba3366f4c) )
 	ROM_LOAD16_BYTE( "27c4000.1",0x000001, 0x080000, CRC(de209f84) SHA1(0860d0ebfab2952e82fc1e292bf9410d673d9322) )
@@ -1947,7 +1947,7 @@ ROM_START( puyobl ) /* Puyo Puyo  (c)1992 Sega / Compile  Bootleg */
 ROM_END
 
 
-ROM_START( ichir ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (World) */
+ROM_START( ichir ) /* Ichidant-R (Puzzle & Action 2)  (c)1994 Sega (World) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pa2_32.bin",     0x000000, 0x080000, CRC(7ba0c025) SHA1(855e9bb2a20c6f51b26381233c57c26aa96ad1f6) )
 	ROM_LOAD16_BYTE( "pa2_31.bin",     0x000001, 0x080000, CRC(5f86e5cc) SHA1(44e201de00dfbf7c66d0e0d40d17b162c6f0625b) )
@@ -1959,7 +1959,7 @@ ROM_START( ichir ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (World) */
 ROM_END
 
 
-ROM_START( ichirk ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Korea) */
+ROM_START( ichirk ) /* Ichidant-R (Puzzle & Action 2)  (c)1994 Sega (Korea) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	/* Again the part numbers are quite strange for the Korean verison */
 	ROM_LOAD16_BYTE( "epr_ichi.32", 0x000000, 0x080000, CRC(804dea11) SHA1(40bf8cbd40969a5880df10914252b7f64d5ce8e9) )
@@ -1972,7 +1972,7 @@ ROM_START( ichirk ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Korea) */
 ROM_END
 
 
-ROM_START( ichirj ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Japan) */
+ROM_START( ichirj ) /* Ichidant-R (Puzzle & Action 2)  (c)1994 Sega (Japan) - 834-10935 ICHIDANT-R */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-16886.ic32", 0x000000, 0x080000, CRC(38208e28) SHA1(07fc634bdf2d3e25274c9c374b3506dec765114c) )
 	ROM_LOAD16_BYTE( "epr-16885.ic31", 0x000001, 0x080000, CRC(1ce4e837) SHA1(16600600e12e3f35e3da89524f7f51f019b5ad17) )
@@ -2518,7 +2518,7 @@ void segac2_state::init_pclubjv5()
 
     Dates are all verified correct from Ingame display, some of the Titles
     such as Ichidant-R, Tant-R might be slightly incorrect as I've seen the
-    games referred to by other names such as Ichident-R, Tanto-R, Tanto Arle
+    games referred to by other names such as Ichidant-R, Tanto-R, Tanto Arle
     etc.
 
     bloxeedc is set as as clone of bloxeed as it is the same game but running

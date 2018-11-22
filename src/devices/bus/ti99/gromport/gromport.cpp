@@ -125,16 +125,14 @@ DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device, "grom
 
 namespace bus { namespace ti99 { namespace gromport {
 
-#define TRACE_READ 0
-#define TRACE_WRITE 0
-
 gromport_device::gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_GROMPORT, tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		m_connector(nullptr),
 		m_reset_on_insert(true),
 		m_console_ready(*this),
-		m_console_reset(*this)
+		m_console_reset(*this),
+		m_mask(0x1fff)
 { }
 
 /*
@@ -263,17 +261,6 @@ ioport_constructor gromport_device::device_input_ports() const
 	return INPUT_PORTS_NAME(gromport);
 }
 
-void gromport_device::configure_slot(bool for998)
-{
-	option_reset();
-	option_add("single", TI99_GROMPORT_SINGLE);
-	option_add("multi", TI99_GROMPORT_MULTI);
-	if (!for998) option_add("gkracker", TI99_GROMPORT_GK);
-	set_default_option("single");
-	set_fixed(false);
-	set_mask(for998? 0x3fff : 0x1fff);
-}
-
 /***************************************************************************
     Different versions of cartridge connections
 
@@ -303,3 +290,15 @@ void cartridge_connector_device::device_config_complete()
 
 } } } // end namespace bus::ti99::gromport
 
+void ti99_gromport_options(device_slot_interface &device)
+{
+	device.option_add("single", TI99_GROMPORT_SINGLE);
+	device.option_add("multi", TI99_GROMPORT_MULTI);
+	device.option_add("gkracker", TI99_GROMPORT_GK);
+}
+
+void ti99_gromport_options_998(device_slot_interface &device)
+{
+	device.option_add("single", TI99_GROMPORT_SINGLE);
+	device.option_add("multi", TI99_GROMPORT_MULTI);
+}

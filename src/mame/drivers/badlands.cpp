@@ -454,10 +454,9 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlands)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlands)
@@ -480,12 +479,11 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_2))
+	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu")
+		.int_callback().set_inputline("maincpu", M68K_IRQ_2);
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	YM2151(config, "ymsnd", ATARI_CLOCK_14MHz/4).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30);
 MACHINE_CONFIG_END
 
 

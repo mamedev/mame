@@ -44,7 +44,7 @@ public:
 	// configuration helpers
 	template <typename Object> void set_analog_callback(Object &&cb) { m_apan_cb = std::forward<Object>(cb); }
 	template <class Object> devcb_base &set_timer_handler(Object &&cb) { return m_timer_handler.set_callback(std::forward<Object>(cb)); }
-
+	auto timer_handler() { return m_timer_handler.bind(); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);

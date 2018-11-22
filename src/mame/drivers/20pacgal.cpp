@@ -404,9 +404,9 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 	MCFG_DEVICE_PROGRAM_MAP(_20pacgal_map)
 	MCFG_DEVICE_IO_MAP(_20pacgal_io_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	_20pacgal_video(config);
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(_25pacman_state::_25pacman)
 	MCFG_DEVICE_PROGRAM_MAP(_25pacman_map)
 	MCFG_DEVICE_IO_MAP(_25pacman_io_map)
 
-	MCFG_AMD_29LV200T_ADD("flash")
+	AMD_29LV200T(config, "flash");
 MACHINE_CONFIG_END
 
 

@@ -146,7 +146,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		/* if SEL == 1 && BUSY == 1, we write data to internal registers */
 		else if ((data & 5) == 5)
 		{
-			m_ppi->write(space, m_nvram_address_latch & 0x03, m_parallel_data);
+			m_ppi->write(m_nvram_address_latch & 0x03, m_parallel_data);
 		}
 
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
@@ -170,7 +170,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", m_nvram_address_latch);
-			m_nvram_data_latch = m_ppi->read(space, m_nvram_address_latch & 0x03);
+			m_nvram_data_latch = m_ppi->read(m_nvram_address_latch & 0x03);
 		}
 
 		/* if SEL == 0, we read NVRAM */
@@ -273,7 +273,7 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	ntsc_video(config);
@@ -315,10 +315,10 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
 
 	// i/o extension
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IO0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, upscope_state, lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, upscope_state, coin_counter_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("IO0");
+	m_ppi->out_pb_callback().set(FUNC(upscope_state::lamps_w));
+	m_ppi->out_pc_callback().set(FUNC(upscope_state::coin_counter_w));
 MACHINE_CONFIG_END
 
 

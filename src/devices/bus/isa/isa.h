@@ -71,79 +71,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ISA8_CPU(_cputag) \
-	downcast<isa8_device &>(*device).set_cputag(_cputag);
-// include this in a driver to have ISA allocate it's own address spaces (e.g. non-x86)
-#define MCFG_ISA8_BUS_CUSTOM_SPACES() \
-	downcast<isa8_device &>(*device).set_custom_spaces();
-#define MCFG_ISA16_CPU(_cputag) \
-	downcast<isa8_device &>(*device).set_cputag(_cputag);
-#define MCFG_ISA16_BUS_CUSTOM_SPACES() \
-	downcast<isa8_device &>(*device).set_custom_spaces();
-
-#define MCFG_ISA_BUS_IOCHCK(_iochck) \
-	downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
-
-#define MCFG_ISA_OUT_IRQ2_CB(_devcb) \
-	downcast<isa8_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ3_CB(_devcb) \
-	downcast<isa8_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ4_CB(_devcb) \
-	downcast<isa8_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ5_CB(_devcb) \
-	downcast<isa8_device &>(*device).set_out_irq5_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ6_CB(_devcb) \
-	downcast<isa8_device &>(*device).set_out_irq6_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ7_CB(_devcb) \
-	downcast<isa8_device &>(*device).set_out_irq7_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ1_CB(_devcb) \
-	downcast<isa8_device &>(*device).set_out_drq1_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ2_CB(_devcb) \
-	downcast<isa8_device &>(*device).set_out_drq2_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ3_CB(_devcb) \
-	downcast<isa8_device &>(*device).set_out_drq3_callback(DEVCB_##_devcb);
-
-
-#define MCFG_ISA_OUT_IRQ10_CB(_devcb) \
-	downcast<isa16_device &>(*device).set_out_irq10_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ11_CB(_devcb) \
-	downcast<isa16_device &>(*device).set_out_irq11_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ12_CB(_devcb) \
-	downcast<isa16_device &>(*device).set_out_irq12_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ14_CB(_devcb) \
-	downcast<isa16_device &>(*device).set_out_irq14_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_IRQ15_CB(_devcb) \
-	downcast<isa16_device &>(*device).set_out_irq15_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ0_CB(_devcb) \
-	downcast<isa16_device &>(*device).set_out_drq0_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ5_CB(_devcb) \
-	downcast<isa16_device &>(*device).set_out_drq5_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ6_CB(_devcb) \
-	downcast<isa16_device &>(*device).set_out_drq6_callback(DEVCB_##_devcb);
-
-#define MCFG_ISA_OUT_DRQ7_CB(_devcb) \
-	downcast<isa16_device &>(*device).set_out_drq7_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -194,19 +121,22 @@ public:
 
 	// construction/destruction
 	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	// inline configuration
 	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	auto iochck_callback() { return m_write_iochck.bind(); }
+	auto irq2_callback() { return m_out_irq2_cb.bind(); }
+	auto irq3_callback() { return m_out_irq3_cb.bind(); }
+	auto irq4_callback() { return m_out_irq4_cb.bind(); }
+	auto irq5_callback() { return m_out_irq5_cb.bind(); }
+	auto irq6_callback() { return m_out_irq6_cb.bind(); }
+	auto irq7_callback() { return m_out_irq7_cb.bind(); }
+	auto drq1_callback() { return m_out_drq1_cb.bind(); }
+	auto drq2_callback() { return m_out_drq2_cb.bind(); }
+	auto drq3_callback() { return m_out_drq3_cb.bind(); }
+
+	// include this in a driver to have ISA allocate its own address spaces (e.g. non-x86)
 	void set_custom_spaces() { m_allocspaces = true; }
-	template <class Object> devcb_base &set_iochck_callback(Object &&cb) { return m_write_iochck.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq2_callback(Object &&cb) { return m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq3_callback(Object &&cb) { return m_out_irq3_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq4_callback(Object &&cb) { return m_out_irq4_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq5_callback(Object &&cb) { return m_out_irq5_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq6_callback(Object &&cb) { return m_out_irq6_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq7_callback(Object &&cb) { return m_out_irq7_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_drq1_callback(Object &&cb) { return m_out_drq1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_drq2_callback(Object &&cb) { return m_out_drq2_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_drq3_callback(Object &&cb) { return m_out_drq3_cb.set_callback(std::forward<Object>(cb)); }
 
 	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
 	virtual space_config_vector memory_space_config() const override;
@@ -368,15 +298,15 @@ public:
 	// construction/destruction
 	isa16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_irq10_callback(Object &&cb) { return m_out_irq10_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq11_callback(Object &&cb) { return m_out_irq11_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq12_callback(Object &&cb) { return m_out_irq12_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq14_callback(Object &&cb) { return m_out_irq14_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq15_callback(Object &&cb) { return m_out_irq15_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_drq0_callback(Object &&cb) { return m_out_drq0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_drq5_callback(Object &&cb) { return m_out_drq5_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_drq6_callback(Object &&cb) { return m_out_drq6_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_drq7_callback(Object &&cb) { return m_out_drq7_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq10_callback() { return m_out_irq10_cb.bind(); }
+	auto irq11_callback() { return m_out_irq11_cb.bind(); }
+	auto irq12_callback() { return m_out_irq12_cb.bind(); }
+	auto irq14_callback() { return m_out_irq14_cb.bind(); }
+	auto irq15_callback() { return m_out_irq15_cb.bind(); }
+	auto drq0_callback() { return m_out_drq0_cb.bind(); }
+	auto drq5_callback() { return m_out_drq5_cb.bind(); }
+	auto drq6_callback() { return m_out_drq6_cb.bind(); }
+	auto drq7_callback() { return m_out_drq7_cb.bind(); }
 
 	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 

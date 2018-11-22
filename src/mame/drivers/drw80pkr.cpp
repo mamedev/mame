@@ -486,13 +486,12 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	MCFG_PALETTE_ADD("palette", 16*16)
 	MCFG_PALETTE_INIT_OWNER(drw80pkr_state, drw80pkr)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_aysnd, AY8912, 20000000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	AY8912(config, m_aysnd, 20000000/12).add_route(ALL_OUTPUTS, "mono", 0.75);
 MACHINE_CONFIG_END
 
 /*************************

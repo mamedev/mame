@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(manohman_state::manohman)
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768)) // M62X42B
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram") // KM6264BL-10 x2 + MAX696CFL + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE); // KM6264BL-10 x2 + MAX696CFL + battery
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("saa", SAA1099, XTAL(8'000'000) / 2) // clock not verified

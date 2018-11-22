@@ -813,7 +813,7 @@ MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_DEVICE_PROGRAM_MAP(mastboy_map)
 	MCFG_DEVICE_IO_MAP(mastboy_io_map)
 
-	MCFG_EEPROM_2816_ADD("earom")
+	EEPROM_2816(config, "earom");
 
 	LS259(config, m_outlatch); // IC17
 	m_outlatch->q_out_cb<0>().set(FUNC(mastboy_state::irq0_ack_w));

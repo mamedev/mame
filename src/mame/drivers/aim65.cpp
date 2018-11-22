@@ -269,9 +269,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_GENERIC_LOAD(aim65_state, z15_load)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","aim65_cart")

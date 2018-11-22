@@ -106,7 +106,8 @@ void epson_lx810l_device::lx810l_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(epson_lx810l_device::device_add_mconfig)
+void epson_lx810l_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
 	upd7810_device &upd(UPD7810(config, m_maincpu, 14.7456_MHz_XTAL));
 	upd.set_addrmap(AS_PROGRAM, &epson_lx810l_device::lx810l_mem);
@@ -130,38 +131,38 @@ MACHINE_CONFIG_START(epson_lx810l_device::device_add_mconfig)
 //  config.set_default_layout(layout_lx800);
 
 	/* video hardware (simulates paper) */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(PAPER_WIDTH, PAPER_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, PAPER_WIDTH-1, 0, PAPER_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(epson_lx810l_device, screen_update_lx810l)
+	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(PAPER_WIDTH, PAPER_HEIGHT);
+	screen.set_visarea(0, PAPER_WIDTH-1, 0, PAPER_HEIGHT-1);
+	screen.set_screen_update(FUNC(epson_lx810l_device::screen_update_lx810l));
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* gate array */
-	MCFG_DEVICE_ADD("e05a30", E05A30, 0)
-	MCFG_E05A30_PRINTHEAD_CALLBACK(WRITE16(*this, epson_lx810l_device, printhead))
-	MCFG_E05A30_PF_STEPPER_CALLBACK(WRITE8(*this, epson_lx810l_device, pf_stepper))
-	MCFG_E05A30_CR_STEPPER_CALLBACK(WRITE8(*this, epson_lx810l_device, cr_stepper))
-	MCFG_E05A30_READY_CALLBACK(WRITELINE(*this, epson_lx810l_device, e05a30_ready))
-	MCFG_E05A30_CENTRONICS_ACK_CALLBACK(WRITELINE(*this, epson_lx810l_device, e05a30_centronics_ack))
-	MCFG_E05A30_CENTRONICS_BUSY_CALLBACK(WRITELINE(*this, epson_lx810l_device, e05a30_centronics_busy))
-	MCFG_E05A30_CENTRONICS_PERROR_CALLBACK(WRITELINE(*this, epson_lx810l_device, e05a30_centronics_perror))
-	MCFG_E05A30_CENTRONICS_FAULT_CALLBACK(WRITELINE(*this, epson_lx810l_device, e05a30_centronics_fault))
-	MCFG_E05A30_CENTRONICS_SELECT_CALLBACK(WRITELINE(*this, epson_lx810l_device, e05a30_centronics_select))
+	e05a30_device &e05a30(E05A30(config, m_e05a30, 0));
+	e05a30.printhead().set(FUNC(epson_lx810l_device::printhead));
+	e05a30.pf_stepper().set(FUNC(epson_lx810l_device::pf_stepper));
+	e05a30.cr_stepper().set(FUNC(epson_lx810l_device::cr_stepper));
+	e05a30.ready().set(FUNC(epson_lx810l_device::e05a30_ready));
+	e05a30.centronics_ack().set(FUNC(epson_lx810l_device::e05a30_centronics_ack));
+	e05a30.centronics_busy().set(FUNC(epson_lx810l_device::e05a30_centronics_busy));
+	e05a30.centronics_perror().set(FUNC(epson_lx810l_device::e05a30_centronics_perror));
+	e05a30.centronics_fault().set(FUNC(epson_lx810l_device::e05a30_centronics_fault));
+	e05a30.centronics_select().set(FUNC(epson_lx810l_device::e05a30_centronics_select));
 
 	/* 256-bit eeprom */
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C06_16BIT)
+	EEPROM_93C06_16BIT(config, "eeprom");
 
-	STEPPER(config, "pf_stepper", (uint8_t)4);
-	STEPPER(config, "cr_stepper", (uint8_t)2);
-
-MACHINE_CONFIG_END
+	STEPPER(config, m_pf_stepper, (uint8_t)4);
+	STEPPER(config, m_cr_stepper, (uint8_t)2);
+}
 
 
 /***************************************************************************

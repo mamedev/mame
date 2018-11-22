@@ -142,8 +142,8 @@ enum mac128model_t
 class mac128_state : public driver_device
 {
 public:
-	mac128_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mac128_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via6522_0"),
 		m_ram(*this, RAM_TAG),
@@ -252,6 +252,8 @@ private:
 #ifndef MAC_USE_EMULATED_KBD
 	TIMER_CALLBACK_MEMBER(kbd_clock);
 	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);
+#else
+	DECLARE_WRITE_LINE_MEMBER(mac_kbd_clk_in);
 #endif
 	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
 	DECLARE_READ8_MEMBER(mac_via_in_a);
@@ -951,8 +953,8 @@ WRITE_LINE_MEMBER(mac128_state::mac_kbd_clk_in)
 
 WRITE_LINE_MEMBER(mac128_state::mac_via_out_cb2)
 {
-	printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
-	m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	printf("Sending %d to kbd (PC=%x)\n", state, m_maincpu->pc());
+	m_mackbd->data_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 #else   // keyboard HLE
@@ -1346,7 +1348,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_screen->set_palette("palette");
 
 	palette_device &palette(PALETTE(config, "palette", 2));
-	palette.set_init(DEVICE_SELF_OWNER, FUNC(mac128_state::palette_init));
+	palette.set_init(DEVICE_SELF, FUNC(mac128_state::palette_init));
 
 	MCFG_VIDEO_START_OVERRIDE(mac128_state,mac)
 

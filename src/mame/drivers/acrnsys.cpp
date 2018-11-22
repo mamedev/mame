@@ -366,10 +366,10 @@ MACHINE_CONFIG_START(acrnsys_state::a6502)
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD(m_ins8154, INS8154, 0)
-	//MCFG_INS8154_IN_A_CB(READ8(*this, acrnsys_state, ins8154_pa_r))
-	//MCFG_INS8154_OUT_A_CB(WRITE8(*this, acrnsys_state, ins8154_pa_w))
-	MCFG_INS8154_IN_B_CB(READ8(*this, acrnsys_state, kbd_r))
+	INS8154(config, m_ins8154);
+	//m_ins8154->in_a().set(FUNC(acrnsys_state::ins8154_pa_r));
+	//m_ins8154->out_a().set(FUNC(acrnsys_state::ins8154_pa_w));
+	m_ins8154->in_b().set(FUNC(acrnsys_state::kbd_r));
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(acrnsys_state, kbd_put))

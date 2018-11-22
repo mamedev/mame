@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLK)
 	MCFG_DEVICE_PROGRAM_MAP(atari_s1_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* Sound */
 	genpin_audio(config);

@@ -147,9 +147,9 @@ void galaxia_state::galaxia_mem_map(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x14ff).mirror(0x6000).ram().share("bullet_ram");
-	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636_1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636_2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636[2], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1800, 0x1bff).mirror(0x6000).r(FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x33ff).rom();
@@ -160,7 +160,7 @@ void galaxia_state::astrowar_mem_map(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x14ff).mirror(0x6000).ram();
-	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1800, 0x1bff).mirror(0x6000).r(FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
 	map(0x1c00, 0x1cff).mirror(0x6000).ram().share("bullet_ram");
 	map(0x2000, 0x33ff).rom();
@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_DEVICE_IO_MAP(galaxia_io_map)
 	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
 	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, galaxia_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -327,17 +327,17 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,galaxia)
 
-	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -26)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[0], 0);
+	m_s2636[0]->set_offsets(-13, -26);
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -26)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[1], 0);
+	m_s2636[1]->set_offsets(-13, -26);
+	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -26)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[2], 0);
+	m_s2636[2]->set_offsets(-13, -26);
+	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_DEVICE_IO_MAP(galaxia_io_map)
 	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
 	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, galaxia_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,9 +371,9 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,astrowar)
 
-	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[0], 0);
+	m_s2636[0]->set_offsets(-13, -8);
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -480,7 +480,7 @@ ROM_START( astrowar )
 	ROM_LOAD( "astro.8i",  0x01000, 0x0400, CRC(ab87fbfc) SHA1(34b670f96c260f186c643e588995ae5d80377784) )
 	ROM_LOAD( "astro.10i", 0x02000, 0x0400, CRC(533675c1) SHA1(69cc066e1874a135a53a21b7b2461bda456504f1) )
 	ROM_LOAD( "astro.11i", 0x02400, 0x0400, CRC(59cf8901) SHA1(e849d4c99350b7e3453c156d91618b71b5be1163) )
-	ROM_LOAD( "astro.13i", 0x02800, 0x0400, CRC(5149c121) SHA1(232ba594e283fb25c31d8ae0b7d8315a81852a71) )
+	ROM_LOAD( "astro.13i", 0x02800, 0x0400, CRC(5149c121) SHA1(232ba594e283fb25c31d8ae0b7d8315a81852a71) BAD_DUMP ) // suspected bad byte at 0x2a00
 	ROM_LOAD( "astro.11l", 0x02c00, 0x0400, CRC(29f52f57) SHA1(5cb50b82e09c537eeaeae167351fca686fde8228) )
 	ROM_LOAD( "astro.13l", 0x03000, 0x0400, CRC(882cdb87) SHA1(062ee8d296316cbce2eb62e72774aa4181e9847d) )
 

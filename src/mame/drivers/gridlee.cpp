@@ -402,9 +402,9 @@ MACHINE_CONFIG_START(gridlee_state::gridlee)
 	MCFG_DEVICE_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	LS259(config, m_latch); // type can only be guessed
 	m_latch->q_out_cb<0>().set_output("led0");

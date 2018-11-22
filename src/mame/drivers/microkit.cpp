@@ -120,20 +120,21 @@ static DEVICE_INPUT_DEFAULTS_START( serial_keyb )
 DEVICE_INPUT_DEFAULTS_END
 
 
-MACHINE_CONFIG_START(microkit_state::microkit)
+void microkit_state::microkit(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", CDP1802, 1750000)
-	MCFG_DEVICE_PROGRAM_MAP(microkit_mem)
-	MCFG_DEVICE_IO_MAP(microkit_io)
-	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, microkit_state, clear_r))
+	CDP1802(config, m_maincpu, 1750000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &microkit_state::microkit_mem);
+	m_maincpu->set_addrmap(AS_IO, &microkit_state::microkit_io);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(microkit_state::clear_r));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", COSMAC_INPUT_LINE_EF4))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", serial_keyb)
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-MACHINE_CONFIG_END
+	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard");
+	m_rs232->rxd_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF4);
+	m_rs232->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(serial_keyb));
+	GENERIC_TERMINAL(config, m_terminal, 0);
+}
 
 ROM_START( microkit )
 	ROM_REGION( 0x200, "maincpu", ROMREGION_INVERT )

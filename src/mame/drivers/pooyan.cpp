@@ -208,7 +208,7 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	mainlatch.q_out_cb<5>().set_nop(); // PAY OUT - not used
 	mainlatch.q_out_cb<7>().set(FUNC(pooyan_state::flipscreen_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

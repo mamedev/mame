@@ -560,9 +560,7 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	MCFG_DEVICE_PROGRAM_MAP( apfimag_map)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K")
+	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K");
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 
@@ -576,7 +574,7 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 	MCFG_CASSETTE_INTERFACE("apf_cass")
 
-	MCFG_DEVICE_ADD("fdc", FD1771, 1000000) // guess
+	FD1771(config, m_fdc, 1000000); // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)

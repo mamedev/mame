@@ -12,6 +12,7 @@
 #include "machine/ay31015.h"
 #include "machine/f3853.h"
 #include "machine/input_merger.h"
+#include "machine/ripple_counter.h"
 #include "sound/beep.h"
 #include "screen.h"
 #include "speaker.h"
@@ -26,6 +27,7 @@ public:
 		, m_io(*this, "io")
 		, m_screen(*this, "screen")
 		, m_bell(*this, "bell")
+		, m_blinkcount(*this, "blinkcount")
 		, m_kbdecode(*this, "kbdecode")
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%u", 0U)
@@ -67,6 +69,7 @@ private:
 	//required_device<rs232_port_device> m_aux;
 	required_device<screen_device> m_screen;
 	required_device<beep_device> m_bell;
+	required_device<ripple_counter_device> m_blinkcount;
 	required_region_ptr<u8> m_kbdecode;
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<11> m_keys;
@@ -77,6 +80,7 @@ private:
 
 	u8 m_port00;
 	u8 m_keylatch;
+	u8 m_attrlatch;
 	u8 m_scroll;
 	std::unique_ptr<u16[]> m_vram;
 
@@ -86,6 +90,7 @@ private:
 void microterm_f8_state::machine_start()
 {
 	m_keylatch = 0;
+	m_attrlatch = 0;
 	m_vram = make_unique_clear<u16[]>(0x800); // 6x MM2114 with weird addressing
 
 	m_baud_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microterm_f8_state::baud_clock), this));
@@ -93,6 +98,7 @@ void microterm_f8_state::machine_start()
 
 	save_item(NAME(m_port00));
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_attrlatch));
 	save_item(NAME(m_scroll));
 	save_pointer(NAME(m_vram), 0x800);
 }
@@ -128,12 +134,22 @@ TIMER_CALLBACK_MEMBER(microterm_f8_state::baud_clock)
 
 u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	if (BIT(m_port00, 2))
+	{
+		// Display blanked?
+		bitmap.fill(rgb_t::black(), cliprect);
+		return 0;
+	}
+
 	const ioport_value jumpers = m_jumpers->read();
 	unsigned y = cliprect.top();
 	offs_t rowbase = (((y / 12) + m_scroll) % 24) * 80;
 	unsigned line = y % 12;
 	if (line >= 6)
 		line += 2;
+
+	const bool cursor_on = (m_blinkcount->count() & (~jumpers << 1) & 0x38) == 0;
+	const bool blink_on = (m_blinkcount->count() & (~jumpers >> 3) & 0x38) == 0;
 
 	while (y <= cliprect.bottom())
 	{
@@ -143,8 +159,8 @@ u32 microterm_f8_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			u16 ch = m_vram[rowbase + (x / 9)];
 			u8 chdata = m_chargen[(line << 7) | (ch & 0x7f)];
-			bool dot = (!BIT(ch, 8) && allow_underline) || BIT(chdata, 8 - (x % 9));
-			if (BIT(ch, 7) == BIT(ch, 9))
+			bool dot = (!BIT(ch, 8) && allow_underline) || ((BIT(ch, 10) || blink_on) && BIT(chdata, 8 - (x % 9)));
+			if ((BIT(ch, 7) && cursor_on) == BIT(ch, 9))
 				dot = !dot;
 			bitmap.pix32(y, x) = dot ? rgb_t::white() : rgb_t::black();
 		}
@@ -192,8 +208,8 @@ READ8_MEMBER(microterm_f8_state::vram_r)
 	assert(vaddr < 0x800);
 
 	u16 vdata = m_vram[vaddr];
-	if ((m_port00 & 0x05) == 0 && !machine().side_effects_disabled())
-		m_port00 = (m_port00 & 0x0f) | (vdata & 0xf00) >> 4;
+	if (!machine().side_effects_disabled())
+		m_attrlatch = (vdata & 0xf00) >> 4;
 
 	// Bit 7 indicates protected attribute
 	if ((~vdata & (~m_jumpers->read() >> 1) & 0xf00) != 0)
@@ -207,7 +223,9 @@ WRITE8_MEMBER(microterm_f8_state::vram_w)
 	offs_t vaddr = (offset >> 8) * 80 + (offset & 0x007f);
 	assert(vaddr < 0x800);
 
-	m_vram[vaddr] = data | (m_port00 & 0xf0) << 4;
+	m_vram[vaddr] = data | u16(m_port00 & 0xf0) << 4;
+	if (BIT(m_port00, 0))
+		m_vram[vaddr] |= u16(m_attrlatch) << 4;
 }
 
 WRITE8_MEMBER(microterm_f8_state::uart_transmit_w)
@@ -238,6 +256,15 @@ bool microterm_f8_state::poll_keyboard()
 
 READ8_MEMBER(microterm_f8_state::key_r)
 {
+	// Cursor is supposed to stop blinking temporarily when keys are depressed
+	// This implementation suspends cursor blinking when keys are actually read
+	// It also suspends blinking text, which perhaps is supposed to happen
+	if (!machine().side_effects_disabled())
+	{
+		m_blinkcount->reset_w(1);
+		m_blinkcount->reset_w(0);
+	}
+
 	return m_keylatch;
 }
 
@@ -248,6 +275,9 @@ READ8_MEMBER(microterm_f8_state::port00_r)
 	// Full duplex switch
 	if (!BIT(m_dsw[2]->read(), 0))
 		flags |= 0x02;
+
+	if (BIT(m_port00, 0))
+		flags |= m_attrlatch;
 
 	return flags;
 }
@@ -518,6 +548,9 @@ void microterm_f8_state::act5a(machine_config &config)
 	screen.set_raw(16.572_MHz_XTAL, 918, 0, 720, 301, 0, 288); // more or less guessed
 	screen.set_screen_update(FUNC(microterm_f8_state::screen_update));
 	screen.screen_vblank().set(FUNC(microterm_f8_state::vblank_w));
+	screen.screen_vblank().append(m_blinkcount, FUNC(ripple_counter_device::clock_w)).invert();
+
+	RIPPLE_COUNTER(config, m_blinkcount).set_stages(6);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_bell, 1760);

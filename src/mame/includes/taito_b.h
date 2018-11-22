@@ -66,7 +66,6 @@ protected:
 	template<int Player> DECLARE_READ16_MEMBER(tracky_lo_r);
 	template<int Player> DECLARE_READ16_MEMBER(trackx_hi_r);
 	template<int Player> DECLARE_READ16_MEMBER(trackx_lo_r);
-	DECLARE_WRITE16_MEMBER(gain_control_w);
 	DECLARE_READ16_MEMBER(eep_latch_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);

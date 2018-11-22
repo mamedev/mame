@@ -7,6 +7,7 @@
 
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
+#include "screen.h"
 
 class bbusters_state : public driver_device
 {
@@ -58,8 +59,8 @@ protected:
 	template<int Layer> DECLARE_WRITE16_MEMBER(pf_w);
 
 	inline const uint8_t *get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block);
-	void draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block);
-	void draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int colval, int colmask);
+	void draw_block(screen_device &screen, bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block,int priority);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const uint16_t *source, int bank);
 
 	void sound_map(address_map &map);
 private:

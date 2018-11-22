@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 
 	MCFG_PALETTE_ADD("palette", 0xc0*2)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

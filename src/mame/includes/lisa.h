@@ -105,8 +105,8 @@ struct lisa_features_t
 class lisa_state : public driver_device
 {
 public:
-	lisa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lisa_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via0(*this, "via6522_0"),
 		m_via1(*this, "via6522_1"),

@@ -377,8 +377,8 @@ MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	//MCFG_DEVICE_IO_MAP(hd63701_slave_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("acia65c51", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	mos6551_device &acia(MOS6551(config, "acia65c51", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
 	/* video hardware */
 

@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_lockout_w));
 	mainlatch.q_out_cb<7>().set(FUNC(rallyx_state::coin_counter_1_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 
@@ -883,7 +883,7 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_counter_2_w)); // OUT3
 	mainlatch.q_out_cb<7>().set(FUNC(rallyx_state::stars_enable_w)); // STARSON
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 

@@ -198,13 +198,12 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	control.q_out_cb<6>().set("beeper", FUNC(beep_device::set_state));
 
 	/* video hardware */
-	tms9929a_device &crtc(TMS9929A(config, "crtc", XTAL(10'738'635) / 2));
-	crtc.out_int_line_callback().set_inputline(m_maincpu, INT_9995_INT1);
-	crtc.out_int_line_callback().append(FUNC(cortex_state::vdp_int_w));
+	tms9929a_device &crtc(TMS9929A(config, "crtc", XTAL(10'738'635)));
+	crtc.set_screen("screen");
+	crtc.int_callback().set_inputline(m_maincpu, INT_9995_INT1);
+	crtc.int_callback().append(FUNC(cortex_state::vdp_int_w));
 	crtc.set_vram_size(0x4000);
-	device = &crtc; // FIXME: this line is needed because the following macro is nasty
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(cortex_state, kbd_put))

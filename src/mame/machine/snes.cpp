@@ -1069,7 +1069,7 @@ void snes_state::snes_init_ram()
 	SNES_CPU_REG(WRIO) = 0xff;
 
 	// init frame counter so first line is 0
-	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59)
+	if (m_screen->frame_period().as_hz() >= 59.0)
 		m_ppu->set_current_vert(SNES_VTOTAL_NTSC);
 	else
 		m_ppu->set_current_vert(SNES_VTOTAL_PAL);

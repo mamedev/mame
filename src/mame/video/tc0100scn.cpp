@@ -287,7 +287,6 @@ void tc0100scn_device::device_start()
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_dblwidth));
 	save_item(NAME(m_gfxbank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(tc0100scn_device::postload), this));
 }
 
 //-------------------------------------------------
@@ -421,8 +420,11 @@ void tc0100scn_device::restore_scroll()
 	m_tilemap[2][1]->set_flip(flip);
 }
 
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
 
-void tc0100scn_device::postload()
+void tc0100scn_device::device_post_load()
 {
 	set_layer_ptrs();
 	restore_scroll();

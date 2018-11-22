@@ -82,42 +82,42 @@ void tv955_state::mem_map(address_map &map)
 static INPUT_PORTS_START( tv955 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tv955_state::tv955)
-	MCFG_DEVICE_ADD("maincpu", M65C02, 19.3396_MHz_XTAL / 9)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+void tv955_state::tv955(machine_config &config)
+{
+	M65C02(config, m_maincpu, 19.3396_MHz_XTAL / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tv955_state::mem_map);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", m6502_device::IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
-	MCFG_DEVICE_ADD("keyboard", I8049, 5.7143_MHz_XTAL)
+	I8049(config, "keyboard", 5.7143_MHz_XTAL);
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HM6116LP-4 + 3.2V battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + 3.2V battery
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(19.3396_MHz_XTAL, 846, 0, 720, 381, 0, 364)
-	//MCFG_SCREEN_RAW_PARAMS(31.684_MHz_XTAL, 1386, 0, 1188, 381, 0, 364)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(19.3396_MHz_XTAL, 846, 0, 720, 381, 0, 364);
+	//screen.set_raw(31.684_MHz_XTAL, 1386, 0, 1188, 381, 0, 364);
+	screen.set_screen_update("crtc", FUNC(scn2674_device::screen_update));
 
-	MCFG_DEVICE_ADD("crtc", SCN2674, 19.3396_MHz_XTAL / 9)
+	SCN2674(config, m_crtc, 19.3396_MHz_XTAL / 9);
 	// Character clock is 31.684_MHz_XTAL / 9 in 132-column mode
 	// Character cells are 9 pixels wide by 14 pixels high
-	MCFG_SCN2674_CHARACTER_WIDTH(9)
-	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(tv955_state, draw_character)
-	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", m6502_device::NMI_LINE))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	m_crtc->set_character_width(9);
+	m_crtc->set_display_callback(FUNC(tv955_state::draw_character));
+	m_crtc->intr_callback().set_inputline(m_maincpu, m6502_device::NMI_LINE);
+	m_crtc->set_screen("screen");
 
-	MCFG_DEVICE_ADD("hostuart", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	MOS6551(config, m_hostuart, 0);
+	m_hostuart->set_xtal(3.6864_MHz_XTAL);
+	m_hostuart->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("printuart", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	mos6551_device &printuart(MOS6551(config, "printuart", 0));
+	printuart.set_xtal(3.6864_MHz_XTAL / 2);
+	printuart.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("keybuart", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2)
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<2>))
-MACHINE_CONFIG_END
+	mos6551_device &keybuart(MOS6551(config, "keybuart", 0));
+	keybuart.set_xtal(3.6864_MHz_XTAL / 2);
+	keybuart.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
+}
 
 /**************************************************************************************************************
 

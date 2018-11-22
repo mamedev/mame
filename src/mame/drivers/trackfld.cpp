@@ -917,9 +917,9 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	m_mainlatch->q_out_cb<6>().set_nop(); // CN3.4
 	m_mainlatch->q_out_cb<7>().set(FUNC(trackfld_state::irq_mask_w)); // INT
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -940,7 +940,7 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 
@@ -993,9 +993,9 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	mainlatch.q_out_cb<6>().set_nop();
 	mainlatch.q_out_cb<7>().set(FUNC(trackfld_state::irq_mask_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -1016,7 +1016,7 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, finder_base::DUMMY_TAG, m_vlm)
 
@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_START(trackfld_state::hyprolyb)
 	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
 	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 

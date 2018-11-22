@@ -593,16 +593,18 @@ uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  MACHINE_CONFIG( pc1512 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512_video)
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(pc1512_state, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 24*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_REFRESH_RATE(50)
+void pc1512_state::pc1512_video(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(pc1512_state::screen_update));
+	m_screen->set_size(80*8, 24*8);
+	m_screen->set_visarea(0, 80*8-1, 0, 24*8-1);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_refresh_hz(50);
 
-	MCFG_MC6845_ADD(AMS40041_TAG, AMS40041, SCREEN_TAG, XTAL(28'636'363)/32)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pc1512_state, crtc_update_row)
-MACHINE_CONFIG_END
+	AMS40041(config, m_vdu, XTAL(28'636'363)/32);
+	m_vdu->set_screen(m_screen);
+	m_vdu->set_show_border_area(true);
+	m_vdu->set_char_width(8);
+	m_vdu->set_update_row_callback(FUNC(pc1512_state::crtc_update_row), this);
+}

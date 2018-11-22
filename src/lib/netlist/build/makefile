@@ -79,6 +79,7 @@ NLOBJS := \
 	$(NLOBJ)/analog/nld_opamps.o \
 	$(NLOBJ)/devices/nld_2102A.o \
 	$(NLOBJ)/devices/nld_2716.o \
+	$(NLOBJ)/devices/nld_tms4800.o \
 	$(NLOBJ)/devices/nld_4020.o \
 	$(NLOBJ)/devices/nld_4066.o \
 	$(NLOBJ)/devices/nld_4316.o \
@@ -113,6 +114,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_9316.o \
 	$(NLOBJ)/devices/nld_9322.o \
 	$(NLOBJ)/devices/nld_am2847.o \
+	$(NLOBJ)/devices/nld_dm9314.o \
 	$(NLOBJ)/devices/nld_dm9334.o \
 	$(NLOBJ)/devices/nld_mm5837.o \
 	$(NLOBJ)/devices/nld_ne555.o \

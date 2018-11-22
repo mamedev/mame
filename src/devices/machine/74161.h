@@ -108,7 +108,7 @@ private:
 	uint8_t m_pe;       // pin 9
 	uint8_t m_cet;      // pin 10
 	uint8_t m_cep;      // pin 7
-	uint8_t m_clock;    // pin 2
+	uint8_t m_pclock;   // pin 2
 	uint8_t m_p;        // pins 3-6 from LSB to MSB
 
 	// outputs

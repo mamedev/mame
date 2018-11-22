@@ -6,14 +6,19 @@
     Irem M58 hardware
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_M58_H
+#define MAME_INCLUDES_M58_H
+
+#pragma once
+
 #include "emupal.h"
 #include "screen.h"
 
 class m58_state : public driver_device
 {
 public:
-	m58_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m58_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -62,3 +67,5 @@ private:
 	void draw_panel( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void yard_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M58_H

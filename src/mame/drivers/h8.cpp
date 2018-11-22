@@ -197,11 +197,9 @@ void h8_state::h8_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xf0, 0xf0).rw(FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
 	map(0xf1, 0xf1).w(FUNC(h8_state::portf1_w));
-	map(0xf8, 0xf8).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf9, 0xf9).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf8, 0xf9).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// optional connection to a serial terminal @ 600 baud
-	//AM_RANGE(0xfa, 0xfa) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	//AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
+	//map(0xfa, 0xfb).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */

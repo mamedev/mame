@@ -4,11 +4,7 @@
 
  Motorola 68328 ("DragonBall") System-on-a-Chip implementation
 
- By Ryan Holtz
-
- **********************************************************************/
-
-/*****************************************************************************************************************
+***********************************************************************
 
                                                              P P P P P P P   P P P P P P P
                                                              E E E E E E E   J J J J J J J
@@ -95,33 +91,39 @@
 class mc68328_device : public device_t
 {
 public:
+	template <typename T>
+	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: mc68328_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
+
 	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
-	template <class Object> devcb_base &set_out_port_a_callback(Object &&cb) { return m_out_port_a_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_port_b_callback(Object &&cb) { return m_out_port_b_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_port_c_callback(Object &&cb) { return m_out_port_c_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_port_d_callback(Object &&cb) { return m_out_port_d_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_port_e_callback(Object &&cb) { return m_out_port_e_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_port_f_callback(Object &&cb) { return m_out_port_f_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_port_g_callback(Object &&cb) { return m_out_port_g_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_port_j_callback(Object &&cb) { return m_out_port_j_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_port_k_callback(Object &&cb) { return m_out_port_k_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_port_m_callback(Object &&cb) { return m_out_port_m_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_a_callback(Object &&cb) { return m_in_port_a_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_b_callback(Object &&cb) { return m_in_port_b_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_c_callback(Object &&cb) { return m_in_port_c_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_d_callback(Object &&cb) { return m_in_port_d_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_e_callback(Object &&cb) { return m_in_port_e_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_f_callback(Object &&cb) { return m_in_port_f_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_g_callback(Object &&cb) { return m_in_port_g_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_j_callback(Object &&cb) { return m_in_port_j_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_k_callback(Object &&cb) { return m_in_port_k_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_port_m_callback(Object &&cb) { return m_in_port_m_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_pwm_callback(Object &&cb) { return m_out_pwm_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_spim_callback(Object &&cb) { return m_out_spim_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_spim_callback(Object &&cb) { return m_in_spim_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_spim_xch_trigger_callback(Object &&cb) { return m_spim_xch_trigger_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_port_a() { return m_out_port_a_cb.bind(); }
+	auto out_port_b() { return m_out_port_b_cb.bind(); }
+	auto out_port_c() { return m_out_port_c_cb.bind(); }
+	auto out_port_d() { return m_out_port_d_cb.bind(); }
+	auto out_port_e() { return m_out_port_e_cb.bind(); }
+	auto out_port_f() { return m_out_port_f_cb.bind(); }
+	auto out_port_g() { return m_out_port_g_cb.bind(); }
+	auto out_port_j() { return m_out_port_j_cb.bind(); }
+	auto out_port_k() { return m_out_port_k_cb.bind(); }
+	auto out_port_m() { return m_out_port_m_cb.bind(); }
+	auto in_port_a() { return m_in_port_a_cb.bind(); }
+	auto in_port_b() { return m_in_port_b_cb.bind(); }
+	auto in_port_c() { return m_in_port_c_cb.bind(); }
+	auto in_port_d() { return m_in_port_d_cb.bind(); }
+	auto in_port_e() { return m_in_port_e_cb.bind(); }
+	auto in_port_f() { return m_in_port_f_cb.bind(); }
+	auto in_port_g() { return m_in_port_g_cb.bind(); }
+	auto in_port_j() { return m_in_port_j_cb.bind(); }
+	auto in_port_k() { return m_in_port_k_cb.bind(); }
+	auto in_port_m() { return m_in_port_m_cb.bind(); }
+	auto out_pwm() { return m_out_pwm_cb.bind(); }
+	auto out_spim() { return m_out_spim_cb.bind(); }
+	auto in_spim() { return m_in_spim_cb.bind(); }
+	auto spim_xch_trigger() { return m_spim_xch_trigger_cb.bind(); }
 
 
 	DECLARE_WRITE16_MEMBER(write);
@@ -384,81 +386,5 @@ private:
 
 
 DECLARE_DEVICE_TYPE(MC68328, mc68328_device)
-
-#define MCFG_MC68328_CPU(_tag) \
-	downcast<mc68328_device &>(*device).set_cpu_tag(_tag);
-
-#define MCFG_MC68328_OUT_PORT_A_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_a_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_B_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_b_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_C_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_c_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_D_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_d_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_E_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_e_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_F_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_f_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_G_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_g_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_J_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_j_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_K_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_k_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_M_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_port_m_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_A_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_a_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_B_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_b_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_C_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_c_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_D_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_d_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_E_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_e_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_F_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_f_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_G_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_g_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_J_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_j_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_K_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_k_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_M_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_port_m_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PWM_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_pwm_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_SPIM_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_out_spim_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_SPIM_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_in_spim_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_SPIM_XCH_TRIGGER_CB(_devcb) \
-	downcast<mc68328_device &>(*device).set_spim_xch_trigger_callback(DEVCB_##_devcb);
-
 
 #endif // MAME_MACHINE_MC68328_H

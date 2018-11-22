@@ -11,11 +11,13 @@
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
+#include "sound/huc6230.h"
 #include "video/huc6261.h"
 #include "video/huc6270.h"
 #include "video/huc6271.h"
 #include "video/huc6272.h"
 #include "screen.h"
+#include "speaker.h"
 
 class pcfx_state : public driver_device
 {
@@ -189,7 +191,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 void pcfx_state::pcfx_io(address_map &map)
 {
 	map(0x00000000, 0x000000FF).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
-	map(0x00000100, 0x000001FF).noprw();   /* HuC6230 */
+	map(0x00000100, 0x000001FF).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
 	map(0x00000200, 0x000002FF).m("huc6271", FUNC(huc6271_device::regs)).umask32(0x0000ffff);   /* HuC6271 */
 	map(0x00000300, 0x000003FF).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
 	map(0x00000400, 0x000004FF).rw("huc6270_a", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-A */
@@ -444,6 +446,17 @@ MACHINE_CONFIG_START(pcfx_state::pcfx)
 	MCFG_DEVICE_ADD( "huc6271", HUC6271, XTAL(21'477'272) )
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "pcfx")
+
+	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	huc6230_device &huc6230(HuC6230(config, "huc6230", XTAL(21'477'272)));
+	huc6230.adpcm_update_cb<0>().set("huc6272", FUNC(huc6272_device::adpcm_update_0));
+	huc6230.adpcm_update_cb<1>().set("huc6272", FUNC(huc6272_device::adpcm_update_1));
+	huc6230.cdda_cb().set("huc6272", FUNC(huc6272_device::cdda_update));
+	huc6230.add_route(0, "lspeaker", 1.0);
+	huc6230.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

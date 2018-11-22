@@ -209,18 +209,6 @@
 
 /*************************************
  *
- *  Prototypes
- *
- *************************************/
-
-
-
-
-
-
-
-/*************************************
- *
  *  PIA1 - Main CPU
  *
  *************************************/
@@ -526,7 +514,7 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	MCFG_DEVICE_ADD("audiocpu", M6802, 3000000)
 	MCFG_DEVICE_PROGRAM_MAP(spiders_audio_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -535,13 +523,12 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(spiders_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic60", ttl74123_device, a_w))
-
-	/* 74LS123 */
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(spiders_state::crtc_update_row), this);
+	crtc.out_de_callback().set("ic60", FUNC(ttl74123_device::a_w));
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
@@ -571,12 +558,12 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	m_pia[3]->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
 	ttl74123_device &ic60(TTL74123(config, "ic60", 0));
-	ic60.set_connection_type(TTL74123_GROUNDED);	/* the hook up type */
-	ic60.set_resistor_value(RES_K(22));				/* resistor connected to RCext */
-	ic60.set_capacitor_value(CAP_U(0.01));			/* capacitor connected to Cext and RCext */
-	ic60.set_a_pin_value(1);						/* A pin - driven by the CRTC */
-	ic60.set_b_pin_value(1);						/* B pin - pulled high */
-	ic60.set_clear_pin_value(1);					/* Clear pin - pulled high */
+	ic60.set_connection_type(TTL74123_GROUNDED);    /* the hook up type */
+	ic60.set_resistor_value(RES_K(22));             /* resistor connected to RCext */
+	ic60.set_capacitor_value(CAP_U(0.01));          /* capacitor connected to Cext and RCext */
+	ic60.set_a_pin_value(1);                        /* A pin - driven by the CRTC */
+	ic60.set_b_pin_value(1);                        /* B pin - pulled high */
+	ic60.set_clear_pin_value(1);                    /* Clear pin - pulled high */
 	ic60.out_cb().set(FUNC(spiders_state::ic60_74123_output_changed));
 
 	/* audio hardware */

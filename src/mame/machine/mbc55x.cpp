@@ -38,51 +38,54 @@ static int instruction_hook(device_t &device, offs_t curpc);
 //static void fdc_reset(running_machine &machine);
 //static void set_disk_int(running_machine &machine, int state);
 
+READ8_MEMBER(mbc55x_state::iodecode_r)
+{
+	return m_iodecode->read8(space, offset >> 1);
+}
+
+WRITE8_MEMBER(mbc55x_state::iodecode_w)
+{
+	m_iodecode->write8(space, offset >> 1, data);
+}
+
 /* 8255 Configuration */
 
-READ8_MEMBER( mbc55x_state::ppi8255_r )
-{
-	return m_ppi->read(space, offset>>1);
-}
-
-WRITE8_MEMBER( mbc55x_state::ppi8255_w )
-{
-	m_ppi->write(space, offset>>1, data);
-}
-
-READ8_MEMBER( mbc55x_state::mbc55x_ppi_porta_r )
+READ8_MEMBER(mbc55x_state::game_io_r)
 {
 	return 0xff;
 }
 
-READ8_MEMBER( mbc55x_state::mbc55x_ppi_portb_r )
-{
-	return 0xff;
-}
-
-READ8_MEMBER( mbc55x_state::mbc55x_ppi_portc_r )
-{
-	return 0xff;
-}
-
-WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_porta_w )
+WRITE8_MEMBER(mbc55x_state::game_io_w)
 {
 }
 
-WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portb_w )
+READ8_MEMBER( mbc55x_state::printer_status_r)
 {
+	return m_printer_status;
 }
 
-WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portc_w )
+WRITE8_MEMBER(mbc55x_state::printer_data_w)
+{
+	m_printer->write_data7(!BIT(data, 7));
+	m_printer->write_data6(!BIT(data, 6));
+	m_printer->write_data5(!BIT(data, 5));
+	m_printer->write_data4(!BIT(data, 4));
+	m_printer->write_data3(!BIT(data, 3));
+	m_printer->write_data2(!BIT(data, 2));
+	m_printer->write_data1(!BIT(data, 1));
+	m_printer->write_data0(!BIT(data, 0));
+}
+
+WRITE8_MEMBER(mbc55x_state::disk_select_w)
 {
 	floppy_image_device *floppy = nullptr;
 
 	switch (data & 0x03)
 	{
-	case 0: floppy = m_floppy0->get_device(); break;
-	case 1: floppy = m_floppy1->get_device(); break;
-	case 2: floppy = m_floppy2->get_device(); break;
-	case 3: floppy = m_floppy3->get_device(); break;
+	case 0: floppy = m_floppy[0]->get_device(); break;
+	case 1: floppy = m_floppy[1]->get_device(); break;
+	case 2: floppy = m_floppy[2]->get_device(); break;
+	case 3: floppy = m_floppy[3]->get_device(); break;
 	}
 
 	m_fdc->set_floppy(floppy);
@@ -92,45 +95,23 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portc_w )
 		floppy->mon_w(0);
 		floppy->ss_w(BIT(data, 2));
 	}
+
+	m_printer->write_strobe(!BIT(data, 3));
 }
 
-/* Serial port USART, unimplemented as yet */
-
-READ8_MEMBER( mbc55x_state::mbc55x_usart_r )
+WRITE_LINE_MEMBER(mbc55x_state::printer_busy_w)
 {
-	return 0;
+	m_printer_status = (m_printer_status & 0xef) | (state ? 0x10 : 0x00);
 }
 
-WRITE8_MEMBER( mbc55x_state::mbc55x_usart_w )
+WRITE_LINE_MEMBER(mbc55x_state::printer_paper_end_w)
 {
+	m_printer_status = (m_printer_status & 0xdf) | (state ? 0x20 : 0x00);
 }
 
-/* PIC 8259 Configuration */
-
-READ8_MEMBER(mbc55x_state::mbcpic8259_r)
+WRITE_LINE_MEMBER(mbc55x_state::printer_select_w)
 {
-	return m_pic->read(space, offset>>1);
-}
-
-WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
-{
-	m_pic->write(space, offset>>1, data);
-}
-
-READ8_MEMBER(mbc55x_state::mbcpit8253_r)
-{
-	return m_pit->read(space, offset >> 1);
-}
-
-WRITE8_MEMBER(mbc55x_state::mbcpit8253_w)
-{
-	m_pit->write(space, offset >> 1, data);
-}
-
-WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )
-{
-	m_kb_uart->write_txc(state);
-	m_kb_uart->write_rxc(state);
+	m_printer_status = (m_printer_status & 0xbf) | (state ? 0x40 : 0x00);
 }
 
 /* Video ram page register */
@@ -145,16 +126,6 @@ WRITE8_MEMBER( mbc55x_state::vram_page_w )
 	logerror("%s : set vram page to %02X\n", machine().describe_context(),data);
 
 	m_vram_page=data;
-}
-
-READ8_MEMBER(mbc55x_state::mbc55x_disk_r)
-{
-	return m_fdc->read(offset>>1);
-}
-
-WRITE8_MEMBER(mbc55x_state::mbc55x_disk_w)
-{
-	m_fdc->write(offset>>1, data);
 }
 
 
@@ -195,9 +166,9 @@ void mbc55x_state::scan_keyboard()
 		{ '9',  '0', '-', '=',  '\\', 'q',  'w',  'e' },
 		{ 'r',  't', 'y', 'u',  'i',  'o',  'p',  '[' },
 		{ ']',  'a', 's', 'd',  'f',  'g',  'h',  'j' },
-		{ 'k',  'l', ';', '\'', '`',  0x0D,  'z',  'x' },
+		{ 'k',  'l', ';', '\'', '`',  0x0d,  'z',  'x' },
 		{ 'c',  'v', 'b', 'n',  'm',  ',',  '.',  '/', },
-		{ ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' ', }
+		{ ' ', 0x08, ' ', ' ',  ' ',  ' ',  ' ',  ' ', }
 
 	};
 
@@ -209,7 +180,7 @@ void mbc55x_state::scan_keyboard()
 		{ '}',  'A', 'S', 'D',  'F',  'G',  'H',  'J' },
 		{ 'K',  'L', ':', '"',  '~',  0x0d, 'Z',  'X' },
 		{ 'C',  'V', 'B', 'N',  'M',  ',',  '?',  '/' },
-		{ ' ',  ' ', ' ', ' ',  ' ',  ' ',  ' ',  ' ' }
+		{ ' ', 0x08, ' ', ' ',  ' ',  ' ',  ' ',  ' ' }
 	};
 
 	// First read shift, control and graph
@@ -246,33 +217,21 @@ TIMER_CALLBACK_MEMBER(mbc55x_state::keyscan_callback)
 READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
 {
 	uint8_t result = 0;
-	offset>>=1;
 
 	switch (offset)
 	{
 		case 0: //logerror("%s read kb_uart\n",machine().describe_context());
-			result = m_kb_uart->data_r(space,0);
+			result = m_kb_uart->data_r();
 			break;
 
 		case 1:
-			result = m_kb_uart->status_r(space,0);
+			result = m_kb_uart->status_r();
 			if (m_keyboard.key_special & KEY_BIT_CTRL)  // Parity error used to flag control down
 				result |= i8251_device::I8251_STATUS_PARITY_ERROR;
 			break;
 	}
 
 	return result;
-}
-
-WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
-{
-	offset>>=1;
-
-	switch (offset)
-	{
-		case 0  : m_kb_uart->data_w(space, 0, data); break;
-		case 1  : m_kb_uart->control_w(space, 0, data); break;
-	}
 }
 
 void mbc55x_state::set_ram_size()
@@ -346,8 +305,12 @@ void mbc55x_state::machine_start()
 
 	m_debug_machine=DEBUG_NONE;
 
+	m_printer_status = 0xff;
+
 	// Allocate keyscan timer
 	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mbc55x_state::keyscan_callback),this));
+
+	m_kb_uart->write_cts(0);
 }
 
 

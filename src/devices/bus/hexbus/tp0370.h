@@ -28,9 +28,10 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	template <class Object> static devcb_base &set_ibc_int_callback(device_t &device, Object &&cb) { return downcast<ibc_device &>(device).m_int.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_hexbus_wr_callback(device_t &device, Object &&cb) { return downcast<ibc_device &>(device).m_hexout.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_hsklatch_wr_callback(device_t &device, Object &&cb) { return downcast<ibc_device &>(device).m_latch.set_callback(std::forward<Object>(cb)); }
+	// Callbacks
+	auto int_cb() { return m_int.bind(); }
+	auto hexbus_cb() { return m_hexout.bind(); }
+	auto hsklatch_cb() { return m_latch.bind(); }
 
 	// INT line
 	devcb_write_line m_int;
@@ -67,20 +68,6 @@ private:
 };
 
 }   }
-
-
-/*
-    Links to outside
-*/
-
-#define MCFG_IBC_HEXBUS_OUT_CALLBACK(_write) \
-	ibc_device::set_hexbus_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_IBC_HSKLATCH_CALLBACK(_write) \
-	ibc_device::set_hsklatch_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_IBC_INT_CALLBACK(_write) \
-	ibc_device::set_ibc_int_callback(*device, DEVCB_##_write);
 
 DECLARE_DEVICE_TYPE_NS(IBC, bus::hexbus, ibc_device)
 #endif

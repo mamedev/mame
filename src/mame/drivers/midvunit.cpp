@@ -1069,12 +1069,12 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 	MCFG_DEVICE_ADD("maincpu", TMS32031, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(midvunit_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_ADD_NONE("timer0")
 	MCFG_TIMER_ADD_NONE("timer1")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)

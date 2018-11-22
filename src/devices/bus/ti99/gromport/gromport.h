@@ -28,6 +28,16 @@ class cartridge_connector_device;
 class gromport_device : public device_t, public device_slot_interface
 {
 public:
+	template <typename U>
+	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: gromport_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
@@ -38,31 +48,28 @@ public:
 	void set_gromlines(line_state mline, line_state moline, line_state gsq);
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
-	void set_mask(int mask) { m_mask = mask; }
-
-	template <class Object> devcb_base &set_ready_callback(Object &&cb)  { return m_console_ready.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_reset_callback(Object &&cb) { return m_console_reset.set_callback(std::forward<Object>(cb)); }
-
 	void    cartridge_inserted();
 	bool    is_grom_idle();
 
 	auto ready_cb() { return m_console_ready.bind(); }
 	auto reset_cb() { return m_console_reset.bind(); }
-	void configure_slot(bool for998);
+
+	// Configure for 16K ROM space (TI-99/8 only)
+	gromport_device& extend() { m_mask = 0x3fff; return *this; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_config_complete() override;
-	virtual ioport_constructor device_input_ports() const override;
+	void device_start() override;
+	void device_reset() override;
+	void device_config_complete() override;
+	ioport_constructor device_input_ports() const override;
 
 private:
 	cartridge_connector_device*    m_connector;
 	bool                m_reset_on_insert;
 	devcb_write_line   m_console_ready;
 	devcb_write_line   m_console_reset;
-	int             m_mask;
 	int m_romgq;
+	int m_mask;
 };
 
 class cartridge_connector_device : public device_t
@@ -97,5 +104,8 @@ protected:
 } } } // end namespace bus::ti99::gromport
 
 DECLARE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device)
+
+void ti99_gromport_options(device_slot_interface &device);
+void ti99_gromport_options_998(device_slot_interface &device);
 
 #endif // MAME_BUS_TI99_GROMPORT_GROMPORT_H

@@ -524,12 +524,12 @@ public:
 	const subdevice_list &subdevices() const { return m_subdevices; }
 
 	// device-relative tag lookups
-	std::string subtag(const char *tag) const;
-	std::string siblingtag(const char *tag) const { return (m_owner != nullptr) ? m_owner->subtag(tag) : std::string(tag); }
-	memory_region *memregion(const char *tag) const;
-	memory_share *memshare(const char *tag) const;
-	memory_bank *membank(const char *tag) const;
-	ioport_port *ioport(const char *tag) const;
+	std::string subtag(std::string tag) const;
+	std::string siblingtag(std::string tag) const { return (m_owner != nullptr) ? m_owner->subtag(tag) : tag; }
+	memory_region *memregion(std::string tag) const;
+	memory_share *memshare(std::string tag) const;
+	memory_bank *membank(std::string tag) const;
+	ioport_port *ioport(std::string tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
 	template<class DeviceClass> DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }

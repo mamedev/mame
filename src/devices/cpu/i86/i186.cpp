@@ -1777,6 +1777,10 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 				while(m_dma[which].control & ST_STOP)
 					drq_callback(which);
 			}
+			if((m_dma[which].control & ST_STOP) == ST_STOP && (m_dma[which].control & SYNC_MASK) != 0)
+			{
+				if (m_dma[which].drq_state) drq_callback(which);
+			}
 			break;
 
 		case 0x7f:

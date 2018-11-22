@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -599,9 +599,9 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sengokmj_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, sengokmj_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, sengokmj_state, layer_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(sengokmj_state::layer_en_w));
+	crtc.layer_scroll_callback().set(FUNC(sengokmj_state::layer_scroll_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sengokmj)
 	MCFG_PALETTE_ADD("palette", 0x800)

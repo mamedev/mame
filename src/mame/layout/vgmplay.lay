@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <mamelayout version="2">
 	<!--
 	Activity LEDs:
@@ -69,13 +69,13 @@
 	<element name="act_label_ymf271"><text string="YMF271" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_ymz280b"><text string="YMZ280B" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_rf5c164"><text string="RF5C164" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="act_label_pwm"><text string="32X PWM" align="1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="act_label_pwm"><text string="32X PWM" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_ay8910"><text string="AY-3-8910" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_gameboy"><text string="Game Boy™" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_nesapu"><text string="NES™ APU" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_multipcm"><text string="YMW-258-F" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_upd7759"><text string="uPD7759" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="act_label_okim6258"><text string="M6258" align="1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="act_label_okim6258"><text string="M6258" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_okim6295"><text string="M6295" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_k051649"><text string="K051649" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_k054539"><text string="K054539" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -84,7 +84,7 @@
 	<element name="act_label_k053260"><text string="K053260" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_pokey"><text string="POKEY" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_qsound"><text string="QSound™" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="act_label_scsp"><text string="SCSP" align="1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="act_label_scsp"><text string="SCSP" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_wswan"><text string="WonderSwan" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_vsu_vue"><text string="VSU-VUE" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_saa1099"><text string="SAA1099" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>

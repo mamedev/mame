@@ -321,13 +321,13 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	MCFG_SCREEN_UPDATE_DRIVER(konendev_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gcu", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, konendev_state, gcu_interrupt))
+	K057714(config, m_gcu, 0);
+	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("nvram0")
-	MCFG_NVRAM_ADD_0FILL("nvram1")
+	NVRAM(config, "nvram0", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

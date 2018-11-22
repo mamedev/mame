@@ -880,7 +880,7 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
 	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
+	MCFG_DEVICE_ADD(m_duart, SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, dectalk_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, dectalk_state, duart_txa))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
@@ -909,8 +909,8 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
 MACHINE_CONFIG_END
 
 

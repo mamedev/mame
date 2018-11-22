@@ -65,6 +65,30 @@
 		</part>
 	</software>
 
+	<software name="mech">
+		<description>Intergraph Mechanical Software</description>
+		<year>1997</year>
+		<publisher>Intergraph</publisher>
+
+		<info name="date" value="17-AUG-1997"/>
+
+		<!-- MDEM Software #17-AUG-1997#081797#FMDA0320N (disc label: MMDA6680B) -->
+		<part name="disc1" interface="cdrom">
+			<feature name="part_id" value="MDEM Software" />
+			<diskarea name="cdrom">
+				<disk name="mech_081797_1" sha1="a03f9a9b08d6220b49f1be8a50a2032323f69fb8" writeable="no" />
+			</diskarea>
+		</part>
+
+		<!-- MDEM Disc II#17-AUG-1997#081797#FMDA0310J (disc label: MMDA67107) -->
+		<part name="disc2" interface="cdrom">
+			<feature name="part_id" value="MDEM Disc II" />
+			<diskarea name="cdrom">
+				<disk name="mech_081797_2" sha1="a269113a742c8dbf081855bcf2135b70c42738ef" writeable="no" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!--
 	The REBUILD product allows a set of system rebuild floppy disks to be
 	created from source binary data. When using the software, the user is
@@ -192,6 +216,29 @@
 			<feature name="compatibility" value="6000,6040"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="60x0_root4.img" size="1474560" offset="0" crc="27764477" sha1="be89a8ba99aebe99b0bddc914b62c0ac106b56cc" />
+			</dataarea>
+		</part>
+
+		<!-- rebuild root floppies for 6400 and 6450 systems -->
+		<part name="6450_root2" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #2/4" />
+			<feature name="compatibility" value="6400,6450"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="6450_root2.img" size="1474560" offset="0" crc="33bb336f" sha1="74a05fb7b7f615f0e2b3186da34bd32d7e3d0880" />
+			</dataarea>
+		</part>
+		<part name="6450_root3" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #3/4" />
+			<feature name="compatibility" value="6400,6450"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="6450_root3.img" size="1474560" offset="0" crc="7a9d0379" sha1="fc1623163b6a18ba840c43cfba5ca41a72deeb80" />
+			</dataarea>
+		</part>
+		<part name="6450_root4" interface="floppy_3_5">
+			<feature name="part_id" value="Rebuild Floppy #4/4" />
+			<feature name="compatibility" value="6400,6450"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="6450_root4.img" size="1474560" offset="0" crc="224cfb96" sha1="19edcc1a796eee9fdc4ec02e503ce46664c26a29" />
 			</dataarea>
 		</part>
 

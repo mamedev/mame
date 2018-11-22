@@ -655,19 +655,19 @@ MACHINE_CONFIG_START(mvme147_state::mvme147)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD("vme", 1, mvme147_vme_cards, nullptr)
 
-	MCFG_DEVICE_ADD("m48t18", M48T02, 0) /* t08 differs only in accepted voltage levels compared to t18 */
+	M48T02(config, "m48t18", 0); /* t08 differs only in accepted voltage levels compared to t18 */
 
 	/* Terminal Port config */
-	MCFG_DEVICE_ADD("scc", SCC85C30, SCC_CLOCK)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232trm", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232trm", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232trm", rs232_port_device, write_rts))
+	SCC85C30(config, m_sccterm, SCC_CLOCK);
+	m_sccterm->out_txda_callback().set("rs232trm", FUNC(rs232_port_device::write_txd));
+	m_sccterm->out_dtra_callback().set("rs232trm", FUNC(rs232_port_device::write_dtr));
+	m_sccterm->out_rtsa_callback().set("rs232trm", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc85c30_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc85c30_device, ctsa_w))
+	rs232_port_device &rs232trm(RS232_PORT(config, "rs232trm", default_rs232_devices, "terminal"));
+	rs232trm.rxd_handler().set(m_sccterm, FUNC(scc85c30_device::rxa_w));
+	rs232trm.cts_handler().set(m_sccterm, FUNC(scc85c30_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("scc2", SCC85C30, SCC_CLOCK)
+	SCC85C30(config, m_sccterm2, SCC_CLOCK);
 MACHINE_CONFIG_END
 
 /* ROM definitions */

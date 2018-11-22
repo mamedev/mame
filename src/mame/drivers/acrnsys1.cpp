@@ -276,10 +276,10 @@ MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("b1", INS8154, 0)
-	MCFG_INS8154_IN_A_CB(READ8(*this, acrnsys1_state, ins8154_b1_port_a_r))
-	MCFG_INS8154_OUT_A_CB(WRITE8(*this, acrnsys1_state, ins8154_b1_port_a_w))
-	MCFG_INS8154_OUT_B_CB(WRITE8(*this, acrnsys1_state, acrnsys1_led_segment_w))
+	ins8154_device &b1(INS8154(config, "b1"));
+	b1.in_a().set(FUNC(acrnsys1_state::ins8154_b1_port_a_r));
+	b1.out_a().set(FUNC(acrnsys1_state::ins8154_b1_port_a_w));
+	b1.out_b().set(FUNC(acrnsys1_state::acrnsys1_led_segment_w));
 
 	TTL74145(config, m_ttl74145, 0);
 

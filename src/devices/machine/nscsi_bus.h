@@ -285,7 +285,7 @@ protected:
 	void scsi_data_in(int buf, int size);
 	void scsi_data_out(int buf, int size);
 
-	void sense(bool deferred, uint8_t key);
+	void sense(bool deferred, uint8_t key, uint8_t asc = 0, uint8_t ascq = 0);
 	int get_lun(int def = 0);
 	void bad_lun();
 
@@ -354,7 +354,7 @@ protected:
 	// Fast negation period (30ns)
 	virtual attotime scsi_fast_negation_period();
 
-	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[8];
+	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[18];
 	int scsi_cmdsize;
 	uint8_t scsi_identify;
 

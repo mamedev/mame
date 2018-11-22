@@ -198,14 +198,6 @@ void tceptor_state::mcu_map(address_map &map)
 }
 
 
-void tceptor_state::mcu_io_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(M6801_PORT1, M6801_PORT1).nopw();
-	map(M6801_PORT2, M6801_PORT2).nopw();
-}
-
-
 
 /*******************************************************************/
 
@@ -337,13 +329,12 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	MCFG_DEVICE_ADD("sub", M68000, XTAL(49'152'000)/4)
 	MCFG_DEVICE_PROGRAM_MAP(m68k_map)
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) // or compatible 6808 with extra instructions
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
+	HD63701(config, m_mcu, XTAL(49'152'000)/8); // or compatible 6808 with extra instructions
+	m_mcu->set_addrmap(AS_PROGRAM, &tceptor_state::mcu_map);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	adc0809_device &adc(ADC0809(config, "adc", 1000000)); // unknown clock (needs to >640khz or the wait loop is too fast)
 	adc.in_callback<0>().set_constant(0); // unknown
@@ -373,9 +364,7 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)

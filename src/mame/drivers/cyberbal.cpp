@@ -27,6 +27,7 @@
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
+#include "diexec.h"
 #include "speaker.h"
 
 #include "rendlay.h"
@@ -133,8 +134,8 @@ void cyberbal_state::main_map(address_map &map)
 	map(0xfe1000, 0xfe1fff).portr("IN1");
 	map(0xfe8000, 0xfe8fff).ram().w("rpalette", FUNC(palette_device::write16)).share("rpalette");
 	map(0xfec000, 0xfecfff).ram().w("lpalette", FUNC(palette_device::write16)).share("lpalette");
-	map(0xff0000, 0xff1fff).ram().w(m_playfield2_tilemap, FUNC(tilemap_device::write16)).share("playfield2");
-	map(0xff2000, 0xff2fff).ram().w(m_alpha2_tilemap, FUNC(tilemap_device::write16)).share("alpha2");
+	map(0xff0000, 0xff1fff).ram().w(m_playfield2, FUNC(tilemap_device::write16)).share("playfield2");
+	map(0xff2000, 0xff2fff).ram().w(m_alpha2, FUNC(tilemap_device::write16)).share("alpha2");
 	map(0xff3000, 0xff37ff).ram().share("mob2");
 	map(0xff3800, 0xff3fff).ram().share("ff3800");
 	map(0xff4000, 0xff5fff).ram().w("playfield", FUNC(tilemap_device::write16)).share("playfield");
@@ -161,8 +162,8 @@ void cyberbal_state::extra_map(address_map &map)
 	map(0xfe1000, 0xfe1fff).portr("IN1");
 	map(0xfe8000, 0xfe8fff).ram().w("rpalette", FUNC(palette_device::write16)).share("rpalette");
 	map(0xfec000, 0xfecfff).ram().w("lpalette", FUNC(palette_device::write16)).share("lpalette");
-	map(0xff0000, 0xff1fff).ram().w(m_playfield2_tilemap, FUNC(tilemap_device::write16)).share("playfield2");
-	map(0xff2000, 0xff2fff).ram().w(m_alpha2_tilemap, FUNC(tilemap_device::write16)).share("alpha2");
+	map(0xff0000, 0xff1fff).ram().w(m_playfield2, FUNC(tilemap_device::write16)).share("playfield2");
+	map(0xff2000, 0xff2fff).ram().w(m_alpha2, FUNC(tilemap_device::write16)).share("alpha2");
 	map(0xff3000, 0xff37ff).ram().share("mob2");
 	map(0xff3800, 0xff3fff).ram().share("ff3800");
 	map(0xff4000, 0xff5fff).ram().w("playfield", FUNC(tilemap_device::write16)).share("playfield");
@@ -392,92 +393,101 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cyberbal_state::cyberbal)
+MACHINE_CONFIG_START(cyberbal_state::cyberbal_base)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, ATARI_CLOCK_14MHz/4/4/16/16/14)
+	M6502(config, m_audiocpu, ATARI_CLOCK_14MHz/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cyberbal_state::sound_map);
+	m_audiocpu->set_periodic_int("soundcomm", FUNC(atari_sound_comm_device::sound_irq_gen), attotime::from_hz(ATARI_CLOCK_14MHz/4/4/16/16/14));
 
-	MCFG_DEVICE_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(extra_map)
+	M68000(config, m_extracpu, ATARI_CLOCK_14MHz/2);
+	m_extracpu->set_addrmap(AS_PROGRAM, &cyberbal_state::extra_map);
 
 	MCFG_DEVICE_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(sound_68k_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(cyberbal_state, sound_68k_irq_gen,  10000)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_interleaved)
+	GFXDECODE(config, m_gfxdecode, "lpalette", gfx_interleaved);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	PALETTE(config, "lpalette", 2048).set_format(PALETTE_FORMAT_IRRRRRGGGGGBBBBB);
+	PALETTE(config, "rpalette", 2048).set_format(PALETTE_FORMAT_IRRRRRGGGGGBBBBB);
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, cyberbal_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "lscreen", cyberbal_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	TILEMAP(config, m_playfield, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,64)
+		.set_info_callback(FUNC(cyberbal_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,32, 0)
+		.set_info_callback(FUNC(cyberbal_state::get_alpha_tile_info));
+	ATARI_MOTION_OBJECTS(config, m_mob, 0).set_screen("lscreen");
+	m_mob->set_config(cyberbal_state::s_mob_config);
+	m_mob->set_gfxdecode("gfxdecode");
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield2", "gfxdecode", 2, cyberbal_state, get_playfield2_tile_info, 16,8, SCAN_ROWS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha2", "gfxdecode", 2, cyberbal_state, get_alpha2_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob2", "rscreen", cyberbal_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	TILEMAP(config, m_playfield2, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,64)
+		.set_info_callback(FUNC(cyberbal_state::get_playfield2_tile_info));
+	TILEMAP(config, m_alpha2, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,32, 0)
+		.set_info_callback(FUNC(cyberbal_state::get_alpha2_tile_info));
+	ATARI_MOTION_OBJECTS(config, m_mob2, 0).set_screen("rscreen");
+	m_mob2->set_config(cyberbal_state::s_mob_config);
+	m_mob2->set_gfxdecode("gfxdecode");
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	m_lscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(cyberbal_state, screen_update_cyberbal_left)
-	MCFG_SCREEN_PALETTE("lpalette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cyberbal_state, video_int_write_line)) /* or is it "right?" */
+	m_lscreen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_lscreen->set_screen_update(FUNC(cyberbal_state::screen_update_cyberbal_left));
+	m_lscreen->set_palette("lpalette");
+	m_lscreen->screen_vblank().set(FUNC(cyberbal_state::video_int_write_line)); /* or is it "right?" har, har! */
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	m_rscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(cyberbal_state, screen_update_cyberbal_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	m_rscreen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240);
+	m_rscreen->set_screen_update(FUNC(cyberbal_state::screen_update_cyberbal_right));
+	m_rscreen->set_palette("rpalette");
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_1))
+	ATARI_SOUND_COMM(config, m_soundcomm, "audiocpu")
+		.int_callback().set_inputline("maincpu", M68K_IRQ_1);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, m_ymsnd, ATARI_CLOCK_14MHz/4);
+	m_ymsnd->irq_handler().set("soundcomm", FUNC(atari_sound_comm_device::ym2151_irq_gen));
+	m_ymsnd->add_route(0, "lspeaker", 0.60);
+	m_ymsnd->add_route(1, "rspeaker", 0.60);
 
-	MCFG_DEVICE_ADD("rdac", AM6012, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // AM6012.6j
-	MCFG_DEVICE_ADD("ldac", AM6012, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // AM6012.6j
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	AM6012(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // AM6012.6j
+	AM6012(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // AM6012.6j
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
 MACHINE_CONFIG_END
 
+void cyberbal_state::cyberbal(machine_config &config)
+{
+	cyberbal_base(config);
 
-MACHINE_CONFIG_START(cyberbal_state::cyberbalt)
-	cyberbal(config);
-	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
+}
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 116, true)
-MACHINE_CONFIG_END
+void cyberbal_state::cyberbalt(machine_config &config)
+{
+	cyberbal_base(config);
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
+	SLAPSTIC(config, "slapstic", 116, true);
+}
 
 MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 
@@ -485,20 +495,22 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(cyberbal2p_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyberbal)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, cyberbal2p_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, cyberbal2p_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", cyberbal2p_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	TILEMAP(config, m_playfield, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,64)
+		.set_info_callback(FUNC(cyberbal2p_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha, "gfxdecode", 2, 16,8, TILEMAP_SCAN_ROWS, 64,32, 0)
+		.set_info_callback(FUNC(cyberbal2p_state::get_alpha_tile_info));
+	ATARI_MOTION_OBJECTS(config, m_mob, 0).set_screen("screen");
+	m_mob->set_config(cyberbal2p_state::s_mob_config);
+	m_mob->set_gfxdecode("gfxdecode");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

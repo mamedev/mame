@@ -732,15 +732,15 @@ MACHINE_CONFIG_START(atom_state::atom)
 	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, atom_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, atom_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, atom_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, atom_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, INS8255_TAG));
+	ppi.out_pa_callback().set(FUNC(atom_state::ppi_pa_w));
+	ppi.in_pb_callback().set(FUNC(atom_state::ppi_pb_r));
+	ppi.in_pc_callback().set(FUNC(atom_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(atom_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8271_TAG, I8271 , 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, atom_state, atom_8271_interrupt_callback))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, atom_state, motor_w))
+	I8271(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(atom_state::atom_8271_interrupt_callback));
+	m_fdc->hdl_wr_callback().set(FUNC(atom_state::motor_w));
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
@@ -765,10 +765,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_GENERIC_LOAD(atom_state, cart_load)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,4K,6K,8K,10K,12K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("2K,4K,6K,8K,10K,12K").set_default_value(0x00);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("rom_list","atom_rom")
@@ -842,11 +839,11 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	via.irq_handler().set_inputline(SY6502_TAG, M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, atom_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, atom_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, atom_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, atom_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, INS8255_TAG));
+	ppi.out_pa_callback().set(FUNC(atom_state::ppi_pa_w));
+	ppi.in_pb_callback().set(FUNC(atom_state::ppi_pb_r));
+	ppi.in_pc_callback().set(FUNC(atom_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(atom_state::ppi_pc_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
@@ -860,10 +857,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_CASSETTE_INTERFACE("atom_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,12K")
-
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

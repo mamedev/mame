@@ -482,29 +482,40 @@ void snug_bwg_device::set_drive()
 {
 	LOGMASKED(LOG_CRU, "new DSEL = %d\n", m_DSEL);
 
-	if ((m_DSEL != 0) && (m_DSEL != 1) && (m_DSEL != 2) && (m_DSEL != 4) && (m_DSEL != 8))
+	int bits = m_DSEL & 0x0f;
+	int num = -1;
+
+	// If the selected floppy drive is not attached, remove that line
+	if (m_floppy[3] == nullptr) bits &= 0x07;  // 0111
+	if (m_floppy[2] == nullptr) bits &= 0x0b;  // 1011
+	if (m_floppy[1] == nullptr) bits &= 0x0d;  // 1101
+	if (m_floppy[0] == nullptr) bits &= 0x0e;  // 1110
+
+	if ((bits != 0) && (bits != 1) && (bits != 2) && (bits != 4) && (bits != 8))
 		LOGMASKED(LOG_WARN, "Warning - multiple drives selected\n");
 
 	// The schematics do not reveal any countermeasures against multiple selection
 	// so we assume that the highest value wins.
 
-	int bits = m_DSEL & 0x0f;
-	int i = -1;
-
-	while (bits != 0)
-	{
-		bits >>= 1;
-		i++;
-	}
-	if (i != -1)
-	{
-		m_current_floppy = m_floppy[i];
-		LOGMASKED(LOG_CRU, "Selected floppy %d\n", i);
-	}
-	else
+	if (bits==0)
 	{
 		m_current_floppy = nullptr;
 		LOGMASKED(LOG_CRU, "All drives deselected\n");
+	}
+	else
+	{
+		if ((bits & 0x08)!=0) num = 3;
+		else
+		{
+			if ((bits & 0x04)!=0) num = 2;
+			else
+			{
+				if ((bits & 0x02)!=0) num = 1;
+				else num = 0;
+			}
+		}
+		LOGMASKED(LOG_CRU, "Selected floppy DSK%d\n", num+1);
+		m_current_floppy = m_floppy[num];
 	}
 	m_wd1773->set_floppy(m_current_floppy);
 }
@@ -675,28 +686,21 @@ ROM_START( bwg_fdc )
 	ROM_LOAD("bwg_dsr.u15", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
 ROM_END
 
-MACHINE_CONFIG_START(snug_bwg_device::device_add_mconfig)
+void snug_bwg_device::device_add_mconfig(machine_config& config)
+{
 	WD1773(config, m_wd1773, 8_MHz_XTAL);
 	m_wd1773->intrq_wr_callback().set(FUNC(snug_bwg_device::fdc_irq_w));
 	m_wd1773->drq_wr_callback().set(FUNC(snug_bwg_device::fdc_drq_w));
 
-	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
-	MCFG_MM58274C_MODE24(1) // 24 hour
-	MCFG_MM58274C_DAY1(0)   // sunday
+	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 
-	MCFG_FLOPPY_DRIVE_ADD("0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("2", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "2", bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
 
-	MCFG_RAM_ADD(BUFFER)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+	RAM(config, BUFFER).set_default_size("2K").set_default_value(0);
+}
 
 ioport_constructor snug_bwg_device::device_input_ports() const
 {

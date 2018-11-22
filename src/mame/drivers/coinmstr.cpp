@@ -1284,16 +1284,17 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coinmstr)
 	MCFG_PALETTE_ADD("palette", 46*32*4)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 14000000 / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	h46505_device &crtc(H46505(config, "crtc", 14000000 / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coinmstr_state::quizmstr)
@@ -1325,7 +1326,7 @@ MACHINE_CONFIG_START(coinmstr_state::jpcoin)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(jpcoin_map)
 	MCFG_DEVICE_IO_MAP(jpcoin_io_map)
-//  MCFG_NVRAM_ADD_0FILL("attr_ram3")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 /*

@@ -305,7 +305,7 @@ void tms9995_device::device_start()
 	// save_item(NAME(m_first_cycle)); // only for log output
 }
 
-const char* tms9995_device::s_statename[20] =
+char const *const tms9995_device::s_statename[20] =
 {
 	"PC",  "WP",  "ST",  "IR",
 	"R0",  "R1",  "R2",  "R3",
@@ -384,7 +384,7 @@ void tms9995_device::state_export(const device_state_entry &entry)
 */
 void tms9995_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	static const char *statestr = "LAECOPX-----IIII";
+	static char const statestr[] = "LAECOPX-----IIII";
 	char flags[17];
 	memset(flags, 0x00, ARRAY_LENGTH(flags));
 	uint16_t val = 0x8000;

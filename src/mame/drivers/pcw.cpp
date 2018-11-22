@@ -1263,8 +1263,8 @@ MACHINE_CONFIG_START(pcw_state::pcw)
 	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pcw_state, pcw_fdc_interrupt))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set(FUNC(pcw_state::pcw_fdc_interrupt));
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
@@ -1272,8 +1272,7 @@ MACHINE_CONFIG_START(pcw_state::pcw)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, m_ram).set_default_size("256K");
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pcw_timer", pcw_state, pcw_timer_interrupt, attotime::from_hz(300))
 MACHINE_CONFIG_END
@@ -1303,8 +1302,7 @@ MACHINE_CONFIG_START(pcw_state::pcw8512)
 	config.set_default_layout(layout_pcw);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	m_ram->set_default_size("512K");
 MACHINE_CONFIG_END
 
 /* PCW9512, PCW9512+, PCW10 */
@@ -1314,8 +1312,7 @@ MACHINE_CONFIG_START(pcw_state::pcw9512)
 	MCFG_DEVICE_IO_MAP(pcw9512_io)
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	m_ram->set_default_size("512K");
 MACHINE_CONFIG_END
 
 

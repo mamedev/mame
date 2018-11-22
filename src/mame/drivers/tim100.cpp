@@ -51,7 +51,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<i8275_device> m_crtc;
+	required_device<i8276_device> m_crtc;
 };
 
 void tim100_state::tim100_mem(address_map &map)
@@ -59,12 +59,10 @@ void tim100_state::tim100_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom(); // 2764 at U16
 	map(0x2000, 0x27ff).ram().share("videoram"); // 2KB static ram CDM6116A at U15
-	map(0x6000, 0x6000).rw("uart_u17", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x6001, 0x6001).rw("uart_u17", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x8000, 0x8000).rw("uart_u18", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x8001, 0x8001).rw("uart_u18", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x6000, 0x6001).rw("uart_u17", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x8000, 0x8001).rw("uart_u18", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa000, 0xa000).nopw();   // continuously writes 00 here
-	map(0xc000, 0xc001).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)); // i8276
+	map(0xc000, 0xc001).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
 }
 
 void tim100_state::tim100_io(address_map &map)
@@ -170,7 +168,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8276_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(600, 352)
@@ -178,7 +176,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tim100 )
 
-	MCFG_DEVICE_ADD("crtc", I8275, XTAL(4'915'200))
+	MCFG_DEVICE_ADD("crtc", I8276, XTAL(4'915'200))
 	MCFG_I8275_CHARACTER_WIDTH(12)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(tim100_state, crtc_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, tim100_state, drq_w))

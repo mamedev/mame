@@ -12,6 +12,8 @@
       game bug or 6802 core bug or something else?
       This bug behaves slightly differently in the different sets, depending on whether
       nvram is cleared beforehand or not, and whether the last reset was soft or hard.
+      Proximate cause is smashing the stack, after which the RTS at 61DE (in bk2k_l4)
+      transfers to 0000 (where no valid code exists).
     - Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?
     - Advance button doesn't seem to work well (TODO: check if this may have been fixed with the irq and diagnostic button masking changes)
     - Jokerz has an entirely different "Pin Sound '88" stereo audio board (D-12338-567)
@@ -306,7 +308,7 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
 	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Add the soundcard */
 	MCFG_DEVICE_ADD("audiocpu", M6802, XTAL(4'000'000))
@@ -337,9 +339,9 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	SPEAKER(config, "bg").front_center();
-	MCFG_DEVICE_ADD("ym2151", YM2151, 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, s11b_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
+	YM2151(config, m_ym, 3580000);
+	m_ym->irq_handler().set(FUNC(s11b_state::ym2151_irq_w));
+	m_ym->add_route(ALL_OUTPUTS, "bg", 0.25);
 
 	MCFG_DEVICE_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
 

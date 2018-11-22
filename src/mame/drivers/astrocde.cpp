@@ -116,7 +116,6 @@
 #include "emu.h"
 #include "includes/astrocde.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/nvram.h"
@@ -1202,7 +1201,7 @@ MACHINE_CONFIG_START(astrocde_state::astrocade_16color_base)
 	/* basic machine hardware */
 	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&astrocde_state::bank4000_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x4000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1241,8 +1240,7 @@ MACHINE_CONFIG_START(astrocde_state::astrocade_stereo_sound)
 	MCFG_DEVICE_ADD("astrocade2", ASTROCADE_IO, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024B on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024B on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 MACHINE_CONFIG_END
 
 
@@ -1311,8 +1309,7 @@ MACHINE_CONFIG_START(ebases_state::ebases)
 	MCFG_DEVICE_MODIFY("astrocade1")
 	MCFG_ASTROCADE_IO_SO1_STROBE_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 MACHINE_CONFIG_END
 
 
@@ -1333,8 +1330,7 @@ MACHINE_CONFIG_START(astrocde_state::spacezap)
 	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<0>))
 	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE(*this, astrocde_state, coin_counter_w<1>))
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(astrocde_state::wow)
@@ -1400,8 +1396,7 @@ MACHINE_CONFIG_START(astrocde_state::gorf)
 	lamplatch.q_out_cb<6>().set_nop(); // n/c
 	lamplatch.q_out_cb<7>().set_output("lamp7");
 
-	MCFG_WATCHDOG_ADD("watchdog") // MC14024 on CPU board at U18
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128) // CLK = VERTDR, Q7 used for RESET
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // MC14024 on CPU board at U18, CLK = VERTDR, Q7 used for RESET
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1436,7 +1431,7 @@ MACHINE_CONFIG_START(astrocde_state::robby)
 	MCFG_DEVICE_PROGRAM_MAP(robby_map)
 	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // HM6116LP-4 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + battery
 
 	cd4099_device &outlatch(CD4099(config, "outlatch")); // on game board at U1
 	outlatch.q_out_cb<0>().set(FUNC(astrocde_state::coin_counter_w<0>));
@@ -1513,23 +1508,23 @@ MACHINE_CONFIG_START(tenpindx_state::tenpindx)
 	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
 	MCFG_DEVICE_IO_MAP(port_map_16col_pattern_tenpindx)
 
-	MCFG_DEVICE_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
-	MCFG_Z80_DAISY_CHAIN(tenpin_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_IO_MAP(sub_io_map)
+	Z80(config, m_subcpu, ASTROCADE_CLOCK/4); /* real clock unknown */
+	m_subcpu->set_daisy_config(tenpin_daisy_chain);
+	m_subcpu->set_addrmap(AS_PROGRAM, &tenpindx_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &tenpindx_state::sub_io_map);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, ASTROCADE_CLOCK/4 /* same as "sub" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", ASTROCADE_CLOCK/4 /* same as "sub" */));
+	ctc.intr_callback().set_inputline(m_subcpu, INPUT_LINE_IRQ0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)  /* real clock unknown */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DIPSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8912_device &aysnd(AY8912(config, "aysnd", ASTROCADE_CLOCK/4));  /* real clock unknown */
+	aysnd.port_a_read_callback().set_ioport("DIPSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 

@@ -5,18 +5,24 @@
     Sega Zaxxon hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_ZAXXON_H
+#define MAME_INCLUDES_ZAXXON_H
+
+#pragma once
 
 #include "machine/74259.h"
+#include "machine/i8255.h"
 #include "sound/samples.h"
 #include "emupal.h"
 
 class zaxxon_state : public driver_device
 {
 public:
-	zaxxon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	zaxxon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainlatch(*this, "mainlatch%u", 1),
+		m_ppi(*this, "ppi8255"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -24,7 +30,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	void root(machine_config &config);
 	void ixion(machine_config &config);
@@ -48,6 +55,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<ls259_device, 2> m_mainlatch;
+	optional_device<i8255_device> m_ppi;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -128,3 +136,4 @@ private:
 	void zaxxon_map(address_map &map);
 };
 
+#endif // MAME_INCLUDES_ZAXXON_H

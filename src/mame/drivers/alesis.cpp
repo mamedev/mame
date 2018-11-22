@@ -72,7 +72,7 @@ WRITE8_MEMBER( alesis_state::p3_w )
 
 WRITE8_MEMBER( alesis_state::sr16_lcd_w )
 {
-	m_lcdc->write(space, BIT(m_kb_matrix,7), data);
+	m_lcdc->write(BIT(m_kb_matrix,7), data);
 }
 
 WRITE8_MEMBER( alesis_state::mmt8_led_w )
@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	/* sound hardware */
 	MCFG_ALESIS_DM3AG_ADD("dm3ag", 12_MHz_XTAL/2)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alesis_state::sr16)

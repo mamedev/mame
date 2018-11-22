@@ -255,7 +255,7 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			if (!BIT(sel, b))
 			{
 				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
-				m_baudgen_timer->adjust(attotime::from_hz(XTAL(23'814'000) / 3.5 / divisor), !param);
+				m_baudgen_timer->adjust(attotime::from_hz(23.814_MHz_XTAL / 3.5 / divisor), !param);
 				break;
 			}
 		}
@@ -272,7 +272,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		return 0;
 	}
 
-	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
+	const u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
 	ioport_value videoctrl = m_video_control->read();
 
 	rectangle curs;
@@ -896,7 +896,7 @@ void tv912_state::tv912(machine_config &config)
 
 	TMS9927(config, m_crtc, 23.814_MHz_XTAL / CHAR_WIDTH);
 	m_crtc->set_char_width(CHAR_WIDTH);
-	m_crtc->vsyn_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_crtc->vsyn_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc->set_screen("screen");
 
 	AY51013(config, m_uart);

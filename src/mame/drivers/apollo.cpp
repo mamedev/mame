@@ -8,8 +8,7 @@
  *
  *  Adapted February 19, 2012 for general MAME/MESS standards by R. Belmont
  *
- *  TODO: use MESS ram device and MCFG_RAM_* to handle RAM sizing.
- *        Remove need for instruction hook.
+ *  TODO: Remove need for instruction hook.
  *        Convert to modern address map.
  *
  *  see also:
@@ -700,7 +699,7 @@ void apollo_state::dn3500_map(address_map &map)
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
 		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM /* 8MB RAM */
-		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 		map(0x05d800, 0x05dc07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
 		map(0xfa0000, 0xfdffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
@@ -741,7 +740,7 @@ void apollo_state::dsp3500_map(address_map &map)
 
 		map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
 
-		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
@@ -772,7 +771,7 @@ void apollo_state::dn3000_map(address_map &map)
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
 		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
-		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 		map(0x05d800, 0x05dc07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
 		map(0xfa0000, 0xfdffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
@@ -806,7 +805,7 @@ void apollo_state::dsp3000_map(address_map &map)
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
 		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
-		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 }
 
@@ -842,7 +841,7 @@ void apollo_state::dn5500_map(address_map &map)
 
 	// FIXME: must match with RAM size in driver/apollo_sio.c
 	// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  /* 8MB RAM */
-	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 	map(0x05d800, 0x05dc07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
 	map(0xfa0000, 0xfdffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
@@ -888,7 +887,7 @@ void apollo_state::dsp5500_map(address_map &map)
 	map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 	// FIXME: must match with RAM size in driver/apollo_sio.c
-	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 	map(0x07000000, 0x0700FFFF).rw(FUNC(apollo_state::dn5500_io_protection_map_r), FUNC(apollo_state::dn5500_io_protection_map_w));
 //  AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
@@ -946,7 +945,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
  ***************************************************************************/
 
 void apollo_state::machine_start(){
-	memory_share *messram = memshare("messram");
+	memory_share *messram = memshare(RAM_TAG);
 	//MLOG1(("machine_start_dn3500: ram size is %d MB", (int)messram->bytes()/(1024*1024)));
 
 	// clear ram
@@ -1061,9 +1060,7 @@ MACHINE_CONFIG_START(apollo_state::dn3500)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M")
+	RAM(config, m_ram).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 #ifdef APOLLO_XXL
 	MCFG_DEVICE_ADD(APOLLO_STDIO_TAG, APOLLO_STDIO, 0)
@@ -1085,9 +1082,7 @@ MACHINE_CONFIG_START(apollo_state::dsp3500)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M")
+	RAM(config, RAM_TAG).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 	/* terminal hardware */
 	config.set_default_layout(layout_apollo_dsp);
@@ -1117,13 +1112,10 @@ MACHINE_CONFIG_START(apollo_state::dn3000)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
 	MCFG_DEVICE_PROGRAM_MAP(dn3000_map)
 	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
-	MCFG_RAM_MODIFY("messram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	m_ram->set_default_size("8M").set_extra_options("4M");
 
 	// FIXME: is this interrupt really only connected on DN3000?
-	MCFG_DEVICE_MODIFY(APOLLO_RTC_TAG)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, apollo_state, apollo_rtc_irq_function))
+	m_rtc->irq().set(FUNC(apollo_state::apollo_rtc_irq_function));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apollo_state::dsp3000)
@@ -1140,12 +1132,9 @@ MACHINE_CONFIG_START(apollo_state::dsp3000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	RAM(config, m_ram).set_default_size("8M").set_extra_options("4M");
 
 	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
-	MCFG_RAM_MODIFY("messram")
 
 	/* terminal hardware */
 	config.set_default_layout(layout_apollo_dsp);
@@ -1187,6 +1176,10 @@ MACHINE_CONFIG_START(apollo_state::dsp5500)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* internal ram */
+	// FIXME: guess, to fix validation
+	RAM(config, RAM_TAG).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 	/* terminal hardware */
 	config.set_default_layout(layout_apollo_dsp);

@@ -99,16 +99,16 @@ Notes:
       SW4     : 8 position Dip Switch
       U30,U31,
       U32,U33 : Macronix MX27C4000 512k x8 EPROM (DIP32, PCB labelled 'RPRO0', 'RPRO1', 'RPRO2', 'RPRO3')
-      U34,U35 : 8M MASKROM (DIP42, PCB labelled 'RD0', 'RD1')
-      U70     : 16M MASKROM (DIP42, PCB labelled 'ZPRO0')
-      *       : Unpopulated position for 16M DIP42 MASKROM (PCB labelled 'ZPRO1')
+      U34,U35 : 8M mask ROM (DIP42, PCB labelled 'RD0', 'RD1')
+      U70     : 16M mask ROM (DIP42, PCB labelled 'ZPRO0')
+      *       : Unpopulated position for 16M DIP42 mask ROM (PCB labelled 'ZPRO1')
 
 */
 
 #include "emu.h"
 #include "emupal.h"
 #include "machine/st0016.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include <algorithm>
 
 class speglsht_state : public driver_device
@@ -132,7 +132,7 @@ public:
 private:
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<r3051_device> m_subcpu;
 
 	required_shared_ptr<uint8_t> m_shared;
 	required_shared_ptr<uint32_t> m_framebuffer;
@@ -264,7 +264,7 @@ READ32_MEMBER(speglsht_state::cop_r)
 
 READ32_MEMBER(speglsht_state::irq_ack_clear)
 {
-	m_subcpu->set_input_line(R3000_IRQ4, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
@@ -421,10 +421,10 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("sub", R3051, 25000000)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_DEVICE_PROGRAM_MAP(speglsht_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
+	R3051(config, m_subcpu, 25000000);
+	m_subcpu->set_endianness(ENDIANNESS_LITTLE);
+	m_subcpu->set_addrmap(AS_PROGRAM, &speglsht_state::speglsht_mem);
+	m_subcpu->set_vblank_int("screen", FUNC(speglsht_state::irq4_line_assert));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)

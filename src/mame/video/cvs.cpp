@@ -2,7 +2,7 @@
 // copyright-holders:Mike Coates, Couriersud
 /***************************************************************************
 
-  video\cvs.c
+  video\cvs.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -190,9 +190,9 @@ uint32_t cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitma
 	copyscrollbitmap(m_scrolled_collision_background, m_collision_background, 0, nullptr, 8, scroll, cliprect);
 
 	/* update the S2636 chips */
-	bitmap_ind16 const &s2636_0_bitmap = m_s2636_0->update(cliprect);
-	bitmap_ind16 const &s2636_1_bitmap = m_s2636_1->update(cliprect);
-	bitmap_ind16 const &s2636_2_bitmap = m_s2636_2->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(cliprect);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636[1]->update(cliprect);
+	bitmap_ind16 const &s2636_2_bitmap = m_s2636[2]->update(cliprect);
 
 	/* Bullet Hardware */
 	for (offs = 8; offs < 256; offs++ )

@@ -37,18 +37,19 @@ DEFINE_DEVICE_TYPE(C64_TURBO232, c64_turbo232_cartridge_device, "c64_turbo232", 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_turbo232_cartridge_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(3'686'400))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, c64_turbo232_cartridge_device, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+void c64_turbo232_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(3.6864_MHz_XTAL);
+	m_acia->irq_handler().set(FUNC(c64_turbo232_cartridge_device::acia_irq_w));
+	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
+}
 
 
 //-------------------------------------------------

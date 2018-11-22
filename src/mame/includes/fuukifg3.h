@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood, Luca Elia
+#ifndef MAME_INCLUDES_FUUKIFG3_H
+#define MAME_INCLUDES_FUUKIFG3_H
+
+#pragma once
+
 #include "video/fuukifg.h"
 #include "emupal.h"
 #include "screen.h"
@@ -91,3 +96,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_FUUKIFG3_H

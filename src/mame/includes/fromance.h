@@ -22,12 +22,12 @@ public:
 	fromance_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
 		m_spriteram(*this, "spriteram"),
 		m_palette(*this, "palette"),
 		m_gga(*this, "gga"),
 		m_videoram(*this, "videoram"),
 		m_spr_old(*this, "vsystem_spr_old"),
-		m_subcpu(*this, "sub"),
 		m_sublatch(*this, "sublatch"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -44,6 +44,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	optional_shared_ptr<uint8_t> m_spriteram;
 	required_device<palette_device> m_palette;
 	required_device<vsystem_gga_device> m_gga;
@@ -113,7 +114,6 @@ private:
 	inline void get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer );
 	void crtc_refresh();
 	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);
-	required_device<cpu_device> m_subcpu;
 	optional_device<generic_latch_8_device> m_sublatch;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;

@@ -395,21 +395,21 @@ MACHINE_CONFIG_START(exerion_state::exerion)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, EXERION_AY8910_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "ay1", EXERION_AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, EXERION_AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, exerion_state, exerion_porta_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, exerion_state, exerion_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &ay2(AY8910(config, "ay2", EXERION_AY8910_CLOCK));
+	ay2.port_a_read_callback().set(FUNC(exerion_state::exerion_porta_r));
+	ay2.port_b_write_callback().set(FUNC(exerion_state::exerion_portb_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(exerion_state::irion)
+void exerion_state::irion(machine_config &config)
+{
 	exerion(config);
-	MCFG_DEVICE_REMOVE("sub")
-MACHINE_CONFIG_END
+	config.device_remove("sub");
+}
 
 
 

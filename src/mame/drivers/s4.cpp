@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(s4_state::s4)
 	m_pia30->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia30->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(s4_state::s4a)

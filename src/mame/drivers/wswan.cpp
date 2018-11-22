@@ -141,7 +141,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wswan)
 	MCFG_PALETTE_ADD("palette", 16)
@@ -193,12 +193,12 @@ MACHINE_CONFIG_END
 
 ROM_START( wswan )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-//  ROM_LOAD_OPTIONAL( "ws_bios.bin", 0x0000, 0x0001, NO_DUMP )
+//  ROM_LOAD( "ws_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
 ROM_START( wscolor )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
-//  ROM_LOAD_OPTIONAL( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
+//  ROM_LOAD( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY   FULLNAME

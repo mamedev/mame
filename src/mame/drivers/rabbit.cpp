@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(rabbit_state::rabbit)
 	MCFG_DEVICE_PROGRAM_MAP(rabbit_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rabbit)
 

@@ -153,10 +153,10 @@ READ8_MEMBER(taito_cchip_device::asic_r)
 
 WRITE8_MEMBER(taito_cchip_device::asic_w)
 {
-	logerror("%s: asic_w %04x %02x\n", machine().describe_context(), offset, data);
+	//logerror("%s: asic_w %04x %02x\n", machine().describe_context(), offset, data);
 	if (offset == 0x200)
 	{
-		logerror("cchip set bank to %02x\n", data & 0x7);
+		//logerror("cchip set bank to %02x\n", data & 0x7);
 		m_upd4464_bank->set_bank(data & 0x7);
 	}
 	else
@@ -167,10 +167,10 @@ WRITE8_MEMBER(taito_cchip_device::asic_w)
 
 WRITE8_MEMBER(taito_cchip_device::asic68_w)
 {
-	logerror("%s: asic68_w %04x %02x\n", machine().describe_context(), offset, data);
+	//logerror("%s: asic68_w %04x %02x\n", machine().describe_context(), offset, data);
 	if (offset == 0x200)
 	{
-		logerror("cchip (68k side) set bank to %02x\n", data & 0x7);
+		//logerror("cchip (68k side) set bank to %02x\n", data & 0x7);
 		m_upd4464_bank68->set_bank(data & 0x7);
 	}
 	else

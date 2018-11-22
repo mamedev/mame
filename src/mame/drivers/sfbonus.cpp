@@ -1384,7 +1384,7 @@ MACHINE_CONFIG_START(sfbonus_state::sfbonus)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(sfbonus_state, nmi_line_pulse, 100)
 
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sfbonus)
 
@@ -1398,7 +1398,8 @@ MACHINE_CONFIG_START(sfbonus_state::sfbonus)
 
 	MCFG_PALETTE_ADD("palette", 0x100*2) // *2 for priority workaraound / custom drawing
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &sfbonus_state::ramdac_map);
 
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */

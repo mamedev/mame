@@ -118,6 +118,7 @@ public:
 	void init_scud();
 	void init_harley();
 	void init_swtrilga();
+	void init_swtrilgp();
 	void init_vs29815();
 	void init_model3_10();
 	void init_vs215();
@@ -367,6 +368,8 @@ private:
 	void model3_10_mem(address_map &map);
 	void model3_mem(address_map &map);
 	void model3_snd(address_map &map);
+	void scsp1_map(address_map &map);
+	void scsp2_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MODEL3_H

@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+#ifndef MAME_INCLUDES_SIMPSONS_H
+#define MAME_INCLUDES_SIMPSONS_H
+
+#pragma once
+
 #include "machine/bankdev.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k052109.h"
@@ -9,15 +14,16 @@
 class simpsons_state : public driver_device
 {
 public:
-	simpsons_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	simpsons_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank0000(*this, "bank0000"),
 		m_bank2000(*this, "bank2000"),
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251") { }
+		m_k053251(*this, "k053251")
+	{ }
 
 	void simpsons(machine_config &config);
 
@@ -74,3 +80,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_SIMPSONS_H

@@ -111,7 +111,6 @@ public:
 	void granny_map(address_map &map);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
 	void video_map(address_map &map);
 private:
 	uint8_t m_mpu_to_vid;
@@ -190,12 +189,6 @@ void by133_state::granny_map(address_map &map)
 void by133_state::sound_map(address_map &map)
 { // U27 Vidiot
 	map(0xc000, 0xffff).rom();
-}
-
-void by133_state::sound_portmap(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).w("dac", FUNC(dac_byte_interface::data_w)); // P10-P17
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(by133_state::m6803_port2_r), FUNC(by133_state::m6803_port2_w)); // P20-P24 sound command in
 }
 
 
@@ -761,11 +754,13 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	MCFG_DEVICE_ADD("videocpu", MC6809, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(video_map)
 
-	MCFG_DEVICE_ADD("audiocpu", M6803, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	M6803(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &by133_state::sound_map);
+	m_audiocpu->out_p1_cb().set("dac", FUNC(dac_byte_interface::data_w)); // P10-P17
+	m_audiocpu->in_p2_cb().set(FUNC(by133_state::m6803_port2_r)); // P20-P24 sound command in
+	m_audiocpu->out_p2_cb().set(FUNC(by133_state::m6803_port2_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PIA6821(config, m_pia_u7, 0);
 	m_pia_u7->readpa_handler().set(FUNC(by133_state::u7_a_r));
@@ -800,11 +795,10 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac2", by133_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "crtc", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("videocpu", M6809_IRQ_LINE))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
+	TMS9928A(config, m_crtc, XTAL(10'738'635)).set_screen("screen");
+	m_crtc->set_vram_size(0x4000);
+	m_crtc->int_callback().set_inputline(m_videocpu, M6809_IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -823,16 +817,11 @@ MACHINE_CONFIG_START(by133_state::granny)
 	MCFG_DEVICE_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
 	MCFG_DEVICE_PROGRAM_MAP(granny_map)
 
-	MCFG_DEVICE_REMOVE("screen")
+	TMS9928A(config, m_crtc2, XTAL(10'738'635)).set_screen("screen");
+	m_crtc2->set_vram_size(0x4000);
+	m_crtc2->int_callback().set_inputline(m_videocpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD( "crtc2", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("videocpu", M6809_IRQ_LINE))
-	MCFG_VIDEO_SET_SCREEN("screen")
-
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL(10'738'635) / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
+	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(by133_state, screen_update_granny)
 MACHINE_CONFIG_END
 

@@ -35,6 +35,7 @@ DEFINE_DEVICE_TYPE(TMS9128,  tms9128_device,  "tms9128",  "TMS9128 VDP")
 DEFINE_DEVICE_TYPE(TMS9929,  tms9929_device,  "tms9929",  "TMS9929 VDP")
 DEFINE_DEVICE_TYPE(TMS9929A, tms9929a_device, "tms9929a", "TMS9929A VDP")
 DEFINE_DEVICE_TYPE(TMS9129,  tms9129_device,  "tms9129",  "TMS9129 VDP")
+DEFINE_DEVICE_TYPE(EFO90501, efo90501_device, "efo90501", "EFO90501 VDP")
 
 // ======= Debugging =========
 
@@ -70,8 +71,27 @@ tms9928a_device::tms9928a_device(const machine_config &mconfig, device_type type
 {
 }
 
+void tms9928a_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
 
-tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+	if (!screen().has_screen_update())
+		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(tms9928a_device::screen_update), this));
+
+	if (!screen().refresh_attoseconds())
+	{
+		if (m_50hz)
+			screen().set_raw(clock() / 2, TOTAL_HORZ, HORZ_DISPLAY_START - 12, HORZ_DISPLAY_START + 256 + 12,
+				TOTAL_VERT_PAL, VERT_DISPLAY_START_PAL - 12, VERT_DISPLAY_START_PAL + 192 + 12);
+		else
+			screen().set_raw(clock() / 2, TOTAL_HORZ, HORZ_DISPLAY_START - 12, HORZ_DISPLAY_START + 256 + 12,
+				TOTAL_VERT_NTSC, VERT_DISPLAY_START_NTSC - 12, VERT_DISPLAY_START_NTSC + 192 + 12);
+	}
+}
+
+
+tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9928a_device(mconfig, TMS9928A, tag, owner, clock, false, true, true)
 {
 }
@@ -108,6 +128,11 @@ tms9929_device::tms9929_device(const machine_config &mconfig, const char *tag, d
 
 tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms9928a_device(mconfig, TMS9929A, tag, owner, clock, true, true, true)
+{
+}
+
+efo90501_device::efo90501_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms9928a_device(mconfig, EFO90501, tag, owner, clock, true, true, true)
 {
 }
 
@@ -765,5 +790,6 @@ void tms9928a_device::device_reset()
 	m_line_timer->adjust( screen().time_until_pos( 0, HORZ_DISPLAY_START ) );
 
 	// TODO: Check clock freq settings in all drivers
-	if (!m_out_gromclk_cb.isnull() && m_99) m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()/12));
+	if (!m_out_gromclk_cb.isnull() && m_99)
+		m_gromclk_timer->adjust(attotime::zero, 0, clocks_to_attotime(24));
 }

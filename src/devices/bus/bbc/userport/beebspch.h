@@ -33,7 +33,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -42,7 +41,6 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(pb_w) override;
 
 private:
-	required_memory_region m_rom;
 	required_device<sp0256_device> m_nsp;
 };
 

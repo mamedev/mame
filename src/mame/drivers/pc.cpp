@@ -454,8 +454,7 @@ void pc_state::epc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x0070, 0x0070).rw("i8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0071, 0x0071).rw("i8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0070, 0x0071).rw("i8251", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
@@ -535,10 +534,9 @@ MACHINE_CONFIG_START(pc_state::pccga)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
@@ -623,10 +621,9 @@ MACHINE_CONFIG_START(pc_state::iskr3104)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 MACHINE_CONFIG_END
 
 
@@ -645,10 +642,9 @@ MACHINE_CONFIG_START(pc_state::poisk2)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 MACHINE_CONFIG_END
 
 
@@ -676,10 +672,9 @@ MACHINE_CONFIG_START(pc_state::zenith)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
@@ -693,9 +688,7 @@ MACHINE_CONFIG_START(pc_state::ncrpc4i)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	subdevice<ram_device>(RAM_TAG)->set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 MACHINE_CONFIG_END
 
 
@@ -721,11 +714,9 @@ MACHINE_CONFIG_START(pc_state::siemens)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 MACHINE_CONFIG_END
 
 
@@ -745,10 +736,9 @@ MACHINE_CONFIG_START(pc_state::ibm5550)
 
 	/* keyboard */
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 MACHINE_CONFIG_END
 
 
@@ -764,9 +754,8 @@ MACHINE_CONFIG_START(pc_state::m15)
 	MCFG_DEVICE_INPUT_DEFAULTS(m15)
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("448K")
-	MCFG_RAM_EXTRA_OPTIONS("16K, 160K, 304K")
+
+	subdevice<ram_device>(RAM_TAG)->set_default_size("448K").set_extra_options("16K, 160K, 304K");
 MACHINE_CONFIG_END
 
 
@@ -808,9 +797,7 @@ MACHINE_CONFIG_START(pc_state::laser_xt3)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1024K,1536K,1664K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("512K,1024K,1536K,1664K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
@@ -838,9 +825,7 @@ MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,768K,896K,1024K,1408K,1536K,1664K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("512K,768K,896K,1024K,1408K,1536K,1664K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
@@ -857,8 +842,7 @@ MACHINE_CONFIG_START(pc_state::olytext30)
 	MCFG_SLOT_DEFAULT_OPTION("")
 	MCFG_DEVICE_MODIFY("isa5")
 	MCFG_SLOT_DEFAULT_OPTION("hdc")
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K")
+	subdevice<ram_device>(RAM_TAG)->set_default_size("768K");
 MACHINE_CONFIG_END
 
 // Kaypro 16
@@ -874,9 +858,7 @@ MACHINE_CONFIG_START(pc_state::kaypro16)
 	MCFG_SLOT_FIXED(true)
 	MCFG_DEVICE_MODIFY("isa5")
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K, 640K")
+	subdevice<ram_device>(RAM_TAG)->set_default_size("256K").set_extra_options("512K, 640K");
 MACHINE_CONFIG_END
 
 //**************************************************************************

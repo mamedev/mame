@@ -17,7 +17,7 @@ void i82371sb_isa_device::config_map(address_map &map)
 	map(0x60, 0x63).rw(FUNC(i82371sb_isa_device::pirqrc_r), FUNC(i82371sb_isa_device::pirqrc_w));
 	map(0x68, 0x68).rw(FUNC(i82371sb_isa_device::tom_r), FUNC(i82371sb_isa_device::tom_w));
 	map(0x6a, 0x6b).rw(FUNC(i82371sb_isa_device::mstat_r), FUNC(i82371sb_isa_device::mstat_w));
-	map(0x70, 0x70).rw(FUNC(i82371sb_isa_device::mbirq0_r), FUNC(i82371sb_isa_device::mbirq0_w));
+	map(0x70, 0x71).rw(FUNC(i82371sb_isa_device::mbirq01_r), FUNC(i82371sb_isa_device::mbirq01_w));
 	map(0x76, 0x77).rw(FUNC(i82371sb_isa_device::mbdma_r), FUNC(i82371sb_isa_device::mbdma_w));
 	map(0x82, 0x82).rw(FUNC(i82371sb_isa_device::dlc_r), FUNC(i82371sb_isa_device::dlc_w));
 	map(0xa0, 0xa0).rw(FUNC(i82371sb_isa_device::smicntl_r), FUNC(i82371sb_isa_device::smicntl_w));
@@ -39,6 +39,7 @@ void i82371sb_isa_device::internal_io_map(address_map &map)
 	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00b2, 0x00b3).rw(FUNC(i82371sb_isa_device::read_apmcapms), FUNC(i82371sb_isa_device::write_apmcapms));
 	map(0x00c0, 0x00df).rw(FUNC(i82371sb_isa_device::at_dma8237_2_r), FUNC(i82371sb_isa_device::at_dma8237_2_w));
+	map(0x04d0, 0x04d1).rw(FUNC(i82371sb_isa_device::eisa_irq_read), FUNC(i82371sb_isa_device::eisa_irq_write));
 	map(0x00e0, 0x00ef).noprw();
 }
 
@@ -46,7 +47,8 @@ void i82371sb_isa_device::internal_io_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
+void i82371sb_isa_device::device_add_mconfig(machine_config &config)
+{
 	PIT8254(config, m_pit8254, 0);
 	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit8254->out_handler<0>().set(FUNC(i82371sb_isa_device::at_pit8254_out0_changed));
@@ -101,27 +103,27 @@ MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("isabus", ISA16, 0)
-	MCFG_ISA16_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_master", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_master", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_master", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_slave", pic8259_device, ir1_w)) // in place of irq 2 on at irq 9 is used
-	MCFG_ISA_OUT_IRQ10_CB(WRITELINE("pic8259_slave", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ11_CB(WRITELINE("pic8259_slave", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ12_CB(WRITELINE("pic8259_slave", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ14_CB(WRITELINE("pic8259_slave", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ15_CB(WRITELINE("pic8259_slave", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ0_CB(WRITELINE("dma8237_1", am9517a_device, dreq0_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
-	MCFG_ISA_OUT_DRQ5_CB(WRITELINE("dma8237_2", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ6_CB(WRITELINE("dma8237_2", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("dma8237_2", am9517a_device, dreq3_w))
-MACHINE_CONFIG_END
+	ISA16(config, m_isabus, 0);
+	m_isabus->set_cputag(":maincpu");
+	m_isabus->irq3_callback().set(FUNC(i82371sb_isa_device::pc_irq3_w));
+	m_isabus->irq4_callback().set(FUNC(i82371sb_isa_device::pc_irq4_w));
+	m_isabus->irq5_callback().set(FUNC(i82371sb_isa_device::pc_irq5_w));
+	m_isabus->irq6_callback().set(FUNC(i82371sb_isa_device::pc_irq6_w));
+	m_isabus->irq7_callback().set(FUNC(i82371sb_isa_device::pc_irq7_w));
+	m_isabus->irq2_callback().set(FUNC(i82371sb_isa_device::pc_irq9_w));
+	m_isabus->irq10_callback().set(FUNC(i82371sb_isa_device::pc_irq10_w));
+	m_isabus->irq11_callback().set(FUNC(i82371sb_isa_device::pc_irq11_w));
+	m_isabus->irq12_callback().set(FUNC(i82371sb_isa_device::pc_irq12m_w));
+	m_isabus->irq14_callback().set(FUNC(i82371sb_isa_device::pc_irq14_w));
+	m_isabus->irq15_callback().set(FUNC(i82371sb_isa_device::pc_irq15_w));
+	m_isabus->drq0_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
+}
 
 i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pci_device(mconfig, I82371SB_ISA, tag, owner, clock),
@@ -135,7 +137,7 @@ i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const ch
 	m_pit8254(*this, "pit8254"),
 	m_isabus(*this, "isabus"),
 	m_speaker(*this, "speaker"),
-	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
+	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_eisa_irq_mode(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
 	set_ids(0x80867000, 0x03, 0x060100, 0x00000000);
 }
@@ -157,6 +159,7 @@ void i82371sb_isa_device::device_reset()
 	tom = 0x02;
 	mstat = 0x0000;
 	mbirq0 = 0x80;
+	mbirq1 = 0x80;
 	memset(mbdma, 0x0c, sizeof(mbdma));
 	pcsc = 0x0002;
 	apicbase = 0x00;
@@ -248,15 +251,26 @@ WRITE16_MEMBER(i82371sb_isa_device::mstat_w)
 	logerror("mstat = %04x\n", mstat);
 }
 
-READ8_MEMBER (i82371sb_isa_device::mbirq0_r)
+READ8_MEMBER (i82371sb_isa_device::mbirq01_r)
 {
-	return mbirq0;
+	if (offset == 0)
+		return mbirq0;
+	else
+		return mbirq1;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::mbirq0_w)
+WRITE8_MEMBER(i82371sb_isa_device::mbirq01_w)
 {
-	mbirq0 = data;
-	logerror("mbirq0 = %02x\n", mbirq0);
+	if (offset == 0)
+	{
+		mbirq0 = data;
+		logerror("mbirq0 = %02x\n", mbirq0);
+	}
+	else if (offset == 1)
+	{
+		mbirq1 = data;
+		logerror("mbirq1 = %02x\n", mbirq1);
+	}
 }
 
 READ8_MEMBER (i82371sb_isa_device::mbdma_r)
@@ -663,6 +677,126 @@ WRITE_LINE_MEMBER( i82371sb_isa_device::pc_dack5_w ) { pc_select_dma_channel(5, 
 WRITE_LINE_MEMBER( i82371sb_isa_device::pc_dack6_w ) { pc_select_dma_channel(6, state); }
 WRITE_LINE_MEMBER( i82371sb_isa_device::pc_dack7_w ) { pc_select_dma_channel(7, state); }
 
+void i82371sb_isa_device::redirect_irq(int irq, int state)
+{
+	switch (irq)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 8:
+	case 13:
+		break;
+	case 3:
+		m_pic8259_master->ir3_w(state);
+		break;
+	case 4:
+		m_pic8259_master->ir4_w(state);
+		break;
+	case 5:
+		m_pic8259_master->ir5_w(state);
+		break;
+	case 6:
+		m_pic8259_master->ir6_w(state);
+		break;
+	case 7:
+		m_pic8259_master->ir7_w(state);
+		break;
+	case 9:
+		m_pic8259_slave->ir1_w(state);
+		break;
+	case 10:
+		m_pic8259_slave->ir2_w(state);
+		break;
+	case 11:
+		m_pic8259_slave->ir3_w(state);
+		break;
+	case 12:
+		m_pic8259_slave->ir4_w(state);
+		break;
+	case 14:
+		m_pic8259_slave->ir6_w(state);
+		break;
+	case 15:
+		m_pic8259_slave->ir7_w(state);
+		break;
+	}
+}
+
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_pirqa_w)
+{
+	int irq = pirqrc[0] & 15;
+
+	if (pirqrc[0] & 128)
+		return;
+	redirect_irq(irq, state);
+}
+
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_pirqb_w )
+{
+	int irq = pirqrc[1] & 15;
+
+	if (pirqrc[1] & 128)
+		return;
+	redirect_irq(irq, state);
+}
+
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_pirqc_w )
+{
+	int irq = pirqrc[2] & 15;
+
+	if (pirqrc[2] & 128)
+		return;
+	redirect_irq(irq, state);
+}
+
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_pirqd_w )
+{
+	int irq = pirqrc[3] & 15;
+
+	if (pirqrc[3] & 128)
+		return;
+	redirect_irq(irq, state);
+}
+
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_mirq0_w )
+{
+	int irq = mbirq0 & 15;
+
+	if (mbirq0 & (128 | 32))
+		return;
+	redirect_irq(irq, state);
+}
+
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_mirq1_w )
+{
+	int irq = mbirq1 & 15;
+
+	if (mbirq1 & 128)
+		return;
+	redirect_irq(irq, state);
+}
+
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_ferr_w )
+{
+	m_pic8259_slave->ir5_w(state);
+}
+
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq1_w )   { m_pic8259_master->ir1_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq3_w )   { m_pic8259_master->ir3_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq4_w )   { m_pic8259_master->ir4_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq5_w )   { m_pic8259_master->ir5_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq6_w )   { m_pic8259_master->ir6_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq7_w )   { m_pic8259_master->ir7_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq8n_w )  { m_pic8259_slave->ir0_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq9_w )   { m_pic8259_slave->ir1_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq10_w )  { m_pic8259_slave->ir2_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq11_w )  { m_pic8259_slave->ir3_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq12m_w ) { m_pic8259_slave->ir4_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq14_w )  { m_pic8259_slave->ir6_w(state); }
+WRITE_LINE_MEMBER( i82371sb_isa_device::pc_irq15_w )  { m_pic8259_slave->ir7_w(state); }
+
+
 READ8_MEMBER( i82371sb_isa_device::at_portb_r )
 {
 	uint8_t data = m_at_speaker;
@@ -695,6 +829,23 @@ READ8_MEMBER( i82371sb_isa_device::at_dma8237_2_r )
 WRITE8_MEMBER( i82371sb_isa_device::at_dma8237_2_w )
 {
 	m_dma8237_2->write( space, offset / 2, data);
+}
+
+READ8_MEMBER(i82371sb_isa_device::eisa_irq_read)
+{
+	if (offset == 0)
+		return m_eisa_irq_mode & 0xff;
+	else
+		return m_eisa_irq_mode >> 8;
+}
+
+WRITE8_MEMBER(i82371sb_isa_device::eisa_irq_write)
+{
+	if (offset == 0)
+		m_eisa_irq_mode = (m_eisa_irq_mode & 0xff00) | data;
+	else
+		m_eisa_irq_mode = (m_eisa_irq_mode & 0x00ff) | (data << 8);
+	// TODO: update m_pic8259_master and m_pic8259_slave with the new configuration
 }
 
 READ8_MEMBER( i82371sb_isa_device::read_apmcapms )

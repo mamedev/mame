@@ -611,7 +611,7 @@ MACHINE_CONFIG_START(qix_state::qix_base)
 	/* Zookeeper settings and high score table seem especially sensitive to this */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PIA6821(config, m_pia0, 0);
 	m_pia0->readpa_handler().set_ioport("P1");

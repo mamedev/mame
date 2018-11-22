@@ -21,13 +21,13 @@ public:
 	ddragon3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
 		m_screen(*this, "screen")
 	{
@@ -43,6 +43,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -85,7 +86,6 @@ private:
 	required_device<buffered_spriteram16_device> m_spriteram;
 
 	/* devices */
-	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 

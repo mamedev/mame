@@ -333,9 +333,9 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_M68705_PORTB_W_CB(WRITE8(*this, maxaflex_state, mcu_portB_w))
 	MCFG_M68705_PORTC_W_CB(WRITE8(*this, maxaflex_state, mcu_portC_w))
 
-	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
-	MCFG_GTIA_REGION(GTIA_NTSC)
-	MCFG_GTIA_READ_CB(IOPORT("console"))
+	ATARI_GTIA(config, m_gtia, 0);
+	m_gtia->set_region(GTIA_NTSC);
+	m_gtia->read_callback().set_ioport("console");
 
 	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
 	MCFG_ANTIC_GTIA("gtia")
@@ -370,6 +370,8 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	RAM(config, RAM_TAG).set_default_size("16K");
 MACHINE_CONFIG_END
 
 

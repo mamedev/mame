@@ -223,7 +223,7 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	MCFG_DEVICE_PROGRAM_MAP(poolshrk_cpu_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

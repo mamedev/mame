@@ -929,8 +929,7 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	MCFG_QUICKLOAD_ADD("quickload", plus4_state, cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -995,9 +994,7 @@ MACHINE_CONFIG_START(c16_state::c16n)
 	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NOOP)
 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	m_ram->set_default_size("16K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 
@@ -1018,21 +1015,15 @@ MACHINE_CONFIG_START(c16_state::c16p)
 	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NOOP)
 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	m_ram->set_default_size("16K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  MACHINE_CONFIG( c232 )
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(c16_state::c232)
+void c16_state::c232(machine_config &config)
+{
 	c16p(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("32K");
+}
 
 
 //-------------------------------------------------

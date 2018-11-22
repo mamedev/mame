@@ -17,24 +17,16 @@ DEFINE_DEVICE_TYPE(VT82C496, vt82c496_device, "vt82c496", "VIA VT82C496 system c
 
 
 vt82c496_device::vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VT82C496, tag, owner, clock), m_cpu_tag(nullptr), m_region_tag(nullptr), m_space(nullptr), m_ram(nullptr), m_rom(nullptr), m_reg_select(0)
+	: device_t(mconfig, VT82C496, tag, owner, clock), m_cpu(*this, finder_base::DUMMY_TAG), m_space(nullptr), m_ram(*this, finder_base::DUMMY_TAG), m_rom(*this, finder_base::DUMMY_TAG), m_reg_select(0)
 {
 }
 
 void vt82c496_device::device_start()
 {
 	/* get address space we are working on */
-	device_t *cpu = machine().device(m_cpu_tag);
-	assert(cpu != nullptr);
-
-	m_space = &cpu->memory().space(AS_PROGRAM);
-
-	/* get rom region */
-	m_rom = machine().root_device().memregion(m_region_tag)->base();
+	m_space = &m_cpu->space(AS_PROGRAM);
 
 	save_pointer(m_reg,"Registers",0x100);
-
-	m_ram = machine().device<ram_device>(RAM_TAG);
 }
 
 void vt82c496_device::device_reset()

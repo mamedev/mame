@@ -566,19 +566,6 @@ void hx20_state::hx20_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( hx20_io )
-//-------------------------------------------------
-
-void hx20_state::hx20_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(hx20_state::main_p1_r), FUNC(hx20_state::main_p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(hx20_state::main_p2_r), FUNC(hx20_state::main_p2_w));
-	map(M6801_PORT3, M6801_PORT3).noprw(); // A0-A7, D0-D7
-	map(M6801_PORT4, M6801_PORT4).noprw(); // A8-A15
-}
-
-
-//-------------------------------------------------
 //  ADDRESS_MAP( hx20_sub_mem )
 //-------------------------------------------------
 
@@ -587,19 +574,6 @@ void hx20_state::hx20_sub_mem(address_map &map)
 	map(0x0000, 0x001f).rw(m_subcpu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
 	map(0x0080, 0x00ff).ram();
 	map(0xf000, 0xffff).rom().region(HD6301V1_SLAVE_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( hx20_sub_io )
-//-------------------------------------------------
-
-void hx20_state::hx20_sub_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(hx20_state::slave_p1_r), FUNC(hx20_state::slave_p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(hx20_state::slave_p2_r), FUNC(hx20_state::slave_p2_w));
-	map(M6801_PORT3, M6801_PORT3).rw(FUNC(hx20_state::slave_p3_r), FUNC(hx20_state::slave_p3_w));
-	map(M6801_PORT4, M6801_PORT4).rw(FUNC(hx20_state::slave_p4_r), FUNC(hx20_state::slave_p4_w));
 }
 
 
@@ -896,13 +870,25 @@ void hx20_state::machine_start()
 
 MACHINE_CONFIG_START(hx20_state::hx20)
 	// basic machine hardware
-	MCFG_DEVICE_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(hx20_mem)
-	MCFG_DEVICE_IO_MAP(hx20_io)
+	HD63701(config, m_maincpu, XTAL(2'457'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_mem);
+	m_maincpu->in_p1_cb().set(FUNC(hx20_state::main_p1_r));
+	m_maincpu->out_p1_cb().set(FUNC(hx20_state::main_p1_w));
+	m_maincpu->in_p2_cb().set(FUNC(hx20_state::main_p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(hx20_state::main_p2_w));
+	// Port 3 = A0-A7, D0-D7
+	// Port 4 = A8-A15
 
-	MCFG_DEVICE_ADD(HD6301V1_SLAVE_TAG, HD63701, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(hx20_sub_mem)
-	MCFG_DEVICE_IO_MAP(hx20_sub_io)
+	HD63701(config, m_subcpu, XTAL(2'457'600));
+	m_subcpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_sub_mem);
+	m_subcpu->in_p1_cb().set(FUNC(hx20_state::slave_p1_r));
+	m_subcpu->out_p1_cb().set(FUNC(hx20_state::slave_p1_w));
+	m_subcpu->in_p2_cb().set(FUNC(hx20_state::slave_p2_r));
+	m_subcpu->out_p2_cb().set(FUNC(hx20_state::slave_p2_w));
+	m_subcpu->in_p3_cb().set(FUNC(hx20_state::slave_p3_r));
+	m_subcpu->out_p3_cb().set(FUNC(hx20_state::slave_p3_w));
+	m_subcpu->in_p4_cb().set(FUNC(hx20_state::slave_p4_r));
+	m_subcpu->out_p4_cb().set(FUNC(hx20_state::slave_p4_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -929,18 +915,17 @@ MACHINE_CONFIG_START(hx20_state::hx20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 4.194304_MHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, hx20_state, rtc_irq_w))
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
+	m_rtc->irq().set(FUNC(hx20_state::rtc_irq_w));
+
+	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")
 	MCFG_EPSON_SIO_RX(WRITELINE(*this, hx20_state, sio_rx_w))
 	MCFG_EPSON_SIO_PIN(WRITELINE(*this, hx20_state, sio_pin_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 
 	// optional rom
 	MCFG_GENERIC_SOCKET_ADD("optrom", generic_plain_slot, "opt_rom")
@@ -960,9 +945,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hx20_state::cm6000)
 	hx20(config);
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(HD6301V1_MAIN_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(cm6000_mem)
-	MCFG_DEVICE_IO_MAP(hx20_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6000_mem);
 
 	// optional rom
 	MCFG_DEVICE_REMOVE("optrom")

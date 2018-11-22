@@ -36,6 +36,7 @@
 #include "bus/rs232/rs232.h"
 
 #include "diserial.h"
+#include "screen.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -127,7 +128,8 @@ public:
 	apollo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU),
-		m_messram_ptr(*this, "messram"),
+		m_ram(*this, RAM_TAG),
+		m_messram_ptr(*this, RAM_TAG),
 		m_dma8237_1(*this, APOLLO_DMA1_TAG),
 		m_dma8237_2(*this, APOLLO_DMA2_TAG),
 		m_pic8259_master(*this, APOLLO_PIC1_TAG),
@@ -143,6 +145,7 @@ public:
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_shared_ptr<uint32_t> m_messram_ptr;
 
 	required_device<am9517a_device> m_dma8237_1;

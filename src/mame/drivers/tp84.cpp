@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	mainlatch.q_out_cb<4>().set(FUNC(tp84_state::flip_screen_x_w));
 	mainlatch.q_out_cb<5>().set(FUNC(tp84_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,7 +371,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("y2404_1", Y2404, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)

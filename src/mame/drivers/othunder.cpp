@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/2/2)
 	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	adc0808_device &adc(ADC0808(config, "adc", 16_MHz_XTAL/2/2/8));
 	adc.eoc_callback().set(FUNC(othunder_state::adc_eoc_w));

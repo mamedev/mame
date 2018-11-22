@@ -262,9 +262,9 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000)/9)); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

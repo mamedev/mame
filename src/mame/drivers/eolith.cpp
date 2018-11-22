@@ -551,9 +551,9 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
-	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(250))
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(250))
+	EEPROM_93C66_8BIT(config, "eeprom")
+		.erase_time(attotime::from_usec(250))
+		.write_time(attotime::from_usec(250));
 
 //  for testing sound sync
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -576,8 +576,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", MCS51_INT0_LINE))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, MCS51_INT0_LINE);
 
 	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)

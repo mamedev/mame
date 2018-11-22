@@ -496,10 +496,9 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gauntlet)
@@ -522,13 +521,14 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gauntlet_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
+	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu")
+		.int_callback().set_inputline("maincpu", M68K_IRQ_6);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.48)
+	YM2151(config, m_ym2151, ATARI_CLOCK_14MHz/4);
+	m_ym2151->add_route(1, "lspeaker", 0.48);
+	m_ym2151->add_route(0, "rspeaker", 0.48);
 
 	MCFG_DEVICE_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.32)

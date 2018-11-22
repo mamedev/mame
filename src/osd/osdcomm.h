@@ -95,19 +95,19 @@ template <typename T, typename U> using equivalent_array_t = typename equivalent
 #define EQUIVALENT_ARRAY(a, T) equivalent_array_t<T, std::remove_reference_t<decltype(a)> >
 
 /* Macros for normalizing data into big or little endian formats */
-constexpr uint16_t flipendian_int16(uint16_t val) { return (val << 8) | (val >> 8); }
+constexpr uint16_t swapendian_int16(uint16_t val) { return (val << 8) | (val >> 8); }
 
-constexpr uint32_t flipendian_int32_partial16(uint32_t val) { return ((val << 8) & 0xFF00FF00U) | ((val >> 8) & 0x00FF00FFU); }
-constexpr uint32_t flipendian_int32(uint32_t val) { return (flipendian_int32_partial16(val) << 16) | (flipendian_int32_partial16(val) >> 16); }
+constexpr uint32_t swapendian_int32_partial16(uint32_t val) { return ((val << 8) & 0xFF00FF00U) | ((val >> 8) & 0x00FF00FFU); }
+constexpr uint32_t swapendian_int32(uint32_t val) { return (swapendian_int32_partial16(val) << 16) | (swapendian_int32_partial16(val) >> 16); }
 
-constexpr uint64_t flipendian_int64_partial16(uint64_t val) { return ((val << 8) & 0xFF00FF00FF00FF00U) | ((val >> 8) & 0x00FF00FF00FF00FFU); }
-constexpr uint64_t flipendian_int64_partial32(uint64_t val) { return ((flipendian_int64_partial16(val) << 16) & 0xFFFF0000FFFF0000U) | ((flipendian_int64_partial16(val) >> 16) & 0x0000FFFF0000FFFFU); }
-constexpr uint64_t flipendian_int64(uint64_t val) { return (flipendian_int64_partial32(val) << 32) | (flipendian_int64_partial32(val) >> 32); }
+constexpr uint64_t swapendian_int64_partial16(uint64_t val) { return ((val << 8) & 0xFF00FF00FF00FF00U) | ((val >> 8) & 0x00FF00FF00FF00FFU); }
+constexpr uint64_t swapendian_int64_partial32(uint64_t val) { return ((swapendian_int64_partial16(val) << 16) & 0xFFFF0000FFFF0000U) | ((swapendian_int64_partial16(val) >> 16) & 0x0000FFFF0000FFFFU); }
+constexpr uint64_t swapendian_int64(uint64_t val) { return (swapendian_int64_partial32(val) << 32) | (swapendian_int64_partial32(val) >> 32); }
 
 #ifdef LSB_FIRST
-constexpr uint16_t big_endianize_int16(uint16_t x) { return flipendian_int16(x); }
-constexpr uint32_t big_endianize_int32(uint32_t x) { return flipendian_int32(x); }
-constexpr uint64_t big_endianize_int64(uint64_t x) { return flipendian_int64(x); }
+constexpr uint16_t big_endianize_int16(uint16_t x) { return swapendian_int16(x); }
+constexpr uint32_t big_endianize_int32(uint32_t x) { return swapendian_int32(x); }
+constexpr uint64_t big_endianize_int64(uint64_t x) { return swapendian_int64(x); }
 constexpr uint16_t little_endianize_int16(uint16_t x) { return x; }
 constexpr uint32_t little_endianize_int32(uint32_t x) { return x; }
 constexpr uint64_t little_endianize_int64(uint64_t x) { return x; }
@@ -115,9 +115,9 @@ constexpr uint64_t little_endianize_int64(uint64_t x) { return x; }
 constexpr uint16_t big_endianize_int16(uint16_t x) { return x; }
 constexpr uint32_t big_endianize_int32(uint32_t x) { return x; }
 constexpr uint64_t big_endianize_int64(uint64_t x) { return x; }
-constexpr uint16_t little_endianize_int16(uint16_t x) { return flipendian_int16(x); }
-constexpr uint32_t little_endianize_int32(uint32_t x) { return flipendian_int32(x); }
-constexpr uint64_t little_endianize_int64(uint64_t x) { return flipendian_int64(x); }
+constexpr uint16_t little_endianize_int16(uint16_t x) { return swapendian_int16(x); }
+constexpr uint32_t little_endianize_int32(uint32_t x) { return swapendian_int32(x); }
+constexpr uint64_t little_endianize_int64(uint64_t x) { return swapendian_int64(x); }
 #endif /* LSB_FIRST */
 
 #ifdef _MSC_VER

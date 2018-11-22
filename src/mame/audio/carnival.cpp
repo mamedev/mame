@@ -206,8 +206,7 @@ MACHINE_CONFIG_START(vicdual_state::carnival_audio)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, vicdual_state, carnival_music_port_2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, vicdual_state, carnival_music_port_t1_r))
 
-	MCFG_DEVICE_ADD("psg", AY8912, XTAL(3'579'545)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_psg, XTAL(3'579'545)/3).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* samples */
 	MCFG_DEVICE_ADD("samples", SAMPLES)

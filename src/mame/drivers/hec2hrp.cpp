@@ -464,9 +464,9 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_DEVICE_IO_MAP(hecdisc2_io)
-	MCFG_UPD765A_ADD(m_upd_fdc, false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_dma_irq))
+	UPD765A(config, m_upd_fdc, false, true);
+	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
+	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
 	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
@@ -504,9 +504,9 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_DEVICE_IO_MAP(hecdisc2_io)
-	MCFG_UPD765A_ADD(m_upd_fdc, false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_dma_irq))
+	UPD765A(config, m_upd_fdc, false, true);
+	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
+	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
 	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
 	/* 3.5" ("mini") disc */
-	MCFG_DEVICE_ADD("wd179x", FD1793, 1_MHz_XTAL)
+	FD1793(config, m_minidisc_fdc, 1_MHz_XTAL);
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", minidisc_floppies, "dd", hec2hrp_state::minidisc_formats)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -575,9 +575,9 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 	MCFG_DEVICE_ADD("disc2cpu", Z80, 4_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_DEVICE_IO_MAP(hecdisc2_io)
-	MCFG_UPD765A_ADD(m_upd_fdc, false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_dma_irq))
+	UPD765A(config, m_upd_fdc, false, true);
+	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
+	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
 	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 

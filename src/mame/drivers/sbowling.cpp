@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	MCFG_DEVICE_IO_MAP(port_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, interrupt, "screen", 0, 1)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -435,8 +435,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(19'968'000)/16)  /* ? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	AY8910(config, "aysnd", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.33);  /* ? */
 MACHINE_CONFIG_END
 
 ROM_START( sbowling )

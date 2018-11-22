@@ -133,7 +133,7 @@ void  model1io_device::device_add_mconfig(machine_config &config)
 	z80_device &iocpu(Z80(config, "iocpu", 32_MHz_XTAL/8));
 	iocpu.set_addrmap(AS_PROGRAM, &model1io_device::mem_map);
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom); // 93C45
+	EEPROM_93C46_16BIT(config, m_eeprom); // 93C45
 
 	sega_315_5338a_device &io(SEGA_315_5338A(config, "io", 32_MHz_XTAL));
 	io.read_callback().set(FUNC(model1io_device::io_r));

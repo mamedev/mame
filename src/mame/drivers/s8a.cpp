@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(s8a_state::s8a)
 	m_pia30->irqa_handler().set(FUNC(s8a_state::pia_irq));
 	m_pia30->irqb_handler().set(FUNC(s8a_state::pia_irq));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
 	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000))

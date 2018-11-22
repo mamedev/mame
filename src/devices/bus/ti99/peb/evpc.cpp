@@ -482,22 +482,33 @@ ioport_constructor snug_enhanced_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti99_evpc);
 }
 
-MACHINE_CONFIG_START(snug_enhanced_video_device::device_add_mconfig)
+void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
+{
 	// video hardware
-	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL(21'477'272))  /* typical 9938 clock, not verified */
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, snug_enhanced_video_device, video_interrupt_in))
-	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL(21'477'272))
+	V9938(config, m_video, XTAL(21'477'272)); // typical 9938 clock, not verified
+	m_video->set_vram_size(0x20000);
+	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
+	m_video->set_screen(TI_SCREEN_TAG);
+	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(21'477'272),
+		v99x8_device::HTOTAL,
+		0,
+		v99x8_device::HVISIBLE - 1,
+		v99x8_device::VTOTAL_NTSC * 2,
+		v99x8_device::VERTICAL_ADJUST * 2,
+		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
+	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, snug_enhanced_video_device, ready_line) )
+	sn94624_device& soundgen(SN94624(config, TI_SOUNDCHIP_TAG, 3579545/8));
+	soundgen.ready_cb().set(FUNC(snug_enhanced_video_device::ready_line));
+	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// Mouse connected to the color bus of the v9938
-	TI99_COLORBUS(config, m_colorbus, 0);
-	m_colorbus->configure_slot();
-
-MACHINE_CONFIG_END
+	TI99_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, "busmouse");
+}
 
 } } } // end namespace bus::ti99::peb
+
+

@@ -660,7 +660,7 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 	MCFG_DEVICE_PROGRAM_MAP(zeropnt2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_8BIT)
+	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -679,9 +679,7 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 0.70).add_route(1, "rspeaker", 0.70); /* 3.579545 MHz */
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, zeropnt_oki_map)

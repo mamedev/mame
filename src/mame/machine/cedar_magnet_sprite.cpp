@@ -206,26 +206,27 @@ MACHINE_CONFIG_START(cedar_magnet_sprite_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_sprite_map)
 	MCFG_DEVICE_IO_MAP(cedar_magnet_sprite_io)
 
-	MCFG_DEVICE_ADD("z80pio0", Z80PIO, 4000000/2)
-//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_sprite_device, pio0_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_sprite_device, pio0_pa_w))
-//  MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_sprite_device, pio0_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_sprite_device, pio0_pb_w))
+	Z80PIO(config, m_pio0, 4000000/2);
+//  m_pio0->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
+	m_pio0->in_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio0_pa_r));
+	m_pio0->out_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio0_pa_w));
+//  m_pio0->in_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio0_pb_r));
+	m_pio0->out_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio0_pb_w));
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 4000000/2)
-//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//  MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_sprite_device, pio1_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_sprite_device, pio1_pa_w))
-//  MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_sprite_device, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_sprite_device, pio1_pb_w))
+	Z80PIO(config, m_pio1, 4000000/2);
+//  m_pio1->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
+//  m_pio1->in_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio1_pa_r));
+	m_pio1->out_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio1_pa_w));
+//  m_pio1->in_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio1_pb_r));
+	m_pio1->out_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio1_pb_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 4000000/2)
-//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//  MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_sprite_device, pio2_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_sprite_device, pio2_pa_w))
-//  MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_sprite_device, pio2_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_sprite_device, pio2_pb_w))
+	Z80PIO(config, m_pio2, 4000000/2);
+//  m_pio2->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
+//  m_pio2->in_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio2_pa_r));
+	m_pio2->out_pa_callback().set(FUNC(cedar_magnet_sprite_device::pio2_pa_w));
+//  m_pio2->in_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio2_pb_r));
+	m_pio2->out_pb_callback().set(FUNC(cedar_magnet_sprite_device::pio2_pb_w));
+
 
 	ADDRESS_MAP_BANK(config, "sp_sub_ram").set_map(&cedar_magnet_sprite_device::cedar_magnet_sprite_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 MACHINE_CONFIG_END

@@ -46,12 +46,9 @@ Check game speed, it depends on a bit we toggle..
 
 /* The top 64k of samples are banked (16 banks total) */
 
-WRITE16_MEMBER(blmbycar_state::okibank_w)
+WRITE8_MEMBER(blmbycar_state::okibank_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		membank("okibank")->set_entry(data & 0x0f);
-	}
+	m_okibank->set_entry(data & 0x0f);
 }
 
 /***************************************************************************
@@ -64,20 +61,16 @@ WRITE16_MEMBER(blmbycar_state::okibank_w)
 
 /* Preliminary potentiometric wheel support */
 
-WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_reset_w)
+WRITE8_MEMBER(blmbycar_state::blmbycar_pot_wheel_reset_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_pot_wheel = ioport("POT_WHEEL")->read() & 0xff;
+	m_pot_wheel = m_pot_wheel_io->read() & 0xff;
 }
 
-WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_shift_w)
+WRITE8_MEMBER(blmbycar_state::blmbycar_pot_wheel_shift_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		if ( ((m_old_val & 0xff) == 0xff) && ((data & 0xff) == 0) )
-			m_pot_wheel <<= 1;
-		m_old_val = data;
-	}
+	if ( ((m_old_val & 0xff) == 0xff) && ((data & 0xff) == 0) )
+		m_pot_wheel <<= 1;
+	m_old_val = data;
 }
 
 READ16_MEMBER(blmbycar_state::blmbycar_pot_wheel_r)
@@ -90,7 +83,23 @@ READ16_MEMBER(blmbycar_state::blmbycar_pot_wheel_r)
 
 READ16_MEMBER(blmbycar_state::blmbycar_opt_wheel_r)
 {
-	return ((ioport("OPT_WHEEL")->read() & 0xff) << 8) | 0xff;
+	return ((m_opt_wheel_io->read() & 0xff) << 8) | 0xff;
+}
+
+
+/***************************************************************************
+
+
+                                Video Handling
+
+
+***************************************************************************/
+
+template<int Layer>
+WRITE16_MEMBER(blmbycar_state::vram_w)
+{
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
 }
 
 
@@ -105,21 +114,20 @@ READ16_MEMBER(blmbycar_state::blmbycar_opt_wheel_r)
 void blmbycar_state::common_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0xfec000, 0xfeffff).ram();
 	map(0x100000, 0x103fff).writeonly();                                               // ???
-	map(0x104000, 0x105fff).ram().w(FUNC(blmbycar_state::vram_1_w)).share("vram_1"); // Layer 1
-	map(0x106000, 0x107fff).ram().w(FUNC(blmbycar_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0x104000, 0x105fff).ram().w(FUNC(blmbycar_state::vram_w<1>)).share("vram_1"); // Layer 1
+	map(0x106000, 0x107fff).ram().w(FUNC(blmbycar_state::vram_w<0>)).share("vram_0"); // Layer 0
 	map(0x108000, 0x10bfff).writeonly();                                               // ???
 	map(0x10c000, 0x10c003).writeonly().share("scroll_1");              // Scroll 1
 	map(0x10c004, 0x10c007).writeonly().share("scroll_0");              // Scroll 0
-	map(0x200000, 0x2005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x4000); // Palette
-	map(0x200600, 0x203fff).ram().mirror(0x4000);
+	map(0x200000, 0x203fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x4000); // Palette
 	map(0x440000, 0x441fff).ram();
 	map(0x444000, 0x445fff).writeonly().share("spriteram");// Sprites (size?)
 	map(0x700000, 0x700001).portr("DSW");
 	map(0x700002, 0x700003).portr("P1_P2");
-	map(0x70000c, 0x70000d).w(FUNC(blmbycar_state::okibank_w));                               // Sound
+	map(0x70000d, 0x70000d).w(FUNC(blmbycar_state::okibank_w));                               // Sound
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
+	map(0xfec000, 0xfeffff).ram();
 }
 
 void blmbycar_state::blmbycar_map(address_map &map)
@@ -130,8 +138,10 @@ void blmbycar_state::blmbycar_map(address_map &map)
 	map(0x700006, 0x700007).portr("UNK");
 	map(0x700008, 0x700009).r(FUNC(blmbycar_state::blmbycar_pot_wheel_r));                              // Wheel (potentiometer)
 	map(0x70000a, 0x70000b).nopw();                                                // ? Wheel
-	map(0x70006a, 0x70006b).nopr().w(FUNC(blmbycar_state::blmbycar_pot_wheel_reset_w));                       // Wheel (potentiometer)
-	map(0x70007a, 0x70007b).nopr().w(FUNC(blmbycar_state::blmbycar_pot_wheel_shift_w));                       //
+	map(0x70006a, 0x70006b).nopr();                                                                    // Wheel (potentiometer)
+	map(0x70006b, 0x70006b).w(FUNC(blmbycar_state::blmbycar_pot_wheel_reset_w));                       // Wheel (potentiometer)
+	map(0x70007a, 0x70007b).nopr();                                                                    //
+	map(0x70007b, 0x70007b).w(FUNC(blmbycar_state::blmbycar_pot_wheel_shift_w));                       //
 }
 
 READ16_MEMBER(blmbycar_state::waterball_unk_r)
@@ -178,7 +188,7 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0010, "Pot Wheel" ) // Preliminary
 	PORT_DIPSETTING(      0x0008, "Opt Wheel" ) // Preliminary
-//  PORT_DIPSETTING(      0x0000, DEF_STR( Unused ) )   // Time goes to 0 rally fast!
+    PORT_DIPSETTING(      0x0000, "invalid, breaks game" )   // Time goes to 0 rally fast!
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -326,7 +336,7 @@ static const gfx_layout layout_16x16x4 =
 
 /* Layers both use the first $20 color codes. Sprites the next $10 */
 static GFXDECODE_START( gfx_blmbycar )
-	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 0x0, 64*8 ) // [0] Layers + Sprites
 GFXDECODE_END
 
 
@@ -344,7 +354,7 @@ MACHINE_START_MEMBER(blmbycar_state,blmbycar)
 	save_item(NAME(m_pot_wheel));
 	save_item(NAME(m_old_val));
 
-	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
 MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
@@ -375,17 +385,19 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blmbycar)
 
-	MCFG_PALETTE_ADD("palette", 0x300)
+	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
+	BLMBYCAR_SPRITES(config, m_sprites, 0);
+	m_sprites->set_gfxdecode_tag("gfxdecode");
+	m_sprites->set_screen_tag("screen");
+
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, blmbycar_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -393,7 +405,7 @@ MACHINE_START_MEMBER(blmbycar_state,watrball)
 {
 	save_item(NAME(m_retvalue));
 
-	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
 MACHINE_RESET_MEMBER(blmbycar_state,watrball)
@@ -524,6 +536,6 @@ void blmbycar_state::init_blmbycar()
 
 ***************************************************************************/
 
-GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, init_blmbycar, ROT0, "ABM & Gecas", "Blomby Car", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, blmbycar_state, empty_init,    ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, init_blmbycar, ROT0, "ABM & Gecas", "Blomby Car (Version 1P0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, blmbycar_state, empty_init,    ROT0, "ABM & Gecas", "Blomby Car (Version 1P0, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, watrball,  0,        watrball, watrball, blmbycar_state, empty_init,    ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )

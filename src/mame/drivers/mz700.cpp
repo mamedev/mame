@@ -401,19 +401,19 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("other", mz_state, ne556_other_callback, attotime::from_hz(34.5))
 
 	/* devices */
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(17'734'470)/20)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz_state, pit_out0_changed))
-	MCFG_PIT8253_CLK1(15611.0)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
-	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mz_state, pit_irq_2))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(17'734'470)/20);
+	m_pit->out_handler<0>().set(FUNC(mz_state::pit_out0_changed));
+	m_pit->set_clk<1>(15611.0);
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
+	m_pit->set_clk<2>(0);
+	m_pit->out_handler<2>().set(FUNC(mz_state::pit_irq_2));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz_state, pio_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz_state, pio_port_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz_state, pio_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz_state, pio_port_c_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(mz_state::pio_port_a_w));
+	m_ppi->in_pb_callback().set(FUNC(mz_state::pio_port_b_r));
+	m_ppi->in_pc_callback().set(FUNC(mz_state::pio_port_c_r));
+	m_ppi->out_pc_callback().set(FUNC(mz_state::pio_port_c_w));
 
 	TTL74145(config, m_ls145);
 
@@ -425,8 +425,7 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -454,14 +453,13 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz800_cass")
 
 	/* devices */
-	MCFG_DEVICE_MODIFY("pit8253")
-	MCFG_PIT8253_CLK0(XTAL(17'734'470)/16)
+	m_pit->set_clk<0>(XTAL(17'734'470)/16);
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(17'734'470)/5)
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, mz_state, mz800_z80pio_irq))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz_state, mz800_z80pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz_state, mz800_z80pio_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(17'734'470)/5));
+	pio.out_int_callback().set(FUNC(mz_state::mz800_z80pio_irq));
+	pio.in_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_r));
+	pio.out_pa_callback().set(FUNC(mz_state::mz800_z80pio_port_a_w));
+	pio.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 

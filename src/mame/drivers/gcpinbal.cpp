@@ -76,7 +76,7 @@ Custom: EXCELLENT SYSTEM ES-9208 347102 (QFP160)
 
 * Denotes unpopulated components
 
-NOTE: Mask roms from Power Flipper Pinball Shooting have not been dumped, but assumed to
+NOTE: Mask ROMs from Power Flipper Pinball Shooting have not been dumped, but assumed to
       be the same data.
 
 ***************************************************************************/
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
@@ -419,20 +419,20 @@ ROM_START( pwrflip ) /* Updated version of Grand Cross Pinball or semi-sequel? *
 	ROM_LOAD16_WORD_SWAP( "p.f.u46",       0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
 	ROM_REGION( 0x200000, "bg0", 0 )  /* BG0 (16 x 16) */
-	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
+	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 mask ROMs */
 	ROM_LOAD16_WORD_SWAP( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
 
 	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
 	ROM_LOAD16_WORD_SWAP( "p.f.u10",   0x000000, 0x020000, CRC(50e34549) SHA1(ca1808513ff3feb8bcd34d9aafd7b374e4244732) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
-	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
+	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
-	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B MASK ROM */
+	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B mask ROM */
 
 	ROM_REGION( 0x200000, "essnd", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
-	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 MASK ROM */
+	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x000400, "plds", 0 ) /* 2x TIBPAL16L8-15CN */
 	ROM_LOAD( "a.u72", 0x000, 0x104, NO_DUMP )
@@ -447,20 +447,20 @@ ROM_START( gcpinbal )
 	ROM_LOAD16_WORD_SWAP( "4_excellent.u46",  0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 
 	ROM_REGION( 0x200000, "bg0", 0 )  /* BG0 (16 x 16) */
-	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
+	ROM_LOAD16_WORD_SWAP( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 mask ROMs */
 	ROM_LOAD16_WORD_SWAP( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
 
 	ROM_REGION( 0x020000, "fg0", 0 )  /* FG0 (8 x 8) */
 	ROM_LOAD16_WORD_SWAP( "1_excellent.u10",   0x000000, 0x020000, CRC(79321550) SHA1(61f1b772ed8cf95bfee9df8394b0c3ff727e8702) )
 
 	ROM_REGION( 0x200000, "sprite", 0 )  /* Sprites (16 x 16) */
-	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
+	ROM_LOAD16_WORD_SWAP( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
-	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B MASK ROM */
+	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B mask ROM */
 
 	ROM_REGION( 0x200000, "essnd", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
-	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 MASK ROM */
+	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 mask ROM */
 
 	ROM_REGION( 0x000400, "plds", 0 ) /* 2x TIBPAL16L8-15CN */
 	ROM_LOAD( "a.u72", 0x000, 0x104, NO_DUMP )

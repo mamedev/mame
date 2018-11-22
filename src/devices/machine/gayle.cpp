@@ -58,6 +58,9 @@ void gayle_device::device_start()
 	m_cs0_write.resolve_safe();
 	m_cs1_read.resolve_safe(0xffff);
 	m_cs1_write.resolve_safe();
+
+	save_item(NAME(m_gayle_id_count));
+	save_item(NAME(m_gayle_reg));
 }
 
 //-------------------------------------------------

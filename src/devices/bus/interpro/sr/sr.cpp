@@ -274,7 +274,7 @@ void interpro_bus_device::device_resolve_objects()
 	m_out_irq0_cb.resolve_safe();
 	m_out_irq1_cb.resolve_safe();
 	m_out_irq2_cb.resolve_safe();
-	m_out_vblank_cb.resolve_safe();
+	m_out_irq3_cb.resolve_safe();
 }
 
 cbus_bus_device::cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

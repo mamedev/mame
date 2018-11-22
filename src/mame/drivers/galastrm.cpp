@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(galastrm_state::galastrm)
 	MCFG_DEVICE_PROGRAM_MAP(galastrm_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galastrm_state,  galastrm_interrupt) /* VBL */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 6);

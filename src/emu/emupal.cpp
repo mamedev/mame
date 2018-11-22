@@ -117,11 +117,20 @@ WRITE8_MEMBER(palette_device::write8_ext)
 	update_for_write(offset, 1);
 }
 
-
 WRITE16_MEMBER(palette_device::write16_ext)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
+}
+
+READ8_MEMBER(palette_device::read8_ext)
+{
+	return m_paletteram_ext.read8(offset);
+}
+
+READ16_MEMBER(palette_device::read16_ext)
+{
+	return m_paletteram_ext.read16(offset);
 }
 
 

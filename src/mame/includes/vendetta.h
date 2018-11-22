@@ -5,6 +5,11 @@
     Vendetta
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_VENDETTA_H
+#define MAME_INCLUDES_VENDETTA_H
+
+#pragma once
+
 #include "machine/bankdev.h"
 #include "machine/k053252.h"
 #include "video/k053246_k053247_k055673.h"
@@ -17,8 +22,8 @@
 class vendetta_state : public driver_device
 {
 public:
-	vendetta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vendetta_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k052109(*this, "k052109"),
@@ -28,7 +33,8 @@ public:
 		m_k054000(*this, "k054000"),
 		m_palette(*this, "palette"),
 		m_videobank0(*this, "videobank0"),
-		m_videobank1(*this, "videobank1") { }
+		m_videobank1(*this, "videobank1")
+	{ }
 
 	void esckids(machine_config &config);
 	void vendetta(machine_config &config);
@@ -39,15 +45,15 @@ private:
 		TIMER_Z80_NMI
 	};
 
-	/* video-related */
+	// video-related
 	int        m_layer_colorbase[3];
 	int        m_sprite_colorbase;
 	int        m_layerpri[3];
 
-	/* misc */
+	// misc
 	int        m_irq_enabled;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k052109_device> m_k052109;
@@ -88,3 +94,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_VENDETTA_H

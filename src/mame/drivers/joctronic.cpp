@@ -74,7 +74,7 @@ private:
 	void slalom03_sound_io_map(address_map &map);
 	void slalom03_sound_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<msm5205_device> m_oki;
@@ -337,25 +337,25 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(joctronic_state::joctronic)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4) // 3 MHz - uses WAIT
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map) // 139
-	MCFG_DEVICE_IO_MAP(maincpu_io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4); // 3 MHz - uses WAIT
+	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::maincpu_map); // 139
+	m_maincpu->set_addrmap(AS_IO, &joctronic_state::maincpu_io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
 	MCFG_DEVICE_PROGRAM_MAP(joctronic_sound_map)
 	MCFG_DEVICE_IO_MAP(joctronic_sound_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5516
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5516
 
 	LS259(config, m_mainlatch); // IC4 - exact type unknown
-	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::display_select_w)); MCFG_DEVCB_MASK(0x07)
-	//MCFG_DEVCB_CHAIN_OUTPUT(WRITE8(*this, joctronic_state, ls145_w)) MCFG_DEVCB_RSHIFT(4)
+	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::display_select_w)).mask(0x07);
+	//m_mainlatch->parallel_out_cb().append(FUNC(joctronic_state::ls145_w)).rshift(4);
 	//m_mainlatch->q_out_cb<3>().set(FUNC(joctronic_state::display_reset_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(12'000'000)/4) // 3 MHz
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(12'000'000)/4)); // 3 MHz
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0); //SINT
 
 	MCFG_DEVICE_ADD("drivers1", LS259, 0) // IC4
 	MCFG_DEVICE_ADD("drivers2", LS259, 0) // IC3
@@ -366,13 +366,12 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 	SPEAKER(config, "mono").front_center();
 
 	// Datasheet suggests YM2203 as a possible replacement for this AY8910
-	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("r2r1", dac_8bit_r2r_device, data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("r2r2", dac_8bit_r2r_device, data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", XTAL(12'000'000)/8)); // 1.5 MHz
+	aysnd1.port_a_write_callback().set("r2r1", FUNC(dac_8bit_r2r_device::data_w));
+	aysnd1.port_b_write_callback().set("r2r2", FUNC(dac_8bit_r2r_device::data_w));
+	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("aysnd2", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "aysnd2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.40); // 1.5 MHz
 
 	MCFG_DEVICE_ADD("r2r1", DAC_8BIT_R2R, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -383,25 +382,25 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(joctronic_state::slalom03)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
-	MCFG_DEVICE_PROGRAM_MAP(slalom03_maincpu_map) // 138, 368, 32
-	MCFG_DEVICE_IO_MAP(maincpu_io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2); // 6 MHz - uses WAIT
+	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::slalom03_maincpu_map); // 138, 368, 32
+	m_maincpu->set_addrmap(AS_IO, &joctronic_state::maincpu_io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
 	MCFG_DEVICE_PROGRAM_MAP(slalom03_sound_map)
 	MCFG_DEVICE_IO_MAP(slalom03_sound_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // 5516
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5516
 
 	LS259(config, m_mainlatch); // IC6 - exact type unknown
 	//m_mainlatch->q_out_cb<0>().set(FUNC(joctronic_state::cont_w));
-	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::ls145_w)); MCFG_DEVCB_RSHIFT(3) MCFG_DEVCB_MASK(0x38)
+	//m_mainlatch->parallel_out_cb().set(FUNC(joctronic_state::ls145_w)).rshift(3).mask(0x38);
 	//m_mainlatch->q_out_cb<7>().set(FUNC(joctronic_state::slalom03_reset_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(12'000'000)/2) // 6 MHz
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(12'000'000)/2)); // 6 MHz
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	//ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0); //SINT
 
 	MCFG_DEVICE_ADD("drivers1", HC259, 0) // IC1
 	MCFG_DEVICE_ADD("drivers2", HC259, 0) // IC2
@@ -413,14 +412,14 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, joctronic_state, slalom03_oki_bank_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("adpcm_select", ls157_device, ba_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", XTAL(12'000'000)/8)); // 1.5 MHz
+	aysnd1.port_a_write_callback().set(FUNC(joctronic_state::slalom03_oki_bank_w));
+	aysnd1.port_b_write_callback().set(m_adpcm_select, FUNC(ls157_device::ba_w));
+	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("aysnd2", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("r2r", dac_8bit_r2r_device, data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", XTAL(12'000'000)/8)); // 1.5 MHz
+	aysnd2.port_a_write_callback().set("r2r", FUNC(dac_8bit_r2r_device::data_w));
+	aysnd2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	MCFG_DEVICE_ADD("r2r", DAC_8BIT_R2R, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -434,11 +433,11 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(joctronic_state::bldyrolr)
+void joctronic_state::bldyrolr(machine_config & config)
+{
 	slalom03(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bldyrolr_maincpu_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &joctronic_state::bldyrolr_maincpu_map);
+}
 
 
 /*-------------------------------------------------------------------

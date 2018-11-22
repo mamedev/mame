@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	m_mainlatch->q_out_cb<6>().set(FUNC(timeplt_state::coin_counter_2_w));
 	m_mainlatch->q_out_cb<7>().set_nop(); // PAY OUT - not used
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -499,8 +499,7 @@ MACHINE_CONFIG_START(timeplt_state::chkun)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_chkun)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("timeplt_audio:ay2")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, timeplt_state, chkun_sound_w))
+	subdevice<ay8910_device>("timeplt_audio:ay2")->port_a_write_callback().set(FUNC(timeplt_state::chkun_sound_w));
 
 	MCFG_TC8830F_ADD("tc8830f", XTAL(512'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "timeplt_audio:mono", 0.10)

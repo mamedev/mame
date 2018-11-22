@@ -58,10 +58,11 @@ void tti_state::prg_map(address_map &map)
 	map(0x80070, 0x80077).w("bitlatch", FUNC(ls259_device::write_d0));
 }
 
-MACHINE_CONFIG_START(tti_state::tti)
-	MCFG_DEVICE_ADD("maincpu", M68008, 20_MHz_XTAL / 2) // guess
-	MCFG_DEVICE_PROGRAM_MAP(prg_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(tti_state, intack)
+void tti_state::tti(machine_config &config)
+{
+	M68008(config, m_maincpu, 20_MHz_XTAL / 2); // guess
+	m_maincpu->set_addrmap(AS_PROGRAM, &tti_state::prg_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(tti_state::intack));
 
 	MC68901(config, m_mfp, 20_MHz_XTAL / 2); // guess
 	m_mfp->set_timer_clock(20_MHz_XTAL / 2); // guess
@@ -70,17 +71,16 @@ MACHINE_CONFIG_START(tti_state::tti)
 	m_mfp->out_so_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_mfp->out_irq_cb().set_inputline("maincpu", M68K_IRQ_5);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mfp", mc68901_device, write_rx))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
 
-	MCFG_DEVICE_ADD("novram", EEPROM_SERIAL_X24C44_16BIT)
-	MCFG_EEPROM_SERIAL_DO_CALLBACK(WRITELINE("mfp", mc68901_device, i0_w))
+	EEPROM_X24C44_16BIT(config, "novram").do_callback().set("mfp", FUNC(mc68901_device::i0_w));
 
 	ls259_device &bitlatch(LS259(config, "bitlatch")); // U17
 	bitlatch.q_out_cb<0>().set("novram", FUNC(eeprom_serial_x24c44_device::di_write));
 	bitlatch.q_out_cb<1>().set("novram", FUNC(eeprom_serial_x24c44_device::clk_write));
 	bitlatch.q_out_cb<2>().set("novram", FUNC(eeprom_serial_x24c44_device::cs_write));
-MACHINE_CONFIG_END
+}
 
 ROM_START( tti )
 	ROM_REGION( 0x8000, "maincpu", 0 )

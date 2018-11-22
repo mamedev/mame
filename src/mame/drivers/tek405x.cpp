@@ -1093,9 +1093,7 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MC6820_GPIB_TAG, pia6821_device, cb1_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
+	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K,24K,32K");
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "tek4050_cart")
@@ -1129,9 +1127,7 @@ MACHINE_CONFIG_START(tek4052_state::tek4052)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("64K");
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "tek4050_cart")

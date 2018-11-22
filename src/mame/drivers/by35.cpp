@@ -644,7 +644,7 @@ WRITE_LINE_MEMBER( as2888_state::u11_cb2_as2888_w )
 	{
 		m_snd_sustain_timer->adjust(attotime::from_msec(5));
 
-		m_discrete->write(machine().dummy_space(), NODE_08, 11);  // 11 volt pulse
+		m_discrete->write(NODE_08, 11);  // 11 volt pulse
 	}
 
 	u11_cb2_w(state);
@@ -919,8 +919,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_s )
 		m_snd_tone_gen = m_snd_sel;
 		m_snd_div++;
 
-		m_discrete->write(machine().dummy_space(), NODE_04, BIT(m_snd_div, 2) * 1);
-		m_discrete->write(machine().dummy_space(), NODE_01, BIT(m_snd_div, 0) * 1);
+		m_discrete->write(NODE_04, BIT(m_snd_div, 2) * 1);
+		m_discrete->write(NODE_01, BIT(m_snd_div, 0) * 1);
 
 		if (m_snd_sel == 0x01) LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
 	}
@@ -939,7 +939,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( as2888_state::timer_as2888 )
 		LOG("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
 	}
 
-	m_discrete->write(machine().dummy_space(), NODE_08, 0);
+	m_discrete->write(NODE_08, 0);
 	m_snd_sustain_timer->adjust(attotime::never);
 
 	LOG("Sustain off\n");
@@ -1097,7 +1097,7 @@ MACHINE_CONFIG_START(by35_state::by35)
 	MCFG_DEVICE_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_DEVICE_PROGRAM_MAP(by35_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // 'F' filled causes Credit Display to be blank on first startup
 
 	/* Video */
 	config.set_default_layout(layout_by35);
@@ -2174,14 +2174,8 @@ ROM_START(darkshad)
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_COPY("maincpu", 0x5800, 0xf800,0x0800)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("bp_u4.532", 0x8000, 0x1000, CRC(57978b4a) SHA1(4995837790d81b02325d39b548fb882a591769c5))
-	ROM_RELOAD(0x9000, 0x1000)
-	ROM_RELOAD(0xa000, 0x1000)
-	ROM_RELOAD(0xb000, 0x1000)
-	ROM_LOAD("bp_u3.532", 0xc000, 0x1000, CRC(a5005067) SHA1(bd460a20a6e8f33746880d72241d6776b85126cf))
-	ROM_RELOAD(0xd000, 0x1000)
-	ROM_RELOAD(0xe000, 0x1000)
-	ROM_RELOAD(0xf000, 0x1000)
+	ROM_LOAD("darkshad.snd", 0xc000, 0x2000, CRC(9fd6ee82) SHA1(6486fa56c663152e565e160b8f517be824338a9a))
+	ROM_RELOAD(0xe000, 0x2000)
 ROM_END
 
 /*--------------------------------
@@ -2306,7 +2300,7 @@ ROM_START(toppin)
 	ROM_RELOAD(0x28000, 0x8000)
 	ROM_LOAD("snd_u10.bin",0x10000,0x8000, CRC(bca9a805) SHA1(0deb3172b5c8fc91c4b02b21b1e3794ed7adef13))
 	ROM_RELOAD(0x30000, 0x8000)
-	ROM_LOAD("snd_u11.bin",0x18000,0x8000, CRC(1814a50d) SHA1(6fe22e774fa90725d0db9f1020bad88bae0ef85c))
+	ROM_LOAD("snd_u11.bin",0x18000,0x8000, CRC(513d06a9) SHA1(3785398649fde5579b5a0461b52360ef83d71323))
 	ROM_RELOAD(0x38000, 0x8000)
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_COPY("sound1", 0x0000, 0x8000,0x8000)
@@ -2412,8 +2406,7 @@ ROM_START(suprbowl)
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("720_u3.snd", 0xc000, 0x2000, CRC(5d8e2adb) SHA1(901a26f5e598386295a1298ee3a634941bd58b3e))
-	ROM_RELOAD(0xe000, 0x2000)
+	ROM_LOAD("suprbowl.snd", 0xf000, 0x1000, CRC(97fc0f7a) SHA1(595aa080a6d2c1ab7e718974c4d01e846e142cc1))
 ROM_END
 
 // AS-2888 sound

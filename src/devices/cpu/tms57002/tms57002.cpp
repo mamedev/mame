@@ -16,7 +16,6 @@
 
 DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "Texas Instruments TMS57002 \"DASP\"")
 
-// Can't use a DEVICE_ADDRESS_MAP, not yet anyway
 void tms57002_device::internal_pgm(address_map &map)
 {
 	map(0x00, 0xff).ram();
@@ -25,8 +24,10 @@ void tms57002_device::internal_pgm(address_map &map)
 tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS57002, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, macc(0), st0(0), st1(0), sti(0), txrd(0)
+	, macc(0), macc_read(0), macc_write(0), st0(0), st1(0), sti(0), txrd(0)
 	, m_dready_callback(*this)
+	, m_pc0_callback(*this)
+	, m_empty_callback(*this)
 	, program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(tms57002_device::internal_pgm), this))
 	, data_config("data", ENDIANNESS_LITTLE, 8, 20)
 {
@@ -47,7 +48,9 @@ WRITE_LINE_MEMBER(tms57002_device::pload_w)
 	if(olds ^ sti) {
 		if (sti & IN_PLOAD) {
 			hidx = 0;
-			hpc = 0;
+			pc = 0;
+			ca = 0;
+			sti &= ~(SU_MASK);
 		}
 	}
 }
@@ -62,26 +65,30 @@ WRITE_LINE_MEMBER(tms57002_device::cload_w)
 	if(olds ^ sti) {
 		if (sti & IN_CLOAD) {
 			hidx = 0;
-			ca = 0;
+			//ca = 0; // Seems extremely dubious
 		}
 	}
 }
 
 void tms57002_device::device_reset()
 {
-	sti = (sti & ~(SU_MASK|S_READ|S_WRITE|S_BRANCH|S_HOST)) | (SU_ST0|S_IDLE);
+	sti = (sti & ~(SU_MASK|S_READ|S_WRITE|S_BRANCH|S_HOST|S_UPDATE)) | (SU_ST0|S_IDLE);
 	pc = 0;
 	ca = 0;
 	hidx = 0;
 	id = 0;
 	ba0 = 0;
 	ba1 = 0;
+	update_counter_tail = 0;
+	update_counter_head = 0;
 	st0 &= ~(ST0_INCS | ST0_DIRI | ST0_FI | ST0_SIM | ST0_PLRI |
 			ST0_PBCI | ST0_DIRO | ST0_FO | ST0_SOM | ST0_PLRO |
 			ST0_PBCO | ST0_CNS);
-	st1 &= ~(ST1_AOV | ST1_SFAI | ST1_SFAO | ST1_MOVM | ST1_MOV |
+	st1 &= ~(ST1_AOV | ST1_SFAI | ST1_SFAO | ST1_AOVM | ST1_MOVM | ST1_MOV |
 			ST1_SFMA | ST1_SFMO | ST1_RND | ST1_CRM | ST1_DBP);
 	update_dready();
+	update_pc0();
+	update_empty();
 
 	xba = 0;
 	xoa = 0;
@@ -112,6 +119,7 @@ WRITE8_MEMBER(tms57002_device::data_w)
 				break;
 			case SU_PRG:
 				program->write_dword(pc++, val);
+				update_pc0();
 				break;
 			}
 		}
@@ -121,9 +129,11 @@ WRITE8_MEMBER(tms57002_device::data_w)
 			host[hidx++] = data;
 			if(hidx >= 4) {
 				uint32_t val = (host[0]<<24) | (host[1]<<16) | (host[2]<<8) | host[3];
-				cmem[sa] = val;
 				sti &= ~SU_CVAL;
-				allow_update = 0;
+				update[update_counter_head] = val;
+				update_counter_head = (update_counter_head + 1) & 0x0f;
+				hidx = 1; // the write shouldn't really happen until CLOAD is high though
+				update_empty();
 			}
 		} else {
 			sa = data;
@@ -160,11 +170,6 @@ READ8_MEMBER(tms57002_device::data_r)
 	return res;
 }
 
-READ_LINE_MEMBER(tms57002_device::empty_r)
-{
-	return 1;
-}
-
 READ_LINE_MEMBER(tms57002_device::dready_r)
 {
 	return sti & S_HOST ? 0 : 1;
@@ -180,9 +185,24 @@ READ_LINE_MEMBER(tms57002_device::pc0_r)
 	return pc == 0 ? 0 : 1;
 }
 
+void tms57002_device::update_pc0()
+{
+	m_pc0_callback(pc == 0 ? 0 : 1);
+}
+
+READ_LINE_MEMBER(tms57002_device::empty_r)
+{
+	return (update_counter_head == update_counter_tail);
+}
+
+void tms57002_device::update_empty()
+{
+	m_empty_callback(update_counter_head == update_counter_tail);
+}
+
 WRITE_LINE_MEMBER(tms57002_device::sync_w)
 {
-	if(sti & (IN_PLOAD | IN_CLOAD))
+	if(sti & (IN_PLOAD /*| IN_CLOAD*/))
 		return;
 
 	allow_update = 1;
@@ -293,7 +313,7 @@ inline void tms57002_device::xm_step_write()
 
 int64_t tms57002_device::macc_to_output_0(int64_t rounding, uint64_t rmask)
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 	int over = 0;
 
@@ -318,7 +338,7 @@ int64_t tms57002_device::macc_to_output_0(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::macc_to_output_1(int64_t rounding, uint64_t rmask)
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 	int over = 0;
 
@@ -344,7 +364,7 @@ int64_t tms57002_device::macc_to_output_1(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::macc_to_output_2(int64_t rounding, uint64_t rmask)
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 	int over = 0;
 
@@ -370,7 +390,7 @@ int64_t tms57002_device::macc_to_output_2(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::macc_to_output_3(int64_t rounding, uint64_t rmask)
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 	int over = 0;
 
@@ -393,7 +413,7 @@ int64_t tms57002_device::macc_to_output_3(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::macc_to_output_0s(int64_t rounding, uint64_t rmask)
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 	int over = 0;
 
@@ -422,7 +442,7 @@ int64_t tms57002_device::macc_to_output_0s(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::macc_to_output_1s(int64_t rounding, uint64_t rmask)
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 	int over = 0;
 
@@ -452,7 +472,7 @@ int64_t tms57002_device::macc_to_output_1s(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::macc_to_output_2s(int64_t rounding, uint64_t rmask)
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 	int over = 0;
 
@@ -482,7 +502,7 @@ int64_t tms57002_device::macc_to_output_2s(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::macc_to_output_3s(int64_t rounding, uint64_t rmask)
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 	int over = 0;
 
@@ -509,7 +529,7 @@ int64_t tms57002_device::macc_to_output_3s(int64_t rounding, uint64_t rmask)
 
 int64_t tms57002_device::check_macc_overflow_0()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -522,7 +542,7 @@ int64_t tms57002_device::check_macc_overflow_0()
 
 int64_t tms57002_device::check_macc_overflow_1()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -535,7 +555,7 @@ int64_t tms57002_device::check_macc_overflow_1()
 
 int64_t tms57002_device::check_macc_overflow_2()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -548,12 +568,12 @@ int64_t tms57002_device::check_macc_overflow_2()
 
 int64_t tms57002_device::check_macc_overflow_3()
 {
-	return macc;
+	return macc_read;
 }
 
 int64_t tms57002_device::check_macc_overflow_0s()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -570,7 +590,7 @@ int64_t tms57002_device::check_macc_overflow_0s()
 
 int64_t tms57002_device::check_macc_overflow_1s()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -587,7 +607,7 @@ int64_t tms57002_device::check_macc_overflow_1s()
 
 int64_t tms57002_device::check_macc_overflow_2s()
 {
-	int64_t m = macc;
+	int64_t m = macc_read;
 	uint64_t m1;
 
 	// Overflow detection
@@ -604,7 +624,35 @@ int64_t tms57002_device::check_macc_overflow_2s()
 
 int64_t tms57002_device::check_macc_overflow_3s()
 {
-	return macc;
+	return macc_read;
+}
+
+uint32_t tms57002_device::get_cmem(uint8_t addr)
+{
+	if(sa == addr && update_counter_head != update_counter_tail)
+		sti |= S_UPDATE;
+
+	if(sti & S_UPDATE)
+	{
+		cmem[addr] = update[update_counter_tail];
+		update_counter_tail = (update_counter_tail + 1) & 0x0f;
+		update_empty();
+
+		if(update_counter_head == update_counter_tail)
+			sti &= ~S_UPDATE;
+
+		return cmem[addr]; // The value of crm is ignored during an update.
+	}
+	else
+	{
+		int crm = (st1 & ST1_CRM) >> ST1_CRM_SHIFT;
+		uint32_t cvar = cmem[addr];
+		if(crm == 1)
+			return (cvar & 0xffff0000);
+		else if(crm == 2)
+			return (cvar << 16);
+		return cvar;
+	}
 }
 
 void tms57002_device::cache_flush()
@@ -730,7 +778,7 @@ void tms57002_device::execute_run()
 {
 	int ipc = -1;
 
-	while(icount > 0 && !(sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
+	while(icount > 0 && !(sti & (S_IDLE | IN_PLOAD /*| IN_CLOAD*/))) {
 		int iipc;
 
 		debugger_instruction_hook(pc);
@@ -747,9 +795,10 @@ void tms57002_device::execute_run()
 				xm_step_write();
 		}
 
+		macc_read = macc_write;
+		macc_write = macc;
+
 		for(;;) {
-			uint32_t c, d;
-			int64_t r;
 			const icd *i = cache.inst + ipc;
 
 			ipc = i->next;
@@ -769,9 +818,9 @@ void tms57002_device::execute_run()
 				++ca, ++id;
 				goto inst;
 
-#define CINTRP
+#define CINTRPSWITCH
 #include "cpu/tms57002/tms57002.hxx"
-#undef CINTRP
+#undef CINTRPSWITCH
 
 			default:
 				fatalerror("Unhandled opcode in tms57002_execute\n");
@@ -786,8 +835,10 @@ void tms57002_device::execute_run()
 		} else if(sti & S_BRANCH) {
 			sti &= ~S_BRANCH;
 			ipc = -1;
-		} else
+		} else {
 			pc++; // Wraps if it reaches 256, next wraps too
+			update_pc0();
+		}
 
 		if(rptc_next) {
 			rptc = rptc_next;
@@ -825,6 +876,8 @@ void tms57002_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 void tms57002_device::device_resolve_objects()
 {
 	m_dready_callback.resolve_safe();
+	m_pc0_callback.resolve_safe();
+	m_empty_callback.resolve_safe();
 }
 
 void tms57002_device::device_start()
@@ -861,10 +914,13 @@ void tms57002_device::device_start()
 	stream_alloc(4, 4, STREAM_SYNC);
 
 	save_item(NAME(macc));
+	save_item(NAME(macc_read));
+	save_item(NAME(macc_write));
 
 	save_item(NAME(cmem));
 	save_item(NAME(dmem0));
 	save_item(NAME(dmem1));
+	save_item(NAME(update));
 
 	save_item(NAME(si));
 	save_item(NAME(so));
@@ -893,6 +949,9 @@ void tms57002_device::device_start()
 
 	save_item(NAME(host));
 	save_item(NAME(hidx));
+
+	save_item(NAME(update_counter_head));
+	save_item(NAME(update_counter_tail));
 	save_item(NAME(allow_update));
 }
 

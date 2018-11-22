@@ -766,9 +766,7 @@ MACHINE_CONFIG_START(prestige_state::prestige_base)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::glcolor)

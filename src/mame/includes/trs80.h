@@ -53,7 +53,7 @@ public:
 		, m_io_baud(*this, "BAUD")
 		, m_io_config(*this, "CONFIG")
 		, m_io_keyboard(*this, "LINE%u", 0)
-		{ }
+	{ }
 
 	void sys80(machine_config &config);
 	void trs80(machine_config &config);

@@ -8,6 +8,10 @@
 
     Info from: http://www.sol20.org/
 
+    The Sol Terminal Computer was the first complete S-100 microcomputer
+    with a built-in keyboard and video output. However, its internal
+    architecture resembles a video display terminal more than anything else.
+
     Note that the SOLOS dump comes from the Solace emu. Confirmed as ok.
 
     The roms DPMON and CONSOL are widely available on the net as ENT files,
@@ -148,6 +152,7 @@ public:
 	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_cass1(*this, "cassette")
 		, m_cass2(*this, "cassette2")
 		, m_uart(*this, "uart")
@@ -201,6 +206,7 @@ private:
 	emu_timer *m_cassette_timer;
 	cassette_image_device *cassette_device_image();
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cass1;
 	required_device<cassette_image_device> m_cass2;
 	required_device<ay31015_device> m_uart;
@@ -542,6 +548,13 @@ static INPUT_PORTS_START( sol20 )
 	PORT_CONFNAME( 0x02, 0x00, "Character Rom")
 	PORT_CONFSETTING(    0x00, "6574")
 	PORT_CONFSETTING(    0x02, "6575")
+	PORT_CONFNAME( 0x04, 0x04, "Field Rate") // modification described on page III-40 of Sol Systems Manual
+	PORT_CONFSETTING(    0x00, "50 Hz")
+	PORT_CONFSETTING(    0x04, "60 Hz")
+	PORT_CONFNAME( 0x18, 0x18, "CPU Clock")
+	PORT_CONFSETTING(    0x18, "2.04 MHz (8080A)")
+	PORT_CONFSETTING(    0x10, "2.36 MHz (8080A-2)")
+	PORT_CONFSETTING(    0x08, "2.86 MHz (8080A-1)")
 INPUT_PORTS_END
 
 
@@ -609,6 +622,13 @@ void sol20_state::machine_reset()
 
 	m_rs232->write_dtr(0);
 	m_rs232->write_rts(1);
+
+	int lines = BIT(m_iop_config->read(), 2) ? 260 : 312;
+	m_screen->configure(918, lines, m_screen->visible_area(), attotime::from_ticks(918 * lines, 14.318181_MHz_XTAL).as_attoseconds());
+
+	// set CPU speed (TODO: also present on bus pin 49)
+	double freq = (14.318181_MHz_XTAL / (4 + ((m_iop_config->read() >> 3) & 3))).dvalue();
+	m_maincpu->set_unscaled_clock(freq);
 }
 
 void sol20_state::init_sol20()
@@ -718,7 +738,7 @@ void sol20_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(sol20_state::sol20)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 14.318181_MHz_XTAL / 7) // divider selectable as 5, 6 or 7 through jumpers
+	MCFG_DEVICE_ADD("maincpu", I8080A, 14.318181_MHz_XTAL / 7) // divider selectable as 5, 6 or 7 through jumpers
 	MCFG_DEVICE_PROGRAM_MAP(sol20_mem)
 	MCFG_DEVICE_IO_MAP(sol20_io)
 	MCFG_I8085A_INTE(WRITELINE("speaker", speaker_sound_device, level_w))
@@ -754,11 +774,11 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	m_uart->set_rx_clock(4800.0);
 	m_uart->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	AY51013(config, m_uart_s); // TMS6011NC
-	m_uart_s->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
-	m_uart_s->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart_s->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
+	m_uart_s->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_uart_s->set_tx_clock(4800.0);
 	m_uart_s->set_rx_clock(4800.0);
 	m_uart_s->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
@@ -792,5 +812,5 @@ ROM_START( sol20 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME  FLAGS
-COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, init_sol20, "Processor Technology Corporation", "SOL-20", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME                    FLAGS
+COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, init_sol20, "Processor Technology Corporation", "Sol-20 Terminal Computer", 0 )

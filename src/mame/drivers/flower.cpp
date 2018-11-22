@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(flower_state::flower)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flower)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	SPEAKER(config, "mono").front_center();
 

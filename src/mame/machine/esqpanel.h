@@ -114,10 +114,6 @@ protected:
 	virtual bool write_contents(std::ostream &o) override;
 
 	required_device<esq2x40_device> m_vfd;
-
-private:
-	static const char *html;
-	static const char *js;
 };
 
 class esqpanel2x40_sq1_device : public esqpanel_device {

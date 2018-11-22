@@ -267,10 +267,10 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_SOUND_ROUTE(0, "mono", 0.55)
-	MCFG_SOUND_ROUTE(1, "mono", 0.55)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000)/9));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
+	ym2.add_route(0, "mono", 0.55);
+	ym2.add_route(1, "mono", 0.55);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

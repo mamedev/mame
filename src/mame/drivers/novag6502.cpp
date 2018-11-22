@@ -410,7 +410,7 @@ WRITE8_MEMBER(novag6502_state::sexpert_lcd_control_w)
 	// d1: HD44780 R/W
 	// d2: HD44780 E
 	if (m_lcd_control & ~data & 4 && ~data & 2)
-		m_lcd->write(space, m_lcd_control & 1, m_lcd_data);
+		m_lcd->write(m_lcd_control & 1, m_lcd_data);
 	m_lcd_control = data & 7;
 }
 
@@ -878,7 +878,7 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
 	MCFG_DEVICE_PROGRAM_MAP(supercon_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_novag_supercon);
@@ -898,7 +898,7 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for 11us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	HLCD0538(config, m_hlcd0538, 0);
@@ -922,17 +922,18 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(21500)) // active for 21.5us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
-	MCFG_DEVICE_ADD("acia", MOS6551, 0) // R65C51P2 - RTS to CTS, DCD to GND
-	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
-	MCFG_MOS6551_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE("acia", mos6551_device, write_cts))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
+	mos6551_device &acia(MOS6551(config, "acia", 0)); // R65C51P2 - RTS to CTS, DCD to GND
+	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set_inputline("maincpu", m65c02_device::NMI_LINE);
+	acia.rts_handler().set("acia", FUNC(mos6551_device::write_cts));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("acia", FUNC(mos6551_device::write_rxd));
+	rs232.dsr_handler().set("acia", FUNC(mos6551_device::write_dsr));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(novag6502_state, sexpert)
 

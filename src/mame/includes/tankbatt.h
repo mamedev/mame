@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
+#ifndef MAME_INCLUDES_TANKBATT_H
+#define MAME_INCLUDES_TANKBATT_H
+
+#pragma once
 
 #include "sound/samples.h"
 #include "emupal.h"
@@ -7,14 +11,15 @@
 class tankbatt_state : public driver_device
 {
 public:
-	tankbatt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tankbatt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_bulletsram(*this, "bulletsram"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void tankbatt(machine_config &config);
 
@@ -58,3 +63,5 @@ private:
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TANKBATT_H

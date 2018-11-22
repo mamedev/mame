@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	MCFG_DEVICE_ADD(M6809_TAG, MC6809, 10.738635_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(arachnid_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // MK48Z02 (or DS1220Y)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02 (or DS1220Y)
 
 	// devices
 	PIA6821(config, m_pia_u4, 0);
@@ -448,11 +448,11 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	m_pia_u17->cb2_handler().set(FUNC(arachnid_state::pia_u17_pcb_w));
 
 	// video hardware
-	MCFG_DEVICE_ADD(TMS9118_TAG, TMS9118, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6809_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9118_TAG, tms9118_device, screen_update )
+	tms9118_device &vdp(TMS9118(config, TMS9118_TAG, 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

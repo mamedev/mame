@@ -1500,8 +1500,7 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	m_adc->in_callback<6>().set_ioport("A2D6");
 	m_adc->in_callback<7>().set_ioport("A2D7");
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigx2)

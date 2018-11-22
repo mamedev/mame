@@ -81,15 +81,15 @@ PWB403045B (C) 1997 KONAMI CO., LTD.
 |                                                          |
 |----------------------------------------------------------|
 Notes:
-      056879     - Konami custom IC, location 10E (QFP120)
-      058232     - Konami custom ceramic flat pack IC, DAC?
+      056879     - Konami custom IC, location 10E (TQFP120)
+      058232     - Konami custom ceramic flat pack IC, DAC? (SIP14)
       003461     - Konami custom IC, location 11K (QFP100)
       CN16       - 4 pin connector for CD-DA in from CDROM
       CN15       - Standard (PC-compatible) 40 pin IDE CDROM flat cable connector and 4 pin power plug connector,
                    connected to Panasonic CR-583 8-speed CDROM drive.
       LA4705     - LA4705 Power Amplifier
       DSW        - 8 position dip switch
-      BOOTROM.8Q - 16MBit MASKROM. Location 8Q (DIP42)
+      BOOTROM.8Q - 16MBit mask ROM. Location 8Q (DIP42)
                    Battle Tryst       - 636A01.8Q
                    Evil Night         -       .8Q
                    Heat Of Eleven '98 -       .8Q

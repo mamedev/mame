@@ -354,9 +354,9 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	m_mainlatch->q_out_cb<6>().set(FUNC(tomcat_state::ack_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(tomcat_state::txbuff_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
 
@@ -383,9 +383,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
 MACHINE_CONFIG_END
 
 ROM_START( tomcat )

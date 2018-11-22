@@ -466,19 +466,6 @@ void fp_state::sound_mem(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( sound_io )
-//-------------------------------------------------
-
-void fp_state::sound_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1);
-	map(M6801_PORT2, M6801_PORT2);
-	map(M6801_PORT3, M6801_PORT3);
-	map(M6801_PORT4, M6801_PORT4);
-}
-
-
 
 //**************************************************************************
 //  INPUT PORTS
@@ -587,7 +574,6 @@ MACHINE_CONFIG_START(fp_state::fp)
 
 	MCFG_DEVICE_ADD(HD63B01V1_TAG, HD6301, 2000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
-	MCFG_DEVICE_IO_MAP(sound_io)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -611,10 +597,11 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(fp_state, update_row)
+	MC6845(config, m_crtc, 4000000);
+	m_crtc->set_screen(SCREEN_CRT_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(fp_state::update_row), this);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -622,7 +609,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
 
 	AM9517A(config, m_dmac, 250000);
 	m_dmac->out_eop_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
@@ -657,9 +644,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,1M");
 MACHINE_CONFIG_END
 
 

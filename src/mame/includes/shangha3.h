@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_SHANGHA3_H
+#define MAME_INCLUDES_SHANGHA3_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
@@ -29,6 +33,9 @@ public:
 	void init_shangha3();
 	void init_heberpop();
 	void init_blocken();
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -68,8 +75,6 @@ private:
 	// blocken specific
 	DECLARE_WRITE8_MEMBER(blocken_coinctrl_w);
 
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void blocken_map(address_map &map);
@@ -79,3 +84,5 @@ private:
 	void heberpop_sound_map(address_map &map);
 	void shangha3_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SHANGHA3_H

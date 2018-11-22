@@ -163,6 +163,7 @@ private:
 	uint8_t     m_prev_gamebank_select;
 
 	void sound_mem(address_map &map);
+	void scsp_mem(address_map &map);
 	void stv_mem(address_map &map);
 	void stvcd_mem(address_map &map);
 };

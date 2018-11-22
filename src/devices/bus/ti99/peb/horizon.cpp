@@ -479,17 +479,12 @@ INPUT_PORTS_START( horizon )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(horizon_ramdisk_device::device_add_mconfig)
-	MCFG_RAM_ADD(NVRAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("16M")
-
-	MCFG_RAM_ADD(ROSREGION)
-	MCFG_RAM_DEFAULT_SIZE("8k")
-
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("32k")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+void horizon_ramdisk_device::device_add_mconfig(machine_config &config)
+{
+	RAM(config, NVRAMREGION).set_default_size("16M");
+	RAM(config, ROSREGION).set_default_size("8K");
+	RAM(config, RAMREGION).set_default_size("32K").set_default_value(0);
+}
 
 ioport_constructor horizon_ramdisk_device::device_input_ports() const
 {

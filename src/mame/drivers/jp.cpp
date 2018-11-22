@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(jp_state::jp)
 	MCFG_DEVICE_PROGRAM_MAP(jp_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, 8_MHz_XTAL / 8192) // 4020 divider
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	LS259(config, m_latch[0]);
 	m_latch[0]->q_out_cb<1>().set(FUNC(jp_state::disp_data_w)).invert();
@@ -374,10 +374,10 @@ MACHINE_CONFIG_START(jp_state::jp)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	MCFG_DEVICE_ADD("ay", AY8910, 8_MHz_XTAL / 4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jp_state, porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jp_state, portb_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 0.9)
+	ay8910_device &ay(AY8910(config, "ay", 8_MHz_XTAL / 4));
+	ay.port_a_read_callback().set(FUNC(jp_state::porta_r));
+	ay.port_b_read_callback().set(FUNC(jp_state::portb_r));
+	ay.add_route(ALL_OUTPUTS, "ayvol", 0.9);
 MACHINE_CONFIG_END
 
 WRITE8_MEMBER(jp_state::sample_bank_w)
