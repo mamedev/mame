@@ -49,22 +49,22 @@ void orion_state::machine_start()
 
 READ8_MEMBER(orion_state::orion128_system_r)
 {
-	return m_ppi8255_2->read(space, offset & 3);
+	return m_ppi8255_2->read(offset & 3);
 }
 
 WRITE8_MEMBER(orion_state::orion128_system_w)
 {
-	m_ppi8255_2->write(space, offset & 3, data);
+	m_ppi8255_2->write(offset & 3, data);
 }
 
 READ8_MEMBER(orion_state::orion128_romdisk_r)
 {
-	return m_ppi8255_1->read(space, offset & 3);
+	return m_ppi8255_1->read(offset & 3);
 }
 
 WRITE8_MEMBER(orion_state::orion128_romdisk_w)
 {
-	m_ppi8255_1->write(space, offset & 3, data);
+	m_ppi8255_1->write(offset & 3, data);
 }
 
 void orion_state::orion_set_video_mode(int width)

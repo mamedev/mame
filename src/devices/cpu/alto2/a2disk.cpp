@@ -89,8 +89,8 @@ enum {
 
 #if ALTO2_DEBUG
 /** @brief human readable names for the KADR<- modes */
-static const char *rwc_name[4] = {"read", "check", "write", "write2"};
-static const char* raise_lower[2] = {"/","\\"};
+static char const *const rwc_name[4] = {"read", "check", "write", "write2"};
+static char const *const raise_lower[2] = {"/","\\"};
 #endif
 
 /**

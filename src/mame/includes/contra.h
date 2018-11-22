@@ -5,6 +5,10 @@
     Contra / Gryzor
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CONTRA_H
+#define MAME_INCLUDES_CONTRA_H
+
+#pragma once
 
 #include "video/k007121.h"
 #include "emupal.h"
@@ -13,13 +17,14 @@
 class contra_state : public driver_device
 {
 public:
-	contra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	contra_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_cram(*this, "fg_cram"),
 		m_fg_vram(*this, "fg_vram"),
 		m_tx_cram(*this, "tx_cram"),
 		m_tx_vram(*this, "tx_vram"),
 		m_spriteram(*this, "spriteram"),
+		m_spriteram_2(*this, "spriteram_2"),
 		m_bg_cram(*this, "bg_cram"),
 		m_bg_vram(*this, "bg_vram"),
 		m_audiocpu(*this, "audiocpu"),
@@ -28,7 +33,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	std::unique_ptr<uint8_t[]>       m_buffered_spriteram;
@@ -38,6 +44,7 @@ public:
 	required_shared_ptr<uint8_t> m_tx_cram;
 	required_shared_ptr<uint8_t> m_tx_vram;
 	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram_2;
 	required_shared_ptr<uint8_t> m_bg_cram;
 	required_shared_ptr<uint8_t> m_bg_vram;
 
@@ -83,3 +90,5 @@ public:
 	void contra_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CONTRA_H

@@ -408,6 +408,7 @@ public:
 	}
 
 	virtual void remove_passthrough(std::unordered_set<handler_entry *> &handlers) override {
+		invalidate_caches(read_or_write::READWRITE);
 		m_root_read->detach(handlers);
 		m_root_write->detach(handlers);
 	}
@@ -1890,7 +1891,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 	VPRINTF(("address_space::install_readwrite_port(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-			    rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
+				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_readwrite_port", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -1934,7 +1935,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-			    rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
+				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_bank_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);

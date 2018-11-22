@@ -390,7 +390,7 @@ void acclaim_rax_device::recompute_sample_rate(int which)
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
 	sample_period = sample_period * (16 * 1);
-	dmadac_set_frequency(&m_dmadac[0], 2, ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
+	dmadac_set_frequency(&m_dmadac[0], 2, sample_period.as_hz());
 	dmadac_enable(&m_dmadac[0], 2, 1);
 
 	/* fire off a timer which will hit every half-buffer */
@@ -501,8 +501,8 @@ MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
 	MCFG_TIMER_DEVICE_ADD("adsp_reg_timer0", DEVICE_SELF, acclaim_rax_device, adsp_irq0)
 	MCFG_TIMER_DEVICE_ADD("adsp_dma_timer", DEVICE_SELF, acclaim_rax_device, dma_timer_callback)
 
-	MCFG_GENERIC_LATCH_16_ADD("data_in")
-	MCFG_GENERIC_LATCH_16_ADD("data_out")
+	GENERIC_LATCH_16(config, m_data_in);
+	GENERIC_LATCH_16(config, m_data_out);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

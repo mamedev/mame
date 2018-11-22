@@ -1143,7 +1143,7 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_S29290_16BIT(config, "eeprom");
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1160,9 +1160,9 @@ MACHINE_CONFIG_START(jclub2o_state::jclub2o)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("st0020", ST0020_SPRITES, 0)
-	MCFG_ST0020_IS_JCLUB2(1)
-	MCFG_ST0020_SPRITES_PALETTE("palette")
+	ST0020_SPRITES(config, m_st0020, 0);
+	m_st0020->set_is_jclub2(1);
+	m_st0020->set_palette(m_palette);
 
 	// layout
 	config.set_default_layout(layout_jclub2o);
@@ -1177,7 +1177,7 @@ MACHINE_CONFIG_START(jclub2_state::jclub2)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -1195,10 +1195,10 @@ MACHINE_CONFIG_START(jclub2_state::jclub2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
-	MCFG_DEVICE_ADD("st0020", ST0020_SPRITES, 0)
-	MCFG_ST0020_IS_ST0032(1)
-	MCFG_ST0020_IS_JCLUB2(1) // offsets
-	MCFG_ST0020_SPRITES_PALETTE("palette")
+	ST0020_SPRITES(config, m_st0020, 0);
+	m_st0020->set_is_st0032(1);
+	m_st0020->set_is_jclub2(1); // offsets
+	m_st0020->set_palette(m_palette);
 
 	// layout
 	config.set_default_layout(layout_jclub2o);
@@ -1212,7 +1212,7 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)

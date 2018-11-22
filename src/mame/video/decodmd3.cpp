@@ -130,19 +130,21 @@ void decodmd_type3_device::decodmd3_map(address_map &map)
 	map(0x00c00020, 0x00c00021).rw(FUNC(decodmd_type3_device::latch_r), FUNC(decodmd_type3_device::status_w));
 }
 
-MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
+void decodmd_type3_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("dmdcpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(decodmd3_map)
+	M68000(config, m_cpu, XTAL(12'000'000));
+	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type3_device::decodmd3_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", decodmd_type3_device, dmd_irq, attotime::from_hz(150))
+	TIMER(config, "irq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(decodmd_type3_device::dmd_irq), this), attotime::from_hz(150));
 
-	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL(12'000'000) / 4)  // TODO: confirm clock speed
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type3_device, crtc_update_row)
+	MC6845(config, m_mc6845, XTAL(12'000'000) / 4);  // TODO: confirm clock speed
+	m_mc6845->set_screen(nullptr);
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(16);
+	m_mc6845->set_update_row_callback(FUNC(decodmd_type3_device::crtc_update_row), this);
 
 	screen_device &screen(SCREEN(config, "dmd", SCREEN_TYPE_RASTER));
 	screen.set_native_aspect();
@@ -152,7 +154,7 @@ MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	screen.set_refresh_hz(60);
 
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

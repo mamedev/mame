@@ -498,7 +498,7 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gauntlet)
@@ -526,9 +526,9 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.48)
+	YM2151(config, m_ym2151, ATARI_CLOCK_14MHz/4);
+	m_ym2151->add_route(1, "lspeaker", 0.48);
+	m_ym2151->add_route(0, "rspeaker", 0.48);
 
 	MCFG_DEVICE_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.32)

@@ -673,6 +673,39 @@ static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( barek3 )
+	PORT_INCLUDE( md_common )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME(0x18, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME(0xe0, 0x00, "Unknown" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x20, "6" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x60, "0" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0xa0, "4" )
+	PORT_DIPSETTING(    0xc0, "4" )
+	PORT_DIPSETTING(    0xe0, "4" )
+INPUT_PORTS_END
+
 /*************************************
  *
  *  Machine Configuration
@@ -774,6 +807,16 @@ ROM_START( sonic2mb )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "m1", 0x000001, 0x080000,  CRC(7b40aa24) SHA1(247882cd1f412366d61aeb4d85bbeefd5f108e1d) )
 	ROM_LOAD16_BYTE( "m2", 0x000000, 0x080000,  CRC(84b3f758) SHA1(19846b9d951db6f78f3e155d33f1b6349fb87f1a) )
+ROM_END
+
+ROM_START( barek3mb )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "6.u19", 0x000000, 0x080000,  CRC(2de19519) SHA1(f5fcef1da8b5370e399f0451382e3c6e7754c9c8) )
+	ROM_LOAD16_BYTE( "3.u18", 0x000001, 0x080000,  CRC(db900e82) SHA1(172a4fe01a0ffd1ea3aed74f2c58234fd55b876d) )
+	ROM_LOAD16_BYTE( "4.u15", 0x100000, 0x080000,  CRC(6353b4b1) SHA1(9f89a2f02170496ca798b89e37e1f2bae0e9155d) )
+	ROM_LOAD16_BYTE( "1.u14", 0x100001, 0x080000,  CRC(24d31e12) SHA1(64c1b968e1ee5d0355d902e280f33e4466f27b07) )
+	ROM_LOAD16_BYTE( "5.u17", 0x200000, 0x080000,  CRC(0feb974f) SHA1(ed1a25b6f1669dc6061d519985b6373fa89176c7) )
+	ROM_LOAD16_BYTE( "2.u16", 0x200001, 0x080000,  CRC(bba4a585) SHA1(32c59729943d7b4c1a39f2a2b0dae9ce16991e9c) )
 ROM_END
 
 
@@ -908,6 +951,21 @@ void md_boot_state::init_topshoot()
 	init_megadriv();
 }
 
+void md_boot_state::init_barek3()
+{
+	uint8_t* rom = memregion("maincpu")->base();
+
+	for (int x = 0x00001; x < 0x300000; x += 2)
+	{
+		rom[x] = bitswap<8>(rom[x], 6,2,4,0,7,1,3,5);
+	}
+
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x380070, 0x380071, "COINS");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x380078, 0x380079, "DSW");
+
+	init_megadrij();
+}
+
 /*************************************
  *
  *  Game driver(s)
@@ -920,3 +978,4 @@ GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_state, init_ssf2mdb,  R
 GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
 GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)
 GAME( 1993, sonic2mb, 0, megadrvb,     aladmdb,  md_boot_state, init_aladmdb,  ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", MACHINE_NOT_WORKING )
+GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)", 0 )

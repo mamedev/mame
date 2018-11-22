@@ -142,7 +142,7 @@ READ8_MEMBER(qtsbc_state::io_r)
 		case 2:
 		case 3:
 		default:
-			return m_pit->read(space, offset & 3);
+			return m_pit->read(offset & 3);
 
 		case 4:
 		case 5:
@@ -150,10 +150,8 @@ READ8_MEMBER(qtsbc_state::io_r)
 			return 0xff;
 
 		case 6:
-			return m_usart->data_r(space, 0);
-
 		case 7:
-			return m_usart->status_r(space, 0);
+			return m_usart->read(offset & 1);
 		}
 	}
 	else
@@ -183,7 +181,7 @@ WRITE8_MEMBER(qtsbc_state::io_w)
 		case 2:
 		case 3:
 		default:
-			m_pit->write(space, offset & 3, data);
+			m_pit->write(offset & 3, data);
 			break;
 
 		case 4:
@@ -192,11 +190,8 @@ WRITE8_MEMBER(qtsbc_state::io_w)
 			break;
 
 		case 6:
-			m_usart->data_w(space, 0, data);
-			break;
-
 		case 7:
-			m_usart->control_w(space, 0, data);
+			m_usart->write(offset & 1, data);
 			break;
 		}
 	}
@@ -479,11 +474,12 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(qtsbc_state::qtsbc)
+void qtsbc_state::qtsbc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL) // Mostek MK3880
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, 4_MHz_XTAL); // Mostek MK3880
+	m_maincpu->set_addrmap(AS_PROGRAM, &qtsbc_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &qtsbc_state::io_map);
 
 	/* video hardware */
 	PIT8253(config, m_pit, 0); // U9
@@ -494,15 +490,15 @@ MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
 
 	I8251(config, m_usart, 0); // U8
-	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_usart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr)) // actually from pin 11, "Reverse Channel Transmit"
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, qtsbc_state, rts_loopback_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
-MACHINE_CONFIG_END
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
+	m_rs232->rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	m_rs232->dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr)); // actually from pin 11, "Reverse Channel Transmit"
+	m_rs232->cts_handler().set(FUNC(qtsbc_state::rts_loopback_w));
+	m_rs232->dcd_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+}
 
 /* ROM definition */
 ROM_START( qtsbc )

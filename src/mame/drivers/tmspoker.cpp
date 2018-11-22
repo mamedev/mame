@@ -563,7 +563,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 
 	// CPU TMS9980A; no line connections
-	TMS9980A(config, m_maincpu, MASTER_CLOCK/4);
+	TMS9980A(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmspoker_state::tmspoker_map);
 	m_maincpu->set_addrmap(AS_IO, &tmspoker_state::tmspoker_cru_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tmspoker_state::tmspoker_interrupt));
@@ -582,9 +582,10 @@ MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/4)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 MACHINE_CONFIG_END
 
@@ -599,7 +600,7 @@ ROM_START( tmspoker )
 	ROM_LOAD( "0.bin",  0x0800, 0x0800, CRC(a20ae6cb) SHA1(d47780119b4ebb16dc759a50dfc880ddbc6a1112) )  /* Program 1 */
 	ROM_CONTINUE(       0x0000, 0x0800 )
 	ROM_LOAD( "8.bin",  0x1800, 0x0800, CRC(0c0a7159) SHA1(92cc3dc32a5bf4a7fa197e72c3931e583c96ef33) )  /* Program 2 */
-	ROM_CONTINUE(       0x0800, 0x0800 )
+	ROM_CONTINUE(       0x1000, 0x0800 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "3.bin",  0x0000, 0x0800, CRC(55458dae) SHA1(bf96d1b287292ff89bc2dbd9451a88a2ab941f3e) )

@@ -5,6 +5,10 @@
     Circus Charlie
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CIRCUSC_H
+#define MAME_INCLUDES_CIRCUSC_H
+
+#pragma once
 
 #include "sound/dac.h"
 #include "sound/sn76496.h"
@@ -14,8 +18,8 @@
 class circusc_state : public driver_device
 {
 public:
-	circusc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	circusc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_scroll(*this, "scroll"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -28,7 +32,8 @@ public:
 		m_discrete(*this, "fltdisc"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_scroll;
@@ -79,3 +84,5 @@ public:
 	void circusc_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CIRCUSC_H

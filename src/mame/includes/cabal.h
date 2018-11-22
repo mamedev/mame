@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano
+#ifndef MAME_INCLUDES_CABAL_H
+#define MAME_INCLUDES_CABAL_H
+
+#pragma once
+
 #include "audio/seibu.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
@@ -7,8 +12,8 @@
 class cabal_state : public driver_device
 {
 public:
-	cabal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cabal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_seibu_sound(*this, "seibu_sound"),
@@ -20,7 +25,8 @@ public:
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -85,3 +91,5 @@ public:
 	void sound_map(address_map &map);
 	void trackball_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CABAL_H

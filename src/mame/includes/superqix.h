@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni, Nicola Salmoria, Tomasz Slanina
+#ifndef MAME_INCLUDES_SUPERQIX_H
+#define MAME_INCLUDES_SUPERQIX_H
+
+#pragma once
 
 #include "sound/ay8910.h"
 #include "sound/samples.h"
@@ -9,16 +13,17 @@ class superqix_state_base : public driver_device
 {
 public:
 	superqix_state_base(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"),
-		m_bitmapram(*this, "bitmapram"),
-		m_bitmapram2(*this, "bitmapram2"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_ay1(*this, "ay1"),
-		m_mcu(*this, "mcu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_spriteram(*this, "spriteram")
+		, m_videoram(*this, "videoram")
+		, m_bitmapram(*this, "bitmapram")
+		, m_bitmapram2(*this, "bitmapram2")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_ay1(*this, "ay1")
+		, m_mcu(*this, "mcu")
+	{ }
 
 	void init_perestro();
 	void init_sqix();
@@ -75,8 +80,8 @@ class superqix_state : public superqix_state_base
 {
 public:
 	superqix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: superqix_state_base(mconfig, type, tag),
-		m_ay2(*this, "ay2")
+		: superqix_state_base(mconfig, type, tag)
+		, m_ay2(*this, "ay2")
 	{
 	}
 
@@ -196,3 +201,5 @@ private:
 	int m_dial_oldpos[2];
 	int m_dial_sign[2];
 };
+
+#endif // MAME_INCLUDES_SUPERQIX_H

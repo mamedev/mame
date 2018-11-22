@@ -285,17 +285,17 @@ uint32_t apollo_graphics_15i::bt458::get_rgb(uint8_t index)
 
 const char *apollo_graphics_15i::cr_text(offs_t offset, uint8_t data, uint8_t rw)
 {
-	static const char *cr0[8] =
+	static char const *const cr0[8] =
 	{ "cr0 mode=0 CPU dest BLT", "cr0 mode=1 Alternating BLT",
 			"cr0 mode=2 Vector mode", "cr0 mode=3 CPU Source BLT",
 			"cr0 mode=4 Double access BLT ", "cr0 mode=5 ???",
 			"cr0 mode=6 ???", "cr0 mode=7 Normal" };
 
-	static const char *cr2[4] =
+	static char const *const cr2[4] =
 			{ "cr2 Constant access", "cr2 Pixel access", "cr2 ???",
 					"cr2 Plane access" };
 
-	static const char *cr2b[4] =
+	static char const *const cr2b[4] =
 	{ "cr2b Constant access", "cr2b Pixel access", "cr2b ???",
 			"cr2b Plane access" };
 

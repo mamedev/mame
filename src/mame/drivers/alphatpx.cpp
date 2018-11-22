@@ -269,8 +269,7 @@ void alphatp_12_state::alphatp2_map(address_map &map)
 void alphatp_12_state::alphatp2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_12_state::beep_w));
 	map(0x50, 0x53).rw(FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
@@ -309,8 +308,7 @@ void alphatp_34_state::alphatp3_io(address_map &map)
 {
 	map.unmap_value_high();
 	//AM_RANGE(0x00, 0x00) AM_READ // unknown
-	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x08, 0x09).rw(FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
 	map(0x12, 0x12).w(FUNC(alphatp_34_state::beep_w));
@@ -1229,8 +1227,8 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 
 	CRT5027(config, m_crtc, 12.8544_MHz_XTAL / 8);
 	m_crtc->set_char_width(8);
-	m_crtc->hsyn_wr_callback().set_inputline("maincpu", I8085_RST55_LINE);
-	m_crtc->vsyn_wr_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
+	m_crtc->hsyn_callback().set_inputline("maincpu", I8085_RST55_LINE);
+	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
 	m_crtc->set_screen("screen");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
@@ -1243,10 +1241,10 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	// 4.9152_MHz_XTAL serial clock
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_12_state, fdchld_w))
+	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(alphatp_12_state::fdcirq_w));
+	m_fdc->drq_wr_callback().set(FUNC(alphatp_12_state::fdcdrq_w));
+	m_fdc->hld_wr_callback().set(FUNC(alphatp_12_state::fdchld_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
@@ -1306,7 +1304,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 
 	CRT5037(config, m_crtc, 12.8544_MHz_XTAL / 8);
 	m_crtc->set_char_width(8);
-	m_crtc->vsyn_wr_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
+	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
 	m_crtc->set_screen("screen");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
@@ -1319,32 +1317,33 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	// 4.9152_MHz_XTAL serial clock
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 4_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_34_state, fdchld_w))
+	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(alphatp_34_state::fdcirq_w));
+	m_fdc->drq_wr_callback().set(FUNC(alphatp_34_state::fdcdrq_w));
+	m_fdc->hld_wr_callback().set(FUNC(alphatp_34_state::fdchld_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
+void alphatp_34_state::alphatp30(machine_config &config)
+{
 	alphatp3(config);
-	MCFG_DEVICE_ADD("i8088", I8088, 6000000) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(alphatp30_8088_map)
-	MCFG_DEVICE_IO_MAP(alphatp30_8088_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-	MCFG_DEVICE_DISABLE()
+	I8088(config, m_i8088, 6000000); // unknown clock
+	m_i8088->set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp30_8088_map);
+	m_i8088->set_addrmap(AS_IO, &alphatp_34_state::alphatp30_8088_io);
+	m_i8088->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_i8088->set_disable();
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i8088", 0))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_i8088, 0);
+	m_pic->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(100000)  // 15Mhz osc with unknown divisor
-	MCFG_PIT8253_CLK1(100000)
-	MCFG_PIT8253_CLK2(100000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
-MACHINE_CONFIG_END
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(100000);  // 15Mhz osc with unknown divisor
+	pit.set_clk<1>(100000);
+	pit.set_clk<2>(100000);
+	pit.out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+}
 
 //**************************************************************************
 //  ROM DEFINITIONS

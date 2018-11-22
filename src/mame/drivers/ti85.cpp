@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(ti85_state::ti83p)
 
 	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 
-	MCFG_AMD_29F400T_ADD("flash")
+	AMD_29F400T(config, "flash");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti83pse)

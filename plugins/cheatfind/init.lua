@@ -260,7 +260,7 @@ function cheatfind.startplugin()
 	local formtable = { " I1", " i1", "<I2", ">I2", "<i2", ">i2", "<I4", ">I4", "<i4", ">i4", "<I8", ">I8", "<i8", ">i8", }-- " <f", " >f", " <d", " >d" }
 	local formname = { "u8", "s8", "little u16", "big u16", "little s16", "big s16",
 			   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64", }
-		   	   -- "little float", "big float", "little double", "big double" }
+			   -- "little float", "big float", "little double", "big double" }
 	local width = 1
 	local bcd = 0
 	local align = 0
@@ -784,7 +784,7 @@ function cheatfind.startplugin()
 						local json = require("json")
 						cheat.desc = "%s"
 						cheat_save.json = json.stringify({[1] = cheat}, {indent = true})
-						cheat_save.xml = string.format("<mamecheat version=1>\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
+						cheat_save.xml = string.format("<mamecheat version=\"1\">\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
 						cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, match.newval)
 						manager:machine():popmessage(string.format(_("Default name is %s"), cheat_save.name))
 						return true

@@ -405,17 +405,15 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_INPUT_MERGER_ANY_HIGH("fgcpu_irq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("fgcpu", INPUT_LINE_IRQ0))
 
-	MCFG_GENERIC_LATCH_8_ADD("fg2spr")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("spritecpu", INPUT_LINE_IRQ0))
+	GENERIC_LATCH_8(config, "fg2spr").data_pending_callback().set_inputline(m_spritecpu, INPUT_LINE_IRQ0);
 
-	MCFG_GENERIC_LATCH_8_ADD("fg2roz")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("rozcpu", INPUT_LINE_IRQ0))
+	GENERIC_LATCH_8(config, "fg2roz").data_pending_callback().set_inputline(m_rozcpu, INPUT_LINE_IRQ0);
 
-	MCFG_GENERIC_LATCH_8_ADD("spr2fg")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_spr2fg_latch);
+	m_spr2fg_latch->data_pending_callback().set(m_fgcpu_irq, FUNC(input_merger_any_high_device::in_w<0>));
 
-	MCFG_GENERIC_LATCH_8_ADD("roz2fg")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<1>))
+	GENERIC_LATCH_8(config, m_roz2fg_latch);
+	m_roz2fg_latch->data_pending_callback().set(m_fgcpu_irq, FUNC(input_merger_any_high_device::in_w<1>));
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")

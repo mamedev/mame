@@ -5,9 +5,10 @@
  * includes/advision.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_ADVISION_H
 #define MAME_INCLUDES_ADVISION_H
+
+#pragma once
 
 #include "sound/dac.h"
 #include "bus/generic/slot.h"
@@ -22,14 +23,14 @@ class advision_state : public driver_device
 {
 public:
 	advision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8048_TAG),
-			m_soundcpu(*this, COP411_TAG),
-			m_dac(*this, "dac"),
-			m_cart(*this, "cartslot"),
-			m_bank1(*this, "bank1"),
-			m_joy(*this, "joystick"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, I8048_TAG)
+		, m_soundcpu(*this, COP411_TAG)
+		, m_dac(*this, "dac")
+		, m_cart(*this, "cartslot")
+		, m_bank1(*this, "bank1")
+		, m_joy(*this, "joystick")
+		, m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -78,7 +79,7 @@ public:
 	int m_video_bank;
 	int m_video_hpos;
 	uint8_t m_led_latch[8];
-	std::vector<uint8_t> m_display;
+	std::unique_ptr<uint8_t []> m_display;
 
 	/* sound state */
 	int m_sound_cmd;

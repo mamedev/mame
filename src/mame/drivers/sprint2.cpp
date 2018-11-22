@@ -105,10 +105,9 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 		}
 	}
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_discrete->write(space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
-	m_discrete->write(space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
-	m_discrete->write(space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
+	m_discrete->write(SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
+	m_discrete->write(SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
+	m_discrete->write(SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -218,7 +217,7 @@ WRITE8_MEMBER(sprint2_state::output_latch_w)
 
 WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
 {
-	m_discrete->write(space, SPRINT2_NOISE_RESET, 0);
+	m_discrete->write(SPRINT2_NOISE_RESET, 0);
 }
 
 
@@ -497,11 +496,10 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_DEVICE_PROGRAM_MAP(sprint2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL, 768, 0, 512, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint2_state, screen_update_sprint2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint2_state, screen_vblank_sprint2))

@@ -553,17 +553,17 @@ READ8_MEMBER(p1_state::p1_ppi_r)
 	switch (offset)
 	{
 	case 0:
-		return m_ppi8255n1->read(space, 0);
+		return m_ppi8255n1->read(0);
 	case 9:
 	case 10:
 	case 11:
-		return m_ppi8255n1->read(space, offset - 8);
+		return m_ppi8255n1->read(offset - 8);
 	case 8:
-		return m_ppi8255n2->read(space, 0);
+		return m_ppi8255n2->read(0);
 	case 1:
 	case 2:
 	case 3:
-		return m_ppi8255n2->read(space, offset);
+		return m_ppi8255n2->read(offset);
 	default:
 		DBG_LOG(1, "p1ppi", ("R %.2x (unimp)\n", 0x60 + offset));
 		return 0xff;
@@ -575,17 +575,17 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
 	switch (offset)
 	{
 	case 0:
-		return m_ppi8255n1->write(space, 0, data);
+		return m_ppi8255n1->write(0, data);
 	case 9:
 	case 10:
 	case 11:
-		return m_ppi8255n1->write(space, offset - 8, data);
+		return m_ppi8255n1->write(offset - 8, data);
 	case 8:
-		return m_ppi8255n2->write(space, 0, data);
+		return m_ppi8255n2->write(0, data);
 	case 1:
 	case 2:
 	case 3:
-		return m_ppi8255n2->write(space, offset, data);
+		return m_ppi8255n2->write(offset, data);
 	default:
 		DBG_LOG(1, "p1ppi", ("W %.2x $%02x (unimp)\n", 0x60 + offset, data));
 		return;
@@ -647,44 +647,45 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(p1_state::poisk1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8088, 5000000)
-	MCFG_DEVICE_PROGRAM_MAP(poisk1_map)
-	MCFG_DEVICE_IO_MAP(poisk1_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, 5000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &p1_state::poisk1_map);
+	m_maincpu->set_addrmap(AS_IO, &p1_state::poisk1_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
 	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
 
-	MCFG_DEVICE_ADD( "pit8253", PIT8253 ,0)
-	MCFG_PIT8253_CLK0(XTAL(15'000'000)/12) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(15'000'000)/12) /* keyboard poll -- XXX edge or level triggered? */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_PIT8253_CLK2(XTAL(15'000'000)/12) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, p1_state, p1_pit8253_out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(15'000'000)/12); /* heartbeat IRQ */
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(15'000'000)/12); /* keyboard poll -- XXX edge or level triggered? */
+	m_pit8253->out_handler<1>().set(m_pic8259, FUNC(pic8259_device::ir6_w));
+	m_pit8253->set_clk<2>(XTAL(15'000'000)/12); /* pio port c pin 4, and speaker polling enough */
+	m_pit8253->out_handler<2>().set(FUNC(p1_state::p1_pit8253_out2_changed));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("ppi8255n1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, p1_state, p1_ppi_porta_r)) /*60H*/
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, p1_state, p1_ppi_portb_r)) /*69H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, p1_state, p1_ppi_portc_w))   /*6AH*/
+	I8255A(config, m_ppi8255n1);
+	m_ppi8255n1->in_pa_callback().set(FUNC(p1_state::p1_ppi_porta_r)); /*60H*/
+	m_ppi8255n1->out_pa_callback().set(FUNC(p1_state::p1_ppi_porta_w));
+	m_ppi8255n1->in_pb_callback().set(FUNC(p1_state::p1_ppi_portb_r)); /*69H*/
+	m_ppi8255n1->in_pc_callback().set(FUNC(p1_state::p1_ppi_portc_r));
+	m_ppi8255n1->out_pc_callback().set(FUNC(p1_state::p1_ppi_portc_w));   /*6AH*/
 
-	MCFG_DEVICE_ADD("ppi8255n2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, p1_state, p1_ppi2_porta_w))  /*68H*/
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, p1_state, p1_ppi2_portb_w))  /*61H*/
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, p1_state, p1_ppi2_portc_r))    /*62H*/
+	I8255A(config, m_ppi8255n2);
+	m_ppi8255n2->out_pa_callback().set(FUNC(p1_state::p1_ppi2_porta_w));  /*68H*/
+	m_ppi8255n2->out_pb_callback().set(FUNC(p1_state::p1_ppi2_portb_w));  /*61H*/
+	m_ppi8255n2->in_pc_callback().set(FUNC(p1_state::p1_ppi2_portc_r));    /*62H*/
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_cputag("maincpu");
+	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	m_isabus->irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
+
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", p1_isa8_cards, "fdc", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)

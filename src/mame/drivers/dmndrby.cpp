@@ -560,10 +560,9 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1789750) // frequency guessed
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 1789750).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed
 MACHINE_CONFIG_END
 
 

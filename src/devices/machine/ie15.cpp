@@ -577,11 +577,11 @@ MACHINE_CONFIG_START(ie15_device::ie15core)
 	config.set_default_layout(layout_ie15);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", IE15_KEYBOARD, 0)
-	MCFG_IE15_KEYBOARD_CB(WRITE16(*this, ie15_device, kbd_put))
+	IE15_KEYBOARD(config, m_keyboard, 0)
+			.keyboard_cb().set(FUNC(ie15_device::kbd_put));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, ie15_device, serial_rx_callback))
+	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
+	m_rs232->rxd_handler().set(FUNC(ie15_device::serial_rx_callback));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)

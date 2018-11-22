@@ -211,6 +211,9 @@ int mame_machine_manager::execute()
 		// parse any INI files as the first thing
 		if (m_options.read_config())
 		{
+			// but first, revert out any potential game-specific INI settings from previous runs via the internal UI
+			m_options.revert(OPTION_PRIORITY_INI);
+
 			std::ostringstream errors;
 			mame_options::parse_standard_inis(m_options, errors);
 		}

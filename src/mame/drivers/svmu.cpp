@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(svmu_state::svmu)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_ATMEL_29C010_ADD("flash")
+	ATMEL_29C010(config, "flash");
 	MCFG_QUICKLOAD_ADD("quickload", svmu_state, svmu, "vms,bin", 0)
 	MCFG_QUICKLOAD_INTERFACE("svmu_quik")
 

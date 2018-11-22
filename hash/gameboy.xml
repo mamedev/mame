@@ -274,6 +274,9 @@
 		<info name="serial" value="DMG-KS-USA, DMG-KS-(NOE/ESP)"/>
 		<info name="alt_title" value="Die Abenteuer von Star Saver (Ger cart)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="adventures of star saver, the (usa, europe).bin" size="131072" crc="5d461374" sha1="408b19a92c73daa11b3b1a52aa6a987cc6615e97" offset="0" />
@@ -1045,6 +1048,12 @@
 		<info name="release" value="19921016"/>
 		<info name="alt_title" value="アレサIII"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-GDAN-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u3" value="U3 RAM [LH5168NFB-10TL]" />
+			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="aretha iii (japan).bin" size="262144" crc="430d3d6b" sha1="f57ff26d31283c88cc4c414b18ef6f182d07da9d" offset="0" />
@@ -1749,7 +1758,32 @@
 		</part>
 	</software>
 
-<!-- Requires barcode boy set emulation -->
+	<!--
+	Battle Space requires Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		1 (up):
+			4905672306367
+		1 (down):
+			4902776809367
+		2 (up):
+			4908052808369
+		2 (down):
+			4907981000301
+		3 (up):
+			4911826551347
+		3 (down):
+			4909062206350
+		4 (up):
+			4913508504399
+		4 (down):
+			4912713004366
+		5 (up):
+			4918156001351
+		5 (down):
+			4916911302309
+	There is also a "free card" without barcodes.
+	-->
 	<software name="bspace" supported="no">
 		<description>Battle Space (Jpn)</description>
 		<year>1992</year>
@@ -3730,6 +3764,7 @@
 		</part>
 	</software>
 
+	<!-- Game cart has an integrated infrared port for multiplayer play. -->
 	<software name="spinner">
 		<!-- Notes: SGB enhanced -->
 		<description>Chousoku Spinner (Jpn)</description>
@@ -3739,6 +3774,12 @@
 		<info name="release" value="19980918"/>
 		<info name="alt_title" value="超速スピナー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-TEDN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 HuC1 [HuC-1]" />
+			<feature name="u3" value="U3 RAM [GM76C256CLLFW70]" />
+			<feature name="u4" value="U4 26A [6129A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_huc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="chousoku spinner (japan).bin" size="524288" crc="b4fa9cf2" sha1="057a3251bbb7eb4e04b01f786bd2986af5eabc58" offset="0" />
@@ -4214,6 +4255,11 @@
 		</part>
 	</software>
 
+	<!--
+	The Miracle of the Zone supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="miraclzn">
 		<!-- Notes: SGB enhanced -->
 		<description>Daikaijuu Monogatari - The Miracle of the Zone (Jpn)</description>
@@ -5822,6 +5868,24 @@
 		</part>
 	</software>
 
+	<!--
+	Family Jockey 2 is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards:
+		バーコードカード No. 1 (barcode card #1)
+			競争馬 A (Racehorse A): 5893713522816 (EAN-13)
+			競争馬 B (Racehorse B): 1509843019075 (EAN-13)
+		バーコードカード No. 2 (barcode card #2)
+			繁殖馬 A (Breeding horse A): 2378649896765 (EAN-13)
+			繁殖馬 B (Breeding horse B): 4232978865152 (EAN-13)
+		バーコードカード No. 3 (barcode card #3)
+			繁殖馬 C (Breeding horse C): 7164625542390 (EAN-13)
+		バーコードカード No. 4 (barcode card #4)
+			種馬 A (Stallion A): 9845554422318 (EAN-13)
+			種馬 B (Stallion B): 3572821107673 (EAN-13)
+		バーコードカード No. 5 (barcode card #5)
+			種馬 C (Stallion C) : 6319537443513 (EAN-13)
+	-->
 	<software name="famjock2">
 		<description>Family Jockey 2 - Meiba no Kettou (Jpn)</description>
 		<year>1993</year>
@@ -5845,7 +5909,7 @@
 		</part>
 	</software>
 
-	<software name="famista" cloneof="xtrabase">
+	<software name="famista" cloneof="xtrabase"> <!-- AKA Family Stadium -->
 		<description>Famista (Jpn)</description>
 		<year>1990</year>
 		<publisher>Namcot</publisher>
@@ -5863,7 +5927,7 @@
 		</part>
 	</software>
 
-	<software name="famista2">
+	<software name="famista2"> <!-- Family Stadium 2 -->
 		<description>Famista 2 (Jpn)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -5881,6 +5945,19 @@
 		</part>
 	</software>
 
+	<!--
+	Family Stadium 3 (Famista 3) is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		No. 1: ホームランバッター
+			8357933639923
+		No. 2: 高打率バッター
+			7814374127798
+		No. 3: 駿足バッター
+			9880692151263
+		No. 4: ピッチャー
+			1414213562177
+	-->
 	<software name="famista3">
 		<description>Famista 3 (Jpn)</description>
 		<year>1993</year>
@@ -5889,6 +5966,12 @@
 		<info name="release" value="19931029"/>
 		<info name="alt_title" value="ファミスタ3"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u3" value="U3 RAM [MN4464-08LL]" />
+			<feature name="u4" value="U4 26A [6129]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="famista 3 (japan).bin" size="262144" crc="bdc4ccc3" sha1="ac4b03e11e2ba135d0427c8b1da7de57c006b4a6" offset="0" />
@@ -6736,7 +6819,8 @@
 	</software>
 
 	<software name="tamaosu">
-		<!-- Notes: SGB enhanced -->
+		<!-- Notes: SGB enhanced.
+			The game cart has an integrated speaker and a replaceable battery (CR2016). -->
 		<description>Game de Hakken!! Tamagotchi - Osutchi to Mesutchi (Jpn)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
@@ -6995,9 +7079,14 @@
 		</part>
 	</software>
 
+	<!--
+	"GBKiss" is an integrated infrared port for cart-to-cart multiplayer play, but also for PC connection 
+	with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel port (DB25) modem/adaptor for PC-DOS
+	for transfering files between the game and a computer.
+	-->
 	<software name="gbkiss">
 		<description>GBKiss Mini Games (Jpn)</description>
-		<year>19??</year>
+		<year>1997</year> <!-- Year printed on the cart label -->
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-AKAJ-JPN"/>
 		<part name="cart" interface="gameboy_cart">
@@ -7035,6 +7124,9 @@
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="ゲゲゲの鬼太郎 妖怪創造主現る!"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="gegege no kitarou - youkai souzoushu arawaru! (japan).bin" size="262144" crc="28e507b0" sha1="fa52c8f0bb31e25be829c7d4f52a7f4db1d5ef5b" offset="0" />
@@ -7317,6 +7409,9 @@
 		<publisher>Electro Brain</publisher>
 		<info name="serial" value="DMG-GT-USA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="go! go! tank (usa).bin" size="65536" crc="65dfabcb" sha1="7f3408c951a161f93394812d34f6d2534658b7d3" offset="0" />
@@ -7407,6 +7502,9 @@
 		<info name="release" value="19901218"/>
 		<info name="alt_title" value="ゴジラくん 怪獣大行進"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="godzilla-kun (japan).bin" size="131072" crc="ed204600" sha1="4c03da759e5fb2ec06d286d5f0b52d64621fea41" offset="0" />
@@ -7423,6 +7521,11 @@
 		<info name="release" value="19891128 (JPN)"/>
 		<info name="alt_title" value="ゴルフ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-GDAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC2A [DMG MBC2-A]" />
+			<feature name="u3" value="U3 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
 				<rom name="golf (world).bin" size="131072" crc="6ed10383" sha1="2acee1a14ba611e73b0b7d6bce170107213fcc0c" offset="0" />
@@ -8369,6 +8472,11 @@
 		<info name="release" value="19921227"/>
 		<info name="alt_title" value="ヘラクレスの栄光 動きだした神々"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-GDAN-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC2A [DMG MBC2-A]" />
+			<feature name="u3" value="U3 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="262144">
 				<rom name="hercules no eikou - ugokidashita kamigami (japan).bin" size="262144" crc="4f8a61bf" sha1="c12c60b0c0a2ee1aaded61020fa72b5b467459e1" offset="0" />
@@ -8649,6 +8757,9 @@
 		<info name="release" value="19920427"/>
 		<info name="alt_title" value="星のカービィ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="hoshi no kirby (japan) (rev a).bin" size="262144" crc="04342c83" sha1="5fe35fab25299b6c53b40decfe2b1827b4a64d2a" offset="0" />
@@ -9127,6 +9238,12 @@
 		<info name="release" value="19910517"/>
 		<info name="alt_title" value="一発逆転! DX馬券王"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u3" value="U3 RAM [LH516NF-10L]" />
+			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="ippatsu gyakuten! dx bakenou (japan).bin" size="65536" crc="8f3e7f95" sha1="991efd117dcb30ddf111bb4f6e46bdda1c811417" offset="0" />
@@ -10039,6 +10156,23 @@
 		</part>
 	</software>
 
+	<!--
+	Kattobi Road is compatible with Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		No. 1:
+			4903301160625
+		No. 2:
+			4987084410924
+		No. 3:
+			4902888119101
+		No. 4:
+			4901121110004
+		No. 5 (up):
+			4902105002063
+		No. 5 (down):
+			4901780161157
+	-->
 	<software name="kattobi">
 		<description>Kattobi Road (Jpn)</description>
 		<year>1993</year>
@@ -10047,6 +10181,12 @@
 		<info name="release" value="19931008"/>
 		<info name="alt_title" value="カットビロード"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
+			<feature name="u4" value="U4 [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="kattobi road (japan).bin" size="131072" crc="efbc23fc" sha1="7ac064a877ecc8247dfb7213722dbd0f4be665f0" offset="0" />
@@ -10405,6 +10545,12 @@
 		<info name="release" value="19951214"/>
 		<info name="alt_title" value="カービィのブロックボール"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-20" />
+			<feature name="u1" value="U1 PRG [MX23C4002-20]" />
+			<feature name="u2" value="U2 MBC1 [DMG MBC1-B]" />
+			<feature name="u3" value="U3 RAM (C3) [BR6256BF-10SL]" />
+			<feature name="u4" value="U4 MM1134A [6735]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="kirby no block ball (japan).bin" size="524288" crc="df3bbcd7" sha1="3fecc964d2c13ad98abac1df49f05c488833ef5a" offset="0" />
@@ -10442,6 +10588,11 @@
 		<info name="alt_title" value="カービィのピンボール"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc2" />
+			<feature name="pcb" value="DMG-GDAN-03" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
+			<feature name="u3" value="U3 26A [6129]" />
+			<feature name="batt" value="Batt CR1616" />
 			<dataarea name="rom" size="262144">
 				<rom name="kirby no pinball (japan).bin" size="262144" crc="8b44fb7d" sha1="678ca586f5a2e2fc894fb8e9f7b9efa54fabba44" offset="0" />
 			</dataarea>
@@ -11735,6 +11886,9 @@
 		<info name="release" value="19910615"/>
 		<info name="alt_title" value="まじかる☆タルるートくん"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="magical taruruuto-kun (japan).bin" size="131072" crc="9c4f54f1" sha1="0b7723d1761a61dcf42fc93f134b59f2232d4c37" offset="0" />
@@ -11969,6 +12123,12 @@
 		<info name="release" value="19950314"/>
 		<info name="alt_title" value="マリオのピクロス"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u3" value="U3 RAM [VN4464-08LL]" />
+			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="mario no picross (japan).bin" size="262144" crc="17533700" sha1="6b72cbff3e224299eff6f79e0110a477b8f840c2" offset="0" />
@@ -13226,6 +13386,28 @@
 		</part>
 	</software>
 
+	<!--
+	Monster Maker requires Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		1 (fg up):
+			9120153954577
+		1 (fg down):
+			9022038781998
+		1 (bg up):
+			9362462085911
+		1 (bg down):
+			9752412234900
+		2 (fg up):
+			9052091324955
+		2 (fg down):
+			9322158686716
+		2 (bg up):
+			9447410810323
+		2 (bg down):
+			9998017308336
+	Cards 3, 4 and 5 contains no barcodes.
+	-->
 	<software name="monstmkr">
 		<description>Monster Maker (Jpn)</description>
 		<year>1990</year>
@@ -13243,7 +13425,28 @@
 		</part>
 	</software>
 
-<!-- Requires barcode boy set emulation -->
+	<!--
+	Monster Maker - Barcode Saga requires Barcode Boy, a barcode reader accessory for Game Boy.
+	The Barcode Boy is based on Intel N80C51BH (internal ROM undumped).
+	It came bundled with the following barcode cards (all EAN-13):
+		1 (fg up):
+			9120153954577
+		1 (fg down):
+			9022038781998
+		1 (bg up):
+			9362462085911
+		1 (bg down):
+			9752412234900
+		2 (fg up):
+			9052091324955
+		2 (fg down):
+			9322158686716
+		2 (bg up):
+			9447410810323
+		2 (bg down):
+			9998017308336
+	Cards 3, 4 and 5 contains no barcodes.
+	-->
 	<software name="monstmkb" supported="no">
 		<description>Monster Maker - Barcode Saga (Jpn)</description>
 		<year>1993</year>
@@ -14106,6 +14309,11 @@
 		</part>
 	</software>
 
+	<!--
+	Nectaris supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="nectaris">
 		<!-- Notes: SGB enhanced -->
 		<description>Nectaris GB (Jpn)</description>
@@ -14115,6 +14323,12 @@
 		<info name="release" value="19980227"/>
 		<info name="alt_title" value="ネクタリスジービー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-TEDN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 HuC1 [HuC-1]" />
+			<feature name="u3" value="U3 RAM [BR62256F-70LL]" />
+			<feature name="u4" value="U4 26A [6129A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_huc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="nectaris gb (japan).bin" size="524288" crc="20bfd7ef" sha1="ba251bfef8162ef032da8d5c28fe693ede28f030" offset="0" />
@@ -14556,6 +14770,9 @@
 		<info name="release" value="19941118"/>
 		<info name="alt_title" value="ニチブツマージャン 吉本劇場"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="nichibutsu mahjong - yoshimoto gekijou (japan).bin" size="262144" crc="d983ff48" sha1="1ccec61dd26b163d921043893b1d2405e05ae3a2" offset="0" />
@@ -14664,6 +14881,9 @@
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="DMG-CL-USA, DMG-CL-ESP"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="ninja boy (usa, europe).bin" size="65536" crc="59d3e2ad" sha1="acd93f152574a47e2bef3ba739f722bec90badef" offset="0" />
@@ -14811,6 +15031,9 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-NC-USA, DMG-NC-(NOE/ESP-1/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="nintendo world cup (usa, europe).bin" size="131072" crc="96c24e13" sha1="9308dadfeb1becb81fe35015397df6e8e8ead06e" offset="0" />
@@ -14916,6 +15139,9 @@
 		<info name="release" value="19900928"/>
 		<info name="alt_title" value="おいらじゃじゃ丸! 世界大冒険"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="oira jajamaru! sekai daibouken (japan).bin" size="131072" crc="2d08d27f" sha1="5e13eeb635b41589689fc1b495ee077125b7e8c1" offset="0" />
@@ -15183,6 +15409,9 @@
 		<info name="release" value="19951222"/>
 		<info name="alt_title" value="P・マン GB"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN(K)-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="p-man gb (japan).bin" size="131072" crc="727d5509" sha1="d8704a68e1f3037c43e8987ca99f557ad6dbc0de" offset="0" />
@@ -15971,6 +16200,9 @@
 		<info name="release" value="19891018"/>
 		<info name="alt_title" value="ピンボール 66匹のワニ大行進"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BBA-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1A]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="pinball - 66hiki no wani daikoushin! (japan).bin" size="65536" crc="1b3a89c6" sha1="3671335514b388ee08322416abd873f11a5e0b66" offset="0" />
@@ -16228,6 +16460,11 @@
 		</part>
 	</software>
 
+	<!--
+	Pocket Bomberman (Jpn) supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="pockbmanj" cloneof="pockbman">
 		<!-- Notes: SGB enhanced -->
 		<description>Pocket Bomberman (Jpn)</description>
@@ -16268,6 +16505,11 @@
 		</part>
 	</software>
 
+	<!--
+	Pocket Family supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="pockfam">
 		<!-- Notes: SGB enhanced -->
 		<description>Pocket Family (Jpn)</description>
@@ -16746,6 +16988,12 @@
 		<info name="serial" value="DMG-APAE-USA, DMG-APAU-(EUR/AUS)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
+			<feature name="pcb" value="DMG-KFDN-10" /> <!-- DMG-APAU-EUR -->
+			<feature name="u1" value="U1 PRG" /> <!-- DMG-APAU-EUR -->
+			<feature name="u2" value="U2 MBC3A [MBC3 B]" /> <!-- DMG-APAU-EUR -->
+			<feature name="u3" value="U3 RAM [W24257S-70LL]" /> <!-- DMG-APAU-EUR -->
+			<feature name="u4" value="U4 MM1134 [134A]" /> <!-- DMG-APAU-EUR -->
+			<feature name="batt" value="Batt CR2025" /> <!-- DMG-APAU-EUR -->
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon - red version (usa, europe).bin" size="1048576" crc="9f7fdd53" sha1="ea9bcae617fdf159b045185467ae58b2e4a48b9a" offset="0" />
 			</dataarea>
@@ -17012,6 +17260,9 @@
 		<info name="release" value="19900420"/>
 		<info name="alt_title" value="ポパイ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="popeye (japan).bin" size="131072" crc="2fb4da21" sha1="d7c4cfa460e65368477f9394164b67e03310fc69" offset="0" />
@@ -18056,6 +18307,9 @@
 		<info name="release" value="19900502"/>
 		<info name="alt_title" value="レッドアリーマー〜魔界村外伝〜"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="red arremer - makaimura gaiden (japan).bin" size="131072" crc="ae0122aa" sha1="dd49a66372411da76023e993b3476190f76eeca8" offset="0" />
@@ -18705,6 +18959,12 @@
 		<info name="release" value="19911213"/>
 		<info name="alt_title" value="サ・ガ3 時空の覇者"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u3" value="U3 RAM [LH5168NFB-10L]" />
+			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="sa-ga 3 - jikuu no hasha (japan).bin" size="262144" crc="575d6d9d" sha1="c8dcbefc0352b0590fd85a683d983b5510a63519" offset="0" />
@@ -18939,6 +19199,9 @@
 		<info name="release" value="19910518"/>
 		<info name="alt_title" value="ジーアームズ オペレーションガンダム"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1-B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="sd command gundam - g-arms (japan).bin" size="131072" crc="39058153" sha1="7d8011636fe36266b5f716e78e3e29006f024992" offset="0" />
@@ -18954,6 +19217,11 @@
 		<info name="release" value="19901006"/>
 		<info name="alt_title" value="SDガンダム外伝 ラクロアンヒーローズ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-GDAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC2A [DMG MBC2A]" />
+			<feature name="u3" value="U3 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc2" />
 			<dataarea name="rom" size="131072">
 				<rom name="sd gundam gaiden - lacroan' heroes (japan).bin" size="131072" crc="c9dbba10" sha1="bc598168a70bbbc1b89b3de13086ec89e8ce9ded" offset="0" />
@@ -19018,6 +19286,9 @@
 		<info name="release" value="19900324"/>
 		<info name="alt_title" value="SDガンダム SD戦国伝 国盗り物語 ~ SD Gundam - SD Sengokuden - Kunitori Monogatari (Box)"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1A]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="sd sengokuden - kunitori monogatari (japan).bin" size="131072" crc="016a0552" sha1="86a57796557698def6ee760bfa03c8e3befcc4ef" offset="0" />
@@ -19139,6 +19410,9 @@
 		<info name="release" value="19891228"/>
 		<info name="alt_title" value="セレクション 選ばれし者"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BCA-01" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1A]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="selection - erabareshi mono (japan).bin" size="131072" crc="799c5cdb" sha1="a52a8dcd93c4fa4f020719c83780092b514d2b03" offset="0" />
@@ -19455,6 +19729,8 @@
 		<info name="release" value="19900713"/>
 		<info name="alt_title" value="四川省 MATCH MANIA"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-AAA-03" />
+			<feature name="u1" value="U1 PRG [DMG-MAA-0]" />
 			<dataarea name="rom" size="32768">
 				<rom name="shisenshou - match-mania (japan).bin" size="32768" crc="0cdd8b04" sha1="6e84a906f9e1ce43272db84c63f1b037096ac34f" offset="0" />
 			</dataarea>
@@ -20811,6 +21087,11 @@
 		</part>
 	</software>
 
+	<!--
+	Super B-Daman - Fighting Phoenix supports "GBKiss". "GBKiss" is an integrated infrared port for cart-to-cart
+	multiplayer play, but also for PC connection with the "GBKISS LINK" (Hudson Soft model No. HC-749), a parallel
+	port (DB25) modem/adaptor for PC-DOS for transfering files between the game and a computer.
+	-->
 	<software name="sbdaman">
 		<!-- Notes: SGB enhanced -->
 		<description>Super B-Daman - Fighting Phoenix (Jpn)</description>
@@ -21063,7 +21344,7 @@
 		<description>Super Donkey Kong GB (Jpn)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-YTJ"/>
+		<info name="serial" value="DMG-YTJ"/> <!-- DMG-YTJ-JPN G735376 -->
 		<info name="release" value="19950727"/>
 		<info name="alt_title" value="スーパードンキーコングGB"/>
 		<part name="cart" interface="gameboy_cart">
@@ -21205,6 +21486,12 @@
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-MQ-USA, DMG-MQ-ESP-1"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
+			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
+			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="super mario land 2 - 6 golden coins (usa, europe) (rev a).bin" size="524288" crc="e6f886e5" sha1="96e3a314561fb394cdf51101f9178a32713c2313" offset="0" />
@@ -21326,6 +21613,11 @@
 		<info name="release" value="19940218"/>
 		<info name="alt_title" value="スーパー桃太郎電鉄II"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DECN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1A/1B [MBC1-B]" />
+			<feature name="u3" value="U3 RAM [HY6264ALLJ-10]" />
+			<feature name="u4" value="U4 26A" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="super momotarou dentetsu ii (japan).bin" size="262144" crc="e8b4891f" sha1="4974d8e868cc359dca73312749b71b0f163df92e" offset="0" />
@@ -21631,6 +21923,9 @@
 		<info name="release" value="19900223"/>
 		<info name="alt_title" value="対局連珠"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BBA-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="taikyoku renju (japan) (en,ja).bin" size="65536" crc="62a31de6" sha1="4bd7e9944be0f71258b9955c77c0696484e9773a" offset="0" />
@@ -22116,6 +22411,9 @@
 		<info name="release" value="19930730"/>
 		<info name="alt_title" value="鉄球ファイト! ザ・グレイトバトル外伝"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-BEAN-02" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1/1A/1B [DMG MBC1B1]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
 				<rom name="tekkyu fight! - the great battle gaiden (japan).bin" size="131072" crc="b8da8eb5" sha1="06a6ab3ba59286772f915053cfcd6e1e873358b1" offset="0" />
@@ -22167,7 +22465,7 @@
 		<info name="release" value="19890529 (JPN)"/>
 		<info name="alt_title" value="テニス"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="pcb" value="DMG-AAA-03" />   <!-- NOE cart -->
+			<feature name="pcb" value="DMG-AAA-03" /> <!-- DMG-TN-NOE and DMG-TNA carts -->
 			<feature name="u1" value="U1 PRG" />
 			<dataarea name="rom" size="32768">
 				<rom name="dmg-tna-0.u1" size="32768" crc="5009215f" sha1="ec45a932fb3fc21394fef5e27e7fe9eccd0c7f70" offset="0" />
@@ -24641,6 +24939,12 @@
 		<info name="release" value="19981217"/>
 		<info name="alt_title" value="遊戯王デュエルモンスターズ"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="DMG-DFCN-10" />
+			<feature name="u1" value="U1 PRG" />
+			<feature name="u2" value="U2 MBC1B/1B1 [DMG MBC1-B]" />
+			<feature name="u3" value="U3 RAM (C3) [HY6264A]" />
+			<feature name="u4" value="U4 26A [26A]" />
+			<feature name="batt" value="Batt CR1616" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="yu-gi-oh! duel monsters (japan).bin" size="1048576" crc="8875ec54" sha1="07ae4a6437f00f6af462bf84fd0ac1cf345c8365" offset="0" />
@@ -25349,6 +25653,8 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 
 <!-- Non game cartridges -->
 
+	<!-- Official Nintendo cleaning cartridge is P/N "DMG-A-CN-USA" -->
+
 	<software name="ggenie" supported="no">
 		<description>Game Genie BIOS (USA) (v2.1)</description>
 		<year>19??</year>
@@ -25386,11 +25692,16 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 
 
 	<software name="gboycam" supported="no">
-		<description>Game Boy Camera (Euro, USA)</description>
+		<description>Game Boy Camera (Euro, USA)</description> <!-- MGB-006 -->
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="GBD-USA, GBD-EUR"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="MGB-MGBD-10" />
+			<feature name="u1" value="U1 [MAC-GBD 9808 SA]" />
+			<feature name="u2" value="U2 [MX23C8004-12]" />
+			<feature name="u3" value="U3 [52CV1000SF85LL]" />
+			<feature name="batt" value="Batt CR2025" />
 			<feature name="slot" value="rom_camera" />
 			<dataarea name="rom" size="1048576">
 				<rom name="game boy camera (usa, europe).bin" size="1048576" crc="4640909f" sha1="461c3c37ed270681e3e94053efb21504b600aef5" offset="0" />
@@ -25431,13 +25742,25 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 		</part>
 	</software>
 
+	<!--
+	The game cart includes a real 200MHz fishing sonar (developed in cooperation with Honda Electronics).
+	There is a separated PCB labeled "HD0B220002" for the sonar components and a jack connector for attaching the
+	sonar (20 meters cable with its head on the other end).
+	There is a Game Boy prototype version (undumped) named "Handy Watcher", and also a WonderSwan version named "Handy Sonar".
+	It's a Nintendo officially licensed product from Bandai.
+	-->
 	<software name="pocksonr">
 		<description>Pocket Sonar (Jpn)</description>
 		<year>1998</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="DMG-AHWJ-JPN"/>
 		<info name="release" value="19980724"/>
 		<info name="alt_title" value="魚群探知機 ポケットソナー"/>
 		<part name="cart" interface="gameboy_cart">
+			<feature name="pcb" value="020310E4-00-1" />
+			<feature name="u1" value="U1 MX23C4002MC [GYOTAN 1P0206Y5 J982638]" />
+			<feature name="u2" value="U2 MBC1B [MBC1B1]" />
+			<feature name="u3" value="U3 74HC373 [74HC373A]" />
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket sonar (japan).bin" size="524288" crc="d68c9f79" sha1="788cdf148431b82b5308c68b3e45b133a7074196" offset="0" />
@@ -25468,5 +25791,13 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- There is official Game Foy flash cart where players could load official games on stores.
+		pcb="DMG-A20-01"
+		u1="G-MMC1 (MX15002) [MX15002UCA]"
+		u2="8M-FLASH [29F008ATC-14]"
+		u3="1M SRAM [UT621024SC-70LL]"
+                batt="Batt CR2025"
+	-->
 
 </softwarelist>

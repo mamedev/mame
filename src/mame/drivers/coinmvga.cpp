@@ -659,10 +659,12 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	MCFG_DEVICE_ADD("gfxdecode2", GFXDECODE, "palette2", gfx_coinmvga2)
 
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &coinmvga_state::ramdac_map);
 
 	MCFG_PALETTE_ADD("palette2", 16)
-	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette2")
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette2));
+	ramdac2.set_addrmap(0, &coinmvga_state::ramdac2_map);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

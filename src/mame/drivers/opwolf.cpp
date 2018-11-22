@@ -258,7 +258,10 @@ TODO
 
 There are a few unmapped writes for the sound Z80 in the log.
 
-Unknown writes to the MSM5205 control addresses
+Unknown writes to the MSM5205 control addresses (RUN/RES implementation is wrong)
+
+Sound volume filtering is imperfect. Notably the coin insert sound:
+MSM1 rings it at volume 0xa8, MSM2 echos it at volume 0x84 but should be more muffled.
 
 Raine source has standard Asuka/Mofflot sprite/tile priority:
 0x2000 in sprite_ctrl puts all sprites under top bg layer. But
@@ -304,7 +307,9 @@ public:
 		m_cchip_irq_clear(*this, "cchip_irq_clear"),
 		m_pc080sn(*this, "pc080sn"),
 		m_pc090oj(*this, "pc090oj"),
-		m_msm(*this, "msm%u", 0)
+		m_msm(*this, "msm%u", 0),
+		m_lspeaker(*this, "lspeaker"),
+		m_rspeaker(*this, "rspeaker")
 	{ }
 
 	void opwolf(machine_config &config);
@@ -371,6 +376,8 @@ private:
 	required_device<pc080sn_device> m_pc080sn;
 	required_device<pc090oj_device> m_pc090oj;
 	required_device_array<msm5205_device, 2> m_msm;
+	required_device<speaker_device> m_lspeaker;
+	required_device<speaker_device> m_rspeaker;
 };
 
 
@@ -747,15 +754,15 @@ WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
 	membank("z80bank")->set_entry(data & 0x03);
 }
 
-//static uint8_t adpcm_d[0x08];
 //0 - start ROM offset LSB
 //1 - start ROM offset MSB
 //2 - end ROM offset LSB
 //3 - end ROM offset MSB
 //start & end need to be multiplied by 16 to get a proper _byte_ address in adpcm ROM
-//4 - always zero write (start trigger ?)
-//5 - different values
-//6 - different values
+//4 - RUN, always zero write (start trigger ?)
+//5 - VOL, sample volume
+//6 - RES
+//7 - N/C
 
 template<int N>
 WRITE_LINE_MEMBER(opwolf_state::msm5205_vck_w)
@@ -794,6 +801,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
 		m_msm[0]->reset_w(0);
+		m_msm[0]->set_output_gain(0, m_adpcm_b[5] / 255.0);
 		//logerror("TRIGGER MSM1\n");
 	}
 
@@ -816,6 +824,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
 		m_msm[1]->reset_w(0);
+		m_msm[1]->set_output_gain(0, m_adpcm_c[5] / 255.0);
 		//logerror("TRIGGER MSM2\n");
 	}
 
@@ -824,12 +833,16 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 
 WRITE8_MEMBER(opwolf_state::opwolf_adpcm_d_w)
 {
-//   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
+	// total volume (speaker 1)
+	for (int i = 0; i <= 2; i++)
+		m_lspeaker->set_input_gain(i, data / 255.0);
 }
 
 WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
 {
-//  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,m_audiocpu->pc() );
+	// total volume (speaker 2)
+	for (int i = 0; i <= 2; i++)
+		m_rspeaker->set_input_gain(i, data / 255.0);
 }
 
 
@@ -966,23 +979,23 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)  /* 4 MHz */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));  /* 4 MHz */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set(FUNC(opwolf_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("msm0", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<0>))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<1>))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
@@ -1041,23 +1054,23 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set(FUNC(opwolf_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("msm0", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<0>))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, opwolf_state, msm5205_vck_w<1>))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
@@ -1267,8 +1280,6 @@ ROM_END
 // Prototype rom set includes the string - 'T KATO 10/6/87'
 // Regular rom set includes the string '11 Sep 1987'
 // C-Chip includes the string 'By_TAITO_Copration_On_OSAKA_BUNSHITU._01.Sep.1987_Toshiaki.Kato_Tsutomuawa_4
-
-// MACHINE_IMPERFECT_SOUND is present because the credit sound appears to double trigger.  All other sounds seem correct.
 
 //    year  rom       parent    machine   inp      state          init
 GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  init_opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

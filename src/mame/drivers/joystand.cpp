@@ -588,15 +588,15 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // !! TMP68301 !!
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(16'000'000)) // !! TMP68301 !!
 	MCFG_DEVICE_PROGRAM_MAP(joystand_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", joystand_state, joystand_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, joystand_state, eeprom_r))
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, joystand_state, eeprom_w))
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
+	m_tmp68301->in_parallel_callback().set(FUNC(joystand_state::eeprom_r));
+	m_tmp68301->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -621,18 +621,18 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// cart
-	MCFG_TMS_29F040_ADD("cart.u1")
-	MCFG_TMS_29F040_ADD("cart.u2")
-	MCFG_TMS_29F040_ADD("cart.u3")
-	MCFG_TMS_29F040_ADD("cart.u4")
-	MCFG_TMS_29F040_ADD("cart.u5")
-	MCFG_TMS_29F040_ADD("cart.u6")
-	MCFG_TMS_29F040_ADD("cart.u7")
-	MCFG_TMS_29F040_ADD("cart.u8")
-	MCFG_TMS_29F040_ADD("cart.u9")
-	MCFG_TMS_29F040_ADD("cart.u10")
-	MCFG_TMS_29F040_ADD("cart.u11")
-	MCFG_TMS_29F040_ADD("cart.u12")
+	TMS_29F040(config, "cart.u1");
+	TMS_29F040(config, "cart.u2");
+	TMS_29F040(config, "cart.u3");
+	TMS_29F040(config, "cart.u4");
+	TMS_29F040(config, "cart.u5");
+	TMS_29F040(config, "cart.u6");
+	TMS_29F040(config, "cart.u7");
+	TMS_29F040(config, "cart.u8");
+	TMS_29F040(config, "cart.u9");
+	TMS_29F040(config, "cart.u10");
+	TMS_29F040(config, "cart.u11");
+	TMS_29F040(config, "cart.u12");
 
 	// devices
 	EEPROM_93C46_16BIT(config, "eeprom");

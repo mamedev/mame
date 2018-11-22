@@ -127,9 +127,9 @@ WRITE8_MEMBER(al_magicsound_device::timer_w)
 {
 	// can both PITs be selected at the same time?
 	if(offset & 0x08)
-		m_timer1->write(space,offset & 0x03,data);
+		m_timer1->write(offset & 0x03,data);
 	if(offset & 0x04)
-		m_timer2->write(space,offset & 0x03,data);
+		m_timer2->write(offset & 0x03,data);
 }
 
 WRITE8_MEMBER(al_magicsound_device::volume_w)

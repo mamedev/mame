@@ -121,8 +121,8 @@ MACHINE_CONFIG_START(hotstuff_state::hotstuff)
 	scc8530_device& scc2(SCC8530N(config, "scc2", 4915200));
 	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	MCFG_DEVICE_ADD("rtc", MC146818, XTAL(32'768))
-	MCFG_MC146818_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
+	MC146818(config, m_rtc, XTAL(32'768));
+	m_rtc->irq().set_inputline("maincpu", M68K_IRQ_1);
 MACHINE_CONFIG_END
 
 

@@ -902,8 +902,7 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 	MCFG_DEVICE_ADD("maincpu", M68000, 7723800)
 	MCFG_DEVICE_PROGRAM_MAP(mcr68_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
 
@@ -932,31 +931,30 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(mcr68_state::xenophob)
+void mcr68_state::xenophob(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mcr68_state::intlaser)
+void mcr68_state::intlaser(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 800)
-MACHINE_CONFIG_END
+	subdevice<watchdog_timer_device>("watchdog")->set_vblank_count("screen", 800);
+}
 
 
 MACHINE_CONFIG_START(mcr68_state::spyhunt2)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
+	MCFG_DEVICE_ADD(m_sounds_good, MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

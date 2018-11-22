@@ -4034,7 +4034,7 @@
 	<software name="druidsci">
 		<description>The Druids Circle</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9266">
 				<rom name="druidscircle_e(1984)(hollsoft).uef" size="9266" crc="9154b8a4" sha1="de5b7eff6294131a7e74c85cca3d11513982643c" offset="0" />
@@ -4648,7 +4648,7 @@
 	<software name="fireisla">
 		<description>Fire Island</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10298">
 				<rom name="fireisland_e(1984)(hollsoft).uef" size="10298" crc="7875509b" sha1="6f9ba787788f55ba793d645f6d2aee2c3a3597cf" offset="0" />
@@ -6052,7 +6052,7 @@
 	</software>
 
 	<software name="hitchhik">
-		<description>Hitch Hiker</description>
+		<description>Hitch-Hiker</description>
 		<year>1982</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -8158,7 +8158,7 @@
 	<software name="missxp2">
 		<description>Mission XP2</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8463">
 				<rom name="missionxp2_e(1984)(hollsoft).uef" size="8463" crc="e1d7e35d" sha1="0b09dd32476793feebcb97f53c82cc5563f51976" offset="0" />
@@ -9507,7 +9507,7 @@
 	<software name="ponyexpr">
 		<description>Pony Express</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9030">
 				<rom name="ponyexpress_e(1984)(hollsoft).uef" size="9030" crc="fa5532e8" sha1="a138bbf06c90054713a81e5e038586f55fd6a096" offset="0" />
@@ -9637,7 +9637,7 @@
 	</software>
 
 	<software name="progsrev">
-		<description>Programmer's Revenge</description>
+		<description>Programmer's Revenge!</description>
 		<year>1984</year>
 		<publisher>Colisoft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -13325,7 +13325,7 @@
 	<software name="tombdeat">
 		<description>Tomb of Death</description>
 		<year>1984</year>
-		<publisher>Hollsoft</publisher>
+		<publisher>Holl-Soft</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8855">
 				<rom name="tombofdeath_e(1984)(hollsoft).uef" size="8855" crc="dbaab767" sha1="e9738e67d8f32ebc840294f2f51ae94d5c5ecdcc" offset="0" />

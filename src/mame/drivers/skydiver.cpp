@@ -151,12 +151,11 @@ WRITE_LINE_MEMBER(skydiver_state::nmion_w)
 INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
 {
 	/* Convert range data to divide value and write to sound */
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_discrete->write(space, SKYDIVER_RANGE_DATA, (0x01 << (~m_videoram[0x394] & 0x07)) & 0xff);   // Range 0-2
+	m_discrete->write(SKYDIVER_RANGE_DATA, (0x01 << (~m_videoram[0x394] & 0x07)) & 0xff);   // Range 0-2
 
-	m_discrete->write(space, SKYDIVER_RANGE3_EN,  m_videoram[0x394] & 0x08);       // Range 3 - note disable
-	m_discrete->write(space, SKYDIVER_NOTE_DATA, ~m_videoram[0x395] & 0xff);       // Note - freq
-	m_discrete->write(space, SKYDIVER_NOISE_DATA,  m_videoram[0x396] & 0x0f);  // NAM - Noise Amplitude
+	m_discrete->write(SKYDIVER_RANGE3_EN,  m_videoram[0x394] & 0x08);       // Range 3 - note disable
+	m_discrete->write(SKYDIVER_NOTE_DATA, ~m_videoram[0x395] & 0xff);       // Note - freq
+	m_discrete->write(SKYDIVER_NOISE_DATA,  m_videoram[0x396] & 0x0f);  // NAM - Noise Amplitude
 
 	if (m_nmion)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
@@ -352,8 +351,7 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	MCFG_DEVICE_PROGRAM_MAP(skydiver_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(skydiver_state, interrupt,  5*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)    // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);    // 128V clocks the same as VBLANK
 
 	f9334_device &latch1(F9334(config, "latch1")); // F12
 	latch1.q_out_cb<0>().set(FUNC(skydiver_state::lamp_s_w));

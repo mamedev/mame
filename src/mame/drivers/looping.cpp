@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(looping_state::looping)
 	m_maincpu->set_vblank_int("screen", FUNC(looping_state::looping_interrupt));
 
 	// CPU TMS9980A for audio subsystem; no line connections
-	TMS9980A(config, m_audiocpu, SOUND_CLOCK/4);
+	TMS9980A(config, m_audiocpu, SOUND_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &looping_state::looping_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &looping_state::looping_sound_io_map);
 
@@ -652,7 +652,7 @@ MACHINE_CONFIG_START(looping_state::looping)
 	mainlatch.q_out_cb<6>().set(FUNC(looping_state::main_irq_ack_w));
 	mainlatch.q_out_cb<7>().set(FUNC(looping_state::watchdog_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -673,11 +673,11 @@ MACHINE_CONFIG_START(looping_state::looping)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+	AY8910(config, m_aysnd, SOUND_CLOCK/4);
+	m_aysnd->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	MCFG_DEVICE_ADD("tms", TMS5220, TMS_CLOCK)
 	MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(*this, looping_state, looping_spcint))

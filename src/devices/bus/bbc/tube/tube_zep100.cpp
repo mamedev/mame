@@ -45,12 +45,20 @@ void bbc_tube_zep100_device::tube_zep100_io(address_map &map)
 //-------------------------------------------------
 
 ROM_START( tube_zep100 )
+	ROM_REGION(0x4000, "exp_rom", 0)
+	ROM_DEFAULT_BIOS("mcp120")
+	ROM_SYSTEM_BIOS(0, "mcp120", "MCP v1.20 (CBL)")  // 1985
+	ROMX_LOAD("mcp120cbl.rom", 0x0000, 0x4000, CRC(851d0879) SHA1(2e54ef15692ba7dd9fcfd1ef0d660464a772b156), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "mcp041", "MCP v0.41 (CBL)")  // 1983
+	ROMX_LOAD("mcp041cbl.rom", 0x0000, 0x4000, CRC(b36f07f4) SHA1(bd53f09bf73357845a6f97df1ee9e5aea5cdca90), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "cpn071", "CPN 0.71")         // 1982
+	ROMX_LOAD("cpn71.rom", 0x0000, 0x2000, CRC(fcb1bdc8) SHA1(756e22f6d76eb26206765f92c78c7152944102b6), ROM_BIOS(2))
+	ROM_RELOAD(            0x2000, 0x2000)
+
 	ROM_REGION(0x2000, "rom", 0)
-	ROM_DEFAULT_BIOS("cccp102")
-	ROM_SYSTEM_BIOS(0, "cccp102", "CCCP 1.02")
 	ROMX_LOAD("cccp102.rom", 0x0000, 0x2000, CRC(2eb40a21) SHA1(e6ee738e5f2f8556002b79d18caa8ef21f14e08d), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "cccp094", "CCCP 0.94")
 	ROMX_LOAD("cccp094.rom", 0x0000, 0x2000, CRC(49989bd4) SHA1(62b57c858a3baa4ff943c31f77d331c414772a61), ROM_BIOS(1))
+	ROMX_LOAD("cccp094.rom", 0x0000, 0x2000, CRC(49989bd4) SHA1(62b57c858a3baa4ff943c31f77d331c414772a61), ROM_BIOS(2))
 ROM_END
 
 //-------------------------------------------------
@@ -59,11 +67,11 @@ ROM_END
 
 void bbc_tube_zep100_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_z80, XTAL(4'000'000));
+	Z80(config, m_z80, 4_MHz_XTAL);
 	m_z80->set_addrmap(AS_PROGRAM, &bbc_tube_zep100_device::tube_zep100_mem);
 	m_z80->set_addrmap(AS_IO, &bbc_tube_zep100_device::tube_zep100_io);
 
-	VIA6522(config, m_via, XTAL(4'000'000) / 2);
+	VIA6522(config, m_via, 4_MHz_XTAL / 2);
 	m_via->writepb_handler().set(FUNC(bbc_tube_zep100_device::via_pb_w));
 	m_via->cb2_handler().set(m_ppi, FUNC(i8255_device::pc2_w));
 	m_via->ca2_handler().set(m_ppi, FUNC(i8255_device::pc6_w));
@@ -75,12 +83,10 @@ void bbc_tube_zep100_device::device_add_mconfig(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(bbc_tube_zep100_device::ppi_pc_w));
 
 	/* internal ram */
-	RAM(config, m_ram);
-	m_ram->set_default_size("64K");
-	m_ram->set_default_value(0x00);
+	RAM(config, m_ram).set_default_size("64K").set_default_value(0x00);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "flop_ls_torch").set_type("bbc_flop_torch", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_ls_torch").set_type("bbc_flop_torch", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter("Z80");
 }
 
 //-------------------------------------------------
@@ -100,16 +106,21 @@ const tiny_rom_entry *bbc_tube_zep100_device::device_rom_region() const
 //  bbc_tube_zep100_device - constructor
 //-------------------------------------------------
 
+bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_bbc_tube_interface(mconfig, *this)
+	, m_rom_enabled(true)
+	, m_z80(*this, "z80")
+	, m_via(*this, "via")
+	, m_ppi(*this, "ppi")
+	, m_ram(*this, "ram")
+	, m_rom(*this, "rom")
+	, m_port_b(0)
+{
+}
+
 bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_TUBE_ZEP100, tag, owner, clock),
-		device_bbc_tube_interface(mconfig, *this),
-		m_z80(*this, "z80"),
-		m_via(*this, "via"),
-		m_ppi(*this, "ppi"),
-		m_ram(*this, "ram"),
-		m_rom(*this, "rom"),
-		m_port_b(0),
-		m_rom_enabled(true)
+	: bbc_tube_zep100_device(mconfig, BBC_TUBE_ZEP100, tag, owner, clock)
 {
 }
 
@@ -119,7 +130,6 @@ bbc_tube_zep100_device::bbc_tube_zep100_device(const machine_config &mconfig, co
 
 void bbc_tube_zep100_device::device_start()
 {
-	m_slot = dynamic_cast<bbc_tube_slot_device *>(owner());
 }
 
 //-------------------------------------------------
@@ -128,8 +138,6 @@ void bbc_tube_zep100_device::device_start()
 
 void bbc_tube_zep100_device::device_reset()
 {
-	m_via->reset();
-
 	m_rom_enabled = true;
 }
 
@@ -177,14 +185,14 @@ READ8_MEMBER(bbc_tube_zep100_device::io_r)
 	if (!machine().side_effects_disabled())
 		m_rom_enabled = !BIT(offset, 2);
 
-	data = m_ppi->read(space, offset & 0x03);
+	data = m_ppi->read(offset & 0x03);
 
 	return data;
 }
 
 WRITE8_MEMBER(bbc_tube_zep100_device::io_w)
 {
-	m_ppi->write(space, offset & 0x03, data);
+	m_ppi->write(offset & 0x03, data);
 }
 
 

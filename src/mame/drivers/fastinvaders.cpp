@@ -649,17 +649,17 @@ MACHINE_CONFIG_START(fastinvaders_state::fastinvaders)
 //  MCFG_DEVICE_IO_MAP(fastinvaders_io_map)
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold)
 	MCFG_I8085A_SID(READLINE(*this, fastinvaders_state, sid_read))
-MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
-MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, "screen", 0, 1)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("dma8257", I8257, 6144100)
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, fastinvaders_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, fastinvaders_state, memory_write_byte))
-	MCFG_I8257_OUT_DACK_1_CB(WRITE8(*this, fastinvaders_state, dark_1_clr))
-	MCFG_I8257_OUT_DACK_2_CB(WRITE8(*this, fastinvaders_state, dark_2_clr))
+	I8257(config, m_dma8257, 6144100);
+	m_dma8257->in_memr_cb().set(FUNC(fastinvaders_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(fastinvaders_state::memory_write_byte));
+	m_dma8257->out_dack_cb<1>().set(FUNC(fastinvaders_state::dark_1_clr));
+	m_dma8257->out_dack_cb<2>().set(FUNC(fastinvaders_state::dark_2_clr));
 
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("count_ar", fastinvaders_state, count_ar,  attotime::from_hz(11500000/2))
@@ -696,11 +696,12 @@ MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_6845)
 	MCFG_DEVICE_MODIFY("maincpu" ) // guess
 	MCFG_DEVICE_IO_MAP(fastinvaders_6845_io)
 
-	MCFG_MC6845_ADD("6845", MC6845, "screen", 11500000/16) /* confirmed */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fastinvaders_state,vsync))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, fastinvaders_state,hsync))
+	MC6845(config, m_crtc6845, 11500000/16); /* confirmed */
+	m_crtc6845->set_screen("screen");
+	m_crtc6845->set_show_border_area(false);
+	m_crtc6845->set_char_width(16);
+	m_crtc6845->out_vsync_callback().set(FUNC(fastinvaders_state::vsync));
+	m_crtc6845->out_hsync_callback().set(FUNC(fastinvaders_state::hsync));
 MACHINE_CONFIG_END
 
 

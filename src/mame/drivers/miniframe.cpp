@@ -224,10 +224,11 @@ static void miniframe_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(miniframe_state::miniframe)
+void miniframe_state::miniframe(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68010, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(miniframe_mem)
+	M68010(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &miniframe_state::miniframe_mem);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M");
@@ -236,10 +237,10 @@ MACHINE_CONFIG_START(miniframe_state::miniframe)
 	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&miniframe_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);
 
 	// floppy
-	MCFG_DEVICE_ADD("wd2797", WD2797, 1000000)
-//  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_intrq_w))
-//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	WD2797(config, m_wd2797, 1000000);
+//  m_wd2797->intrq_wr_callback().set(FUNC(miniframe_state::wd2797_intrq_w));
+//  m_wd2797->drq_wr_callback().set(FUNC(miniframe_state::wd2797_drq_w));
+	FLOPPY_CONNECTOR(config, "wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	// 8263s
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
@@ -257,10 +258,10 @@ MACHINE_CONFIG_START(miniframe_state::miniframe)
 	baudgen.set_clk<2>(1228800);
 
 	// PIC8259s
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_PIC8259_IN_SP_CB(CONSTANT(1))
-MACHINE_CONFIG_END
+	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
+	pic8259.in_sp_callback().set_constant(1);
+}
 
 
 /***************************************************************************

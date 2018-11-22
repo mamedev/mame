@@ -165,9 +165,9 @@ MACHINE_CONFIG_START(ssrj_state::ssrj)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/5)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 8000000/5));
+	aysnd.port_b_read_callback().set_ioport("IN3");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -58,6 +58,9 @@ void cinemat_state::machine_start()
 	save_item(NAME(m_coin_detected));
 	save_item(NAME(m_coin_last_reset));
 	save_item(NAME(m_mux_select));
+	save_item(NAME(m_vector_color));
+	save_item(NAME(m_lastx));
+	save_item(NAME(m_lasty));
 	m_led.resolve();
 	m_pressed.resolve();
 }
@@ -768,6 +771,41 @@ static INPUT_PORTS_START( starcas )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( starcasc )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x07c0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SWITCHES")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( solarq )
 	PORT_START("INPUTS")
@@ -1319,6 +1357,16 @@ ROM_START( starcas )
 	CCPU_PROMS
 ROM_END
 
+ROM_START( starcasc )
+	ROM_REGION( 0x2000, "maincpu", 0 ) // all HN462716G, all labels hand-written
+	ROM_LOAD16_BYTE( "ctsc926_ue_3265.t7", 0x0000, 0x0800, CRC(c140a1bb) SHA1(82c5871af7171408cccb93b4905312856f16a607) )
+	ROM_LOAD16_BYTE( "ctsc926_le_deac.p7", 0x0001, 0x0800, CRC(8a074f6c) SHA1(e6be9897b4e8b94a9a75ab03c39637f499811d3a) )
+	ROM_LOAD16_BYTE( "ctsc926_u0_48e7.u7", 0x1000, 0x0800, CRC(ed136f11) SHA1(75965b79a7e5466fb80b61d3dd024907a9a0248a) )
+	ROM_LOAD16_BYTE( "ctsc926_l0_f707.r7", 0x1001, 0x0800, CRC(1930b1fb) SHA1(8f8370f62536ab7529ad74e51698973ee61b97e2) )
+
+	CCPU_PROMS
+ROM_END
+
 ROM_START( starcasp )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "starcasp.t7", 0x0000, 0x0800, CRC(d2c551a2) SHA1(90b5e1c6988839b812028f1baaea16420c011c08) )
@@ -1464,6 +1512,7 @@ void cinemat_state::init_speedfrk()
 	m_gear = 0xe;
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(cinemat_state::speedfrk_wheel_r),this));
 	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8_delegate(FUNC(cinemat_state::speedfrk_gear_r),this));
+	save_item(NAME(m_gear));
 }
 
 
@@ -1482,9 +1531,16 @@ void cinemat_color_state::init_boxingb()
 void qb3_state::init_qb3()
 {
 	membank("bank1")->configure_entries(0, 4, m_rambase, 0x100*2);
+
+	save_item(NAME(m_qb3_lastx));
+	save_item(NAME(m_qb3_lasty));
 }
 
-
+void cinemat_64level_state::init_solarq()
+{
+	save_item(NAME(m_target_volume));
+	save_item(NAME(m_current_volume));
+}
 
 /*************************************
  *
@@ -1506,11 +1562,12 @@ GAMEL( 1980, armorar,  armora,   armora,   armora,   cinemat_state,         empt
 GAME(  1980, ripoff,   0,        ripoff,   ripoff,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Rip Off", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1980, starcas,  0,        starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (version 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, starcas1, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (older)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
+GAMEL( 1980, starcasc, starcas,  starcas,  starcasc, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, starcasp, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, starcase, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Mottoeis license)", "Star Castle (Mottoeis)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, stellcas, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "bootleg (Elettronolo)", "Stellar Castle (Elettronolo)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1981, spaceftr, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Zaccaria license)", "Space Fortress (Zaccaria)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, empty_init,    ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_solarq )
+GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, init_solarq,   ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_solarq )
 GAME(  1981, boxingb,  0,        boxingb,  boxingb,  cinemat_color_state,   init_boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1981, wotw,     0,        wotw,     wotw,     cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wotw )
 GAME(  1981, wotwc,    wotw,     wotwc,    wotw,     cinemat_color_state,   empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds (color)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

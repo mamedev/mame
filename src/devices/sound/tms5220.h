@@ -91,11 +91,9 @@ public:
 	/RS is bit 1, /WS is bit 0
 	Note this is a hack and probably can be removed later, once the 'real'
 	line handlers above defer by at least 4 clock cycles before taking effect */
-	DECLARE_WRITE8_MEMBER( data_w ) { write_data(data); }
-	DECLARE_READ8_MEMBER( status_r ) { return read_status(); }
 
-	void write_data(uint8_t data);
-	uint8_t read_status();
+	void data_w(uint8_t data);
+	uint8_t status_r();
 
 	READ_LINE_MEMBER( readyq_r );
 	READ_LINE_MEMBER( intq_r );

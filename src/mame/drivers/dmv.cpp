@@ -801,10 +801,10 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	config.set_default_layout(layout_dmv);
 
 	// devices
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(5'000'000)/2) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(dmv_state, hgdc_display_pixels)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(dmv_state, hgdc_draw_text)
+	UPD7220(config, m_hgdc, XTAL(5'000'000)/2); // unk clock
+	m_hgdc->set_addrmap(0, &dmv_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(dmv_state::hgdc_display_pixels), this);
+	m_hgdc->set_draw_text_callback(FUNC(dmv_state::hgdc_draw_text), this);
 
 	AM9517A(config, m_dmac, 4_MHz_XTAL);
 	m_dmac->out_hreq_callback().set(FUNC(dmv_state::dma_hrq_changed));
@@ -821,17 +821,17 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(dmv_state::dmac_dack3));
 
-	MCFG_I8272A_ADD( "i8272", true )
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, dmv_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma8237", am9517a_device, dreq3_w))
+	I8272A(config, m_fdc, true);
+	m_fdc->intrq_wr_callback().set(FUNC(dmv_state::fdc_irq));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(50)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, dmv_state, pit_out0))
-	MCFG_PIT8253_CLK2(XTAL(24'000'000) / 3 / 16)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, dmv_state, timint_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(50);
+	m_pit->out_handler<0>().set(FUNC(dmv_state::pit_out0));
+	m_pit->set_clk<2>(XTAL(24'000'000) / 3 / 16);
+	m_pit->out_handler<2>().set(FUNC(dmv_state::timint_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

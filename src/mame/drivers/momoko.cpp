@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(momoko_state::momoko)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(10'000'000)/4)  /* 2.5MHz */
 	MCFG_DEVICE_PROGRAM_MAP(momoko_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -284,20 +284,20 @@ MACHINE_CONFIG_START(momoko_state::momoko)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(10'000'000)/8)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(10'000'000)/8));
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(10'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(10'000'000)/8));
+	ym2.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.40);
 MACHINE_CONFIG_END
 
 /****************************************************************************/

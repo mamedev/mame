@@ -244,7 +244,7 @@ WRITE8_MEMBER(lordgun_state::aliencha_dip_w)
 }
 
 // Unknown, always equal to 7 in lordgun, aliencha.
-WRITE16_MEMBER(lordgun_state::lordgun_priority_w)
+WRITE16_MEMBER(lordgun_state::priority_w)
 {
 	COMBINE_DATA(&m_priority);
 }
@@ -270,7 +270,7 @@ READ16_MEMBER(lordgun_state::lordgun_gun_1_y_r)
 	return m_gun[1].hw_y;
 }
 
-WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
+WRITE16_MEMBER(lordgun_state::soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)     m_soundlatch->write(space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)    m_soundlatch2->write(space, 0, (data >> 8) & 0xff);
@@ -278,19 +278,25 @@ WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void lordgun_state::lordgun_map(address_map &map)
+template<int Layer>
+WRITE16_MEMBER(lordgun_state::vram_w)
 {
-	map(0x000000, 0x0fffff).rom();
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset/2);
+}
+
+void lordgun_state::common_map(address_map &map)
+{
 	map(0x200000, 0x20ffff).ram();
 	map(0x210000, 0x21ffff).ram().share("priority_ram");                        // PRIORITY
-	map(0x300000, 0x30ffff).ram().w(FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // DISPLAY
-	map(0x310000, 0x313fff).ram().w(FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // DISPLAY
-	map(0x314000, 0x314fff).ram().w(FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // DISPLAY
+	map(0x300000, 0x30ffff).ram().w(FUNC(lordgun_state::vram_w<0>)).share("vram.0");  // DISPLAY (BACKGROUND 1 for aliencha)
+	map(0x310000, 0x313fff).ram().w(FUNC(lordgun_state::vram_w<1>)).share("vram.1");  // DISPLAY (BACKGROUND 2 for aliencha)
+	map(0x314000, 0x314fff).ram().w(FUNC(lordgun_state::vram_w<2>)).share("vram.2");  // DISPLAY (BACKGROUND 3 for aliencha)
 	map(0x315000, 0x317fff).ram();                                                     //
-	map(0x318000, 0x319fff).ram().w(FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // DISPLAY
-	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE
-	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATOR
-	map(0x500000, 0x500fff).ram().w(FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
+	map(0x318000, 0x319fff).ram().w(FUNC(lordgun_state::vram_w<3>)).share("vram.3");  // DISPLAY (TEXT for aliencha)
+	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE (LINE OFFSET for aliencha)
+	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATOR (ANIMATE for aliencha)
+	map(0x500000, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x502000, 0x502001).writeonly().share("scroll_x.0");
 	map(0x502200, 0x502201).writeonly().share("scroll_x.1");
 	map(0x502400, 0x502401).writeonly().share("scroll_x.2");
@@ -299,43 +305,28 @@ void lordgun_state::lordgun_map(address_map &map)
 	map(0x502a00, 0x502a01).writeonly().share("scroll_y.1");
 	map(0x502c00, 0x502c01).writeonly().share("scroll_y.2");
 	map(0x502e00, 0x502e01).writeonly().share("scroll_y.3");
-	map(0x503000, 0x503001).w(FUNC(lordgun_state::lordgun_priority_w));
+	map(0x503000, 0x503001).w(FUNC(lordgun_state::priority_w));
+	map(0x504000, 0x504001).w(FUNC(lordgun_state::soundlatch_w));
+	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+}
+
+void lordgun_state::lordgun_map(address_map &map)
+{
+	common_map(map);
+	map(0x000000, 0x0fffff).rom();
 	map(0x503800, 0x503801).r(FUNC(lordgun_state::lordgun_gun_0_x_r));
 	map(0x503a00, 0x503a01).r(FUNC(lordgun_state::lordgun_gun_1_x_r));
 	map(0x503c00, 0x503c01).r(FUNC(lordgun_state::lordgun_gun_0_y_r));
 	map(0x503e00, 0x503e01).r(FUNC(lordgun_state::lordgun_gun_1_y_r));
-	map(0x504000, 0x504001).w(FUNC(lordgun_state::lordgun_soundlatch_w));
-	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x50a900, 0x50a9ff).rw(FUNC(lordgun_state::lordgun_protection_r), FUNC(lordgun_state::lordgun_protection_w));
 }
 
 
 void lordgun_state::aliencha_map(address_map &map)
 {
+	common_map(map);
 	map(0x000000, 0x1fffff).rom();
-	map(0x200000, 0x20ffff).ram();
-	map(0x210000, 0x21ffff).ram().share("priority_ram");                        // PRIORITY
-	map(0x300000, 0x30ffff).ram().w(FUNC(lordgun_state::lordgun_vram_0_w)).share("vram.0");  // BACKGROUND 1
-	map(0x310000, 0x313fff).ram().w(FUNC(lordgun_state::lordgun_vram_1_w)).share("vram.1");  // BACKGROUND 2
-	map(0x314000, 0x314fff).ram().w(FUNC(lordgun_state::lordgun_vram_2_w)).share("vram.2");  // BACKGROUND 3
-	map(0x315000, 0x317fff).ram();                                                     //
-	map(0x318000, 0x319fff).ram().w(FUNC(lordgun_state::lordgun_vram_3_w)).share("vram.3");  // TEXT
-	map(0x31c000, 0x31c7ff).ram().share("scrollram");                           // LINE OFFSET
-	map(0x400000, 0x4007ff).ram().share("spriteram");                       // ANIMATE
-	map(0x500000, 0x500fff).ram().w(FUNC(lordgun_state::lordgun_paletteram_w)).share("paletteram");
-	map(0x502000, 0x502001).writeonly().share("scroll_x.0");
-	map(0x502200, 0x502201).writeonly().share("scroll_x.1");
-	map(0x502400, 0x502401).writeonly().share("scroll_x.2");
-	map(0x502600, 0x502601).writeonly().share("scroll_x.3");
-	map(0x502800, 0x502801).writeonly().share("scroll_y.0");
-	map(0x502a00, 0x502a01).writeonly().share("scroll_y.1");
-	map(0x502c00, 0x502c01).writeonly().share("scroll_y.2");
-	map(0x502e00, 0x502e01).writeonly().share("scroll_y.3");
-	map(0x503000, 0x503001).w(FUNC(lordgun_state::lordgun_priority_w));
-	map(0x504000, 0x504001).w(FUNC(lordgun_state::lordgun_soundlatch_w));
-	map(0x506000, 0x506007).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x508000, 0x508007).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x50b900, 0x50b9ff).rw(FUNC(lordgun_state::aliencha_protection_r), FUNC(lordgun_state::aliencha_protection_w));
 }
 
@@ -350,7 +341,7 @@ void lordgun_state::ymf278_map(address_map &map)
 
 ***************************************************************************/
 
-void lordgun_state::lordgun_soundmem_map(address_map &map)
+void lordgun_state::soundmem_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xffff).ram();
@@ -644,23 +635,23 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_DEVICE_PROGRAM_MAP(soundmem_map)
 	MCFG_DEVICE_IO_MAP(lordgun_soundio_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DIP"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, lordgun_eeprom_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake2_w))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("DIP");
+	ppi0.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi0.out_pb_callback().set(FUNC(lordgun_state::lordgun_eeprom_w));
+	ppi0.in_pc_callback().set_ioport("SERVICE");
+	ppi0.out_pc_callback().set(FUNC(lordgun_state::fake2_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("START1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("START2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("START1");
+	ppi1.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pb_callback().set_ioport("START2");
+	ppi1.out_pb_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pc_callback().set_ioport("COIN");
+	ppi1.out_pc_callback().set(FUNC(lordgun_state::fake_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -669,17 +660,19 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
+	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
+
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -696,23 +689,23 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_DEVICE_PROGRAM_MAP(soundmem_map)
 	MCFG_DEVICE_IO_MAP(aliencha_soundio_map)
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, lordgun_state, aliencha_dip_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake2_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, aliencha_eeprom_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, aliencha_dip_w))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set(FUNC(lordgun_state::aliencha_dip_r));
+	ppi0.out_pa_callback().set(FUNC(lordgun_state::fake2_w));
+	ppi0.out_pb_callback().set(FUNC(lordgun_state::aliencha_eeprom_w));
+	ppi0.in_pc_callback().set_ioport("SERVICE");
+	ppi0.out_pc_callback().set(FUNC(lordgun_state::aliencha_dip_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, fake_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("P1");
+	ppi1.out_pa_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pb_callback().set_ioport("P2");
+	ppi1.out_pb_callback().set(FUNC(lordgun_state::fake_w));
+	ppi1.in_pc_callback().set_ioport("COIN");
+	ppi1.out_pc_callback().set(FUNC(lordgun_state::fake_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -721,19 +714,21 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
+	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
+
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
+	MCFG_DEVICE_ADD("ymf", YMF278B, XTAL(33'868'800))            // ? 33.8688MHz matches video (decrease for faster music tempo)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -1086,6 +1081,6 @@ void lordgun_state::init_aliencha()
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, init_lordgun, ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, empty_init,   ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, empty_init,   ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, init_lordgun,  ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, init_aliencha, ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, init_aliencha, ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )

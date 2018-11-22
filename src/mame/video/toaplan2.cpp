@@ -63,9 +63,10 @@ void toaplan2_state::create_tx_tilemap(int dx, int dx_flipped)
 	m_tx_tilemap->set_transparent_pen(0);
 }
 
-void toaplan2_state::truxton2_postload()
+void toaplan2_state::device_post_load()
 {
-	m_gfxdecode->gfx(0)->mark_all_dirty();
+	if (m_tx_gfxram != nullptr)
+		m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
 VIDEO_START_MEMBER(toaplan2_state,toaplan2)
@@ -91,8 +92,7 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram16.target()));
-	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram.target()));
 
 	create_tx_tilemap(0x1d5, 0x16a);
 }
@@ -136,8 +136,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	m_vdp[0]->disable_sprite_buffer(); // disable buffering on this game
 
 	/* Create the Text tilemap for this game */
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram16.target()));
-	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram.target()));
 
 	create_tx_tilemap(0x1d4, 0x16b);
 
@@ -145,14 +144,14 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	m_vdp[0]->set_gfxrom_banked();
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_tx_videoram_w)
+WRITE16_MEMBER(toaplan2_state::tx_videoram_w)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	if (offset < 64*32)
 		m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_tx_linescroll_w)
+WRITE16_MEMBER(toaplan2_state::tx_linescroll_w)
 {
 	/*** Line-Scroll RAM for Text Layer ***/
 	COMBINE_DATA(&m_tx_linescroll[offset]);
@@ -160,16 +159,29 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_tx_linescroll_w)
 	m_tx_tilemap->set_scrollx(offset, m_tx_linescroll[offset]);
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
+WRITE16_MEMBER(toaplan2_state::tx_gfxram_w)
 {
 	/*** Dynamic GFX decoding for Truxton 2 / FixEight ***/
 
-	uint16_t oldword = m_tx_gfxram16[offset];
+	uint16_t oldword = m_tx_gfxram[offset];
 
 	if (oldword != data)
 	{
-		COMBINE_DATA(&m_tx_gfxram16[offset]);
+		COMBINE_DATA(&m_tx_gfxram[offset]);
 		m_gfxdecode->gfx(0)->mark_dirty(offset/32);
+	}
+}
+
+WRITE16_MEMBER(toaplan2_state::batrider_tx_gfxram_w)
+{
+	/*** Dynamic GFX decoding for Batrider / Battle Bakraid ***/
+
+	uint16_t oldword = m_tx_gfxram[offset];
+
+	if (oldword != data)
+	{
+		COMBINE_DATA(&m_tx_gfxram[offset]);
+		m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 	}
 }
 
@@ -180,7 +192,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 	m_dma_space->set_bank(1);
 	for (int i = 0; i < (0x8000 >> 1); i++)
 	{
-		m_dma_space->write16(space, i, m_mainram16[i]);
+		m_dma_space->write16(space, i, m_mainram[i]);
 	}
 }
 
@@ -192,7 +204,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_pal_text_dma_w)
 	m_dma_space->set_bank(0);
 	for (int i = 0; i < (0x3400 >> 1); i++)
 	{
-		m_dma_space->write16(space, i, m_mainram16[i]);
+		m_dma_space->write16(space, i, m_mainram[i]);
 	}
 }
 
@@ -209,12 +221,12 @@ uint32_t toaplan2_state::screen_update_dogyuun(screen_device &screen, bitmap_ind
 	if (m_vdp[1])
 	{
 		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp[1]->gp9001_render_vdp(bitmap, cliprect);
+		m_vdp[1]->render_vdp(bitmap, cliprect);
 	}
 	if (m_vdp[0])
 	{
 		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp[0]->gp9001_render_vdp(bitmap, cliprect);
+		m_vdp[0]->render_vdp(bitmap, cliprect);
 	}
 
 
@@ -232,13 +244,13 @@ uint32_t toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_in
 	{
 		bitmap.fill(0, cliprect);
 		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp[0]->gp9001_render_vdp(bitmap, cliprect);
+		m_vdp[0]->render_vdp(bitmap, cliprect);
 	}
 	if (m_vdp[1])
 	{
 		m_secondary_render_bitmap.fill(0, cliprect);
 		m_custom_priority_bitmap.fill(0, cliprect);
-		m_vdp[1]->gp9001_render_vdp(m_secondary_render_bitmap, cliprect);
+		m_vdp[1]->render_vdp(m_secondary_render_bitmap, cliprect);
 	}
 
 
@@ -323,7 +335,7 @@ uint32_t toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp[0]->gp9001_render_vdp(bitmap, cliprect);
+	m_vdp[0]->render_vdp(bitmap, cliprect);
 
 	return 0;
 }
@@ -361,12 +373,12 @@ uint32_t toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_in
 
 
 
-WRITE_LINE_MEMBER(toaplan2_state::screen_vblank_toaplan2)
+WRITE_LINE_MEMBER(toaplan2_state::screen_vblank)
 {
 	// rising edge
 	if (state)
 	{
-		if (m_vdp[0]) m_vdp[0]->gp9001_screen_eof();
-		if (m_vdp[1]) m_vdp[1]->gp9001_screen_eof();
+		if (m_vdp[0]) m_vdp[0]->screen_eof();
+		if (m_vdp[1]) m_vdp[1]->screen_eof();
 	}
 }

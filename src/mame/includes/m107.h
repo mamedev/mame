@@ -5,6 +5,10 @@
     Irem M107 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_M107_H
+#define MAME_INCLUDES_M107_H
+
+#pragma once
 
 #include "machine/pic8259.h"
 #include "machine/timer.h"
@@ -96,3 +100,5 @@ private:
 	void wpksoc_io_map(address_map &map);
 	void wpksoc_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M107_H

@@ -685,9 +685,10 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	m_coinlatch->q_out_cb<7>().set(FUNC(twincobr_state::coin_lockout_2_w));
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(28'000'000)/8) /* 3.5MHz measured on CLKin */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(2)
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(28'000'000)/8)); /* 3.5MHz measured on CLKin */
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(2);
 
 	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
 

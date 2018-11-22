@@ -276,10 +276,9 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("psg", YM2149, SOUND_CLOCK / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	YM2149(config, "psg", SOUND_CLOCK / 2).add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	MCFG_DEVICE_ADD("ymsnd", Y8950, SOUND_CLOCK) /* The Y8950 is basically a YM3526 with ADPCM built in */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

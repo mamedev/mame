@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(changela_state::changela)
 	outlatch.q_out_cb<4>().set(FUNC(changela_state::mcu_pc_0_w));
 	outlatch.q_out_cb<5>().set(FUNC(changela_state::collision_reset_1_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -449,15 +449,15 @@ MACHINE_CONFIG_START(changela_state::changela)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay1(AY8910(config, "ay1", 1250000));
+	ay1.port_a_read_callback().set_ioport("DSWA");
+	ay1.port_b_read_callback().set_ioport("DSWB");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWC"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWD"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay2(AY8910(config, "ay2", 1250000));
+	ay2.port_a_read_callback().set_ioport("DSWC");
+	ay2.port_b_read_callback().set_ioport("DSWD");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

@@ -485,17 +485,17 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD(m_ctc_0, Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, nanos_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, nanos_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, nanos_state, ctc_z2_w))
+	Z80CTC(config, m_ctc_0, XTAL(4'000'000));
+	m_ctc_0->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc_0->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
+	m_ctc_0->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
+	m_ctc_0->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(m_ctc_1, Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, nanos_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, nanos_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, nanos_state, ctc_z2_w))
+	Z80CTC(config, m_ctc_1, XTAL(4'000'000));
+	m_ctc_1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc_1->zc_callback<0>().set(FUNC(nanos_state::ctc_z0_w));
+	m_ctc_1->zc_callback<1>().set(FUNC(nanos_state::ctc_z1_w));
+	m_ctc_1->zc_callback<2>().set(FUNC(nanos_state::ctc_z2_w));
 
 	Z80PIO(config, m_pio_0, XTAL(4'000'000));
 	m_pio_0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	m_pio->out_pb_callback().set(FUNC(nanos_state::port_b_w));
 
 	/* UPD765 */
-	MCFG_UPD765A_ADD(m_fdc, false, true)
+	UPD765A(config, m_fdc, false, true);
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy, nanos_floppies, "525hd", nanos_state::floppy_formats)
 
 	/* internal ram */

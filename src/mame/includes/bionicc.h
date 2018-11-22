@@ -6,6 +6,10 @@
     Bionic Commando
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_BIONICC_H
+#define MAME_INCLUDES_BIONICC_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -17,8 +21,8 @@
 class bionicc_state : public driver_device
 {
 public:
-	bionicc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bionicc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -36,7 +40,6 @@ public:
 	void bionicc(machine_config &config);
 
 private:
-
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void mcu_io(address_map &map);
@@ -89,3 +92,5 @@ private:
 	/* misc */
 	int m_old_p3;
 };
+
+#endif // MAME_INCLUDES_BIONICC_H

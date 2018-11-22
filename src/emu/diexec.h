@@ -43,7 +43,7 @@ enum line_state
 enum
 {
 	// input lines
-	MAX_INPUT_LINES = 32+3,
+	MAX_INPUT_LINES = 64+3,
 	INPUT_LINE_IRQ0 = 0,
 	INPUT_LINE_IRQ1 = 1,
 	INPUT_LINE_IRQ2 = 2,
@@ -273,6 +273,12 @@ protected:
 	{
 		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
 			device().debug()->exception_hook(exception);
+	}
+
+	void debugger_privilege_hook()
+	{
+		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+			device().debug()->privilege_hook();
 	}
 
 private:

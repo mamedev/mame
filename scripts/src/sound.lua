@@ -1497,3 +1497,15 @@ if (SOUNDS["IOPSPU"]~=null) then
 		MAME_DIR .. "src/devices/sound/iopspu.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/sound/swp30.h,SOUNDS["SWP30"] = true
+---------------------------------------------------
+
+if (SOUNDS["SWP30"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/swp30.cpp",
+		MAME_DIR .. "src/devices/sound/swp30.h",
+	}
+end

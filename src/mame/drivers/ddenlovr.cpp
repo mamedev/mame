@@ -4391,11 +4391,11 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::sprtmtch_vblank_w));
 
-	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
-	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hnoridur_blit_pixel_w))
-	MCFG_DYNAX_BLITTER_REV2_SCROLLX_CB(WRITE8(*this, dynax_state, dynax_blit_scrollx_w))
-	MCFG_DYNAX_BLITTER_REV2_SCROLLY_CB(WRITE8(*this, dynax_state, dynax_blit_scrolly_w))
-	MCFG_DYNAX_BLITTER_REV2_READY_CB(WRITELINE(*this, dynax_state, sprtmtch_blitter_irq_w))
+	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	m_blitter->vram_out_cb().set(FUNC(dynax_state::hnoridur_blit_pixel_w));
+	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
+	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
+	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -4404,13 +4404,12 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000 / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, htengoku_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, htengoku_dsw_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000 / 16));
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::htengoku_dsw_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::htengoku_dsw_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
@@ -9749,11 +9748,9 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", YMZ284, XTAL(28'636'363) / 16)  // or /8 ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YMZ284(config, "aysnd", XTAL(28'636'363) / 16).add_route(ALL_OUTPUTS, "mono", 0.30);  // or /8 ?
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -9804,10 +9801,10 @@ MACHINE_CONFIG_START(ddenlovr_state::quiz365)
 	m_mainlatch->q_out_cb<1>().set(FUNC(ddenlovr_state::quiz365_oki_bank1_w));
 	m_mainlatch->q_out_cb<6>().set(FUNC(ddenlovr_state::quiz365_oki_bank2_w));
 
-	MCFG_DEVICE_REPLACE("aysnd", YM2149, XTAL(28'636'363) / 16)  // or /8 ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, quiz365_input_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
+	ym2149_device &aysnd(YM2149(config.replace(), "aysnd", XTAL(28'636'363) / 16));  // or /8 ?
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::quiz365_input_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
 
 	MCFG_DEVICE_REPLACE("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
@@ -9877,8 +9874,7 @@ MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363)/8) // 3.579545Mhz, verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 1.50); // 3.579545Mhz, verified
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -9965,14 +9961,12 @@ MACHINE_CONFIG_START(ddenlovr_state::mmpanic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1022720, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -10051,8 +10045,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hanakanz)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1022720, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -10098,8 +10091,7 @@ MACHINE_CONFIG_START(ddenlovr_state::kotbinyo)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'375'160) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'375'160) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'375'160) / 28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -10152,8 +10144,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjchuuka)
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1))
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1789772)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, "aysnd", 1789772).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -10223,11 +10214,9 @@ MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -10268,9 +10257,9 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyster)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -10305,10 +10294,10 @@ MACHINE_CONFIG_START(ddenlovr_state::hginga)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, hginga_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::hginga_dsw_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::hgokou)
@@ -10331,10 +10320,10 @@ MACHINE_CONFIG_START(ddenlovr_state::hgokou)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, hginga_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::hginga_dsw_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::hgokbang)
@@ -10376,9 +10365,9 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyuniv)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1789772)
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1789772));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::mjmyornt)
@@ -10404,9 +10393,9 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyornt)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1789772)
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1789772));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 
@@ -10456,8 +10445,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjflove)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 28636363/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", 28636363/8).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::hparadis)
@@ -10508,8 +10496,7 @@ MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -10565,11 +10552,9 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", YMZ284, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YMZ284(config, "aysnd", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -10616,11 +10601,9 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", YMZ284, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YMZ284(config, "aysnd", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -10688,13 +10671,12 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(28'636'363) / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, seljan2_dsw_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(28'636'363) / 8));
+	aysnd.port_a_read_callback().set(FUNC(ddenlovr_state::seljan2_dsw_r));
+	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -10738,8 +10720,7 @@ MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ym2413", XTAL(28'636'363) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363) / 28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

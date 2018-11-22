@@ -302,8 +302,8 @@ void bigevglf_state::bigevglf_sub_portmap(address_map &map)
 	map(0x0e, 0x0e).nopw(); /* 0-enable MCU, 1-keep reset line ASSERTED; D0 goes to the input of ls74 and the /Q of this ls74 goes to reset line on 68705 */
 	map(0x10, 0x17).w(FUNC(bigevglf_state::beg13_a_clr_w));
 	map(0x18, 0x1f).w(FUNC(bigevglf_state::beg13_b_set_w));
-	map(0x20, 0x20).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0x20, 0x20).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0x20, 0x20).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
+	map(0x20, 0x20).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x21, 0x21).r(FUNC(bigevglf_state::soundstate_r));
 }
 
@@ -321,8 +321,8 @@ void bigevglf_state::sound_map(address_map &map)
 	map(0xca00, 0xca0d).w(m_msm, FUNC(msm5232_device::write));
 	map(0xcc00, 0xcc00).nopw();
 	map(0xce00, 0xce00).nopw();
-	map(0xd800, 0xd800).r("soundlatch1", FUNC(generic_latch_8_device::read));
-	map(0xd800, 0xd800).w("soundlatch2", FUNC(generic_latch_8_device::write)); /* write to D800 sets bit 1 in status */
+	map(0xd800, 0xd800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0xd800, 0xd800).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)); /* write to D800 sets bit 1 in status */
 	map(0xda00, 0xda00).r(FUNC(bigevglf_state::soundstate_r));
 	map(0xda00, 0xda00).w("soundnmi", FUNC(input_merger_device::in_set<1>)); // enable NMI
 	map(0xdc00, 0xdc00).w("soundnmi", FUNC(input_merger_device::in_clear<1>)); // disable NMI
@@ -396,10 +396,10 @@ MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 	    2 irqs/frame give good music tempo but also SOUND ERROR in test mode,
 	    4 irqs/frame give SOUND OK in test mode but music seems to be running too fast */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
+ 
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -424,8 +424,7 @@ MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 8000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	YM2149(config, "aysnd", 8000000/4).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, 8000000/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors */

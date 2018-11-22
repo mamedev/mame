@@ -1755,7 +1755,7 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 	m_outlatch->q_out_cb<3>().set_output("led0").invert(); // LED 1
 	m_outlatch->q_out_cb<4>().set_output("led1").invert(); // LED 2
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* timer */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", centiped_state, generate_interrupt, "screen", 0, 16)
@@ -1812,9 +1812,7 @@ MACHINE_CONFIG_START(centiped_state::caterplr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 12096000/8)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, m_aysnd, 12096000/8).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -1830,9 +1828,9 @@ MACHINE_CONFIG_START(centiped_state::centipdb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 12096000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, centiped_state, caterplr_unknown_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	AY8910(config, m_aysnd, 12096000/8);
+	m_aysnd->port_a_read_callback().set(FUNC(centiped_state::caterplr_unknown_r));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 2.0);
 MACHINE_CONFIG_END
 
 
@@ -1850,9 +1848,7 @@ MACHINE_CONFIG_START(centiped_state::magworm)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 12096000/8) // AY-3-8912 at 2/3H
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-
+	AY8912(config, m_aysnd, 12096000/8).add_route(ALL_OUTPUTS, "mono", 2.0); // AY-3-8912 at 2/3H
 MACHINE_CONFIG_END
 
 
@@ -1968,7 +1964,7 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 	m_outlatch->q_out_cb<4>().set_output("led1").invert();
 	m_outlatch->q_out_cb<7>().set(FUNC(centiped_state::flip_screen_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2136,6 +2132,21 @@ ROM_START( centipdb )
 	ROM_LOAD( "136001-213.p4", 0x0000, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) )
 ROM_END
 
+ROM_START( centipdb2 ) // Single PCB with hand-written "Millipede", but is a Centipede bootleg instead
+	ROM_REGION( 0x10000, "maincpu", 0 ) // all 2716
+	ROM_LOAD( "mp1.d1",  0x2000, 0x0800, CRC(b17b8e0b) SHA1(01944cf040cf23aeb4c50d4f2e63181e08a07310) )
+	ROM_LOAD( "mp2.e1",  0x2800, 0x0800, CRC(7684398e) SHA1(eea8e05506a7af2fec55c2689e3caafc62ea524f) )
+	ROM_LOAD( "mp3.h1",  0x3000, 0x0800, CRC(74580fe4) SHA1(35b8a8675e4e020e234e51c3e4bd4ee5c24b79d2) )
+	ROM_LOAD( "mp4.j1",  0x3800, 0x0800, CRC(849b1614) SHA1(9060e39ec1d5c66e26c8d28a86818bcc1801c610) )
+	ROM_LOAD( "mp5.k1",  0x6000, 0x0800, CRC(9d3ad0e5) SHA1(ad7520b3c95d729bfd022553817f868485e9a191) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // all 2716
+	ROM_LOAD( "mp6.f7",  0x0000, 0x0800, CRC(880acfb9) SHA1(6c862352c329776f2f9974a0df9dbe41f9dbc361) )
+	ROM_LOAD( "mp7.j7",  0x0800, 0x0800, CRC(b1397029) SHA1(974c03d29aeca672fffa4dfc00a06be6a851aacb) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.p4", 0x0000, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) )
+ROM_END
 
 ROM_START( millpac )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2328,7 +2339,8 @@ GAME( 1980, centiped3, centiped, centiped,  centiped,  centiped_state, empty_ini
 GAME( 1980, centiped2, centiped, centiped,  centiped,  centiped_state, empty_init,    ROT270, "Atari", "Centipede (revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, centiped1, centiped, centiped,  centiped,  centiped_state, empty_init,    ROT270, "Atari", "Centipede (revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, centipedj, centiped, centipedj, centipedj, centiped_state, empty_init,    ROT270, "Atari", "Centipede (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, centipdb,  centiped, centipdb,  centiped,  centiped_state, empty_init,    ROT270, "bootleg", "Centipede (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, centipdb,  centiped, centipdb,  centiped,  centiped_state, empty_init,    ROT270, "bootleg", "Centipede (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, centipdb2, centiped, centipdb,  centiped,  centiped_state, empty_init,    ROT270, "bootleg", "Centipede (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, centipdd,  centiped, centiped,  centiped,  centiped_state, empty_init,    ROT270, "hack (Two-Bit Score)", "Centipede Dux (hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, caterplr,  centiped, caterplr,  caterplr,  centiped_state, empty_init,    ROT270, "bootleg (Olympia)", "Caterpillar (bootleg of Centipede)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, millpac,   centiped, centipdb,  centiped,  centiped_state, empty_init,    ROT270, "bootleg? (Valadon Automation)", "Millpac (bootleg of Centipede)", MACHINE_SUPPORTS_SAVE )

@@ -65,8 +65,7 @@ void poly88_state::poly88_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x04, 0x04).w(FUNC(poly88_state::poly88_baud_rate_w));
 	map(0x08, 0x08).w(FUNC(poly88_state::poly88_intr_w));
 	map(0xf8, 0xf8).r(FUNC(poly88_state::poly88_keyboard_r));

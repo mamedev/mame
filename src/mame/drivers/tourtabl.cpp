@@ -170,12 +170,12 @@ MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	riot2.in_pb_callback().set_ioport("RIOT1_SWB");
 	riot2.out_pb_callback().set(FUNC(tourtabl_state::tourtabl_led_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0, "tia")
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tourtabl_state, tourtabl_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tourtabl_state, tourtabl_get_databus_contents))
+	tia_ntsc_video_device &tia(TIA_NTSC_VIDEO(config, "tia_video", 0, "tia"));
+	tia.read_input_port_callback().set(FUNC(tourtabl_state::tourtabl_read_input_port));
+	tia.databus_contents_callback().set(FUNC(tourtabl_state::tourtabl_get_databus_contents));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )

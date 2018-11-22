@@ -33,8 +33,8 @@ If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 #include "bus/isa/isa.h"
 #include "bus/isa/sblaster.h"
 #include "bus/isa/trident.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/ser_mouse.h"
 
 #include "screen.h"
 
@@ -145,7 +145,7 @@ INPUT_PORTS_END
 
 static void pcat_dyn_com(device_slot_interface &device)
 {
-	device.option_add("msmouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("msmouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 }
 
 static void pcat_dyn_isa8_cards(device_slot_interface &device)
@@ -178,10 +178,9 @@ MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 
 	pcat_common(config);
 
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	DS12885(config.replace(), m_mc146818);
+	m_mc146818->irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
+	m_mc146818->set_century_index(0x32);
 
 	MCFG_DEVICE_ADD("ad1848", AD1848, 0)
 	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("pic8259_1", pic8259_device, ir5_w))
@@ -192,30 +191,31 @@ MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 
 	NVRAM(config, "nvram").set_custom_handler(FUNC(pcat_dyn_state::nvram_init));
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_DEVICE_ADD( "serport", RS232_PORT, pcat_dyn_com, "msmouse" )
-	MCFG_SLOT_FIXED(true)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
+	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
+	uart.out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
+	uart.out_dtr_callback().set("serport", FUNC(rs232_port_device::write_dtr));
+	uart.out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
+	uart.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_2", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_1", pic8259_device, ir3_w))
-	//MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
-	//MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_1", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_1", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
+	rs232_port_device &serport(RS232_PORT(config, "serport", pcat_dyn_com, "msmouse"));
+	serport.set_fixed(true);
+	serport.rxd_handler().set("ns16550", FUNC(ins8250_uart_device::rx_w));
+	serport.dcd_handler().set("ns16550", FUNC(ins8250_uart_device::dcd_w));
+	serport.dsr_handler().set("ns16550", FUNC(ins8250_uart_device::dsr_w));
+	serport.ri_handler().set("ns16550", FUNC(ins8250_uart_device::ri_w));
+	serport.cts_handler().set("ns16550", FUNC(ins8250_uart_device::cts_w));
+
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_cputag("maincpu");
+	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set("pic8259_1", FUNC(pic8259_device::ir3_w));
+	//m_isabus->irq4_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
+	//m_isabus->irq5_callback().set("pic8259_1", FUNC(pic8259_device::ir5_w));
+	m_isabus->irq6_callback().set("pic8259_1", FUNC(pic8259_device::ir6_w));
+	m_isabus->irq7_callback().set("pic8259_1", FUNC(pic8259_device::ir7_w));
+	m_isabus->drq1_callback().set("dma8237_1", FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set("dma8237_1", FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", pcat_dyn_isa8_cards, "sb15", true)

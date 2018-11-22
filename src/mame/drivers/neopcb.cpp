@@ -34,13 +34,12 @@ protected:
 	// device overrides
 	virtual void machine_start() override;
 
-	virtual void neogeo_postload() override;
+	virtual void device_post_load() override;
 
 	DECLARE_WRITE16_MEMBER(write_bankpvc);
 
 	void install_common();
 	void install_banked_bios();
-	void neopcb_postload();
 
 	// non-carts
 	void svcpcb_gfx_decrypt();
@@ -63,9 +62,9 @@ void neopcb_state::machine_start()
 	m_sprgen->set_screen(m_screen);
 }
 
-void neopcb_state::neogeo_postload()
+void neopcb_state::device_post_load()
 {
-	ngarcade_base_state::neogeo_postload();
+	ngarcade_base_state::device_post_load();
 
 	membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
 }

@@ -785,8 +785,10 @@ READ32_MEMBER(konamigx_state::type3_sync_r)
 /*
     Run and Gun 2, Rushing Heroes, Winning Spike, and Vs. Net Soccer contain a XILINX FPGA that serves as security.
 
-    RnG2's version is stamped "K002204", while Rushing Heroes' is "K0000035891".  Vs Net's is unknown at this time.
-    Winning Spike's is "0000032652".
+    RnG2's version is "K002204"
+    Rushing Heroes' is "K0000035891"
+    Vs Net Soccer is "003462"
+    Winning Spike's is "0000032652"
 
     RnG2's is used to generate the sprite list just like the ESC, among other tasks.  (RnG2 sends many commands per frame to the protection).
 
@@ -1622,11 +1624,11 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_DEVICE_ADD("dasp", TMS57002, MASTER_CLOCK/2)
 	MCFG_DEVICE_DATA_MAP(gxtmsmap)
 
-	MCFG_DEVICE_ADD("k053252", K053252, MASTER_CLOCK/4)
-	MCFG_K053252_OFFSETS(24, 16)
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, konamigx_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, konamigx_state, hblank_irq_ack_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	K053252(config, m_k053252, MASTER_CLOCK/4);
+	m_k053252->set_offsets(24, 16);
+	m_k053252->int1_ack().set(FUNC(konamigx_state::vblank_irq_ack_w));
+	m_k053252->int2_ack().set(FUNC(konamigx_state::hblank_irq_ack_w));
+	m_k053252->set_screen("screen");
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -1660,9 +1662,9 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 
 	MCFG_K055555_ADD("k055555")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, m_k054338, 0, m_k055555);
+	m_k054338->set_screen(m_screen);
+	m_k054338->set_alpha_invert(1);
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
 	MCFG_K055673_CB(konamigx_state, type2_sprite_callback)
@@ -1683,8 +1685,8 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.3)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.3)
 
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_soundcpu, M68K_IRQ_1);
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ROM("k054539")
@@ -1734,8 +1736,7 @@ MACHINE_CONFIG_START(konamigx_state::dragoonj)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24+16, 16)
+	m_k053252->set_offsets(24+16, 16);
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 1, 0)
@@ -1807,8 +1808,7 @@ MACHINE_CONFIG_START(konamigx_state::racinfrc)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_racinfrc)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, racinfrc)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24-8+16, 0)
+	m_k053252->set_offsets(24-8+16, 0);
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0)
@@ -1835,9 +1835,8 @@ MACHINE_CONFIG_START(konamigx_state::gxtype3)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type3)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(0, 16)
-	MCFG_K053252_SET_SLAVE_SCREEN("screen2")
+	m_k053252->set_offsets(0, 16);
+	m_k053252->set_slave_screen("screen2");
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 2)
@@ -1894,10 +1893,8 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type4)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(0, 16)
-	MCFG_K053252_SET_SLAVE_SCREEN("screen2")
-
+	m_k053252->set_offsets(0, 16);
+	m_k053252->set_slave_screen("screen2");
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 0)
@@ -1914,9 +1911,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
 	//MCFG_SCREEN_SIZE(128*8, 32*8)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(0, 16)
-
+	m_k053252->set_offsets(0, 16);
 
 	MCFG_SCREEN_MODIFY("screen2")
 	MCFG_SCREEN_SIZE(1024, 1024)
@@ -1944,8 +1939,7 @@ MACHINE_CONFIG_START(konamigx_state::winspike)
 	//MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24+15, 16)
+	m_k053252->set_offsets(24+15, 16);
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
@@ -3180,9 +3174,9 @@ Notes:
                      058143      - QFP160
                      058142      - QFP120
                      058141      - QFP120
-                     056832      - QFP120
-                     055555      - QFP160
-                     055673      - QFP160
+                     056832      - TQFP144
+                     055555      - TQFP176
+                     055673      - TQFP176
 
 
 Game Board (This sits on top of the Mother PCB)
@@ -3218,8 +3212,8 @@ Notes:
 
       Konami Customs:
                      003462 - Xilinx PLCC84 FPGA stamped 003462
-                     053936 - QFP100, also marked KS10011-PF PSAC2
-                     058146 - QFP160
+                     053936 - QFP80, also marked KS10011-PF PSAC2
+                     058146 - TQFP176
 
       RAM:
           814260 : 256K x16 DRAM

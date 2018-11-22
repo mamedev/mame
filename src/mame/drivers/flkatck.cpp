@@ -98,8 +98,9 @@ void flkatck_state::flkatck_map(address_map &map)
 	map(0x0008, 0x03ff).ram();                                                                 /* RAM */
 	map(0x0400, 0x041f).rw(FUNC(flkatck_state::flkatck_ls138_r), FUNC(flkatck_state::flkatck_ls138_w));                         /* inputs, DIPS, bankswitch, counters, sound command */
 	map(0x0800, 0x0bff).ram().w("palette", FUNC(palette_device::write8)).share("palette"); /* palette */
-	map(0x1000, 0x1fff).ram();                                                                 /* RAM */
-	map(0x2000, 0x3fff).ram().w(FUNC(flkatck_state::flkatck_k007121_w)).share("k007121_ram");                    /* Video RAM (007121) */
+	map(0x1000, 0x1fff).ram().share("spriteram");                                            /* RAM */
+	map(0x2000, 0x2fff).ram().w(FUNC(flkatck_state::vram_w)).share("vram");                    /* Video RAM (007121) */
+	map(0x3000, 0x3fff).ram();
 	map(0x4000, 0x5fff).bankr("bank1");                                                            /* banked ROM */
 	map(0x6000, 0xffff).rom();                                                                 /* ROM */
 }
@@ -222,7 +223,7 @@ MACHINE_CONFIG_START(flkatck_state::flkatck)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -245,11 +246,9 @@ MACHINE_CONFIG_START(flkatck_state::flkatck)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, flkatck_state, volume_callback))

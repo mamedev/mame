@@ -274,10 +274,10 @@ MACHINE_CONFIG_START(lola8a_state::lola8a)
 	MCFG_I8085A_SOD(WRITELINE(*this, lola8a_state, cass_w))
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, lola8a_state, lola8a_port_a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lola8a_state, lola8a_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
+	ay8910_device &aysnd(AY8910(config, AY8910_TAG, XTAL(4'915'200) / 4));
+	aysnd.port_a_read_callback().set(FUNC(lola8a_state::lola8a_port_a_r));
+	aysnd.port_b_write_callback().set(FUNC(lola8a_state::lola8a_port_b_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -287,11 +287,12 @@ MACHINE_CONFIG_START(lola8a_state::lola8a)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL(8'000'000) / 8) // HD6845 == HD46505S
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(lola8a_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, lola8a_state, crtc_vsync))
+	hd6845_device &crtc(HD6845(config, HD46505SP_TAG, XTAL(8'000'000) / 8)); // HD6845 == HD46505S
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(lola8a_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set(FUNC(lola8a_state::crtc_vsync));
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 

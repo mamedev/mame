@@ -467,7 +467,7 @@ z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag,
 	, m_rx_first(0)
 	, m_rx_break(0)
 	, m_rx_rr0_latch(0)
-	, m_rxd(0)
+	, m_rxd(1)
 	, m_ri(0)
 	, m_cts(0)
 	, m_dcd(0)
@@ -802,7 +802,7 @@ void z80dart_channel::control_write(uint8_t data)
 
 			if (!m_dcd) m_rr[0] |= RR0_DCD;
 			if (m_ri) m_rr[0] |= RR0_RI;
-			if (m_cts) m_rr[0] |= RR0_CTS;
+			if (!m_cts) m_rr[0] |= RR0_CTS;
 
 			m_rx_rr0_latch = 0;
 
@@ -920,7 +920,8 @@ void z80dart_channel::control_write(uint8_t data)
 		LOG("Z80DART \"%s\" Channel %c : Request to Send %u\n", owner()->tag(), 'A' + m_index, (data & WR5_RTS) ? 1 : 0);
 		LOG("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", owner()->tag(), 'A' + m_index, (data & WR5_DTR) ? 1 : 0);
 
-		if (data != prev)
+		// don't update if parameters haven't changed; in fact, don't update at all since these ones are currently unused
+		if (0 && (data & WR5_TX_WORD_LENGTH_MASK) != (prev & WR5_TX_WORD_LENGTH_MASK))
 			update_serial();
 
 		if (data & WR5_RTS)
@@ -932,6 +933,8 @@ void z80dart_channel::control_write(uint8_t data)
 		else
 		{
 			// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
+			if (m_rr[1] & RR1_ALL_SENT)
+				set_rts(1);
 			m_rts = 0;
 		}
 
@@ -1269,7 +1272,7 @@ void z80dart_channel::update_serial()
 	{
 		set_tra_rate(m_txc / clocks);
 	}
-	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset
+	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset (FIXME: doing this without checking is stupid)
 }
 
 

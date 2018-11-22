@@ -540,19 +540,19 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 
 	ADDRESS_MAP_BANK(config, "io").set_map(&svi3x8_state::svi3x8_io_bank).set_data_width(8).set_addr_width(9).set_stride(0x100);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, svi3x8_state, ppi_port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, svi3x8_state, ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, svi3x8_state, ppi_port_c_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set(FUNC(svi3x8_state::ppi_port_a_r));
+	ppi.in_pb_callback().set(FUNC(svi3x8_state::ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(svi3x8_state::ppi_port_c_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("psg", AY8910, XTAL(10'738'635) / 6)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, svi3x8_state, bank_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'635) / 6));
+	psg.port_a_read_callback().set_ioport("JOY");
+	psg.port_b_write_callback().set(FUNC(svi3x8_state::bank_w));
+	psg.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// cassette
 	MCFG_CASSETTE_ADD("cassette")

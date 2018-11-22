@@ -72,7 +72,7 @@ void wangpc_rtc_device::wangpc_rtc_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_sio, FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
 	map(0x10, 0x1f).rw(AM9517A_TAG, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x20, 0x23).rw(Z80CTC_0_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x20, 0x23).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x30, 0x30); //AM_WRITE(clear_char_w)
 	map(0x31, 0x31); //AM_WRITE(set_char_w)
 	map(0x40, 0x40).portr("SW1"); //AM_WRITE(control_w)
@@ -83,7 +83,7 @@ void wangpc_rtc_device::wangpc_rtc_io(address_map &map)
 	map(0x51, 0x52); //AM_WRITE(status_w)
 	map(0x54, 0x54); //AM_WRITE(enable_inbound_data_w)
 	map(0x51, 0x52); //AM_WRITE(inbound_data_w)
-	map(0x60, 0x63).rw(Z80CTC_1_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x60, 0x63).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x70, 0x70); //AM_READWRITE(led_toggle_r, odd_parity_w)
 	map(0x71, 0x71); //AM_WRITE(even_parity_w)
 }
@@ -102,10 +102,11 @@ static const z80_daisy_config wangpc_rtc_daisy_chain[] =
 };
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( wangpc_rtc )
+//  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(wangpc_rtc_device::device_add_mconfig)
+void wangpc_rtc_device::device_add_mconfig(machine_config &config)
+{
 	Z80(config, m_maincpu, 2000000);
 	m_maincpu->set_daisy_config(wangpc_rtc_daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wangpc_rtc_device::wangpc_rtc_mem);
@@ -113,15 +114,15 @@ MACHINE_CONFIG_START(wangpc_rtc_device::device_add_mconfig)
 
 	AM9517A(config, m_dmac, 2000000);
 
-	MCFG_DEVICE_ADD(Z80CTC_0_TAG, Z80CTC, 2000000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc0, 2000000);
+	m_ctc0->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80CTC_1_TAG, Z80CTC, 2000000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc1, 2000000);
+	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80SIO0(config, m_sio, 2000000);
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------

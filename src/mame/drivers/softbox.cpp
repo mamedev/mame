@@ -126,8 +126,7 @@ void softbox_state::softbox_mem(address_map &map)
 void softbox_state::softbox_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x08, 0x08).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x09, 0x09).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x08, 0x09).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0c, 0x0c).w(COM8116_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x10, 0x13).rw(I8255_0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x14, 0x17).rw(I8255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -372,22 +371,22 @@ MACHINE_CONFIG_START(softbox_state::softbox)
 	i8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	i8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251_TAG, i8251_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(I8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set(I8251_TAG, FUNC(i8251_device::write_cts));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, softbox_state, ppi0_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, softbox_state, ppi0_pb_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SW1"))
+	i8255_device &ppi0(I8255A(config, I8255_0_TAG));
+	ppi0.in_pa_callback().set(FUNC(softbox_state::ppi0_pa_r));
+	ppi0.out_pb_callback().set(FUNC(softbox_state::ppi0_pb_w));
+	ppi0.in_pc_callback().set_ioport("SW1");
 
-	MCFG_DEVICE_ADD(I8255_1_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, softbox_state, ppi1_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, softbox_state, ppi1_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, softbox_state, ppi1_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, softbox_state, ppi1_pc_w))
+	i8255_device &ppi1(I8255A(config, I8255_1_TAG));
+	ppi1.in_pa_callback().set(FUNC(softbox_state::ppi1_pa_r));
+	ppi1.out_pb_callback().set(FUNC(softbox_state::ppi1_pb_w));
+	ppi1.in_pc_callback().set(FUNC(softbox_state::ppi1_pc_r));
+	ppi1.out_pc_callback().set(FUNC(softbox_state::ppi1_pc_w));
 
 	com8116_device &dbrg(COM8116(config, COM8116_TAG, 5.0688_MHz_XTAL));
 	dbrg.fr_handler().set(I8251_TAG, FUNC(i8251_device::write_rxc));

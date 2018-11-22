@@ -6,6 +6,10 @@
     Driver for Midway T-unit games.
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_MIDTUNIT_H
+#define MAME_INCLUDES_MIDTUNIT_H
+
+#pragma once
 
 #include "audio/dcs.h"
 #include "audio/williams.h"
@@ -22,15 +26,16 @@ public:
 		TIMER_DMA
 	};
 
-	midtunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	midtunit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dcs(*this, "dcs"),
 		m_palette(*this, "palette"),
 		m_cvsd_sound(*this, "cvsd"),
 		m_adpcm_sound(*this, "adpcm"),
 		m_nvram(*this, "nvram"),
-		m_gfxrom(*this, "gfxrom") { }
+		m_gfxrom(*this, "gfxrom")
+	{ }
 
 	void tunit_core(machine_config &config);
 	void tunit_adpcm(machine_config &config);
@@ -132,3 +137,5 @@ private:
 	void main_map(address_map &map);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_MIDTUNIT_H

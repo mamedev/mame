@@ -455,17 +455,17 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state, z80net )
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state, z80net )
 
-	MCFG_DEVICE_ADD("lx387_kr2376", KR2376_ST, 50000)
-	MCFG_KR2376_MATRIX_X0(IOPORT("X0"))
-	MCFG_KR2376_MATRIX_X1(IOPORT("X1"))
-	MCFG_KR2376_MATRIX_X2(IOPORT("X2"))
-	MCFG_KR2376_MATRIX_X3(IOPORT("X3"))
-	MCFG_KR2376_MATRIX_X4(IOPORT("X4"))
-	MCFG_KR2376_MATRIX_X5(IOPORT("X5"))
-	MCFG_KR2376_MATRIX_X6(IOPORT("X6"))
-	MCFG_KR2376_MATRIX_X7(IOPORT("X7"))
-	MCFG_KR2376_SHIFT_CB(READLINE(*this, z80ne_state, lx387_shift_r))
-	MCFG_KR2376_CONTROL_CB(READLINE(*this, z80ne_state, lx387_control_r))
+	KR2376_ST(config, m_lx387_kr2376, 50000);
+	m_lx387_kr2376->x<0>().set_ioport("X0");
+	m_lx387_kr2376->x<1>().set_ioport("X1");
+	m_lx387_kr2376->x<2>().set_ioport("X2");
+	m_lx387_kr2376->x<3>().set_ioport("X3");
+	m_lx387_kr2376->x<4>().set_ioport("X4");
+	m_lx387_kr2376->x<5>().set_ioport("X5");
+	m_lx387_kr2376->x<6>().set_ioport("X6");
+	m_lx387_kr2376->x<7>().set_ioport("X7");
+	m_lx387_kr2376->shift().set(FUNC(z80ne_state::lx387_shift_r));
+	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
@@ -504,17 +504,17 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("z80ne_cass")
 
-	MCFG_DEVICE_ADD("lx387_kr2376", KR2376_ST, 50000)
-	MCFG_KR2376_MATRIX_X0(IOPORT("X0"))
-	MCFG_KR2376_MATRIX_X1(IOPORT("X1"))
-	MCFG_KR2376_MATRIX_X2(IOPORT("X2"))
-	MCFG_KR2376_MATRIX_X3(IOPORT("X3"))
-	MCFG_KR2376_MATRIX_X4(IOPORT("X4"))
-	MCFG_KR2376_MATRIX_X5(IOPORT("X5"))
-	MCFG_KR2376_MATRIX_X6(IOPORT("X6"))
-	MCFG_KR2376_MATRIX_X7(IOPORT("X7"))
-	MCFG_KR2376_SHIFT_CB(READLINE(*this, z80ne_state, lx387_shift_r))
-	MCFG_KR2376_CONTROL_CB(READLINE(*this, z80ne_state, lx387_control_r))
+	KR2376_ST(config, m_lx387_kr2376, 50000);
+	m_lx387_kr2376->x<0>().set_ioport("X0");
+	m_lx387_kr2376->x<1>().set_ioport("X1");
+	m_lx387_kr2376->x<2>().set_ioport("X2");
+	m_lx387_kr2376->x<3>().set_ioport("X3");
+	m_lx387_kr2376->x<4>().set_ioport("X4");
+	m_lx387_kr2376->x<5>().set_ioport("X5");
+	m_lx387_kr2376->x<6>().set_ioport("X6");
+	m_lx387_kr2376->x<7>().set_ioport("X7");
+	m_lx387_kr2376->shift().set(FUNC(z80ne_state::lx387_shift_r));
+	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
@@ -553,7 +553,7 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("z80ne_cass")
 
-	MCFG_DEVICE_ADD("lx387_kr2376", KR2376_ST, 50000)
+	KR2376_ST(config, m_lx387_kr2376, 50000);
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
@@ -563,7 +563,7 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
-	MCFG_DEVICE_ADD("wd1771", FD1771, 2_MHz_XTAL / 2)
+	FD1771(config, m_wd1771, 2_MHz_XTAL / 2);
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)

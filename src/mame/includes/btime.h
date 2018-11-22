@@ -5,6 +5,10 @@
     Burger Time hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_BTIME_H
+#define MAME_INCLUDES_BTIME_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
@@ -132,24 +136,26 @@ public:
 							uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
 							uint8_t *sprite_ram, offs_t interleave );
 
-							void lnc(machine_config &config);
-							void disco(machine_config &config);
-							void mmonkey(machine_config &config);
-							void bnj(machine_config &config);
-							void cookrace(machine_config &config);
-							void wtennis(machine_config &config);
-							void sdtennis(machine_config &config);
-							void tisland(machine_config &config);
-							void zoar(machine_config &config);
-							void btime(machine_config &config);
-							void audio_map(address_map &map);
-							void bnj_map(address_map &map);
-							void btime_map(address_map &map);
-							void cookrace_map(address_map &map);
-							void disco_audio_map(address_map &map);
-							void disco_map(address_map &map);
-							void lnc_map(address_map &map);
-							void mmonkey_map(address_map &map);
-							void tisland_map(address_map &map);
-							void zoar_map(address_map &map);
+	void lnc(machine_config &config);
+	void disco(machine_config &config);
+	void mmonkey(machine_config &config);
+	void bnj(machine_config &config);
+	void cookrace(machine_config &config);
+	void wtennis(machine_config &config);
+	void sdtennis(machine_config &config);
+	void tisland(machine_config &config);
+	void zoar(machine_config &config);
+	void btime(machine_config &config);
+	void audio_map(address_map &map);
+	void bnj_map(address_map &map);
+	void btime_map(address_map &map);
+	void cookrace_map(address_map &map);
+	void disco_audio_map(address_map &map);
+	void disco_map(address_map &map);
+	void lnc_map(address_map &map);
+	void mmonkey_map(address_map &map);
+	void tisland_map(address_map &map);
+	void zoar_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BTIME_H

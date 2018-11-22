@@ -188,7 +188,7 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-void k052109_device::set_ram(bool ram)
+void k052109_device::set_char_ram(bool ram)
 {
 	if (ram)
 		set_info(gfxinfo_ram);
@@ -252,7 +252,6 @@ void k052109_device::device_start()
 	save_item(NAME(m_charrombank));
 	save_item(NAME(m_charrombank_2));
 	save_item(NAME(m_has_extra_video_ram));
-	machine().save().register_postload(save_prepost_delegate(FUNC(k052109_device::tileflip_reset), this));
 }
 
 //-------------------------------------------------
@@ -273,6 +272,15 @@ void k052109_device::device_reset()
 		m_charrombank[i] = 0;
 		m_charrombank_2[i] = 0;
 	}
+}
+
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
+
+void k052109_device::device_post_load()
+{
+	tileflip_reset();
 }
 
 /*****************************************************************************

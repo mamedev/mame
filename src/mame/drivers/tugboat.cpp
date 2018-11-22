@@ -389,8 +389,7 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(10'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8912(config, "aysnd", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.35);
 MACHINE_CONFIG_END
 
 

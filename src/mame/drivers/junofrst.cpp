@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	mainlatch.q_out_cb<4>().set(FUNC(junofrst_state::flip_screen_x_w)); // HFF
 	mainlatch.q_out_cb<5>().set(FUNC(junofrst_state::flip_screen_y_w)); // VFLIP
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
@@ -443,15 +443,15 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, junofrst_state, portA_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, junofrst_state, portB_w))
-	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.30)
-	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
-	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 14318000/8));
+	aysnd.port_a_read_callback().set(FUNC(junofrst_state::portA_r));
+	aysnd.port_b_write_callback().set(FUNC(junofrst_state::portB_w));
+	aysnd.add_route(0, "filter.0.0", 0.30);
+	aysnd.add_route(1, "filter.0.1", 0.30);
+	aysnd.add_route(2, "filter.0.2", 0.30);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 100K (R56-63)/200K (R64-71) ladder network
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

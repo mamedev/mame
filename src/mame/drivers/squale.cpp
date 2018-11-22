@@ -804,13 +804,13 @@ MACHINE_CONFIG_START(squale_state::squale)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, AY_CLOCK)
+	AY8910(config, m_ay8910, AY_CLOCK);
 	// TODO : Add port I/O handler
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, squale_state, ay_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, squale_state, ay_portb_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, squale_state, ay_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, squale_state, ay_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	m_ay8910->port_a_read_callback().set(FUNC(squale_state::ay_porta_r));
+	m_ay8910->port_b_read_callback().set(FUNC(squale_state::ay_portb_r));
+	m_ay8910->port_a_write_callback().set(FUNC(squale_state::ay_porta_w));
+	m_ay8910->port_b_write_callback().set(FUNC(squale_state::ay_portb_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_DEVICE_ADD ("ef6850", ACIA6850, 0)
 
@@ -830,7 +830,7 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
-	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL)
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")

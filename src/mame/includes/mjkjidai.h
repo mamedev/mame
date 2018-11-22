@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_MJKJIDAI_H
+#define MAME_INCLUDES_MJKJIDAI_H
+
+#pragma once
+
 #include "machine/nvram.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
@@ -7,8 +12,8 @@
 class mjkjidai_state : public driver_device
 {
 public:
-	mjkjidai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mjkjidai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_nvram(*this, "nvram"),
@@ -16,7 +21,8 @@ public:
 		m_palette(*this, "palette"),
 		m_adpcmrom(*this, "adpcm"),
 		m_videoram(*this, "videoram"),
-		m_row(*this, "ROW.%u", 0) { }
+		m_row(*this, "ROW.%u", 0)
+	{ }
 
 	void mjkjidai(machine_config &config);
 
@@ -57,3 +63,5 @@ private:
 	void mjkjidai_io_map(address_map &map);
 	void mjkjidai_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MJKJIDAI_H

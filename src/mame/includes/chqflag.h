@@ -5,6 +5,11 @@
     Chequered Flag
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CHQFLAG_H
+#define MAME_INCLUDES_CHQFLAG_H
+
+#pragma once
+
 #include "machine/bankdev.h"
 #include "sound/k007232.h"
 #include "video/k051960.h"
@@ -71,3 +76,5 @@ private:
 	required_memory_bank m_rombank;
 	void update_background_shadows(uint8_t data);
 };
+
+#endif // MAME_INCLUDES_CHQFLAG_H

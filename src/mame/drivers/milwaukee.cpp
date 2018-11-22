@@ -9,6 +9,13 @@ Milwaukee Computer MC-1000 series (MC-1000/1100/1200/1300/1400) all the same exc
 Chips: SY6502, 2x 6821, 2x MC6850P, 6852, INS8253
 Other: 2x 7-position rotary "dips" to select baud rates on each 6850 (19.2K, 9600, 4800, 2400, 1200, 600, 300).
 
+
+Status:
+- When booted it asks for a test to perform. Valid answers are A,B,D,E,H,I,M,O,P,S,W. To exit a test, press E.
+         M displays * then loops. E just asks the Test question again. P gets caught in a loop (fdc test).
+         When W pressed, N is displayed.
+
+
 ************************************************************************************************************************************/
 
 #include "emu.h"
@@ -26,7 +33,6 @@ public:
 	milwaukee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		//, m_p_chargen(*this, "chargen")
 	{ }
 
 	void milwaukee(machine_config &config);
@@ -34,12 +40,11 @@ public:
 private:
 	void mem_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
-	//required_region_ptr<u8> m_p_chargen;
 };
 void milwaukee_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xf7ff).ram();
-	//AM_RANGE(0xf800, 0xf87f) expansion i/o
+	//map(0xf800, 0xf87f) expansion i/o
 	map(0xf880, 0xf881).rw("acia1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // terminal
 	map(0xf882, 0xf883).rw("acia2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // remote
 	map(0xf884, 0xf887).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // centronics

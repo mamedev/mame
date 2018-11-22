@@ -1728,15 +1728,6 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	screen_device_iterator iter(m_manager.machine().root_device());
 	std::vector<screen_info> const screens(std::begin(iter), std::end(iter));
 
-	if (!have_default && !have_artwork)
-	{
-		if (screens.size() == 2U)
-		{
-			load_layout_file(nullptr, layout_dualhsxs);
-			if (m_filelist.empty())
-				throw emu_fatalerror("Couldn't parse default layout??");
-		}
-	}
 
 	if (screens.empty()) // ensure the fallback view for systems with no screens is loaded if necessary
 	{
@@ -1944,6 +1935,47 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			generate_view("Left-to-Right (Gapless)", screens.size(), true, [] (unsigned x, unsigned y) { return x; });
 			generate_view("Top-to-Bottom", 1U, false, [] (unsigned x, unsigned y) { return y; });
 			generate_view("Top-to-Bottom (Gapless)", 1U, true, [] (unsigned x, unsigned y) { return y; });
+
+			// generate fake cocktail view for systems with two screens
+			if (screens.size() == 2U)
+			{
+				float const height0(float(screens[0].physical_y()) / screens[0].physical_x());
+				float const height1(float(screens[1].physical_y()) / screens[1].physical_x());
+				float const minor_dim((std::max)((std::min)(height0, 1.0F), (std::min)(height1, 1.0F)));
+
+				util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
+				if (!viewnode)
+					throw emu_fatalerror("Couldn't create XML node??");
+				viewnode->set_attribute("name", "Cocktail");
+
+				util::xml::data_node *const mirrornode(viewnode->add_child("screen", nullptr));
+				if (!mirrornode)
+					throw emu_fatalerror("Couldn't create XML node??");
+				mirrornode->set_attribute_int("index", 1);
+				util::xml::data_node *const mirrorbounds(mirrornode->add_child("bounds", nullptr));
+				if (!mirrorbounds)
+					throw emu_fatalerror("Couldn't create XML node??");
+				mirrorbounds->set_attribute_int("x", 0);
+				mirrorbounds->set_attribute_float("y", (-0.01 * minor_dim) - height1);
+				mirrorbounds->set_attribute_int("width", 1);
+				mirrorbounds->set_attribute_float("height", height1);
+				util::xml::data_node *const flipper(mirrornode->add_child("orientation", nullptr));
+				if (!flipper)
+					throw emu_fatalerror("Couldn't create XML node??");
+				flipper->set_attribute_int("rotate", 180);
+
+				util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+				if (!screennode)
+					throw emu_fatalerror("Couldn't create XML node??");
+				screennode->set_attribute_int("index", 0);
+				util::xml::data_node *const screenbounds(screennode->add_child("bounds", nullptr));
+				if (!screenbounds)
+					throw emu_fatalerror("Couldn't create XML node??");
+				screenbounds->set_attribute_int("x", 0);
+				screenbounds->set_attribute_int("y", 0);
+				screenbounds->set_attribute_int("width", 1);
+				screenbounds->set_attribute_float("height", height0);
+			}
 
 			// generate tiled views
 			for (unsigned mindim = 2; ((screens.size() + mindim - 1) / mindim) >= mindim; ++mindim)

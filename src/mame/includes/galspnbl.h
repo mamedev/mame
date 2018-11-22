@@ -7,6 +7,10 @@
     Gals Pinball
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GALSPNBL_H
+#define MAME_INCLUDES_GALSPNBL_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
@@ -16,8 +20,8 @@
 class galspnbl_state : public driver_device
 {
 public:
-	galspnbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galspnbl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -30,7 +34,7 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch")
-		{ }
+	{ }
 
 	void galspnbl(machine_config &config);
 
@@ -64,3 +68,5 @@ private:
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALSPNBL_H

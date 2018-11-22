@@ -184,10 +184,8 @@ void seibucats_state::seibucats_map(address_map &map)
 	map(0x01200000, 0x01200007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
 	map(0x01200100, 0x01200107).nopw(); // YMF721-S MIDI data
 	map(0x01200104, 0x01200107).nopr(); // YMF721-S MIDI status
-	map(0x01200200, 0x01200200).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01200204, 0x01200204).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x01200300, 0x01200300).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01200304, 0x01200304).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x01200200, 0x01200207).rw("usart1", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x000000ff);
+	map(0x01200300, 0x01200307).rw("usart2", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x000000ff);
 	map(0xa0000000, 0xa1ffffff).noprw(); // NVRAM on ROM board
 	map(0xa2000000, 0xa2000001).w(FUNC(seibucats_state::aux_rtc_w));
 	map(0xffe00000, 0xffffffff).rom().region("ipl", 0);
@@ -305,7 +303,7 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	//MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
+	//JRC6355E(config, m_rtc, XTAL(32'768));
 
 	MCFG_DEVICE_ADD("usart1", I8251, 0)
 	MCFG_DEVICE_ADD("usart2", I8251, 0)

@@ -138,6 +138,7 @@ private:
 	uint8_t m_tandy_data[8];
 
 	uint8_t m_tandy_bios_bank;    /* I/O port FFEAh */
+	uint8_t m_tandy_ppi_porta, m_tandy_ppi_ack;
 	uint8_t m_tandy_ppi_portb, m_tandy_ppi_portc;
 	uint8_t m_vram_bank;
 	static void cfg_fdc_35(device_t *device);
@@ -315,7 +316,10 @@ WRITE8_MEMBER( tandy1000_state::tandy1000_pio_w )
 		// sx enables keyboard from bit 3, others bit 6, hopefully theres no conflict
 		m_keyboard->enable(data&0x48);
 		if ( data & 0x80 )
+		{
 			m_mb->m_pic8259->ir1_w(0);
+			m_tandy_ppi_ack = 1;
+		}
 		break;
 	case 2:
 		m_tandy_ppi_portc = data;
@@ -333,7 +337,12 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 	switch (offset)
 	{
 	case 0:
-		data = m_keyboard->read(space, 0);
+		if (m_tandy_ppi_ack)
+		{
+			m_tandy_ppi_porta = m_keyboard->read(space, 0);
+			m_tandy_ppi_ack = 0;
+		}
+		data = m_tandy_ppi_porta;
 		break;
 	case 1:
 		data=m_tandy_ppi_portb;
@@ -564,7 +573,7 @@ void tandy1000_state::tandy1000_io(address_map &map)
 	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
 	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
 	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr7496_device::command_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr8496_device::command_w));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
@@ -591,7 +600,7 @@ void tandy1000_state::tandy1000_16_io(address_map &map)
 	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
 	map(0x0065, 0x0065).w(FUNC(tandy1000_state::devctrl_w));
 	map(0x00a0, 0x00a0).r(FUNC(tandy1000_state::unk_r));
-	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr7496_device::command_w));
+	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr8496_device::command_w));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
@@ -659,7 +668,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("sn76496", NCR8496, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.80)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -772,7 +781,7 @@ MACHINE_CONFIG_END
 
 #ifdef UNUSED_DEFINITION
 ROM_START( t1000 )
-	// Schematics displays 2 32KB ROMs at U9 and U10
+	// Schematic shows 2 32KB ROMs at U9 and U10 for Tandy 1000; 1000A is a different mainboard.
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "v010000", "v010000" )
 	ROMX_LOAD("v010000.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(0))

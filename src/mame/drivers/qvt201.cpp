@@ -21,6 +21,7 @@ public:
 	qvt201_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainnmi(*this, "mainnmi")
 		, m_eia(*this, "eia")
 		, m_screen(*this, "screen")
 		, m_p_chargen(*this, "chargen")
@@ -40,6 +41,7 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<input_merger_device> m_mainnmi;
 	required_device<rs232_port_device> m_eia;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_p_chargen;
@@ -73,11 +75,12 @@ WRITE8_MEMBER(qvt201_state::duart_out_w)
 	// OP3 = 132/_80
 	// OP4 = SRV
 	// OP5 = BLOCK/_UL
-	// OP6 = preset NMI flipflop
+	// OP6 = preset MBC NMI flipflop
 	// OP7 = _DATA/TALK (EIA pin 14)
 
 	m_eia->write_rts(BIT(data, 0));
 	m_eia->write_dtr(BIT(data, 1));
+	m_mainnmi->in_w<1>(!BIT(data, 6));
 }
 
 void qvt201_state::mem_map(address_map &map)
@@ -100,33 +103,37 @@ MACHINE_CONFIG_START(qvt201_state::qvt201)
 	MCFG_DEVICE_ADD("maincpu", Z80, 3.6864_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map) // IORQ is not used at all
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainint") // open collector
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
+	input_merger_device &mainint(INPUT_MERGER_ANY_HIGH(config, "mainint")); // open collector
+	mainint.output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
+	input_merger_device &mainnmi(INPUT_MERGER_ALL_HIGH(config, "mainnmi"));
+	mainnmi.output_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("duart", SCN2681, 3.6864_MHz_XTAL) // XTAL not directly connected
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("mainint", input_merger_device, in_w<1>))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("eia", rs232_port_device, write_txd))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m_eia, rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("aux", rs232_port_device, write_txd))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, qvt201_state, duart_out_w))
 
-	MCFG_DEVICE_ADD("eia", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
+	RS232_PORT(config, m_eia, default_rs232_devices, nullptr);
+	m_eia->rxd_handler().set("duart", FUNC(scn2681_device::rx_a_w));
 
-	MCFG_DEVICE_ADD("aux", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("duart", scn2681_device, ip4_w))
+	rs232_port_device &aux(RS232_PORT(config, "aux", default_rs232_devices, nullptr));
+	aux.rxd_handler().set("duart", FUNC(scn2681_device::rx_b_w));
+	aux.dsr_handler().set("duart", FUNC(scn2681_device::ip4_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5516APL-2 or uPD446C-2 + battery
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(48.654_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 265, 0, 250)
-	//MCFG_SCREEN_RAW_PARAMS(48.654_MHz_XTAL / 2, 170 * 9, 0, 132 * 9, 265, 0, 250)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2672_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(48.654_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 265, 0, 250);
+	//screen.set_raw(48.654_MHz_XTAL / 2, 170 * 9, 0, 132 * 9, 265, 0, 250);
+	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));
 
-	MCFG_DEVICE_ADD("crtc", SCN2672, 48.654_MHz_XTAL / 30)
-	MCFG_SCN2672_CHARACTER_WIDTH(10) // 9 in 132-column mode
-	MCFG_SCN2672_INTR_CALLBACK(WRITELINE("mainint", input_merger_device, in_w<0>))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	scn2672_device &crtc(SCN2672(config, "crtc", 48.654_MHz_XTAL / 30));
+	crtc.set_character_width(10); // 9 in 132-column mode
+	crtc.intr_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
+	crtc.breq_callback().set("mainnmi", FUNC(input_merger_device::in_w<0>));
+	crtc.set_screen("screen");
 MACHINE_CONFIG_END
 
 

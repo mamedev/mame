@@ -52,13 +52,14 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mc1502_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mc1502_fdc_device, mc1502_fdc_irq_drq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mc1502_fdc_device, mc1502_fdc_irq_drq))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void mc1502_fdc_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq));
+	m_fdc->drq_wr_callback().set(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq));
+	FLOPPY_CONNECTOR(config, "fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

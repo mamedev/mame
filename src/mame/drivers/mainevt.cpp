@@ -448,19 +448,19 @@ MACHINE_CONFIG_START(mainevt_state::mainevt)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 24_MHz_XTAL)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(mainevt_state, mainevt_tile_callback)
+	K052109(config, m_k052109, 24_MHz_XTAL);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(mainevt_state::mainevt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 24_MHz_XTAL)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(mainevt_state, mainevt_sprite_callback)
+	K051960(config, m_k051960, 24_MHz_XTAL);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(mainevt_state::mainevt_sprite_callback), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3.579545_MHz_XTAL)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, mainevt_state, volume_callback))
@@ -497,25 +497,23 @@ MACHINE_CONFIG_START(mainevt_state::devstors)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 24_MHz_XTAL)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(mainevt_state, dv_tile_callback)
+	K052109(config, m_k052109, 24_MHz_XTAL);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(mainevt_state::dv_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 24_MHz_XTAL)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(mainevt_state, dv_sprite_callback)
+	K051960(config, m_k051960, 24_MHz_XTAL);
+	m_k051960->set_palette("palette");
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(mainevt_state::dv_sprite_callback), this);
 
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("k007232", K007232, 3.579545_MHz_XTAL)
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, mainevt_state, volume_callback))
@@ -767,8 +765,8 @@ GAME( 1988, mainevt,   0,        mainevt,  mainevt,     mainevt_state, empty_ini
 GAME( 1988, mainevto,  mainevt,  mainevt,  mainevt,     mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mainevt2p, mainevt,  mainevt,  mainev2p,    mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ringohja,  mainevt,  mainevt,  mainev2p,    mainevt_state, empty_init, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors,  0,        devstors, devstors,    mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstorsx, devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstorsv, devstors, devstors, devstors,    mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors2, devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. 2)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, garuka,    devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors,  0,        devstors, devstors,    mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, devstorsx, devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, devstorsv, devstors, devstors, devstors,    mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, devstors2, devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, garuka,    devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )

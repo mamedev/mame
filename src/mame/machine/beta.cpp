@@ -267,17 +267,14 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(beta_disk_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("wd179x", KR1818VG93, 8_MHz_XTAL / 8)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void beta_disk_device::device_add_mconfig(machine_config &config)
+{
+	KR1818VG93(config, m_wd179x, 8_MHz_XTAL / 8);
+	FLOPPY_CONNECTOR(config, m_floppy0, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy2, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy3, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+}
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

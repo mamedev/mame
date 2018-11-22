@@ -2260,8 +2260,7 @@ MACHINE_CONFIG_START(wpc_95_state::wpc_95)
 	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
 	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 3)
 	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
-	MCFG_DEVICE_ADD("dmd", WPC_DMD, 0)
-	MCFG_WPC_DMD_SCANLINE_CALLBACK(WRITELINE(*this, wpc_95_state, scanline_irq))
+	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_95_state::scanline_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_WPC, 0)
@@ -2473,6 +2472,19 @@ ROM_START(congo_11)
 	ROM_LOAD16_BYTE("cgs2v1_1.rom", 0x000000, 0x100000, CRC(2b7637ae) SHA1(5b5d7214c632a506b986c892b39b1356b2909598))
 	ROM_LOAD16_BYTE("cgs3v1_0.rom", 0x200000, 0x100000, CRC(6cfd9fe0) SHA1(a76267f865c645648c8cb27aec2d05062a4a20b5))
 	ROM_LOAD16_BYTE("cgs4v1_0.rom", 0x400000, 0x100000, CRC(2a1980e7) SHA1(0badf27c2b8bc7b0074dc5e606d64490470bc108))
+ROM_END
+
+ROM_START(congo_11s10)
+	ROM_REGION(0x100000, "maincpu", 0)
+	ROM_LOAD("cong1_10.rom", 0x00000, 0x80000, CRC(b0b0ffd9) SHA1(26343f3bfbacf85b3f4db5aa3dad39216311a2da))
+	ROM_RELOAD(0x80000, 0x80000)
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("su2-100.rom", 0x000000, 0x80000, CRC(c4b59ac9) SHA1(a0bc5150120777c771a181496ced71bd3f92a311))
+	ROM_LOAD16_BYTE("su3-100.rom", 0x200000, 0x80000, CRC(1d4dbc9a) SHA1(3fac6ffb1af806d1dfcf71d85b0be21e7ea4b8d2))
+	ROM_LOAD16_BYTE("su4-100.rom", 0x400000, 0x80000, CRC(a3e9fd93) SHA1(7d767ddf22080f9886621a5130929d7afce90472))
+	ROM_LOAD16_BYTE("su5-100.rom", 0x600000, 0x80000, CRC(c397b3f6) SHA1(ef4cc5a08a55ae941f42d2b02213cc5c85d67b43))
+	ROM_LOAD16_BYTE("su6-100.rom", 0x800000, 0x80000, CRC(f89a29a2) SHA1(63f69ae6a886d9eac44627edd5ee561bdb3dd418))
+	ROM_LOAD16_BYTE("su7-100.rom", 0xa00000, 0x80000, CRC(d1244d35) SHA1(7c5b3fcf8a35c417c778cd9bc741b92aaffeb444))
 ROM_END
 
 /*-----------------
@@ -3053,6 +3065,7 @@ GAME(1995,  congo_21,   0,          wpc_95, congo,  wpc_95_state,   init_congo, 
 GAME(1995,  congo_20,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (2.0)",                            MACHINE_MECHANICAL)
 GAME(1995,  congo_13,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (1.3)",                            MACHINE_MECHANICAL)
 GAME(1995,  congo_11,   congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (1.1)",                            MACHINE_MECHANICAL)
+GAME(1995,  congo_11s10,congo_21,   wpc_95, congo,  wpc_95_state,   init_congo,  ROT0, "Williams",             "Congo (1.1, DCS sound 1.0)",             MACHINE_MECHANICAL)
 GAME(1996,  jy_12,      0,          wpc_95, jy,     wpc_95_state,   init_jy,     ROT0, "Williams",             "Junk Yard (1.2)",                        MACHINE_MECHANICAL)
 GAME(1996,  jy_11,      jy_12,      wpc_95, jy,     wpc_95_state,   init_jy,     ROT0, "Williams",             "Junk Yard (1.1)",                        MACHINE_MECHANICAL)
 GAME(1996,  jy_03,      jy_12,      wpc_95, jy,     wpc_95_state,   init_jy,     ROT0, "Williams",             "Junk Yard (0.3)",                        MACHINE_MECHANICAL)

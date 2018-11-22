@@ -285,7 +285,7 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_analog_reset_w)
+WRITE8_MEMBER(gottlieb_state::analog_reset_w)
 {
 	/* reset the trackball counters */
 	m_track[0] = m_track_x.read_safe(0);
@@ -307,13 +307,13 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::general_output_w)
+void gottlieb_state::general_output_w(u8 data)
 {
 	/* bits 0-3 control video features, and are different for laserdisc games */
 	if (m_laserdisc == nullptr)
-		gottlieb_video_control_w(space, offset, data);
+		video_control_w(data);
 	else
-		gottlieb_laserdisc_video_control_w(space, offset, data);
+		laserdisc_video_control_w(data);
 
 	/* bit 4 normally controls the coin meter */
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
@@ -326,7 +326,7 @@ WRITE8_MEMBER(gottlieb_state::general_output_w)
 // custom overrides
 WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 {
-	general_output_w(space, offset, data & ~0xe0);
+	general_output_w(data & ~0xe0);
 
 	m_leds[0] = BIT(data, 5);
 	m_leds[1] = BIT(data, 6);
@@ -335,7 +335,7 @@ WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 
 WRITE8_MEMBER(gottlieb_state::qbert_output_w)
 {
-	general_output_w(space, offset, data & ~0x20);
+	general_output_w(data & ~0x20);
 
 	// bit 5 controls the knocker
 	qbert_knocker(data >> 5 & 1);
@@ -344,7 +344,7 @@ WRITE8_MEMBER(gottlieb_state::qbert_output_w)
 WRITE8_MEMBER(gottlieb_state::qbertqub_output_w)
 {
 	// coincounter is on bit 5 instead
-	general_output_w(space, offset, (data >> 1 & 0x10) | (data & ~0x30));
+	general_output_w((data >> 1 & 0x10) | (data & ~0x30));
 
 	// bit 4 controls the sprite bank
 	m_spritebank = (data & 0x10) >> 4;
@@ -352,7 +352,7 @@ WRITE8_MEMBER(gottlieb_state::qbertqub_output_w)
 
 WRITE8_MEMBER(gottlieb_state::stooges_output_w)
 {
-	general_output_w(space, offset, data & ~0x60);
+	general_output_w(data & ~0x60);
 
 	// bit 5,6: joystick input multiplexer
 	m_joystick_select = (data >> 5) & 0x03;
@@ -717,7 +717,7 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::nmi_clear)
 }
 
 
-INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
+INTERRUPT_GEN_MEMBER(gottlieb_state::interrupt)
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -742,12 +742,12 @@ INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_sh_w)
+void gottlieb_state::sound_w(u8 data)
 {
 	if (m_r1_sound != nullptr)
-		m_r1_sound->write(space, offset, data);
+		m_r1_sound->write(data);
 	if (m_r2_sound != nullptr)
-		m_r2_sound->write(space, offset, data);
+		m_r2_sound->write(data);
 }
 
 void gottlieb_state::reactor_map(address_map &map)
@@ -755,13 +755,13 @@ void gottlieb_state::reactor_map(address_map &map)
 	map.global_mask(0xffff);
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x20ff).mirror(0x0f00).writeonly().share("spriteram");                           /* FRSEL */
-	map(0x3000, 0x33ff).mirror(0x0c00).ram().w(FUNC(gottlieb_state::gottlieb_videoram_w)).share("videoram");       /* BRSEL */
-	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::gottlieb_charram_w)).share("charram");               /* BOJRSEL1 */
+	map(0x3000, 0x33ff).mirror(0x0c00).ram().w(FUNC(gottlieb_state::videoram_w)).share("videoram");       /* BRSEL */
+	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share("charram");               /* BOJRSEL1 */
 /*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */                                                               /* BOJRSEL2 */
-	map(0x6000, 0x601f).mirror(0x0fe0).w(FUNC(gottlieb_state::gottlieb_paletteram_w)).share("paletteram");       /* COLSEL */
+	map(0x6000, 0x601f).mirror(0x0fe0).w(FUNC(gottlieb_state::palette_w)).share("paletteram");       /* COLSEL */
 	map(0x7000, 0x7000).mirror(0x0ff8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x7001, 0x7001).mirror(0x0ff8).w(FUNC(gottlieb_state::gottlieb_analog_reset_w));                        /* A1J2 interface */
-	map(0x7002, 0x7002).mirror(0x0ff8).w(FUNC(gottlieb_state::gottlieb_sh_w));                                  /* trackball H */
+	map(0x7001, 0x7001).mirror(0x0ff8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
+	map(0x7002, 0x7002).mirror(0x0ff8).w(FUNC(gottlieb_state::sound_w));                                  /* trackball H */
 	map(0x7003, 0x7003).mirror(0x0ff8).w(FUNC(gottlieb_state::reactor_output_w));                               /* trackball V */
 	map(0x7000, 0x7000).mirror(0x0ff8).portr("DSW");
 	map(0x7001, 0x7001).mirror(0x0ff8).portr("IN1");                                      /* buttons */
@@ -779,12 +779,12 @@ void gottlieb_state::gottlieb_map(address_map &map)
 	map(0x1000, 0x1fff).ram().region("maincpu", 0x1000);    /* or ROM */
 	map(0x2000, 0x2fff).ram().region("maincpu", 0x2000);    /* or ROM */
 	map(0x3000, 0x30ff).mirror(0x0700).writeonly().share("spriteram");                           /* FRSEL */
-	map(0x3800, 0x3bff).mirror(0x0400).ram().w(FUNC(gottlieb_state::gottlieb_videoram_w)).share("videoram");       /* BRSEL */
-	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::gottlieb_charram_w)).share("charram");               /* BOJRSEL1 */
-	map(0x5000, 0x501f).mirror(0x07e0).w(FUNC(gottlieb_state::gottlieb_paletteram_w)).share("paletteram");       /* COLSEL */
+	map(0x3800, 0x3bff).mirror(0x0400).ram().w(FUNC(gottlieb_state::videoram_w)).share("videoram");       /* BRSEL */
+	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share("charram");               /* BOJRSEL1 */
+	map(0x5000, 0x501f).mirror(0x07e0).w(FUNC(gottlieb_state::palette_w)).share("paletteram");       /* COLSEL */
 	map(0x5800, 0x5800).mirror(0x07f8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x5801, 0x5801).mirror(0x07f8).w(FUNC(gottlieb_state::gottlieb_analog_reset_w));                        /* A1J2 interface */
-	map(0x5802, 0x5802).mirror(0x07f8).w(FUNC(gottlieb_state::gottlieb_sh_w));                                  /* OP20-27 */
+	map(0x5801, 0x5801).mirror(0x07f8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
+	map(0x5802, 0x5802).mirror(0x07f8).w(FUNC(gottlieb_state::sound_w));                                  /* OP20-27 */
 	map(0x5803, 0x5803).mirror(0x07f8).w(FUNC(gottlieb_state::general_output_w));                               /* OP30-37 */
 /*  AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE()*/                                              /* OP40-47 */
 	map(0x5800, 0x5800).mirror(0x07f8).portr("DSW");
@@ -1720,21 +1720,10 @@ INPUT_PORTS_END
 
 /* the games can store char gfx data in either a 4k RAM area (128 chars), or */
 /* a 8k ROM area (256 chars). */
-static const gfx_layout bg_ram_layout =
+static const gfx_layout bg_layout =
 {
 	8,8,
-	128,
-	4,
-	{ STEP4(0,1) },
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	32*8
-};
-
-static const gfx_layout bg_rom_layout =
-{
-	8,8,
-	256,
+	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
 	{ STEP8(0,4) },
@@ -1754,9 +1743,9 @@ static const gfx_layout fg_layout =
 };
 
 static GFXDECODE_START( gfxdecode )
-	GFXDECODE_ENTRY( nullptr,      0x4000, bg_ram_layout, 0, 1 )   /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "bgtiles", 0x0000, bg_rom_layout, 0, 1 )
-	GFXDECODE_ENTRY( "sprites", 0x0000, fg_layout,     0, 1 )
+	GFXDECODE_RAM(   "charram", 0, bg_layout, 0, 1 )   /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( "bgtiles", 0, bg_layout, 0, 1 )
+	GFXDECODE_ENTRY( "sprites", 0, fg_layout, 0, 1 )
 GFXDECODE_END
 
 
@@ -1772,20 +1761,19 @@ MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8088, CPU_CLOCK/3)
 	MCFG_DEVICE_PROGRAM_MAP(gottlieb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gottlieb_state,  gottlieb_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gottlieb_state, interrupt)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK)
-	MCFG_SCREEN_UPDATE_DRIVER(gottlieb_state, screen_update_gottlieb)
+	MCFG_SCREEN_UPDATE_DRIVER(gottlieb_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode)
-	MCFG_PALETTE_ADD("palette", 16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode);
+	PALETTE(config, m_palette, 16);
 
 	// basic speaker configuration
 	SPEAKER(config, "speaker").front_center();
@@ -1813,7 +1801,7 @@ MACHINE_CONFIG_START(gottlieb_state::g2laser)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this))
-	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
+	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
@@ -1877,7 +1865,7 @@ MACHINE_CONFIG_START(gottlieb_state::cobram3)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_AUDIO(laserdisc_device::audio_delegate(&gottlieb_state::laserdisc_audio_process, this))
-	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
+	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)

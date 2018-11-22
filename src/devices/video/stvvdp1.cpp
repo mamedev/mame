@@ -1072,6 +1072,9 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				case 4: /* Gouraud shading */
 					m_vdp1.framebuffer_draw_lines[y][x] = stv_vdp1_apply_gouraud_shading( x, y, pix );
 					break;
+				// TODO: Pro Yakyuu Team mo Tsukurou (during team creation, on PR girl select)
+				//case 6:
+				//	break;
 				case 7: /* Gouraud-shading + half-transparent */
 					// Lupin the 3rd Pyramid no Kenja enemy shadows
 					// Death Crimson lives indicators

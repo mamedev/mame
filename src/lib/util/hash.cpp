@@ -20,15 +20,15 @@ namespace util {
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const char hash_collection::HASH_CRC;
-const char hash_collection::HASH_SHA1;
+char const hash_collection::HASH_CRC;
+char const hash_collection::HASH_SHA1;
 
-const char *hash_collection::HASH_TYPES_CRC = "R";
-const char *hash_collection::HASH_TYPES_CRC_SHA1 = "RS";
-const char *hash_collection::HASH_TYPES_ALL = "RS";
+char const *const hash_collection::HASH_TYPES_CRC = "R";
+char const *const hash_collection::HASH_TYPES_CRC_SHA1 = "RS";
+char const *const hash_collection::HASH_TYPES_ALL = "RS";
 
-const char hash_collection::FLAG_NO_DUMP;
-const char hash_collection::FLAG_BAD_DUMP;
+char const hash_collection::FLAG_NO_DUMP;
+char const hash_collection::FLAG_BAD_DUMP;
 
 
 

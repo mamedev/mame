@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(commando_state::commando)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ym1", YM2203, PHI_B/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

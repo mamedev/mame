@@ -1365,10 +1365,10 @@ READ8_MEMBER( cmi_state::fdc_r )
 	{
 		switch (m_fdc_addr)
 		{
-			case 0xc: { return m_wd1791->status_r() ^ 0xff; }
-			case 0xd: { return m_wd1791->track_r() ^ 0xff; }
-			case 0xe: { return m_wd1791->sector_r() ^ 0xff; }
-			case 0xf: { return m_wd1791->data_r() ^ 0xff; }
+			case 0xc: return m_wd1791->status_r() ^ 0xff;
+			case 0xd: return m_wd1791->track_r() ^ 0xff;
+			case 0xe: return m_wd1791->sector_r() ^ 0xff;
+			case 0xf: return m_wd1791->data_r() ^ 0xff;
 			default:  return 0;
 		}
 	}
@@ -2280,9 +2280,9 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	PTM6840(config, m_cmi07_ptm, 2000000); // ptm_cmi07_config TODO
 	m_cmi07_ptm->irq_callback().set(FUNC(cmi_state::cmi07_irq));
 
-	MCFG_DEVICE_ADD("wd1791", FD1791, 16_MHz_XTAL / 8) // wd1791_interface
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, cmi_state, wd1791_irq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, cmi_state, wd1791_drq))
+	FD1791(config, m_wd1791, 16_MHz_XTAL / 8); // wd1791_interface
+	m_wd1791->intrq_wr_callback().set(FUNC(cmi_state::wd1791_irq));
+	m_wd1791->drq_wr_callback().set(FUNC(cmi_state::wd1791_drq));
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 

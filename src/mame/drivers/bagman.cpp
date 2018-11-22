@@ -304,9 +304,23 @@ static INPUT_PORTS_START( botanici )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x10, "3 (duplicate 1)" )
 	PORT_DIPSETTING(    0x18, "3 (duplicate 2)" )
-	PORT_DIPNAME( 0x20, 0x20, "Language / Disable Invlunerability Fruits" )          PORT_DIPLOCATION("SW1:6") // changing this off, even in game, seems to remove all fruits you have?
+	PORT_DIPNAME( 0x20, 0x20, "Language / Disable Invulnerability Fruits" )          PORT_DIPLOCATION("SW1:6") // changing this off, even in game, seems to remove all fruits you have?
 	PORT_DIPSETTING(    0x20, "Fruits On, English" )
 	PORT_DIPSETTING(    0x00, "Fruits Off, Spanish" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( botanici2 )
+	PORT_INCLUDE( botanici )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )          PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Spanish ) )
 INPUT_PORTS_END
 
 
@@ -535,14 +549,13 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	aysnd.port_a_read_callback().set_ioport("P1");
+	aysnd.port_b_read_callback().set_ioport("P2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* maybe */
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 /*
@@ -595,13 +608,12 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	aysnd.port_a_read_callback().set_ioport("P1");
+	aysnd.port_b_read_callback().set_ioport("P2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 
@@ -813,6 +825,38 @@ ROM_START( bagmanj )
 	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
 	ROM_LOAD( "bf8_12.r9",    0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) ) // 2732
 	ROM_LOAD( "bf8_13.t9",    0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) ) // 2732
+ROM_END
+
+ROM_START( botanic2 ) // PCB has Valadon logo with 'bajo licencia Itisa (Palamos)'.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "5.9e",    0x0000, 0x1000, CRC(c5170449) SHA1(3f85f254f1a318a0b4d6e12d4df756c880751327) ) // 2732
+	ROM_LOAD( "6.9f",    0x1000, 0x1000, CRC(33b2df44) SHA1(9d3697bdf0d906b27374a1460cdac715ef10565d) ) // 2732
+	ROM_LOAD( "7.9j",    0x2000, 0x1000, CRC(95bade4c) SHA1(09feb3ecba7d8a0b14af66c89423a22dd6efc90d) ) // 2732
+	ROM_LOAD( "8.9k",    0x3000, 0x1000, CRC(1c1a184b) SHA1(0abee2934bd6b00944f25ba5da23c81f2874fa65) ) // 2732
+	ROM_LOAD( "9.9m",    0x4000, 0x1000, CRC(728a59a4) SHA1(c833e66ce61f1db72dc094274213b7569dd32569) ) // 2732
+	ROM_LOAD( "10.9n",   0x5000, 0x1000, CRC(9e43d32b) SHA1(4f28ddbbe2684aa65f04512eb75f4aac825951a5) ) // 2732
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "2.1e",   0x0000, 0x1000, CRC(bea449a6) SHA1(fe06208996d15a4d50753fb62a3020063a0a6620) )
+	ROM_LOAD( "4.1j",   0x1000, 0x1000, CRC(a5deb8ed) SHA1(b6b38daffdda263a366656168a6d094ad2b1458f) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "1.1c",    0x0000, 0x1000, CRC(a1148d89) SHA1(b1424693cebc410749216457d07bae54b903bc07) )
+	ROM_LOAD( "3.1f",    0x1000, 0x1000, CRC(70be5565) SHA1(a7eab667a82d3e7321f393073f29c6e5e865ec6b) )
+
+	ROM_REGION( 0x0040, "proms", 0 ) // strangely uses one PROM from bagman and one from botanic
+	ROM_LOAD( "82s123.6r",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_LOAD( "b-tbp18s030.3r",  0x0020, 0x0020, CRC(edf88f34) SHA1(b9c342d51303d552f87df2543a34e38c30acd07c) )
+
+	ROM_REGION( 0x0020, "5110ctrl", 0)
+	ROM_LOAD( "82s123.3p",       0x0000, 0x0020, CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) ) /*state machine driving TMS5110*/
+
+	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
+	ROM_LOAD( "11.9r",    0x0000, 0x1000, CRC(2e0057ff) SHA1(33e3ffa6418f86864eb81e5e9bda4bf540c143a6) ) // 2732
+	ROM_LOAD( "12.9t",    0x1000, 0x1000, CRC(b2120edd) SHA1(52b89dbcc749b084331fa82b13d0876e911fce52) ) // 2732
+
+	ROM_REGION( 0x200, "pld", 0 ) // protection related?
+	ROM_LOAD( "pal16r6.6p", 0x000, 0x200, NO_DUMP ) // protected, USA handwritten on PAL
 ROM_END
 
 ROM_START( sbagman )
@@ -1060,21 +1104,22 @@ ROM_START( squaitsa )
 ROM_END
 
 
-GAME( 1982, bagman,   0,       bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Bagman", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnard,  bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Le Bagnard (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnarda, bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Le Bagnard (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnardi, bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans,  bagman,  bagman,   bagmans,  bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans2, bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmanj,  bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation (Taito license)", "Bagman (Taito)", MACHINE_SUPPORTS_SAVE ) // title screen actually doesn't mention Valadon, only Stern and Taito
+GAME( 1982, bagman,    0,       bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation", "Bagman", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnard,   bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation", "Le Bagnard (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnarda,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation", "Le Bagnard (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnardi,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans,   bagman,  bagman,   bagmans,   bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans2,  bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmanj,   bagman,  bagman,   bagman,    bagman_state,   empty_init, ROT270, "Valadon Automation (Taito license)", "Bagman (Taito)", MACHINE_SUPPORTS_SAVE ) // title screen actually doesn't mention Valadon, only Stern and Taito
 
-GAME( 1984, sbagman,  0,       sbagman,  sbagman,  bagman_state,   empty_init, ROT270, "Valadon Automation", "Super Bagman", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbagmani, sbagman, sbagmani, sbagman,  bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)", "Super Bagman (Itisa, Spain)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // different color PROMs, needs correct decoding
-GAME( 1984, sbagmans, sbagman, sbagman,  sbagman,  bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagman,   0,       sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Super Bagman", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagmani,  sbagman, sbagmani, sbagman,   bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)", "Super Bagman (Itisa, Spain)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // different color PROMs, needs correct decoding
+GAME( 1984, sbagmans,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, pickin,   0,       pickin,   pickin,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Pickin'", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pickin,    0,       pickin,   pickin,    bagman_state,   empty_init, ROT270, "Valadon Automation", "Pickin'", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,  0,       botanic,  botanici, bagman_state,   empty_init, ROT90,  "Itisa",                              "Botanic (English / Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, botanicf, botanic, botanic,  botanicf, bagman_state,   empty_init, ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic,   0,       botanic,  botanici,  bagman_state,   empty_init, ROT90,  "Itisa", "Botanic (English / Spanish, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   empty_init, ROT90,  "Itisa", "Botanic (English / Spanish, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // At the title screen, Botanic in corrupted in the first loop, ok from the second on. Colors likely wrong, too. Has a leftover 5110.
+GAME( 1984, botanicf,  botanic, botanic,  botanicf,  bagman_state,   empty_init, ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, squaitsa, 0,       botanic,  squaitsa, squaitsa_state, empty_init, ROT0,   "Itisa", "Squash (Itisa)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, squaitsa,  0,       botanic,  squaitsa,  squaitsa_state, empty_init, ROT0,   "Itisa", "Squash (Itisa)", MACHINE_SUPPORTS_SAVE )

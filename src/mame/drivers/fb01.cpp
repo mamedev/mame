@@ -82,8 +82,7 @@ void fb01_state::fb01_io(address_map &map)
 	map(0x01, 0x01).rw("ym2164", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 
 	// 10-11  USART uPD71051C  4MHz & 4MHz / 8
-	map(0x10, 0x10).rw(m_upd71051, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).rw(m_upd71051, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).rw(m_upd71051, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 	// 20     PANEL SWITCH
 	map(0x20, 0x20).portr("PANEL");
@@ -220,10 +219,10 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ym2164", YM2151, XTAL(4'000'000))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, fb01_state, ym2164_irq_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	ym2151_device &ym2164(YM2151(config, "ym2164", XTAL(4'000'000)));
+	ym2164.irq_handler().set(FUNC(fb01_state::ym2164_irq_w));
+	ym2164.add_route(0, "lspeaker", 1.00);
+	ym2164.add_route(1, "rspeaker", 1.00);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END

@@ -597,7 +597,7 @@ private:
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t0_r);
 	DECLARE_READ_LINE_MEMBER(vbrc_mcu_t1_r);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
-	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
+	template<int P> void vbrc_ioexp_port_w(uint8_t data);
 	void vbrc_main_io(address_map &map);
 	void vbrc_main_map(address_map &map);
 
@@ -1050,10 +1050,11 @@ WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 
 // I8243 I/O expander
 
-WRITE8_MEMBER(fidelz80_state::vbrc_ioexp_port_w)
+template<int P>
+void fidelz80_state::vbrc_ioexp_port_w(uint8_t data)
 {
 	// P4-P7: digit segment data
-	m_7seg_data = (m_7seg_data & ~(0xf << (4*offset))) | ((data & 0xf) << (4*offset));
+	m_7seg_data = (m_7seg_data & ~(0xf << (4*P))) | ((data & 0xf) << (4*P));
 	vbrc_prepare_display();
 }
 
@@ -1071,7 +1072,7 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 {
 	// P20-P23: I8243 P2
 	// P24-P27: multiplexed inputs (active low)
-	return (m_i8243->p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
+	return (m_i8243->p2_r() & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
 READ_LINE_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
@@ -1203,7 +1204,7 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 {
 	u8 data = 0xff; // open bus
 	if (~offset & 4)
-		data &= m_ppi8255->read(space, offset & 3);
+		data &= m_ppi8255->read(offset & 3);
 	if (~offset & 8)
 		data &= m_z80pio->read(space, offset & 3);
 
@@ -1213,7 +1214,7 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
 {
 	if (~offset & 4)
-		m_ppi8255->write(space, offset & 3, data);
+		m_ppi8255->write(offset & 3, data);
 	if (~offset & 8)
 		m_z80pio->write(space, offset & 3, data);
 }
@@ -1700,14 +1701,14 @@ MACHINE_CONFIG_START(fidelz80_state::cc10)
 	MCFG_DEVICE_PROGRAM_MAP(cc10_map)
 	MCFG_DEVICE_IO_MAP(vcc_io)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fidelz80_state, cc10_ppi_porta_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("LEVEL"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fidelz80_state, vcc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, fidelz80_state, vcc_ppi_portc_r))
-	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidelz80_state, vcc_ppi_portc_w))
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::cc10_ppi_porta_w));
+	m_ppi8255->tri_pa_callback().set_constant(0);
+	m_ppi8255->in_pb_callback().set_ioport("LEVEL");
+	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::vcc_ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_r));
+	m_ppi8255->tri_pb_callback().set_constant(0);
+	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_cc);
@@ -1726,14 +1727,14 @@ MACHINE_CONFIG_START(fidelz80_state::vcc)
 	MCFG_DEVICE_PROGRAM_MAP(vcc_map)
 	MCFG_DEVICE_IO_MAP(vcc_io)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fidelz80_state, vcc_ppi_porta_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, fidelz80_state, vcc_ppi_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fidelz80_state, vcc_ppi_portb_w))
-	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, fidelz80_state, vcc_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidelz80_state, vcc_ppi_portc_w))
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::vcc_ppi_porta_w));
+	m_ppi8255->tri_pa_callback().set_constant(0);
+	m_ppi8255->in_pb_callback().set(FUNC(fidelz80_state::vcc_ppi_portb_r));
+	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::vcc_ppi_portb_w));
+	m_ppi8255->tri_pb_callback().set_constant(0);
+	m_ppi8255->in_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_r));
+	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vcc_ppi_portc_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_vcc);
@@ -1755,10 +1756,10 @@ MACHINE_CONFIG_START(fidelz80_state::vsc)
 	MCFG_DEVICE_IO_MAP(vsc_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidelz80_state, nmi_line_pulse, 587) // 555 timer, measured
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fidelz80_state, vsc_ppi_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fidelz80_state, vsc_ppi_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidelz80_state, vsc_ppi_portc_w))
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(fidelz80_state::vsc_ppi_porta_w));
+	m_ppi8255->out_pb_callback().set(FUNC(fidelz80_state::vsc_ppi_portb_w));
+	m_ppi8255->out_pc_callback().set(FUNC(fidelz80_state::vsc_ppi_portc_w));
 
 	Z80PIO(config, m_z80pio, 3.9_MHz_XTAL);
 	m_z80pio->in_pa_callback().set(FUNC(fidelz80_state::vsc_pio_porta_r));
@@ -1792,8 +1793,10 @@ MACHINE_CONFIG_START(fidelz80_state::vbrc)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, fidelz80_state, vbrc_mcu_t1_r))
 
 	I8243(config, m_i8243);
-	m_i8243->read_handler().set_constant(0);
-	m_i8243->write_handler().set(FUNC(fidelz80_state::vbrc_ioexp_port_w));
+	m_i8243->p4_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<1>));
+	m_i8243->p6_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<2>));
+	m_i8243->p7_out_cb().set(FUNC(fidelz80_state::vbrc_ioexp_port_w<3>));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_fidel_vbrc);

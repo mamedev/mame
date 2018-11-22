@@ -147,9 +147,9 @@ void galaxia_state::galaxia_mem_map(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x14ff).mirror(0x6000).ram().share("bullet_ram");
-	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636_1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
-	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636_2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636[2], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1800, 0x1bff).mirror(0x6000).r(FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x33ff).rom();
@@ -160,7 +160,7 @@ void galaxia_state::astrowar_mem_map(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x14ff).mirror(0x6000).ram();
-	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1800, 0x1bff).mirror(0x6000).r(FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
 	map(0x1c00, 0x1cff).mirror(0x6000).ram().share("bullet_ram");
 	map(0x2000, 0x33ff).rom();
@@ -327,17 +327,17 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,galaxia)
 
-	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -26)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[0], 0);
+	m_s2636[0]->set_offsets(-13, -26);
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -26)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[1], 0);
+	m_s2636[1]->set_offsets(-13, -26);
+	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -26)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[2], 0);
+	m_s2636[2]->set_offsets(-13, -26);
+	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -371,9 +371,9 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,astrowar)
 
-	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
-	MCFG_S2636_OFFSETS(-13, -8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	S2636(config, m_s2636[0], 0);
+	m_s2636[0]->set_offsets(-13, -8);
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

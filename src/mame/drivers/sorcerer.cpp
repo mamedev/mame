@@ -434,8 +434,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	m_uart->set_rx_clock(ES_UART_CLOCK);
 	m_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, "rs232", default_rs232_devices, "null_modem").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* printer */
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "covox")
@@ -489,10 +488,10 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	MCFG_MICROPOLIS_DEFAULT_DRIVE4_TAGS
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
 
-	MCFG_DEVICE_ADD("fdc2", FD1793, 8_MHz_XTAL / 8)  // confirmed clock
-	MCFG_WD_FDC_FORCE_READY // should be able to get rid of this when fdc issue is fixed
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, sorcerer_state, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, sorcerer_state, drq_w))
+	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock
+	m_fdc2->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
+	m_fdc2->intrq_wr_callback().set(FUNC(sorcerer_state::intrq_w));
+	m_fdc2->drq_wr_callback().set(FUNC(sorcerer_state::drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats)
@@ -548,6 +547,12 @@ ROM_START(sorcerer2)
 	ROM_SYSTEM_BIOS(2, "dwmon", "DWMON 2.2C")
 	ROMX_LOAD("dwmon.1e",    0xe000, 0x0800, CRC(a22db498) SHA1(ebedbce7454007f5a02fafe449fd09169173d7b3), ROM_BIOS(2) )
 	ROMX_LOAD("dwmon.2e",    0xe800, 0x0800, CRC(7b22b65a) SHA1(7f23dd308f34b6d795d6df06f2387dfd17f69edd), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(3, "ddmon", "DDMON 1.3")
+	ROMX_LOAD("ddmon.1e",    0xe000, 0x0800, CRC(6ce481da) SHA1(c927762b29a281b7c13d59bb17ea56494c64569b), ROM_BIOS(3) )
+	ROMX_LOAD("ddmon.2e",    0xe800, 0x0800, CRC(50069b13) SHA1(0808018830fac15cceaed8ff2b19900f77447470), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(4, "adsmon", "ADSMON") // This requires an unemulated 80-column card. You can type 64 to get 64-columns, but it's mostly off the side.
+	ROMX_LOAD("adsmon.1e",   0xe000, 0x0800, CRC(460f981a) SHA1(bdae1d87b9e8ae2cae11663acd349b9ed2387094), ROM_BIOS(4) )
+	ROMX_LOAD("adsmon.2e",   0xe800, 0x0800, CRC(cb3f1dda) SHA1(3fc14306e83d73b9b9afd9b543566e52ba3e008f), ROM_BIOS(4) )
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */

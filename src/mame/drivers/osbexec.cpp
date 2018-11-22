@@ -598,8 +598,8 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	printer_port.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
 	printer_port.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/24)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_pia[1], pia6821_device, cb1_w))
+	MB8877(config, m_mb8877, MAIN_CLOCK/24);
+	m_mb8877->intrq_wr_callback().set(m_pia[1], FUNC(pia6821_device::cb1_w));
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 

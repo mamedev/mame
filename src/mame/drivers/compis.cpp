@@ -203,14 +203,7 @@ READ16_MEMBER( compis_state::pcs6_2_3_r )
 	}
 	else
 	{
-		if (BIT(offset, 0))
-		{
-			return m_uart->status_r(space, 0) << 8;
-		}
-		else
-		{
-			return m_uart->data_r(space, 0) << 8;
-		}
+		return m_uart->read(offset & 1) << 8;
 	}
 }
 
@@ -221,14 +214,7 @@ WRITE16_MEMBER( compis_state::pcs6_2_3_w )
 	}
 	else
 	{
-		if (BIT(offset, 0))
-		{
-			m_uart->control_w(space, 0, data >> 8);
-		}
-		else
-		{
-			m_uart->data_w(space, 0, data >> 8);
-		}
+		m_uart->write(offset & 1, data >> 8);
 	}
 }
 
@@ -421,8 +407,8 @@ void compis_state::compis2_mem(address_map &map)
 void compis_state::compis_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(I8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
-	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(I8253_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x0000, 0x0007) /* PCS0 */ .mirror(0x78).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x0080, 0x0087) /* PCS1 */ .mirror(0x78).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x0100, 0x011f) /* PCS2 */ .mirror(0x60).rw(MM58174A_TAG, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0x00ff);
 	map(0x0180, 0x01ff) /* PCS3 */ .rw(GRAPHICS_TAG, FUNC(compis_graphics_slot_device::pcs3_r), FUNC(compis_graphics_slot_device::pcs3_w));
 	//map(0x0200, 0x0201) /* PCS4 */ .mirror(0x7e);
@@ -767,17 +753,17 @@ MACHINE_CONFIG_START(compis_state::compis)
 	m_osp->delay().set(I80130_TAG, FUNC(i80130_device::ir7_w));
 	m_osp->baud().set(FUNC(compis_state::tmr2_w));
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m_mpsc, i8274_device, rxtxcb_w))
-	MCFG_PIT8253_CLK1(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_CLK2(15.36_MHz_XTAL/8)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, compis_state, tmr5_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(15.36_MHz_XTAL/8);
+	m_pit->out_handler<0>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
+	m_pit->set_clk<1>(15.36_MHz_XTAL/8);
+	m_pit->set_clk<2>(15.36_MHz_XTAL/8);
+	m_pit->out_handler<2>().set(FUNC(compis_state::tmr5_w));
 
-	MCFG_DEVICE_ADD(I8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, compis_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, compis_state, ppi_pc_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi->in_pb_callback().set(FUNC(compis_state::ppi_pb_r));
+	m_ppi->out_pc_callback().set(FUNC(compis_state::ppi_pc_w));
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(COMPIS_KEYBOARD_TAG, FUNC(compis_keyboard_device::si_w));
@@ -805,15 +791,15 @@ MACHINE_CONFIG_START(compis_state::compis)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_mpsc, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_mpsc, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_mpsc, z80dart_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
+	rs232b.dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcdb_w));
+	rs232b.cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, compis_state, write_centronics_busy))

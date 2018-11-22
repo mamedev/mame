@@ -333,11 +333,11 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	MCFG_DEVICE_PROGRAM_MAP(tiamc1_map)
 	MCFG_DEVICE_IO_MAP(tiamc1_io_map)
 
-	MCFG_DEVICE_ADD("kr580vv55a", I8255A, 0)  /* soviet clone of i8255 */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tiamc1_state, tiamc1_control_w))
+	i8255_device &ppi(I8255A(config, "kr580vv55a"));  /* soviet clone of i8255 */
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
+	ppi.out_pc_callback().set(FUNC(tiamc1_state::tiamc1_control_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -372,10 +372,10 @@ MACHINE_CONFIG_START(tiamc1_state::kot)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(PIXEL_CLOCK / 4)
-	MCFG_PIT8253_CLK2(SND_CLOCK)                // guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, tiamc1_state, pit8253_2_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(PIXEL_CLOCK / 4);
+	pit8253.set_clk<2>(SND_CLOCK);                // guess
+	pit8253.out_handler<2>().set(FUNC(tiamc1_state::pit8253_2_w));
 MACHINE_CONFIG_END
 
 

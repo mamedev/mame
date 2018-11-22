@@ -375,7 +375,7 @@ WRITE8_MEMBER(mephisto_display_modul_device::latch_w)
 WRITE8_MEMBER(mephisto_display_modul_device::io_w)
 {
 	if (BIT(data, 1) && !BIT(m_ctrl, 1))
-		m_lcdc->write(space, BIT(data, 0), m_latch);
+		m_lcdc->write(BIT(data, 0), m_latch);
 
 	m_beeper->set_state(BIT(data, 2) | BIT(data, 3));
 

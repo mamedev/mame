@@ -7,7 +7,10 @@
     Frank Palazzolo (palazzol@home.com)
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_STACTICS_H
+#define MAME_INCLUDES_STACTICS_H
 
+#pragma once
 
 #include "machine/74259.h"
 #include "emupal.h"
@@ -123,3 +126,5 @@ private:
 	uint16_t m_beam_states_per_frame;
 	uint8_t  m_palette_bank;
 };
+
+#endif // MAME_INCLUDES_STACTICS_H

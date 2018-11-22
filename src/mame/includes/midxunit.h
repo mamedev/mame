@@ -5,6 +5,10 @@
     Driver for Midway X-unit games.
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_MIDXUNIT_H
+#define MAME_INCLUDES_MIDXUNIT_H
+
+#pragma once
 
 #include "machine/midwayic.h"
 
@@ -12,9 +16,10 @@ class midxunit_state : public midtunit_state
 {
 public:
 	midxunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: midtunit_state(mconfig, type, tag),
-			m_nvram(*this, "nvram"),
-			m_midway_serial_pic(*this, "serial_pic") { }
+		: midtunit_state(mconfig, type, tag)
+		, m_nvram(*this, "nvram")
+		, m_midway_serial_pic(*this, "serial_pic")
+	{ }
 
 	void midxunit(machine_config &config);
 
@@ -52,3 +57,5 @@ private:
 	uint8_t m_security_bits;
 	bool m_adc_int;
 };
+
+#endif // MAME_INCLUDES_MIDXUNIT_H

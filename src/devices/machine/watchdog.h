@@ -1,24 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-
 #ifndef MAME_MACHINE_WATCHDOG_H
 #define MAME_MACHINE_WATCHDOG_H
 
 #pragma once
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_WATCHDOG_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WATCHDOG_TIMER, 0)
-#define MCFG_WATCHDOG_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-#define MCFG_WATCHDOG_VBLANK_INIT(_screen, _count) \
-	downcast<watchdog_timer_device &>(*device).set_vblank_count(_screen, _count);
-#define MCFG_WATCHDOG_TIME_INIT(_time) \
-	downcast<watchdog_timer_device &>(*device).set_time(_time);
+#include <screen.h>
 
 
 //**************************************************************************
@@ -34,7 +21,7 @@ public:
 	watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration helpers
-	void set_vblank_count(const char *screen_tag, int32_t count) { m_screen_tag = screen_tag; m_vblank_count = count; }
+	template <typename T> void set_vblank_count(T &&screen_tag, int32_t count) { m_screen.set_tag(std::forward<T>(screen_tag)); m_vblank_count = count; }
 	void set_time(attotime time) { m_time = time; }
 
 	// watchdog control
@@ -63,13 +50,13 @@ private:
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
 
 	// configuration data
-	int32_t                   m_vblank_count; // number of VBLANKs until resetting the machine
+	int32_t                 m_vblank_count; // number of VBLANKs until resetting the machine
 	attotime                m_time;         // length of time until resetting the machine
-	const char *            m_screen_tag;   // the tag of the screen this timer tracks
+	optional_device<screen_device> m_screen; // the tag of the screen this timer tracks
 
 	// internal state
 	bool                    m_enabled;      // is the watchdog enabled?
-	int32_t                   m_counter;      // counter for VBLANK tracking
+	int32_t                 m_counter;      // counter for VBLANK tracking
 	emu_timer *             m_timer;        // timer for triggering reset
 };
 

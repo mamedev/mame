@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman, Curt Coder
+#ifndef MAME_INCLUDES_SIDEARMS_H
+#define MAME_INCLUDES_SIDEARMS_H
+
+#pragma once
+
 #include "video/bufsprite.h"
 #include "emupal.h"
 
 class sidearms_state : public driver_device
 {
 public:
-	sidearms_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sidearms_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -93,3 +98,5 @@ private:
 	void whizz_map(address_map &map);
 	void whizz_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SIDEARMS_H

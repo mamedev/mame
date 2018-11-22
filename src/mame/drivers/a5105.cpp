@@ -593,22 +593,22 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	BEEP(config, "beeper", 500).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(15'000'000) / 16) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(a5105_state, hgdc_display_pixels)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(a5105_state, hgdc_draw_text)
+	UPD7220(config, m_hgdc, XTAL(15'000'000) / 16); // unk clock
+	m_hgdc->set_addrmap(0, &a5105_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(a5105_state::hgdc_display_pixels), this);
+	m_hgdc->set_draw_text_callback(FUNC(a5105_state::hgdc_draw_text), this);
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(15'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg2))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(15'000'000) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, 0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg2));
+	ctc.zc_callback<2>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(15'000'000) / 4));
 	pio.out_int_callback().set_inputline(m_maincpu, 0);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_UPD765A_ADD("upd765a", true, true)
+	UPD765A(config, m_fdc, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525qd", a5105_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525qd", a5105_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525qd", a5105_state::floppy_formats)

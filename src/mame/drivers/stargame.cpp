@@ -119,9 +119,9 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 15000000 / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))    // SINT - turn on interrupt of the audiocpu
+	Z80CTC(config, m_ctc, 15000000 / 4);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);    // SINT - turn on interrupt of the audiocpu
 
 	/* sound hardware */
 	genpin_audio(config);
@@ -129,8 +129,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 	MCFG_DEVICE_ADD("mea8000", MEA8000, 15000000 / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "measnd", 1.0)
 	SPEAKER(config, "aysnd").front_center();
-	MCFG_DEVICE_ADD("ay", AY8910, 15000000 / 8) // clock line marked as CK2 and derived from 15MHz crystal
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.25)
+	AY8910(config, "ay", 15000000 / 8).add_route(ALL_OUTPUTS, "aysnd", 0.25); // clock line marked as CK2 and derived from 15MHz crystal
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_nop(); // DADIS
@@ -144,7 +143,7 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 MACHINE_CONFIG_END
 
 ROM_START(spcship)

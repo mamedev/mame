@@ -594,10 +594,11 @@ MACHINE_CONFIG_START(mrgame_state::mrgame)
 
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mrgame_state, irq_timer, attotime::from_hz(16000)) //ugh
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mrgame_state, porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mrgame_state, portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mrgame_state, portc_r))
+
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set(FUNC(mrgame_state::porta_r));
+	ppi.out_pb_callback().set(FUNC(mrgame_state::portb_w));
+	ppi.in_pc_callback().set(FUNC(mrgame_state::portc_r));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mrgame_state::wcup90)

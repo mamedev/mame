@@ -24,9 +24,9 @@ BMC Bowling (c) 1994.05 BMC, Ltd
         BET(B)+START(1) - other tests
         START(1) - next test
 
- press START(1)+HP(S) durning boot to see stats
+ press START(1)+HP(S) during boot to see stats
 
- press CONFIRM(N) durning boot, to enter    settings
+ press CONFIRM(N) during boot, to enter    settings
         BET(B) - change page
         STOP1(X)/STOP3(V) - modify
         START(1)/SMALL(F) - move
@@ -63,7 +63,7 @@ GREAT1 21.47727
 
 DIPS:
 Place for 4 8 switch dips
-dips 1 & 3 are all connected via resitors
+dips 1 & 3 are all connected via resistors
 dips 2 & 4 are standard 8 switch dips
 
 EEPROM       Label         Use
@@ -477,8 +477,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, HOLD_LINE);
 
 	PALETTE(config, m_palette, 256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0));
-	ramdac.set_palette(m_palette);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &bmcbowl_state::ramdac_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);

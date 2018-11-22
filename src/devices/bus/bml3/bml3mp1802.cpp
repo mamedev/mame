@@ -54,15 +54,16 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bml3bus_mp1802_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", MB8866, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bml3bus_mp1802_device, bml3_wd17xx_intrq_w))
+void bml3bus_mp1802_device::device_add_mconfig(machine_config &config)
+{
+	MB8866(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(bml3bus_mp1802_device::bml3_wd17xx_intrq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mp1802_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mp1802_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", mp1802_floppies, "", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", mp1802_floppies, "", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, mp1802_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, mp1802_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, mp1802_floppies, "", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, mp1802_floppies, "", floppy_image_device::default_floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

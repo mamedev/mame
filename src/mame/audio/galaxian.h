@@ -22,9 +22,6 @@ public:
 	DECLARE_WRITE8_MEMBER( fire_enable_w );
 	DECLARE_WRITE8_MEMBER( lfo_freq_w );
 
-	void mooncrst_audio(machine_config &config);
-	void galaxian_audio(machine_config &config);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -40,5 +37,7 @@ private:
 
 DECLARE_DEVICE_TYPE(GALAXIAN, galaxian_sound_device)
 
+DISCRETE_SOUND_EXTERN(galaxian_discrete);
+DISCRETE_SOUND_EXTERN(mooncrst_discrete);
 
 #endif // MAME_AUDIO_GALAXIAN_H

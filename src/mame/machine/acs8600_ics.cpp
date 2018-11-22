@@ -95,7 +95,8 @@ static const z80_daisy_config ics_daisy_chain[] =
 	nullptr
 };
 
-MACHINE_CONFIG_START(acs8600_ics_device::device_add_mconfig)
+void acs8600_ics_device::device_add_mconfig(machine_config &config)
+{
 	Z80(config, m_icscpu, 4_MHz_XTAL);
 	m_icscpu->set_addrmap(AS_PROGRAM, &acs8600_ics_device::ics_mem);
 	m_icscpu->set_addrmap(AS_IO, &acs8600_ics_device::ics_io);
@@ -127,16 +128,16 @@ MACHINE_CONFIG_START(acs8600_ics_device::device_add_mconfig)
 	sio1.out_int_callback().set_inputline(m_icscpu, INPUT_LINE_IRQ0);
 	sio1.set_cputag(m_icscpu);
 
-	MCFG_DEVICE_ADD("rs2321a", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80sio_device, ctsa_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", altos8600_terminal)
+	rs232_port_device &rs2321a(RS232_PORT(config, "rs2321a", default_rs232_devices, "terminal"));
+	rs2321a.rxd_handler().set("sio1", FUNC(z80sio_device::rxa_w));
+	rs2321a.dcd_handler().set("sio1", FUNC(z80sio_device::dcda_w));
+	rs2321a.cts_handler().set("sio1", FUNC(z80sio_device::ctsa_w));
+	rs2321a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(altos8600_terminal));
 
-	MCFG_DEVICE_ADD("rs2321b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio1", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio1", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio1", z80sio_device, ctsb_w))
+	rs232_port_device &rs2321b(RS232_PORT(config, "rs2321b", default_rs232_devices, nullptr));
+	rs2321b.rxd_handler().set("sio1", FUNC(z80sio_device::rxb_w));
+	rs2321b.dcd_handler().set("sio1", FUNC(z80sio_device::dcdb_w));
+	rs2321b.cts_handler().set("sio1", FUNC(z80sio_device::ctsb_w));
 
 	z80sio_device &sio2(Z80SIO(config, "sio2", 8_MHz_XTAL/2));
 	sio2.out_txda_callback().set("rs2322a", FUNC(rs232_port_device::write_txd));
@@ -148,15 +149,15 @@ MACHINE_CONFIG_START(acs8600_ics_device::device_add_mconfig)
 	sio2.out_int_callback().set_inputline(m_icscpu, INPUT_LINE_IRQ0);
 	sio2.set_cputag(m_icscpu);
 
-	MCFG_DEVICE_ADD("rs2322a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio2", z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio2", z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio2", z80sio_device, ctsa_w))
+	rs232_port_device &rs2322a(RS232_PORT(config, "rs2322a", default_rs232_devices, nullptr));
+	rs2322a.rxd_handler().set("sio2", FUNC(z80sio_device::rxa_w));
+	rs2322a.dcd_handler().set("sio2", FUNC(z80sio_device::dcda_w));
+	rs2322a.cts_handler().set("sio2", FUNC(z80sio_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs2322b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio2", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio2", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio2", z80sio_device, ctsb_w))
+	rs232_port_device &rs2322b(RS232_PORT(config, "rs2322b", default_rs232_devices, nullptr));
+	rs2322b.rxd_handler().set("sio2", FUNC(z80sio_device::rxb_w));
+	rs2322b.dcd_handler().set("sio2", FUNC(z80sio_device::dcdb_w));
+	rs2322b.cts_handler().set("sio2", FUNC(z80sio_device::ctsb_w));
 
 	z80sio_device &sio3(Z80SIO(config, "sio3", 8_MHz_XTAL/2));
 	sio3.out_txda_callback().set("rs2323a", FUNC(rs232_port_device::write_txd));
@@ -168,15 +169,15 @@ MACHINE_CONFIG_START(acs8600_ics_device::device_add_mconfig)
 	sio3.out_int_callback().set_inputline(m_icscpu, INPUT_LINE_IRQ0);
 	sio3.set_cputag(m_icscpu);
 
-	MCFG_DEVICE_ADD("rs2323a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio3", z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio3", z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio3", z80sio_device, ctsa_w))
+	rs232_port_device &rs2323a(RS232_PORT(config, "rs2323a", default_rs232_devices, nullptr));
+	rs2323a.rxd_handler().set("sio3", FUNC(z80sio_device::rxa_w));
+	rs2323a.dcd_handler().set("sio3", FUNC(z80sio_device::dcda_w));
+	rs2323a.cts_handler().set("sio3", FUNC(z80sio_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs2323b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio3", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio3", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio3", z80sio_device, ctsb_w))
+	rs232_port_device &rs2323b(RS232_PORT(config, "rs2323b", default_rs232_devices, nullptr));
+	rs2323b.rxd_handler().set("sio3", FUNC(z80sio_device::rxb_w));
+	rs2323b.dcd_handler().set("sio3", FUNC(z80sio_device::dcdb_w));
+	rs2323b.cts_handler().set("sio3", FUNC(z80sio_device::ctsb_w));
 
 	z80sio_device &sio4(Z80SIO(config, "sio4", 8_MHz_XTAL/2));
 	sio4.out_txda_callback().set("rs2324a", FUNC(rs232_port_device::write_txd));
@@ -188,16 +189,16 @@ MACHINE_CONFIG_START(acs8600_ics_device::device_add_mconfig)
 	sio4.out_int_callback().set_inputline(m_icscpu, INPUT_LINE_IRQ0);
 	sio4.set_cputag(m_icscpu);
 
-	MCFG_DEVICE_ADD("rs2324a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio4", z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio4", z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio4", z80sio_device, ctsa_w))
+	rs232_port_device &rs2324a(RS232_PORT(config, "rs2324a", default_rs232_devices, nullptr));
+	rs2324a.rxd_handler().set("sio4", FUNC(z80sio_device::rxa_w));
+	rs2324a.dcd_handler().set("sio4", FUNC(z80sio_device::dcda_w));
+	rs2324a.cts_handler().set("sio4", FUNC(z80sio_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("rs2324b", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio4", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio4", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio4", z80sio_device, ctsb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs2324b(RS232_PORT(config, "rs2324b", default_rs232_devices, nullptr));
+	rs2324b.rxd_handler().set("sio4", FUNC(z80sio_device::rxb_w));
+	rs2324b.dcd_handler().set("sio4", FUNC(z80sio_device::dcdb_w));
+	rs2324b.cts_handler().set("sio4", FUNC(z80sio_device::ctsb_w));
+}
 
 void acs8600_ics_device::device_resolve_objects()
 {

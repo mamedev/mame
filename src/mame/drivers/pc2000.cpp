@@ -362,7 +362,7 @@ READ8_MEMBER( pc1000_state::kb_r )
 READ8_MEMBER( pc1000_state::lcdc_data_r )
 {
 	//logerror("lcdc data r\n");
-	return m_lcdc->data_read(space, 0) >> 4;
+	return m_lcdc->data_read() >> 4;
 }
 
 WRITE8_MEMBER( pc1000_state::lcdc_data_w )
@@ -370,19 +370,19 @@ WRITE8_MEMBER( pc1000_state::lcdc_data_w )
 	//popmessage("%s", (char*)m_maincpu->space(AS_PROGRAM).get_read_ptr(0x4290));
 
 	//logerror("lcdc data w %x\n", data);
-	m_lcdc->data_write(space, 0, data << 4);
+	m_lcdc->data_write(data << 4);
 }
 
 READ8_MEMBER( pc1000_state::lcdc_control_r )
 {
 	//logerror("lcdc control r\n");
-	return m_lcdc->control_read(space, 0) >> 4;
+	return m_lcdc->control_read() >> 4;
 }
 
 WRITE8_MEMBER( pc1000_state::lcdc_control_w )
 {
 	//logerror("lcdc control w %x\n", data);
-	m_lcdc->control_write(space, 0, data<<4);
+	m_lcdc->control_write(data<<4);
 }
 
 HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)

@@ -817,10 +817,11 @@ MACHINE_CONFIG_START(super80_state::super80v)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(SUPER80V_DOTS)
-	MCFG_MC6845_UPDATE_ROW_CB(super80_state, crtc_update_row)
+	MC6845(config, m_crtc, MASTER_CLOCK / SUPER80V_DOTS);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(SUPER80V_DOTS);
+	m_crtc->set_update_row_callback(FUNC(super80_state::crtc_update_row), this);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super80v)
 	config.set_default_layout(layout_super80);
@@ -871,8 +872,8 @@ MACHINE_CONFIG_START(super80_state::super80r)
 	m_dma->in_iorq_callback().set(FUNC(super80_state::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(super80_state::io_write_byte));
 
-	MCFG_DEVICE_ADD("fdc", WD2793, 2_MHz_XTAL)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
+	WD2793(config, m_fdc, 2_MHz_XTAL);
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", super80_floppies, "525dd", floppy_image_device::default_floppy_formats)

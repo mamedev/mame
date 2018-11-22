@@ -5,6 +5,10 @@
     Parodius
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_PARODIUS_H
+#define MAME_INCLUDES_PARODIUS_H
+
+#pragma once
 
 #include "machine/bankdev.h"
 #include "video/k053244_k053245.h"
@@ -20,15 +24,16 @@ public:
 		TIMER_NMI
 	};
 
-	parodius_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	parodius_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank0000(*this, "bank0000"),
 		m_bank2000(*this, "bank2000"),
 		m_k052109(*this, "k052109"),
 		m_k053245(*this, "k053245"),
-		m_k053251(*this, "k053251") { }
+		m_k053251(*this, "k053251")
+	{ }
 
 	/* video-related */
 	int        m_layer_colorbase[3];
@@ -66,3 +71,5 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_PARODIUS_H

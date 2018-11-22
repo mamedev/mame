@@ -5,6 +5,10 @@
     Fire Trap
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_FIRETRAP_H
+#define MAME_INCLUDES_FIRETRAP_H
+
+#pragma once
 
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
@@ -14,8 +18,8 @@
 class firetrap_state : public driver_device
 {
 public:
-	firetrap_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	firetrap_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg1videoram(*this, "bg1videoram"),
 		m_bg2videoram(*this, "bg2videoram"),
 		m_fgvideoram(*this, "fgvideoram"),
@@ -26,7 +30,8 @@ public:
 		m_adpcm_select(*this, "adpcm_select"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void firetrapbl(machine_config &config);
 	void firetrap(machine_config &config);
@@ -103,3 +108,5 @@ private:
 	void firetrap_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FIRETRAP_H

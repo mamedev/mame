@@ -606,8 +606,8 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
+	K053252(config, m_k053252, XTAL(32'000'000)/4);
+	m_k053252->set_offsets(40, 16); // TODO
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -647,8 +647,7 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	//MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
 	//MCFG_K053246_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, "k054338", 0, m_k055555).set_alpha_invert(1);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

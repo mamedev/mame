@@ -262,10 +262,10 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	sio.out_rtsa_callback().set("serial", FUNC(rs232_port_device::write_rts));
 	sio.out_txdb_callback().set("kbd", FUNC(kaypro_10_keyboard_device::txd_w));
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_drq_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1793(config, m_fdc, 20_MHz_XTAL / 20);
+	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
+	m_fdc->set_force_ready(true);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
@@ -312,10 +312,11 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2000000) /* comes out of ULA - needs to be measured */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(7)
-	MCFG_MC6845_UPDATE_ROW_CB(kaypro_state, kaypro484_update_row)
+	MC6845(config, m_crtc, 2000000); /* comes out of ULA - needs to be measured */
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(7);
+	m_crtc->set_update_row_callback(FUNC(kaypro_state::kaypro484_update_row), this);
 
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro, "com,cpm", 3)
 
@@ -358,10 +359,10 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	brg.ft_handler().set("sio_2", FUNC(z80sio_device::rxca_w));
 	brg.ft_handler().append("sio_2", FUNC(z80sio_device::txca_w));
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, kaypro_state, fdc_drq_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
+	m_fdc->set_force_ready(true);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)

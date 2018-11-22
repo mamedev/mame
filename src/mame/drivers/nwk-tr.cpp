@@ -854,11 +854,8 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	ADC12138(config, m_adc12138, 0);
 	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
-	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo0")
-
-	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo1")
+	K033906(config, "k033906_1", 0, "voodoo0");
+	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
@@ -899,8 +896,8 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(16'934'400));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // as per Guru readme above
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

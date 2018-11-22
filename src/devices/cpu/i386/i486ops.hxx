@@ -34,7 +34,8 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 
 			default:
 			{
-				logerror("CPUID called with unsupported EAX=%08x at %08x!\n", REG32(EAX), m_eip);
+				// call the model specific implementation
+				opcode_cpuid();
 				break;
 			}
 		}
@@ -513,6 +514,8 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 			CYCLES(CYCLES_MOV_REG_CR0);
 			if((oldcr ^ m_cr[cr]) & 0x80010000)
 				vtlb_flush_dynamic();
+			if (PROTECTED_MODE != BIT(data, 0))
+				debugger_privilege_hook();
 			break;
 		case 2: CYCLES(CYCLES_MOV_REG_CR2); break;
 		case 3:
