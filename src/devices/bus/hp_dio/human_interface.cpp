@@ -155,7 +155,8 @@ WRITE_LINE_MEMBER(human_interface_device::reset_in)
 
 void human_interface_device::update_gpib_irq()
 {
-	irq3_out((m_gpib_irq_line || (m_ppoll_sc & PPOLL_IR)) ? ASSERT_LINE : CLEAR_LINE);
+	irq3_out((m_gpib_irq_line ||
+		((m_ppoll_sc & (PPOLL_IR|PPOLL_IE)) == (PPOLL_IR|PPOLL_IE))) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(human_interface_device::gpib_irq)
@@ -171,11 +172,13 @@ WRITE_LINE_MEMBER(human_interface_device::gpib_dreq)
 
 WRITE8_MEMBER(human_interface_device::ieee488_dio_w)
 {
+	if (m_ieee488->atn_r() || m_ieee488->eoi_r())
+		return;
+
 	if ((m_ppoll_mask & ~data) && (m_ppoll_sc & PPOLL_IE)) {
-		LOG("%s: PPOLL triggered\n");
-		m_ieee488->host_atn_w(1);
-		m_ieee488->host_eoi_w(1);
-		m_ppoll_sc |= PPOLL_IR;
+		LOG("%s: parallel poll triggered\n", __func__);
+		if (m_ppoll_sc & PPOLL_IE)
+			m_ppoll_sc |= PPOLL_IR;
 		update_gpib_irq();
 	}
 }
@@ -202,12 +205,13 @@ WRITE8_MEMBER(human_interface_device::gpib_w)
 
 		if (m_ppoll_sc & PPOLL_IE) {
 			LOG("%s: start parallel poll\n", __func__);
-			m_ieee488->host_atn_w(0);
-			m_ieee488->host_eoi_w(0);
+			ieee488_dio_w(space, 0, m_ieee488->dio_r(space, 0));
 		}
 		break;
 	case 4:
 		m_ppoll_mask = data;
+		break;
+	default:
 		break;
 	}
 	LOG("gpib_w: %s %02X = %02X\n", machine().describe_context().c_str(), offset, data);
