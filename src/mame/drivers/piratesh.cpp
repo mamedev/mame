@@ -647,8 +647,7 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	//MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
 	//MCFG_K053246_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, "k054338", 0, m_k055555).set_alpha_invert(1);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

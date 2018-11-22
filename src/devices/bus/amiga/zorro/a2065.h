@@ -30,9 +30,11 @@ public:
 	// construction/destruction
 	a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( ram_r );
-	DECLARE_WRITE16_MEMBER( ram_w );
+	DECLARE_READ16_MEMBER( host_ram_r );
+	DECLARE_WRITE16_MEMBER( host_ram_w );
 
+	DECLARE_READ16_MEMBER( lance_ram_r );
+	DECLARE_WRITE16_MEMBER( lance_ram_w );
 	DECLARE_WRITE_LINE_MEMBER( lance_irq_w );
 
 protected:

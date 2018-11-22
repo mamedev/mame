@@ -749,12 +749,6 @@ void seta2_state::telpacfl_map(address_map &map)
 
 // Touchscreen
 
-#define MCFG_FUNCUBE_TOUCHSCREEN_ADD( _tag, _clock ) \
-	MCFG_DEVICE_ADD( _tag, FUNCUBE_TOUCHSCREEN, _clock )
-
-#define MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(_devcb) \
-	downcast<funcube_touchscreen_device &>(*device).set_tx_cb(DEVCB_##_devcb);
-
 class funcube_touchscreen_device : public device_t,
 									public device_serial_interface
 {
@@ -762,7 +756,7 @@ public:
 	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
-	template <class Object> devcb_base &set_tx_cb(Object &&cb) { return m_tx_cb.set_callback(std::forward<Object>(cb)); }
+	auto tx_cb() { return m_tx_cb.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -2801,8 +2795,7 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
-	MCFG_FUNCUBE_TOUCHSCREEN_ADD("touchscreen", 200)
-	MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(WRITELINE(":sub:sci1", h8_sci_device, rx_w))
+	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

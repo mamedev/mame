@@ -15560,6 +15560,9 @@ stellecu                        // (c) 1998
 farmer                          // TVG17 (c) 1985 Sun Electronics
 ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 
+@source:ikt5a.cpp
+ikt5a                           //
+
 @source:imds2.cpp
 imds2                           // Intellec MDS series-II
 
@@ -17651,6 +17654,7 @@ kissp2                          //
 klax                            // 136075           (c) 1989
 klax2                           // 136075           (c) 1989
 klax2bl                         // bootleg
+klax2bl2                        // bootleg
 klax3                           // 136075           (c) 1989
 klaxd                           // 136075           (c) 1989 (Germany)
 klaxj                           // 136075           (c) 1989 (Japan)
@@ -21469,6 +21473,8 @@ minivadr                        // D26 cabinet test board
 @source:mips.cpp
 rc2030                          // MIPS RC2030
 rs2030                          // MIPS RS2030
+rc3230                          // MIPS RC3230
+rs3230                          // MIPS RS3230
 
 @source:mirage.cpp
 mirage                          // (c) 1994 Mitchell
@@ -37120,7 +37126,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 7951om                          //
 alcat258                        //
 feap90                          //
-ikt5a                           //
 itt9216                         //
 loewe715                        //
 loewed                          //

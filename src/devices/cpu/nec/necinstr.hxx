@@ -360,7 +360,7 @@ OP( 0x99, i_cwd       ) { Wreg(DW) = (Breg(AH) & 0x80) ? 0xffff : 0;    CLK(4); 
 OP( 0x9a, i_call_far  ) { uint32_t tmp, tmp2; tmp = fetchword(); tmp2 = fetchword(); PUSH(Sreg(PS)); PUSH(m_ip); m_ip = (WORD)tmp; Sreg(PS) = (WORD)tmp2; CHANGE_PC; CLKW(29,29,13,29,21,9,Wreg(SP)); }
 OP( 0x9b, i_wait      ) { if (!m_poll_state) m_ip--; CLK(5); }
 OP( 0x9c, i_pushf     ) { uint16_t tmp = CompressFlags(); PUSH( tmp ); CLKS(12,8,3); }
-OP( 0x9d, i_popf      ) { uint32_t tmp; POP(tmp); ExpandFlags(tmp | 0xf000); CLKS(12,8,5); if (m_TF) nec_trap(); }
+OP( 0x9d, i_popf      ) { uint32_t tmp; POP(tmp); ExpandFlags(tmp); CLKS(12,8,5); if (m_TF) nec_trap(); }
 OP( 0x9e, i_sahf      ) { uint32_t tmp = (CompressFlags() & 0xff00) | (Breg(AH) & 0xd5); ExpandFlags(tmp); CLKS(3,3,2); }
 OP( 0x9f, i_lahf      ) { Breg(AH) = CompressFlags() & 0xff; CLKS(3,3,2); }
 

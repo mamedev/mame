@@ -193,16 +193,15 @@ MACHINE_CONFIG_START(surpratk_state::surpratk)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(surpratk_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(surpratk_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053244", K053244, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
-	MCFG_K05324X_CB(surpratk_state, sprite_callback)
+	K053244(config, m_k053244, 0);
+	m_k053244->set_palette(m_palette);
+	m_k053244->set_sprite_callback(FUNC(surpratk_state::sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

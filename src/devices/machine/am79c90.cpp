@@ -1,13 +1,43 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
-/*****************************************************************************
+// copyright-holders:Patrick Mackinlay
 
-    AMD Am79C90 CMOS Local Area Network Controller for Ethernet (C-LANCE)
-
-    TODO:
-        - Error handling
-
-*****************************************************************************/
+/*
+ * AMD Am7990 Local Area Network Controller for Ethernet (LANCE) and Am79C90
+ * CMOS Local Area Network Controller for Ethernet (C-LANCE).
+ *
+ * Sources:
+ *
+ *  https://datasheet.datasheetarchive.com/originals/distributors/Datasheets-115/DSAP00824.pdf
+ *
+ * TODO
+ *   - hp9k/3xx diagnostic failures
+ *
+ *                          _____   _____
+ *                 Vss   1 |*    \_/     | 48  Vdd
+ *                DAL7   2 |             | 47  DAL8
+ *                DAL6   3 |             | 46  DAL9
+ *                DAL5   4 |             | 45  DAL10
+ *                DAL4   5 |             | 44  DAL11
+ *                DAL3   6 |             | 43  DAL12
+ *                DAL2   7 |             | 42  DAL13
+ *                DAL1   8 |             | 41  DAL14
+ *                DAL0   9 |             | 40  DAL15
+ *                READ  10 |             | 39  A16
+ *               /INTR  11 |             | 38  A17
+ *               /DALI  12 |   Am79C90   | 37  A18
+ *               /DALI  13 |             | 36  A19
+ *                /DAS  14 |             | 35  A20
+ *           /BM0,BYTE  15 |             | 34  A21
+ *        /BM1,/BUSAKO  16 |             | 33  A22
+ *        /HOLD,/BUSRQ  17 |             | 32  A23
+ *             ALE,/AS  18 |             | 31  RX
+ *               /HLDA  19 |             | 30  RENA
+ *                 /CS  20 |             | 29  TX
+ *                 ADR  21 |             | 28  CLSN
+ *              /READY  22 |             | 27  RCLK
+ *              /RESET  23 |             | 26  TENA
+ *                 Vss  24 |_____________| 25  TCLK
+ */
 
 #include "emu.h"
 #include "am79c90.h"
@@ -89,8 +119,6 @@ void am7990_device_base::device_reset()
 	m_csr[3] = 0;
 	m_lb_length = 0;
 
-	m_transmit_poll->enable(false);
-
 	update_interrupts();
 }
 
@@ -103,6 +131,7 @@ void am7990_device_base::update_interrupts()
 		{
 			m_intr_out_state = !m_intr_out_state;
 			m_intr_out_cb(m_intr_out_state);
+			LOG("interrupt asserted\n");
 		}
 	}
 	else
@@ -171,6 +200,8 @@ int am7990_device_base::receive(u8 *buf, int length)
 		u32 const rx_buf_address = (u32(m_rx_md[1] & 0xff) << 16) | m_rx_md[0];
 		int const rx_buf_length = -s16(m_rx_md[2]);
 
+		LOGMASKED(LOG_RXTX, "receive buffer address 0x%06x length %d\n", rx_buf_address, rx_buf_length);
+
 		// write the data to memory
 		int const count = std::min(length - offset, rx_buf_length);
 		dma_out(rx_buf_address, &buf[offset], count);
@@ -213,7 +244,7 @@ int am7990_device_base::receive(u8 *buf, int length)
 			{
 				LOGMASKED(LOG_RXTX, "receive incorrect fcs 0x%08x\n", ~crc);
 
-				m_rx_md[1] |= RMD1_CRC;
+				m_rx_md[1] |= RMD1_ERR | RMD1_CRC;
 			}
 		}
 
@@ -250,7 +281,7 @@ void am7990_device_base::recv_complete_cb(int result)
 void am7990_device_base::transmit_poll(void *ptr, s32 param)
 {
 	// receive pending internal loopback data
-	if (m_lb_length && (m_mode & MODE_LOOP) && (m_mode & MODE_INTL))
+	if (m_lb_length && (m_mode & MODE_LOOP) && (m_mode & MODE_INTL) && (m_csr[0] & CSR0_RXON))
 	{
 		int const result = receive(m_lb_buf, m_lb_length);
 		m_lb_length = 0;
@@ -259,12 +290,17 @@ void am7990_device_base::transmit_poll(void *ptr, s32 param)
 		return;
 	}
 
-	u32 const ring_address = (m_tx_ring_base + (m_tx_ring_pos << 3)) & RING_ADDR_MASK;
-	m_tx_md[1] = m_dma_in_cb(ring_address | 2);
+	if (m_csr[0] & CSR0_TXON)
+	{
+		m_csr[0] &= ~CSR0_TDMD;
 
-	// start transmitting if we own the current descriptor
-	if (m_tx_md[1] & TMD1_OWN)
-		transmit();
+		u32 const ring_address = (m_tx_ring_base + (m_tx_ring_pos << 3)) & RING_ADDR_MASK;
+		m_tx_md[1] = m_dma_in_cb(ring_address | 2);
+
+		// start transmitting if we own the current descriptor
+		if (m_tx_md[1] & TMD1_OWN)
+			transmit();
+	}
 }
 
 void am7990_device_base::transmit()
@@ -293,7 +329,7 @@ void am7990_device_base::transmit()
 		m_transmit_poll->enable(false);
 
 	// check whether to append fcs or not
-	bool const add_fcs = !(m_mode & MODE_DTCR) || ((type() == AM79C90) && (m_tx_md[1] & TMD1_ADD_FCS));
+	bool const append_fcs = !(m_mode & MODE_DTCR) || ((type() == AM79C90) && (m_tx_md[1] & TMD1_ADD_FCS));
 
 	u8 buf[4096];
 	int length = 0;
@@ -307,6 +343,8 @@ void am7990_device_base::transmit()
 
 		u32 const tx_buf_address = (u32(m_tx_md[1] & 0xff) << 16) | m_tx_md[0];
 		u16 const tx_buf_length = -s16(m_tx_md[2]);
+
+		LOGMASKED(LOG_RXTX, "transmit buffer address 0x%06x length %d\n", tx_buf_address, tx_buf_length);
 
 		// minimum length 100 when chaining, or 64 when not (except for internal loopback mode)
 		if (!length && tx_buf_length < ((m_tx_md[1] & TMD1_ENP) ? 64 : 100) && ((m_mode & (MODE_LOOP | MODE_INTL)) != (MODE_LOOP | MODE_INTL)))
@@ -337,8 +375,12 @@ void am7990_device_base::transmit()
 			else
 			{
 				// buffer error
+				m_tx_md[1] |= TMD1_ERR;
 				m_tx_md[3] |= TMD3_BUFF | TMD3_UFLO;
 				m_dma_out_cb(ring_address | 6, m_tx_md[3]);
+
+				// turn off the transmitter
+				m_csr[0] &= ~CSR0_TXON;
 				break;
 			}
 		}
@@ -347,7 +389,7 @@ void am7990_device_base::transmit()
 	}
 
 	// compute and append the fcs
-	if (add_fcs)
+	if (append_fcs)
 	{
 		u32 const crc = util::crc32_creator::simple(buf, length);
 
@@ -368,12 +410,22 @@ void am7990_device_base::transmit()
 	// handle internal loopback
 	if ((m_mode & MODE_LOOP) && (m_mode & MODE_INTL))
 	{
-		int const fcs_length = add_fcs ? 4 : 0;
+		// forced collision
+		if (m_mode & MODE_COLL)
+		{
+			send_complete_cb(-1);
+			return;
+		}
+
+		int const fcs_length = append_fcs ? 4 : 0;
 
 		if ((length - fcs_length) < 8 || (length - fcs_length) > 32)
 		{
 			logerror("transmit invalid loopback packet length %d\n", length - fcs_length);
-			length = 0;
+
+			// FIXME: don't know what to do, so just drop the packet
+			send_complete_cb(-2);
+			return;
 		}
 
 		memcpy(m_lb_buf, buf, length);
@@ -389,9 +441,23 @@ void am7990_device_base::send_complete_cb(int result)
 {
 	u32 const ring_address = (m_tx_ring_base + (m_tx_ring_pos << 3)) & RING_ADDR_MASK;
 
-	// FIXME: flag a loss of carrier on error
-	if (!result)
+	// update tmd3 on error
+	switch (result)
+	{
+	case -2: // invalid internal loopback packet
+		m_tx_md[1] |= TMD1_ERR;
+		break;
+
+	case -1: // forced collision
+		m_tx_md[1] |= TMD1_ERR;
+		m_dma_out_cb(ring_address | 6, m_tx_md[3] | TMD3_RTRY);
+		break;
+
+	case 0: // failure to transmit (assume loss of carrier)
+		m_tx_md[1] |= TMD1_ERR;
 		m_dma_out_cb(ring_address | 6, m_tx_md[3] | TMD3_LCAR);
+		break;
+	}
 
 	// release the current descriptor
 	m_dma_out_cb(ring_address | 2, m_tx_md[1] & ~TMD1_OWN);
@@ -403,10 +469,8 @@ void am7990_device_base::send_complete_cb(int result)
 	m_csr[0] |= CSR0_TINT | CSR0_INTR;
 	update_interrupts();
 
-	// TODO: back-to-back transmit
-
-	// resume transmit polling
-	m_transmit_poll->enable(true);
+	// resume transmit polling (back-to-back)
+	m_transmit_poll->adjust(attotime::zero, 0, TX_POLL_PERIOD);
 }
 
 READ16_MEMBER(am7990_device_base::regs_r)
@@ -415,7 +479,10 @@ READ16_MEMBER(am7990_device_base::regs_r)
 	{
 		LOGMASKED(LOG_REG, "regs_r csr%d data 0x%04x (%s)\n", m_rap, m_csr[m_rap], machine().describe_context());
 
-		return m_csr[m_rap];
+		if (m_rap && !(m_csr[0] & CSR0_STOP))
+			return space.unmap();
+		else
+			return m_csr[m_rap];
 	}
 	else
 		return m_rap;
@@ -499,14 +566,14 @@ WRITE16_MEMBER(am7990_device_base::regs_w)
 						m_csr[0] &= ~CSR0_TXON;
 					else
 						m_csr[0] |= CSR0_TXON;
-
-					if (m_csr[0] & CSR0_TXON)
-						m_transmit_poll->enable(true);
 				}
 
 				// transmit demand
-				if ((data & CSR0_TDMD) && (m_csr[0] & CSR0_TXON))
+				if ((data & CSR0_TDMD) && !(m_csr[0] & CSR0_TDMD))
+				{
+					m_csr[0] |= CSR0_TDMD;
 					m_transmit_poll->adjust(attotime::zero, 0, TX_POLL_PERIOD);
+				}
 
 				// ERR == BABL || CERR || MISS || MERR
 				if (m_csr[0] & CSR0_ANY_ERR)
@@ -531,7 +598,8 @@ WRITE16_MEMBER(am7990_device_base::regs_w)
 			// Datasheet says "must be zero", but doesn't indicate what
 			// happens if it's written non-zero. Must be writable to pass
 			// system diagnostic on MIPS RS2030.
-			m_csr[1] = data;
+			if (m_csr[0] & CSR0_STOP)
+				m_csr[1] = data;
 			break;
 
 		case 2: // Most significant 8 bits of the Initialization Block
@@ -539,11 +607,13 @@ WRITE16_MEMBER(am7990_device_base::regs_w)
 			// write as zero, while LANCE datasheet just says "reserved".
 			// MIPS RS2030 diagnostic requires these bits to be writable,
 			// so assuming this is older device behaviour.
-			m_csr[2] = (type() == AM7990) ? data : (data & 0x00ff);
+			if (m_csr[0] & CSR0_STOP)
+				m_csr[2] = (type() == AM7990) ? data : (data & 0x00ff);
 			break;
 
 		case 3: // Bus master interface
-			m_csr[3] = data & CSR3_MASK;
+			if (m_csr[0] & CSR0_STOP)
+				m_csr[3] = data & CSR3_MASK;
 			break;
 		}
 	}
@@ -559,10 +629,7 @@ void am7990_device_base::initialize()
 	LOG("INITIALIZE initialization block address 0x%08x\n", init_addr);
 
 	for (int i = 0; i < 12; i++)
-	{
 		init_block[i] = m_dma_in_cb(init_addr + i * 2);
-		LOGMASKED(LOG_INIT, "IADR +%02d: 0x%04x\n", i * 2, init_block[i]);
-	}
 
 	m_mode = init_block[0];
 
@@ -594,8 +661,6 @@ void am7990_device_base::initialize()
 
 	m_csr[0] |= CSR0_IDON | CSR0_INIT;
 	m_csr[0] &= ~CSR0_STOP;
-
-	m_transmit_poll->enable(false);
 }
 
 void am7990_device_base::dma_in(u32 address, u8 *buf, int length)

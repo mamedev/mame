@@ -749,9 +749,9 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, r2dx_v33_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, r2dx_v33_state, tile_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(r2dx_v33_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(r2dx_v33_state::tile_scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -786,9 +786,9 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, r2dx_v33_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, r2dx_v33_state, tile_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(r2dx_v33_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(r2dx_v33_state::tile_scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

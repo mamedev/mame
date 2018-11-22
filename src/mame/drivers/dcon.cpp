@@ -295,9 +295,9 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 	MCFG_SCREEN_UPDATE_DRIVER(dcon_state, screen_update_dcon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(dcon_state::layer_en_w));
+	crtc.layer_scroll_callback().set(FUNC(dcon_state::layer_scroll_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -340,9 +340,9 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 	MCFG_SCREEN_UPDATE_DRIVER(dcon_state, screen_update_sdgndmps)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(dcon_state::layer_en_w));
+	crtc.layer_scroll_callback().set(FUNC(dcon_state::layer_scroll_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dcon)
 	MCFG_PALETTE_ADD("palette", 2048)

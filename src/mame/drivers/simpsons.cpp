@@ -354,9 +354,9 @@ MACHINE_CONFIG_START(simpsons_state::simpsons)
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(simpsons_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(simpsons_state::tile_callback), this);
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(simpsons_state, sprite_callback)

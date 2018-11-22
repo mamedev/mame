@@ -343,13 +343,13 @@ MACHINE_CONFIG_START(chqflag_state::chqflag)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(chqflag_state, sprite_callback)
-	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
-	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(*this, chqflag_state,background_brt_w))
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback), this);
+	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
+	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_k051960->vreg_contrast_handler().set(FUNC(chqflag_state::background_brt_w));
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")

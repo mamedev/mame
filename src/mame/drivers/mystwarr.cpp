@@ -985,8 +985,8 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -48, -24)
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, m_k054338, 0, m_k055555);
+	m_k054338->set_alpha_invert(1);
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 

@@ -7,7 +7,7 @@
 
  This is an ARM7 with Internal ROM. (Also used on later PGM games)
 
- In some cases the first part of the Internal ROM is excute only, and
+ In some cases the first part of the Internal ROM is execute only, and
  cannot be read out with a trojan.  It hasn't been confirmed if these
  games make use of that feature.
 
@@ -346,11 +346,11 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_REVERSE_TEXT_BITS
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_text_reverse_bits();
+	m_igs017_igs031->set_palette("palette");
 
-	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
+	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
 
 	/* sound hardware */
 	// OK6295
@@ -380,11 +380,11 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_IGS017_IGS031_REVERSE_TEXT_BITS
-	MCFG_GFX_PALETTE("palette")
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_text_reverse_bits();
+	m_igs017_igs031->set_palette("palette");
 
-	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
+	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
 
 	/* sound hardware */
 	// OK6295

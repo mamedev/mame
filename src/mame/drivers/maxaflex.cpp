@@ -333,9 +333,9 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_M68705_PORTB_W_CB(WRITE8(*this, maxaflex_state, mcu_portB_w))
 	MCFG_M68705_PORTC_W_CB(WRITE8(*this, maxaflex_state, mcu_portC_w))
 
-	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
-	MCFG_GTIA_REGION(GTIA_NTSC)
-	MCFG_GTIA_READ_CB(IOPORT("console"))
+	ATARI_GTIA(config, m_gtia, 0);
+	m_gtia->set_region(GTIA_NTSC);
+	m_gtia->read_callback().set_ioport("console");
 
 	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
 	MCFG_ANTIC_GTIA("gtia")

@@ -896,10 +896,6 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 //  requests
 //-------------------------------------------------
 
-
-
-
-
 void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index)
 {
 	switch (index)
@@ -3808,6 +3804,8 @@ MACHINE_CONFIG_START(segas16b_state::system16b_i8751)
 	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("SERVICE"))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, segas16b_state, spin_68k_w))
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))

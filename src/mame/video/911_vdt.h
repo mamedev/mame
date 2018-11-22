@@ -50,16 +50,6 @@ public:
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 
-	template <class Object> devcb_base &set_keyint_callback(Object &&cb)
-	{
-		return m_keyint_line.set_callback(std::forward<Object>(cb));
-	}
-
-	template <class Object> devcb_base &set_lineint_callback(Object &&cb)
-	{
-		return m_lineint_line.set_callback(std::forward<Object>(cb));
-	}
-
 	auto keyint_cb() { return m_keyint_line.bind(); }
 	auto lineint_cb() { return m_lineint_line.bind(); }
 

@@ -1662,9 +1662,9 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 
 	MCFG_K055555_ADD("k055555")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, m_k054338, 0, m_k055555);
+	m_k054338->set_screen(m_screen);
+	m_k054338->set_alpha_invert(1);
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
 	MCFG_K055673_CB(konamigx_state, type2_sprite_callback)

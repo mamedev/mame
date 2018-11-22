@@ -580,10 +580,10 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	MCFG_SCREEN_UPDATE_DRIVER(seicupbl_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	//MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	//MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, seicupbl_state, tilemap_enable_w))
-	//MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seicupbl_state, tile_scroll_w))
-	//MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seicupbl_state, tile_vreg_1a_w))
+	//seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	//crtc.layer_en_callback().set(FUNC(seicupbl_state::tilemap_enable_w));
+	//crtc.layer_scroll_callback().set(FUNC(seicupbl_state::tile_scroll_w));
+	//crtc.reg_1a_callback().set(FUNC(seicupbl_state::tile_vreg_1a_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seicupbl_csb)
 

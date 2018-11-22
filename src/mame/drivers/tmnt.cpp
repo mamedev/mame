@@ -1947,15 +1947,15 @@ MACHINE_CONFIG_START(tmnt_state::cuebrick)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,cuebrick)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, cuebrick_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::cuebrick_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(tmnt_state, mia_sprite_callback)
-	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
+	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1999,15 +1999,15 @@ MACHINE_CONFIG_START(tmnt_state::mia)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,mia)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, mia_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::mia_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(tmnt_state, mia_sprite_callback)
-	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
+	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2063,15 +2063,15 @@ MACHINE_CONFIG_START(tmnt_state::tmnt)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,tmnt)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(tmnt_state, tmnt_sprite_callback)
-	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(tmnt_state::tmnt_sprite_callback), this);
+	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2126,16 +2126,16 @@ MACHINE_CONFIG_START(tmnt_state::punkshot)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(tmnt_state, punkshot_sprite_callback)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(tmnt_state::punkshot_sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2179,16 +2179,15 @@ MACHINE_CONFIG_START(tmnt_state::lgtnfght)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
-	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2238,17 +2237,17 @@ MACHINE_CONFIG_START(tmnt_state::blswhstl)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state, blswhstl )
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, blswhstl_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::blswhstl_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
-	MCFG_K05324X_CB(tmnt_state, blswhstl_sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_sprite_callback(FUNC(tmnt_state::blswhstl_sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
-	MCFG_K054000_ADD("k054000")
+	K053251(config, m_k053251, 0);
+
+	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2314,20 +2313,19 @@ MACHINE_CONFIG_START(tmnt_state::glfgreat)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,glfgreat)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
-	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_WRAP(1)
 	MCFG_K053936_OFFSETS(85, 0)
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2383,19 +2381,18 @@ MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,prmrsocr)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
-	MCFG_K05324X_CB(tmnt_state, prmrsocr_sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_sprite_callback(FUNC(tmnt_state::prmrsocr_sprite_callback), this);
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_OFFSETS(85, 1)
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2451,16 +2448,15 @@ MACHINE_CONFIG_START(tmnt_state::tmnt2)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
-	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2509,16 +2505,15 @@ MACHINE_CONFIG_START(tmnt_state::ssriders)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
-	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2559,16 +2554,15 @@ MACHINE_CONFIG_START(tmnt_state::sunsetbl)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, ssbl_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::ssbl_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(0, 0)
-	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2609,18 +2603,18 @@ MACHINE_CONFIG_START(tmnt_state::thndrx2)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(tmnt_state, thndrx2_sprite_callback)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(tmnt_state::thndrx2_sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, m_k054000, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

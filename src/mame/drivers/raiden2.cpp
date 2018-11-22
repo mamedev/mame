@@ -1048,9 +1048,9 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
@@ -1111,9 +1111,9 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
