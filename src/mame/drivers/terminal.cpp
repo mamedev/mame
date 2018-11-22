@@ -87,10 +87,10 @@ ROM_END
 
 ROM_START( t3210 ) // order unknown // i8031, 8742 // 4+2k ram onboard; 24kb in battery-backed expansion // b&w
 	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "s22723_r121-c2-2.d11",     0x00000, 0x0800, CRC(f0eda00e) SHA1(6b0d9f5e9d99644c3be16cbf0c0d3b1ea05aabee) )
-	ROM_LOAD( "d8742_s22723_r118-c1.d16", 0x00800, 0x0800, CRC(f334a2a3) SHA1(c1cd4d775c2984252e6869a4c8f99d56646b89e9) )
-	ROM_LOAD( "s22723_r115-c1-6_ct.d6",   0x01000, 0x8000, CRC(d09fea94) SHA1(52168060093dfe964c0316d9ff335cd59da01d48) )
-	ROM_LOAD( "s22723_r115-c2-6_ct.d7",   0x09000, 0x8000, CRC(6e1eaacd) SHA1(cfda25dbbeddc7c75379c4b0dc97addb602d79ef) )
+	ROM_LOAD( "s22723_r115-c1-6_ct.d6",   0x00000, 0x8000, CRC(d09fea94) SHA1(52168060093dfe964c0316d9ff335cd59da01d48) )
+	ROM_LOAD( "s22723_r115-c2-6_ct.d7",   0x08000, 0x8000, CRC(6e1eaacd) SHA1(cfda25dbbeddc7c75379c4b0dc97addb602d79ef) )
+	ROM_LOAD( "s22723_r121-c2-2.d11",     0x10000, 0x0800, CRC(f0eda00e) SHA1(6b0d9f5e9d99644c3be16cbf0c0d3b1ea05aabee) )
+	ROM_LOAD( "d8742_s22723_r118-c1.d16", 0x10800, 0x0800, CRC(f334a2a3) SHA1(c1cd4d775c2984252e6869a4c8f99d56646b89e9) )
 	ROM_LOAD( "prom_s22723_r120-c1.bin",  0x11000, 0x0100, CRC(4460cd50) SHA1(fe36d758d64493cb5f8217fe51bbbe8203424fbe) )
 ROM_END
 
@@ -109,13 +109,6 @@ ROM_START( 7951om ) // TTL (no cpu) // 1k x 6bits display ram 64-characters uppe
 
 	ROM_REGION( 0x0800, "chargen", ROMREGION_INVERT )
 	ROM_LOAD( "7951om.bin",     0x0000, 0x0800, CRC(36fc61c6) SHA1(6b5e8701b185b32a1a2630ddfc5402345628ecba) )
-ROM_END
-
-
-ROM_START( ikt5a ) // order unknown // 80C51 (+xtal 15.000) // 8k ram // RGB external, uses XT keyboard
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "g26.bin",      0x0000, 0x2000, CRC(657668be) SHA1(212a9eb1fb9b9c16f3cc606c6befbd913ddfa395) )
-	ROM_LOAD( "ver_ih.bin",   0x2000, 0x4000, CRC(5a15b4e8) SHA1(cc0336892279b730f1596f31e129c5a898ecdc8f) )
 ROM_END
 
 
@@ -138,5 +131,4 @@ COMP( 1988, loewe715,  0,      0,      terminal, terminal, terminal_state, empty
 COMP( 1986, t3210,     0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Bitel T3210",            MACHINE_IS_SKELETON )
 COMP( 1986, feap90,    0,      0,      terminal, terminal, terminal_state, empty_init, "Siemens",            "Multitel Fe Ap 90-1.1",  MACHINE_IS_SKELETON )
 COMP( 1987, 7951om,    0,      0,      terminal, terminal, terminal_state, empty_init, "Mera-Elzab",         "7951om",                 MACHINE_IS_SKELETON )
-COMP( 1993, ikt5a,     0,      0,      terminal, terminal, terminal_state, empty_init, "Creator / Fura Elektronik", "IKT-5A",          MACHINE_IS_SKELETON )
 COMP( 1992, teleguide, 0,      0,      terminal, terminal, terminal_state, empty_init, "Loewe / Televerket", "Teleguide",              MACHINE_IS_SKELETON )

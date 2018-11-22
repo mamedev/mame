@@ -15560,6 +15560,9 @@ stellecu                        // (c) 1998
 farmer                          // TVG17 (c) 1985 Sun Electronics
 ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 
+@source:ikt5a.cpp
+ikt5a                           //
+
 @source:imds2.cpp
 imds2                           // Intellec MDS series-II
 
@@ -37123,7 +37126,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 7951om                          //
 alcat258                        //
 feap90                          //
-ikt5a                           //
 itt9216                         //
 loewe715                        //
 loewed                          //
