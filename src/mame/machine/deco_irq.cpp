@@ -122,7 +122,7 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 	}
 
 	// wait for next line
-	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1), visible.right() + 1);
+	m_scanline_timer->adjust(m_screen->time_until_pos(y + 1, visible.right() + 1));
 }
 
 
