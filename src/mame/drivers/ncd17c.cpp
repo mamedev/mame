@@ -187,6 +187,7 @@ void ncd_020_state::ncd_17c_map(address_map &map)
 	map(0x001c8000, 0x001c803f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
 	map(0x001d0000, 0x001d0003).w(FUNC(ncd_020_state::bt478_palette_w));
 	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::mcu_irq_w));
+	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
 	map(0x01000000, 0x02ffffff).ram();
 	map(0x03000000, 0x03ffffff).ram().share("mainram");
 }
