@@ -827,9 +827,10 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,satansat)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
 
@@ -873,9 +874,10 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,snk6502)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	// sound hardware
 	MCFG_DEVICE_ADD("snk6502", VANGUARD_SOUND, 0)

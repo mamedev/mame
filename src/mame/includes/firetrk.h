@@ -5,6 +5,10 @@
 Atari Fire Truck + Super Bug + Monte Carlo driver
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_FIRETRK_H
+#define MAME_INCLUDES_FIRETRK_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -60,7 +64,7 @@ public:
 		, m_bit_6(*this, "BIT_6")
 		, m_bit_7(*this, "BIT_7")
 		, m_dips(*this, {"DIP_0", "DIP_1"})
-		, m_steer(*this, {"STEER_1", "STEER_2"})
+		, m_steer(*this, "STEER_%u", 1U)
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -173,3 +177,5 @@ private:
 DISCRETE_SOUND_EXTERN( firetrk_discrete );
 DISCRETE_SOUND_EXTERN( superbug_discrete );
 DISCRETE_SOUND_EXTERN( montecar_discrete );
+
+#endif // MAME_INCLUDES_FIRETRK_H

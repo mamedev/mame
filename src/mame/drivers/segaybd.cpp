@@ -1336,13 +1336,12 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/8)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/8));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.43);
+	ymsnd.add_route(1, "rspeaker", 0.43);
 
 	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/8)
 	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)
@@ -2081,7 +2080,7 @@ ROM_START( pdrift )
 	ROM_RELOAD(                 0x160000, 0x20000 )
 
 	ROM_REGION( 0x100000, "user1", 0 )
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD( "epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD( "epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD( "epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )
@@ -2164,7 +2163,7 @@ ROM_START( pdrifta )
 	ROM_RELOAD(                 0x160000, 0x20000 )
 
 	ROM_REGION( 0x100000, "user1", 0 )
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD( "epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD( "epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD( "epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )
@@ -2173,7 +2172,7 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Power Drift (World)
-//  Earlier set based on eprom numbers & Sega Eprom/Mask Rom Locations sheet 421-7708
+//  Earlier set based on EPROM numbers & Sega EPROM/Mask ROM Locations sheet 421-7708
 //
 ROM_START( pdrifte )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
@@ -2248,7 +2247,7 @@ ROM_START( pdrifte )
 	ROM_RELOAD(                 0x160000, 0x20000 )
 
 	ROM_REGION( 0x100000, "user1", 0 )
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD( "epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD( "epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD( "epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )
@@ -2334,7 +2333,7 @@ ROM_START( pdriftj )
 	ROM_RELOAD(                 0x160000, 0x20000 )
 
 	ROM_REGION( 0x100000, "user1", 0 )
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD( "epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD( "epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD( "epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )
@@ -2345,7 +2344,7 @@ ROM_END
 //  Power Drift (Japan), Sega Y-board Link version
 //  Sega Game ID:  833-6697
 //
-//  This was just 6 loose program roms + 4 sprite roms + the link PCBs, other roms could be incorrect
+//  This was just 6 loose program ROMs + 4 sprite ROMs + the link PCBs, other ROMs could be incorrect
 //
 ROM_START(pdriftl)
 	ROM_REGION(0x080000, "maincpu", 0) // M
@@ -2419,7 +2418,7 @@ ROM_START(pdriftl)
 	ROM_RELOAD(               0x160000, 0x20000)
 
 	ROM_REGION(0x100000, "user1", 0)
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD("epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD("epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD("epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )

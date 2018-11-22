@@ -5,6 +5,10 @@
     Zaccaria Galaxia HW
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_GALAXIA_H
+#define MAME_INCLUDES_GALAXIA_H
+
+#pragma once
 
 #include "includes/cvs.h"
 
@@ -12,7 +16,8 @@ class galaxia_state : public cvs_state
 {
 public:
 	galaxia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cvs_state(mconfig, type, tag) { }
+		: cvs_state(mconfig, type, tag)
+	{ }
 
 	void astrowar(machine_config &config);
 	void galaxia(machine_config &config);
@@ -42,3 +47,5 @@ private:
 	void galaxia_io_map(address_map &map);
 	void galaxia_mem_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALAXIA_H

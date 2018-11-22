@@ -1050,8 +1050,8 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 	// decode_charram();
 
 	/* registers are normally 002a006f 01ef01c6
-			widescreen mode = 00230076 026501c6
-		only SFIII2 uses widescreen, I don't know exactly which register controls it */
+	        widescreen mode = 00230076 026501c6
+	    only SFIII2 uses widescreen, I don't know exactly which register controls it */
 	if (((m_fullscreenzoom[1] & 0xffff0000) >> 16) == 0x0265)
 	{
 		if (m_screenwidth != 496)
@@ -1154,7 +1154,7 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 					int tilemapnum = ((value3 & 0x00000030) >> 4);
 
 					/* Urgh, the startline / endline seem to be direct screen co-ordinates regardless of fullscreen zoom
-						which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
+					    which probably means the fullscreen zoom is applied when rendering everything, not aftewards */
 
 					if (bg_drawn[tilemapnum] == 0)
 					{
@@ -1288,10 +1288,10 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 }
 
 /*
-	SSRAM 0x0000 - 0x1fff tilemap layout bank 0
-	      0x2000 - 0x3fff tilemap layout bank 1
-		  0x4000 - 0x7fff rowscroll (banked?)
-		  0x8000 - 0xffff tile character definitions
+    SSRAM 0x0000 - 0x1fff tilemap layout bank 0
+          0x2000 - 0x3fff tilemap layout bank 1
+          0x4000 - 0x7fff rowscroll (banked?)
+          0x8000 - 0xffff tile character definitions
 
 */
 

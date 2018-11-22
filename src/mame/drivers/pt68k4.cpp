@@ -425,10 +425,11 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[0], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(m_floppy_connector[1], pt68k_floppies, "525dd", pt68k4_state::floppy_formats)
 
-	MCFG_DEVICE_ADD(ISABUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(M68K_TAG)
-	MCFG_ISA8_BUS_CUSTOM_SPACES()
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(*this, pt68k4_state, irq5_w))
+	ISA8(config, m_isa, 0);
+	m_isa->set_cputag(M68K_TAG);
+	m_isa->set_custom_spaces();
+	m_isa->irq5_callback().set(FUNC(pt68k4_state::irq5_w));
+
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, "cga", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
@@ -462,9 +463,10 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 
 	MCFG_DEVICE_ADD(TIMEKEEPER_TAG, M48T02, 0)
 
-	MCFG_DEVICE_ADD(ISABUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(M68K_TAG)
-	MCFG_ISA8_BUS_CUSTOM_SPACES()
+	ISA8(config, m_isa, 0);
+	m_isa->set_cputag(M68K_TAG);
+	m_isa->set_custom_spaces();
+
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, "fdc_at", false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, "cga", false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)

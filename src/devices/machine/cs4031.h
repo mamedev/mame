@@ -48,15 +48,6 @@ public:
 	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Obj> devcb_base &set_ior_callback(Obj &&ior) { return m_read_ior.set_callback(std::forward<Obj>(ior)); }
-	template <class Obj> devcb_base &set_iow_callback(Obj &&iow) { return m_write_iow.set_callback(std::forward<Obj>(iow)); }
-	template <class Obj> devcb_base &set_tc_callback(Obj &&tc) { return m_write_tc.set_callback(std::forward<Obj>(tc)); }
-	template <class Obj> devcb_base &set_hold_callback(Obj &&hold) { return m_write_hold.set_callback(std::forward<Obj>(hold)); }
-	template <class Obj> devcb_base &set_cpureset_callback(Obj &&cpureset) { return m_write_cpureset.set_callback(std::forward<Obj>(cpureset)); }
-	template <class Obj> devcb_base &set_nmi_callback(Obj &&nmi) { return m_write_nmi.set_callback(std::forward<Obj>(nmi)); }
-	template <class Obj> devcb_base &set_intr_callback(Obj &&intr) { return m_write_intr.set_callback(std::forward<Obj>(intr)); }
-	template <class Obj> devcb_base &set_a20m_callback(Obj &&a20m) { return m_write_a20m.set_callback(std::forward<Obj>(a20m)); }
-	template <class Obj> devcb_base &set_spkr_callback(Obj &&spkr) { return m_write_spkr.set_callback(std::forward<Obj>(spkr)); }
 	auto ior() { return m_read_ior.bind(); }
 	auto iow() { return m_write_iow.bind(); }
 	auto tc() { return m_write_tc.bind(); }

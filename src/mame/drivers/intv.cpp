@@ -489,10 +489,10 @@ MACHINE_CONFIG_START(intv_state::intv)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("iopt_right_ctrl", intv_control_port_device, ctrl_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8("iopt_left_ctrl",  intv_control_port_device, ctrl_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	AY8914(config, m_sound, XTAL(3'579'545)/2);
+	m_sound->port_a_read_callback().set("iopt_right_ctrl", FUNC(intv_control_port_device::ctrl_r));
+	m_sound->port_b_read_callback().set("iopt_left_ctrl", FUNC(intv_control_port_device::ctrl_r));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 0.33);
 
 	/* cartridge */
 	MCFG_INTV_CARTRIDGE_ADD("cartslot", intv_cart, nullptr)

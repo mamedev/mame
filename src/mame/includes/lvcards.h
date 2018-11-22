@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari, Curt Coder
+#ifndef MAME_INCLUDES_LVCARDS_H
+#define MAME_INCLUDES_LVCARDS_H
+
+#pragma once
 
 #include "emupal.h"
 
 class lvcards_state : public driver_device
 {
 public:
-	lvcards_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lvcards_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void lvpoker(machine_config &config);
 	void lvcards(machine_config &config);
@@ -42,3 +47,5 @@ private:
 	void lvpoker_map(address_map &map);
 	void ponttehk_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LVCARDS_H

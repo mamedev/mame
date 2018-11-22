@@ -444,9 +444,10 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 	MCFG_PALETTE_INIT_OWNER(supercrd_state, supercrd)
 	MCFG_VIDEO_START_OVERRIDE(supercrd_state, supercrd)
 
-//  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8)
-//  MCFG_MC6845_SHOW_BORDER_AREA(false)
-//  MCFG_MC6845_CHAR_WIDTH(4)
+//  mc6845_device &crtc(MC6845(config, "crtc",  MASTER_CLOCK/8));
+//  crtc.set_screen("screen");
+//  crtc.set_show_border_area(false);
+//  crtc.set_char_width(4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

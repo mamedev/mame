@@ -920,7 +920,8 @@ void z80dart_channel::control_write(uint8_t data)
 		LOG("Z80DART \"%s\" Channel %c : Request to Send %u\n", owner()->tag(), 'A' + m_index, (data & WR5_RTS) ? 1 : 0);
 		LOG("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", owner()->tag(), 'A' + m_index, (data & WR5_DTR) ? 1 : 0);
 
-		if (data != prev)
+		// don't update if parameters haven't changed; in fact, don't update at all since these ones are currently unused
+		if (0 && (data & WR5_TX_WORD_LENGTH_MASK) != (prev & WR5_TX_WORD_LENGTH_MASK))
 			update_serial();
 
 		if (data & WR5_RTS)
@@ -1271,7 +1272,7 @@ void z80dart_channel::update_serial()
 	{
 		set_tra_rate(m_txc / clocks);
 	}
-	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset
+	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset (FIXME: doing this without checking is stupid)
 }
 
 

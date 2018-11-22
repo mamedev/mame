@@ -261,8 +261,8 @@ void mc1000_state::mc1000_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x04, 0x04).rw(FUNC(mc1000_state::printer_r), FUNC(mc1000_state::printer_w));
 	map(0x05, 0x05).w("cent_data_out", FUNC(output_latch_device::bus_w));
-//  AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-//  AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
+//  map(0x10, 0x10).w(m_crtc, FUNC(mc6845_device::address_w));
+//  map(0x11, 0x11).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x12, 0x12).w(FUNC(mc1000_state::mc6845_ctrl_w));
 	map(0x20, 0x20).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0x40, 0x40).r(AY8910_TAG, FUNC(ay8910_device::data_r));
@@ -567,12 +567,12 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 3579545/2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(2.2), 0, 0)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mc1000_state, keydata_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mc1000_state, keylatch_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay8910(AY8910(config, AY8910_TAG, 3579545/2));
+	ay8910.set_flags(AY8910_SINGLE_OUTPUT);
+	ay8910.set_resistors_load(RES_K(2.2), 0, 0);
+	ay8910.port_b_read_callback().set(FUNC(mc1000_state::keydata_r));
+	ay8910.port_a_write_callback().set(FUNC(mc1000_state::keylatch_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_CASSETTE_ADD("cassette")

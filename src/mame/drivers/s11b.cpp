@@ -339,9 +339,9 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	SPEAKER(config, "bg").front_center();
-	MCFG_DEVICE_ADD("ym2151", YM2151, 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, s11b_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
+	YM2151(config, m_ym, 3580000);
+	m_ym->irq_handler().set(FUNC(s11b_state::ym2151_irq_w));
+	m_ym->add_route(ALL_OUTPUTS, "bg", 0.25);
 
 	MCFG_DEVICE_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
 

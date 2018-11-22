@@ -1,6 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau, Nicola Salmoria
+#ifndef MAME_INCLUDES_TECMO16_H
+#define MAME_INCLUDES_TECMO16_H
 
+#pragma once
+
+#include "video/bufsprite.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 #include "emupal.h"
@@ -9,8 +14,8 @@
 class tecmo16_state : public driver_device
 {
 public:
-	tecmo16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tecmo16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -44,7 +49,7 @@ private:
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_colorram2;
 	required_shared_ptr<uint16_t> m_charram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -52,6 +57,7 @@ private:
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tile_bitmap_bg;
 	bitmap_ind16 m_tile_bitmap_fg;
+	bitmap_ind16 m_tile_bitmap_tx;
 	int m_flipscreen;
 	int m_game_is_riot;
 	uint16_t m_scroll_x_w;
@@ -90,3 +96,5 @@ private:
 	void ginkun_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TECMO16_H

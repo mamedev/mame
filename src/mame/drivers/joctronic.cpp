@@ -366,13 +366,12 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 	SPEAKER(config, "mono").front_center();
 
 	// Datasheet suggests YM2203 as a possible replacement for this AY8910
-	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("r2r1", dac_8bit_r2r_device, data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("r2r2", dac_8bit_r2r_device, data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", XTAL(12'000'000)/8)); // 1.5 MHz
+	aysnd1.port_a_write_callback().set("r2r1", FUNC(dac_8bit_r2r_device::data_w));
+	aysnd1.port_b_write_callback().set("r2r2", FUNC(dac_8bit_r2r_device::data_w));
+	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("aysnd2", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "aysnd2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.40); // 1.5 MHz
 
 	MCFG_DEVICE_ADD("r2r1", DAC_8BIT_R2R, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -413,14 +412,14 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, joctronic_state, slalom03_oki_bank_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("adpcm_select", ls157_device, ba_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", XTAL(12'000'000)/8)); // 1.5 MHz
+	aysnd1.port_a_write_callback().set(FUNC(joctronic_state::slalom03_oki_bank_w));
+	aysnd1.port_b_write_callback().set(m_adpcm_select, FUNC(ls157_device::ba_w));
+	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("aysnd2", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("r2r", dac_8bit_r2r_device, data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", XTAL(12'000'000)/8)); // 1.5 MHz
+	aysnd2.port_a_write_callback().set("r2r", FUNC(dac_8bit_r2r_device::data_w));
+	aysnd2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	MCFG_DEVICE_ADD("r2r", DAC_8BIT_R2R, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

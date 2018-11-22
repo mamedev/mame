@@ -1102,7 +1102,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 	m_z80pio[0]->port_a_write(m_vint);
 }
 
-MACHINE_CONFIG_START(meritm_state::crt250)
+void meritm_state::crt250(machine_config &config)
+{
 	Z80(config, m_maincpu, SYSTEM_CLK/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::crt250_map);
 	m_maincpu->set_addrmap(AS_IO, &meritm_state::crt250_io_map);
@@ -1126,12 +1127,12 @@ MACHINE_CONFIG_START(meritm_state::crt250)
 	m_z80pio[1]->in_pb_callback().set_ioport("PIO1_PORTB");
 	m_z80pio[1]->out_pb_callback().set(FUNC(meritm_state::io_pio_port_b_w));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_start", meritm_state, vblank_start_tick, "screen", 259, 262)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_end", meritm_state, vblank_end_tick, "screen", 262, 262)
+	TIMER(config, "vblank_start", 0).configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
+	TIMER(config, "vblank_end", 0).configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DS1204_ADD(m_ds1204)
+	DS1204(config, m_ds1204);
 
 	V9938(config, m_v9938[0], SYSTEM_CLK);
 	m_v9938[0]->set_screen_ntsc("screen");
@@ -1147,11 +1148,11 @@ MACHINE_CONFIG_START(meritm_state::crt250)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8930, SYSTEM_CLK/12)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) /* Port A read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, meritm_state, ay8930_port_b_w))  /* Port B write */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ay8930_device &aysnd(AY8930(config, "aysnd", SYSTEM_CLK/12));
+	aysnd.port_a_read_callback().set_ioport("DSW");
+	aysnd.port_b_write_callback().set(FUNC(meritm_state::ay8930_port_b_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 MACHINE_CONFIG_START(meritm_state::crt250_questions)
 	crt250(config);

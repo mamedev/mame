@@ -1524,8 +1524,8 @@ void vgmplay_device::execute_run()
 				}
 				//else if ((offset & 0x7f) == 0x15 && m_nes_apu_channel_hack[index] == -2 && (m_file->read_byte(m_pc + 2) & 0x1f) != 0)
 				//{
-				//	osd_printf_error("bad rip false positive, late enabling nesapu.%d channels %x/%x\n", index, m_pc, m_io->read_dword(REG_SIZE));
-				//	m_nes_apu_channel_hack[index] = -1;
+				//  osd_printf_error("bad rip false positive, late enabling nesapu.%d channels %x/%x\n", index, m_pc, m_io->read_dword(REG_SIZE));
+				//  m_nes_apu_channel_hack[index] = -1;
 				//}
 
 				if (offset & 0x80)

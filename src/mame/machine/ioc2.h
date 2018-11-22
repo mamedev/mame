@@ -30,10 +30,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
 	DECLARE_INPUT_CHANGED_MEMBER( volume_up );
 
-	void lower_local0_irq(uint8_t source_mask);
-	void raise_local0_irq(uint8_t source_mask);
-	void lower_local1_irq(uint8_t source_mask);
-	void raise_local1_irq(uint8_t source_mask);
+	void raise_local_irq(int channel, uint8_t mask);
+	void lower_local_irq(int channel, uint8_t mask);
 
 	enum
 	{
@@ -59,6 +57,18 @@ public:
 		INT3_LOCAL1_RETRACE   = 0x80,
 	};
 
+	uint32_t get_local_int_status(int channel) const { return m_int3_local_status_reg[channel]; }
+	uint32_t get_local_int_mask(int channel) const { return m_int3_local_mask_reg[channel]; }
+	uint32_t get_map_int_status() const { return m_int3_map_status_reg; }
+	uint32_t get_map_int_mask(int channel) const { return m_int3_map_mask_reg[channel]; }
+
+	void set_local_int_mask(int channel, const uint32_t mask);
+	void set_map_int_mask(int channel, const uint32_t mask);
+	void set_timer_int_clear(const uint32_t data);
+
+	uint8_t get_pit_reg(uint32_t offset) { return m_pit->read(offset); }
+	void set_pit_reg(uint32_t offset, uint8_t data) { return m_pit->write(offset, data); }
+
 protected:
 	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -66,6 +76,13 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	DECLARE_WRITE_LINE_MEMBER(timer0_int);
+	DECLARE_WRITE_LINE_MEMBER(timer1_int);
+	DECLARE_WRITE_LINE_MEMBER(kbdc_int_w);
+	DECLARE_WRITE_LINE_MEMBER(duart_int_w);
+
+	void set_mappable_int(uint8_t mask, bool state);
 
 	enum
 	{
@@ -123,6 +140,10 @@ protected:
 		FRONT_PANEL_VOL_DOWN_HOLD    = 0x20,
 		FRONT_PANEL_VOL_UP_INT       = 0x40,
 		FRONT_PANEL_VOL_UP_HOLD      = 0x80,
+
+		FRONT_PANEL_INT_MASK         = FRONT_PANEL_POWER_BUTTON_INT |
+                                       FRONT_PANEL_VOL_DOWN_INT |
+                                       FRONT_PANEL_VOL_UP_INT
 	};
 
 	enum
@@ -152,15 +173,11 @@ protected:
 	uint8_t m_reset_reg;
 	uint8_t m_write_reg;
 
-	uint8_t m_int3_local0_status_reg;
-	uint8_t m_int3_local0_mask_reg;
-	uint8_t m_int3_local1_status_reg;
-	uint8_t m_int3_local1_mask_reg;
+	uint8_t m_int3_local_status_reg[2];
+	uint8_t m_int3_local_mask_reg[2];
 	uint8_t m_int3_map_status_reg;
-	uint8_t m_int3_map_mask0_reg;
-	uint8_t m_int3_map_mask1_reg;
+	uint8_t m_int3_map_mask_reg[2];
 	uint8_t m_int3_map_pol_reg;
-	uint8_t m_int3_timer_clear_reg;
 	uint8_t m_int3_err_status_reg;
 
 	uint32_t    m_par_read_cnt;

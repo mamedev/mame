@@ -631,8 +631,6 @@ private:
 	DECLARE_WRITE8_MEMBER( auxio_w );
 	DECLARE_READ32_MEMBER( dma_r );
 	DECLARE_WRITE32_MEMBER( dma_w );
-	DECLARE_READ32_MEMBER( lance_dma_r ); // TODO: Should be 16 bits
-	DECLARE_WRITE32_MEMBER( lance_dma_w );
 	DECLARE_WRITE32_MEMBER( buserr_w );
 
 	DECLARE_WRITE_LINE_MEMBER( scsi_irq );
@@ -1805,22 +1803,6 @@ WRITE_LINE_MEMBER( sun4_state::fdc_irq )
 	}
 }
 
-READ32_MEMBER( sun4_state::lance_dma_r )
-{
-	if (m_arch == ARCH_SUN4)
-		return sun4_insn_data_r<SUPER_DATA>(space, offset, mem_mask);
-	else
-		return m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>(offset, mem_mask);
-}
-
-WRITE32_MEMBER( sun4_state::lance_dma_w )
-{
-	if (m_arch == ARCH_SUN4)
-		sun4_insn_data_w(space, offset, data, mem_mask);
-	else
-		m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>(offset, data, mem_mask);
-}
-
 WRITE32_MEMBER( sun4_state::buserr_w )
 {
 	COMBINE_DATA(&m_buserr[offset]);
@@ -1897,9 +1879,20 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_s4_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
-	AM79C90(config, m_lance, 10'000'000); // clock is a guess
-	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
-	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
+	AM79C90(config, m_lance);
+	m_lance->dma_in().set([this](address_space &space, offs_t offset)
+	{
+		u32 const data = sun4_insn_data_r<SUPER_DATA>(space, (0xff000000U | offset) >> 2);
+
+		return (offset & 2) ? u16(data) : u16(data >> 16);
+	});
+	m_lance->dma_out().set([this](address_space &space, offs_t offset, u16 data, u16 mem_mask)
+	{
+		if (offset & 2)
+			sun4_insn_data_w(space, (0xff000000U | offset) >> 2, data, mem_mask);
+		else
+			sun4_insn_data_w(space, (0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
+	});
 
 	// Keyboard/mouse
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1916,16 +1909,15 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
-
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
@@ -1971,9 +1963,20 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_sbus_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// Ethernet
-	AM79C90(config, m_lance, 10'000'000); // clock is a guess
-	m_lance->dma_in().set(FUNC(sun4_state::lance_dma_r));
-	m_lance->dma_out().set(FUNC(sun4_state::lance_dma_w));
+	AM79C90(config, m_lance);
+	m_lance->dma_in().set([this](offs_t offset)
+	{
+		u32 const data = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, 0xffffffffU);
+
+		return (offset & 2) ? u16(data) : u16(data >> 16);
+	});
+	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask)
+	{
+		if (offset & 2)
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, data, mem_mask);
+		else
+			m_mmu->insn_data_w<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, u32(data) << 16, u32(mem_mask) << 16);
+	});
 
 	// Keyboard/mouse
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1990,15 +1993,15 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)

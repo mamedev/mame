@@ -23,9 +23,9 @@
 void advision_state::video_start()
 {
 	m_video_hpos = 0;
-	m_display.resize(8 * 8 * 256);
-	memset(&m_display[0], 0, 8*8*256);
-	save_item(NAME(m_display));
+	m_display = std::make_unique<uint8_t []>(8 * 8 * 256);
+	std::fill_n(m_display.get(), 8 * 8 * 256, 0);
+	save_pointer(NAME(m_display), 8 * 8 * 256);
 	save_item(NAME(m_video_hpos));
 }
 

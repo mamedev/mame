@@ -5,6 +5,10 @@
     Cross Pang
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CROSPANG_H
+#define MAME_INCLUDES_CROSPANG_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
@@ -72,3 +76,5 @@ public:
 	void crospang_sound_io_map(address_map &map);
 	void crospang_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CROSPANG_H

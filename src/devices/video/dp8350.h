@@ -66,15 +66,20 @@ public:
 	DECLARE_READ_LINE_MEMBER(vsync_r);
 	DECLARE_READ_LINE_MEMBER(vblank_r);
 
+	// address getters (TODO: accurate character-by-character emulation)
+	u16 top_of_page() const { return m_topr; }
+	u16 row_start() const { return m_row_start; }
+	u16 cursor_address() const { return m_cr; }
+
 protected:
 	// base type constructor
 	dp835x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
-                      int char_width, int char_height, int chars_per_row, int rows_per_frame,
-                      int vsync_delay_f1, int vsync_width_f1, int vblank_interval_f1,
-                      int vsync_delay_f0, int vsync_width_f0, int vblank_interval_f0,
-                      int chars_per_line, int hsync_delay, int hsync_width, int vblank_stop,
-                      bool cursor_on_all_lines, int lbc_0_width, int hsync_serration,
-                      bool hsync_active, bool vsync_active, bool vblank_active);
+					  int char_width, int char_height, int chars_per_row, int rows_per_frame,
+					  int vsync_delay_f1, int vsync_width_f1, int vblank_interval_f1,
+					  int vsync_delay_f0, int vsync_width_f0, int vblank_interval_f0,
+					  int chars_per_line, int hsync_delay, int hsync_width, int vblank_stop,
+					  bool cursor_on_all_lines, int lbc_0_width, int hsync_serration,
+					  bool hsync_active, bool vsync_active, bool vblank_active);
 
 	// device-specific overrides
 	virtual void device_config_complete() override;
@@ -165,8 +170,18 @@ public:
 	dp8367_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+// ======================> dp835x_a_device
+
+class dp835x_a_device : public dp835x_device
+{
+public:
+	// device constructor
+	dp835x_a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 // device type declarations
 DECLARE_DEVICE_TYPE(DP8350, dp8350_device)
 DECLARE_DEVICE_TYPE(DP8367, dp8367_device)
+DECLARE_DEVICE_TYPE(DP835X_A, dp835x_a_device)
 
 #endif // MAME_VIDEO_DP8350_H

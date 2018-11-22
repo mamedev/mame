@@ -7,7 +7,7 @@
 
  This is an ARM7 with Internal ROM. (Also used on later PGM games)
 
- In some cases the first part of the Internal ROM is excute only, and
+ In some cases the first part of the Internal ROM is execute only, and
  cannot be read out with a trojan.  It hasn't been confirmed if these
  games make use of that feature.
 

@@ -8,6 +8,8 @@
 #ifndef MAME_INCLUDES_SUBS_H
 #define MAME_INCLUDES_SUBS_H
 
+#pragma once
+
 #include "sound/discrete.h"
 #include "emupal.h"
 

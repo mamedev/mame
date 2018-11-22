@@ -353,10 +353,8 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay0", AY8910, 2500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	AY8910(config, "ay0", 2500000).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay1", 2500000).add_route(ALL_OUTPUTS, "mono", 0.15);
 MACHINE_CONFIG_END
 
 

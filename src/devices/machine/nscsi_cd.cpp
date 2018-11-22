@@ -3,13 +3,59 @@
 #include "emu.h"
 #include "machine/nscsi_cd.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
+DEFINE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device, "nrrd45", "RRD45 CD-ROM (New)")
+DEFINE_DEVICE_TYPE(NSCSI_XM3301, nscsi_toshiba_xm3301_device, "nxm3301", "XM-3301TA CD-ROM (New)")
+DEFINE_DEVICE_TYPE(NSCSI_XM5301SUN, nscsi_toshiba_xm5301_sun_device, "nxm5301sun", "XM-5301B Sun 4x CD-ROM (New)")
+DEFINE_DEVICE_TYPE(NSCSI_XM5401SUN, nscsi_toshiba_xm5401_sun_device, "nxm5401sun", "XM-5401B Sun 4x CD-ROM (New)")
+DEFINE_DEVICE_TYPE(NSCSI_XM5701, nscsi_toshiba_xm5701_device, "nxm5701", "XM-5701B 12x CD-ROM (New)")
+DEFINE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device, "nxm5701sun", "XM-5701B Sun 12x CD-ROM (New)")
 
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_full_device(mconfig, NSCSI_CDROM, tag, owner, clock), cdrom(nullptr), bytes_per_block(bytes_per_sector), lba(0), cur_sector(0), image(*this, "image")
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
+{
+}
+
+nscsi_dec_rrd45_device::nscsi_dec_rrd45_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_RRD45, tag, owner, "DEC     ", "RRD45   (C) DEC ", "0436", 0x98, 0x02)
+{
+}
+
+nscsi_toshiba_xm3301_device::nscsi_toshiba_xm3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_XM3301, tag, owner, "TOSHIBA ", "CD-ROM XM-3301TA", "0272", 0x88, 0x02)
+{
+}
+
+nscsi_toshiba_xm5301_sun_device::nscsi_toshiba_xm5301_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_XM5301SUN, tag, owner, "TOSHIBA ", "XM-5301TASUN4XCD", "2915", 0x98, 0x02)
+{
+}
+
+nscsi_toshiba_xm5401_sun_device::nscsi_toshiba_xm5401_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_XM5401SUN, tag, owner, "TOSHIBA ", "XM-5401TASUN4XCD", "1036", 0x98, 0x02)
+{
+}
+
+nscsi_toshiba_xm5701_device::nscsi_toshiba_xm5701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_XM5701, tag, owner, "TOSHIBA ", "CD-ROM XM-5701TA", "3136", 0x98, 0x02)
+{
+}
+
+nscsi_toshiba_xm5701_sun_device::nscsi_toshiba_xm5701_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_XM5701SUN, tag, owner, "TOSHIBA ", "XM5701TASUN12XCD", "0997", 0x98, 0x02)
+{
+}
+
+nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nscsi_full_device(mconfig, type, tag, owner, clock)
+	, cdrom(nullptr)
+	, bytes_per_block(bytes_per_sector)
+	, lba(0)
+	, cur_sector(0)
+	, image(*this, "image")
 {
 }
 
@@ -163,14 +209,13 @@ void nscsi_cdrom_device::scsi_command()
 
 			scsi_cmdbuf[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
 			scsi_cmdbuf[1] = 0x80; // media is removable
-			scsi_cmdbuf[2] = 0x05; // device complies with SPC-3 standard
+			scsi_cmdbuf[2] = compliance; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x02; // response data format = SPC-3 standard
-			scsi_cmdbuf[4] = 32; // additional length
-			// some Konami games freak out if this isn't "Sony", so we'll lie
-			// this is the actual drive on my Nagano '98 board
-			strncpy((char *)&scsi_cmdbuf[8], "Sony", 4);
-			strncpy((char *)&scsi_cmdbuf[16], "CDU-76S", 7);
-			strncpy((char *)&scsi_cmdbuf[32], "1.0", 3);
+			scsi_cmdbuf[4] = 0x20; // additional length
+			scsi_cmdbuf[7] = inquiry_data;
+			strncpy((char *)&scsi_cmdbuf[8], manufacturer, 8);
+			strncpy((char *)&scsi_cmdbuf[16], product, 16);
+			strncpy((char *)&scsi_cmdbuf[32], revision, 4);
 			if(size > 36)
 				size = 36;
 			scsi_data_in(SBUF_MAIN, size);

@@ -26,8 +26,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_acia6850(*this, "acia6850_%u", 0U),
-		m_upd7759(*this, "upd7759"),
 		m_vfd(*this, "vfd"),
+		m_upd7759(*this, "upd7759"),
 		m_direct_port(*this, "DIRECT"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U),
@@ -58,6 +58,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<acia6850_device, 3> m_acia6850;
+	optional_device<s16lf01_device> m_vfd;
 
 	void jpm_sys5_common_map(address_map &map);
 
@@ -76,7 +77,6 @@ private:
 	void m68000_awp_map_saa(address_map &map);
 
 	required_device<upd7759_device> m_upd7759;
-	optional_device<s16lf01_device> m_vfd;
 	required_ioport m_direct_port;
 	optional_device<meters_device> m_meters; //jpmsys5v doesn't use this
 	output_finder<16 * 16> m_lamps;

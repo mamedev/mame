@@ -925,8 +925,6 @@ MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 	int i;
 	k054539_device *k054539 = subdevice<k054539_device>("k054539");
 
-	k054539->init_flags(k054539_device::REVERSE_STEREO);
-
 	// boost voice(chip 0 channel 4-7)
 	for (i=4; i<=7; i++) k054539->set_gain(i, 1.4);
 }
@@ -987,8 +985,8 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -48, -24)
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0, "k055555")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, m_k054338, 0, m_k055555);
+	m_k054338->set_alpha_invert(1);
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 

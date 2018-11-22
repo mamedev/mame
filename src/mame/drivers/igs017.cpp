@@ -86,13 +86,13 @@ class igs_bitswap_device : public device_t
 public:
 	igs_bitswap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto in_pa_cb() { return m_in_pa_cb.bind(); }
-	auto in_pb_cb() { return m_in_pb_cb.bind(); }
-	auto in_pc_cb() { return m_in_pc_cb.bind(); }
+	auto in_pa_callback()  { return m_in_pa_cb.bind(); }
+	auto in_pb_callback()  { return m_in_pb_cb.bind(); }
+	auto in_pc_callback()  { return m_in_pc_cb.bind(); }
 
-	auto out_pa_cb() { return m_out_pa_cb.bind(); }
-	auto out_pb_cb() { return m_out_pb_cb.bind(); }
-	auto out_pc_cb() { return m_out_pc_cb.bind(); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto out_pc_callback() { return m_out_pc_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -3481,16 +3481,16 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 
 	// protection
 	IGS_BITSWAP(config, m_igs_bitswap, 0);
-	m_igs_bitswap->in_pa_cb().set_ioport("PLAYER1");
-	m_igs_bitswap->in_pb_cb().set_ioport("PLAYER2");
-	m_igs_bitswap->in_pc_cb().set_ioport("COINS");
-	m_igs_bitswap->out_pa_cb().set(FUNC(igs017_state::iqblocka_keyin_w));
+	m_igs_bitswap->in_pa_callback().set_ioport("PLAYER1");
+	m_igs_bitswap->in_pb_callback().set_ioport("PLAYER2");
+	m_igs_bitswap->in_pc_callback().set_ioport("COINS");
+	m_igs_bitswap->out_pa_callback().set(FUNC(igs017_state::iqblocka_keyin_w));
 	m_igs_bitswap->set_val_xor(0x15d6);
 	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
-	m_igs_bitswap->set_m3_bits(0, ~5, 8,  ~10, ~15);
+	m_igs_bitswap->set_m3_bits(0, ~5,  8, ~10, ~15);
 	m_igs_bitswap->set_m3_bits(1,  3, ~8, ~12, ~15);
 	m_igs_bitswap->set_m3_bits(2,  2, ~6, ~11, ~15);
-	m_igs_bitswap->set_m3_bits(3,  0, ~1,  ~3, ~15);
+	m_igs_bitswap->set_m3_bits(3,  0, ~1, ~3,  ~15);
 
 	IGS_INCDEC(config, m_igs_incdec, 0);
 
@@ -3515,14 +3515,16 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(igs017_state::iqblockf)
+void igs017_state::iqblockf(machine_config &config)
+{
 	iqblocka(config);
 	// tweaked protection bitswap
-	m_igs_bitswap->out_pb_cb().set(FUNC(igs017_state::iqblockf_keyout_w));
+	m_igs_bitswap->out_pb_callback().set(FUNC(igs017_state::iqblockf_keyout_w));
 	m_igs_bitswap->set_mf_bits(0, 5, 9, 13);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(igs017_state::genius6)
+void igs017_state::genius6(machine_config &config)
+{
 	iqblockf(config);
 	// tweaked protection bitswap
 	m_igs_bitswap->set_mf_bits(2, 7, 9, 13);
@@ -3530,7 +3532,7 @@ MACHINE_CONFIG_START(igs017_state::genius6)
 	m_igs_bitswap->set_m3_bits(1,  1, ~6,  ~9, ~15);
 	m_igs_bitswap->set_m3_bits(2,  4, ~8, ~12, ~15);
 	m_igs_bitswap->set_m3_bits(3,  3, ~5,  ~6, ~15);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(igs017_state::starzan)
 	iqblocka(config);
@@ -3584,7 +3586,7 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::mgcs_palette_bitswap), this));
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap), this);
 	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
@@ -3625,7 +3627,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::lhzb2a_palette_bitswap), this));
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
 	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
@@ -3651,7 +3653,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2a)
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,lhzb2a)
 
 	// i/o
-//  MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+//  I8255A(config, "ppi8255", 0);
 
 	// protection
 	IGS_BITSWAP(config, m_igs_bitswap, 0);
@@ -3674,7 +3676,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2a)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::lhzb2a_palette_bitswap), this));
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
 //	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
@@ -3715,7 +3717,7 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::slqz2_palette_bitswap), this));
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::slqz2_palette_bitswap), this);
 	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound
@@ -3827,7 +3829,7 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(igs017_igs031_palette_scramble_delegate(FUNC(igs017_state::tjsb_palette_bitswap), this));
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tjsb_palette_bitswap), this);
 	m_igs017_igs031->set_ppi("ppi8255");
 
 	// sound

@@ -1,42 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
-/*****************************************************************************
-
-    AMD Am79C90 CMOS Local Area Network Controller for Ethernet (C-LANCE)
-
-    TODO:
-        - Communication with the outside world
-        - Error handling
-        - Clocks
-
-******************************************************************************
-                            _____   _____
-                   Vss   1 |*    \_/     | 48  Vdd
-                  DAL7   2 |             | 47  DAL8
-                  DAL6   3 |             | 46  DAL9
-                  DAL5   4 |             | 45  DAL10
-                  DAL4   5 |             | 44  DAL11
-                  DAL3   6 |             | 43  DAL12
-                  DAL2   7 |             | 42  DAL13
-                  DAL1   8 |             | 41  DAL14
-                  DAL0   9 |             | 40  DAL15
-                  READ  10 |             | 39  A16
-                 /INTR  11 |             | 38  A17
-                 /DALI  12 |   Am79C90   | 37  A18
-                 /DALI  13 |             | 36  A19
-                  /DAS  14 |             | 35  A20
-             /BM0,BYTE  15 |             | 34  A21
-          /BM1,/BUSAKO  16 |             | 33  A22
-          /HOLD,/BUSRQ  17 |             | 32  A23
-               ALE,/AS  18 |             | 31  RX
-                 /HLDA  19 |             | 30  RENA
-                   /CS  20 |             | 29  TX
-                   ADR  21 |             | 28  CLSN
-                /READY  22 |             | 27  RCLK
-                /RESET  23 |             | 26  TENA
-                   Vss  24 |_____________| 25  TCLK
-
-**********************************************************************/
+// copyright-holders:Patrick Mackinlay
 
 #ifndef MAME_MACHINE_AM79C90_H
 #define MAME_MACHINE_AM79C90_H
@@ -45,158 +8,178 @@
 
 #include "hashing.h"
 
-class am79c90_device :  public device_t
+class am7990_device_base : public device_t, public device_network_interface
 {
 public:
-	am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	auto dma_out() { return m_dma_out_cb.bind(); }
+	auto intr_out() { return m_intr_out_cb.bind(); }
 	auto dma_in() { return m_dma_in_cb.bind(); }
-	auto irq_out() { return m_irq_out_cb.bind(); }
+	auto dma_out() { return m_dma_out_cb.bind(); }
 
 	DECLARE_READ16_MEMBER(regs_r);
 	DECLARE_WRITE16_MEMBER(regs_w);
 
-private:
+protected:
+	am7990_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+
+	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	static const device_timer_id TIMER_TRANSMIT_POLL = 0;
-	static const device_timer_id TIMER_TRANSMIT = 1;
-	//static const device_timer_id TIMER_RECEIVE_POLL = 2;
-	static const device_timer_id TIMER_RECEIVE = 3;
+	// device_network_interface overrides
+	virtual int recv_start_cb(u8 *buf, int length) override;
+	virtual void recv_complete_cb(int result) override;
+	virtual void send_complete_cb(int result) override;
 
-	enum
+	// device helpers
+	void initialize();
+	void update_interrupts();
+	int receive(u8 *buf, int length);
+	TIMER_CALLBACK_MEMBER(transmit_poll);
+	void transmit();
+	bool address_filter(u8 *buf);
+
+	void dma_in(u32 address, u8 *buf, int length);
+	void dma_out(u32 address, u8 *buf, int length);
+	void dump_bytes(u8 *buf, int length);
+
+	// constants and masks
+	static constexpr u32 FCS_RESIDUE = 0xdebb20e3;
+	static const u8 ETH_BROADCAST[];
+
+	static constexpr u32 INIT_ADDR_MASK = 0xfffffe;
+	static constexpr u32 RING_ADDR_MASK = 0xfffff8;
+	static constexpr auto TX_POLL_PERIOD = attotime::from_usec(1600);
+
+	enum csr0_mask : u16
 	{
-		CSR0_ERR      = 0x8000,
-		CSR0_BABL     = 0x4000,
-		CSR0_CERR     = 0x2000,
-		CSR0_MISS     = 0x1000,
-		CSR0_MERR     = 0x0800,
-		CSR0_RINT     = 0x0400,
-		CSR0_TINT     = 0x0200,
-		CSR0_IDON     = 0x0100,
-		CSR0_INTR     = 0x0080,
-		CSR0_INEA     = 0x0040,
-		CSR0_RXON     = 0x0020,
-		CSR0_TXON     = 0x0010,
-		CSR0_TDMD     = 0x0008,
-		CSR0_STOP     = 0x0004,
-		CSR0_STRT     = 0x0002,
-		CSR0_INIT     = 0x0001,
+		CSR0_INIT = 0x0001, // initialize
+		CSR0_STRT = 0x0002, // start
+		CSR0_STOP = 0x0004, // stop
+		CSR0_TDMD = 0x0008, // transmit demand
+		CSR0_TXON = 0x0010, // transmitter on
+		CSR0_RXON = 0x0020, // receiver on
+		CSR0_INEA = 0x0040, // interrupt enable
+		CSR0_INTR = 0x0080, // interrupt flag
+		CSR0_IDON = 0x0100, // initialization done
+		CSR0_TINT = 0x0200, // transmitter interrupt
+		CSR0_RINT = 0x0400, // receiver interrupt
+		CSR0_MERR = 0x0800, // memory error
+		CSR0_MISS = 0x1000, // missed packet
+		CSR0_CERR = 0x2000, // collision error
+		CSR0_BABL = 0x4000, // babble
+		CSR0_ERR  = 0x8000, // error
+
 		CSR0_ANY_INTR = CSR0_BABL | CSR0_MISS | CSR0_MERR | CSR0_RINT | CSR0_TINT | CSR0_IDON,
 		CSR0_ANY_ERR  = CSR0_BABL | CSR0_CERR | CSR0_MISS | CSR0_MERR,
-
-		CSR3_BSWP = 0x0004,
-		CSR3_ACON = 0x0002,
-		CSR3_BCON = 0x0001,
-
-		MODE_DRX  = 0x0001,
-		MODE_DTX  = 0x0002,
-		MODE_LOOP = 0x0004,
-		MODE_DTCR = 0x0008,
-		MODE_COLL = 0x0010,
-		MODE_DRTY = 0x0020,
-		MODE_INTL = 0x0040,
-		MODE_EMBA = 0x0080,
-		MODE_PROM = 0x8000,
-
-		TMD1_ENP     = 0x0100,
-		TMD1_STP     = 0x0200,
-		TMD1_DEF     = 0x0400,
-		TMD1_ONE     = 0x0800,
-		TMD1_MORE    = 0x1000,
-		TMD1_ADD_FCS = 0x2000,
-		TMD1_ERR     = 0x4000,
-		TMD1_OWN     = 0x8000,
-
-		TMD3_RTRY    = 0x0400,
-		TMD3_LCAR    = 0x0800,
-		TMD3_LCOL    = 0x1000,
-		TMD3_RES     = 0x2000,
-		TMD3_UFLO    = 0x4000,
-		TMD3_BUFF    = 0x8000,
-
-		RMD1_ENP     = 0x0100,
-		RMD1_STP     = 0x0200,
-		RMD1_BUFF    = 0x0400,
-		RMD1_CRC     = 0x0800,
-		RMD1_OFLO    = 0x1000,
-		RMD1_FRAM    = 0x2000,
-		RMD1_ERR     = 0x4000,
-		RMD1_OWN     = 0x8000
 	};
 
-	void prepare_transmit_buf();
-	void begin_receiving();
-	void recv_fifo_push(uint32_t value);
-	void fetch_receive_descriptor();
-	void fetch_transmit_descriptor();
-	void poll_transmit();
-	//void poll_receive(); TODO
-	void transmit();
-	void receive();
-	void update_interrupts();
-
-	struct ring_descriptor
+	enum csr3_mask : u16
 	{
-		union
-		{
-			uint32_t m_tmd23;
-			uint32_t m_rmd23;
-		};
-		union
-		{
-			uint32_t m_tmd01;
-			uint32_t m_rmd01;
-		};
-		uint16_t m_byte_count;
-		uint32_t m_buffer_addr;
+		CSR3_BCON = 0x0001, // byte control
+		CSR3_ACON = 0x0002, // ale control
+		CSR3_BSWP = 0x0004, // byte swap
+
+		CSR3_MASK = 0x0007
 	};
 
-	ring_descriptor m_curr_transmit_desc;
-	ring_descriptor m_next_transmit_desc;
-	ring_descriptor m_curr_recv_desc;
-	ring_descriptor m_next_recv_desc;
+	enum mode_mask : u16
+	{
+		MODE_DRX  = 0x0001, // disable the receiver
+		MODE_DTX  = 0x0002, // disable the transmitter
+		MODE_LOOP = 0x0004, // loopback
+		MODE_DTCR = 0x0008, // disable transmit crc
+		MODE_COLL = 0x0010, // force collision
+		MODE_DRTY = 0x0020, // disable retry
+		MODE_INTL = 0x0040, // internal loopback
+		MODE_EMBA = 0x0080, // enable modified back-off algorithm (C-LANCE only)
+		MODE_PROM = 0x8000, // promiscuous
+	};
 
-	uint16_t m_rap;
-	uint16_t m_csr[4];
-	uint16_t m_mode;
-	uint64_t m_logical_addr_filter;
-	uint64_t m_physical_addr;
-	uint32_t m_recv_message_count;
-	uint32_t m_recv_ring_addr;
-	uint32_t m_recv_buf_addr;
-	uint16_t m_recv_buf_count;
-	uint8_t m_recv_ring_length;
-	uint8_t m_recv_ring_pos;
-	uint32_t m_recv_fifo[16];
-	uint8_t m_recv_fifo_write;
-	uint8_t m_recv_fifo_read;
-	bool m_receiving;
-	emu_timer *m_receive_timer;
-	//emu_timer *m_receive_poll_timer;
+	enum tmd1_mask : u16
+	{
+		TMD1_HADR    = 0x00ff, // high order address
+		TMD1_ENP     = 0x0100, // end of packet
+		TMD1_STP     = 0x0200, // start of packet
+		TMD1_DEF     = 0x0400, // deferred
+		TMD1_ONE     = 0x0800, // one retry
+		TMD1_MORE    = 0x1000, // more than one retry
+		TMD1_ADD_FCS = 0x2000, // append fcs (C-LANCE only)
+		TMD1_ERR     = 0x4000, // error
+		TMD1_OWN     = 0x8000, // owned by lance
+	};
 
-	uint32_t m_transmit_ring_addr;
-	uint32_t m_transmit_buf_addr;
-	uint16_t m_transmit_buf_count;
-	uint8_t m_transmit_ring_length;
-	uint8_t m_transmit_ring_pos;
-	uint32_t m_transmit_fifo[12];
-	uint8_t m_transmit_fifo_write;
-	uint8_t m_transmit_fifo_read;
-	bool m_transmitting;
-	emu_timer *m_transmit_timer;
-	emu_timer *m_transmit_poll_timer;
+	enum tmd3_mask : u16
+	{
+		TMD3_TDR  = 0x03ff, // time domain reflectometry
+		TMD3_RTRY = 0x0400, // retry error
+		TMD3_LCAR = 0x0800, // loss of carrier
+		TMD3_LCOL = 0x1000, // late collision
+		TMD3_RES  = 0x2000,
+		TMD3_UFLO = 0x4000, // underflow error
+		TMD3_BUFF = 0x8000, // buffer error
+	};
 
-	devcb_write_line m_irq_out_cb;
-	devcb_write32 m_dma_out_cb; // TODO: Should be read/write16!
-	devcb_read32 m_dma_in_cb;
+	enum rmd1_mask : u16
+	{
+		RMD1_HADR = 0x00ff, // high order address
+		RMD1_ENP  = 0x0100, // end of packet
+		RMD1_STP  = 0x0200, // start of packet
+		RMD1_BUFF = 0x0400, // buffer error
+		RMD1_CRC  = 0x0800, // crc error
+		RMD1_OFLO = 0x1000, // overflow error
+		RMD1_FRAM = 0x2000, // framing error
+		RMD1_ERR  = 0x4000, // error
+		RMD1_OWN  = 0x8000, // owned by lance
+	};
 
-	util::crc32_creator m_crc32;
+	enum rmd3_mask : u16
+	{
+		RMD3_MCNT = 0x0fff, // message byte count
+	};
+
+private:
+	devcb_write_line m_intr_out_cb;
+	devcb_read16 m_dma_in_cb;
+	devcb_write16 m_dma_out_cb;
+
+	u16 m_rap;
+	u16 m_csr[4];
+
+	u16 m_mode;
+	u64 m_logical_addr_filter;
+	u8 m_physical_addr[6];
+
+	u32 m_rx_ring_base;
+	u8 m_rx_ring_mask;
+	u8 m_rx_ring_pos;
+	u16 m_rx_md[4];
+
+	u32 m_tx_ring_base;
+	u8 m_tx_ring_mask;
+	u8 m_tx_ring_pos;
+	u16 m_tx_md[4];
+
+	emu_timer *m_transmit_poll;
+	int m_intr_out_state;
+
+	// internal loopback buffer
+	u8 m_lb_buf[36];
+	int m_lb_length;
 };
 
+class am7990_device : public am7990_device_base
+{
+public:
+	am7990_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+class am79c90_device : public am7990_device_base
+{
+public:
+	am79c90_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+DECLARE_DEVICE_TYPE(AM7990, am7990_device)
 DECLARE_DEVICE_TYPE(AM79C90, am79c90_device)
 
 #endif // MAME_MACHINE_AM79C90_H

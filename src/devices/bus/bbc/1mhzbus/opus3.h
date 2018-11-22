@@ -29,9 +29,10 @@ public:
 	bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	bbc_opus3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -47,7 +48,6 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	required_memory_region m_dfs_rom;
 	required_device<ram_device> m_ramdisk;
 	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -59,8 +59,24 @@ private:
 };
 
 
+class bbc_opusa_device : public bbc_opus3_device
+{
+public:
+	// construction/destruction
+	bbc_opusa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_OPUS3, bbc_opus3_device)
+DECLARE_DEVICE_TYPE(BBC_OPUSA, bbc_opusa_device)
 
 
 #endif // MAME_BUS_BBC_1MHZBUS_OPUS3_H

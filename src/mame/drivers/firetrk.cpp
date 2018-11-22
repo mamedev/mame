@@ -37,7 +37,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::service_mode_switch_changed)
 
 INPUT_CHANGED_MEMBER(firetrk_state::firetrk_horn_changed)
 {
-	m_discrete->write(generic_space(), FIRETRUCK_HORN_EN, newval);
+	m_discrete->write(FIRETRUCK_HORN_EN, newval);
 }
 
 
@@ -81,7 +81,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 	m_leds[3] = BIT(~data, 3);
 
 	/* BIT4 => ATTRACT     */
-	m_discrete->write(space, FIRETRUCK_ATTRACT_EN, data & 0x10);
+	m_discrete->write(FIRETRUCK_ATTRACT_EN, data & 0x10);
 	machine().bookkeeping().coin_lockout_w(0, !(data & 0x10));
 	machine().bookkeeping().coin_lockout_w(1, !(data & 0x10));
 
@@ -91,7 +91,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 	/* BIT6 => UNUSED      */
 
 	/* BIT7 => BELL OUT    */
-	m_discrete->write(space, FIRETRUCK_BELL_EN, data & 0x80);
+	m_discrete->write(FIRETRUCK_BELL_EN, data & 0x80);
 }
 
 
@@ -101,7 +101,7 @@ WRITE8_MEMBER(firetrk_state::superbug_output_w)
 	m_leds[0] = BIT(offset, 0);
 
 	/* BIT1 => ATTRACT    */
-	m_discrete->write(space, SUPERBUG_ATTRACT_EN, offset & 0x02);
+	m_discrete->write(SUPERBUG_ATTRACT_EN, offset & 0x02);
 	machine().bookkeeping().coin_lockout_w(0, !(offset & 0x02));
 	machine().bookkeeping().coin_lockout_w(1, !(offset & 0x02));
 
@@ -122,7 +122,7 @@ WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 	m_leds[1] = BIT(~data, 1);
 
 	/* BIT2 => ATTRACT       */
-	m_discrete->write(space, MONTECAR_ATTRACT_INV, data & 0x04);
+	m_discrete->write(MONTECAR_ATTRACT_INV, data & 0x04);
 
 	/* BIT3 => UNUSED        */
 	/* BIT4 => UNUSED        */
@@ -142,8 +142,8 @@ WRITE8_MEMBER(firetrk_state::montecar_output_2_w)
 {
 	m_flash = data & 0x80;
 
-	m_discrete->write(space, MONTECAR_BEEPER_EN, data & 0x10);
-	m_discrete->write(space, MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
+	m_discrete->write(MONTECAR_BEEPER_EN, data & 0x10);
+	m_discrete->write(MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
 }
 
 

@@ -72,7 +72,7 @@ WRITE8_MEMBER( alesis_state::p3_w )
 
 WRITE8_MEMBER( alesis_state::sr16_lcd_w )
 {
-	m_lcdc->write(space, BIT(m_kb_matrix,7), data);
+	m_lcdc->write(BIT(m_kb_matrix,7), data);
 }
 
 WRITE8_MEMBER( alesis_state::mmt8_led_w )

@@ -77,6 +77,12 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual int get_mode() const override;
 
+	// routines for opcodes whose operation can vary between cpu models
+	// default implementations just log an error message
+	virtual void opcode_cpuid();
+	virtual uint64_t opcode_rdmsr(bool &valid_msr);
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr);
+
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
@@ -425,14 +431,6 @@ protected:
 	inline void WRITEPORT16(offs_t port, uint16_t value);
 	inline uint32_t READPORT32(offs_t port);
 	inline void WRITEPORT32(offs_t port, uint32_t value);
-	uint64_t pentium_msr_read(uint32_t offset,uint8_t *valid_msr);
-	void pentium_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr);
-	uint64_t p6_msr_read(uint32_t offset,uint8_t *valid_msr);
-	void p6_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr);
-	uint64_t piv_msr_read(uint32_t offset,uint8_t *valid_msr);
-	void piv_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr);
-	inline uint64_t MSR_READ(uint32_t offset,uint8_t *valid_msr);
-	inline void MSR_WRITE(uint32_t offset, uint64_t data, uint8_t *valid_msr);
 	uint32_t i386_load_protected_mode_segment(I386_SREG *seg, uint64_t *desc );
 	void i386_load_call_gate(I386_CALL_GATE *gate);
 	void i386_set_descriptor_accessed(uint16_t selector);
@@ -1542,6 +1540,20 @@ protected:
 
 	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+
+class pentium_mmx_device : public pentium_device
+{
+public:
+	// construction/destruction
+	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -1566,24 +1578,16 @@ public:
 	pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
 
 
-class pentium_mmx_device : public pentium_device
-{
-public:
-	// construction/destruction
-	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
-
-class pentium2_device : public pentium_device
+class pentium2_device : public pentium_pro_device
 {
 public:
 	// construction/destruction
@@ -1595,7 +1599,7 @@ protected:
 };
 
 
-class pentium3_device : public pentium_device
+class pentium3_device : public pentium_pro_device
 {
 public:
 	// construction/destruction
@@ -1626,6 +1630,8 @@ public:
 	pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -1636,9 +1642,9 @@ DECLARE_DEVICE_TYPE(I386SX,      i386sx_device)
 DECLARE_DEVICE_TYPE(I486,        i486_device)
 DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
 DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)
+DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(MEDIAGX,     mediagx_device)
 DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
-DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
 DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)
 DECLARE_DEVICE_TYPE(ATHLONXP,    athlonxp_device)

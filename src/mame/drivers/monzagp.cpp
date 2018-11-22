@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Stroffolino
+// copyright-holders:Tomasz Slanina
 /***************************************************************************
 
     Monza GP - Olympia
@@ -73,7 +73,7 @@ private:
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick_timer);
 	DECLARE_PALETTE_INIT(monzagp);
-	uint32_t screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<dp8350_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -168,7 +168,7 @@ void monzagp_state::machine_start()
 	m_digits.resolve();
 }
 
-uint32_t monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t monzagp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
     for(int i=0;i<8;i++)
@@ -510,19 +510,19 @@ MACHINE_CONFIG_START(monzagp_state::monzagp)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, monzagp_state, port2_w))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(monzagp_state, screen_update_monzagp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(10920000, 700, 0, 560, 312, 11, 240); // 11-line offset makes attract mode look symmetric
+	screen.set_screen_update(FUNC(monzagp_state::screen_update));
+	screen.set_palette(m_palette);
 
 	DP8350(config, m_crtc, 10920000); // pins 21/22 connected to XTAL, 3 to GND, 5 to +5
 	m_crtc->set_screen("screen");
 	m_crtc->refresh_control(0);
 	m_crtc->vsync_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ).invert(); // active low; no inverter should be needed
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(monzagp_state, monzagp)
+	PALETTE(config, m_palette, 0x200).set_init(FUNC(monzagp_state::palette_init_monzagp));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_monzagp)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_monzagp);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("time_tick_timer", monzagp_state, time_tick_timer, attotime::from_hz(4))
 
@@ -603,5 +603,5 @@ ROM_START( monzagpb )
 ROM_END
 
 
-GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, empty_init, ROT270, "Olympia", "Monza GP",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
-GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, monzagp_state, empty_init, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, empty_init, ROT270, "Olympia", "Monza GP",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, monzagp_state, empty_init, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND, layout_monzagp )

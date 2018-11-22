@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
-	MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
+	JRC6355E(config, m_rtc, XTAL(32'768));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

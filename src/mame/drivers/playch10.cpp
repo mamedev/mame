@@ -695,7 +695,7 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_RP5H01_ADD("rp5h01")
+	RP5H01(config, m_rp5h01, 0);
 MACHINE_CONFIG_END
 
 void playch10_state::playchnv(machine_config &config)

@@ -10,6 +10,7 @@
 
 typedef device_delegate<uint16_t const (uint16_t)> igs017_igs031_palette_scramble_delegate;
 
+
 class igs017_igs031_device : public device_t,
 							public device_gfx_interface,
 							public device_video_interface,
@@ -18,7 +19,7 @@ class igs017_igs031_device : public device_t,
 public:
 	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename Object> void set_palette_scramble_cb(Object &&cb) { m_palette_scramble_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_palette_scramble_cb(T &&... args) { m_palette_scramble_cb = igs017_igs031_palette_scramble_delegate(std::forward<T>(args)...); }
 	template<typename T> void set_ppi(T &&tag) { m_i8255.set_tag(std::forward<T>(tag)); }
 	void set_text_reverse_bits()
 	{

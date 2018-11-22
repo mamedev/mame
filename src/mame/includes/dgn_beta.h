@@ -9,6 +9,8 @@
 #ifndef MAME_INCLUDES_DGN_BETA_H
 #define MAME_INCLUDES_DGN_BETA_H
 
+#pragma once
+
 #include "video/mc6845.h"
 #include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
@@ -82,8 +84,8 @@ struct PageReg
 class dgn_beta_state : public driver_device
 {
 public:
-	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mc6845(*this, "crtc"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -97,7 +99,8 @@ public:
 		m_floppy1(*this, FDC_TAG ":1"),
 		m_floppy2(*this, FDC_TAG ":2"),
 		m_floppy3(*this, FDC_TAG ":3"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void dgnbeta(machine_config &config);
 

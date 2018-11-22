@@ -19,7 +19,6 @@
 #include "bus/einstein/userport/userport.h"
 #include "bus/rs232/rs232.h"
 #include "machine/adc0844.h"
-#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
@@ -597,14 +596,12 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	z80ctc_device& ctc(Z80CTC(config, IC_I058, XTAL_X002 / 2));
 	ctc.intr_callback().set(FUNC(einstein_state::int_w<1>));
+	ctc.set_clk<0>(XTAL_X002 / 4);
+	ctc.set_clk<1>(XTAL_X002 / 4);
+	ctc.set_clk<2>(XTAL_X002 / 4);
 	ctc.zc_callback<0>().set(IC_I060, FUNC(i8251_device::write_txc));
 	ctc.zc_callback<1>().set(IC_I060, FUNC(i8251_device::write_rxc));
 	ctc.zc_callback<2>().set(IC_I058, FUNC(z80ctc_device::trg3));
-
-	clock_device &ctc_trigger(CLOCK(config, "ctc_trigger", XTAL_X002 / 4));
-	ctc_trigger.signal_handler().set(IC_I058, FUNC(z80ctc_device::trg0));
-	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg1));
-	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg2));
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	Z80DAISY_GENERIC(config, m_keyboard_daisy, 0xf7);
@@ -622,10 +619,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(IC_I030, AY8910, XTAL_X002 / 4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, einstein_state, keyboard_data_read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	AY8910(config, m_psg, XTAL_X002 / 4);
+	m_psg->port_b_read_callback().set(FUNC(einstein_state::keyboard_data_read));
+	m_psg->port_a_write_callback().set(FUNC(einstein_state::keyboard_line_write));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.20);
 
 	adc0844_device &adc(ADC0844(config, "adc", 0));
 	adc.intr_callback().set(m_adc_daisy, FUNC(z80daisy_generic_device::int_w));
@@ -652,10 +649,10 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	ic_i060.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	// rs232 port
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IC_I060, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(IC_I060, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(IC_I060, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(IC_I060, FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set(IC_I060, FUNC(i8251_device::write_cts));
 
 	// floppy
 	WD1770(config, m_fdc, XTAL_X002);

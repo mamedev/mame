@@ -131,17 +131,17 @@ MACHINE_CONFIG_START(fruitpc_state::fruitpc)
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(fruitpc_state::dma8237_1_dack_w));
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_2", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_1", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_1", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_1", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_cputag("maincpu");
+	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set("pic8259_1", FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set("pic8259_1", FUNC(pic8259_device::ir5_w));
+	m_isabus->irq6_callback().set("pic8259_1", FUNC(pic8259_device::ir6_w));
+	m_isabus->irq7_callback().set("pic8259_1", FUNC(pic8259_device::ir7_w));
+	m_isabus->drq1_callback().set("dma8237_1", FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set("dma8237_1", FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", fruitpc_isa8_cards, "sb15", true)

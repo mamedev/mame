@@ -527,21 +527,21 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	m_acia4->txd_handler().set("serial4", FUNC(rs232_port_device::write_txd));
 	m_acia4->rts_handler().set("serial4", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("serial1",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1",acia6850_device,write_cts))
+	rs232_port_device &serial1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
+	serial1.rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	serial1.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("serial2",RS232_PORT, default_rs232_devices,"terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2",acia6850_device,write_cts))
+	rs232_port_device &serial2(RS232_PORT(config, "serial2", default_rs232_devices, "terminal"));
+	serial2.rxd_handler().set(m_acia2, FUNC(acia6850_device::write_rxd));
+	serial2.cts_handler().set(m_acia2, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("serial3",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia3",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia3",acia6850_device,write_cts))
+	rs232_port_device &serial3(RS232_PORT(config, "serial3", default_rs232_devices, nullptr));
+	serial3.rxd_handler().set(m_acia3, FUNC(acia6850_device::write_rxd));
+	serial3.cts_handler().set(m_acia3, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("serial4",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia4",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia4",acia6850_device,write_cts))
+	rs232_port_device &serial4(RS232_PORT(config, "serial4", default_rs232_devices, nullptr));
+	serial4.rxd_handler().set(m_acia4, FUNC(acia6850_device::write_rxd));
+	serial4.cts_handler().set(m_acia4, FUNC(acia6850_device::write_cts));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
 	acia_clock.signal_handler().set(m_acia1, FUNC(acia6850_device::write_txc));

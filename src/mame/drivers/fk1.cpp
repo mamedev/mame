@@ -430,13 +430,13 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(50)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out0))
-	MCFG_PIT8253_CLK1(1000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out1))
-	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out2))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(50);
+	pit8253.out_handler<0>().set(FUNC(fk1_state::fk1_pit_out0));
+	pit8253.set_clk<1>(1000000);
+	pit8253.out_handler<1>().set(FUNC(fk1_state::fk1_pit_out1));
+	pit8253.set_clk<2>(0);
+	pit8253.out_handler<2>().set(FUNC(fk1_state::fk1_pit_out2));
 
 	i8255_device &ppi1(I8255(config, "ppi8255_1"));
 	ppi1.in_pa_callback().set(FUNC(fk1_state::fk1_ppi_1_a_r));
@@ -461,7 +461,7 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	ppi3.out_pc_callback().set(FUNC(fk1_state::fk1_ppi_3_c_w));
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("80K"); // 64 + 16

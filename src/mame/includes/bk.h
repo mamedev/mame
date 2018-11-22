@@ -5,20 +5,22 @@
  * includes/bk.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_BK_H
 #define MAME_INCLUDES_BK_H
+
+#pragma once
 
 #include "imagedev/cassette.h"
 
 class bk_state : public driver_device
 {
 public:
-	bk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bk0010_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette")
+	{ }
 
 	uint16_t m_scrool;
 	required_shared_ptr<uint16_t> m_bk0010_video_ram;

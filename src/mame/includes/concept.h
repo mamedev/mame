@@ -24,22 +24,22 @@
 #define ACIA_1_TAG   "acia1"
 #define VIA_0_TAG    "via6522_0"
 #define KBD_ACIA_TAG "kbacia"
-#define SPEAKER_TAG  "spkr"
 
 class concept_state : public driver_device
 {
 public:
-	concept_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	concept_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_acia0(*this, ACIA_0_TAG),
 		m_acia1(*this, ACIA_1_TAG),
 		m_via0(*this, VIA_0_TAG),
 		m_kbdacia(*this, KBD_ACIA_TAG),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "spkr"),
 		m_mm58274(*this,"mm58274c"),
 		m_a2bus(*this, "a2bus"),
-		m_videoram(*this,"videoram") { }
+		m_videoram(*this,"videoram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6551_device> m_acia0;

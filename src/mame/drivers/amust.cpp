@@ -454,12 +454,13 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(amust_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amust_state, hsync_w))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amust_state, vsync_w))
+	h46505_device &crtc(H46505(config, "crtc", XTAL(14'318'181) / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(amust_state::crtc_update_row), this);
+	crtc.out_hsync_callback().set(FUNC(amust_state::hsync_w));
+	crtc.out_vsync_callback().set(FUNC(amust_state::vsync_w));
 
 	UPD765A(config, m_fdc, true, true);
 	m_fdc->drq_wr_callback().set(FUNC(amust_state::drq_w));
@@ -478,17 +479,17 @@ MACHINE_CONFIG_START(amust_state::amust)
 	uart1.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("uart1", FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 
 	I8251(config, "uart2", 0);
 	//uart2.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//uart2.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	//uart2.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	PIT8253(config, "pit", 0);
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set(FUNC(amust_state::port04_r));

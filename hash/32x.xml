@@ -1127,6 +1127,19 @@
 		</part>
 	</software>
 
+	<software name="cf2">
+		<description>Clay Fighter 2 (Jpn, USA, Euro Prototype)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
+		<part name="cart" interface="_32x_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="clay_fighter_2_32x_odd_4_28_95.u1"  size="524288" crc="55cd507f" sha1="82a620ad9d8de5cdda5504401625dc44011c4444" offset="0x000001" loadflag="load16_byte"/>
+				<rom name="clay_fighter_2_32x_even_4_29_95.u2" size="524288" crc="5cc3c228" sha1="7ebad951b63619c65b848018a774082364d57964" offset="0x000000" loadflag="load16_byte"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kolibri">
 		<description>Kolibri (Euro, USA)</description>
 		<year>1995</year>

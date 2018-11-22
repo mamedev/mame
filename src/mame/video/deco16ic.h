@@ -33,7 +33,7 @@ public:
 	~deco16ic_device() {}
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 //  void set_palette_tag(const char *tag);
 	template <typename... T> void set_bank1_callback(T &&... args) { m_bank1_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }
 	template <typename... T> void set_bank2_callback(T &&... args) { m_bank2_cb = deco16_bank_cb_delegate(std::forward<T>(args)...); }

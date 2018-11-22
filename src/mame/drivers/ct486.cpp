@@ -144,27 +144,27 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_kbc_device_base, kbd_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_DEVICE_ADD("isabus", ISA16, 0)
-	MCFG_ISA16_CPU("maincpu")
-	MCFG_ISA_BUS_IOCHCK(WRITELINE("cs4031", cs4031_device, iochck_w))
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("cs4031", cs4031_device, irq09_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("cs4031", cs4031_device, irq03_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("cs4031", cs4031_device, irq04_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("cs4031", cs4031_device, irq05_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("cs4031", cs4031_device, irq06_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("cs4031", cs4031_device, irq07_w))
-	MCFG_ISA_OUT_IRQ10_CB(WRITELINE("cs4031", cs4031_device, irq10_w))
-	MCFG_ISA_OUT_IRQ11_CB(WRITELINE("cs4031", cs4031_device, irq11_w))
-	MCFG_ISA_OUT_IRQ12_CB(WRITELINE("cs4031", cs4031_device, irq12_w))
-	MCFG_ISA_OUT_IRQ14_CB(WRITELINE("cs4031", cs4031_device, irq14_w))
-	MCFG_ISA_OUT_IRQ15_CB(WRITELINE("cs4031", cs4031_device, irq15_w))
-	MCFG_ISA_OUT_DRQ0_CB(WRITELINE("cs4031", cs4031_device, dreq0_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("cs4031", cs4031_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("cs4031", cs4031_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("cs4031", cs4031_device, dreq3_w))
-	MCFG_ISA_OUT_DRQ5_CB(WRITELINE("cs4031", cs4031_device, dreq5_w))
-	MCFG_ISA_OUT_DRQ6_CB(WRITELINE("cs4031", cs4031_device, dreq6_w))
-	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("cs4031", cs4031_device, dreq7_w))
+	ISA16(config, m_isabus, 0);
+	m_isabus->set_cputag("maincpu");
+	m_isabus->iochck_callback().set(m_cs4031, FUNC(cs4031_device::iochck_w));
+	m_isabus->irq2_callback().set(m_cs4031, FUNC(cs4031_device::irq09_w));
+	m_isabus->irq3_callback().set(m_cs4031, FUNC(cs4031_device::irq03_w));
+	m_isabus->irq4_callback().set(m_cs4031, FUNC(cs4031_device::irq04_w));
+	m_isabus->irq5_callback().set(m_cs4031, FUNC(cs4031_device::irq05_w));
+	m_isabus->irq6_callback().set(m_cs4031, FUNC(cs4031_device::irq06_w));
+	m_isabus->irq7_callback().set(m_cs4031, FUNC(cs4031_device::irq07_w));
+	m_isabus->irq10_callback().set(m_cs4031, FUNC(cs4031_device::irq10_w));
+	m_isabus->irq11_callback().set(m_cs4031, FUNC(cs4031_device::irq11_w));
+	m_isabus->irq12_callback().set(m_cs4031, FUNC(cs4031_device::irq12_w));
+	m_isabus->irq14_callback().set(m_cs4031, FUNC(cs4031_device::irq14_w));
+	m_isabus->irq15_callback().set(m_cs4031, FUNC(cs4031_device::irq15_w));
+	m_isabus->drq0_callback().set(m_cs4031, FUNC(cs4031_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_cs4031, FUNC(cs4031_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_cs4031, FUNC(cs4031_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_cs4031, FUNC(cs4031_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_cs4031, FUNC(cs4031_device::dreq5_w));
+	m_isabus->drq6_callback().set(m_cs4031, FUNC(cs4031_device::dreq6_w));
+	m_isabus->drq7_callback().set(m_cs4031, FUNC(cs4031_device::dreq7_w));
 	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "fdcsmc", true)
 	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "comat", true)
 	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "ide", true)

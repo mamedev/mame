@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
 #include "machine/i8243.h"
@@ -29,6 +29,7 @@ public:
 		, m_mainint(*this, "mainint")
 		, m_crtc(*this, "crtc")
 		, m_beeper(*this, "beep")
+		, m_videoram(*this, "videoram")
 		, m_keys(*this, "KEY%u", 0U)
 	{
 	}
@@ -42,6 +43,7 @@ private:
 	void p1_w(u8 data);
 	u8 p2_r();
 	void p2_w(u8 data);
+	void videoram_w(offs_t offset, u8 data);
 	void crtc_w(offs_t offset, u8 data);
 	void p6_w(u8 data);
 	void p7_w(u8 data);
@@ -63,6 +65,7 @@ private:
 	required_device<input_merger_device> m_mainint;
 	required_device<dp8350_device> m_crtc;
 	required_device<beep_device> m_beeper;
+	required_shared_ptr<u8> m_videoram;
 	required_ioport_array<10> m_keys;
 };
 
@@ -86,6 +89,13 @@ u8 hazl1420_state::p2_r()
 void hazl1420_state::p2_w(u8 data)
 {
 	m_bankdev->set_bank((data & 0xe0) >> 1 | (data & 0x0f));
+}
+
+void hazl1420_state::videoram_w(offs_t offset, u8 data)
+{
+	m_videoram[offset] = data;
+	if (BIT(m_maincpu->p1_r(), 5))
+		m_videoram[offset ^ 1] = data;
 }
 
 void hazl1420_state::crtc_w(offs_t offset, u8 data)
@@ -121,7 +131,7 @@ void hazl1420_state::io_map(address_map &map)
 
 void hazl1420_state::bank_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("videoram");
+	map(0x0000, 0x07ff).ram().share("videoram").w(FUNC(hazl1420_state::videoram_w));
 	map(0x0800, 0x0807).mirror(0x10).rw("ace", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x0c00, 0x0cff).ram(); // optional input buffer?
 	map(0x4000, 0x7fff).w(FUNC(hazl1420_state::crtc_w));
@@ -352,6 +362,10 @@ void hazl1420_state::hazl1420(machine_config &config)
 
 	ins8250_device &ace(INS8250(config, "ace", 2'764'800));
 	ace.out_int_callback().set(m_mainint, FUNC(input_merger_device::in_w<1>));
+	ace.out_tx_callback().set("eia", FUNC(rs232_port_device::write_txd));
+	ace.out_rts_callback().set("eia", FUNC(rs232_port_device::write_rts));
+	ace.out_dtr_callback().set("eia", FUNC(rs232_port_device::write_dtr));
+	//ace.baudout_callback().set("eia", FUNC(rs232_port_device::write_etc)); // 16x rate output (unemulated)
 
 	DP8350(config, m_crtc, 10.92_MHz_XTAL).set_screen("screen");
 	m_crtc->lbre_callback().set(FUNC(hazl1420_state::crtc_lbre_w));
@@ -362,6 +376,12 @@ void hazl1420_state::hazl1420(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	rs232_port_device &eia(RS232_PORT(config, "eia", default_rs232_devices, nullptr));
+	eia.rxd_handler().set("ace", FUNC(ins8250_device::rx_w));
+	eia.cts_handler().set("ace", FUNC(ins8250_device::cts_w));
+	eia.dsr_handler().set("ace", FUNC(ins8250_device::dsr_w));
+	eia.dcd_handler().set("ace", FUNC(ins8250_device::dcd_w));
 }
 
 ROM_START(hazl1420)

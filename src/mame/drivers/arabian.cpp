@@ -394,10 +394,10 @@ MACHINE_CONFIG_START(arabian_state::arabian)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_OSC/4/2)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, arabian_state, ay8910_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, arabian_state, ay8910_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MAIN_OSC/4/2));
+	aysnd.port_a_write_callback().set(FUNC(arabian_state::ay8910_porta_w));
+	aysnd.port_b_write_callback().set(FUNC(arabian_state::ay8910_portb_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

@@ -69,7 +69,6 @@ class cit101_state : public driver_device
 public:
 	cit101_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_nvr(*this, "nvr")
 		, m_comuart(*this, "comuart")
@@ -108,7 +107,6 @@ private:
 	bool m_blink;
 	u8 m_brightness;
 
-	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<er2055_device> m_nvr;
 	required_device<i8251_device> m_comuart;
@@ -329,18 +327,19 @@ static INPUT_PORTS_START( cit101 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(cit101_state::cit101)
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_I8085A_SID(CONSTANT(0)) // used to time NVR reads
-	MCFG_I8085A_SOD(WRITELINE(*this, cit101_state, blink_w))
+void cit101_state::cit101(machine_config &config)
+{
+	i8085a_cpu_device &maincpu(I8085A(config, "maincpu", 6.144_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &cit101_state::mem_map);
+	maincpu.set_addrmap(AS_IO, &cit101_state::io_map);
+	maincpu.in_sid_func().set_constant(0); // used to time NVR reads
+	maincpu.out_sod_func().set(FUNC(cit101_state::blink_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_RAW_PARAMS(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240)
-	MCFG_SCREEN_RAW_PARAMS(22.464_MHz_XTAL, 1440, 0, 1188, 260, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(cit101_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//m_screen->set_raw(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240);
+	m_screen->set_raw(22.464_MHz_XTAL, 1440, 0, 1188, 260, 0, 240);
+	m_screen->set_screen_update(FUNC(cit101_state::screen_update));
+	m_screen->screen_vblank().set_inputline("maincpu", I8085_RST75_LINE);
 
 	I8251(config, m_comuart, 6.144_MHz_XTAL / 2);
 	m_comuart->txd_handler().set("comm", FUNC(rs232_port_device::write_txd));
@@ -349,9 +348,9 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	m_comuart->rxrdy_handler().set("uartint", FUNC(input_merger_device::in_w<0>));
 	m_comuart->txrdy_handler().set("uartint", FUNC(input_merger_device::in_w<2>));
 
-	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("comuart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("comuart", i8251_device, write_dsr))
+	rs232_port_device &comm(RS232_PORT(config, "comm", default_rs232_devices, nullptr));
+	comm.rxd_handler().set("comuart", FUNC(i8251_device::write_rxd));
+	comm.dsr_handler().set("comuart", FUNC(i8251_device::write_dsr));
 	// CTS can be disabled in SET-UP Mode C
 	// DSR, CD, SI, RI are examined only during the modem test, not "always ignored" as the User's Manual claims
 
@@ -360,26 +359,24 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	auxuart.rxrdy_handler().set("uartint", FUNC(input_merger_device::in_w<1>));
 	auxuart.txrdy_handler().set("uartint", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("auxuart", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("auxuart", i8251_device, write_cts))
+	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	printer.rxd_handler().set("auxuart", FUNC(i8251_device::write_rxd));
+	printer.cts_handler().set("auxuart", FUNC(i8251_device::write_cts));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("uartint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "uartint").output_handler().set_inputline("maincpu", I8085_RST55_LINE);
 
 	I8251(config, m_kbduart, 6.144_MHz_XTAL / 2);
 	m_kbduart->txd_handler().set("keyboard", FUNC(cit101_hle_keyboard_device::write_rxd));
 	m_kbduart->rxrdy_handler().set_inputline("maincpu", I8085_RST65_LINE);
 
-	MCFG_DEVICE_ADD("keyboard", CIT101_HLE_KEYBOARD, 0)
-	MCFG_CIT101_HLE_KEYBOARD_TXD_CALLBACK(WRITELINE("kbduart", i8251_device, write_rxd))
+	CIT101_HLE_KEYBOARD(config, "keyboard").txd_callback().set("kbduart", FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
-	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
-	//MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("auxuart", i8251_device, write_txc))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("auxuart", i8251_device, write_rxc))
+	pit8253_device &pit0(PIT8253(config, "pit0", 0));
+	pit0.set_clk<0>(6.144_MHz_XTAL / 4);
+	pit0.set_clk<1>(6.144_MHz_XTAL / 4);
+	//pit0.set_clk<2>(6.144_MHz_XTAL / 4);
+	pit0.out_handler<0>().set("auxuart", FUNC(i8251_device::write_txc));
+	pit0.out_handler<1>().set("auxuart", FUNC(i8251_device::write_rxc));
 	// OUT2 might be used for an internal expansion similar to the VT100 STP.
 	// The output appears to be fixed to a 307.2 kHz rate; turning this off boosts driver performance.
 
@@ -402,8 +399,8 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	ppi.in_pc_callback().append("comm", FUNC(rs232_port_device::si_r)).lshift(3); // tied to CTS for loopback test
 	ppi.out_pc_callback().set(FUNC(cit101_state::nvr_control_w));
 
-	MCFG_DEVICE_ADD("nvr", ER2055, 0)
-MACHINE_CONFIG_END
+	ER2055(config, m_nvr);
+}
 
 
 // PCB ID: HAV-2P005B / CIT-101 / C. ITOH

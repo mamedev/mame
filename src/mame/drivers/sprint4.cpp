@@ -207,13 +207,13 @@ WRITE8_MEMBER(sprint4_state::lockout_w)
 
 WRITE8_MEMBER(sprint4_state::bang_w)
 {
-	m_discrete->write(space, SPRINT4_BANG_DATA, data & 0x0f);
+	m_discrete->write(SPRINT4_BANG_DATA, data & 0x0f);
 }
 
 
 WRITE8_MEMBER(sprint4_state::attract_w)
 {
-	m_discrete->write(space, SPRINT4_ATTRACT_EN, data & 1);
+	m_discrete->write(SPRINT4_ATTRACT_EN, data & 1);
 }
 
 

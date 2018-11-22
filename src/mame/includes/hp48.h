@@ -59,7 +59,9 @@ public:
 		, m_dac(*this, "dac")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
-		, m_port(*this, "port%u", 1U) {}
+		, m_port(*this, "port%u", 1U)
+	{
+	}
 
 	void hp48s(machine_config &config);
 	void hp48gp(machine_config &config);

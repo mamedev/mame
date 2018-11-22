@@ -44,8 +44,8 @@ MACHINE_CONFIG_START(dw_fdc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
 	UPD765A(config, "upd765", false, false);
-//	m_upd_fdc->intrq_wr_callback().set("pic8259", FUNC(pic8259_device::ir4_w));
-//	m_upd_fdc->drq_wr_callback().set("dma8257", FUNC(dma8257_device::XXX));
+//  m_upd_fdc->intrq_wr_callback().set("pic8259", FUNC(pic8259_device::ir4_w));
+//  m_upd_fdc->drq_wr_callback().set("dma8257", FUNC(dma8257_device::XXX));
 //  MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 //  MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 MACHINE_CONFIG_END

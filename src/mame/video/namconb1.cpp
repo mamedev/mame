@@ -123,7 +123,7 @@ uint32_t namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_in
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
-	bitmap.fill(m_palette->black_pen(), cliprect );
+	bitmap.fill(m_c116->black_pen(), cliprect );
 
 	video_update_common( screen, bitmap, clip, 0 );
 
@@ -163,7 +163,7 @@ uint32_t namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_in
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
-	bitmap.fill(m_palette->black_pen(), cliprect );
+	bitmap.fill(m_c116->black_pen(), cliprect );
 
 	if( memcmp(m_tilemap_tile_bank,m_tilebank32,sizeof(m_tilemap_tile_bank))!=0 )
 	{

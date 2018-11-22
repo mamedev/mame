@@ -187,8 +187,8 @@ void dominob_state::memmap(address_map &map)
 	map(0x0000, 0xbfff).rom().nopw(); // there are some garbage writes to ROM
 	map(0xc000, 0xc7ff).ram();
 
-	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xd000, 0xd001).w("aysnd", FUNC(ym2149_device::address_data_w));
+	map(0xd001, 0xd001).r("aysnd", FUNC(ym2149_device::data_r));
 	map(0xd008, 0xd008).w(FUNC(dominob_state::dominob_d008_w));
 	map(0xd00c, 0xd00c).portr("IN0");
 	map(0xd010, 0xd010).portr("IN1").nopw();
@@ -321,9 +321,9 @@ MACHINE_CONFIG_START(dominob_state::dominob)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL(12'000'000)/4));
+	aysnd.port_b_read_callback().set_ioport("DSW");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 /***************************************************************************

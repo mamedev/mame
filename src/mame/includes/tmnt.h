@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_TMNT_H
+#define MAME_INCLUDES_TMNT_H
+
+#pragma once
+
 #include "sound/samples.h"
 #include "sound/upd7759.h"
 #include "sound/k007232.h"
@@ -17,8 +22,8 @@
 class tmnt_state : public driver_device
 {
 public:
-	tmnt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tmnt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_tmnt2_rom(*this, "tmnt2_rom"),
 		m_sunset_104000(*this, "sunset_104000"),
@@ -37,7 +42,8 @@ public:
 		m_upd7759(*this, "upd"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void cuebrick(machine_config &config);
 	void blswhstl(machine_config &config);
@@ -223,3 +229,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_TMNT_H

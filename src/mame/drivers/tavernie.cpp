@@ -327,9 +327,9 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
@@ -361,10 +361,11 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(tavernie_state, kbd_put))
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // unknown clock
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(tavernie_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // unknown clock
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(tavernie_state::crtc_update_row), this);
 
 	PIA6821(config, m_pia_ivg, 0);
 	m_pia_ivg->readpb_handler().set(FUNC(tavernie_state::pb_ivg_r));

@@ -25,7 +25,6 @@
 #include "video/namco_c123tmap.h"
 #include "video/namcos2_sprite.h"
 #include "video/namcos2_roz.h"
-#include "emupal.h"
 #include "screen.h"
 
 /*********************************************/
@@ -53,7 +52,6 @@ public:
 		m_sci(*this, "sci"),
 		m_c169roz(*this, "c169roz"),
 		m_c355spr(*this, "c355spr"),
-		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_audiobank(*this, "audiobank"),
@@ -163,22 +161,21 @@ enum
 
 	int m_gametype;
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_slave;
-	optional_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_slave;
+	required_device<cpu_device> m_audiocpu;
 	optional_device<namcoc65_device> m_c65;
 	optional_device<namcoc68_device> m_c68;
-	optional_device<c140_device> m_c140;
-	optional_device<namco_c116_device> m_c116;
-	optional_device<namco_c123tmap_device> m_c123tmap;
-	optional_device<namco_c148_device> m_master_intc;
-	optional_device<namco_c148_device> m_slave_intc;
-	optional_device<namco_c139_device> m_sci;
+	required_device<c140_device> m_c140;
+	required_device<namco_c116_device> m_c116;
+	required_device<namco_c123tmap_device> m_c123tmap;
+	required_device<namco_c148_device> m_master_intc;
+	required_device<namco_c148_device> m_slave_intc;
+	required_device<namco_c139_device> m_sci;
 	optional_device<namco_c169roz_device> m_c169roz;
 	optional_device<namco_c355spr_device> m_c355spr;
-	required_device<palette_device> m_palette;
 	optional_device<gfxdecode_device> m_gfxdecode;
-	optional_device<screen_device> m_screen;
-	optional_memory_bank m_audiobank;
+	required_device<screen_device> m_screen;
+	required_memory_bank m_audiobank;
 
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
@@ -187,18 +184,16 @@ enum
 	DECLARE_READ8_MEMBER(dpram_byte_r);
 	DECLARE_WRITE8_MEMBER(dpram_byte_w);
 
-	DECLARE_WRITE8_MEMBER( namcos2_68k_eeprom_w );
-	DECLARE_READ8_MEMBER( namcos2_68k_eeprom_r );
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_READ8_MEMBER(eeprom_r);
 
-	DECLARE_WRITE8_MEMBER( namcos2_sound_bankselect_w );
+	DECLARE_WRITE8_MEMBER(sound_bankselect_w);
 
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(system_reset_w);
 	void reset_all_subcpus(int state);
 
 	virtual void video_start() override;
-	void video_start_finallap();
-	void video_start_finalap2();
 	void video_start_luckywld();
 	void video_start_metlhawk();
 	void video_start_sgunner();
@@ -214,8 +209,8 @@ enum
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
 
-	DECLARE_MACHINE_START(namcos2);
-	DECLARE_MACHINE_RESET(namcos2);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void create_shadow_table();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
@@ -281,17 +276,5 @@ enum
 #define NAMCOS2_C148_POSIRQ     5       /* 0x1ca000 */
 #define NAMCOS2_C148_SERIRQ     6       /* 0x1cc000 */
 #define NAMCOS2_C148_VBLANKIRQ  7       /* 0x1ce000 */
-
-/**************************************************************/
-/* MASTER CPU RAM MEMORY                                      */
-/**************************************************************/
-
-#define NAMCOS2_68K_MASTER_RAM  "bank3"
-
-/**************************************************************/
-/* SLAVE CPU RAM MEMORY                                       */
-/**************************************************************/
-
-#define NAMCOS2_68K_SLAVE_RAM   "bank4"
 
 #endif // MAME_INCLUDES_NAMCOS2_H

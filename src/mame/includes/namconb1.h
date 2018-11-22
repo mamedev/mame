@@ -5,6 +5,10 @@
     Namco System NB-1 hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_NAMCONB1_H
+#define MAME_INCLUDES_NAMCONB1_H
+
+#pragma once
 
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
@@ -14,20 +18,7 @@
 #include "video/namco_c123tmap.h"
 #include "video/namco_c169roz.h"
 
-#define NAMCONB1_HTOTAL     (288)   /* wrong */
-#define NAMCONB1_HBSTART    (288)
-#define NAMCONB1_VTOTAL     (262)   /* needs to be checked */
-#define NAMCONB1_VBSTART    (224)
-
-#define NAMCONB1_TILEMASKREGION     "tilemask"
-#define NAMCONB1_TILEGFXREGION      "tile"
-#define NAMCONB1_SPRITEGFXREGION    "sprite"
-#define NAMCONB1_ROTMASKREGION      "rotmask"
-#define NAMCONB1_ROTGFXREGION       "rot"
-
-#define NAMCONB1_TILEGFX        0
-#define NAMCONB1_SPRITEGFX      1
-#define NAMCONB1_ROTGFX         2
+#define NAMCONB1_SPRITEGFX      0
 
 
 
@@ -38,7 +29,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_gametype(0),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
 		m_c116(*this, "c116"),
 		m_c123tmap(*this, "c123tmap"),
 		m_c355spr(*this, "c355spr"),
@@ -58,7 +48,8 @@ public:
 		m_spritebank32(*this, "spritebank32"),
 		m_tilebank32(*this, "tilebank32"),
 		m_rozbank32(*this, "rozbank32"),
-		m_namconb_shareram(*this, "namconb_share") { }
+		m_namconb_shareram(*this, "namconb_share")
+	{ }
 
 	void namconb1(machine_config &config);
 	void namconb2(machine_config &config);
@@ -96,7 +87,6 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
 	required_device<namco_c116_device> m_c116;
 	required_device<namco_c123tmap_device> m_c123tmap;
 	required_device<namco_c355spr_device> m_c355spr;
@@ -176,3 +166,5 @@ private:
 	void namconb1_am(address_map &map);
 	void namconb2_am(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NAMCONB1_H

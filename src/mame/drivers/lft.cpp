@@ -83,11 +83,12 @@ void lft_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(lft_state::lft)
+void lft_state::lft(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	I80186(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lft_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &lft_state::io_map);
 
 	// Devices
 	MM58167(config, m_rtc, 32.768_kHz_XTAL);
@@ -97,20 +98,20 @@ MACHINE_CONFIG_START(lft_state::lft)
 	m_scc->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc8530_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc8530_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc8530_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc, FUNC(scc8530_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc, FUNC(scc8530_device::dcda_w));
+	rs232a.cts_handler().set(m_scc, FUNC(scc8530_device::ctsa_w));
 
 	m_scc->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc, scc8530_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc, scc8530_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc, scc8530_device, ctsb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
+	rs232b.rxd_handler().set(m_scc, FUNC(scc8530_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc, FUNC(scc8530_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(scc8530_device::ctsb_w));
+}
 
 
 /* ROM definition */

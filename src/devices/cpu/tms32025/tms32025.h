@@ -183,6 +183,7 @@ protected:
 	int     m_icount;
 	int     m_mHackIgnoreARP;          /* special handling for lst, lst1 instructions */
 	int     m_waiting_for_serial_frame;
+	bool    m_mp_mc;
 
 	inline void CLR0(uint16_t flag);
 	inline void SET0(uint16_t flag);
@@ -360,8 +361,6 @@ protected:
 	void zals();
 	inline int process_IRQs();
 	inline void process_timer(int clocks);
-
-	bool m_mp_mc;
 };
 
 

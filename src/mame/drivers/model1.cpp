@@ -72,13 +72,13 @@ Notes:
 
       IC6, IC7, IC8,\
       IC9, IC10,    \
-      IC11, IC12,   | 834000 4M MASKROM (DIP32)
+      IC11, IC12,   | 834000 4M mask ROM (DIP32)
       IC13,         |
       IC39, IC40,   /
       IC41, IC42    /
 
       IC26, IC27,   \
-      IC28, IC29,   | 8316200 16M MASKROM (DIP42)
+      IC28, IC29,   | 8316200 16M mask ROM (DIP42)
       IC30, IC31,   /
       IC32, IC33    /
 
@@ -195,13 +195,13 @@ Notes:
       J4, J5, J6    - Jumpers, all set to 2-3
 
       OPR-14742.44  \
-      OPR-14743.45  - 1M SOP40 MASKROMs, tied to 315-5464
+      OPR-14743.45  - 1M SOP40 mask ROMs, tied to 315-5464
 
       OPR-14744.64  \
-      OPR-14745.65  - 1M SOP40 MASKROMs, tied to both 315-5572's
+      OPR-14745.65  - 1M SOP40 mask ROMs, tied to both 315-5572's
 
       OPR-14746.68  \
-      OPR-14747.69  - 1M SOP40 MASKROMs, tied to 315-5572 @ IC66
+      OPR-14747.69  - 1M SOP40 mask ROMs, tied to 315-5572 @ IC66
 
 
 VIDEO PCB
@@ -280,7 +280,7 @@ Notes:
       315-5292 - Sega Custom (QFP160)
 
       OPR-14748.15  \
-      OPR-14748.16  - 1M SOP40 MASKROMs, tied to 315-5423 & 315-5424. Note both ROMs are identical.
+      OPR-14748.16  - 1M SOP40 mask ROMs, tied to 315-5423 & 315-5424. Note both ROMs are identical.
 
 
 Motor PCB
@@ -1701,8 +1701,7 @@ MACHINE_CONFIG_START(model1_state::model1)
 
 	MB8421(config, m_dpram, 0);
 
-	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
-	MCFG_GFX_PALETTE("palette")
+	S24TILE(config, m_tiles, 0, 0x3fff).set_palette(m_palette);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )

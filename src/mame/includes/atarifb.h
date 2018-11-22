@@ -5,6 +5,10 @@
     Atari Football hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ATARIFB_H
+#define MAME_INCLUDES_ATARIFB_H
+
+#pragma once
 
 #include "sound/discrete.h"
 #include "emupal.h"
@@ -114,6 +118,8 @@ protected:
 	output_finder<2> m_leds;
 };
 
-/*----------- defined in audio/atarifb.c -----------*/
+//----------- defined in audio/atarifb.cpp -----------
 DISCRETE_SOUND_EXTERN( atarifb_discrete );
 DISCRETE_SOUND_EXTERN( abaseb_discrete );
+
+#endif // MAME_INCLUDES_ATARIFB_H

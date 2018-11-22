@@ -853,6 +853,8 @@ void astinvad_state::init_spcking2()
 {
 	/* don't have the schematics, but the blanking must center the screen here */
 	m_flip_yoffs = 0;
+
+	save_item(NAME(m_player));
 }
 
 

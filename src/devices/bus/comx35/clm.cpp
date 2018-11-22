@@ -148,10 +148,11 @@ MACHINE_CONFIG_START(comx_clm_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_comx_clm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, MC6845_SCREEN_TAG, XTAL(14'318'181)/7)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(comx_clm_device, crtc_update_row)
+	MC6845(config, m_crtc, XTAL(14'318'181)/7);
+	m_crtc->set_screen(MC6845_SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(comx_clm_device::crtc_update_row), this);
 MACHINE_CONFIG_END
 
 

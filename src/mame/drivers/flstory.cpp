@@ -771,19 +771,19 @@ MACHINE_CONFIG_START(flstory_state::flstory)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(8'000'000)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, flstory_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, flstory_state, sound_control_3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	YM2149(config, m_ay, XTAL(8'000'000)/4); /* verified on pcb */
+	m_ay->port_a_write_callback().set(FUNC(flstory_state::sound_control_2_w));
+	m_ay->port_b_write_callback().set(FUNC(flstory_state::sound_control_3_w));
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4) /* verified on pcb */
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
@@ -840,19 +840,19 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, flstory_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, flstory_state, sound_control_3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	YM2149(config, m_ay, XTAL(8'000'000)/4);
+	m_ay->port_a_write_callback().set(FUNC(flstory_state::sound_control_2_w));
+	m_ay->port_b_write_callback().set(FUNC(flstory_state::sound_control_3_w));
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
@@ -920,19 +920,19 @@ MACHINE_CONFIG_START(flstory_state::victnine)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, flstory_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, flstory_state, sound_control_3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	YM2149(config, m_ay, XTAL(8'000'000)/4);
+	m_ay->port_a_write_callback().set(FUNC(flstory_state::sound_control_2_w));
+	m_ay->port_b_write_callback().set(FUNC(flstory_state::sound_control_3_w));
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */
@@ -993,19 +993,19 @@ MACHINE_CONFIG_START(flstory_state::rumba)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(8'000'000)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, flstory_state, sound_control_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, flstory_state, sound_control_3_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	YM2149(config, m_ay, XTAL(8'000'000)/4); /* verified on pcb */
+	m_ay->port_a_write_callback().set(FUNC(flstory_state::sound_control_2_w));
+	m_ay->port_b_write_callback().set(FUNC(flstory_state::sound_control_3_w));
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4) /* verified on pcb */
 	MCFG_MSM5232_SET_CAPACITORS(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6) /* 1.0 uF capacitors (verified on real PCB) */

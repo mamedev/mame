@@ -5,6 +5,10 @@
     Galaxian hardware family
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_GALAXIAN_H
+#define MAME_INCLUDES_GALAXIAN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
@@ -342,9 +346,6 @@ public:
 	void kong(machine_config &config);
 	void scorpnmc(machine_config &config);
 
-	void galaxian_audio(machine_config &config);
-	void mooncrst_audio(machine_config &config);
-
 protected:
 	void amigo2_map(address_map &map);
 	void anteaterg_map(address_map &map);
@@ -473,3 +474,5 @@ protected:
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5];
 };
+
+#endif // MAME_INCLUDES_GALAXIAN_H

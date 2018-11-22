@@ -5,7 +5,7 @@
 
 /******************************************************************************/
 
-WRITE32_MEMBER( deco32_state::pri_w )
+void deco32_state::pri_w(u32 data, u32 mem_mask)
 {
 	m_pri = data;
 }
@@ -29,7 +29,7 @@ only updated on a DMA call */
 
 WRITE32_MEMBER( deco32_state::buffered_palette_w )
 {
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 	m_dirty_palette[offset]=1;
 }
 
@@ -41,9 +41,9 @@ WRITE32_MEMBER( deco32_state::palette_dma_w )
 		{
 			m_dirty_palette[i] = 0;
 
-			uint8_t b = (m_generic_paletteram_32[i] >>16) & 0xff;
-			uint8_t g = (m_generic_paletteram_32[i] >> 8) & 0xff;
-			uint8_t r = (m_generic_paletteram_32[i] >> 0) & 0xff;
+			uint8_t b = (m_paletteram[i] >> 16) & 0xff;
+			uint8_t g = (m_paletteram[i] >>  8) & 0xff;
+			uint8_t r = (m_paletteram[i] >>  0) & 0xff;
 
 			m_palette->set_pen_color(i,rgb_t(r,g,b));
 		}
@@ -83,14 +83,15 @@ void deco32_state::allocate_rowscroll(int size1, int size2, int size3, int size4
 	save_pointer(NAME(m_pf_rowscroll[3]), size4);
 }
 
-VIDEO_START_MEMBER( captaven_state, captaven )
+void captaven_state::video_start()
 {
+	m_deco_tilegen[1]->set_pf1_8bpp_mode(1);
 	deco32_state::allocate_spriteram(0);
 	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER( fghthist_state, fghthist )
+void fghthist_state::video_start()
 {
 	m_sprgen[0]->alloc_sprite_bitmap();
 	deco32_state::allocate_spriteram(0);
@@ -99,12 +100,12 @@ VIDEO_START_MEMBER( fghthist_state, fghthist )
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER( nslasher_state, nslasher )
+void nslasher_state::video_start()
 {
 	int width, height;
 	width = m_screen->width();
 	height = m_screen->height();
-	m_tilemap_alpha_bitmap=std::make_unique<bitmap_ind16>(width, height );
+	m_tilemap_alpha_bitmap=std::make_unique<bitmap_ind16>(width, height);
 	for (int chip = 0; chip < 2; chip++)
 	{
 		m_sprgen[chip]->alloc_sprite_bitmap();
@@ -114,8 +115,9 @@ VIDEO_START_MEMBER( nslasher_state, nslasher )
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER( dragngun_state, dragngun )
+void dragngun_state::video_start()
 {
+	//m_deco_tilegen[0]->set_pf1_8bpp_mode(1); // despite being 8bpp this doesn't require the same shifting as captaven, why not?
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
 	deco32_state::allocate_buffered_palette();
@@ -126,7 +128,7 @@ VIDEO_START_MEMBER( dragngun_state, dragngun )
 
 /******************************************************************************/
 
-uint32_t captaven_state::screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t captaven_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen[0]->pf_control_r(space, 0, 0xffff);
@@ -135,8 +137,6 @@ uint32_t captaven_state::screen_update_captaven(screen_device &screen, bitmap_in
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x000), cliprect); // Palette index not confirmed
-
-	m_deco_tilegen[1]->set_pf1_8bpp_mode(1);
 
 	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
 	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
@@ -162,15 +162,13 @@ uint32_t captaven_state::screen_update_captaven(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint32_t dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x400), cliprect); // Palette index not confirmed
 
 	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());
 	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2].get(), m_pf_rowscroll[3].get());
-
-	//m_deco_tilegen[0]->set_pf3_8bpp_mode(1); // despite being 8bpp this doesn't require the same shifting as captaven, why not?
 
 	m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1); // it uses pf3 in 8bpp mode instead, like captaven
 	m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
@@ -196,7 +194,7 @@ uint32_t dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rg
 }
 
 
-uint32_t fghthist_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t fghthist_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x300), cliprect); // Palette index not confirmed
@@ -369,7 +367,7 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 	}
 }
 
-uint32_t nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nslasher_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int alphaTilemap=0;
 	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0].get(), m_pf_rowscroll[1].get());

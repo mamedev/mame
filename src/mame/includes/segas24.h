@@ -23,9 +23,10 @@ public:
 		, m_subcpu(*this, "subcpu")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_generic_paletteram_16(*this, "paletteram")
+		, m_paletteram(*this, "paletteram")
 		, m_romboard(*this, "romboard")
 		, m_floppy(*this, "floppy")
+		, m_rombank(*this, "rombank%u", 1U)
 		, m_irq_timer(*this, "irq_timer")
 		, m_irq_timer_clear(*this, "irq_timer_clear")
 		, m_frc_cnt_timer(*this, "frc_timer")
@@ -58,23 +59,30 @@ public:
 	void init_qsww();
 	void init_sgmast();
 
-	void mahmajn(machine_config &config);
-	void system24_floppy_fd_upd(machine_config &config);
-	void system24_floppy(machine_config &config);
-	void system24_floppy_fd1094(machine_config &config);
 	void dcclub(machine_config &config);
+	void mahmajn(machine_config &config);
+	void system24_floppy(machine_config &config);
 	void system24_floppy_dcclub(machine_config &config);
+	void system24_floppy_fd1094(machine_config &config);
+	void system24_floppy_fd_upd(machine_config &config);
 	void system24_floppy_hotrod(machine_config &config);
+	void system24_floppy_rom(machine_config &config);
+	void system24_rom(machine_config &config);
 	void system24(machine_config &config);
+
+protected:
+	virtual void device_post_load() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint16_t> m_generic_paletteram_16;
+	required_shared_ptr<uint16_t> m_paletteram;
 	optional_memory_region m_romboard;
 	optional_region_ptr<uint8_t> m_floppy;
+
+	optional_memory_bank_array<2> m_rombank;
 
 	static const uint8_t  s_mahmajn_mlt[8];
 	static const uint8_t s_mahmajn2_mlt[8];
@@ -84,6 +92,8 @@ private:
 	static const uint8_t s_quizmeku_mlt[8];
 	static const uint8_t   s_dcclub_mlt[8];
 
+	uint8_t m_fdc_track_side;
+	uint8_t m_fdc_mode;
 	int m_fdc_status;
 	int m_fdc_track;
 	int m_fdc_sector;
@@ -121,22 +131,22 @@ private:
 	required_device<segas24_mixer_device> m_vmixer;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_ym);
-	DECLARE_READ16_MEMBER(  sys16_paletteram_r );
-	DECLARE_WRITE16_MEMBER( sys16_paletteram_w );
+	DECLARE_READ16_MEMBER(  paletteram_r );
+	DECLARE_WRITE16_MEMBER( paletteram_w );
 	DECLARE_READ16_MEMBER(  irq_r );
 	DECLARE_WRITE16_MEMBER( irq_w );
 	DECLARE_READ16_MEMBER(  fdc_r );
 	DECLARE_WRITE16_MEMBER( fdc_w );
 	DECLARE_READ16_MEMBER(  fdc_status_r );
 	DECLARE_WRITE16_MEMBER( fdc_ctrl_w );
-	DECLARE_READ16_MEMBER(  curbank_r );
-	DECLARE_WRITE16_MEMBER( curbank_w );
+	DECLARE_READ8_MEMBER(  curbank_r );
+	DECLARE_WRITE8_MEMBER( curbank_w );
 	DECLARE_READ8_MEMBER(  frc_mode_r );
 	DECLARE_WRITE8_MEMBER( frc_mode_w );
 	DECLARE_READ8_MEMBER(  frc_r );
 	DECLARE_WRITE8_MEMBER( frc_w );
-	DECLARE_READ16_MEMBER(  mlatch_r );
-	DECLARE_WRITE16_MEMBER( mlatch_w );
+	DECLARE_READ8_MEMBER(  mlatch_r );
+	DECLARE_WRITE8_MEMBER( mlatch_w );
 	DECLARE_READ16_MEMBER(  iod_r );
 	DECLARE_WRITE16_MEMBER( iod_w );
 
@@ -157,7 +167,7 @@ private:
 	WRITE_LINE_MEMBER(cnt1);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_system24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_clear_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_frc_cb);
@@ -172,13 +182,19 @@ private:
 	optional_ioport m_paddle;
 	optional_ioport_array<8> m_mj_inputs;
 
+	void common_map(address_map &map);
+	void cpu1_map(address_map &map);
+	void cpu2_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
+	void hotrod_common_map(address_map &map);
 	void hotrod_cpu1_map(address_map &map);
 	void hotrod_cpu2_map(address_map &map);
+	void rombd_common_map(address_map &map);
+	void rombd_cpu1_map(address_map &map);
+	void rombd_cpu2_map(address_map &map);
+	void roughrac_common_map(address_map &map);
 	void roughrac_cpu1_map(address_map &map);
 	void roughrac_cpu2_map(address_map &map);
-	void system24_cpu1_map(address_map &map);
-	void system24_cpu2_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_SEGAS24_H

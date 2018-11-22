@@ -31,7 +31,8 @@ DEFINE_DEVICE_TYPE(ISA8_MYB3K_COM, isa8_myb3k_com_device, "isa8_myb3k_com", "ADP
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
+void isa8_myb3k_com_device::device_add_mconfig(machine_config &config)
+{
 	I8251( config, m_usart, XTAL(15'974'400) / 8 );
 	m_usart->txd_handler().set("com1", FUNC(rs232_port_device::write_txd));
 	m_usart->dtr_handler().set("com1", FUNC(rs232_port_device::write_dtr));
@@ -39,22 +40,22 @@ MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
 	m_usart->rxrdy_handler().set(FUNC(isa8_myb3k_com_device::com_int_rx));
 	m_usart->txrdy_handler().set(FUNC(isa8_myb3k_com_device::com_int_tx));
 
-	MCFG_DEVICE_ADD( "com1", RS232_PORT, isa8_myb3k_com, nullptr )
-	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("usart", i8251_device, write_cts))
-	MCFG_RS232_RI_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, ri_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, dcd_w))
+	rs232_port_device &com1(RS232_PORT(config, "com1", isa8_myb3k_com, nullptr));
+	com1.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	com1.dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr));
+	com1.cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
+	com1.ri_handler().set(FUNC(isa8_myb3k_com_device::ri_w));
+	com1.dcd_handler().set(FUNC(isa8_myb3k_com_device::dcd_w));
 	// TODO: configure RxC and TxC from RS232 connector when these are defined is rs232.h
 
 	/* Timer chip */
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(15'974'400) / 8 ) /* TxC */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, pit_txc))
-	MCFG_PIT8253_CLK1(XTAL(15'974'400) / 8 ) /* RxC */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, pit_rxc))
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(XTAL(15'974'400) / 8); /* TxC */
+	pit.out_handler<0>().set(FUNC(isa8_myb3k_com_device::pit_txc));
+	pit.set_clk<1>(XTAL(15'974'400) / 8); /* RxC */
+	pit.out_handler<1>().set(FUNC(isa8_myb3k_com_device::pit_rxc));
 	// Timer 2 is not used/connected to anything on the schematics
-MACHINE_CONFIG_END
+}
 
 // PORT definitions moved to the end of this file as it became very long
 

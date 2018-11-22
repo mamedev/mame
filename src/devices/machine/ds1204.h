@@ -20,7 +20,7 @@ class ds1204_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	ds1204_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
+	ds1204_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0 );
 
 	DECLARE_WRITE_LINE_MEMBER( write_rst );
 	DECLARE_WRITE_LINE_MEMBER( write_clk );

@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:BUT
+#ifndef MAME_INCLUDES_TCEPTOR_H
+#define MAME_INCLUDES_TCEPTOR_H
+
+#pragma once
+
 #include "sound/namco.h"
 #include "video/c45.h"
 #include "emupal.h"
@@ -106,3 +111,5 @@ private:
 	void mcu_io_map(address_map &map);
 	void mcu_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TCEPTOR_H
