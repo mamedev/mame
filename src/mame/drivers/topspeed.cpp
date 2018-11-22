@@ -595,9 +595,9 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	MCFG_PC080SN_OFFSETS(0, 8)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 
 	TC0040IOC(config, m_tc0040ioc, 0);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");

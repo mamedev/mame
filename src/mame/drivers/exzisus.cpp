@@ -269,9 +269,9 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("cpub")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag("cpub");
+	ciu.set_slave_tag("audiocpu");
 MACHINE_CONFIG_END
 
 

@@ -358,23 +358,23 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 }
 
 
-MACHINE_CONFIG_START(csplayh5_state::csplayh5)
-
+void csplayh5_state::csplayh5(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu,M68000,16000000) /* TMP68301-16 */
-	MCFG_DEVICE_PROGRAM_MAP(csplayh5_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
+	M68000(config, m_maincpu, 16000000); /* TMP68301-16 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_map);
+	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
+	TIMER(config, "scantimer", 0).configure_scanline(timer_device::expired_delegate(FUNC(csplayh5_state::csplayh5_irq), this), "screen", 0, 1);
 
 	TMP68301(config, m_tmp68301, 0);
 	m_tmp68301->set_cputag(m_maincpu);
 	m_tmp68301->out_parallel_callback().set(FUNC(csplayh5_state::tmp68301_parallel_port_w));
 
 #if USE_H8
-	MCFG_DEVICE_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
-	MCFG_DEVICE_PROGRAM_MAP(csplayh5_sub_map)
-	MCFG_DEVICE_IO_MAP(csplayh5_sub_io_map)
+	h830002_device &subcpu(H83002(config, "subcpu", DVD_CLOCK/2));    /* unknown divider */
+	subcpu.set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_sub_map);
+	subcpu.set_addrmap(AS_IO, &csplayh5_state::csplayh5_sub_io_map);
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true)); // dvd
 	ide.irq_handler().set(FUNC(csplayh5_state::ide_irq));
@@ -390,8 +390,8 @@ MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_NICHISND_ADD("nichisnd")
-MACHINE_CONFIG_END
+	NICHISND(config, m_nichisnd, 0);
+}
 
 /***************************************************************************
 

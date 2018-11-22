@@ -424,10 +424,11 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:pokey")
+	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	m_jsa->test_read_cb().set_ioport("260010").bit(1);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	config.device_remove("jsa:pokey");
 MACHINE_CONFIG_END
 
 
@@ -466,9 +467,10 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_II(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	m_jsa->test_read_cb().set_ioport("260010").bit(1);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -513,9 +515,10 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_II(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	m_jsa->test_read_cb().set_ioport("260010").bit(1);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

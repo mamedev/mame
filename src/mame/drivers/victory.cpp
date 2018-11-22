@@ -241,7 +241,7 @@ MACHINE_CONFIG_START(victory_state::victory)
 
 
 	/* audio hardware */
-	MCFG_DEVICE_ADD("soundbd", EXIDY_VICTORY, 0)
+	EXIDY_VICTORY(config, "soundbd", 0);
 MACHINE_CONFIG_END
 
 

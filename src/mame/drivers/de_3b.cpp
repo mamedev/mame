@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(de_3b_state::de_3b)
 	genpin_audio(config);
 
 	/* sound hardware */
-	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
+	DECOBSMT(config, m_decobsmt, 0);
 
 	MCFG_DECODMD_TYPE3_ADD("decodmd",":cpu3")
 MACHINE_CONFIG_END

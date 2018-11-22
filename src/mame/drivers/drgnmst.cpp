@@ -449,6 +449,42 @@ ROM_START( drgnmst )
 	ROM_LOAD16_BYTE( "dm1008", 0x000000, 0x100000, CRC(b8572be3) SHA1(29aab76821e0a56033cf06b0a1890b11804da8d8) )
 ROM_END
 
+ROM_START( drgnmst2 ) // only the maincpu ROMs were provided for this set
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "even", 0x00000, 0x80000, CRC(63eae56a) SHA1(24939923be09dea523d74ecd72d7d1587469b6dc) )
+	ROM_LOAD16_BYTE( "odd", 0x00001, 0x80000, CRC(35734a49) SHA1(8e9b40ca68c1dd3b2d6c262b833f71333fb43209) )
+
+	ROM_REGION( 0x400, "audiocpu", ROMREGION_ERASE00 ) /* PIC16C55 Code */
+//  ROM_LOAD( "pic16c55", 0x0000, 0x400, CRC(531c9f8d) SHA1(8ec180b0566f2ce1e08f0347e5ad402c73b44049) )
+	/* ROM will be copied here by the init code from the USER1 region */
+
+	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_LOAD( "pic16c55.hex", 0x000, 0x0b7b, CRC(f17011e7) SHA1(8f3bd94ffb528f661eed77d89e5b772442d2f5a6) )
+
+	ROM_REGION( 0x140000, "oki1", 0 ) /* OKI-0 Samples */
+	ROM_LOAD( "dm1001", 0x00000, 0x100000, CRC(63566f7f) SHA1(0fe6cb67a5d99cd54e46e9889ea121097756b9ef) )
+
+	ROM_REGION( 0x200000, "oki2", 0 ) /* OKI-1 Samples */
+	ROM_LOAD( "dm1002", 0x00000, 0x200000, CRC(0f1a874e) SHA1(8efc39f8ff7e6e7138b19959bd083b9df002acca) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprites (16x16x4) */
+	ROM_LOAD16_BYTE( "dm1003", 0x000000, 0x080000, CRC(0ca10e81) SHA1(abebd8437764110278c8b7e583d846db27e205ec) )
+	ROM_CONTINUE(0x400000, 0x080000)
+	ROM_CONTINUE(0x100000, 0x080000)
+	ROM_CONTINUE(0x500000, 0x080000)
+	ROM_LOAD16_BYTE( "dm1005", 0x000001, 0x080000, CRC(4c2b1db5) SHA1(35d799cd13540e2aca1d1164291fe4c9938ed0ce) )
+	ROM_CONTINUE(0x400001, 0x080000)
+	ROM_CONTINUE(0x100001, 0x080000)
+	ROM_CONTINUE(0x500001, 0x080000)
+	ROM_LOAD16_BYTE( "dm1004", 0x200000, 0x040000, CRC(1a9ac249) SHA1(c15c7399dcb24dcab05887e3711e5b31bb7f31e8) )
+	ROM_CONTINUE(0x600000, 0x040000)
+	ROM_LOAD16_BYTE( "dm1006", 0x200001, 0x040000, CRC(c46da6fc) SHA1(f2256f02c833bc1074681729bd2b95fa6f3350cf) )
+	ROM_CONTINUE(0x600001, 0x040000)
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles (8x8x4, 16x16x4 and 32x32x4) */
+	ROM_LOAD16_BYTE( "dm1007", 0x000001, 0x100000, CRC(d5ad81c4) SHA1(03df467b218682a02245a6e8f500ab83de382448) )
+	ROM_LOAD16_BYTE( "dm1008", 0x000000, 0x100000, CRC(b8572be3) SHA1(29aab76821e0a56033cf06b0a1890b11804da8d8) )
+ROM_END
 
 uint8_t drgnmst_state::drgnmst_asciitohex( uint8_t data )
 {
@@ -531,4 +567,5 @@ void drgnmst_state::init_drgnmst()
 }
 
 
-GAME( 1994, drgnmst, 0, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drgnmst,        0, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drgnmst2, drgnmst, drgnmst,  drgnmst, drgnmst_state, init_drgnmst, ROT0, "Unico", "Dragon Master (set 2)", MACHINE_SUPPORTS_SAVE )

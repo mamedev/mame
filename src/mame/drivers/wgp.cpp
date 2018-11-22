@@ -967,9 +967,9 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("sub")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_subcpu);
+	m_tc0140syt->set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 

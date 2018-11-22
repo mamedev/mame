@@ -2352,7 +2352,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	m_ioprot->set_interface_scramble_interleave();
 
 	/* sound hardware */
-	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
+	DECOBSMT(config, m_decobsmt, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nslasher_state::nslasher)

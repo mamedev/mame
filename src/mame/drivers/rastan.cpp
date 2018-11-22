@@ -417,9 +417,9 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	LS157(config, m_adpcm_sel, 0);
 	m_adpcm_sel->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 

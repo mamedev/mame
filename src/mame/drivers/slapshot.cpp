@@ -498,9 +498,9 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 
 	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_maincpu);
+	m_tc0140syt->set_slave_tag("audiocpu");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapshot_state::opwolf3)
@@ -567,9 +567,9 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_maincpu);
+	m_tc0140syt->set_slave_tag("audiocpu");
 MACHINE_CONFIG_END
 
 /***************************************************************************

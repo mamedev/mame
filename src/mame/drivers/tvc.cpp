@@ -795,9 +795,9 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", TVC_SOUND, 0)
-	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(*this, tvc_state, int_ff_set))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	TVC_SOUND(config, m_sound, 0);
+	m_sound->sndint_wr_callback().set(FUNC(tvc_state::int_ff_set));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tvc_state, centronics_ack))

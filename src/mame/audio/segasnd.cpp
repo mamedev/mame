@@ -245,8 +245,7 @@ MACHINE_CONFIG_START(segag80snd_common::sega_speech_board)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE("segaspeech", speech_sound_device, t1_r))
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("segaspeech", SEGASPEECH, 0)
-	MCFG_SEGASPEECH_INT_CALLBACK(WRITELINE(*this, segag80snd_common, segaspeech_int_w))
+	SEGASPEECH(config, "segaspeech", 0).int_cb().set(FUNC(segag80snd_common::segaspeech_int_w));
 	MCFG_DEVICE_ADD("speech", SP0250, SPEECH_MASTER_CLOCK)
 	MCFG_SP0250_DRQ_CALLBACK(WRITELINE("segaspeech", speech_sound_device, drq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

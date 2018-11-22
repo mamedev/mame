@@ -23,6 +23,7 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, d
 	, m_hc55516(*this, "hc55516_bg")
 	, m_pia40(*this, "pia40")
 	, m_cpubank(*this, "bgbank")
+	, m_rom(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -88,11 +89,7 @@ void s11c_bg_device::device_start()
 
 void s11c_bg_device::device_reset()
 {
-	uint8_t* ROM;
-
-	m_rom = memregion(m_regiontag);
-	ROM = m_rom->base();
-	m_cpubank->configure_entries(0, 8, &ROM[0x10000], 0x8000);
+	m_cpubank->configure_entries(0, 8, &m_rom[0x10000], 0x8000);
 	m_cpubank->set_entry(0);
 	// reset the CPU again, so that the CPU are starting with the right vectors (otherwise sound may die on reset)
 	m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
