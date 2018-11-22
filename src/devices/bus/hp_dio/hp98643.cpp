@@ -163,7 +163,7 @@ WRITE16_MEMBER(dio16_98643_device::novram_w)
 WRITE16_MEMBER(dio16_98643_device::lance_dma_out)
 {
 	LOG("%s: offset=%04x, data=%d\n", __func__, offset, data);
-	m_ram[(offset >>1) & 0x1fff] = data;
+	COMBINE_DATA(&m_ram[(offset >>1) & 0x1fff]);
 }
 
 READ16_MEMBER(dio16_98643_device::lance_dma_in)
