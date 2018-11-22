@@ -29853,6 +29853,9 @@ ncd19                           // 1990 Network Computing Devices
 @source:ncdmips.cpp
 hmxpro                          // 1994 Network Computing Devices
 
+@source:ncdppc.cpp
+explorapro                      // 1995 Network Computing Devices
+
 @source:nds.cpp
 nds                             // 2004 Nintendo
 
