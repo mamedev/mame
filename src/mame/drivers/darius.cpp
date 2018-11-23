@@ -756,12 +756,12 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_right)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_OFFSETS(-16, 8)
-	MCFG_PC080SN_YINVERT(0)
-	MCFG_PC080SN_DBLWIDTH(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_offsets(-16, 8);
+	m_pc080sn->set_yinvert(0);
+	m_pc080sn->set_dblwidth(1);
+	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -392,13 +392,13 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_GFX_REGION(1)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_gfx_region(1);
+	m_pc090oj->set_gfxdecode_tag("gfxdecode");
+	m_pc090oj->set_palette_tag("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

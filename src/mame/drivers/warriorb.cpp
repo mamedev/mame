@@ -227,13 +227,13 @@ void warriorb_state::darius2d_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();     /* main ram */
-	map(0x200000, 0x213fff).r("tc0100scn_1", FUNC(tc0100scn_device::word_r)).w(FUNC(warriorb_state::tc0100scn_dual_screen_w));   /* tilemaps (all screens) */
+	map(0x200000, 0x213fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::word_r)).w(FUNC(warriorb_state::tc0100scn_dual_screen_w));   /* tilemaps (all screens) */
 	map(0x214000, 0x2141ff).nopw();                                            /* error in screen clearing code ? */
-	map(0x220000, 0x22000f).rw("tc0100scn_1", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x240000, 0x253fff).rw("tc0100scn_2", FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (2nd screen) */
-	map(0x260000, 0x26000f).rw("tc0100scn_2", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x400000, 0x400007).rw("tc0110pcr_1", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (1st screen) */
-	map(0x420000, 0x420007).rw("tc0110pcr_2", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (2nd screen) */
+	map(0x220000, 0x22000f).rw(m_tc0100scn[0], FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x240000, 0x253fff).rw(m_tc0100scn[1], FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (2nd screen) */
+	map(0x260000, 0x26000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x400000, 0x400007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (1st screen) */
+	map(0x420000, 0x420007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (2nd screen) */
 	map(0x600000, 0x6013ff).ram().share("spriteram");
 	map(0x800000, 0x80000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
@@ -244,12 +244,12 @@ void warriorb_state::warriorb_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x213fff).ram();
-	map(0x300000, 0x313fff).r("tc0100scn_1", FUNC(tc0100scn_device::word_r)).w(FUNC(warriorb_state::tc0100scn_dual_screen_w));   /* tilemaps (all screens) */
-	map(0x320000, 0x32000f).rw("tc0100scn_1", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x340000, 0x353fff).rw("tc0100scn_2", FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (2nd screen) */
-	map(0x360000, 0x36000f).rw("tc0100scn_2", FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x400000, 0x400007).rw("tc0110pcr_1", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (1st screen) */
-	map(0x420000, 0x420007).rw("tc0110pcr_2", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (2nd screen) */
+	map(0x300000, 0x313fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::word_r)).w(FUNC(warriorb_state::tc0100scn_dual_screen_w));   /* tilemaps (all screens) */
+	map(0x320000, 0x32000f).rw(m_tc0100scn[0], FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x340000, 0x353fff).rw(m_tc0100scn[1], FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (2nd screen) */
+	map(0x360000, 0x36000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x400000, 0x400007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (1st screen) */
+	map(0x420000, 0x420007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (2nd screen) */
 	map(0x600000, 0x6013ff).ram().share("spriteram");
 	map(0x800000, 0x80000f).rw(m_tc0510nio, FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
@@ -468,14 +468,14 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_OFFSETS(4, 0)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn[0], 0);
+	m_tc0100scn[0]->set_gfx_region(1);
+	m_tc0100scn[0]->set_tx_region(3);
+	m_tc0100scn[0]->set_offsets(4, 0);
+	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[0]->set_palette_tag(m_palette);
 
-	MCFG_DEVICE_ADD("tc0110pcr_1", TC0110PCR, 0, "palette")
+	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -485,15 +485,15 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("palette2")
 
-	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(2)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_OFFSETS(4, 0)
-	MCFG_TC0100SCN_MULTISCR_HACK(1)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette2")
+	TC0100SCN(config, m_tc0100scn[1], 0);
+	m_tc0100scn[1]->set_gfx_region(2);
+	m_tc0100scn[1]->set_tx_region(3);
+	m_tc0100scn[1]->set_offsets(4, 0);
+	m_tc0100scn[1]->set_multiscr_hack(1);
+	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[1]->set_palette_tag("palette2");
 
-	MCFG_DEVICE_ADD("tc0110pcr_2", TC0110PCR, 0, "palette2")
+	TC0110PCR(config, m_tc0110pcr[1], 0, "palette2");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -552,14 +552,14 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_OFFSETS(4, 0)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn[0], 0);
+	m_tc0100scn[0]->set_gfx_region(1);
+	m_tc0100scn[0]->set_tx_region(3);
+	m_tc0100scn[0]->set_offsets(4, 0);
+	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[0]->set_palette_tag(m_palette);
 
-	MCFG_DEVICE_ADD("tc0110pcr_1", TC0110PCR, 0, "palette")
+	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -569,16 +569,16 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("palette2")
 
-	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(2)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_OFFSETS(4, 0)
-	MCFG_TC0100SCN_MULTISCR_XOFFS(1)
-	MCFG_TC0100SCN_MULTISCR_HACK(1)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette2")
+	TC0100SCN(config, m_tc0100scn[1], 0);
+	m_tc0100scn[1]->set_gfx_region(2);
+	m_tc0100scn[1]->set_tx_region(3);
+	m_tc0100scn[1]->set_offsets(4, 0);
+	m_tc0100scn[1]->set_multiscr_xoffs(1);
+	m_tc0100scn[1]->set_multiscr_hack(1);
+	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn[1]->set_palette_tag("palette2");
 
-	MCFG_DEVICE_ADD("tc0110pcr_2", TC0110PCR, 0, "palette2")
+	TC0110PCR(config, m_tc0110pcr[1], 0, "palette2");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

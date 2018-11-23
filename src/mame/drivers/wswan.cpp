@@ -123,10 +123,10 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_DEVICE_PROGRAM_MAP(wswan_mem)
 	MCFG_DEVICE_IO_MAP(wswan_io)
 
-	MCFG_DEVICE_ADD(m_vdp, WSWAN_VIDEO, 0)
-	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSWAN)
-	MCFG_WSWAN_VIDEO_IRQ_CB(wswan_state, set_irq_line)
-	MCFG_WSWAN_VIDEO_DMASND_CB(wswan_state, dma_sound_cb)
+	WSWAN_VIDEO(config, m_vdp, 0);
+	m_vdp->set_vdp_type(VDP_TYPE_WSWAN);
+	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line), this);
+	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb), this);
 
 	MCFG_SCREEN_ADD("screen", LCD)
 //  MCFG_SCREEN_REFRESH_RATE(75)
@@ -171,8 +171,7 @@ MACHINE_CONFIG_START(wscolor_state::wscolor)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(wscolor_mem)
 
-	MCFG_DEVICE_MODIFY("vdp")
-	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSC)
+	m_vdp->set_vdp_type(VDP_TYPE_WSWAN);
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)

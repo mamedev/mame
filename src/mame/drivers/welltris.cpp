@@ -50,7 +50,7 @@ V-SYSTEM VS8803 6082 9040 EBBB
 
 ********************************************************************************
 
- its impossible to know what some of the video registers do due to lack of
+ it's impossible to know what some of the video registers do due to lack of
  evidence (bg palette has a selector, but I'm not sure which ... test mode
  colours use different palette on rgb test
 
@@ -695,12 +695,12 @@ MACHINE_CONFIG_START(welltris_state::welltris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(-1)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old, 0);
+	m_spr_old->set_gfx_region(1);
+	m_spr_old->set_pritype(-1);
+	m_spr_old->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -724,8 +724,7 @@ MACHINE_CONFIG_START(welltris_state::quiz18k)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(15, 335-1, 0, 224-1)
 
-	MCFG_DEVICE_MODIFY("vsystem_spr_old")
-	MCFG_VSYSTEM_SPR2_SET_OFFSETS(6, 1)
+	m_spr_old->set_offsets(6, 1);
 MACHINE_CONFIG_END
 
 

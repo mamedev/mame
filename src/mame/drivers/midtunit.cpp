@@ -622,22 +622,23 @@ MACHINE_CONFIG_START(midtunit_state::tunit_core)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(midtunit_state::tunit_adpcm)
+void midtunit_state::tunit_adpcm(machine_config &config)
+{
 	tunit_core(config);
 
 	/* basic machine hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("adpcm", WILLIAMS_ADPCM_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	WILLIAMS_ADPCM_SOUND(config, m_adpcm_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(midtunit_state::tunit_dcs)
+void midtunit_state::tunit_dcs(machine_config &config)
+{
 	tunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
-MACHINE_CONFIG_END
+	DCS_AUDIO_2K(config, m_dcs, 0);
+}
 
 
 

@@ -25,6 +25,16 @@ void galastrm_state::video_start()
 
 	m_screen->register_screen_bitmap(m_tmpbitmaps);
 	m_screen->register_screen_bitmap(m_poly->screenbits());
+
+	save_item(NAME(m_rsxb));
+	save_item(NAME(m_rsyb));
+	save_item(NAME(m_rsxoffs));
+	save_item(NAME(m_rsyoffs));
+	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_tc0110pcr_addr));
+	save_item(NAME(m_tc0610_0_addr));
+	save_item(NAME(m_tc0610_1_addr));
+	save_item(NAME(m_tc0610_ctrl_reg));
 }
 
 
@@ -416,7 +426,7 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
                 SCREEN REFRESH
 **************************************************************/
 
-uint32_t galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galastrm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t layer[5];
 	uint8_t pivlayer[3];

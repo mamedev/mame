@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(tbowl_state::tbowl)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
+	TECMO_SPRITE(config, m_sprgen, 0);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

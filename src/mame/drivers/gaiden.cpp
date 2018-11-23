@@ -777,8 +777,8 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
-	MCFG_TECMO_SPRITE_GFX_REGION(3)
+	TECMO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(3);
 
 	TECMO_MIXER(config, m_mixer, 0);
 	m_mixer->set_mixer_shifts(10,9,4);

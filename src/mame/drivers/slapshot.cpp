@@ -474,16 +474,16 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
-	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
-	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
-	MCFG_TC0480SCP_COL_BASE(4096)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_offsets(30 + 3, 9);
+	m_tc0480scp->set_offsets_tx(-1, -1);
+	m_tc0480scp->set_offsets_flip(0, 2);
+	m_tc0480scp->set_col_base(4096);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_TC0360PRI_ADD("tc0360pri")
+	TC0360PRI(config, m_tc0360pri, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -543,16 +543,16 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(2)
-	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
-	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
-	MCFG_TC0480SCP_COL_BASE(4096)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(2);
+	m_tc0480scp->set_offsets(30 + 3, 9);
+	m_tc0480scp->set_offsets_tx(-1, -1);
+	m_tc0480scp->set_offsets_flip(0, 2);
+	m_tc0480scp->set_col_base(4096);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_TC0360PRI_ADD("tc0360pri")
+	TC0360PRI(config, m_tc0360pri, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
