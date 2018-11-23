@@ -1471,8 +1471,6 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
-
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 MACHINE_CONFIG_END
 

@@ -1600,7 +1600,7 @@ MACHINE_CONFIG_START(extrmatn_state::extrmatn)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
+	MCFG_PALETTE_INIT_OWNER(extrmatn_state, prompalette)
 MACHINE_CONFIG_END
 
 void extrmatn_state::plumppop(machine_config &config)

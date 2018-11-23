@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
+	MCFG_PALETTE_INIT_OWNER(cchance_state, prompalette)
 
 	SPEAKER(config, "mono").front_center();
 

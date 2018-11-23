@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
+#ifndef MAME_INCLUDES_LKAGE_H
+#define MAME_INCLUDES_LKAGE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
@@ -9,8 +13,8 @@
 class lkage_state : public driver_device
 {
 public:
-	lkage_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lkage_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vreg(*this, "vreg"),
 		m_scroll(*this, "scroll"),
 		m_spriteram(*this, "spriteram"),
@@ -21,13 +25,19 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_soundnmi(*this, "soundnmi") { }
+		m_soundnmi(*this, "soundnmi")
+	{ }
 
 	void lkageb(machine_config &config);
 	void lkage(machine_config &config);
 
 	void init_bygone();
 	void init_lkage();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint8_t> m_vreg;
@@ -71,9 +81,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void lkage_io_map(address_map &map);
@@ -82,3 +89,5 @@ private:
 	void lkage_map_mcu(address_map &map);
 	void lkage_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LKAGE_H

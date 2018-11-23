@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Angelo Salese
+#ifndef MAME_INCLUDES_TATSUMI_H
+#define MAME_INCLUDES_TATSUMI_H
+
+#pragma once
 
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
@@ -200,11 +204,13 @@ public:
 	{
 	}
 
-
 	void cyclwarr(machine_config &config);
 	void bigfight(machine_config &config);
 
 	void init_cyclwarr();
+
+protected:
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_READ16_MEMBER(cyclwarr_sprite_r);
@@ -231,8 +237,6 @@ private:
 	void slave_map(address_map &map);
 	void sound_map(address_map &map);
 
-	virtual void machine_reset() override;
-
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_master_ram;
@@ -258,3 +262,4 @@ private:
 	void apply_highlight_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &highlight_bitmap);
 };
 
+#endif // MAME_INCLUDES_TATSUMI_H
