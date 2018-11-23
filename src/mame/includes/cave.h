@@ -13,7 +13,6 @@
 
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
-#include "machine/nmk112.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "emupal.h"

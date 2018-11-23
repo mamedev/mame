@@ -83,6 +83,7 @@ Versions known to exist but not dumped:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/nmk112.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
@@ -2127,10 +2128,10 @@ MACHINE_CONFIG_START(cave_state::donpachi)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 4.224_MHz_XTAL/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
-	MCFG_NMK112_DISABLE_PAGEMASK(1 << 0)    // chip #0 (music) is not paged
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
+	nmk112.set_page_mask(1 << 0);    // chip #0 (music) is not paged
 MACHINE_CONFIG_END
 
 
@@ -2633,9 +2634,9 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 3_MHz_XTAL, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 

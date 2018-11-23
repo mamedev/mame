@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#include "machine/nmk112.h"
 #include "emupal.h"
 #include "screen.h"
 

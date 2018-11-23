@@ -729,8 +729,8 @@ WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
 
 WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
 {
-	m_nmk112->okibank_w(space, offset, data & 0x0f);
-	m_nmk112->okibank_w(space, offset + 1, (data >> 4) & 0x0f);
+	m_nmk112->okibank_w(offset, data & 0x0f);
+	m_nmk112->okibank_w(offset + 1, (data >> 4) & 0x0f);
 }
 
 
