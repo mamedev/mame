@@ -256,9 +256,9 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx) // fg palette ram, bit 0 seems to be a transparency flag for the front bitmap
 	MCFG_PALETTE_INIT_OWNER(galpanic_state, galpanic)
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_OFFSETS(0, -16)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_offsets(0, -16);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

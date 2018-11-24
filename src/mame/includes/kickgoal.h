@@ -5,6 +5,10 @@
     Kick Goal - Action Hollywood
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_KICKGOAL_H
+#define MAME_INCLUDES_KICKGOAL_H
+
+#pragma once
 
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
@@ -14,8 +18,8 @@
 class kickgoal_state : public driver_device
 {
 public:
-	kickgoal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kickgoal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_bgram(*this, "bgram"),
 		m_bg2ram(*this, "bg2ram"),
@@ -36,6 +40,10 @@ public:
 
 	void init_kickgoal();
 	void init_actionhw();
+
+protected:
+	void machine_start() override;
+	void machine_reset() override;
 
 private:
 	DECLARE_READ16_MEMBER(kickgoal_eeprom_r);
@@ -68,9 +76,6 @@ private:
 
 	void kickgoal_program_map(address_map &map);
 	void oki_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	/* video-related */
 	tilemap_t     *m_fgtm;
@@ -115,3 +120,5 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 };
+
+#endif // MAME_INCLUDES_KICKGOAL_H

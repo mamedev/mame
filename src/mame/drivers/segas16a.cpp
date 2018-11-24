@@ -2005,8 +2005,8 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16a_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16A_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGA_SYS16A_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas16a)
 	MCFG_PALETTE_ADD("palette", 2048*3)

@@ -53,6 +53,7 @@ public:
 		m_mcu(*this, "mcu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
+		m_vram(*this, "vram"),
 		m_duart(*this, "duart"),
 		m_lance(*this, "am79c90")
 	{
@@ -71,11 +72,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(lance_irq_w);
 	DECLARE_READ16_MEMBER(lance_dma_r);
 	DECLARE_WRITE16_MEMBER(lance_dma_w);
+	DECLARE_READ16_MEMBER(lance19_dma_r);
+	DECLARE_WRITE16_MEMBER(lance19_dma_w);
 	DECLARE_WRITE32_MEMBER(bt478_palette_w);
 	DECLARE_READ32_MEMBER(from_mcu_r);
 	DECLARE_WRITE32_MEMBER(to_mcu_w);
 	DECLARE_READ32_MEMBER(mcu_status_r);
-	DECLARE_WRITE32_MEMBER(mcu_irq_w);
+	DECLARE_WRITE32_MEMBER(irq_w);
 	INTERRUPT_GEN_MEMBER(vblank);
 	DECLARE_READ8_MEMBER(mcu_ports_r);
 	DECLARE_WRITE8_MEMBER(mcu_ports_w);
@@ -87,6 +90,7 @@ private:
 	required_device<m6805_device> m_mcu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_mainram;
+	optional_shared_ptr<uint32_t> m_vram;
 	required_device<scn2681_device> m_duart;
 	required_device<am7990_device> m_lance;
 
@@ -138,14 +142,14 @@ uint32_t ncd_020_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	uint32_t *scanline;
 	int x, y;
 	uint8_t pixels;
-	uint8_t *m_vram = (uint8_t *)m_mainram.target();
+	uint8_t *vram = (uint8_t *)m_mainram.target();
 
 	for (y = 0; y < 768; y++)
 	{
 		scanline = &bitmap.pix32(y);
 		for (x = 0; x < 1024; x++)
 		{
-			pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+			pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 			*scanline++ = m_palette[pixels];
 		}
 	}
@@ -159,14 +163,14 @@ uint32_t ncd_020_state::screen_update_19(screen_device &screen, bitmap_rgb32 &bi
 	int x, y;
 	uint8_t pixels;
 	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t *m_vram = (uint8_t *)m_mainram.target();
+	uint8_t *vram = (uint8_t *)m_vram.target();
 
 	for (y = 0; y < 1024; y++)
 	{
 		scanline = &bitmap.pix32(y);
 		for (x = 0; x < 1024/8; x++)
 		{
-			pixels = m_vram[(y * (2048/8)) + (BYTE4_XOR_BE(x))];
+			pixels = vram[(y * (2048/8)) + (BYTE4_XOR_BE(x))];
 
 			*scanline++ = palette[(pixels>>7)&1];
 			*scanline++ = palette[(pixels>>6)&1];
@@ -188,7 +192,7 @@ void ncd_020_state::ncd_17c_map(address_map &map)
 	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_020_state::from_mcu_r), FUNC(ncd_020_state::to_mcu_w));
 	map(0x001c8000, 0x001c803f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
 	map(0x001d0000, 0x001d0003).w(FUNC(ncd_020_state::bt478_palette_w));
-	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::mcu_irq_w));
+	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::irq_w));
 	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
 	map(0x01000000, 0x02ffffff).ram();
 	map(0x03000000, 0x03ffffff).ram().share("mainram");
@@ -198,11 +202,11 @@ void ncd_020_state::ncd_19_map(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).rom().region("maincpu", 0);
 	map(0x001c0000, 0x001c0003).rw(FUNC(ncd_020_state::from_mcu_r), FUNC(ncd_020_state::to_mcu_w));
-	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::mcu_irq_w));
+	map(0x001d8000, 0x001d8003).rw(FUNC(ncd_020_state::mcu_status_r), FUNC(ncd_020_state::irq_w));
 	map(0x001e0000, 0x001e003f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask32(0xff000000);
 	map(0x00200000, 0x00200003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w)).umask32(0xffffffff);
-	map(0x00400000, 0x0043ffff).ram().share("mainram");
-	map(0x00800000, 0x00ffffff).ram();
+	map(0x00400000, 0x0043ffff).ram().share("vram");
+	map(0x00800000, 0x00ffffff).ram().share("mainram");
 }
 
 READ8_MEMBER(ncd_020_state::mcu_ports_r)
@@ -251,7 +255,7 @@ WRITE8_MEMBER(ncd_020_state::mcu_ports_w)
 			//if (data != m_porta) printf("%02x to port A\n", data);
 			if ((data & 0x40) && !(m_porta & 0x40))
 			{
-				//printf("Promoting portB %02x to 020\n", m_portb);
+				//printf("Sending %02x to 020\n", m_portb);
 				m_to020 = m_portb;
 				m_unread_to020 = true;
 				m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
@@ -272,6 +276,7 @@ WRITE8_MEMBER(ncd_020_state::mcu_ports_w)
 
 READ32_MEMBER(ncd_020_state::from_mcu_r)
 {
+	//printf("020 read %02x\n", m_to020);
 	m_unread_to020 = false;
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 	return m_to020<<24;
@@ -282,6 +287,7 @@ WRITE32_MEMBER(ncd_020_state::to_mcu_w)
 	//printf("Sending %02x to MCU\n", data);
 	m_from020 = data>>24;
 	m_unread_from020 = true;
+	m_maincpu->yield();
 }
 
 READ32_MEMBER(ncd_020_state::mcu_status_r)
@@ -299,8 +305,16 @@ READ32_MEMBER(ncd_020_state::mcu_status_r)
 	return rv;
 }
 
-WRITE32_MEMBER(ncd_020_state::mcu_irq_w)
+WRITE32_MEMBER(ncd_020_state::irq_w)
 {
+	if (data & 0x80000000)
+	{
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	}
 }
 
 void ncd_020_state::ncd_mcu_map(address_map &map)
@@ -324,8 +338,6 @@ WRITE_LINE_MEMBER(ncd_020_state::lance_irq_w)
 
 READ16_MEMBER(ncd_020_state::lance_dma_r)
 {
-	// FIXME: ncd19 lance is trying to access 0x80xxxx-0xfxxxxx, which is
-	// not the "mainram" and therefore hates R.Belmont :)
 	u32 const data = m_mainram.target()[offset >> 2];
 
 	return (offset & 2) ? u16(data) : u16(data >> 16);
@@ -333,6 +345,35 @@ READ16_MEMBER(ncd_020_state::lance_dma_r)
 
 WRITE16_MEMBER(ncd_020_state::lance_dma_w)
 {
+	u32 const existing = m_mainram.target()[offset >> 2];
+
+	if (offset & 2)
+		m_mainram.target()[offset >> 2] = (existing & (0xffff0000U | ~mem_mask)) | (data & mem_mask);
+	else
+		m_mainram.target()[offset >> 2] = (existing & (0x0000ffffU | ~(mem_mask << 16))) | ((data & mem_mask) << 16);
+}
+
+READ16_MEMBER(ncd_020_state::lance19_dma_r)
+{
+	if (offset < 0x800000)
+	{
+		fatalerror("ncd17c.cpp: DMA target %08x not handled!", offset);
+	}
+
+	offset &= 0x7fffff;
+	u32 const data = m_mainram.target()[offset >> 2];
+
+	return (offset & 2) ? u16(data) : u16(data >> 16);
+}
+
+WRITE16_MEMBER(ncd_020_state::lance19_dma_w)
+{
+	if (offset < 0x800000)
+	{
+		fatalerror("ncd17c.cpp: DMA target %08x not handled!", offset);
+	}
+	
+	offset &= 0x7fffff;
 	u32 const existing = m_mainram.target()[offset >> 2];
 
 	if (offset & 2)
@@ -418,8 +459,8 @@ void ncd_020_state::ncd_19(machine_config &config)
 
 	AM7990(config, m_lance);
 	m_lance->intr_out().set(FUNC(ncd_020_state::lance_irq_w)).invert();
-	m_lance->dma_in().set(FUNC(ncd_020_state::lance_dma_r));
-	m_lance->dma_out().set(FUNC(ncd_020_state::lance_dma_w));
+	m_lance->dma_in().set(FUNC(ncd_020_state::lance19_dma_r));
+	m_lance->dma_out().set(FUNC(ncd_020_state::lance19_dma_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(72);

@@ -5,6 +5,10 @@
 Crazy Ballooon
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CRBALOON_H
+#define MAME_INCLUDES_CRBALOON_H
+
+#pragma once
 
 #include "sound/discrete.h"
 #include "sound/sn76477.h"
@@ -16,8 +20,8 @@ Crazy Ballooon
 class crbaloon_state : public driver_device
 {
 public:
-	crbaloon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	crbaloon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -25,7 +29,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sn(*this, "snsnd"),
 		m_discrete(*this, "discrete"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -69,3 +74,5 @@ public:
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CRBALOON_H

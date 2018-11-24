@@ -11708,6 +11708,7 @@ rolcrusha                       // (c) 1999 SemiCom
 
 @source:drgnmst.cpp
 drgnmst                         // (c) 1994
+drgnmst2                        // (c) 1994
 
 @source:dribling.cpp
 dribling                        // (c) 1983 Model Racing
@@ -12677,6 +12678,7 @@ falco5220e                      // 1987
 falco5220s                      // 1989
 
 @source:falcots.cpp
+ts1                             // 1980
 ts2624                          // 1982
 
 @source:famibox.cpp
@@ -29851,6 +29853,9 @@ ncd19                           // 1990 Network Computing Devices
 
 @source:ncdmips.cpp
 hmxpro                          // 1994 Network Computing Devices
+
+@source:ncdppc.cpp
+explorapro                      // 1995 Network Computing Devices
 
 @source:nds.cpp
 nds                             // 2004 Nintendo

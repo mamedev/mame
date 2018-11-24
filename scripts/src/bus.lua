@@ -999,6 +999,14 @@ if (BUSES["IEEE488"]~=null) then
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.h",
 	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/ieee488/hp9122c.cpp", GEN_DIR .. "emu/layout/hp9122c.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "hp9122c"),
+	}
 end
 
 

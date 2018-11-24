@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "includes/xavix.h"
 
-#define VERBOSE 1
+// #define VERBOSE 1
 #include "logmacro.h"
 
 // 16 stereo voices?

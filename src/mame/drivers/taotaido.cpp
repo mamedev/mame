@@ -388,10 +388,10 @@ MACHINE_CONFIG_START(taotaido_state::taotaido)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( taotaido_state, tile_callback )
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(0)
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR(config, m_spr, 0);
+	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback), this);
+	m_spr->set_gfx_region(0);
+	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

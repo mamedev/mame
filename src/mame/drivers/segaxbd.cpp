@@ -1723,9 +1723,9 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_SCREEN_UPDATE_DRIVER(segaxbd_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("sprites", SEGA_XBOARD_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SEGA_XBOARD_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
+	m_segaic16vid->set_screen(m_screen);
 
 	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 

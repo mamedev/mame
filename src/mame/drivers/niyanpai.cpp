@@ -717,7 +717,7 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	MCFG_PALETTE_ADD("palette", 256*3)
 
 	/* sound hardware */
-	MCFG_NICHISND_ADD("nichisnd")
+	NICHISND(config, "nichisnd", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(niyanpai_state::musobana)

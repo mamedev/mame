@@ -420,7 +420,9 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(2);
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 32, 14)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(32, 14);
 
 	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
 

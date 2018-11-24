@@ -538,7 +538,7 @@ MACHINE_CONFIG_START(play_3_state::sklflite)
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
 
-	MCFG_DEVICE_ADD("zsu", EFO_ZSU1, 0)
+	EFO_ZSU1(config, m_zsu, 0);
 MACHINE_CONFIG_END
 
 

@@ -778,7 +778,7 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 	m_i8255_2->out_pa_callback().set(FUNC(segahang_state::sub_control_adc_w));
 	m_i8255_2->in_pc_callback().set(FUNC(segahang_state::adc_status_r));
 
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
 
 	// video hardware
@@ -794,11 +794,12 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(segahang_state::hangon_base)
+void segahang_state::hangon_base(machine_config &config)
+{
 	shared_base(config);
 	// video hardware
-	MCFG_DEVICE_ADD("sprites", SEGA_HANGON_SPRITES, 0)
-MACHINE_CONFIG_END
+	SEGA_HANGON_SPRITES(config, m_sprites, 0);
+}
 
 
 MACHINE_CONFIG_START(segahang_state::sharrier_base)
@@ -813,7 +814,7 @@ MACHINE_CONFIG_START(segahang_state::sharrier_base)
 	MCFG_DEVICE_CLOCK(MASTER_CLOCK_10MHz)
 
 	// video hardware
-	MCFG_DEVICE_ADD("sprites", SEGA_SHARRIER_SPRITES, 0)
+	SEGA_SHARRIER_SPRITES(config, m_sprites, 0);
 MACHINE_CONFIG_END
 
 

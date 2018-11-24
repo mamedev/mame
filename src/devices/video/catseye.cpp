@@ -878,6 +878,10 @@ READ16_MEMBER(catseye_device::ctrl_r)
 	}
 
 	switch(offset) {
+	case TOPCAT_REG_WMOVE_ACTIVE:
+		ret = 0;
+		break;
+
 	case TOPCAT_REG_ENABLE_BLINK_PLANES:
 		ret = m_blink_enable;
 		break;

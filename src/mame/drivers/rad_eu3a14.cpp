@@ -799,9 +799,9 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("6ch_sound", RADICA6502_SOUND, 8000)
-	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(*this, radica_eu3a14_state, read_full_space))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	radica6502_sound_device &sound(RADICA6502_SOUND(config, "6ch_sound", 8000));
+	sound.space_read_callback().set(FUNC(radica_eu3a14_state::read_full_space));
+	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 MACHINE_CONFIG_END
 

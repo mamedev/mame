@@ -479,6 +479,7 @@ nascom1.cpp
 nc.cpp
 ncd17c.cpp
 ncdmips.cpp
+ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp

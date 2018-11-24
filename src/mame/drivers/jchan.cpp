@@ -627,10 +627,10 @@ MACHINE_CONFIG_START(jchan_state::jchan)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("view2", KANEKO_TMAP, 0)
-	MCFG_KANEKO_TMAP_GFX_REGION(0)
-	MCFG_KANEKO_TMAP_OFFSET(33, 11, 320, 240)
-	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	KANEKO_TMAP(config, m_view2);
+	m_view2->set_gfx_region(0);
+	m_view2->set_offset(33, 11, 320, 240);
+	m_view2->set_gfxdecode_tag("gfxdecode");
 
 	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
 	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)

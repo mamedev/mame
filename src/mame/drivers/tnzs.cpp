@@ -1544,8 +1544,8 @@ MACHINE_CONFIG_START(tnzs_base_state::tnzs_base)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1600,7 +1600,7 @@ MACHINE_CONFIG_START(extrmatn_state::extrmatn)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
+	MCFG_PALETTE_INIT_OWNER(extrmatn_state, prompalette)
 MACHINE_CONFIG_END
 
 void extrmatn_state::plumppop(machine_config &config)

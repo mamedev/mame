@@ -16,11 +16,6 @@
 #include "machine/timer.h"
 #include "sound/dmadac.h"
 
-#define MCFG_ATARI_CAGE_IRQ_CALLBACK(_write) \
-	downcast<atari_cage_device &>(*device).set_irqhandler_callback(DEVCB_##_write);
-
-#define MCFG_ATARI_CAGE_SPEEDUP(_speedup) \
-	downcast<atari_cage_device &>(*device).set_speedup(_speedup);
 
 class atari_cage_device : public device_t
 {
@@ -35,7 +30,6 @@ public:
 	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_speedup(offs_t speedup) { m_speedup = speedup; }
-	template <class Object> devcb_base &set_irqhandler_callback(Object &&cb) { return m_irqhandler.set_callback(std::forward<Object>(cb)); }
 	auto irq_handler() { return m_irqhandler.bind(); }
 
 	void reset_w(int state);

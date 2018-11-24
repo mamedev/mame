@@ -135,7 +135,7 @@ WRITE8_MEMBER( s11c_state::bgbank_w )
 //  popmessage("BG bank set to %02x (%i)",data,bank);
 }
 */
-MACHINE_RESET_MEMBER( s11c_state, s11c )
+void s11c_state::machine_reset()
 {
 //  membank("bgbank")->set_entry(0);
 	// reset the CPUs again, so that the CPUs are starting with the right vectors (otherwise sound may die on reset)
@@ -153,11 +153,11 @@ void s11c_state::init_s11c()
 	timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 }
 
-MACHINE_CONFIG_START(s11c_state::s11c)
+void s11c_state::s11c(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(s11c_main_map)
-	MCFG_MACHINE_RESET_OVERRIDE(s11c_state, s11c)
+	M6808(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &s11c_state::s11c_main_map);
 
 	/* Video */
 	config.set_default_layout(layout_s11c);
@@ -217,10 +217,10 @@ MACHINE_CONFIG_START(s11c_state::s11c)
 
 	/* Add the background music card */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("bgm", S11C_BG)
-	MCFG_S11C_BG_ROM_REGION(":bgcpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	S11C_BG(config, m_bg);
+	m_bg->set_romregion("bgcpu");
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 /*--------------------
 / Bugs Bunny Birthday Ball 11/90

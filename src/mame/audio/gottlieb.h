@@ -24,15 +24,6 @@ DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_de
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
 
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS() \
-	downcast<gottlieb_sound_r2_device &>(*device).enable_cobram3_mods();
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

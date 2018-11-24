@@ -262,7 +262,7 @@
 	-->
 	<software name="us_vol1">
 		<description>e-kara US Volume 1 (US-E001)</description>
-		<year>2000</year>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -285,7 +285,7 @@
 	-->
 	<software name="us_vol2">
 		<description>e-kara US Volume 2 (US-E002)</description>
-		<year>2000</year>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -308,11 +308,103 @@
 	-->
 	<software name="us_vol3">
 		<description>e-kara US Volume 3 (US-E003)</description>
-		<year>2000</year>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e003.u1" size="0x100000" crc="d90a7e58" sha1="37b899676935fb3dda266dc5614ef53cb2c33980" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<!-- e-kara US Volume 4 (US-E004)
+	1.  "Can't Buy Me Love"   The Beatles
+	2.  "A Hard Day's Night"  The Beatles
+	3.  "Ticket To Ride"      The Beatles
+	4.  "Yesterday"           The Beatles
+	5.  "Help"                The Beatles
+	6.  "Michelle"            The Beatles
+	7.  "Yellow Submarine"    The Beatles
+	8.  "All My Loving"       The Beatles
+	9.  "Drive My Car"        The Beatles
+	10. "We Can Work It Out"  The Beatles
+	-->
+	<software name="us_vol4">
+		<description>e-kara US Volume 4 (US-E004)</description>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e004.u1" size="0x100000" crc="790822e9" sha1="cc5806fdc79f777a42980d6825c92837b07fd80d" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+
+	<!-- e-kara US Volume 5 (US-E005)
+	1.  "Lucy In the Sky With Diamonds"  The Beatles
+	2.  "All You Need Is Love"           The Beatles
+	3.  "Hello Goodbye"                  The Beatles
+	4.  "Hey Jude"                       The Beatles
+	5.  "Ob-La-Di, Ob-La-Da"             The Beatles
+	6.  "Get Back"                       The Beatles
+	7.  "Come Together"                  The Beatles
+	8.  "Oh! Darling"                    The Beatles
+	9.  "Let It Be"                      The Beatles
+	10. "The Long And Winding Road"      The Beatles
+	-->	
+	<software name="us_vol5">
+		<description>e-kara US Volume 5 (US-E005)</description>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e005.u1" size="0x100000" crc="edf1e4ce" sha1="7e5e3116f62897ae023c84842036f24b19c926cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>		
+	
+	<!-- e-kara US Volume 6 (US-E006)
+	1.  "Survivor (Album Version)"             Destiny's Child
+	2.  "Jumpin', Jumpin'"                     Destiny's Child
+	3.  "I Turn To You"                        Christina Aguilera
+    4.  "As Long As You're Loving Me"          Vitamin C
+	5.  "Body II Body"                         Samantha Mumba
+	6.  "Love Don't Cost a Thing"              Jennifer Lopez
+	7.  "Again"                                Janet Jackson
+    8.  "If I Fall You're Going Down With Me"  Dixie Chicks
+	9.  "Can't Fight The Moonlight"            LeAnn Rimes
+	10. "American Pie (Album Version)"         Madonna 
+	-->
+	<software name="us_vol6">
+		<description>e-kara US Volume 6 (US-E006)</description>
+		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e006.u1" size="0x100000" crc="e9aaca2f" sha1="983086f068ee38b970c01d2304e757148474aee3" offset="0" />
+			</dataarea>
+		</part>
+	</software>			
+	
+	<!-- e-kara US Volume 7 (US-E007)
+	1.  "Show Me The Meaning of Being Lonely"  Backstreet Boys
+	2.  "Lucky"                                Britney Spears
+	3.  "When It's Over"                       Sugar Ray
+	4.  "Bootylicious"                         Destiny's Child
+	5.  "Nobody Wants to be Lonely"            Ricky Martin & Christina Aguilera
+	6.  "Breathe"                              Faith Hill
+	7.  "It's Gonna Be Me"                     *N Sync
+	8.  "Don't Think I'm Not"                  Kandi
+    9.  "Lady Marmalade"                       Christina Aguilera, Lik'Kim, Mya & Pink
+    10. "God Bless The U.S.A."                 Lee Greenwood 
+	-->
+	<software name="us_vol7">
+		<description>e-kara US Volume 7 (US-E007)</description>
+		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="us-e007.u1" size="0x100000" crc="b7f5ca53" sha1="84af6d96512de96dbab03c236b3416b2e604f753" offset="0" />
 			</dataarea>
 		</part>
 	</software>		
@@ -331,7 +423,7 @@
 	-->
 	<software name="us_vol8">
 		<description>e-kara US Volume 8 'No Boys Allowed' (US-E008)</description>
-		<year>2002</year>
+		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
@@ -354,7 +446,7 @@
 	-->	
 	<software name="us_vol9">
 		<description>e-kara US Volume 9 'No Boys Allowed' (US-E009)</description>
-		<year>2002</year>
+		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">

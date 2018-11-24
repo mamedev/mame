@@ -38,103 +38,112 @@
 #define CPU_MASTER_CLOCK    (XTAL(15'000'000))
 #define BUGGYBOY_ZCLK       (CPU_MASTER_CLOCK / 2)
 
-struct math_t
-{
-	uint16_t  cpulatch;
-	uint16_t  promaddr;
-	uint16_t  inslatch;
-	uint32_t  mux;
-	uint16_t  ppshift;
-	uint32_t  i0ff;
-	uint16_t  retval;
-	uint16_t  muxlatch;   // TX-1
-	int     dbgaddr;
-	int     dbgpc;
-};
-
-/*
-    SN74S516 16x16 Multiplier/Divider
-*/
-struct sn74s516_t
-{
-	int16_t   X;
-	int16_t   Y;
-
-	union
-	{
-	#ifdef LSB_FIRST
-		struct { uint16_t W; int16_t Z; } as16bit;
-	#else
-		struct { int16_t Z; uint16_t W; } as16bit;
-	#endif
-		int32_t ZW32;
-	} ZW;
-
-	int     code;
-	int     state;
-	int     ZWfl;
-};
-
-struct vregs_t
-{
-	uint16_t  scol;       /* Road colours */
-	uint32_t  slock;      /* Scroll lock */
-	uint8_t   flags;      /* Road flags */
-
-	uint32_t  ba_val;     /* Accumulator */
-	uint32_t  ba_inc;
-	uint32_t  bank_mode;
-
-	uint16_t  h_val;      /* Accumulator */
-	uint16_t  h_inc;
-	uint16_t  h_init;
-
-	uint8_t   slin_val;   /* Accumulator */
-	uint8_t   slin_inc;
-
-	/* Buggyboy only */
-	uint8_t   wa8;
-	uint8_t   wa4;
-
-	uint16_t  wave_lfsr;
-	uint8_t   sky;
-	uint16_t  gas;
-	uint8_t   shift;
-};
-
 
 class tx1_state : public driver_device
 {
 public:
-	tx1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_mathcpu(*this, "math_cpu"),
-			m_maincpu(*this, "main_cpu"),
-			m_math_ram(*this, "math_ram"),
-			m_vram(*this, "vram"),
-			m_objram(*this, "objram"),
-			m_rcram(*this, "rcram"),
-			m_char_tiles(*this, "char_tiles"),
-			m_obj_tiles(*this, "obj_tiles"),
-			m_road_rom(*this, "road"),
-			m_obj_map(*this, "obj_map"),
-			m_obj_luts(*this, "obj_luts"),
-			m_proms(*this, "proms"),
-			m_screen(*this, "screen"),
-			m_sound(*this, "soundbrd")
-		{ }
+	tx1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_mathcpu(*this, "math_cpu"),
+		m_maincpu(*this, "main_cpu"),
+		m_math_ram(*this, "math_ram"),
+		m_vram(*this, "vram"),
+		m_objram(*this, "objram"),
+		m_rcram(*this, "rcram"),
+		m_char_tiles(*this, "char_tiles"),
+		m_obj_tiles(*this, "obj_tiles"),
+		m_road_rom(*this, "road"),
+		m_obj_map(*this, "obj_map"),
+		m_obj_luts(*this, "obj_luts"),
+		m_proms(*this, "proms"),
+		m_screen(*this, "screen"),
+		m_sound(*this, "soundbrd")
+	{ }
 
 	void tx1(machine_config &config);
 	void tx1j(machine_config &config);
 	void buggyboy(machine_config &config);
 	void buggybjr(machine_config &config);
 
+private:
+	struct math_t
+	{
+		uint16_t  cpulatch;
+		uint16_t  promaddr;
+		uint16_t  inslatch;
+		uint32_t  mux;
+		uint16_t  ppshift;
+		uint32_t  i0ff;
+		uint16_t  retval;
+		uint16_t  muxlatch;   // TX-1
+		int     dbgaddr;
+		int     dbgpc;
+
+		uint16_t get_datarom_addr() const;
+		uint16_t get_bb_datarom_addr() const;
+	};
+
+	// SN74S516 16x16 Multiplier/Divider
+	class sn74s516_t
+	{
+	public:
+		int16_t   X;
+		int16_t   Y;
+
+		union
+		{
+#ifdef LSB_FIRST
+			struct { uint16_t W; int16_t Z; } as16bit;
+#else
+			struct { int16_t Z; uint16_t W; } as16bit;
+#endif
+			int32_t ZW32;
+		} ZW;
+
+		int     code;
+		int     state;
+		int     ZWfl;
+
+		void kick(running_machine &machine, math_t &math, uint16_t *data, int ins);
+
+	private:
+		void multiply(running_machine &machine);
+		void divide(running_machine &machine);
+		void update(running_machine &machine, int ins);
+	};
+
+	struct vregs_t
+	{
+		uint16_t  scol;       /* Road colours */
+		uint32_t  slock;      /* Scroll lock */
+		uint8_t   flags;      /* Road flags */
+
+		uint32_t  ba_val;     /* Accumulator */
+		uint32_t  ba_inc;
+		uint32_t  bank_mode;
+
+		uint16_t  h_val;      /* Accumulator */
+		uint16_t  h_inc;
+		uint16_t  h_init;
+
+		uint8_t   slin_val;   /* Accumulator */
+		uint8_t   slin_inc;
+
+		/* Buggyboy only */
+		uint8_t   wa8;
+		uint8_t   wa4;
+
+		uint16_t  wave_lfsr;
+		uint8_t   sky;
+		uint16_t  gas;
+		uint8_t   shift;
+	};
+
 	math_t m_math;
 	sn74s516_t m_sn74s516;
 
 	required_device<cpu_device> m_mathcpu;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_math_ram;
 	required_shared_ptr<uint16_t> m_vram;
@@ -160,6 +169,10 @@ private:
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	bool m_needs_update;
+
+	void kick_sn74s516(uint16_t *data, int ins);
+	void tx1_update_state();
+	void buggyboy_update_state();
 
 	DECLARE_READ16_MEMBER(tx1_math_r);
 	DECLARE_WRITE16_MEMBER(tx1_math_w);
