@@ -577,7 +577,7 @@ From the above some noteworthy cases are:
 
 /* Draw a tilemap sprite */
 
-void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll)
+void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sx, int in_sy, int scroll)
 {
 	int xnum = 0x20;        // width in tiles (screen-wide)
 	int ynum = 0x8;         // height in tiles (always 64 pixels?)
@@ -585,128 +585,130 @@ void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx
 	scroll &= 0x7;      // scroll register index
 
 	/* Sign extend the position */
-	sx = 0;
-	sy = (sy & 0x1ff) - (sy & 0x200);
+	in_sx = 0;
+	in_sy = (in_sy & 0x1ff) - (in_sy & 0x200);
 
 	/* Set up a clipping region for the tilemap slice .. */
-	rectangle clip;
-	clip.set(sx, sx + xnum * 0x10 - 1, sy, sy + ynum * 0x8  - 1);
+	rectangle outclip;
+	outclip.set(in_sx, in_sx + xnum * 0x10 - 1, in_sy, in_sy + ynum * 0x8  - 1);
 
-	/* .. and clip it against the visible screen */
+	/* .. and outclip it against the visible screen */
 
-	if (clip.min_x > cliprect.max_x)    return;
-	if (clip.min_y > cliprect.max_y)    return;
+	if (outclip.min_x > cliprect.max_x)    return;
+	if (outclip.min_y > cliprect.max_y)    return;
 
-	if (clip.max_x < cliprect.min_x)    return;
-	if (clip.max_y < cliprect.min_y)    return;
+	if (outclip.max_x < cliprect.min_x)    return;
+	if (outclip.max_y < cliprect.min_y)    return;
 
-	if (clip.min_x < cliprect.min_x)    clip.min_x = cliprect.min_x;
-	if (clip.max_x > cliprect.max_x)    clip.max_x = cliprect.max_x;
+	if (outclip.min_x < cliprect.min_x)    outclip.min_x = cliprect.min_x;
+	if (outclip.max_x > cliprect.max_x)    outclip.max_x = cliprect.max_x;
 
-	if (clip.min_y < cliprect.min_y)    clip.min_y = cliprect.min_y;
-	if (clip.max_y > cliprect.max_y)    clip.max_y = cliprect.max_y;
+	if (outclip.min_y < cliprect.min_y)    outclip.min_y = cliprect.min_y;
+	if (outclip.max_y > cliprect.max_y)    outclip.max_y = cliprect.max_y;
 
-	/* Get the scroll data */
-	int x    = m_scroll[ scroll * 4 + 0 ];    // x scroll
-	int y    = m_scroll[ scroll * 4 + 1 ];    // y scroll
-	//     m_scroll[ scroll * 4 + 2 ];    // ???
-	int mode = m_scroll[ scroll * 4 + 3 ];    // layer disabled, shadow, depth etc.
-
-	/* Background layer disabled */
-	if ((mode & 0xe000) == 0)
-		return;
-
-	int shadow = (mode & 0x0800);
-
-	/* Decide the actual size of the tilemap */
-	int size    =   1 << (8 + ((mode & 0xe000) >> 13));
-	int page    =   (x & 0x7fff) / size;
-
-	/* Given a fixed scroll value, the portion of tilemap displayed changes with the sprite position */
-	x += sx;
-	y += sy;
-
-	/* Tweak the scroll values */
-	// x += 0;
-	y    += ((m_scroll[0x70/2] & 0x1ff) - (m_scroll[0x70/2] & 0x200) + m_scroll[0x6a/2] + 2);
-
-	// Kludge for eaglshot
-	if ((m_scroll[ scroll * 4 + 2 ] & 0x05ff) == 0x0440) x += -0x10;
-	if ((m_scroll[ scroll * 4 + 2 ] & 0x05ff) == 0x0401) x += -0x20;
-
-	/* Draw the rows */
-	int x1  = x;
-	int y1  = y;
-	int sx1 = sx - (x & 0xf);
-	int sy1 = sy - (y & 0xf);
-
-	for (sx=sx1,x=x1; sx <= clip.max_x; sx+=0x10,x+=0x10)
+	for (int line = outclip.min_y; line < outclip.max_y; line++)
 	{
-		for (sy=sy1,y=y1; sy <= clip.max_y; sy+=0x10,y+=0x10)
+		rectangle clip;
+		clip.set(outclip.min_x, outclip.max_x, line, line+1);
+
+		/* Get the scroll data */
+		int x = m_scroll[scroll * 4 + 0];    // x scroll
+		int y = m_scroll[scroll * 4 + 1];    // y scroll
+		//     m_scroll[ scroll * 4 + 2 ];    // ???
+		int mode = m_scroll[scroll * 4 + 3];    // layer disabled, shadow, depth etc.
+
+		/* Background layer disabled */
+		if ((mode & 0xe000) == 0)
+			return;
+
+		int shadow = (mode & 0x0800);
+
+		/* Decide the actual size of the tilemap */
+		int size = 1 << (8 + ((mode & 0xe000) >> 13));
+		int page = (x & 0x7fff) / size;
+
+		/* Given a fixed scroll value, the portion of tilemap displayed changes with the sprite position */
+		x += in_sx;
+		y += in_sy;
+
+		/* Tweak the scroll values */
+		// x += 0;
+		y += ((m_scroll[0x70 / 2] & 0x1ff) - (m_scroll[0x70 / 2] & 0x200) + m_scroll[0x6a / 2] + 2);
+
+		// Kludge for eaglshot
+		if ((m_scroll[scroll * 4 + 2] & 0x05ff) == 0x0440) x += -0x10;
+		if ((m_scroll[scroll * 4 + 2] & 0x05ff) == 0x0401) x += -0x20;
+
+		/* Draw the rows */
+		int x1 = x;
+		int y1 = y;
+		int sx1 = in_sx - (x & 0xf);
+		int sy1 = in_sy - (y & 0xf);
+
+		for (int sx = sx1, x = x1; sx <= clip.max_x; sx += 0x10, x += 0x10)
 		{
-			int tx, ty, gfx;
-
-			uint16_t* s3  =   &m_spriteram[   page * (size * ((0x1000/0x200)/2))  +
-									((x & ((size -1) & ~0xf)) << 2) +
-									((y & ((0x200-1) & ~0xf)) >> 3)     ];
-
-			int code    =   s3[0];  // code high bits
-			int attr    =   s3[1];  // code low  bits + color
-
-			/* Code's high bits are scrambled */
-			code    +=  m_tile_code[(attr & 0x3c00)>>10];
-			int flipy   =   (attr & 0x4000);
-			int flipx   =   (attr & 0x8000);
-
-			if ((m_scroll[0x74/2] & 0x1000) && ((m_scroll[0x74/2] & 0x2000) == 0))
+			for (int sy = sy1, y = y1; sy <= clip.max_y; sy += 0x10, y += 0x10)
 			{
-				if (flipx == 0) flipx = 1; else flipx = 0;
-			}
-			if ((m_scroll[0x74/2] & 0x4000) && ((m_scroll[0x74/2] & 0x2000) == 0))
-			{
-				if (flipy == 0) flipy = 1; else flipy = 0;
-			}
+				uint16_t* s3 = &m_spriteram[page * (size * ((0x1000 / 0x200) / 2)) +
+					((x & ((size - 1) & ~0xf)) << 2) +
+					((y & ((0x200 - 1) & ~0xf)) >> 3)];
 
-			int color   =   attr;
+				int code = s3[0];  // code high bits
+				int attr = s3[1];  // code low  bits + color
 
-			/* Select 256 or 64 color tiles */
-			gfx =   ((mode & 0x0100) ? 0 : 1);
+				/* Code's high bits are scrambled */
+				code += m_tile_code[(attr & 0x3c00) >> 10];
+				int flipy = (attr & 0x4000);
+				int flipx = (attr & 0x8000);
 
-			/* Force 16x16 tiles ? */
-			int xstart, xend, xinc;
-			int ystart, yend, yinc;
-
-			if (flipx)  { xstart = 1-1;  xend = -1; xinc = -1; }
-			else        { xstart = 0;    xend = 1;  xinc = +1; }
-
-			if (flipy)  { ystart = 2-1;  yend = -1; yinc = -1; }
-			else        { ystart = 0;    yend = 2;  yinc = +1; }
-
-			/* Draw a tile (16x16) */
-			for (tx = xstart; tx != xend; tx += xinc)
-			{
-				for (ty = ystart; ty != yend; ty += yinc)
+				if ((m_scroll[0x74 / 2] & 0x1000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
 				{
-					drawgfx( bitmap, clip, m_gfxdecode->gfx(gfx),
-											code++,
-											color,
-											flipx, flipy,
-											sx + tx * 16, sy + ty * 8,
-											shadow  );
-				} /* ty */
-			} /* tx */
+					if (flipx == 0) flipx = 1; else flipx = 0;
+				}
+				if ((m_scroll[0x74 / 2] & 0x4000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
+				{
+					if (flipy == 0) flipy = 1; else flipy = 0;
+				}
 
-		} /* sy */
-	} /* sx */
+				int color = attr;
 
+				/* Select 256 or 64 color tiles */
+				int gfx = ((mode & 0x0100) ? 0 : 1);
+
+				/* Force 16x16 tiles ? */
+				int xstart, xend, xinc;
+				int ystart, yend, yinc;
+
+				if (flipx) { xstart = 1 - 1;  xend = -1; xinc = -1; }
+				else { xstart = 0;    xend = 1;  xinc = +1; }
+
+				if (flipy) { ystart = 2 - 1;  yend = -1; yinc = -1; }
+				else { ystart = 0;    yend = 2;  yinc = +1; }
+
+				/* Draw a tile (16x16) */
+				for (int tx = xstart; tx != xend; tx += xinc)
+				{
+					for (int ty = ystart; ty != yend; ty += yinc)
+					{
+						drawgfx(bitmap, clip, m_gfxdecode->gfx(gfx),
+							code++,
+							color,
+							flipx, flipy,
+							sx + tx * 16, sy + ty * 8,
+							shadow);
+					} /* ty */
+				} /* tx */
+
+			} /* sy */
+		} /* sx */
+	} /* line */
 }
 
 /* Draw the "background layer" using multiple tilemap sprites */
 
 void ssv_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr)
 {
-	int sy;
-	for ( sy = 0; sy <= m_screen->visible_area().max_y; sy += 0x40 )
+	for ( int sy = 0; sy <= m_screen->visible_area().max_y; sy += 0x40 )
 		draw_row(bitmap, cliprect, 0, sy, nr);
 }
 
