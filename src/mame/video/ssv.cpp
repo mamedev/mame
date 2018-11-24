@@ -644,7 +644,7 @@ void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int in
 		/* Get the scroll data */
 		int foo_x = m_scroll[scrollreg * 4 + 0];    // x scroll
 		int foo_y = m_scroll[scrollreg * 4 + 1];    // y scroll
-		//     m_scroll[ scrollreg * 4 + 2 ];    // ???
+		int unknown = m_scroll[scrollreg * 4 + 2];    // ???
 		int mode = m_scroll[scrollreg * 4 + 3];    // layer disabled, shadow, depth etc.
 
 		/* Background layer disabled */
@@ -660,8 +660,8 @@ void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int in
 		foo_y += ((m_scroll[0x70 / 2] & 0x1ff) - (m_scroll[0x70 / 2] & 0x200) + m_scroll[0x6a / 2] + 2);
 
 		// Kludge for eaglshot
-		if ((m_scroll[scrollreg * 4 + 2] & 0x05ff) == 0x0440) foo_x += -0x10;
-		if ((m_scroll[scrollreg * 4 + 2] & 0x05ff) == 0x0401) foo_x += -0x20;
+		if ((unknown & 0x05ff) == 0x0440) foo_x += -0x10;
+		if ((unknown & 0x05ff) == 0x0401) foo_x += -0x20;
 
 		/* Draw the rows */
 		int sx1 = in_sx - (foo_x & 0xf);
