@@ -1057,9 +1057,6 @@ void screen_device::set_visible_area(int min_x, int max_x, int min_y, int max_y)
 
 bool screen_device::update_partial(int scanline)
 {
-	// validate arguments
-	assert(scanline >= 0);
-
 	LOG_PARTIAL_UPDATES(("Partial: update_partial(%s, %d): ", tag(), scanline));
 
 	// these two checks only apply if we're allowed to skip frames
