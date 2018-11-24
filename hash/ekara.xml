@@ -170,7 +170,7 @@
 	S-15  SC0015-     (unknown)
 	S-16  SC0016-     (unknown)
 	S-17  SC0017-     (unknown)
-	S-18  SC0018-     (unknown)
+	S-18  SC0018-     (unknown) Volume 1
 	S-19 *SC0019-SAI  SAI Volume 6
 	S-20  SC0020-     (unknown)
 	S-21 *SC0021-SAI  SAI Volume 7
@@ -205,18 +205,18 @@
 	1. e-Kara
 	2. thing with 4 buttons on it
 
-	G-1   GC0001-     untranslated volume 1 (Artist Selection?)
-	G-2  *GC0002-BHT  BHT Volume 1
-	G-3   GC0003-     untranslated volume 2 (Artist Selection?)
-	G-4   GC0004-BHT  BHT Volume 2
+	G-1   GC0001-BAT  BAT Volume 1 (Artist Selection?)
+	G-2  *GC0002-BHT  BHT Volume 1 (Best Artists?)
+	G-3   GC0003-BAT  BAT Volume 2 (Artist Selection?)
+	G-4   GC0004-BHT  BHT Volume 2 (Best Artists?)
 	G-5   GC0005-     TV Pop Volume 1
-	G-6  *GC0006-BHT  BHT Volume 3
-	G-7   GC0007-     untranslated Volume 3 (Artist Selection?)
-	G-8   GC0008-     untranslated (no volume)
+	G-6  *GC0006-BHT  BHT Volume 3 (Best Artists?)
+	G-7   GC0007-BAT  BAT Volume 3 (Artist Selection?)
+	G-8   GC0008-MIN? untranslated (no volume)
 	G-9   GC0009-     TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
-	G-10  GC0010-     untranslated Volume 4 (Artist Selection?)
+	G-10  GC0010-     BAT Volume 4 (Artist Selection?)
 	G-11  GC0011-     TV Pop Volume 4
-	G-12  GC0012-BHT  BHT Volume 5 (Volume 4 is 'P-1' in 'P' series)
+	G-12  GC0012-BHT  BHT Volume 5 (Best Artists?) (Volume 4 is 'P-1' in 'P' series)
 	G-13  GC0013-     (unknown)
 	G-14  GC0014-     (unknown)
 	G-15  GC0015-     (unknown)
@@ -234,7 +234,7 @@
 	2. thing with 4 buttons on it
 	3. Konami DDR Family Mat
 
-	P-1  BHT Volume 4 (1,2,3, 5 in G series)
+	P-1  BHT Volume 4 (Best Artists?) (1,2,3, 5 in G series)
 	P-2  TV Pop Volume 2 (1,3,4 in G series)
 	P-3  untranslated Volume 1
 	P-4  untranslated Volume 7
