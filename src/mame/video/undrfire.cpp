@@ -553,7 +553,7 @@ uint32_t undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_in
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
-	// TODO : priority behavior isn't correct
+	// TODO : priority behavior isn't correct (TC0360PRI isn't implemented)
 	// ex : Sometimes one SCC layer drawn over some TC0480SCP Tilemaps and/or some sprites in real hardware.
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
