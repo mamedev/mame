@@ -18,7 +18,7 @@
 		</text>
 		<rect state="1">
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
+			<color red="0.0" green="0.0" blue="0.5" />
 		</rect>
 	</element>
 
@@ -131,22 +131,26 @@
 		<bezel name="button_local_text1"     element="button_local_text">    <bounds x="95" y="52" width="10" height="8"/></bezel>
 
 
-<!-- all this is wrong -->
-		<bezel element="hl" inputtag="COL.0" inputmask="0x01"><bounds x="5" y="52" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.0" inputmask="0x02"><bounds x="20" y="86" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.0" inputmask="0x04"><bounds x="35" y="120" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.0" inputmask="0x08"><bounds x="50" y="154" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.1" inputmask="0x01"><bounds x="65" y="52" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.1" inputmask="0x02"><bounds x="80" y="86" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.1" inputmask="0x04"><bounds x="85" y="120" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.1" inputmask="0x08"><bounds x="54" y="154" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.2" inputmask="0x01"><bounds x="88" y="52" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.2" inputmask="0x02"><bounds x="88" y="86" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.2" inputmask="0x04"><bounds x="88" y="120" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.2" inputmask="0x08"><bounds x="88" y="154" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.3" inputmask="0x01"><bounds x="122" y="52" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.3" inputmask="0x02"><bounds x="122" y="86" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.3" inputmask="0x04"><bounds x="122" y="120" width="21" height="21" /><color alpha="0.2" /></bezel>
-		<bezel element="hl" inputtag="COL.3" inputmask="0x08"><bounds x="122" y="154" width="21" height="21" /><color alpha="0.2" /></bezel>
+<!-- to match the schematics, we consider Col.0-3 to be driven by P14-17. The value in "inputmask" is the one read as "p1 & 0x0F", i.e. P13-P10. -->
+<!--	col.0 : (nc)|shift|ACA|DCA
+		col.1 : 4W|2W|ACV|DCV
+		col.2 : int|dn|up|auto
+		col.3 : (nc)|loc|srq|sgl -->
+		<bezel element="hl" inputtag="COL.0" inputmask="0x01"><bounds x="65" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.0" inputmask="0x02"><bounds x="80" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.0" inputmask="0x04"><bounds x="95" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<!--bezel element="hl" inputtag="COL.0" inputmask="0x08"><bounds x="" y="54" width="10" height="10" /><color alpha="0.2" /></bezel -->
+		<bezel element="hl" inputtag="COL.1" inputmask="0x01"><bounds x="5" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x02"><bounds x="20" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x04"><bounds x="35" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x08"><bounds x="50" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x01"><bounds x="5" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x02"><bounds x="20" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x04"><bounds x="35" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x08"><bounds x="50" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x01"><bounds x="65" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x02"><bounds x="80" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x04"><bounds x="95" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<!--bezel element="hl" inputtag="COL.3" inputmask="0x08"><bounds x="" y="5" width="10" height="10" /><color alpha="0.2" /></bezel -->
 	</view>
 </mamelayout>

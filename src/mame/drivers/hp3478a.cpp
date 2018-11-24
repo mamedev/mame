@@ -15,8 +15,6 @@
 * - pressing Shift+Sgl to force a 'test/reset' gets the firmware in an endless loop, not sure why.
 *
 *
-* TODO kindof important
-* * keypad on port1
 *
 * TODO next level
 * * annunciators
@@ -100,16 +98,20 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 
 
 /***** callbacks */
-
-WRITE8_MEMBER( hp3478a_state::p1write )
-{
-	LOGMASKED(DEBUG_PORTS, "port1 write: %02X\n", data);
-}
+/* port1 manages the keypad matrix */
 
 READ8_MEMBER( hp3478a_state::p1read )
 {
-	uint8_t data = m_maincpu->p1_r();
-	LOGMASKED(DEBUG_PORTS, "port1 read: 0x%02X\n", data);
+	unsigned i;
+	uint8_t data = m_maincpu->p1_r() | 0x0F; //P10-P13 "pull-up"
+
+	// for each column, set Px=0 for pressed buttons (active low)
+	for (i = 0; i < 4; i++) {
+		if (!(data & (0x10 << i))) {
+			data &= (0xF0 | m_keypad[i]->read());	//not sure if the undefined upper bits will read as 1 ?
+		}
+	}
+	LOGMASKED(DEBUG_KEYPAD, "port1 read: 0x%02X\n", data);
 	return data;
 }
 
@@ -494,6 +496,33 @@ void hp3478a_state::io_bank(address_map &map)
  Input Ports
 ******************************************************************************/
 static INPUT_PORTS_START( hp3478a )
+/* keypad bit matrix:
+			0x08|0x04|0x02|0x01
+	col.0 : (nc)|shift|ACA|DCA
+	col.1 : 4W|2W|ACV|DCV
+	col.2 : int|dn|up|auto
+	col.3 : (nc)|loc|srq|sgl
+*/
+	PORT_START("COL.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("DCA")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("ACA")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("SHIFT")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )	//nothing on 0x08
+	PORT_START("COL.1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("DCV")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("ACV")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("2W")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("4W")
+	PORT_START("COL.2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("AUTO")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("UP")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("DN")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("INT")
+	PORT_START("COL.3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("SGL")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("SRQ")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("LOC")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )	//nothing on 0x08
 INPUT_PORTS_END
 
 /******************************************************************************
@@ -506,7 +535,6 @@ void hp3478a_state::hp3478a(machine_config &config)
 	mcu.set_addrmap(AS_PROGRAM, &hp3478a_state::i8039_map);
 	mcu.set_addrmap(AS_IO, &hp3478a_state::i8039_io);
 	mcu.p1_in_cb().set(FUNC(hp3478a_state::p1read));
-	mcu.p1_out_cb().set(FUNC(hp3478a_state::p1write));
 	mcu.p2_out_cb().set(FUNC(hp3478a_state::p2write));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

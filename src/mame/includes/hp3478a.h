@@ -36,6 +36,7 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_bank0(*this, "bank0")
 		, m_iobank(*this, "iobank")
+		, m_keypad(*this, "COL.%u", 0)
 	{
 	}
 
@@ -45,11 +46,8 @@ protected:
 	virtual void machine_start() override;
 	//virtual void machine_reset() override;	//not needed?
 
-	DECLARE_WRITE8_MEMBER(p1write);
 	DECLARE_READ8_MEMBER(p1read);
 	DECLARE_WRITE8_MEMBER(p2write);
-	DECLARE_READ8_MEMBER(busread);
-	DECLARE_WRITE8_MEMBER(buswrite);
 	DECLARE_READ8_MEMBER(dipread);
 
 	void io_bank(address_map &map);
@@ -60,6 +58,7 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_memory_bank m_bank0;
 	required_device<address_map_bank_device> m_iobank;
+	required_ioport_array<4> m_keypad;
 
 	/////////////// stuff for internal LCD emulation
 	// could be split to a separate driver ?
