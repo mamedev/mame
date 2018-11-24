@@ -748,32 +748,25 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	for ( ; s1 < end1; s1+=4 )
 	{
-		int mode   = s1[ 0 ];
 		int sprite = s1[ 1 ];
-		int xoffs  = s1[ 2 ];
-		int yoffs  = s1[ 3 ];
 
 		/* Last sprite */
 		if (sprite & 0x8000) break;
 
-		/* Single-sprite address */
-		uint16_t* s2 = &m_spriteram[ (sprite & 0x7fff) * 4 ];
-		int tilemaps_offsy = ((s2[3] & 0x1ff) - (s2[3] & 0x200));
-
-		/* Every single sprite is offset by x & yoffs, and additionally
-		by one of the 8 x & y offsets in the 1c0040-1c005f area   */
-
-		xoffs   +=      m_scroll[((mode & 0x00e0) >> 4) + 0x40/2];
-		yoffs   +=      m_scroll[((mode & 0x00e0) >> 4) + 0x42/2];
+		int mode   = s1[ 0 ];
 
 		/* Number of single-sprites (1-32) */
 		int num             =   (mode & 0x001f) + 1;
 
+		uint16_t* s2 = &m_spriteram[ (sprite & 0x7fff) * 4 ];
+
 		for( ; num > 0; num--,s2+=4 )
 		{
+			/* Single-sprite address */
+
 			uint16_t *end2    =   m_spriteram + 0x40000/2;
 
-			if (s2 >= end2) break;
+			if (s2 >= end2) break;	
 
 			int sx      =       s2[ 2 ];
 			int sy      =       s2[ 3 ];
@@ -788,9 +781,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			if ( s2[0] <= 7 && s2[1] == 0 && xnum == 0 && ynum == 0x0c00)
 			{
 				// Tilemap Sprite
-				int scroll;
-
-				scroll  =   s2[ 0 ];    // scroll index
+				int scroll  =   s2[ 0 ];    // scroll index
 
 				if (m_scroll[0x76/2] & 0x1000)
 					sy -= 0x20;                     // eaglshot
@@ -798,6 +789,8 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				{
 					if (m_scroll[0x7a/2] & 0x0800)
 					{
+						int tilemaps_offsy = ((s2[3] & 0x1ff) - (s2[3] & 0x200));
+
 						if (m_scroll[0x7a/2] & 0x1000)    // drifto94, dynagear, keithlcy, mslider, stmblade, gdfs, ultrax, twineag2
 							sy -= tilemaps_offsy;
 						else                        // srmp4
@@ -819,7 +812,17 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					ultrax (begin of lev1): 100010: 6b60 4280 0016 00a0
 											121400: 51a0 0042 6800 0c00 needs to be a normal sprite
 				*/
-				
+
+				int xoffs  = s1[ 2 ];
+				int yoffs  = s1[ 3 ];
+
+				/* Every single sprite is offset by x & yoffs, and additionally
+				by one of the 8 x & y offsets in the 1c0040-1c005f area   */
+
+				xoffs   +=      m_scroll[((mode & 0x00e0) >> 4) + 0x40/2];
+				yoffs   +=      m_scroll[((mode & 0x00e0) >> 4) + 0x42/2];
+
+
 				if (s2 >= end2) break;
 
 				int code    =   s2[0];  // code high bits
