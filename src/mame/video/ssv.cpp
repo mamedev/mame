@@ -639,7 +639,7 @@ void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int in
 	for (int line = outclip.min_y; line < outclip.max_y; line++)
 	{
 		rectangle clip;
-		clip.set(outclip.min_x, outclip.max_x, line, line + 1);
+		clip.set(outclip.min_x, outclip.max_x, line, line);
 
 		/* Get the scroll data */
 		int foo_x = m_scroll[scrollreg * 4 + 0];    // x scroll
