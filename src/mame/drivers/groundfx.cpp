@@ -187,13 +187,12 @@ INPUT_PORTS_END
 static const gfx_layout tile16x16_layout =
 {
 	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,5),
 	5,  /* 5 bits per pixel */
-	{ RGN_FRAC(1,2), 0, 8, 16, 24 },
-	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64,  2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	64*16   /* every sprite takes 128 consecutive bytes */
+	{ 0, RGN_FRAC(1,5), RGN_FRAC(2,5), RGN_FRAC(3,5), RGN_FRAC(4,5) },
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
+	16*16   /* every sprite takes 32 consecutive bytes */
 };
 
 static const gfx_layout charlayout =
@@ -201,9 +200,9 @@ static const gfx_layout charlayout =
 	16,16,    /* 16*16 characters */
 	RGN_FRAC(1,1),
 	4,        /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 5*4, 4*4, 3*4, 2*4, 7*4, 6*4, 9*4, 8*4, 13*4, 12*4, 11*4, 10*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP4(0,1) },
+	{ STEP8(4*7,-4), STEP8(4*15,-4) },
+	{ STEP16(0,4*16) },
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
@@ -214,7 +213,7 @@ static const gfx_layout scclayout =
 	6,      /* 4 bits per pixel */
 	{ RGN_FRAC(1,2), RGN_FRAC(1,2)+1, 0, 1, 2, 3 },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,4*8) },
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
@@ -307,15 +306,15 @@ ROM_START( groundfx )
 	ROM_LOAD16_BYTE( "d51-30.56", 0x100001, 0x40000,  CRC(45f339fe) SHA1(cc7adfb2b86070f5bb426542e3b7ed2a50b3c39e) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "d51-08.35", 0x000000, 0x200000, CRC(835b7a0f) SHA1(0131fceabd73b0045b5d4ae0bb2f03efdd407962) )    /* SCR 16x16 tiles */
-	ROM_LOAD16_BYTE( "d51-09.34", 0x000001, 0x200000, CRC(6dabd83d) SHA1(3dbd7ea36b9900faa6420af1f1600efe295db74c) )
+	ROM_LOAD32_WORD_SWAP( "d51-08.35", 0x000002, 0x200000, CRC(835b7a0f) SHA1(0131fceabd73b0045b5d4ae0bb2f03efdd407962) )    /* SCR 16x16 tiles */
+	ROM_LOAD32_WORD_SWAP( "d51-09.34", 0x000000, 0x200000, CRC(6dabd83d) SHA1(3dbd7ea36b9900faa6420af1f1600efe295db74c) )
 
-	ROM_REGION( 0x1000000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "d51-03.47", 0x800000, 0x200000, CRC(629a5c99) SHA1(cfc1c0b07ecefd6eddb83edcbcf710e8b8de19e4) )    /* OBJ 16x16 tiles */
-	ROM_LOAD32_BYTE( "d51-04.48", 0x000000, 0x200000, CRC(f49b14b7) SHA1(31129771159c1295a074c8311344ece525302289) )
-	ROM_LOAD32_BYTE( "d51-05.49", 0x000001, 0x200000, CRC(3a2e2cbf) SHA1(ed2c1ca9211b1d70b4767a54e08263a3e4867199) )
-	ROM_LOAD32_BYTE( "d51-06.50", 0x000002, 0x200000, CRC(d33ce2a0) SHA1(92c4504344672ea798cd6dd34f4b46848bf9f82b) )
-	ROM_LOAD32_BYTE( "d51-07.51", 0x000003, 0x200000, CRC(24b2f97d) SHA1(6980e67b435d189ce897c0301e0411763410ab47) )
+	ROM_REGION( 0xa00000, "gfx2", 0 )
+	ROM_LOAD16_WORD_SWAP( "d51-03.47", 0x000000, 0x200000, CRC(629a5c99) SHA1(cfc1c0b07ecefd6eddb83edcbcf710e8b8de19e4) )    /* OBJ 16x16 tiles */
+	ROM_LOAD16_WORD_SWAP( "d51-04.48", 0x200000, 0x200000, CRC(f49b14b7) SHA1(31129771159c1295a074c8311344ece525302289) )
+	ROM_LOAD16_WORD_SWAP( "d51-05.49", 0x400000, 0x200000, CRC(3a2e2cbf) SHA1(ed2c1ca9211b1d70b4767a54e08263a3e4867199) )
+	ROM_LOAD16_WORD_SWAP( "d51-06.50", 0x600000, 0x200000, CRC(d33ce2a0) SHA1(92c4504344672ea798cd6dd34f4b46848bf9f82b) )
+	ROM_LOAD16_WORD_SWAP( "d51-07.51", 0x800000, 0x200000, CRC(24b2f97d) SHA1(6980e67b435d189ce897c0301e0411763410ab47) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )
 	ROM_LOAD16_BYTE( "d51-10.95", 0x000000, 0x100000, CRC(d5910604) SHA1(8efe13884cfdef208394ddfe19f43eb1b9f78ff3) )    /* SCC 8x8 tiles, 6bpp */
@@ -323,7 +322,7 @@ ROM_START( groundfx )
 	ROM_LOAD       ( "d51-12.97", 0x300000, 0x100000, CRC(d630287b) SHA1(2fa09e1821b7280d193ca9a2a270759c3c3189d1) )
 	ROM_FILL       (              0x200000, 0x100000, 0x00 )
 
-	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_REGION16_LE( 0x80000, "sprmaprom", 0 )
 	ROM_LOAD16_WORD( "d51-13.7", 0x00000,  0x80000,  CRC(36921b8b) SHA1(2130120f78a3b984618a53054fc937cf727177b9) ) /* STY, spritemap */
 
 	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00 )

@@ -64,7 +64,6 @@ Heavy use is made of sprite zooming.
 void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs)
 {
 	uint32_t *spriteram32 = m_spriteram;
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -130,7 +129,7 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				if (flipx)  px = dimension-1-k;
 				if (flipy)  py = dimension-1-j;
 
-				code = spritemap[map_offset + px + (py<<(dblsize+1))];
+				code = m_spritemap_rom[map_offset + px + (py<<(dblsize+1))];
 
 				if (code==0xffff)
 				{

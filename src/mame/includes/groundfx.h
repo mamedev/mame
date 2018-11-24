@@ -26,6 +26,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
+		m_spritemap_rom(*this, "sprmaprom"),
 		m_maincpu(*this, "maincpu"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0480scp(*this, "tc0480scp"),
@@ -42,6 +43,8 @@ protected:
 private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_shared_ptr<uint32_t> m_spriteram;
+
+	required_region_ptr<uint16_t> m_spritemap_rom;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0100scn_device> m_tc0100scn;
