@@ -6984,13 +6984,13 @@ ROM_END
 
 ROM_START( gnw_climber )
         ROM_REGION( 0x1000, "maincpu", 0 )
-        ROM_LOAD( "dr-106.program", 0x0000, 0x1000, CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) )
+        ROM_LOAD( "dr-106.program", 0x0000, 0x1000, CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) )
 
         ROM_REGION( 0x100, "maincpu:melody", 0 )
-        ROM_LOAD( "dr-106.melody", 0x000, 0x100, CRC(b48c6d90) SHA1(a1ce1e52627767752974ab0d49bec48ead36663e) )
+        ROM_LOAD( "dr-106.melody", 0x000, 0x100, CRC(c99d7998) SHA1(4f8cf35b13f8b7654e7186bfd67d197d9053e949) )
 
-        ROM_REGION( 648209, "svg", 0)
-        ROM_LOAD( "gnw_climber.svg", 0, 648209, CRC(4a6fdb28) SHA1(0a0bc48d82d5b8bf8ef96ef9ce2f87ba6ea850c1) )
+        ROM_REGION( 542332, "svg", 0)
+        ROM_LOAD( "gnw_climber.svg", 0, 542332, CRC(d7e84c21) SHA1(a5b5b68c8cdb3a09966bfb91b281791bef311248) )
 ROM_END
 
 
