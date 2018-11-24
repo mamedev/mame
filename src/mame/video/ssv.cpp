@@ -647,6 +647,10 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		if ((mode & 0xe000) == 0)
 			return;
 
+		/* Decide the actual size of the tilemap */
+		int size = 1 << (8 + ((mode & 0xe000) >> 13));
+		int page = (foo_x & 0x7fff) / size;
+
 		/* Given a fixed scroll value, the portion of tilemap displayed changes with the sprite position */
 		foo_x += in_sx;
 		foo_y += in_sy;
@@ -669,10 +673,6 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 			int sx, x;
 			for (sx = sx1, x = foo_x; sx <= clip.max_x; sx += 0x10, x += 0x10)
 			{
-				/* Decide the actual size of the tilemap */
-				int size = 1 << (8 + ((mode & 0xe000) >> 13));
-				int page = (foo_x & 0x7fff) / size;
-
 				uint16_t* s3 = &m_spriteram[page * (size * ((0x1000 / 0x200) / 2)) +
 					((x & ((size - 1) & ~0xf)) << 2) +
 					((y & ((0x200 - 1) & ~0xf)) >> 3)];
