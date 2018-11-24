@@ -138,7 +138,7 @@
 	M-1  *MC0001-ATM  Mini Volume 1
 	M-2   MC0002-
 	M-3   MC0003-
-	M-4   MC0004-
+	M-4   MC0004-     Mini Volume 4 (w-inds)
 	M-5   MC0005-
 	M-6   MC0006-
 	M-7   MC0007-ATM  Mini Volume 5	 
@@ -172,7 +172,7 @@
 	S-17  SC0017-     (unknown)
 	S-18  SC0018-     (unknown) Volume 1
 	S-19 *SC0019-SAI  SAI Volume 6
-	S-20  SC0020-     (unknown)
+	S-20  SC0020-     (unknown) Volume 5
 	S-21 *SC0021-SAI  SAI Volume 7
 	S-22 *SC0022-SAI  SAI Volume 8
 	S-23  SC0023-     (unknown)
@@ -217,9 +217,9 @@
 	G-10  GC0010-     BAT Volume 4 (Artist Selection?)
 	G-11  GC0011-     TV Pop Volume 4
 	G-12  GC0012-BHT  BHT Volume 5 (Best Artists?) (Volume 4 is 'P-1' in 'P' series)
-	G-13  GC0013-     (unknown)
-	G-14  GC0014-     (unknown)
-	G-15  GC0015-     (unknown)
+	G-13  GC0013-     (unknown) Volume 6
+	G-14  GC0014-     (unknown) Volume 2
+	G-15  GC0015-     (unknown) Volume 5
 	G-16  GC0016-     (unknown)
 	G-17  GC0017-     TV Pop Volume 6
 
