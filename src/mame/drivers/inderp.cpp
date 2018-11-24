@@ -239,6 +239,16 @@ ROM_START(topaz)
 	ROM_LOAD("topaz2.bin", 0x0c00, 0x0400, CRC(b8d2e7c6) SHA1(e19bec04fab15536fea51c4298c6a4cb3817630c))
 ROM_END
 
+ROM_START(skatebrd)
+	ROM_REGION(0x1800, "roms", 0)
+	ROM_LOAD("skate2.bin",  0x0000, 0x0800, CRC(ee9b4c4c) SHA1(1a8b2ef8dfead18bfc62e85474dab2838b73ce08))
+	ROM_LOAD("skate3.bin",  0x0800, 0x0400, CRC(58e181fe) SHA1(f54c8099100d0c96dc2ddbae8db9293f8581d459))
+	ROM_RELOAD(0x0c00, 0x0400)
+	ROM_LOAD("skate4.bin",  0x1000, 0x0400, CRC(fcdccffe) SHA1(a2db53f7bc555d705aa894e62307590fd74067dd))
+	ROM_RELOAD(0x1400, 0x0400)
+ROM_END
+
 GAME( 1979, centauri,  0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (Inder)",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, centauri2, centauri, inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Centaur (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, topaz,     0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Topaz (Inder)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1980, skatebrd,  0,        inderp, inderp, inderp_state, empty_init, ROT0, "Inder", "Skate Board (Inder)",     MACHINE_IS_SKELETON_MECHANICAL )

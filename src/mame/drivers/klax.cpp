@@ -7,10 +7,10 @@
     driver by Aaron Giles
 
     Games supported:
-        * Klax (1989) [5 sets]
+        * Klax (1989) [6 original sets + 2 bootleg sets]
 
     Known bugs:
-        * none at this time
+        * Bootleg sets don't work
 
 ****************************************************************************
 
@@ -292,7 +292,7 @@ ROM_START( klax )
 ROM_END
 
 
-ROM_START( klax2 )
+ROM_START( klax5 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "13607-5006.3n", 0x00000, 0x10000, CRC(05c98fc0) SHA1(84880d3d65c46c96c739063b3f61b1663989c56e) )
 	ROM_LOAD16_BYTE( "13607-5005.1n", 0x00001, 0x10000, CRC(d461e1ee) SHA1(73e8615a742555f74c1086c0b745afc7e94a478f) )
@@ -321,7 +321,7 @@ ROM_START( klax2 )
 	ROM_LOAD( "136075-1004.6w.bin",  0x0000, 0x0117, CRC(6cd3270d) SHA1(84854b5beee539a80fc94f6e4637aa1c2543a1cb) )
 ROM_END
 
-ROM_START( klax2bl ) // derived from 'klax2' set
+ROM_START( klax5bl ) // derived from 'klax5' set
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "6.bin", 0x00000, 0x10000, CRC(3cfd2748) SHA1(165c446bab9df6517746451d056330386cb5212c) )
 	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x10000, CRC(910e5bf9) SHA1(2b5af427e7cbad8d4ed2a202900f227295e1dea9) )
@@ -343,7 +343,7 @@ ROM_START( klax2bl ) // derived from 'klax2' set
 	ROM_LOAD( "8.bin", 0x10000, 0x10000, CRC(36764bbc) SHA1(5762996a327b5f7f93f42dad7eccb6297b3e4c0b) )
 ROM_END
 
-ROM_START( klax2bl2 ) // derived from 'klax2' set, closer than klax2bl
+ROM_START( klax5bl2 ) // derived from 'klax5' set, closer than klax2bl
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "3.ic31", 0x00000, 0x10000, CRC(e43699f3) SHA1(2a78959ad065e1c0f69cc2ba4146a50102ccfd7e) )
 	ROM_LOAD16_BYTE( "1.ic13", 0x00001, 0x10000, CRC(dc67f13a) SHA1(6021f48b53f9000983bcd786b8366ba8638174de) )
@@ -364,14 +364,14 @@ ROM_START( klax2bl2 ) // derived from 'klax2' set, closer than klax2bl
 	ROM_LOAD( "10.ic101", 0x00000, 0x10000, CRC(5c551e92) SHA1(cbff8fc4f4d370b6db2b4953ecbedd249916b891) )
 	ROM_LOAD( "9.ic102",  0x10000, 0x10000, CRC(29708e34) SHA1(6bea1527ad941fbb1abfad59ef3d78900dcd7f27) )
 
-	ROM_REGION( 0x400, "plds", 0) // protected
+	ROM_REGION( 0x800, "plds", 0) // protected
 	ROM_LOAD( "palce16v8.ic67", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "palce16v8.ic91", 0x200, 0x117, NO_DUMP )
-	ROM_LOAD( "gal16v8.ic24", 0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "gal16v8.ic29", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.ic24",   0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.ic29",   0x600, 0x117, NO_DUMP )
 ROM_END
 
-ROM_START( klax3 )
+ROM_START( klax4 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136075-5006.3n", 0x00000, 0x10000, CRC(65eb9a31) SHA1(3f47d58fe9eb154ab14ac282919f92679b5c7922) )
 	ROM_LOAD16_BYTE( "136075-5005.1n", 0x00001, 0x10000, CRC(7be27349) SHA1(79eef2b7f4a0fb6991d81f6543d5ae00de9f2452) )
@@ -400,8 +400,36 @@ ROM_START( klax3 )
 	ROM_LOAD( "136075-1004.6w.bin",  0x0000, 0x0117, CRC(6cd3270d) SHA1(84854b5beee539a80fc94f6e4637aa1c2543a1cb) )
 ROM_END
 
+ROM_START( klaxj4 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
+	ROM_LOAD16_BYTE( "136075-4406.3n", 0x00000, 0x10000, CRC(fc4045ec) SHA1(58441ffeb58c1dc9ef18f3c6381eec52923ffe03) )
+	ROM_LOAD16_BYTE( "136075-4405.1n", 0x00001, 0x10000, CRC(f017461a) SHA1(a0acd66a48c2a964c3e8f2bdacd94908bfc84843) )
+	ROM_LOAD16_BYTE( "136075-4408.3k", 0x20000, 0x10000, CRC(23231159) SHA1(a0ac57d358078f7fbec95964a2608213f79e4b6f) )
+	ROM_LOAD16_BYTE( "136075-4407.1k", 0x20001, 0x10000, CRC(8d8158b2) SHA1(299570f16a6019c34f210bffe39ff8489f3f11f1) )
 
-ROM_START( klaxj )
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "136075-2010.17x", 0x00000, 0x10000, CRC(15290a0d) SHA1(e1338f3fb298aae19735548f4b597d1c33944960) )
+	ROM_LOAD( "136075-2012.12x", 0x10000, 0x10000, CRC(c0d9eb0f) SHA1(aa68b9ad435eeaa8b43693e237cc7f9a53d94dfc) )
+	ROM_LOAD( "136075-2009.17u", 0x20000, 0x10000, CRC(6368dbaf) SHA1(fa8b5cf6777108c0b1e38a3650ee4cdb2ec76810) )
+	ROM_LOAD( "136075-2011.12u", 0x30000, 0x10000, CRC(e83cca91) SHA1(45f1155d51ab3e2cc08aad1ec4e557d132085cc6) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "136075-2014.17y", 0x00000, 0x10000, CRC(5c551e92) SHA1(cbff8fc4f4d370b6db2b4953ecbedd249916b891) )
+	ROM_LOAD( "136075-2013.17w", 0x10000, 0x10000, CRC(36764bbc) SHA1(5762996a327b5f7f93f42dad7eccb6297b3e4c0b) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM data */
+	ROM_LOAD( "136075-1015.14b", 0x00000, 0x10000, CRC(4d24c768) SHA1(da102105a4d8c552e3594b8ffb1903ecbaa69415) )
+	ROM_LOAD( "136075-1016.12b", 0x10000, 0x10000, CRC(12e9b4b7) SHA1(2447f116cd865e46e61022143a2668beca99d5d1) )
+
+	ROM_REGION( 0x00573, "pals", 0 ) /* Lattice GAL16V8A-25LP GAL's */
+	ROM_LOAD( "136075-1000.11c.bin", 0x0000, 0x0117, CRC(fb86e94a) SHA1(b16f037c49766ab734e47c8e1b16b5178809b8a3) )
+	ROM_LOAD( "136075-1001.18l.bin", 0x0000, 0x0117, CRC(cd21acfe) SHA1(14bd9e2f1b50a1da550933e3fdc16e3f09b65e92) )
+	ROM_LOAD( "136075-1002.8w.bin",  0x0000, 0x0117, CRC(4a7b6c44) SHA1(9579e098af3e5cd19bd14c361d3b1c5cb9047171) )
+	ROM_LOAD( "136075-1003.9w.bin",  0x0000, 0x0117, CRC(72f7f904) SHA1(f792b5bcc313c5f3338a569a6f376a3ebb1eabf7) )
+	ROM_LOAD( "136075-1004.6w.bin",  0x0000, 0x0117, CRC(6cd3270d) SHA1(84854b5beee539a80fc94f6e4637aa1c2543a1cb) )
+ROM_END
+
+ROM_START( klaxj3 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136075-3406.3n", 0x00000, 0x10000, CRC(ab2aa50b) SHA1(0ebffc8b4724eb8c4423e0b1f62b0fff7cc30aab) )
 	ROM_LOAD16_BYTE( "136075-3405.1n", 0x00001, 0x10000, CRC(9dc9a590) SHA1(4c77b1ad9c083325f33520f2b6aa598dde247ad8) )
@@ -431,7 +459,7 @@ ROM_START( klaxj )
 ROM_END
 
 
-ROM_START( klaxd )
+ROM_START( klaxd2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136075-2206.3n", 0x00000, 0x10000, CRC(9d1a713b) SHA1(6e60a43934bd8959c5c07dd12e087c63ea791bb9) )
 	ROM_LOAD16_BYTE( "136075-1205.1n", 0x00001, 0x10000, CRC(45065a5a) SHA1(77339ca04e54a04489ce9d6e11816475e57d1311) )
@@ -468,11 +496,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, klax,    0,    klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (set 1)", 0 )
-GAME( 1989, klax2,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (set 2)", 0 )
-GAME( 1989, klax3,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (set 3)", 0 )
-GAME( 1989, klaxj,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Japan)", 0 )
-GAME( 1989, klaxd,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Germany)", 0 )
+GAME( 1989, klax,     0,    klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (version 6)", 0 )
+GAME( 1989, klax5,    klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (version 5)", 0 )
+GAME( 1989, klax4,    klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (version 4)", 0 )
+GAME( 1989, klaxj4,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Japan, version 4)", 0 )
+GAME( 1989, klaxj3,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Japan, version 3)", 0 )
+GAME( 1989, klaxd2,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Germany, version 2)", 0 )
 
-GAME( 1989, klax2bl, klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (set 2, bootleg set 1)", MACHINE_NOT_WORKING )
-GAME( 1989, klax2bl2,klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (set 2, bootleg set 2)", MACHINE_NOT_WORKING )
+GAME( 1989, klax5bl,  klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (version 5, bootleg set 1)", MACHINE_NOT_WORKING )
+GAME( 1989, klax5bl2, klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (version 5, bootleg set 2)", MACHINE_NOT_WORKING )
