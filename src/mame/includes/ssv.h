@@ -173,7 +173,7 @@ private:
 
 	void draw_16x16_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int flipx, int flipy, int mode, int code, int color, int sx, int sy );
 
-	void draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sx, int in_sy, int scroll);
+	void draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sx, int in_sy, int scroll);
 	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void enable_video(int enable);

@@ -610,7 +610,7 @@ void ssv_state::draw_16x16_tiles(bitmap_ind16 &bitmap, const rectangle &clip, in
 }
 
 
-void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sx, int in_sy, int scrollreg)
+void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sx, int in_sy, int scrollreg)
 {
 	scrollreg &= 0x7;      // scroll register index
 
@@ -620,9 +620,9 @@ void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int in
 
 	/* Set up a clipping region for the tilemap slice .. */
 	rectangle outclip;
-	outclip.set(in_sx, in_sx + 0x20/*width in tiles*/ * 0x10 - 1, in_sy, in_sy + 0x8/*height in tiles, always 64 pixels*/ * 0x8 - 1);
+	outclip.set(in_sx, in_sx + 0x20/*width in tiles*/ * 0x10, in_sy, in_sy + 0x8/*height in tiles, always 64 pixels*/ * 0x8);
 
-	/* .. and outclip it against the visible screen */
+	/* .. and clip it against the visible screen */
 
 	if (outclip.min_x > cliprect.max_x)    return;
 	if (outclip.min_y > cliprect.max_y)    return;
@@ -630,13 +630,9 @@ void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int in
 	if (outclip.max_x < cliprect.min_x)    return;
 	if (outclip.max_y < cliprect.min_y)    return;
 
-	if (outclip.min_x < cliprect.min_x)    outclip.min_x = cliprect.min_x;
-	if (outclip.max_x > cliprect.max_x)    outclip.max_x = cliprect.max_x;
+	outclip &= cliprect;
 
-	if (outclip.min_y < cliprect.min_y)    outclip.min_y = cliprect.min_y;
-	if (outclip.max_y > cliprect.max_y)    outclip.max_y = cliprect.max_y;
-
-	for (int line = outclip.min_y; line < outclip.max_y; line++)
+	for (int line = outclip.min_y; line <= outclip.max_y; line++)
 	{
 		rectangle clip;
 		clip.set(outclip.min_x, outclip.max_x, line, line);
@@ -710,7 +706,7 @@ void ssv_state::draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int in
 void ssv_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr)
 {
 	for ( int sy = 0; sy <= m_screen->visible_area().max_y; sy += 0x40 )
-		draw_row(bitmap, cliprect, 0, sy, nr);
+		draw_row_64pixhigh(bitmap, cliprect, 0, sy, nr);
 }
 
 /* Draw sprites in the sprites list */
@@ -804,7 +800,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				}
 
 				if ((mode & 0x001f) != 0)
-					draw_row(bitmap, cliprect, sx, sy, scroll);
+					draw_row_64pixhigh(bitmap, cliprect, sx, sy, scroll);
 			}
 			else
 			{
