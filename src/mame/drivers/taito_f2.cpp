@@ -639,9 +639,9 @@ void taitof2_state::finalb_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x320001, 0x320001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x320003, 0x320003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x810000, 0x81ffff).nopw();   /* error in game init code ? */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xb00002, 0xb00003).nopw();   /* ?? */
 }
@@ -654,8 +654,8 @@ void taitof2_state::dondokod_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x320000, 0x320000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x320002, 0x320002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xa00000, 0xa01fff).rw(m_tc0280grd, FUNC(tc0280grd_device::tc0280grd_word_r), FUNC(tc0280grd_device::tc0280grd_word_w));    /* ROZ tilemap */
 	map(0xa02000, 0xa0200f).w(m_tc0280grd, FUNC(tc0280grd_device::tc0280grd_ctrl_word_w));
@@ -673,9 +673,9 @@ void taitof2_state::megab_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x40001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
-	map(0x600000, 0x60ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
+	map(0x600000, 0x60ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x610000, 0x61ffff).ram();   /* unused? */
-	map(0x620000, 0x62000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x620000, 0x62000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x800000, 0x80ffff).ram().share("spriteram");
 }
 
@@ -687,10 +687,10 @@ void taitof2_state::thundfox_map(address_map &map)
 	map(0x220000, 0x220000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x220002, 0x220002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x300000, 0x30ffff).ram();
-	map(0x400000, 0x40ffff).rw(m_tc0100scn_1, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));  /* tilemaps */
-	map(0x420000, 0x42000f).rw(m_tc0100scn_1, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x500000, 0x50ffff).rw(m_tc0100scn_2, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));  /* tilemaps */
-	map(0x520000, 0x52000f).rw(m_tc0100scn_2, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x400000, 0x40ffff).rw(m_tc0100scn_1, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));  /* tilemaps */
+	map(0x420000, 0x42000f).rw(m_tc0100scn_1, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
+	map(0x500000, 0x50ffff).rw(m_tc0100scn_2, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));  /* tilemaps */
+	map(0x520000, 0x52000f).rw(m_tc0100scn_2, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x600000, 0x60ffff).ram().share("spriteram");
 	map(0x800000, 0x80001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);
 }
@@ -704,8 +704,8 @@ void taitof2_state::cameltry_map(address_map &map)
 	map(0x300018, 0x30001f).r(FUNC(taitof2_state::cameltry_paddle_r));
 	map(0x320000, 0x320000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x320002, 0x320002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x800000, 0x813fff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x813fff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xa00000, 0xa01fff).rw(m_tc0280grd, FUNC(tc0280grd_device::tc0280grd_word_r), FUNC(tc0280grd_device::tc0280grd_word_w));    /* ROZ tilemap */
 	map(0xa02000, 0xa0200f).w(m_tc0280grd, FUNC(tc0280grd_device::tc0280grd_ctrl_word_w));
@@ -721,8 +721,8 @@ void taitof2_state::cameltrya_map(address_map &map)
 	map(0x300018, 0x30001f).r(FUNC(taitof2_state::cameltry_paddle_r));
 	map(0x320000, 0x320000).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x320002, 0x320002).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	map(0x800000, 0x813fff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x813fff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xa00000, 0xa01fff).rw(m_tc0280grd, FUNC(tc0280grd_device::tc0280grd_word_r), FUNC(tc0280grd_device::tc0280grd_word_w));    /* ROZ tilemap */
 	map(0xa02000, 0xa0200f).w(m_tc0280grd, FUNC(tc0280grd_device::tc0280grd_ctrl_word_w));
@@ -737,8 +737,8 @@ void taitof2_state::qtorimon_map(address_map &map)
 	map(0x500000, 0x50000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x600000, 0x600000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x600002, 0x600002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0x910000, 0x9120ff).nopw();   /* error in init code ? */
 }
@@ -751,8 +751,8 @@ void taitof2_state::liquidk_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x320001, 0x320001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x320003, 0x320003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
 }
@@ -773,9 +773,9 @@ void taitof2_state::quizhq_map(address_map &map)
 	map(0x600001, 0x600001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x600003, 0x600003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x680000, 0x680001).nopw();   /* ??? */
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x810000, 0x81ffff).nopw();   /* error in init code ? */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 }
 
@@ -788,8 +788,8 @@ void taitof2_state::ssi_map(address_map &map)
 	map(0x400000, 0x400000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x400002, 0x400002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ?? */
-	map(0x600000, 0x60ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps (not used) */
-	map(0x620000, 0x62000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x600000, 0x60ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps (not used) */
+	map(0x620000, 0x62000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x800000, 0x80ffff).ram().share("spriteram");   /* sprite ram */
 }
 
@@ -801,8 +801,8 @@ void taitof2_state::gunfront_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
 	map(0x320000, 0x320000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x320002, 0x320002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 //  AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP   /* ?? */
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
@@ -826,8 +826,8 @@ void taitof2_state::growl_map(address_map &map)
 	map(0x504000, 0x504001).nopw();    /* unknown... various values */
 	map(0x508000, 0x50800f).portr("IN3");
 	map(0x50c000, 0x50c00f).portr("IN4");
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
 }
@@ -846,8 +846,8 @@ void taitof2_state::mjnquest_map(address_map &map)
 	map(0x360000, 0x360000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x360002, 0x360002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x380000, 0x380001).w(m_tc0100scn, FUNC(tc0100scn_device::gfxbank_w));   /* scr gfx bank select */
-	map(0x400000, 0x40ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x420000, 0x42000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x400000, 0x40ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x420000, 0x42000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x500000, 0x50ffff).ram().share("spriteram");
 }
 
@@ -875,8 +875,8 @@ void taitof2_state::koshien_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_r), FUNC(tc0510nio_device::halfword_w));
 	map(0x320000, 0x320000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x320002, 0x320002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xa20000, 0xa20001).w(FUNC(taitof2_state::koshien_spritebank_w));
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);
@@ -888,8 +888,8 @@ void taitof2_state::yuyugogo_map(address_map &map)
 	map(0x200000, 0x20000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_r), FUNC(tc0510nio_device::halfword_w));
 	map(0x400000, 0x400000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x400002, 0x400002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xa00000, 0xa01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xb00000, 0xb10fff).ram();   /* deliberate writes to $b10xxx, I think */
@@ -907,8 +907,8 @@ void taitof2_state::ninjak_map(address_map &map)
 	map(0x400000, 0x400000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x400002, 0x400002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x600000, 0x60000f).w(FUNC(taitof2_state::taitof2_spritebank_w));
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* b00002 written like a watchdog?! */
 }
@@ -929,8 +929,8 @@ void taitof2_state::solfigtr_map(address_map &map)
 	map(0x400002, 0x400002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x500000, 0x50000f).w(FUNC(taitof2_state::taitof2_spritebank_w));
 	map(0x504000, 0x504001).nopw();    /* unknown... various values */
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
 }
@@ -944,8 +944,8 @@ void taitof2_state::qzquest_map(address_map &map)
 	map(0x400000, 0x401fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x50ffff).ram();
 	map(0x600000, 0x60ffff).ram().share("spriteram");
-	map(0x700000, 0x70ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x720000, 0x72000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x700000, 0x70ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x720000, 0x72000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 void taitof2_state::pulirula_map(address_map &map)
@@ -959,8 +959,8 @@ void taitof2_state::pulirula_map(address_map &map)
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ??? */
 	map(0x600000, 0x603fff).w(FUNC(taitof2_state::taitof2_sprite_extension_w)).share("sprite_ext");
 	map(0x700000, 0x701fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xa00000, 0xa0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);
 	map(0xb00000, 0xb0000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_r), FUNC(tc0510nio_device::halfword_w));
@@ -991,8 +991,8 @@ void taitof2_state::qzchikyu_map(address_map &map)
 	map(0x400000, 0x401fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x50ffff).ram();
 	map(0x600000, 0x60ffff).ram().share("spriteram");
-	map(0x700000, 0x70ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x720000, 0x72000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x700000, 0x70ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x720000, 0x72000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 void taitof2_state::yesnoj_map(address_map &map)
@@ -1000,8 +1000,8 @@ void taitof2_state::yesnoj_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x400000, 0x40ffff).ram().share("spriteram");
-	map(0x500000, 0x50ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x520000, 0x52000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x500000, 0x50ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x520000, 0x52000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x70001f).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write)).umask16(0x00ff);
 	map(0x800000, 0x800000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
@@ -1041,8 +1041,8 @@ void taitof2_state::dinorex_map(address_map &map)
 	map(0x600000, 0x60ffff).ram();
 	map(0x700000, 0x70001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
 	map(0x800000, 0x80ffff).ram().share("spriteram");
-	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xa00000, 0xa00000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0xa00002, 0xa00002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xb00000, 0xb00001).nopw();   /* watchdog? */
@@ -1057,8 +1057,8 @@ void taitof2_state::qjinsei_map(address_map &map)
 	map(0x500000, 0x500001).nopw();   /* watchdog ? */
 	map(0x600000, 0x603fff).w(FUNC(taitof2_state::taitof2_sprite_extension_w)).share("sprite_ext");
 	map(0x700000, 0x701fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xa00000, 0xa0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
 	map(0xb00000, 0xb0000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_r), FUNC(tc0510nio_device::halfword_w));
@@ -1075,8 +1075,8 @@ void taitof2_state::qcrayon_map(address_map &map)
 	map(0x600000, 0x603fff).w(FUNC(taitof2_state::taitof2_sprite_extension_w)).share("sprite_ext");
 	map(0x700000, 0x701fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x800000, 0x80ffff).ram().share("spriteram");
-	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xa00000, 0xa0000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_r), FUNC(tc0510nio_device::halfword_w));
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
 }
@@ -1087,8 +1087,8 @@ void taitof2_state::qcrayon2_map(address_map &map)
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x40ffff).ram().share("spriteram");
-	map(0x500000, 0x50ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x520000, 0x52000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x500000, 0x50ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x520000, 0x52000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x600000, 0x67ffff).rom().region("extra", 0);   /* extra data rom */
 	map(0x700000, 0x70000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_r), FUNC(tc0510nio_device::halfword_w));
 	map(0x900000, 0x90001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
@@ -1106,8 +1106,8 @@ void taitof2_state::driftout_map(address_map &map)
 	map(0x400000, 0x401fff).rw(m_tc0430grw, FUNC(tc0280grd_device::tc0430grw_word_r), FUNC(tc0280grd_device::tc0430grw_word_w));    /* ROZ tilemap */
 	map(0x402000, 0x40200f).w(m_tc0430grw, FUNC(tc0280grd_device::tc0430grw_ctrl_word_w));
 	map(0x700000, 0x701fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xa00000, 0xa0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);
 	map(0xb00000, 0xb0000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_r), FUNC(tc0510nio_device::halfword_w));
@@ -1124,8 +1124,8 @@ void taitof2_state::driveout_map(address_map &map)
 	map(0x400000, 0x401fff).rw(m_tc0430grw, FUNC(tc0280grd_device::tc0430grw_word_r), FUNC(tc0280grd_device::tc0430grw_word_w));    /* ROZ tilemap */
 	map(0x402000, 0x40200f).w(m_tc0430grw, FUNC(tc0280grd_device::tc0430grw_ctrl_word_w));
 	map(0x700000, 0x701fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
-	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x800000, 0x80ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
+	map(0x820000, 0x82000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x900000, 0x90ffff).ram().share("spriteram");
 	map(0xa00000, 0xa0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);
 	map(0xb00000, 0xb0000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_r), FUNC(tc0510nio_device::halfword_w));
@@ -2955,10 +2955,9 @@ MACHINE_CONFIG_START(taitof2_state::finalb)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 MACHINE_CONFIG_END
@@ -2980,10 +2979,9 @@ MACHINE_CONFIG_START(taitof2_state::dondokod)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0280GRD(config, m_tc0280grd, 0);
 	m_tc0280grd->set_gfx_region(2);
@@ -3013,10 +3011,9 @@ MACHINE_CONFIG_START(taitof2_state::megab)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3038,23 +3035,21 @@ MACHINE_CONFIG_START(taitof2_state::thundfox)
 
 	TC0100SCN(config, m_tc0100scn_1, 0);
 	m_tc0100scn_1->set_gfx_region(1);
-	m_tc0100scn_1->set_tx_region(3);
 	m_tc0100scn_1->set_offsets(3, 0);
 	m_tc0100scn_1->set_offsets_flip(5, 0);
 	m_tc0100scn_1->set_offsets_fliptx(4, 1);
 	m_tc0100scn_1->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn_1->set_palette_tag(m_palette);
+	m_tc0100scn_1->set_palette(m_palette);
 
 	TC0100SCN(config, m_tc0100scn_2, 0);
 	m_tc0100scn_2->set_gfx_region(2);
-	m_tc0100scn_2->set_tx_region(4);
 	m_tc0100scn_2->set_offsets(3, 0);
 	m_tc0100scn_2->set_offsets_flip(5, 0);
 	m_tc0100scn_2->set_offsets_fliptx(4, 1);
 	m_tc0100scn_2->set_multiscr_xoffs(tc0100scn_device::SINGLE_VDU);
 	m_tc0100scn_2->set_multiscr_hack(1);
 	m_tc0100scn_2->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn_2->set_palette_tag(m_palette);
+	m_tc0100scn_2->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3075,10 +3070,9 @@ MACHINE_CONFIG_START(taitof2_state::cameltry)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0280GRD(config, m_tc0280grd, 0);
 	m_tc0280grd->set_gfx_region(2);
@@ -3102,9 +3096,8 @@ MACHINE_CONFIG_START(taitof2_state::qtorimon)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 MACHINE_CONFIG_END
@@ -3125,10 +3118,9 @@ MACHINE_CONFIG_START(taitof2_state::liquidk)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3148,9 +3140,8 @@ MACHINE_CONFIG_START(taitof2_state::quizhq)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 MACHINE_CONFIG_END
@@ -3174,10 +3165,9 @@ MACHINE_CONFIG_START(taitof2_state::ssi)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 MACHINE_CONFIG_END
 
 
@@ -3199,10 +3189,9 @@ MACHINE_CONFIG_START(taitof2_state::gunfront)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3225,10 +3214,9 @@ MACHINE_CONFIG_START(taitof2_state::growl)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3246,9 +3234,8 @@ MACHINE_CONFIG_START(taitof2_state::mjnquest)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 MACHINE_CONFIG_END
@@ -3330,11 +3317,10 @@ MACHINE_CONFIG_START(taitof2_state::koshien)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_offsets_flip(2, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3358,10 +3344,9 @@ MACHINE_CONFIG_START(taitof2_state::yuyugogo)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 MACHINE_CONFIG_END
 
 
@@ -3389,10 +3374,9 @@ MACHINE_CONFIG_START(taitof2_state::ninjak)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3412,12 +3396,11 @@ MACHINE_CONFIG_START(taitof2_state::solfigtr)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_offsets_flip(6, 0);
 	m_tc0100scn->set_offsets_fliptx(6, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3436,9 +3419,8 @@ MACHINE_CONFIG_START(taitof2_state::qzquest)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 MACHINE_CONFIG_END
 
 
@@ -3457,10 +3439,9 @@ MACHINE_CONFIG_START(taitof2_state::pulirula)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0430GRW(config, m_tc0430grw, 0);
 	m_tc0430grw->set_gfx_region(2);
@@ -3514,12 +3495,11 @@ MACHINE_CONFIG_START(taitof2_state::qzchikyu)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(0, 0);
 	m_tc0100scn->set_offsets_flip(-4, 0);
 	m_tc0100scn->set_offsets_fliptx(-11, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 MACHINE_CONFIG_END
 
 
@@ -3541,10 +3521,9 @@ MACHINE_CONFIG_START(taitof2_state::yesnoj)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC8521(config, "rtc", XTAL(32'768));
 MACHINE_CONFIG_END
@@ -3620,10 +3599,9 @@ MACHINE_CONFIG_START(taitof2_state::dinorex)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3646,10 +3624,9 @@ MACHINE_CONFIG_START(taitof2_state::qjinsei)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3672,10 +3649,9 @@ MACHINE_CONFIG_START(taitof2_state::qcrayon)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3698,10 +3674,9 @@ MACHINE_CONFIG_START(taitof2_state::qcrayon2)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0360PRI(config, m_tc0360pri, 0);
 MACHINE_CONFIG_END
@@ -3723,10 +3698,9 @@ MACHINE_CONFIG_START(taitof2_state::driftout)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0430GRW(config, m_tc0430grw, 0);
 	m_tc0430grw->set_gfx_region(2);
@@ -3774,10 +3748,9 @@ MACHINE_CONFIG_START(taitof2_state::cameltrya)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0280GRD(config, m_tc0280grd, 0);
 	m_tc0280grd->set_gfx_region(2);
@@ -3843,10 +3816,9 @@ MACHINE_CONFIG_START(taitof2_state::driveout)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(3);
 	m_tc0100scn->set_offsets(3, 0);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0430GRW(config, m_tc0430grw, 0);
 	m_tc0430grw->set_gfx_region(2);

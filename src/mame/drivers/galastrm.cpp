@@ -118,8 +118,8 @@ void galastrm_state::main_map(address_map &map)
 	map(0x900000, 0x900003).w(FUNC(galastrm_state::palette_w));                               /* TC0110PCR */
 	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::tc0610_0_w));                              /* TC0610 */
 	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::tc0610_1_w));
-	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* piv tilemaps */
-	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
+	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));        /* piv tilemaps */
+	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 /***********************************************************
@@ -241,14 +241,13 @@ void galastrm_state::galastrm(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn, 0);
 	m_tc0100scn->set_gfx_region(0);
-	m_tc0100scn->set_tx_region(2);
 	m_tc0100scn->set_offsets(-48, -56);
 	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	m_tc0100scn->set_palette(m_palette);
 
 	TC0480SCP(config, m_tc0480scp, 0);
 	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(3);
+	m_tc0480scp->set_tx_region(2);
 	m_tc0480scp->set_offsets(-40, -3);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 

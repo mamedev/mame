@@ -215,8 +215,8 @@ WRITE8_MEMBER(warriorb_state::pancontrol_w)
 
 WRITE16_MEMBER(warriorb_state::tc0100scn_dual_screen_w)
 {
-	m_tc0100scn[0]->word_w(space, offset, data, mem_mask);
-	m_tc0100scn[1]->word_w(space, offset, data, mem_mask);
+	m_tc0100scn[0]->ram_w(offset, data, mem_mask);
+	m_tc0100scn[1]->ram_w(offset, data, mem_mask);
 }
 
 /***********************************************************
@@ -227,11 +227,11 @@ void warriorb_state::darius2d_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();     /* main ram */
-	map(0x200000, 0x213fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::word_r)).w(FUNC(warriorb_state::tc0100scn_dual_screen_w));   /* tilemaps (all screens) */
+	map(0x200000, 0x213fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::ram_r)).w(FUNC(warriorb_state::tc0100scn_dual_screen_w));   /* tilemaps (all screens) */
 	map(0x214000, 0x2141ff).nopw();                                            /* error in screen clearing code ? */
-	map(0x220000, 0x22000f).rw(m_tc0100scn[0], FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x240000, 0x253fff).rw(m_tc0100scn[1], FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (2nd screen) */
-	map(0x260000, 0x26000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x220000, 0x22000f).rw(m_tc0100scn[0], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
+	map(0x240000, 0x253fff).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));      /* tilemaps (2nd screen) */
+	map(0x260000, 0x26000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x400000, 0x400007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (1st screen) */
 	map(0x420000, 0x420007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (2nd screen) */
 	map(0x600000, 0x6013ff).ram().share("spriteram");
@@ -244,10 +244,10 @@ void warriorb_state::warriorb_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x213fff).ram();
-	map(0x300000, 0x313fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::word_r)).w(FUNC(warriorb_state::tc0100scn_dual_screen_w));   /* tilemaps (all screens) */
-	map(0x320000, 0x32000f).rw(m_tc0100scn[0], FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x340000, 0x353fff).rw(m_tc0100scn[1], FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));      /* tilemaps (2nd screen) */
-	map(0x360000, 0x36000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x300000, 0x313fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::ram_r)).w(FUNC(warriorb_state::tc0100scn_dual_screen_w));   /* tilemaps (all screens) */
+	map(0x320000, 0x32000f).rw(m_tc0100scn[0], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
+	map(0x340000, 0x353fff).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));      /* tilemaps (2nd screen) */
+	map(0x360000, 0x36000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x400000, 0x400007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (1st screen) */
 	map(0x420000, 0x420007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));    /* palette (2nd screen) */
 	map(0x600000, 0x6013ff).ram().share("spriteram");
@@ -470,10 +470,9 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
-	m_tc0100scn[0]->set_tx_region(3);
 	m_tc0100scn[0]->set_offsets(4, 0);
 	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn[0]->set_palette_tag(m_palette);
+	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
@@ -487,11 +486,10 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
 	m_tc0100scn[1]->set_gfx_region(2);
-	m_tc0100scn[1]->set_tx_region(3);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn[1]->set_palette_tag("palette2");
+	m_tc0100scn[1]->set_palette("palette2");
 
 	TC0110PCR(config, m_tc0110pcr[1], 0, "palette2");
 
@@ -554,10 +552,9 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfx_region(1);
-	m_tc0100scn[0]->set_tx_region(3);
 	m_tc0100scn[0]->set_offsets(4, 0);
 	m_tc0100scn[0]->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn[0]->set_palette_tag(m_palette);
+	m_tc0100scn[0]->set_palette(m_palette);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0, m_palette);
 
@@ -571,12 +568,11 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
 	m_tc0100scn[1]->set_gfx_region(2);
-	m_tc0100scn[1]->set_tx_region(3);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(1);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn[1]->set_palette_tag("palette2");
+	m_tc0100scn[1]->set_palette("palette2");
 
 	TC0110PCR(config, m_tc0110pcr[1], 0, "palette2");
 
