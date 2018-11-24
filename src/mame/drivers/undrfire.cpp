@@ -375,7 +375,7 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0x900000, 0x90ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));        /* 6bpp tilemaps */
 	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0xb00000, 0xb0000f).ram(); /* ? */
+	map(0xb00000, 0xb0000f).ram(); /* TC0360PRI */
 	map(0xc00000, 0xc00007).ram(); /* LAN controller? */
 	map(0xd00000, 0xd00003).w(FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
 	map(0xe00000, 0xe0ffff).ram().share("shared_ram");
