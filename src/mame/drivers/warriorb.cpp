@@ -177,23 +177,6 @@ WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
 	m_z80bank->set_entry(data & 7);
 }
 
-WRITE16_MEMBER(warriorb_state::sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-}
-
-READ16_MEMBER(warriorb_state::sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
-	else
-		return 0;
-}
-
-
 WRITE8_MEMBER(warriorb_state::pancontrol_w)
 {
 	filter_volume_device *flt = nullptr;
@@ -237,7 +220,8 @@ void warriorb_state::darius2d_map(address_map &map)
 	map(0x600000, 0x6013ff).ram().share("spriteram");
 	map(0x800000, 0x80000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
-	map(0x830000, 0x830003).rw(FUNC(warriorb_state::sound_r), FUNC(warriorb_state::sound_w));
+	map(0x830001, 0x830001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x830003, 0x830003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 void warriorb_state::warriorb_map(address_map &map)
@@ -253,7 +237,8 @@ void warriorb_state::warriorb_map(address_map &map)
 	map(0x600000, 0x6013ff).ram().share("spriteram");
 	map(0x800000, 0x80000f).rw(m_tc0510nio, FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
-	map(0x830000, 0x830003).rw(FUNC(warriorb_state::sound_r), FUNC(warriorb_state::sound_w));
+	map(0x830001, 0x830001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x830003, 0x830003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 /***************************************************************************/
