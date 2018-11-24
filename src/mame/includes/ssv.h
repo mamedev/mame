@@ -175,6 +175,8 @@ private:
 
 	void draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sx, int in_sy, int scroll);
 	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);
+	
+	void draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, int flipx, int flipy, int gfx, int shadow, int color, int sx, int sy, int xnum, int ynum);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void enable_video(int enable);
 	void init(int interrupt_ultrax);
