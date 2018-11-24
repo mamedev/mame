@@ -3,230 +3,296 @@
 <softwarelist name="ekara" description="Takara e-kara cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
 	
-	<!-- Each region has it's own set of cartridges (at least US, UK/EU and Japan)
-	     The Japanese ones appear to have a number of different genres each with their own numbering
-		 
-		 There are some carts which are meant to be compatible with both Japanese e-Kara units and
-		 several other systems.
-    
-	     The genres in the Japanese games are represented by the code after the EC number
-		 ECxxxx-JPM = J-Pop Mix
-		 ECxxxx-ATS = Artist Selection (all songs by a single artist)
-		 ECxxxx-KID = Kid's Mix
-		 ECxxxx-ENK = unknown
-		 ECxxxx-BSC = Graduation Encouragement
-		 ECxxxx-G79 = 1979-1981 collection
-		 
-		 Some Japanese carts have a number starting with DC  (D-x on case)
-		 DCxxxx-BHT = unknown (best artists?)
-		
-		 Some Japanese carts have a number starting with GC  (G-x on case)
-		 GCxxxx-BHT = unknown (best artists?)
+	<!-- 
+	Each region has it's own set of cartridges (at least US, UK/EU and Japan)
+	The Japanese ones appear to have a number of different genres each with their own numbering
 
-		 Some Japanese carts have a number starting with SC  (S-x on case)
-		 SCxxxx-SAI = unknown
-		 SCxxxx-HKW = unknown
-		 
-		 (there are more codes, see lists below)
-		 
-			 
-	    ***********************************************************************************
-			 
-		 Japanese cart listing (by EC code) - the EC number is printed on the left side of the cart label, as well as in the serial code
-		 early carts don't have a number printed on the box, only the title, after a certain point a number was added (when?)
-		 
-		  * = dumped
-		 	 
-		..   EC0001-JPM  J-Pop Mix Volume 1
-		..  *EC0002-JPM  J-Pop Mix Volume 2
-		..  *EC0003-JPM  J-Pop Mix Volume 3
-		..   EC0004-JPM  J-Pop Mix Volume 4
-		..   EC0005-JPM  J-Pop Mix Volume 5
-		..  *EC0006-ENK  ENK Volume 1
-		..   EC0007-G76  1976-78 Volume 1
-		..  *EC0008-G79  1979-81 Volume 1
-		..   EC0009-     untranslated Volume 1
-	
-		..  *EC0010-KID  Kid's Mix Volume 1
-		..   EC0011-JPM  J-Pop Mix Volume 6
-		..  *EC0012-JPM  J-Pop Mix Volume 7 
-		..  *EC0013-JPM  J-Pop Mix Volume 8
-		..  *EC0014-ATS  Artist Selection Volume 1 - untranslated artist
-		..  *EC0015-ATS  Artist Selection Volume 2 - untranslated artist
-		..   EC0016-ENK  ENK Volume 2
-		..   EC0017-G73  1973-75 Volume 1
-		..   EC0018-G82  1982-84 Volume 1
-	  	..   EC0019-BSC  Graduation Encouragement Volume 1
+	There are some carts which are meant to be compatible with both Japanese e-Kara units and
+	several other systems.
+
+	The genres in the Japanese games are represented by the code after the EC number
+	ECxxxx-JPM = J-Pop Mix
+	ECxxxx-ATS = Artist Selection (all songs by a single artist)
+	ECxxxx-KID = Kid's Mix
+	ECxxxx-ENK = unknown
+	ECxxxx-BSC = Graduation Encouragement
+	ECxxxx-G79 = 1979-1981 collection
+
+	Some Japanese carts have a number starting with DC  (D-x on case)
+	DCxxxx-BHT = unknown (best artists?)
+
+	Some Japanese carts have a number starting with GC  (G-x on case)
+	GCxxxx-BHT = unknown (best artists?)
+
+	Some Japanese carts have a number starting with SC  (S-x on case)
+	SCxxxx-SAI = unknown
+	SCxxxx-HKW = unknown
+
+	(there are more codes, see lists below)
+
 	 
-		..   EC0020-KID  Kid's Mix Volume 2
-		..   EC0021-JPM  J-Pop Mix Volume 9
-		..  *EC0022-JPM  J-Pop Mix Volume 10
-		23  *EC0023-JPM  J-Pop Mix Volume 11
-		24   EC0024-JPM  J-Pop Mix Volume 12
-		25  *EC0025-JPM  J-Pop Mix Volume 13
-		26  *EC0026-JPM  J-Pop Mix Volume 14 
-		27  *EC0027-JPM  J-Pop Mix Volume 15 
-		28   EC0028-JPM  J-Pop Mix Volume 16
-		29  *EC0029-ATS  Artist Selection Volume 3 - Dreams Come True	
-
-		30   EC0030-ENK  ENK Volume 3
-		31  *EC0031-ATS  Artist Selection Volume 4 - untranslated artist
-		32   EC0032-     untranslated Volume 2 (sequel to EC0009)
-		33   EC0033-JPM  J-Pop Mix Volume 17
-		34  *EC0034-KID  Kid's Mix Volume 3 
-		35  *EC0035-ATS  Artist Selection Volume 5 - Matsuda Seiko
-		36  *EC0036-ATS  Artist Selection Volume 6 - KinKi Kids
-		37   EC0037-ENK  ENK Volume 4
-		38   EC0038-BSC  Graduation Encouragement Volume 2
-		39   EC0039-ATS  Artist Selection Volume 7 - B'z
-	
-		40   EC0040-JPM  J-Pop Mix Volume 18
-		41  *EC0041-ATS  Artist Selection Volume 8 - untranslated artist
-		42  *EC0042-JPM  J-Pop Mix Volume 19
-		43   EC0043-ENK  ENK Volume 5
-		44  *EC0044-ATS  Artist Selection Volume 9 - Every Little Thing 
-		45  *EC0045-ATS  Artist Selection Volume 10 - Mr. Children 
-		46   EC0046-JPM  J-Pop Mix Volume 20
-		47   EC0047-     untranslated Volume 1
-		48  *EC0048-ENK  ENK Volume 6
-		49  *EC0049-ATS  Artist Selection Volume 11 - Judy and Mary
-
-		50   EC0050-ATS  Artist Selection Volume 12 - The Beatles
-		51   EC0051-JPM  J-Pop Mix Volume 21 
-		52   EC0052-ENK  ENK Volume 7
-		53   EC0053-JPM  J-Pop Mix Volume 22
-		54  *EC0054-JPM  J-Pop Mix Volume 23
-		55   EC0055-ATS  Artist Selection Volume 13 - Tube
-		56   EC0056-JPM  J-Pop Mix Volume 24
-		57   EC0057-ATS  Artist Selection Volume 14 - SMAP (should be Vol 14? sales sheet still lists 13 tho)
-		58   EC0058-ENK  ENK Volume 8
-		59   EC0059-JPM  J-Pop Mix Volume 25
-		 
-		60   EC0060-JPM  J-Pop Mix Volume 26
-		61   EC0061-JPM  J-Pop Mix Volume 27
-		62   EC0062-JPM  J-Pop Mix Volume 28
-		63   EC0063-JPM  J-Pop Mix Volume 29 
-		64   EC0064-ENK  ENK Volume 9
-		65   EC0065-JPM  J-Pop Mix Volume 30
-		66   EC0066-JPM  J-Pop Mix Volume 31
-		67   EC0067-JPM  J-Pop Mix Volume 32
-		68  *EC0068-JPM  J-Pop Mix Volume 33
-		69   EC0069-     untranslated
-
-		70  *EC0070-JPM  J-Pop Mix Volume 34
-		71   EC0071-JPM  J-Pop Mix Volume 35
-		72  *EC0072-JPM  J-Pop Mix Volume 36
-		73   EC0073-     untranslated volume 1
-		74   EC0074-JPM  J-Pop Mix Volume 37
-		75   EC0075-JPM  J-Pop Mix Volume 38
-		76  *EC0076-JPM  J-Pop Mix Volume 39
-	    77   EC0077-ATS  Artist Selection Volume 15 - unknown artist (should be Vol 15? sales sheet lists 5?)
-	    78   EC0078-     (unknown)
-		79   EC0079-     (unknown)
-		80   EC0080-     (unknown)
-		81   EC0081-JPM  J-Pop Mix Volume 42
-		 
-		 (more? what's the EC highest number?)
-		 
-	    ***********************************************************************************
-
-		 Japanese cart listing (by GC code)  (G-x on cartridge / box)
- 		  * = dumped
-
-		G-1   GC0001-     (unknown)
-		G-2  *GC0002-BHT  BHT Volume 1
-		G-3   GC0003-     (unknown)
-		G-4   GC0004-     (unknown)
-		G-5   GC0005-     (unknown)
-		G-6  *GC0006-BHT  BHT Volume 3
-		 
- 		 (more? what's the GC highest number?)
-
-	    ***********************************************************************************
-
-		 Japanese cart listing (by MC code)  (M-x on cartridge / box)
- 		  * = dumped
-
-		M-1  *MC0001-ATM Mini Volume 1
-			 
- 		 (more? what's the MC highest number?)
+	In all lists below 
+	* = dumped
 	 
-	    ***********************************************************************************
+	***********************************************************************************
 	 
-		 Japanese cart listing (by DC code)  (D-x on cartridge / box)
-		 (the numbering on these doesn't make much sense are these re-releases?)
- 		  * = dumped
+	Japanese cart listing (by EC code) - the EC number is printed on the left side of the cart label, as well as in the serial code
+	early carts don't have a number printed on the box, only the title, after a certain point a number was added (when?)
 
-		D-2   DC0002-BAT  Best Artist Volume 6?
-		D-3   DC0003-BHT  Best Artist Volume 9?
-		 
- 		 (more? what's the DC highest number?) 
-		 
-		***********************************************************************************
- 
-		 Japanese cart listing (by SC code) (S-x on cartridge / box)
-		 TODO: what are the full titles for SAI and HWK
-		 
-		S-1   SC0001-     Hello Kitty Special
-		S-2   SC0002-     (unknown)
- 		S-3   SC0003-     (unknown)
-		S-4   SC0004-     (unknown)
-		S-5  *SC0005-SAI  SAI Volume 1
-		S-6  *SC0006-SAI  SAI Volume 2
-		S-7   SC0007-     (unknown)
-		S-8   SC0008-     (unknown)
-		S-9  *SC0009-SAI  SAI Volume 3
-		S-10 *SC0010-HWK  HWK (untranslated) 
-		S-11  SC0011-     (unknown)
-		S-12  SC0012-     (unknown)
-		S-13  SC0013-     (unknown)
-		S-14  SC0014-     (unknown)
-		S-15  SC0015-     (unknown)
-		S-16  SC0016-     (unknown)
-		S-17  SC0017-     (unknown)
-		S-18  SC0018-     (unknown)
-		S-19 *SC0019-SAI  SAI Volume 6
-		S-20  SC0020-     (unknown)
-		S-21 *SC0021-SAI  SAI Volume 7
-		S-22 *SC0022-SAI  SAI Volume 8
-		S-23  SC0023-     (unknown)
-				  
-		(more? what's the SC highest number?) 
-		
-		***********************************************************************************
- 
-		 Japanese cart listing (by G code) (for use on multiple devices?)
-		 
-		 G-1   untranslated volume 1 (Artist Selection?)
-		 G-2   untranslated volume 1 (B)
-		 G-3   untranslated volume 2 (Artist Selection?)
-		 G-4   untranslated volume 2 (B)
-		 G-5   TV Pop Volume 1
-		 G-6   untranslated volume 3 (B)
-		 G-7   untranslated Volume 3 (Artist Selection?)
-		 G-8   untranslated (no volume)
-		 G-9   TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
-         G-10  untranslated Volume 4 (Artist Selection?)
-		 G-11  TV Pop Volume 4
-		 G-12  untranslated volume 5 (B) (Volume 4 is 'P-1' in 'P' series)
-		 
-		(more? what's the G highest number?) 
-		 
-		***********************************************************************************
- 
-		 Japanese cart listing (by P code) (for use on multiple devices, including DDR)
-		 
-		 P-1  untranslated Volume 4 (1,2,3, 5 in G series)
-		 P-2  TV Pop Volume 2 (1,3,4 in G series)
-		 P-3  untranslated Volume 1
-		 P-4  untranslated Volume 7
-		 
-		(more? what's the P highest number?)  
+	 
+	..   EC0001-JPM  J-Pop Mix Volume 1
+	..  *EC0002-JPM  J-Pop Mix Volume 2
+	..  *EC0003-JPM  J-Pop Mix Volume 3
+	..   EC0004-JPM  J-Pop Mix Volume 4
+	..   EC0005-JPM  J-Pop Mix Volume 5
+	..  *EC0006-ENK  ENK Volume 1
+	..   EC0007-G76  1976-78 Volume 1
+	..  *EC0008-G79  1979-81 Volume 1
+	..   EC0009-     untranslated Volume 1
 
-		***********************************************************************************
- 
+	..  *EC0010-KID  Kid's Mix Volume 1
+	..   EC0011-JPM  J-Pop Mix Volume 6
+	..  *EC0012-JPM  J-Pop Mix Volume 7 
+	..  *EC0013-JPM  J-Pop Mix Volume 8
+	..  *EC0014-ATS  Artist Selection Volume 1 - untranslated artist
+	..  *EC0015-ATS  Artist Selection Volume 2 - untranslated artist
+	..   EC0016-ENK  ENK Volume 2
+	..   EC0017-G73  1973-75 Volume 1
+	..   EC0018-G82  1982-84 Volume 1
+	..   EC0019-BSC  Graduation Encouragement Volume 1
+
+	..   EC0020-KID  Kid's Mix Volume 2
+	..   EC0021-JPM  J-Pop Mix Volume 9
+	..  *EC0022-JPM  J-Pop Mix Volume 10
+	23  *EC0023-JPM  J-Pop Mix Volume 11
+	24   EC0024-JPM  J-Pop Mix Volume 12
+	25  *EC0025-JPM  J-Pop Mix Volume 13
+	26  *EC0026-JPM  J-Pop Mix Volume 14 
+	27  *EC0027-JPM  J-Pop Mix Volume 15 
+	28   EC0028-JPM  J-Pop Mix Volume 16
+	29  *EC0029-ATS  Artist Selection Volume 3 - Dreams Come True	
+
+	30   EC0030-ENK  ENK Volume 3
+	31  *EC0031-ATS  Artist Selection Volume 4 - untranslated artist
+	32   EC0032-     untranslated Volume 2 (sequel to EC0009)
+	33   EC0033-JPM  J-Pop Mix Volume 17
+	34  *EC0034-KID  Kid's Mix Volume 3 
+	35  *EC0035-ATS  Artist Selection Volume 5 - Matsuda Seiko
+	36  *EC0036-ATS  Artist Selection Volume 6 - KinKi Kids
+	37   EC0037-ENK  ENK Volume 4
+	38   EC0038-BSC  Graduation Encouragement Volume 2
+	39   EC0039-ATS  Artist Selection Volume 7 - B'z
+
+	40   EC0040-JPM  J-Pop Mix Volume 18
+	41  *EC0041-ATS  Artist Selection Volume 8 - untranslated artist
+	42  *EC0042-JPM  J-Pop Mix Volume 19
+	43   EC0043-ENK  ENK Volume 5
+	44  *EC0044-ATS  Artist Selection Volume 9 - Every Little Thing 
+	45  *EC0045-ATS  Artist Selection Volume 10 - Mr. Children 
+	46   EC0046-JPM  J-Pop Mix Volume 20
+	47   EC0047-     untranslated Volume 1
+	48  *EC0048-ENK  ENK Volume 6
+	49  *EC0049-ATS  Artist Selection Volume 11 - Judy and Mary
+
+	50   EC0050-ATS  Artist Selection Volume 12 - The Beatles
+	51   EC0051-JPM  J-Pop Mix Volume 21 
+	52   EC0052-ENK  ENK Volume 7
+	53   EC0053-JPM  J-Pop Mix Volume 22
+	54  *EC0054-JPM  J-Pop Mix Volume 23
+	55   EC0055-ATS  Artist Selection Volume 13 - Tube
+	56   EC0056-JPM  J-Pop Mix Volume 24
+	57   EC0057-ATS  Artist Selection Volume 14 - SMAP (should be Vol 14? sales sheet still lists 13 tho)
+	58   EC0058-ENK  ENK Volume 8
+	59   EC0059-JPM  J-Pop Mix Volume 25
+
+	60   EC0060-JPM  J-Pop Mix Volume 26
+	61   EC0061-JPM  J-Pop Mix Volume 27
+	62   EC0062-JPM  J-Pop Mix Volume 28
+	63   EC0063-JPM  J-Pop Mix Volume 29 
+	64   EC0064-ENK  ENK Volume 9
+	65   EC0065-JPM  J-Pop Mix Volume 30
+	66   EC0066-JPM  J-Pop Mix Volume 31
+	67   EC0067-JPM  J-Pop Mix Volume 32
+	68  *EC0068-JPM  J-Pop Mix Volume 33
+	69   EC0069-     untranslated
+
+	70  *EC0070-JPM  J-Pop Mix Volume 34
+	71   EC0071-JPM  J-Pop Mix Volume 35
+	72  *EC0072-JPM  J-Pop Mix Volume 36
+	73   EC0073-     untranslated volume 1
+	74   EC0074-JPM  J-Pop Mix Volume 37
+	75   EC0075-JPM  J-Pop Mix Volume 38
+	76  *EC0076-JPM  J-Pop Mix Volume 39
+	77   EC0077-ATS  Artist Selection Volume 15 - unknown artist (should be Vol 15? sales sheet lists 5?)
+	78   EC0078-     (unknown)
+	79   EC0079-     (unknown)
+	80   EC0080-     (unknown)
+	81   EC0081-JPM  J-Pop Mix Volume 42
+
+	(more? what's the EC highest number?)
+
+	***********************************************************************************
+
+	Japanese cart listing (by M code)  (M-x on cartridge / box)
+
+	These are for use with 1 different unit
+	1. e-Kara 
+
+	M-1  *MC0001-ATM  Mini Volume 1
+	M-2   MC0002-
+	M-3   MC0003-
+	M-4   MC0004-
+	M-5   MC0005-
+	M-6   MC0006-
+	M-7   MC0007-ATM  Mini Volume 5	 
+
+	(more? what's the MC highest number?)
+
+	***********************************************************************************
+
+	Japanese cart listing (by SC code) (S-x on cartridge / box)
+	TODO: what are the full titles for SAI and HWK
+
+	These are for use with 1 different unit
+	1. e-Kara
+
+	S-1   SC0001-     Hello Kitty Special
+	S-2   SC0002-     (unknown)
+	S-3   SC0003-     (unknown)
+	S-4   SC0004-     (unknown)
+	S-5  *SC0005-SAI  SAI Volume 1
+	S-6  *SC0006-SAI  SAI Volume 2
+	S-7   SC0007-     (unknown)
+	S-8   SC0008-     (unknown)
+	S-9  *SC0009-SAI  SAI Volume 3
+	S-10 *SC0010-HWK  HWK (untranslated) 
+	S-11  SC0011-     (unknown)
+	S-12  SC0012-     (unknown)
+	S-13  SC0013-     (unknown)
+	S-14  SC0014-     (unknown)
+	S-15  SC0015-     (unknown)
+	S-16  SC0016-     (unknown)
+	S-17  SC0017-     (unknown)
+	S-18  SC0018-     (unknown)
+	S-19 *SC0019-SAI  SAI Volume 6
+	S-20  SC0020-     (unknown)
+	S-21 *SC0021-SAI  SAI Volume 7
+	S-22 *SC0022-SAI  SAI Volume 8
+	S-23  SC0023-     (unknown)
+		  
+	(more? what's the SC highest number?) 
+
+	************************************************************************************************************************************************************
+	 Everything below is for use with other units as well as e-kara
+	************************************************************************************************************************************************************
+
+	Japanese cart listing (by DC code)  (D-x on cartridge / box)
+
+	These are for use with 2 units
+	1. e-Kara
+	2. Drum
+		  
+	note BAT and BHT aren't the same series
+
+	D-1   DC0001-     (unknown)
+	D-2   DC0002-BAT  BAT Volume 6?
+	D-3   DC0003-BHT  BHT (Best Artists?) Volume 9?  (most other BHT carts are in G series, or P series)
+
+	(more? what's the DC highest number?) 
+
+	***********************************************************************************
+
+	Japanese cart listing (by G code)
+
+	These are for use with 2 different units
+	1. e-Kara
+	2. thing with 4 buttons on it
+
+	G-1   GC0001-     untranslated volume 1 (Artist Selection?)
+	G-2  *GC0002-BHT  BHT Volume 1
+	G-3   GC0003-     untranslated volume 2 (Artist Selection?)
+	G-4   GC0004-BHT  BHT Volume 2
+	G-5   GC0005-     TV Pop Volume 1
+	G-6  *GC0006-BHT  BHT Volume 3
+	G-7   GC0007-     untranslated Volume 3 (Artist Selection?)
+	G-8   GC0008-     untranslated (no volume)
+	G-9   GC0009-     TV Pop Volume 3 (Volume 2 is 'P-2' in 'P' series)
+	G-10  GC0010-     untranslated Volume 4 (Artist Selection?)
+	G-11  GC0011-     TV Pop Volume 4
+	G-12  GC0012-BHT  BHT Volume 5 (Volume 4 is 'P-1' in 'P' series)
+	G-13  GC0013-     (unknown)
+	G-14  GC0014-     (unknown)
+	G-15  GC0015-     (unknown)
+	G-16  GC0016-     (unknown)
+	G-17  GC0017-     TV Pop Volume 6
+
+	(more? what's the G highest number?) 
+
+	***********************************************************************************
+
+	Japanese cart listing (by P code) (for use on multiple devices, including DDR)
+
+	These are for use with 3 different units
+	1. e-Kara
+	2. thing with 4 buttons on it
+	3. Konami DDR Family Mat
+
+	P-1  BHT Volume 4 (1,2,3, 5 in G series)
+	P-2  TV Pop Volume 2 (1,3,4 in G series)
+	P-3  untranslated Volume 1
+	P-4  untranslated Volume 7
+
+	(more? what's the P highest number?)  
+
+	***********************************************************************************
+
+	Japanese cart listing (by SP code) 
+
+	These are for use with 2 different units
+	1. e-Kara
+	2. Stepping Pad (like a dance mat)
+
+	SP-1  (unknown)
+	SP-2  (unknown)
+
+	(more? what's the P highest number?)  
+
+	************************************************************************************************************************************************************
+	 Everything below might not worth with a standard e-kara, requires different hardware even if cart form is the same
+	************************************************************************************************************************************************************
+
+	Japanese cart listing (by KE code) 
+
+	These are only compatible with some special 'Kids' unit and shaped as lyric books
+	(not e-kara compatible?)
+
+	KE-01  (unknown)
+	KE-02  (unknown)
+
+	(more?)
+
+	***********************************************************************************
+
+	Japanese cart listing (by A code) 	 
+
+	These are for Pichi Pichi Pitch
+	(not e-kara compatible?)
+
+	https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q10109392860
+
+	A-1  (unknown)
+	A-2  (unknown)
+	A-3  (unknown)
+	A-4  (unknown)
+	A-5  (unknown)
+	A-6  (unknown)
+	A-7  (unknown)
+	A-8  (unknown)
+
+	***********************************************************************************
+
 	-->
-	
+
 	
 	<!-- US cartridges -->
 	
