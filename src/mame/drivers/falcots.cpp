@@ -9,7 +9,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 //#include "bus/rs232/rs232.h"
+#include "machine/mc2661.h"
 #include "machine/nvram.h"
+#include "machine/rstbuf.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
@@ -21,6 +23,7 @@ public:
 	falcots_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rstbuf(*this, "rstbuf")
 		, m_crtc(*this, "crtc")
 		, m_vram(*this, "vram")
 		, m_chargen(*this, "chargen")
@@ -37,8 +40,6 @@ protected:
 private:
 	MC6845_UPDATE_ROW(update_row);
 
-	DECLARE_WRITE_LINE_MEMBER(hsync_w);
-
 	u8 key_status_r();
 	void key_scan_w(u8 data);
 	void vram0_w(u8 data);
@@ -46,9 +47,11 @@ private:
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+	void ts1_mem_map(address_map &map);
 	void ts1_io_map(address_map &map);
 
 	required_device<z80_device> m_maincpu;
+	optional_device<rst_pos_buffer_device> m_rstbuf;
 	required_device<mc6845_device> m_crtc;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_chargen;
@@ -94,21 +97,33 @@ void falcots_state::vram1_w(u8 data)
 {
 }
 
-void falcots_state::mem_map(address_map &map)
+void falcots_state::ts1_mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region("maincpu", 0);
-	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0xa000, 0xbfff).ram(); // 4x HM6116P-3
-	map(0xc000, 0xffff).ram().share("vram"); // 8x AM9016EPC (4116)
+	map(0x0000, 0x1fff).rom().region("maincpu", 0);
+	map(0x8000, 0xbfff).ram().share("vram"); // 8x NEC D416C
+	map(0xec00, 0xefff).ram().share("nvram");
+	map(0xf000, 0xffff).ram(); // 6x(!?) AM9114EPC
 }
 
 void falcots_state::ts1_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xe1, 0xe1).w(FUNC(falcots_state::key_scan_w));
+	map(0xe2, 0xe2).w(FUNC(falcots_state::vram0_w));
+	map(0xe4, 0xe4).w(FUNC(falcots_state::vram1_w));
 	map(0xe8, 0xe8).r(FUNC(falcots_state::key_status_r));
 	map(0xf0, 0xf0).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0xf1, 0xf1).w(m_crtc, FUNC(mc6845_device::register_w));
+	map(0xf8, 0xfb).r("pci", FUNC(mc2661_device::read));
+	map(0xfc, 0xff).w("pci", FUNC(mc2661_device::write));
+}
+
+void falcots_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0xa000, 0xbfff).ram(); // 4x HM6116P-3
+	map(0xc000, 0xffff).ram().share("vram"); // 8x AM9016EPC (4116)
 }
 
 void falcots_state::io_map(address_map &map)
@@ -246,6 +261,32 @@ static INPUT_PORTS_START(ts2624)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad Forward Tab") PORT_CHAR(UCHAR_MAMEKEY(TAB_PAD)) PORT_CODE(KEYCODE_ENTER_PAD)
 INPUT_PORTS_END
 
+void falcots_state::ts1(machine_config &config)
+{
+	Z80(config, m_maincpu, 15.2064_MHz_XTAL / 4); // NEC D780C-1 (divider guessed)
+	m_maincpu->set_addrmap(AS_PROGRAM, &falcots_state::ts1_mem_map);
+	m_maincpu->set_addrmap(AS_IO, &falcots_state::ts1_io_map);
+	m_maincpu->set_irq_acknowledge_callback("rstbuf", FUNC(rst_pos_buffer_device::inta_cb));
+
+	RST_POS_BUFFER(config, m_rstbuf).int_callback().set_inputline(m_maincpu, 0);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x NEC D444C + battery?
+
+	mc2661_device &pci(MC2661(config, "pci", 15.2064_MHz_XTAL / 3)); // SCN2651N
+	pci.txrdy_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst1_w));
+	pci.rxrdy_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst2_w));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(15.2064_MHz_XTAL, 792, 0, 640, 320, 0, 300);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+
+	MC6845(config, m_crtc, 15.2064_MHz_XTAL / 8); // MC6845P
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(falcots_state::update_row), this);
+}
+
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
@@ -285,21 +326,8 @@ void falcots_state::ts2624(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(falcots_state::update_row), this);
 }
 
-void falcots_state::ts1(machine_config &config)
-{
-	ts2624(config);
-
-	m_maincpu->set_addrmap(AS_IO, &falcots_state::ts1_io_map);
-
-	m_crtc->set_clock(15'206'400 / 8);
-	m_crtc->set_char_width(8);
-
-	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_raw(15'206'400, 792, 0, 640, 320, 0, 300);
-}
-
 ROM_START(ts1)
-	ROM_REGION(0x8000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD("v2_13_x.d9",  0x0000, 0x1000, CRC(420e1ecd) SHA1(748e3733858ba813b9d72dfe018ba4f918d8c0db)) // Chip Type: 2732
 	ROM_LOAD("v2_13_0.d10", 0x1000, 0x1000, CRC(228e7321) SHA1(43e0d04c58ee7c71f5603222bf0aaaf7979d67a3)) // Chip Type: 2732
 
