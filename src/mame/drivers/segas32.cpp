@@ -566,9 +566,9 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_z80_shared_ram(*this,"z80_shared_ram")
 	, m_system32_workram(*this,"workram")
-	, m_system32_videoram(*this,"videoram", 0)
-	, m_system32_spriteram(*this,"spriteram", 0)
-	, m_system32_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
+	, m_videoram(*this,"videoram", 0)
+	, m_spriteram(*this,"spriteram", 0)
+	, m_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
 	, m_maincpu(*this, "maincpu")
 	, m_soundcpu(*this, "soundcpu")
 	, m_multipcm(*this, "sega")
@@ -868,18 +868,11 @@ WRITE8_MEMBER(segas32_state::tilebank_external_w)
 	m_system32_tilebank_external = data;
 }
 
-
-WRITE_LINE_MEMBER(segas32_state::display_enable_0_w)
+template<int Which>
+WRITE_LINE_MEMBER(segas32_state::display_enable_w)
 {
-	m_system32_displayenable[0] = state;
+	m_system32_displayenable[Which] = state;
 }
-
-
-WRITE_LINE_MEMBER(segas32_state::display_enable_1_w)
-{
-	m_system32_displayenable[1] = state;
-}
-
 
 
 /*************************************
@@ -899,7 +892,6 @@ READ16_MEMBER(segas32_state::random_number_r)
 }
 
 
-
 /*************************************
  *
  *  Sound communications
@@ -916,7 +908,6 @@ WRITE8_MEMBER(segas32_state::shared_ram_w)
 {
 	m_z80_shared_ram[offset] = data;
 }
-
 
 
 /*************************************
@@ -995,7 +986,6 @@ WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
 }
 
 
-
 /*************************************
  *
  *  Sound banking
@@ -1030,7 +1020,6 @@ WRITE8_MEMBER(segas32_state::scross_bank_w)
 }
 
 
-
 /*************************************
  *
  *  Sound hack (not protection)
@@ -1049,6 +1038,122 @@ WRITE8_MEMBER(segas32_state::sound_dummy_w)
 }
 
 
+/*************************************
+ *
+ *  Common palette handling
+ *
+ *************************************/
+
+inline uint16_t segas32_state::xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value)
+{
+	int r = (value >> 0) & 0x1f;
+	int g = (value >> 5) & 0x1f;
+	int b = (value >> 10) & 0x1f;
+	value = (value & 0x8000) | ((b & 0x01) << 14) | ((g & 0x01) << 13) | ((r & 0x01) << 12);
+	value |= ((b & 0x1e) << 7) | ((g & 0x1e) << 3) | ((r & 0x1e) >> 1);
+	return value;
+}
+
+
+inline uint16_t segas32_state::xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(uint16_t value)
+{
+	int r = ((value >> 12) & 0x01) | ((value << 1) & 0x1e);
+	int g = ((value >> 13) & 0x01) | ((value >> 3) & 0x1e);
+	int b = ((value >> 14) & 0x01) | ((value >> 7) & 0x1e);
+	return (value & 0x8000) | (b << 10) | (g << 5) | (r << 0);
+}
+
+
+inline void segas32_state::update_color(int offset, uint16_t data)
+{
+	/* note that since we use this RAM directly, we don't technically need */
+	/* to call palette_set_color() at all; however, it does give us that */
+	/* nice display when you hit F4, which is useful for debugging */
+
+	/* set the color */
+	m_palette->set_pen_color(offset, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
+
+
+/*************************************
+ *
+ *  Palette RAM access
+ *
+ *************************************/
+
+template<int Which>
+READ16_MEMBER(segas32_state::paletteram_r)
+{
+	int convert;
+
+	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
+	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
+	/* we store everything if the first format, and convert accesses to the other format */
+	/* on the fly */
+	convert = (offset & 0x4000);
+	offset &= 0x3fff;
+
+	if (!convert)
+		return m_paletteram[Which][offset];
+	else
+		return xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(m_paletteram[Which][offset]);
+}
+
+template<int Which>
+WRITE16_MEMBER(segas32_state::paletteram_w)
+{
+	uint16_t value;
+	int convert;
+
+	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
+	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
+	/* we store everything if the first format, and convert accesses to the other format */
+	/* on the fly */
+	convert = (offset & 0x4000);
+	offset &= 0x3fff;
+
+	/* read, modify, and write the new value, updating the palette */
+	value = m_paletteram[Which][offset];
+	if (convert) value = xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(value);
+	COMBINE_DATA(&value);
+	if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
+	m_paletteram[Which][offset] = value;
+	update_color(0x4000*Which + offset, value);
+
+	/* if blending is enabled, writes go to both halves of palette RAM */
+	if (m_mixer_control[Which][0x4e/2] & 0x0880)
+	{
+		offset ^= 0x2000;
+
+		/* read, modify, and write the new value, updating the palette */
+		value = m_paletteram[Which][offset];
+		if (convert) value = xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(value);
+		COMBINE_DATA(&value);
+		if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
+		m_paletteram[Which][offset] = value;
+		update_color(0x4000*Which + offset, value);
+	}
+}
+
+
+/*************************************
+ *
+ *  Mixer control registers
+ *
+ *************************************/
+
+template<int Which>
+READ16_MEMBER(segas32_state::mixer_r)
+{
+	return m_mixer_control[Which][offset];
+}
+
+template<int Which>
+WRITE16_MEMBER(segas32_state::mixer_w)
+{
+	COMBINE_DATA(&m_mixer_control[Which][offset]);
+}
+
 
 /*************************************
  *
@@ -1061,11 +1166,11 @@ void segas32_state::system32_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share("workram");
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_spriteram_r), FUNC(segas32_state::system32_spriteram_w)).share("spriteram");
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
-	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_paletteram_r), FUNC(segas32_state::system32_paletteram_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::system32_mixer_r), FUNC(segas32_state::system32_mixer_w));
+	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
@@ -1084,13 +1189,13 @@ void segas32_state::multi32_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).mirror(0x0e0000).ram();
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::multi32_spriteram_r), FUNC(segas32_state::multi32_spriteram_w)).share("spriteram");
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
-	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::multi32_paletteram_0_r), FUNC(segas32_state::multi32_paletteram_0_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::multi32_mixer_0_w));
-	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::multi32_paletteram_1_r), FUNC(segas32_state::multi32_paletteram_1_w)).share("paletteram.1");
-	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::multi32_mixer_1_w));
+	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<0>));
+	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>)).share("paletteram.1");
+	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<1>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
@@ -2224,7 +2329,7 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	io_chip.in_pf_callback().set_ioport("SERVICE34_A");
 	io_chip.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
 	io_chip.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
-	io_chip.out_cnt1_callback().set(FUNC(segas32_state::display_enable_0_w));
+	io_chip.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
 	io_chip.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -2534,7 +2639,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	io_chip_0.in_pf_callback().set_ioport("SERVICE34_A");
 	io_chip_0.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
 	io_chip_0.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
-	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_0_w));
+	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
 	io_chip_0.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
 	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", 0)); // unknown clock
@@ -2548,7 +2653,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	io_chip_1.out_ph_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);
 	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(5);
 	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
-	io_chip_1.out_cnt1_callback().set(FUNC(segas32_state::display_enable_1_w));
+	io_chip_1.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<1>));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
