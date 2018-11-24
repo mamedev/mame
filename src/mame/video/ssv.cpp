@@ -584,10 +584,10 @@ void ssv_state::draw_16x16_tiles(bitmap_ind16 &bitmap, const rectangle &clip, in
 	int xstart, xend, xinc;
 	int ystart, yend, yinc;
 
-	if (flipx) { xstart = 1 - 1;  xend = -1; xinc = -1; }
+	if (flipx) { xstart = 0;  xend = -1; xinc = -1; }
 	else { xstart = 0;    xend = 1;  xinc = +1; }
 
-	if (flipy) { ystart = 2 - 1;  yend = -1; yinc = -1; }
+	if (flipy) { ystart = 1;  yend = -1; yinc = -1; }
 	else { ystart = 0;    yend = 2;  yinc = +1; }
 
 	/* Draw a tile (16x16) */
@@ -768,15 +768,9 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		/* Number of single-sprites (1-32) */
 		int num             =   (mode & 0x001f) + 1;
-		int global_ynum     =   (mode & 0x0300) << 2;
-		int global_xnum     =   (mode & 0x0c00);
-		int global_depth    =   (mode & 0xf000);
-
 
 		for( ; num > 0; num--,s2+=4 )
 		{
-			int depth, local_depth, local_xnum, local_ynum;
-
 			uint16_t *end2    =   m_spriteram + 0x40000/2;
 
 			if (s2 >= end2) break;
@@ -784,23 +778,12 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			int sx      =       s2[ 2 ];
 			int sy      =       s2[ 3 ];
 
-			local_depth     =   sx & 0xf000;
-			local_xnum      =   sx & 0x0c00;
-			local_ynum      =   sy & 0x0c00;
+			/* do we use local sizes (set here) or global ones (set in previous list) */
+			int use_local = m_scroll[0x76/2] & 0x4000;
 
-			int xnum, ynum;
-			if (m_scroll[0x76/2] & 0x4000)
-			{
-				xnum    =   local_xnum;
-				ynum    =   local_ynum;
-				depth   =   local_depth;
-			}
-			else
-			{
-				xnum    =   global_xnum;
-				ynum    =   global_ynum;
-				depth   =   global_depth;
-			}
+			int xnum = use_local ? (sx & 0x0c00) : (mode & 0x0c00);
+			int ynum = use_local ? (sy & 0x0c00) : (mode & 0x0300) << 2;
+			int depth = use_local ? (sx & 0xf000) : (mode & 0xf000);
 
 			if ( s2[0] <= 7 && s2[1] == 0 && xnum == 0 && ynum == 0x0c00)
 			{
@@ -828,16 +811,15 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			else
 			{
 				// "Normal" Sprite
-/*
-    hot spots:
-    "warning" in hypreac2 has mode & 0x0100 and is not 16x16
-    keithlcy high scores has mode & 0x0100 and y & 0x0c00 can be 0x0c00
-    drifto94 "you have proved yOur".. has mode & 0x0100 and x & 0x0c00 can be 0x0c00
-    ultrax (begin of lev1): 100010: 6b60 4280 0016 00a0
-                            121400: 51a0 0042 6800 0c00 needs to be a normal sprite
-*/
-
-				int shadow, gfx;
+				/*
+					hot spots:
+					"warning" in hypreac2 has mode & 0x0100 and is not 16x16
+					keithlcy high scores has mode & 0x0100 and y & 0x0c00 can be 0x0c00
+					drifto94 "you have proved yOur".. has mode & 0x0100 and x & 0x0c00 can be 0x0c00
+					ultrax (begin of lev1): 100010: 6b60 4280 0016 00a0
+											121400: 51a0 0042 6800 0c00 needs to be a normal sprite
+				*/
+				
 				if (s2 >= end2) break;
 
 				int code    =   s2[0];  // code high bits
@@ -858,8 +840,8 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				}
 
 				/* Select 256 or 64 color tiles */
-				gfx     =   (depth & 0x1000) ? 0 : 1;
-				shadow  =   (depth & 0x8000);
+				int gfx     =   (depth & 0x1000) ? 0 : 1;
+				int shadow  =   (depth & 0x8000);
 
 				/* Apply global offsets */
 				sx  +=  xoffs;
