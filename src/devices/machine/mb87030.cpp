@@ -351,8 +351,7 @@ void mb87030_device::step(bool timeout)
 		if (!m_tc || m_fifo.full())
 			break;
 
-		LOG("pushing read data: %02X\n", data);
-		m_fifo.enqueue(data);
+		m_bus_data = data;
 		update_state(State::TransferSendAck, 10);
 		break;
 
@@ -372,7 +371,7 @@ void mb87030_device::step(bool timeout)
 
 	case State::TransferSendData:
 		if (m_tc && !m_fifo.empty()) {
-			scsi_bus->data_w(scsi_refid, m_fifo.dequeue());
+			scsi_bus->data_w(scsi_refid, m_fifo.peek());
 			update_state(State::TransferSendAck, 10);
 			break;
 		}
@@ -415,6 +414,14 @@ void mb87030_device::step(bool timeout)
 
 	case State::TransferDeassertACK:
 		m_tc--;
+		if (!m_dma_transfer) {
+			if (!(ctrl & S_INP)) {
+				m_fifo.dequeue();
+			} else {
+				LOG("pushing read data: %02X\n", m_bus_data);
+				m_fifo.enqueue(m_bus_data);
+			}
+		}
 		update_state(State::TransferWaitReq, 10);
 		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 		scsi_set_ctrl(0, S_ACK);
@@ -453,6 +460,7 @@ void mb87030_device::device_start()
 	save_item(NAME(m_scsi_phase));
 	save_item(NAME(m_scsi_ctrl));
 	save_item(NAME(m_dma_transfer));
+	save_item(NAME(m_bus_data));
 //  save_item(NAME(m_state));
 }
 
