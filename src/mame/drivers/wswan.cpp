@@ -171,7 +171,7 @@ MACHINE_CONFIG_START(wscolor_state::wscolor)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(wscolor_mem)
 
-	m_vdp->set_vdp_type(VDP_TYPE_WSWAN);
+	m_vdp->set_vdp_type(VDP_TYPE_WSC);
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
