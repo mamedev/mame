@@ -68,7 +68,6 @@ Heavy use is made of sprite zooming.
 void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	uint32_t *spriteram32 = m_spriteram;
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -134,7 +133,7 @@ void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				if (flipx)  px = dimension-1-k;
 				if (flipy)  py = dimension-1-j;
 
-				code = spritemap[map_offset + px + (py<<(dblsize+1))];
+				code = m_spritemap_rom[map_offset + px + (py<<(dblsize+1))];
 
 				if (code==0xffff)
 				{
@@ -211,8 +210,6 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	uint32_t *spriteram32 = m_spriteram;
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint8_t *spritemapHibit = (uint8_t *)memregion("user2")->base();
 
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
@@ -279,7 +276,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 			if (flipy)  py = dimension-1-j;
 
 			map_addr = map_offset + px + (py << (dblsize + 1));
-			code =  (spritemapHibit[map_addr] << 16) | spritemap[map_addr];
+			code =  (m_spritemap_rom_hi[map_addr] << 16) | m_spritemap_rom[map_addr];
 
 			curx = x + ((k*zoomx)/dimension);
 			cury = y + ((j*zoomy)/dimension);
@@ -556,6 +553,8 @@ uint32_t undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_in
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
+	// TODO : priority behavior isn't correct
+	// ex : Sometimes one SCC layer drawn over some TC0480SCP Tilemaps and/or some sprites in real hardware.
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
 

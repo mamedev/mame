@@ -24,14 +24,15 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_spritemap_rom(*this, "sprmaprom"),
+		m_spritemap_rom_hi(*this, "sprmaprom_hi")
 	{ }
 
 	void undrfire(machine_config &config);
 	void cbombers(machine_config &config);
 
-	void init_undrfire();
-	void init_cbombers();
+	void driver_init() override;
 
 protected:
 	enum
@@ -67,6 +68,8 @@ private:
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_region_ptr<uint16_t> m_spritemap_rom;
+	optional_region_ptr<uint8_t> m_spritemap_rom_hi;
 
 	DECLARE_WRITE8_MEMBER(coin_word_w);
 	DECLARE_READ16_MEMBER(shared_ram_r);
