@@ -360,10 +360,11 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(i7000_state, i7000)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(20'000'000)) /* (?) */
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_ADDR_CHANGED_CB(i7000_state, crtc_addr)
+	r6545_1_device &crtc(R6545_1(config, "crtc", XTAL(20'000'000))); /* (?) */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(true);
+	crtc.set_char_width(8);
+	crtc.set_on_update_addr_change_callback(FUNC(i7000_state::crtc_addr), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

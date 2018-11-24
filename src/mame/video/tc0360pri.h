@@ -25,7 +25,5 @@ private:
 
 DECLARE_DEVICE_TYPE(TC0360PRI, tc0360pri_device)
 
-#define MCFG_TC0360PRI_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TC0360PRI, 0)
 
 #endif // MAME_VIDEO_TC0360PRI_H

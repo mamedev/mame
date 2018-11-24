@@ -1701,8 +1701,7 @@ MACHINE_CONFIG_START(model1_state::model1)
 
 	MB8421(config, m_dpram, 0);
 
-	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
-	MCFG_GFX_PALETTE("palette")
+	S24TILE(config, m_tiles, 0, 0x3fff).set_palette(m_palette);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )

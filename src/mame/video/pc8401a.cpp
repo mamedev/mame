@@ -104,7 +104,8 @@ MACHINE_CONFIG_START(pc8500_state::pc8500_video)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, CRT_SCREEN_TAG, 400000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(6)
+	MC6845(config, m_crtc, 400000);
+	m_crtc->set_screen(CRT_SCREEN_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(6);
 MACHINE_CONFIG_END

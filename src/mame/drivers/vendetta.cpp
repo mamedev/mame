@@ -459,9 +459,9 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(vendetta_state, vendetta_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback), this);
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(vendetta_state, sprite_callback)
@@ -476,9 +476,7 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified with PCB */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);  /* verified with PCB */
 
 	MCFG_K053260_ADD("k053260", XTAL(3'579'545))    /* verified with PCB */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
@@ -500,9 +498,9 @@ MACHINE_CONFIG_START(vendetta_state::esckids)
 	MCFG_DEVICE_REMOVE("k054000")
 	MCFG_DEVICE_REMOVE("k052109")
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(vendetta_state, esckids_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback), this);
 
 	MCFG_DEVICE_MODIFY("k053246")
 	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 101, 6)

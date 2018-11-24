@@ -979,10 +979,11 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	// m_pit8253->out_handler<2>().set(FUNC(myb3k_state::pit_out2_changed));
 
 	/* Video controller */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181) / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(myb3k_state, crtc_update_row)
+	H46505(config, m_crtc, XTAL(14'318'181) / 16); /* Main crystal divided by 16 through a 74163 4 bit counter */
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(myb3k_state::crtc_update_row), this);
 
 	/* ISA8+ Expansion bus */
 	ISA8(config, m_isabus, 0);

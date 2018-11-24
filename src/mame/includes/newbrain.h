@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_NEWBRAIN_H
 #define MAME_INCLUDES_NEWBRAIN_H
+
+#pragma once
 
 
 #include "bus/newbrain/exp.h"

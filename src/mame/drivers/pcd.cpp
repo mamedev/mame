@@ -586,8 +586,8 @@ MACHINE_CONFIG_START(pcd_state::pcx)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(pcx_io)
 
-	MCFG_DEVICE_REPLACE("video", PCX_VIDEO, 0)
-	MCFG_PCX_VIDEO_TXD_HANDLER(WRITELINE("keyboard", pcd_keyboard_device, t0_w))
+	pcx_video_device &video(PCX_VIDEO(config.replace(), "video", 0));
+	video.txd_handler().set("keyboard", FUNC(pcd_keyboard_device::t0_w));
 
 	MCFG_DEVICE_MODIFY("keyboard")
 	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(WRITELINE("video", pcx_video_device, rx_w))

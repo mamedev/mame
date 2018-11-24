@@ -410,6 +410,13 @@ uint8_t xavix_i2c_state::read_io1(uint8_t direction)
 
 void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 {
+	// ignore these writes so that epo_edfx can send read requests to the ee-prom and doesn't just report an error
+	// TODO: check if these writes shouldn't be happening (the first is a direct write, the 2nd is from a port direction change)
+	//  or if the i2cmem code is oversensitive, or if something else is missing to reset the state
+	if (hackaddress1 != -1)
+		if ((m_maincpu->pc() == hackaddress1) || (m_maincpu->pc() == hackaddress2))
+			return;
+
 	if (direction & 0x08)
 	{
 		m_i2cmem->write_sda((data & 0x08) >> 3);
@@ -766,43 +773,18 @@ WRITE8_MEMBER(xavix_state::mult_param_w)
 		// rad_madf uses this mode (add to previous result)
 		if ((m_multparams[0] & 0xc0) == 0xc0)
 		{
-			if (signmode == 0x0)
-			{
-				uint8_t param1 = m_multparams[1];
-				uint8_t param2 = m_multparams[2];
-				result = param1 * param2;
-			}
-			else
-			{
-				popmessage("unknown signmode %02x", m_multparams[0] & 0x3f);
-			}
+			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
+			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
+
+			result = param1 * param2;
 
 			uint16_t oldresult = (m_multresults[1] << 8) | m_multresults[0];
 			result = oldresult + result;
 		}
 		else if ((m_multparams[0] & 0xc0) == 0x00)
 		{
-			int param1 = 0, param2 = 0;
-			
-			if (signmode == 0x0)
-			{
-				param1 = (uint8_t)m_multparams[1];
-				param2 = (uint8_t)m_multparams[2];
-			}
-			else if (signmode == 0x2)
-			{
-				param1 = (int8_t)m_multparams[1];
-				param2 = (uint8_t)m_multparams[2];
-			}
-			else if (signmode == 0x1)
-			{
-				param1 = (uint8_t)m_multparams[1];
-				param2 = (int8_t)m_multparams[2];
-			}
-			else
-			{
-				popmessage("unknown signmode %02x", m_multparams[0] & 0x3f);
-			}
+			const int param1 = signmode & 0x2 ? (int8_t)m_multparams[1] : (uint8_t)m_multparams[1];
+			const int param2 = signmode & 0x1 ? (int8_t)m_multparams[2] : (uint8_t)m_multparams[2];
 
 			result = param1 * param2;
 		}
@@ -924,6 +906,8 @@ void xavix_state::machine_reset()
 	m_sound_regbase = 0x00;
 
 	m_adc_control = 0x00;
+
+	m_sprite_xhigh_ignore_hack = true;
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;

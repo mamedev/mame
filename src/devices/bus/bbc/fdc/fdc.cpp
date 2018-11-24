@@ -121,7 +121,6 @@ WRITE8_MEMBER(bbc_fdc_slot_device::write)
 #include "opus.h"
 //#include "solidisk.h"
 #include "watford.h"
-//#include "zdfs.h"
 
 
 void bbc_fdc_devices(device_slot_interface &device)
@@ -142,5 +141,4 @@ void bbc_fdc_devices(device_slot_interface &device)
 	//device.option_add("stl1770_2", BBC_STL1770_2);
 	device.option_add("weddb2",    BBC_WEDDB2);
 	device.option_add("weddb3",    BBC_WEDDB3);
-	//device.option_add("zdfs",      BBC_ZDFS);
 }

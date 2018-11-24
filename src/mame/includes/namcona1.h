@@ -5,6 +5,10 @@
     Namco NA-1 System hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_NAMCONA1_H
+#define MAME_INCLUDES_NAMCONA1_H
+
+#pragma once
 
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
@@ -17,8 +21,8 @@
 class namcona1_state : public driver_device
 {
 public:
-	namcona1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	namcona1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -179,8 +183,8 @@ protected:
 class namcona2_state : public namcona1_state
 {
 public:
-	namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcona1_state(mconfig, type, tag)
+	namcona2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcona1_state(mconfig, type, tag)
 	{}
 
 	void c70(machine_config &config);
@@ -195,8 +199,8 @@ public:
 class xday2_namcona2_state : public namcona2_state
 {
 public:
-	xday2_namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcona2_state(mconfig, type, tag),
+	xday2_namcona2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcona2_state(mconfig, type, tag),
 		m_rtc(*this, "rtc")
 	{}
 
@@ -214,3 +218,5 @@ private:
 
 	void xday2_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NAMCONA1_H

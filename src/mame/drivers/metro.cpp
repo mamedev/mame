@@ -3189,9 +3189,9 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, UPD7810_INTF2);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1200000, okim6295_device::PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -3529,9 +3529,9 @@ MACHINE_CONFIG_START(metro_state::pururun)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)  /* Confirmed match to reference video */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));  /* Confirmed match to reference video */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, UPD7810_INTF2);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 3.579545_MHz_XTAL/3, okim6295_device::PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

@@ -300,9 +300,9 @@ MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(0, "dac9", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac9", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "speaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.40)
+	YM2151(config, m_ymsnd, 4000000);
+	m_ymsnd->add_route(0, "speaker", 0.40);
+	m_ymsnd->add_route(1, "speaker", 0.40);
 
 	PIT8254(config, m_pit[0], 0);
 	m_pit[0]->set_clk<0>(4000000);

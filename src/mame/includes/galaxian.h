@@ -5,6 +5,10 @@
     Galaxian hardware family
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_GALAXIAN_H
+#define MAME_INCLUDES_GALAXIAN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
@@ -470,3 +474,5 @@ protected:
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5];
 };
+
+#endif // MAME_INCLUDES_GALAXIAN_H

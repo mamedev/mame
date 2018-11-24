@@ -219,10 +219,10 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ym2164", YM2151, XTAL(4'000'000))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, fb01_state, ym2164_irq_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	ym2151_device &ym2164(YM2151(config, "ym2164", XTAL(4'000'000)));
+	ym2164.irq_handler().set(FUNC(fb01_state::ym2164_irq_w));
+	ym2164.add_route(0, "lspeaker", 1.00);
+	ym2164.add_route(1, "rspeaker", 1.00);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END

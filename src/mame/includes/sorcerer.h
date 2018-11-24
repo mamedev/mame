@@ -5,9 +5,10 @@
  * includes/sorcerer.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_SORCERER_H
 #define MAME_INCLUDES_SORCERER_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
@@ -30,14 +31,14 @@
 
 struct cass_data_t {
 	struct {
-		int length;     /* time cassette level is at input.level */
-		int level;      /* cassette level */
-		int bit;        /* bit being read */
+		int length;     // time cassette level is at input.level
+		int level;      // cassette level
+		int bit;        // bit being read
 	} input;
 	struct {
-		int length;     /* time cassette level is at output.level */
-		int level;      /* cassette level */
-		int bit;        /* bit to output */
+		int length;     // time cassette level is at output.level
+		int level;      // cassette level
+		int bit;        // bit to output
 	} output;
 };
 

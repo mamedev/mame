@@ -553,10 +553,10 @@ ioport_constructor tx1j_sound_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(tx1_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, TX1_PIXEL_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tx1_sound_prg)
-	MCFG_DEVICE_IO_MAP(tx1_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, tx1_sound_device, z80_irq,  TX1_PIXEL_CLOCK / 4 / 2048 / 2)
+	Z80(config, m_audiocpu, TX1_PIXEL_CLOCK / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tx1_sound_device::tx1_sound_prg);
+	m_audiocpu->set_addrmap(AS_IO, &tx1_sound_device::tx1_sound_io);
+	m_audiocpu->set_periodic_int(DEVICE_SELF, FUNC(tx1_sound_device::z80_irq), attotime::from_hz(TX1_PIXEL_CLOCK / 4 / 2048 / 2));
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(tx1_sound_device::tx1_ppi_porta_r));
@@ -1060,10 +1060,10 @@ ioport_constructor buggyboyjr_sound_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, BUGGYBOY_ZCLK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(buggyboy_sound_prg)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, buggyboy_sound_device, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
-	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
+	Z80(config, m_audiocpu, BUGGYBOY_ZCLK / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &buggyboy_sound_device::buggyboy_sound_prg);
+	m_audiocpu->set_addrmap(AS_IO, &buggyboy_sound_device::buggyboy_sound_io);
+	m_audiocpu->set_periodic_int(DEVICE_SELF, FUNC(buggyboy_sound_device::z80_irq), attotime::from_hz(BUGGYBOY_ZCLK / 2 / 4 / 2048));
 
 	I8255A(config, m_ppi);
 	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
@@ -1091,10 +1091,10 @@ MACHINE_CONFIG_START(buggyboy_sound_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(buggyboyjr_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, BUGGYBOY_ZCLK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(buggybjr_sound_prg)
-	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE(DEVICE_SELF, buggyboy_sound_device, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
+	Z80(config, m_audiocpu, BUGGYBOY_ZCLK / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &buggyboyjr_sound_device::buggybjr_sound_prg);
+	m_audiocpu->set_addrmap(AS_IO, &buggyboyjr_sound_device::buggyboy_sound_io);
+	m_audiocpu->set_periodic_int(DEVICE_SELF, FUNC(buggyboy_sound_device::z80_irq), attotime::from_hz(BUGGYBOY_ZCLK / 2 / 4 / 2048));
 
 	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
 	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);

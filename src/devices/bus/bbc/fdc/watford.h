@@ -27,9 +27,6 @@ class bbc_watfordfdc_device :
 public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-
 protected:
 	// construction/destruction
 	bbc_watfordfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -43,7 +40,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -52,7 +48,6 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	required_memory_region m_dfs_rom;
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
@@ -68,7 +63,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -77,7 +71,6 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
-	required_memory_region m_dfs_rom;
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;

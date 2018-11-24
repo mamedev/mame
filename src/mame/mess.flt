@@ -1,6 +1,5 @@
 3do.cpp
 4004clk.cpp
-4d20.cpp
 4dpi.cpp
 68ksbc.cpp
 a2600.cpp
@@ -317,6 +316,7 @@ icatel.cpp
 icebox.cpp
 ie15.cpp
 if800.cpp
+ikt5a.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -335,6 +335,7 @@ iq151.cpp
 iqunlim.cpp
 iris3130.cpp
 irisha.cpp
+iris_power.cpp
 is48x.cpp
 isbc.cpp
 isbc8010.cpp
@@ -477,6 +478,8 @@ nanos.cpp
 nascom1.cpp
 nc.cpp
 ncd17c.cpp
+ncdmips.cpp
+ncdppc.cpp
 nds.cpp
 neogeocd.cpp
 nes.cpp

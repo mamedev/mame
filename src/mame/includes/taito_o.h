@@ -5,6 +5,10 @@
     Taito O system
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TAITO_O_H
+#define MAME_INCLUDES_TAITO_O_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -26,6 +30,9 @@ public:
 
 	void parentj(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -39,9 +46,10 @@ private:
 
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(io_r);
-	virtual void machine_start() override;
 	uint32_t screen_update_parentj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(parentj_interrupt);
-	void parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	void parentj_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void parentj_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TAITO_O_H

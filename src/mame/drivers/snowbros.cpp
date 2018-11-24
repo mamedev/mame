@@ -1750,8 +1750,8 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1805,10 +1805,10 @@ MACHINE_CONFIG_START(snowbros_state::semicom)
 	config.device_remove("soundlatch2");
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ymsnd", YM2151, XTAL(16'000'000)/4) /* 4MHz - Confirmed */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
+	ym2151_device &ymsnd(YM2151(config.replace(), "ymsnd", XTAL(16'000'000)/4)); /* 4MHz - Confirmed */
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "mono", 0.10);
+	ymsnd.add_route(1, "mono", 0.10);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1942,10 +1942,10 @@ MACHINE_CONFIG_START(snowbros_state::finalttr)
 
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, finalttr )
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2151, XTAL(3'579'545)) /* possible but less likely 4MHz (12MHz/3) */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.08)
-	MCFG_SOUND_ROUTE(1, "mono", 0.08)
+	ym2151_device &ymsnd(YM2151(config.replace(), "ymsnd", XTAL(3'579'545))); /* possible but less likely 4MHz (12MHz/3) */
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "mono", 0.08);
+	ymsnd.add_route(1, "mono", 0.08);
 
 	MCFG_DEVICE_REPLACE("oki", OKIM6295, 999900, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -2012,8 +2012,8 @@ MACHINE_CONFIG_START(snowbros_state::yutnori)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

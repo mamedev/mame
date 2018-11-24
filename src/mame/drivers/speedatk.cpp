@@ -324,9 +324,10 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	MCFG_SCREEN_UPDATE_DRIVER(speedatk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16)   /* hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, MASTER_CLOCK/16);   /* hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedatk)
 	MCFG_PALETTE_ADD("palette", 0x100)

@@ -10,6 +10,8 @@
 #ifndef MAME_INCLUDES_MADALIEN_H
 #define MAME_INCLUDES_MADALIEN_H
 
+#pragma once
+
 #include "machine/gen_latch.h"
 #include "sound/discrete.h"
 #include "emupal.h"
@@ -21,8 +23,8 @@
 class madalien_state : public driver_device
 {
 public:
-	madalien_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	madalien_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_charram(*this, "charram"),
 		m_video_control(*this, "video_control"),
@@ -39,7 +41,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2") { }
+		m_soundlatch2(*this, "soundlatch2")
+	{ }
 
 	void madalien(machine_config &config);
 	void madalien_video(machine_config &config);

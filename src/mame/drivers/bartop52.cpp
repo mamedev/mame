@@ -132,8 +132,8 @@ MACHINE_CONFIG_START(bartop52_state::a5200)
 	MCFG_DEVICE_PROGRAM_MAP(a5200_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bartop52_state, bartop_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	ATARI_GTIA(config, m_gtia, 0);
+	m_gtia->set_region(GTIA_NTSC);
 
 	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
 	MCFG_ANTIC_GTIA("gtia")

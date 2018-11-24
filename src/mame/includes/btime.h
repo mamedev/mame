@@ -5,6 +5,10 @@
     Burger Time hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_BTIME_H
+#define MAME_INCLUDES_BTIME_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
@@ -153,3 +157,5 @@ public:
 	void tisland_map(address_map &map);
 	void zoar_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BTIME_H

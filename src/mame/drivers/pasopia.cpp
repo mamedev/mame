@@ -305,10 +305,11 @@ MACHINE_CONFIG_START(pasopia_state::pasopia)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(4'000'000)/4)   /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(pasopia_state, crtc_update_row)
+	H46505(config, m_crtc, XTAL(4'000'000)/4);   /* unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(pasopia_state::crtc_update_row), this);
 
 	I8255A(config, m_ppi0);
 	m_ppi0->out_pa_callback().set(FUNC(pasopia_state::vram_addr_lo_w));

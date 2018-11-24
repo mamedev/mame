@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_DEC0_H
+#define MAME_INCLUDES_DEC0_H
+
+#pragma once
+
 #include "machine/74157.h"
 #include "cpu/h6280/h6280.h"
 #include "machine/bankdev.h"
@@ -197,3 +202,5 @@ private:
 	void secretab_map(address_map &map);
 	void secretab_s_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DEC0_H

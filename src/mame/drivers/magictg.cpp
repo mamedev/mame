@@ -310,7 +310,7 @@ uint32_t magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb3
 
 uint32_t magictg_state::pci_dev0_r(int function, int reg, uint32_t mem_mask)
 {
-	osd_printf_debug("PCI[0] READ: %x\n", reg);
+	logerror("PCI[0] READ: %x\n", reg);
 	return 0x00000000; // TODO
 }
 
@@ -335,7 +335,7 @@ uint32_t magictg_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask)
 			val = m_voodoo_pci_regs[0].init_enable;
 			break;
 		default:
-			osd_printf_debug("Voodoo[0] PCI R: %x\n", reg);
+			logerror("Voodoo[0] PCI R: %x\n", reg);
 	}
 	return val;
 }
@@ -359,7 +359,7 @@ void magictg_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_
 			break;
 
 		default:
-			osd_printf_debug("Voodoo [%x]: %x\n", reg, data);
+			logerror("Voodoo [%x]: %x\n", reg, data);
 	}
 }
 
@@ -380,7 +380,7 @@ uint32_t magictg_state::voodoo_1_pci_r(int function, int reg, uint32_t mem_mask)
 			val = m_voodoo_pci_regs[1].init_enable;
 			break;
 		default:
-			osd_printf_debug("Voodoo[1] PCI R: %x\n", reg);
+			logerror("Voodoo[1] PCI R: %x\n", reg);
 	}
 	return val;
 }
@@ -404,7 +404,7 @@ void magictg_state::voodoo_1_pci_w(int function, int reg, uint32_t data, uint32_
 			break;
 
 		default:
-			osd_printf_debug("Voodoo [%x]: %x\n", reg, data);
+			logerror("Voodoo [%x]: %x\n", reg, data);
 	}
 }
 #endif
@@ -462,7 +462,7 @@ uint32_t magictg_state::zr36120_pci_r(int function, int reg, uint32_t mem_mask)
 			val = m_zr36120.base_addr;
 			break;
 		default:
-			osd_printf_debug("ZR36120 R[%x]\n", reg);
+			logerror("ZR36120 R[%x]\n", reg);
 	}
 	return val;
 }
@@ -478,7 +478,7 @@ void magictg_state::zr36120_pci_w(int function, int reg, uint32_t data, uint32_t
 			m_zr36120.base_addr = data & 0xfffff000;
 			break;
 		default:
-			osd_printf_debug("ZR36120 [%x]: %x\n", reg, data);
+			logerror("ZR36120 [%x]: %x\n", reg, data);
 	}
 }
 
@@ -501,7 +501,7 @@ READ32_MEMBER( magictg_state::zr36120_r )
 		/* Post office */
 		res = 0;//mame_rand(machine);//m_zr36120.as_regs[0x48/4];
 	}
-	osd_printf_debug("PINKEYE_R[%x]\n", offset);
+	logerror("PINKEYE_R[%x]\n", offset);
 	return res;
 }
 
@@ -511,7 +511,7 @@ WRITE32_MEMBER( magictg_state::zr36120_w )
 
 	if (offset < 0x200)
 	{
-		osd_printf_debug("PINKEYE_W[%x] %x\n", offset, data);
+		logerror("PINKEYE_W[%x] %x\n", offset, data);
 		switch (offset)
 		{
 			case 0x00/4:
@@ -534,7 +534,7 @@ WRITE32_MEMBER( magictg_state::zr36120_w )
 		//  zr36120_guest_write(guest, g_data, g_reg);
 		// 2 - ZR36050 JPEG decoder
 		// 3 - ZR36016 color-space converter
-		osd_printf_debug("GUEST (%.8x): %d  REG: %d  DATA: %x\n", data, guest, g_reg, g_data);
+		logerror("GUEST (%.8x): %d  REG: %d  DATA: %x\n", data, guest, g_reg, g_data);
 	}
 }
 
@@ -582,21 +582,21 @@ WRITE32_MEMBER( magictg_state::f0_w )
 		case 0x808:
 		case 0x80c:
 			m_dma_ch[ch].count = data;
-//          osd_printf_debug("DMA%d COUNT: %.8x\n", ch, data);
+//          logerror("DMA%d COUNT: %.8x\n", ch, data);
 			break;
 
 		case 0x814:
 		case 0x818:
 		case 0x81c:
 			m_dma_ch[ch].src_addr = data;
-//          osd_printf_debug("DMA%d SRC: %.8x\n", ch, data);
+//          logerror("DMA%d SRC: %.8x\n", ch, data);
 			break;
 
 		case 0x824:
 		case 0x828:
 		case 0x82c:
 			m_dma_ch[ch].dst_addr = data;
-//          osd_printf_debug("DMA%d DST: %.8x\n", ch, data);
+//          logerror("DMA%d DST: %.8x\n", ch, data);
 			break;
 
 		case 0x844:
@@ -604,7 +604,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 		case 0x84c:
 		{
 			m_dma_ch[ch].ctrl = data;
-//          osd_printf_debug("DMA%d CTRL: %.8x\n", ch, data);
+//          logerror("DMA%d CTRL: %.8x\n", ch, data);
 
 			if (data & 0x1000)
 			{
@@ -650,7 +650,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 			break;
 		}
 //      default:
-//          osd_printf_debug("W: %.8x: %.8x\n", 0x0f000000 + offset, data);
+//          logerror("W: %.8x: %.8x\n", 0x0f000000 + offset, data);
 	}
 }
 
@@ -687,7 +687,7 @@ READ32_MEMBER( magictg_state::f0_r )
 			break;
 		}
 //      default:
-//          osd_printf_debug("R: %.8x\n", 0x0f000000 + offset);
+//          logerror("R: %.8x\n", 0x0f000000 + offset);
 	}
 
 	return swapendian_int32(val);
@@ -713,7 +713,7 @@ READ32_MEMBER( magictg_state::adsp_idma_data_r )
 	// TODO: Set /IACK appropriately
 	if (ACCESSING_BITS_0_15)
 	{
-		//osd_printf_debug("RD %.8x %.8x\n", offset, mem_mask);
+		//logerror("RD %.8x %.8x\n", offset, mem_mask);
 		return m_adsp->idma_addr_r();
 	}
 	else
@@ -728,7 +728,7 @@ WRITE32_MEMBER( magictg_state::adsp_idma_addr_w )
 	if (ACCESSING_BITS_16_31)
 	{
 		m_adsp->idma_addr_w(data >> 16);
-		//osd_printf_debug("WR %.8x %.8x %.8x\n", offset, mem_mask, data >> 16);
+		//logerror("WR %.8x %.8x %.8x\n", offset, mem_mask, data >> 16);
 	}
 	else
 		fatalerror("????\n");
@@ -753,7 +753,7 @@ READ16_MEMBER( magictg_state::adsp_control_r )
 			res = machine().rand() & 0xff;
 			break;
 		default:
-			osd_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
+			logerror("Unhandled register: %x\n", 0x3fe0 + offset);
 	}
 	return res;
 }
@@ -831,10 +831,10 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 			break;
 		}
 		case 5:
-			osd_printf_debug("PFLAGS: %x\n", data);
+			logerror("PFLAGS: %x\n", data);
 			break;
 		default:
-			osd_printf_debug("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
+			logerror("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
 	}
 }
 
@@ -968,7 +968,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( magictg )
-	ROM_REGION32_BE( 0x400000, "mips", 0 )
+	ROM_REGION64_BE( 0x400000, "mips", 0 )
 	ROM_LOAD16_BYTE( "magic.u34", 0x000000, 0x100000, CRC(2e8971e2) SHA1(9bdf433a7c7257389ebdf131317ef26a7d4e1ba2) )
 	ROM_LOAD16_BYTE( "magic.u35", 0x000001, 0x100000, CRC(e2202143) SHA1(f07b7da81508cd4594f66e34dabd904a21eb03f0) )
 	ROM_LOAD16_BYTE( "magic.u32", 0x200000, 0x100000, CRC(f1d530e3) SHA1(fcc392804cd6b98917a869cc5d3826278b7ba90b) )
@@ -994,7 +994,7 @@ ROM_START( magictg )
 ROM_END
 
 ROM_START( magictga )
-	ROM_REGION32_BE( 0x400000, "mips", 0 )
+	ROM_REGION64_BE( 0x400000, "mips", 0 )
 	ROM_LOAD16_BYTE( "magic.u63", 0x000000, 0x100000, CRC(a10d45f1) SHA1(0ede10f19cf70baf7b43e3f672532b4be1a179f8) )
 	ROM_LOAD16_BYTE( "magic.u64", 0x000001, 0x100000, CRC(8fdb6060) SHA1(b638244cad86dc60435a4a9150a5b639f5d61a3f) )
 	ROM_LOAD16_BYTE( "magic.u61", 0x200000, 0x100000, CRC(968891d6) SHA1(67ab87039864bb148d20795333ffa7a23e3b84f2) )

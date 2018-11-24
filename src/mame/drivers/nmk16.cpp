@@ -166,6 +166,7 @@ Afega stands for "Art-Fiction Electronic Game"
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
 #include "machine/nmk004.h"
+#include "machine/nmk112.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
@@ -4128,11 +4129,12 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 #define BIOSHIP_CRYSTAL1 10000000
@@ -4315,11 +4317,12 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::tdragon)
@@ -4639,9 +4642,9 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::tdragon2)
@@ -4684,9 +4687,9 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 // TODO : Sound system is different
@@ -4737,9 +4740,9 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::bjtwin)
@@ -4769,9 +4772,9 @@ MACHINE_CONFIG_START(nmk16_state::bjtwin)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
 MACHINE_CONFIG_END
 
 
@@ -5399,10 +5402,10 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(4'000'000))); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.30);
+	ymsnd.add_route(1, "rspeaker", 0.30);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)

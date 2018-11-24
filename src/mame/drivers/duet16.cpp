@@ -414,9 +414,9 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_DEVICE_ADD("crtc", H46505, 2000000)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(duet16_state, crtc_update_row)
+	h46505_device &crtc(H46505(config, "crtc", 2000000));
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_ADD_3BIT_BRG("chrpal")

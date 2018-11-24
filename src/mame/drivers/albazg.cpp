@@ -8,7 +8,7 @@ driver by Angelo Salese
 
 Notes:
 -The name of this hardware is "Alba ZG board",a newer revision of the
- "Alba ZC board" used by Hanaroku (albazc.c driver). Test mode says clearly that this is
+ "Alba ZC board" used by Hanaroku (albazc.cpp driver). Test mode says clearly that this is
  from 1991.
 
 TODO:
@@ -385,9 +385,10 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	MCFG_SCREEN_UPDATE_DRIVER(albazg_state, screen_update_yumefuda)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16)   /* hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	h46505_device &crtc(H46505(config, "crtc", MASTER_CLOCK/16));   /* hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yumefuda )
 	MCFG_PALETTE_ADD("palette", 0x80)

@@ -3,7 +3,7 @@
 /****************************************************************************
 
     drivers/4dpi.cpp
-    SGI 4D/PI IP6 family skeleton driver
+    SGI Personal IRIS family skeleton driver
 
     by Ryan Holtz
 
@@ -12,6 +12,12 @@
     Interrupts:
         R2000:
             NYI
+
+	Year  Model  Board  CPU    Clock    I/D Cache
+	1988  4D/20  IP6    R2000  12.5MHz  16KiB/8KiB
+	      4D/25  IP10   R3000  20MHz    64KiB/32KiB
+	      4D/30  IP14   R3000  30MHz
+	1991  4D/35  IP12   R3000  36MHz
 
 ****************************************************************************/
 
@@ -234,7 +240,7 @@ void sgi_ip6_state::sgi_ip6_map(address_map &map)
 ***************************************************************************/
 
 MACHINE_CONFIG_START(sgi_ip6_state::sgi_ip6)
-	R2000(config, m_maincpu, 25_MHz_XTAL / 2);
+	R2000(config, m_maincpu, 25_MHz_XTAL / 2, 16384, 8192);
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sgi_ip6_state::sgi_ip6_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sgi_ip6_state::sgi_ip6_vbl));
@@ -271,5 +277,5 @@ ROM_START( sgi_ip6 )
 	ROM_LOAD( "4d202031.bin", 0x000000, 0x040000, CRC(065a290a) SHA1(6f5738e79643f94901e6efe3612468d14177f65b) )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME                  FLAGS
-COMP( 1988, sgi_ip6, 0,      0,      sgi_ip6, sgi_ip6, sgi_ip6_state, init_sgi_ip6, "Silicon Graphics Inc", "4D/PI (R2000, 12.5MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME FLAGS
+COMP( 1988, sgi_ip6, 0,      0,      sgi_ip6, sgi_ip6, sgi_ip6_state, init_sgi_ip6, "Silicon Graphics Inc", "4D/20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

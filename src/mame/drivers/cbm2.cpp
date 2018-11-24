@@ -2527,10 +2527,11 @@ MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, SCREEN_TAG, XTAL(18'000'000)/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(9)
-	MCFG_MC6845_UPDATE_ROW_CB(cbm2_state, crtc_update_row)
+	MC6845(config, m_crtc, XTAL(18'000'000)/9);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(9);
+	m_crtc->set_update_row_callback(FUNC(cbm2_state::crtc_update_row), this);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

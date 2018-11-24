@@ -692,9 +692,10 @@ MACHINE_CONFIG_START(jubilee_state::jubileep)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jubileep)
 	MCFG_PALETTE_ADD("palette",8)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 MACHINE_CONFIG_END
 
 

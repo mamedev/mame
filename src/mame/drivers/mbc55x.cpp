@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phill Harvey-Smith
 /*
-    drivers/mbc55x.c
+    drivers/mbc55x.cpp
 
     Machine driver for the Sanyo MBC-550 and MBC-555.
 
@@ -311,12 +311,13 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_ppi->in_pc_callback().set(FUNC(mbc55x_state::printer_status_r));
 	m_ppi->out_pc_callback().set(FUNC(mbc55x_state::disk_select_w));
 
-	MCFG_MC6845_ADD(VID_MC6845_NAME, HD6845, SCREEN_TAG, 14.318181_MHz_XTAL / 8) // HD46505SP-1
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbc55x_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mbc55x_state, vid_hsync_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, mbc55x_state, vid_vsync_changed))
+	HD6845(config, m_crtc, 14.318181_MHz_XTAL / 8); // HD46505SP-1
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mbc55x_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(mbc55x_state::vid_vsync_changed));
+	m_crtc->out_hsync_callback().set(FUNC(mbc55x_state::vid_hsync_changed));
 
 	/* Backing storage */
 	FD1793(config, m_fdc, 14.318181_MHz_XTAL / 14); // M5W1793-02P (clock is nominally 1 MHz)

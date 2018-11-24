@@ -219,8 +219,8 @@ MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki");
 MACHINE_CONFIG_END
 
 ROM_START( quizpani )

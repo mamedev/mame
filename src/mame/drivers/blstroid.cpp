@@ -209,12 +209,13 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 7)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:pokey")
-	MCFG_DEVICE_REMOVE("jsa:tms")
+	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_jsa->test_read_cb().set_ioport("IN0").bit(7);
+	m_jsa->add_route(0, "lspeaker", 1.0);
+	m_jsa->add_route(1, "rspeaker", 1.0);
+	config.device_remove("jsa:pokey");
+	config.device_remove("jsa:tms");
 MACHINE_CONFIG_END
 
 

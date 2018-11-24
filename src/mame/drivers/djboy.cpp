@@ -526,8 +526,8 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djboy)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -1926,11 +1926,11 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
+	YM2151(config, m_ym2151, XTAL(32'220'000)/9); /* verified on pcb */
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
+	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
+	m_ym2151->add_route(0, "lspeaker", 0.42);
+	m_ym2151->add_route(1, "rspeaker", 0.42);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -2011,11 +2011,11 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
+	YM2151(config, m_ym2151, 32220000/9);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
+	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
+	m_ym2151->add_route(0, "lspeaker", 0.42);
+	m_ym2151->add_route(1, "rspeaker", 0.42);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -2042,26 +2042,23 @@ MACHINE_CONFIG_START(fghthist_state::fghthsta)
 MACHINE_CONFIG_END
 
 // DE-0396-0
-MACHINE_CONFIG_START(fghthist_state::fghthistu)
+void fghthist_state::fghthistu(machine_config &config)
+{
 	fghthsta(config);
-	MCFG_DEVICE_REMOVE("audiocpu")
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'220'000) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
-	MCFG_DEVICE_IO_MAP(z80_sound_io)
+	Z80(config.replace(), m_audiocpu, XTAL(32'220'000) / 9);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fghthist_state::z80_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fghthist_state::z80_sound_io);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, "sound_irq_merger").output_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_MODIFY("ioprot")
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
+	m_ioprot->soundlatch_irq_cb().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
-
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
-MACHINE_CONFIG_END
+	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
+	m_ym2151->reset_routes();
+	m_ym2151->add_route(0, "lspeaker", 0.40);
+	m_ym2151->add_route(1, "rspeaker", 0.40);
+}
 
 // DE-0359-2 + Bottom board DE-0360-4
 MACHINE_CONFIG_START(dragngun_state::dragngun)
@@ -2141,11 +2138,11 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
+	YM2151(config, m_ym2151, 32220000/9);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
+	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
+	m_ym2151->add_route(0, "lspeaker", 0.42);
+	m_ym2151->add_route(1, "rspeaker", 0.42);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -2184,8 +2181,7 @@ MACHINE_CONFIG_START(dragngun_state::lockloadu)
 	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)    // lockload definitely wants pf34 half width..
 
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dragngun_state, lockload_okibank_lo_w))
+	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
 MACHINE_CONFIG_END
 
 // DE-0420-1 + Bottom board DE-0421-0
@@ -2272,11 +2268,11 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dragngun_state, lockload_okibank_lo_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
+	YM2151(config, m_ym2151, 32220000/9);
+	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
+	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
+	m_ym2151->add_route(0, "lspeaker", 0.42);
+	m_ym2151->add_route(1, "rspeaker", 0.42);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -2356,7 +2352,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	m_ioprot->set_interface_scramble_interleave();
 
 	/* sound hardware */
-	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
+	DECOBSMT(config, m_decobsmt, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nslasher_state::nslasher)
@@ -2436,11 +2432,11 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	YM2151(config, m_ym2151, 32220000/9);
+	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
+	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
+	m_ym2151->add_route(0, "lspeaker", 0.40);
+	m_ym2151->add_route(1, "rspeaker", 0.40);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
@@ -2463,8 +2459,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasheru)
 
 	MCFG_DEVICE_REMOVE("sound_irq_merger")
 
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 
 	m_ioprot->soundlatch_irq_cb().set_inputline("audiocpu", 0);
 MACHINE_CONFIG_END

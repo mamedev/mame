@@ -1783,10 +1783,10 @@ MACHINE_CONFIG_START(nemesis_state::salamand)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.08)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.08)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2) // reversed according to MT #4565
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.2)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "rspeaker", 1.2); // reversed according to MT #4565
+	ymsnd.add_route(1, "lspeaker", 1.2);
 MACHINE_CONFIG_END
 
 
@@ -1830,10 +1830,10 @@ MACHINE_CONFIG_START(nemesis_state::blkpnthr)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -1988,10 +1988,10 @@ MACHINE_CONFIG_START(nemesis_state::hcrash)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) ... Interrupts _are_ generated, I wonder where they go
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+//  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
+	ymsnd.add_route(0, "lspeaker", 1.0);
+	ymsnd.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 /***************************************************************************

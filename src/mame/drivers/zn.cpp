@@ -1163,9 +1163,9 @@ MACHINE_CONFIG_START(zn_state::coh1000ta)
 
 	MB3773(config, "mb3773");
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt.set_master_tag(m_maincpu);
+	tc0140syt.set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 WRITE8_MEMBER(zn_state::fx1b_fram_w)

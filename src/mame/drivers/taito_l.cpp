@@ -1471,8 +1471,6 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(taitol_state, taito_l)
-
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
 MACHINE_CONFIG_END
 
@@ -1518,9 +1516,9 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	ymsnd.add_route(2, "mono", 0.20);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("slave")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag("slave");
+	ciu.set_slave_tag(m_audio_cpu);
 MACHINE_CONFIG_END
 
 
@@ -1588,9 +1586,9 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("slave")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt.set_master_tag("slave");
+	tc0140syt.set_slave_tag(m_audio_cpu);
 MACHINE_CONFIG_END
 
 

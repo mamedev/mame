@@ -158,8 +158,9 @@ protected:
 class trsm100_state : public kc85_state
 {
 public:
-	trsm100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kc85_state(mconfig, type, tag) { }
+	trsm100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kc85_state(mconfig, type, tag)
+	{ }
 
 	virtual void machine_start() override;
 	void trsm100(machine_config &config);
@@ -169,9 +170,9 @@ public:
 class pc8201_state : public kc85_state
 {
 public:
-	pc8201_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kc85_state(mconfig, type, tag),
-			m_cas_cart(*this, "cas_cartslot")
+	pc8201_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kc85_state(mconfig, type, tag),
+		m_cas_cart(*this, "cas_cartslot")
 	{ }
 
 	virtual void machine_start() override;

@@ -896,10 +896,6 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 //  requests
 //-------------------------------------------------
 
-
-
-
-
 void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index)
 {
 	switch (index)
@@ -1894,7 +1890,7 @@ void segas16b_state::lockonph_sound_map(address_map &map)
 void segas16b_state::lockonph_sound_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x00, 0x01).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x40, 0x40).nopw(); // ??
 	map(0x80, 0x80).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
@@ -3742,14 +3738,13 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, MASTER_CLOCK_8MHz/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
+	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2).add_route(ALL_OUTPUTS, "mono", 0.43);
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_UPD7759_MD(0)
@@ -3809,6 +3804,8 @@ MACHINE_CONFIG_START(segas16b_state::system16b_i8751)
 	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("SERVICE"))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, segas16b_state, spin_68k_w))
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))
@@ -3896,12 +3893,11 @@ MACHINE_CONFIG_START(segas16b_state::fpointbl)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(75) // these align the pieces with the playfield
-	MCFG_BOOTLEG_SYS16B_SPRITES_YORIGIN(-2) // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(75); // these align the pieces with the playfield
+	m_sprites->set_local_originy(-2); // some other gfx don't have identical alignment to original tho (flickey character over 'good luck')
 
-	MCFG_DEVICE_MODIFY("segaic16vid")
-	MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB(segas16b_state, tilemap_16b_fpointbl_fill_latch)
+	m_segaic16vid->set_pagelatch_cb(FUNC(segas16b_state::tilemap_16b_fpointbl_fill_latch), this);
 
 MACHINE_CONFIG_END
 
@@ -3914,8 +3910,7 @@ MACHINE_CONFIG_START(segas16b_state::fpointbla)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
 
-	MCFG_DEVICE_MODIFY("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(60) // these align the pieces with the playfield
+	m_sprites->set_local_originx(60); // these align the pieces with the playfield
 	MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::lockonph)
@@ -3941,8 +3936,8 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -3950,10 +3945,10 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) // ??
-//  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
-	MCFG_SOUND_ROUTE(0, "mono", 0.5)
-	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+	YM2151(config, m_ym2151, XTAL(16'000'000)/4); // ??
+//  m_ym2151->irq_handler().set_inputline(m_soundcpu", 0); // does set up the timer, but end up with no sound?
+	m_ym2151->add_route(0, "mono", 0.5);
+	m_ym2151->add_route(1, "mono", 0.5);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // clock / pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
@@ -7754,15 +7749,18 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Shinobi, Sega System 16B
-//  CPU: 68000
-//  ROM Board type: 171-5521
-// Following board numbers are NOT verified:
-//  Main board: 837-6500-01 ??
+//   Shinobi, Sega System 16B
+//   CPU: 68000
+//   ROM Board type: 171-5521
+//  Main board: 837-6500-01
 // Game Number: 833-6496-01 SHINOBI ??
 //   ROM board: 834-6499-01 ??
 //
-ROM_START( shinobi5 )
+// Game Number and ROM board NOT verified
+//
+//  Same version as shinobi4 below except with a standard Z80 sound CPU and sound program ROM
+//
+ROM_START( shinobi6 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-11360.a7", 0x00000, 0x20000, CRC(b1f67ab9) SHA1(83eddd1ef3fbe58f1f8e8d57229fabf1907fc371) )
 	ROM_LOAD16_BYTE( "epr-11359.a5", 0x00001, 0x20000, CRC(0f0306e1) SHA1(eebe7c88e5f665d1d0920fb9b545e20b05be9b52) )
@@ -7781,6 +7779,44 @@ ROM_START( shinobi5 )
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11361.a10", 0x00000, 0x08000, CRC(1f47ebcb) SHA1(32837f3f1dd5ff309d1d955c1a738c444b248d3d) )
 	ROM_LOAD( "mpr-11362.a11", 0x10000, 0x20000, CRC(256af749) SHA1(041bd007ea7708c6d69f07865828b9bd17a139f5) ) // 28 pin Fujitsu MB831000 mask ROM
+ROM_END
+
+//*************************************************************************************************************************
+//    Shinobi, Sega System 16B
+//    CPU: 68000
+//    ROM Board type: 171-5358
+//  Main board: 837-6500-01
+// Game Number: 833-6496-02 SHINOBI
+//   ROM board: 834-6499-02
+//
+//  Same version as shinobi3 below except with a standard Z80 sound CPU and sound program ROM
+//
+ROM_START( shinobi5 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-11299.a4", 0x00000, 0x10000, CRC(b930399d) SHA1(955ff2948e1990463631b0bc5c7f5275384236cc) )
+	ROM_LOAD16_BYTE( "epr-11298.a1", 0x00001, 0x10000, CRC(343f4c46) SHA1(2cf5d00462ad85ae9a2e16d59171c8ab85e10f49) )
+	ROM_LOAD16_BYTE( "epr-11283.a5", 0x20000, 0x10000, CRC(9d46e707) SHA1(37ab25b3b37365c9f45837bfb6ec80652691dd4c) )
+	ROM_LOAD16_BYTE( "epr-11281.a2", 0x20001, 0x10000, CRC(7961d07e) SHA1(38cbdab35f901532c0ad99ad0083513abd2ff182) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "opr-11284.b9",  0x00000, 0x10000, CRC(5f62e163) SHA1(03f008745a1af84142ada647acf3601049f43ad5) )
+	ROM_LOAD( "opr-11285.b10", 0x10000, 0x10000, CRC(75f8fbc9) SHA1(29072edcd583af60ec66b4c8bb82b179a3751edf) )
+	ROM_LOAD( "opr-11286.b11", 0x20000, 0x10000, CRC(06508bb9) SHA1(57c9036123ec8e35d0275ab6eaff25a16aa203d4) )
+
+	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "opr-11290.b1", 0x00001, 0x10000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
+	ROM_LOAD16_BYTE( "opr-11294.b5", 0x00000, 0x10000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
+	ROM_LOAD16_BYTE( "opr-11291.b2", 0x20001, 0x10000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
+	ROM_LOAD16_BYTE( "opr-11295.b6", 0x20000, 0x10000, CRC(25307ef8) SHA1(91ffbe436f80d583524ee113a8b7c0cf5d8ab286) )
+	ROM_LOAD16_BYTE( "opr-11292.b3", 0x40001, 0x10000, CRC(c29ac34e) SHA1(b5e9b8c3233a7d6797f91531a0d9123febcf1660) )
+	ROM_LOAD16_BYTE( "opr-11296.b7", 0x40000, 0x10000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
+	ROM_LOAD16_BYTE( "opr-11293.b4", 0x60001, 0x10000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
+	ROM_LOAD16_BYTE( "opr-11297.b8", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-11287.a7", 0x00000, 0x8000, CRC(e8cccd42) SHA1(39cbf9298540b9d5a26f47fcf6c9b89b6cead6c9) )
+	ROM_LOAD( "epr-11288.a8", 0x10000, 0x8000, CRC(c8df8460) SHA1(0aeb41a493df155edb5f600f53ec43b798927dff) )
+	ROM_LOAD( "epr-11289.a9", 0x20000, 0x8000, CRC(e5a4cf30) SHA1(d1982da7a550c11ab2253f5d64ac6ab847da0a04) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -7831,19 +7867,19 @@ ROM_START( shinobi3 )
 	ROM_LOAD16_BYTE( "epr-11281.a2", 0x20001, 0x10000, CRC(7961d07e) SHA1(38cbdab35f901532c0ad99ad0083513abd2ff182) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-11284.b9",  0x00000, 0x10000, CRC(5f62e163) SHA1(03f008745a1af84142ada647acf3601049f43ad5) )
-	ROM_LOAD( "epr-11285.b10", 0x10000, 0x10000, CRC(75f8fbc9) SHA1(29072edcd583af60ec66b4c8bb82b179a3751edf) )
-	ROM_LOAD( "epr-11286.b11", 0x20000, 0x10000, CRC(06508bb9) SHA1(57c9036123ec8e35d0275ab6eaff25a16aa203d4) )
+	ROM_LOAD( "opr-11284.b9",  0x00000, 0x10000, CRC(5f62e163) SHA1(03f008745a1af84142ada647acf3601049f43ad5) )
+	ROM_LOAD( "opr-11285.b10", 0x10000, 0x10000, CRC(75f8fbc9) SHA1(29072edcd583af60ec66b4c8bb82b179a3751edf) )
+	ROM_LOAD( "opr-11286.b11", 0x20000, 0x10000, CRC(06508bb9) SHA1(57c9036123ec8e35d0275ab6eaff25a16aa203d4) )
 
 	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-11290.b1", 0x00001, 0x10000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
-	ROM_LOAD16_BYTE( "epr-11294.b5", 0x00000, 0x10000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
-	ROM_LOAD16_BYTE( "epr-11291.b2", 0x20001, 0x10000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
-	ROM_LOAD16_BYTE( "epr-11295.b6", 0x20000, 0x10000, CRC(25307ef8) SHA1(91ffbe436f80d583524ee113a8b7c0cf5d8ab286) )
-	ROM_LOAD16_BYTE( "epr-11292.b3", 0x40001, 0x10000, CRC(c29ac34e) SHA1(b5e9b8c3233a7d6797f91531a0d9123febcf1660) )
-	ROM_LOAD16_BYTE( "epr-11296.b7", 0x40000, 0x10000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
-	ROM_LOAD16_BYTE( "epr-11293.b4", 0x60001, 0x10000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
-	ROM_LOAD16_BYTE( "epr-11297.b8", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
+	ROM_LOAD16_BYTE( "opr-11290.b1", 0x00001, 0x10000, CRC(611f413a) SHA1(180f83216e2dfbfd77b0fb3be83c3042954d12df) )
+	ROM_LOAD16_BYTE( "opr-11294.b5", 0x00000, 0x10000, CRC(5eb00fc1) SHA1(97e02eee74f61fabcad2a9e24f1868cafaac1d51) )
+	ROM_LOAD16_BYTE( "opr-11291.b2", 0x20001, 0x10000, CRC(3c0797c0) SHA1(df18c7987281bd9379026c6cf7f96f6ae49fd7f9) )
+	ROM_LOAD16_BYTE( "opr-11295.b6", 0x20000, 0x10000, CRC(25307ef8) SHA1(91ffbe436f80d583524ee113a8b7c0cf5d8ab286) )
+	ROM_LOAD16_BYTE( "opr-11292.b3", 0x40001, 0x10000, CRC(c29ac34e) SHA1(b5e9b8c3233a7d6797f91531a0d9123febcf1660) )
+	ROM_LOAD16_BYTE( "opr-11296.b7", 0x40000, 0x10000, CRC(04a437f8) SHA1(ea5fed64443236e3404fab243761e60e2e48c84c) )
+	ROM_LOAD16_BYTE( "opr-11293.b4", 0x60001, 0x10000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
+	ROM_LOAD16_BYTE( "opr-11297.b8", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11372.a7", 0x00000, 0x8000, CRC(0824269a) SHA1(501ab1b80c6e8a4b0ccda148c13fa96c71c7300d) )   // MC8123B (317-0054) encrypted version of epr-11287.a7
@@ -9230,7 +9266,8 @@ GAME( 1987, defense,    sdi,      system16b_fd1089a,     sdi,      segas16b_stat
 GAME( 1987, sdib,       sdi,      system16b_fd1089a,     sdi,      segas16b_state, init_defense_5358_small, ROT0,   "Sega", "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
 GAME( 1987, sdibl,      sdi,      system16b,             sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, original hardware)", 0 ) // seems to be a bootleg of an older version of the game than any supported original sets
 
-GAME( 1987, shinobi5,   shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5521,       ROT0,   "Sega", "Shinobi (set 5, System 16B) (unprotected)", 0 )
+GAME( 1987, shinobi6,   shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5521,       ROT0,   "Sega", "Shinobi (set 6, System 16B) (unprotected)", 0 )
+GAME( 1987, shinobi5,   shinobi,  system16b,             shinobi,  segas16b_state, init_generic_5358,       ROT0,   "Sega", "Shinobi (set 5, System 16B) (unprotected)", 0 )
 GAME( 1987, shinobi4,   shinobi,  system16b_mc8123,      shinobi,  segas16b_state, init_shinobi4_5521,      ROT0,   "Sega", "Shinobi (set 4, System 16B) (MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi3,   shinobi,  system16b_mc8123,      shinobi,  segas16b_state, init_shinobi3_5358,      ROT0,   "Sega", "Shinobi (set 3, System 16B) (MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi2,   shinobi,  system16b_fd1094,      shinobi,  segas16b_state, init_generic_5358,       ROT0,   "Sega", "Shinobi (set 2, System 16B) (FD1094 317-0049)", 0 )

@@ -32,6 +32,7 @@ public:
 	DECLARE_WRITE32_MEMBER(write);
 
 	void set_cpu_buserr(uint32_t address);
+	uint32_t get_mem_config(int channel) const { return m_mem_config[channel]; }
 
 protected:
 	// device-level overrides

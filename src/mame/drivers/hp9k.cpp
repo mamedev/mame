@@ -412,9 +412,10 @@ MACHINE_CONFIG_START(hp9k_state::hp9k)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hp9k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL(16'000'000) / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MC6845(config, m_6845, XTAL(16'000'000) / 16);
+	m_6845->set_screen("screen");
+	m_6845->set_show_border_area(false);
+	m_6845->set_char_width(8);
 MACHINE_CONFIG_END
 
 /* ROM definition */

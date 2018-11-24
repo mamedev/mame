@@ -2370,14 +2370,14 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 	MCFG_SCREEN_UPDATE_DRIVER(pc9801_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pc9801_state, vrtc_irq))
 
-	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 21.0526_MHz_XTAL / 8)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
-	MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE("upd7220_btm", upd7220_device, ext_sync_w))
+	UPD7220(config, m_hgdc1, 21.0526_MHz_XTAL / 8);
+	m_hgdc1->set_addrmap(0, &pc9801_state::upd7220_1_map);
+	m_hgdc1->set_draw_text_callback(FUNC(pc9801_state::hgdc_draw_text), this);
+	m_hgdc1->vsync_wr_callback().set(m_hgdc2, FUNC(upd7220_device::ext_sync_w));
 
-	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 21.0526_MHz_XTAL / 8)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc2, 21.0526_MHz_XTAL / 8);
+	m_hgdc2->set_addrmap(0, &pc9801_state::upd7220_2_map);
+	m_hgdc2->set_display_pixels_callback(FUNC(pc9801_state::hgdc_display_pixels), this);
 
 	SPEAKER(config, "mono").front_center();
 

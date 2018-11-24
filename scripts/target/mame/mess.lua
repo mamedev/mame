@@ -289,6 +289,7 @@ VIDEOS["SEGA315_5313"] = true
 --VIDEOS["BUFSPRITE"] = true
 VIDEOS["BT45X"] = true
 VIDEOS["BT459"] = true
+VIDEOS["CATSEYE"] = true
 VIDEOS["CDP1861"] = true
 VIDEOS["CDP1862"] = true
 --VIDEOS["CESBLIT"] = true
@@ -2573,6 +2574,8 @@ files {
 createMESSProjects(_target, _subtarget, "ncd")
 files {
 	MAME_DIR .. "src/mame/drivers/ncd17c.cpp",
+	MAME_DIR .. "src/mame/drivers/ncdmips.cpp",
+	MAME_DIR .. "src/mame/drivers/ncdppc.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ne")
@@ -3012,7 +3015,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "sgi")
 files {
-	MAME_DIR .. "src/mame/drivers/4d20.cpp",
+	MAME_DIR .. "src/mame/drivers/iris_power.cpp",
 	MAME_DIR .. "src/mame/drivers/crimson.cpp",
 	MAME_DIR .. "src/mame/drivers/o2.cpp",
 	MAME_DIR .. "src/mame/drivers/octane.cpp",
@@ -3026,12 +3029,16 @@ files {
 	MAME_DIR .. "src/mame/machine/hpc3.h",
 	MAME_DIR .. "src/mame/machine/ioc2.cpp",
 	MAME_DIR .. "src/mame/machine/ioc2.h",
+	MAME_DIR .. "src/mame/machine/mace.cpp",
+	MAME_DIR .. "src/mame/machine/mace.h",
 	MAME_DIR .. "src/mame/drivers/iris3130.cpp",
 	MAME_DIR .. "src/mame/drivers/4dpi.cpp",
 	MAME_DIR .. "src/mame/drivers/indigo.cpp",
 	MAME_DIR .. "src/mame/drivers/indy_indigo2.cpp",
 	MAME_DIR .. "src/mame/video/newport.cpp",
 	MAME_DIR .. "src/mame/video/newport.h",
+	MAME_DIR .. "src/mame/video/crime.cpp",
+	MAME_DIR .. "src/mame/video/crime.h",
 }
 
 createMESSProjects(_target, _subtarget, "sharp")
@@ -3758,6 +3765,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/icatel.cpp",
 	MAME_DIR .. "src/mame/drivers/icebox.cpp",
 	MAME_DIR .. "src/mame/drivers/if800.cpp",
+	MAME_DIR .. "src/mame/drivers/ikt5a.cpp",
 	MAME_DIR .. "src/mame/drivers/imsai.cpp",
 	MAME_DIR .. "src/mame/drivers/indiana.cpp",
 	MAME_DIR .. "src/mame/drivers/is48x.cpp",

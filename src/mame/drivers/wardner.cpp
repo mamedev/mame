@@ -415,11 +415,14 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	coinlatch.q_out_cb<7>().set(FUNC(wardner_state::coin_lockout_2_w));
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(14'000'000)/4) /* 3.5MHz measured on CLKin */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(2)
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(14'000'000)/4)); /* 3.5MHz measured on CLKin */
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(2);
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 32, 14)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(32, 14);
 
 	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
 

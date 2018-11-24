@@ -287,11 +287,12 @@ MACHINE_CONFIG_START(lola8a_state::lola8a)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL(8'000'000) / 8) // HD6845 == HD46505S
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(lola8a_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, lola8a_state, crtc_vsync))
+	hd6845_device &crtc(HD6845(config, HD46505SP_TAG, XTAL(8'000'000) / 8)); // HD6845 == HD46505S
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(lola8a_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set(FUNC(lola8a_state::crtc_vsync));
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 

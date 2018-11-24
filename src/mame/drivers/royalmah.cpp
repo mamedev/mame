@@ -3590,9 +3590,10 @@ MACHINE_CONFIG_START(royalmah_state::janyoup2)
 	MCFG_DEVICE_CLOCK(XTAL(18'432'000)/4) // unknown divider
 	MCFG_DEVICE_IO_MAP(janyoup2_iomap)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(18'432'000)/12) // unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
+	h46505_device &crtc(H46505(config, "crtc", XTAL(18'432'000)/12)); // unknown divider
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::seljan)

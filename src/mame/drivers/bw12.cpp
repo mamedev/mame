@@ -566,10 +566,11 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bw12)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(16'000'000)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bw12_state, crtc_update_row)
+	MC6845(config, m_crtc, XTAL(16'000'000)/8);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(bw12_state::crtc_update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -325,9 +325,9 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(xmen_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(xmen_state, sprite_callback)
@@ -342,9 +342,7 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	YM2151(config, "ymsnd", XTAL(16'000'000)/4).add_route(0, "lspeaker", 0.20).add_route(1, "rspeaker", 0.20);  /* verified on pcb */
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
@@ -390,9 +388,9 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(xmen_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(xmen_state, sprite_callback)
@@ -408,9 +406,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	YM2151(config, "ymsnd", XTAL(16'000'000)/4).add_route(0, "lspeaker", 0.20).add_route(1, "rspeaker", 0.20);
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)

@@ -377,9 +377,8 @@ MACHINE_CONFIG_START(segam1_state::segam1)
 	mb8421_device &dpram(MB8421(config, "dpram"));
 	dpram.intl_callback().set_inputline("m1comm", 0);
 
-	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_DEVICE_ADD("mixer", S24MIXER, 0)
+	S24TILE(config, m_tile, 0, 0x3fff).set_palette(m_palette);
+	S24MIXER(config, m_mixer, 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

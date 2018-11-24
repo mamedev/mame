@@ -64,7 +64,7 @@ public:
 	void jtc(machine_config &config);
 	void jtc_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z8_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
@@ -812,11 +812,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(jtc_state::basic)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(UB8830D_TAG, UB8830D, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(jtc_mem)
-	MCFG_Z8_PORT_P2_WRITE_CB(WRITE8(*this, jtc_state, p2_w))
-	MCFG_Z8_PORT_P3_READ_CB(READ8(*this, jtc_state, p3_r))
-	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(*this, jtc_state, p3_w))
+	UB8830D(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &jtc_state::jtc_mem);
+	m_maincpu->p2_out_cb().set(FUNC(jtc_state::p2_w));
+	m_maincpu->p3_in_cb().set(FUNC(jtc_state::p3_r));
+	m_maincpu->p3_out_cb().set(FUNC(jtc_state::p3_w));
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -862,8 +862,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jtces23_state::jtces23)
 	basic(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY(UB8830D_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(jtc_es23_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &jtces23_state::jtc_es23_mem);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -884,8 +883,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jtces40_state::jtces40)
 	basic(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY(UB8830D_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(jtc_es40_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &jtces40_state::jtc_es40_mem);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

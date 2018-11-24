@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
+#ifndef MAME_INCLUDES_DEADANG_H
+#define MAME_INCLUDES_DEADANG_H
+
+#pragma once
 
 #include "audio/seibu.h"
 #include "machine/timer.h"
@@ -9,8 +13,8 @@
 class deadang_state : public driver_device
 {
 public:
-	deadang_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	deadang_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_scroll_ram(*this, "scroll_ram"),
 		m_videoram(*this, "videoram"),
 		m_video_data(*this, "video_data"),
@@ -85,9 +89,9 @@ private:
 class popnrun_state : public deadang_state
 {
 public:
-	popnrun_state(const machine_config &mconfig, device_type type, const char *tag)
-	: deadang_state(mconfig, type, tag)
-	{}
+	popnrun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		deadang_state(mconfig, type, tag)
+	{ }
 
 	void popnrun(machine_config &config);
 
@@ -106,3 +110,5 @@ private:
 	uint32_t popnrun_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void popnrun_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+#endif // MAME_INCLUDES_DEADANG_H

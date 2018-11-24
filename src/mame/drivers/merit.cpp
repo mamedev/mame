@@ -1429,13 +1429,14 @@ MACHINE_CONFIG_START(merit_state::pitboss)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(merit_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(merit_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, merit_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_begin_update_callback(FUNC(merit_state::crtc_begin_update), this);
+	crtc.set_update_row_callback(FUNC(merit_state::crtc_update_row), this);
+	crtc.out_hsync_callback().set(FUNC(merit_state::hsync_changed));
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -5,6 +5,10 @@
     Aliens
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ALIENS_H
+#define MAME_INCLUDES_ALIENS_H
+
+#pragma once
 
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
@@ -15,8 +19,8 @@
 class aliens_state : public driver_device
 {
 public:
-	aliens_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	aliens_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank0000(*this, "bank0000"),
@@ -24,7 +28,8 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
 		m_soundlatch(*this, "soundlatch"),
-		m_rombank(*this, "rombank") { }
+		m_rombank(*this, "rombank")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -53,3 +58,5 @@ public:
 	void aliens_sound_map(address_map &map);
 	void bank0000_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ALIENS_H

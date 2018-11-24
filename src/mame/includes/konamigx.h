@@ -3,6 +3,8 @@
 #ifndef MAME_INCLUDES_KONAMIGX_H
 #define MAME_INCLUDES_KONAMIGX_H
 
+#pragma once
+
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
 #include "machine/k053252.h"

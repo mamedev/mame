@@ -475,9 +475,10 @@ MACHINE_CONFIG_START(chance32_state::chance32)
 	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 12000000/16)   /* 52.786 Hz (similar to Major Poker) */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
+	h46505_device &crtc(H46505(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(16);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chance32)
 	MCFG_PALETTE_ADD("palette", 0x800)

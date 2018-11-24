@@ -4391,11 +4391,11 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::sprtmtch_vblank_w));
 
-	MCFG_DEVICE_ADD(m_blitter, DYNAX_BLITTER_REV2, 0)
-	MCFG_DYNAX_BLITTER_REV2_VRAM_OUT_CB(WRITE8(*this, dynax_state, hnoridur_blit_pixel_w))
-	MCFG_DYNAX_BLITTER_REV2_SCROLLX_CB(WRITE8(*this, dynax_state, dynax_blit_scrollx_w))
-	MCFG_DYNAX_BLITTER_REV2_SCROLLY_CB(WRITE8(*this, dynax_state, dynax_blit_scrolly_w))
-	MCFG_DYNAX_BLITTER_REV2_READY_CB(WRITELINE(*this, dynax_state, sprtmtch_blitter_irq_w))
+	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	m_blitter->vram_out_cb().set(FUNC(dynax_state::hnoridur_blit_pixel_w));
+	m_blitter->scrollx_cb().set(FUNC(dynax_state::dynax_blit_scrollx_w));
+	m_blitter->scrolly_cb().set(FUNC(dynax_state::dynax_blit_scrolly_w));
+	m_blitter->ready_cb().set(FUNC(dynax_state::sprtmtch_blitter_irq_w));
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 

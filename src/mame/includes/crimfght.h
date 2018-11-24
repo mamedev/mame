@@ -5,6 +5,10 @@
     Crime Fighters
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CRIMFGHT_H
+#define MAME_INCLUDES_CRIMFGHT_H
+
+#pragma once
 
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
@@ -16,8 +20,8 @@
 class crimfght_state : public driver_device
 {
 public:
-	crimfght_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	crimfght_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank0000(*this, "bank0000"),
@@ -26,7 +30,8 @@ public:
 		m_k051960(*this, "k051960"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_rombank(*this, "rombank") { }
+		m_rombank(*this, "rombank")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -62,3 +67,5 @@ private:
 	int m_rmrd;
 	int m_init;
 };
+
+#endif // MAME_INCLUDES_CRIMFGHT_H

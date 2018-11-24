@@ -11,6 +11,7 @@ DEFINE_DEVICE_TYPE(NEREID, nereid_device, "nereid", "HP Nereid ASIC")
 
 nereid_device::nereid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_palette_interface(mconfig, *this),
 	m_red(0),
 	m_green(0),
 	m_blue(0),
@@ -30,8 +31,6 @@ void nereid_device::device_start()
 	save_item(NAME(m_green));
 	save_item(NAME(m_blue));
 	save_item(NAME(m_index));
-	save_item(NAME(m_video_palette));
-	save_item(NAME(m_overlay_palette));
 	save_item(NAME(m_plane_mask));
 	save_item(NAME(m_overlay_ctl));
 	save_item(NAME(m_overlay_index));
@@ -40,9 +39,8 @@ void nereid_device::device_start()
 
 void nereid_device::device_reset()
 {
-	std::fill(m_video_palette.begin(), m_video_palette.end(), 0);
-	std::fill(m_overlay_palette.begin(), m_overlay_palette.end(), 0);
-
+	for(int i = 0; i < palette_entries(); i++)
+		set_pen_color(i, rgb_t(0, 0, 0));
 	m_index = 0;
 	m_plane_mask = 0;
 	m_overlay_ctl = 0;
@@ -136,20 +134,22 @@ WRITE16_MEMBER(nereid_device::ctrl_w)
 			const int index = (m_overlay_index >> 1) & 0x3;
 			LOG("NEREID: set overlay color index %u: rgb_t(%u,%u,%u)\n",
 					index, m_red, m_green, m_blue);
-				m_overlay_palette[index] = rgb_t(m_red, m_green, m_blue);
+			set_pen_color(index | 0x100, rgb_t(m_red, m_green, m_blue));
 		} else {
 			LOG("NEREID: set video color index %u: rgb_t(%u,%u,%u)\n",
 					m_index, m_red, m_green, m_blue);
-			m_video_palette[m_index] = rgb_t(m_red, m_green, m_blue);
+			set_pen_color(m_index, rgb_t(m_red, m_green, m_blue));
 		}
 		break;
 
 	case NEREID_READ_STROBE:
-		m_red = m_video_palette[m_index].r();
-		m_green = m_video_palette[m_index].g();
-		m_blue = m_video_palette[m_index].b();
+	{
+		rgb_t tmp = pen_color(m_index);
+		m_red = tmp.r();
+		m_green = tmp.g();
+		m_blue = tmp.b();
 		break;
-
+	}
 	case NEREID_PLANE_MASK:
 		m_plane_mask = data;
 		LOG("W NEREID_PLANE_MASK = %02x\n", m_plane_mask);
@@ -180,8 +180,9 @@ rgb_t nereid_device::map_color(uint8_t input, uint8_t ovl)
 {
 	ovl &= m_overlay_ctl;
 
-	if (ovl == 0)
-		return m_video_palette[input & m_plane_mask];
-	else
-		return m_overlay_palette[ovl & m_plane_mask];
+	if (ovl == 0) {
+		return pen_color(input & m_plane_mask);
+	} else {
+		return pen_color((ovl & m_plane_mask) | 0x100);
+	}
 }

@@ -14,12 +14,12 @@
 class mystwarr_state : public konamigx_state
 {
 public:
-	mystwarr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: konamigx_state(mconfig, type, tag),
+	mystwarr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		konamigx_state(mconfig, type, tag),
 		m_k054321(*this, "k054321"),
-		m_gx_workram(*this,"gx_workram"),
-		m_spriteram(*this,"spriteram")
-		{ }
+		m_gx_workram(*this, "gx_workram"),
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void martchmp(machine_config &config);
 	void mystwarr(machine_config &config);

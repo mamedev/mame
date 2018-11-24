@@ -5,6 +5,10 @@
     Ginga NinkyouDen
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GINGANIN_H
+#define MAME_INCLUDES_GINGANIN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -12,8 +16,8 @@
 class ginganin_state : public driver_device
 {
 public:
-	ginganin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ginganin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_txtram(*this, "txtram"),
 		m_spriteram(*this, "spriteram"),
 		m_vregs(*this, "vregs"),
@@ -22,7 +26,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void ginganin(machine_config &config);
 
@@ -68,3 +73,5 @@ private:
 	void ginganin_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GINGANIN_H

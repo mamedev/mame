@@ -595,11 +595,12 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 16_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bigbord2_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(m_ctc1, z80ctc_device, trg3))
+	mc6845_device &crtc(MC6845(config, "crtc", 16_MHz_XTAL / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(bigbord2_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 
 	ls259_device &proglatch(LS259(config, "proglatch")); // U41
 	proglatch.q_out_cb<6>().set("outlatch1", FUNC(ls259_device::clear_w)); // FCRST - also resets the 8877

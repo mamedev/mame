@@ -1770,10 +1770,10 @@ MACHINE_CONFIG_START(cps_state::kodb)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))  /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.35)
-	MCFG_SOUND_ROUTE(1, "mono", 0.35)
+	ym2151_device &ym2151(YM2151(config, "2151", XTAL(3'579'545)));  /* verified on pcb */
+	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2151.add_route(0, "mono", 0.35);
+	ym2151.add_route(1, "mono", 0.35);
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
@@ -1812,10 +1812,10 @@ MACHINE_CONFIG_START(cps_state::mtwinsb)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.35)
-	MCFG_SOUND_ROUTE(1, "mono", 0.35)
+	ym2151_device &ym2151(YM2151(config, "2151", XTAL(3'579'545)));
+	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2151.add_route(0, "mono", 0.35);
+	ym2151.add_route(1, "mono", 0.35);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -1852,9 +1852,7 @@ MACHINE_CONFIG_START(cps_state::sf2mdt)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("2151", YM2151, 3579545)
-	MCFG_SOUND_ROUTE(0, "mono", 0.35)
-	MCFG_SOUND_ROUTE(1, "mono", 0.35)
+	YM2151(config, "2151", XTAL(3'579'545)).add_route(0, "mono", 0.35).add_route(1, "mono", 0.35);
 
 	/* has 2x MSM5205 instead of OKI6295 */
 	MCFG_DEVICE_ADD("msm1", MSM5205, 24000000/64)    /* ? */
@@ -1905,10 +1903,10 @@ MACHINE_CONFIG_START(cps_state::knightsb)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("2151", YM2151, 29821000 / 8)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.35)
-	MCFG_SOUND_ROUTE(1, "mono", 0.35)
+	ym2151_device &ym2151(YM2151(config, "2151", 29821000 / 8));
+	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2151.add_route(0, "mono", 0.35);
+	ym2151.add_route(1, "mono", 0.35);
 
 	/* has 2x MSM5205 instead of OKI6295 */
 	MCFG_DEVICE_ADD("msm1", MSM5205, 24000000/64)    /* ? */
@@ -2478,10 +2476,10 @@ MACHINE_CONFIG_START(cps_state::sgyxz)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))  /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.35)
-	MCFG_SOUND_ROUTE(1, "mono", 0.35)
+	ym2151_device &ym2151(YM2151(config, "2151", XTAL(3'579'545)));  /* verified on pcb */
+	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2151.add_route(0, "mono", 0.35);
+	ym2151.add_route(1, "mono", 0.35);
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
@@ -2790,10 +2788,10 @@ MACHINE_CONFIG_START(cps_state::sf2m1)
 	SPEAKER(config, "mono").front_center();
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
-	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.35)
-	MCFG_SOUND_ROUTE(1, "mono", 0.35)
+	ym2151_device &ym2151(YM2151(config, "2151", XTAL(3'579'545)));
+	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2151.add_route(0, "mono", 0.35);
+	ym2151.add_route(1, "mono", 0.35);
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -3272,10 +3270,10 @@ MACHINE_CONFIG_START(cps_state::varthb)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.35)
-	MCFG_SOUND_ROUTE(1, "mono", 0.35)
+	ym2151_device &ym2151(YM2151(config, "2151", XTAL(3'579'545)));
+	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2151.add_route(0, "mono", 0.35);
+	ym2151.add_route(1, "mono", 0.35);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

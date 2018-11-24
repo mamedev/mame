@@ -1891,7 +1891,8 @@ INPUT_PORTS_END
  *  Machine drivers
  *
  *************************************/
-MACHINE_CONFIG_START(seattle_state::seattle_common)
+void seattle_state::seattle_common(machine_config &config)
+{
 
 	/* basic machine hardware */
 	R5000LE(config, m_maincpu, SYSTEM_CLOCK * 3);
@@ -1930,10 +1931,11 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
 	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(seattle_state::phoenixsa)
+void seattle_state::phoenixsa(machine_config &config)
+{
 	seattle_common(config);
 	R4700LE(config.replace(), m_maincpu, SYSTEM_CLOCK * 2);
 	m_maincpu->set_icache_size(16384);
@@ -1942,38 +1944,43 @@ MACHINE_CONFIG_START(seattle_state::phoenixsa)
 
 	m_galileo->set_simm0_size(0x00200000);
 	m_galileo->set_simm1_size(0x00200000);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle150)
+void seattle_state::seattle150(machine_config &config)
+{
 	seattle_common(config);
 	R5000LE(config.replace(), m_maincpu, SYSTEM_CLOCK * 3);
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_system_clock(SYSTEM_CLOCK);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle150_widget)
+void seattle_state::seattle150_widget(machine_config &config)
+{
 	seattle150(config);
 	SMC91C94(config, m_ethernet, 0);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle200)
+void seattle_state::seattle200(machine_config &config)
+{
 	seattle150(config);
 	m_maincpu->set_clock(SYSTEM_CLOCK * 4);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle200_widget)
+void seattle_state::seattle200_widget(machine_config &config)
+{
 	seattle200(config);
 	SMC91C94(config, m_ethernet, 0);
 	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::flagstaff)
+void seattle_state::flagstaff(machine_config &config)
+{
 	seattle150(config);
 	m_maincpu->set_clock(SYSTEM_CLOCK * 4);
 
@@ -1984,11 +1991,12 @@ MACHINE_CONFIG_START(seattle_state::flagstaff)
 
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 4);
-MACHINE_CONFIG_END
+}
 
 // Per game configurations
 
-MACHINE_CONFIG_START(seattle_state::wg3dh)
+void seattle_state::wg3dh(machine_config &config)
+{
 	phoenixsa(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -1999,10 +2007,11 @@ MACHINE_CONFIG_START(seattle_state::wg3dh)
 	m_ioasic->set_upper(310/* others? */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(seattle_state::mace)
+void seattle_state::mace(machine_config &config)
+{
 	seattle150(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -2013,9 +2022,10 @@ MACHINE_CONFIG_START(seattle_state::mace)
 	m_ioasic->set_upper(319/* others? */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::sfrush)
+void seattle_state::sfrush(machine_config &config)
+{
 	flagstaff(config);
 	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
 	cage.set_speedup(0x5236);
@@ -2027,9 +2037,10 @@ MACHINE_CONFIG_START(seattle_state::sfrush)
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 	m_ioasic->aux_output_handler().set(FUNC(seattle_state::wheel_board_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::sfrushrk)
+void seattle_state::sfrushrk(machine_config &config)
+{
 	flagstaff(config);
 	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
 	cage.set_speedup(0x5329);
@@ -2041,14 +2052,16 @@ MACHINE_CONFIG_START(seattle_state::sfrushrk)
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 	m_ioasic->aux_output_handler().set(FUNC(seattle_state::wheel_board_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::sfrushrkw)
+void seattle_state::sfrushrkw(machine_config &config)
+{
 	sfrushrk(config);
 	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::calspeed)
+void seattle_state::calspeed(machine_config &config)
+{
 	seattle150_widget(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -2060,9 +2073,10 @@ MACHINE_CONFIG_START(seattle_state::calspeed)
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 	m_ioasic->set_auto_ack(1);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::vaportrx)
+void seattle_state::vaportrx(machine_config &config)
+{
 	seattle200_widget(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -2073,9 +2087,10 @@ MACHINE_CONFIG_START(seattle_state::vaportrx)
 	m_ioasic->set_upper(324/* 334? unknown */);
 	m_ioasic->set_yearoffs(100);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::biofreak)
+void seattle_state::biofreak(machine_config &config)
+{
 	seattle150(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -2086,9 +2101,10 @@ MACHINE_CONFIG_START(seattle_state::biofreak)
 	m_ioasic->set_upper(231/* no alternates */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::blitz)
+void seattle_state::blitz(machine_config &config)
+{
 	seattle150(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -2099,9 +2115,10 @@ MACHINE_CONFIG_START(seattle_state::blitz)
 	m_ioasic->set_upper(444/* or 528 */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::blitz99)
+void seattle_state::blitz99(machine_config &config)
+{
 	seattle150(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -2112,9 +2129,10 @@ MACHINE_CONFIG_START(seattle_state::blitz99)
 	m_ioasic->set_upper(481/* or 484 or 520 */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::blitz2k)
+void seattle_state::blitz2k(machine_config &config)
+{
 	seattle150(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -2125,9 +2143,10 @@ MACHINE_CONFIG_START(seattle_state::blitz2k)
 	m_ioasic->set_upper(494/* or 498 */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::carnevil)
+void seattle_state::carnevil(machine_config &config)
+{
 	seattle150(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -2138,9 +2157,10 @@ MACHINE_CONFIG_START(seattle_state::carnevil)
 	m_ioasic->set_upper(469/* 469 or 486 or 528 */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(seattle_state::hyprdriv)
+void seattle_state::hyprdriv(machine_config &config)
+{
 	seattle200_widget(config);
 	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
 	dcs.set_dram_in_mb(2);
@@ -2151,7 +2171,7 @@ MACHINE_CONFIG_START(seattle_state::hyprdriv)
 	m_ioasic->set_upper(469/* unknown */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

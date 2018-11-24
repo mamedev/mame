@@ -768,10 +768,10 @@ MACHINE_CONFIG_START(m90_state::m90)
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
-	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.15)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(0, "speaker", 0.15);
+	ymsnd.add_route(1, "speaker", 0.15);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -880,8 +880,7 @@ MACHINE_CONFIG_START(m90_state::dynablsb)
 	soundlatch.data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 	soundlatch.set_separate_acknowledge(false);
 
-	MCFG_DEVICE_MODIFY("ymsnd")
-	MCFG_YM2151_IRQ_HANDLER(NOOP) /* this bootleg polls the YM2151 instead of taking interrupts from it */
+	subdevice<ym2151_device>("ymsnd")->irq_handler().set_nop(); /* this bootleg polls the YM2151 instead of taking interrupts from it */
 MACHINE_CONFIG_END
 
 

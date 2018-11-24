@@ -11,9 +11,10 @@
     - scobra.cpp
 
 ***************************************************************************/
-
 #ifndef MAME_INCLUDES_GALAXOLD_H
 #define MAME_INCLUDES_GALAXOLD_H
+
+#pragma once
 
 #include "machine/7474.h"
 #include "machine/timer.h"

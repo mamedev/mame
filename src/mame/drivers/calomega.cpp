@@ -2600,9 +2600,10 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_PALETTE_ADD("palette", 256) /* or 128? is the upper half of the PROMs really valid colors? */
 	MCFG_PALETTE_INIT_OWNER(calomega_state, calomega)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK) /* 6845 @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 6845 @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

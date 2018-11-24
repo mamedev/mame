@@ -303,11 +303,12 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 16_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(v6809_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(v6809_state, crtc_update_addr)
+	SY6545_1(config, m_crtc, 16_MHz_XTAL / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr), this);
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(v6809_state, kbd_put))

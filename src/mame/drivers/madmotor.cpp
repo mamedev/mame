@@ -305,10 +305,10 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_DEVICE_ADD("ym1", YM2203, 21470000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_DEVICE_ADD("ym2", YM2151, 21470000/6)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", 21470000/6));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.add_route(0, "mono", 0.45);
+	ym2.add_route(1, "mono", 0.45);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

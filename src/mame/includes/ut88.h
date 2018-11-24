@@ -42,7 +42,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
 	void ut88(machine_config &config);
 	void ut88mini(machine_config &config);

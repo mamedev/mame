@@ -38,16 +38,6 @@ private:
 };
 
 
-struct gs_tempsprite
-{
-	int gfx;
-	int code,color;
-	int flipx,flipy;
-	int x,y;
-	int zoomx,zoomy;
-	int primask;
-};
-
 class galastrm_state : public driver_device
 {
 	friend class galastrm_renderer;
@@ -83,11 +73,20 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
+	struct gs_tempsprite
+	{
+		int gfx;
+		int code,color;
+		int flipx,flipy;
+		int x,y;
+		int zoomx,zoomy;
+		int primask;
+	};
+
 	uint16_t m_frame_counter;
 	int m_tc0110pcr_addr;
 	int m_tc0610_0_addr;
 	int m_tc0610_1_addr;
-	uint32_t m_mem[2];
 	int16_t m_tc0610_ctrl_reg[2][8];
 	std::unique_ptr<gs_tempsprite[]> m_spritelist;
 	struct gs_tempsprite *m_sprite_ptr_pre;
@@ -99,16 +98,16 @@ private:
 	int m_rsxoffs;
 	int m_rsyoffs;
 
-	DECLARE_WRITE32_MEMBER(galastrm_palette_w);
-	DECLARE_WRITE32_MEMBER(galastrm_tc0610_0_w);
-	DECLARE_WRITE32_MEMBER(galastrm_tc0610_1_w);
+	DECLARE_WRITE32_MEMBER(palette_w);
+	DECLARE_WRITE32_MEMBER(tc0610_0_w);
+	DECLARE_WRITE32_MEMBER(tc0610_1_w);
 	DECLARE_WRITE8_MEMBER(coin_word_w);
-	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
 
-	void galastrm_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_GALASTRM_H

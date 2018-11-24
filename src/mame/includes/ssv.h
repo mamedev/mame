@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_SSV_H
+#define MAME_INCLUDES_SSV_H
+
+#pragma once
 
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
@@ -14,8 +18,8 @@
 class ssv_state : public driver_device
 {
 public:
-	ssv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ssv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ensoniq(*this, "ensoniq"),
 		m_eeprom(*this, "eeprom"),
@@ -205,3 +209,5 @@ private:
 
 	void ssv_map(address_map &map, u32 rom);
 };
+
+#endif // MAME_INCLUDES_SSV_H

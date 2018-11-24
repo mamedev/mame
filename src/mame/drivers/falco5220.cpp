@@ -131,14 +131,21 @@ void falco5220_state::falco5220(machine_config &config)
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(37.98_MHz_XTAL, 1500, 0, 1320, 422, 0, 400); // parameters guessed
+	screen.set_raw(37.98_MHz_XTAL, 1500, 0, 1320, 422, 0, 400); // 25.32 kHz/60 Hz confirmed
 	screen.set_screen_update(FUNC(falco5220_state::screen_update));
 }
 
-ROM_START(falco5220)
-	ROM_REGION(0x10000, "roms", 0)
+ROM_START(falco5220e)
+	ROM_REGION(0x10000, "roms", 0) // (c) 1987 FDP, Inc 2321
 	ROM_LOAD("152321-000.bin", 0x0000, 0x8000, CRC(45ef4a68) SHA1(71e12dce710f9b66290618e299b2382834845057))
 	ROM_LOAD("152321-001.bin", 0x8000, 0x8000, CRC(91056626) SHA1(217ca3de76d5e9861284f5b64f8eff8e541fad3d))
 ROM_END
 
-COMP(1987, falco5220, 0, 0, falco5220, falco5220, falco5220_state, empty_init, "Falco Data Products", "Falco 5220", MACHINE_IS_SKELETON)
+ROM_START(falco5220s)
+	ROM_REGION(0x10000, "roms", 0) // (c) 1989 FDP, Inc 0412
+	ROM_LOAD("168412-00.bin", 0x0000, 0x8000, CRC(de34b149) SHA1(6a4824eb5941f4c6475949011e64b28ab185ba59))
+	ROM_LOAD("168412-01.bin", 0x8000, 0x8000, CRC(e6facd5b) SHA1(2b9bf3ca18e3e30032dcb6faf0809b6cf6f467ac))
+ROM_END
+
+COMP(1987, falco5220e, 0,          0, falco5220, falco5220, falco5220_state, empty_init, "Falco Data Products", "Falco 5220e", MACHINE_IS_SKELETON)
+COMP(1989, falco5220s, falco5220e, 0, falco5220, falco5220, falco5220_state, empty_init, "Falco Data Products", "Falco 5220s", MACHINE_IS_SKELETON)

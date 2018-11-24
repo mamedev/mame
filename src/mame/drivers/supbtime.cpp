@@ -379,10 +379,10 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ 2
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
+	ymsnd.add_route(0, "mono", 0.45);
+	ymsnd.add_route(1, "mono", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(21'477'272) / 20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
