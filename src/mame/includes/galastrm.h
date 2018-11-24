@@ -45,7 +45,8 @@ public:
 	galastrm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
-		m_spriteram(*this,"spriteram") ,
+		m_spriteram(*this,"spriteram"),
+		m_spritemap_rom(*this, "sprmaprom"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_tc0100scn(*this, "tc0100scn"),
@@ -64,6 +65,8 @@ protected:
 private:
 	required_shared_ptr<uint32_t> m_ram;
 	required_shared_ptr<uint32_t> m_spriteram;
+
+	required_region_ptr<uint16_t> m_spritemap_rom;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
