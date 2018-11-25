@@ -595,11 +595,34 @@ void ssv_state::draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &clip
 
 }
 
+inline void ssv_state::get_tile(int x, int y, int size, int page, int& code, int& attr, int& flipx, int& flipy)
+{
+	uint16_t* s3 = &m_spriteram[page * (size * ((0x1000 / 0x200) / 2)) +
+		((x & ((size - 1) & ~0xf)) << 2) +
+		((y & ((0x200 - 1) & ~0xf)) >> 3)];
+
+	code = s3[0];  // code high bits
+	attr = s3[1];  // code low  bits + color
+
+	/* Code's high bits are scrambled */
+	code += m_tile_code[(attr & 0x3c00) >> 10];
+	flipy = (attr & 0x4000);
+	flipx = (attr & 0x8000);
+
+	if ((m_scroll[0x74 / 2] & 0x1000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
+	{
+		if (flipx == 0) flipx = 1; else flipx = 0;
+	}
+	if ((m_scroll[0x74 / 2] & 0x4000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
+	{
+		if (flipy == 0) flipy = 1; else flipy = 0;
+	}
+}
 
 void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sy, int scrollreg)
 {
 	scrollreg &= 0x7;      // scroll register index
-	
+
 	/* in_sy will always be 0x00, 0x40, 0x80, 0xc0 in 'draw layer' */
 	in_sy = (in_sy & 0x1ff) - (in_sy & 0x200);
 
@@ -648,47 +671,32 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 
 		/* Draw the rows */
 		int sx1 = 0 - (foo_x & 0xf);
-		int sy1 = in_sy - (foo_y & 0xf);
 
-		int y = foo_y;
-		for (int sy = sy1; sy <= clip.max_y; sy += 0x10)
+		int x = foo_x;
+		for (int sx = sx1; sx <= clip.max_x; sx += 0x10)
 		{
-			int x = foo_x;
-			for (int sx = sx1; sx <= clip.max_x; sx += 0x10)
+
+			int sy1 = in_sy - (foo_y & 0xf);
+			int y = foo_y;
+			for (int sy = sy1; sy <= clip.max_y; sy += 0x10)
 			{
-				uint16_t* s3 = &m_spriteram[page * (size * ((0x1000 / 0x200) / 2)) +
-					((x & ((size - 1) & ~0xf)) << 2) +
-					((y & ((0x200 - 1) & ~0xf)) >> 3)];
-
-				int code = s3[0];  // code high bits
-				int attr = s3[1];  // code low  bits + color
-
-				/* Code's high bits are scrambled */
-				code += m_tile_code[(attr & 0x3c00) >> 10];
-				int flipy = (attr & 0x4000);
-				int flipx = (attr & 0x8000);
-
-				if ((m_scroll[0x74 / 2] & 0x1000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
-				{
-					if (flipx == 0) flipx = 1; else flipx = 0;
-				}
-				if ((m_scroll[0x74 / 2] & 0x4000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
-				{
-					if (flipy == 0) flipy = 1; else flipy = 0;
-				}
+				int code,attr,flipx,flipy;
+				get_tile(x, y, size, page, code, attr, flipx, flipy);
 
 				for (int innerline = 0; innerline < 16; innerline++)
 				{
-					int realline = sy+innerline;
+					int realline = sy + innerline;
 
 					if (realline == line)
 						draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, sy, realline, innerline);
 				}
 
-				x += 0x10;
-			} /* sx */
-			y += 0x10;
-		} /* sy */
+				y += 0x10;
+
+
+			} /* sy */
+			x += 0x10;
+		} /* sx */
 	} /* line */
 }
 
