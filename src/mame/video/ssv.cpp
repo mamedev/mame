@@ -137,50 +137,43 @@
 #include "render.h"
 
 
-
-void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow)
+void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line)
 {
 	const uint8_t *const addr = gfx->get_data(code  % gfx->elements());
 	const uint32_t realcolor = gfx->granularity() * (color % gfx->colors());
 
+	const uint8_t* const source = flipy ? addr + (7 - line) * gfx->rowbytes() : addr + line * gfx->rowbytes();
+
+	if (realline >= cliprect.min_y && realline <= cliprect.max_y)
+	{
+		uint16_t* dest = &bitmap.pix16(realline);
+
+		const int x0 = flipx ? (base_sx + gfx->width() - 1) : (base_sx);
+		const int x1 = flipx ? (base_sx - 1) : (x0 + gfx->width());
+		const int dx = flipx ? (-1) : (1);
+
+		int column = 0;
+		for (int sx = x0; sx != x1; sx += dx)
+		{
+			uint8_t pen = source[column];
+
+			if (pen && sx >= cliprect.min_x && sx <= cliprect.max_x)
+			{
+				if (shadow)
+					dest[sx] = ((dest[sx] & m_shadow_pen_mask) | (pen << m_shadow_pen_shift)) & 0x7fff;                                                \
+				else
+					dest[sx] = (realcolor + pen) & 0x7fff;
+			}
+			column++;
+		}
+	}
+}
+
+void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow)
+{
 	for (int line = 0; line < 8; line++)
 	{
-		int realline = base_sy + line;
-
-		const uint8_t* source;
-			
-		if (flipy)
-		{
-			source = addr + (7-line) * gfx->rowbytes();
-		}
-		else
-		{
-			source = addr + line * gfx->rowbytes();
-		}
-
-		if (realline >= cliprect.min_y && realline <= cliprect.max_y)
-		{
-			uint16_t* dest = &bitmap.pix16(realline);
-
-			const int x0 = flipx ? (base_sx + gfx->width() - 1) : (base_sx);
-			const int x1 = flipx ? (base_sx - 1) : (x0 + gfx->width());
-			const int dx = flipx ? (-1) : (1);
-
-			int column = 0;
-			for (int sx = x0; sx != x1; sx += dx)
-			{
-				uint8_t pen = source[column];
-
-				if (pen && sx >= cliprect.min_x && sx <= cliprect.max_x)
-				{
-					if (shadow)
-						dest[sx] = ((dest[sx] & m_shadow_pen_mask) | (pen << m_shadow_pen_shift)) & 0x7fff;                                                \
-					else
-						dest[sx] = (realcolor + pen) & 0x7fff;
-				}
-				column++;
-			}
-		}
+		drawgfx_line(bitmap, cliprect, gfx, code, color, flipx, flipy, base_sx, base_sy, shadow, base_sy+line, line);
 	}
 }
 
