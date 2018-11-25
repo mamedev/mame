@@ -12394,6 +12394,9 @@ ep128                           // Enterprise 128
 ep64                            // Enterprise 64
 phc64                           // Hegener & Glaser Mephisto PHC 64
 
+@source:epic14e.cpp
+epic14e                         //
+
 @source:epos.cpp
 catapult                        // (c) 1982
 dealer                          // (c) 198?
