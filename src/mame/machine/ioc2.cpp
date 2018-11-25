@@ -10,21 +10,21 @@
 #include "bus/rs232/rs232.h"
 #include "machine/ioc2.h"
 
-#define LOG_PI1			(1 << 0)
-#define LOG_SERIAL		(1 << 1)
-#define LOG_MOUSEKBD	(1 << 2)
-#define LOG_PANEL		(1 << 3)
-#define LOG_SYSID		(1 << 4)
-#define LOG_READ		(1 << 5)
-#define LOG_DMA_SEL		(1 << 6)
-#define LOG_RESET		(1 << 7)
-#define LOG_WRITE		(1 << 8)
-#define LOG_INT3		(1 << 9)
-#define LOG_PIT			(1 << 10)
-#define LOG_ALL			(LOG_PI1 | LOG_SERIAL | LOG_MOUSEKBD | LOG_PANEL | LOG_SYSID | LOG_READ | LOG_DMA_SEL | LOG_RESET | LOG_WRITE | LOG_INT3 | LOG_PIT)
-#define LOG_DEFAULT		(LOG_ALL & ~(LOG_SYSID | LOG_MOUSEKBD))
+#define LOG_PI1         (1 << 0)
+#define LOG_SERIAL      (1 << 1)
+#define LOG_MOUSEKBD    (1 << 2)
+#define LOG_PANEL       (1 << 3)
+#define LOG_SYSID       (1 << 4)
+#define LOG_READ        (1 << 5)
+#define LOG_DMA_SEL     (1 << 6)
+#define LOG_RESET       (1 << 7)
+#define LOG_WRITE       (1 << 8)
+#define LOG_INT3        (1 << 9)
+#define LOG_PIT         (1 << 10)
+#define LOG_ALL         (LOG_PI1 | LOG_SERIAL | LOG_MOUSEKBD | LOG_PANEL | LOG_SYSID | LOG_READ | LOG_DMA_SEL | LOG_RESET | LOG_WRITE | LOG_INT3 | LOG_PIT)
+#define LOG_DEFAULT     (LOG_ALL & ~(LOG_SYSID | LOG_MOUSEKBD))
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 /*static*/ char const *const ioc2_device::SCC_TAG = "scc";

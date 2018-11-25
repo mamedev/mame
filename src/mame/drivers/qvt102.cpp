@@ -171,7 +171,7 @@ void qvt102_state::qvt102(machine_config &config)
 	m_ctc->set_clk<1>(MASTER_CLOCK / 18);
 	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_txc));
 	m_ctc->zc_callback<0>().append(m_acia, FUNC(acia6850_device::write_rxc));
-//	m_ctc->zc_callback<1>().set(m_acia, FUNC(acia6850_device::write_rxc));
+//  m_ctc->zc_callback<1>().set(m_acia, FUNC(acia6850_device::write_rxc));
 
 	I8748(config, "kbdmcu", XTAL(6'000'000));
 }

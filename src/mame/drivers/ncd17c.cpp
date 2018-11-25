@@ -372,7 +372,7 @@ WRITE16_MEMBER(ncd_020_state::lance19_dma_w)
 	{
 		fatalerror("ncd17c.cpp: DMA target %08x not handled!", offset);
 	}
-	
+
 	offset &= 0x7fffff;
 	u32 const existing = m_mainram.target()[offset >> 2];
 

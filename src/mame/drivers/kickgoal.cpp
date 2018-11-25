@@ -202,7 +202,7 @@ void kickgoal_state::kickgoal_program_map(address_map &map)
 	map(0x900000, 0x90ffff).nopw(); // during startup
 	map(0x900000, 0x900005).w(FUNC(kickgoal_state::kickgoal_eeprom_w));
 	map(0x900006, 0x900007).r(FUNC(kickgoal_state::kickgoal_eeprom_r));
-	
+
 	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::kickgoal_fgram_w)).share("fgram"); /* FG Layer */
 	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::kickgoal_bgram_w)).share("bgram"); /* Higher BG Layer */
 	map(0xa08000, 0xa0bfff).ram().w(FUNC(kickgoal_state::kickgoal_bg2ram_w)).share("bg2ram"); /* Lower BG Layer */
@@ -361,7 +361,7 @@ WRITE8_MEMBER(kickgoal_state::soundio_port_a_w)
 	case 0x02: m_okibank->set_entry(1); break;
 	case 0x01: m_okibank->set_entry(3); break;
 	default: m_okibank->set_entry(2); break; // not used
-	}	
+	}
 }
 
 READ8_MEMBER(kickgoal_state::soundio_port_b_r)

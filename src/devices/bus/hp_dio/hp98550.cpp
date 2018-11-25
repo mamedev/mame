@@ -25,7 +25,7 @@ ROM_END
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98550, bus::hp_dio, dio32_98550_device, "dio98550", "HP98550 high-res color DIO video card")
 
-namespace bus {	namespace hp_dio {
+namespace bus { namespace hp_dio {
 
 void dio32_98550_device::device_add_mconfig(machine_config &config)
 {

@@ -6,8 +6,8 @@
 
     Video mixing
 
-	- are there priority registers / bits in the sprites that would allow
-	  this to be collapsed further?
+    - are there priority registers / bits in the sprites that would allow
+      this to be collapsed further?
 
 ***************************************************************************/
 

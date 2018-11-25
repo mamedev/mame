@@ -1106,19 +1106,19 @@ ROM_END
 Top T. Cash
 
 CPUs
-1x 	H8/3337 			32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
-1x 	D7759 			ADPCM Speech Synthesizer LSIs - sound
-1x 	TDA2003 			Audio Amplifier - sound
-1x 	oscillator 	14.318181MHz 		
-1x 	oscillator 	16.000MHz 		
+1x  H8/3337             32-bit Single-Chip Microcomputer - main (internal ROM not dumped)
+1x  D7759           ADPCM Speech Synthesizer LSIs - sound
+1x  TDA2003             Audio Amplifier - sound
+1x  oscillator  14.318181MHz
+1x  oscillator  16.000MHz
 
 ROMs
-5x 	M27C4001 	0,1,2,3,4 	dumped
+5x  M27C4001    0,1,2,3,4   dumped
 
 RAMs
-3x 	YY628100BllG-70 	
+3x  YY628100BllG-70
 PLDs
-1x 	ispLSI1032E-70LJ 		read protected
+1x  ispLSI1032E-70LJ        read protected
 
 Others
 1x 28x2 JAMMA edge connector
@@ -1133,7 +1133,7 @@ Notes
 
 PCB is marked: "VideoIdea - Via Turati,2 - 40026 Imola (BO)" and "2-0257/V" on component side
 PCB is marked: "TE 1100 CE" on solder side
-PCB is labeled: "BACCHI 1883 - 21/02/02 - Rip[] RiProg[X]" on component side 
+PCB is labeled: "BACCHI 1883 - 21/02/02 - Rip[] RiProg[X]" on component side
 */
 
 ROM_START( toptcash )

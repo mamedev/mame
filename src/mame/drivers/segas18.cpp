@@ -1518,7 +1518,7 @@ ROM_END
     ROM Board: 171-5873B
         main pcb: 834-7381-02
     Game numbers: 833-7379-02
-	     ROM pcb: 834-7380-02
+         ROM pcb: 834-7380-02
 */
 ROM_START( astorm3 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // 68000 code

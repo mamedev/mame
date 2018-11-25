@@ -434,9 +434,9 @@ void gts80b_state::gts80b_s(machine_config &config)
 
 //void gts80b_state::gts80b_ss(machine_config &config)
 //{
-//	gts80b(config);
-//	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-//	//GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);  // votrax crashes
+//  gts80b(config);
+//  GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+//  //GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);  // votrax crashes
 //}
 
 void gts80b_state::gts80b_s1(machine_config &config)

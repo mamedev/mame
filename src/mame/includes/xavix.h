@@ -93,7 +93,7 @@ public:
 		m_lowbus(*this, "lowbus"),
 		m_sound(*this, "xavix_sound")
 	{ }
-	
+
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
@@ -144,8 +144,8 @@ private:
 
 	/* this is just a quick memory system bypass for video reads etc. because going through the
 	   memory system is slow and also pollutes logs significantly with unmapped reads if the games
-	   enable the video before actually setting up the source registers! 
-   
+	   enable the video before actually setting up the source registers!
+
 	   this will need modifying if any games have RAM instead of ROM (which I think is possible
 	   with SuperXaviX at least)
 	*/
@@ -407,7 +407,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
 	required_device<screen_device> m_screen;
-	
+
 	void update_irqs();
 	uint8_t m_irqsource;
 
