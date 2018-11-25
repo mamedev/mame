@@ -640,10 +640,11 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 
 	outclip &= cliprect;
 
-	for (int line = outclip.min_y; line <= outclip.max_y; line++)
-	{
+//	for (int line = outclip.min_y; line <= outclip.max_y; line++)
+//	{
 		rectangle clip;
-		clip.set(outclip.min_x, outclip.max_x, line, line);
+		//clip.set(outclip.min_x, outclip.max_x, line, line);
+		clip = outclip;
 
 		/* Get the scroll data */
 		int foo_x = m_scroll[scrollreg * 4 + 0];    // x scroll
@@ -677,26 +678,24 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		{
 			int sy1 = in_sy - (foo_y & 0xf);
 			int y = foo_y;
+
 			for (int sy = sy1; sy <= clip.max_y; sy += 0x10)
 			{
 				int code,attr,flipx,flipy;
-				get_tile(x, y, size, page, code, attr, flipx, flipy);
+				get_tile(x, y + ((sy-sy1)/0x10) * 0x10, size, page, code, attr, flipx, flipy);
 
 				for (int innerline = 0; innerline < 16; innerline++)
 				{
 					int realline = sy + innerline;
 
-					if (realline == line)
+				//	if (realline == line)
 						draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, sy, realline, innerline);
 				}
-
-				y += 0x10;
-
 
 			} /* sy */
 			x += 0x10;
 		} /* sx */
-	} /* line */
+//	} /* line */
 }
 
 /* Draw the "background layer" using multiple tilemap sprites */
