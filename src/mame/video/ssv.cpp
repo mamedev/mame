@@ -675,7 +675,6 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		int x = foo_x;
 		for (int sx = sx1; sx <= clip.max_x; sx += 0x10)
 		{
-
 			int sy1 = in_sy - (foo_y & 0xf);
 			int y = foo_y;
 			for (int sy = sy1; sy <= clip.max_y; sy += 0x10)
