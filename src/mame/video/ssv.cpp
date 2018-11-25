@@ -610,19 +610,16 @@ void ssv_state::draw_16x16_tiles(bitmap_ind16 &bitmap, const rectangle &clip, in
 }
 
 
-void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sx, int in_sy, int scrollreg)
+void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sy, int scrollreg)
 {
 	scrollreg &= 0x7;      // scroll register index
-
-	/* Sign extend the position */
-	in_sx = 0;
 	
 	/* in_sy will always be 0x00, 0x40, 0x80, 0xc0 in 'draw layer' */
 	in_sy = (in_sy & 0x1ff) - (in_sy & 0x200);
 
 	/* Set up a clipping region for the tilemap slice .. */
 	rectangle outclip;
-	outclip.set(in_sx, in_sx + 0x20/*width in tiles*/ * 0x10, in_sy, in_sy + 0x8/*height in tiles, always 64 pixels*/ * 0x8);
+	outclip.set(0, 0x20/*width in tiles*/ * 0x10, in_sy, in_sy + 0x8/*height in tiles, always 64 pixels*/ * 0x8);
 
 	/* .. and clip it against the visible screen */
 
@@ -654,11 +651,9 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		int page = (foo_x & 0x7fff) / size;
 
 		/* Given a fixed scroll value, the portion of tilemap displayed changes with the sprite position */
-		foo_x += in_sx;
 		foo_y += in_sy;
 
 		/* Tweak the scroll values */
-		// foo_x += 0;
 		foo_y += ((m_scroll[0x70 / 2] & 0x1ff) - (m_scroll[0x70 / 2] & 0x200) + m_scroll[0x6a / 2] + 2);
 
 		// Kludge for eaglshot
@@ -666,7 +661,7 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		if ((unknown & 0x05ff) == 0x0401) foo_x += -0x20;
 
 		/* Draw the rows */
-		int sx1 = in_sx - (foo_x & 0xf);
+		int sx1 = 0 - (foo_x & 0xf);
 		int sy1 = in_sy - (foo_y & 0xf);
 
 		int sy, y;
@@ -708,7 +703,7 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 void ssv_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr)
 {
 	for ( int sy = 0; sy <= m_screen->visible_area().max_y; sy += 0x40 )
-		draw_row_64pixhigh(bitmap, cliprect, 0, sy, nr);
+		draw_row_64pixhigh(bitmap, cliprect, sy, nr);
 }
 
 void ssv_state::draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, int flipx, int flipy, int gfx, int shadow, int color, int sx, int sy, int xnum, int ynum)
@@ -799,7 +794,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				}
 
 				if (local_num != 0)
-					draw_row_64pixhigh(bitmap, cliprect, sx, sy, scroll);
+					draw_row_64pixhigh(bitmap, cliprect, sy, scroll);
 			}
 			else
 			{
