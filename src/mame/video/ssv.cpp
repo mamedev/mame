@@ -567,27 +567,31 @@ From the above some noteworthy cases are:
 /* Draw a tilemap sprite */
 
 
-void ssv_state::draw_16x16_tiles(bitmap_ind16 &bitmap, const rectangle &clip, int flipx, int flipy, int mode, int code, int color, int sx, int sy)
+void ssv_state::draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int flipx, int flipy, int mode, int code, int color, int sx, int sy, int line)
 {
 	/* Force 16x16 tiles ? */
-	int ystart, yend, yinc;
-
-	if (flipy) { ystart = 1;  yend = -1; yinc = -1; }
-	else { ystart = 0;    yend = 2;  yinc = +1; }
-
-	for (int ty = ystart; ty != yend; ty += yinc)
+	int realcode;
+	if (flipy)
 	{
-		int shadow = (mode & 0x0800);
-		/* Select 256 or 64 color tiles */
-		int gfx = ((mode & 0x0100) ? 0 : 1);
+		if (line & 8)
+			realcode = code ;
+		else
+			realcode = code + 1;
+	}
+	else
+	{
+		if (line & 8)
+			realcode = code + 1;
+		else
+			realcode = code;
+	}
+	int tileline = line & 7;
 
-		drawgfx(bitmap, clip, m_gfxdecode->gfx(gfx),
-			code++,
-			color,
-			flipx, flipy,
-			sx, sy + ty * 8,
-			shadow);
-	} /* ty */
+	int shadow = (mode & 0x0800);
+	/* Select 256 or 64 color tiles */
+	int gfx = ((mode & 0x0100) ? 0 : 1);
+
+	drawgfx_line(bitmap, cliprect, m_gfxdecode->gfx(gfx), realcode, color, flipx, flipy, sx, sy, shadow, sy+line, tileline);
 
 }
 
@@ -673,7 +677,11 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 					if (flipy == 0) flipy = 1; else flipy = 0;
 				}
 
-				draw_16x16_tiles(bitmap, clip, flipx, flipy, mode, code, attr, sx, sy);
+				for (int line = 0; line < 16; line++)
+				{
+					draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, sy, line);
+				}
+
 				x += 0x10;
 			} /* sx */
 			y += 0x10;
