@@ -142,28 +142,30 @@ void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_ele
 	uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
 	int shadow)
 {
-	const uint8_t *addr = gfx->get_data(code  % gfx->elements());
+	const uint8_t *const addr = gfx->get_data(code  % gfx->elements());
 	const uint32_t realcolor = gfx->granularity() * (color % gfx->colors());
 
 	const int y0 = flipy ? (sy + gfx->height() - 1) : (sy);
 	const int y1 = flipy ? (sy - 1)                 : (y0 + gfx->height());
 	const int dy = flipy ? (-1)                     : (1);
 
+	int line = 0;
 	for (int sy = y0; sy != y1; sy += dy)
 	{
+		const uint8_t* const source = addr + line * gfx->rowbytes();
 
 		if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 		{
-			uint8_t* source = (uint8_t*)addr;
 			uint16_t* dest = &bitmap.pix16(sy);
 
 			const int x0 = flipx ? (sx + gfx->width() - 1) : (sx);
 			const int x1 = flipx ? (sx - 1)                : (x0 + gfx->width());
 			const int dx = flipx ? (-1)                    : (1);
 
+			int column = 0;
 			for (int sx = x0; sx != x1; sx += dx)
 			{
-				uint8_t pen = *source++;
+				uint8_t pen = source[column];
 
 				if (pen && sx >= cliprect.min_x && sx <= cliprect.max_x)
 				{
@@ -172,9 +174,10 @@ void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_ele
 					else
 						dest[sx] = (realcolor + pen) & 0x7fff;
 				}
+				column++;
 			}
 		}
-		addr += gfx->rowbytes();
+		line++;
 	}
 }
 
