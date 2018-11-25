@@ -251,4 +251,4 @@ ROM_START(epic14e)
 ROM_END
 
 
-COMP(1982, epic14e, 0, 0, epic14e, epic14e, epic14e_state, empty_init, "Epic Computer Systems", "Epic 14E (v1.0)", MACHINE_IS_SKELETON)
+COMP(1982, epic14e, 0, 0, epic14e, epic14e, epic14e_state, empty_init, "Epic Computer Products", "Epic 14E (v1.0)", MACHINE_IS_SKELETON)
