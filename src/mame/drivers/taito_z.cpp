@@ -1593,66 +1593,11 @@ READ16_MEMBER(taitoz_state::aquajack_unknown_r)
 
 WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
 {
-	membank("z80bank")->set_entry(data & 7);
+	m_z80bank->set_entry(data & 7);
 }
-
-WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-
-#ifdef MAME_DEBUG
-//  if (data & 0xff00)
-//  {
-//      char buf[80];
-//
-//      sprintf(buf,"taitoz_sound_w to high byte: %04x",data);
-//      popmessage(buf);
-//  }
-#endif
-}
-
-READ16_MEMBER(taitoz_state::taitoz_sound_r)
-{
-	if (offset == 1)
-		return (m_tc0140syt->master_comm_r(space, 0) & 0xff);
-	else
-		return 0;
-}
-
-#if 0
-WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(0, (data >> 8) & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(0, (data >> 8) & 0xff);
-
-#ifdef MAME_DEBUG
-	if (data & 0xff)
-	{
-		char buf[80];
-
-		sprintf(buf,"taitoz_msb_sound_w to low byte: %04x",data);
-		popmessage(buf);
-	}
-#endif
-}
-
-READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(0) & 0xff) << 8);
-	else
-		return 0;
-}
-#endif
-
 
 /**** sound pan control ****/
-WRITE8_MEMBER(taitoz_state::taitoz_pancontrol)
+WRITE8_MEMBER(taitoz_state::pancontrol_w)
 {
 	m_filter[offset & 3]->flt_volume_set_volume(data / 255.0f);
 }
@@ -1683,7 +1628,8 @@ void taitoz_state::contcirc_cpub_map(address_map &map)
 	map(0x084000, 0x087fff).ram().share("share1");
 	map(0x100001, 0x100001).r(FUNC(taitoz_state::contcirc_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x100003, 0x100003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::watchdog_r), FUNC(tc0040ioc_device::port_w));
-	map(0x200000, 0x200003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x200001, 0x200001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x200003, 0x200003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
 
 
@@ -1696,7 +1642,8 @@ void taitoz_state::chasehq_map(address_map &map)
 	map(0x400001, 0x400001).r(FUNC(taitoz_state::chasehq_input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x400003, 0x400003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::watchdog_r), FUNC(tc0040ioc_device::port_w));
 	map(0x800000, 0x800001).w(FUNC(taitoz_state::chasehq_cpua_ctrl_w));
-	map(0x820000, 0x820003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x820001, 0x820001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x820003, 0x820003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
@@ -1731,7 +1678,8 @@ void taitoz_state::enforce_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
-	map(0x200000, 0x200003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x200001, 0x200001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x200003, 0x200003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x300000, 0x300003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::read), FUNC(tc0040ioc_device::write)).umask16(0x00ff);
 }
 
@@ -1769,7 +1717,7 @@ void taitoz_state::bshark_cpub_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x108000, 0x10bfff).ram();
 	map(0x110000, 0x113fff).ram().share("share1");
-	map(0x400000, 0x400007).w(FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
+	map(0x400000, 0x400007).w(FUNC(taitoz_state::pancontrol_w)).umask16(0x00ff);  /* pan */
 //  map(0x40000a, 0x40000b).r(FUNC(taitoz_state::taitoz_unknown_r));  // ???
 	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
 	map(0x60000c, 0x60000d).noprw(); // interrupt controller?
@@ -1787,7 +1735,8 @@ void taitoz_state::sci_map(address_map &map)
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x200010, 0x20001f).r(FUNC(taitoz_state::sci_steer_input_r));
 //  map(0x400000, 0x400001).w(FUNC(taitoz_state::cpua_ctrl_w));  // ?? doesn't seem to fit what's written
-	map(0x420000, 0x420003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x420001, 0x420001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x420003, 0x420003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0xa20000, 0xa2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
@@ -1811,7 +1760,8 @@ void taitoz_state::nightstr_map(address_map &map)
 	map(0x110000, 0x113fff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x800000, 0x800001).w(FUNC(taitoz_state::cpua_ctrl_w));
-	map(0x820000, 0x820003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x820001, 0x820001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x820003, 0x820003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xa00000, 0xa00007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));  /* palette */
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
@@ -1848,7 +1798,8 @@ void taitoz_state::aquajack_cpub_map(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
 	map(0x200000, 0x20000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0x300000, 0x300003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x300001, 0x300001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x300003, 0x300003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800800, 0x80083f).r(FUNC(taitoz_state::aquajack_unknown_r)); // Read regularly after write to 800800...
 //  map(0x800800, 0x800801).w(FUNC(taitoz_state::taitoz_unknown_w));
 //  map(0x900000, 0x900007).rw(FUNC(taitoz_state::taitoz_unknown_r), FUNC(taitoz_state::taitoz_unknown_w));
@@ -1875,7 +1826,7 @@ void taitoz_state::spacegun_cpub_map(address_map &map)
 	map(0xc00000, 0xc00007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
 	map(0xc0000c, 0xc0000d).noprw(); // interrupt controller?
 	map(0xc0000e, 0xc0000f).noprw();
-	map(0xc20000, 0xc20007).w(FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
+	map(0xc20000, 0xc20007).w(FUNC(taitoz_state::pancontrol_w)).umask16(0x00ff);  /* pan */
 	map(0xe00000, 0xe00001).w(FUNC(taitoz_state::spacegun_gun_output_w));    /* gun outputs */
 	map(0xf00000, 0xf0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 }
@@ -1889,7 +1840,8 @@ void taitoz_state::dblaxle_map(address_map &map)
 	map(0x400000, 0x40000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
 	map(0x400010, 0x40001f).r(FUNC(taitoz_state::dblaxle_steer_input_r));
 	map(0x600000, 0x600001).w(FUNC(taitoz_state::dblaxle_cpua_ctrl_w));  /* could this be causing int6 ? */
-	map(0x620000, 0x620003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x620001, 0x620001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x620003, 0x620003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x800000, 0x801fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemap mirror */
 	map(0xa00000, 0xa0ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemaps */
@@ -1916,7 +1868,8 @@ void taitoz_state::racingb_map(address_map &map)
 	map(0x300000, 0x30000f).rw(m_tc0510nio, FUNC(tc0510nio_device::halfword_wordswap_r), FUNC(tc0510nio_device::halfword_wordswap_w));
 	map(0x300010, 0x30001f).r(FUNC(taitoz_state::dblaxle_steer_input_r));
 	map(0x500002, 0x500003).w(FUNC(taitoz_state::cpua_ctrl_w));
-	map(0x520000, 0x520003).rw(FUNC(taitoz_state::taitoz_sound_r), FUNC(taitoz_state::taitoz_sound_w));
+	map(0x520001, 0x520001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
+	map(0x520003, 0x520003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x700000, 0x701fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));      /* tilemaps */
 	map(0x930000, 0x93002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
@@ -1944,7 +1897,7 @@ void taitoz_state::z80_sound_map(address_map &map)
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
-	map(0xe400, 0xe403).w(FUNC(taitoz_state::taitoz_pancontrol)); /* pan */
+	map(0xe400, 0xe403).w(FUNC(taitoz_state::pancontrol_w)); /* pan */
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
@@ -3050,9 +3003,9 @@ static const gfx_layout tile16x8_layout =
 	16,8,   /* 16*8 sprites */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 8, 16, 24 },
-	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
+	{ STEP4(0,8) },
+	{ STEP8(8*4,1), STEP8(0,1) },
+	{ STEP8(0,8*8) },
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
@@ -3061,10 +3014,9 @@ static const gfx_layout tile16x16_layout =
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 8, 16, 24 },
-	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64,  2*64,  3*64,  4*64,  5*64,  6*64,  7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP4(0,8) },
+	{ STEP8(8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*8) },
 	64*16   /* every sprite takes 128 consecutive bytes */
 };
 
@@ -3073,9 +3025,9 @@ static const gfx_layout charlayout =
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),
 	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
+	{ STEP4(0,1) },
 	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,4*8) },
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
@@ -3084,9 +3036,9 @@ static const gfx_layout dblaxle_charlayout =
 	16,16,    /* 16*16 characters */
 	RGN_FRAC(1,1),
 	4,        /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 5*4, 4*4, 3*4, 2*4, 7*4, 6*4, 9*4, 8*4, 13*4, 12*4, 11*4, 10*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP4(0,1) },
+	{ STEP8(4*7,-4), STEP8(4*15,-4) },
+	{ STEP16(0,4*16) },
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
@@ -3159,7 +3111,7 @@ MACHINE_START_MEMBER(taitoz_state,taitoz)
 {
 	int banks = memregion("audiocpu")->bytes() / 0x4000;
 
-	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
+	m_z80bank->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
 
 	MACHINE_START_CALL_MEMBER(bshark);
 }
@@ -5356,8 +5308,8 @@ ROM_START( dblaxle )
 	ROM_LOAD    ( "c78-34.c42", 0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c78-11.11", 0x00001, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
+	ROM_LOAD32_WORD_SWAP( "c78-10.12", 0x00002, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c78-11.11", 0x00000, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c78-08.25", 0x000000, 0x100000, CRC(6c725211) SHA1(3c1765f44fe57b496d305e994516674f71bd4c3c) )    /* OBJ 16x8 */
@@ -5403,8 +5355,8 @@ ROM_START( dblaxleu )
 	ROM_LOAD    ( "c78-34.c42", 0x00000, 0x20000, CRC(f2186943) SHA1(2e9aed39fddf3aa1db7e20f8a709b6b82cc3e7df) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c78-11.11", 0x00001, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
+	ROM_LOAD32_WORD_SWAP( "c78-10.12", 0x00002, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c78-11.11", 0x00000, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c78-08.25", 0x000000, 0x100000, CRC(6c725211) SHA1(3c1765f44fe57b496d305e994516674f71bd4c3c) )    /* OBJ 16x8 */
@@ -5450,8 +5402,8 @@ ROM_START( pwheelsj )
 	ROM_LOAD    ( "c78-32.42",    0x00000, 0x20000, CRC(1494199c) SHA1(f6b6ccaadbc5440f9342750a79ebc00c019ef355) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c78-10.12", 0x00000, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c78-11.11", 0x00001, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
+	ROM_LOAD32_WORD_SWAP( "c78-10.12", 0x00002, 0x80000, CRC(44b1897c) SHA1(7ad179db6d7dfeb139ea13cb4a231f99d177f2b1) )  /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c78-11.11", 0x00000, 0x80000, CRC(7db3d4a3) SHA1(fc3c44ed36b212688a5bd8dc61321a994578258e) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c78-08.25", 0x000000, 0x100000, CRC(6c725211) SHA1(3c1765f44fe57b496d305e994516674f71bd4c3c) )    /* OBJ 16x8 */
@@ -5495,8 +5447,8 @@ ROM_START( racingb )
 	ROM_LOAD    ( "c84-101.42",    0x00000, 0x20000, CRC(9322106e) SHA1(6c42ee7b9c76483fec2e397ec2737c030a082267) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c84-90.12",  0x00000, 0x80000, CRC(83ee0e8d) SHA1(a3b6067913f15656e1f74b30b4c0364a50d1846a) ) /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c84-89.11",  0x00001, 0x80000, CRC(aae43c87) SHA1(cfc05553f7a18132127ae5f1d181fcc582432b56) )
+	ROM_LOAD32_WORD_SWAP( "c84-90.12",  0x00002, 0x80000, CRC(83ee0e8d) SHA1(a3b6067913f15656e1f74b30b4c0364a50d1846a) ) /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c84-89.11",  0x00000, 0x80000, CRC(aae43c87) SHA1(cfc05553f7a18132127ae5f1d181fcc582432b56) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c84-92.25", 0x000000, 0x100000, CRC(56e8fd55) SHA1(852446d4069a446dd9b88b29e461b83b8d626b2c) )    /* OBJ 16x8 */
@@ -5540,8 +5492,8 @@ ROM_START( racingbj )
 	ROM_LOAD    ( "c84-101.42",    0x00000, 0x20000, CRC(9322106e) SHA1(6c42ee7b9c76483fec2e397ec2737c030a082267) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "c84-90.12",  0x00000, 0x80000, CRC(83ee0e8d) SHA1(a3b6067913f15656e1f74b30b4c0364a50d1846a) ) /* SCR 8x8 */
-	ROM_LOAD16_BYTE( "c84-89.11",  0x00001, 0x80000, CRC(aae43c87) SHA1(cfc05553f7a18132127ae5f1d181fcc582432b56) )
+	ROM_LOAD32_WORD_SWAP( "c84-90.12",  0x00002, 0x80000, CRC(83ee0e8d) SHA1(a3b6067913f15656e1f74b30b4c0364a50d1846a) ) /* SCR 8x8 */
+	ROM_LOAD32_WORD_SWAP( "c84-89.11",  0x00000, 0x80000, CRC(aae43c87) SHA1(cfc05553f7a18132127ae5f1d181fcc582432b56) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "c84-92.25", 0x000000, 0x100000, CRC(56e8fd55) SHA1(852446d4069a446dd9b88b29e461b83b8d626b2c) )    /* OBJ 16x8 */

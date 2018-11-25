@@ -27,6 +27,7 @@ public:
 	taitoz_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
+		m_z80bank(*this, "z80bank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -75,6 +76,8 @@ private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 
+	optional_memory_bank m_z80bank;
+
 	/* video-related */
 	int         m_sci_spriteframe;
 	int         m_road_palbank;
@@ -119,9 +122,7 @@ private:
 	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_READ16_MEMBER(aquajack_unknown_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(taitoz_sound_w);
-	DECLARE_READ16_MEMBER(taitoz_sound_r);
-	DECLARE_WRITE8_MEMBER(taitoz_pancontrol);
+	DECLARE_WRITE8_MEMBER(pancontrol_w);
 	DECLARE_READ16_MEMBER(sci_spriteframe_r);
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
 	DECLARE_WRITE16_MEMBER(contcirc_out_w);
