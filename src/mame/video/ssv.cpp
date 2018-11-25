@@ -647,8 +647,8 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		clip = outclip;
 
 		/* Get the scroll data */
-		int foo_x = m_scroll[scrollreg * 4 + 0];    // x scroll
-		int foo_y = m_scroll[scrollreg * 4 + 1];    // y scroll
+		int tilemap_scrollx = m_scroll[scrollreg * 4 + 0];    // x scroll
+		int tilemap_scrolly = m_scroll[scrollreg * 4 + 1];    // y scroll
 		int unknown = m_scroll[scrollreg * 4 + 2];    // ???
 		int mode = m_scroll[scrollreg * 4 + 3];    // layer disabled, shadow, depth etc.
 
@@ -658,31 +658,31 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 
 		/* Decide the actual size of the tilemap */
 		int size = 1 << (8 + ((mode & 0xe000) >> 13));
-		int page = (foo_x & 0x7fff) / size;
+		int page = (tilemap_scrollx & 0x7fff) / size;
 
 		/* Given a fixed scroll value, the portion of tilemap displayed changes with the sprite position */
-		foo_y += in_sy;
+		tilemap_scrolly += in_sy;
 
 		/* Tweak the scroll values */
-		foo_y += ((m_scroll[0x70 / 2] & 0x1ff) - (m_scroll[0x70 / 2] & 0x200) + m_scroll[0x6a / 2] + 2);
+		tilemap_scrolly += ((m_scroll[0x70 / 2] & 0x1ff) - (m_scroll[0x70 / 2] & 0x200) + m_scroll[0x6a / 2] + 2);
 
 		// Kludge for eaglshot
-		if ((unknown & 0x05ff) == 0x0440) foo_x += -0x10;
-		if ((unknown & 0x05ff) == 0x0401) foo_x += -0x20;
+		if ((unknown & 0x05ff) == 0x0440) tilemap_scrollx += -0x10;
+		if ((unknown & 0x05ff) == 0x0401) tilemap_scrollx += -0x20;
 
 		/* Draw the rows */
-		int sx1 = 0 - (foo_x & 0xf);
+		int sx1 = 0 - (tilemap_scrollx & 0xf);
 
-		int x = foo_x;
+		int x = tilemap_scrollx;
 		for (int sx = sx1; sx <= clip.max_x; sx += 0x10)
 		{
-			int sy1 = in_sy - (foo_y & 0xf);
-			int y = foo_y;
+			int sy1 = in_sy - (tilemap_scrolly & 0xf);
+			int y = tilemap_scrolly;
 
 			for (int sy = sy1; sy <= clip.max_y; sy += 0x10)
 			{
 				int code,attr,flipx,flipy;
-				get_tile(x, y + ((sy-sy1)/0x10) * 0x10, size, page, code, attr, flipx, flipy);
+				get_tile(x, y + (sy-sy1), size, page, code, attr, flipx, flipy);
 
 				for (int innerline = 0; innerline < 16; innerline++)
 				{
