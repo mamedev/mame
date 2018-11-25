@@ -748,10 +748,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	for (; spritelist_global < spritelist_global_end; spritelist_global += 4)
 	{
-		int mode = spritelist_global[0];
 		int sprite = spritelist_global[1];
-		int xoffs = spritelist_global[2];
-		int yoffs = spritelist_global[3];
 
 		/* Last sprite */
 		if (sprite & 0x8000) break;
@@ -760,11 +757,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		uint16_t* spritelist_local = &m_spriteram[(sprite & 0x7fff) * 4];
 		int tilemaps_offsy = ((spritelist_local[3] & 0x1ff) - (spritelist_local[3] & 0x200));
 
-		/* Every single sprite is offset by x & yoffs, and additionally
-		by one of the 8 x & y offsets in the 1c0040-1c005f area   */
-
-		xoffs += m_scroll[((mode & 0x00e0) >> 4) + 0x40 / 2];
-		yoffs += m_scroll[((mode & 0x00e0) >> 4) + 0x42 / 2];
+		int mode = spritelist_global[0];
 
 		/* Number of single-sprites int local list (1-32) */
 		int local_num = (mode & 0x001f);
@@ -841,9 +834,14 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				int gfx = (depth & 0x1000) ? 0 : 1;
 				int shadow = (depth & 0x8000);
 
+				/* Every single sprite is offset by x & yoffs, and additionally
+				by one of the 8 x & y offsets in the 1c0040-1c005f area   */
+
 				/* Apply global offsets */
-				sx += xoffs;
-				sy += yoffs;
+				int scrollreg = ((mode & 0x00e0) >> 4);
+
+				sx += spritelist_global[2] + m_scroll[scrollreg + (0x40 / 2)];
+				sy += spritelist_global[3] + m_scroll[scrollreg + (0x42 / 2)];
 
 				/* Sign extend the position */
 				sx = (sx & 0x1ff) - (sx & 0x200);
