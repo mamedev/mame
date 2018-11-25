@@ -246,7 +246,7 @@ READ8_MEMBER(pbaction_tecfri_state::maintosub_r)
 READ8_MEMBER(pbaction_tecfri_state::subcpu_r)
 {
 	return 0x00; // other values stop the flippers from working? are there different inputs from the custom cabinet in here somehow?
-//	return m_subtomainlatch->read(space, offset);
+//  return m_subtomainlatch->read(space, offset);
 }
 
 WRITE8_MEMBER(pbaction_tecfri_state::subcpu_w)
@@ -264,7 +264,7 @@ void pbaction_tecfri_state::sub_map(address_map &map)
 	map(0x8008, 0x8008).w(FUNC(pbaction_tecfri_state::sub8008_w));
 
 	map(0x8010, 0x8010).r(FUNC(pbaction_tecfri_state::maintosub_r));
-	map(0x8018, 0x8018).w(FUNC(pbaction_tecfri_state::subtomain_w));	
+	map(0x8018, 0x8018).w(FUNC(pbaction_tecfri_state::subtomain_w));
 }
 
 void pbaction_tecfri_state::sub_io_map(address_map &map)
@@ -518,7 +518,7 @@ void pbaction_tecfri_state::machine_start()
 void pbaction_tecfri_state::pbactiont(machine_config &config)
 {
 	pbaction(config);
-	
+
 	m_maincpu->set_addrmap(AS_IO, &pbaction_tecfri_state::main_io_map);
 
 	Z80(config, m_subcpu, 4_MHz_XTAL);

@@ -32,7 +32,7 @@ public:
 		m_okibank(*this, "okibank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") 
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void kickgoal(machine_config &config);

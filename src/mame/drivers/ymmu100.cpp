@@ -199,9 +199,9 @@ reads
 [:] snd_r 00.09 (00d658)
 [:] snd_r 00.09 (00d65c)
 
-	e3 = (note - ->m1b) * 100 + s8(->m2b)
+    e3 = (note - ->m1b) * 100 + s8(->m2b)
 
-	compute freq adjustment in 1/100th of semitone (ex. 737)
+    compute freq adjustment in 1/100th of semitone (ex. 737)
 clamp to +/- 9599
 (2d74)
 div/rem by 300 -> e6 = 137, r6 = 2
@@ -252,12 +252,12 @@ class mu100_state : public driver_device
 {
 public:
 	mu100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_swp30(*this, "swp30"),
-			m_lcd(*this, "lcd"),
-			m_ioport_p7(*this, "P7"),
-			m_ioport_p8(*this, "P8")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_swp30(*this, "swp30")
+		, m_lcd(*this, "lcd")
+		, m_ioport_p7(*this, "P7")
+		, m_ioport_p8(*this, "P8")
 	{ }
 
 	void mu100(machine_config &config);
@@ -355,7 +355,7 @@ struct v1 {
 	u16 ma;
 	u8  mc;
 	u8  md;
- 	u16 me;
+	u16 me;
 };
 
 // g base = ffec00
@@ -439,8 +439,8 @@ void f1e40()
 	r4 = (r4 << 8) | (er3->m3b << 1);
 	r4 = cb710 + lb4898[r4 >> 1]; // dword 2a404 -> f5b14 005a GrandP #
 	g0c = r4 + 0xe;
-	
-	
+
+
 }
 
 void f2ace(er4 *instrument) // f5b1e
@@ -484,13 +484,13 @@ void f2e1c(er4 **instrument) // 20f03e -> f5b1e
 	er6 = *er4;
 	r0 = xv1->mc << 8;
 	r5 = (er6->m43 << 7) + er6->m44;
-    if(!(g64 & 0x80)) {
+	if(!(g64 & 0x80)) {
 		er1 = max(0, er1 - er5);
 
 	} else {
 		// 2ae2
 	}
-    // 2ef8
+	// 2ef8
 	g5c = er1;
 	g66 = er2;
 	g60 = er3;
@@ -706,9 +706,9 @@ void mu100_state::mu100_iomap(address_map &map)
 
 void mu100_state::swp30_map(address_map &map)
 {
-       map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
-       map(0x400000*4, 0x500000*4-1).rom().region("swp30",  0x800000).mirror(4*0x300000);
-       map(0x800000*4, 0xa00000*4-1).rom().region("swp30", 0x1000000).mirror(4*0x200000); // Missing roms...
+	   map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
+	   map(0x400000*4, 0x500000*4-1).rom().region("swp30",  0x800000).mirror(4*0x300000);
+	   map(0x800000*4, 0xa00000*4-1).rom().region("swp30", 0x1000000).mirror(4*0x200000); // Missing roms...
 }
 
 void mu100_state::mu100(machine_config &config)

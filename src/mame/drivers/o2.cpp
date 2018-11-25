@@ -2,16 +2,16 @@
 // copyright-holders:Ryan Holtz
 /**********************************************************************
 
-	SGI O2 workstation skeleton driver
+    SGI O2 workstation skeleton driver
 
-	To Do: Everything
+    To Do: Everything
 
-	Memory map:
-	00000000 - 0fffffff      RAM (256mbyte mirror)
-	14000000 - 15ffffff      CRIME
-	1f000000 - 1f3fffff      MACE
-	1fc00000 - 1fc7ffff      Boot ROM
-	40000000 - 7fffffff      RAM
+    Memory map:
+    00000000 - 0fffffff      RAM (256mbyte mirror)
+    14000000 - 15ffffff      CRIME
+    1f000000 - 1f3fffff      MACE
+    1fc00000 - 1fc7ffff      Boot ROM
+    40000000 - 7fffffff      RAM
 
 **********************************************************************/
 

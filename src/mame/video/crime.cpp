@@ -9,12 +9,12 @@
 #include "emu.h"
 #include "video/crime.h"
 
-#define LOG_UNKNOWN			(1 << 0U)
-#define LOG_READS			(1 << 1U)
-#define LOG_WRITES			(1 << 2U)
-#define LOG_ALL				(LOG_UNKNOWN | LOG_READS | LOG_WRITES)
+#define LOG_UNKNOWN         (1 << 0U)
+#define LOG_READS           (1 << 1U)
+#define LOG_WRITES          (1 << 2U)
+#define LOG_ALL             (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
 
-#define VERBOSE				(LOG_ALL)
+#define VERBOSE             (LOG_ALL)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SGI_CRIME, crime_device, "sgicrime", "SGI CRIME")

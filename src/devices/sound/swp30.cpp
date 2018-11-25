@@ -70,7 +70,7 @@ void f_62fcc(e0, r0, e1, r1l, er5) // 8 (11/12) 1 6 84268
 			r6, e6 = l925a6[r6].l; // 13d2 5368
 		} else
 			r6, e6 = 0, 0;
-		
+
 	}
 	er0 = *er5.w++;
 	g214ca4[0x10 + er0].w = e6;
@@ -100,7 +100,7 @@ swp30_device::swp30_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, SWP30, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_rom_interface(mconfig, *this, 25+2, ENDIANNESS_LITTLE, 32)
-{	
+{
 }
 
 void swp30_device::device_start()
@@ -379,7 +379,7 @@ u16 swp30_device::freq_r(offs_t offset)
 void swp30_device::freq_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	//	delta is 4*256 per octave, positive means higher freq, e.g 4.10 format.
+	// delta is 4*256 per octave, positive means higher freq, e.g 4.10 format.
 	s16 v = data & 0x2000 ? data | 0xc000 : data;
 	if(m_freq[chan] != data)
 		logerror("snd chan %02x freq %c%c %d.%03x\n", chan, data & 0x8000 ? '#' : '.', data & 0x4000 ? '#' : '.', v / 1024, (v < 0 ? -v : v) & 0x3ff);
@@ -567,9 +567,10 @@ u16 swp30_device::snd_r(offs_t offset)
 			preg = util::string_format("%03x", (slot-0x21)/2 + 6*chan);
 		logerror("snd_r [%04x %04x - %-4s] %02x.%02x  %04x\n", offset, offset*2, preg, chan, slot, rr[offset]);
 	}
-	if(offset == 0x080f)
+	if(offset == 0x080f) {
 		return rr[offset] & ~8;
-	//	return chan == 0x20 && slot == 0xf ? 0 : 0xffff;
+	//  return chan == 0x20 && slot == 0xf ? 0 : 0xffff;
+	}
 	return rr[offset];
 }
 
@@ -655,8 +656,8 @@ void swp30_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 					samp = m_sample_log8[read_byte(base_address + spos)];
 					break;
 				}
-				
-				//				logerror("sample %02x %06x [%d] %+5d %04x  %04x %04x\n", channel, base_address >> 2, m_address[channel] >> 30, spos, samp & 0xffff, m_volume[channel], m_pan[channel]);
+
+				//logerror("sample %02x %06x [%d] %+5d %04x  %04x %04x\n", channel, base_address >> 2, m_address[channel] >> 30, spos, samp & 0xffff, m_volume[channel], m_pan[channel]);
 
 				// Second, step the sample pos, loop/deactivate as needed
 				m_sample_pos[channel] += m_sample_increment[m_freq[channel] & 0x3fff];

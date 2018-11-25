@@ -48,8 +48,8 @@ protected:
 private:
 	enum
 	{
-		TIMER_CLICK	= 30000,
-		TIMER_BEEP	= 30001
+		TIMER_CLICK = 30000,
+		TIMER_BEEP  = 30001
 	};
 
 	enum
@@ -65,8 +65,8 @@ private:
 
 	enum
 	{
-		BEEPER_BELL		= 0x01,
-		BEEPER_CLICK	= 0x02
+		BEEPER_BELL     = 0x01,
+		BEEPER_CLICK    = 0x02
 	};
 
 	enum
@@ -76,21 +76,21 @@ private:
 
 	enum
 	{
-		CTRL_A_SBEEP		= 1,
-		CTRL_A_LBEEP		= 2,
-		CTRL_A_NOCLICK		= 3,
-		CTRL_A_RCB			= 4,
-		CTRL_A_NUMLK		= 5,
-		CTRL_A_CAPSLK		= 6,
-		CTRL_A_AUTOREP		= 7,
+		CTRL_A_SBEEP        = 1,
+		CTRL_A_LBEEP        = 2,
+		CTRL_A_NOCLICK      = 3,
+		CTRL_A_RCB          = 4,
+		CTRL_A_NUMLK        = 5,
+		CTRL_A_CAPSLK       = 6,
+		CTRL_A_AUTOREP      = 7,
 
-		CTRL_B				= 0,
-		CTRL_B_CMPL_DS1_2	= 1,
-		CTRL_B_SCRLK		= 2,
-		CTRL_B_L1			= 3,
-		CTRL_B_L2			= 4,
-		CTRL_B_L3			= 5,
-		CTRL_B_L4			= 6
+		CTRL_B              = 0,
+		CTRL_B_CMPL_DS1_2   = 1,
+		CTRL_B_SCRLK        = 2,
+		CTRL_B_L1           = 3,
+		CTRL_B_L2           = 4,
+		CTRL_B_L3           = 5,
+		CTRL_B_L4           = 6
 	};
 
 	// device_buffered_serial_interface overrides
@@ -101,12 +101,12 @@ private:
 	required_device<beep_device>    m_beeper;
 	output_finder<7>                m_leds;
 
-	uint8_t		m_make_count;
+	uint8_t     m_make_count;
 
-	bool		m_keyclick;
-	bool		m_auto_repeat;
-	uint8_t		m_beeper_state;
-	uint8_t		m_led_state;
+	bool        m_keyclick;
+	bool        m_auto_repeat;
+	uint8_t     m_beeper_state;
+	uint8_t     m_led_state;
 };
 
 } } // namespace bus::sgikbd

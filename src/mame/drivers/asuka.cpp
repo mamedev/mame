@@ -1785,7 +1785,7 @@ void asuka_state::init_earthjkr()
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	// 357c -> 317c, I think this is bitrot, see ROM loading for which ROM needs redumping, causes rowscroll to be broken on final stage (writes to ROM area instead)
 	// code is correct in the 'prototype?' set
-	rom[0x7aaa/2] = 0x317c; 
+	rom[0x7aaa/2] = 0x317c;
 }
 
 GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv, asuka_state, empty_init,  ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Newer)", MACHINE_SUPPORTS_SAVE )
