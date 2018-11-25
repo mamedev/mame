@@ -640,11 +640,10 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 
 	outclip &= cliprect;
 
-//	for (int line = outclip.min_y; line <= outclip.max_y; line++)
-//	{
+	for (int line = outclip.min_y; line <= outclip.max_y; line++)
+	{
 		rectangle clip;
-		//clip.set(outclip.min_x, outclip.max_x, line, line);
-		clip = outclip;
+		clip.set(outclip.min_x, outclip.max_x, line, line);
 
 		/* Get the scroll data */
 		int tilemap_scrollx = m_scroll[scrollreg * 4 + 0];    // x scroll
@@ -672,30 +671,15 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 
 		/* Draw the rows */
 		int sx1 = 0 - (tilemap_scrollx & 0xf);
-
 		int x = tilemap_scrollx;
 		for (int sx = sx1; sx <= clip.max_x; sx += 0x10)
 		{
-			int sy1 = in_sy - (tilemap_scrolly & 0xf);
-			int y = tilemap_scrolly;
-
-			for (int sy = sy1; sy <= clip.max_y; sy += 0x10)
-			{
-				int code,attr,flipx,flipy;
-				get_tile(x, y + (sy-sy1), size, page, code, attr, flipx, flipy);
-
-				for (int innerline = 0; innerline < 16; innerline++)
-				{
-					int realline = sy + innerline;
-
-				//	if (realline == line)
-						draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, sy, realline, innerline);
-				}
-
-			} /* sy */
+			int code, attr, flipx, flipy;
+			get_tile(x, tilemap_scrolly + (line - in_sy), size, page, code, attr, flipx, flipy);
+			draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, tilemap_scrolly + (line - in_sy), line,(tilemap_scrolly + (line - in_sy)) & 0xf);
 			x += 0x10;
 		} /* sx */
-//	} /* line */
+	} /* line */
 }
 
 /* Draw the "background layer" using multiple tilemap sprites */
