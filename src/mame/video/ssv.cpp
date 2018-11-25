@@ -130,8 +130,6 @@
     The number of low bits from the "shadowing tile" is 4 or 2, depending on
     bit 7 of 1c0076.
 
-Note: press Z to show some info on each sprite (debug builds only)
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -139,15 +137,42 @@ Note: press Z to show some info on each sprite (debug builds only)
 #include "render.h"
 
 
+
+
+void ssv_state::drawgfx_inner(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t color, int x0, int y0, int dx, int dy, int x1, int y1, int shadow, const uint8_t* addr)
+{
+	for (int sy = y0; sy != y1; sy += dy)
+	{
+		if (sy >= cliprect.min_y && sy <= cliprect.max_y)
+		{
+			uint8_t* source = (uint8_t*)addr;
+			uint16_t* dest = &bitmap.pix16(sy);
+
+			for (int sx = x0; sx != x1; sx += dx)
+			{
+				uint8_t pen = *source++;
+
+				if (pen && sx >= cliprect.min_x && sx <= cliprect.max_x)
+				{
+					if (shadow)
+						dest[sx] = ((dest[sx] & m_shadow_pen_mask) | (pen << m_shadow_pen_shift)) & 0x7fff;                                                \
+					else
+						dest[sx] = (color + pen) & 0x7fff;
+				}
+			}
+		}
+		addr += gfx->rowbytes();
+	}
+}
+
+
 void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
 					uint32_t code,uint32_t color,int flipx,int flipy,int x0,int y0,
 					int shadow )
 {
-	const uint8_t *addr, *source;
-	uint8_t pen;
-	uint16_t *dest;
-	int sx, x1, dx;
-	int sy, y1, dy;
+	const uint8_t *addr;
+	int x1, dx;
+	int y1, dy;
 
 	addr    =   gfx->get_data(code  % gfx->elements());
 	color   =   gfx->granularity() * (color % gfx->colors());
@@ -158,34 +183,7 @@ void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_ele
 	if ( flipy )    {   y1 = y0-1;              y0 += gfx->height()-1;  dy = -1;    }
 	else            {   y1 = y0 + gfx->height();                            dy =  1;    }
 
-#define SSV_DRAWGFX(SETPIXELCOLOR)                                              \
-	for ( sy = y0; sy != y1; sy += dy )                                         \
-	{                                                                           \
-		if ( sy >= cliprect.min_y && sy <= cliprect.max_y )                 \
-		{                                                                       \
-			source  =   addr;                                                   \
-			dest    =   &bitmap.pix16(sy);                          \
-																				\
-			for ( sx = x0; sx != x1; sx += dx )                                 \
-			{                                                                   \
-				pen = *source++;                                                \
-																				\
-				if ( pen && sx >= cliprect.min_x && sx <= cliprect.max_x )  \
-					SETPIXELCOLOR                                               \
-			}                                                                   \
-		}                                                                       \
-																				\
-		addr    +=  gfx->rowbytes();                                            \
-	}
-
-	if (shadow)
-	{
-		SSV_DRAWGFX( { dest[sx] = ((dest[sx] & m_shadow_pen_mask) | (pen << m_shadow_pen_shift)) & 0x7fff; } )
-	}
-	else
-	{
-		SSV_DRAWGFX( { dest[sx] = (color + pen) & 0x7fff; } )
-	}
+	drawgfx_inner(bitmap, cliprect, gfx, color, x0, y0, dx, dy, x1, y1, shadow, addr);
 }
 
 
