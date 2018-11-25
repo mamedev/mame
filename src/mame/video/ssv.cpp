@@ -138,27 +138,27 @@
 
 
 
-void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy,int shadow)
+void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow)
 {
 	const uint8_t *const addr = gfx->get_data(code  % gfx->elements());
 	const uint32_t realcolor = gfx->granularity() * (color % gfx->colors());
 
-	const int y0 = flipy ? (base_sy + gfx->height() - 1) : (base_sy);
-	const int y1 = flipy ? (base_sy - 1)                 : (y0 + gfx->height());
-	const int dy = flipy ? (-1)                          : (1);
+	const int y0 = flipy ? (gfx->height() - 1) : (0);
+	const int dy = flipy ? (-1) : (1);
 
-	int line = 0;
-	for (int sy = y0; sy != y1; sy += dy)
+	for (int line = 0; line < 8; line++)
 	{
-		const uint8_t* const source = addr + line * gfx->rowbytes();
+		int realline = base_sy + line;
 
-		if (sy >= cliprect.min_y && sy <= cliprect.max_y)
+		const uint8_t* const source = addr + y0 + ((line*dy) * gfx->rowbytes());
+
+		if (realline >= cliprect.min_y && realline <= cliprect.max_y)
 		{
-			uint16_t* dest = &bitmap.pix16(sy);
+			uint16_t* dest = &bitmap.pix16(realline);
 
 			const int x0 = flipx ? (base_sx + gfx->width() - 1) : (base_sx);
-			const int x1 = flipx ? (base_sx - 1)                : (x0 + gfx->width());
-			const int dx = flipx ? (-1)                         : (1);
+			const int x1 = flipx ? (base_sx - 1) : (x0 + gfx->width());
+			const int dx = flipx ? (-1) : (1);
 
 			int column = 0;
 			for (int sx = x0; sx != x1; sx += dx)
@@ -175,7 +175,6 @@ void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_ele
 				column++;
 			}
 		}
-		line++;
 	}
 }
 
