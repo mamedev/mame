@@ -43,7 +43,7 @@ public:
 	void set_bg_tilemask(int mask);
 
 	/* Function to for Mjnquest to select gfx bank */
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
+	void gfxbank_w(u8 data);
 
 	u16 ram_r(offs_t offset, u16 mem_mask);
 	void ram_w(offs_t offset, u16 data, u16 mem_mask);

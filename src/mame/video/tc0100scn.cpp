@@ -293,7 +293,7 @@ void tc0100scn_device::device_start()
 void tc0100scn_device::device_reset()
 {
 	m_dblwidth = 0;
-	m_gfxbank = 0; /* Mjnquest uniquely banks tiles */
+	gfxbank_w(0); /* Mjnquest uniquely banks tiles */
 
 	for (auto & elem : m_ctrl)
 		elem = 0;
@@ -307,19 +307,9 @@ void tc0100scn_device::device_reset()
 template<int Offset, int Layer>
 TILE_GET_INFO_MEMBER(tc0100scn_device::get_bg_tile_info)
 {
-	int code, attr;
-
-	if (!m_dblwidth)
-	{
-		/* Mahjong Quest (F2 system) inexplicably has a banking feature */
-		code = (m_ram[Offset + 2 * tile_index + 1] & m_bg_tilemask) + (m_gfxbank << 15);
-		attr = m_ram[Offset + 2 * tile_index];
-	}
-	else
-	{
-		code = m_ram[Offset + 2 * tile_index + 1] & m_bg_tilemask;
-		attr = m_ram[Offset + 2 * tile_index];
-	}
+	/* Mahjong Quest (F2 system) inexplicably has a banking feature */
+	uint32_t const code = (m_ram[Offset + 2 * tile_index + 1] & m_bg_tilemask) + (m_gfxbank << 15);
+	uint16_t const attr = m_ram[Offset + 2 * tile_index];
 
 	SET_TILE_INFO_MEMBER(m_gfxnum,
 			code,
@@ -350,9 +340,19 @@ void tc0100scn_device::set_bg_tilemask( int mask )
 	m_bg_tilemask = mask;
 }
 
-WRITE16_MEMBER( tc0100scn_device::gfxbank_w )   /* Mjnquest banks its 2 sets of scr tiles */
+void tc0100scn_device::gfxbank_w(u8 data)   /* Mjnquest banks its 2 sets of scr tiles */
 {
-	m_gfxbank = (data & 0x1);
+	if ((data & 0x1) != m_gfxbank)
+	{
+		m_gfxbank = (data & 0x1);
+		for (int i = 0; i < 2; i++)
+		{
+			for (int j = 0; j < 2; j++)
+			{
+				m_tilemap[i][j]->mark_all_dirty();
+			}
+		}
+	}
 }
 
 void tc0100scn_device::set_layer_ptrs()

@@ -845,7 +845,7 @@ void taitof2_state::mjnquest_map(address_map &map)
 	map(0x350000, 0x350001).nopw();   /* watchdog ? */
 	map(0x360000, 0x360000).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
 	map(0x360002, 0x360002).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-	map(0x380000, 0x380001).w(m_tc0100scn, FUNC(tc0100scn_device::gfxbank_w));   /* scr gfx bank select */
+	map(0x380001, 0x380001).w(m_tc0100scn, FUNC(tc0100scn_device::gfxbank_w));   /* scr gfx bank select */
 	map(0x400000, 0x40ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x420000, 0x42000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x500000, 0x50ffff).ram().share("spriteram");
