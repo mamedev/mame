@@ -27,6 +27,7 @@ public:
 	taitoz_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
+		m_spritemap_rom(*this, "sprmaprom"),
 		m_z80bank(*this, "z80bank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -75,6 +76,7 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_region_ptr<uint16_t> m_spritemap_rom;
 
 	optional_memory_bank m_z80bank;
 
@@ -106,8 +108,7 @@ private:
 	optional_ioport m_steer;
 	output_finder<2> m_lamps;
 
-	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
-	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
+	void cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spacegun_eeprom_w);
@@ -125,7 +126,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pancontrol_w);
 	DECLARE_READ16_MEMBER(sci_spriteframe_r);
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
-	DECLARE_WRITE16_MEMBER(contcirc_out_w);
+	DECLARE_WRITE8_MEMBER(contcirc_out_w);
 	DECLARE_MACHINE_START(taitoz);
 	DECLARE_MACHINE_RESET(taitoz);
 	DECLARE_VIDEO_START(taitoz);

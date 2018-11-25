@@ -147,7 +147,6 @@ confirmed
 
 void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -201,7 +200,7 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 			px = flipx ?  (7 - k) : k;  /* pick tiles back to front for x and y flips */
 			py = flipy ? (15 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 3)];
+			code = m_spritemap_rom[map_offset + px + (py << 3)];
 
 			if (code == 0xffff)
 				bad_chunks++;
@@ -241,7 +240,6 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 
 void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -298,7 +296,7 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 				px = flipx ? (7 - k) : k;   /* pick tiles back to front for x and y flips */
 				py = flipy ? (7 - j) : j;
 
-				code = spritemap[map_offset + px + (py << 3)];
+				code = m_spritemap_rom[map_offset + px + (py << 3)];
 
 				if (code == 0xffff)
 					bad_chunks++;
@@ -342,7 +340,7 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 				px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 				py = flipy ? (7 - j) : j;
 
-				code = spritemap[map_offset + px + (py << 2)];
+				code = m_spritemap_rom[map_offset + px + (py << 2)];
 
 				if (code == 0xffff) bad_chunks++;
 
@@ -385,7 +383,7 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 				px = flipx ? (1 - k) : k;   /* pick tiles back to front for x and y flips */
 				py = flipy ? (7 - j) : j;
 
-				code = spritemap[map_offset + px + (py << 1)];
+				code = m_spritemap_rom[map_offset + px + (py << 1)];
 
 				if (code == 0xffff) bad_chunks ++;
 
@@ -426,7 +424,6 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 
 void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -480,7 +477,7 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 			py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			code = m_spritemap_rom[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
@@ -521,7 +518,6 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 
 void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	uint16_t *spriteram = m_spriteram;
 	int offs, start_offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -584,7 +580,7 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 			py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			code = m_spritemap_rom[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
@@ -625,7 +621,6 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 
 void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -678,7 +673,7 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 			py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			code = m_spritemap_rom[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
@@ -719,7 +714,6 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 
 void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	uint16_t *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -772,7 +766,7 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
 			py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			code = m_spritemap_rom[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
@@ -814,22 +808,19 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
                         SCREEN REFRESH
 **************************************************************/
 
-WRITE16_MEMBER(taitoz_state::contcirc_out_w)
+WRITE8_MEMBER(taitoz_state::contcirc_out_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		/* bit 0 = reset sub CPU */
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	/* bit 0 = reset sub CPU */
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
-		/* bits 1-3 n.c. */
+	/* bits 1-3 n.c. */
 
-		/* 3d glasses control */
-		/* bit 4 = SCPSW */
-		/* bit 5 = SCP */
+	/* 3d glasses control */
+	/* bit 4 = SCPSW */
+	/* bit 5 = SCP */
 
-		/* bits 6 and 7 select the road palette bank */
-		m_road_palbank = (data & 0xc0) >> 6;
-	}
+	/* bits 6 and 7 select the road palette bank */
+	m_road_palbank = (data & 0xc0) >> 6;
 }
 
 
