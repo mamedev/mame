@@ -7,9 +7,11 @@
  *
  * Sources:
  *
- *  https://datasheet.datasheetarchive.com/originals/distributors/Datasheets-115/DSAP00824.pdf
+ *  http://bitsavers.org/components/amd/Am7990/Am7990.pdf
+ *  http://bitsavers.org/components/amd/Am7990/Am79c90.pdf
  *
  * TODO
+ *   - external loopback
  *   - hp9k/3xx diagnostic failures
  *
  *                          _____   _____
@@ -106,6 +108,7 @@ void am7990_device_base::device_start()
 	save_item(NAME(m_tx_md));
 
 	save_item(NAME(m_intr_out_state));
+	save_item(NAME(m_idon));
 	save_item(NAME(m_lb_buf));
 	save_item(NAME(m_lb_length));
 }
@@ -114,10 +117,11 @@ void am7990_device_base::device_reset()
 {
 	m_rap = 0;
 	m_csr[0] = CSR0_STOP;
-	m_csr[1] = 0;
-	m_csr[2] = 0;
 	m_csr[3] = 0;
+
+	m_mode = 0;
 	m_lb_length = 0;
+	m_idon = false;
 
 	update_interrupts();
 }
@@ -147,14 +151,6 @@ void am7990_device_base::update_interrupts()
 
 int am7990_device_base::recv_start_cb(u8 *buf, int length)
 {
-	// check receiving enabled
-	if (!(m_csr[0] & CSR0_RXON))
-	{
-		LOGMASKED(LOG_RXTX, "receive disabled, external packet discarded\n");
-
-		return 0;
-	}
-
 	// check internal loopback
 	if ((m_mode & MODE_LOOP) && (m_mode & MODE_INTL))
 	{
@@ -171,21 +167,32 @@ int am7990_device_base::recv_start_cb(u8 *buf, int length)
 		return 0;
 	}
 
-	// address filter
-	if (!address_filter(buf))
-		return 0;
-
 	return receive(buf, length);
 }
 
 int am7990_device_base::receive(u8 *buf, int length)
 {
+	// check receiver enabled
+	if (!(m_csr[0] & CSR0_RXON))
+	{
+		LOGMASKED(LOG_RXTX, "receive disabled, external packet discarded\n");
+
+		return -1;
+	}
+
+	// address filter
+	if (!address_filter(buf))
+		return -1;
+
+	LOGMASKED(LOG_RXTX, "receive packet length %d\n", length);
+	dump_bytes(buf, length);
+
 	// check we have a buffer
 	u32 ring_address = (m_rx_ring_base + (m_rx_ring_pos << 3)) & RING_ADDR_MASK;
 	m_rx_md[1] = m_dma_in_cb(ring_address | 2);
 
 	if (!(m_rx_md[1] & RMD1_OWN))
-		return -1;
+		return -2;
 
 	// flag start of packet
 	m_rx_md[1] |= RMD1_STP;
@@ -198,28 +205,37 @@ int am7990_device_base::receive(u8 *buf, int length)
 		m_rx_md[2] = m_dma_in_cb(ring_address | 4);
 
 		u32 const rx_buf_address = (u32(m_rx_md[1] & 0xff) << 16) | m_rx_md[0];
-		int const rx_buf_length = -s16(m_rx_md[2]);
+		int const rx_buf_length = get_buf_length(m_rx_md[2]);
 
-		LOGMASKED(LOG_RXTX, "receive buffer address 0x%06x length %d\n", rx_buf_address, rx_buf_length);
+		// FIXME: In the C-LANCE device, the case of all 0's in the receive
+		// descriptor may produce unpredictable results.
 
 		// write the data to memory
 		int const count = std::min(length - offset, rx_buf_length);
 		dma_out(rx_buf_address, &buf[offset], count);
 		offset += count;
 
+		LOGMASKED(LOG_RXTX, "receive buffer address 0x%06x length %d wrote %d\n", rx_buf_address, rx_buf_length, count);
+
+		// clear ownership
+		m_rx_md[1] &= ~RMD1_OWN;
+
 		if (offset < length)
 		{
 			// look ahead to next descriptor
 			u8 const next_ring_pos = (m_rx_ring_pos + 1) & m_rx_ring_mask;
 			u32 const next_ring_address = (m_rx_ring_base + (next_ring_pos << 3)) & RING_ADDR_MASK;
-			u16 next_rmd1 = m_dma_in_cb(ring_address | 2);
 
+			// only read the next descriptor if there's more than one in the ring
+			u16 const next_rmd1 = (next_ring_address != ring_address) ? m_dma_in_cb(next_ring_address | 2) : m_rx_md[1];
+
+			// check ownership of the next descriptor
 			if (next_rmd1 & RMD1_OWN)
 			{
-				// release the current descriptor
-				m_dma_out_cb(ring_address | 2, m_rx_md[1] & ~RMD1_OWN);
+				// update the descriptor
+				m_dma_out_cb(ring_address | 2, m_rx_md[1]);
 
-				// advance ring position
+				// advance the ring
 				m_rx_ring_pos = next_ring_pos;
 				ring_address = next_ring_address;
 				m_rx_md[1] = next_rmd1;
@@ -227,7 +243,7 @@ int am7990_device_base::receive(u8 *buf, int length)
 			else
 			{
 				// overflow error
-				m_rx_md[1] |= RMD1_BUFF | RMD1_OFLO;
+				m_rx_md[1] |= RMD1_ERR | RMD1_BUFF;
 				break;
 			}
 		}
@@ -236,7 +252,7 @@ int am7990_device_base::receive(u8 *buf, int length)
 	if (offset == length)
 	{
 		// check fcs
-		if (!(m_mode & MODE_LOOP) || !(m_mode & MODE_INTL) || (m_mode & MODE_DTCR))
+		if (!(m_mode & MODE_LOOP) || (m_mode & MODE_DTCR))
 		{
 			u32 const crc = util::crc32_creator::simple(buf, length);
 
@@ -251,27 +267,33 @@ int am7990_device_base::receive(u8 *buf, int length)
 		m_rx_md[1] |= RMD1_ENP;
 	}
 
-	LOGMASKED(LOG_RXTX, "receive packet length %d\n", length);
-	dump_bytes(buf, length);
-
 	return offset;
 }
 
 void am7990_device_base::recv_complete_cb(int result)
 {
-	if (result > 0)
+	switch (result)
 	{
-		// update the final descriptor
-		u32 const ring_address = (m_rx_ring_base + (m_rx_ring_pos << 3)) & RING_ADDR_MASK;
-
-		m_dma_out_cb(ring_address | 2, m_rx_md[1] & ~RMD1_OWN);
-		m_dma_out_cb(ring_address | 6, result & RMD3_MCNT);
-
-		// advance the ring
-		m_rx_ring_pos = (m_rx_ring_pos + 1) & m_rx_ring_mask;
-	}
-	else if (result == -1)
+	case -2: // missed packet
 		m_csr[0] |= CSR0_ERR | CSR0_MISS;
+		break;
+
+	case -1: // packet discarded or filtered
+		return;
+
+	default: // received something
+		{
+			// update the final descriptor
+			u32 const ring_address = (m_rx_ring_base + (m_rx_ring_pos << 3)) & RING_ADDR_MASK;
+
+			m_dma_out_cb(ring_address | 2, m_rx_md[1]);
+			m_dma_out_cb(ring_address | 6, result & RMD3_MCNT);
+
+			// advance the ring
+			m_rx_ring_pos = (m_rx_ring_pos + 1) & m_rx_ring_mask;
+		}
+		break;
+	}
 
 	// generate receive interrupt
 	m_csr[0] |= CSR0_RINT | CSR0_INTR;
@@ -280,57 +302,59 @@ void am7990_device_base::recv_complete_cb(int result)
 
 void am7990_device_base::transmit_poll(void *ptr, s32 param)
 {
-	// receive pending internal loopback data
-	if (m_lb_length && (m_mode & MODE_LOOP) && (m_mode & MODE_INTL) && (m_csr[0] & CSR0_RXON))
-	{
-		int const result = receive(m_lb_buf, m_lb_length);
-		m_lb_length = 0;
-		recv_complete_cb(result);
-
-		return;
-	}
-
+	// check transmitter enabled
 	if (m_csr[0] & CSR0_TXON)
 	{
+		// clear transmit demand
 		m_csr[0] &= ~CSR0_TDMD;
 
+		// read a transmit descriptor
 		u32 const ring_address = (m_tx_ring_base + (m_tx_ring_pos << 3)) & RING_ADDR_MASK;
 		m_tx_md[1] = m_dma_in_cb(ring_address | 2);
 
-		// start transmitting if we own the current descriptor
+		// check ownership
 		if (m_tx_md[1] & TMD1_OWN)
-			transmit();
+		{
+			// check for start of packet
+			if (!(m_tx_md[1] & TMD1_STP))
+			{
+				// clear ownership
+				m_dma_out_cb(ring_address | 2, m_tx_md[1] & ~TMD1_OWN);
+
+				// advance the ring
+				m_tx_ring_pos = (m_tx_ring_pos + 1) & m_tx_ring_mask;
+			}
+			else
+				transmit();
+		}
+	}
+
+	// receive pending loopback data
+	if (m_lb_length && (m_mode & MODE_LOOP))
+	{
+		LOGMASKED(LOG_RXTX, "receive loopback packet length %d\n", m_lb_length);
+
+		int const result = receive(m_lb_buf, m_lb_length);
+		m_lb_length = 0;
+		recv_complete_cb(result);
 	}
 }
 
 void am7990_device_base::transmit()
 {
-	u32 ring_address = (m_tx_ring_base + (m_tx_ring_pos << 3)) & RING_ADDR_MASK;
+	// stop transmit polling
+	m_transmit_poll->enable(false);
 
-	// check if the descriptor contains the start of a packet
-	if (!(m_tx_md[1] & TMD1_STP))
-	{
-		// release owned descriptors which don't start a packet
-		while ((m_tx_md[1] & TMD1_OWN) && !(m_tx_md[1] & TMD1_STP))
-		{
-			// release the descriptor
-			m_dma_out_cb(ring_address | 2, m_tx_md[1] & ~TMD1_OWN);
+	// check whether to append fcs
+	bool append_fcs = !(m_mode & MODE_DTCR);
 
-			// advance the ring
-			m_tx_ring_pos = (m_tx_ring_pos + 1) & m_tx_ring_mask;
-			ring_address = (m_tx_ring_base + (m_tx_ring_pos << 3)) & RING_ADDR_MASK;
-			m_tx_md[1] = m_dma_in_cb(ring_address | 2);
-		}
-
-		return;
-	}
+	// this bit can be used to detect C-LANCE
+	if (type() == AM79C90)
+		append_fcs = append_fcs || bool(m_tx_md[1] & TMD1_ADD_FCS);
 	else
-		// stop transmit polling
-		m_transmit_poll->enable(false);
+		m_tx_md[1] &= ~TMD1_ADD_FCS;
 
-	// check whether to append fcs or not
-	bool const append_fcs = !(m_mode & MODE_DTCR) || ((type() == AM79C90) && (m_tx_md[1] & TMD1_ADD_FCS));
-
+	u32 ring_address = (m_tx_ring_base + (m_tx_ring_pos << 3)) & RING_ADDR_MASK;
 	u8 buf[4096];
 	int length = 0;
 
@@ -341,13 +365,29 @@ void am7990_device_base::transmit()
 		m_tx_md[2] = m_dma_in_cb(ring_address | 4);
 		m_tx_md[3] = 0;
 
-		u32 const tx_buf_address = (u32(m_tx_md[1] & 0xff) << 16) | m_tx_md[0];
-		u16 const tx_buf_length = -s16(m_tx_md[2]);
+		u32 const tx_buf_address = (u32(m_tx_md[1] & TMD1_HADR) << 16) | m_tx_md[0];
+		int const tx_buf_length = get_buf_length(m_tx_md[2]);
 
-		LOGMASKED(LOG_RXTX, "transmit buffer address 0x%06x length %d\n", tx_buf_address, tx_buf_length);
+		LOGMASKED(LOG_RXTX, "transmit buffer address 0x%06x length %d%s%s%s\n", tx_buf_address, tx_buf_length,
+			m_tx_md[1] & TMD1_OWN ? " OWN" : "", m_tx_md[1] & TMD1_STP ? " STP" : "", m_tx_md[1] & TMD1_ENP ? " ENP" : "");
 
-		// minimum length 100 when chaining, or 64 when not (except for internal loopback mode)
-		if (!length && tx_buf_length < ((m_tx_md[1] & TMD1_ENP) ? 64 : 100) && ((m_mode & (MODE_LOOP | MODE_INTL)) != (MODE_LOOP | MODE_INTL)))
+		// clear ownership
+		m_tx_md[1] &= ~TMD1_OWN;
+
+		// FIXME: zero length transmit buffer
+		if (tx_buf_length == 0)
+		{
+			// update the descriptor
+			m_dma_out_cb(ring_address | 2, m_tx_md[1]);
+
+			// advance the ring
+			m_tx_ring_pos = (m_tx_ring_pos + 1) & m_tx_ring_mask;
+
+			return;
+		}
+
+		// minimum length 100 when chaining, or 64 when not, except in loopback mode
+		if (!length && !(m_mode & MODE_LOOP) && tx_buf_length < ((m_tx_md[1] & TMD1_ENP) ? 64 : 100))
 			logerror("first transmit buffer length %d less than required minimum\n", tx_buf_length);
 
 		// read the data from memory
@@ -360,17 +400,19 @@ void am7990_device_base::transmit()
 			// look ahead to next descriptor
 			u8 const next_ring_pos = (m_tx_ring_pos + 1) & m_tx_ring_mask;
 			u32 const next_ring_address = (m_tx_ring_base + (next_ring_pos << 3)) & RING_ADDR_MASK;
-			u16 const next_tx_md1 = m_dma_in_cb(ring_address | 2);
 
-			if (next_tx_md1 & TMD1_OWN)
+			// only read the next descriptor if there's more than one in the ring
+			u16 const next_tmd1 = (next_ring_address != ring_address) ? m_dma_in_cb(next_ring_address | 2) : m_tx_md[1];
+
+			if (next_tmd1 & TMD1_OWN)
 			{
-				// release the current descriptor
-				m_dma_out_cb(ring_address | 2, m_tx_md[1] & ~TMD1_OWN);
+				// update the descriptor
+				m_dma_out_cb(ring_address | 2, m_tx_md[1]);
 
-				// advance ring position
+				// advance the ring
 				m_tx_ring_pos = next_ring_pos;
 				ring_address = next_ring_address;
-				m_tx_md[1] = next_tx_md1;
+				m_tx_md[1] = next_tmd1;
 			}
 			else
 			{
@@ -388,6 +430,10 @@ void am7990_device_base::transmit()
 			break;
 	}
 
+	// check for babble
+	if (length > 1518)
+		m_csr[0] |= CSR0_ERR | CSR0_BABL;
+
 	// compute and append the fcs
 	if (append_fcs)
 	{
@@ -400,18 +446,14 @@ void am7990_device_base::transmit()
 		buf[length++] = crc >> 24;
 	}
 
-	// check for babble
-	if (length > 1518)
-		m_csr[0] |= CSR0_ERR | CSR0_BABL;
-
 	LOGMASKED(LOG_RXTX, "transmit sending packet length %d\n", length);
 	dump_bytes(buf, length);
 
-	// handle internal loopback
-	if ((m_mode & MODE_LOOP) && (m_mode & MODE_INTL))
+	// handle loopback
+	if (m_mode & MODE_LOOP)
 	{
 		// forced collision
-		if (m_mode & MODE_COLL)
+		if ((m_mode & MODE_COLL) && (m_mode & MODE_INTL))
 		{
 			send_complete_cb(-1);
 			return;
@@ -431,10 +473,14 @@ void am7990_device_base::transmit()
 		memcpy(m_lb_buf, buf, length);
 		m_lb_length = length;
 
-		send_complete_cb(length);
+		if (m_mode & MODE_INTL)
+		{
+			send_complete_cb(length);
+			return;
+		}
 	}
-	else
-		send(buf, length);
+
+	send(buf, length);
 }
 
 void am7990_device_base::send_complete_cb(int result)
@@ -444,7 +490,7 @@ void am7990_device_base::send_complete_cb(int result)
 	// update tmd3 on error
 	switch (result)
 	{
-	case -2: // invalid internal loopback packet
+	case -2: // invalid loopback packet
 		m_tx_md[1] |= TMD1_ERR;
 		break;
 
@@ -459,8 +505,8 @@ void am7990_device_base::send_complete_cb(int result)
 		break;
 	}
 
-	// release the current descriptor
-	m_dma_out_cb(ring_address | 2, m_tx_md[1] & ~TMD1_OWN);
+	// update the last descriptor
+	m_dma_out_cb(ring_address | 2, m_tx_md[1]);
 
 	// advance the ring
 	m_tx_ring_pos = (m_tx_ring_pos + 1) & m_tx_ring_mask;
@@ -507,8 +553,76 @@ WRITE16_MEMBER(am7990_device_base::regs_w)
 			 *
 			 */
 
-			// setting STOP overrides all other bits
-			if (!(data & CSR0_STOP))
+			// STOP takes priority over all other bits
+			if (data & CSR0_STOP)
+			{
+				if ((type() == AM7990) || !(m_csr[0] & CSR0_STOP))
+					device_reset();
+				break;
+			}
+
+			// interrupt/error flags are all cleared by writing 1
+			m_csr[0] &= ~(data & (CSR0_BABL | CSR0_CERR | CSR0_MISS | CSR0_MERR | CSR0_RINT | CSR0_TINT | CSR0_IDON));
+
+			// handle INIT
+			if ((data & CSR0_INIT) && !(m_csr[0] & CSR0_INIT))
+			{
+				if (m_csr[0] & CSR0_STOP)
+					initialize();
+				else
+					m_csr[0] |= m_idon ? CSR0_IDON : CSR0_INIT;
+			}
+
+			/*
+			 * From the Am7990 datasheet:
+			 *
+			 * The STOP bit must be set prior to setting the STRT bit. INIT
+			 * and STRT must not be set at the same time. The LANCE must be
+			 * initialized first and the user must wait for the IDON bit to
+			 * be set (IDON=1) before setting the STRT bit.
+			 *
+			 * And:
+			 *
+			 * The STOP bit must be set prior to setting the INIT bit.
+			 * Setting INIT clears the STOP bit.
+			 *
+			 * This is clearly contradictory; driver code sets the STRT bit
+			 * after INIT, so assume STRT does not require STOP to be set.
+			 *
+			 * HP9000/3xx diagnostic sets INIT and STRT simultaneously.
+			 */
+			// handle STRT
+			if ((data & CSR0_STRT) && !(m_csr[0] & CSR0_STRT))
+			{
+				LOG("START receiver %s transmitter %s\n",
+					(m_mode & MODE_DRX) ? "OFF" : "ON", (m_mode & MODE_DTX) ? "OFF" : "ON");
+
+				m_csr[0] |= CSR0_STRT;
+				m_csr[0] &= ~CSR0_STOP;
+
+				if (m_mode & MODE_DRX)
+					m_csr[0] &= ~CSR0_RXON;
+				else
+					m_csr[0] |= CSR0_RXON;
+
+				if (m_mode & MODE_DTX)
+					m_csr[0] &= ~CSR0_TXON;
+				else
+					m_csr[0] |= CSR0_TXON;
+
+				// trigger an immediate transmit poll
+				m_transmit_poll->adjust(attotime::zero, 0, TX_POLL_PERIOD);
+			}
+
+			// transmit demand
+			if ((data & CSR0_TDMD) && !(m_csr[0] & CSR0_TDMD))
+			{
+				m_csr[0] |= CSR0_TDMD;
+				m_transmit_poll->adjust(attotime::zero, 0, TX_POLL_PERIOD);
+			}
+
+			// interrupt enable
+			if (!(m_csr[0] & CSR0_STOP) || type() == AM79C90)
 			{
 				// interrupt enable is read/write
 				if ((data ^ m_csr[0]) & CSR0_INEA)
@@ -518,80 +632,21 @@ WRITE16_MEMBER(am7990_device_base::regs_w)
 					m_csr[0] |= CSR0_INEA;
 				else
 					m_csr[0] &= ~CSR0_INEA;
-
-				// interrupt/error flags are all cleared by writing 1
-				m_csr[0] &= ~(data & (CSR0_BABL | CSR0_CERR | CSR0_MISS | CSR0_MERR | CSR0_RINT | CSR0_TINT | CSR0_IDON));
-
-				// INIT and STRT are only valid if STOP is set
-				if (m_csr[0] & CSR0_STOP)
-				{
-					// handle INIT
-					if ((data & CSR0_INIT) && !(m_csr[0] & CSR0_INIT))
-						initialize();
-
-					// FIXME: handle STRT, see below
-				}
-
-				/*
-				 * From the Am7990 datasheet:
-				 *
-				 * The STOP bit must be set prior to setting the STRT bit. INIT
-				 * and STRT must not be set at the same time. The LANCE must be
-				 * initialized first and the user must wait for the IDON bit to
-				 * be set (IDON=1) before setting the STRT bit.
-				 *
-				 * And:
-				 *
-				 * The STOP bit must be set prior to setting the INIT bit.
-				 * Setting INIT clears the STOP bit.
-				 *
-				 * This is clearly contradictory; driver code sets the STRT bit
-				 * after INIT, so assume STRT does not require STOP to be set.
-				 */
-				 // handle STRT
-				if ((data & CSR0_STRT) && !(m_csr[0] & CSR0_STRT))
-				{
-					LOG("START receiver %s transmitter %s\n",
-						(m_mode & MODE_DRX) ? "OFF" : "ON", (m_mode & MODE_DTX) ? "OFF" : "ON");
-
-					m_csr[0] |= CSR0_STRT;
-					m_csr[0] &= ~CSR0_STOP;
-
-					if (m_mode & MODE_DRX)
-						m_csr[0] &= ~CSR0_RXON;
-					else
-						m_csr[0] |= CSR0_RXON;
-
-					if (m_mode & MODE_DTX)
-						m_csr[0] &= ~CSR0_TXON;
-					else
-						m_csr[0] |= CSR0_TXON;
-				}
-
-				// transmit demand
-				if ((data & CSR0_TDMD) && !(m_csr[0] & CSR0_TDMD))
-				{
-					m_csr[0] |= CSR0_TDMD;
-					m_transmit_poll->adjust(attotime::zero, 0, TX_POLL_PERIOD);
-				}
-
-				// ERR == BABL || CERR || MISS || MERR
-				if (m_csr[0] & CSR0_ANY_ERR)
-					m_csr[0] |= CSR0_ERR;
-				else
-					m_csr[0] &= ~CSR0_ERR;
-
-				// INTR == BABL || MISS || MERR || RINT || TINT || IDON
-				if (m_csr[0] & CSR0_ANY_INTR)
-					m_csr[0] |= CSR0_INTR;
-				else
-					m_csr[0] &= ~CSR0_INTR;
-
-				update_interrupts();
 			}
-			else
-				device_reset();
 
+			// ERR == BABL || CERR || MISS || MERR
+			if (m_csr[0] & CSR0_ANY_ERR)
+				m_csr[0] |= CSR0_ERR;
+			else
+				m_csr[0] &= ~CSR0_ERR;
+
+			// INTR == BABL || MISS || MERR || RINT || TINT || IDON
+			if (m_csr[0] & CSR0_ANY_INTR)
+				m_csr[0] |= CSR0_INTR;
+			else
+				m_csr[0] &= ~CSR0_INTR;
+
+			update_interrupts();
 			break;
 
 		case 1: // Least significant 15 bits of the Initialization Block
@@ -661,6 +716,8 @@ void am7990_device_base::initialize()
 
 	m_csr[0] |= CSR0_IDON | CSR0_INIT;
 	m_csr[0] &= ~CSR0_STOP;
+
+	m_idon = true;
 }
 
 void am7990_device_base::dma_in(u32 address, u8 *buf, int length)
@@ -796,14 +853,12 @@ bool am7990_device_base::address_filter(u8 *buf)
 
 		// multicast
 		/*
-		 * FIXME: This logic is unverified. It's based on the assumption that
-		 * the computed crc is bit-reversed compared to hardware, so it uses
-		 * the low-order 6 bits instead of the high-order bits, then reverses
-		 * them to find the hash position. Unsure if inversion is required.
+		 * Multicast address matching is performed by computing the fcs crc of
+		 * the destination address, and then using the upper 6 bits as an index
+		 * into the 64-bit logical address filter.
 		 */
 		u32 const crc = util::crc32_creator::simple(buf, 6);
-		u8 const hash = bitswap<6>(crc, 0, 1, 2, 3, 4, 5);
-		if (m_logical_addr_filter & (1U << hash))
+		if (BIT(m_logical_addr_filter, 63 - (crc >> 26)))
 		{
 			LOGMASKED(LOG_FILTER, "address_filter accepted (logical address match) %02x-%02x-%02x-%02x-%02x-%02x\n",
 				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
