@@ -143,14 +143,20 @@ void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_ele
 	const uint8_t *const addr = gfx->get_data(code  % gfx->elements());
 	const uint32_t realcolor = gfx->granularity() * (color % gfx->colors());
 
-	const int y0 = flipy ? (gfx->height() - 1) : (0);
-	const int dy = flipy ? (-1) : (1);
-
 	for (int line = 0; line < 8; line++)
 	{
 		int realline = base_sy + line;
 
-		const uint8_t* const source = addr + y0 + ((line*dy) * gfx->rowbytes());
+		const uint8_t* source;
+			
+		if (flipy)
+		{
+			source = addr + (7-line) * gfx->rowbytes();
+		}
+		else
+		{
+			source = addr + line * gfx->rowbytes();
+		}
 
 		if (realline >= cliprect.min_y && realline <= cliprect.max_y)
 		{
