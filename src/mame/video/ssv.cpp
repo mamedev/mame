@@ -578,35 +578,28 @@ From the above some noteworthy cases are:
 /* Draw a tilemap sprite */
 
 
-void ssv_state::draw_16x16_tiles(bitmap_ind16 &bitmap, const rectangle &clip, int flipx, int flipy, int mode, int code, int color, int sx, int sy )
+void ssv_state::draw_16x16_tiles(bitmap_ind16 &bitmap, const rectangle &clip, int flipx, int flipy, int mode, int code, int color, int sx, int sy)
 {
 	/* Force 16x16 tiles ? */
-	int xstart, xend, xinc;
 	int ystart, yend, yinc;
-
-	if (flipx) { xstart = 0;  xend = -1; xinc = -1; }
-	else { xstart = 0;    xend = 1;  xinc = +1; }
 
 	if (flipy) { ystart = 1;  yend = -1; yinc = -1; }
 	else { ystart = 0;    yend = 2;  yinc = +1; }
 
-	/* Draw a tile (16x16) */
-	for (int tx = xstart; tx != xend; tx += xinc)
+	for (int ty = ystart; ty != yend; ty += yinc)
 	{
-		for (int ty = ystart; ty != yend; ty += yinc)
-		{
-			int shadow = (mode & 0x0800);
-			/* Select 256 or 64 color tiles */
-			int gfx = ((mode & 0x0100) ? 0 : 1);
+		int shadow = (mode & 0x0800);
+		/* Select 256 or 64 color tiles */
+		int gfx = ((mode & 0x0100) ? 0 : 1);
 
-			drawgfx(bitmap, clip, m_gfxdecode->gfx(gfx),
-				code++,
-				color,
-				flipx, flipy,
-				sx + tx * 16, sy + ty * 8,
-				shadow);
-		} /* ty */
-	} /* tx */
+		drawgfx(bitmap, clip, m_gfxdecode->gfx(gfx),
+			code++,
+			color,
+			flipx, flipy,
+			sx, sy + ty * 8,
+			shadow);
+	} /* ty */
+
 }
 
 
