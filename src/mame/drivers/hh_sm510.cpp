@@ -6987,7 +6987,7 @@ ROM_START( gnw_climber )
 	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "dr-106.melody", 0x000, 0x100, CRC(c99d7998) SHA1(4f8cf35b13f8b7654e7186bfd67d197d9053e949) )
+	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(c99d7998) SHA1(4f8cf35b13f8b7654e7186bfd67d197d9053e949) ) // dumped electronically, decap needed to verify accuracy
 
 	ROM_REGION( 542332, "svg", 0)
 	ROM_LOAD( "gnw_climber.svg", 0, 542332, CRC(d7e84c21) SHA1(a5b5b68c8cdb3a09966bfb91b281791bef311248) )
