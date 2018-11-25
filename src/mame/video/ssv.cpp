@@ -567,7 +567,7 @@ From the above some noteworthy cases are:
 /* Draw a tilemap sprite */
 
 
-void ssv_state::draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int flipx, int flipy, int mode, int code, int color, int sx, int sy, int line)
+void ssv_state::draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int flipx, int flipy, int mode, int code, int color, int sx, int sy, int realline, int line)
 {
 	/* Force 16x16 tiles ? */
 	int realcode;
@@ -591,7 +591,7 @@ void ssv_state::draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &clip
 	/* Select 256 or 64 color tiles */
 	int gfx = ((mode & 0x0100) ? 0 : 1);
 
-	drawgfx_line(bitmap, cliprect, m_gfxdecode->gfx(gfx), realcode, color, flipx, flipy, sx, sy, shadow, sy+line, tileline);
+	drawgfx_line(bitmap, cliprect, m_gfxdecode->gfx(gfx), realcode, color, flipx, flipy, sx, sy, shadow, realline, tileline);
 
 }
 
@@ -677,9 +677,12 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 					if (flipy == 0) flipy = 1; else flipy = 0;
 				}
 
-				for (int line = 0; line < 16; line++)
+				for (int innerline = 0; innerline < 16; innerline++)
 				{
-					draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, sy, line);
+					int realline = sy+innerline;
+
+					if (realline == line)
+						draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, sy, realline, innerline);
 				}
 
 				x += 0x10;
