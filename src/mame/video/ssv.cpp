@@ -138,15 +138,28 @@
 
 
 
-
-void ssv_state::drawgfx_inner(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t color, int x0, int y0, int dx, int dy, int x1, int y1, int shadow, const uint8_t* addr)
+void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
+	uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
+	int shadow)
 {
+	const uint8_t *addr = gfx->get_data(code  % gfx->elements());
+	const uint32_t realcolor = gfx->granularity() * (color % gfx->colors());
+
+	const int y0 = flipy ? (sy + gfx->height() - 1) : (sy);
+	const int y1 = flipy ? (sy - 1)                 : (y0 + gfx->height());
+	const int dy = flipy ? (-1)                     : (1);
+
 	for (int sy = y0; sy != y1; sy += dy)
 	{
+
 		if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 		{
 			uint8_t* source = (uint8_t*)addr;
 			uint16_t* dest = &bitmap.pix16(sy);
+
+			const int x0 = flipx ? (sx + gfx->width() - 1) : (sx);
+			const int x1 = flipx ? (sx - 1)                : (x0 + gfx->width());
+			const int dx = flipx ? (-1)                    : (1);
 
 			for (int sx = x0; sx != x1; sx += dx)
 			{
@@ -157,33 +170,12 @@ void ssv_state::drawgfx_inner(bitmap_ind16 &bitmap, const rectangle &cliprect, g
 					if (shadow)
 						dest[sx] = ((dest[sx] & m_shadow_pen_mask) | (pen << m_shadow_pen_shift)) & 0x7fff;                                                \
 					else
-						dest[sx] = (color + pen) & 0x7fff;
+						dest[sx] = (realcolor + pen) & 0x7fff;
 				}
 			}
 		}
 		addr += gfx->rowbytes();
 	}
-}
-
-
-void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
-					uint32_t code,uint32_t color,int flipx,int flipy,int x0,int y0,
-					int shadow )
-{
-	const uint8_t *addr;
-	int x1, dx;
-	int y1, dy;
-
-	addr    =   gfx->get_data(code  % gfx->elements());
-	color   =   gfx->granularity() * (color % gfx->colors());
-
-	if ( flipx )    {   x1 = x0-1;              x0 += gfx->width()-1;       dx = -1;    }
-	else            {   x1 = x0 + gfx->width();                         dx =  1;    }
-
-	if ( flipy )    {   y1 = y0-1;              y0 += gfx->height()-1;  dy = -1;    }
-	else            {   y1 = y0 + gfx->height();                            dy =  1;    }
-
-	drawgfx_inner(bitmap, cliprect, gfx, color, x0, y0, dx, dy, x1, y1, shadow, addr);
 }
 
 
