@@ -710,6 +710,7 @@ MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_DEVICE_PROGRAM_MAP(limenko_map)
 	MCFG_DEVICE_IO_MAP(limenko_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -749,6 +750,7 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_DEVICE_PROGRAM_MAP(spotty_map)
 	MCFG_DEVICE_IO_MAP(spotty_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	MCFG_DEVICE_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, limenko_state, spotty_sound_r))

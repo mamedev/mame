@@ -176,6 +176,8 @@ uint32_t vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &b
 MACHINE_CONFIG_START(vegaeo_state::vega)
 	MCFG_DEVICE_ADD("maincpu", GMS30C2132, XTAL(55'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(vega_map)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vegaeo_state, eolith_speedup, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)

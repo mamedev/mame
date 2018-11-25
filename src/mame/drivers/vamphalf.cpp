@@ -1109,6 +1109,7 @@ MACHINE_CONFIG_START(vamphalf_state::common)
 	MCFG_DEVICE_ADD("maincpu", E116T, 50000000)    /* 50 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(common_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	// various games require fast timing to save settings, probably because our Hyperstone core timings are incorrect
 	EEPROM_93C46_16BIT(config, "eeprom")
@@ -1189,6 +1190,7 @@ MACHINE_CONFIG_START(vamphalf_qdsp_state::misncrft)
 	MCFG_DEVICE_PROGRAM_MAP(common_map)
 	MCFG_DEVICE_IO_MAP(misncrft_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	sound_qs1000(config);
 MACHINE_CONFIG_END
@@ -1250,6 +1252,7 @@ MACHINE_CONFIG_START(vamphalf_state::mrdig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(mrdig_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	sound_ym_oki(config);
 MACHINE_CONFIG_END
@@ -1260,6 +1263,8 @@ MACHINE_CONFIG_START(vamphalf_qdsp_state::wyvernwg)
 	MCFG_DEVICE_PROGRAM_MAP(common_32bit_map)
 	MCFG_DEVICE_IO_MAP(wyvernwg_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
+
 
 	sound_qs1000(config);
 MACHINE_CONFIG_END
@@ -1270,6 +1275,7 @@ MACHINE_CONFIG_START(vamphalf_nvram_state::finalgdr)
 	MCFG_DEVICE_PROGRAM_MAP(common_32bit_map)
 	MCFG_DEVICE_IO_MAP(finalgdr_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1282,6 +1288,7 @@ MACHINE_CONFIG_START(vamphalf_nvram_state::mrkickera)
 	MCFG_DEVICE_PROGRAM_MAP(common_32bit_map)
 	MCFG_DEVICE_IO_MAP(mrkickera_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1295,6 +1302,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_DEVICE_PROGRAM_MAP(aoh_map)
 	MCFG_DEVICE_IO_MAP(aoh_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -1341,6 +1349,7 @@ MACHINE_CONFIG_START(vamphalf_qdsp_state::yorijori)
 	MCFG_DEVICE_PROGRAM_MAP(yorijori_32bit_map)
 	MCFG_DEVICE_IO_MAP(yorijori_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	sound_qs1000(config);
 MACHINE_CONFIG_END

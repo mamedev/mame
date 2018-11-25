@@ -405,6 +405,7 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_DEVICE_PROGRAM_MAP(pasha2_map)
 	MCFG_DEVICE_IO_MAP(pasha2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pasha2_state,  irq0_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	MCFG_DEVICE_ADD("audiocpu", AT89C52, 12000000)     /* clock from docs */
 	/* TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used */

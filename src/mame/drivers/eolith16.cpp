@@ -162,6 +162,8 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 MACHINE_CONFIG_START(eolith16_state::eolith16)
 	MCFG_DEVICE_ADD("maincpu", E116T, XTAL(60'000'000))        /* no internal multiplier */
 	MCFG_DEVICE_PROGRAM_MAP(eolith16_map)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 
 	EEPROM_93C66_8BIT(config, "eeprom");

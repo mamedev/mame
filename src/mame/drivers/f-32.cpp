@@ -174,6 +174,7 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	MCFG_DEVICE_PROGRAM_MAP(common_map)
 	MCFG_DEVICE_IO_MAP(mosaicf2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	EEPROM_93C46_16BIT(config, "eeprom")
 		.erase_time(attotime::from_usec(1))
@@ -253,6 +254,7 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	MCFG_DEVICE_PROGRAM_MAP(royalpk2_map)
 	MCFG_DEVICE_IO_MAP(royalpk2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	EEPROM_93C46_16BIT(config, "eeprom")
 		.erase_time(attotime::from_usec(1))

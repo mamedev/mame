@@ -540,6 +540,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(eolith_state::eolith45)
 	MCFG_DEVICE_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(eolith_map)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour, causes service mode to be black screen in landbrk + clones.
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
 
 	/* Sound CPU */

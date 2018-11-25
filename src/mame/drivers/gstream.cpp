@@ -835,6 +835,7 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 	MCFG_DEVICE_PROGRAM_MAP(gstream_32bit_map)
 	MCFG_DEVICE_IO_MAP(gstream_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -868,6 +869,7 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 	MCFG_DEVICE_PROGRAM_MAP(x2222_32bit_map)
 	MCFG_DEVICE_IO_MAP(x2222_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

@@ -434,6 +434,7 @@ MACHINE_CONFIG_START(dgpix_state::dgpix)
 	MCFG_DEVICE_ADD("maincpu", E132XT, 20000000*4) /* 4x internal multiplier */
 	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 /*
     unknown 16bit sound cpu, embedded inside the KS0164 sound chip

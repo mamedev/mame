@@ -470,6 +470,7 @@ MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 	MCFG_DEVICE_PROGRAM_MAP(mjsenpu_32bit_map)
 	MCFG_DEVICE_IO_MAP(mjsenpu_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
+	MCFG_CPU_FORCE_NO_DRC() // DRC FIXME: causes hangs after just over half an hour
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
