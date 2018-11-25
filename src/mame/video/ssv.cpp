@@ -669,14 +669,23 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		if ((unknown & 0x05ff) == 0x0440) tilemap_scrollx += -0x10;
 		if ((unknown & 0x05ff) == 0x0401) tilemap_scrollx += -0x20;
 
+		int realy = tilemap_scrolly + (line - in_sy);
+
+		if ((mode & 0x1000))
+		{
+			uint32_t scrolltable_base = ((mode & 0x00ff) * 0x400 ) /2;
+			//logerror("line %d realy %04x: scrolltable base is %08x\n", line,realy&0x1ff, scrolltable_base*2);
+			tilemap_scrollx += m_spriteram[(scrolltable_base+(realy&0x1ff)) & 0x1ffff];
+		}
+
 		/* Draw the rows */
 		int sx1 = 0 - (tilemap_scrollx & 0xf);
 		int x = tilemap_scrollx;
 		for (int sx = sx1; sx <= clip.max_x; sx += 0x10)
 		{
 			int code, attr, flipx, flipy;
-			get_tile(x, tilemap_scrolly + (line - in_sy), size, page, code, attr, flipx, flipy);
-			draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, tilemap_scrolly + (line - in_sy), line,(tilemap_scrolly + (line - in_sy)) & 0xf);
+			get_tile(x, realy, size, page, code, attr, flipx, flipy);
+			draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, realy, line,realy & 0xf);
 			x += 0x10;
 		} /* sx */
 	} /* line */
