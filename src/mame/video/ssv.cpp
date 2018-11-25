@@ -657,11 +657,11 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		int sx1 = 0 - (foo_x & 0xf);
 		int sy1 = in_sy - (foo_y & 0xf);
 
-		int sy, y;
-		for (sy = sy1, y = foo_y; sy <= clip.max_y; sy += 0x10, y += 0x10)
+		int y = foo_y;
+		for (int sy = sy1; sy <= clip.max_y; sy += 0x10)
 		{
-			int sx, x;
-			for (sx = sx1, x = foo_x; sx <= clip.max_x; sx += 0x10, x += 0x10)
+			int x = foo_x;
+			for (int sx = sx1; sx <= clip.max_x; sx += 0x10)
 			{
 				uint16_t* s3 = &m_spriteram[page * (size * ((0x1000 / 0x200) / 2)) +
 					((x & ((size - 1) & ~0xf)) << 2) +
@@ -685,8 +685,9 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 				}
 
 				draw_16x16_tiles(bitmap, clip, flipx, flipy, mode, code, attr, sx, sy);
-
+				x += 0x10;
 			} /* sx */
+			y += 0x10;
 		} /* sy */
 	} /* line */
 }
