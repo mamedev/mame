@@ -743,22 +743,22 @@ void ssv_state::draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &clipre
 void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Sprites list */
-	uint16_t *s1 = m_spriteram;
-	uint16_t *end1 = m_spriteram + 0x02000 / 2;
+	uint16_t *spritelist_global = m_spriteram;
+	uint16_t *spritelist_global_end = m_spriteram + 0x02000 / 2;
 
-	for (; s1 < end1; s1 += 4)
+	for (; spritelist_global < spritelist_global_end; spritelist_global += 4)
 	{
-		int mode = s1[0];
-		int sprite = s1[1];
-		int xoffs = s1[2];
-		int yoffs = s1[3];
+		int mode = spritelist_global[0];
+		int sprite = spritelist_global[1];
+		int xoffs = spritelist_global[2];
+		int yoffs = spritelist_global[3];
 
 		/* Last sprite */
 		if (sprite & 0x8000) break;
 
 		/* Single-sprite address */
-		uint16_t* s2 = &m_spriteram[(sprite & 0x7fff) * 4];
-		int tilemaps_offsy = ((s2[3] & 0x1ff) - (s2[3] & 0x200));
+		uint16_t* spritelist_local = &m_spriteram[(sprite & 0x7fff) * 4];
+		int tilemaps_offsy = ((spritelist_local[3] & 0x1ff) - (spritelist_local[3] & 0x200));
 
 		/* Every single sprite is offset by x & yoffs, and additionally
 		by one of the 8 x & y offsets in the 1c0040-1c005f area   */
@@ -769,14 +769,14 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		/* Number of single-sprites int local list (1-32) */
 		int local_num = (mode & 0x001f);
 
-		for (int count = 0; count <= local_num; count++, s2 += 4)
+		for (int count = 0; count <= local_num; count++, spritelist_local += 4)
 		{
-			uint16_t *end2 = m_spriteram + 0x40000 / 2;
+			uint16_t *spritelist_local_end = m_spriteram + 0x40000 / 2;
 
-			if (s2 >= end2) break;
+			if (spritelist_local >= spritelist_local_end) break;
 
-			int sx = s2[2];
-			int sy = s2[3];
+			int sx = spritelist_local[2];
+			int sy = spritelist_local[3];
 
 			/* do we use local sizes (set here) or global ones (set in previous list) */
 			int use_local = m_scroll[0x76 / 2] & 0x4000;
@@ -785,12 +785,12 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			int ynum = use_local ? (sy & 0x0c00) : (mode & 0x0300) << 2;
 			int depth = use_local ? (sx & 0xf000) : (mode & 0xf000);
 
-			if (s2[0] <= 7 && s2[1] == 0 && xnum == 0 && ynum == 0x0c00)
+			if (spritelist_local[0] <= 7 && spritelist_local[1] == 0 && xnum == 0 && ynum == 0x0c00)
 			{
 				// Tilemap Sprite
 				int scroll;
 
-				scroll = s2[0];    // scroll index
+				scroll = spritelist_local[0];    // scroll index
 
 				if (m_scroll[0x76 / 2] & 0x1000)
 					sy -= 0x20;                     // eaglshot
@@ -820,8 +820,8 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 											121400: 51a0 0042 6800 0c00 needs to be a normal sprite
 				*/
 
-				int code = s2[0];  // code high bits
-				int attr = s2[1];  // code low  bits + color
+				int code = spritelist_local[0];  // code high bits
+				int attr = spritelist_local[1];  // code low  bits + color
 
 				/* Code's high bits are scrambled */
 				code += m_tile_code[(attr & 0x3c00) >> 10];
@@ -887,7 +887,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				}
 				else
 				{
-					// hypreact, hypreac2, janjans1, meosism, ryorioh, survarts, sxyreact, sxyreac2, vasara, vasara2
+					// hypreact, hypreac2, janjanspritelist_global, meosism, ryorioh, survarts, sxyreact, sxyreac2, vasara, vasara2
 					sx = sprites_offsx + sx;
 					sy = sprites_offsy - sy - (ynum * 8);
 				}
