@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Graves, R. Belmont
+// copyright-holders:David Graves, R. Belmont, David Haywood
 /***************************************************************************
 
 Excellent System's ES-9209B Hardware
@@ -95,7 +95,9 @@ NOTE: Mask ROMs from Power Flipper Pinball Shooting have not been dumped, but as
 
 TIMER_DEVICE_CALLBACK_MEMBER(gcpinbal_state::scanline_cb)
 {
-	m_screen->update_partial(m_screen->vpos());
+	
+	if (param>=16)
+		m_screen->update_partial(m_screen->vpos()-1);
 
 	if (param==240)
 		m_maincpu->set_input_line(1, HOLD_LINE); // V-blank
