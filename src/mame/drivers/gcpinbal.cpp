@@ -26,7 +26,7 @@ TODO
  - Modernize ES-8712 and hook up to MSM6585 and HCT157
  - Figure out which customs use D80010-D80077 and merge implementation with Aquarium
  - Is SW3 actually used?
- - Power Flipper reference video: https://www.youtube.com/watch?v=zBGjncVsSf4
+ - Power Flipper reference video: https://www.youtube.com/watch?v=zBGjncVsSf4 (seems to have been recorded with 'flipscreen' dipswitch on, because it causes a jumping glitch before the raster effect, same in MAME)
 
 BGMs (controlled by OKI MSM6585 sound chip)
   MSM6585: is an upgraded MSM5205 voice synth IC.
