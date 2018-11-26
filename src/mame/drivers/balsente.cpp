@@ -39,6 +39,7 @@
     Known bugs:
         * CEM3394 emulation is not perfect
         * Shrike Avenger doesn't work properly
+        * unktp set runs on different hardware which isn't emulated yet
 
     Other:
         * Some of the cartridge types are unknown
@@ -233,6 +234,9 @@ DIP locations verified for:
 #include "cpu/m68000/m68000.h"
 #include "machine/clock.h"
 #include "machine/watchdog.h"
+#include "machine/z80ctc.h"
+#include "sound/ay8910.h"
+#include "sound/msm5205.h"
 #include "sound/cem3394.h"
 #include "speaker.h"
 
@@ -312,6 +316,19 @@ void balsente_state::cpu2_io_map(address_map &map)
 	map(0x0e, 0x0f).w(FUNC(balsente_state::chip_select_w));
 }
 
+
+// TODO: banking
+void balsente_state::cpu2_unktp_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x1fff).ram();
+}
+
+// TODO: hookup 2x Z80CTC, 2x AY8910A, 1x M5205
+void balsente_state::cpu2_unktp_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 
 /*************************************
@@ -1304,16 +1321,16 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(balsente_state::balsente)
-
+void balsente_state::balsente(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 20_MHz_XTAL / 16) /* xtal verified but not speed */
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", balsente_state, update_analog_inputs)
+	MC6809E(config, m_maincpu, 20_MHz_XTAL / 16); /* xtal verified but not speed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(balsente_state::update_analog_inputs));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL / 2) /* xtal verified but not speed */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_IO_MAP(cpu2_io_map)
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2); /* xtal verified but not speed */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu2_map);
+	m_audiocpu->set_addrmap(AS_IO, &balsente_state::cpu2_io_map);
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set(m_audiouart, FUNC(acia6850_device::write_rxd));
@@ -1335,8 +1352,8 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", balsente_state, interrupt_timer)
-	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, clock_counter_0_ff)
+	TIMER(config, m_scanline_timer, 0).configure_generic(timer_device::expired_delegate(FUNC(balsente_state::interrupt_timer), this));
+	TIMER(config, m_counter_0_timer, 0).configure_generic(timer_device::expired_delegate(FUNC(balsente_state::clock_counter_0_ff), this));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->out_handler<0>().set(FUNC(balsente_state::counter_0_set_out));
@@ -1357,76 +1374,99 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 	m_outlatch->q_out_cb<7>().set(FUNC(balsente_state::nvrecall_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(BALSENTE_PIXEL_CLOCK, BALSENTE_HTOTAL, BALSENTE_HBEND, BALSENTE_HBSTART, BALSENTE_VTOTAL, BALSENTE_VBEND, BALSENTE_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(balsente_state, screen_update_balsente)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(BALSENTE_PIXEL_CLOCK, BALSENTE_HTOTAL, BALSENTE_HBEND, BALSENTE_HBSTART, BALSENTE_VTOTAL, BALSENTE_VBEND, BALSENTE_VBSTART);
+	m_screen->set_screen_update(FUNC(balsente_state::screen_update_balsente));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
+	PALETTE(config, m_palette, 1024);
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_CEM3394_ADD("cem1", 0)
-	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_0)
-	MCFG_CEM3394_VCO_ZERO(431.894)
-	MCFG_CEM3394_FILTER_ZERO(1300.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	CEM3394(config, m_cem_device[0], 0);
+	m_cem_device[0]->set_ext_input_callback(FUNC(balsente_state::noise_gen_0), this);
+	m_cem_device[0]->set_vco_zero_freq(431.894);
+	m_cem_device[0]->set_filter_zero_freq(1300.0);
+	m_cem_device[0]->add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_CEM3394_ADD("cem2", 0)
-	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_1)
-	MCFG_CEM3394_VCO_ZERO(431.894)
-	MCFG_CEM3394_FILTER_ZERO(1300.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	CEM3394(config, m_cem_device[1], 0);
+	m_cem_device[1]->set_ext_input_callback(FUNC(balsente_state::noise_gen_1), this);
+	m_cem_device[1]->set_vco_zero_freq(431.894);
+	m_cem_device[1]->set_filter_zero_freq(1300.0);
+	m_cem_device[1]->add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_CEM3394_ADD("cem3", 0)
-	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_2)
-	MCFG_CEM3394_VCO_ZERO(431.894)
-	MCFG_CEM3394_FILTER_ZERO(1300.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	CEM3394(config, m_cem_device[2], 0);
+	m_cem_device[2]->set_ext_input_callback(FUNC(balsente_state::noise_gen_2), this);
+	m_cem_device[2]->set_vco_zero_freq(431.894);
+	m_cem_device[2]->set_filter_zero_freq(1300.0);
+	m_cem_device[2]->add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_CEM3394_ADD("cem4", 0)
-	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_3)
-	MCFG_CEM3394_VCO_ZERO(431.894)
-	MCFG_CEM3394_FILTER_ZERO(1300.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	CEM3394(config, m_cem_device[3], 0);
+	m_cem_device[3]->set_ext_input_callback(FUNC(balsente_state::noise_gen_3), this);
+	m_cem_device[3]->set_vco_zero_freq(431.894);
+	m_cem_device[3]->set_filter_zero_freq(1300.0);
+	m_cem_device[3]->add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_CEM3394_ADD("cem5", 0)
-	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_4)
-	MCFG_CEM3394_VCO_ZERO(431.894)
-	MCFG_CEM3394_FILTER_ZERO(1300.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	CEM3394(config, m_cem_device[4], 0);
+	m_cem_device[4]->set_ext_input_callback(FUNC(balsente_state::noise_gen_4), this);
+	m_cem_device[4]->set_vco_zero_freq(431.894);
+	m_cem_device[4]->set_filter_zero_freq(1300.0);
+	m_cem_device[4]->add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_CEM3394_ADD("cem6", 0)
-	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_5)
-	MCFG_CEM3394_VCO_ZERO(431.894)
-	MCFG_CEM3394_FILTER_ZERO(1300.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_CONFIG_END
+	CEM3394(config, m_cem_device[5], 0);
+	m_cem_device[5]->set_ext_input_callback(FUNC(balsente_state::noise_gen_5), this);
+	m_cem_device[5]->set_vco_zero_freq(431.894);
+	m_cem_device[5]->set_filter_zero_freq(1300.0);
+	m_cem_device[5]->add_route(ALL_OUTPUTS, "mono", 0.90);
+}
 
 
-MACHINE_CONFIG_START(balsente_state::shrike)
+void balsente_state::shrike(machine_config &config)
+{
 	balsente(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_ADD("68k", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(shrike68k_map)
+	M68000(config, m_68k, 8000000);
+	m_68k->set_addrmap(AS_PROGRAM, &balsente_state::shrike68k_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(6000);
+}
 
 
-MACHINE_CONFIG_START(balsente_state::rescraid)
+void balsente_state::rescraid(machine_config &config)
+{
 	balsente(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_smudge_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu1_smudge_map);
+}
 
+void balsente_state::unktp(machine_config &config)
+{
+	balsente(config);
 
+	// sound PCB has: 2x Z80CTC, 2x AY8910A, 1x M5205, 1x 8MHz XTAL (divisor unknown for every device)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &balsente_state::cpu2_unktp_map);
+	m_audiocpu->set_addrmap(AS_IO, &balsente_state::cpu2_unktp_io_map);
+
+	Z80CTC(config, "ctc1", 8_MHz_XTAL / 2);
+	Z80CTC(config, "ctc2", 8_MHz_XTAL / 2);
+
+	AY8910(config, "ay1", 8_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.90);
+	AY8910(config, "ay2", 8_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.90);
+
+	MSM5205(config, "msm", 384000).add_route(ALL_OUTPUTS, "mono", 0.90);
+
+	config.device_remove("cem1");
+	config.device_remove("cem2");
+	config.device_remove("cem3");
+	config.device_remove("cem4");
+	config.device_remove("cem5");
+	config.device_remove("cem6");
+}
 
 /*************************************
  *
@@ -1834,6 +1874,26 @@ ROM_START( triviaes )
 	MOTHERBOARD_PALS
 ROM_END
 
+ROM_START( triviaes2 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // all 27128
+	ROM_LOAD( "tpe-2cd45.u2a",  0x10000, 0x04000, CRC(ef26b178) SHA1(7bf0453de9192f37f7c8855aaa752c5374e72eb8) )
+	ROM_LOAD( "tpe-2ab23.u7a",  0x14000, 0x04000, CRC(348dc874) SHA1(eb5719db02f9cdfcfba47a93f0a4f2745ba96836) )
+	ROM_LOAD( "tpe-2cd01.u4a",  0x18000, 0x04000, CRC(9695d8ed) SHA1(9849dbe3303335f7f0568aa0f45a431d60602e54) )
+	ROM_LOAD( "tpe-2ab67.u5a",  0x1c000, 0x04000, CRC(808a3e1e) SHA1(ac34a131fea30729bb81a47cc6742a296ce65770) )
+	ROM_LOAD( "tpe-2ab01.u8a",  0x20000, 0x04000, CRC(39ddbafd) SHA1(bb06ad80be7c49d0e2c6762b3e2220a85c273c99) )
+	ROM_LOAD( "tpe-2cd23.u3a",  0x2c000, 0x04000, CRC(dacd287e) SHA1(3667c835a2b1f35ff69aa28d4f33824f4e457e1a) )
+	ROM_LOAD( "tpe-2cdef.u1a",  0x24000, 0x04000, CRC(22f9e1b4) SHA1(f5f5d9dadcd12f8e8f3a715854243f6da8678c23) )
+	ROM_LOAD( "tpe-2ab45.u6a",  0x28000, 0x04000, CRC(cf48b8eb) SHA1(f63590bcdd7e17d85f4f490640785e8828358f93) )
+
+	SOUNDBOARD_ROMS // 2764 labeled with handwritten 'PANEA'
+
+	ROM_REGION( 0x10000, "gfx1", 0 ) // all 27128
+	ROM_LOAD( "tpegr01.u6b", 0x00000, 0x4000, CRC(6829de8e) SHA1(4ec494883ba358f2ac7ce8d5a623a2f34b5bc843) )
+	ROM_LOAD( "tpegr23.u5b", 0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
+	ROM_LOAD( "tpegr45.u4b", 0x08000, 0x4000, CRC(1242033e) SHA1(1a3fe186bb261e2c7d9fbbb2a3103b39bf029b35) )
+
+	MOTHERBOARD_PALS
+ROM_END
 
 ROM_START( gimeabrk )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -2272,7 +2332,27 @@ ROM_START( shrike )
 	MOTHERBOARD_PALS
 ROM_END
 
+ROM_START( unktp ) // 2PCB set: main PCB marked 87111801 and MAB-016, sound PCB marked COM
+	ROM_REGION( 0x40000, "maincpu", 0 ) // all 27256, ROM loading order probably wrong
+	ROM_LOAD( "tpe-35-volumen 4.ic35",  0x20000, 0x08000, CRC(8233c9af) SHA1(1853cbff5ff9b0bed4c12717ef705f6ee9679622) )
+	ROM_LOAD( "tpe-43-volumen 4.ic43",  0x18000, 0x08000, CRC(b404b163) SHA1(de30b47d08765a953b01cc3a6bdd95938af6b3d8) )
+	ROM_LOAD( "tpe-53-volumen 4.ic53",  0x10000, 0x08000, CRC(64e439d9) SHA1(f5fe3fa38997c1088c16361f8949648acc353c57) )
+	ROM_LOAD( "tpe-60-volumen 4.ic60",  0x28000, 0x08000, CRC(0773a142) SHA1(5654ece65be7714b25970f08ba876b9766d8ebb5) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // all 27256
+	ROM_LOAD( "tpe-2a0.bin", 0x00000, 0x8000, CRC(9aefea1d) SHA1(2af60e19de37533a5ad111de4c6b58de41be92fd) )
+	ROM_LOAD( "tpe-2b0.bin", 0x08000, 0x8000, CRC(ddcb4f6f) SHA1(f29c97ccc6711c433e104a8fc738ff390ba102e8) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 ) // all 27128, ROM loading order probably wrong
+	ROM_LOAD( "tpe-8.ic8",   0x00000, 0x4000, CRC(0cde2421) SHA1(54604817a456f78110458e588c91c5029cf3189b) )
+	ROM_LOAD( "tpe-33.ic33", 0x04000, 0x4000, CRC(552c2f4f) SHA1(a72d112c70b2c7ffbb8d51cc76124d507a543e2b) )
+	ROM_LOAD( "tpe-57.ic57", 0x08000, 0x4000, CRC(90c8948a) SHA1(4b19bed71889756162dfe226eb531084603cf76f) )
+	ROM_LOAD( "tpe-73.ic73", 0x0c000, 0x4000, CRC(b15bc90b) SHA1(dc84717178a177904eb3ddbeeaae5fc9b19b4a12) )
+
+	ROM_REGION( 0x400, "motherbrd_pals", 0) /* Motherboard PAL's */ \
+	ROM_LOAD( "pal16l8a.ic31", 0x000, 0x104, NO_DUMP ) /* PAL16L8 */
+	ROM_LOAD( "pal16l8a.ic51", 0x200, 0x104, NO_DUMP ) /* PAL16L8 */
+ROM_END
 
 /*************************************
  *
@@ -2381,6 +2461,7 @@ void balsente_state::init_triviag2()
 	expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */);
 }
 void balsente_state::init_triviaes()  { expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */); }
+void balsente_state::init_triviaes2() { expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */); }
 void balsente_state::init_gimeabrk()  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
 void balsente_state::init_minigolf()  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 2); }
 void balsente_state::init_minigolf2() { expand_roms(0x0c);        config_shooter_adc(false, 2); }
@@ -2451,45 +2532,50 @@ GAME( 1984, hattrick,  0,        balsente, hattrick, balsente_state, init_hattri
 GAME( 1984, trivia12,  triviag1, balsente, triviag1, balsente_state, init_triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (12/14/84)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown (From a picture on eBay Snacks'n Jaxson does not match any documented types here.) */
-GAME( 1984, otwalls,   0,        balsente, otwalls,  balsente_state, init_otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, snakepit,  0,        balsente, sentetst, balsente_state, init_snakepit, ROT0, "Bally/Sente",  "Snake Pit", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, snakepit2, snakepit, balsente, sentetst, balsente_state, init_snakepit, ROT0, "Sente Technologies Inc.", "Snake Pit (9/14/84)", MACHINE_SUPPORTS_SAVE ) // 1984, even though titlescreen says 1983
-GAME( 1984, snakjack,  0,        balsente, snakjack, balsente_state, init_snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, otwalls,   0,        balsente, otwalls,  balsente_state, init_otwalls,   ROT0, "Bally/Sente",  "Off the Wall (Sente)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, snakepit,  0,        balsente, sentetst, balsente_state, init_snakepit,  ROT0, "Bally/Sente",  "Snake Pit", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, snakepit2, snakepit, balsente, sentetst, balsente_state, init_snakepit,  ROT0, "Sente Technologies Inc.", "Snake Pit (9/14/84)", MACHINE_SUPPORTS_SAVE ) // 1984, even though titlescreen says 1983
+GAME( 1984, snakjack,  0,        balsente, snakjack, balsente_state, init_snakjack,  ROT0, "Bally/Sente",  "Snacks'n Jaxson", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8025-01-0B Rev B */
-GAMEL(1984, stocker,   0,        balsente, stocker,  balsente_state, init_stocker,  ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
-GAME( 1985, gimeabrk,  0,        balsente, gimeabrk, balsente_state, init_gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, minigolf,  0,        balsente, minigolf, balsente_state, init_minigolf, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, minigolf2, minigolf, balsente, minigolf2,balsente_state, init_minigolf2,ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviabb,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, grudge,    0,        balsente, grudge,   balsente_state, init_grudge,   ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
-GAME( 198?, grudgep,   grudge,   balsente, grudgep,  balsente_state, init_grudge,   ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
+GAMEL(1984, stocker,   0,        balsente, stocker,  balsente_state, init_stocker,   ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
+GAME( 1985, gimeabrk,  0,        balsente, gimeabrk, balsente_state, init_gimeabrk,  ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolf,  0,        balsente, minigolf, balsente_state, init_minigolf,  ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolf2, minigolf, balsente, minigolf2,balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviabb,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, grudge,    0,        balsente, grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
+GAME( 198?, grudgep,   grudge,   balsente, grudgep,  balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown  */
-GAME( 1984, triviag1,  0,        balsente, triviag1, balsente_state, init_triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviag2,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nametune,  0,        balsente, nametune, balsente_state, init_nametune, ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviag1,  0,        balsente, triviag1, balsente_state, init_triviag1,  ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviag2,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II Edition)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviasp,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, triviayp,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, triviaes,  0,        balsente, triviaes, balsente_state, init_triviaes,  ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle,    ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametune,  0,        balsente, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
+
+/* Board: 007-8001-01-0C Rev C1 */
+GAME( 1987, triviaes2, triviaes, balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Young Players Edition?, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // Young Players edition not present on title screen, but red background supposedly means this
 
 /* Board: 006-8030-01-0A Rev A */
-GAME( 1986, nametune2, nametune, balsente, nametune, balsente_state, init_nametune, ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nametune2, nametune, balsente, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8027-01-0B Rev B */
-GAME( 1986, nstocker,  0,        balsente, nstocker, balsente_state, init_nstocker, ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nstocker2, nstocker, balsente, nstocker, balsente_state, init_nstocker, ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sfootbal,  0,        balsente, sfootbal, balsente_state, init_sfootbal, ROT0, "Bally/Sente",  "Street Football (11/12/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker,    0,        balsente, spiker,   balsente_state, init_spiker,   ROT0, "Bally/Sente",  "Spiker", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker2,   spiker,   balsente, spiker,   balsente_state, init_spiker,   ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker3,   spiker,   balsente, spiker,   balsente_state, init_spiker,   ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stompin,   0,        balsente, stompin,  balsente_state, init_stompin,  ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nstocker,  0,        balsente, nstocker, balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nstocker2, nstocker, balsente, nstocker, balsente_state, init_nstocker,  ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sfootbal,  0,        balsente, sfootbal, balsente_state, init_sfootbal,  ROT0, "Bally/Sente",  "Street Football (11/12/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker,    0,        balsente, spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker2,   spiker,   balsente, spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker3,   spiker,   balsente, spiker,   balsente_state, init_spiker,    ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stompin,   0,        balsente, stompin,  balsente_state, init_stompin,   ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: A084-91889-A000 (Not a cartridge, but dedicated board) */
-GAME( 1987, rescraid,  0,        rescraid, rescraid, balsente_state, init_rescraid, ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rescraid,  0,        rescraid, rescraid, balsente_state, init_rescraid,  ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown */
-GAME( 1986, shrike,    0,        shrike,   shrike,   balsente_state, init_shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rescraida, rescraid, rescraid, rescraid, balsente_state, init_rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teamht,    0,        balsente, teamht,   balsente_state, init_teamht,   ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shrike,    0,        shrike,   shrike,   balsente_state, init_shrike,    ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rescraida, rescraid, rescraid, rescraid, balsente_state, init_rescraid,  ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teamht,    0,        balsente, teamht,   balsente_state, init_teamht,    ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
+
+GAME( 198?, unktp,     0,        balsente, triviaes, balsente_state, init_triviaes2, ROT0, "bootleg?",     "unknown Trivial Pursuit bootleg", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different (bootleg?) hardware. maincpu ROMs structure clearly similar to Trivial Pursuit games
