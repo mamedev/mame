@@ -10,15 +10,14 @@
 * Some of this will probably be applicable to HP 3468A units too.
 *
 * Current status : runs, AD LINK ERROR on stock ROM due to unimplemented AD link
-* - patching the AD comms, we get to a mostly functional state
+* - patching the AD comms, we get to a mostly functional state (for patch examples,
+*	see https://github.com/fenugrec/hp3478a_rompatch )
 * - pressing Shift+Sgl to force a 'test/reset' gets the firmware in an endless loop, not sure why.
 *
 *
 * TODO next level
-* * annunciators
-* * DIP switches
 * * do something for analog CPU serial link (not quite uart), or dump+emulate CPU
-* * better display render and layout (show button subtext)
+* * better display render and layout (annunciators + show button subtext)
 *
 * TODO level 9000
 * * Connect this with the existing i8291.cpp driver
@@ -152,13 +151,6 @@ WRITE8_MEMBER( hp3478a_state::p2write )
 	}
 
 	p2_oldstate = data;
-}
-
-
-READ8_MEMBER( hp3478a_state::dipread )
-{
-	logerror("dip read unimpl\n");
-	return 0;
 }
 
 
@@ -497,7 +489,7 @@ void hp3478a_state::io_bank(address_map &map)
 	map.unmap_value_high();
 	map(0x000, 0x0ff).ram().region("nvram", 0).share("nvram").w(FUNC(hp3478a_state::nvwrite));
 	map(0x100, 0x107).ram().share("gpibregs");	//XXX TODO : connect to i8291.cpp
-	map(0x200, 0x2ff).r(FUNC(hp3478a_state::dipread));
+	map(0x200, 0x2ff).portr("DIP");
 }
 
 
@@ -537,6 +529,48 @@ static INPUT_PORTS_START( hp3478a )
 	PORT_CONFNAME(1, 0, "CAL")
 	PORT_CONFSETTING(0x00, "disabled")
 	PORT_CONFSETTING(0x01, "enabled")
+
+	PORT_START("DIP")
+	PORT_DIPNAME( 0x1f, 0x17, "HP-IB Bus Address" ) PORT_DIPLOCATION("DIP:1,2,3,4,5")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x09, "9" )
+	PORT_DIPSETTING(    0x0a, "10" )
+	PORT_DIPSETTING(    0x0b, "11" )
+	PORT_DIPSETTING(    0x0c, "12" )
+	PORT_DIPSETTING(    0x0d, "13" )
+	PORT_DIPSETTING(    0x0e, "14" )
+	PORT_DIPSETTING(    0x0f, "15" )
+	PORT_DIPSETTING(    0x10, "16" )
+	PORT_DIPSETTING(    0x11, "17" )
+	PORT_DIPSETTING(    0x12, "18" )
+	PORT_DIPSETTING(    0x13, "19" )
+	PORT_DIPSETTING(    0x14, "20" )
+	PORT_DIPSETTING(    0x15, "21" )
+	PORT_DIPSETTING(    0x16, "22" )
+	PORT_DIPSETTING(    0x17, "23" )
+	PORT_DIPSETTING(    0x18, "24" )
+	PORT_DIPSETTING(    0x19, "25" )
+	PORT_DIPSETTING(    0x1a, "26" )
+	PORT_DIPSETTING(    0x1b, "27" )
+	PORT_DIPSETTING(    0x1c, "28" )
+	PORT_DIPSETTING(    0x1d, "29" )
+	PORT_DIPSETTING(    0x1e, "30" )
+	PORT_DIPSETTING(    0x1f, "31" )
+	PORT_DIPNAME( 0x20, 0x00, "PWR ON SRQ" ) PORT_DIPLOCATION("DIP:6")
+	PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPSETTING(    0x20, "Enabled" )
+	//0x40 unused
+	PORT_DIPNAME( 0x80, 0x00, "50/60Hz AC" ) PORT_DIPLOCATION("DIP:8")
+	PORT_DIPSETTING(    0x00, "60Hz" )
+	PORT_DIPSETTING(    0x80, "50Hz" )
 
 INPUT_PORTS_END
 

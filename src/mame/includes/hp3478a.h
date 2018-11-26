@@ -50,7 +50,6 @@ protected:
 
 	DECLARE_READ8_MEMBER(p1read);
 	DECLARE_WRITE8_MEMBER(p2write);
-	DECLARE_READ8_MEMBER(dipread);
 	DECLARE_WRITE8_MEMBER(nvwrite);
 
 	void io_bank(address_map &map);
