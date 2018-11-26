@@ -34,9 +34,11 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_nvram(*this, "nvram")
+		, m_nvram_raw(*this, "nvram")
 		, m_bank0(*this, "bank0")
 		, m_iobank(*this, "iobank")
 		, m_keypad(*this, "COL.%u", 0)
+		, m_calenable(*this, "CAL_EN")
 	{
 	}
 
@@ -49,6 +51,7 @@ protected:
 	DECLARE_READ8_MEMBER(p1read);
 	DECLARE_WRITE8_MEMBER(p2write);
 	DECLARE_READ8_MEMBER(dipread);
+	DECLARE_WRITE8_MEMBER(nvwrite);
 
 	void io_bank(address_map &map);
 	void i8039_io(address_map &map);
@@ -56,9 +59,11 @@ protected:
 
 	required_device<i8039_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
+	required_shared_ptr<uint8_t> m_nvram_raw;
 	required_memory_bank m_bank0;
 	required_device<address_map_bank_device> m_iobank;
 	required_ioport_array<4> m_keypad;
+	required_ioport m_calenable;
 
 	/////////////// stuff for internal LCD emulation
 	// could be split to a separate driver ?

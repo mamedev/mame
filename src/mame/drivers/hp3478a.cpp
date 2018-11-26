@@ -10,10 +10,8 @@
 * Some of this will probably be applicable to HP 3468A units too.
 *
 * Current status : runs, AD LINK ERROR on stock ROM due to unimplemented AD link
-* - patching the AD comms, we get to a functional state but with an altered display
-* due to the CAL RAM not being write-protected.
+* - patching the AD comms, we get to a mostly functional state
 * - pressing Shift+Sgl to force a 'test/reset' gets the firmware in an endless loop, not sure why.
-*
 *
 *
 * TODO next level
@@ -21,7 +19,6 @@
 * * DIP switches
 * * do something for analog CPU serial link (not quite uart), or dump+emulate CPU
 * * better display render and layout (show button subtext)
-* * "cal enable" switch must make NVRAM write-protected
 *
 * TODO level 9000
 * * Connect this with the existing i8291.cpp driver
@@ -82,16 +79,16 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 #define GPIB_ENTRY 1
 #define DIP_ENTRY 2
 
-/**** optional debug outputs, must be before #include */
+/**** optional debug outputs, must be before #include logmacro.*/
 #define DEBUG_PORTS (LOG_GENERAL << 1)
 #define DEBUG_BANKING (LOG_GENERAL << 2)
-#define DEBUG_BUS (LOG_GENERAL << 3)
+#define DEBUG_BUS (LOG_GENERAL << 3)	//not used after all
 #define DEBUG_KEYPAD (LOG_GENERAL << 4)
 #define DEBUG_LCD (LOG_GENERAL << 5)	//low level
 #define DEBUG_LCD2 (LOG_GENERAL << 6)
 #define DEBUG_CAL (LOG_GENERAL << 7)
 
-#define VERBOSE (DEBUG_KEYPAD)
+#define VERBOSE (DEBUG_BUS)	//can be combined, like (DEBUG_CAL | DEBUG_KEYPAD)
 
 #include "logmacro.h"
 
@@ -115,11 +112,6 @@ READ8_MEMBER( hp3478a_state::p1read )
 	return data;
 }
 
-READ8_MEMBER( hp3478a_state::dipread )
-{
-	logerror("dip read unimpl\n");
-	return 0;
-}
 
 /** a lot of stuff multiplexed on the P2 pins.
  * parse the chipselect lines, A12 line, and LCD interface.
@@ -163,6 +155,23 @@ WRITE8_MEMBER( hp3478a_state::p2write )
 }
 
 
+READ8_MEMBER( hp3478a_state::dipread )
+{
+	logerror("dip read unimpl\n");
+	return 0;
+}
+
+
+/* CAL RAM write handler, to implement "CAL enable" front panel switch
+*/
+WRITE8_MEMBER( hp3478a_state::nvwrite ) {
+	if (m_calenable->read()) {
+		m_nvram_raw[offset] = data;
+		LOGMASKED(DEBUG_CAL, "write %02X to cal[%02X]\n", data, offset);
+	} else {
+		LOGMASKED(DEBUG_CAL, "write %02X to cal[%02X]:dropped\n", data, offset);
+	}
+}
 
 
 /**** LCD emulation
@@ -486,7 +495,7 @@ void hp3478a_state::i8039_io(address_map &map)
 void hp3478a_state::io_bank(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000, 0x0ff).ram().region("nvram", 0).share("nvram");
+	map(0x000, 0x0ff).ram().region("nvram", 0).share("nvram").w(FUNC(hp3478a_state::nvwrite));
 	map(0x100, 0x107).ram().share("gpibregs");	//XXX TODO : connect to i8291.cpp
 	map(0x200, 0x2ff).r(FUNC(hp3478a_state::dipread));
 }
@@ -523,6 +532,12 @@ static INPUT_PORTS_START( hp3478a )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("SRQ")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("LOC")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )	//nothing on 0x08
+
+	PORT_START("CAL_EN")
+	PORT_CONFNAME(1, 0, "CAL")
+	PORT_CONFSETTING(0x00, "disabled")
+	PORT_CONFSETTING(0x01, "enabled")
+
 INPUT_PORTS_END
 
 /******************************************************************************
