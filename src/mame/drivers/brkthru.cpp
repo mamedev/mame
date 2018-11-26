@@ -587,8 +587,19 @@ ROM_START( brkthrut )
 	ROM_LOAD( "12_de-0231-2_27156.h5", 0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) ) // Same as parent
 
 	ROM_REGION( 0x0300, "proms", 0 ) // Truly dumped on the Tecfri PCB
-	ROM_LOAD( "6309.c2", 0x0000, 0x0200, CRC(cd9709be) SHA1(1d9c451c771a7b38680e2179aa22289ea7cb2720) ) // Red and green component (82S147N)
-	ROM_LOAD( "6301.c1", 0x0200, 0x0100, CRC(f2d4822a) SHA1(f535e91b87ff01f2a73662856fd3f72907ca62e9) ) // Blue component (82S129N), same as parent
+	/* The original 82s129 bipolar PROM for R/G was replaced with one 82s147
+	   that has twice the size, and apparently the A04 line disconnected...
+	*/
+	ROM_LOAD( "6309.c2", 0x0000, 0x0040, CRC(cd9709be) SHA1(1d9c451c771a7b38680e2179aa22289ea7cb2720) ) // Red and green component (82S147N)
+	ROM_CONTINUE(        0x0020, 0x0040 )
+	ROM_CONTINUE(        0x0040, 0x0040 )
+	ROM_CONTINUE(        0x0060, 0x0040 )
+	ROM_CONTINUE(        0x0080, 0x0040 )
+	ROM_CONTINUE(        0x00a0, 0x0040 )
+	ROM_CONTINUE(        0x00c0, 0x0040 )
+	ROM_CONTINUE(        0x00e0, 0x0040 )
+
+	ROM_LOAD( "6301.c1", 0x0100, 0x0100, CRC(f2d4822a) SHA1(f535e91b87ff01f2a73662856fd3f72907ca62e9) ) // Blue component (82S129N), same as parent
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "4_de-0230-2_27256.d6", 0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) ) // Same as parent
@@ -696,6 +707,6 @@ void brkthru_state::init_brkthru()
 
 GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, init_brkthru, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation",                  "Kyohkoh-Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthrut, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthrut, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, init_brkthru, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )
