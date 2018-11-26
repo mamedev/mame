@@ -94,8 +94,7 @@ void device_memory_interface::interface_config_complete()
 void device_memory_interface::interface_validity_check(validity_checker &valid) const
 {
 	// loop over all address spaces
-	const int max_spaces = std::max(m_address_map.size(), m_address_config.size());
-	for (int spacenum = 0; spacenum < max_spaces; ++spacenum)
+	for (int spacenum = 0; spacenum < int(m_address_map.size()); ++spacenum)
 	{
 		if (space_config(spacenum))
 		{
