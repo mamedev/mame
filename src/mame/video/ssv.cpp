@@ -37,7 +37,8 @@
 
 
 * bit c, which enables/disables the 2 high order bitplanes (256 / 64 color tiles)
-  is the only one implemented. Needed by keithlcy (logo), drifto94 (wheels).
+  is needed by keithlcy (logo), drifto94 (wheels).
+  eaglshot masks even more bits, needed for 'birdie' text etc.
 
     A single-sprite can be:
 
@@ -137,30 +138,38 @@
 #include "render.h"
 
 
-void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line)
+void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line)
 {
-	const uint8_t *const addr = gfx->get_data(code  % gfx->elements());
-	const uint32_t realcolor = gfx->granularity() * (color % gfx->colors());
+	gfx_element *gfxelement = m_gfxdecode->gfx(0);
+	
+	const uint8_t *const addr = gfxelement->get_data(code  % gfxelement->elements());
+	const uint32_t realcolor = gfxelement->granularity() * (color % gfxelement->colors());
 
-	const uint8_t* const source = flipy ? addr + (7 - line) * gfx->rowbytes() : addr + line * gfx->rowbytes();
+	const uint8_t* const source = flipy ? addr + (7 - line) * gfxelement->rowbytes() : addr + line * gfxelement->rowbytes();
 
 	if (realline >= cliprect.min_y && realline <= cliprect.max_y)
 	{
+		 uint8_t m_gfxbppmask = 0x03; // lower 2 bitplanes always enabled?
+		 // each additional bit enables 2 bitplanes
+		 if (gfx & 0x01) m_gfxbppmask |= 0xc0;
+		 if (gfx & 0x02) m_gfxbppmask |= 0x30;
+		 if (gfx & 0x04) m_gfxbppmask |= 0x0c;
+
 		uint16_t* dest = &bitmap.pix16(realline);
 
-		const int x0 = flipx ? (base_sx + gfx->width() - 1) : (base_sx);
-		const int x1 = flipx ? (base_sx - 1) : (x0 + gfx->width());
+		const int x0 = flipx ? (base_sx + gfxelement->width() - 1) : (base_sx);
+		const int x1 = flipx ? (base_sx - 1) : (x0 + gfxelement->width());
 		const int dx = flipx ? (-1) : (1);
 
 		int column = 0;
 		for (int sx = x0; sx != x1; sx += dx)
 		{
-			uint8_t pen = source[column];
+			uint8_t pen = source[column] & m_gfxbppmask;
 
 			if (pen && sx >= cliprect.min_x && sx <= cliprect.max_x)
 			{
 				if (shadow)
-					dest[sx] = ((dest[sx] & m_shadow_pen_mask) | (pen << m_shadow_pen_shift)) & 0x7fff;                                                \
+					dest[sx] = ((dest[sx] & m_shadow_pen_mask) | (pen << m_shadow_pen_shift)) & 0x7fff;
 				else
 					dest[sx] = (realcolor + pen) & 0x7fff;
 			}
@@ -169,7 +178,7 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, gf
 	}
 }
 
-void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow)
+void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow)
 {
 	for (int line = 0; line < 8; line++)
 	{
@@ -194,7 +203,6 @@ VIDEO_START_MEMBER(ssv_state,eaglshot)
 	m_eaglshot_gfxram       =   std::make_unique<uint16_t[]>(16 * 0x40000 / 2);
 
 	m_gfxdecode->gfx(0)->set_source((uint8_t *)m_eaglshot_gfxram.get());
-	m_gfxdecode->gfx(1)->set_source((uint8_t *)m_eaglshot_gfxram.get());
 
 	save_pointer(NAME(m_eaglshot_gfxram), 16 * 0x40000 / 2);
 }
@@ -203,7 +211,7 @@ TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)
 {
 	uint16_t tile = m_gdfs_tmapram[tile_index];
 
-	SET_TILE_INFO_MEMBER(2, tile, 0, TILE_FLIPXY( tile >> 14 ));
+	SET_TILE_INFO_MEMBER(1, tile, 0, TILE_FLIPXY( tile >> 14 ));
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
@@ -215,7 +223,6 @@ WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
 VIDEO_START_MEMBER(ssv_state,gdfs)
 {
 	ssv_state::video_start();
-
 
 	m_gdfs_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ssv_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16,16, 0x100,0x100);
 
@@ -589,9 +596,9 @@ void ssv_state::draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &clip
 
 	int shadow = (mode & 0x0800);
 	/* Select 256 or 64 color tiles */
-	int gfx = ((mode & 0x0100) ? 0 : 1);
+	int gfx = ((mode & 0x0700) >> 8);
 
-	drawgfx_line(bitmap, cliprect, m_gfxdecode->gfx(gfx), realcode, color, flipx, flipy, sx, sy, shadow, realline, tileline);
+	drawgfx_line(bitmap, cliprect, gfx, realcode, color, flipx, flipy, sx, sy, shadow, realline, tileline);
 
 }
 
@@ -715,7 +722,7 @@ void ssv_state::draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &clipre
 	{
 		for (int y = ystart; y != yend; y += yinc)
 		{
-			drawgfx(bitmap, cliprect, m_gfxdecode->gfx(gfx),
+			drawgfx(bitmap, cliprect, gfx,
 				code++,
 				color,
 				flipx, flipy,
@@ -819,7 +826,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				}
 
 				/* Select 256 or 64 color tiles */
-				int gfx = (depth & 0x1000) ? 0 : 1;
+				int gfx = (depth & 0x7000) >>12;
 				int shadow = (depth & 0x8000);
 
 				/* Every single sprite is offset by x & yoffs, and additionally
