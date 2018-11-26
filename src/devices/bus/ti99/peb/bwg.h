@@ -17,7 +17,7 @@
 #pragma once
 
 #include "peribox.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"

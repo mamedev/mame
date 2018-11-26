@@ -16,7 +16,7 @@
 #include "cpu/i8085/i8085.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"

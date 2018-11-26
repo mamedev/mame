@@ -10,7 +10,6 @@
 #include "fdc.h"
 #include "machine/busmouse.h"
 #include "machine/pc_fdc.h"
-#include "imagedev/flopdrv.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 

@@ -94,7 +94,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/z80ne.h"
-#include "imagedev/flopdrv.h"
 #include "formats/dmk_dsk.h"
 #include "machine/ram.h"
 #include "softlist.h"

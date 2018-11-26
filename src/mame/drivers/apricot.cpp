@@ -19,7 +19,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
 #include "formats/apridisk.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/74153.h"

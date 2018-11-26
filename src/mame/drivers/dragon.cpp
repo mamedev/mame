@@ -18,7 +18,7 @@
 #include "formats/vdk_dsk.h"
 #include "formats/dmk_dsk.h"
 #include "formats/sdf_dsk.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "bus/coco/dragon_fdc.h"
 #include "bus/coco/dragon_jcbsnd.h"

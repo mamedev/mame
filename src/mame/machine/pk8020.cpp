@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "includes/pk8020.h"
 #include "cpu/i8085/i8085.h"
-#include "imagedev/flopdrv.h"
 
 
 READ8_MEMBER(pk8020_state::keyboard_r)

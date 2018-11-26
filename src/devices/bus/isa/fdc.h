@@ -11,6 +11,7 @@
 #pragma once
 
 #include "isa.h"
+#include "imagedev/floppy.h"
 #include "machine/busmouse.h"
 #include "machine/upd765.h"
 
