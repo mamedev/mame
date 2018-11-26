@@ -28,6 +28,7 @@
     1991  Waku Waku Sonic Patrol Car Sega              317-0140         C2
     1992  Ribbit!                    Sega              317-0178         C2
     1992  Puyo Puyo                  Sega / Compile    317-0203         C2     171-5992A
+    1992  SegaSonic Bros. (Japan)    Sega              n/a              C2?
     1992  Tant-R (Japan)             Sega              317-0211         C2
     1992  Tant-R (Korea)             Sega              ?                C2
     1992  Waku Waku Marine           Sega              317-0140         C2
@@ -1265,6 +1266,29 @@ static INPUT_PORTS_START( ichir )
 	//"SW2:8" unused
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ssonicbr )
+	PORT_INCLUDE( systemc_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( bloxeedc )
 	PORT_INCLUDE( systemc_generic )
@@ -1794,6 +1818,15 @@ ROM_START( wwmarine ) /* Waku Waku Marine  (c)1992 Sega - 834-9082 WAKUWAKU MARI
 
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "epr-15095.ic4", 0x000000, 0x040000, CRC(df13755b) SHA1(177aac7aaadc36e14dbcdf12bd42dbe70b3edd49) )
+ROM_END
+
+ROM_START( ssonicbr )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ssonicbr.ic32", 0x000000, 0x040000, CRC(cf254ecd) SHA1(4bb295ec80f8ddfeab4e360eebf12c5e2dfb9800) )
+	ROM_LOAD16_BYTE( "ssonicbr.ic31", 0x000001, 0x040000, CRC(03709746) SHA1(0b457f557da77acd3f43950428117c1decdfaf26) )
+
+	ROM_REGION( 0x020000, "upd", 0 )
+	ROM_LOAD( "ssonicbr.ic4", 0x000000, 0x020000, CRC(78e56a51) SHA1(8a72c12975cd74919b4337e0f681273e6b5cbbc6) )
 ROM_END
 
 ROM_START( anpanman ) /* Sega Soreike! Anpanman Popcorn Factory (Rev.B) (c)1993 Sega - 834-8795-01 (EMP5032 labeled 317-0140) */
@@ -2556,6 +2589,8 @@ GAME( 1992, puyo,      0,        segac2, puyo,            segac2_state,    init_
 GAME( 1992, puyobl,    puyo,     segac2, puyo,            segac2_state,    init_puyo,     ROT0,   "bootleg", "Puyo Puyo (World, bootleg)", 0 )
 GAME( 1992, puyoj,     puyo,     segac2, puyo,            segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev B)", 0 )
 GAME( 1992, puyoja,    puyo,     segac2, puyo,            segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev A)", 0 )
+
+GAME( 1992, ssonicbr,  0,        segac2, ssonicbr,        segac2_state,    init_bloxeedc, ROT0,   "Sega", "SegaSonic Bros. (Japan, prototype)", 0 )
 
 GAME( 1992, tantr,     0,        segac2, ichir,           segac2_state,    init_tantr,    ROT0,   "Sega", "Puzzle & Action: Tant-R (Japan)", 0 )
 GAME( 1993, tantrkor,  tantr,    segac2, ichir,           segac2_state,    init_tantrkor, ROT0,   "Sega", "Puzzle & Action: Tant-R (Korea)", 0 )
