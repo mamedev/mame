@@ -35,6 +35,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"

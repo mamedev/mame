@@ -15,6 +15,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/scsi/omti5100.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/mc146818.h"
 #include "machine/mc2661.h"
 #include "machine/nvram.h"

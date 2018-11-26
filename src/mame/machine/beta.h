@@ -15,6 +15,7 @@
 #pragma once
 
 #include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
 
 
 #define BETA_DISK_TAG   "beta"

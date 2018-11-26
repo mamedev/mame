@@ -132,6 +132,8 @@
 
 #include "includes/mips.h"
 
+#include "imagedev/floppy.h"
+
 #include "debugger.h"
 
 #define LOG_GENERAL (1U << 0)

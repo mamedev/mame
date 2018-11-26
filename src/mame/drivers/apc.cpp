@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"

@@ -118,6 +118,7 @@ http://bitsavers.org/pdf/caltech/ovro/Caltech-OVRO_Forth_Manual_Jun78.pdf
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/com8116.h"
 #include "bus/rs232/rs232.h"

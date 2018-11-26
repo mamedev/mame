@@ -41,6 +41,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"

@@ -22,6 +22,7 @@ Wicat - various systems.
 #include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
+#include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/am9517a.h"

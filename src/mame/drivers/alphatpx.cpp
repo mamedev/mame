@@ -68,6 +68,7 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/wd_fdc.h"

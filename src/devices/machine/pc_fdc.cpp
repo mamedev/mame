@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "machine/pc_fdc.h"
+#include "imagedev/floppy.h"
 
 //#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 

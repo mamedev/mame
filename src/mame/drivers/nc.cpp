@@ -99,6 +99,7 @@
 #include "includes/nc.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/mc146818.h"   // for NC200 real time clock
 #include "machine/rp5c01.h"     // for NC100 real time clock
 #include "formats/pc_dsk.h"     // for NC200 disk image

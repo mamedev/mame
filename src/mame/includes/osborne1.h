@@ -15,6 +15,8 @@
 
 #include "cpu/z80/z80.h"
 
+#include "imagedev/floppy.h"
+
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/ram.h"

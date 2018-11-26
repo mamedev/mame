@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"

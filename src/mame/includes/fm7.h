@@ -14,6 +14,7 @@
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "sound/beep.h"
 #include "sound/2203intf.h"
 #include "machine/wd_fdc.h"

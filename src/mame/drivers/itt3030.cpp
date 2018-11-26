@@ -192,6 +192,7 @@ Beeper Circuit, all ICs shown:
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"

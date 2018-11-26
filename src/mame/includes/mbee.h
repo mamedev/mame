@@ -16,6 +16,7 @@
 #include "machine/z80daisy.h"
 
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 
 #include "machine/8530scc.h"

@@ -16,6 +16,8 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
 
+#include "imagedev/floppy.h"
+
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
 #include "machine/ram.h"

@@ -25,6 +25,7 @@
 #include "includes/pasopia.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/upd765.h"
 #include "machine/z80ctc.h"

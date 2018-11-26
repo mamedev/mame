@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/i8251.h"
 #include "machine/z80dart.h"
