@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders:Luca Elia, Roberto Zandona, David Haywood
 /***************************************************************************
 
                     -= Seta, Sammy, Visco (SSV) System =-
