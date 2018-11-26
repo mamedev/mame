@@ -45,7 +45,7 @@ ROM_START( djdma )
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "djdma-2b.2b", 0x000, 0x104, CRC(d6925f2c) SHA1(1e58dfb7b8a2a5bbaa6589d4018042626fd5ceaf) ) // PAL16R4
-	ROM_LOAD( "djdma 2c 81d5.2c", 0x0000, 0x10, NO_DUMP ) // ?
+	ROM_LOAD( "djdma 2c 81d5.2c", 0x0000, 0x10, NO_DUMP ) // 82S105
 ROM_END
 
 
