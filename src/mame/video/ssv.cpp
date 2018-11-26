@@ -141,7 +141,7 @@
 void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line)
 {
 	gfx_element *gfxelement = m_gfxdecode->gfx(0);
-	
+
 	const uint8_t *const addr = gfxelement->get_data(code  % gfxelement->elements());
 	const uint32_t realcolor = gfxelement->granularity() * (color % gfxelement->colors());
 
@@ -149,11 +149,23 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 
 	if (realline >= cliprect.min_y && realline <= cliprect.max_y)
 	{
-		 uint8_t m_gfxbppmask = 0x03; // lower 2 bitplanes always enabled?
-		 // each additional bit enables 2 bitplanes
-		 if (gfx & 0x01) m_gfxbppmask |= 0xc0;
-		 if (gfx & 0x02) m_gfxbppmask |= 0x30;
-		 if (gfx & 0x04) m_gfxbppmask |= 0x0c;
+		int8_t m_gfxbppmask = 0x00;
+
+		if (gfx & 0x01) m_gfxbppmask |= 0xc0; // confirmed, lots of games
+
+		if (m_is_eaglshot) // ultrax and twineag2 are brokn by this logic at least, is the gfx value being passed incorrect? (some other local / global mode?)
+		{
+			if (gfx & 0x02) m_gfxbppmask |= 0x30;
+			if (gfx & 0x04) m_gfxbppmask |= 0x0c;
+		}
+		else
+		{
+			m_gfxbppmask |= 0x3c;
+		}
+
+		m_gfxbppmask |= 0x03; // lower 3 bitplanes always enabled?
+
+		uint8_t m_gfxbppmask = 0x03; // lower 2 bitplanes always enabled?
 
 		uint16_t* dest = &bitmap.pix16(realline);
 

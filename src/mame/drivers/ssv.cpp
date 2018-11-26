@@ -2482,7 +2482,7 @@ void ssv_state::init_eaglshot_banking()
 }
 
 void ssv_state::init_drifto94()     { init(0); }
-void ssv_state::init_eaglshot()     { init(0); init_eaglshot_banking(); }
+void ssv_state::init_eaglshot()     { init(0); m_is_eaglshot = true; init_eaglshot_banking(); }
 void ssv_state::init_gdfs()         { init(0); }
 void ssv_state::init_hypreact()     { init(0); }
 void ssv_state::init_hypreac2()     { init(0); init_hypreac2_common();    }
