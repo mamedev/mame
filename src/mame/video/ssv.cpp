@@ -149,7 +149,7 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 
 	if (realline >= cliprect.min_y && realline <= cliprect.max_y)
 	{
-		int8_t m_gfxbppmask = 0x00;
+		uint8_t m_gfxbppmask = 0x00;
 
 		if (gfx & 0x01) m_gfxbppmask |= 0xc0; // confirmed, lots of games
 
@@ -157,15 +157,12 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		{
 			if (gfx & 0x02) m_gfxbppmask |= 0x30;
 			if (gfx & 0x04) m_gfxbppmask |= 0x0c;
+			m_gfxbppmask |= 0x03; // lower 2 bitplanes always enabled?
 		}
 		else
 		{
-			m_gfxbppmask |= 0x3c;
+			m_gfxbppmask |= 0x3f;
 		}
-
-		m_gfxbppmask |= 0x03; // lower 3 bitplanes always enabled?
-
-		uint8_t m_gfxbppmask = 0x03; // lower 2 bitplanes always enabled?
 
 		uint16_t* dest = &bitmap.pix16(realline);
 
