@@ -14,6 +14,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 /* port pin/bit defs */
 #define P20	(1 << 0)
@@ -35,6 +36,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_nvram(*this, "nvram")
 		, m_nvram_raw(*this, "nvram")
+		, m_watchdog(*this, "watchdog")
 		, m_bank0(*this, "bank0")
 		, m_iobank(*this, "iobank")
 		, m_keypad(*this, "COL.%u", 0)
@@ -49,6 +51,7 @@ protected:
 	//virtual void machine_reset() override;	//not needed?
 
 	DECLARE_READ8_MEMBER(p1read);
+	DECLARE_WRITE8_MEMBER(p1write);
 	DECLARE_WRITE8_MEMBER(p2write);
 	DECLARE_WRITE8_MEMBER(nvwrite);
 
@@ -59,6 +62,7 @@ protected:
 	required_device<i8039_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
 	required_shared_ptr<uint8_t> m_nvram_raw;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_memory_bank m_bank0;
 	required_device<address_map_bank_device> m_iobank;
 	required_ioport_array<4> m_keypad;
@@ -91,6 +95,7 @@ protected:
 	uint32_t lcd_segdata[12];
 
 	uint8_t p2_oldstate;	//used to detect edges on Port2 IO pins. Should be saveable ?
+	uint8_t p1_oldstate;	//for P17 edge detection (WDT reset)
 
 };
 

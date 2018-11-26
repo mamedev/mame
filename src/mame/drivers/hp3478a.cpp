@@ -12,7 +12,6 @@
 * Current status : runs, AD LINK ERROR on stock ROM due to unimplemented AD link
 * - patching the AD comms, we get to a mostly functional state (for patch examples,
 *	see https://github.com/fenugrec/hp3478a_rompatch )
-* - pressing Shift+Sgl to force a 'test/reset' gets the firmware in an endless loop, not sure why.
 *
 *
 * TODO next level
@@ -111,6 +110,15 @@ READ8_MEMBER( hp3478a_state::p1read )
 	return data;
 }
 
+/* pin P17 rising edges also reset the external WDT counter */
+WRITE8_MEMBER( hp3478a_state::p1write )
+{
+	if (~p1_oldstate & data & 0x80) {
+		//P17 rising edge
+		m_watchdog->watchdog_reset();
+	}
+	p1_oldstate = data;
+}
 
 /** a lot of stuff multiplexed on the P2 pins.
  * parse the chipselect lines, A12 line, and LCD interface.
@@ -463,6 +471,8 @@ void hp3478a_state::machine_start()
 	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", (unsigned) 0);
 	m_outputs->resolve();
 
+	m_watchdog->watchdog_enable();
+
 }
 
 /******************************************************************************
@@ -584,6 +594,7 @@ void hp3478a_state::hp3478a(machine_config &config)
 	mcu.set_addrmap(AS_PROGRAM, &hp3478a_state::i8039_map);
 	mcu.set_addrmap(AS_IO, &hp3478a_state::i8039_io);
 	mcu.p1_in_cb().set(FUNC(hp3478a_state::p1read));
+	mcu.p1_out_cb().set(FUNC(hp3478a_state::p1write));
 	mcu.p2_out_cb().set(FUNC(hp3478a_state::p2write));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -593,6 +604,8 @@ void hp3478a_state::hp3478a(machine_config &config)
 	m_iobank->set_data_width(8);
 	m_iobank->set_addr_width(18);
 	m_iobank->set_stride(0x100);
+
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_ticks(3*5*(1<<19),CPU_CLOCK));
 
 	// video
 	config.set_default_layout(layout_hp3478a);
