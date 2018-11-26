@@ -38,7 +38,7 @@
 
 #define SINGLE_INSTRUCTION_MODE         (1)
 
-#define ENABLE_E132XS_DRC               (1)
+#define ENABLE_E132XS_DRC               (0)
 
 #define E132XS_LOG_DRC_REGS             (0)
 #define E132XS_LOG_INTERPRETER_REGS     (0)
