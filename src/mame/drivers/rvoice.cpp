@@ -91,7 +91,6 @@ private:
 	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	void hd63701_main_io(address_map &map);
 	void hd63701_main_mem(address_map &map);
 };
 
@@ -347,11 +346,6 @@ void rvoice_state::hd63701_main_mem(address_map &map)
 	map(0x8000, 0xffff).rom(); // 27512 EPROM
 }
 
-void rvoice_state::hd63701_main_io(address_map &map)
-{
-	map.unmap_value_high();
-}
-
 
 /******************************************************************************
  Input Ports
@@ -370,7 +364,6 @@ MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", HD63701, XTAL(7'372'800))
 	MCFG_DEVICE_PROGRAM_MAP(hd63701_main_mem)
-	MCFG_DEVICE_IO_MAP(hd63701_main_io)
 
 	//MCFG_DEVICE_ADD("playercpu", HD63701, XTAL(7'372'800)) // not dumped yet
 	//MCFG_DEVICE_PROGRAM_MAP(hd63701_slave_mem)
