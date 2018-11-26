@@ -39,8 +39,7 @@ public:
 		m_io_paddle(*this, "PADDLE"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_is_eaglshot(false)
+		m_palette(*this, "palette")
 	{ }
 
 	void ssv(machine_config &config);
@@ -215,8 +214,6 @@ private:
 	required_device<palette_device> m_palette;
 
 	void ssv_map(address_map &map, u32 rom);
-
-	bool m_is_eaglshot;
 };
 
 #endif // MAME_INCLUDES_SSV_H

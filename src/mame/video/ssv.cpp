@@ -151,17 +151,21 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 	{
 		uint8_t m_gfxbppmask = 0x00;
 
-		if (gfx & 0x01) m_gfxbppmask |= 0xc0; // confirmed, lots of games
+		// comments at top suggest that each bit of 'gfx' enables 2 bitplanes, but ultrax case disagrees, also that would require 4 bits to cover all cases, and we only have 3
+		switch (gfx & 0x07)
+		{
+		case 0x07: m_gfxbppmask = 0xff; break; // common 8bpp case
+		case 0x06: m_gfxbppmask = 0x3f; break; // common 6bpp case + keithlcy (logo), drifto94 (wheels) masking
 
-		if (m_is_eaglshot) // ultrax and twineag2 are brokn by this logic at least, is the gfx value being passed incorrect? (some other local / global mode?)
-		{
-			if (gfx & 0x02) m_gfxbppmask |= 0x30;
-			if (gfx & 0x04) m_gfxbppmask |= 0x0c;
-			m_gfxbppmask |= 0x03; // lower 2 bitplanes always enabled?
-		}
-		else
-		{
-			m_gfxbppmask |= 0x3f;
+		case 0x04: m_gfxbppmask = 0x0f; break; // eagle shot 4bpp birdie text (there is probably a case for the other 4bpp? but that's only used for Japanese text and the supported set isn't Japanese)
+
+		case 0x00: m_gfxbppmask = 0x3f; break; // ultrax, twineag2 text - is there a local / global mixup somewhere, or is this an 'invalid' setting that just enables all planes?
+
+		// unverified cases, just mimic old driver behavior of only using lowest bit
+		case 0x05: m_gfxbppmask = 0xff; break; 
+		case 0x03: m_gfxbppmask = 0xff; break; 
+		case 0x01: m_gfxbppmask = 0xff; break; 
+		case 0x02: m_gfxbppmask = 0x3f; break; 
 		}
 
 		uint16_t* dest = &bitmap.pix16(realline);
