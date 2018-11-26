@@ -2556,7 +2556,7 @@ GAME( 1985, toggle,    0,        balsente, toggle,   balsente_state, init_toggle
 GAME( 1986, nametune,  0,        balsente, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 007-8001-01-0C Rev C1 */
-GAME( 1987, triviaes2, triviaes, balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Young Players Edition?, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // Young Players edition not present on title screen, but red background supposedly means this
+GAME( 1987, triviaes2, triviaes, balsente, triviaes, balsente_state, init_triviaes2, ROT0, "Bally/Sente (Maibesa license)",  "Trivial Pursuit (Edicion Jovenes Carrozas?, Spanish, Maibesa license)", MACHINE_SUPPORTS_SAVE ) // Edicion Jovenes Carrozas not present on title screen, but red background supposedly means this
 
 /* Board: 006-8030-01-0A Rev A */
 GAME( 1986, nametune2, nametune, balsente, nametune, balsente_state, init_nametune,  ROT0, "Bally/Sente",  "Name That Tune (3/23/86)", MACHINE_SUPPORTS_SAVE )
