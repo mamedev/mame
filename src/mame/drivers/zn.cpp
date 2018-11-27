@@ -3852,6 +3852,32 @@ ROM_START( sfex2p )
 	CPZN2_BIOS
 
 	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
+	ROM_LOAD( "x2pe_04.2h", 0x0000000, 0x080000, CRC(2cbd44ff) SHA1(9f32e447b811df8a8fa8d28d11204fc8ca7f93f8) ) // HN27C4096AG-12
+
+	ROM_REGION32_LE( 0x3000000, "bankedroms", 0 )
+	ROM_LOAD( "x2p-05m.3h", 0x0000000, 0x800000, CRC(4ee3110f) SHA1(704f8dca7d0b698659af9e3271ea5072dfd42b8b) )
+	ROM_LOAD( "x2p-06m.4h", 0x0800000, 0x800000, CRC(4cd53a45) SHA1(39499ea6c9aa51c71f4fe44cc02f93d5a39e14ec) )
+	ROM_LOAD( "x2p-07m.5h", 0x1000000, 0x800000, CRC(11207c2a) SHA1(0182652819f1c3a36e7b42e34ef86d2455a2dd90) )
+	ROM_LOAD( "x2p-08m.2k", 0x1800000, 0x800000, CRC(3560c2cc) SHA1(8b0ce22d954387f7bb032b5220d1014ef68741e8) )
+	ROM_LOAD( "x2p-09m.3k", 0x2000000, 0x800000, CRC(344aa227) SHA1(69dc6f511939bf7fa25c2531ecf307a7565fe7a8) )
+	ROM_LOAD( "x2p-10m.4k", 0x2800000, 0x800000, CRC(2eef5931) SHA1(e5227529fb68eeb1b2f25813694173a75d906b52) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "x2p_02.2e",  0x00000, 0x20000, CRC(3705de5e) SHA1(847007ca271da64bf13ffbf496d4291429eee27a) )
+	ROM_LOAD( "x2p_03.3e",  0x20000, 0x20000, CRC(6ae828f6) SHA1(41c54165e87b846a845da581f408b96979288158) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
+	ROM_LOAD16_WORD_SWAP( "x2p-01m.3a", 0x0000000, 0x400000, CRC(14a5bb0e) SHA1(dfe3c3a53bd4c58743d8039b5344d3afbe2a9c24) )
+
+	ROM_REGION( 0x8, "cat702_2", 0 )
+	ROM_LOAD( "cp12", 0x000000, 0x000008, CRC(7cc2ed68) SHA1(a409ae837665700bdc4e3aa7c41a418d5b792940) )
+ROM_END
+
+/* 97695-1 */
+ROM_START( sfex2pu )
+	CPZN2_BIOS
+
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "x2pu_04.2h", 0x0000000, 0x080000, CRC(2938118c) SHA1(4bdeeb9aa3dd54ef44aa3fc73d78d65297b1ed25) )
 
 	ROM_REGION32_LE( 0x3000000, "bankedroms", 0 )
@@ -5404,7 +5430,8 @@ GAME( 1998, tgmj,      coh3002c, coh3002c,    zn4w,     zn_state, empty_init, RO
 GAME( 1998, techromn,  coh3002c, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Euro 980914)",                              MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromnu, techromn, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom",         "Tech Romancer (USA 980914)",                               MACHINE_IMPERFECT_SOUND )
 GAME( 1998, kikaioh,   techromn, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom",         "Choukou Senki Kikaioh (Japan 980914)",                     MACHINE_IMPERFECT_SOUND )
-GAME( 1999, sfex2p,    coh3002c, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)",                     MACHINE_IMPERFECT_SOUND )
+GAME( 1999, sfex2p,    coh3002c, coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Euro 990611)",                    MACHINE_IMPERFECT_SOUND )
+GAME( 1999, sfex2pu,   sfex2p,   coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)",                     MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pa,   sfex2p,   coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)",                    MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2ph,   sfex2p,   coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hispanic 990611)",                MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pj,   sfex2p,   coh3002c,    zn6b,     zn_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)",                   MACHINE_IMPERFECT_SOUND )
