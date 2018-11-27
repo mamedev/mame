@@ -590,9 +590,9 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, cc40_state, keyboard_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, cc40_state, keyboard_w))
 
-	MCFG_NVRAM_ADD_0FILL("sysram.0")
-	MCFG_NVRAM_ADD_0FILL("sysram.1")
-	MCFG_NVRAM_ADD_0FILL("sysram.2")
+	NVRAM(config, "sysram.0", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "sysram.1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "sysram.2", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreambal)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93lc46b
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93lc46b
 
 	DECO104PROT(config, m_deco104, 0);
 	m_deco104->port_a_cb().set_ioport("INPUTS");

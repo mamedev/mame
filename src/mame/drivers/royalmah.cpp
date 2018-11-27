@@ -3481,10 +3481,10 @@ MACHINE_CONFIG_START(royalmah_state::royalmah)
 	MCFG_DEVICE_IO_MAP(royalmah_iomap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 16*2)
+	MCFG_PALETTE_ADD("palette", 16*4)
 	MCFG_PALETTE_INIT_OWNER(royalmah_state,royalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3498,10 +3498,10 @@ MACHINE_CONFIG_START(royalmah_state::royalmah)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, royalmah_state, player_1_port_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, royalmah_state, player_2_port_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
+	AY8910(config, m_ay, 18432000/12);
+	m_ay->port_a_read_callback().set(FUNC(royalmah_state::player_1_port_r));
+	m_ay->port_b_read_callback().set(FUNC(royalmah_state::player_2_port_r));
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.33);
 MACHINE_CONFIG_END
 
 
@@ -3529,7 +3529,7 @@ MACHINE_CONFIG_START(royalmah_state::jansou)
 	MCFG_DEVICE_IO_MAP(jansou_sub_iomap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(royalmah_state, irq0_line_hold, 4000000/512)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -3590,9 +3590,10 @@ MACHINE_CONFIG_START(royalmah_state::janyoup2)
 	MCFG_DEVICE_CLOCK(XTAL(18'432'000)/4) // unknown divider
 	MCFG_DEVICE_IO_MAP(janyoup2_iomap)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(18'432'000)/12) // unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
+	h46505_device &crtc(H46505(config, "crtc", XTAL(18'432'000)/12)); // unknown divider
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::seljan)
@@ -4885,7 +4886,7 @@ ROM_START( mjsiyoub )
 	ROM_LOAD( "1.1k", 0x00000, 0x8000, CRC(a1083321) SHA1(b36772e90be60270234df16cf92d87f8d950190d) )
 	ROM_LOAD( "2.1g", 0x08000, 0x4000, CRC(cfe5de1d) SHA1(4acf9a752aa3c02b0889b0b49d3744359fa24460) )
 
-	ROM_REGION( 0x40000, "proms", 0 )
+	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "color.bpr", 0x00, 0x20,  CRC(d21367e5) SHA1(b28321ac8f99abfebe2ef4da0c751cefe9f3f3b6) )
 ROM_END
 

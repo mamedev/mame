@@ -5,12 +5,11 @@
 
 #pragma once
 
-#pragma once
-
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/scsi/s1410.h"
+#include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"

@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Nicola Salmoria,Paul Priest
+#ifndef MAME_INCLUDES_PIRATES_H
+#define MAME_INCLUDES_PIRATES_H
+
+#pragma once
+
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
@@ -7,8 +12,8 @@
 class pirates_state : public driver_device
 {
 public:
-	pirates_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pirates_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_oki(*this, "oki"),
@@ -18,7 +23,8 @@ public:
 		m_scroll(*this, "scroll"),
 		m_tx_tileram(*this, "tx_tileram"),
 		m_fg_tileram(*this, "fg_tileram"),
-		m_bg_tileram(*this, "bg_tileram") { }
+		m_bg_tileram(*this, "bg_tileram")
+	{ }
 
 	void pirates(machine_config &config);
 
@@ -65,3 +71,5 @@ private:
 	void decrypt_oki();
 	void pirates_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PIRATES_H

@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(midxunit_state::midxunit)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_MACHINE_RESET_OVERRIDE(midxunit_state,midxunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(midxunit_state::midxunit)
 	adc.ch6_callback().set_ioport("AN5");
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K_UART, 0)
+	DCS_AUDIO_2K_UART(config, m_dcs, 0);
 MACHINE_CONFIG_END
 
 

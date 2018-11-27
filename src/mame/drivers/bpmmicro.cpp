@@ -362,14 +362,15 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(bpmmicro_state::bpmmicro)
+void bpmmicro_state::bpmmicro(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(32'000'000)/4) /* divider is guessed, cpu is an AMD N80L286-16/S part */
-	MCFG_DEVICE_PROGRAM_MAP(i286_mem)
-	MCFG_DEVICE_IO_MAP(i286_io)
+	I80286(config, m_maincpu, XTAL(32'000'000)/4); /* divider is guessed, cpu is an AMD N80L286-16/S part */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bpmmicro_state::i286_mem);
+	m_maincpu->set_addrmap(AS_IO, &bpmmicro_state::i286_io);
 
-	MCFG_DEVICE_ADD("eeprom_u38", EEPROM_SERIAL_93C46_16BIT)
-MACHINE_CONFIG_END
+	EEPROM_93C46_16BIT(config, "eeprom_u38");
+}
 
 
 

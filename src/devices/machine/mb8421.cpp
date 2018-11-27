@@ -9,7 +9,7 @@
     MB843x is same as MB842x, except that it supports slave mode for 16-bit or
     32-bit expansion. It makes sure there are no clashes with the _BUSY pin.
 
-	IDT71321 is function compatible, but not pin compatible with MB8421
+    IDT71321 is function compatible, but not pin compatible with MB8421
 
 **********************************************************************/
 

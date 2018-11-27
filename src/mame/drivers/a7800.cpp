@@ -553,7 +553,7 @@ upon display type.
 	rgb_t(0xA1,0x8F,0x1A), rgb_t(0xB2,0xA0,0x2B), rgb_t(0xC3,0xB1,0x3C), rgb_t(0xD4,0xC2,0x4D), \
 	rgb_t(0xE5,0xD3,0x5E), rgb_t(0xF6,0xE4,0x6F), rgb_t(0xFF,0xF5,0x82), rgb_t(0xFF,0xFF,0x96   )
 
-static const rgb_t a7800_palette[256*3] =
+static const rgb_t a7800_palette[256] =
 {
 	NTSC_GREY,
 	NTSC_GOLD,
@@ -573,7 +573,7 @@ static const rgb_t a7800_palette[256*3] =
 	NTSC_LIGHT_ORANGE
 };
 
-static const rgb_t a7800p_palette[256*3] =
+static const rgb_t a7800p_palette[256] =
 {
 	NTSC_GREY,
 	NTSC_ORANGE_GREEN,
@@ -1387,12 +1387,12 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 	MCFG_SCREEN_UPDATE_DEVICE("maria", atari_maria_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(a7800_palette) / 3)
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(a7800_palette))
 	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800)
 
-	MCFG_DEVICE_ADD("maria", ATARI_MARIA, 0)
-	MCFG_MARIA_DMACPU("maincpu")
-	MCFG_MARIA_SCREEN("screen")
+	ATARI_MARIA(config, m_maria, 0);
+	m_maria->set_dmacpu_tag(m_maincpu);
+	m_maria->set_screen_tag(m_screen);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

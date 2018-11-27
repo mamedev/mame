@@ -14,7 +14,7 @@
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
 
     TODO:
-	- Where are EXTS Connected?
+    - Where are EXTS Connected?
 */
 
 #include "emu.h"
@@ -980,7 +980,7 @@ void aica_device::w16(address_space &space,unsigned int addr,unsigned short val)
 		else if(addr<0x45c0)
 			*((unsigned short *) (m_DSP.EFREG+(addr-0x4580)/4))=val;
 		//else if(addr<0x45c8)
-		//	*((unsigned short *) (m_DSP.EXTS+(addr-0x45c0)/2))=val; // Read only
+		//  *((unsigned short *) (m_DSP.EXTS+(addr-0x45c0)/2))=val; // Read only
 	}
 }
 

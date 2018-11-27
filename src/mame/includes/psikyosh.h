@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Paul Priest
+#ifndef MAME_INCLUDES_PSIKYOSH_H
+#define MAME_INCLUDES_PSIKYOSH_H
+
+#pragma once
+
 #include "video/bufsprite.h"
 #include "machine/eepromser.h"
 #include "cpu/sh/sh2.h"
@@ -27,8 +32,8 @@
 class psikyosh_state : public driver_device
 {
 public:
-	psikyosh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	psikyosh_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram") ,
 		m_bgram(*this, "bgram"),
 		m_zoomram(*this, "zoomram"),
@@ -38,7 +43,8 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void psikyo3v1(machine_config &config);
 	void psikyo5(machine_config &config);
@@ -95,3 +101,5 @@ private:
 	void ps3v1_map(address_map &map);
 	void ps5_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PSIKYOSH_H

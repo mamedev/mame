@@ -18,7 +18,7 @@ Supported games:
 Notes:
         Basically the same video and machine hardware as Flying Shark,
           except for the Main CPU which is a Z80 here.
-        See twincobr.c machine and video drivers to complete the
+        See twincobr.cpp machine and video drivers to complete the
           hardware setup.
         To enter the "test mode", press START1 when the grid is displayed.
         Press 0 (actually P1 button 3) on startup to skip some video RAM tests
@@ -151,6 +151,10 @@ public:
 
 	void init_wardner();
 
+protected:
+	virtual void driver_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<address_map_bank_device> m_membank;
 
@@ -163,9 +167,6 @@ private:
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_program_map(address_map &map);
-
-	virtual void driver_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -367,7 +368,7 @@ GFXDECODE_END
 
 void wardner_state::driver_start()
 {
-	/* Save-State stuff in src/machine/twincobr.c */
+	/* Save-State stuff in src/machine/twincobr.cpp */
 	twincobr_driver_savestate();
 }
 
@@ -414,11 +415,14 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	coinlatch.q_out_cb<7>().set(FUNC(wardner_state::coin_lockout_2_w));
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(14'000'000)/4) /* 3.5MHz measured on CLKin */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(2)
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(14'000'000)/4)); /* 3.5MHz measured on CLKin */
+	crtc.set_screen(m_screen);
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(2);
 
-	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 32, 14)
+	TOAPLAN_SCU(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_xoffsets(32, 14);
 
 	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
 
@@ -431,7 +435,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
-	MCFG_PALETTE_ADD("palette", 1792)
+	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)

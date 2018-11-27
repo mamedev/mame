@@ -1875,13 +1875,13 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 
-	MCFG_DEVICE_ADD("ds2404", DS2404, 32.768_kHz_XTAL)
-	MCFG_DS2404_REF_YEAR(1995)
-	MCFG_DS2404_REF_MONTH(1)
-	MCFG_DS2404_REF_DAY(1)
+	ds2404_device &rtc(DS2404(config, "ds2404", 32.768_kHz_XTAL));
+	rtc.ref_year(1995);
+	rtc.ref_month(1);
+	rtc.ref_day(1);
 
-	MCFG_INTEL_E28F008SA_ADD("soundflash1") // Sharp LH28F008 on newer mainboard revision
-	MCFG_INTEL_E28F008SA_ADD("soundflash2") // "
+	INTEL_E28F008SA(config, "soundflash1"); // Sharp LH28F008 on newer mainboard revision
+	INTEL_E28F008SA(config, "soundflash2"); // "
 
 	FIFO7200(config, m_soundfifo[0], 0x200); // LH5496D, but on single board hw it's one CY7C421
 	FIFO7200(config, m_soundfifo[1], 0x200); // "
@@ -1895,11 +1895,11 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(*this, seibuspi_state, tile_decrypt_key_w))
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, seibuspi_state, spi_layer_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seibuspi_state, spi_layer_bank_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seibuspi_state, scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
+	crtc.layer_en_callback().set(FUNC(seibuspi_state::spi_layer_enable_w));
+	crtc.reg_1a_callback().set(FUNC(seibuspi_state::spi_layer_bank_w));
+	crtc.layer_scroll_callback().set(FUNC(seibuspi_state::scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1976,7 +1976,7 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2f)
 
 	MCFG_DEVICE_REMOVE("ds2404")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// Z80 is Z84C0006PCS instead of Z84C0008PEC
 	// clock is unknown, possibly slower than 7.159MHz
@@ -2010,7 +2010,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386i)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2021,11 +2021,11 @@ MACHINE_CONFIG_START(seibuspi_state::sys386i)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(*this, seibuspi_state, tile_decrypt_key_w))
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, seibuspi_state, spi_layer_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seibuspi_state, spi_layer_bank_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seibuspi_state, scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
+	crtc.layer_en_callback().set(FUNC(seibuspi_state::spi_layer_enable_w));
+	crtc.reg_1a_callback().set(FUNC(seibuspi_state::spi_layer_bank_w));
+	crtc.layer_scroll_callback().set(FUNC(seibuspi_state::scroll_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2066,7 +2066,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

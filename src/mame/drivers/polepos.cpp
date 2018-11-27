@@ -871,11 +871,11 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	n51xx.output_callback<0>().set(FUNC(polepos_state::out_0));
 	n51xx.output_callback<1>().set(FUNC(polepos_state::out_1));
 
-	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
-	MCFG_NAMCO_52XX_DISCRETE("discrete")
-	MCFG_NAMCO_52XX_BASENODE(NODE_04)
-	MCFG_NAMCO_52XX_ROMREAD_CB(READ8(*this, polepos_state,namco_52xx_rom_r))
-	MCFG_NAMCO_52XX_SI_CB(READ8(*this, polepos_state,namco_52xx_si_r))
+	namco_52xx_device &n52xx(NAMCO_52XX(config, "52xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
+	n52xx.set_discrete("discrete");
+	n52xx.set_basenote(NODE_04);
+	n52xx.romread_callback().set(FUNC(polepos_state::namco_52xx_rom_r));
+	n52xx.si_callback().set(FUNC(polepos_state::namco_52xx_si_r));
 
 	namco_53xx_device &n53xx(NAMCO_53XX(config, "53xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
 	n53xx.k_port_callback().set(FUNC(polepos_state::namco_53xx_k_r));
@@ -884,9 +884,9 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	n53xx.input_callback<2>().set_ioport("DSWA").mask(0x0f);
 	n53xx.input_callback<3>().set_ioport("DSWA").rshift(4);
 
-	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/8/2)  /* 1.536 MHz */
-	MCFG_NAMCO_54XX_DISCRETE("discrete")
-	MCFG_NAMCO_54XX_BASENODE(NODE_01)
+	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
+	n54xx.set_discrete("discrete");
+	n54xx.set_basenote(NODE_01);
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
@@ -897,12 +897,11 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_NAMCO_06XX_WRITE_2_CB(WRITE8("52xx", namco_52xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_3_CB(WRITE8("54xx", namco_54xx_device, write))
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)   // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, scanline, "screen", 0, 1)
 
@@ -1007,12 +1006,11 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_NAMCO_06XX_READ_0_CB(READ8("51xx", namco_51xx_device, read))
 	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)   // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, scanline, "screen", 0, 1)
 

@@ -954,7 +954,7 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x7dc00000, 0x7dc0000f).rw(m_duart_com, FUNC(pc16552_device::read), FUNC(pc16552_device::write));
 	map(0x7e000000, 0x7e00003f).rw("rtc", FUNC(rtc65271_device::rtc_r), FUNC(rtc65271_device::rtc_w));
 	map(0x7e000100, 0x7e00013f).rw("rtc", FUNC(rtc65271_device::xram_r), FUNC(rtc65271_device::xram_w));
-	map(0x7e800000, 0x7e8000ff).rw("gcu0", FUNC(k057714_device::read), FUNC(k057714_device::write));
+	map(0x7e800000, 0x7e8000ff).rw(m_gcu[0], FUNC(k057714_device::read), FUNC(k057714_device::write));
 	map(0x7fe00000, 0x7fe0000f).rw(FUNC(firebeat_state::ata_command_r), FUNC(firebeat_state::ata_command_w));
 	map(0x7fe80000, 0x7fe8000f).rw(FUNC(firebeat_state::ata_control_r), FUNC(firebeat_state::ata_control_w));
 	map(0x7ff80000, 0x7fffffff).rom().region("user1", 0);       /* System BIOS */
@@ -963,7 +963,7 @@ void firebeat_state::firebeat_map(address_map &map)
 void firebeat_state::firebeat2_map(address_map &map)
 {
 	firebeat_map(map);
-	map(0x7e800100, 0x7e8001ff).rw("gcu1", FUNC(k057714_device::read), FUNC(k057714_device::write));
+	map(0x7e800100, 0x7e8001ff).rw(m_gcu[1], FUNC(k057714_device::read), FUNC(k057714_device::write));
 }
 
 void firebeat_state::spu_map(address_map &map)
@@ -1185,11 +1185,11 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
-	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
+	RTC65271(config, "rtc", 0);
 
-	MCFG_FUJITSU_29F016A_ADD("flash_main")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
+	FUJITSU_29F016A(config, "flash_main");
+	FUJITSU_29F016A(config, "flash_snd1");
+	FUJITSU_29F016A(config, "flash_snd2");
 
 	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
 	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
@@ -1200,8 +1200,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
-	MCFG_DEVICE_ADD("gcu0", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, firebeat_state, gcu0_interrupt))
+	K057714(config, m_gcu[0], 0);
+	m_gcu[0]->irq_callback().set(FUNC(firebeat_state::gcu0_interrupt));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1223,14 +1223,14 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("duart_com", PC16552D, 0)  // pgmd to 9600baud
-	MCFG_DEVICE_ADD("duart_com:chan0", NS16550, XTAL(19'660'800))
-	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL(19'660'800))
-	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)  // in all memory maps, pgmd to 31250baud
-	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch0_irq_callback))
-	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch1_irq_callback))
+	PC16552D(config, "duart_com", 0);  // pgmd to 9600baud
+	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
+	NS16550(config, "duart_com:chan1", XTAL(19'660'800));
+	PC16552D(config, "duart_midi", 0);  // in all memory maps, pgmd to 31250baud
+	ns16550_device &midi_chan0(NS16550(config, "duart_midi:chan0", XTAL(24'000'000)));
+	midi_chan0.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch0_irq_callback));
+	ns16550_device &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
+	midi_chan1.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch1_irq_callback));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(firebeat_state::firebeat2)
@@ -1243,11 +1243,11 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
-	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
+	RTC65271(config, "rtc", 0);
 
-	MCFG_FUJITSU_29F016A_ADD("flash_main")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
+	FUJITSU_29F016A(config, "flash_main");
+	FUJITSU_29F016A(config, "flash_snd1");
+	FUJITSU_29F016A(config, "flash_snd2");
 
 	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
 	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
@@ -1258,11 +1258,11 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
-	MCFG_DEVICE_ADD("gcu0", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, firebeat_state, gcu0_interrupt))
+	K057714(config, m_gcu[0], 0);
+	m_gcu[0]->irq_callback().set(FUNC(firebeat_state::gcu0_interrupt));
 
-	MCFG_DEVICE_ADD("gcu1", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, firebeat_state, gcu1_interrupt))
+	K057714(config, m_gcu[1], 0);
+	m_gcu[1]->irq_callback().set(FUNC(firebeat_state::gcu1_interrupt));
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1292,16 +1292,17 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("duart_com", PC16552D, 0)
-	MCFG_DEVICE_ADD("duart_com:chan0", NS16550, XTAL(19'660'800))
-	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL(19'660'800))
-	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)
-	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch0_irq_callback))
-	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch1_irq_callback))
-	MCFG_MIDI_KBD_ADD("kbd0", WRITELINE("duart_midi:chan0", ins8250_uart_device, rx_w), 31250)
-	MCFG_MIDI_KBD_ADD("kbd1", WRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
+	PC16552D(config, "duart_com", 0);
+	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
+	NS16550(config, "duart_com:chan1", XTAL(19'660'800));
+	PC16552D(config, "duart_midi", 0);
+	ns16550_device &midi_chan0(NS16550(config, "duart_midi:chan0", XTAL(24'000'000)));
+	midi_chan0.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch0_irq_callback));
+	ns16550_device &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
+	midi_chan1.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch1_irq_callback));
+
+	MCFG_MIDI_KBD_ADD("kbd0", WRITELINE(midi_chan0, ins8250_uart_device, rx_w), 31250)
+	MCFG_MIDI_KBD_ADD("kbd1", WRITELINE(midi_chan1, ins8250_uart_device, rx_w), 31250)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(firebeat_state::firebeat_spu)

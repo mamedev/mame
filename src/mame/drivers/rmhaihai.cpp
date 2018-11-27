@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 	MCFG_DEVICE_IO_MAP(rmhaihai_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rmhaihai_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -530,10 +530,10 @@ MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000/16)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000/16));
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 500000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)

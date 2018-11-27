@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(darius_state::darius)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame ? */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darius)
@@ -756,41 +756,41 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_right)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_OFFSETS(-16, 8)
-	MCFG_PC080SN_YINVERT(0)
-	MCFG_PC080SN_DBLWIDTH(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_offsets(-16, 8);
+	m_pc080sn->set_yinvert(0);
+	m_pc080sn->set_dblwidth(1);
+	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) /* assumes Z80 sandwiched between 68Ks */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, darius_state, darius_write_portA0))  /* portA write */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, darius_state, darius_write_portB0))  /* portB write */
-	MCFG_SOUND_ROUTE(0, "filter0.0l", 0.08)
-	MCFG_SOUND_ROUTE(0, "filter0.0r", 0.08)
-	MCFG_SOUND_ROUTE(1, "filter0.1l", 0.08)
-	MCFG_SOUND_ROUTE(1, "filter0.1r", 0.08)
-	MCFG_SOUND_ROUTE(2, "filter0.2l", 0.08)
-	MCFG_SOUND_ROUTE(2, "filter0.2r", 0.08)
-	MCFG_SOUND_ROUTE(3, "filter0.3l", 0.60)
-	MCFG_SOUND_ROUTE(3, "filter0.3r", 0.60)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(8'000'000)/2)); /* 4 MHz */
+	ym1.irq_handler().set_inputline(m_audiocpu, 0); /* assumes Z80 sandwiched between 68Ks */
+	ym1.port_a_write_callback().set(FUNC(darius_state::darius_write_portA0));
+	ym1.port_b_write_callback().set(FUNC(darius_state::darius_write_portB0));
+	ym1.add_route(0, "filter0.0l", 0.08);
+	ym1.add_route(0, "filter0.0r", 0.08);
+	ym1.add_route(1, "filter0.1l", 0.08);
+	ym1.add_route(1, "filter0.1r", 0.08);
+	ym1.add_route(2, "filter0.2l", 0.08);
+	ym1.add_route(2, "filter0.2r", 0.08);
+	ym1.add_route(3, "filter0.3l", 0.60);
+	ym1.add_route(3, "filter0.3r", 0.60);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, darius_state, darius_write_portA1))  /* portA write */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, darius_state, darius_write_portB1))  /* portB write */
-	MCFG_SOUND_ROUTE(0, "filter1.0l", 0.08)
-	MCFG_SOUND_ROUTE(0, "filter1.0r", 0.08)
-	MCFG_SOUND_ROUTE(1, "filter1.1l", 0.08)
-	MCFG_SOUND_ROUTE(1, "filter1.1r", 0.08)
-	MCFG_SOUND_ROUTE(2, "filter1.2l", 0.08)
-	MCFG_SOUND_ROUTE(2, "filter1.2r", 0.08)
-	MCFG_SOUND_ROUTE(3, "filter1.3l", 0.60)
-	MCFG_SOUND_ROUTE(3, "filter1.3r", 0.60)
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(8'000'000)/2)); /* 4 MHz */
+	ym2.port_a_write_callback().set(FUNC(darius_state::darius_write_portA1));
+	ym2.port_b_write_callback().set(FUNC(darius_state::darius_write_portB1));
+	ym2.add_route(0, "filter1.0l", 0.08);
+	ym2.add_route(0, "filter1.0r", 0.08);
+	ym2.add_route(1, "filter1.1l", 0.08);
+	ym2.add_route(1, "filter1.1r", 0.08);
+	ym2.add_route(2, "filter1.2l", 0.08);
+	ym2.add_route(2, "filter1.2r", 0.08);
+	ym2.add_route(3, "filter1.3l", 0.60);
+	ym2.add_route(3, "filter1.3r", 0.60);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, darius_state, darius_adpcm_int))   /* interrupt function */
@@ -819,9 +819,9 @@ MACHINE_CONFIG_START(darius_state::darius)
 	FILTER_VOLUME(config, "msm5205.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "msm5205.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 

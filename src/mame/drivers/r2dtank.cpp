@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_DEVICE_ADD("audiocpu", M6802,3000000)         /* ?? */
 	MCFG_DEVICE_PROGRAM_MAP(r2dtank_audio_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -457,21 +457,22 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(r2dtank_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE("74123", ttl74123_device, a_w))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(r2dtank_state::crtc_update_row), this);
+	crtc.out_de_callback().set("74123", FUNC(ttl74123_device::a_w));
 
 	/* 74LS123 */
 
 	ttl74123_device &ttl74123(TTL74123(config, "74123", 0));
-	ttl74123.set_connection_type(TTL74123_GROUNDED);	/* the hook up type */
-	ttl74123.set_resistor_value(RES_K(22));				/* resistor connected to RCext */
-	ttl74123.set_capacitor_value(CAP_U(0.01));			/* capacitor connected to Cext and RCext */
-	ttl74123.set_a_pin_value(1);						/* A pin - driven by the CRTC */
-	ttl74123.set_b_pin_value(1);						/* B pin - pulled high */
-	ttl74123.set_clear_pin_value(1);					/* Clear pin - pulled high */
+	ttl74123.set_connection_type(TTL74123_GROUNDED);    /* the hook up type */
+	ttl74123.set_resistor_value(RES_K(22));             /* resistor connected to RCext */
+	ttl74123.set_capacitor_value(CAP_U(0.01));          /* capacitor connected to Cext and RCext */
+	ttl74123.set_a_pin_value(1);                        /* A pin - driven by the CRTC */
+	ttl74123.set_b_pin_value(1);                        /* B pin - pulled high */
+	ttl74123.set_clear_pin_value(1);                    /* Clear pin - pulled high */
 	ttl74123.out_cb().set(FUNC(r2dtank_state::ttl74123_output_changed));
 
 	PIA6821(config, m_pia_main, 0);
@@ -491,17 +492,17 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, (4000000 / 4))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay1, (4000000 / 4));
+	m_ay1->port_a_read_callback().set_ioport("DSWB");
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, (4000000 / 4))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay2, (4000000 / 4));
+	m_ay2->port_a_read_callback().set_ioport("IN1");
+	m_ay2->port_b_read_callback().set_ioport("DSWA");
+	m_ay2->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 MACHINE_CONFIG_END
 

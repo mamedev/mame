@@ -838,22 +838,22 @@ MACHINE_CONFIG_START(m10_state::m10)
 	/* 74LS123 */
 
 	TTL74123(config, m_ic8j1, 0); /* completely illegible */
-	m_ic8j1->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);	/* the hook up type */
-	m_ic8j1->set_resistor_value(RES_K(1));						/* resistor connected to RCext */
-	m_ic8j1->set_capacitor_value(CAP_U(1));						/* capacitor connected to Cext and RCext */
-	m_ic8j1->set_a_pin_value(1);								/* A pin - driven by the CRTC */
-	m_ic8j1->set_b_pin_value(1);								/* B pin - pulled high */
-	m_ic8j1->set_clear_pin_value(1);							/* Clear pin - pulled high */
+	m_ic8j1->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  /* the hook up type */
+	m_ic8j1->set_resistor_value(RES_K(1));                      /* resistor connected to RCext */
+	m_ic8j1->set_capacitor_value(CAP_U(1));                     /* capacitor connected to Cext and RCext */
+	m_ic8j1->set_a_pin_value(1);                                /* A pin - driven by the CRTC */
+	m_ic8j1->set_b_pin_value(1);                                /* B pin - pulled high */
+	m_ic8j1->set_clear_pin_value(1);                            /* Clear pin - pulled high */
 	m_ic8j1->out_cb().set(FUNC(m10_state::ic8j1_output_changed));
 
 	TTL74123(config, m_ic8j2, 0);
-	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);	/* the hook up type */
+	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  /* the hook up type */
 	/* 10k + 20k variable resistor */
-	m_ic8j2->set_resistor_value(RES_K(22));						/* resistor connected to RCext */
-	m_ic8j2->set_capacitor_value(CAP_U(2.2));					/* capacitor connected to Cext and RCext */
-	m_ic8j2->set_a_pin_value(1);								/* A pin - driven by the CRTC */
-	m_ic8j2->set_b_pin_value(1);								/* B pin - pulled high */
-	m_ic8j2->set_clear_pin_value(1);							/* Clear pin - pulled high */
+	m_ic8j2->set_resistor_value(RES_K(22));                     /* resistor connected to RCext */
+	m_ic8j2->set_capacitor_value(CAP_U(2.2));                   /* capacitor connected to Cext and RCext */
+	m_ic8j2->set_a_pin_value(1);                                /* A pin - driven by the CRTC */
+	m_ic8j2->set_b_pin_value(1);                                /* B pin - pulled high */
+	m_ic8j2->set_clear_pin_value(1);                            /* Clear pin - pulled high */
 	m_ic8j2->out_cb().set(FUNC(m10_state::ic8j2_output_changed));
 
 	/* sound hardware */

@@ -94,7 +94,7 @@ void tlcs870_device::tmp87ph40an_mem(address_map &map)
 
 	map(0x003c, 0x003c).rw(FUNC(tlcs870_device::il_l_r), FUNC(tlcs870_device::il_l_w)); // Interrupt latch
 	map(0x003d, 0x003d).rw(FUNC(tlcs870_device::il_h_r), FUNC(tlcs870_device::il_h_w)); //
-	
+
 	// 0x3e reserved
 	map(0x003f, 0x003f).rw(FUNC(tlcs870_device::psw_r), FUNC(tlcs870_device::rbs_w)); // Program status word / Register bank selector
 
@@ -296,9 +296,9 @@ WRITE8_MEMBER(tlcs870_device::tc1cr_w)
 	LOG("%d: SCAP1/MCAP1/METT1/MPPG1\n",                  (m_TC1CR & 0x40) ? 1 : 0);
 	LOG("%d: TC1S-1 (TC1 Start Control)\n",               (m_TC1CR & 0x20) ? 1 : 0);
 	LOG("%d: TC1S-0 (TC1 Start Control)\n",               (m_TC1CR & 0x10) ? 1 : 0);
-	LOG("%d: TC1CK-1 (TC1 Source Clock select)\n",        (m_TC1CR & 0x08) ? 1 : 0); 
-	LOG("%d: TC1CK-0 (TC1 Source Clock select)\n",        (m_TC1CR & 0x04) ? 1 : 0); 
-	LOG("%d: TC1M-1 (TC1 Mode Select)\n",                 (m_TC1CR & 0x02) ? 1 : 0); 
+	LOG("%d: TC1CK-1 (TC1 Source Clock select)\n",        (m_TC1CR & 0x08) ? 1 : 0);
+	LOG("%d: TC1CK-0 (TC1 Source Clock select)\n",        (m_TC1CR & 0x04) ? 1 : 0);
+	LOG("%d: TC1M-1 (TC1 Mode Select)\n",                 (m_TC1CR & 0x02) ? 1 : 0);
 	LOG("%d: TC1M-0 (TC1 Mode Select)\n",                 (m_TC1CR & 0x01) ? 1 : 0);
 }
 
@@ -371,9 +371,9 @@ WRITE8_MEMBER(tlcs870_device::tc2cr_w)
 	LOG("%d: (invalid)\n",                         (m_TC2CR & 0x40) ? 1 : 0);
 	LOG("%d: TC2S (TC2 Start Control)\n",          (m_TC2CR & 0x20) ? 1 : 0);
 	LOG("%d: TC2CK-2 (TC2 Source Clock select)\n", (m_TC2CR & 0x10) ? 1 : 0);
-	LOG("%d: TC2CK-1 (TC2 Source Clock select)\n", (m_TC2CR & 0x08) ? 1 : 0); 
-	LOG("%d: TC2CK-0 (TC2 Source Clock select)\n", (m_TC2CR & 0x04) ? 1 : 0); 
-	LOG("%d: (invalid)\n",                         (m_TC2CR & 0x02) ? 1 : 0); 
+	LOG("%d: TC2CK-1 (TC2 Source Clock select)\n", (m_TC2CR & 0x08) ? 1 : 0);
+	LOG("%d: TC2CK-0 (TC2 Source Clock select)\n", (m_TC2CR & 0x04) ? 1 : 0);
+	LOG("%d: (invalid)\n",                         (m_TC2CR & 0x02) ? 1 : 0);
 	LOG("%d: TC2M (TC2 Mode Select)\n",            (m_TC2CR & 0x01) ? 1 : 0);
 }
 
@@ -403,9 +403,9 @@ WRITE8_MEMBER(tlcs870_device::tc3cr_w)
 	LOG("%d: SCAP (Software Capture Control)\n",   (m_TC3CR & 0x40) ? 1 : 0);
 	LOG("%d: (invalid)\n",                         (m_TC3CR & 0x20) ? 1 : 0);
 	LOG("%d: TC3S (TC3 Start Control)\n",          (m_TC3CR & 0x10) ? 1 : 0);
-	LOG("%d: TC3CK-1 (TC3 Source Clock select)\n", (m_TC3CR & 0x08) ? 1 : 0); 
-	LOG("%d: TC3CK-0 (TC3 Source Clock select)\n", (m_TC3CR & 0x04) ? 1 : 0); 
-	LOG("%d: (invalid)\n",                         (m_TC3CR & 0x02) ? 1 : 0); 
+	LOG("%d: TC3CK-1 (TC3 Source Clock select)\n", (m_TC3CR & 0x08) ? 1 : 0);
+	LOG("%d: TC3CK-0 (TC3 Source Clock select)\n", (m_TC3CR & 0x04) ? 1 : 0);
+	LOG("%d: (invalid)\n",                         (m_TC3CR & 0x02) ? 1 : 0);
 	LOG("%d: TC3M (TC3 Mode Select)\n",            (m_TC3CR & 0x01) ? 1 : 0);
 }
 
@@ -440,9 +440,9 @@ WRITE8_MEMBER(tlcs870_device::tc4cr_w)
 	LOG("%d: TFF4-0 (Timer F/F 4 Control)\n",      (m_TC4CR & 0x40) ? 1 : 0);
 	LOG("%d: (invalid)\n",                         (m_TC4CR & 0x20) ? 1 : 0);
 	LOG("%d: TC4S (TC4 Start Control)\n",          (m_TC4CR & 0x10) ? 1 : 0);
-	LOG("%d: TC4CK-1 (TC4 Source Clock select)\n", (m_TC4CR & 0x08) ? 1 : 0); 
-	LOG("%d: TC4CK-0 (TC4 Source Clock select)\n", (m_TC4CR & 0x04) ? 1 : 0); 
-	LOG("%d: TC4M-1 (TC4 Mode Select)\n",          (m_TC4CR & 0x02) ? 1 : 0); 
+	LOG("%d: TC4CK-1 (TC4 Source Clock select)\n", (m_TC4CR & 0x08) ? 1 : 0);
+	LOG("%d: TC4CK-0 (TC4 Source Clock select)\n", (m_TC4CR & 0x04) ? 1 : 0);
+	LOG("%d: TC4M-1 (TC4 Mode Select)\n",          (m_TC4CR & 0x02) ? 1 : 0);
 	LOG("%d: TC4M-0 (TC4 Mode Select)\n",          (m_TC4CR & 0x01) ? 1 : 0);
 }
 
@@ -453,7 +453,7 @@ WRITE8_MEMBER(tlcs870_device::treg4_w)
 
 // Time Base Timer
 
-// this is used with TLCS870_IRQ_INTTBT (FFF2 INTTBT) (not used by hng64) 
+// this is used with TLCS870_IRQ_INTTBT (FFF2 INTTBT) (not used by hng64)
 // the divider output makes use of PORT1 bit 3, which must be properly configured
 WRITE8_MEMBER(tlcs870_device::tbtcr_w)
 {
@@ -464,9 +464,9 @@ WRITE8_MEMBER(tlcs870_device::tbtcr_w)
 	LOG("%d: DVOCK-1 (Divide Output Frequency Selection)n",     (m_TBTCR & 0x40) ? 1 : 0);
 	LOG("%d: DVOCK-0 (Divide Output Frequency Selection)\n",    (m_TBTCR & 0x20) ? 1 : 0);
 	LOG("%d: DV7CK (?)\n",                                      (m_TBTCR & 0x10) ? 1 : 0);
-	LOG("%d: TBTEN (Time Base Timer Enable)\n",                 (m_TBTCR & 0x08) ? 1 : 0); 
-	LOG("%d: TBTCK-2 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x04) ? 1 : 0); 
-	LOG("%d: TBTCK-1 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x02) ? 1 : 0); 
+	LOG("%d: TBTEN (Time Base Timer Enable)\n",                 (m_TBTCR & 0x08) ? 1 : 0);
+	LOG("%d: TBTCK-2 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x04) ? 1 : 0);
+	LOG("%d: TBTCK-1 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x02) ? 1 : 0);
 	LOG("%d: TBTCK-0 (Time Base Timer Interrupt Frequency)\n",  (m_TBTCR & 0x01) ? 1 : 0);
 }
 
@@ -489,9 +489,9 @@ WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 	LOG("%d: SIOINH1 (Abort/Continue transfer)\n", (m_SIOCR1[0] & 0x40) ? 1 : 0);
 	LOG("%d: SIOM1-2 (Serial Mode)\n",             (m_SIOCR1[0] & 0x20) ? 1 : 0);
 	LOG("%d: SIOM1-1 (Serial Mode)\n",             (m_SIOCR1[0] & 0x10) ? 1 : 0);
-	LOG("%d: SIOM1-0 (Serial Mode)\n",             (m_SIOCR1[0] & 0x08) ? 1 : 0); 
-	LOG("%d: SCK1-2 (Serial Clock)\n",             (m_SIOCR1[0] & 0x04) ? 1 : 0); 
-	LOG("%d: SCK1-1 (Serial Clock)\n",             (m_SIOCR1[0] & 0x02) ? 1 : 0); 
+	LOG("%d: SIOM1-0 (Serial Mode)\n",             (m_SIOCR1[0] & 0x08) ? 1 : 0);
+	LOG("%d: SCK1-2 (Serial Clock)\n",             (m_SIOCR1[0] & 0x04) ? 1 : 0);
+	LOG("%d: SCK1-1 (Serial Clock)\n",             (m_SIOCR1[0] & 0x02) ? 1 : 0);
 	LOG("%d: SCK1-0 (Serial Clock)\n",             (m_SIOCR1[0] & 0x01) ? 1 : 0);
 
 	m_transfer_mode[0] = (m_SIOCR1[0] & 0x38) >> 3;
@@ -503,7 +503,7 @@ WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 		m_receive_bits[0] = 0;
 		break;
 
-	case 0x2: 
+	case 0x2:
 		LOG("(Serial set to 4-bit transmit mode)\n");
 		m_transmit_bits[0] = 4;
 		m_receive_bits[0] = 0;
@@ -523,7 +523,7 @@ WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 	case 0x6:
 		LOG("(Serial set to 4-bit receive mode)\n");
 		m_transmit_bits[0] = 0;
-		m_receive_bits[0] = 4;		
+		m_receive_bits[0] = 4;
 		break;
 
 	default:
@@ -540,7 +540,7 @@ WRITE8_MEMBER(tlcs870_device::sio1cr1_w)
 		m_transfer_shiftreg[0] = 0;
 		m_transfer_pos[0] = 0;
 
-		m_serial_transmit_timer[0]->adjust(attotime::zero);	
+		m_serial_transmit_timer[0]->adjust(attotime::zero);
 	}
 }
 
@@ -554,9 +554,9 @@ WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
 	LOG("%d: (invalid)\n",                          (m_SIOCR2[0] & 0x40) ? 1 : 0);
 	LOG("%d: (invalid)\n",                          (m_SIOCR2[0] & 0x20) ? 1 : 0);
 	LOG("%d: WAIT1-1 (Wait Control\n",              (m_SIOCR2[0] & 0x10) ? 1 : 0);
-	LOG("%d: WAIT1-0 (Wait Control)\n",             (m_SIOCR2[0] & 0x08) ? 1 : 0); 
-	LOG("%d: BUF1-2 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x04) ? 1 : 0); 
-	LOG("%d: BUF1-1 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x02) ? 1 : 0); 
+	LOG("%d: WAIT1-0 (Wait Control)\n",             (m_SIOCR2[0] & 0x08) ? 1 : 0);
+	LOG("%d: BUF1-2 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x04) ? 1 : 0);
+	LOG("%d: BUF1-1 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x02) ? 1 : 0);
 	LOG("%d: BUF1-0 (Number of Transfer Bytes)\n",  (m_SIOCR2[0] & 0x01) ? 1 : 0);
 
 	m_transfer_numbytes[0] = (m_SIOCR2[0] & 0x7);
@@ -567,7 +567,7 @@ WRITE8_MEMBER(tlcs870_device::sio1cr2_w)
 READ8_MEMBER(tlcs870_device::sio1sr_r)
 {
 	/* TS-- ----
-	 
+
 	   T = Transfer in Progress
 	   S = Shift in Progress
 
@@ -625,9 +625,9 @@ WRITE8_MEMBER(tlcs870_device::sio2cr1_w)
 	LOG("%d: SIOINH2 (Abort/Continue transfer)\n", (m_SIOCR1[1] & 0x40) ? 1 : 0);
 	LOG("%d: SIOM2-2 (Serial Mode)\n",             (m_SIOCR1[1] & 0x20) ? 1 : 0);
 	LOG("%d: SIOM2-1 (Serial Mode)\n",             (m_SIOCR1[1] & 0x10) ? 1 : 0);
-	LOG("%d: SIOM2-0 (Serial Mode)\n",             (m_SIOCR1[1] & 0x08) ? 1 : 0); 
-	LOG("%d: SCK2-2 (Serial Clock)\n",             (m_SIOCR1[1] & 0x04) ? 1 : 0); 
-	LOG("%d: SCK2-1 (Serial Clock)\n",             (m_SIOCR1[1] & 0x02) ? 1 : 0); 
+	LOG("%d: SIOM2-0 (Serial Mode)\n",             (m_SIOCR1[1] & 0x08) ? 1 : 0);
+	LOG("%d: SCK2-2 (Serial Clock)\n",             (m_SIOCR1[1] & 0x04) ? 1 : 0);
+	LOG("%d: SCK2-1 (Serial Clock)\n",             (m_SIOCR1[1] & 0x02) ? 1 : 0);
 	LOG("%d: SCK2-0 (Serial Clock)\n",             (m_SIOCR1[1] & 0x01) ? 1 : 0);
 }
 
@@ -640,9 +640,9 @@ WRITE8_MEMBER(tlcs870_device::sio2cr2_w)
 	LOG("%d: (invalid)\n",                          (m_SIOCR2[1] & 0x40) ? 1 : 0);
 	LOG("%d: (invalid)\n",                          (m_SIOCR2[1] & 0x20) ? 1 : 0);
 	LOG("%d: WAIT2-1 (Wait Control\n",              (m_SIOCR2[1] & 0x10) ? 1 : 0);
-	LOG("%d: WAIT2-0 (Wait Control)\n",             (m_SIOCR2[1] & 0x08) ? 1 : 0); 
-	LOG("%d: BUF2-2 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x04) ? 1 : 0); 
-	LOG("%d: BUF2-1 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x02) ? 1 : 0); 
+	LOG("%d: WAIT2-0 (Wait Control)\n",             (m_SIOCR2[1] & 0x08) ? 1 : 0);
+	LOG("%d: BUF2-2 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x04) ? 1 : 0);
+	LOG("%d: BUF2-1 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x02) ? 1 : 0);
 	LOG("%d: BUF2-0 (Number of Transfer Bytes)\n",  (m_SIOCR2[1] & 0x01) ? 1 : 0);
 }
 
@@ -653,7 +653,7 @@ TIMER_CALLBACK_MEMBER(tlcs870_device::sio1_transmit_cb)
 READ8_MEMBER(tlcs870_device::sio2sr_r)
 {
 	/* TS-- ----
-	 
+
 	   T = Transfer in Progress
 	   S = Shift in Progress
 
@@ -672,9 +672,9 @@ WRITE8_MEMBER(tlcs870_device::wdtcr1_w)
 	LOG("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x40) ? 1 : 0);
 	LOG("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x20) ? 1 : 0);
 	LOG("%d: (invalid)\n",                                                          (m_WDTCR1 & 0x10) ? 1 : 0);
-	LOG("%d: WDTEN (Watchdog Timer Enable, also req disable code to WDTCR2)\n",     (m_WDTCR1 & 0x08) ? 1 : 0); 
-	LOG("%d: WDTT-1 (Watchdog Timer Detection Time)\n",                             (m_WDTCR1 & 0x04) ? 1 : 0); 
-	LOG("%d: WDTT-0 (Watchdog Timer Detection Time)\n",                             (m_WDTCR1 & 0x02) ? 1 : 0); 
+	LOG("%d: WDTEN (Watchdog Timer Enable, also req disable code to WDTCR2)\n",     (m_WDTCR1 & 0x08) ? 1 : 0);
+	LOG("%d: WDTT-1 (Watchdog Timer Detection Time)\n",                             (m_WDTCR1 & 0x04) ? 1 : 0);
+	LOG("%d: WDTT-0 (Watchdog Timer Detection Time)\n",                             (m_WDTCR1 & 0x02) ? 1 : 0);
 	LOG("%d: WDTOUT (Watchdog Timer Output select, 0 = interrupt, 1 = reset out)\n",(m_WDTCR1 & 0x01) ? 1 : 0);
 
 	// WDTOUT cannot be set to 1 by software
@@ -708,9 +708,9 @@ WRITE8_MEMBER(tlcs870_device::syscr1_w)
 	LOG("%d: RELM (release method for STOP, 0 edge, 1 level)\n", (m_SYSCR1 & 0x40) ? 1 : 0);
 	LOG("%d: RETM (return mode after STOP, 0 normal, 1 slow)\n", (m_SYSCR1 & 0x20) ? 1 : 0);
 	LOG("%d: OUTEN (port output control during STOP)\n",         (m_SYSCR1 & 0x10) ? 1 : 0);
-	LOG("%d: WUT-1 (warm up time at STOP release)\n",            (m_SYSCR1 & 0x08) ? 1 : 0); 
-	LOG("%d: WUT-0 (warm up time at STOP release)\n",            (m_SYSCR1 & 0x04) ? 1 : 0); 
-	LOG("%d: (invalid)\n",                                       (m_SYSCR1 & 0x02) ? 1 : 0); 
+	LOG("%d: WUT-1 (warm up time at STOP release)\n",            (m_SYSCR1 & 0x08) ? 1 : 0);
+	LOG("%d: WUT-0 (warm up time at STOP release)\n",            (m_SYSCR1 & 0x04) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                       (m_SYSCR1 & 0x02) ? 1 : 0);
 	LOG("%d: (invalid)\n",                                       (m_SYSCR1 & 0x01) ? 1 : 0);
 }
 
@@ -723,9 +723,9 @@ WRITE8_MEMBER(tlcs870_device::syscr2_w)
 	LOG("%d: XTEN (Low Frequency Oscillator control)\n",         (m_SYSCR2 & 0x40) ? 1 : 0);
 	LOG("%d: SYSCK (system clock select 0 high, 1 low)\n",       (m_SYSCR2 & 0x20) ? 1 : 0);
 	LOG("%d: IDLE (IDLE mode start)\n",                          (m_SYSCR2 & 0x10) ? 1 : 0); // hng64 sets this in case of ram test failures
-	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x08) ? 1 : 0); 
-	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x04) ? 1 : 0); 
-	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x02) ? 1 : 0); 
+	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x08) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x04) ? 1 : 0);
+	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x02) ? 1 : 0);
 	LOG("%d: (invalid)\n",                                       (m_SYSCR2 & 0x01) ? 1 : 0);
 }
 
@@ -760,12 +760,12 @@ READ8_MEMBER(tlcs870_device::adcdr_r)
 	return m_ADCDR;
 }
 
-/* 
+/*
 
  ADCCR register bits
 
  es-apppp
- 
+
  e = end flag (1 = done, data available in ADCDR, 0 = not requested / not finished) (r/o)
  s = start flag (1 = request data be processed and put in ADCDR)
 
@@ -810,9 +810,9 @@ WRITE8_MEMBER(tlcs870_device::eintcr_w)
 	LOG("%d: INT0EN (Interrupt 0 enable)\n",     (m_EINTCR & 0x40) ? 1 : 0);
 	LOG("%d: (invalid)\n",                       (m_EINTCR & 0x20) ? 1 : 0);
 	LOG("%d: INT4ES (edge select)\n",            (m_EINTCR & 0x10) ? 1 : 0);
-	LOG("%d: INT3ES (edge select)\n",            (m_EINTCR & 0x08) ? 1 : 0); 
-	LOG("%d: INT2ES (edge select)\n",            (m_EINTCR & 0x04) ? 1 : 0); 
-	LOG("%d: INT1ES (edge select)\n",            (m_EINTCR & 0x02) ? 1 : 0); 
+	LOG("%d: INT3ES (edge select)\n",            (m_EINTCR & 0x08) ? 1 : 0);
+	LOG("%d: INT2ES (edge select)\n",            (m_EINTCR & 0x04) ? 1 : 0);
+	LOG("%d: INT1ES (edge select)\n",            (m_EINTCR & 0x02) ? 1 : 0);
 	LOG("%d: (invalid)\n",                       (m_EINTCR & 0x01) ? 1 : 0);
 
 	/* For edge select register 0 = rising edge, 1 = falling edge
@@ -858,15 +858,15 @@ WRITE8_MEMBER(tlcs870_device::eir_h_w)
 	LOG("%d: EF12 (External Interrupt 4)\n",          (m_EIR & 0x1000) ? 1 : 0);
 	LOG("%d: EF11 (External Interrupt 3)\n",          (m_EIR & 0x0800) ? 1 : 0);
 	LOG("%d: EF10 (8-bit TC4 Interrupt)\n",           (m_EIR & 0x0400) ? 1 : 0);
-	LOG("%d: EF9  (Serial Interface 1 Interrupt)\n",  (m_EIR & 0x0200) ? 1 : 0); 
+	LOG("%d: EF9  (Serial Interface 1 Interrupt)\n",  (m_EIR & 0x0200) ? 1 : 0);
 	LOG("%d: EF8  (8-bit TC3 Interrupt)\n",           (m_EIR & 0x0100) ? 1 : 0);
 }
 
 /*
-	the READ/WRITE/MODIFY operations cannot be used to clear interrupt latches
+    the READ/WRITE/MODIFY operations cannot be used to clear interrupt latches
 
-	also you can't set a latch by writing '1' to it, only clear a latch
-	by writing 0 to it
+    also you can't set a latch by writing '1' to it, only clear a latch
+    by writing 0 to it
 
 */
 READ8_MEMBER(tlcs870_device::il_l_r)
@@ -1028,7 +1028,7 @@ void tlcs870_device::execute_run()
 void tlcs870_device::device_reset()
 {
 	m_pc.d = RM16(0xfffe);
-	
+
 	m_RBS = 0x00;
 	m_EIR = 0x0000;
 	m_IL = 0x0000;

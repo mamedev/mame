@@ -145,17 +145,13 @@
 
     ROM dumps
     ---------
-    Hard to believe, but we have access to two people with one 24K and
-    one 32K version, and we were able to dumps the ROMs correctly.
+    Although these machines are extremely rare, we were lucky to get in
+    contact with users of both console variants and got dumps from
+    their machines.
 
     The ROMs contain a stripped-down version of TI BASIC, but without
     the specific graphics subprograms. Programs written on the 99/2 should
     run on the 99/4A, but the opposite is not true.
-
-    TODO
-    ----
-    * Fix cassette
-    * Add Hexbus
 
     Original implementation: Raphael Nabet; December 1999, 2000
 
@@ -173,6 +169,7 @@
 #include "bus/ti99/internal/992board.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
+#include "bus/hexbus/hexbus.h"
 
 #define TI992_SCREEN_TAG      "screen"
 #define TI992_ROM          "rom_region"
@@ -208,11 +205,11 @@ public:
 	void ti99_224(machine_config &config);
 	void ti99_232(machine_config &config);
 
-private:
-	DECLARE_MACHINE_START( ti99_224 );
-	DECLARE_MACHINE_START( ti99_232 );
-	DECLARE_MACHINE_RESET( ti99_2 );
+	// Lifecycle
+	void driver_start() override;
+	void driver_reset() override;
 
+private:
 	DECLARE_WRITE8_MEMBER(intflag_write);
 
 	DECLARE_READ8_MEMBER(mem_read);
@@ -242,21 +239,14 @@ private:
 	int m_first_ram_page;
 };
 
-MACHINE_START_MEMBER(ti99_2_state, ti99_224)
+void ti99_2_state::driver_start()
 {
 	m_rom = memregion(TI992_ROM)->base();
 	m_ram_start = 0xf000 - m_ram->default_size();
 	m_first_ram_page = m_ram_start >> 12;
 }
 
-MACHINE_START_MEMBER(ti99_2_state, ti99_232)
-{
-	m_rom = memregion(TI992_ROM)->base();
-	m_ram_start = 0xf000 - m_ram->default_size();
-	m_first_ram_page = m_ram_start >> 12;
-}
-
-MACHINE_RESET_MEMBER(ti99_2_state, ti99_2)
+void ti99_2_state::driver_reset()
 {
 	m_otherbank = false;
 
@@ -416,40 +406,56 @@ WRITE_LINE_MEMBER(ti99_2_state::holda)
 	LOGMASKED(LOG_SIGNALS, "HOLDA: %d\n", state);
 }
 
-MACHINE_CONFIG_START(ti99_2_state::ti99_224)
+void ti99_2_state::ti99_224(machine_config& config)
+{
 	ti99_2(config);
 	// Video hardware
-	MCFG_DEVICE_ADD( TI992_VDC_TAG, VIDEO99224, XTAL(10'738'635) )
-	MCFG_VIDEO992_MEM_ACCESS_CB( READ8( *this, ti99_2_state, mem_read ) )
-	MCFG_VIDEO992_HOLD_CB( WRITELINE( *this, ti99_2_state, hold ) )
-	MCFG_VIDEO992_INT_CB( WRITELINE( *this, ti99_2_state, interrupt ) )
-	MCFG_VIDEO992_SCREEN_ADD( TI992_SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TI992_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
-	// I/O interface circuit
-	MCFG_DEVICE_ADD(TI992_IO_TAG, IO99224, 0)
+	VIDEO99224(config, m_videoctrl, XTAL(10'738'635));
+	m_videoctrl->readmem_cb().set(FUNC(ti99_2_state::mem_read));
+	m_videoctrl->hold_cb().set(FUNC(ti99_2_state::hold));
+	m_videoctrl->int_cb().set(FUNC(ti99_2_state::interrupt));
 
-	MCFG_MACHINE_START_OVERRIDE(ti99_2_state, ti99_224 )
-MACHINE_CONFIG_END
+	using namespace bus::ti99::internal;
+	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(10'738'635) / 2,
+			video992_device::TOTAL_HORZ,
+			video992_device::HORZ_DISPLAY_START-12,
+			video992_device::HORZ_DISPLAY_START + 256 + 12,
+			video992_device::TOTAL_VERT_NTSC,
+			video992_device::VERT_DISPLAY_START_NTSC - 12,
+			video992_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
+	screen.set_screen_update(TI992_VDC_TAG, FUNC(video992_device::screen_update));
 
-MACHINE_CONFIG_START(ti99_2_state::ti99_232)
+	// I/O interface circuit. No banking callback.
+	IO99224(config, m_io992, 0);
+}
+
+void ti99_2_state::ti99_232(machine_config& config)
+{
 	ti99_2(config);
 	// Video hardware
-	MCFG_DEVICE_ADD( TI992_VDC_TAG, VIDEO99232, XTAL(10'738'635) )
-	MCFG_VIDEO992_MEM_ACCESS_CB( READ8( *this, ti99_2_state, mem_read ) )
-	MCFG_VIDEO992_HOLD_CB( WRITELINE( *this, ti99_2_state, hold ) )
-	MCFG_VIDEO992_INT_CB( WRITELINE( *this, ti99_2_state, interrupt ) )
-	MCFG_VIDEO992_SCREEN_ADD( TI992_SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TI992_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
+	VIDEO99232(config, m_videoctrl, XTAL(10'738'635));
+	m_videoctrl->readmem_cb().set(FUNC(ti99_2_state::mem_read));
+	m_videoctrl->hold_cb().set(FUNC(ti99_2_state::hold));
+	m_videoctrl->int_cb().set(FUNC(ti99_2_state::interrupt));
+
+	using namespace bus::ti99::internal;
+	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(10'738'635) / 2,
+			video992_device::TOTAL_HORZ,
+			video992_device::HORZ_DISPLAY_START-12,
+			video992_device::HORZ_DISPLAY_START + 256 + 12,
+			video992_device::TOTAL_VERT_NTSC,
+			video992_device::VERT_DISPLAY_START_NTSC - 12,
+			video992_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
+	screen.set_screen_update(TI992_VDC_TAG, FUNC(video992_device::screen_update));
 
 	// I/O interface circuit
-	MCFG_DEVICE_ADD(TI992_IO_TAG, IO99232, 0)
-	MCFG_SET_ROMBANK_HANDLER(WRITELINE(*this, ti99_2_state, rombank_set) )
+	IO99232(config, m_io992, 0).rombank_cb().set(FUNC(ti99_2_state::rombank_set));
+}
 
-	MCFG_MACHINE_START_OVERRIDE(ti99_2_state, ti99_232 )
-
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(ti99_2_state::ti99_2)
+void ti99_2_state::ti99_2(machine_config& config)
+{
 	// TMS9995, standard variant
 	// Documents state that there is a divider by 2 for the clock rate
 	// Experiments with real consoles proved them wrong.
@@ -462,20 +468,16 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	// Early documents indicate 2 KiB RAM, but this does not work with
 	// either ROM version, so we have to assume that the 2 KiB were never
 	// sufficient, not even in the initial design
-	MCFG_RAM_ADD(TI992_RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4096")
-	MCFG_RAM_DEFAULT_VALUE(0)
-
-	MCFG_MACHINE_RESET_OVERRIDE(ti99_2_state, ti99_2 )
+	RAM(config, TI992_RAM_TAG).set_default_size("4096").set_default_value(0);
 
 	// Cassette drives
-	// There is no route from the cassette to some audio output, so we don't hear it.
-	MCFG_CASSETTE_ADD( "cassette" )
+	// There is no route from the cassette to some audio input,
+	// so we don't hear it.
+	CASSETTE(config, "cassette", 0);
 
 	// Hexbus
-	MCFG_HEXBUS_ADD( TI_HEXBUS_TAG )
-
-MACHINE_CONFIG_END
+	HEXBUS(config, TI_HEXBUS_TAG, 0, hexbus_options, nullptr);
+}
 
 /*
   ROM loading

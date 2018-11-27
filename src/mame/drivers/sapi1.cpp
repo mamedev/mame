@@ -639,8 +639,7 @@ MACHINE_CONFIG_START(sapi1_state::sapi1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapi1_state::sapi2)
@@ -672,10 +671,11 @@ MACHINE_CONFIG_START(sapi1_state::sapi3b)
 	MCFG_DEVICE_PROGRAM_MAP(sapi3b_mem)
 	MCFG_DEVICE_IO_MAP(sapi3b_io)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // guess
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(6)
-	MCFG_MC6845_UPDATE_ROW_CB(sapi1_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", 1008000)); // guess
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(6);
+	crtc.set_update_row_callback(FUNC(sapi1_state::crtc_update_row), this);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
@@ -702,16 +702,14 @@ MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	AY51013(config, m_uart); // Tesla MHB1012
 	m_uart->set_tx_clock(XTAL(12'288'000) / 80); // not actual rate?
 	m_uart->set_rx_clock(XTAL(12'288'000) / 80); // not actual rate?
-	m_uart->read_si_callback().set("v24", FUNC(rs232_port_device::rxd_r));
-	m_uart->write_so_callback().set("v24", FUNC(rs232_port_device::write_txd));
+	m_uart->read_si_callback().set(m_v24, FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set(m_v24, FUNC(rs232_port_device::write_txd));
 	m_uart->set_auto_rdav(true); // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
 
-	MCFG_DEVICE_ADD("v24", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, m_v24, default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 

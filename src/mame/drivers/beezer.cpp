@@ -528,7 +528,7 @@ void beezer_state::beezer(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, 16);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(beezer_state::palette_init));
+	m_palette->set_init(DEVICE_SELF, FUNC(beezer_state::palette_init));
 
 	// sound hardware
 	MC6809(config, m_audiocpu, XTAL(4'000'000));

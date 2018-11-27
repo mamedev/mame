@@ -367,7 +367,7 @@ MACHINE_CONFIG_START(esh_state::esh)
 	MCFG_DEVICE_IO_MAP(z80_0_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(*this, esh_state, ld_command_strobe_cb))

@@ -32,6 +32,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "imagedev/floppy.h"
 #include "machine/mos6530n.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
@@ -372,8 +373,7 @@ MACHINE_CONFIG_START(beta_state::beta)
 	MCFG_GENERIC_UNLOAD(beta_state, beta_eprom)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
+	RAM(config, RAM_TAG).set_default_size("256");
 MACHINE_CONFIG_END
 
 /* ROMs */

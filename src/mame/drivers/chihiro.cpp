@@ -374,8 +374,9 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 */
 
 #include "emu.h"
-#include "includes/xbox.h"
+#include "machine/pci.h"
 #include "includes/xbox_pci.h"
+#include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
 #include "machine/idehd.h"
@@ -2356,9 +2357,9 @@ ROM_START( qofd3 )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "cdv-10026d", 0, SHA1(b079778f7837100a9b4fa2a536a4efc7817dd2d2) )  // DVD
 
-	// satellite Chihiro security PIC is missing
+	// satellite Chihiro security PIC, label is unknown
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	ROM_LOAD("317-xxxx-jpn.pic", 0x00, 0x4000, NO_DUMP )
+	ROM_LOAD("317-xxxx-jpn.pic", 0x00, 0x4000, CRC(bacf6f52) SHA1(72892aba23a540c02d3260be8c68d2b3fa45bdae) )
 
 	// "Quest of D Ver. 3.0"
 	// CD QOD3 VERSION UPDATE

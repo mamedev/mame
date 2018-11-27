@@ -1363,7 +1363,7 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 	MCFG_DEVICE_PROGRAM_MAP(brvteam_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	config.set_default_layout(layout_inder);
@@ -1381,7 +1381,7 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	MCFG_DEVICE_PROGRAM_MAP(canasta_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	config.set_default_layout(layout_inder);
@@ -1389,8 +1389,7 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	MCFG_DEVICE_ADD("ay", AY8910, XTAL(4'000'000) / 2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	AY8910(config, "ay", XTAL(4'000'000) / 2).add_route(ALL_OUTPUTS, "ayvol", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::lapbylap)
@@ -1402,7 +1401,7 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	MCFG_DEVICE_PROGRAM_MAP(lapbylap_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	config.set_default_layout(layout_inder);
@@ -1410,11 +1409,10 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, inder_state, sndcmd_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	AY8910(config, "ay1", XTAL(2'000'000)).add_route(ALL_OUTPUTS, "ayvol", 1.0); // same xtal that drives subcpu
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(2'000'000))); // same xtal that drives subcpu
+	ay2.port_a_read_callback().set(FUNC(inder_state::sndcmd_r));
+	ay2.add_route(ALL_OUTPUTS, "ayvol", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::inder)
@@ -1426,7 +1424,7 @@ MACHINE_CONFIG_START(inder_state::inder)
 	MCFG_DEVICE_PROGRAM_MAP(inder_sub_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Video */
 	config.set_default_layout(layout_inder);
@@ -1441,45 +1439,23 @@ MACHINE_CONFIG_START(inder_state::inder)
 	m_msm->add_route(ALL_OUTPUTS, "msmvol", 1.0);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi60", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi60a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi60a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi60b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi60b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, sw_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi60c_w))
+	i8255_device &ppi60(I8255A(config, "ppi60"));
+	ppi60.out_pa_callback().set(FUNC(inder_state::ppi60a_w));
+	ppi60.out_pb_callback().set(FUNC(inder_state::ppi60b_w));
+	ppi60.in_pc_callback().set(FUNC(inder_state::sw_r));
 
-	MCFG_DEVICE_ADD("ppi64", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi64a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi64a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi64b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi64b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi64c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi64c_w))
+	i8255_device &ppi64(I8255A(config, "ppi64"));
+	ppi64.out_pc_callback().set(FUNC(inder_state::ppi64c_w));
 
-	MCFG_DEVICE_ADD("ppi68", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi68a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi68a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi68b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi68b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi68c_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi68c_w))
+	I8255A(config, "ppi68");
 
-	MCFG_DEVICE_ADD("ppi6c", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi6ca_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi6ca_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi6cb_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi6cb_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi6cc_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi6cc_w))
+	I8255A(config, "ppi6c");
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppia_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppia_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppib_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppib_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppic_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppic_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(inder_state::ppia_w));
+	ppi.out_pb_callback().set(FUNC(inder_state::ppib_w));
+	ppi.in_pc_callback().set(FUNC(inder_state::ppic_r));
+	ppi.out_pc_callback().set(FUNC(inder_state::ppic_w));
 
 	TTL7474(config, m_7a, 0);
 	m_7a->comp_output_cb().set(FUNC(inder_state::qc7a_w));
@@ -1550,7 +1526,7 @@ ROM_START(pinclown)
 	ROM_LOAD("clown_a.bin", 0x0000, 0x2000, CRC(b7c3f9ab) SHA1(89ede10d9e108089da501b28f53cd7849f791a00))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
-	ROM_LOAD("clown_b.bin", 0x0000, 0x2000, CRC(81a66302) SHA1(3d1243ae878747f20e54cd3322c5a54ded45ce21))
+	ROM_LOAD("clown_b.bin", 0x0000, 0x2000, CRC(c223c961) SHA1(ed5180505b6ebbfb9451f67a44d07df3555c8f8d))
 
 	ROM_REGION(0x40000, "speech", 0)
 	ROM_LOAD("clown_c.bin", 0x00000, 0x10000, CRC(dff89319) SHA1(3745a02c3755d11ea7fb552f7a5df2e8bbee2c29))

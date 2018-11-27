@@ -56,7 +56,6 @@
 #include "cpu/m6502/m6502.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
 
 #include "machine/bankdev.h"
 #include "machine/kb3600.h"
@@ -73,8 +72,6 @@
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
-
-#include "formats/ap2_dsk.h"
 
 
 #define A7_CPU_TAG "maincpu"
@@ -1088,10 +1085,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 
 	MCFG_DEVICE_ADD(m_video, AGAT7VIDEO, RAM_TAG, "gfx1")
 
-	MCFG_RAM_ADD(m_ram)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-//  MCFG_RAM_EXTRA_OPTIONS("64K,128K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("32K").set_default_value(0);//.set_extra_options("64K,128K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1102,20 +1096,20 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat7_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* keyboard controller -- XXX must be replaced */
-	MCFG_DEVICE_ADD(m_ay3600, AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(*this, agat7_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(*this, agat7_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, agat7_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(*this, agat7_state, ay3600_ako_w))
+	AY3600(config, m_ay3600, 0);
+	m_ay3600->x0().set_ioport("X0");
+	m_ay3600->x1().set_ioport("X1");
+	m_ay3600->x2().set_ioport("X2");
+	m_ay3600->x3().set_ioport("X3");
+	m_ay3600->x4().set_ioport("X4");
+	m_ay3600->x5().set_ioport("X5");
+	m_ay3600->x6().set_ioport("X6");
+	m_ay3600->x7().set_ioport("X7");
+	m_ay3600->x8().set_ioport("X8");
+	m_ay3600->shift().set(FUNC(agat7_state::ay3600_shift_r));
+	m_ay3600->control().set(FUNC(agat7_state::ay3600_control_r));
+	m_ay3600->data_ready().set(FUNC(agat7_state::ay3600_data_ready_w));
+	m_ay3600->ako().set(FUNC(agat7_state::ay3600_ako_w));
 
 	/* repeat timer.  10 Hz per Mymrin's book */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", agat7_state, ay3600_repeat, attotime::from_hz(10))

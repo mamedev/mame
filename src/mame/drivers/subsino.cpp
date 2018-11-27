@@ -2710,12 +2710,12 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	MCFG_DEVICE_PROGRAM_MAP(victor21_map)
 	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, subsino_state, out_a_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, subsino_state, out_b_w))
-	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("INC"))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(subsino_state::out_a_w));
+	ppi.tri_pa_callback().set_constant(0);
+	ppi.out_pb_callback().set(FUNC(subsino_state::out_b_w));
+	ppi.tri_pb_callback().set_constant(0);
+	ppi.in_pc_callback().set_ioport("INC");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -2793,15 +2793,15 @@ MACHINE_CONFIG_START(subsino_state::srider)
 	MCFG_DEVICE_PROGRAM_MAP(srider_map)
 	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SW3"))
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.in_pa_callback().set_ioport("SW1");
+	ppi1.in_pb_callback().set_ioport("SW2");
+	ppi1.in_pc_callback().set_ioport("SW3");
 
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SW4"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("INA"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("INB"))
+	i8255_device &ppi2(I8255A(config, "ppi2"));
+	ppi2.in_pa_callback().set_ioport("SW4");
+	ppi2.in_pb_callback().set_ioport("INA");
+	ppi2.in_pc_callback().set_ioport("INB");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -2846,15 +2846,15 @@ MACHINE_CONFIG_START(subsino_state::tisub)
 	MCFG_DEVICE_PROGRAM_MAP(tisub_map)
 	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SW3"))
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.in_pa_callback().set_ioport("SW1");
+	ppi1.in_pb_callback().set_ioport("SW2");
+	ppi1.in_pc_callback().set_ioport("SW3");
 
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SW4"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("INA"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("INB"))
+	i8255_device &ppi2(I8255A(config, "ppi2"));
+	ppi2.in_pa_callback().set_ioport("SW4");
+	ppi2.in_pb_callback().set_ioport("INA");
+	ppi2.in_pc_callback().set_ioport("INB");
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -2887,17 +2887,17 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_DEVICE_PROGRAM_MAP(stbsub_map)
 	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("SW3"))
+	i8255_device &ppi1(I8255A(config, "ppi1"));
+	ppi1.in_pa_callback().set_ioport("SW1");
+	ppi1.in_pb_callback().set_ioport("SW2");
+	ppi1.in_pc_callback().set_ioport("SW3");
 
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("SW4"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("INB"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("INA"))
+	i8255_device &ppi2(I8255A(config, "ppi2"));
+	ppi2.in_pa_callback().set_ioport("SW4");
+	ppi2.in_pb_callback().set_ioport("INB");
+	ppi2.in_pc_callback().set_ioport("INA");
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
@@ -2914,7 +2914,8 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	//MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &subsino_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
 

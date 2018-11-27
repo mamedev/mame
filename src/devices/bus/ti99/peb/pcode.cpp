@@ -93,14 +93,6 @@ namespace bus { namespace ti99 { namespace peb {
 #define PCODE_GROM_TAG "pcode_grom"
 #define PCODE_ROM_TAG "pcode_rom"
 
-#define PGROM0_TAG "grom0"
-#define PGROM1_TAG "grom1"
-#define PGROM2_TAG "grom2"
-#define PGROM3_TAG "grom3"
-#define PGROM4_TAG "grom4"
-#define PGROM5_TAG "grom5"
-#define PGROM6_TAG "grom6"
-#define PGROM7_TAG "grom7"
 #define ACTIVE_TAG "ACTIVE"
 
 #define CRU_BASE 0x1f00
@@ -108,14 +100,7 @@ namespace bus { namespace ti99 { namespace peb {
 ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_P_CODE, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
-	m_grom0(*this, PGROM0_TAG),
-	m_grom1(*this, PGROM1_TAG),
-	m_grom2(*this, PGROM2_TAG),
-	m_grom3(*this, PGROM3_TAG),
-	m_grom4(*this, PGROM4_TAG),
-	m_grom5(*this, PGROM5_TAG),
-	m_grom6(*this, PGROM6_TAG),
-	m_grom7(*this, PGROM7_TAG),
+	m_groms(*this, "grom%u", 0U),
 	m_crulatch(*this, "crulatch"),
 	m_rom(nullptr),
 	m_bank_select(0),
@@ -152,14 +137,8 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 		line_state mline = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 		line_state gsq = m_isgrom? ASSERT_LINE : CLEAR_LINE;
 
-		m_grom0->set_lines(mline, a14, gsq);
-		m_grom1->set_lines(mline, a14, gsq);
-		m_grom2->set_lines(mline, a14, gsq);
-		m_grom3->set_lines(mline, a14, gsq);
-		m_grom4->set_lines(mline, a14, gsq);
-		m_grom5->set_lines(mline, a14, gsq);
-		m_grom6->set_lines(mline, a14, gsq);
-		m_grom7->set_lines(mline, a14, gsq);
+		for (auto &grom : m_groms)
+			grom->set_lines(mline, a14, gsq);
 	}
 }
 
@@ -195,14 +174,8 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 		{
 			if (m_isgrom)
 			{
-				m_grom0->readz(value);
-				m_grom1->readz(value);
-				m_grom2->readz(value);
-				m_grom3->readz(value);
-				m_grom4->readz(value);
-				m_grom5->readz(value);
-				m_grom6->readz(value);
-				m_grom7->readz(value);
+				for (auto &grom : m_groms)
+					grom->readz(value);
 				LOGMASKED(LOG_GROM, "Read from grom %04x: %02x\n", m_address&0xffff, *value);
 			}
 			else
@@ -232,14 +205,8 @@ WRITE8_MEMBER( ti_pcode_card_device::write )
 	if (machine().side_effects_disabled()) return;
 	if (m_active && m_isgrom && m_selected)
 	{
-		m_grom0->write(data);
-		m_grom1->write(data);
-		m_grom2->write(data);
-		m_grom3->write(data);
-		m_grom4->write(data);
-		m_grom5->write(data);
-		m_grom6->write(data);
-		m_grom7->write(data);
+		for (auto &grom : m_groms)
+			grom->write(data);
 	}
 }
 
@@ -263,14 +230,8 @@ WRITE_LINE_MEMBER( ti_pcode_card_device::clock_in)
 	{
 		// Toggle
 		m_clockhigh = !m_clockhigh;
-		m_grom0->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
-		m_grom1->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
-		m_grom2->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
-		m_grom3->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
-		m_grom4->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
-		m_grom5->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
-		m_grom6->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
-		m_grom7->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
+		for (auto &grom : m_groms)
+			grom->gclock_in(m_clockhigh ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -385,43 +346,15 @@ ROM_START( ti99_pcode )
 	ROM_LOAD("pcode_rom1.u18", 0x1000, 0x2000, CRC(46a06b8b) SHA1(24e2608179921aef312cdee6f455e3f46deb30d0)) /* TI P-Code card rom4764 */
 ROM_END
 
-MACHINE_CONFIG_START(ti_pcode_card_device::device_add_mconfig)
-	TMC0430(config, m_grom0, 0);
-	m_grom0->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
-	m_grom0->set_region_and_ident(PCODE_GROM_TAG, 0x0000, 0);
-
-	TMC0430(config, m_grom1, 0);
-	m_grom1->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
-	m_grom1->set_region_and_ident(PCODE_GROM_TAG, 0x2000, 1);
-
-	TMC0430(config, m_grom2, 0);
-	m_grom2->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
-	m_grom2->set_region_and_ident(PCODE_GROM_TAG, 0x4000, 2);
-
-	TMC0430(config, m_grom3, 0);
-	m_grom3->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
-	m_grom3->set_region_and_ident(PCODE_GROM_TAG, 0x6000, 3);
-
-	TMC0430(config, m_grom4, 0);
-	m_grom4->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
-	m_grom4->set_region_and_ident(PCODE_GROM_TAG, 0x8000, 4);
-
-	TMC0430(config, m_grom5, 0);
-	m_grom5->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
-	m_grom5->set_region_and_ident(PCODE_GROM_TAG, 0xa000, 5);
-
-	TMC0430(config, m_grom6, 0);
-	m_grom6->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
-	m_grom6->set_region_and_ident(PCODE_GROM_TAG, 0xc000, 6);
-
-	TMC0430(config, m_grom7, 0);
-	m_grom7->ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
-	m_grom7->set_region_and_ident(PCODE_GROM_TAG, 0xe000, 7);
+void ti_pcode_card_device::device_add_mconfig(machine_config &config)
+{
+	for (unsigned i = 0; m_groms.size() > i; ++i)
+		TMC0430(config, m_groms[i], PCODE_GROM_TAG, 0x2000 * i, i).ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
 
 	LS259(config, m_crulatch); // U12
 	m_crulatch->q_out_cb<0>().set(FUNC(ti_pcode_card_device::pcpage_w));
 	m_crulatch->q_out_cb<4>().set(FUNC(ti_pcode_card_device::ekrpg_w));
-MACHINE_CONFIG_END
+}
 
 const tiny_rom_entry *ti_pcode_card_device::device_rom_region() const
 {

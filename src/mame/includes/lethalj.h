@@ -24,10 +24,11 @@ public:
 	};
 
 	lethalj_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag) ,
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_ticket(*this, "ticket"),
+		m_blitter_base(*this, "gfx"),
 		m_paddle(*this, "PADDLE"),
 		m_light0_x(*this, "LIGHT0_X"),
 		m_light0_y(*this, "LIGHT0_Y"),
@@ -50,7 +51,7 @@ private:
 	DECLARE_WRITE16_MEMBER(cfarm_control_w);
 	DECLARE_WRITE16_MEMBER(cclownz_control_w);
 	DECLARE_READ16_MEMBER(lethalj_gun_r);
-	DECLARE_WRITE16_MEMBER(lethalj_blitter_w);
+	DECLARE_WRITE16_MEMBER(blitter_w);
 	void do_blit();
 	inline void get_crosshair_xy(int player, int *x, int *y);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
@@ -64,6 +65,9 @@ private:
 	required_device<tms34010_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ticket_dispenser_device> m_ticket;
+
+	required_region_ptr<uint16_t> m_blitter_base;
+
 	optional_ioport m_paddle;
 	optional_ioport m_light0_x;
 	optional_ioport m_light0_y;
@@ -75,7 +79,6 @@ private:
 	uint16_t m_blitter_data[8];
 	std::unique_ptr<uint16_t[]> m_screenram;
 	uint8_t m_vispage;
-	uint16_t *m_blitter_base;
 	int m_blitter_rows;
 	uint16_t m_gunx;
 	uint16_t m_guny;

@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	m_mainlatch->q_out_cb<4>().set(FUNC(retofinv_state::irq1_ack_w));
 	m_mainlatch->q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -458,7 +458,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(18'432'000)/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

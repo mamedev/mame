@@ -1069,12 +1069,12 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 	MCFG_DEVICE_ADD("maincpu", TMS32031, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(midvunit_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TIMER_ADD_NONE("timer0")
 	MCFG_TIMER_ADD_NONE("timer1")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -1135,9 +1135,9 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(94)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x3839);
 MACHINE_CONFIG_END
 
 

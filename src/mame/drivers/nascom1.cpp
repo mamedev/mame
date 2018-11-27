@@ -690,12 +690,10 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_CASSETTE_ADD("cassette")
 
 	// pio
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(16'000'000)/8)
+	Z80PIO(config, "z80pio", XTAL(16'000'000)/8);
 
 	// internal extra ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
+	RAM(config, m_ram).set_default_size("48K").set_extra_options("8K,16K,32K");
 
 	// devices
 	MCFG_SNAPSHOT_ADD("snapshot", nascom_state, nascom1, "nas", 0.5)
@@ -748,9 +746,7 @@ MACHINE_CONFIG_START(nascom2_state::nascom2c)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(nascom2c_mem)
 
-	MCFG_DEVICE_REMOVE(RAM_TAG)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("60K")
+	m_ram->set_default_size("60K");
 
 	MCFG_DEVICE_MODIFY(NASBUS_TAG)
 	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_cpm_w))

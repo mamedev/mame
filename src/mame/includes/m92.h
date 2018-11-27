@@ -5,6 +5,10 @@
     Irem M92 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_M92_H
+#define MAME_INCLUDES_M92_H
+
+#pragma once
 
 #include "video/bufsprite.h"
 #include "sound/okim6295.h"
@@ -42,7 +46,8 @@ public:
 		m_palette(*this, "palette"),
 		m_upd71059c(*this, "upd71059c"),
 		m_eeprom(*this, "eeprom", 16),
-		m_mainbank(*this, "mainbank") { }
+		m_mainbank(*this, "mainbank")
+	{ }
 
 	void m92(machine_config &config);
 	void m92_banked(machine_config &config);
@@ -129,3 +134,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_M92_H

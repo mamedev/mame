@@ -180,7 +180,7 @@ WRITE_LINE_MEMBER(ti990_4_state::asrkey_interrupt)
 
 WRITE8_MEMBER( ti990_4_state::external_operation )
 {
-	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	switch (offset)
 	{
 	case IDLE_OP:
@@ -303,15 +303,14 @@ MACHINE_CONFIG_START(ti990_4_state::ti990_4)
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
-	MCFG_DEVICE_ADD("asr733", ASR733, 0)
-	MCFG_ASR733_KEYINT_HANDLER(WRITELINE(*this, ti990_4_state, asrkey_interrupt))
-	MCFG_ASR733_LINEINT_HANDLER(WRITELINE(*this, ti990_4_state, line_interrupt))
+	asr733_device& term(ASR733(config, "asr733", 0));
+	term.keyint_cb().set(FUNC(ti990_4_state::asrkey_interrupt));
+	term.lineint_cb().set(FUNC(ti990_4_state::line_interrupt));
 
 	// Floppy controller
-	MCFG_DEVICE_ADD("fd800", TI99X_FD800, 0)
-	MCFG_FD800_INT_HANDLER(WRITELINE(*this, ti990_4_state, fd_interrupt))
+	TI99X_FD800(config, "fd800", 0).int_cb().set(FUNC(ti990_4_state::fd_interrupt));
 
-//  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
+	//  TODO: Add floppy drives
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti990_4_state::ti990_4v)
@@ -323,16 +322,15 @@ MACHINE_CONFIG_START(ti990_4_state::ti990_4v)
 	m_maincpu->extop_cb().set(FUNC(ti990_4_state::external_operation));
 	m_maincpu->intlevel_cb().set(FUNC(ti990_4_state::interrupt_level));
 
-	// Terminal
-	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
-	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(*this, ti990_4_state, vdtkey_interrupt))
-	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(*this, ti990_4_state, line_interrupt))
+	// VDT 911 terminal
+	vdt911_device& term(VDT911(config, "vdt911", 0));
+	term.keyint_cb().set(FUNC(ti990_4_state::vdtkey_interrupt));
+	term.lineint_cb().set(FUNC(ti990_4_state::line_interrupt));
 
 	// Floppy controller
-	MCFG_DEVICE_ADD("fd800", TI99X_FD800, 0)
-	MCFG_FD800_INT_HANDLER(WRITELINE(*this, ti990_4_state, fd_interrupt))
+	TI99X_FD800(config, "fd800", 0).int_cb().set(FUNC(ti990_4_state::fd_interrupt));
 
-//  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
+	//  TODO: Add floppy drives
 MACHINE_CONFIG_END
 
 /*

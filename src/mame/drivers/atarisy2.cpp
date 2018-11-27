@@ -700,7 +700,7 @@ WRITE8_MEMBER(atarisy2_state::tms5220_w)
 {
 	if (m_tms5220.found())
 	{
-		m_tms5220->data_w(space, 0, data);
+		m_tms5220->data_w(data);
 	}
 }
 
@@ -1189,9 +1189,9 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
+	M6502(config, m_audiocpu, SOUND_CLOCK/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy2_state::sound_map);
+	m_audiocpu->set_periodic_int("soundcomm", FUNC(atari_sound_comm_device::sound_irq_gen), attotime::from_hz(MASTER_CLOCK/2/16/16/16/10));
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
@@ -1206,9 +1206,9 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	// IN6 = J102 pin 2 (unused)
 	// IN7 = J102 pin 3 (unused)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
+	EEPROM_2804(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy2)
@@ -1233,12 +1233,12 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", NOOP)
+	ATARI_SOUND_COMM(config, m_soundcomm, m_audiocpu).int_callback().set_nop();
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, m_ym2151, SOUND_CLOCK/4);
+	m_ym2151->add_route(0, "lspeaker", 0.60);
+	m_ym2151->add_route(1, "rspeaker", 0.60);
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, SOUND_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))
@@ -1300,7 +1300,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( paperboy )
+ROM_START( paperboy ) // ALL of these roms should be 136034-xxx but the correct labels aren't known per game rev!
 	ROM_REGION( 0x90000, "maincpu", 0 ) /* 9*64k for T11 code */
 	ROM_LOAD16_BYTE( "cpu_l07.rv3", 0x008000, 0x004000, CRC(4024bb9b) SHA1(9030ce5a6a1a3d769c699a92b32a55013f9766aa) )
 	ROM_LOAD16_BYTE( "cpu_n07.rv3", 0x008001, 0x004000, CRC(0260901a) SHA1(39d786f5c440ca1fd529ee73e2a4d2406cd1db8f) )

@@ -399,8 +399,8 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
@@ -451,8 +451,8 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
@@ -551,6 +551,58 @@ ROM_START( brkthruj )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "brkthru.5",    0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) )
+ROM_END
+
+// Tecfri PCB with Data East license (DE-0230-2 / DE-0231-2).
+ROM_START( brkthrut )
+	ROM_REGION( 0x20000, "maincpu", 0 )     // 64k for main CPU + 64k for banked ROMs
+	ROM_LOAD( "5_de-0230-2_27128.f9",  0x04000, 0x4000, CRC(158e660a) SHA1(608082e8b49d3c5595c25be8c19b80402310406a) )
+	ROM_LOAD( "6_de-0230-2_27256.f11", 0x08000, 0x8000, CRC(62dbe49e) SHA1(f0510cf0144d75c208f0ced342d3a726325a70d4) )
+	ROM_LOAD( "8_de-0230-2_27256.f13", 0x10000, 0x8000, CRC(8cabf252) SHA1(45e8847b2e6b278989f67e0b27b827a9b3b92581) ) // Same as parent
+	ROM_LOAD( "7_de-0230-2_27256.f12", 0x18000, 0x8000, CRC(2f2c40c2) SHA1(fcb78941453520a3a07f272127dae7c2cc1999ea) ) // Same as parent
+
+	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_LOAD( "9_de-0231-2_2764.c8", 0x00000, 0x2000, CRC(58c0b29b) SHA1(9dc075f8afae7e8fe164a9fe325e9948cdc7e4bb) ) // Characters, same as parent
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	// Background
+	// We do a lot of scatter loading here, to place the data in a format
+	// which can be decoded by MAME's standard functions
+	ROM_LOAD( "2_de-0230-2_27256.a6", 0x00000, 0x4000, CRC(920cc56a) SHA1(c75806691073f1f3bd54dcaca4c14155ecf4471d) ) // Bitplanes 1,2 for bank 1,2, same as parent
+	ROM_CONTINUE(             0x08000, 0x4000 )             // Bitplanes 1,2 for bank 3,4
+	ROM_LOAD( "1_de-0230-2_27256.a5", 0x10000, 0x4000, CRC(fd3cee40) SHA1(3308b96bb69e0fa6dffbdff296273fafa16d5e70) ) // Bitplanes 1,2 for bank 5,6, same as parent
+	ROM_CONTINUE(             0x18000, 0x4000 )             // Bitplanes 1,2 for bank 7,8
+	ROM_LOAD( "3_de-0230-2_27256.a8", 0x04000, 0x1000, CRC(f67ee64e) SHA1(75634bd481ae44b8aa02acb4f9b4d7ff973a4c71) ) // Bitplane 3 for bank 1,2, same as parent
+	ROM_CONTINUE(             0x06000, 0x1000 )
+	ROM_CONTINUE(             0x0c000, 0x1000 )             // Bitplane 3 for bank 3,4
+	ROM_CONTINUE(             0x0e000, 0x1000 )
+	ROM_CONTINUE(             0x14000, 0x1000 )             // Bitplane 3 for bank 5,6
+	ROM_CONTINUE(             0x16000, 0x1000 )
+	ROM_CONTINUE(             0x1c000, 0x1000 )             // Bitplane 3 for bank 7,8
+	ROM_CONTINUE(             0x1e000, 0x1000 )
+
+	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_LOAD( "10_de-0231-2_27156.h2", 0x00000, 0x8000, CRC(f54e50a7) SHA1(eccf4d859c26944271ec6586644b4730a72851fd) ) // Sprites, same as parent
+	ROM_LOAD( "11_de-0231-2_27156.h4", 0x08000, 0x8000, CRC(fd156945) SHA1(a0575a4164217e63317886176ab7e59d255fc771) ) // Same as parent
+	ROM_LOAD( "12_de-0231-2_27156.h5", 0x10000, 0x8000, CRC(c152a99b) SHA1(f96133aa01219eda357b9e906bd9577dbfe359c0) ) // Same as parent
+
+	ROM_REGION( 0x0300, "proms", 0 ) // Truly dumped on the Tecfri PCB
+	/* The original 82s129 bipolar PROM for R/G was replaced with one 82s147
+	   that has twice the size, and apparently the A04 line disconnected...
+	*/
+	ROM_LOAD( "6309.c2", 0x0000, 0x0040, CRC(cd9709be) SHA1(1d9c451c771a7b38680e2179aa22289ea7cb2720) ) // Red and green component (82S147N)
+	ROM_CONTINUE(        0x0020, 0x0040 )
+	ROM_CONTINUE(        0x0040, 0x0040 )
+	ROM_CONTINUE(        0x0060, 0x0040 )
+	ROM_CONTINUE(        0x0080, 0x0040 )
+	ROM_CONTINUE(        0x00a0, 0x0040 )
+	ROM_CONTINUE(        0x00c0, 0x0040 )
+	ROM_CONTINUE(        0x00e0, 0x0040 )
+
+	ROM_LOAD( "6301.c1", 0x0100, 0x0100, CRC(f2d4822a) SHA1(f535e91b87ff01f2a73662856fd3f72907ca62e9) ) // Blue component (82S129N), same as parent
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "4_de-0230-2_27256.d6", 0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) ) // Same as parent
 ROM_END
 
 /* bootleg, changed prg rom fails test, probably just the japanese version modified to have english title */
@@ -653,7 +705,8 @@ void brkthru_state::init_brkthru()
  *
  *************************************/
 
-GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, init_brkthru, ROT0,   "Data East USA",         "Break Thru (US)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, init_brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, init_brkthru, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation",                  "Kyohkoh-Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthrut, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, init_brkthru, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )

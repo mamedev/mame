@@ -374,7 +374,7 @@ WRITE8_MEMBER( gts80b_state::port3b_w )
 	if (m_r0_sound)
 		m_r0_sound->write(space, offset, sndcmd);
 	if (m_r1_sound)
-		m_r1_sound->write(space, offset, sndcmd);
+		m_r1_sound->write(sndcmd);
 }
 
 void gts80b_state::machine_reset()
@@ -388,12 +388,13 @@ void gts80b_state::init_gts80b()
 }
 
 /* with Sound Board */
-MACHINE_CONFIG_START(gts80b_state::gts80b)
+void gts80b_state::gts80b(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
-	MCFG_DEVICE_PROGRAM_MAP(gts80b_map)
+	M6502(config, m_maincpu, XTAL(3'579'545)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gts80b_state::gts80b_map);
 
-	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
 	/* Video */
 	config.set_default_layout(layout_gts80b);
@@ -423,48 +424,52 @@ MACHINE_CONFIG_START(gts80b_state::gts80b)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gts80b_state::gts80b_s)
+void gts80b_state::gts80b_s(machine_config &config)
+{
 	gts80b(config);
-	MCFG_DEVICE_ADD("r0sound", GOTTLIEB_SOUND_REV0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	GOTTLIEB_SOUND_REV0(config, m_r0_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-//static MACHINE_CONFIG_START( gts80b_ss )
-//static    gts80b(config);
-//  MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
-//  //MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX0)  // votrax crashes
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-//MACHINE_CONFIG_END
+//void gts80b_state::gts80b_ss(machine_config &config)
+//{
+//  gts80b(config);
+//  GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+//  //GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);  // votrax crashes
+//}
 
-MACHINE_CONFIG_START(gts80b_state::gts80b_s1)
-	gts80b(config);
-
-	/* related to src/mame/audio/gottlieb.c? */
-//  MCFG_IMPORT_FROM(gts80s_b1)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(gts80b_state::gts80b_s2)
+void gts80b_state::gts80b_s1(machine_config &config)
+{
 	gts80b(config);
 
-	/* related to src/mame/audio/gottlieb.c? */
-//  MCFG_IMPORT_FROM(gts80s_b2)
-MACHINE_CONFIG_END
+	/* related to src/mame/audio/gottlieb.cpp? */
+//  gts80s_b1(config);
+}
 
-MACHINE_CONFIG_START(gts80b_state::gts80b_s3)
+void gts80b_state::gts80b_s2(machine_config &config)
+{
 	gts80b(config);
 
-	/* related to src/mame/audio/gottlieb.c? */
-//  MCFG_IMPORT_FROM(gts80s_b3)
-MACHINE_CONFIG_END
+	/* related to src/mame/audio/gottlieb.cpp? */
+//  gts80s_b2(config);
+}
 
-MACHINE_CONFIG_START(gts80b_state::bonebstr)
+void gts80b_state::gts80b_s3(machine_config &config)
+{
 	gts80b(config);
 
-	/* related to src/mame/audio/gottlieb.c? */
-//  MCFG_IMPORT_FROM(gts80s_b3a)
-MACHINE_CONFIG_END
+	/* related to src/mame/audio/gottlieb.cpp? */
+//  gts80s_b3(config);
+}
+
+void gts80b_state::bonebstr(machine_config &config)
+{
+	gts80b(config);
+
+	/* related to src/mame/audio/gottlieb.cpp? */
+//  gts80s_b3a(config);
+}
 
 
 /*-------------------------------------------------------------------

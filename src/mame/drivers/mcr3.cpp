@@ -526,7 +526,7 @@ void mcr3_state::spyhunt_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0x84, 0x86).w(FUNC(mcr3_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
@@ -1081,27 +1081,27 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mcr3_state::mcrmono)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(mcrmono_map)
-	MCFG_DEVICE_IO_MAP(mcrmono_portmap)
-	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
+	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::mcrmono_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr3_state::mcrmono_portmap);
+	m_maincpu->set_daisy_config(mcr_daisy_chain);
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK/4 /* same as "maincpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	Z80CTC(config, m_ctc, MASTER_CLOCK/4 /* same as "maincpu" */);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1163,9 +1163,8 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spyhunt_map)
-	MCFG_DEVICE_IO_MAP(spyhunt_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::spyhunt_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr3_state::spyhunt_portmap);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

@@ -609,9 +609,9 @@ MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_S16LF01_ADD("vfd",0)//for debug ports
+	S16LF01(config, m_vfd); //for debug ports
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000) / 4, 676, 20*4, 147*4, 256, 0, 254)
@@ -830,8 +830,8 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_S16LF01_ADD("vfd",0)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	S16LF01(config, m_vfd);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -888,8 +888,8 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia6850[2], FUNC(acia6850_device::write_rxc));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_S16LF01_ADD("vfd",0)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	S16LF01(config, m_vfd);
 
 	SPEAKER(config, "mono").front_center();
 

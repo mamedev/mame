@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_DEVICE_IO_MAP(wink_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -423,11 +423,11 @@ MACHINE_CONFIG_START(wink_state::wink)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 12000000 / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, wink_state, sound_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8912_device &aysnd(AY8912(config, "aysnd", 12000000 / 8));
+	aysnd.port_a_read_callback().set(FUNC(wink_state::sound_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /***************************************************************************

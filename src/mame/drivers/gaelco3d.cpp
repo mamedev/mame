@@ -609,7 +609,7 @@ WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
 
 			for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
 			{
-				m_dmadac[i]->set_frequency(ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
+				m_dmadac[i]->set_frequency(sample_period.as_hz());
 				m_dmadac[i]->enable(1);
 			}
 
@@ -939,7 +939,7 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
 	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
-	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C66_16BIT, eeprom_serial_streaming::ENABLE)
+	EEPROM_93C66_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

@@ -112,9 +112,9 @@ WRITE8_MEMBER(piggypas_state::lcd_control_w)
 	if (BIT(data, 0))
 	{
 		if (BIT(data, 2))
-			m_lcd_latch = m_hd44780->read(space, BIT(data, 1));
+			m_lcd_latch = m_hd44780->read(BIT(data, 1));
 		else
-			m_hd44780->write(space, BIT(data, 1), m_lcd_latch);
+			m_hd44780->write(BIT(data, 1), m_lcd_latch);
 	}
 
 	// T0 (P3.4) = output shift clock (serial data present at P1.0)
@@ -212,7 +212,7 @@ MACHINE_CONFIG_START(piggypas_state::piggypas)
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, piggypas_state, mcs51_tx_callback))
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // DS1220AD
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220AD
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -234,10 +234,10 @@ MACHINE_CONFIG_START(piggypas_state::piggypas)
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'448'000) / 8, okim6295_device::PIN7_HIGH) // clock and pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0) // OKI M82C55A-2
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, piggypas_state, ctrl_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))
+	i8255_device &ppi(I8255A(config, "ppi")); // OKI M82C55A-2
+	ppi.in_pa_callback().set_ioport("IN1");
+	ppi.out_pb_callback().set(FUNC(piggypas_state::ctrl_w));
+	ppi.in_pc_callback().set_ioport("IN0");
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END

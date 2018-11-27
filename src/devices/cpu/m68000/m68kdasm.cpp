@@ -53,7 +53,8 @@ std::string m68k_disassembler::make_signed_hex_str_32(u32 val)
 
 std::string m68k_disassembler::get_imm_str_s(u32 size)
 {
-	switch(size) {
+	switch(size)
+	{
 	case 0: return util::string_format("#%s", make_signed_hex_str_8(read_imm_8()));
 	case 1: return util::string_format("#%s", make_signed_hex_str_16(read_imm_16()));
 	case 2: return util::string_format("#%s", make_signed_hex_str_32(read_imm_32()));
@@ -63,7 +64,8 @@ std::string m68k_disassembler::get_imm_str_s(u32 size)
 
 std::string m68k_disassembler::get_imm_str_u(u32 size)
 {
-	switch(size) {
+	switch(size)
+	{
 	case 0: return util::string_format("#$%x", read_imm_8());
 	case 1: return util::string_format("#$%x", read_imm_16());
 	case 2: return util::string_format("#$%x", read_imm_32());
@@ -977,7 +979,7 @@ std::string m68k_disassembler::d68040_cinv()
 	if(limit.first)
 		return limit.second;
 
-	static const char *cachetype[4] = { "nop", "data", "inst", "both" };
+	static char const *const cachetype[4] = { "nop", "data", "inst", "both" };
 
 	switch((m_cpu_ir>>3)&3)
 	{
@@ -1241,7 +1243,7 @@ std::string m68k_disassembler::d68040_cpush()
 	if(limit.first)
 		return limit.second;
 
-	static const char *cachetype[4] = { "nop", "data", "inst", "both" };
+	static char const *const cachetype[4] = { "nop", "data", "inst", "both" };
 
 	switch((m_cpu_ir>>3)&3)
 	{
@@ -2422,23 +2424,6 @@ std::string m68k_disassembler::d68000_pea()
 	return util::string_format("pea     %s", get_ea_mode_str_32(m_cpu_ir));
 }
 
-// this is a 68040-specific form of PFLUSH
-std::string m68k_disassembler::d68040_pflush()
-{
-	auto limit = limit_cpu_types(M68040_PLUS);
-	if(limit.first)
-		return limit.second;
-
-	if (m_cpu_ir & 0x10)
-	{
-		return util::string_format("pflusha%s", (m_cpu_ir & 8) ? "" : "n");
-	}
-	else
-	{
-		return util::string_format("pflush%s(A%d)", (m_cpu_ir & 8) ? "" : "n", m_cpu_ir & 7);
-	}
-}
-
 std::string m68k_disassembler::d68000_reset()
 {
 	return util::string_format("reset");
@@ -2916,7 +2901,53 @@ std::string m68k_disassembler::d68020_unpk_mm()
 	return util::string_format("unpk    -(A%d), -(A%d), %s; (2+)", m_cpu_ir&7, (m_cpu_ir>>9)&7, get_imm_str_u16());
 }
 
+std::string m68k_disassembler::fc_to_string(uint16_t modes)
+{
+	uint16_t fc = modes & 0x1f;
 
+	if (fc == 0)
+	{
+		return "%sfc";
+	}
+	else if (fc == 1)
+	{
+		return "%dfc";
+	}
+	else if ((fc >> 3) == 1)
+	{
+		return util::string_format("D%d", fc & 7);
+	}
+	else if ((fc >> 3) == 2)
+	{
+		return util::string_format("#%d", fc & 7);
+	}
+	return util::string_format("unknown fc %x", fc);
+}
+
+std::string m68k_disassembler::d68040_p000()
+{
+
+	if ((m_cpu_ir & 0xffd8) == 0xf548) // 68040 PTEST
+	{
+		return util::string_format("ptest%c  (A%d)", (m_cpu_ir & 0x20) ? 'r' : 'w', m_cpu_ir & 7);
+	}
+
+	if ((m_cpu_ir & 0xffe0) == 0xf500) // 68040 PFLUSH
+	{
+		switch((m_cpu_ir >> 3) & 3)
+		{
+		case 0:
+			return util::string_format("pflushn (A%d)", m_cpu_ir & 7);
+		case 1:
+			return util::string_format("pflush  (A%d)", m_cpu_ir & 7);
+		case 2:
+			return "pflushan";
+		case 3:
+			return "pflusha";
+		}
+	}
+	return util::string_format("unknown instruction: %04x", m_cpu_ir);
+}
 // PFLUSH:  001xxx0xxxxxxxxx
 // PLOAD:   001000x0000xxxxx
 // PVALID1: 0010100000000000
@@ -2937,11 +2968,11 @@ std::string m68k_disassembler::d68851_p000()
 	{
 		if (modes & 0x0200)
 		{
-			return util::string_format("pload  #%d, %s", (modes>>10)&7, str);
+			return util::string_format("pload   #%d, %s", (modes>>10)&7, str);
 		}
 		else
 		{
-			return util::string_format("pload  %s, #%d", str, (modes>>10)&7);
+			return util::string_format("pload   %s, #%d", str, (modes>>10)&7);
 		}
 	}
 
@@ -2957,17 +2988,33 @@ std::string m68k_disassembler::d68851_p000()
 
 	if (modes == 0x2800)    // PVALID (FORMAT 1)
 	{
-		return util::string_format("pvalid VAL, %s", str);
+		return util::string_format("pvalid  VAL, %s", str);
 	}
 
 	if ((modes & 0xfff8) == 0x2c00) // PVALID (FORMAT 2)
 	{
-		return util::string_format("pvalid A%d, %s", modes & 0xf, str);
+		return util::string_format("pvalid  A%d, %s", modes & 0xf, str);
 	}
 
 	if ((modes & 0xe000) == 0x8000) // PTEST
 	{
-		return util::string_format("ptest #%d, %s", modes & 0x1f, str);
+		if (modes & 0x100)
+		{
+			return util::string_format("ptest%c  %s, %s, %d, @A%d",
+					(modes & 0x200) ? 'r' : 'w',
+							fc_to_string(modes),
+							str,
+							(modes >> 10) & 7,
+							(modes >> 5) & 7);
+		}
+		else
+		{
+			return util::string_format("ptest%c  %s, %s, %d",
+					(modes & 0x200) ? 'r' : 'w',
+							fc_to_string(modes),
+							str,
+							(modes >> 10) & 7);
+		}
 	}
 
 	switch ((modes>>13) & 0x7)
@@ -2978,22 +3025,22 @@ std::string m68k_disassembler::d68851_p000()
 			{
 				if (modes & 0x0200)
 				{
-					return util::string_format("pmovefd  %s, %s", m_mmuregs[(modes>>10)&7], str);
+					return util::string_format("pmovefd %s, %s", m_mmuregs[(modes>>10)&7], str);
 				}
 				else
 				{
-					return util::string_format("pmovefd  %s, %s", str, m_mmuregs[(modes>>10)&7]);
+					return util::string_format("pmovefd %s, %s", str, m_mmuregs[(modes>>10)&7]);
 				}
 			}
 			else
 			{
 				if (modes & 0x0200)
 				{
-					return util::string_format("pmove  %s, %s", m_mmuregs[(modes>>10)&7], str);
+					return util::string_format("pmove   %s, %s", m_mmuregs[(modes>>10)&7], str);
 				}
 				else
 				{
-					return util::string_format("pmove  %s, %s", str, m_mmuregs[(modes>>10)&7]);
+					return util::string_format("pmove   %s, %s", str, m_mmuregs[(modes>>10)&7]);
 				}
 			}
 			break;
@@ -3001,11 +3048,11 @@ std::string m68k_disassembler::d68851_p000()
 		case 3: // MC68030 to/from status reg
 			if (modes & 0x0200)
 			{
-				return util::string_format("pmove  mmusr, %s", str);
+				return util::string_format("pmove   mmusr, %s", str);
 			}
 			else
 			{
-				return util::string_format("pmove  %s, mmusr", str);
+				return util::string_format("pmove   %s, mmusr", str);
 			}
 			break;
 
@@ -3302,7 +3349,7 @@ const m68k_disassembler::opcode_struct m68k_disassembler::m_opcode_info[] =
 	{&m68k_disassembler::d68020_pack_rr      , 0xf1f8, 0x8140, 0x000},
 	{&m68k_disassembler::d68020_pack_mm      , 0xf1f8, 0x8148, 0x000},
 	{&m68k_disassembler::d68000_pea          , 0xffc0, 0x4840, 0x27b},
-	{&m68k_disassembler::d68040_pflush       , 0xffe0, 0xf500, 0x000},
+	{&m68k_disassembler::d68040_p000         , 0xff80, 0xf500, 0x000},
 	{&m68k_disassembler::d68000_reset        , 0xffff, 0x4e70, 0x000},
 	{&m68k_disassembler::d68000_ror_s_8      , 0xf1f8, 0xe018, 0x000},
 	{&m68k_disassembler::d68000_ror_s_16     , 0xf1f8, 0xe058, 0x000},

@@ -2222,7 +2222,7 @@ WRITE8_MEMBER(vga_device::mem_linear_w)
 
 MACHINE_CONFIG_START(ati_vga_device::device_add_mconfig)
 	MCFG_MACH8_ADD_OWNER("8514a")
-	MCFG_DEVICE_ADD("ati_eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "ati_eeprom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(s3_vga_device::device_add_mconfig)

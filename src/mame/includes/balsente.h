@@ -67,9 +67,11 @@ public:
 	void shrike(machine_config &config);
 	void rescraid(machine_config &config);
 	void balsente(machine_config &config);
+	void unktp(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(nstocker_bits_r);
 	void init_otwalls();
 	void init_triviaes();
+	void init_triviaes2();
 	void init_nstocker();
 	void init_sentetst();
 	void init_rescraid();
@@ -162,6 +164,8 @@ private:
 	void cpu1_smudge_map(address_map &map);
 	void cpu2_io_map(address_map &map);
 	void cpu2_map(address_map &map);
+	void cpu2_unktp_io_map(address_map &map);
+	void cpu2_unktp_map(address_map &map);
 	void shrike68k_map(address_map &map);
 
 	required_device<timer_device> m_scanline_timer;
@@ -232,9 +236,5 @@ private:
 	required_device<acia6850_device> m_audiouart;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 };
-
-
-/*----------- defined in machine/balsente.c -----------*/
-void balsente_noise_gen(device_t *device, int count, short *buffer);
 
 #endif // MAME_INCLUDES_BALSENTE_H

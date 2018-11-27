@@ -1463,7 +1463,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 
 	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 117, true)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	ADC0809(config, m_adc8, 1000000); // unknown clock
 	m_adc8->in_callback<0>().set_ioport("8BADC.0");
@@ -1489,14 +1489,15 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 
 	MCFG_DEVICE_ADD("200e", M48T02, 0)
-	MCFG_EEPROM_2816_ADD("210e") // MK48Z02
+
+	EEPROM_2816(config, "210e"); // MK48Z02
 
 	MCFG_DEVICE_ADD("duartn68681", MC68681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, harddriv_state, harddriv_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE ("rs232", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE ("duartn68681", mc68681_device, rx_a_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("duartn68681", FUNC(mc68681_device::rx_a_w));
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -1524,7 +1525,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_msp)
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 MACHINE_CONFIG_END
 
 
@@ -1563,7 +1564,7 @@ MACHINE_CONFIG_START(harddriv_state::multisync_msp)
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, harddriv_state, hdmsp_irq_gen))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 MACHINE_CONFIG_END
 
 
@@ -1579,7 +1580,7 @@ MACHINE_CONFIG_START(harddriv_state::multisync2)
 	MCFG_DEVICE_MODIFY("gsp")
 	MCFG_DEVICE_PROGRAM_MAP(multisync2_gsp_map)
 
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 MACHINE_CONFIG_END
 
 
@@ -1651,8 +1652,8 @@ MACHINE_CONFIG_START(harddriv_state::dsk)
 	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(*this, harddriv_state,hddsk_update_pif))
 	MCFG_DEVICE_PROGRAM_MAP(dsk_dsp32_map)
 
-	MCFG_EEPROM_2816_ADD("dsk_10c") // MK48Z02
-	MCFG_EEPROM_2816_ADD("dsk_30c") // MK48Z02
+	EEPROM_2816(config, "dsk_10c"); // MK48Z02
+	EEPROM_2816(config, "dsk_30c"); // MK48Z02
 
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_STANDARD)
@@ -1863,7 +1864,7 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("gsp")
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000)  /* pixel clock */
 	adsp(config);                       /* ADSP board */
-	MCFG_DEVICE_REMOVE("slapstic")
+	config.device_remove("slapstic");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1872,9 +1873,10 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	/* sund hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_II(config, m_jsa, 0);
+	m_jsa->main_int_cb().set(FUNC(harddriv_state::sound_int_write_line));
+	m_jsa->test_read_cb().set_ioport("IN0").bit(5);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /* Steel Talons */
@@ -1926,22 +1928,23 @@ MACHINE_CONFIG_START(steeltal_board_device_state::device_add_mconfig)
 
 	/* basic machine hardware */        /* multisync board with MSP */
 	ds3(config);                        /* DS III board */
-	MCFG_DEVICE_REMOVE("ds3sdsp")       /* DS III sound components are not present */
-	MCFG_DEVICE_REMOVE("ds3xdsp")
-	MCFG_DEVICE_REMOVE("ldac")
-	MCFG_DEVICE_REMOVE("rdac")
-	MCFG_DEVICE_REMOVE("vref")
-	MCFG_DEVICE_REMOVE("lspeaker")
-	MCFG_DEVICE_REMOVE("rspeaker")
+	config.device_remove("ds3sdsp");       /* DS III sound components are not present */
+	config.device_remove("ds3xdsp");
+	config.device_remove("ldac");
+	config.device_remove("rdac");
+	config.device_remove("vref");
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
 
 	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
 
 	/* sund hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->main_int_cb().set(FUNC(harddriv_state::sound_int_write_line));
+	m_jsa->test_read_cb().set_ioport("IN0").bit(5);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /* Street Drivin' */

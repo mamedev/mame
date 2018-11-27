@@ -327,8 +327,7 @@ MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 	MCFG_DEVICE_PROGRAM_MAP(ohmygod_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ohmygod_state,  irq1_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
 
 	/* video hardware */

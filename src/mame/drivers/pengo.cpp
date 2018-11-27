@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	m_latch->q_out_cb<6>().set(FUNC(pengo_state::pengo_colortablebank_w));
 	m_latch->q_out_cb<7>().set(FUNC(pengo_state::pengo_gfxbank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pengo)

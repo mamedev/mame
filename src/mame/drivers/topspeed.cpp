@@ -582,22 +582,22 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	MCFG_DEVICE_PROGRAM_MAP(z80_prg)
 	MCFG_DEVICE_IO_MAP(z80_io)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, topspeed_state, z80ctc_to0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
+	ctc.intr_callback().set(FUNC(topspeed_state::z80ctc_to0));
 
-	MCFG_DEVICE_ADD("pc080sn_1", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_OFFSETS(0, 8)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn[0], 0);
+	m_pc080sn[0]->set_gfx_region(1);
+	m_pc080sn[0]->set_offsets(0, 8);
+	m_pc080sn[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("pc080sn_2", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_OFFSETS(0, 8)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn[1], 0);
+	m_pc080sn[1]->set_gfx_region(1);
+	m_pc080sn[1]->set_offsets(0, 8);
+	m_pc080sn[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 
 	TC0040IOC(config, m_tc0040ioc, 0);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");

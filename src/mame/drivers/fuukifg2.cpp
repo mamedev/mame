@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(fuuki16_state::fuuki16)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(28'640'000) / 8) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

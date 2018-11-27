@@ -24,6 +24,7 @@
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
@@ -174,7 +175,7 @@ void goupil_g1_state::device_timer(emu_timer &timer, device_timer_id id, int par
 		m_scanline_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 10));
 		break;
 	default:
-		assert_always(false, "Unknown id in goupil_g1_state::device_timer");
+		throw emu_fatalerror("Unknown id in goupil_g1_state::device_timer");
 	}
 }
 
@@ -551,15 +552,15 @@ void goupil_base_state::base(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy1, goupil_floppies, "525qd", floppy_image_device::default_floppy_formats);
 
 	i8279_device &i8279_kb1(I8279(config, "i8279_kb1", CPU_CLOCK));
-	i8279_kb1.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd1_w));	// scan SL lines
-	i8279_kb1.in_rl_callback().set(FUNC(goupil_g1_state::kbd1_r));				// kbd RL lines
+	i8279_kb1.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd1_w));   // scan SL lines
+	i8279_kb1.in_rl_callback().set(FUNC(goupil_g1_state::kbd1_r));              // kbd RL lines
 	i8279_kb1.in_shift_callback().set(FUNC(goupil_g1_state::shift_kb1_r));
 	i8279_kb1.in_ctrl_callback().set(FUNC(goupil_g1_state::ctrl_kb1_r));
 	i8279_kb1.out_irq_callback().set(m_via_keyb, FUNC(via6522_device::write_ca1));
 
 	i8279_device &i8279_kb2(I8279(config, "i8279_kb2", CPU_CLOCK));
-	i8279_kb2.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd2_w));	// scan SL lines
-	i8279_kb2.in_rl_callback().set(FUNC(goupil_g1_state::kbd2_r));				// kbd RL lines
+	i8279_kb2.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd2_w));   // scan SL lines
+	i8279_kb2.in_rl_callback().set(FUNC(goupil_g1_state::kbd2_r));              // kbd RL lines
 	i8279_kb2.in_shift_callback().set_constant(1);
 	i8279_kb2.in_ctrl_callback().set_constant(1);
 }
@@ -597,7 +598,7 @@ void goupil_g2_state::goupil_g2(machine_config &config)
 	m_screen->set_size((80*8), (24*(8+4)));
 	m_screen->set_visarea(0, (80*8)-1, 0, (24*(8+4))-1);
 
-	PALETTE(config, m_palette, 2);
+	PALETTE(config, m_palette, 3);
 	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
 
 	mc6845_device &crtc(MC6845(config, "crtc", 14.318181_MHz_XTAL / 8));

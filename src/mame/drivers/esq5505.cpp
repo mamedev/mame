@@ -132,6 +132,7 @@
 #include "cpu/es5510/es5510.h"
 #include "cpu/m68000/m68000.h"
 #include "formats/esq16_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/esqlcd.h"
 #include "machine/esqpanel.h"
 #include "machine/esqvfd.h"
@@ -681,7 +682,7 @@ void esq5505_state::eps(machine_config &config)
 
 	HD63450(config, m_dmac, 10_MHz_XTAL);   // MC68450 compatible
 	m_dmac->set_cpu_tag(m_maincpu);
-	m_dmac->set_our_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
+	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
 	m_dmac->dma_end().set(FUNC(esq5505_state::dma_end));
 	m_dmac->dma_error().set(FUNC(esq5505_state::dma_error));

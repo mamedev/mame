@@ -23,7 +23,7 @@ public:
 	deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region_wide(int region8x8, int region16x16, int wide)
 	{
 		m_gfxregion8x8 = region8x8;

@@ -132,8 +132,8 @@ MACHINE_CONFIG_START(mcb216_state::mcb216)
 	m_tms5501->xmt_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_tms5501->int_callback().set_inputline("maincpu", 0);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("tms5501", tms5501_device, rcv_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_tms5501, FUNC(tms5501_device::rcv_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mcb216_state::cb308)
@@ -149,8 +149,8 @@ MACHINE_CONFIG_START(mcb216_state::cb308)
 	m_tms5501->xmt_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_tms5501->int_callback().set_inputline("maincpu", 0);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("tms5501", tms5501_device, rcv_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_tms5501, FUNC(tms5501_device::rcv_w));
 MACHINE_CONFIG_END
 
 /* ROM definition */

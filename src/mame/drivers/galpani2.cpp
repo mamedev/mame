@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -655,10 +655,9 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 	MCFG_PALETTE_INIT_OWNER(galpani2_state,galpani2)
 
-	MCFG_DEVICE_ADD_KC002_SPRITES
-	MCFG_KANEKO16_SPRITE_OFFSETS(0x10000 - 0x16c0 + 0xc00, 0)
-	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
-
+	KANEKO_KC002_SPRITE(config, m_kaneko_spr);
+	m_kaneko_spr->set_offsets(0x10000 - 0x16c0 + 0xc00, 0);
+	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

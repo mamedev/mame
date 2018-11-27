@@ -112,12 +112,6 @@ void kncljoe_state::sound_map(address_map &map)
 	map(0x2000, 0x7fff).rom();
 }
 
-void kncljoe_state::sound_portmap(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(kncljoe_state::m6803_port1_r), FUNC(kncljoe_state::m6803_port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(kncljoe_state::m6803_port2_r), FUNC(kncljoe_state::m6803_port2_w));
-}
-
 
 /******************************************************************************/
 
@@ -262,11 +256,13 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kncljoe_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("soundcpu", M6803, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(kncljoe_state, sound_nmi,  (double)3970) //measured 3.970 kHz
-
+	m6803_cpu_device &soundcpu(M6803(config, "soundcpu", XTAL(3'579'545))); /* verified on pcb */
+	soundcpu.set_addrmap(AS_PROGRAM, &kncljoe_state::sound_map);
+	soundcpu.in_p1_cb().set(FUNC(kncljoe_state::m6803_port1_r));
+	soundcpu.out_p1_cb().set(FUNC(kncljoe_state::m6803_port1_w));
+	soundcpu.in_p2_cb().set(FUNC(kncljoe_state::m6803_port2_r));
+	soundcpu.out_p2_cb().set(FUNC(kncljoe_state::m6803_port2_w));
+	soundcpu.set_periodic_int(FUNC(kncljoe_state::sound_nmi), attotime::from_hz((double)3970)); //measured 3.970 kHz
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -286,12 +282,12 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kncljoe_state, unused_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, m_ay8910, XTAL(3'579'545)/4); /* verified on pcb */
+	m_ay8910->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910->port_b_write_callback().set(FUNC(kncljoe_state::unused_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

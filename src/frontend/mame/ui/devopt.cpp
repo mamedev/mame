@@ -105,7 +105,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 						screen.tag(),
 						visarea.width(),
 						visarea.height(),
-						ATTOSECONDS_TO_HZ(screen.frame_period().attoseconds()));
+						screen.frame_period().as_hz());
 			}
 		}
 	}

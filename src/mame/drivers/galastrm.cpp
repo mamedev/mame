@@ -36,6 +36,10 @@ Written by Hau
 tips
 $300.b debugmode
 $305.b invincibility
+
+TODO:
+- convert to use device implementation of TC0110PCR
+- device-ify TC0610? (no other known users)
 */
 
 
@@ -51,13 +55,13 @@ $305.b invincibility
 
 /*********************************************************************/
 
-INTERRUPT_GEN_MEMBER(galastrm_state::galastrm_interrupt)
+INTERRUPT_GEN_MEMBER(galastrm_state::interrupt)
 {
 	m_frame_counter ^= 1;
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
+WRITE32_MEMBER(galastrm_state::palette_w)
 {
 	if (ACCESSING_BITS_16_31)
 		m_tc0110pcr_addr = data >> 16;
@@ -65,7 +69,7 @@ WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
 		m_palette->set_pen_color(m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-WRITE32_MEMBER(galastrm_state::galastrm_tc0610_0_w)
+WRITE32_MEMBER(galastrm_state::tc0610_0_w)
 {
 	if (ACCESSING_BITS_16_31)
 		m_tc0610_0_addr = data >> 16;
@@ -73,7 +77,7 @@ WRITE32_MEMBER(galastrm_state::galastrm_tc0610_0_w)
 		m_tc0610_ctrl_reg[0][m_tc0610_0_addr] = data;
 }
 
-WRITE32_MEMBER(galastrm_state::galastrm_tc0610_1_w)
+WRITE32_MEMBER(galastrm_state::tc0610_1_w)
 {
 	if (ACCESSING_BITS_16_31)
 		m_tc0610_1_addr = data >> 16;
@@ -100,7 +104,7 @@ WRITE8_MEMBER(galastrm_state::coin_word_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-void galastrm_state::galastrm_map(address_map &map)
+void galastrm_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x21ffff).ram().share("ram");                             /* main CPUA ram */
@@ -111,9 +115,9 @@ void galastrm_state::galastrm_map(address_map &map)
 	map(0x600000, 0x6007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
-	map(0x900000, 0x900003).w(FUNC(galastrm_state::galastrm_palette_w));                               /* TC0110PCR */
-	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::galastrm_tc0610_0_w));                              /* TC0610 */
-	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::galastrm_tc0610_1_w));
+	map(0x900000, 0x900003).w(FUNC(galastrm_state::palette_w));                               /* TC0110PCR */
+	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::tc0610_0_w));                              /* TC0610 */
+	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::tc0610_1_w));
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::long_r), FUNC(tc0100scn_device::long_w));        /* piv tilemaps */
 	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
 }
@@ -125,7 +129,7 @@ void galastrm_state::galastrm_map(address_map &map)
 static INPUT_PORTS_START( galastrm )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state,frame_counter_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state, frame_counter_r, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -200,13 +204,14 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-MACHINE_CONFIG_START(galastrm_state::galastrm)
+void galastrm_state::galastrm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 16000000) /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(galastrm_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galastrm_state,  galastrm_interrupt) /* VBL */
+	M68EC020(config, m_maincpu, 16000000); /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &galastrm_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(galastrm_state::interrupt)); /* VBL */
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 6);
@@ -223,33 +228,33 @@ MACHINE_CONFIG_START(galastrm_state::galastrm)
 	tc0510nio.read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 50*8)
-	MCFG_SCREEN_VISIBLE_AREA(0+96, 40*8-1+96, 3*8+60, 32*8-1+60)
-	MCFG_SCREEN_UPDATE_DRIVER(galastrm_state, screen_update_galastrm)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 50*8);
+	m_screen->set_visarea(0+96, 40*8-1+96, 3*8+60, 32*8-1+60);
+	m_screen->set_screen_update(FUNC(galastrm_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galastrm)
-	MCFG_PALETTE_ADD("palette", 4096)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galastrm);
+	PALETTE(config, m_palette, 4096);
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(0)
-	MCFG_TC0100SCN_TX_REGION(2)
-	MCFG_TC0100SCN_OFFSETS(-48, -56)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(0);
+	m_tc0100scn->set_tx_region(2);
+	m_tc0100scn->set_offsets(-48, -56);
+	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn->set_palette_tag(m_palette);
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(3)
-	MCFG_TC0480SCP_OFFSETS(-40, -3)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(3);
+	m_tc0480scp->set_offsets(-40, -3);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
-MACHINE_CONFIG_END
+	TAITO_EN(config, "taito_en", 0);
+}
 
 /***************************************************************************/
 
@@ -291,4 +296,4 @@ ROM_START( galastrm )
 ROM_END
 
 
-GAME( 1992, galastrm, 0, galastrm, galastrm, galastrm_state, empty_init, ROT0, "Taito Corporation", "Galactic Storm (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, galastrm, 0, galastrm, galastrm, galastrm_state, empty_init, ROT0, "Taito Corporation", "Galactic Storm (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

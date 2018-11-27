@@ -1120,12 +1120,14 @@ private:
 
 	template <typename Source, typename Func> class transform_builder; // workaround for MSVC
 	template <typename Sink, typename Func> class first_transform_builder; // workaround for MSVC
+	template <typename Func> class functoid_builder; // workaround for MSVC
 
 	class builder_base
 	{
 	protected:
 		template <typename T, typename U> friend class transform_builder; // workaround for MSVC
 		template <typename T, typename U> friend class first_transform_builder; // workaround for MSVC
+		template <typename Func> friend class functoid_builder; // workaround for MSVC
 
 		builder_base(devcb_write &target, bool append) : m_target(target), m_append(append) { }
 		builder_base(builder_base const &) = delete;

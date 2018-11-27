@@ -1500,8 +1500,7 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	m_adc->in_callback<6>().set_ioport("A2D6");
 	m_adc->in_callback<7>().set_ioport("A2D7");
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigx2)
@@ -1524,10 +1523,11 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_IIIS_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_ATARI_JSA_TEST_PORT("SERVICE", 6)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ATARI_JSA_IIIS(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
+	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
+	m_jsa->add_route(0, "lspeaker", 1.0);
+	m_jsa->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

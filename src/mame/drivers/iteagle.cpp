@@ -115,15 +115,28 @@ www.multitech.com
 //*************************************
 // Main iteagle driver
 //*************************************
+#define PCI_ID_NILE     ":pci:00.0"
+#define PCI_ID_PERIPH   ":pci:06.0"
+#define PCI_ID_IDE      ":pci:06.1"
+// Secondary IDE Control ":pci:06.2"
+#define PCI_ID_SOUND    ":pci:07.0"
+#define PCI_ID_FPGA     ":pci:08.0"
+#define PCI_ID_VIDEO    ":pci:09.0"
+#define PCI_ID_EEPROM   ":pci:0a.0"
+
 class iteagle_state : public driver_device
 {
 public:
 	iteagle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_fpga(*this, PCI_ID_FPGA)
+		, m_eeprom(*this, PCI_ID_EEPROM)
 	{}
 
 	required_device<mips3_device> m_maincpu;
+	required_device<iteagle_fpga_device> m_fpga;
+	required_device<iteagle_eeprom_device> m_eeprom;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -152,163 +165,130 @@ void iteagle_state::machine_reset()
 {
 }
 
-#define PCI_ID_NILE     ":pci:00.0"
-#define PCI_ID_PERIPH   ":pci:06.0"
-#define PCI_ID_IDE      ":pci:06.1"
-// Seconday IDE Control ":pci:06.2"
-#define PCI_ID_SOUND    ":pci:07.0"
-#define PCI_ID_FPGA     ":pci:08.0"
-#define PCI_ID_VIDEO    ":pci:09.0"
-#define PCI_ID_EEPROM   ":pci:0a.0"
-
 MACHINE_CONFIG_START(iteagle_state::iteagle)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, VR4310LE, 166666666)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(8192)
-	MCFG_MIPS3_SYSTEM_CLOCK(66666667)
+	VR4310LE(config, m_maincpu, 166666666);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(8192);
+	m_maincpu->set_system_clock(66666667);
 
-	MCFG_DEVICE_ADD(":pci", PCI_ROOT, 0)
-	MCFG_DEVICE_ADD(PCI_ID_NILE, VRC4373, 0, m_maincpu)
-	MCFG_VRC4373_SET_RAM(0x00800000)
-	MCFG_VRC4373_SET_SIMM0(0x02000000)
+	PCI_ROOT(config, ":pci", 0);
+
+	vrc4373_device &vrc4373(VRC4373(config, PCI_ID_NILE, 0, m_maincpu));
+	vrc4373.set_ram_size(0x00800000);
+	vrc4373.set_simm0_size(0x02000000);
+
 	ITEAGLE_PERIPH(config, PCI_ID_PERIPH, 0);
-	IDE_PCI(config, PCI_ID_IDE, 0, 0x1080C693, 0x00, 0x0).irq_handler().set_inputline(m_maincpu, MIPS3_IRQ2);
+	IDE_PCI(config, PCI_ID_IDE, 0, 0x1080C693, 0x00, 0x0)
+		.irq_handler().set_inputline(m_maincpu, MIPS3_IRQ2);
 
-	iteagle_fpga_device &iteagle_fpga(ITEAGLE_FPGA(config, PCI_ID_FPGA, 0, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4));
-	iteagle_fpga.in_callback<iteagle_fpga_device::IO_SW5>().set_ioport("SW5");
-	iteagle_fpga.in_callback<iteagle_fpga_device::IO_IN1>().set_ioport("IN1");
-	iteagle_fpga.in_callback<iteagle_fpga_device::IO_SYSTEM>().set_ioport("SYSTEM");
-	iteagle_fpga.trackx_callback().set_ioport("TRACKX1");
-	iteagle_fpga.tracky_callback().set_ioport("TRACKY1");
-	iteagle_fpga.gunx_callback().set_ioport("GUNX1");
-	iteagle_fpga.guny_callback().set_ioport("GUNY1");
+	ITEAGLE_FPGA(config, m_fpga, 0, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4);
+	m_fpga->in_callback<iteagle_fpga_device::IO_SW5>().set_ioport("SW5");
+	m_fpga->in_callback<iteagle_fpga_device::IO_IN1>().set_ioport("IN1");
+	m_fpga->in_callback<iteagle_fpga_device::IO_SYSTEM>().set_ioport("SYSTEM");
+	m_fpga->trackx_callback().set_ioport("TRACKX1");
+	m_fpga->tracky_callback().set_ioport("TRACKY1");
+	m_fpga->gunx_callback().set_ioport("GUNX1");
+	m_fpga->guny_callback().set_ioport("GUNY1");
 
 	es1373_device &pci_sound(ES1373(config, PCI_ID_SOUND, 0));
 	pci_sound.add_route(0, PCI_ID_SOUND":lspeaker", 1.0).add_route(1, PCI_ID_SOUND":rspeaker", 1.0);
 	pci_sound.irq_handler().set_inputline(m_maincpu, MIPS3_IRQ3);
 
-	MCFG_DEVICE_ADD(PCI_ID_VIDEO, VOODOO_3_PCI, 0, m_maincpu, "screen")
-	MCFG_VOODOO_PCI_FBMEM(16)
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(PCI_ID_FPGA, iteagle_fpga_device, vblank_update))
+	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo.set_fbmem(16);
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(m_fpga, FUNC(iteagle_fpga_device::vblank_update));
 
-	MCFG_DEVICE_ADD(                  PCI_ID_EEPROM, ITEAGLE_EEPROM, 0)
+	ITEAGLE_EEPROM(config, m_eeprom, 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_UPDATE_DEVICE(PCI_ID_VIDEO, voodoo_pci_device, screen_update)
-
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(512, 384);
+	screen.set_visarea(0, 512 - 1, 0, 384 - 1);
+	screen.set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_pci_device::screen_update));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::gtfore01)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000401, 0x0b0b0b)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0401, 0x7)
+	m_fpga->set_init_info(0x01000401, 0x0b0b0b);
+	m_eeprom->set_info(0x0401, 0x7);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::gtfore02)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000402, 0x020201)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0402, 0x7)
+	m_fpga->set_init_info(0x01000402, 0x020201);
+	m_eeprom->set_info(0x0402, 0x7);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::gtfore03)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000403, 0x0a0b0a)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0403, 0x7)
+	m_fpga->set_init_info(0x01000403, 0x0a0b0a);
+	m_eeprom->set_info(0x0403, 0x7);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::gtfore04)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000404, 0x0a020b)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0404, 0x7)
+	m_fpga->set_init_info(0x01000404, 0x0a020b);
+	m_eeprom->set_info(0x0404, 0x7);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::gtfore05)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000405, 0x0b0a0c)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0405, 0x7);
+	m_fpga->set_init_info(0x01000405, 0x0b0a0c);
+	m_eeprom->set_info(0x0405, 0x7);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::gtfore06)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000406, 0x0c0b0d)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0406, 0x9);
+	m_fpga->set_init_info(0x01000406, 0x0c0b0d);
+	m_eeprom->set_info(0x0406, 0x9);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::carnking)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000a01, 0x0e0a0a)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0a01, 0x9)
+	m_fpga->set_init_info(0x01000a01, 0x0e0a0a);
+	m_eeprom->set_info(0x0a01, 0x9);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::bbh)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	// 0xXX01XXXX = tournament board
-	MCFG_ITEAGLE_FPGA_INIT(0x02010600, 0x0b0a0a)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0000, 0x7)
+	m_fpga->set_init_info(0x02010600, 0x0b0a0a);
+	m_eeprom->set_info(0x0000, 0x7);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::bbhsc)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
 	// 0xXX01XXXX = tournament board
-	MCFG_ITEAGLE_FPGA_INIT(0x02010600, 0x0c0a0a)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0000, 0x7)
+	m_fpga->set_init_info(0x02010600, 0x0c0a0a);
+	m_eeprom->set_info(0x0000, 0x7);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::bbh2sp)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x02010602, 0x0d0a0a)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0000, 0x7)
+	m_fpga->set_init_info(0x02010602, 0x0d0a0a);
+	m_eeprom->set_info(0x0000, 0x7);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::bbhcotw)
 	iteagle(config);
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x02010603, 0x080704)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x9)
+	m_fpga->set_init_info(0x02010603, 0x080704);
+	m_eeprom->set_info(0x0603, 0x9);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iteagle_state::virtpool)
 	iteagle(config);
 	// Not sure what the actual value should be
 	// Setting a lower frequency helps delay the tutorial screen premature cut-out
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(99999999)
-	MCFG_MIPS3_SYSTEM_CLOCK(33333333)
+	m_maincpu->set_clock(99999999);
+	m_maincpu->set_system_clock(33333333);
 
-	MCFG_DEVICE_REPLACE(PCI_ID_VIDEO, VOODOO_1_PCI, 0, m_maincpu, "screen")
-	MCFG_VOODOO_PCI_FBMEM(4)
-	MCFG_VOODOO_PCI_TMUMEM(4, 4)
+	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
+	voodoo.set_fbmem(4);
+	voodoo.set_tmumem(4, 4);
 
-	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x01000202, 0x080808)
-	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
-	MCFG_ITEAGLE_EEPROM_INIT(0x0202, 0x7)
+	m_fpga->set_init_info(0x01000202, 0x080808);
+	m_eeprom->set_info(0x0202, 0x7);
 MACHINE_CONFIG_END
 
 

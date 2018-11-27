@@ -783,22 +783,21 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(tvc_state, tvc)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3125000/2) // clk taken from schematics
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
-	MCFG_MC6845_UPDATE_ROW_CB(tvc_state, crtc_update_row)
-	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, tvc_state, int_ff_set))
+	mc6845_device &crtc(MC6845(config, "crtc", 3125000/2)); // clk taken from schematics
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8); /*?*/
+	crtc.set_update_row_callback(FUNC(tvc_state::crtc_update_row), this);
+	crtc.out_cur_callback().set(FUNC(tvc_state::int_ff_set));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", TVC_SOUND, 0)
-	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(*this, tvc_state, int_ff_set))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	TVC_SOUND(config, m_sound, 0);
+	m_sound->sndint_wr_callback().set(FUNC(tvc_state::int_ff_set));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tvc_state, centronics_ack))

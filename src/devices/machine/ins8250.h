@@ -33,13 +33,15 @@ public:
 	auto out_out1_callback() { return m_out_out1_cb.bind(); }
 	auto out_out2_callback() { return m_out_out2_cb.bind(); }
 
-	DECLARE_WRITE8_MEMBER( ins8250_w );
-	DECLARE_READ8_MEMBER( ins8250_r );
-	DECLARE_WRITE_LINE_MEMBER( dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( ri_w );
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rx_w );
+	DECLARE_WRITE8_MEMBER(ins8250_w);
+	DECLARE_READ8_MEMBER(ins8250_r);
+
+	DECLARE_WRITE_LINE_MEMBER(dcd_w);
+	DECLARE_WRITE_LINE_MEMBER(dsr_w);
+	DECLARE_WRITE_LINE_MEMBER(ri_w);
+	DECLARE_WRITE_LINE_MEMBER(cts_w);
+	DECLARE_WRITE_LINE_MEMBER(rx_w);
+	DECLARE_READ_LINE_MEMBER(intrpt_r);
 
 protected:
 	enum class dev_type {
@@ -157,28 +159,5 @@ DECLARE_DEVICE_TYPE(PC16552D, pc16552_device)
 DECLARE_DEVICE_TYPE(INS8250,  ins8250_device)
 DECLARE_DEVICE_TYPE(NS16450,  ns16450_device)
 DECLARE_DEVICE_TYPE(NS16550,  ns16550_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_INS8250_OUT_TX_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_tx_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_DTR_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_dtr_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_RTS_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_rts_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_INT_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_OUT1_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_out1_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8250_OUT_OUT2_CB(_devcb) \
-	downcast<ins8250_uart_device &>(*device).set_out_out2_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_INS8250_H

@@ -11,7 +11,7 @@ public:
 	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
 	void set_yinvert(int y_inv) { m_y_invert = y_inv; }
 	void set_dblwidth(int dblwidth) { m_dblwidth = dblwidth; }
@@ -45,11 +45,12 @@ public:
 
 	void restore_scroll();
 
-	protected:
+protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 
-	private:
+private:
 	// internal state
 	uint16_t         m_ctrl[8];
 
@@ -70,21 +71,5 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(PC080SN, pc080sn_device)
-
-
-#define MCFG_PC080SN_GFX_REGION(_region) \
-	downcast<pc080sn_device &>(*device).set_gfx_region(_region);
-
-#define MCFG_PC080SN_OFFSETS(_xoffs, _yoffs) \
-	downcast<pc080sn_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-#define MCFG_PC080SN_YINVERT(_yinv) \
-	downcast<pc080sn_device &>(*device).set_yinvert(_yinv);
-
-#define MCFG_PC080SN_DBLWIDTH(_dbl) \
-	downcast<pc080sn_device &>(*device).set_dblwidth(_dbl);
-
-#define MCFG_PC080SN_GFXDECODE(_gfxtag) \
-	downcast<pc080sn_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_PC080SN_H

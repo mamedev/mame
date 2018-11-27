@@ -990,9 +990,9 @@ READ32_MEMBER(model2_state::model2_serial_r)
 	{
 		u32 result = 0;
 		if (ACCESSING_BITS_0_7 && (offset == 0))
-			result |= m_uart->data_r(space, 0);
+			result |= m_uart->data_r();
 		if (ACCESSING_BITS_16_23 && (offset == 0))
-			result |= m_uart->status_r(space, 0) << 16;
+			result |= m_uart->status_r() << 16;
 		return result;
 	}
 
@@ -1004,7 +1004,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		m_uart->data_w(space, 0, data & 0xff);
+		m_uart->data_w(data & 0xff);
 
 		if (m_scsp.found())
 		{
@@ -1017,7 +1017,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 	}
 	if (ACCESSING_BITS_16_23 && (offset == 0))
 	{
-		m_uart->control_w(space, 0, (data >> 16) & 0xff);
+		m_uart->control_w((data >> 16) & 0xff);
 	}
 }
 
@@ -2434,10 +2434,10 @@ MACHINE_CONFIG_START(model2_state::model2_timers)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2_state::model2_screen)
-	MCFG_DEVICE_ADD("tile", S24TILE, 0, 0x3fff)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_S24TILE_XHOUT_CALLBACK(WRITE16(*this, model2_state, horizontal_sync_w))
-	MCFG_S24TILE_XVOUT_CALLBACK(WRITE16(*this, model2_state, vertical_sync_w))
+	S24TILE(config, m_tiles, 0, 0x3fff);
+	m_tiles->set_palette(m_palette);
+	m_tiles->xhout_write_callback().set(FUNC(model2_state::horizontal_sync_w));
+	m_tiles->xvout_write_callback().set(FUNC(model2_state::vertical_sync_w));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -2496,7 +2496,7 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2o_state,model2o)
 
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
 	model1io_device &ioboard(SEGA_MODEL1IO(config, "ioboard", 0));
 	ioboard.set_default_bios_tag("epr14869c");
@@ -2653,8 +2653,8 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2a_state,model2a)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	EEPROM_93C46_16BIT(config, "eeprom");
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
 	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
 	io.out_pa_callback().set(FUNC(model2a_state::eeprom_w));
@@ -2778,8 +2778,8 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_MACHINE_START_OVERRIDE(model2b_state,model2b)
 	MCFG_MACHINE_RESET_OVERRIDE(model2b_state,model2b)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	EEPROM_93C46_16BIT(config, "eeprom");
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
 	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
 	io.out_pa_callback().set(FUNC(model2b_state::eeprom_w));
@@ -2901,8 +2901,8 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_MACHINE_START_OVERRIDE(model2c_state,model2c)
 	MCFG_MACHINE_RESET_OVERRIDE(model2c_state,model2c)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
-	MCFG_NVRAM_ADD_1FILL("backup1")
+	EEPROM_93C46_16BIT(config, "eeprom");
+	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_1);
 
 	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
 	io.out_pa_callback().set(FUNC(model2c_state::eeprom_w));
@@ -4663,6 +4663,55 @@ ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054, 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	ROM_LOAD16_WORD_SWAP("mpr-19721.32", 0x000000, 0x400000, CRC(f5d8fa9a) SHA1(6836973a687c59dd80f8e6c30d33155e306be199) )
 	ROM_LOAD16_WORD_SWAP("mpr-19722.34", 0x400000, 0x400000, CRC(a56fa539) SHA1(405a892bc368ba862ba71bda7525b421d6973c0e) )
+ROM_END
+
+ROM_START( hotdp )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD("prg0.15", 0x000000, 0x080000, CRC(548ed10a) SHA1(393f1f96bc7efcaaa41c09ee08ce081391102583) )
+	ROM_LOAD32_WORD("prg1.16", 0x000002, 0x080000, CRC(f43bb51f) SHA1(1a2a68adbfd21042fcfa20e7366f6a250e2fdf8e) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data, Flash ROM modules instead if DIP ROMs
+	ROM_LOAD32_WORD("dat0.11",    0x0000000, 0x400000, CRC(8d40fc82) SHA1(9ce989706795fe103fce8679f3b117cf48d9b843) )
+	ROM_LOAD32_WORD("dat1.12",    0x0000002, 0x400000, CRC(63e04c15) SHA1(c62417b0b8b3a50425da0833550728eb574655fb) )
+	ROM_LOAD32_WORD("dat2.9",     0x0800000, 0x400000, CRC(2aa9e4b9) SHA1(e53583cdb5eef3d31192f3ba7d21e6647e438224) )
+	ROM_LOAD32_WORD("dat3.10",    0x0800002, 0x400000, CRC(356d348b) SHA1(4e43264ab5a61804f12b6f4b63c644d1250dd43d) )
+	ROM_LOAD32_WORD("dat4.7",     0x1000000, 0x400000, CRC(7ec403f6) SHA1(1120616bcf8151c642183dd2e3f8636a640b624d) )
+	ROM_LOAD32_WORD("dat5.8",     0x1000002, 0x400000, CRC(592fac50) SHA1(8a0386478ee8056616ea475979c515e74414a78b) )
+	ROM_COPY( "main_data", 0x1800000, 0x1900000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1a00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1b00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1c00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1d00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1e00000, 0x100000 )
+	ROM_COPY( "main_data", 0x1800000, 0x1f00000, 0x100000 )
+
+
+	ROM_REGION( 0x800000, "copro_data", 0 ) // TGPx4 program
+	ROM_LOAD32_WORD("copro0.29",  0x000000, 0x200000, CRC(fc2380f5) SHA1(02a2f8bfc3915787f3aa9645de8a0af4450cea33) )
+	ROM_LOAD32_WORD("copro1.30",  0x000002, 0x200000, CRC(e6ae8f3c) SHA1(9a2c3d3b305e4707f7691d6242ff1bf47d1ced10) )
+
+	ROM_REGION( 0x2000000, "polygons", 0 ) // Models, Flash ROM modules instead if DIP ROMs
+	ROM_LOAD32_WORD("tgp0.17", 0x0000000, 0x400000, CRC(b458ec9b) SHA1(8d51443d5d0e790dc9f0060d8cedc50f177fee04) )
+	ROM_LOAD32_WORD("tgp1.21", 0x0000002, 0x400000, CRC(4b250500) SHA1(425a397f8ba8e295d922c76b1145ad92cafa6b32) )
+	ROM_LOAD32_WORD("tgp2.18", 0x0800000, 0x400000, CRC(17f68d25) SHA1(2f194149c456dc5195eca6426c3b1d4ee4e7fc69) )
+	ROM_LOAD32_WORD("tgp3.22", 0x0800002, 0x400000, CRC(caff1d48) SHA1(033676cd1d2cf0008367d17de30675e3d4d75547) )
+	ROM_LOAD32_WORD("tgp4.19", 0x1000000, 0x400000, CRC(8854f204) SHA1(54f7e23f2cc5c939000f8fd257d907cca7919b64) )
+	ROM_LOAD32_WORD("tgp5.23", 0x1000002, 0x400000, CRC(29f311f3) SHA1(2f89767aaefeb2650091b37c4d505701681bb375) )
+
+	ROM_REGION( 0x1000000, "textures", 0 ) // Textures, Flash ROM modules instead if DIP ROMs
+	ROM_LOAD32_WORD("tex1.27", 0x0000000, 0x400000, BAD_DUMP CRC(86ef3ee4) SHA1(8ad2aa98d94e9a4f1abb61a02aba95064e533a61) ) // one of flash ROMs had broken most significant address pin, dump contains only half of even-bytes data mirrored 2x, correct sum should be 28DA
+	ROM_LOAD32_WORD("tex0.25", 0x0000002, 0x400000, CRC(fb10366a) SHA1(189389f84fa5f04c586953c54254f7bd09dd8d92) )
+	ROM_LOAD32_WORD("tex3.28", 0x0800000, 0x400000, CRC(9a61d7e8) SHA1(d9a563f74e485df5bdf149afaed69811b5536712) )
+	ROM_LOAD32_WORD("tex2.26", 0x0800002, 0x400000, CRC(84ec2923) SHA1(daea23864fbc48c14177e77cd783f73621472708) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("sndpgm0.31", 0x000000, 0x080000, CRC(30accd2e) SHA1(098f07feaa007647f86ea02ef5e1102859c5890a) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("sound1.32", 0x000000, 0x200000, CRC(e0a8dd56) SHA1(c80abe8e7541946b7dd615da98aeb04170ebf91d) )
+	ROM_LOAD16_WORD_SWAP("sound2.33", 0x200000, 0x200000, CRC(a517834f) SHA1(232ec02fedf259a6112dd04e8a6b3a7a1ba17786) )
+	ROM_LOAD16_WORD_SWAP("sound3.34", 0x400000, 0x200000, CRC(f0c529bb) SHA1(3c8f3843e9719079d993206feb083305aa85b0fb) )
+	ROM_LOAD16_WORD_SWAP("sound4.35", 0x600000, 0x200000, CRC(3ad48d53) SHA1(b17f513705217966bc224721b444957de66d74b4) )
 ROM_END
 
 ROM_START( lastbrnx ) /* Last Bronx Revision A (Export), Model 2B */
@@ -6709,6 +6758,7 @@ GAME( 1996, stcca,     stcc,     stcc,         indy500,  model2c_state, empty_in
 GAME( 1996, waverunr,  0,        waverunr,     waverunr, model2c_state, empty_init, ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, bel,       0,        bel,          bel,      model2c_state, empty_init, ROT0, "Sega / EPL Productions", "Behind Enemy Lines", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,      0,        hotd,         hotd,     model2c_state, empty_init, ROT0, "Sega",   "The House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, hotdp,     hotd,     hotd,         hotd,     model2c_state, empty_init, ROT0, "Sega",   "The House of the Dead (prototype)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrev,   0,        overrev2c,    overrev,  model2c_state, empty_init, ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, rascot2,   0,        model2c,      model2,   model2c_state, empty_init, ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,  0,        segawski,     segawski, model2c_state, empty_init, ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

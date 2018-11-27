@@ -69,7 +69,7 @@
 #include "dragon_fdc.h"
 
 #include "coco_fdc.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"
@@ -367,7 +367,7 @@ WRITE8_MEMBER(premier_fdc_device_base::scs_write)
 
 ROM_START(dragon_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("ddos10.rom", 0x0000, 0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
+	ROM_LOAD("ddos10.rom", 0x0000, 0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
 ROM_END
 
 namespace
@@ -399,7 +399,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_FDC, device_cococart_interface, dragon_fdc_dev
 
 ROM_START(premier_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("deltados.rom", 0x0000, 0x2000, CRC(149eb4dd) SHA1(eb686ce6afe63e4d4011b333a882ca812c69307f))
+	ROM_LOAD("deltados.rom", 0x0000, 0x2000, CRC(149eb4dd) SHA1(eb686ce6afe63e4d4011b333a882ca812c69307f))
 ROM_END
 
 namespace
@@ -431,7 +431,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(PREMIER_FDC, device_cococart_interface, premier_fdc_d
 
 ROM_START(sdtandy_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("sdtandy.rom", 0x0000, 0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
+	ROM_LOAD("sdtandy.rom", 0x0000, 0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
 ROM_END
 
 namespace

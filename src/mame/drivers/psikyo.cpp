@@ -1057,9 +1057,9 @@ MACHINE_CONFIG_START(psikyo_state::sngkace)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 MACHINE_CONFIG_END
 
 
@@ -1103,9 +1103,9 @@ MACHINE_CONFIG_START(psikyo_state::gunbird)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psikyo_state::s1945jn)
@@ -1189,9 +1189,9 @@ MACHINE_CONFIG_START(psikyo_state::s1945)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 MACHINE_CONFIG_END
 
 
@@ -1610,11 +1610,11 @@ Notes:
       HA1388   - Hitachi HA1388 Sound Amp
       2058D    - JRC 2058 Op Amp
       U61, U34,\
-      U20, U21,- 16M MASKROM (SOP44)
+      U20, U21,- 16M mask ROM (SOP44)
       U22, U23 /
-      U1       - 4M MASKROM (SOP44)
+      U1       - 4M mask ROM (SOP44)
       VOL      - Master Volume Potentiometer
-      *        - Unpopulated position for 16M SOP44 MASKROM
+      *        - Unpopulated position for 16M SOP44 mask ROM
 
 
 CPU:    MC68EC020FG16

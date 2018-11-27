@@ -625,10 +625,10 @@ MACHINE_CONFIG_START(enigma2_state::enigma2)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
+	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
+	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -652,10 +652,10 @@ MACHINE_CONFIG_START(enigma2_state::enigma2a)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
+	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
+	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

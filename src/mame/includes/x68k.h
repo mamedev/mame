@@ -12,9 +12,11 @@
 #define MAME_INCLUDES_X68K_H
 
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/i8255.h"
+#include "machine/mb89352.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rp5c15.h"
@@ -74,16 +76,12 @@ public:
 		, m_spritereg(0x8000/sizeof(uint16_t), 0)
 	{ }
 
-	void x68kxvi(machine_config &config);
-	void x68ksupr(machine_config &config);
-	void x68030(machine_config &config);
+	void x68000_base(machine_config &config);
 	void x68000(machine_config &config);
 
-	void init_x68kxvi();
-	void init_x68030();
-	void init_x68000();
+	virtual void driver_init() override;
 
-private:
+protected:
 	enum
 	{
 		TIMER_X68K_LED,
@@ -95,6 +93,14 @@ private:
 		TIMER_X68K_FDC_TC,
 		TIMER_X68K_ADPCM
 	};
+
+	template <typename CpuType, typename AddrMap, typename Clock>
+	void add_cpu(machine_config &config, CpuType &&type, AddrMap &&map, Clock &&clock)
+	{
+		type(config, m_maincpu, std::forward<Clock>(clock));
+		m_maincpu->set_addrmap(AS_PROGRAM, std::forward<AddrMap>(map));
+		m_maincpu->set_irq_acknowledge_callback(FUNC(x68k_state::int_ack));
+	}
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
@@ -240,89 +246,86 @@ private:
 	int m_sprite_shift;
 	bool m_is_32bit;
 
-	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile);
-	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile);
-	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile_16);
-	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile_16);
-	DECLARE_VIDEO_START(x68000);
+	TILE_GET_INFO_MEMBER(get_bg0_tile);
+	TILE_GET_INFO_MEMBER(get_bg1_tile);
+	TILE_GET_INFO_MEMBER(get_bg0_tile_16);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_16);
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(x68000);
-	uint32_t screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(x68k_led_callback);
-	TIMER_CALLBACK_MEMBER(x68k_scc_ack);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(led_callback);
+	TIMER_CALLBACK_MEMBER(scc_ack);
 	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
 	TIMER_CALLBACK_MEMBER(md_6button_port2_timeout);
-	TIMER_CALLBACK_MEMBER(x68k_bus_error);
-	TIMER_CALLBACK_MEMBER(x68k_net_irq);
+	TIMER_CALLBACK_MEMBER(bus_error);
+	TIMER_CALLBACK_MEMBER(net_irq);
 	DECLARE_READ8_MEMBER(ppi_port_a_r);
 	DECLARE_READ8_MEMBER(ppi_port_b_r);
 	DECLARE_READ8_MEMBER(ppi_port_c_r);
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE8_MEMBER(x68k_ct_w);
-	DECLARE_WRITE8_MEMBER(x68030_adpcm_w);
+	DECLARE_WRITE8_MEMBER(ct_w);
+	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
 
 	//dmac
 	void dma_irq(int channel);
 	DECLARE_WRITE8_MEMBER(dma_end);
 	DECLARE_WRITE8_MEMBER(dma_error);
 
-	int x68k_read_mouse();
-	void x68k_set_adpcm();
+	int read_mouse();
+	void set_adpcm();
 	uint8_t md_3button_r(int port);
 	void md_6button_init();
 	uint8_t md_6button_r(int port);
 	uint8_t xpd1lr_r(int port);
 
-	DECLARE_WRITE_LINE_MEMBER(x68k_fm_irq);
-	DECLARE_WRITE_LINE_MEMBER(x68k_irq2_line);
-	DECLARE_WRITE_LINE_MEMBER(x68k_irq4_line);
+	DECLARE_WRITE_LINE_MEMBER(fm_irq);
+	DECLARE_WRITE_LINE_MEMBER(irq2_line);
+	DECLARE_WRITE_LINE_MEMBER(irq4_line);
 
-	DECLARE_WRITE16_MEMBER(x68k_scc_w);
-	DECLARE_WRITE16_MEMBER(x68k_fdc_w);
-	DECLARE_READ16_MEMBER(x68k_fdc_r);
-	DECLARE_WRITE16_MEMBER(x68k_ioc_w);
-	DECLARE_READ16_MEMBER(x68k_ioc_r);
-	DECLARE_WRITE16_MEMBER(x68k_sysport_w);
-	DECLARE_READ16_MEMBER(x68k_sysport_r);
-	DECLARE_WRITE16_MEMBER(x68k_ppi_w);
-	DECLARE_READ16_MEMBER(x68k_ppi_r);
-	DECLARE_WRITE16_MEMBER(x68k_sram_w);
-	DECLARE_READ16_MEMBER(x68k_sram_r);
-	DECLARE_WRITE16_MEMBER(x68k_vid_w);
-	DECLARE_READ16_MEMBER(x68k_vid_r);
-	DECLARE_READ16_MEMBER(x68k_areaset_r);
-	DECLARE_WRITE16_MEMBER(x68k_areaset_w);
-	DECLARE_WRITE16_MEMBER(x68k_enh_areaset_w);
-	DECLARE_READ16_MEMBER(x68k_rom0_r);
-	DECLARE_WRITE16_MEMBER(x68k_rom0_w);
-	DECLARE_READ16_MEMBER(x68k_emptyram_r);
-	DECLARE_WRITE16_MEMBER(x68k_emptyram_w);
-	DECLARE_READ16_MEMBER(x68k_exp_r);
-	DECLARE_WRITE16_MEMBER(x68k_exp_w);
-	DECLARE_READ16_MEMBER(x68k_scc_r);
+	DECLARE_WRITE16_MEMBER(scc_w);
+	DECLARE_READ16_MEMBER(scc_r);
+	DECLARE_WRITE16_MEMBER(fdc_w);
+	DECLARE_READ16_MEMBER(fdc_r);
+	DECLARE_WRITE16_MEMBER(ioc_w);
+	DECLARE_READ16_MEMBER(ioc_r);
+	DECLARE_WRITE16_MEMBER(sysport_w);
+	DECLARE_READ16_MEMBER(sysport_r);
+	DECLARE_WRITE16_MEMBER(ppi_w);
+	DECLARE_READ16_MEMBER(ppi_r);
+	DECLARE_WRITE16_MEMBER(sram_w);
+	DECLARE_READ16_MEMBER(sram_r);
+	DECLARE_WRITE16_MEMBER(vid_w);
+	DECLARE_READ16_MEMBER(vid_r);
+	DECLARE_READ16_MEMBER(areaset_r);
+	DECLARE_WRITE16_MEMBER(areaset_w);
+	DECLARE_WRITE16_MEMBER(enh_areaset_w);
+	DECLARE_READ16_MEMBER(rom0_r);
+	DECLARE_WRITE16_MEMBER(rom0_w);
+	DECLARE_READ16_MEMBER(emptyram_r);
+	DECLARE_WRITE16_MEMBER(emptyram_w);
+	DECLARE_READ16_MEMBER(exp_r);
+	DECLARE_WRITE16_MEMBER(exp_w);
 
-	DECLARE_READ16_MEMBER(x68k_spritereg_r);
-	DECLARE_WRITE16_MEMBER(x68k_spritereg_w);
-	DECLARE_READ16_MEMBER(x68k_spriteram_r);
-	DECLARE_WRITE16_MEMBER(x68k_spriteram_w);
+	DECLARE_READ16_MEMBER(spritereg_r);
+	DECLARE_WRITE16_MEMBER(spritereg_w);
+	DECLARE_READ16_MEMBER(spriteram_r);
+	DECLARE_WRITE16_MEMBER(spriteram_w);
 	DECLARE_READ16_MEMBER(tvram_read);
 	DECLARE_WRITE16_MEMBER(tvram_write);
 	DECLARE_READ16_MEMBER(gvram_read);
 	DECLARE_WRITE16_MEMBER(gvram_write);
-	IRQ_CALLBACK_MEMBER(x68k_int_ack);
+	IRQ_CALLBACK_MEMBER(int_ack);
 
-	void x68030_map(address_map &map);
+	void x68k_base_map(address_map &map);
 	void x68k_map(address_map &map);
-	void x68kxvi_map(address_map &map);
 
-	inline void x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
-	void x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
-	bool x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority);
-	void x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
-	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
+	inline void plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
+	void draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
+	bool draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority);
+	void draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 
 public:
 	DECLARE_PALETTE_DECODER(GGGGGRRRRRBBBBBI);
@@ -335,6 +338,44 @@ protected:
 	bool m_bus_error;
 };
 
+class x68ksupr_state : public x68k_state
+{
+public:
+	x68ksupr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: x68k_state(mconfig, type, tag)
+		, m_scsictrl(*this, "mb89352")
+	{
+	}
 
+	void x68ksupr_base(machine_config &config);
+	void x68kxvi(machine_config &config);
+	void x68ksupr(machine_config &config);
+
+	virtual void driver_init() override;
+
+protected:
+	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+
+	required_device<mb89352_device> m_scsictrl;
+
+	void x68kxvi_map(address_map &map);
+};
+
+class x68030_state : public x68ksupr_state
+{
+public:
+	x68030_state(const machine_config &mconfig, device_type type, const char *tag)
+		: x68ksupr_state(mconfig, type, tag)
+	{
+	}
+
+	void x68030(machine_config &config);
+
+	virtual void driver_init() override;
+
+protected:
+	void x68030_map(address_map &map);
+};
 
 #endif // MAME_INCLUDES_X68K_H

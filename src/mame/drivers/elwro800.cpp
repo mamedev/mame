@@ -277,7 +277,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		return m_i8255->read(space, (offset & 0x03) ^ 0x03);
+		return m_i8255->read((offset & 0x03) ^ 0x03);
 	}
 	else if (!BIT(cs,3))
 	{
@@ -294,14 +294,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		if (offset & 1)
-		{
-			return m_i8251->status_r(space, 0);
-		}
-		else
-		{
-			return m_i8251->data_r(space, 0);
-		}
+		return m_i8251->read(offset & 1);
 	}
 	else if (!BIT(cs,5))
 	{
@@ -332,7 +325,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		m_i8255->write(space, (offset & 0x03) ^ 0x03, data);
+		m_i8255->write((offset & 0x03) ^ 0x03, data);
 	}
 	else if (!BIT(cs,3))
 	{
@@ -345,14 +338,7 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		if (offset & 1)
-		{
-			m_i8251->control_w(space, 0, data);
-		}
-		else
-		{
-			m_i8251->data_w(space, 0, data);
-		}
+		m_i8251->write(offset & 1, data);
 	}
 	else if (!BIT(cs,5))
 	{
@@ -625,8 +611,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&elwro800_state::elwro800_bank1).set_data_width(8).set_stride(0x2000);
 	ADDRESS_MAP_BANK(config, "bank2").set_map(&elwro800_state::elwro800_bank2).set_data_width(8).set_stride(0x2000);

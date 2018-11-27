@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Quench
+#ifndef MAME_INCLUDES_SSLAM_H
+#define MAME_INCLUDES_SSLAM_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
@@ -8,8 +12,8 @@
 class sslam_state : public driver_device
 {
 public:
-	sslam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sslam_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
@@ -20,7 +24,8 @@ public:
 		m_md_tileram(*this, "md_tileram"),
 		m_tx_tileram(*this, "tx_tileram"),
 		m_regs(*this, "regs"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void sslam(machine_config &config);
 	void powerbls(machine_config &config);
@@ -84,3 +89,5 @@ private:
 	void powerbls_map(address_map &map);
 	void sslam_program_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SSLAM_H

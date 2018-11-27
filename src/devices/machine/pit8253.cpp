@@ -809,7 +809,7 @@ uint8_t pit_counter_device::read()
 	return data;
 }
 
-READ8_MEMBER( pit8253_device::read )
+uint8_t pit8253_device::read(offs_t offset)
 {
 	offset &= 3;
 
@@ -1023,7 +1023,7 @@ void pit_counter_device::count_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( pit8253_device::write )
+void pit8253_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 3;
 

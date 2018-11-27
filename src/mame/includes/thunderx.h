@@ -5,6 +5,11 @@
     Super Contra / Thunder Cross
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_THUNDERX_H
+#define MAME_INCLUDES_THUNDERX_H
+
+#pragma once
+
 #include "cpu/m6809/konami.h"
 #include "machine/bankdev.h"
 #include "sound/k007232.h"
@@ -16,8 +21,8 @@
 class thunderx_state : public driver_device
 {
 public:
-	thunderx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	thunderx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank5800(*this, "bank5800"),
@@ -26,7 +31,8 @@ public:
 		m_k051960(*this, "k051960"),
 		m_palette(*this, "palette"),
 		m_rombank(*this, "rombank"),
-		m_pmcram(*this, "pmcram") { }
+		m_pmcram(*this, "pmcram")
+	{ }
 
 	void scontra(machine_config &config);
 	void gbusters(machine_config &config);
@@ -95,3 +101,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_THUNDERX_H

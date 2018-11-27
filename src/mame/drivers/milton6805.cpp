@@ -121,11 +121,10 @@ MACHINE_CONFIG_START(milton_state::milton)
 	MCFG_DEVICE_ADD("maincpu", M6805, 3120000) // MC6805P2, needs a CPU core
 	MCFG_DEVICE_PROGRAM_MAP(prg_map)
 
-	MCFG_DEVICE_ADD("grom3", TMC0430, 3120000 / 8)
-	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x0000, 0);
-
-	MCFG_DEVICE_ADD("grom4", TMC0430, 3120000 / 8)
-	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x2000, 1);
+	// GROMs. They still require a ready callback and external clock
+	// of 3120000/8 Hz, pulsing their glock_in line (see tmc0430.cpp and ti99_4x.cpp)
+	TMC0430(config, "grom3", "groms", 0x0000, 0);
+	TMC0430(config, "grom4", "groms", 0x2000, 1);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("sp0250", SP0250, 3120000)

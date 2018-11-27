@@ -1127,7 +1127,7 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 	MCFG_DEVICE_PROGRAM_MAP(berzerk_map)
 	MCFG_DEVICE_IO_MAP(berzerk_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("ls181_10c", TTL74181)
 	MCFG_DEVICE_ADD("ls181_12c", TTL74181)
@@ -1142,8 +1142,7 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 
 	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_DEVICE_ADD("exidy", EXIDY, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	EXIDY(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 

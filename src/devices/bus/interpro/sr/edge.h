@@ -107,7 +107,7 @@ protected:
 
 	void dsp1_map(address_map &map);
 
-	virtual void device_start() override {};
+	virtual void device_start() override {}
 
 	DECLARE_WRITE_LINE_MEMBER(holda);
 	DECLARE_WRITE_LINE_MEMBER(scc_irq);

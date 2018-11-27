@@ -158,9 +158,10 @@ protected:
 
 DEFINE_DEVICE_TYPE(GALGAMES_BIOS_CART, galgames_bios_cart_device, "galgames_bios_cart", "Galaxy Games BIOS Cartridge")
 
-MACHINE_CONFIG_START(galgames_bios_cart_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C76_8BIT)
-MACHINE_CONFIG_END
+void galgames_bios_cart_device::device_add_mconfig(machine_config &config)
+{
+	EEPROM_93C76_8BIT(config, "eeprom");
+}
 
 #define MCFG_GALGAMES_BIOS_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_BIOS_CART, 0) \
@@ -189,7 +190,7 @@ MACHINE_CONFIG_START(galgames_starpak2_cart_device::device_add_mconfig)
 	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C76_8BIT)
+	EEPROM_93C76_8BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_STARPAK2_CART_ADD(_tag, _cart) \
@@ -221,7 +222,7 @@ MACHINE_CONFIG_START(galgames_starpak3_cart_device::device_add_mconfig)
 	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C76_8BIT)
+	EEPROM_93C76_8BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_STARPAK3_CART_ADD(_tag, _cart) \
@@ -982,7 +983,7 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(galgames_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galgames_state, scanline_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_GALGAMES_SLOT_ADD("slot")
 	MCFG_GALGAMES_BIOS_CART_ADD( "cart0", 0)

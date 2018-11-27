@@ -1513,7 +1513,7 @@ void device_debug::interrupt_hook(int irqline)
 
 void device_debug::exception_hook(int exception)
 {
-	// see if this matches a pending interrupt request
+	// see if this matches an exception breakpoint
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
 		m_device.machine().debugger().cpu().set_execution_stopped();
@@ -1522,6 +1522,37 @@ void device_debug::exception_hook(int exception)
 	}
 }
 
+
+//-------------------------------------------------
+//  privilege_hook - called when privilege level is
+//  changed
+//-------------------------------------------------
+
+void device_debug::privilege_hook()
+{
+	bool matched = 1;
+
+	if ((m_flags & DEBUG_FLAG_STOP_PRIVILEGE) != 0)
+	{
+		if (m_privilege_condition && !m_privilege_condition->is_empty())
+		{
+			try
+			{
+				matched = m_privilege_condition->execute();
+			}
+			catch (...)
+			{
+			}
+		}
+
+		if (matched)
+		{
+			m_device.machine().debugger().cpu().set_execution_stopped();
+			m_device.machine().debugger().console().printf("Stopped due to privilege change\n", m_device.tag());
+			compute_debug_flags();
+		}
+	}
+}
 
 //-------------------------------------------------
 //  instruction_hook - called by the CPU cores
@@ -1856,6 +1887,21 @@ void device_debug::go_milliseconds(u64 milliseconds)
 	m_device.machine().rewind_invalidate();
 	m_stoptime = m_device.machine().time() + attotime::from_msec(milliseconds);
 	m_flags |= DEBUG_FLAG_STOP_TIME;
+	m_device.machine().debugger().cpu().set_execution_running();
+}
+
+
+//-------------------------------------------------
+//  go_privilege - execute until execution
+//  level changes
+//-------------------------------------------------
+
+void device_debug::go_privilege(const char *condition)
+{
+	assert(m_exec != nullptr);
+	m_device.machine().rewind_invalidate();
+	m_privilege_condition = std::make_unique<parsed_expression>(&m_symtable, condition);
+	m_flags |= DEBUG_FLAG_STOP_PRIVILEGE;
 	m_device.machine().debugger().cpu().set_execution_running();
 }
 
@@ -2747,7 +2793,7 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	std::fill(std::begin(m_end_address), std::end(m_end_address), 0);
 	std::fill(std::begin(m_masks), std::end(m_masks), 0);
 
-	offs_t ashift = m_space.addr_shift();
+	int ashift = m_space.addr_shift();
 	endianness_t endian = m_space.endianness();
 	offs_t subamask = m_space.alignment() - 1;
 	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
@@ -2939,7 +2985,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 
 	// adjust address, size & value_to_write based on mem_mask.
 	offs_t size = 0;
-	offs_t ashift = m_space.addr_shift();
+	int ashift = m_space.addr_shift();
 	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
 	u64 unit_mask = make_bitmask<u64>(unit_size);
 

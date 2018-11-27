@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
+#ifndef MAME_INCLUDES_QDRMFGP_H
+#define MAME_INCLUDES_QDRMFGP_H
+
+#pragma once
 
 #include "machine/ataintf.h"
 #include "machine/timer.h"
@@ -12,8 +16,8 @@
 class qdrmfgp_state : public driver_device
 {
 public:
-	qdrmfgp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	qdrmfgp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_workram(*this, "workram"),
@@ -85,3 +89,5 @@ private:
 	void qdrmfgp_k054539_map(address_map &map);
 	void qdrmfgp_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_QDRMFGP_H

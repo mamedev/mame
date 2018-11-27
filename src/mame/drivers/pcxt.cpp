@@ -504,8 +504,8 @@ MACHINE_CONFIG_START(pcxt_state::filetto)
 
 	MCFG_DEVICE_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.60)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	RAM(config, RAM_TAG).set_default_size("640K");
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&pcxt_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 MACHINE_CONFIG_END
@@ -518,8 +518,8 @@ MACHINE_CONFIG_START(pcxt_state::tetriskr)
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
 
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "tetriskr", true) // FIXME: determine ISA bus clock
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	RAM(config, RAM_TAG).set_default_size("640K");
 MACHINE_CONFIG_END
 
 ROM_START( filetto )

@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -735,17 +735,17 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(13'333'000)/2); // divider not verified
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 12000000/6)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw2_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ym2149_device &aysnd(YM2149(config, "aysnd", 12000000/6));
+	aysnd.port_a_read_callback().set(FUNC(ojankohs_state::ojankohs_dipsw1_r));
+	aysnd.port_b_read_callback().set(FUNC(ojankohs_state::ojankohs_dipsw2_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
@@ -762,7 +762,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoy)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -782,10 +782,10 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12000000/8));
+	aysnd.port_a_read_callback().set_ioport("dsw1");
+	aysnd.port_b_read_callback().set_ioport("dsw2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
@@ -802,7 +802,7 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -816,17 +816,17 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(13'333'000)/2); // divider not verified
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ccasino)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12000000/8));
+	aysnd.port_a_read_callback().set_ioport("dsw1");
+	aysnd.port_b_read_callback().set_ioport("dsw2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoc)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -861,10 +861,10 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 8000000/4));
+	aysnd.port_a_read_callback().set_ioport("dsw1");
+	aysnd.port_b_read_callback().set_ioport("dsw2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 8000000/22)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */

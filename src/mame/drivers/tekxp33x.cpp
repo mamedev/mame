@@ -36,7 +36,7 @@
 
 
 #include "emu.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/tms34010/tms34010.h"
 #include "emupal.h"
 #include "screen.h"
@@ -99,9 +99,9 @@ void tekxp330_state::machine_start()
 
 MACHINE_CONFIG_START(tekxp330_state::tekxp330)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R3052, XTAL(20'000'000)) /* IDT 79R3052E, clock unknown */
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	r3052e_device &maincpu(R3052E(config, "maincpu", XTAL(20'000'000))); /* IDT 79R3052E, clock unknown */
+	maincpu.set_endianness(ENDIANNESS_BIG);
+	maincpu.set_addrmap(AS_PROGRAM, &tekxp330_state::cpu_map);
 
 	MCFG_DEVICE_ADD("tms", TMS34010, XTAL(40'000'000)) /* clock unknown */
 	MCFG_DEVICE_PROGRAM_MAP(tms_map)

@@ -164,7 +164,7 @@ MACHINE_CONFIG_START(xorworld_state::xorworld)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)); // CS (active low)

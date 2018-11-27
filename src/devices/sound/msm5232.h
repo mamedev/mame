@@ -30,6 +30,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -101,7 +102,6 @@ private:
 	void init(int clock, int rate);
 	void EG_voices_advance();
 	void TG_group_advance(int groupidx);
-	void postload();
 };
 
 DECLARE_DEVICE_TYPE(MSM5232, msm5232_device)

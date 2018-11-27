@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/i8251.h"
 #include "machine/z80dart.h"
@@ -392,8 +393,7 @@ void pwrview_state::pwrview_io(address_map &map)
 	map(0xc280, 0xc287).rw(FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
 	map(0xc288, 0xc28f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio2_device::cd_ba_r), FUNC(z80sio2_device::cd_ba_w)).umask16(0x00ff);
-	map(0xc2c0, 0xc2c0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc2c2, 0xc2c2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc2c0, 0xc2c3).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xc2e0, 0xc2e3).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xc2e4, 0xc2e5).ram();
 	map(0xc2e6, 0xc2e6).r(FUNC(pwrview_state::pitclock_r));
@@ -414,25 +414,25 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/16) // clocks unknown, fix above when found
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/16)
-	MCFG_PIT8253_CLK2(XTAL(16'000'000)/16)
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(16'000'000)/16); // clocks unknown, fix above when found
+	m_pit->set_clk<1>(XTAL(16'000'000)/16);
+	m_pit->set_clk<2>(XTAL(16'000'000)/16);
 
 	// floppy disk controller
-	MCFG_UPD765A_ADD("fdc", true, true) // Rockwell R7675P
-	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic1", pic8259_device, ir6_w))
-	//MCFG_UPD765_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
+	UPD765A(config, "fdc", true, true); // Rockwell R7675P
+	//fdc.intrq_wr_callback().set("pic1", FUNC(pic8259_device::ir6_w));
+	//fdc.drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
-	MCFG_DEVICE_ADD("sio", Z80SIO2, 4000000)
+	Z80SIO2(config, "sio", 4000000);
 
-	MCFG_DEVICE_ADD("crtc", HD6845, XTAL(64'000'000)/64) // clock unknown
-	MCFG_MC6845_CHAR_WIDTH(32) // ??
-	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)
+	hd6845_device &crtc(HD6845(config, "crtc", XTAL(64'000'000)/64)); // clock unknown
+	crtc.set_char_width(32);   /* ? */
+	crtc.set_update_row_callback(FUNC(pwrview_state::update_row), this);
 
 	ADDRESS_MAP_BANK(config, "bios_bank").set_map(&pwrview_state::bios_bank).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
 MACHINE_CONFIG_END

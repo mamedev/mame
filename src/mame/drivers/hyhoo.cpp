@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(hyhoo_state::hyhoo)
 	MCFG_DEVICE_IO_MAP(hyhoo_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hyhoo_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -251,10 +251,10 @@ MACHINE_CONFIG_START(hyhoo_state::hyhoo)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1250000));
+	aysnd.port_a_read_callback().set_ioport("DSWA");
+	aysnd.port_b_read_callback().set_ioport("DSWB");
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

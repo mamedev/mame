@@ -80,6 +80,14 @@ void save_manager::allow_registration(bool allowed)
 	m_reg_allowed = allowed;
 	if (!allowed)
 	{
+		// look for duplicates
+		std::sort(m_entry_list.begin(), m_entry_list.end(),
+			[](std::unique_ptr<state_entry> const& a, std::unique_ptr<state_entry> const& b) { return a->m_name < b->m_name; });
+
+		for (int i = 0; i < m_entry_list.size() - 1; i++)
+			if (m_entry_list[i]->m_name == m_entry_list[i + 1]->m_name)
+				fatalerror("Duplicate save state registration entry (%s)\n", m_entry_list[i]->m_name.c_str());
+
 		dump_registry();
 
 		// everything is registered by now, evaluate the savestate size
@@ -175,22 +183,8 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	else
 		totalname = string_format("%s/%X/%s", module, index, name);
 
-	// look for duplicates and an entry to insert in front of
-	std::vector<std::unique_ptr<state_entry>>::iterator insert_after = m_entry_list.begin();
-	for (auto it = m_entry_list.begin(); it != m_entry_list.end(); ++it)
-	{
-		// stop when we find an entry whose name is after ours
-		if (it->get()->m_name.compare(totalname)>0)
-			break;
-		insert_after = it;
-
-		// error if we are equal
-		if (it->get()->m_name.compare(totalname)==0)
-			fatalerror("Duplicate save state registration entry (%s)\n", totalname.c_str());
-	}
-
 	// insert us into the list
-	m_entry_list.insert(insert_after, std::make_unique<state_entry>(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount));
+	m_entry_list.emplace_back(std::make_unique<state_entry>(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount));
 }
 
 
@@ -908,19 +902,19 @@ void state_entry::flip_data()
 		case 2:
 			data16 = (u16 *)m_data;
 			for (count = 0; count < m_typecount; count++)
-				data16[count] = flipendian_int16(data16[count]);
+				data16[count] = swapendian_int16(data16[count]);
 			break;
 
 		case 4:
 			data32 = (u32 *)m_data;
 			for (count = 0; count < m_typecount; count++)
-				data32[count] = flipendian_int32(data32[count]);
+				data32[count] = swapendian_int32(data32[count]);
 			break;
 
 		case 8:
 			data64 = (u64 *)m_data;
 			for (count = 0; count < m_typecount; count++)
-				data64[count] = flipendian_int64(data64[count]);
+				data64[count] = swapendian_int64(data64[count]);
 			break;
 	}
 }

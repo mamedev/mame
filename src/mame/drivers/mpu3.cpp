@@ -841,7 +841,7 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_DEVICE_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
 	MCFG_DEVICE_PROGRAM_MAP(mpu3_basemap)
 
-	MCFG_MSC1937_ADD("vfd",0)
+	MSC1937(config, m_vfd);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu3_state, gen_50hz, attotime::from_hz(100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("555_ic10", mpu3_state, ic10_callback, PERIOD_OF_555_ASTABLE(10000,1000,0.0000001))
@@ -883,19 +883,19 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	m_pia6->irqa_handler().set(FUNC(mpu3_state::cpu0_irq));
 	m_pia6->irqb_handler().set(FUNC(mpu3_state::cpu0_irq));
 
-	MCFG_DEVICE_ADD("reel0", REEL, MPU3_48STEP_REEL, 1, 3, 0x00, 2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, mpu3_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, MPU3_48STEP_REEL, 1, 3, 0x00, 2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, mpu3_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, MPU3_48STEP_REEL, 1, 3, 0x00, 2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, mpu3_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, MPU3_48STEP_REEL, 1, 3, 0x00, 2)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, mpu3_state, reel_optic_cb<3>))
+	REEL(config, m_reels[0], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
+	m_reels[0]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<0>));
+	REEL(config, m_reels[1], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
+	m_reels[1]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<1>));
+	REEL(config, m_reels[2], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
+	m_reels[2]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<2>));
+	REEL(config, m_reels[3], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
+	m_reels[3]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<3>));
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_mpu3);
 MACHINE_CONFIG_END

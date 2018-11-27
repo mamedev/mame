@@ -15,6 +15,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/am9519.h"
 #include "machine/upd765.h"
 #include "machine/mc2661.h"
@@ -197,30 +198,30 @@ static void floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(dps1_state::dps1)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dps1_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dps1_state::io_map);
+
 	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	mc2661_device &uart(MC2661(config, "uart", XTAL(5'068'800)));
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart",mc2661_device,rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart",mc2661_device,cts_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(uart, FUNC(mc2661_device::rx_w));
+	rs232.dsr_handler().set(uart, FUNC(mc2661_device::dsr_w));
+	rs232.cts_handler().set(uart, FUNC(mc2661_device::cts_w));
 
-	MCFG_DEVICE_ADD("am9519a", AM9519, 0)
-
-	MCFG_DEVICE_ADD("am9519b", AM9519, 0)
+	AM9519(config, "am9519a", 0);
+	AM9519(config, "am9519b", 0);
 
 	// floppy
-	MCFG_UPD765A_ADD("fdc", false, true)
-	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, dps1_state, fdc_int_w)) // doesn't appear to be used
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, dps1_state, fdc_drq_w))
+	UPD765A(config, m_fdc, false, true);
+	//m_fdc->intrq_wr_callback().set(FUNC(dps1_state::fdc_int_w)); // doesn't appear to be used
+	m_fdc->drq_wr_callback().set(FUNC(dps1_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats)

@@ -898,7 +898,8 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 
 	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
 
-	MCFG_RAMDAC_ADD(m_ramdac, ramdac_map, "palette")
+	RAMDAC(config, m_ramdac, 0, m_palette);
+	m_ramdac->set_addrmap(0, &mediagx_state::ramdac_map);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

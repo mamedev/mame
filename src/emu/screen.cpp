@@ -558,6 +558,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_xscale(1.0f)
 	, m_yscale(1.0f)
 	, m_screen_vblank(*this)
+	, m_scanline_cb(*this)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_video_attributes(0)
 	, m_svg_region(nullptr)
@@ -656,19 +657,32 @@ void screen_device::device_config_complete()
 {
 	// combine orientation with machine orientation
 	m_orientation = orientation_add(m_orientation, mconfig().gamedrv().flags & machine_flags::MASK_ORIENTATION);
+}
+
+
+//-------------------------------------------------
+//  physical_aspect - determine the physical
+//  aspect ratio to be used for rendering
+//-------------------------------------------------
+
+std::pair<unsigned, unsigned> screen_device::physical_aspect() const
+{
+	assert(configured());
+
+	std::pair<unsigned, unsigned> phys_aspect = m_phys_aspect;
 
 	// physical aspect ratio unconfigured
-	if (!m_phys_aspect.first || !m_phys_aspect.second)
+	if (!phys_aspect.first || !phys_aspect.second)
 	{
 		switch (m_type)
 		{
 		case SCREEN_TYPE_RASTER:
 		case SCREEN_TYPE_VECTOR:
-			m_phys_aspect = std::make_pair(4, 3); // assume standard CRT
+			phys_aspect = std::make_pair(4, 3); // assume standard CRT
 			break;
 		case SCREEN_TYPE_LCD:
 		case SCREEN_TYPE_SVG:
-			m_phys_aspect = std::make_pair(~0U, ~0U); // assume square pixels
+			phys_aspect = std::make_pair(~0U, ~0U); // assume square pixels
 			break;
 		case SCREEN_TYPE_INVALID:
 		default:
@@ -677,16 +691,17 @@ void screen_device::device_config_complete()
 	}
 
 	// square pixels?
-	if ((~0U == m_phys_aspect.first) && (~0U == m_phys_aspect.second))
+	if ((~0U == phys_aspect.first) && (~0U == phys_aspect.second))
 	{
-		m_phys_aspect.first = visible_area().width();
-		m_phys_aspect.second = visible_area().height();
+		phys_aspect.first = visible_area().width();
+		phys_aspect.second = visible_area().height();
 	}
 
 	// always keep this in reduced form
-	util::reduce_fraction(m_phys_aspect.first, m_phys_aspect.second);
-}
+	util::reduce_fraction(phys_aspect.first, phys_aspect.second);
 
+	return phys_aspect;
+}
 
 
 //-------------------------------------------------
@@ -701,6 +716,7 @@ void screen_device::device_resolve_objects()
 	m_screen_update_ind16.bind_relative_to(*owner());
 	m_screen_update_rgb32.bind_relative_to(*owner());
 	m_screen_vblank.resolve_safe();
+	m_scanline_cb.resolve();
 
 	// assign our format to the palette before it starts
 	if (m_palette)
@@ -750,9 +766,9 @@ void screen_device::device_start()
 
 	// allocate raw textures
 	m_texture[0] = machine().render().texture_alloc();
-	m_texture[0]->set_osd_data(u64((m_unique_id << 1) | 0));
+	m_texture[0]->set_id(u64(m_unique_id) << 57);
 	m_texture[1] = machine().render().texture_alloc();
-	m_texture[1]->set_osd_data(u64((m_unique_id << 1) | 1));
+	m_texture[1]->set_id((u64(m_unique_id) << 57) | 1);
 
 	// configure the default cliparea
 	render_container::user_settings settings;
@@ -771,7 +787,7 @@ void screen_device::device_start()
 	m_scanline0_timer = timer_alloc(TID_SCANLINE0);
 
 	// allocate a timer to generate per-scanline updates
-	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
 		m_scanline_timer = timer_alloc(TID_SCANLINE);
 
 	// configure the screen with the default parameters
@@ -782,7 +798,7 @@ void screen_device::device_start()
 	m_vblank_end_time = attotime(0, m_vblank_period);
 
 	// start the timer to generate per-scanline updates
-	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
 		m_scanline_timer->adjust(time_until_pos(0));
 
 	// create burn-in bitmap
@@ -885,9 +901,13 @@ void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		// subsequent scanlines when scanline updates are enabled
 		case TID_SCANLINE:
-
-			// force a partial update to the current scanline
-			update_partial(param);
+			if (m_video_attributes & VIDEO_UPDATE_SCANLINE)
+			{
+				// force a partial update to the current scanline
+				update_partial(param);
+			}
+			if (m_scanline_cb)
+				m_scanline_cb(param);
 
 			// compute the next visible scanline
 			param++;
@@ -1037,9 +1057,6 @@ void screen_device::set_visible_area(int min_x, int max_x, int min_y, int max_y)
 
 bool screen_device::update_partial(int scanline)
 {
-	// validate arguments
-	assert(scanline >= 0);
-
 	LOG_PARTIAL_UPDATES(("Partial: update_partial(%s, %d): ", tag(), scanline));
 
 	// these two checks only apply if we're allowed to skip frames
@@ -1245,6 +1262,96 @@ void screen_device::reset_partial_updates()
 	m_partial_scan_hpos = 0;
 	m_partial_updates_this_frame = 0;
 	m_scanline0_timer->adjust(time_until_pos(0));
+}
+
+
+//-------------------------------------------------
+//  pixel - returns the RGB value of the specified
+//  pixel location
+//-------------------------------------------------
+
+u32 screen_device::pixel(s32 x, s32 y)
+{
+	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	if (!curbitmap.valid())
+		return 0;
+
+	const int srcwidth = curbitmap.width();
+	const int srcheight = curbitmap.height();
+
+	if (x < 0 || y < 0 || x >= srcwidth || y >= srcheight)
+		return 0;
+
+	switch (curbitmap.format())
+	{
+		case BITMAP_FORMAT_IND16:
+		{
+			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
+			const u16 src = srcbitmap.pix(y, x);
+			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+			return (u32)palette[src];
+		}
+
+		case BITMAP_FORMAT_RGB32:
+		{
+			// iterate over rows in the destination
+			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
+			return (u32)srcbitmap.pix(y, x);
+		}
+
+		default:
+			return 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  pixels - fills the specified buffer with the
+//  RGB values of each pixel in the screen.
+//-------------------------------------------------
+
+void screen_device::pixels(u32 *buffer)
+{
+	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	if (!curbitmap.valid())
+		return;
+
+	const rectangle &visarea = visible_area();
+
+	switch (curbitmap.format())
+	{
+		case BITMAP_FORMAT_IND16:
+		{
+			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
+			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+			for (int y = visarea.min_y; y <= visarea.max_y; y++)
+			{
+				const u16 *src = &srcbitmap.pix(y, visarea.min_x);
+				for (int x = visarea.min_x; x <= visarea.max_x; x++)
+				{
+					*buffer++ = palette[*src++];
+				}
+			}
+			break;
+		}
+
+		case BITMAP_FORMAT_RGB32:
+		{
+			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
+			for (int y = visarea.min_y; y <= visarea.max_y; y++)
+			{
+				const u32 *src = &srcbitmap.pix(y, visarea.min_x);
+				for (int x = visarea.min_x; x <= visarea.max_x; x++)
+				{
+					*buffer++ = *src++;
+				}
+			}
+			break;
+		}
+
+		default:
+			break;
+	}
 }
 
 

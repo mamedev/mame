@@ -14,7 +14,7 @@
 #include "machine/rmnkbd.h"
 
 #include "cpu/mcs51/mcs51.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "bus/isa/fdc.h"
 #include "bus/rs232/rs232.h"
@@ -183,7 +183,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	rs232b.ri_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rib_w));
 	rs232b.cts_handler().set(Z80SIO_TAG, FUNC(z80dart_device::ctsb_w));
 
-	EEPROM_SERIAL_93C06_16BIT(config, m_eeprom);
+	EEPROM_93C06_16BIT(config, m_eeprom);
 
 	VIA6522(config, m_via, 1000000);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));

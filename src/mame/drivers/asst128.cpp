@@ -6,6 +6,7 @@
 #include "cpu/i86/i86.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "imagedev/floppy.h"
 #include "machine/pc_fdc.h"
 
 #include "formats/asst128_dsk.h"
@@ -120,16 +121,14 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
-	MCFG_PC_FDC_XT_ADD("fdc")
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE("mb:pic8259", pic8259_device, ir6_w))
+	PC_FDC_XT(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set("mb:pic8259", FUNC(pic8259_device::ir6_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("64K, 128K, 256K");
 MACHINE_CONFIG_END
 
 ROM_START( asst128 )

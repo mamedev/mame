@@ -346,7 +346,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "machine/wd_fdc.h"
 #include "formats/rx50_dsk.h"
 #include "formats/pc_dsk.h" // PC Formats
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "imagedev/harddriv.h"
 #include "machine/wd2010.h"
@@ -356,8 +356,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "bus/rs232/rs232.h"
 #include "imagedev/bitbngr.h"
 #include "machine/com8116.h"
+#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/terminal.h"
-#include "bus/rs232/ser_mouse.h"
 
 #include "machine/i8251.h"
 #include "machine/dec_lk201.h"
@@ -432,7 +432,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #define MHFU_RESET              -250
 
 // ----------------------------------------------------------------------------------------------
-// NEC 7220 GDC     ***************** GDC-NEW ********************
+// NEC 7220 GDC     *************************************
 
 // Indirect Register, port $53, see page 181 of AA-AE36A (PDF):
 // (actual values : see comments)
@@ -527,10 +527,10 @@ public:
 		m_ext_ram(*this, "ext_ram"),
 
 		m_rtc(*this, "rtc"),
-		m_hgdc(*this, "upd7220"), // GDC-NEW
+		m_hgdc(*this, "upd7220"), // GDC
 
 		m_screen2(*this, "screen2"),
-		m_palette2(*this, "palette2"), // GDC-NEW
+		m_palette2(*this, "palette2"), // GDC
 		m_video_ram(*this, "vram"),
 
 		m_digits(*this, "digit%u", 0U)
@@ -688,7 +688,7 @@ private:
 
 	optional_device<ds1315_device> m_rtc;
 
-	required_device<upd7220_device> m_hgdc;  // GDC-NEW
+	required_device<upd7220_device> m_hgdc;  // GDC
 	required_device<screen_device> m_screen2;
 	required_device<palette_device> m_palette2;
 	required_shared_ptr<uint16_t> m_video_ram;
@@ -957,8 +957,7 @@ void rainbow_state::rainbow8088_io(address_map &map)
 
 	map(0x0e, 0x0e).w(FUNC(rainbow_state::printer_bitrate_w));
 
-	map(0x10, 0x10).rw(m_kbd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).rw(m_kbd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).rw(m_kbd8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 	// ===========================================================
 	// There are 4 select lines for Option Select 1 to 4
@@ -1103,7 +1102,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("GRAPHICS OPTION") // GDC-NEW
+	PORT_START("GRAPHICS OPTION") // GDC
 	PORT_DIPNAME(0x01, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
@@ -1140,7 +1139,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 
-	PORT_START("MONITOR CONFIGURATION") // GDC-NEW
+	PORT_START("MONITOR CONFIGURATION") // GDC
 	PORT_DIPNAME(0x03, 0x03, "MONITOR CONFIGURATION")
 	PORT_DIPSETTING(0x01, "MONO ONLY / 4 to 16 monochrome shades (single VR-201)")
 	PORT_DIPSETTING(0x02, "COLOR ONLY (single VR-241 with BCC-17 cable)")
@@ -2562,7 +2561,7 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 	return intnum;
 }
 
-// NEC7220 Vsync IRQ ***************************************** GDC-NEW
+// NEC7220 Vsync IRQ ***************************************** GDC
 
 // VERIFY: SCROLL_MAP & COLOR_MAP are updated at the next VSYNC (not immediately)... Are there more registers?
 WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
@@ -3205,7 +3204,7 @@ static GFXDECODE_START(gfx_rainbow)
 	GFXDECODE_ENTRY("chargen", 0x0000, rainbow_charlayout, 0, 1)
 GFXDECODE_END
 
-// Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC-NEW):
+// Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC):
 void rainbow_state::upd7220_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rw(FUNC(rainbow_state::vram_r), FUNC(rainbow_state::vram_w)).share("vram");
@@ -3232,21 +3231,21 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_rainbow)
 
-	MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, 24.0734_MHz_XTAL)
-
-	MCFG_VT_SET_SCREEN("screen")
-	MCFG_VT_CHARGEN("chargen")
-	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(*this, rainbow_state, read_video_ram_r))
-	MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(*this, rainbow_state, video_interrupt))
+	RAINBOW_VIDEO(config, m_crtc, 24.0734_MHz_XTAL);
+	m_crtc->set_screen("screen");
+	m_crtc->set_chargen("chargen");
+	m_crtc->ram_rd_callback().set(FUNC(rainbow_state::read_video_ram_r));
+	m_crtc->vert_freq_intr_wr_callback().set(FUNC(rainbow_state::video_interrupt));
 
 	// *************************** COLOR GRAPHICS (OPTION) **************************************
 	// While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).
-	MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 32) // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
-	MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(*this, rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
+	UPD7220(config, m_hgdc, 31188000 / 32); // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
+	m_hgdc->vsync_wr_callback().set(FUNC(rainbow_state::GDC_vblank_irq)); // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(rainbow_state, hgdc_display_pixels)
-	MCFG_VIDEO_SET_SCREEN("screen2") // SET_SCREEN needs to be added after 7720 device in the machine config, not after the screen.
+	m_hgdc->set_addrmap(0, &rainbow_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(rainbow_state::hgdc_display_pixels), this);
+	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7720 device in the machine config, not after the screen.
+
 	MCFG_PALETTE_ADD("palette2", 32)
 
 	MCFG_SCREEN_ADD("screen2", RASTER)
@@ -3261,7 +3260,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
-	MCFG_DEVICE_ADD(FD1793_TAG, FD1793, 24.0734_MHz_XTAL / 24) // no separate 1 Mhz quartz
+	FD1793(config, m_fdc, 24.0734_MHz_XTAL / 24); // no separate 1 Mhz quartz
 	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 	//MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
@@ -3271,25 +3270,25 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
 
 	/// ********************************* HARD DISK CONTROLLER *****************************************
-	MCFG_DEVICE_ADD("hdc", WD2010, 5000000) // 10 Mhz quartz on controller (divided by 2 for WCLK)
-	MCFG_WD2010_OUT_INTRQ_CB(WRITELINE(*this, rainbow_state, bundle_irq)) // FIRST IRQ SOURCE (OR'ed with DRQ)
-	MCFG_WD2010_OUT_BDRQ_CB(WRITELINE(*this, rainbow_state, hdc_bdrq))  // BUFFER DATA REQUEST
+	WD2010(config, m_hdc, 5000000); // 10 Mhz quartz on controller (divided by 2 for WCLK)
+	m_hdc->out_intrq_callback().set(FUNC(rainbow_state::bundle_irq)); // FIRST IRQ SOURCE (OR'ed with DRQ)
+	m_hdc->out_bdrq_callback().set(FUNC(rainbow_state::hdc_bdrq));  // BUFFER DATA REQUEST
 
 	// SIGNALS -FROM- WD CONTROLLER:
-	MCFG_WD2010_OUT_BCS_CB(WRITELINE(*this, rainbow_state, hdc_read_sector)) // Problem: OUT_BCS_CB = WRITE8 ... (!)
-	MCFG_WD2010_OUT_BCR_CB(WRITELINE(*this, rainbow_state, hdc_bcr))         // BUFFER COUNTER RESET (pulses)
+	m_hdc->out_bcs_callback().set(FUNC(rainbow_state::hdc_read_sector)); // Problem: OUT_BCS_CB = WRITE8 ... (!)
+	m_hdc->out_bcr_callback().set(FUNC(rainbow_state::hdc_bcr));         // BUFFER COUNTER RESET (pulses)
 
-	MCFG_WD2010_OUT_WG_CB(WRITELINE(*this, rainbow_state, hdc_write_sector))   // WRITE GATE
-	MCFG_WD2010_OUT_STEP_CB(WRITELINE(*this, rainbow_state, hdc_step))         // STEP PULSE
-	MCFG_WD2010_OUT_DIRIN_CB(WRITELINE(*this, rainbow_state, hdc_direction))
+	m_hdc->out_wg_callback().set(FUNC(rainbow_state::hdc_write_sector));   // WRITE GATE
+	m_hdc->out_step_callback().set(FUNC(rainbow_state::hdc_step));         // STEP PULSE
+	m_hdc->out_dirin_callback().set(FUNC(rainbow_state::hdc_direction));
 
-	MCFG_WD2010_IN_WF_CB(READLINE(*this, rainbow_state, hdc_write_fault))   // WRITE FAULT  (set to GND if not serviced)
+	// WF + DRDY are actually wired to a routine here:
+	m_hdc->in_wf_callback().set(FUNC(rainbow_state::hdc_write_fault));   // WRITE FAULT (fatal until next reset)
+	m_hdc->in_drdy_callback().set(FUNC(rainbow_state::hdc_drive_ready)); // DRIVE_READY (VCC = ready)
 
-	MCFG_WD2010_IN_DRDY_CB(READLINE(*this, rainbow_state, hdc_drive_ready)) // DRIVE_READY  (set to VCC if not serviced)
-	MCFG_WD2010_IN_SC_CB(CONSTANT(1))                                        // SEEK COMPLETE (set to VCC if not serviced)
-
-	MCFG_WD2010_IN_TK000_CB(CONSTANT(1)) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
-	MCFG_WD2010_IN_INDEX_CB(CONSTANT(1)) //    "
+	// Always set seek complete and track 00 signal (not super clean, but does not affect operation):
+	m_hdc->in_sc_callback().set_constant(1);                             // SEEK COMPLETE (VCC = complete)
+	m_hdc->in_tk000_callback().set_constant(1);                  // TRACK 00 signal (= from drive)
 
 	MCFG_HARDDISK_ADD("decharddisk1")
 	/// ******************************** / HARD DISK CONTROLLER ****************************************
@@ -3304,40 +3303,39 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	MCFG_HARDDISK_ADD("harddisk4")
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")
 
-	MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
+	DS1315(config, m_rtc, 0); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
 	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
 	m_dbrg->fr_handler().set(FUNC(rainbow_state::dbrg_fr_w));
 	m_dbrg->ft_handler().set(FUNC(rainbow_state::dbrg_ft_w));
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 24.0734_MHz_XTAL / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, rainbow_state, mpsc_irq))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("comm", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("printer", rs232_port_device, write_txd))
+	UPD7201_NEW(config, m_mpsc, 24.0734_MHz_XTAL / 5 / 2); // 2.4073 MHz (nominally 2.5 MHz)
+	m_mpsc->out_int_callback().set(FUNC(rainbow_state::mpsc_irq));
+	m_mpsc->out_txda_callback().set(m_comm_port, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	// RTS and DTR outputs are not connected
 
-	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("mpsc", upd7201_new_device, dcda_w))
+	RS232_PORT(config, m_comm_port, default_rs232_devices, nullptr);
+	m_comm_port->rxd_handler().set(m_mpsc, FUNC(upd7201_new_device::rxa_w));
+	m_comm_port->cts_handler().set(m_mpsc, FUNC(upd7201_new_device::ctsa_w));
+	m_comm_port->dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::dcda_w));
 
-	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsb_w)) // actually DTR
+	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	printer.rxd_handler().set(m_mpsc, FUNC(upd7201_new_device::rxb_w));
+	printer.dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::ctsb_w)); // actually DTR
 
-	MCFG_DEVICE_MODIFY("comm")
-	MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_SERIAL_MOUSE)
-	MCFG_SLOT_OPTION_ADD("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
-	MCFG_SLOT_DEFAULT_OPTION("microsoft_mouse")
+	m_comm_port->option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	m_comm_port->option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	m_comm_port->option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	m_comm_port->set_default_option("logitech_mouse");
 
-	MCFG_DEVICE_MODIFY("printer")
-	MCFG_SLOT_DEFAULT_OPTION("printer")
+	printer.set_default_option("printer");
 
-	MCFG_DEVICE_ADD("kbdser", I8251, 24.0734_MHz_XTAL / 5 / 2)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, rainbow_state, kbd_tx))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(*this, rainbow_state, irq_hi_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, rainbow_state, kbd_rxready_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, rainbow_state, kbd_txready_w))
+	I8251(config, m_kbd8251, 24.0734_MHz_XTAL / 5 / 2);
+	m_kbd8251->txd_handler().set(FUNC(rainbow_state::kbd_tx));
+	m_kbd8251->dtr_handler().set(FUNC(rainbow_state::irq_hi_w));
+	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_state::kbd_rxready_w));
+	m_kbd8251->txrdy_handler().set(FUNC(rainbow_state::kbd_txready_w));
 
 	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
 	MCFG_LK201_TX_HANDLER(WRITELINE("kbdser", i8251_device, write_rxd))
@@ -3349,7 +3347,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 //----------------------------------------------------------------------------------------

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_SSV_H
+#define MAME_INCLUDES_SSV_H
+
+#pragma once
 
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
@@ -14,8 +18,8 @@
 class ssv_state : public driver_device
 {
 public:
-	ssv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ssv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ensoniq(*this, "ensoniq"),
 		m_eeprom(*this, "eeprom"),
@@ -165,9 +169,15 @@ private:
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int x0,int y0,int shadow);
-	void draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll);
+	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line);
+	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy,int shadow);
+
+	void draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int flipx, int flipy, int mode, int code, int color, int sx, int sy, int realline, int line);
+	void get_tile(int x, int y, int size, int page, int& code, int& attr, int& flipx, int& flipy);
+	void draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sy, int scroll);
 	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);
+	
+	void draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, int flipx, int flipy, int gfx, int shadow, int color, int sx, int sy, int xnum, int ynum);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void enable_video(int enable);
 	void init(int interrupt_ultrax);
@@ -205,3 +215,5 @@ private:
 
 	void ssv_map(address_map &map, u32 rom);
 };
+
+#endif // MAME_INCLUDES_SSV_H

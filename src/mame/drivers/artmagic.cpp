@@ -471,7 +471,7 @@ void artmagic_state::tms_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram0");
 	map(0x00400000, 0x005fffff).ram().share("vram1");
-	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::blitter_r), FUNC(artmagic_state::blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).ram();
@@ -482,7 +482,7 @@ void artmagic_state::stonebal_tms_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram0");
 	map(0x00400000, 0x005fffff).ram().share("vram1");
-	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::artmagic_blitter_r), FUNC(artmagic_state::artmagic_blitter_w));
+	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::blitter_r), FUNC(artmagic_state::blitter_w));
 	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffc00000, 0xffffffff).ram();
@@ -823,12 +823,11 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(artmagic_state, from_shiftreg)          /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1)) // FIXME: false-readback polling should make this unnecessary
+
+	EEPROM_2816(config, "eeprom").write_time(attotime::from_usec(1)); // FIXME: false-readback polling should make this unnecessary
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
-
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256)
@@ -879,8 +878,7 @@ MACHINE_CONFIG_START(artmagic_state::shtstar)
 
 	MCFG_DEVICE_ADD("subduart", MC68681, 3686400)
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 3686400/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	YM2149(config, "aysnd", 3686400/2).add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	/*gun board cpu*/
 	MCFG_DEVICE_ADD("guncpu", I80C31, 6000000)
@@ -902,7 +900,7 @@ ROM_START( cheesech )
 	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(1d6e07c5) SHA1(8650868cce47f685d22131aa28aad45033cb0a52) )
 	ROM_LOAD16_BYTE( "u101",     0x00001, 0x40000, CRC(30ae9f95) SHA1(fede5d271aabb654c1efc077253d81ba23786f22) )
 
-	ROM_REGION16_LE( 0x100000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x100000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "u134", 0x00000, 0x80000, CRC(354ba4a6) SHA1(68e7df750efb21c716ba8b8ed4ca15a8cdc9141b) )
 	ROM_LOAD16_BYTE( "u135", 0x00001, 0x80000, CRC(97348681) SHA1(7e74685041cd5e8fbd45731284cf316dc3ffec60) )
 
@@ -916,7 +914,7 @@ ROM_START( ultennis )
 	ROM_LOAD16_BYTE( "a+m001b1093_13b_u102.u102", 0x00000, 0x40000, CRC(ec31385e) SHA1(244e78619c549712d5541fb252656afeba639bb7) ) /* labeled  A&M001B1093  13B  U102 */
 	ROM_LOAD16_BYTE( "a+m001b1093_12b_u101.u101", 0x00001, 0x40000, CRC(08a7f655) SHA1(b8a4265472360b68bed71d6c175fc54dff088c1d) ) /* labeled  A&M001B1093  12B  U101 */
 
-	ROM_REGION16_LE( 0x200000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x200000, "gfx", 0 )
 	ROM_LOAD( "a+m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) ) /* mask ROM labeled as  A&M-001-01-A  (C)1993 ART & MAGIC */
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -929,7 +927,7 @@ ROM_START( ultennisj )
 	ROM_LOAD16_BYTE( "a+m001d0194-13c-u102-japan.u102", 0x00000, 0x40000, CRC(65cee452) SHA1(49259e8faf289d6d80769f6d44e9d61d15e431c6) ) /* labeled  A&M001D0194  13C  U102 */
 	ROM_LOAD16_BYTE( "a+m001d0194-12c-u101-japan.u101", 0x00001, 0x40000, CRC(5f4b0ca0) SHA1(57e9ed60cc0e53eeb4e08c4003138d3bdaec3de7) ) /* labeled  A&M001D0194  12C  U101 */
 
-	ROM_REGION16_LE( 0x200000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x200000, "gfx", 0 )
 	ROM_LOAD( "a+m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) ) /* mask ROM labeled as  A&M-001-01-A  (C)1993 ART & MAGIC */
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -982,7 +980,7 @@ ROM_START( stonebal )
 	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(712feda1) SHA1(c5b385f425786566fa274fe166a7116615a8ce86) ) /* 4 Players kit, v1-20 13/12/1994 */
 	ROM_LOAD16_BYTE( "u101",     0x00001, 0x40000, CRC(4f1656a9) SHA1(720717ae4166b3ec50bb572197a8c6c96b284648) )
 
-	ROM_REGION16_LE( 0x400000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x400000, "gfx", 0 )
 	ROM_LOAD( "u1600.bin", 0x000000, 0x200000, CRC(d2ffe9ff) SHA1(1c5dcbd8208e45458da9db7621f6b8602bca0fae) )
 	ROM_LOAD( "u1601.bin", 0x200000, 0x200000, CRC(dbe893f0) SHA1(71a8a022decc0ff7d4c65f7e6e0cbba9e0b5582c) )
 
@@ -996,7 +994,7 @@ ROM_START( stonebal2 )
 	ROM_LOAD16_BYTE( "u102.bin", 0x00000, 0x40000, CRC(b3c4f64f) SHA1(6327e9f3cd9deb871a6910cf1f006c8ee143e859) ) /* 2 Players kit, v1-20 7/11/1994 */
 	ROM_LOAD16_BYTE( "u101.bin", 0x00001, 0x40000, CRC(fe373f74) SHA1(bafac4bbd1aae4ccc4ae16205309483f1bbdd464) )
 
-	ROM_REGION16_LE( 0x400000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x400000, "gfx", 0 )
 	ROM_LOAD( "u1600.bin", 0x000000, 0x200000, CRC(d2ffe9ff) SHA1(1c5dcbd8208e45458da9db7621f6b8602bca0fae) )
 	ROM_LOAD( "u1601.bin", 0x200000, 0x200000, CRC(dbe893f0) SHA1(71a8a022decc0ff7d4c65f7e6e0cbba9e0b5582c) )
 
@@ -1010,7 +1008,7 @@ ROM_START( stonebal2o )
 	ROM_LOAD16_BYTE( "sb_o_2p_24-10.u102", 0x00000, 0x40000, CRC(ab58c6b2) SHA1(6e29646d4b0802733d04e722909c03b87761c759) ) /* 2 Players kit, v1-20 21/10/1994 */
 	ROM_LOAD16_BYTE( "sb_e_2p_24-10.u101", 0x00001, 0x40000, CRC(ea967835) SHA1(12655f0dc44981f4a49ed45f271d5eb24f2cc5c6) ) /* Yes the Odd / Even labels are backwards & chips dated 24/10 */
 
-	ROM_REGION16_LE( 0x400000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x400000, "gfx", 0 )
 	ROM_LOAD( "u1600.bin", 0x000000, 0x200000, CRC(d2ffe9ff) SHA1(1c5dcbd8208e45458da9db7621f6b8602bca0fae) )
 	ROM_LOAD( "u1601.bin", 0x200000, 0x200000, CRC(dbe893f0) SHA1(71a8a022decc0ff7d4c65f7e6e0cbba9e0b5582c) )
 
@@ -1097,7 +1095,7 @@ ROM_START( shtstar )
 	ROM_REGION( 0x10000, "guncpu", 0 )
 	ROM_LOAD( "2207_7b42c5.u6", 0x00000, 0x8000, CRC(6dd4b4ed) SHA1(b37e9e5ddfb5d88c5412dc79643adfc4362fbb46) )
 
-	ROM_REGION16_LE( 0x100000, "gfx1", 0 )
+	ROM_REGION16_LE( 0x100000, "gfx", 0 )
 	ROM_LOAD( "a+m005c0494_13a.u134", 0x00000, 0x80000, CRC(f101136a) SHA1(9ff7275e0c1fc41f3d97ae0bd628581e2803910a) )
 	ROM_LOAD( "a+m005c0494_14a.u135", 0x80000, 0x80000, CRC(3e847f8f) SHA1(c99159951303b7f752305fa8e7e6d4bfb4fc54ba) )
 

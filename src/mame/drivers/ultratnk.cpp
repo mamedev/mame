@@ -143,11 +143,11 @@ WRITE_LINE_MEMBER(ultratnk_state::lockout_w)
 
 WRITE8_MEMBER(ultratnk_state::attract_w)
 {
-	m_discrete->write(space, ULTRATNK_ATTRACT_EN, data & 1);
+	m_discrete->write(ULTRATNK_ATTRACT_EN, data & 1);
 }
 WRITE8_MEMBER(ultratnk_state::explosion_w)
 {
-	m_discrete->write(space, ULTRATNK_EXPLOSION_DATA, data & 15);
+	m_discrete->write(ULTRATNK_EXPLOSION_DATA, data & 15);
 }
 
 
@@ -302,11 +302,10 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 	latch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<ULTRATNK_FIRE_EN_2>));
 	latch.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<ULTRATNK_FIRE_EN_1>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(ultratnk_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ultratnk_state, screen_vblank))

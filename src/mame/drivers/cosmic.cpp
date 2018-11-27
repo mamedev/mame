@@ -1092,14 +1092,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cosmic_state::cosmicg)
 
 	/* basic machine hardware */
-	TMS9980A(config, m_maincpu, COSMICG_MASTER_CLOCK/8);
+	TMS9980A(config, m_maincpu, COSMICG_MASTER_CLOCK); // 9.828 MHz Crystal
 	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::cosmicg_map);
 	m_maincpu->set_addrmap(AS_IO, &cosmic_state::cosmicg_io_map);
-
-	/* 9.828 MHz Crystal */
-		/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
-		fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
-		1.5MHz.  So, if someone can check this... */
 
 	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
 	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmicg)

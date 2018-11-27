@@ -65,8 +65,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
-	void device_add_mconfig(machine_config &config) override;
-	virtual void configure_slot(peribox_slot_device &slot, int number);
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// Next three methods call back the console via slot 1
 	devcb_write_line m_slot1_inta;   // INTA line (Box to console)
@@ -126,7 +125,7 @@ public:
 	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void configure_slot(peribox_slot_device &slot, int number) override;
+	void device_add_mconfig(machine_config &config) override;
 };
 
 /*
@@ -138,7 +137,7 @@ public:
 	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void configure_slot(peribox_slot_device &slot, int number) override;
+	void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -152,7 +151,7 @@ public:
 
 protected:
 	peribox_gen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void configure_slot(peribox_slot_device &slot, int number) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 /*
@@ -164,7 +163,7 @@ public:
 	peribox_genmod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void configure_slot(peribox_slot_device &slot, int number) override;
+	void device_add_mconfig(machine_config &config) override;
 };
 
 /*****************************************************************************
@@ -217,6 +216,17 @@ class peribox_slot_device : public device_t, public device_slot_interface
 {
 	friend class peribox_device;
 public:
+	template <typename U>
+	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, int slot, U &&opts, const char *dflt)
+		: peribox_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		m_slotnumber = slot;
+	}
+
 	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Called from the box (direction to card)
@@ -239,7 +249,6 @@ public:
 
 	// called from the box itself
 	void set_genmod(bool set);
-	void configure_slot(int number);
 	void set_number(int number) { m_slotnumber = number; }
 
 protected:
@@ -261,5 +270,10 @@ DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_SG,   bus::ti99::peb, peribox_sg_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_GEN,  bus::ti99::peb, peribox_gen_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_GENMOD,  bus::ti99::peb, peribox_genmod_device)
+
+void ti99_peribox_slot_standard(device_slot_interface &device);
+void ti99_peribox_slot_evpc(device_slot_interface &device);
+void ti99_peribox_slot_geneve(device_slot_interface &device);
+void ti99_peribox_slot_sgcpu(device_slot_interface &device);
 
 #endif // MAME_BUS_TI99_PEB_PERIBOX_H

@@ -5,6 +5,10 @@
     Galivan - Cosmo Police
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_GALIVAN_H
+#define MAME_INCLUDES_GALIVAN_H
+
+#pragma once
 
 #include "machine/nb1412m2.h"
 #include "machine/nb1414m4.h"
@@ -15,15 +19,16 @@
 class galivan_state : public driver_device
 {
 public:
-	galivan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galivan_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_nb1414m4(*this, "nb1414m4"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void galivan(machine_config &config);
 	void ninjemak(machine_config &config);
@@ -95,10 +100,11 @@ private:
 class dangarj_state : public galivan_state
 {
 public:
-	dangarj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galivan_state(mconfig, type, tag),
+	dangarj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galivan_state(mconfig, type, tag),
 		m_prot(*this, "prot_chip")
-		{}
+	{ }
+
 	void dangarj(machine_config &config);
 
 private:
@@ -106,3 +112,5 @@ private:
 
 	void dangarj_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALIVAN_H

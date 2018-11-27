@@ -94,6 +94,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_vram(*this, "vram")
 		, m_attr(*this, "attr")
+		, m_ppi(*this, "ppi8255_%u", 0U)
 		, m_spriteram(*this, "spriteram")
 		, m_soundcpu(*this, "soundcpu")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -146,6 +147,7 @@ private:
 	uint8_t m_p1_hopper;
 	uint8_t m_p2_hopper;
 	uint8_t m_mux_data;
+	required_device_array<i8255_device, 2> m_ppi;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -448,8 +450,8 @@ void kingdrby_state::slave_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x3fff).rom(); //sound rom, tested for the post check
 	map(0x4000, 0x43ff).ram().share("nvram"); //backup ram
-	map(0x5000, 0x5003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
-	map(0x6000, 0x6003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+	map(0x5000, 0x5003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+	map(0x6000, 0x6003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
 	map(0x7000, 0x73ff).ram().share("share1");
 	map(0x7400, 0x74ff).ram().share("spriteram");
 	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
@@ -469,8 +471,8 @@ void kingdrby_state::slave_1986_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x3fff).rom(); //sound rom tested for the post check
 	map(0x4000, 0x47ff).ram().share("nvram"); //backup ram
-	map(0x5000, 0x5003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
-//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) /* I/O Ports */
+	map(0x5000, 0x5003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE(m_ppi[1], i8255_device, read, write) /* I/O Ports */
 	map(0x7000, 0x73ff).ram().share("share1");
 	map(0x7400, 0x74ff).ram().share("spriteram");
 	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
@@ -976,21 +978,21 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// 5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, kingdrby_state, hopper_io_r))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kingdrby_state, hopper_io_w))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set(FUNC(kingdrby_state::hopper_io_r));
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->out_pc_callback().set(FUNC(kingdrby_state::hopper_io_w));
 
 	// 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kingdrby_state, sound_cmd_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, kingdrby_state, key_matrix_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, kingdrby_state, input_mux_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kingdrby_state, outport2_w))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->out_pa_callback().set(FUNC(kingdrby_state::sound_cmd_w));
+	m_ppi[1]->tri_pa_callback().set_constant(0x7f);
+	m_ppi[1]->in_pb_callback().set(FUNC(kingdrby_state::key_matrix_r));
+	m_ppi[1]->in_pc_callback().set(FUNC(kingdrby_state::input_mux_r));
+	m_ppi[1]->out_pc_callback().set(FUNC(kingdrby_state::outport2_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingdrby)
 	MCFG_PALETTE_ADD("palette", 0x200)
@@ -1003,15 +1005,16 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CLK_1/32)  /* 53.333 Hz. guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CLK_1/32));  /* 53.333 Hz. guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", CLK_1/8));    /* guess */
+	aysnd.port_a_read_callback().set(FUNC(kingdrby_state::sound_cmd_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
@@ -1023,19 +1026,22 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrbb)
 
-	MCFG_DEVICE_REMOVE("ppi8255_0")
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	/* C as input, (all) as output */
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kingdrby_state, sound_cmd_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kingdrby_state, outportb_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
+	m_ppi[0]->out_pa_callback().set(FUNC(kingdrby_state::sound_cmd_w));
+	m_ppi[0]->in_pa_callback().set_constant(0);
+	m_ppi[0]->tri_pa_callback().set_constant(0x7f);
+	m_ppi[0]->in_pb_callback().set_ioport("IN0");
+	m_ppi[0]->out_pb_callback().set(FUNC(kingdrby_state::outportb_w));
+	m_ppi[0]->in_pc_callback().set_ioport("IN1");
+	m_ppi[0]->out_pc_callback().set_nop();
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	/* actually unused */
+	/* PPI1 is actually unused */
+	m_ppi[1]->in_pa_callback().set_constant(0);
+	m_ppi[1]->in_pb_callback().set_constant(0);
+	m_ppi[1]->in_pc_callback().set_constant(0);
+	m_ppi[1]->out_pa_callback().set_nop();
+	m_ppi[1]->out_pb_callback().set_nop();
+	m_ppi[1]->out_pc_callback().set_nop();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingdrby_state::cowrace)
@@ -1051,11 +1057,11 @@ MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DEVICE_REPLACE("aysnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8("oki", okim6295_device, read))   // read B
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("oki", okim6295_device, write))   // write B
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2203_device &aysnd(YM2203(config.replace(), "aysnd", 3000000));
+	aysnd.port_a_read_callback().set(FUNC(kingdrby_state::sound_cmd_r));
+	aysnd.port_b_read_callback().set("oki", FUNC(okim6295_device::read));
+	aysnd.port_b_write_callback().set("oki", FUNC(okim6295_device::write));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 MACHINE_CONFIG_END
 
 ROM_START( kingdrby )

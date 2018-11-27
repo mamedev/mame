@@ -1366,8 +1366,7 @@ MACHINE_CONFIG_START(c64_state::ntsc)
 	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -1533,8 +1532,7 @@ MACHINE_CONFIG_START(c64_state::pal)
 	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -1672,8 +1670,7 @@ MACHINE_CONFIG_START(c64gs_state::pal_gs)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 

@@ -127,6 +127,9 @@ private:
 	uint16_t m_counter[3];
 
 	static const char *const opmode[];
+
+	// set in dual 8 bit mode to indicate Output high time cycle
+	bool m_hightime[3];
 };
 
 

@@ -12,46 +12,18 @@
 #pragma once
 
 
-#define MCFG_Z8_PORT_P0_READ_CB(_devcb) \
-	downcast<z8_device &>(*device).set_input_cb(0, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P1_READ_CB(_devcb) \
-	downcast<z8_device &>(*device).set_input_cb(1, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P2_READ_CB(_devcb) \
-	downcast<z8_device &>(*device).set_input_cb(2, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P3_READ_CB(_devcb) \
-	downcast<z8_device &>(*device).set_input_cb(3, DEVCB_##_devcb);
-
-
-#define MCFG_Z8_PORT_P0_WRITE_CB(_devcb) \
-	downcast<z8_device &>(*device).set_output_cb(0, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P1_WRITE_CB(_devcb) \
-	downcast<z8_device &>(*device).set_output_cb(1, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P2_WRITE_CB(_devcb) \
-	downcast<z8_device &>(*device).set_output_cb(2, DEVCB_##_devcb);
-
-#define MCFG_Z8_PORT_P3_WRITE_CB(_devcb) \
-	downcast<z8_device &>(*device).set_output_cb(3, DEVCB_##_devcb);
-
-
 class z8_device : public cpu_device
 {
 public:
 	// configuration
-	template<class Object> devcb_base &set_input_cb(int port, Object &&object)
-	{
-		assert(port >= 0 && port < 4);
-		return m_input_cb[port].set_callback(std::forward<Object>(object));
-	}
-	template<class Object> devcb_base &set_output_cb(int port, Object &&object)
-	{
-		assert(port >= 0 && port < 4);
-		return m_output_cb[port].set_callback(std::forward<Object>(object));
-	}
+	auto p0_in_cb() { return m_input_cb[0].bind(); }
+	auto p1_in_cb() { return m_input_cb[1].bind(); }
+	auto p2_in_cb() { return m_input_cb[2].bind(); }
+	auto p3_in_cb() { return m_input_cb[3].bind(); }
+	auto p0_out_cb() { return m_output_cb[0].bind(); }
+	auto p1_out_cb() { return m_output_cb[1].bind(); }
+	auto p2_out_cb() { return m_output_cb[2].bind(); }
+	auto p3_out_cb() { return m_output_cb[3].bind(); }
 
 protected:
 	enum
@@ -163,8 +135,8 @@ private:
 	inline void load_to_memory_autoinc(address_space &space);
 	inline void pop(uint8_t dst);
 	inline void push(uint8_t src);
-	inline void add_carry(uint8_t dst, int8_t src);
-	inline void add(uint8_t dst, int8_t src);
+	inline void add_carry(uint8_t dst, uint8_t src);
+	inline void add(uint8_t dst, uint8_t src);
 	inline void compare(uint8_t dst, uint8_t src);
 	inline void decimal_adjust(uint8_t dst);
 	inline void decrement(uint8_t dst);
@@ -179,7 +151,7 @@ private:
 	inline void _xor(uint8_t dst, uint8_t src);
 	inline void call(uint16_t dst);
 	inline void jump(uint16_t dst);
-	inline int check_condition_code(int cc);
+	inline bool check_condition_code(int cc);
 	inline void test_complement_under_mask(uint8_t dst, uint8_t src);
 	inline void test_under_mask(uint8_t dst, uint8_t src);
 	inline void rotate_left(uint8_t dst);

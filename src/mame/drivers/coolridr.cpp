@@ -3288,7 +3288,7 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_DEVICE_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "screen", 0, 1)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	sega_315_5649_device &io(SEGA_315_5649(config, "io", 0));
 	io.out_pb_callback().set(FUNC(coolridr_state::lamps_w));

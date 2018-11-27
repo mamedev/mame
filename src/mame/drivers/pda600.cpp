@@ -204,29 +204,30 @@ static GFXDECODE_START( gfx_pda600 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(pda600_state::pda600)
+void pda600_state::pda600(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z180, XTAL(14'318'181))
-	MCFG_DEVICE_PROGRAM_MAP(pda600_mem)
-	MCFG_DEVICE_IO_MAP(pda600_io)
+	Z180(config, m_maincpu, XTAL(14'318'181));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pda600_state::pda600_mem);
+	m_maincpu->set_addrmap(AS_IO, &pda600_state::pda600_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(240, 320)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 320-1)
-	MCFG_SCREEN_UPDATE_DRIVER( pda600_state, screen_update )
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(240, 320);
+	screen.set_visarea(0, 240-1, 0, 320-1);
+	screen.set_screen_update(FUNC(pda600_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pda600)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pda600);
+	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
-	MCFG_DEVICE_ADD("rtc", HD64610, XTAL(32'768))
-MACHINE_CONFIG_END
+	HD64610(config, "rtc", XTAL(32'768));
+}
 
 /* ROM definition */
 ROM_START( pda600 )

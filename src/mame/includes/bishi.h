@@ -5,6 +5,10 @@
     Bishi Bashi Champ Mini Game Senshuken
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_BISHI_H
+#define MAME_INCLUDES_BISHI_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "video/k054156_k054157_k056832.h"
@@ -20,15 +24,16 @@
 class bishi_state : public driver_device
 {
 public:
-	bishi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bishi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k056832(*this, "k056832"),
 		m_k054338(*this, "k054338"),
 		m_k055555(*this, "k055555"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	DECLARE_READ16_MEMBER(control_r);
 	DECLARE_WRITE16_MEMBER(control_w);
@@ -66,3 +71,5 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
+
+#endif // MAME_INCLUDES_BISHI_H

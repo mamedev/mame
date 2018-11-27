@@ -9,6 +9,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/buffer.h"
 #include "machine/timer.h"
@@ -131,7 +132,7 @@ private:
 	void mc6845_cursor_configure();
 	void super80_cassette_motor(bool data);
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_ram;
 	optional_region_ptr<u8> m_p_chargen;
 	optional_region_ptr<u8> m_p_colorram;

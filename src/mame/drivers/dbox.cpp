@@ -617,20 +617,21 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	MCFG_DEVICE_MODIFY("maincpu:serial")
 	MCFG_MC68340SER_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MC68340SER_B_TX_CALLBACK(WRITELINE("modem", rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD ("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("maincpu:serial", mc68340_serial_module_device, rx_a_w))
-	MCFG_DEVICE_ADD ("modem", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("maincpu:serial", mc68340_serial_module_device, rx_b_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("maincpu:serial", FUNC(mc68340_serial_module_device::rx_a_w));
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	modem.rxd_handler().set("maincpu:serial", FUNC(mc68340_serial_module_device::rx_b_w));
 
 	/* Add the boot flash */
-	MCFG_AMD_29F800B_16BIT_ADD("flash")
+	AMD_29F800B_16BIT(config, "flash");
 
 	/* LED Matrix Display */
 	MCFG_SDA5708_ADD("display")
 	config.set_default_layout(layout_sda5708);
+
 	/* IP16 74256 8 bit latch */
-	MCFG_LATCH8_ADD("hct259.ip16")
-	MCFG_LATCH8_WRITE_4(WRITELINE("display", sda5708_device, reset_w))
+	LATCH8(config, m_ip16_74259);
+	m_ip16_74259->write_cb<4>().set("display", FUNC(sda5708_device::reset_w));
 MACHINE_CONFIG_END
 
 void dbox_state::init_dbox()

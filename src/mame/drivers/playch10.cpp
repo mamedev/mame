@@ -695,13 +695,14 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_RP5H01_ADD("rp5h01")
+	RP5H01(config, m_rp5h01, 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(playch10_state::playchnv)
+void playch10_state::playchnv(machine_config &config)
+{
 	playch10(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 MACHINE_CONFIG_START(playch10_state::playch10_hboard)
 	playch10(config);
@@ -724,7 +725,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS( 0, "pch1-c__8t_e-2.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
 	ROM_SYSTEM_BIOS( 1, "single", "Single Monitor Version" ) \
 	ROM_LOAD_BIOS( 1, "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
-	ROM_SYSTEM_BIOS( 2, "alt", "Alt Bios" ) /* this bios doens't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
+	ROM_SYSTEM_BIOS( 2, "alt", "Alt Bios" ) /* this bios doesn't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
 	ROM_LOAD_BIOS( 2, "pch1-c_8te.8t", 0x00000, 0x4000, CRC(123ffa37) SHA1(3bef754a5a85a8498bb6222ddf5cb9021f264db5) ) \
 	ROM_SYSTEM_BIOS( 3, "singleb", "Single Monitor Version (Newer?)" ) /* Newer single screen? Four bytes different, reported bugfix in freeplay */ \
 	ROM_LOAD_BIOS( 3, "pck1-c_fix.8t", 0x00000, 0x4000, CRC(0be8ceb4) SHA1(45b127a537370226e6b30be2b5a92ad05673ca7f) )

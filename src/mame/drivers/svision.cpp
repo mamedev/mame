@@ -150,12 +150,13 @@ WRITE8_MEMBER(svision_state::svision_w)
 		}
 
 		case 0x23: /* delta hero irq routine write */
+		{
+			int delay = (data == 0) ? 0x100 : data;
+			delay *= (BIT(m_reg[BANK], 4)) ? 0x4000 : 0x100;
 			m_svision.timer1->enable(true);
-			if (BIT(m_reg[BANK], 4))
-				m_svision.timer1->reset(m_maincpu->cycles_to_attotime(0x100 * 0x4000));
-			else
-				m_svision.timer1->reset(m_maincpu->cycles_to_attotime(0x100 * 0x100));
+			m_svision.timer1->reset(m_maincpu->cycles_to_attotime(delay));
 			break;
+		}
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
 			m_sound->soundport_w(0, offset & 3, data);
@@ -504,10 +505,10 @@ MACHINE_CONFIG_START(svision_state::svision_base)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD(m_sound, SVISION_SND, 4000000, m_maincpu, m_bank1)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-	MCFG_SVISION_SOUND_IRQ_CALLBACK(WRITELINE(*this, svision_state, sound_irq_w));
+	SVISION_SND(config, m_sound, 4000000, m_maincpu, m_bank1);
+	m_sound->add_route(0, "lspeaker", 0.50);
+	m_sound->add_route(1, "rspeaker", 0.50);
+	m_sound->irq_cb().set(FUNC(svision_state::sound_irq_w));
 
 	MCFG_GENERIC_CARTSLOT_ADD(m_cart, generic_plain_slot, "svision_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ws,sv")

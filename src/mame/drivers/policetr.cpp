@@ -102,7 +102,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 WRITE_LINE_MEMBER(policetr_state::vblank)
 {
-	m_maincpu->set_input_line(state ? R3000_IRQ4 : R3000_IRQ5, ASSERT_LINE);
+	m_maincpu->set_input_line(state ? INPUT_LINE_IRQ4 : INPUT_LINE_IRQ5, ASSERT_LINE);
 }
 
 /*************************************
@@ -237,6 +237,8 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 void policetr_state::mem(address_map &map)
 {
+	map.global_mask(0x3fffffff);
+
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
 	map(0x00200000, 0x0020000f).w(FUNC(policetr_state::video_w));
 	map(0x00400000, 0x00400003).r(FUNC(policetr_state::video_r));
@@ -257,6 +259,8 @@ void policetr_state::mem(address_map &map)
 
 void sshooter_state::mem(address_map &map)
 {
+	map.global_mask(0x3fffffff);
+
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
 	map(0x00200000, 0x00200003).w(FUNC(sshooter_state::bsmt2000_data_w));
 	map(0x00300001, 0x00300001).w(FUNC(sshooter_state::palette_offset_w));
@@ -284,40 +288,40 @@ void sshooter_state::mem(address_map &map)
 
 static INPUT_PORTS_START( policetr )
 	PORT_START("IN0")
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2SPR1	(note 1) */
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2PUSH3	(note 1) */
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2PUSH2	(note 1) */
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2USH1	(note 1) */
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2RIGHT	(note 1) */
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2LEFT	(note 1) */
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2DOWN	(note 1) */
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P2UP	(note 1) */
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1SPR1	(note 1) */
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1PUSH3	(note 1) */
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1PUSH2	(note 1) */
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1PUSH1	(note 1) */
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1RIGHT	(note 1) */
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1LEFT	(note 1) */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1DOWN	(note 1) */
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /P1UP	(note 1) */
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2SPR1  (note 1) */
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2PUSH3 (note 1) */
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2PUSH2 (note 1) */
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2USH1  (note 1) */
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2RIGHT (note 1) */
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2LEFT  (note 1) */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2DOWN  (note 1) */
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P2UP    (note 1) */
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1SPR1  (note 1) */
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1PUSH3 (note 1) */
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1PUSH2 (note 1) */
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1PUSH1 (note 1) */
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1RIGHT (note 1) */
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1LEFT  (note 1) */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1DOWN  (note 1) */
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /P1UP    (note 1) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /TILT (note 1) */
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /TILT (note 1) */
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /SERVICE (note 1) */
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM )	PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state, bsmt_status_r, nullptr)
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_PLAYER(1)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* /XSW2 (note 2) */
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_PLAYER(2)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* /XSW2 (note 2) */
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* TKTSNS (note 3) */
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM )	PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* EEPROM read */
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /VOLMDN (note 1) */
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )	/* /VOLMUP (note 1) */
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /SERVICE (note 1) */
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, policetr_state, bsmt_status_r, nullptr)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(1)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* /XSW2 (note 2) */
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(2)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* /XSW2 (note 2) */
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* TKTSNS (note 3) */
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* EEPROM read */
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /VOLMDN (note 1) */
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )   /* /VOLMUP (note 1) */
 
 	/* Note 1: Input is unused but is shown in the service menu and noted as written on the I/O schematic in the Police Trainer manual. */
 	/* Note 2: It is unknown if this input is used, but it is noted as written on the I/O schematic in the Police Trainer manual. */
@@ -410,7 +414,7 @@ void policetr_state::policetr(machine_config &config)
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::mem);
 
-	EEPROM_SERIAL_93C66_16BIT(config, m_eeprom);
+	EEPROM_93C66_16BIT(config, m_eeprom);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

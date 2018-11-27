@@ -423,7 +423,7 @@ Always solder the battery plus to plus and minus to minus. If it's wired in plus
 the voltage will double to 6V.
 If you have a System 32 board with an FD1149 add another new battery now!
 
-Rom Types:
+ROM Types:
 Main program ROM at IC8 is 27C240
 Sound Program at IC36 is 27C100
 Sound Data at IC35,34,24 are 838000
@@ -566,9 +566,9 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_z80_shared_ram(*this,"z80_shared_ram")
 	, m_system32_workram(*this,"workram")
-	, m_system32_videoram(*this,"videoram", 0)
-	, m_system32_spriteram(*this,"spriteram", 0)
-	, m_system32_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
+	, m_videoram(*this,"videoram", 0)
+	, m_spriteram(*this,"spriteram", 0)
+	, m_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
 	, m_maincpu(*this, "maincpu")
 	, m_soundcpu(*this, "soundcpu")
 	, m_multipcm(*this, "sega")
@@ -868,18 +868,11 @@ WRITE8_MEMBER(segas32_state::tilebank_external_w)
 	m_system32_tilebank_external = data;
 }
 
-
-WRITE_LINE_MEMBER(segas32_state::display_enable_0_w)
+template<int Which>
+WRITE_LINE_MEMBER(segas32_state::display_enable_w)
 {
-	m_system32_displayenable[0] = state;
+	m_system32_displayenable[Which] = state;
 }
-
-
-WRITE_LINE_MEMBER(segas32_state::display_enable_1_w)
-{
-	m_system32_displayenable[1] = state;
-}
-
 
 
 /*************************************
@@ -899,7 +892,6 @@ READ16_MEMBER(segas32_state::random_number_r)
 }
 
 
-
 /*************************************
  *
  *  Sound communications
@@ -916,7 +908,6 @@ WRITE8_MEMBER(segas32_state::shared_ram_w)
 {
 	m_z80_shared_ram[offset] = data;
 }
-
 
 
 /*************************************
@@ -995,7 +986,6 @@ WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
 }
 
 
-
 /*************************************
  *
  *  Sound banking
@@ -1030,7 +1020,6 @@ WRITE8_MEMBER(segas32_state::scross_bank_w)
 }
 
 
-
 /*************************************
  *
  *  Sound hack (not protection)
@@ -1049,6 +1038,122 @@ WRITE8_MEMBER(segas32_state::sound_dummy_w)
 }
 
 
+/*************************************
+ *
+ *  Common palette handling
+ *
+ *************************************/
+
+inline uint16_t segas32_state::xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value)
+{
+	int r = (value >> 0) & 0x1f;
+	int g = (value >> 5) & 0x1f;
+	int b = (value >> 10) & 0x1f;
+	value = (value & 0x8000) | ((b & 0x01) << 14) | ((g & 0x01) << 13) | ((r & 0x01) << 12);
+	value |= ((b & 0x1e) << 7) | ((g & 0x1e) << 3) | ((r & 0x1e) >> 1);
+	return value;
+}
+
+
+inline uint16_t segas32_state::xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(uint16_t value)
+{
+	int r = ((value >> 12) & 0x01) | ((value << 1) & 0x1e);
+	int g = ((value >> 13) & 0x01) | ((value >> 3) & 0x1e);
+	int b = ((value >> 14) & 0x01) | ((value >> 7) & 0x1e);
+	return (value & 0x8000) | (b << 10) | (g << 5) | (r << 0);
+}
+
+
+inline void segas32_state::update_color(int offset, uint16_t data)
+{
+	/* note that since we use this RAM directly, we don't technically need */
+	/* to call palette_set_color() at all; however, it does give us that */
+	/* nice display when you hit F4, which is useful for debugging */
+
+	/* set the color */
+	m_palette->set_pen_color(offset, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
+
+
+/*************************************
+ *
+ *  Palette RAM access
+ *
+ *************************************/
+
+template<int Which>
+READ16_MEMBER(segas32_state::paletteram_r)
+{
+	int convert;
+
+	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
+	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
+	/* we store everything if the first format, and convert accesses to the other format */
+	/* on the fly */
+	convert = (offset & 0x4000);
+	offset &= 0x3fff;
+
+	if (!convert)
+		return m_paletteram[Which][offset];
+	else
+		return xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(m_paletteram[Which][offset]);
+}
+
+template<int Which>
+WRITE16_MEMBER(segas32_state::paletteram_w)
+{
+	uint16_t value;
+	int convert;
+
+	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
+	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
+	/* we store everything if the first format, and convert accesses to the other format */
+	/* on the fly */
+	convert = (offset & 0x4000);
+	offset &= 0x3fff;
+
+	/* read, modify, and write the new value, updating the palette */
+	value = m_paletteram[Which][offset];
+	if (convert) value = xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(value);
+	COMBINE_DATA(&value);
+	if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
+	m_paletteram[Which][offset] = value;
+	update_color(0x4000*Which + offset, value);
+
+	/* if blending is enabled, writes go to both halves of palette RAM */
+	if (m_mixer_control[Which][0x4e/2] & 0x0880)
+	{
+		offset ^= 0x2000;
+
+		/* read, modify, and write the new value, updating the palette */
+		value = m_paletteram[Which][offset];
+		if (convert) value = xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(value);
+		COMBINE_DATA(&value);
+		if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
+		m_paletteram[Which][offset] = value;
+		update_color(0x4000*Which + offset, value);
+	}
+}
+
+
+/*************************************
+ *
+ *  Mixer control registers
+ *
+ *************************************/
+
+template<int Which>
+READ16_MEMBER(segas32_state::mixer_r)
+{
+	return m_mixer_control[Which][offset];
+}
+
+template<int Which>
+WRITE16_MEMBER(segas32_state::mixer_w)
+{
+	COMBINE_DATA(&m_mixer_control[Which][offset]);
+}
+
 
 /*************************************
  *
@@ -1061,11 +1166,11 @@ void segas32_state::system32_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share("workram");
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_spriteram_r), FUNC(segas32_state::system32_spriteram_w)).share("spriteram");
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
-	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_paletteram_r), FUNC(segas32_state::system32_paletteram_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::system32_mixer_r), FUNC(segas32_state::system32_mixer_w));
+	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
@@ -1084,13 +1189,13 @@ void segas32_state::multi32_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).mirror(0x0e0000).ram();
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::multi32_spriteram_r), FUNC(segas32_state::multi32_spriteram_w)).share("spriteram");
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
-	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::multi32_paletteram_0_r), FUNC(segas32_state::multi32_paletteram_0_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::multi32_mixer_0_w));
-	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::multi32_paletteram_1_r), FUNC(segas32_state::multi32_paletteram_1_w)).share("paletteram.1");
-	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::multi32_mixer_1_w));
+	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<0>));
+	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>)).share("paletteram.1");
+	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<1>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
@@ -2224,10 +2329,10 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	io_chip.in_pf_callback().set_ioport("SERVICE34_A");
 	io_chip.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
 	io_chip.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
-	io_chip.out_cnt1_callback().set(FUNC(segas32_state::display_enable_0_w));
+	io_chip.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
 	io_chip.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
@@ -2326,17 +2431,17 @@ MACHINE_CONFIG_START(segas32_trackball_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_trackball_map)
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX1")
-	MCFG_UPD4701_PORTY("TRACKY1")
+	upd4701_device &upd1(UPD4701A(config, "upd1"));
+	upd1.set_portx_tag("TRACKX1");
+	upd1.set_porty_tag("TRACKY1");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX2")
-	MCFG_UPD4701_PORTY("TRACKY2")
+	upd4701_device &upd2(UPD4701A(config, "upd2"));
+	upd2.set_portx_tag("TRACKX2");
+	upd2.set_porty_tag("TRACKY2");
 
-	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX3")
-	MCFG_UPD4701_PORTY("TRACKY3")
+	upd4701_device &upd3(UPD4701A(config, "upd3"));
+	upd3.set_portx_tag("TRACKX3");
+	upd3.set_porty_tag("TRACKY3");
 
 	// 837-8685 I/O board has an unpopulated space for a fourth UPD4701A
 MACHINE_CONFIG_END
@@ -2365,10 +2470,10 @@ MACHINE_CONFIG_START(segas32_4player_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(system32_4player_map)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_4PLAYER_DEVICE, segas32_4player_state, "segas32_pcb_4player", "Sega System 32 4-player/fighting PCB")
@@ -2421,7 +2526,7 @@ segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *
 MACHINE_CONFIG_START(segas32_upd7725_state::device_add_mconfig)
 	segas32_analog_state::device_add_mconfig(config);
 
-	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's rom board where an fd1149 could go */
+	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's ROM board where an fd1149 could go */
 	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000) // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
 	MCFG_DEVICE_PROGRAM_MAP(upd7725_prg_map)
 	MCFG_DEVICE_DATA_MAP(upd7725_data_map)
@@ -2534,7 +2639,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	io_chip_0.in_pf_callback().set_ioport("SERVICE34_A");
 	io_chip_0.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
 	io_chip_0.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
-	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_0_w));
+	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
 	io_chip_0.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
 	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", 0)); // unknown clock
@@ -2548,9 +2653,9 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	io_chip_1.out_ph_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);
 	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(5);
 	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
-	io_chip_1.out_cnt1_callback().set(FUNC(segas32_state::display_enable_1_w));
+	io_chip_1.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<1>));
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
@@ -2663,10 +2768,10 @@ MACHINE_CONFIG_START(sega_multi32_6player_state::device_add_mconfig)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(multi32_6player_map)
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_6PLAYER_DEVICE, sega_multi32_6player_state, "segas32_pcb_multi_6player", "Sega Multi 32 6-player PCB")
@@ -2868,7 +2973,7 @@ MACHINE_CONFIG_END
        Game BD: 833-8508-01 AIR RESCUE (US)
                 833-8508-02 AIR RESCUE (Export)
                 833-8508-03 AIR RESCUE (Japan)
-    Rom PCB No: 834-8526-01 (US)
+    ROM PCB No: 834-8526-01 (US)
                 834-8526-02 (Export)
                 834-8526-03 (Japan)
                 834-8526-05 (Export)
@@ -2883,7 +2988,7 @@ MACHINE_CONFIG_END
     This provides a direct connection between the PCBs (NOT a network link) so they effectively operate as a single boardset
     sharing RAM (we should emulate it as such)
 
-    Link PCB is a single sparsely populated romless PCB but contains
+    Link PCB is a single sparsely populated ROMless PCB but contains
 
     Left side
     1x MB8431-12LP (IC2)
@@ -2898,7 +3003,7 @@ MACHINE_CONFIG_END
 
     (todo, full layout)
 
-    The left Rom PCB (master?) contains a sub-board on the ROM board with the math DSP, the right Rom PCB does not have this.
+    The left ROM PCB (master?) contains a sub-board on the ROM board with the math DSP, the right ROM PCB does not have this.
 
 */
 ROM_START( arescue )
@@ -2969,7 +3074,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 833-8508-01 AIR RESCUE
-    Rom PCB No: 834-8526-01
+    ROM PCB No: 834-8526-01
    Link PCB No: 837-8223-01
      A/D BD No: 837-7536 (one for each mainboard)
      DSP BD No: 837-8341
@@ -3045,7 +3150,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 833-8508-03 AIR RESCUE
-    Rom PCB No: 834-8526-03
+    ROM PCB No: 834-8526-03
    Link PCB No: 837-8223-01
      A/D BD No: 837-7536 (one for each mainboard)
      DSP BD No: 837-8341
@@ -3125,7 +3230,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 834-9877-02
-    Rom PCB No: 837-9878-02
+    ROM PCB No: 837-9878-02
       Main PCB: 837-7428-03 (SYSTEM 32 COM)
      A/D BD NO. 837-7536
 */
@@ -3166,7 +3271,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 834-9877-01
-    Rom PCB No: 837-9878-01
+    ROM PCB No: 837-9878-01
       Main PCB: 837-7428-03 (SYSTEM 32 COM)
      A/D BD NO. 837-7536
 */
@@ -3207,7 +3312,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 834-9877
-    Rom PCB No: 837-9878
+    ROM PCB No: 837-9878
       Main PCB: 837-7428-03 (SYSTEM 32 COM)
      A/D BD NO. 837-7536
 */
@@ -3250,7 +3355,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 833-8646-05 ARABIAN FIGHT
-    Rom PCB No: 833-8647-02
+    ROM PCB No: 833-8647-02
    V25 sub PCB: 834-8529-01
      A/D BD NO. 837-7968
 */
@@ -3402,13 +3507,13 @@ ROM_START( brivalj )
 	ROM_LOAD( "mpr-15626.ic34",    0x200000, 0x100000, CRC(83306d1e) SHA1(feb08902b51c0013d9417832cdf198e36cdfc28c) )
 	ROM_LOAD( "mpr-15625.ic24",    0x300000, 0x100000, CRC(3ce82932) SHA1(f2107bc2591f46a51c9f0d706933b1ae69db91f9) )
 
-	/* the 10 roms below may be bad dumps ... mp14598 / 99 have corrupt tiles when compared to the roms
+	/* the 10 ROMs below may be bad dumps ... mp14598 / 99 have corrupt tiles when compared to the ROMs
 	   in the parent set, but Sega did change the part numbers so they might be correct, the others
 	   are suspicious, the changes are very similar but the part numbers haven't changed.  We really
 	   need a 3rd board to verify */
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) ) /* Rom # matches tile rom # from Arabian Fight ??? */
-	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* Rom # matchrs tile rom # from Arabian Fight ??? */
+	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) ) /* ROM # matches tile ROM # from Arabian Fight ??? */
+	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* ROM # matches tile ROM # from Arabian Fight ??? */
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "brivalj_mp15637.32", 0x000000, 0x200000, CRC(f39844c0) SHA1(c48dc8cccdd9d3756cf99a983c6a89ed43fcda22) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3729,6 +3834,9 @@ ROM_END
  **************************************************************************************************************************
     F1 Super Lap (Export)
     protected via FD1149 317-0210
+     GAME BD NO. 833-9407-02 F1 SUPER LAP
+         ROM BD. 834-9408-02
+      A/D BD NO. 837-7536
 */
 ROM_START( f1lap )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -3843,7 +3951,7 @@ ROM_END
     protected via a custom V25 with encrypted code
     Sega Game ID codes:
      Game: 833-8932-02 GOLDEN AXE II AC USA
-Rom board: 833-8933-01
+ROM board: 833-8933-01
 Sub board: 834-8529-02
 
 */
@@ -3986,7 +4094,7 @@ ROM_END
     Holosseum (US)
     not protected
      Game: 833-8887-01 HOLOSSEUM
-Rom board: 834-8888-01
+ROM board: 834-8888-01
 
 */
 ROM_START( holo )
@@ -4168,7 +4276,7 @@ ROM_END
     Soreike Kokology Vol. 2
     Sega System32 + CD - Sega 1993
 
-    Rom Board is 837-8393 16Mb ROM board (Same as godenaxe2 or Arabian Fight)
+    ROM Board is 837-8393 16Mb ROM board (Same as godenaxe2 or Arabian Fight)
 
     SCSI CD board is 839-0572-01. It use a Fujitsu MB89352AP for SCSI + a Sony CXD1095Q for I/O + 8Mhz quartz
 */
@@ -4347,7 +4455,7 @@ Export: EPR-13693.ic21 (dumped)
         EPR-13694.ic37 (not dumped)
         EPR-13695.ic38 (not dumped)
 
-    Japanese version is undumped. There is likely a Japanese specific sound rom at IC20 (EPR-13524.ic20 ??)
+    Japanese version is undumped. There is likely a Japanese specific sound ROM at IC20 (EPR-13524.ic20 ??)
 */
 ROM_START( radm )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -4359,7 +4467,7 @@ ROM_START( radm )
 	ROM_LOAD_x8( "epr-13527.ic9",  0x000000, 0x020000, CRC(a2e3fbbe) SHA1(2787bbef696ab3f2b7855ac991867837d3de54cd) )
 	ROM_LOAD_x2( "epr-13523.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) )
 	ROM_LOAD_x2( "epr-13699.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) )
-	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this rom */
+	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this ROM */
 
 	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-13519.ic3",  0x000000, 0x080000, CRC(bedc9534) SHA1(7b3f7a47b6c0ca6707dc3c1167f3564d43adb32f) )
@@ -4398,7 +4506,7 @@ ROM_START( radmu )
 	ROM_LOAD_x8( "epr-13527.ic9",  0x000000, 0x020000, CRC(a2e3fbbe) SHA1(2787bbef696ab3f2b7855ac991867837d3de54cd) )
 	ROM_LOAD_x2( "epr-13523.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) )
 	ROM_LOAD_x2( "epr-13699.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) )
-	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this rom */
+	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this ROM */
 
 	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-13519.ic3",  0x000000, 0x080000, CRC(bedc9534) SHA1(7b3f7a47b6c0ca6707dc3c1167f3564d43adb32f) )
@@ -4432,7 +4540,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8110-02 RAD RALLY
-Rom board: 833-8111-02
+ROM board: 833-8111-02
 A/D BD NO. 837-7536
 
 */
@@ -4477,7 +4585,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8110-01 RAD RALLY
-Rom board: 833-8111-01
+ROM board: 833-8111-01
 A/D BD NO. 837-7536
 
 */
@@ -4522,7 +4630,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8110-03 RAD RALLY
-Rom board: 833-8111-03
+ROM board: 833-8111-03
 A/D BD NO. 837-7536
 
 */
@@ -4656,7 +4764,7 @@ ROM_START( sonic )
 	ROM_LOAD_x4( "epr-15785.ic36", 0x000000, 0x040000, CRC(0fe7422e) SHA1(b7eaf4736ba155965317bb4ef3b33fc122635151) )
 	ROM_LOAD( "mpr-15784.ic35",    0x100000, 0x100000, CRC(42f06714) SHA1(30e45bb2d9b492f0c1acc4fbe1e5869f0559300b) )
 	ROM_LOAD( "mpr-15783.ic34",    0x200000, 0x100000, CRC(e4220eea) SHA1(a546c8bfc24e0695cf79c49e1a867d2595a1ed7f) )
-	ROM_LOAD( "mpr-15782.ic33",    0x300000, 0x100000, CRC(cf56b5a0) SHA1(5786228aab120c3361524ba93b418b24fd5b8ffb) ) // (this is the only rom unchanged from the prototype)
+	ROM_LOAD( "mpr-15782.ic33",    0x300000, 0x100000, CRC(cf56b5a0) SHA1(5786228aab120c3361524ba93b418b24fd5b8ffb) ) // (this is the only ROM unchanged from the prototype)
 
 	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15789.ic14", 0x000000, 0x100000, CRC(4378f12b) SHA1(826e0550a3c5f2b6e59c6531ac03658a4f826651) )
@@ -4754,9 +4862,9 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8331-04 SPIDER-MAN
-Rom board: 834-8332-01
+ROM board: 834-8332-01
 
- Rom board type: 837-7429-01
+ ROM board type: 837-7429-01
 Input sub board: 837-7968
 
 */
@@ -4795,7 +4903,7 @@ ROM_END
     not protected
 
      Game: 833-8331 SPIDER-MAN
-Rom board: 834-8332
+ROM board: 834-8332
 
 */
 ROM_START( spidmanj )
@@ -4941,7 +5049,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-10851-02
-Rom board: 834-10852-02
+ROM board: 834-10852-02
 */
 ROM_START( svf )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -5104,7 +5212,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 834-9324-02 TITLE FIGHT
-Rom board: 834-9413-02
+ROM board: 834-9413-02
   Main BD: 837-8676 (SYSTEM MULTI 32)
 
 */
@@ -5140,7 +5248,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 834-9324-01 TITLE FIGHT
-Rom board: 834-9413-01
+ROM board: 834-9413-01
   Main BD: 837-8676 (SYSTEM MULTI 32)
 
 */
@@ -5176,7 +5284,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 834-9324-03 TITLE FIGHT
-Rom board: 834-9413-03
+ROM board: 834-9413-03
   Main BD: 837-8676 (SYSTEM MULTI 32)
 
 */

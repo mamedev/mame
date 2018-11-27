@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(s11_state::s11)
 	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
 	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
 	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000))
@@ -470,9 +470,9 @@ MACHINE_CONFIG_START(s11_state::s11)
 	MCFG_DEVICE_PROGRAM_MAP(s11_bg_map)
 
 	SPEAKER(config, "bg").front_center();
-	MCFG_DEVICE_ADD("ym2151", YM2151, 3580000)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, s11_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	YM2151(config, m_ym, 3580000);
+	m_ym->irq_handler().set(FUNC(s11_state::ym2151_irq_w));
+	m_ym->add_route(ALL_OUTPUTS, "bg", 0.50);
 
 	MCFG_DEVICE_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
 

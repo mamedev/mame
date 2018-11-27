@@ -181,6 +181,7 @@ public:
 	void stop_hook();
 	void interrupt_hook(int irqline);
 	void exception_hook(int exception);
+	void privilege_hook();
 	void instruction_hook(offs_t curpc);
 
 	// hooks into our operations
@@ -205,6 +206,7 @@ public:
 	void go_interrupt(int irqline = -1);
 	void go_exception(int exception);
 	void go_milliseconds(u64 milliseconds);
+	void go_privilege(const char *condition);
 	void go_next_device();
 
 	template <typename Format, typename... Params>
@@ -324,6 +326,7 @@ private:
 	attotime                m_stoptime;                 // stop time for DEBUG_FLAG_STOP_TIME
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
+	std::unique_ptr<parsed_expression> m_privilege_condition;      // expression to evaluate on privilege change
 	attotime                m_endexectime;              // ending time of the current execution
 	u64                     m_total_cycles;             // current total cycles
 	u64                     m_last_total_cycles;        // last total cycles
@@ -459,11 +462,13 @@ private:
 	static constexpr u32 DEBUG_FLAG_STOP_TIME       = 0x00002000;       // there is a pending stop at cpu->stoptime
 	static constexpr u32 DEBUG_FLAG_SUSPENDED       = 0x00004000;       // CPU currently suspended
 	static constexpr u32 DEBUG_FLAG_LIVE_BP         = 0x00010000;       // there are live breakpoints for this CPU
+	static constexpr u32 DEBUG_FLAG_STOP_PRIVILEGE  = 0x00020000;       // run until execution level changes
 
 	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
 	static constexpr u32 DEBUG_FLAG_TRACING_ANY     = DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
 	static constexpr u32 DEBUG_FLAG_TRANSIENT       = DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC |
-			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
+			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK |
+			DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PRIVILEGE;
 };
 
 //**************************************************************************

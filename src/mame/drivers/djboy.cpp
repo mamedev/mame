@@ -74,16 +74,16 @@ Notes:
                 BS15.6Y    27C512 EPROM (DIP28)   \ There is an alt. set of labels used for these ROMs with an 'S'
                 BS07.1B    27C512 EPROM (DIP28)   | added to the name (i.e. 'BS15S'), but the actual ROM contents is identical
                 BS19.4B    27C1001 EPROM (DIP32)  / to the regular set (both sets dumped / verified)
-                BS-000.1H  4M MASKROM (DIP32) {sprite}
-                BS-001.1F  4M MASKROM (DIP32) {sprite}
-                BS-002.1D  4M MASKROM (DIP32) {sprite}
-                BS-003.1K  4M MASKROM (DIP32) {sprite}
-                BS-004.1S  4M MASKROM (DIP32) {tile}
-                BS-005.1U  4M MASKROM (DIP32) {tile}
-                BS-100.4D  1M MASKROM (DIP28) {z80}
-                BS-101.6W  1M MASKROM (DIP28) {z80 data}
-                BS-200.8C  1M MASKROM (DIP28) {z80}
-                BS-203.5J  2M MASKROM (DIP32) {oki-m6295 samples}
+                BS-000.1H  4M mask ROM (DIP32) {sprite}
+                BS-001.1F  4M mask ROM (DIP32) {sprite}
+                BS-002.1D  4M mask ROM (DIP32) {sprite}
+                BS-003.1K  4M mask ROM (DIP32) {sprite}
+                BS-004.1S  4M mask ROM (DIP32) {tile}
+                BS-005.1U  4M mask ROM (DIP32) {tile}
+                BS-100.4D  1M mask ROM (DIP28) {Z80}
+                BS-101.6W  1M mask ROM (DIP28) {Z80 data}
+                BS-200.8C  1M mask ROM (DIP28) {Z80}
+                BS-203.5J  2M mask ROM (DIP32) {OKI-M6295 samples}
 
       DIPs    - SW1
                 |--------------------------------------------|
@@ -508,11 +508,11 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_GENERIC_LATCH_8_ADD("slavelatch")
+	GENERIC_LATCH_8(config, m_slavelatch);
 
-	MCFG_GENERIC_LATCH_8_ADD("beastlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("beast", INPUT_LINE_IRQ0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_beastlatch);
+	m_beastlatch->data_pending_callback().set_inputline(m_beast, INPUT_LINE_IRQ0);
+	m_beastlatch->set_separate_acknowledge(true);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57.5)
@@ -526,14 +526,14 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djboy)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
-	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	KANEKO_PANDORA(config, m_pandora, 0);
+	m_pandora->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)

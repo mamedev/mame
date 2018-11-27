@@ -467,7 +467,7 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 	if ((offset >= 0x1000) && (offset <= 0x1015))
 	{
-		m_sound->write(space, offset & 0x1f, data);
+		m_sound->write(offset & 0x1f, data);
 		return;
 	}
 

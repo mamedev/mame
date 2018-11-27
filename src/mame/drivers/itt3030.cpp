@@ -192,6 +192,7 @@ Beeper Circuit, all ICs shown:
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -724,13 +725,12 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	/* devices */
 	ADDRESS_MAP_BANK(config, "lowerbank").set_map(&itt3030_state::lower48_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0xc000);
 
-	MCFG_DEVICE_ADD("crt5027", CRT5027, 6_MHz_XTAL / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	CRT5027(config, m_crtc, 6_MHz_XTAL / 8).set_char_width(8);
 
-	MCFG_DEVICE_ADD("fdc", FD1791, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, itt3030_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, itt3030_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, itt3030_state, fdchld_w))
+	FD1791(config, m_fdc, 20_MHz_XTAL / 20);
+	m_fdc->intrq_wr_callback().set(FUNC(itt3030_state::fdcirq_w));
+	m_fdc->drq_wr_callback().set(FUNC(itt3030_state::fdcdrq_w));
+	m_fdc->hld_wr_callback().set(FUNC(itt3030_state::fdchld_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
@@ -741,8 +741,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_PALETTE_INIT_OWNER(itt3030_state, itt3030)
 
 	/* internal ram */
-	MCFG_RAM_ADD("mainram")
-	MCFG_RAM_DEFAULT_SIZE("256K")
+	RAM(config, "mainram").set_default_size("256K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

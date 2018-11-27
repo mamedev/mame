@@ -103,10 +103,8 @@ void pimps_state::mem_map(address_map &map)
 void pimps_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xf0, 0xf0).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf1, 0xf1).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf2, 0xf2).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf3, 0xf3).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf0, 0xf1).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xf2, 0xf3).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */

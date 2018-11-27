@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 
-	MCFG_NVRAM_ADD_0FILL("backram")
+	NVRAM(config, "backram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 

@@ -25,7 +25,7 @@ public:
 	template <typename T> nmk112_device &set_rom1_tag(T &&tag) { m_rom1.set_tag(std::forward<T>(tag)); return *this; }
 	nmk112_device &set_page_mask(uint8_t mask) { m_page_mask = ~mask; return *this; }
 
-	DECLARE_WRITE8_MEMBER( okibank_w );
+	void okibank_w(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides

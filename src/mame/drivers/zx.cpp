@@ -325,103 +325,94 @@ PALETTE_INIT_MEMBER(zx_state, zx)
 
 /* Machine Configs */
 
-MACHINE_CONFIG_START(zx_state::zx80)
+void zx_state::zx80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(6'500'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(zx80_map)
-	MCFG_DEVICE_IO_MAP(zx80_io_map)
-	MCFG_DEVICE_OPCODES_MAP(ula_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(*this, zx_state, refresh_w))
+	Z80(config, m_maincpu, XTAL(6'500'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zx_state::zx80_map);
+	m_maincpu->set_addrmap(AS_IO, &zx_state::zx80_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &zx_state::ula_map);
+	m_maincpu->refresh_cb().set(FUNC(zx_state::refresh_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(XTAL(6'500'000)/2/64159.0) // 54223 for NTSC
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(XTAL(6'500'000)/2/64159.0); // 54223 for NTSC
+	m_screen->set_size(384, 311);
+	m_screen->set_visarea(0, 383, 0, 310);
+	m_screen->set_palette("palette");
+	m_screen->set_screen_update(FUNC(zx_state::screen_update));
 
-	/* video hardware */
-	MCFG_SCREEN_UPDATE_DRIVER(zx_state, screen_update)
-	MCFG_SCREEN_SIZE(384, 311)
-	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 310)
-	MCFG_SCREEN_PALETTE("palette")
+	palette_device &palette(PALETTE(config, "palette", 2));
+	palette.set_init(palette_init_delegate(FUNC(zx_state::palette_init_zx), this));
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(zx_state,zx)
-
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(zx80_o_format)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("zx80_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(zx80_o_format);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("zx80_cass");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "zx80_cass")
+	SOFTWARE_LIST(config, m_softlist).set_original("zx80_cass");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K,16K")
-MACHINE_CONFIG_END
+	RAM(config, m_ram).set_default_size("1K").set_extra_options("1K,2K,3K,16K");
+}
 
-MACHINE_CONFIG_START(zx_state::zx81)
+void zx_state::zx81(machine_config &config)
+{
 	zx80(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(zx81_map)
-	MCFG_DEVICE_IO_MAP(zx81_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &zx_state::zx81_map);
+	m_maincpu->set_addrmap(AS_IO, &zx_state::zx81_io_map);
 
-	MCFG_CASSETTE_MODIFY( "cassette" )
-	MCFG_CASSETTE_FORMATS(zx81_cassette_formats)
-	MCFG_CASSETTE_INTERFACE("zx81_cass")
+	m_cassette->set_formats(zx81_cassette_formats);
+	m_cassette->set_interface("zx81_cass");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_MODIFY("cass_list", "zx81_cass")
+	m_softlist->set_original("zx81_cass");
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,32K,48K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("16K").set_extra_options("1K,32K,48K");
+}
 
-MACHINE_CONFIG_START(zx_state::zx81_spk )
+void zx_state::zx81_spk(machine_config &config)
+{
 	zx81(config);
 	/* sound hardware */
 	/* Used by pc8300/lambda/pow3000 */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(zx_state::ts1000)
+void zx_state::ts1000(machine_config &config)
+{
 	zx81(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("1K,16K,32K,48K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("2K").set_extra_options("1K,16K,32K,48K");
+}
 
-MACHINE_CONFIG_START(zx_state::ts1500)
+void zx_state::ts1500(machine_config &config)
+{
 	ts1000(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("16K");
+}
 
-MACHINE_CONFIG_START(zx_state::pc8300)
+void zx_state::pc8300(machine_config &config)
+{
 	zx81_spk(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(pc8300_io_map)
+	m_maincpu->set_addrmap(AS_IO, &zx_state::pc8300_io_map);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("16K");
+}
 
-MACHINE_CONFIG_START(zx_state::pow3000)
+void zx_state::pow3000(machine_config &config)
+{
 	zx81_spk(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(pow3000_io_map)
+	m_maincpu->set_addrmap(AS_IO, &zx_state::pow3000_io_map);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("16K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("2K").set_extra_options("16K");
+}
 
 
 /* ROMs */

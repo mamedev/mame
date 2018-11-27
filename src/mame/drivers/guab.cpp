@@ -48,6 +48,7 @@
 #include "cpu/m68000/m68000.h"
 #include "bus/rs232/rs232.h"
 #include "formats/guab_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
@@ -507,37 +508,37 @@ MACHINE_CONFIG_START(guab_state::guab)
 	ptm.set_external_clocks(0, 0, 0);
 	ptm.irq_callback().set_inputline("maincpu", 3);
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi1(I8255(config, "i8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN0");
+	ppi1.in_pb_callback().set_ioport("IN1");
+	ppi1.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, guab_state, output1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, guab_state, output2_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, guab_state, output3_w))
+	i8255_device &ppi2(I8255(config, "i8255_2"));
+	ppi2.out_pa_callback().set(FUNC(guab_state::output1_w));
+	ppi2.out_pb_callback().set(FUNC(guab_state::output2_w));
+	ppi2.out_pc_callback().set(FUNC(guab_state::output3_w));
 
-	MCFG_DEVICE_ADD("i8255_3", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, guab_state, output4_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, guab_state, output5_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, guab_state, output6_w))
+	i8255_device &ppi3(I8255(config, "i8255_3"));
+	ppi3.out_pa_callback().set(FUNC(guab_state::output4_w));
+	ppi3.out_pb_callback().set(FUNC(guab_state::output5_w));
+	ppi3.out_pc_callback().set(FUNC(guab_state::output6_w));
 
-	MCFG_DEVICE_ADD("i8255_4", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, guab_state, sn76489_ready_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, guab_state, sn76489_buffer_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, guab_state, system_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, guab_state, watchdog_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, guab_state, watchdog_w))
+	i8255_device &ppi4(I8255(config, "i8255_4"));
+	ppi4.in_pa_callback().set(FUNC(guab_state::sn76489_ready_r));
+	ppi4.out_pa_callback().set(FUNC(guab_state::sn76489_buffer_w));
+	ppi4.out_pb_callback().set(FUNC(guab_state::system_w));
+	ppi4.in_pc_callback().set(FUNC(guab_state::watchdog_r));
+	ppi4.out_pc_callback().set(FUNC(guab_state::watchdog_w));
 
 	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
 	acia1.txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
 	acia1.rts_handler().set("rs232_1", FUNC(rs232_port_device::write_rts));
 	acia1.irq_handler().set_inputline("maincpu", 4);
 
-	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_cts))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", acia_1_rs232_defaults)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_1", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set("acia6850_1", FUNC(acia6850_device::write_cts));
+	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(acia_1_rs232_defaults));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600)); // source? the ptm doesn't seem to output any common baud values
 	acia_clock.signal_handler().set("acia6850_1", FUNC(acia6850_device::write_txc));
@@ -546,8 +547,8 @@ MACHINE_CONFIG_START(guab_state::guab)
 	ACIA6850(config, "acia6850_2", 0);
 
 	// floppy
-	MCFG_DEVICE_ADD("fdc", WD1773, 8000000)
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", 6))
+	WD1773(config, m_fdc, 8000000);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, 6);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", guab_floppies, "dd", guab_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)

@@ -9,6 +9,8 @@
 
 #include "bus/ieee488/ieee488.h"
 
+#include "imagedev/floppy.h"
+
 #include "machine/6821pia.h"
 #include "machine/i8251.h"
 #include "machine/wd_fdc.h"

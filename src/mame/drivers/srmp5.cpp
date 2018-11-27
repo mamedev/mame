@@ -38,7 +38,7 @@ This is not a bug (real machine behaves the same).
 
 #include "emu.h"
 #include "machine/st0016.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "emupal.h"
 
 #define DEBUG_CHAR
@@ -85,7 +85,7 @@ public:
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<r3051_device> m_maincpu;
 	required_device<st0016_cpu_device> m_soundcpu;
 
 	required_region_ptr<uint16_t> m_chrrom;
@@ -362,7 +362,7 @@ WRITE32_MEMBER(srmp5_state::srmp5_vidregs_w)
 
 READ32_MEMBER(srmp5_state::irq_ack_clear)
 {
-	m_maincpu->set_input_line(R3000_IRQ4, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
@@ -569,10 +569,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(srmp5_state::srmp5)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R3051, 25000000)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_DEVICE_PROGRAM_MAP(srmp5_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp5_state,  irq4_line_assert)
+	R3051(config, m_maincpu, 25000000);
+	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
+	m_maincpu->set_addrmap(AS_PROGRAM, &srmp5_state::srmp5_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(srmp5_state::irq4_line_assert));
 
 	MCFG_DEVICE_ADD("soundcpu",ST0016_CPU,8000000)
 	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)

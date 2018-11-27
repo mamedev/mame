@@ -27,7 +27,7 @@
 #include "speaker.h"
 
 //#include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #define RP5C15_TAG      "rp5c15"
 

@@ -276,9 +276,7 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	MCFG_DEVICE_ADD("kbc", TMS7000, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(kbc_map)

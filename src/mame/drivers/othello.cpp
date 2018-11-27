@@ -117,7 +117,8 @@ private:
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_WRITE8_MEMBER(n7751_p2_w);
-	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
+	template<int Shift> void n7751_rom_addr_w(uint8_t data);
+	void n7751_rom_select_w(uint8_t data);
 
 	DECLARE_PALETTE_INIT(othello);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -280,36 +281,24 @@ void othello_state::audio_portmap(address_map &map)
 	map(0x08, 0x08).w(FUNC(othello_state::ay_select_w));
 }
 
-WRITE8_MEMBER(othello_state::n7751_rom_control_w)
+template<int Shift>
+void othello_state::n7751_rom_addr_w(uint8_t data)
 {
-	/* P4 - address lines 0-3 */
-	/* P5 - address lines 4-7 */
-	/* P6 - address lines 8-11 */
-	/* P7 - ROM selects */
-	switch (offset)
-	{
-		case 0:
-			m_sound_addr = (m_sound_addr & ~0x00f) | ((data & 0x0f) << 0);
-			break;
+	// P4 - address lines 0-3
+	// P5 - address lines 4-7
+	// P6 - address lines 8-11
+	m_sound_addr = (m_sound_addr & ~(0x00f << Shift)) | ((data & 0x0f) << Shift);
+}
 
-		case 1:
-			m_sound_addr = (m_sound_addr & ~0x0f0) | ((data & 0x0f) << 4);
-			break;
+void othello_state::n7751_rom_select_w(uint8_t data)
+{
+	// P7 - ROM selects
+	m_sound_addr &= 0xfff;
 
-		case 2:
-			m_sound_addr = (m_sound_addr & ~0xf00) | ((data & 0x0f) << 8);
-			break;
-
-		case 3:
-			m_sound_addr &= 0xfff;
-			{
-				if (!BIT(data, 0)) m_sound_addr |= 0x0000;
-				if (!BIT(data, 1)) m_sound_addr |= 0x1000;
-				if (!BIT(data, 2)) m_sound_addr |= 0x2000;
-				if (!BIT(data, 3)) m_sound_addr |= 0x3000;
-			}
-			break;
-	}
+	if (!BIT(data, 0)) m_sound_addr |= 0x0000;
+	if (!BIT(data, 1)) m_sound_addr |= 0x1000;
+	if (!BIT(data, 2)) m_sound_addr |= 0x2000;
+	if (!BIT(data, 3)) m_sound_addr |= 0x3000;
 }
 
 READ8_MEMBER(othello_state::n7751_rom_r)
@@ -325,7 +314,7 @@ READ8_MEMBER(othello_state::n7751_command_r)
 WRITE8_MEMBER(othello_state::n7751_p2_w)
 {
 	/* write to P2; low 4 bits go to 8243 */
-	m_i8243->p2_w(space, offset, data & 0x0f);
+	m_i8243->p2_w(data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
@@ -418,7 +407,11 @@ MACHINE_CONFIG_START(othello_state::othello)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, othello_state, n7751_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
 
-	MCFG_I8243_ADD(m_i8243, CONSTANT(0), WRITE8(*this, othello_state, n7751_rom_control_w))
+	I8243(config, m_i8243);
+	m_i8243->p4_out_cb().set(FUNC(othello_state::n7751_rom_addr_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(othello_state::n7751_rom_addr_w<4>));
+	m_i8243->p6_out_cb().set(FUNC(othello_state::n7751_rom_addr_w<8>));
+	m_i8243->p7_out_cb().set(FUNC(othello_state::n7751_rom_select_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -431,21 +424,20 @@ MACHINE_CONFIG_START(othello_state::othello)
 	MCFG_PALETTE_ADD(m_palette, 0x10)
 	MCFG_PALETTE_INIT_OWNER(othello_state, othello)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 1000000 /* ? MHz */)   /* H46505 @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(TILE_WIDTH)
-	MCFG_MC6845_UPDATE_ROW_CB(othello_state, crtc_update_row)
+	h46505_device &crtc(H46505(config, "crtc", 1000000 /* ? MHz */));   /* H46505 @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(TILE_WIDTH);
+	crtc.set_update_row_callback(FUNC(othello_state::crtc_update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD(m_ay[0], AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	AY8910(config, m_ay[0], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD(m_ay[1], AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	AY8910(config, m_ay[1], 2000000).add_route(ALL_OUTPUTS, "speaker", 0.15);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

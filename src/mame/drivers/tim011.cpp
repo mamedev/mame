@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "emupal.h"
 #include "screen.h"
@@ -140,8 +141,8 @@ MACHINE_CONFIG_START(tim011_state::tim011)
 //  MCFG_DEVICE_ADD("keyboard",CDP1802, XTAL(1'750'000)) // CDP1802, unknown clock
 
 	// FDC9266 location U43 XTAL(8'000'000)
-	MCFG_UPD765A_ADD(FDC9266_TAG, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
+	UPD765A(config, m_fdc, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":0", tim011_floppies, "35dd", tim011_floppy_formats)

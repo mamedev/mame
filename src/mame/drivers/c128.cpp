@@ -1654,9 +1654,11 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	m_nmi->output_handler().set_inputline(m_subcpu, m8502_device::NMI_LINE);
 
 	// video hardware
-	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, XTAL(16'000'000), vdc_videoram_map)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MOS8563(config, m_vdc, XTAL(16'000'000));
+	m_vdc->set_screen(SCREEN_VDC_TAG);
+	m_vdc->set_addrmap(0, &c128_state::vdc_videoram_map);
+	m_vdc->set_show_border_area(true);
+	m_vdc->set_char_width(8);
 	MCFG_SCREEN_ADD(SCREEN_VDC_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 200)
@@ -1767,8 +1769,7 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 
@@ -1837,9 +1838,11 @@ MACHINE_CONFIG_START(c128_state::pal)
 	m_nmi->output_handler().set_inputline(m_subcpu, m8502_device::NMI_LINE);
 
 	// video hardware
-	MCFG_MOS8563_ADD(MOS8563_TAG, SCREEN_VDC_TAG, XTAL(16'000'000), vdc_videoram_map)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MOS8563(config, m_vdc, XTAL(16'000'000));
+	m_vdc->set_screen(SCREEN_VDC_TAG);
+	m_vdc->set_addrmap(0, &c128_state::vdc_videoram_map);
+	m_vdc->set_show_border_area(true);
+	m_vdc->set_char_width(8);
 	MCFG_SCREEN_ADD(SCREEN_VDC_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 200)
@@ -1950,8 +1953,7 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 

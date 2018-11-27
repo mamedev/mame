@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 
 	ADDRESS_MAP_BANK(config, "bank4000").set_map(&lethal_state::bank4000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x4000);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_ER5911_8BIT)
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -521,11 +521,11 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8LE, 1, 0)
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053244", K053244, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_BPP(6)
-	MCFG_K05324X_OFFSETS(95, 0)
-	MCFG_K05324X_CB(lethal_state, sprite_callback)
+	K053244(config, m_k053244, 0);
+	m_k053244->set_palette(m_palette);
+	m_k053244->set_bpp(6);
+	m_k053244->set_offsets(95, 0);
+	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback), this);
 
 	MCFG_K054000_ADD("k054000")
 
@@ -533,12 +533,12 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lethal_state::lethalej)
@@ -547,8 +547,7 @@ MACHINE_CONFIG_START(lethal_state::lethalej)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
 
-	MCFG_DEVICE_MODIFY("k053244")
-	MCFG_K05324X_OFFSETS(-105, 0)
+	m_k053244->set_offsets(-105, 0);
 MACHINE_CONFIG_END
 
 ROM_START( lethalen )   // US version UAE

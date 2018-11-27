@@ -95,17 +95,6 @@ void joyport_device::device_config_complete()
 	m_connected = dynamic_cast<device_ti99_joyport_interface*>(subdevices().first());
 }
 
-void joyport_device::configure_slot(bool withmouse, bool withhandset)
-{
-	option_reset();
-	option_add("twinjoy", TI99_JOYSTICK);
-	if (withmouse) option_add("mecmouse", TI99_MECMOUSE);
-	if (withhandset) option_add("handset", TI99_HANDSET);
-	set_default_option("twinjoy");
-	set_fixed(false);
-}
-
-
 /*****************************************************************************/
 
 void device_ti99_joyport_interface::interface_config_complete()
@@ -114,4 +103,22 @@ void device_ti99_joyport_interface::interface_config_complete()
 }
 
 } } } // end namespace bus::ti99::joyport
+
+void ti99_joyport_options_plain(device_slot_interface &device)
+{
+	device.option_add("twinjoy", TI99_JOYSTICK);
+}
+
+void ti99_joyport_options_mouse(device_slot_interface &device)
+{
+	device.option_add("twinjoy", TI99_JOYSTICK);
+	device.option_add("mecmouse", TI99_MECMOUSE);
+}
+
+void ti99_joyport_options_994(device_slot_interface &device)
+{
+	device.option_add("twinjoy", TI99_JOYSTICK);
+	device.option_add("handset", TI99_HANDSET);
+	device.option_add("mecmouse", TI99_MECMOUSE);
+}
 

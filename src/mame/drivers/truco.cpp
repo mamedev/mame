@@ -424,8 +424,7 @@ MACHINE_CONFIG_START(truco_state::truco)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", truco_state,  interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))    /* 1.6 seconds */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(1.6));    /* 1.6 seconds */
 
 	pia6821_device &pia(PIA6821(config, "pia0", 0));
 	pia.readpa_handler().set_ioport("P1");
@@ -448,9 +447,10 @@ MACHINE_CONFIG_START(truco_state::truco)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(truco_state, truco)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* Identified as UM6845 */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* Identified as UM6845 */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

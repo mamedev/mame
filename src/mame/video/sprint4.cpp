@@ -123,11 +123,10 @@ WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
 
 		/* update sound status */
 
-		address_space &space = machine().dummy_space();
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_1, m_videoram[0x391] & 15);
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_2, m_videoram[0x393] & 15);
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_3, m_videoram[0x395] & 15);
-		m_discrete->write(space, SPRINT4_MOTOR_DATA_4, m_videoram[0x397] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_1, m_videoram[0x391] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_2, m_videoram[0x393] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_3, m_videoram[0x395] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_4, m_videoram[0x397] & 15);
 	}
 }
 

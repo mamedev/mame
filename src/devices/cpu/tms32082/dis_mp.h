@@ -17,13 +17,13 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static const char *BCND_CONDITION[32];
-	static const char *BITNUM_CONDITION[32];
-	static const char *MEMOP_S[2];
-	static const char *MEMOP_M[2];
-	static const char *FLOATOP_PRECISION[4];
-	static const char *ACC_SEL[4];
-	static const char *FLOATOP_ROUND[4];
+	static char const *const BCND_CONDITION[32];
+	static char const *const BITNUM_CONDITION[32];
+	static char const *const MEMOP_S[2];
+	static char const *const MEMOP_M[2];
+	static char const *const FLOATOP_PRECISION[4];
+	static char const *const ACC_SEL[4];
+	static char const *const FLOATOP_ROUND[4];
 
 	std::ostream *output;
 

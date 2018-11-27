@@ -264,8 +264,7 @@ void trs80_state::radionic_mem(address_map &map)
 {
 	m1_mem(map);
 	// Optional external RS232 module with 8251
-	//map(0x3400, 0x3400).mirror(0xfe).rw("uart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	//map(0x3401, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	//map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// Internal colour controls (need details)
 	//map(0x3500, 0x35ff).w(FUNC(trs80_state::colour_w));
 	// Internal interface to external slots
@@ -537,8 +536,8 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 1.0)
 
-	MCFG_DEVICE_ADD("fdc", FD1793, 4_MHz_XTAL / 4) // todo: should be fd1771
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, trs80_state, intrq_w))
+	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
+	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -587,10 +586,9 @@ MACHINE_CONFIG_START(trs80_state::ht1080z)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ht1080z)
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1'500'000) // guess of clock
-	//MCFG_AY8910_PORT_A_READ_CB(...)  // ports are some kind of expansion slot
-	//MCFG_AY8910_PORT_B_READ_CB(...)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
+	//ay1.port_a_read_callback(FUNC(trs80_state::...);  // ports are some kind of expansion slot
+	//ay1.port_b_read_callback(FUNC(trs80_state::...);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::lnw80)
@@ -636,11 +634,11 @@ MACHINE_CONFIG_START(trs80_state::radionic)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_radionic)
 
 	// Interface to external circuits
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pulsar_state, ppi_pa_w))    // Data for external plugin printer module
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pulsar_state, ppi_pb_w))    // Control data to external
-	//MCFG_I8255_IN_PORTC_CB(READ8(*this, pulsar_state, ppi_pc_r))      // Sensing from external and printer status
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pulsar_state, ppi_pc_w))    // Printer strobe
+	I8255(config, m_ppi);
+	//m_ppi->in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));      // Sensing from external and printer status
+	//m_ppi->out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));    // Data for external plugin printer module
+	//m_ppi->out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));    // Control data to external
+	//m_ppi->out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));    // Printer strobe
 MACHINE_CONFIG_END
 
 

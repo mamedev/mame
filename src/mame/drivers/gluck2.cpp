@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(gluck2_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -507,21 +507,22 @@ MACHINE_CONFIG_START(gluck2_state::gluck2)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gluck2)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16));    /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW2"))
+	ay8910_device &ay8910(AY8910(config, "ay8910", MASTER_CLOCK/8));    /* guess */
+	ay8910.port_a_read_callback().set_ioport("SW3");
+	ay8910.port_b_read_callback().set_ioport("SW2");
 /*  Output ports have a minimal activity during init.
     They seems unused (at least for Good Luck II)
 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

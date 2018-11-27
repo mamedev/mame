@@ -315,9 +315,7 @@ MACHINE_CONFIG_START(ibmpc_state::ibm5150)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
@@ -356,9 +354,7 @@ MACHINE_CONFIG_START(ibmpc_state::ibm5160)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
@@ -471,12 +467,12 @@ ROM_START( ibm5160 )
 
 	ROM_DEFAULT_BIOS( "rev4" )
 
-	ROM_SYSTEM_BIOS( 0, "rev1", "IBM XT 5160 08/16/82" )    /* ROM at u18 marked as BAD_DUMP for now, as current dump, while likely correct, was regenerated from a number of smaller dumps, and needs a proper redump. */
-	ROMX_LOAD("5000027.u19", 0x0000, 0x8000, CRC(fc982309) SHA1(2aa781a698a21c332398d9bc8503d4f580df0a05), ROM_BIOS(0) )
-	ROMX_LOAD("5000026.u18", 0x8000, 0x8000, BAD_DUMP CRC(3c9b0ac3) SHA1(271c9f4cef5029a1560075550b67c3395db09fef), ROM_BIOS(0) ) /* This is probably a good dump, and works fine, but as it was manually regenerated based on a partial dump, it needs to be reverified. It's a very rare rom revision and may have only appeared on XT prototypes. */
+	ROM_SYSTEM_BIOS( 0, "rev1", "IBM XT 5160 08/16/82" )    /* This is a very rare ROM revision and may have only appeared on XT prototypes. Only 2 machines with this ROM set have been observed in the wild so far. */
+	ROMX_LOAD("5000027.u19", 0x0000, 0x8000, CRC(fc982309) SHA1(2aa781a698a21c332398d9bc8503d4f580df0a05), ROM_BIOS(0) ) /* silkscreen "MK37050N-4 // 5000027 // ZA // (C) IBM 1982 // D MALAYSIA // 8248 B" - FRU: 6359116 - Alt Silkscreen (from yesterpc.com): "(M) // 5000027 // (C) 1983 IBM CORP // X E // 8425B NM"; Contents repeat 4 times */
+	ROMX_LOAD("5000026.u18", 0x8000, 0x8000, CRC(3c9b0ac3) SHA1(271c9f4cef5029a1560075550b67c3395db09fef), ROM_BIOS(0) ) /* ceramic chip; silkscreen "MK38022 P-25 // 5000026 // ZA // (C) IBM 1982 // D DALLAS // 8304" */
 
 	ROM_SYSTEM_BIOS( 1, "rev2", "IBM XT 5160 11/08/82" )    /* Same as PC 5155 BIOS and PC/3270 BIOS */
-	ROMX_LOAD("5000027.u19", 0x0000, 0x8000, CRC(fc982309) SHA1(2aa781a698a21c332398d9bc8503d4f580df0a05), ROM_BIOS(1) ) /* silkscreen "MK37050N-4 // 5000027" - FRU: 6359116 - Contents repeat 4 times; Alt Silkscreen (from yesterpc.com): "(M) // 5000027 // (C) 1983 IBM CORP // X E // 8425B NM"*/
+	ROMX_LOAD("5000027.u19", 0x0000, 0x8000, CRC(fc982309) SHA1(2aa781a698a21c332398d9bc8503d4f580df0a05), ROM_BIOS(1) ) /* silkscreen "MK37050N-4 // 5000027 // ZA // (C) IBM 1982 // D MALAYSIA // 8248 B" - FRU: 6359116 - Alt Silkscreen (from yesterpc.com): "(M) // 5000027 // (C) 1983 IBM CORP // X E // 8425B NM"; Contents repeat 4 times */
 	ROMX_LOAD("1501512.u18", 0x8000, 0x8000, CRC(79522c3d) SHA1(6bac726d8d033491d52507278aa388ec04cf8b7e), ROM_BIOS(1) ) /* silkscreen "MK38036N-25 // 1501512 // ZA // (C)IBM CORP // 1981,1983 // D MALAYSIA // 8438 AP"*/
 
 	ROM_SYSTEM_BIOS( 2, "rev3", "IBM XT 5160 01/10/86" )    /* Has enhanced keyboard support and a 3.5" drive */

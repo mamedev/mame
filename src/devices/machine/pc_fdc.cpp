@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "machine/pc_fdc.h"
+#include "imagedev/floppy.h"
 
 //#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
 
@@ -34,11 +35,11 @@ void pc_fdc_family_device::map(address_map &map)
 // The schematics show address decoding is minimal
 void pc_fdc_xt_device::map(address_map &map)
 {
-	map(0x0, 0x0).r("upd765", FUNC(upd765a_device::msr_r)).w(FUNC(pc_fdc_xt_device::dor_w));
-	map(0x1, 0x1).r("upd765", FUNC(upd765a_device::fifo_r)).w(FUNC(pc_fdc_xt_device::dor_fifo_w));
+	map(0x0, 0x0).r(fdc, FUNC(upd765a_device::msr_r)).w(FUNC(pc_fdc_xt_device::dor_w));
+	map(0x1, 0x1).r(fdc, FUNC(upd765a_device::fifo_r)).w(FUNC(pc_fdc_xt_device::dor_fifo_w));
 	map(0x2, 0x2).w(FUNC(pc_fdc_xt_device::dor_w));
 	map(0x3, 0x3).w(FUNC(pc_fdc_xt_device::dor_w));
-	map(0x4, 0x5).m("upd765", FUNC(upd765a_device::map));
+	map(0x4, 0x5).m(fdc, FUNC(upd765a_device::map));
 }
 
 
@@ -46,7 +47,7 @@ void pc_fdc_xt_device::map(address_map &map)
 void pc_fdc_at_device::map(address_map &map)
 {
 	map(0x2, 0x2).rw(FUNC(pc_fdc_at_device::dor_r), FUNC(pc_fdc_at_device::dor_w));
-	map(0x4, 0x5).m("upd765", FUNC(upd765a_device::map));
+	map(0x4, 0x5).m(fdc, FUNC(upd765a_device::map));
 	map(0x7, 0x7).rw(FUNC(pc_fdc_at_device::dir_r), FUNC(pc_fdc_at_device::ccr_w));
 }
 
@@ -72,11 +73,12 @@ void pc_fdc_family_device::dma_w(uint8_t data)
 	fdc->dma_w(data);
 }
 
-MACHINE_CONFIG_START(pc_fdc_family_device::device_add_mconfig)
-	MCFG_UPD765A_ADD("upd765", false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc_fdc_family_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, pc_fdc_family_device, drq_w))
-MACHINE_CONFIG_END
+void pc_fdc_family_device::device_add_mconfig(machine_config &config)
+{
+	UPD765A(config, fdc, false, false);
+	fdc->intrq_wr_callback().set(FUNC(pc_fdc_family_device::irq_w));
+	fdc->drq_wr_callback().set(FUNC(pc_fdc_family_device::drq_w));
+}
 
 void pc_fdc_family_device::device_start()
 {

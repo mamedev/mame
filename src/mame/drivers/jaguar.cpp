@@ -338,7 +338,7 @@ Notes:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/jaguar/jaguar.h"
 #include "imagedev/chd_cd.h"
 #include "imagedev/snapquik.h"
@@ -1841,9 +1841,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R3041, R3000_CLOCK)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_DEVICE_PROGRAM_MAP(r3000_map)
+	R3041(config, m_maincpu, R3000_CLOCK);
+	downcast<r3041_device &>(*m_maincpu).set_endianness(ENDIANNESS_BIG);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
 	MCFG_DEVICE_ADD("gpu", JAGUARGPU, COJAG_CLOCK/2)
 	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
@@ -1853,9 +1853,9 @@ MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
 	MCFG_DEVICE_PROGRAM_MAP(dsp_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	VT83C461(config, m_ide).options(cojag_devices, "hdd", nullptr, true);
 	m_ide->irq_handler().set(FUNC(jaguar_state::external_int));
@@ -1944,7 +1944,7 @@ MACHINE_CONFIG_START(jaguar_state::jaguar)
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","jaguar")
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	EEPROM_93C46_16BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jaguar_state::jaguarcd)

@@ -26,6 +26,7 @@
 #include "bus/wangpc/wangpc.h"
 #include "cpu/i86/i86.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/im6402.h"
@@ -1314,21 +1315,21 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	m_pit->set_clk<2>(500000);
 	m_pit->out_handler<2>().set(FUNC(wangpc_state::pit2_w));
 
-	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
-	MCFG_IM6402_TRO_CALLBACK(WRITELINE("wangpckb", wangpc_keyboard_device, write_rxd))
-	MCFG_IM6402_DR_CALLBACK(WRITELINE(*this, wangpc_state, uart_dr_w))
-	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(*this, wangpc_state, uart_tbre_w))
+	IM6402(config, m_uart, 62500*16, 62500*16);
+	m_uart->tro_callback().set("wangpckb", FUNC(wangpc_keyboard_device::write_rxd));
+	m_uart->dr_callback().set(FUNC(wangpc_state::uart_dr_w));
+	m_uart->tbre_callback().set(FUNC(wangpc_state::uart_tbre_w));
 
-	MCFG_DEVICE_ADD(SCN2661_TAG, MC2661, 0)
-	MCFG_MC2661_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(*this, wangpc_state, epci_irq_w))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(WRITELINE(*this, wangpc_state, epci_irq_w))
+	MC2661(config, m_epci, 0);
+	m_epci->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_epci->rxrdy_handler().set(FUNC(wangpc_state::epci_irq_w));
+	m_epci->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_epci->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_epci->txemt_dschg_handler().set(FUNC(wangpc_state::epci_irq_w));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, wangpc_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, wangpc_state, fdc_drq))
+	UPD765A(config, m_fdc, false, false);
+	m_fdc->intrq_wr_callback().set(FUNC(wangpc_state::fdc_irq));
+	m_fdc->drq_wr_callback().set(FUNC(wangpc_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 
@@ -1342,8 +1343,8 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	INPUT_BUFFER(config, m_cent_data_in);
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCN2661_TAG, mc2661_device, rx_w))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_epci, FUNC(mc2661_device::rx_w));
 
 	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
@@ -1366,8 +1367,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot5", 5, wangpc_cards, nullptr)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wangpc")

@@ -38,14 +38,15 @@ static void nascom_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nascom_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fd1793", FD1793, 16_MHz_XTAL / 4 / 4)
+void nascom_fdc_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 16_MHz_XTAL / 4 / 4);
 
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", nascom_floppies, nullptr,  nascom_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", nascom_floppies, nullptr,  nascom_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, nascom_floppies, "55f", nascom_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, nascom_floppies, "55f", nascom_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, nascom_floppies, nullptr, nascom_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, nascom_floppies, nullptr, nascom_fdc_device::floppy_formats);
+}
 
 
 //**************************************************************************

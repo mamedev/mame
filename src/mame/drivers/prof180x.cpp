@@ -27,6 +27,7 @@
 #include "includes/prof180x.h"
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "screen.h"
@@ -252,7 +253,7 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	/* devices */
-	MCFG_UPD765A_ADD(FDC9268_TAG, false, true)
+	UPD765A(config, FDC9268_TAG, false, true);
 	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
@@ -264,9 +265,7 @@ MACHINE_CONFIG_START(prof180x_state::prof180x)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K,512K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,512K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "prof180")

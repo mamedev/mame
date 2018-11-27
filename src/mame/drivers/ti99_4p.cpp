@@ -123,18 +123,23 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/tms9901.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #define TI99_SGCPU_TAG "sgcpu"
 #define TI99_AMSRAM_TAG "amsram1meg"
 
-#define TRACE_ILLWRITE 0
-#define TRACE_READY 0
-#define TRACE_INT 0
-#define TRACE_ADDRESS 0
-#define TRACE_MEM 0
-#define TRACE_MUX 0
+// Debugging
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_ILLWRITE    (1U<<2)
+#define LOG_READY       (1U<<3)
+#define LOG_INT         (1U<<4)
+#define LOG_ADDRESS     (1U<<5)
+#define LOG_MEM         (1U<<6)
+#define LOG_MUX         (1U<<7)
+
+#define VERBOSE ( LOG_WARN )
+
+#include "logmacro.h"
 
 class ti99_4p_state : public driver_device
 {
@@ -153,6 +158,8 @@ public:
 	{ }
 
 	void ti99_4p_60hz(machine_config &config);
+	void driver_start() override;
+	void driver_reset() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
@@ -184,8 +191,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
-	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(ti99_4p);
 
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
 
@@ -211,7 +216,7 @@ private:
 	DECLARE_READ16_MEMBER( debugger_read );
 	DECLARE_WRITE16_MEMBER( debugger_write );
 	void ready_join();
-	void    set_keyboard_column(int number, int data);
+	void set_keyboard_column(int number, int data);
 
 	// Pointer to EPROM
 	uint16_t *m_rom;
@@ -440,7 +445,7 @@ READ8_MEMBER( ti99_4p_state::setoffset )
 	m_addr_buf = offset;
 	m_waitcount = 0;
 
-	if (TRACE_ADDRESS) logerror("set address %04x\n", m_addr_buf);
+	LOGMASKED(LOG_ADDRESS, "set address %04x\n", m_addr_buf);
 
 	m_decode = SGCPU_NONE;
 	m_muxready = true;
@@ -523,7 +528,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 		// Reading the even address now
 		m_peribox->readz(space, m_addr_buf, &hbyte);
 		m_peribox->memen_in(CLEAR_LINE);
-		if (TRACE_MEM) logerror("Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+		LOGMASKED(LOG_MEM, "Read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
 		value = (hbyte<<8) | m_latch;
 	}
 
@@ -545,7 +550,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 	switch (m_decode)
 	{
 	case SGCPU_SYSROM:
-		if (TRACE_ILLWRITE) logerror("Ignoring ROM write access at %04x\n", m_addr_buf);
+		LOGMASKED(LOG_ILLWRITE, "Ignoring ROM write access at %04x\n", m_addr_buf);
 		break;
 
 	case SGCPU_RAM:
@@ -560,7 +565,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		break;
 
 	case SGCPU_INTDSR:
-		if (TRACE_ILLWRITE) logerror("Ignoring DSR write access at %04x\n", m_addr_buf);
+		LOGMASKED(LOG_ILLWRITE, "Ignoring DSR write access at %04x\n", m_addr_buf);
 		break;
 
 	case SGCPU_MAPPER:
@@ -587,7 +592,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		m_latch = (data >> 8) & 0xff;
 
 		// write odd byte
-		if (TRACE_MEM) logerror("datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
+		LOGMASKED(LOG_MEM, "datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
 		m_peribox->write(space, m_addr_buf+1, data & 0xff);
 		m_peribox->memen_in(CLEAR_LINE);
 	}
@@ -637,10 +642,10 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
 	{
-		if (TRACE_MUX) logerror("datamux: wait count %d\n", m_waitcount);
+		LOGMASKED(LOG_MUX, "datamux: wait count %d\n", m_waitcount);
 		if (m_sysready==CLEAR_LINE)
 		{
-			if (TRACE_MUX) logerror("datamux: stalled due to external READY=0\n");
+			LOGMASKED(LOG_MUX, "datamux: stalled due to external READY=0\n");
 			return;
 		}
 
@@ -660,7 +665,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 					m_peribox->readz(*m_spacep, m_addr_buf+1, &m_latch);
 					m_peribox->memen_in(CLEAR_LINE);
 
-					if (TRACE_MEM) logerror("datamux: read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
+					LOGMASKED(LOG_MEM, "datamux: read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
 
 					// do the setaddress for the even address
 					m_peribox->memen_in(ASSERT_LINE);
@@ -687,7 +692,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 					m_peribox->setaddress_dbin(*m_spacep, m_addr_buf, m_dbin);
 
 					// write even byte
-					if (TRACE_MEM) logerror("datamux: write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
+					LOGMASKED(LOG_MEM, "datamux: write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
 					m_peribox->write(*m_spacep,  m_addr_buf, m_latch);
 					m_peribox->memen_in(CLEAR_LINE);
 				}
@@ -874,10 +879,7 @@ void ti99_4p_state::ready_join()
 {
 	int combined = (m_sysready == ASSERT_LINE && m_muxready)? ASSERT_LINE : CLEAR_LINE;
 
-	if (TRACE_READY)
-	{
-		if (m_ready_prev != combined) logerror("READY level = %d\n", combined);
-	}
+	if (m_ready_prev != combined) LOGMASKED(LOG_READY, "READY level = %d\n", combined);
 	m_ready_prev = combined;
 	m_cpu->set_ready(combined);
 }
@@ -887,10 +889,7 @@ void ti99_4p_state::ready_join()
 */
 WRITE_LINE_MEMBER( ti99_4p_state::ready_line )
 {
-	if (TRACE_READY)
-	{
-		if (state != m_sysready) logerror("READY line from PBox = %d\n", state);
-	}
+	if (state != m_sysready) LOGMASKED(LOG_READY, "READY line from PBox = %d\n", state);
 	m_sysready = (line_state)state;
 	// Also propagate to CPU via driver
 	ready_join();
@@ -906,13 +905,13 @@ void ti99_4p_state::set_9901_int( int line, line_state state)
 
 WRITE_LINE_MEMBER( ti99_4p_state::extint )
 {
-	if (TRACE_INT) logerror("EXTINT level = %02x\n", state);
+	LOGMASKED(LOG_INT, "EXTINT level = %02x\n", state);
 	set_9901_int(1, (line_state)state);
 }
 
 WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
 {
-	if (TRACE_INT) logerror("Setting a not connected line ... ignored\n");
+	LOGMASKED(LOG_INT, "Setting a not connected line ... ignored\n");
 }
 
 /*
@@ -941,13 +940,13 @@ READ8_MEMBER( ti99_4p_state::interrupt_level )
 
 WRITE8_MEMBER( ti99_4p_state::external_operation )
 {
-	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) logerror("External operation %s not implemented on the SGCPU board\n", extop[offset]);
 }
 
 /*****************************************************************************/
 
-void ti99_4p_state::machine_start()
+void ti99_4p_state::driver_start()
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -995,7 +994,7 @@ WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
 /*
     Reset the machine.
 */
-MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
+void ti99_4p_state::driver_reset()
 {
 	set_9901_int(12, CLEAR_LINE);
 
@@ -1004,11 +1003,11 @@ MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
 	m_9901_int = 0x03; // INT2* and INT1* set to 1, i.e. inactive
 }
 
-
 /*
     Machine description.
 */
-MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
+void ti99_4p_state::ti99_4p_60hz(machine_config& config)
+{
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	TMS9900(config, m_cpu, 3000000);
@@ -1042,26 +1041,18 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	m_peribox->lcp_cb().set(FUNC(ti99_4p_state::video_interrupt_in));
 
 	// Scratch pad RAM 1024 bytes (4 times the size of the TI-99/4A)
-	MCFG_RAM_ADD(TI99_PADRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1k")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_PADRAM_TAG).set_default_size("1K").set_default_value(0);
 
 	// AMS RAM 1 MiB
-	MCFG_RAM_ADD(TI99_AMSRAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_DEFAULT_VALUE(0)
+	RAM(config, TI99_AMSRAM_TAG).set_default_size("1M").set_default_value(0);
 
 	// Cassette drives
 	SPEAKER(config, "cass_out").front_center();
-	MCFG_CASSETTE_ADD( "cassette" )
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Joystick port
-	TI99_JOYPORT(config, m_joyport, 0);
-	m_joyport->configure_slot(false, false);
-
-MACHINE_CONFIG_END
+	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
+}
 
 
 ROM_START(ti99_4p)

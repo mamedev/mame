@@ -566,10 +566,11 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bw12)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(16'000'000)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bw12_state, crtc_update_row)
+	MC6845(config, m_crtc, XTAL(16'000'000)/8);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(bw12_state::crtc_update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -579,7 +580,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
-	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
+	UPD765A(config, m_fdc, false, true);
 
 	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));
@@ -589,46 +590,46 @@ MACHINE_CONFIG_START(bw12_state::common)
 	m_pia->irqa_handler().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 	m_pia->irqb_handler().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(16'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80SIO0(config, m_sio, XTAL(16'000'000)/4);
+	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(1'843'200))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, bw12_state, pit_out0_w))
-	MCFG_PIT8253_CLK1(XTAL(1'843'200))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
-	MCFG_PIT8253_CLK2(XTAL(1'843'200))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, bw12_state, pit_out2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(1'843'200));
+	m_pit->out_handler<0>().set(FUNC(bw12_state::pit_out0_w));
+	m_pit->set_clk<1>(XTAL(1'843'200));
+	m_pit->out_handler<1>().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
+	m_pit->set_clk<2>(XTAL(1'843'200));
+	m_pit->out_handler<2>().set(FUNC(bw12_state::pit_out2_w));
 
-	MCFG_DEVICE_ADD(AY3600PRO002_TAG, AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(*this, bw12_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(*this, bw12_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, bw12_state, ay3600_data_ready_w))
+	AY3600(config, m_kbc, 0);
+	m_kbc->x0().set_ioport("X0");
+	m_kbc->x1().set_ioport("X1");
+	m_kbc->x2().set_ioport("X2");
+	m_kbc->x3().set_ioport("X3");
+	m_kbc->x4().set_ioport("X4");
+	m_kbc->x5().set_ioport("X5");
+	m_kbc->x6().set_ioport("X6");
+	m_kbc->x7().set_ioport("X7");
+	m_kbc->x8().set_ioport("X8");
+	m_kbc->shift().set(FUNC(bw12_state::ay3600_shift_r));
+	m_kbc->control().set(FUNC(bw12_state::ay3600_control_r));
+	m_kbc->data_ready().set(FUNC(bw12_state::ay3600_data_ready_w));
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_sio, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_sio, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_sio, FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80dart_device::rxb_w));
+	rs232b.dcd_handler().set(m_sio, FUNC(z80dart_device::dcdb_w));
+	rs232b.cts_handler().set(m_sio, FUNC(z80dart_device::ctsb_w));
 
 	/* printer */
 	MCFG_DEVICE_ADD(CENTRONICS_TAG, CENTRONICS, centronics_devices, "printer")
@@ -650,8 +651,7 @@ MACHINE_CONFIG_START(bw12_state::bw12)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bw12_state::bw14)
@@ -664,8 +664,7 @@ MACHINE_CONFIG_START(bw12_state::bw14)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw14")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 /* ROMs */

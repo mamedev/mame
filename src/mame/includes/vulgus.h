@@ -5,14 +5,18 @@
   Capcom Vulgus hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_VULGUS_H
+#define MAME_INCLUDES_VULGUS_H
+
+#pragma once
 
 #include "emupal.h"
 
 class vulgus_state : public driver_device
 {
 public:
-	vulgus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vulgus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -61,3 +65,5 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_VULGUS_H

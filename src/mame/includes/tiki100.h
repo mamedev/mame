@@ -12,6 +12,7 @@
 #include "machine/z80daisy.h"
 #include "formats/tiki100_dsk.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
@@ -107,7 +108,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<fd1797_device> m_fdc;
 	required_device<z80pio_device> m_pio;

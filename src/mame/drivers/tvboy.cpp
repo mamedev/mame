@@ -83,10 +83,10 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	MCFG_M6502_DISABLE_CACHE()
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0, "tia")
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tvboy_state, a2600_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tvboy_state, a2600_get_databus_contents))
-	MCFG_TIA_VSYNC_CB(WRITE16(*this, tvboy_state, a2600_tia_vsync_callback_pal))
+	TIA_PAL_VIDEO(config, m_tia, 0, "tia");
+	m_tia->read_input_port_callback().set(FUNC(tvboy_state::a2600_read_input_port));
+	m_tia->databus_contents_callback().set(FUNC(tvboy_state::a2600_get_databus_contents));
+	m_tia->vsync_callback().set(FUNC(tvboy_state::a2600_tia_vsync_callback_pal));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )

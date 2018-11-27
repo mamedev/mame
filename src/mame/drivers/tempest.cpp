@@ -638,8 +638,7 @@ MACHINE_CONFIG_START(tempest_state::tempest)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(CLOCK_3KHZ / 256));
 
 	MCFG_DEVICE_ADD("earom", ER2055)
 

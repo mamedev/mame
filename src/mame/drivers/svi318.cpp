@@ -71,10 +71,11 @@ public:
 		m_keyboard_row(0)
 	{}
 
-	void svi328n(machine_config &config);
 	void svi318(machine_config &config);
+	void svi328n(machine_config &config);
+	void svi318p(machine_config &config);
 	void svi318n(machine_config &config);
-	void svi328(machine_config &config);
+	void svi328p(machine_config &config);
 
 private:
 	DECLARE_READ8_MEMBER( ppi_port_a_r );
@@ -535,31 +536,23 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	MCFG_DEVICE_PROGRAM_MAP(svi3x8_mem)
 	MCFG_DEVICE_IO_MAP(svi3x8_io)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, m_ram).set_default_size("16K");
 
 	ADDRESS_MAP_BANK(config, "io").set_map(&svi3x8_state::svi3x8_io_bank).set_data_width(8).set_addr_width(9).set_stride(0x100);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, svi3x8_state, ppi_port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, svi3x8_state, ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, svi3x8_state, ppi_port_c_w))
-
-	// video hardware
-	MCFG_DEVICE_ADD("vdp", TMS9929A, XTAL(10'738'635) / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, svi3x8_state, intvdp_w))
-	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9929a_device, screen_update)
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set(FUNC(svi3x8_state::ppi_port_a_r));
+	ppi.in_pb_callback().set(FUNC(svi3x8_state::ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(svi3x8_state::ppi_port_c_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_DEVICE_ADD("psg", AY8910, XTAL(10'738'635) / 6)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, svi3x8_state, bank_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'635) / 6));
+	psg.port_a_read_callback().set_ioport("JOY");
+	psg.port_b_write_callback().set(FUNC(svi3x8_state::bank_w));
+	psg.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// cassette
 	MCFG_CASSETTE_ADD("cassette")
@@ -584,30 +577,37 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(*this, svi3x8_state, excs_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(svi3x8_state::svi318n)
+void svi3x8_state::svi318p(machine_config &config)
+{
 	svi318(config);
-	MCFG_DEVICE_REMOVE("vdp")
-	MCFG_DEVICE_REMOVE("screen")
-	MCFG_DEVICE_ADD("vdp", TMS9928A, XTAL(10'738'635) / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, svi3x8_state, intvdp_w))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9928a_device, screen_update)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(svi3x8_state::svi328)
+	// video hardware
+	TMS9929A(config, m_vdp, XTAL(10'738'635)).set_screen("screen");
+	m_vdp->set_vram_size(0x4000);
+	m_vdp->int_callback().set(FUNC(svi3x8_state::intvdp_w));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
+
+void svi3x8_state::svi318n(machine_config &config)
+{
 	svi318(config);
-	MCFG_DEVICE_REMOVE(RAM_TAG)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	TMS9928A(config, m_vdp, XTAL(10'738'635)).set_screen("screen");
+	m_vdp->set_vram_size(0x4000);
+	m_vdp->int_callback().set(FUNC(svi3x8_state::intvdp_w));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
 
-MACHINE_CONFIG_START(svi3x8_state::svi328n)
+void svi3x8_state::svi328p(machine_config &config)
+{
+	svi318p(config);
+	m_ram->set_default_size("64K");
+}
+
+void svi3x8_state::svi328n(machine_config &config)
+{
 	svi318n(config);
-	MCFG_DEVICE_REMOVE(RAM_TAG)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("64K");
+}
 
 
 //**************************************************************************
@@ -635,7 +635,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME          FLAGS
-COMP( 1983, svi318,  0,      0,      svi318,  svi318, svi3x8_state, empty_init, "Spectravideo", "SVI-318 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi318,  0,      0,      svi318p, svi318, svi3x8_state, empty_init, "Spectravideo", "SVI-318 (PAL)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1983, svi318n, svi318, 0,      svi318n, svi318, svi3x8_state, empty_init, "Spectravideo", "SVI-318 (NTSC)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi328,  0,      0,      svi328,  svi328, svi3x8_state, empty_init, "Spectravideo", "SVI-328 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi328,  0,      0,      svi328p, svi328, svi3x8_state, empty_init, "Spectravideo", "SVI-328 (PAL)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1983, svi328n, svi328, 0,      svi328n, svi328, svi3x8_state, empty_init, "Spectravideo", "SVI-328 (NTSC)", MACHINE_SUPPORTS_SAVE )

@@ -148,9 +148,7 @@ private:
 	int m_sio_rx;
 	int m_sio_pin;
 	void cm6000_mem(address_map &map);
-	void hx20_io(address_map &map);
 	void hx20_mem(address_map &map);
-	void hx20_sub_io(address_map &map);
 	void hx20_sub_mem(address_map &map);
 };
 

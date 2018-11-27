@@ -44,6 +44,7 @@ enum manufacturer_codes
 
 DEFINE_DEVICE_TYPE(INTEL_28F010, intel_28f010_device, "intel_28f010", "Intel 28F010 1024K (128K x 8) CMOS Flash Memory")
 DEFINE_DEVICE_TYPE(AMD_28F010, amd_28f010_device, "amd_28f010", "Am28F010 1 Megabit (128K x 8-Bit) CMOS 12.0 Volt, Bulk Erase Flash Memory")
+DEFINE_DEVICE_TYPE(AMD_28F020, amd_28f020_device, "amd_28f020", "Am28F020 2 Megabit (256K x 8-Bit) CMOS 12.0 Volt, Bulk Erase Flash Memory")
 
 ALLOW_SAVE_TYPE(base_28fxxx_device::state);
 
@@ -67,6 +68,11 @@ intel_28f010_device::intel_28f010_device(const machine_config &mconfig, const ch
 
 amd_28f010_device::amd_28f010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: base_28fxxx_device(mconfig, AMD_28F010, tag, owner, clock, 0x20000, MFG_AMD, 0xa7)
+{
+}
+
+amd_28f020_device::amd_28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: base_28fxxx_device(mconfig, AMD_28F020, tag, owner, clock, 0x40000, MFG_AMD, 0x2a)
 {
 }
 

@@ -28,7 +28,7 @@ INTERRUPT_GEN_MEMBER(starshp1_state::starshp1_interrupt)
 WRITE_LINE_MEMBER(starshp1_state::attract_w)
 {
 	m_attract = state;
-	m_discrete->write(machine().dummy_space(), STARSHP1_ATTRACT, state);
+	m_discrete->write(STARSHP1_ATTRACT, state);
 
 	machine().bookkeeping().coin_lockout_w(0, !m_attract);
 	machine().bookkeeping().coin_lockout_w(1, !m_attract);
@@ -38,7 +38,7 @@ WRITE_LINE_MEMBER(starshp1_state::attract_w)
 WRITE_LINE_MEMBER(starshp1_state::phasor_w)
 {
 	m_phasor = state;
-	m_discrete->write(machine().dummy_space(), STARSHP1_PHASOR_ON, state);
+	m_discrete->write(STARSHP1_PHASOR_ON, state);
 }
 
 
@@ -92,13 +92,13 @@ WRITE8_MEMBER(starshp1_state::starshp1_analog_out_w)
 		m_ship_size = data;
 		break;
 	case 2:
-		m_discrete->write(space, STARSHP1_NOISE_AMPLITUDE, data);
+		m_discrete->write(STARSHP1_NOISE_AMPLITUDE, data);
 		break;
 	case 3:
-		m_discrete->write(space, STARSHP1_TONE_PITCH, data);
+		m_discrete->write(STARSHP1_TONE_PITCH, data);
 		break;
 	case 4:
-		m_discrete->write(space, STARSHP1_MOTOR_SPEED, data);
+		m_discrete->write(STARSHP1_MOTOR_SPEED, data);
 		break;
 	case 5:
 		m_circle_hpos = data;

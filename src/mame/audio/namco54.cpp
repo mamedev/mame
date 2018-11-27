@@ -71,16 +71,16 @@ WRITE8_MEMBER( namco_54xx_device::O_w )
 {
 	uint8_t out = (data & 0x0f);
 	if (data & 0x10)
-		m_discrete->write(space, NAMCO_54XX_1_DATA(m_basenode), out);
+		m_discrete->write(NAMCO_54XX_1_DATA(m_basenode), out);
 	else
-		m_discrete->write(space, NAMCO_54XX_0_DATA(m_basenode), out);
+		m_discrete->write(NAMCO_54XX_0_DATA(m_basenode), out);
 }
 
 WRITE8_MEMBER( namco_54xx_device::R1_w )
 {
 	uint8_t out = (data & 0x0f);
 
-	m_discrete->write(space, NAMCO_54XX_2_DATA(m_basenode), out);
+	m_discrete->write(NAMCO_54XX_2_DATA(m_basenode), out);
 }
 
 

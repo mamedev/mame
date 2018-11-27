@@ -5,6 +5,10 @@
     Mermaid
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MERMAID_H
+#define MAME_INCLUDES_MERMAID_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/ripple_counter.h"
@@ -16,8 +20,8 @@
 class mermaid_state : public driver_device
 {
 public:
-	mermaid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mermaid_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram2(*this, "videoram2"),
 		m_videoram(*this, "videoram"),
 		m_bg_scrollram(*this, "bg_scrollram"),
@@ -112,3 +116,5 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(rougien_adpcm_int);
 	void mermaid_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MERMAID_H

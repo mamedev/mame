@@ -16,7 +16,6 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "imagedev/flopdrv.h"
 #include "formats/pk8020_dsk.h"
 #include "machine/ram.h"
 #include "screen.h"
@@ -211,42 +210,42 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8020_state, pk8020)
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8020_state, pk8020_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pk8020_state, pk8020_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pk8020_state, pk8020_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8020_state, pk8020_portc_w))
+	I8255(config, m_ppi8255_1);
+	m_ppi8255_1->in_pa_callback().set(FUNC(pk8020_state::pk8020_porta_r));
+	m_ppi8255_1->out_pb_callback().set(FUNC(pk8020_state::pk8020_portb_w));
+	m_ppi8255_1->in_pc_callback().set(FUNC(pk8020_state::pk8020_portc_r));
+	m_ppi8255_1->out_pc_callback().set(FUNC(pk8020_state::pk8020_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8020_state, pk8020_2_portc_w))
+	I8255(config, m_ppi8255_2);
+	m_ppi8255_2->out_pc_callback().set(FUNC(pk8020_state::pk8020_2_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
+	I8255(config, m_ppi8255_3);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(20_MHz_XTAL / 10)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out0))
-	MCFG_PIT8253_CLK1(20_MHz_XTAL / 10)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out1))
-	MCFG_PIT8253_CLK2((20_MHz_XTAL / 8) / 164)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259", pic8259_device, ir5_w))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(20_MHz_XTAL / 10);
+	m_pit8253->out_handler<0>().set(FUNC(pk8020_state::pk8020_pit_out0));
+	m_pit8253->set_clk<1>(20_MHz_XTAL / 10);
+	m_pit8253->out_handler<1>().set(FUNC(pk8020_state::pk8020_pit_out1));
+	m_pit8253->set_clk<2>((20_MHz_XTAL / 8) / 164);
+	m_pit8253->out_handler<2>().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("i8251line", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
+	I8251(config, m_rs232, 0);
+	m_rs232->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_rs232->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir1_w));
+	m_rs232->txrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_rs232, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_rs232, FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set(m_rs232, FUNC(i8251_device::write_dsr));
 
-	MCFG_DEVICE_ADD("i8251lan", I8251, 0)
+	I8251(config, m_lan, 0);
 
-	MCFG_DEVICE_ADD("wd1793", FD1793, 20_MHz_XTAL / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259", pic8259_device, ir7_w))
+	FD1793(config, m_wd1793, 20_MHz_XTAL / 20);
+	m_wd1793->intrq_wr_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)
@@ -264,9 +263,7 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("258K")   //64 + 4*48 + 2
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0x00); // 64 + 4*48 + 2 = 258
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -135,7 +135,7 @@ private:
 	void dleuro_map(address_map &map);
 	void dlus_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<palette_device> m_palette;
@@ -729,22 +729,22 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(dlair_state::dlair_base)
-
+void dlair_state::dlair_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
-	MCFG_DEVICE_PROGRAM_MAP(dlus_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
+	Z80(config, m_maincpu, MASTER_CLOCK_US/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dlair_state::dlus_map);
+	m_maincpu->set_periodic_int(FUNC(dlair_state::irq0_line_hold),  attotime::from_hz((double)MASTER_CLOCK_US/8/16/16/16/16));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK_US/8));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+}
 
 
 MACHINE_CONFIG_START(dlair_state::dlair_pr7820)
@@ -768,21 +768,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
-	MCFG_Z80_DAISY_CHAIN(dleuro_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(dleuro_map)
-	MCFG_DEVICE_IO_MAP(dleuro_io_map)
+	Z80(config, m_maincpu, MASTER_CLOCK_EURO/4);
+	m_maincpu->set_daisy_config(dleuro_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dlair_state::dleuro_map);
+	m_maincpu->set_addrmap(AS_IO, &dlair_state::dleuro_io_map);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, dlair_state, write_speaker))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", MASTER_CLOCK_EURO/4 /* same as "maincpu" */));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(dlair_state::write_speaker));
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80sio_device& sio(Z80SIO(config, "sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// TODO: hook up tx and rx callbacks
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)));
 
 	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, dlair_state, screen_update_dleuro)

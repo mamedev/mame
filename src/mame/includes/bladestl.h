@@ -5,6 +5,10 @@
     Blades of Steel
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_BLADESTL_H
+#define MAME_INCLUDES_BLADESTL_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -18,9 +22,8 @@
 class bladestl_state : public driver_device
 {
 public:
-	bladestl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-
+	bladestl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007342(*this, "k007342"),
@@ -78,3 +81,5 @@ protected:
 
 	output_finder<2> m_lamps;
 };
+
+#endif // MAME_INCLUDES_BLADESTL_H

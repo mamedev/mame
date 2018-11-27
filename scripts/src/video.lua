@@ -151,6 +151,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/dp8350.h,VIDEOS["DP8350"] = true
+--------------------------------------------------
+
+if (VIDEOS["DP8350"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/dp8350.cpp",
+		MAME_DIR .. "src/devices/video/dp8350.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/ef9340_1.h,VIDEOS["EF9340_1"] = true
 --------------------------------------------------
 
@@ -492,6 +504,18 @@ if (VIDEOS["I8275"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/i8275.cpp",
 		MAME_DIR .. "src/devices/video/i8275.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ims_cvc.h,VIDEOS["IMS_CVC"] = true
+--------------------------------------------------
+
+if (VIDEOS["IMS_CVC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ims_cvc.cpp",
+		MAME_DIR .. "src/devices/video/ims_cvc.h",
 	}
 end
 
@@ -1079,6 +1103,18 @@ if (VIDEOS["TOPCAT"]~=null) then
 		MAME_DIR .. "src/devices/video/topcat.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/catseye.h,VIDEOS["CATSEYE"] = true
+--------------------------------------------------
+if (VIDEOS["CATSEYE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/catseye.cpp",
+		MAME_DIR .. "src/devices/video/catseye.h",
+	}
+end
+
 
 --------------------------------------------------
 --

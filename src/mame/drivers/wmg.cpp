@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu2)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	ADDRESS_MAP_BANK(config, "bankc000").set_map(&wmg_state::wmg_banked_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	// also set a timer to go off on scanline 240
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

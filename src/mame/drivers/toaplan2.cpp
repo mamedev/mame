@@ -729,8 +729,8 @@ WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
 
 WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
 {
-	m_nmk112->okibank_w(space, offset, data & 0x0f);
-	m_nmk112->okibank_w(space, offset + 1, (data >> 4) & 0x0f);
+	m_nmk112->okibank_w(offset, data & 0x0f);
+	m_nmk112->okibank_w(offset + 1, (data >> 4) & 0x0f);
 }
 
 
@@ -846,7 +846,7 @@ void toaplan2_state::tekipaki_68k_mem(address_map &map)
 	map(0x020000, 0x03ffff).rom();                     // extra for Whoopee
 	map(0x080000, 0x082fff).ram();
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x180000, 0x180001).portr("DSWA");
 	map(0x180010, 0x180011).portr("DSWB");
 	map(0x180020, 0x180021).portr("SYS");
@@ -866,7 +866,7 @@ void toaplan2_state::ghox_68k_mem(address_map &map)
 	map(0x080000, 0x083fff).ram();
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x100000, 0x100001).r(FUNC(toaplan2_state::ghox_p1_h_analog_r));
-	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x180000, 0x180fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
 	map(0x181000, 0x181001).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x18100c, 0x18100d).portr("JMPR");
@@ -882,9 +882,9 @@ void toaplan2_state::dogyuun_68k_mem(address_map &map)
 	map(0x200018, 0x200019).portr("SYS");
 	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
 	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));         // test bit 8
 }
 
@@ -898,7 +898,7 @@ void toaplan2_state::kbash_68k_mem(address_map &map)
 	map(0x208014, 0x208015).portr("IN2");
 	map(0x208018, 0x208019).portr("SYS");
 	map(0x20801c, 0x20801d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));         // test bit 8
 }
@@ -921,7 +921,7 @@ void toaplan2_state::kbash2_68k_mem(address_map &map)
 	map(0x200025, 0x200025).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x200029, 0x200029).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
 	map(0x20002c, 0x20002d).r(FUNC(toaplan2_state::video_count_r));
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
@@ -930,13 +930,13 @@ void toaplan2_state::truxton2_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x200000, 0x20000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x200000, 0x20000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x300000, 0x300fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x400000, 0x401fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x400000, 0x401fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
 	map(0x402000, 0x402fff).ram().share("tx_lineselect");
-	map(0x403000, 0x4031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x403000, 0x4031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
 	map(0x403200, 0x403fff).ram();
-	map(0x500000, 0x50ffff).ram().w(FUNC(toaplan2_state::toaplan2_tx_gfxram16_w)).share("tx_gfxram16");
+	map(0x500000, 0x50ffff).ram().w(FUNC(toaplan2_state::tx_gfxram_w)).share("tx_gfxram");
 	map(0x600000, 0x600001).r(FUNC(toaplan2_state::video_count_r));
 	map(0x700000, 0x700001).portr("DSWA");
 	map(0x700002, 0x700003).portr("DSWB");
@@ -955,7 +955,7 @@ void toaplan2_state::pipibibs_68k_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x082fff).ram();
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x190000, 0x190fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
 	map(0x19c01c, 0x19c01d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x19c020, 0x19c021).portr("DSWA");
@@ -1000,12 +1000,12 @@ void toaplan2_state::fixeight_68k_mem(address_map &map)
 	map(0x200010, 0x200011).portr("SYS");
 	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_coin_word_w));
 	map(0x280000, 0x28ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x5021ff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
-	map(0x600000, 0x60ffff).ram().w(FUNC(toaplan2_state::toaplan2_tx_gfxram16_w)).share("tx_gfxram16");
+	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
+	map(0x600000, 0x60ffff).ram().w(FUNC(toaplan2_state::tx_gfxram_w)).share("tx_gfxram");
 	map(0x700000, 0x700001).w(FUNC(toaplan2_state::fixeight_subcpu_ctrl_w));
 	map(0x800000, 0x800001).r(FUNC(toaplan2_state::video_count_r));
 }
@@ -1023,9 +1023,9 @@ void toaplan2_state::fixeightbl_68k_mem(address_map &map)
 	map(0x200015, 0x200015).w(FUNC(toaplan2_state::fixeightbl_oki_bankswitch_w));  // Sound banking. Code at $4084c, $5070
 	map(0x200019, 0x200019).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x20001c, 0x20001d).portr("DSWA");
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
 	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 	map(0x800000, 0x87ffff).rom().region("maincpu", 0x80000);
 }
@@ -1041,7 +1041,7 @@ void toaplan2_state::vfive_68k_mem(address_map &map)
 	map(0x200018, 0x200019).portr("SYS");
 	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
 	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 }
@@ -1056,9 +1056,9 @@ void toaplan2_state::batsugun_68k_mem(address_map &map)
 	map(0x200018, 0x200019).portr("SYS");
 	map(0x20001c, 0x20001d).w(FUNC(toaplan2_state::toaplan2_v25_coin_word_w)); // Coin count/lock + v25 reset line
 	map(0x210000, 0x21ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w));
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x500000, 0x50000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 }
 
@@ -1069,7 +1069,7 @@ void toaplan2_state::pwrkick_68k_mem(address_map &map)
 	map(0x104000, 0x10ffff).ram();
 
 	map(0x200000, 0x20000f).rw(m_rtc, FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x600001, 0x600001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -1092,7 +1092,7 @@ void toaplan2_state::othldrby_68k_mem(address_map &map)
 	map(0x104000, 0x10ffff).ram();
 
 	map(0x200000, 0x20000f).rw(m_rtc, FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x600001, 0x600001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -1127,7 +1127,7 @@ void toaplan2_state::enmadaio_68k_mem(address_map &map)
 	map(0x100000, 0x103fff).ram(); // AM_SHARE("nvram")
 	map(0x104000, 0x10ffff).ram();
 
-	map(0x200000, 0x20000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x200000, 0x20000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x300000, 0x300fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x400003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0x500001, 0x500001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1152,7 +1152,7 @@ void toaplan2_state::snowbro2_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x500003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
 	map(0x600001, 0x600001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1182,12 +1182,12 @@ void toaplan2_state::mahoudai_68k_mem(address_map &map)
 	map(0x21c030, 0x21c031).portr("DSWB");
 	map(0x21c034, 0x21c035).portr("JMPR");
 	map(0x21c03c, 0x21c03d).r(FUNC(toaplan2_state::video_count_r));
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x502fff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
 	map(0x503200, 0x503fff).ram();
 }
 
@@ -1206,12 +1206,12 @@ void toaplan2_state::shippumd_68k_mem(address_map &map)
 	map(0x21c030, 0x21c031).portr("DSWB");
 	map(0x21c034, 0x21c035).portr("JMPR");
 	map(0x21c03c, 0x21c03d).r(FUNC(toaplan2_state::video_count_r));
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x502fff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
 	map(0x503200, 0x503fff).ram();
 }
 
@@ -1229,11 +1229,11 @@ void toaplan2_state::bgaregga_68k_mem(address_map &map)
 	map(0x21c030, 0x21c031).portr("DSWB");
 	map(0x21c034, 0x21c035).portr("JMPR");
 	map(0x21c03c, 0x21c03d).r(FUNC(toaplan2_state::video_count_r));
-	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_r), FUNC(gp9001vdp_device::gp9001_vdp_w));
+	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
 	map(0x502000, 0x502fff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
 	map(0x503200, 0x503fff).ram();
 	map(0x600001, 0x600001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
@@ -1241,12 +1241,12 @@ void toaplan2_state::bgaregga_68k_mem(address_map &map)
 
 void toaplan2_state::batrider_dma_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(FUNC(toaplan2_state::toaplan2_tx_videoram_w)).share("tx_videoram");
+	map(0x0000, 0x1fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
 	map(0x2000, 0x2fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x3000, 0x31ff).ram().share("tx_lineselect");
-	map(0x3200, 0x33ff).ram().w(FUNC(toaplan2_state::toaplan2_tx_linescroll_w)).share("tx_linescroll");
+	map(0x3200, 0x33ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
 	map(0x3400, 0x7fff).ram();
-	map(0x8000, 0xffff).ram().w(FUNC(toaplan2_state::toaplan2_tx_gfxram16_w)).share("tx_gfxram16");
+	map(0x8000, 0xffff).ram().w(FUNC(toaplan2_state::batrider_tx_gfxram_w)).share("tx_gfxram");
 }
 
 
@@ -1254,10 +1254,12 @@ void toaplan2_state::batrider_68k_mem(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
-	map(0x200000, 0x207fff).ram().share("mainram16");
+	map(0x200000, 0x207fff).ram().share("mainram");
 	map(0x208000, 0x20ffff).ram();
 	map(0x300000, 0x37ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
-	map(0x400000, 0x40000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_alt_r), FUNC(gp9001vdp_device::gp9001_vdp_alt_w));
+	map(0x400000, 0x40000d).lrw16("gp9001_invert_rw",
+							[this](offs_t offset, u16 mem_mask) { return m_vdp[0]->read(offset ^ (0xc/2), mem_mask); },
+							[this](offs_t offset, u16 data, u16 mem_mask) { m_vdp[0]->write(offset ^ (0xc/2), data, mem_mask); });
 	map(0x500000, 0x500001).portr("IN");
 	map(0x500002, 0x500003).portr("SYS-DSW");
 	map(0x500004, 0x500005).portr("DSW");
@@ -1281,10 +1283,12 @@ void toaplan2_state::bbakraid_68k_mem(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
-	map(0x200000, 0x207fff).ram().share("mainram16");
+	map(0x200000, 0x207fff).ram().share("mainram");
 	map(0x208000, 0x20ffff).ram();
 	map(0x300000, 0x33ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
-	map(0x400000, 0x40000d).rw(m_vdp[0], FUNC(gp9001vdp_device::gp9001_vdp_alt_r), FUNC(gp9001vdp_device::gp9001_vdp_alt_w));
+	map(0x400000, 0x40000d).lrw16("gp9001_invert_rw",
+							[this](offs_t offset, u16 mem_mask) { return m_vdp[0]->read(offset ^ (0xc/2), mem_mask); },
+							[this](offs_t offset, u16 data, u16 mem_mask) { m_vdp[0]->write(offset ^ (0xc/2), data, mem_mask); });
 	map(0x500000, 0x500001).portr("IN");
 	map(0x500002, 0x500003).portr("SYS-DSW");
 	map(0x500004, 0x500005).portr("DSW");
@@ -3219,7 +3223,7 @@ MACHINE_CONFIG_START(toaplan2_state::tekipaki)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3262,7 +3266,7 @@ MACHINE_CONFIG_START(toaplan2_state::ghox)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3349,7 +3353,7 @@ MACHINE_CONFIG_START(toaplan2_state::dogyuun)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_dogyuun));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3397,7 +3401,7 @@ MACHINE_CONFIG_START(toaplan2_state::kbash)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3433,7 +3437,7 @@ MACHINE_CONFIG_START(toaplan2_state::kbash2)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3467,7 +3471,7 @@ MACHINE_CONFIG_START(toaplan2_state::truxton2)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_truxton2)
@@ -3522,7 +3526,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibs)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3546,11 +3550,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))         /* 10MHz Oscillator */
+	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL) // ??? (position labeled "68000-12" but 10 MHz-rated parts used)
 	MCFG_DEVICE_PROGRAM_MAP(pipibibi_bootleg_68k_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(toaplan2_state, pipibibsbl_irq_ack)
 
-	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // ??? 3.37MHz
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -3560,18 +3564,15 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	//m_screen->set_refresh_hz(60);
-	//m_screen->set_size(432, 262);
-	//m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_raw(28.322_MHz_XTAL / 4, 450, 0, 320, 262, 0, 240); // guess, but this is within NTSC parameters
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
+	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL); // FIXME: bootleg has no VDP
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
@@ -3580,7 +3581,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 27_MHz_XTAL/8));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 28.322_MHz_XTAL / 8)); // ???
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
@@ -3636,14 +3637,14 @@ MACHINE_CONFIG_START(toaplan2_state::fixeight)
 	audiocpu.p0_in_cb().set_ioport("EEPROM");
 	audiocpu.p0_out_cb().set_ioport("EEPROM");
 
-	EEPROM_SERIAL_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240); // verified on PCB
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_truxton2)
@@ -3681,7 +3682,7 @@ MACHINE_CONFIG_START(toaplan2_state::fixeightbl)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_bootleg));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_textrom)
@@ -3722,7 +3723,7 @@ MACHINE_CONFIG_START(toaplan2_state::vfive)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240); // verified on PCB
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3762,7 +3763,7 @@ MACHINE_CONFIG_START(toaplan2_state::batsugun)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_batsugun));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3794,7 +3795,7 @@ MACHINE_CONFIG_START(toaplan2_state::pwrkick)
 
 	UPD4992(config, m_rtc);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(PWRKICK_HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
@@ -3803,7 +3804,7 @@ MACHINE_CONFIG_START(toaplan2_state::pwrkick)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3829,14 +3830,14 @@ MACHINE_CONFIG_START(toaplan2_state::othldrby)
 
 	UPD4992(config, m_rtc);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3866,7 +3867,7 @@ MACHINE_CONFIG_START(toaplan2_state::enmadaio)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3902,7 +3903,7 @@ MACHINE_CONFIG_START(toaplan2_state::snowbro2)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
@@ -3945,7 +3946,7 @@ MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_textrom)
@@ -3989,7 +3990,7 @@ MACHINE_CONFIG_START(toaplan2_state::shippumd)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_textrom)
@@ -4032,7 +4033,7 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_textrom)
@@ -4098,7 +4099,7 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batrider)
@@ -4149,7 +4150,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C66_8BIT)
+	EEPROM_93C66_8BIT(config, "eeprom");
 
 	ADDRESS_MAP_BANK(config, m_dma_space, 0);
 	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);
@@ -4166,7 +4167,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
 	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank_toaplan2));
+	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batrider)
@@ -4893,6 +4894,24 @@ ROM_START( snowbro2b ) // seems to be the same data as the main set, but with th
 
 	ROM_REGION( 0x8000, "user1", 0 )        /* ??? Some sort of table - same as other bootleg boards */
 	ROM_LOAD( "sb2-unk.u100", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+ROM_END
+
+ROM_START( snowbro2b2 ) // seems to mostly be the same data, but with copyright changed to Q Elec. Only set with staff credits still present. Also differently arranged graphics ROMs data.
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "rom10.bin", 0x000000, 0x080000, CRC(3e96da41) SHA1(692211d40f506efb9cb49848521de2da7890e248) ) // 27c04002
+
+	ROM_REGION( 0x300000, "gp9001_0", 0 )
+	ROM_LOAD16_BYTE( "rom07.bin", 0x000000, 0x080000, CRC(c54ae0b3) SHA1(94099b2da52eb12638799eab0819fe8a13aa3879) ) // 27c040
+	ROM_LOAD16_BYTE( "rom05.bin", 0x000001, 0x080000, CRC(af3c74d1) SHA1(e97a688db50dfe41723452a9f652564e89e367ed) ) // 27c040
+	ROM_LOAD16_BYTE( "rom08.bin", 0x100000, 0x040000, CRC(72812088) SHA1(1c0d410a7dd8de0bc48b7ff677979ad269966f7d) ) // 27c02001
+	ROM_LOAD16_BYTE( "rom06.bin", 0x100001, 0x040000, CRC(c8f80774) SHA1(004752d7dfa08c3beb774f545fe3260d328abff0) ) // 27c02001
+	ROM_LOAD16_BYTE( "rom03.bin", 0x180000, 0x080000, CRC(42fecbd7) SHA1(96dc9d5495d7830400ca7475c6613119099e93f2) ) // 27c040
+	ROM_LOAD16_BYTE( "rom01.bin", 0x180001, 0x080000, CRC(e7134937) SHA1(7c12e7c6b08f804613e5ea0db8d622bda01bc036) ) // 27c040
+	ROM_LOAD16_BYTE( "rom04.bin", 0x280000, 0x040000, CRC(3343b7a7) SHA1(10efcb2dfae635f005773655faa573bf51ddc6a3) ) // 27c020
+	ROM_LOAD16_BYTE( "rom02.bin", 0x280001, 0x040000, CRC(af4d9551) SHA1(adcf1641e37b239b1ae4322b5710d49e53c30684) ) // 27c020
+
+	ROM_REGION( 0x80000, "oki1", 0 )         /* ADPCM Samples */
+	ROM_LOAD( "rom09.bin", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
 ROM_END
 
 /* -------------------------- Raizing games ------------------------- */
@@ -5671,8 +5690,9 @@ GAME( 1993, batsugunsp,  batsugun, batsugun,   batsugun,   toaplan2_state, init_
 GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
 
-GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise",           MACHINE_SUPPORTS_SAVE )
-GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg",  "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Hanafram",           "Snow Bros. 2 - With New Elves / Otenki Paradise",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg",            "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, snowbro2b2,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg (Q Elec)",   "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // possibly not a bootleg, has some original parts
 
 GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   toaplan2_state, empty_init,      ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
 GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  toaplan2_state, empty_init,      ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)" ,  MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version

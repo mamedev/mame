@@ -67,6 +67,8 @@ public:
 	auto read_cb() { return m_read_block.bind(); }
 	auto intlevel_cb() { return m_interrupt.bind(); }
 
+	uint16_t pio_outputs() const { return m_pio_output | ~m_pio_direction; }
+
 private:
 	static constexpr device_timer_id DECREMENTER = 0;
 

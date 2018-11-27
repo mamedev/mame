@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(s7_state::s7)
 	m_pia30->irqa_handler().set_inputline("maincpu", M6808_IRQ_LINE);
 	m_pia30->irqb_handler().set_inputline("maincpu", M6808_IRQ_LINE);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Add the soundcard */
 	MCFG_DEVICE_ADD("audiocpu", M6808, 3580000)
