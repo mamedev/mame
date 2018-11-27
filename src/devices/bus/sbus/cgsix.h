@@ -18,6 +18,8 @@
 class sbus_cgsix_device : public device_t, public device_sbus_card_interface
 {
 protected:
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	// construction/destruction
 	sbus_cgsix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t vram_size)
 		: sbus_cgsix_device(mconfig, type, tag, owner, clock)
