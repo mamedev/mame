@@ -52,16 +52,16 @@ protected:
 	void execute_rule(const bool src, const int rule, bool &dst) const;
 	void update_int();
 
-	template<int idx> void window_move();
-	template<int idx> void draw_line();
-	template<int idx> void trigger_wm();
-	template<int idx> void draw_pixel(int x, int y, int color);
-	template<int idx> void vram_w(offs_t offset, u16 data, u16 mem_mask);
-	template<int idx> void vram_w_bit(offs_t offset, u16 data, u16 mem_mask);
-	template<int idx> void vram_w_word(offs_t offset, u16 data, u16 mem_mask);
-	template<int idx> u16 vram_r(offs_t offset, u16 mem_mask);
-	template<int idx> u16 vram_r_bit(offs_t offset);
-	template<int idx> u16 vram_r_word(offs_t offset, u16 mem_mask);
+	template<int Idx> void window_move();
+	template<int Idx> void draw_line();
+	template<int Idx> void trigger_wm();
+	template<int Idx> void draw_pixel(int x, int y, int color);
+	template<int Idx> void vram_w(offs_t offset, u16 data, u16 mem_mask);
+	template<int Idx> void vram_w_bit(offs_t offset, u16 data, u16 mem_mask);
+	template<int Idx> void vram_w_word(offs_t offset, u16 data, u16 mem_mask);
+	template<int Idx> u16 vram_r(offs_t offset, u16 mem_mask);
+	template<int Idx> u16 vram_r_bit(offs_t offset);
+	template<int Idx> u16 vram_r_word(offs_t offset, u16 mem_mask);
 
 	int get_plane_from_idx(const int idx) const {
 		if (idx == VRAM_VIDEO_PLANE) {
@@ -77,55 +77,55 @@ protected:
 		}
 	}
 
-	template<int idx>
+	template<int Idx>
 	void modify_vram(int x, int y, bool state) {
 		m_changed = true;
 		m_status |= CATSEYE_STATUS_UNCLIPPED;
 		const int offset = y * m_fb_width + x;
 		if (state)
-			m_vram[idx][offset] |= m_plane_mask_l;
+			m_vram[Idx][offset] |= m_plane_mask_l;
 		else
-			m_vram[idx][offset] &= ~m_plane_mask_l;
+			m_vram[Idx][offset] &= ~m_plane_mask_l;
 	}
 
-	template<int idx>
+	template<int Idx>
 	void modify_vram_offset(int offset, bool state) {
 		m_changed = true;
 		m_status |= CATSEYE_STATUS_UNCLIPPED;
 		if (state)
-			m_vram[idx][offset] |= m_plane_mask_l;
+			m_vram[Idx][offset] |= m_plane_mask_l;
 		else
-			m_vram[idx][offset] &= ~m_plane_mask_l;
+			m_vram[Idx][offset] &= ~m_plane_mask_l;
 	}
 
-	template<int idx>
+	template<int Idx>
 	u8 get_vram_offset_plane(int offset) const {
-		const int plane = (m_planemode[idx] >> 8) & 0x0f;
-		if (!m_planemode[idx])
-			return m_vram[idx][offset] & m_plane_mask_l;
+		const int plane = (m_planemode[Idx] >> 8) & 0x0f;
+		if (!m_planemode[Idx])
+			return m_vram[Idx][offset] & m_plane_mask_l;
 		else if (plane < 8)
-			return m_vram[idx][offset] & (1 << plane);
+			return m_vram[Idx][offset] & (1 << plane);
 		else
-			return m_vram[idx][offset] & (1 << (plane-8));
+			return m_vram[Idx][offset] & (1 << (plane-8));
 	}
 
 
-	template<int idx>
+	template<int Idx>
 	u8 get_vram_offset(int offset) const {
-			return m_vram[idx][offset] & m_plane_mask_l;
+			return m_vram[Idx][offset] & m_plane_mask_l;
 	}
 
-	template<int idx>
+	template<int Idx>
 	bool get_vram_pixel(int x, int y) const {
-		return m_vram[get_plane_from_idx(idx)][y * m_fb_width + x] & m_plane_mask_l;
+		return m_vram[get_plane_from_idx(Idx)][y * m_fb_width + x] & m_plane_mask_l;
 	}
 
-	template<int idx>
+	template<int Idx>
 	bool get_vram_pixel_plane(int x, int y) const {
-		const int plane = (m_planemode[idx] >> 8) & 0x0f;
+		const int plane = (m_planemode[Idx] >> 8) & 0x0f;
 		const int offset = y * m_fb_width + x;
-		if (!(m_planemode[idx] & (1 << 12)))
-			return m_vram[idx][offset] & m_plane_mask_l;
+		if (!(m_planemode[Idx] & (1 << 12)))
+			return m_vram[Idx][offset] & m_plane_mask_l;
 		else if (plane < 8)
 			return m_vram[0][offset] & (1 << plane);
 		else

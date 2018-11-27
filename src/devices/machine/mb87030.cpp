@@ -427,7 +427,7 @@ void mb87030_device::step(bool timeout)
 		scsi_set_ctrl(0, S_ACK);
 		break;
 
-		}
+	}
 }
 
 void mb87030_device::device_start()

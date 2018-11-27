@@ -47,8 +47,8 @@
 class ncd_020_state : public driver_device
 {
 public:
-	ncd_020_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ncd_020_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_screen(*this, "screen"),
@@ -60,8 +60,13 @@ public:
 	}
 
 	void ncd_17c(machine_config &config);
-	void ncd_17c_map(address_map &map);
 	void ncd_19(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	void ncd_17c_map(address_map &map);
 	void ncd_19_map(address_map &map);
 	void ncd_mcu_map(address_map &map);
 
@@ -82,9 +87,6 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank);
 	DECLARE_READ8_MEMBER(mcu_ports_r);
 	DECLARE_WRITE8_MEMBER(mcu_ports_w);
-
-private:
-	virtual void machine_reset() override;
 
 	required_device<m68020_device> m_maincpu;
 	required_device<m6805_device> m_mcu;
@@ -159,27 +161,18 @@ uint32_t ncd_020_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 uint32_t ncd_020_state::screen_update_19(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint8_t pixels;
-	static const uint32_t palette[2] = { 0, 0xffffff };
-	uint8_t *vram = (uint8_t *)m_vram.target();
+	static constexpr uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t const *const vram = (uint8_t *)m_vram.target();
 
-	for (y = 0; y < 1024; y++)
+	for (int y = 0; y < 1024; y++)
 	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1024/8; x++)
+		uint32_t *scanline = &bitmap.pix32(y);
+		for (int x = 0; x < 1024/8; x++)
 		{
-			pixels = vram[(y * (2048/8)) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = vram[(y * (2048/8)) + (BYTE4_XOR_BE(x))];
 
-			*scanline++ = palette[(pixels>>7)&1];
-			*scanline++ = palette[(pixels>>6)&1];
-			*scanline++ = palette[(pixels>>5)&1];
-			*scanline++ = palette[(pixels>>4)&1];
-			*scanline++ = palette[(pixels>>3)&1];
-			*scanline++ = palette[(pixels>>2)&1];
-			*scanline++ = palette[(pixels>>1)&1];
-			*scanline++ = palette[(pixels&1)];
+			for (int b = 0; b < 8; b++)
+				*scanline++ = palette[BIT(pixels, 7 - b)];
 		}
 	}
 

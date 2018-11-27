@@ -1841,8 +1841,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 
 	/* basic machine hardware */
-	R3041(config, m_maincpu, R3000_CLOCK);
-	downcast<r3041_device &>(*m_maincpu).set_endianness(ENDIANNESS_BIG);
+	R3041(config, m_maincpu, R3000_CLOCK).set_endianness(ENDIANNESS_BIG);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
 	MCFG_DEVICE_ADD("gpu", JAGUARGPU, COJAG_CLOCK/2)

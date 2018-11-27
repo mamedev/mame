@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Patrick Mackinlay
 
 /*
  * MIPS-I emulation, including R2000[A], R3000[A] and IDT R30xx devices. The
