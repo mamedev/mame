@@ -7873,8 +7873,8 @@ rom13.7     27C040   /
 rom10.112   27C040   \  Main Program
 rom11.107   27C040   /
 
-
-
+NOTE: An original (undumped) PCB has been seen with the program ROM labeled as  B-2000 N U107 v1.2
+      It has not been verified the current set is the same v1.2 or some other revision
 
 ***************************************************************************/
 
