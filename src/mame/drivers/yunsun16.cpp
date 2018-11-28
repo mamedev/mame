@@ -16,10 +16,10 @@ Sound Chips  :  OKI M6295 + YM3812 [Optional]
 ---------------------------------------------------------------------------
 Year + Game         Board#
 ---------------------------------------------------------------------------
-199? Magic Bubble     YS-1302 / YS102
 1996 Paparazzi        YS-0211? Looks identical
 1997 Shocking         YS-0211
 1998 Bomb Kick        YS-0211
+1998 Magic Bubble     YS-1302 / YS102
 ---------------------------------------------------------------------------
 
 - Screen flipping: not used!?
@@ -1021,12 +1021,12 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 199?, magicbub,   0,        magicbub, magicbub, yunsun16_state, init_magicbub, ROT0,   "Yun Sung", "Magic Bubble",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbuba,  magicbub, magicbub, magicbua, yunsun16_state, init_magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-1302 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbubb,  magicbub, shocking, magicbua, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, paprazzi,   0,        shocking, paprazzi, yunsun16_state, empty_init,    ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, shocking,   0,        shocking, shocking, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, shockingk,  shocking, shocking, shocking, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, shockingko, shocking, shocking, shocking, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, bombkick,   0,        shocking, bombkick, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, bombkicka,  bombkick, shocking, bombkick, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, magicbub,   0,        magicbub, magicbub, yunsun16_state, init_magicbub, ROT0,   "Yun Sung", "Magic Bubble",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, magicbuba,  magicbub, magicbub, magicbua, yunsun16_state, init_magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-1302 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, magicbubb,  magicbub, shocking, magicbua, yunsun16_state, empty_init,    ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
