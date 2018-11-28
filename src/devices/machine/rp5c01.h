@@ -41,7 +41,7 @@ public:
 	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto out_alarm_callback() { return m_out_alarm_cb.bind(); }
-	void remove_battery() { m_battery_backed = false; }
+	void remove_battery() { m_battery_backed = false; } // include this if the chip is not battery backed
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
