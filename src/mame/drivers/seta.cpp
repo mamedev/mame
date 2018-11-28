@@ -1378,7 +1378,6 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
-#include "machine/tmp68301.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
@@ -9255,13 +9254,19 @@ MACHINE_CONFIG_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
+WRITE_LINE_MEMBER(seta_state::kiwame_vblank)
+{
+	if (state)
+		m_tmp68301->external_interrupt_0();
+}
+
 MACHINE_CONFIG_START(seta_state::kiwame)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD(m_maincpu, M68000, 16000000)   /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(kiwame_map)
-	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
+
 	tmp68301_device &tmp68301(TMP68301(config, "tmp68301", 0));
 	tmp68301.set_cputag(m_maincpu);
 	tmp68301.out_parallel_callback().set(FUNC(seta_state::kiwame_row_select_w));
@@ -9280,6 +9285,7 @@ MACHINE_CONFIG_START(seta_state::kiwame)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, kiwame_vblank))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */

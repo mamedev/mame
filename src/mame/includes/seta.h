@@ -16,6 +16,7 @@
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
+#include "machine/tmp68301.h"
 #include "machine/upd4701.h"
 #include "machine/upd4992.h"
 #include "sound/x1_010.h"
@@ -45,6 +46,7 @@ public:
 	seta_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_tmp68301(*this, "tmp68301"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this,"sub"),
 		m_seta001(*this, "spritegen"),
@@ -147,6 +149,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	optional_device<tmp68301_device> m_tmp68301;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
@@ -300,6 +303,7 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_sub_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(kiwame_vblank);
 	void set_pens();
 	void usclssic_set_pens();
 	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen);
