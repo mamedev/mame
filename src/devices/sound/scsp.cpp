@@ -173,7 +173,6 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 		m_length(0),
 		m_RBUFDST(nullptr)
 {
-	std::fill(std::begin(m_exts_r), std::end(m_exts_r), 0);
 	std::fill(std::begin(m_RINGBUF), std::end(m_RINGBUF), 0);
 	std::fill(std::begin(m_MidiStack), std::end(m_MidiStack), 0);
 	std::fill(std::begin(m_LPANTABLE), std::end(m_LPANTABLE), 0);
