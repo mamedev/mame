@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE32_MEMBER(oki_write);
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
+	void init_namcostr();
+
 protected:
 
 	DECLARE_WRITE16_MEMBER(grdians_lockout_w);

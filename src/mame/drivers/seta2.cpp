@@ -3604,6 +3604,33 @@ ROM_START( namcostr )
 	ROM_LOAD( "ns1voi0.u40", 0x000000, 0x400000, BAD_DUMP CRC(fe5c2b16) SHA1(21e4423cc91e8833297d4588343237b8b3155196) )    // FIXED BITS (xxxxx1xxxxxxxxxx)
 ROM_END
 
+void seta2_state::init_namcostr()
+{
+	// attempt to patch a few of the stuck bits
+	uint16_t *cpurom = &memregion("maincpu")->as_u16(0);
+	for (offs_t addr = 0x00000; addr < 0x00100; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x00100; addr < 0x00180; addr += 2)
+		if (!BIT(cpurom[addr / 2], 9))
+			cpurom[addr / 2] &= 0xfbff;
+	cpurom[0x00184 / 2] &= 0xfbff;
+	for (offs_t addr = 0x00204; addr < 0x002ae; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x002b0; addr < 0x0032c; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	cpurom[0x00332 / 2] &= 0xfbff;
+	for (offs_t addr = 0x00336; addr < 0x00344; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x00348; addr < 0x00364; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x00368; addr < 0x00370; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x00374; addr < 0x003ae; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+	for (offs_t addr = 0x003b0; addr < 0x00400; addr += 2)
+		cpurom[addr / 2] &= 0xfbff;
+}
+
 /***************************************************************************
 
                             Puzzle De Bowling (Japan)
@@ -4621,7 +4648,7 @@ GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,
 GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
 GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",              MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
 GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state,    empty_init,    ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
-GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    empty_init,    ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    init_namcostr, ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
 GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhuntb, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.0",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
