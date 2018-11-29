@@ -60,249 +60,269 @@ neg_acc
 	set_nz(A);
 	prefetch();
 
-oral0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+oraj_imp
 	read_pc_noinc();
-	prefetch();
-
-oral1_acc
-	read_pc_noinc();
-	A |= (m_l & 0x0000ff00) >> 8;
+	A |= m_j;
 	set_nz(A);
 	prefetch();
 
-oral2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+orak_imp
 	read_pc_noinc();
-	prefetch();
-
-oral3_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
-	prefetch();
-
-andl0_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
-	prefetch();
-
-andl1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
-	prefetch();
-
-andl2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
-	prefetch();
-
-andl3_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
-	prefetch();
-
-eorl0_acc
-	read_pc_noinc();
-	A ^= (m_l & 0x000000ff) >> 0;
+	A |= m_k;
 	set_nz(A);
 	prefetch();
 
-eorl1_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+oral_imp
 	read_pc_noinc();
+	A |= m_l;
+	set_nz(A);
 	prefetch();
 
-eorl2_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+oram_imp
 	read_pc_noinc();
+	A |= m_m;
+	set_nz(A);
 	prefetch();
 
-eorl3_acc
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+andj_imp
 	read_pc_noinc();
+	A &= m_j;
+	set_nz(A);
 	prefetch();
 
-adcl0_acc
+andk_imp
 	read_pc_noinc();
-	do_adc((m_l & 0x000000ff) >> 0);
+	A &= m_k;
+	set_nz(A);
 	prefetch();
 
-adcl1_acc
+andl_imp
 	read_pc_noinc();
-	do_adc((m_l & 0x0000ff00) >> 8);
+	A &= m_l;
+	set_nz(A);
 	prefetch();
 
-adcl2_acc
+andm_imp
 	read_pc_noinc();
-	do_adc((m_l & 0x00ff0000) >> 16);
+	A &= m_m;
+	set_nz(A);
 	prefetch();
 
-adcl3_acc
+eorj_imp
 	read_pc_noinc();
-	do_adc((m_l & 0xff000000) >> 24);
+	A ^= m_j;
+	set_nz(A);
 	prefetch();
 
-stal0_acc
+eork_imp
 	read_pc_noinc();
-	m_l = (m_l & 0xffffff00) | (A & 0xff); // TODO: flags
+	A ^= m_k;
+	set_nz(A);
 	prefetch();
 
-stal1_acc
+eorl_imp
 	read_pc_noinc();
-	m_l = (m_l & 0xffff00ff) | ((A & 0xff) << 8); // TODO: flags
+	A ^= m_l;
+	set_nz(A);
 	prefetch();
 
-stal2_acc
+eorm_imp
 	read_pc_noinc();
-	m_l = (m_l & 0xff00ffff) | ((A & 0xff) << 16); // TODO: flags
+	A ^= m_m;
+	set_nz(A);
 	prefetch();
 
-stal3_acc
+adcj_imp
 	read_pc_noinc();
-	m_l = (m_l & 0x00ffffff) | ((A & 0xff) << 24); // TODO: flags
+	do_adc(m_j);
 	prefetch();
 
-ldal0_acc
+adck_imp
 	read_pc_noinc();
-	A = (m_l & 0x000000ff) >> 0; // TODO: flags
+	do_adc(m_k);
 	prefetch();
 
-ldal1_acc
+adcl_imp
 	read_pc_noinc();
-	A = (m_l & 0x0000ff00) >> 8; // TODO: flags
+	do_adc(m_l);
 	prefetch();
 
-ldal2_acc
+adcm_imp
 	read_pc_noinc();
-	A = (m_l & 0x00ff0000) >> 16; // TODO: flags
+	do_adc(m_m);
 	prefetch();
 
-ldal3_acc
+staj_imp
 	read_pc_noinc();
-	A = (m_l & 0xff000000) >> 24; // TODO: flags
+	m_j = A;
 	prefetch();
 
-cmpl0_acc
+stak_imp
 	read_pc_noinc();
-	do_cmp(A, (m_l & 0x000000ff) >> 0);
+	m_k = A;
 	prefetch();
 
-cmpl1_acc
+stal_imp
 	read_pc_noinc();
-	do_cmp(A, (m_l & 0x0000ff00) >> 8);
+	m_l = A;
 	prefetch();
 
-cmpl2_acc
+stam_imp
 	read_pc_noinc();
-	do_cmp(A, (m_l & 0x00ff0000) >> 16);
+	m_m = A;
 	prefetch();
 
-cmpl3_acc
+ldaj_imp
 	read_pc_noinc();
-	do_cmp(A, (m_l & 0xff000000) >> 24);
+	A = m_j;
+	set_nz(A);
 	prefetch();
 
-sbcl0_acc
+ldak_imp
 	read_pc_noinc();
-	do_sbc((m_l & 0x000000ff) >> 0);
+	A = m_k;
+	set_nz(A);
 	prefetch();
 
-sbcl1_acc
+ldal_imp
 	read_pc_noinc();
-	do_sbc((m_l & 0x0000ff00) >> 8);
+	A = m_l;
+	set_nz(A);
 	prefetch();
 
-sbcl2_acc
+ldam_imp
 	read_pc_noinc();
-	do_sbc((m_l & 0x00ff0000) >> 16);
+	A = m_m;
+	set_nz(A);
 	prefetch();
 
-sbcl3_acc
+cmpj_imp
 	read_pc_noinc();
-	do_sbc((m_l & 0xff000000) >> 24);
+	do_cmp(A, m_j);
 	prefetch();
 
-spa0_acc
+cmpk_imp
 	read_pc_noinc();
-	m_pa = (m_pa & 0xffff00) | A; // TODO: Flags?
+	do_cmp(A, m_k);
 	prefetch();
 
-lpa0_acc
+cmpl_imp
 	read_pc_noinc();
-	A = (m_pa & 0x0000ff) >> 0; // TODO: Flags?
+	do_cmp(A, m_l);
 	prefetch();
 
-spa1_acc
+cmpm_imp
 	read_pc_noinc();
-	m_pa = (m_pa & 0xff00ff) | (A << 8); // TODO: Flags?
+	do_cmp(A, m_m);
 	prefetch();
 
-lpa1_acc
+sbcj_imp
 	read_pc_noinc();
-	A = (m_pa & 0x00ff00) >> 8; // TODO: Flags?
+	do_sbc(m_j);
 	prefetch();
 
-spa2_acc
+sbck_imp
 	read_pc_noinc();
-	m_pa = (m_pa & 0x00ffff) | (A << 16); // TODO: Flags?
+	do_sbc(m_k);
 	prefetch();
 
-lpa2_acc
+sbcl_imp
 	read_pc_noinc();
-	A = (m_pa & 0xff0000) >> 16; // TODO: Flags?
+	do_sbc(m_l);
 	prefetch();
 
-spb0_acc
+sbcm_imp
 	read_pc_noinc();
-	m_pb = (m_pb & 0xffff00) | A; // TODO: Flags?
+	do_sbc(m_m);
 	prefetch();
 
-lpb0_acc
+spa0_imp
 	read_pc_noinc();
-	A = (m_pb & 0x0000ff) >> 0; // TODO: Flags?
+	m_pa = (m_pa & 0xffff00) | A;
 	prefetch();
 
-spb1_acc
+lpa0_imp
 	read_pc_noinc();
-	m_pb = (m_pb & 0xff00ff) | (A << 8); // TODO: Flags?
+	A = (m_pa & 0x0000ff) >> 0;
+	set_nz(A);
 	prefetch();
 
-lpb1_acc
+spa1_imp
 	read_pc_noinc();
-	A = (m_pb & 0x00ff00) >> 8; // TODO: Flags?
+	m_pa = (m_pa & 0xff00ff) | (A << 8);
 	prefetch();
 
-spb2_acc
+lpa1_imp
 	read_pc_noinc();
-	m_pb = (m_pb & 0x00ffff) | (A << 16); // TODO: Flags?
+	A = (m_pa & 0x00ff00) >> 8;
+	set_nz(A);
 	prefetch();
 
-lpb2_acc
+spa2_imp
 	read_pc_noinc();
-	A = (m_pb & 0xff0000) >> 16; // TODO: Flags?
+	m_pa = (m_pa & 0x00ffff) | (A << 16);
+	prefetch();
+
+lpa2_imp
+	read_pc_noinc();
+	A = (m_pa & 0xff0000) >> 16;
+	set_nz(A);
+	prefetch();
+
+spb0_imp
+	read_pc_noinc();
+	m_pb = (m_pb & 0xffff00) | A;
+	prefetch();
+
+lpb0_imp
+	read_pc_noinc();
+	A = (m_pb & 0x0000ff) >> 0;
+	set_nz(A);
+	prefetch();
+
+spb1_imp
+	read_pc_noinc();
+	m_pb = (m_pb & 0xff00ff) | (A << 8);
+	prefetch();
+
+lpb1_imp
+	read_pc_noinc();
+	A = (m_pb & 0x00ff00) >> 8;
+	set_nz(A);
+	prefetch();
+
+spb2_imp
+	read_pc_noinc();
+	m_pb = (m_pb & 0x00ffff) | (A << 16);
+	prefetch();
+
+lpb2_imp
+	read_pc_noinc();
+	A = (m_pb & 0xff0000) >> 16;
+	set_nz(A);
 	prefetch();
 
 incpa_imp
 	read_pc_noinc();
-	m_pa++;
+	m_pa = (m_pa & ~0xff) | ((m_pa+1) & 0xff);
 	set_nz(m_pa&0xff); // startup code seems to require flag to set if low byte is 0x00?
 	prefetch();
 
 incpb_imp
 	read_pc_noinc();
-	m_pb++;
+	m_pb = (m_pb & ~0xff) | ((m_pb+1) & 0xff);
 	set_nz(m_pb&0xff); // startup code seems to require flag to set if low byte is 0x00?
 	prefetch();
 
 decpa_imp
 	read_pc_noinc();
-	m_pa--;
+	m_pa = (m_pa & ~0xff) | ((m_pa-1) & 0xff);
 	set_nz(m_pa&0xff); // startup code seems to require flag to set if low byte is 0x00?
 	prefetch();
 
 decpb_imp
 	read_pc_noinc();
-	m_pb--;
+	m_pb = (m_pb & ~0xff) | ((m_pb-1) & 0xff);
 	set_nz(m_pb&0xff); // startup code seems to require flag to set if low byte is 0x00?
 	prefetch();
 
@@ -322,15 +342,16 @@ eorpa_imp
 	prefetch();
 
 adcpa_imp
-	do_adc(read_full_data_sp(m_pa+Y));
+	do_adc(read_full_data_sp(m_pa));
 	prefetch();
 
 stapa_imp
-	write_full_data_sp(m_pa+Y, A);
+	write_full_data_sp(m_pa, A);
 	prefetch();
 
 ldapa_imp
-	A = read_full_data_sp(m_pa+Y);
+	A = read_full_data_sp(m_pa);
+	set_nz(A);
 	prefetch();
 
 cmppa_imp
@@ -339,7 +360,7 @@ cmppa_imp
 	prefetch();
 
 sbcpa_imp
-	do_sbc(read_full_data_sp(m_pa+Y));
+	do_sbc(read_full_data_sp(m_pa));
 	prefetch();
 
 orapb_imp
@@ -358,15 +379,16 @@ eorpb_imp
 	prefetch();
 
 adcpb_imp
-	do_adc(read_full_data_sp(m_pb+Y));
+	do_adc(read_full_data_sp(m_pb));
 	prefetch();
 
 stapb_imp
-	write_full_data_sp(m_pb+Y, A);
+	write_full_data_sp(m_pb, A);
 	prefetch();
 
 ldapb_imp
-	A = read_full_data_sp(m_pb+Y);
+	A = read_full_data_sp(m_pb);
+	set_nz(A);
 	prefetch();
 
 cmppb_imp
@@ -375,7 +397,7 @@ cmppb_imp
 	prefetch();
 
 sbcpb_imp
-	do_sbc(read_full_data_sp(m_pb+Y));
+	do_sbc(read_full_data_sp(m_pb));
 	prefetch();
 
 stx_aby
@@ -420,8 +442,9 @@ bit_imm
 	prefetch();
 
 asr_zpg
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc_noinc();
+	TMP = read_pc(); // TODO: verify this, should it write back or set A?
+	TMP = read(TMP);
+	do_asr(TMP);
 	prefetch();
 
 asr_aba

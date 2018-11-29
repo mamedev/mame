@@ -747,16 +747,17 @@ MACHINE_CONFIG_START(ambush_state::ambush_base)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(18'432'000)/6/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8912_device &ay1(AY8912(config, "ay1", XTAL(18'432'000)/6/2));
+	ay1.port_a_read_callback().set_ioport("buttons");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, XTAL(18'432'000)/6/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8912_device &ay2(AY8912(config, "ay2", XTAL(18'432'000)/6/2));
+	ay2.port_a_read_callback().set_ioport("joystick");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ambush_state::ambush)
+void ambush_state::ambush(machine_config &config)
+{
 	ambush_base(config);
 
 	// addressable latches at 8B and 8C
@@ -768,7 +769,7 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 	LS259(config, m_outlatch[1]);
 	m_outlatch[1]->q_out_cb<5>().set(FUNC(ambush_state::color_bank_2_w));
 	m_outlatch[1]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_2_w));
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ambush_state::mariobl)
 	ambush_base(config);
@@ -790,13 +791,13 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(ambush_state, mario)
 
-	MCFG_DEVICE_REPLACE("ay1", AY8910, XTAL(18'432'000)/6/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", XTAL(18'432'000)/6/2));
+	ay1.port_a_read_callback().set_ioport("buttons");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.33);
 
-	MCFG_DEVICE_REPLACE("ay2", AY8910, XTAL(18'432'000)/6/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", XTAL(18'432'000)/6/2));
+	ay2.port_a_read_callback().set_ioport("joystick");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ambush_state::mariobla)

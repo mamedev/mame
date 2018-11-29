@@ -34,13 +34,13 @@ ROM_END
 
 // device machine config
 MACHINE_CONFIG_START(cpc_rs232_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_pit, PIT8253, 0)
-	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out0_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out1_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(2000000);
+	m_pit->set_clk<1>(2000000);
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<0>().set(FUNC(cpc_rs232_device::pit_out0_w));
+	m_pit->out_handler<1>().set(FUNC(cpc_rs232_device::pit_out1_w));
+	m_pit->out_handler<2>().set(FUNC(cpc_rs232_device::pit_out2_w));
 
 	Z80DART(config, m_dart, XTAL(4'000'000));
 	m_dart->out_txda_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));

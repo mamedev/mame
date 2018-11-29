@@ -422,11 +422,12 @@ MACHINE_CONFIG_START(hp16500_state::hp1650)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 25000000/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
+	mc6845_device &crtc(MC6845(config, "crtc", 25000000/9));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650), this);
+	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
@@ -443,11 +444,12 @@ MACHINE_CONFIG_START(hp16500_state::hp1651)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 25000000/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
+	mc6845_device &crtc(MC6845(config, "crtc", 25000000/9));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650), this);
+	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
@@ -464,11 +466,12 @@ MACHINE_CONFIG_START(hp16500_state::hp16500a)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x320, 0, 0x240, 0x19c, 0, 0x170 )
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 25000000/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
+	mc6845_device &crtc(MC6845(config, "crtc", 25000000/9));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -493,10 +496,7 @@ MACHINE_CONFIG_START(hp16500_state::hp16500)
 
 	// TODO: for now hook up the ipc hil keyboard - this might be replaced
 	// later with a 16500b specific keyboard implementation
-	hp_hil_slot_device &keyboard(HP_HIL_SLOT(config, "hil1", 0));
-	hp_hil_devices(keyboard);
-	keyboard.set_default_option("hp_ipc_kbd");
-	keyboard.set_hp_hil_slot(this, "mlc");
+	HP_HIL_SLOT(config, "hil1", "mlc", hp_hil_devices, "hp_ipc_kbd");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

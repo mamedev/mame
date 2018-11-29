@@ -36,7 +36,7 @@ Notes: (all IC's shown. Only 16 ICs are used)
             Early PCB revisions used a PLCC68 chip in a socket. Later revisions used a
             PGA68 chip soldered directly into the motherboard
      4164 - 4164 64k x4-bit DRAM (4 chips for 32kbytes total)
-      ROM - Hitachi HN613256 32k x8-bit MASK ROM containing OS & BASIC
+      ROM - Hitachi HN613256 32k x8-bit mask ROM containing OS & BASIC
     LM324 - Texas Instruments LM324 Operational Amplifier
       MOD - UHF TV modulator UM1233-E36
      CVBS - Composite color video output socket

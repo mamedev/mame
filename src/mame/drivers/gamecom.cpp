@@ -24,12 +24,8 @@ Todo:
 Game Status:
 - Inbuilt ROM and PDA functions all work
 - Due to an irritating message, the NVRAM is commented out in the machine config
-- All carts appear to work except:
-- - Lost World: freeze just after entering Stage 2 (the nest).
-- --- If you do nothing it freezes at the point where the stegasaurus
-      should turn around. So, straight away start moving to the right
-      and you can keep playing.
-- Weblink and Internet are of no use as there is nothing to connect to.
+- All carts appear to work, from my limited testing.
+-- indy500 skips some speech just before the trial race starts.
 
 ***************************************************************************/
 
@@ -57,7 +53,7 @@ void gamecom_state::gamecom_mem_map(address_map &map)
 	map(0x4000, 0x5FFF).bankr("bank2");                                   /* External ROM/Flash. Controlled by MMU2 */
 	map(0x6000, 0x7FFF).bankr("bank3");                                   /* External ROM/Flash. Controlled by MMU3 */
 	map(0x8000, 0x9FFF).bankr("bank4");                                   /* External ROM/Flash. Controlled by MMU4 */
-	map(0xA000, 0xDFFF).ram().share("videoram");             /* VRAM */
+	map(0xA000, 0xDFFF).writeonly().share("videoram").nopr();             /* VRAM - writeonly, returns 0 on read, as expected by lostwrld */
 	map(0xE000, 0xFFFF).ram().share("nvram");           /* Extended I/O, Extended RAM */
 }
 

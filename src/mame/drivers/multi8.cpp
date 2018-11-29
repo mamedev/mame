@@ -585,19 +585,20 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, multi8_state, ym2203_porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8912(config, m_aysnd, 1500000); //unknown clock / divider
+	m_aysnd->port_a_write_callback().set(FUNC(multi8_state::ym2203_porta_w));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.50);
 	MCFG_DEVICE_ADD("beeper", BEEP, 1200) // guesswork
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", multi8_state, keyboard_callback, attotime::from_hz(240/32))
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(3'579'545)/2)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(multi8_state, crtc_update_row)
+	H46505(config, m_crtc, XTAL(3'579'545)/2);    /* unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(multi8_state::crtc_update_row), this);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(multi8_state::porta_r));
@@ -608,9 +609,9 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("uart", I8251, 0) // for cassette
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	I8251(config, "uart", 0); // for cassette
+	PIT8253(config, "pit", 0);
+	PIC8259(config, "pic", 0);
 
 	//UPD765A(config, "fdc", false, true);
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats)

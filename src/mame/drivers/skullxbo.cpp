@@ -259,9 +259,10 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_JSA_TEST_PORT("FF5802", 7)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_II(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_jsa->test_read_cb().set_ioport("FF5802").bit(7);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

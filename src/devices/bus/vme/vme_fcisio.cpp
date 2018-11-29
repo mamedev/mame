@@ -275,10 +275,11 @@ ROM_START (fcisio1)
 	ROM_LOAD16_BYTE ("isio-1_v2.1_u.bin", 0xf00000, 0x4000, CRC (67986768) SHA1 (215f7ff90d9dbe2bea54510e3722fb33d4e54193))
 ROM_END
 
-MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
+void vme_fcisio1_card_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, CPU_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP (fcisio1_mem)
+	M68010(config, m_maincpu, CPU_CLOCK / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_fcisio1_card_device::fcisio1_mem);
 
 	/* DUSCC channels */
 #define RS232P1_TAG      "rs232p1"
@@ -290,15 +291,16 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 #define RS232P7_TAG      "rs232p7"
 #define RS232P8_TAG      "rs232p8"
 
-	MCFG_DUSCC68562_ADD("duscc0", DUSCC_CLOCK, 0, 0, 0, 0 )
+	DUSCC68562(config, m_duscc0, DUSCC_CLOCK);
+	m_duscc0->configure_channels(0, 0, 0, 0);
 	/* Port 1 on DUSCC 0 Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	m_duscc0->out_txda_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
+	m_duscc0->out_dtra_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
+	m_duscc0->out_rtsa_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_rts));
 	/* Port 2 on DUSCC 0 Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	m_duscc0->out_txdb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_txd));
+	m_duscc0->out_dtrb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_dtr));
+	m_duscc0->out_rtsb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_rts));
 	/* RS232 for DUSCC 0 */
 	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
 	rs232p1.rxd_handler().set(m_duscc0, FUNC(duscc68562_device::rxa_w));
@@ -308,15 +310,16 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	rs232p2.rxd_handler().set(m_duscc0, FUNC(duscc68562_device::rxb_w));
 	rs232p2.cts_handler().set(m_duscc0, FUNC(duscc68562_device::ctsb_w));
 
-	MCFG_DUSCC68562_ADD("duscc1", DUSCC_CLOCK, 0, 0, 0, 0 )
+	DUSCC68562(config, m_duscc1, DUSCC_CLOCK);
+	m_duscc1->configure_channels(0, 0, 0, 0);
 	/* Port 3 on DUSCC 1 Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	m_duscc1->out_txda_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_txd));
+	m_duscc1->out_dtra_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_dtr));
+	m_duscc1->out_rtsa_callback().set(RS232P3_TAG, FUNC(rs232_port_device::write_rts));
 	/* Port 4 on DUSCC 1 Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
+	m_duscc1->out_txdb_callback().set(RS232P4_TAG, FUNC(rs232_port_device::write_txd));
+	m_duscc1->out_dtrb_callback().set(RS232P4_TAG, FUNC(rs232_port_device::write_dtr));
+	m_duscc1->out_rtsb_callback().set(RS232P4_TAG, FUNC(rs232_port_device::write_rts));
 	/* RS232 for DUSCC 1 */
 	rs232_port_device &rs232p3(RS232_PORT(config, RS232P3_TAG, default_rs232_devices, nullptr));
 	rs232p3.rxd_handler().set(m_duscc1, FUNC(duscc68562_device::rxa_w));
@@ -326,15 +329,16 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	rs232p4.rxd_handler().set(m_duscc1, FUNC(duscc68562_device::rxb_w));
 	rs232p4.cts_handler().set(m_duscc1, FUNC(duscc68562_device::ctsb_w));
 
-	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
+	DUSCC68562(config, m_duscc2, DUSCC_CLOCK);
+	m_duscc2->configure_channels(0, 0, 0, 0);
 	/* Port 5 on DUSCC 2 Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P5_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P5_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P5_TAG, rs232_port_device, write_rts))
+	m_duscc2->out_txda_callback().set(RS232P5_TAG, FUNC(rs232_port_device::write_txd));
+	m_duscc2->out_dtra_callback().set(RS232P5_TAG, FUNC(rs232_port_device::write_dtr));
+	m_duscc2->out_rtsa_callback().set(RS232P5_TAG, FUNC(rs232_port_device::write_rts));
 	/* Port 6 on DUSCC 2 Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P6_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P6_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P6_TAG, rs232_port_device, write_rts))
+	m_duscc2->out_txdb_callback().set(RS232P6_TAG, FUNC(rs232_port_device::write_txd));
+	m_duscc2->out_dtrb_callback().set(RS232P6_TAG, FUNC(rs232_port_device::write_dtr));
+	m_duscc2->out_rtsb_callback().set(RS232P6_TAG, FUNC(rs232_port_device::write_rts));
 	/* RS232 for DUSCC 2 */
 	rs232_port_device &rs232p5(RS232_PORT(config, RS232P5_TAG, default_rs232_devices, nullptr));
 	rs232p5.rxd_handler().set(m_duscc2, FUNC(duscc68562_device::rxa_w));
@@ -344,15 +348,16 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	rs232p6.rxd_handler().set(m_duscc2, FUNC(duscc68562_device::rxb_w));
 	rs232p6.cts_handler().set(m_duscc2, FUNC(duscc68562_device::ctsb_w));
 
-	MCFG_DUSCC68562_ADD("duscc3", DUSCC_CLOCK, 0, 0, 0, 0 )
+	DUSCC68562(config, m_duscc3, DUSCC_CLOCK);
+	m_duscc3->configure_channels(0, 0, 0, 0);
 	/* Port 7 on DUSCC 3 Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P7_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P7_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P7_TAG, rs232_port_device, write_rts))
+	m_duscc3->out_txda_callback().set(RS232P7_TAG, FUNC(rs232_port_device::write_txd));
+	m_duscc3->out_dtra_callback().set(RS232P7_TAG, FUNC(rs232_port_device::write_dtr));
+	m_duscc3->out_rtsa_callback().set(RS232P7_TAG, FUNC(rs232_port_device::write_rts));
 	/* Port 8 on DUSCC 3 Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P8_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P8_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P8_TAG, rs232_port_device, write_rts))
+	m_duscc3->out_txdb_callback().set(RS232P8_TAG, FUNC(rs232_port_device::write_txd));
+	m_duscc3->out_dtrb_callback().set(RS232P8_TAG, FUNC(rs232_port_device::write_dtr));
+	m_duscc3->out_rtsb_callback().set(RS232P8_TAG, FUNC(rs232_port_device::write_rts));
 	/* RS232 for DUSCC 4 */
 	rs232_port_device &rs232p7(RS232_PORT(config, RS232P7_TAG, default_rs232_devices, nullptr));
 	rs232p7.rxd_handler().set(m_duscc3, FUNC(duscc68562_device::rxa_w));
@@ -365,8 +370,8 @@ MACHINE_CONFIG_START(vme_fcisio1_card_device::device_add_mconfig)
 	PIT68230(config, m_pit, XTAL(20'000'000) / 2);
 	m_pit->pb_in_callback().set(FUNC(vme_fcisio1_card_device::config_rd));
 
-	MC68153(config, "bim", XTAL(20'000'000) / 2);
-MACHINE_CONFIG_END
+	MC68153(config, m_bim, XTAL(20'000'000) / 2);
+}
 
 const tiny_rom_entry *vme_fcisio1_card_device::device_rom_region() const
 {

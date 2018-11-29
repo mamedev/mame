@@ -1341,8 +1341,7 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, m_aysnd, CPU_CLOCK / 6).add_route(ALL_OUTPUTS, "speaker", 0.3); /* no ports used */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(videopkr_state::fortune1)

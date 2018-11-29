@@ -82,7 +82,7 @@ WRITE8_MEMBER(novag68k_state::diablo68k_control_w)
 	// d0: HD44780 E
 	// d1: HD44780 RS
 	if (m_lcd_control & ~data & 1)
-		m_lcd->write(space, m_lcd_control >> 1 & 1, m_lcd_data);
+		m_lcd->write(m_lcd_control >> 1 & 1, m_lcd_data);
 	m_lcd_control = data & 3;
 
 	// d7: enable beeper
@@ -130,7 +130,7 @@ WRITE8_MEMBER(novag68k_state::scorpio68k_control_w)
 	// d0: HD44780 E
 	// d1: HD44780 RS
 	if (m_lcd_control & ~data & 1)
-		m_lcd->write(space, m_lcd_control >> 1 & 1, m_lcd_data);
+		m_lcd->write(m_lcd_control >> 1 & 1, m_lcd_data);
 	m_lcd_control = data & 3;
 
 	// d7: enable beeper

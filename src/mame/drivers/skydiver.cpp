@@ -151,12 +151,11 @@ WRITE_LINE_MEMBER(skydiver_state::nmion_w)
 INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
 {
 	/* Convert range data to divide value and write to sound */
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_discrete->write(space, SKYDIVER_RANGE_DATA, (0x01 << (~m_videoram[0x394] & 0x07)) & 0xff);   // Range 0-2
+	m_discrete->write(SKYDIVER_RANGE_DATA, (0x01 << (~m_videoram[0x394] & 0x07)) & 0xff);   // Range 0-2
 
-	m_discrete->write(space, SKYDIVER_RANGE3_EN,  m_videoram[0x394] & 0x08);       // Range 3 - note disable
-	m_discrete->write(space, SKYDIVER_NOTE_DATA, ~m_videoram[0x395] & 0xff);       // Note - freq
-	m_discrete->write(space, SKYDIVER_NOISE_DATA,  m_videoram[0x396] & 0x0f);  // NAM - Noise Amplitude
+	m_discrete->write(SKYDIVER_RANGE3_EN,  m_videoram[0x394] & 0x08);       // Range 3 - note disable
+	m_discrete->write(SKYDIVER_NOTE_DATA, ~m_videoram[0x395] & 0xff);       // Note - freq
+	m_discrete->write(SKYDIVER_NOISE_DATA,  m_videoram[0x396] & 0x0f);  // NAM - Noise Amplitude
 
 	if (m_nmion)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);

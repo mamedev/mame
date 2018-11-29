@@ -651,7 +651,7 @@ MACHINE_CONFIG_START(midwunit_state::wunit)
 	MCFG_VIDEO_START_OVERRIDE(midwunit_state,midwunit)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
+	DCS_AUDIO_8K(config, m_dcs, 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midwunit_state::wunit_picsim)

@@ -329,10 +329,11 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_SCREEN_UPDATE_DRIVER(carrera_state, screen_update_carrera)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carrera)
 	MCFG_PALETTE_ADD("palette", 32)
@@ -341,11 +342,11 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/12));
 	/* these are set as input, but I have no idea which input port it uses is for the AY */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, carrera_state, unknown_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, carrera_state, unknown_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	aysnd.port_a_read_callback().set(FUNC(carrera_state::unknown_r));
+	aysnd.port_b_read_callback().set(FUNC(carrera_state::unknown_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 

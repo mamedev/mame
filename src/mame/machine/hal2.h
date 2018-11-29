@@ -59,8 +59,6 @@ protected:
 
 	uint32_t m_iar;
 	uint32_t m_idr[4];
-
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
 
 DECLARE_DEVICE_TYPE(SGI_HAL2, hal2_device)

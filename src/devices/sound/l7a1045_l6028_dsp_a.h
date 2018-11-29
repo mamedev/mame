@@ -24,6 +24,8 @@ public:
 
 	DECLARE_READ8_MEMBER(dma_r_cb);
 	DECLARE_WRITE8_MEMBER(dma_w_cb);
+	DECLARE_READ16_MEMBER(dma_r16_cb) { m_voice[0].pos++; return 0; }
+	DECLARE_WRITE16_MEMBER(dma_w16_cb) { m_voice[0].pos++; }
 	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
 
 protected:

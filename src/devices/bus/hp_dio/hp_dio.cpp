@@ -11,9 +11,11 @@
 #include "hp98265a.h"
 #include "hp98543.h"
 #include "hp98544.h"
+#include "hp98550.h"
 #include "hp98603a.h"
 #include "hp98603b.h"
 #include "hp98620.h"
+#include "hp98643.h"
 #include "hp98644.h"
 #include "human_interface.h"
 
@@ -206,7 +208,7 @@ void dio16_device::set_dmar(unsigned int index, unsigned int num, int state)
 		m_dmar[num] &= ~(1 << index);
 
 
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 
 		if (card->get_index() == index)
 			continue;
@@ -224,7 +226,7 @@ void dio16_device::set_dmar(unsigned int index, unsigned int num, int state)
 
 void dio16_device::dmack_w_out(int index, int channel, uint8_t val)
 {
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 		if (card->get_index() == index)
 			continue;
 		card->dmack_w_in(channel, val);
@@ -235,7 +237,7 @@ uint8_t dio16_device::dmack_r_out(int index, int channel)
 {
 	uint8_t ret = 0xff;
 
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 		if (card->get_index() == index)
 			continue;
 		ret &= card->dmack_r_in(channel);
@@ -245,7 +247,7 @@ uint8_t dio16_device::dmack_r_out(int index, int channel)
 
 WRITE_LINE_MEMBER(dio16_device::reset_in)
 {
-	for (auto & card:m_cards) {
+	for (auto &card : m_cards) {
 		if (card->get_index() != m_bus_index)
 			card->reset_in(state);
 	}
@@ -359,12 +361,15 @@ void dio16_cards(device_slot_interface & device)
 	device.option_add("98544", HPDIO_98544);
 	device.option_add("98603a", HPDIO_98603A);
 	device.option_add("98603b", HPDIO_98603B);
+	device.option_add("98643", HPDIO_98643);
 	device.option_add("98644", HPDIO_98644);
 	device.option_add("human_interface", HPDIO_HUMAN_INTERFACE);
 }
 
 void dio32_cards(device_slot_interface & device)
 {
+	dio16_cards(device);
 	device.option_add("98265a", HPDIO_98265A);
+	device.option_add("98550", HPDIO_98550);
 	device.option_add("98620", HPDIO_98620);
 }

@@ -702,18 +702,18 @@ MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2149_device &ay1(YM2149(config, "ay1", 18432000/12));
+	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
+	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2149_device &ay2(YM2149(config, "ay2", 18432000/12));
+	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
+	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tehkanwc_state, adpcm_int)) /* interrupt function */
@@ -721,18 +721,19 @@ MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tehkanwc_state::tehkanwcb)
+void tehkanwc_state::tehkanwcb(machine_config &config)
+{
 	tehkanwc(config);
-	MCFG_DEVICE_REPLACE("ay1", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18432000/12));
+	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
+	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_REPLACE("ay2", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18432000/12));
+	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
+	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 void tehkanwc_state::init_teedoff()

@@ -990,8 +990,7 @@ MACHINE_CONFIG_START(avt_state::avt)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK/2)    /* 1.25 MHz.?? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, "aysnd", CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.00);    /* 1.25 MHz.?? */
 
 	// device never addressed by cpu
 	z80ctc_device& ctc(Z80CTC(config, "ctc0", CPU_CLOCK)); // U27

@@ -428,7 +428,7 @@ inline void crt9007_device::recompute_parameters()
 	// visible area
 	rectangle visarea(m_hsync_end, horiz_pix_total - 1, m_vsync_end, vert_pix_total - 1);
 
-	LOG("CRT9007 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, ATTOSECONDS_TO_HZ(refresh.as_attoseconds()));
+	LOG("CRT9007 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, refresh.as_hz());
 	LOG("CRT9007 Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 
 	//screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());

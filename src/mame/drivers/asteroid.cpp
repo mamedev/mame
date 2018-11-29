@@ -1032,6 +1032,8 @@ ROM_START( astdelux )
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+
+	ROM_REGION( 0x40, "earom", ROMREGION_ERASE00 ) // default to zero fill to suppress invalid high score display
 ROM_END
 
 ROM_START( astdelux2 )
@@ -1047,6 +1049,8 @@ ROM_START( astdelux2 )
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+
+	ROM_REGION( 0x40, "earom", ROMREGION_ERASE00 ) // default to zero fill to suppress invalid high score display
 ROM_END
 
 /***************************************************************************
@@ -1100,6 +1104,8 @@ ROM_START( astdelux1 )
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+
+	ROM_REGION( 0x40, "earom", ROMREGION_ERASE00 ) // default to zero fill to suppress invalid high score display
 ROM_END
 
 ROM_START( llander )

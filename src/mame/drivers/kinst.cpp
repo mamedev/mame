@@ -743,7 +743,7 @@ MACHINE_CONFIG_START(kinst_state::kinst)
 	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_dcs, DCS_AUDIO_2K, 0)
+	DCS_AUDIO_2K(config, m_dcs, 0);
 MACHINE_CONFIG_END
 
 

@@ -5,6 +5,10 @@
     Jaleco Exerion
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_EXERION_H
+#define MAME_INCLUDES_EXERION_H
+
+#pragma once
 
 #include "emupal.h"
 #include "screen.h"
@@ -26,15 +30,16 @@
 class exerion_state : public driver_device
 {
 public:
-	exerion_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	exerion_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void exerion(machine_config &config);
 	void irion(machine_config &config);
@@ -86,3 +91,5 @@ private:
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_EXERION_H

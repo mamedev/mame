@@ -5,9 +5,10 @@
  * includes/nc.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_NC_H
 #define MAME_INCLUDES_NC_H
+
+#pragma once
 
 #include "bus/centronics/ctronics.h"
 #include "machine/upd765.h"     // for NC200 disk drive interface

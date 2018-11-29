@@ -1210,11 +1210,9 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)  /* 1.536 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)  /* 1.536 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
 MACHINE_CONFIG_END
 
 
@@ -1281,13 +1279,11 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay2", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
 MACHINE_CONFIG_END
 
 void cclimber_state::guzzler(machine_config &config)

@@ -31,7 +31,6 @@
 #include "machine/input_merger.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 
@@ -477,11 +476,11 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000)/2));
 	i8087.set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
 	i8087.set_data_width(16);
-	i8087.irq().set("pic8259", FUNC(pic8259_device::ir0_w));
+	i8087.irq().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// IFSP port on processor card
 	i8255_device &ppi(I8255(config, "ppi8255"));
@@ -527,14 +526,12 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	m_video_bankdev->set_data_width(8);
 	m_video_bankdev->set_stride(0x10000);
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 1230750));
-	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg3));
-
 	Z80CTC(config, m_ctc, 16_MHz_XTAL/3);
 	m_ctc->intr_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
+	m_ctc->set_clk<0>(1230750);
+	m_ctc->set_clk<1>(1230750);
+	m_ctc->set_clk<2>(1230750);
+	m_ctc->set_clk<3>(1230750);
 	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80sio_device::rxca_w));
 	m_ctc->zc_callback<0>().append(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));

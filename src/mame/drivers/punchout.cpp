@@ -672,8 +672,8 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "mono").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
 	MCFG_DEVICE_ADDRESS_MAP(0, punchout_vlm_map)
@@ -688,9 +688,9 @@ MACHINE_CONFIG_START(punchout_state::spnchout)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(spnchout_io_map)
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, 0) // OSCIN -> Vcc
-	MCFG_RP5C01_REMOVE_BATTERY()
-	MCFG_RP5H01_ADD("rp5h01")
+	RP5C01(config, m_rtc, 0); // OSCIN -> Vcc
+	m_rtc->remove_battery();
+	RP5H01(config, m_rp5h01, 0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(punchout_state, spnchout)
 MACHINE_CONFIG_END

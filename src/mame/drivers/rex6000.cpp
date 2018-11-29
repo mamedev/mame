@@ -937,8 +937,8 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
 
-	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, rex6000_state, alarm_irq))
+	tc8521_device &rtc(TC8521(config, TC8521_TAG, XTAL(32'768)));
+	rtc.out_alarm_callback().set(FUNC(rex6000_state::alarm_irq));
 
 	/*
 	Fujitsu 29DL16X has a feature which is capable of reading data from one
@@ -1002,8 +1002,8 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd", 0)
 
-	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, rex6000_state, alarm_irq))
+	tc8521_device &rtc(TC8521(config, TC8521_TAG, XTAL(32'768)));
+	rtc.out_alarm_callback().set(FUNC(rex6000_state::alarm_irq));
 
 	SHARP_LH28F016S(config, m_flash0a);
 	SHARP_LH28F016S(config, m_flash1a);

@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(goal92_state::goal92)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 2500000/2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, goal92_state, irqhandler))

@@ -386,13 +386,14 @@ MACHINE_CONFIG_START(qix_state::qix_video)
 
 	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
 
-	MCFG_MC6845_ADD("vid_u18", MC6845, "screen", QIX_CHARACTER_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(qix_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(qix_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, qix_state, display_enable_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, qix_state, qix_vsync_changed))
+	MC6845(config, m_crtc, QIX_CHARACTER_CLOCK);
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_begin_update_callback(FUNC(qix_state::crtc_begin_update), this);
+	m_crtc->set_update_row_callback(FUNC(qix_state::crtc_update_row), this);
+	m_crtc->out_de_callback().set(FUNC(qix_state::display_enable_changed));
+	m_crtc->out_vsync_callback().set(FUNC(qix_state::qix_vsync_changed));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100) /* from CRTC */

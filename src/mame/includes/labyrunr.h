@@ -5,6 +5,10 @@
     Labyrinth Runner
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_LABYRUNR_H
+#define MAME_INCLUDES_LABYRUNR_H
+
+#pragma once
 
 #include "video/k007121.h"
 #include "video/k051733.h"
@@ -14,8 +18,8 @@
 class labyrunr_state : public driver_device
 {
 public:
-	labyrunr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	labyrunr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_k007121(*this, "k007121"),
 		m_maincpu(*this,"maincpu"),
 		m_scrollram(*this, "scrollram"),
@@ -24,7 +28,8 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void labyrunr(machine_config &config);
 
@@ -62,3 +67,5 @@ private:
 	INTERRUPT_GEN_MEMBER(labyrunr_timer_interrupt);
 	void labyrunr_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_LABYRUNR_H

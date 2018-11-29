@@ -160,9 +160,9 @@ Notes:
 
       ROMs
       ----
-         PGM_M01S.U18 - 16MBit MASKROM (TSOP48)
-         PGM_P01S.U20 - 1MBit  MASKROM (DIP40, socketed, equivalent to 27C1024 EPROM)
-         PGM_T01S.U29 - 16MBit MASKROM (SOP44)
+         PGM_M01S.U18 - 16MBit mask ROM (TSOP48)
+         PGM_P01S.U20 - 1MBit  mask ROM (DIP40, socketed, equivalent to 27C1024 EPROM)
+         PGM_T01S.U29 - 16MBit mask ROM (SOP44)
 
       CUSTOM IC's
       -----------
@@ -544,9 +544,9 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	/*sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
+	GENERIC_LATCH_8(config, m_soundlatch3);
 
 	MCFG_ICS2115_ADD("ics", 0)
 	MCFG_ICS2115_IRQ_CB(INPUTLINE("soundcpu", 0))
@@ -922,8 +922,8 @@ Notes:
       V-110X.U2    - AM27C4096 4MBit EPROM (DIP42, labelled "DRAGON II V-100C")
 
       PALs         - x3, labelled "CZ U3", "CZ U4", "CZ U6"
-      *1           - Unpopulated position for MX23C4100 SOP40 MASKROM
-      *2           - Unpopulated position for MX23C4100 DIP40 EPROM/MASKROM
+      *1           - Unpopulated position for MX23C4100 SOP40 mask ROM
+      *2           - Unpopulated position for MX23C4100 DIP40 EPROM/mask ROM
 
 
 IGS PCB NO-0135
@@ -941,7 +941,7 @@ IGS PCB NO-0135
   |--------------------||---------------------|
 
 Notes:
-      This PCB contains only SOP44 MASKROMS and 2 logic IC's
+      This PCB contains only SOP44 mask ROMS and 2 logic IC's
       Only U5 and U9 are populated
 
       glitch on select screen exists on real board.
@@ -1151,10 +1151,10 @@ IGS025 ASIC
 1x PAL
 2x 27C040 EPROMs (main 68k program)
 1x 27C512 EPROM (protection code?)
-1x 32MBit smt MASKROM (T0400)
+1x 32MBit smt mask ROM (T0400)
 
 Bottom board contains.....
-4x 32MBit smt MASKROMs (A0400, A0401, B0400, M0400)
+4x 32MBit smt mask ROMs (A0400, A0401, B0400, M0400)
 
 */
 
@@ -1987,7 +1987,7 @@ Notes:
       U5           - 27C4000 4MBit EPROM (DIP32, labelled "KB U5 V104")
       U6           - 27C4000 4MBit EPROM (DIP32, labelled "KB U6 V104")
       PALs         - x3, labelled "DH U8", "DH U1", "DH U7"
-      *            - Unpopulated position for DIP42 EPROM/MASKROM (labelled "P0300")
+      *            - Unpopulated position for DIP42 EPROM/mask ROM (labelled "P0300")
 
 
 IGS PCB NO-0178
@@ -2005,19 +2005,19 @@ IGS PCB NO-0178
   |--------------------||---------------------|
 
 Notes:
-      U1           - 32MBit MASKROM (SOP44, labelled "M0300")
-      U2           - 32MBit MASKROM (SOP44, labelled "A0307")
-      U3           - 16MBit MASKROM (DIP42, labelled "A0302")
-      U4           - 16MBit MASKROM (DIP42, labelled "A0304")
-      U5           - 16MBit MASKROM (DIP42, labelled "A0305")
-      U8           - 16MBit MASKROM (DIP42, labelled "B0301")
-      U9           - 32MBit MASKROM (SOP44, labelled "A0300")
-      U10          - 32MBit MASKROM (SOP44, labelled "A0301")
-      U11          - 32MBit MASKROM (SOP44, labelled "A0303")
-      U12          - 32MBit MASKROM (SOP44, labelled "A0306")
-      U13          - 32MBit MASKROM (SOP44, labelled "B0300")
-      U14          - 32MBit MASKROM (SOP44, labelled "B0302")
-      U15          - 32MBit MASKROM (SOP44, labelled "B0303")
+      U1           - 32MBit mask ROM (SOP44, labelled "M0300")
+      U2           - 32MBit mask ROM (SOP44, labelled "A0307")
+      U3           - 16MBit mask ROM (DIP42, labelled "A0302")
+      U4           - 16MBit mask ROM (DIP42, labelled "A0304")
+      U5           - 16MBit mask ROM (DIP42, labelled "A0305")
+      U8           - 16MBit mask ROM (DIP42, labelled "B0301")
+      U9           - 32MBit mask ROM (SOP44, labelled "A0300")
+      U10          - 32MBit mask ROM (SOP44, labelled "A0301")
+      U11          - 32MBit mask ROM (SOP44, labelled "A0303")
+      U12          - 32MBit mask ROM (SOP44, labelled "A0306")
+      U13          - 32MBit mask ROM (SOP44, labelled "B0300")
+      U14          - 32MBit mask ROM (SOP44, labelled "B0302")
+      U15          - 32MBit mask ROM (SOP44, labelled "B0303")
 
 */
 
@@ -2169,7 +2169,7 @@ Notes:
       U1_V100MG.U1  - MX27C4000 512K x8 EPROM (DIP32, labelled 'PuzzleStar U1 V100MG')
       U2_V100MG.U2  - MX27C4000 512K x8 EPROM (DIP32, labelled 'PuzzleStar U2 V100MG')
       PAL           - Atmel ATF22V10B PAL (DIP24, labelled 'EA U4')
-      U3            - Unpopulated position for 32MBit MASKROM (DIP42)
+      U3            - Unpopulated position for 32MBit mask ROM (DIP42)
       U6, U7        - Unpopulated position for 74LS245 logic chip (x2)
 
 
@@ -2248,7 +2248,7 @@ Notes:
       V101.U2/3/4/5- MX27C4000 4MBit EPROM (DIP32)
       PALs         - x2, labelled "CW-2 U8", "CW-2 U7"
       6264         - 8K x8 SRAM
-      *1           - Unpopulated position for SOP44 MASKROM labelled "P0500"
+      *1           - Unpopulated position for SOP44 mask ROM labelled "P0500"
 
 
 IGS PCB NO-0135

@@ -465,9 +465,10 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, (VDP_CLOCK/48)); //unknown divider
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
 
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)
@@ -499,13 +500,13 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 //  SPEAKER(config, "rspeaker").front_right();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
-	MCFG_SOUND_ROUTE(0, "x1_l",  0.25)
-	MCFG_SOUND_ROUTE(0, "x1_r", 0.25)
-	MCFG_SOUND_ROUTE(1, "x1_l",  0.5)
-	MCFG_SOUND_ROUTE(2, "x1_r", 0.5)
+	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
+	ay.port_a_read_callback().set_ioport("P1");
+	ay.port_b_read_callback().set_ioport("P2");
+	ay.add_route(0, "x1_l", 0.25);
+	ay.add_route(0, "x1_r", 0.25);
+	ay.add_route(1, "x1_l", 0.5);
+	ay.add_route(2, "x1_r", 0.5);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 
 	MCFG_CASSETTE_ADD("cassette")

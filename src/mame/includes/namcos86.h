@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_NAMCOS86_H
+#define MAME_INCLUDES_NAMCOS86_H
+
+#pragma once
+
 #include "machine/watchdog.h"
 #include "sound/namco.h"
 #include "sound/n63701x.h"
@@ -109,3 +114,5 @@ private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,uint8_t *vram);
 	void set_scroll(int layer);
 };
+
+#endif // MAME_INCLUDES_NAMCOS86_H

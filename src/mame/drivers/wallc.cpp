@@ -320,7 +320,7 @@ void wallc_state::unkitpkr_map(address_map &map)
 	map(0xb100, 0xb100).w(FUNC(wallc_state::unkitpkr_out1_w));
 	map(0xb200, 0xb200).w(FUNC(wallc_state::unkitpkr_out2_w));
 	map(0xb500, 0xb500).w("aysnd", FUNC(ay8912_device::address_w));
-	map(0xb600, 0xb600).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));  // Port A = DSW
+	map(0xb600, 0xb600).rw("aysnd", FUNC(ay8912_device::data_r), FUNC(ay8910_device::data_w));  // Port A = DSW
 }
 
 
@@ -536,8 +536,7 @@ MACHINE_CONFIG_START(wallc_state::wallc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8912, 12288000 / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8912(config, "aysnd", 12288000 / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wallc_state::wallca)
@@ -557,9 +556,9 @@ MACHINE_CONFIG_START(wallc_state::unkitpkr)
 	MCFG_PALETTE_INIT_OWNER(wallc_state, unkitpkr)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("aysnd")
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	subdevice<ay8912_device>("aysnd")->port_a_read_callback().set_ioport("DSW2");
+	subdevice<ay8912_device>("aysnd")->reset_routes();
+	subdevice<ay8912_device>("aysnd")->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wallc_state::sidampkr)

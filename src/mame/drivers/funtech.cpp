@@ -514,8 +514,7 @@ MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* M5255, ? MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 1.00); /* M5255, ? MHz */
 MACHINE_CONFIG_END
 
 

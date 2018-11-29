@@ -188,35 +188,35 @@ void locomotn_audio_device::locomotn_sound_map(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(timeplt_audio_device::device_add_mconfig)
-
+void timeplt_audio_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_soundcpu, Z80, DERIVED_CLOCK(1, 8))
-	MCFG_DEVICE_PROGRAM_MAP(timeplt_sound_map)
+	Z80(config, m_soundcpu, DERIVED_CLOCK(1, 8));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &timeplt_audio_device::timeplt_sound_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, DERIVED_CLOCK(1, 8))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(m_soundlatch, generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, timeplt_audio_device, portB_r))
-	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
-	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
-	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)
+	ay8910_device &ay1(AY8910(config, "ay1", DERIVED_CLOCK(1, 8)));
+	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.port_b_read_callback().set(FUNC(timeplt_audio_device::portB_r));
+	ay1.add_route(0, "filter.0.0", 0.60);
+	ay1.add_route(1, "filter.0.1", 0.60);
+	ay1.add_route(2, "filter.0.2", 0.60);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, DERIVED_CLOCK(1, 8))
-	MCFG_SOUND_ROUTE(0, "filter.1.0", 0.60)
-	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
-	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
+	ay8910_device &ay2(AY8910(config, "ay2", DERIVED_CLOCK(1, 8)));
+	ay2.add_route(0, "filter.1.0", 0.60);
+	ay2.add_route(1, "filter.1.1", 0.60);
+	ay2.add_route(2, "filter.1.2", 0.60);
 
 	for (required_device<filter_rc_device> &filter : m_filter_0)
 		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	for (required_device<filter_rc_device> &filter : m_filter_1)
 		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(locomotn_audio_device::device_add_mconfig)

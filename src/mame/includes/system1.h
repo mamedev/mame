@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
+#ifndef MAME_INCLUDES_SYSTEM1_H
+#define MAME_INCLUDES_SYSTEM1_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
@@ -13,8 +17,8 @@
 class system1_state : public driver_device
 {
 public:
-	system1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	system1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_pio(*this, "pio"),
 		m_ram(*this, "ram"),
@@ -35,7 +39,7 @@ public:
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d"),
 		m_banked_decrypted_opcodes(nullptr)
-		{ }
+	{ }
 
 	void sys1ppix_315_5051(machine_config &config);
 	void sys1ppisx_315_5064(machine_config &config);
@@ -207,3 +211,5 @@ private:
 	void system1_pio_io_map(address_map &map);
 	void system1_ppi_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SYSTEM1_H

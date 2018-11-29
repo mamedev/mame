@@ -1537,7 +1537,7 @@ MACHINE_CONFIG_START(tandy200_state::tandy200)
 	i8155.in_pc_callback().set(FUNC(tandy200_state::i8155_pc_r));
 	i8155.out_to_callback().set(FUNC(tandy200_state::i8155_to_w));
 
-	MCFG_DEVICE_ADD(RP5C01A_TAG, RP5C01, XTAL(32'768))
+	RP5C01(config, m_rtc, XTAL(32'768));
 
 	i8251_device &i8251(I8251(config, I8251_TAG, 0)); /*XTAL(4'915'200)/2,*/
 	i8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

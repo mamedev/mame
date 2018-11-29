@@ -986,17 +986,17 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, gladiatr_state_base, ym_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ppking_state, ppking_f1_r))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
-	MCFG_SOUND_ROUTE(2, "mono", 0.60)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL/8)); /* verified on pcb */
+	ymsnd.irq_handler().set(FUNC(gladiatr_state_base::ym_irq));
+	ymsnd.port_a_read_callback().set(FUNC(ppking_state::ppking_f1_r));
+	ymsnd.port_b_read_callback().set_ioport("DSW3");
+	ymsnd.add_route(0, "mono", 0.60);
+	ymsnd.add_route(1, "mono", 0.60);
+	ymsnd.add_route(2, "mono", 0.60);
+	ymsnd.add_route(3, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
@@ -1078,16 +1078,16 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, gladiatr_state_base, ym_irq))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, gladiatr_state, gladiator_int_control_w)) /* port A write */
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
-	MCFG_SOUND_ROUTE(2, "mono", 0.60)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL/8)); /* verified on pcb */
+	ymsnd.irq_handler().set(FUNC(gladiatr_state_base::ym_irq));
+	ymsnd.port_b_read_callback().set_ioport("DSW3");
+	ymsnd.port_a_write_callback().set(FUNC(gladiatr_state::gladiator_int_control_w));
+	ymsnd.add_route(0, "mono", 0.60);
+	ymsnd.add_route(1, "mono", 0.60);
+	ymsnd.add_route(2, "mono", 0.60);
+	ymsnd.add_route(3, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */

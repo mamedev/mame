@@ -5,6 +5,10 @@
     Break Thru
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_BRKTRHU_H
+#define MAME_INCLUDES_BRKTRHU_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
@@ -12,8 +16,8 @@
 class brkthru_state : public driver_device
 {
 public:
-	brkthru_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	brkthru_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -21,7 +25,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fg_videoram;
@@ -65,3 +70,5 @@ public:
 	void darwin_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BRKTRHU_H

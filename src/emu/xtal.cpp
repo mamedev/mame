@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /*************************************************************************
 
-    xtal.h
+    xtal.cpp
 
     Documentation and consistent naming for known existing crystals.
 
@@ -155,6 +155,7 @@ const double XTAL::known_xtals[] = {
 	 10'816'000, /* 10.816_MHz_XTAL        Universal 1979-1980 (Cosmic Alien, etc) */
 	 10'920'000, /* 10.92_MHz_XTAL         ADDS Viewpoint 60, Viewpoint A2 */
 	 11'000'000, /* 11_MHz_XTAL            Mario I8039 sound */
+	 11'004'000, /* 11.004_MHz_XTAL        TI 911 VDT */
 	 11'059'200, /* 11.0592_MHz_XTAL       Used with MCS-51 to generate common baud rates */
 	 11'200'000, /* 11.2_MHz_XTAL          New York, New York */
 	 11'289'000, /* 11.289_MHz_XTAL        Vanguard */
@@ -182,6 +183,7 @@ const double XTAL::known_xtals[] = {
 	 13'400'000, /* 13.4_MHz_XTAL          TNK3, Ikari Warriors h/w */
 	 13'478'400, /* 13.4784_MHz_XTAL       TeleVideo 970 80-column display clock */
 	 13'495'200, /* 13.4952_MHz_XTAL       Used on Shadow Force pcb and maybe other Technos pcbs? */
+	 13'500'000, /* 13.5_MHz_XTAL          Microbee */
 	 13'516'800, /* 13.5168_MHz_XTAL       Kontron KDT6 */
 	 13'608'000, /* 13.608_MHz_XTAL        TeleVideo 910 & 925 */
 	 13'824'000, /* 13.824_MHz_XTAL        Robotron PC-1715 display circuit */
@@ -199,6 +201,7 @@ const double XTAL::known_xtals[] = {
 	 14'976'000, /* 14.976_MHz_XTAL        CIT-101 80-column display clock */
 	 15'000'000, /* 15_MHz_XTAL            Sinclair QL, Amusco Poker */
 	 15'148'800, /* 15.1488_MHz_XTAL       Zentec 9002/9003 */
+	 15'206'400, /* 15.2064_MHz_XTAL       Falco TS-1 */
 	 15'288'000, /* 15.288_MHz_XTAL        DEC VT220 80-column display clock */
 	 15'300'720, /* 15.30072_MHz_XTAL      Microterm 420 */
 	 15'360'000, /* 15.36_MHz_XTAL         Visual 1050 */
@@ -371,10 +374,12 @@ const double XTAL::known_xtals[] = {
 	 72'000'000, /* 72_MHz_XTAL            Aristocrat MKV */
 	 72'576'000, /* 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede" */
 	 73'728'000, /* 73.728_MHz_XTAL        Ms. Pac-Man/Galaga 20th Anniversary */
+	 77'414'400, /* 77.4144_MHz_XTAL       NCD17c */
 	 80'000'000, /* 80_MHz_XTAL            ARM710 */
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
+	108'108'000, /* 108.108_MHz_XTAL       HP 98550 high-res color card */
 	200'000'000  /* 200_MHz_XTAL           Base SH4 CPU (Naomi, Hikaru etc.) */
 };
 

@@ -566,10 +566,11 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bw12)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(16'000'000)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bw12_state, crtc_update_row)
+	MC6845(config, m_crtc, XTAL(16'000'000)/8);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(bw12_state::crtc_update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -598,13 +599,13 @@ MACHINE_CONFIG_START(bw12_state::common)
 	m_sio->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(1'843'200))
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, bw12_state, pit_out0_w))
-	MCFG_PIT8253_CLK1(XTAL(1'843'200))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_sio, z80dart_device, rxtxcb_w))
-	MCFG_PIT8253_CLK2(XTAL(1'843'200))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, bw12_state, pit_out2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(1'843'200));
+	m_pit->out_handler<0>().set(FUNC(bw12_state::pit_out0_w));
+	m_pit->set_clk<1>(XTAL(1'843'200));
+	m_pit->out_handler<1>().set(m_sio, FUNC(z80dart_device::rxtxcb_w));
+	m_pit->set_clk<2>(XTAL(1'843'200));
+	m_pit->out_handler<2>().set(FUNC(bw12_state::pit_out2_w));
 
 	AY3600(config, m_kbc, 0);
 	m_kbc->x0().set_ioport("X0");

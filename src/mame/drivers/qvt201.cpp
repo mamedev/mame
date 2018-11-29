@@ -21,6 +21,7 @@ public:
 	qvt201_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainnmi(*this, "mainnmi")
 		, m_eia(*this, "eia")
 		, m_screen(*this, "screen")
 		, m_p_chargen(*this, "chargen")
@@ -40,6 +41,7 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<input_merger_device> m_mainnmi;
 	required_device<rs232_port_device> m_eia;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_p_chargen;
@@ -73,11 +75,12 @@ WRITE8_MEMBER(qvt201_state::duart_out_w)
 	// OP3 = 132/_80
 	// OP4 = SRV
 	// OP5 = BLOCK/_UL
-	// OP6 = preset NMI flipflop
+	// OP6 = preset MBC NMI flipflop
 	// OP7 = _DATA/TALK (EIA pin 14)
 
 	m_eia->write_rts(BIT(data, 0));
 	m_eia->write_dtr(BIT(data, 1));
+	m_mainnmi->in_w<1>(!BIT(data, 6));
 }
 
 void qvt201_state::mem_map(address_map &map)
@@ -100,8 +103,11 @@ MACHINE_CONFIG_START(qvt201_state::qvt201)
 	MCFG_DEVICE_ADD("maincpu", Z80, 3.6864_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map) // IORQ is not used at all
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainint") // open collector
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
+	input_merger_device &mainint(INPUT_MERGER_ANY_HIGH(config, "mainint")); // open collector
+	mainint.output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
+	input_merger_device &mainnmi(INPUT_MERGER_ALL_HIGH(config, "mainnmi"));
+	mainnmi.output_handler().set_inputline("maincpu", INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("duart", SCN2681, 3.6864_MHz_XTAL) // XTAL not directly connected
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("mainint", input_merger_device, in_w<1>))
@@ -126,6 +132,7 @@ MACHINE_CONFIG_START(qvt201_state::qvt201)
 	scn2672_device &crtc(SCN2672(config, "crtc", 48.654_MHz_XTAL / 30));
 	crtc.set_character_width(10); // 9 in 132-column mode
 	crtc.intr_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
+	crtc.breq_callback().set("mainnmi", FUNC(input_merger_device::in_w<0>));
 	crtc.set_screen("screen");
 MACHINE_CONFIG_END
 

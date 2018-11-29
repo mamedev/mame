@@ -852,7 +852,7 @@ MACHINE_CONFIG_START(namcos21_c67_state::namcos21)
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_gfxdecode_tag("gfxdecode");
-	m_c355spr->set_is_namcofl(false);
+	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr->set_palxor(0xf); // reverse mapping
 	m_c355spr->set_gfxregion(0);
@@ -865,9 +865,7 @@ MACHINE_CONFIG_START(namcos21_c67_state::namcos21)
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
+	YM2151(config, "ymsnd", 3579580).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos21_c67_state::aircomb)

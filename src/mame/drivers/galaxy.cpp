@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL/4) // FIXME: really no output routes for this AY?
+	AY8910(config, "ay8910", XTAL/4); // FIXME: really no output routes for this AY?
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )

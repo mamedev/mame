@@ -355,13 +355,13 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
 
 	/* AY clock speeds confirmed to match known recording */
-	MCFG_DEVICE_ADD(m_ay8910[0], AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay8910[0], XTAL(15'000'000)/8);
+	//m_ay8910[0]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD(m_ay8910[1], AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay8910[1], XTAL(15'000'000)/8);
+	//m_ay8910[1]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

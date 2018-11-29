@@ -35,7 +35,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -46,7 +45,6 @@ protected:
 private:
 	required_ioport_array<4> m_channel;
 	required_ioport m_buttons;
-	required_memory_region m_rom;
 };
 
 class bbc_bitstik1_device : public bbc_bitstik_device

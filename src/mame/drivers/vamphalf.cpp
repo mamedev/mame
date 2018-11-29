@@ -36,8 +36,8 @@
 
  Notes:
 
- Mr Kicker: Doesn't boot without a valid default eeprom, but no longer seems to fail
-            after you get a high score (since eeprom rewrite).
+ Mr Kicker: Doesn't boot without a valid default EEPROM, but no longer seems to fail
+            after you get a high score (since EEPROM rewrite).
 
  Boong-Ga Boong-Ga: the test mode is usable with a standard input configuration like the "common" one
 
@@ -1035,7 +1035,7 @@ static INPUT_PORTS_START( aoh )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // eeprom bit
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM bit
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1133,9 +1133,7 @@ MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'000'000)/8) /* 3.5MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(28'000'000)/8).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); /* 3.5MHz */
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(28'000'000)/16 , okim6295_device::PIN7_HIGH) /* 1.75MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -1153,9 +1151,7 @@ MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); /* 3.579545 MHz */
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -1167,9 +1163,9 @@ MACHINE_CONFIG_START(vamphalf_state::sound_qs1000)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
+	m_soundlatch->set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
@@ -1319,9 +1315,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("oki_1", OKIM6295, XTAL(32'000'000)/8, okim6295_device::PIN7_HIGH) /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -1409,7 +1403,7 @@ Ealier DANBI PCB:
 Graphics: Actel A40MX04-F PL84
    Sound: Oki M6295 rebaged as U6295
           YM3012/YM2151 rebaged as KA3002/KA51
-    ROMs: ROML01, ROMU01 - SOP44 32MBit MASK ROM for ELC & EVI
+    ROMs: ROML01, ROMU01 - SOP44 32MBit mask ROM for ELC & EVI
           ROML00, ROMU00 - unpopulated
    DRAM1: LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
 
@@ -1447,7 +1441,7 @@ ROM_START( vamphalfr1 )
 	ROM_LOAD( "ws1-01201.rom1", 0x80000, 0x80000, CRC(afa75c19) SHA1(5dac104d1b3c026b6fce4d1f9126c048ebb557ef) ) /* at 0x162B8: Europe Version 1.0.0903 */
 
 	ROM_REGION( 0x800000, "gfx", 0 ) /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "elc.roml01", 0x000000, 0x400000, CRC(19df4056) SHA1(8b05769d8e245f8b25bf92013b98c9d7e5ab4548) ) /* only 2 roms, though twice as big as other sets */
+	ROM_LOAD32_WORD( "elc.roml01", 0x000000, 0x400000, CRC(19df4056) SHA1(8b05769d8e245f8b25bf92013b98c9d7e5ab4548) ) /* only 2 ROMs, though twice as big as other sets */
 	ROM_LOAD32_WORD( "evi.romu01", 0x000002, 0x400000, CRC(f9803923) SHA1(adc1d4fa2c6283bc24829f924b58fbd9d1bacdd2) )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
@@ -2213,7 +2207,7 @@ Wivern Wings (c) 2001 SemiCom / Wyvern Wings (c) 2001 SemiCom, Game Vision Licen
 
    CPU: Hyperstone E1-32T
  Video: 2 QuickLogic QL12x16B-XPL84 FPGA
- Sound: AdMOS QDSP1000 with QDSP QS1001A sample rom
+ Sound: AdMOS QDSP1000 with QDSP QS1001A sample ROM
    OSC: 50MHz, 28MHz & 24MHz
 EEPROM: 93C46
 
@@ -2256,8 +2250,8 @@ F-E1-32-010-D
 S1 is the setup button
 S2 is the reset button
 
-ROMH & ROML are all MX 29F1610MC-16 flash roms
-u15A is a MX 29F1610MC-16 flash rom
+ROMH & ROML are all MX 29F1610MC-16 flash ROMs
+u15A is a MX 29F1610MC-16 flash ROM
 u7 is a ST 27c1001
 ROM1 & ROM2 are both ST 27C4000D
 
@@ -2275,7 +2269,7 @@ ROM_START( wivernwg )
 	ROM_RELOAD(      0x60000, 0x20000 )
 
 	ROM_REGION( 0x1000000, "gfx", 0 )  /* gfx data */
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) ) /* MX 29F1610MC-16 flash roms with no labels */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) ) /* MX 29F1610MC-16 flash ROMs with no labels */
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(516aca48) SHA1(42cf5678eb4c0ee7da2ab0bd66e4e34b2735c75a) )
 	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1c764f95) SHA1(ba6ac1376e837b491bc0269f2a1d10577a3d40cb) )
 	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fee42c63) SHA1(a27b5cbca0defa9be85fee91dde1273f445d3372) )
@@ -2285,7 +2279,7 @@ ROM_START( wivernwg )
 	ROM_LOAD32_WORD( "h03",    0xc00002, 0x200000, CRC(ade8af9f) SHA1(05cdc1b38dec9d8a86302f2de794391fd3e376a5) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* Music data / QDSP samples (SFX) */
-	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) ) /* MX 29F1610MC-16 flash rom with no label */
+	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) ) /* MX 29F1610MC-16 flash ROM with no label */
 	ROM_LOAD( "qs1001a",     0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -2301,7 +2295,7 @@ ROM_START( wyvernwg )
 	ROM_RELOAD(      0x60000, 0x20000 )
 
 	ROM_REGION( 0x1000000, "gfx", 0 )  /* gfx data */
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) ) /* MX 29F1610MC-16 flash roms with no labels */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) ) /* MX 29F1610MC-16 flash ROMs with no labels */
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(516aca48) SHA1(42cf5678eb4c0ee7da2ab0bd66e4e34b2735c75a) )
 	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1c764f95) SHA1(ba6ac1376e837b491bc0269f2a1d10577a3d40cb) )
 	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fee42c63) SHA1(a27b5cbca0defa9be85fee91dde1273f445d3372) )
@@ -2311,7 +2305,7 @@ ROM_START( wyvernwg )
 	ROM_LOAD32_WORD( "romh03", 0xc00002, 0x200000, CRC(e01c2a92) SHA1(f53c2db92d62f595d473b1835c46d426f0dbe6b3) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* Music data / QDSP samples (SFX) */
-	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) ) /* MX 29F1610MC-16 flash rom with no label */
+	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) ) /* MX 29F1610MC-16 flash ROM with no label */
 	ROM_LOAD( "qs1001a",     0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -2327,7 +2321,7 @@ ROM_START( wyvernwga )
 	ROM_RELOAD(      0x60000, 0x20000 )
 
 	ROM_REGION( 0x1000000, "gfx", 0 )  /* gfx data */
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) ) /* MX 29F1610MC-16 flash roms with no labels */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) ) /* MX 29F1610MC-16 flash ROMs with no labels */
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(516aca48) SHA1(42cf5678eb4c0ee7da2ab0bd66e4e34b2735c75a) )
 	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1c764f95) SHA1(ba6ac1376e837b491bc0269f2a1d10577a3d40cb) )
 	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fee42c63) SHA1(a27b5cbca0defa9be85fee91dde1273f445d3372) )
@@ -2337,7 +2331,7 @@ ROM_START( wyvernwga )
 	ROM_LOAD32_WORD( "romh03", 0xc00002, 0x200000, CRC(e01c2a92) SHA1(f53c2db92d62f595d473b1835c46d426f0dbe6b3) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* Music data / QDSP samples (SFX) */
-	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) ) /* MX 29F1610MC-16 flash rom with no label */
+	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) ) /* MX 29F1610MC-16 flash ROM with no label */
 	ROM_LOAD( "qs1001a",     0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -2469,7 +2463,7 @@ CPU - Hyperstone E1-32T @ 50.000MHz
 OSC - 50MHz, 27MHz, 24MHz & 7.3728MHz (unpopulated)
 
 QDSP QS1000 @ 24MHz (silkscreened as SND1)
-     QS1001A Sample rom (silkscreened as SND3)
+     QS1001A Sample ROM (silkscreened as SND3)
      SND2 Additional sound samples
      SND5 8052 CPU code for QS1000?
 
@@ -2558,7 +2552,7 @@ SEMICOM-003a
 +---------------------------------------------+
 
 ROM1 & U7 are 27C040
-ROML00 & ROMH00 are MX 29F1610MC flashroms
+ROML00 & ROMH00 are MX 29F1610MC flash ROMs
 ROM0, ROML01 & ROMH01 are unpopulated
 YM2151, YM3012 & M6295 badged as BS901, BS902 & U6295
 CRAM are MCM6206BAEJ15
@@ -2622,7 +2616,7 @@ SEMICOM-003b
 +---------------------------------------------+
 
 ROM1 & U7 are 27C040
-ROML00 & ROMH00 are MX 29F1610MC flashroms
+ROML00 & ROMH00 are MX 29F1610MC flash ROMs
 ROM0, ROML01 & ROMH01 are unpopulated
 YM2151, YM3012 & M6295 badged as U6651, U6612 & AD-65
 CRAM are MCM6206BAEJ15
@@ -3564,7 +3558,7 @@ GAME( 1999, poosho,     0,        jmpbreak,  common,   vamphalf_state,      init
 
 GAME( 1999, newxpang,   0,        newxpang,  common,   vamphalf_state,      init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang" , MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, worldadv,   0,        worldadv,  common,   vamphalf_state,      init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, worldadv,   0,        worldadv,  common,   vamphalf_state,      init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure" , MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time
 
 GAME( 1999, suplup,     0,        suplup,    common,   vamphalf_state,      init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup,     suplup,   suplup,    common,   vamphalf_state,      init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
@@ -3579,8 +3573,8 @@ GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,   vamphalf_state,      init
 
 GAME( 2000, dquizgo2,   0,        coolmini,  common,   vamphalf_state,      init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2" , MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, misncrft,   0,        misncrft,  common,   vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, misncrfta,  misncrft, misncrft,  common,   vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, misncrft,   0,        misncrft,  common,   vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time (you can usually complete 1 loop)
+GAME( 2000, misncrfta,  misncrft, misncrft,  common,   vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME( 2000, mrdig,      0,        mrdig,     common,   vamphalf_state,      init_mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
 
@@ -3589,13 +3583,13 @@ GAME( 2001, dtfamily,   0,        mrkicker,  common,   vamphalf_state,      init
 GAME( 2001, finalgdr,   0,        finalgdr,  finalgdr, vamphalf_nvram_state,init_finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2001, mrkicker,   0,        mrkicker,  common,   vamphalf_state,      init_mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr, vamphalf_nvram_state,init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow eeprom saving works then this set corrupts the eeprom and then won't boot
+GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr, vamphalf_nvram_state,init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow EEPROM saving, then this set corrupts the EEPROM and then won't boot
 
 GAME( 2001, toyland,    0,        coolmini,  common,   vamphalf_state,      init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, wivernwg,   0,        wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, wivernwg,   0,        wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // gives a protection error after a certain number of plays / coins?
+GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,   vamphalf_qdsp_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
 GAME( 2001, aoh,        0,        aoh,       aoh,      vamphalf_state,      init_aoh,       ROT0,   "Unico",                         "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", MACHINE_SUPPORTS_SAVE )
 

@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	I8214(config, m_pic, XTAL(18'432'000) / 9);
 	m_pic->int_wr_callback().set(FUNC(ms6102_state::irq_w));
 
-	MCFG_DEVICE_ADD("earom", KR1601RR1, 0)
+	KR1601RR1(config, m_earom, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -359,11 +359,11 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->rxd_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'400'000) / 9)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("i8251", i8251_device, write_txc))
-	MCFG_PIT8253_CLK1(XTAL(16'400'000) / 9)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("i8251", i8251_device, write_rxc))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(XTAL(16'400'000) / 9);
+	pit8253.out_handler<0>().set(m_i8251, FUNC(i8251_device::write_txc));
+	pit8253.set_clk<1>(XTAL(16'400'000) / 9);
+	pit8253.out_handler<1>().set(m_i8251, FUNC(i8251_device::write_rxc));
 MACHINE_CONFIG_END
 
 ROM_START( ms6102 )

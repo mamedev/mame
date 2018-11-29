@@ -187,12 +187,12 @@ void hp9k3xx_state::hp9k360_map(address_map &map)
 	map(0xff000000, 0xffffffff).ram();
 }
 
-// 9000/370 - 8 MB RAM standard
+// 9000/370 - with 48 MB RAM (max. configuration)
 void hp9k3xx_state::hp9k370_map(address_map &map)
 {
 	hp9k3xx_common(map);
 	// main memory
-	map(0xff800000, 0xffffffff).ram();
+	map(0xfd000000, 0xffffffff).ram();
 }
 
 // 9000/380 - '040
@@ -283,13 +283,16 @@ void hp9k3xx_state::add_dio32_bus(machine_config &config)
 	dio32.irq7_out_cb().set(FUNC(hp9k3xx_state::dio_irq7_w));
 }
 
-void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
+void hp9k3xx_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
+	if (m_maincpu->m68851_buserror(address))
+		return;
+
 	if (m_bus_error)
 		return;
 
 	m_bus_error = true;
-	m_maincpu->set_buserror_details(address, write, m_maincpu->get_fc());
+	m_maincpu->set_buserror_details(address, rw, m_maincpu->get_fc());
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_bus_error_timer->adjust(m_maincpu->cycles_to_attotime(16)); // let rmw cycles complete
 }
@@ -297,14 +300,14 @@ void hp9k3xx_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mas
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
 	if (!machine().side_effects_disabled())
-		set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
+		set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
 	return 0xffff;
 }
 
 WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 {
 	if (!machine().side_effects_disabled())
-		set_bus_error((offset << 1) & 0xFFFFFF, true, mem_mask);
+		set_bus_error((offset << 1) & 0xFFFFFF, false, mem_mask);
 }
 
 READ32_MEMBER(hp9k3xx_state::buserror_r)
@@ -339,11 +342,12 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 
 	add_dio16_bus(config);
 
-	DIO16_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", false);
+	DIO16_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
 	DIO16_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98544", false);
 	DIO16_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
-	DIO16_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
-	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, nullptr, false);
+	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98643", false);
+	DIO16_SLOT(config, "sl4", 0, "diobus", dio16_cards, "98644", false);
+	DIO16_SLOT(config, "sl5", 0, "diobus", dio16_cards, nullptr, false);
 
 MACHINE_CONFIG_END
 
@@ -354,13 +358,13 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	hp9k300(config);
 	add_dio32_bus(config);
 
-	DIO32_SLOT(config, "sl0", 0, "diobus", dio16_cards, "human_interface", true);
-	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, "98543", false);
-	DIO32_SLOT(config, "sl2", 0, "diobus", dio16_cards, "98603b", false);
-	DIO32_SLOT(config, "sl3", 0, "diobus", dio16_cards, "98644", false);
+	DIO32_SLOT(config, "sl0", 0, "diobus", dio32_cards, "human_interface", true);
+	DIO32_SLOT(config, "sl1", 0, "diobus", dio32_cards, "98543", false);
+	DIO32_SLOT(config, "sl2", 0, "diobus", dio32_cards, "98603b", false);
+	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98644", false);
 	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98620", false);
 	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, "98265a", false);
-	DIO32_SLOT(config, "sl6", 0, "diobus", dio16_cards, nullptr, false);
+	DIO32_SLOT(config, "sl7", 0, "diobus", dio32_cards, nullptr, false);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
@@ -400,29 +404,40 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k340)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k360)
-	hp9k320(config);
 
-	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp9k370_map)
+	hp9k300(config);
+
+	MCFG_DEVICE_ADD(m_maincpu, M68030, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp9k360_map)
+
+	add_dio32_bus(config);
+
+	DIO32_SLOT(config, "sl0", 0, "diobus", dio32_cards, "human_interface", true);
+	DIO32_SLOT(config, "sl1", 0, "diobus", dio32_cards, "98550", false);
+	DIO32_SLOT(config, "sl2", 0, "diobus", dio32_cards, "98644", false);
+	DIO32_SLOT(config, "sl3", 0, "diobus", dio32_cards, "98620", false);
+	DIO32_SLOT(config, "sl4", 0, "diobus", dio32_cards, "98265a", false);
+	DIO32_SLOT(config, "sl5", 0, "diobus", dio32_cards, nullptr, false);
+
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k370)
-	hp9k320(config);
+	hp9k360(config);
 
 	MCFG_DEVICE_REPLACE(m_maincpu, M68030, 33000000)
 	MCFG_DEVICE_PROGRAM_MAP(hp9k370_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k380)
-	hp9k320(config);
+	hp9k360(config);
 
 	MCFG_DEVICE_REPLACE(m_maincpu, M68040, 25000000)
 	MCFG_DEVICE_PROGRAM_MAP(hp9k380_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k382)
-	hp9k320(config);
+	hp9k360(config);
 
 	MCFG_DEVICE_REPLACE(m_maincpu, M68040, 25000000)
 	MCFG_DEVICE_PROGRAM_MAP(hp9k382_map)

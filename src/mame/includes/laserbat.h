@@ -33,9 +33,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_gfxmix(*this, "gfxmix")
-		, m_pvi1(*this, "pvi1")
-		, m_pvi2(*this, "pvi2")
-		, m_pvi3(*this, "pvi3")
+		, m_pvi(*this, "pvi%u", 1U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_scanline_timer(nullptr)
 		, m_gfx1(nullptr)
@@ -107,13 +105,11 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	// video devices
-	required_device<screen_device>      m_screen;
-	required_device<palette_device>     m_palette;
-	required_device<pla_device>         m_gfxmix;
-	required_device<s2636_device>       m_pvi1;
-	required_device<s2636_device>       m_pvi2;
-	required_device<s2636_device>       m_pvi3;
-	required_device<gfxdecode_device>   m_gfxdecode;
+	required_device<screen_device>         m_screen;
+	required_device<palette_device>        m_palette;
+	required_device<pla_device>            m_gfxmix;
+	required_device_array<s2636_device, 3> m_pvi;
+	required_device<gfxdecode_device>      m_gfxdecode;
 
 	// stuff for rendering video
 	emu_timer       *m_scanline_timer;

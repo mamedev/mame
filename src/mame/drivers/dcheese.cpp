@@ -405,8 +405,8 @@ MACHINE_CONFIG_START(dcheese_state::dcheese)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("bsmt", BSMT2000, SOUND_OSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.2)

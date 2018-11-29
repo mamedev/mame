@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-DRC_CPUS = { "E1", "SH", "MIPS", "POWERPC", "RSP", "ARM7", "ADSP21062", "MB86235", "DSP16" }
+DRC_CPUS = { "E1", "SH", "MIPS3", "POWERPC", "RSP", "ARM7", "ADSP21062", "MB86235", "DSP16" }
 CPU_INCLUDE_DRC = false
 for i, v in ipairs(DRC_CPUS) do
 	if (CPUS[v]~=null) then
@@ -1072,6 +1072,7 @@ if (CPUS["I386"]~=null) then
 		MAME_DIR .. "src/devices/cpu/i386/i486ops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/pentops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87ops.hxx",
+		MAME_DIR .. "src/devices/cpu/i386/x87priv.h",
 	}
 end
 
@@ -1253,27 +1254,27 @@ end
 
 --------------------------------------------------
 -- MIPS R3000 (MIPS I/II) series
---@src/devices/cpu/mips/r3000.h,CPUS["R3000"] = true
+--@src/devices/cpu/mips/mips1.h,CPUS["MIPS1"] = true
 --------------------------------------------------
 
-if (CPUS["R3000"]~=null) then
+if (CPUS["MIPS1"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/cpu/mips/r3000.cpp",
-		MAME_DIR .. "src/devices/cpu/mips/r3000.h",
+		MAME_DIR .. "src/devices/cpu/mips/mips1.cpp",
+		MAME_DIR .. "src/devices/cpu/mips/mips1.h",
 	}
 end
 
-if (CPUS["R3000"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/r3kdasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/r3kdasm.h")
+if (CPUS["MIPS1"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/mips1dsm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/mips1dsm.h")
 end
 
 --------------------------------------------------
 -- MIPS R4000 (MIPS III/IV) series
---@src/devices/cpu/mips/mips3.h,CPUS["MIPS"] = true
+--@src/devices/cpu/mips/mips3.h,CPUS["MIPS3"] = true
 --------------------------------------------------
 
-if (CPUS["MIPS"]~=null) then
+if (CPUS["MIPS3"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/mips/mips3com.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/mips3com.h",
@@ -1282,6 +1283,7 @@ if (CPUS["MIPS"]~=null) then
 		MAME_DIR .. "src/devices/cpu/mips/mips3fe.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/mips3fe.h",
 		MAME_DIR .. "src/devices/cpu/mips/mips3drc.cpp",
+		MAME_DIR .. "src/devices/cpu/mips/o2dprintf.hxx",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vu.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vu.h",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.cpp",
@@ -1289,7 +1291,7 @@ if (CPUS["MIPS"]~=null) then
 	}
 end
 
-if (CPUS["MIPS"]~=null or _OPTIONS["with-tools"]) then
+if (CPUS["MIPS3"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/mips3dsm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/mips3dsm.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mips/vudasm.cpp")
@@ -1746,7 +1748,7 @@ end
 -- NEC V-series Intel-compatible
 --@src/devices/cpu/nec/nec.h,CPUS["NEC"] = true
 --@src/devices/cpu/nec/v25.h,CPUS["NEC"] = true
---@src/devices/cpu/nec/v53.h,CPUS["NEC"] = true
+--@src/devices/cpu/nec/v5x.h,CPUS["NEC"] = true
 --@src/devices/cpu/v30mz/v30mz.h,CPUS["V30MZ"] = true
 --------------------------------------------------
 
@@ -1766,8 +1768,8 @@ if (CPUS["NEC"]~=null) then
 		MAME_DIR .. "src/devices/cpu/nec/v25.cpp",
 		MAME_DIR .. "src/devices/cpu/nec/v25.h",
 		MAME_DIR .. "src/devices/cpu/nec/v25sfr.cpp",
-		MAME_DIR .. "src/devices/cpu/nec/v53.cpp",
-		MAME_DIR .. "src/devices/cpu/nec/v53.h",
+		MAME_DIR .. "src/devices/cpu/nec/v5x.cpp",
+		MAME_DIR .. "src/devices/cpu/nec/v5x.h",
 	}
 end
 

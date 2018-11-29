@@ -53,19 +53,12 @@ Namco System 1 Video Hardware
 
 ***************************************************************************/
 
-template <int Offset>
-TILE_GET_INFO_MEMBER(namcos1_state::get_tile_info)
+void namcos1_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {
-	int code;
-
-	tile_index <<= 1;
-	tile_index += Offset;
-	code = m_videoram[tile_index + 1] + ((m_videoram[tile_index] & 0x3f) << 8);
-	SET_TILE_INFO_MEMBER(0,code,0,0);
-	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
+	code &= 0x3fff;
+	*tile = code;
+	*mask = code;
 }
-
-
 
 /***************************************************************************
 
@@ -76,27 +69,6 @@ TILE_GET_INFO_MEMBER(namcos1_state::get_tile_info)
 void namcos1_state::video_start()
 {
 	int i;
-
-	/* initialize playfields */
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x0000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x2000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x4000>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x6000>),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x7010>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
-	m_bg_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::get_tile_info<0x7810>),this),TILEMAP_SCAN_ROWS,8,8,36,28);
-
-	for (i = 0; i < 4; i++)
-	{
-		static const int xdisp[] = { 25, 27, 28, 29 };
-
-		m_bg_tilemap[i]->set_scrolldx(xdisp[i], 434 - xdisp[i]);
-		m_bg_tilemap[i]->set_scrolldy(-8, 256 + 8);
-	}
-
-	m_bg_tilemap[4]->set_scrolldx(73, 73);
-	m_bg_tilemap[5]->set_scrolldx(73, 73);
-	m_bg_tilemap[4]->set_scrolldy(16, 16);
-	m_bg_tilemap[5]->set_scrolldy(16, 16);
 
 	/* set table for sprite color == 0x7f */
 	for (i = 0;i < 15;i++)
@@ -110,7 +82,6 @@ void namcos1_state::video_start()
 	for (i = 0x0800;i < 0x1000;i++)
 		m_c116->shadow_table()[i] = i + 0x0800;
 
-	memset(m_playfield_control, 0, sizeof(m_playfield_control));
 	m_copy_sprites = 0;
 
 	save_item(NAME(m_copy_sprites));
@@ -123,25 +94,6 @@ void namcos1_state::video_start()
   Memory handlers
 
 ***************************************************************************/
-
-WRITE8_MEMBER( namcos1_state::videoram_w )
-{
-	m_videoram[offset] = data;
-	if (offset < 0x7000)
-	{   /* background 0-3 */
-		int layer = offset >> 13;
-		int num = (offset & 0x1fff) >> 1;
-		m_bg_tilemap[layer]->mark_tile_dirty(num);
-	}
-	else
-	{   /* foreground 4-5 */
-		int layer = (offset >> 11 & 1) + 4;
-		int num = ((offset & 0x7ff) - 0x10) >> 1;
-		if (num >= 0 && num < 0x3f0)
-			m_bg_tilemap[layer]->mark_tile_dirty(num);
-	}
-}
-
 
 WRITE8_MEMBER( namcos1_state::spriteram_w )
 {
@@ -187,7 +139,7 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	uint8_t *spriteram = m_spriteram + 0x800;
 	const uint8_t *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
 	const uint8_t *finish = &spriteram[0];
-	gfx_element *gfx = m_gfxdecode->gfx(1);
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = spriteram[0x07f7];
@@ -255,7 +207,7 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 uint32_t namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i, j, scrollx, scrolly, priority;
+	int i;
 	rectangle new_clip = cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
@@ -277,39 +229,15 @@ uint32_t namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	if (new_clip.empty())
 		return 0;
 
-
-	/* set palette base */
-	for (i = 0;i < 6;i++)
-		m_bg_tilemap[i]->set_palette_offset((m_playfield_control[i + 24] & 7) * 256);
-
-	for (i = 0;i < 4;i++)
-	{
-		j = i << 2;
-		scrollx = ( m_playfield_control[j+1] + (m_playfield_control[j+0]<<8) );
-		scrolly = ( m_playfield_control[j+3] + (m_playfield_control[j+2]<<8) );
-
-		if (flip_screen())
-		{
-			scrollx = -scrollx;
-			scrolly = -scrolly;
-		}
-
-		m_bg_tilemap[i]->set_scrollx(0,scrollx);
-		m_bg_tilemap[i]->set_scrolly(0,scrolly);
-	}
-
+	m_c123tmap->init_scroll(flip_screen());
 
 	screen.priority().fill(0, new_clip);
 
 	/* bit 0-2 priority */
 	/* bit 3   disable  */
-	for (priority = 0; priority < 8;priority++)
+	for (int priority = 0; priority < 8; priority++)
 	{
-		for (i = 0;i < 6;i++)
-		{
-			if (m_playfield_control[16 + i] == priority)
-				m_bg_tilemap[i]->draw(screen, bitmap, new_clip, 0,priority,0);
-		}
+		m_c123tmap->draw(screen, bitmap, new_clip, priority, priority, 0);
 	}
 
 	draw_sprites(screen, bitmap, new_clip);
@@ -335,5 +263,9 @@ WRITE_LINE_MEMBER(namcos1_state::screen_vblank)
 
 			m_copy_sprites = 0;
 		}
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+		m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+		m_mcu->set_input_line(HD6301_IRQ_LINE, ASSERT_LINE);
 	}
 }

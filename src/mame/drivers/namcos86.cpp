@@ -1084,9 +1084,7 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
-	MCFG_SOUND_ROUTE(0, "mono", 0.0)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)   /* only right channel is connected */
+	YM2151(config, "ymsnd", 3579580).add_route(0, "mono", 0.0).add_route(1, "mono", 0.60);   /* only right channel is connected */
 
 	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)

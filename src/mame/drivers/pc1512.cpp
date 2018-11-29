@@ -1199,20 +1199,20 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pc1512_state, pit1_w))
-	MCFG_PIT8253_CLK2(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pc1512_state, pit2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<1>().set(FUNC(pc1512_state::pit1_w));
+	m_pit->set_clk<2>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<2>().set(FUNC(pc1512_state::pit2_w));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq().set(I8259A2_TAG, FUNC(pic8259_device::ir2_w));
+	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, pc1512_state, fdc_int_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, pc1512_state, fdc_drq_w))
+	PC_FDC_XT(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(pc1512_state::fdc_int_w));
+	m_fdc->drq_wr_callback().set(FUNC(pc1512_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 
@@ -1220,7 +1220,7 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
-	m_uart->out_int_callback().set(I8259A2_TAG, FUNC(pic8259_device::ir4_w));
+	m_uart->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_ack))
@@ -1238,17 +1238,17 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
-	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(I8086_TAG)
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq3_w))
+	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
+	isa.set_cputag(I8086_TAG);
+	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
+	isa.irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	isa.irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	isa.irq5_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	isa.irq6_callback().set(m_pic, FUNC(pic8259_device::ir6_w));
+	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
+	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
+	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
+	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
@@ -1330,20 +1330,20 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pc1512_base_state, pit1_w))
-	MCFG_PIT8253_CLK2(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pc1512_base_state, pit2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<1>().set(FUNC(pc1512_base_state::pit1_w));
+	m_pit->set_clk<2>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<2>().set(FUNC(pc1512_base_state::pit2_w));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq().set(I8259A2_TAG, FUNC(pic8259_device::ir2_w));
+	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, pc1512_base_state, fdc_int_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, pc1512_base_state, fdc_drq_w))
+	PC_FDC_XT(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(pc1512_base_state::fdc_int_w));
+	m_fdc->drq_wr_callback().set(FUNC(pc1512_base_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
 
@@ -1351,7 +1351,7 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
-	m_uart->out_int_callback().set(I8259A2_TAG, FUNC(pic8259_device::ir4_w));
+	m_uart->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_ack))
@@ -1369,17 +1369,17 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
-	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(I8086_TAG)
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq3_w))
+	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
+	isa.set_cputag(I8086_TAG);
+	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
+	isa.irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	isa.irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	isa.irq5_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	isa.irq6_callback().set(m_pic, FUNC(pic8259_device::ir6_w));
+	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
+	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
+	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
+	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)

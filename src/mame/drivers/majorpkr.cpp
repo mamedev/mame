@@ -1026,10 +1026,11 @@ MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	MCFG_PALETTE_ADD("palette", 0x100 * 16)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)  // verified.
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_VISAREA_ADJUST(0, -16, 0, 0)
-	MCFG_MC6845_CHAR_WIDTH(16)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));  // verified.
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_visarea_adjust(0, -16, 0, 0);
+	crtc.set_char_width(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

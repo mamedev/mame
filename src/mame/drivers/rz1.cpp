@@ -245,7 +245,7 @@ READ8_MEMBER( rz1_state::port_a_r )
 	if ((BIT(m_port_b, 7) == 0) && (BIT(m_port_b, 6) == 1))
 	{
 		// Not clear why, but code expects to read busy flag from PA5 rather than PA7
-		return bitswap<8>(m_hd44780->read(space, BIT(m_port_b, 5)), 5, 6, 7, 4, 3, 2, 1, 0);
+		return bitswap<8>(m_hd44780->read(BIT(m_port_b, 5)), 5, 6, 7, 4, 3, 2, 1, 0);
 	}
 
 	logerror("port_a_r (PB = %02x)\n", m_port_b);
@@ -257,7 +257,7 @@ WRITE8_MEMBER( rz1_state::port_a_w )
 	m_port_a = data;
 
 	if ((BIT(m_port_b, 7) == 0) && (BIT(m_port_b, 6) == 0))
-		m_hd44780->write(space, BIT(m_port_b, 5), data);
+		m_hd44780->write(BIT(m_port_b, 5), data);
 }
 
 // 7-------  lcd e

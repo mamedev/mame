@@ -246,18 +246,18 @@ void bosco_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		{
 			int x,y;
 
-			if ( (set_a == m_star_seed_tab[star_cntr].set) || ( set_b == m_star_seed_tab[star_cntr].set) )
+			if ((set_a == s_star_seed_tab[star_cntr].set) || (set_b == s_star_seed_tab[star_cntr].set))
 			{
-				x = (m_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256;
-				y = (m_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
+				x = (s_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256;
+				y = (s_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
 
 				/* don't draw the stars that are off the screen */
-				if ( x < 224 )
+				if (x < 224)
 				{
 					if (flip) x += 64;
 
 					if (cliprect.contains(x, y))
-						bitmap.pix16(y, x) = STARS_COLOR_BASE + m_star_seed_tab[star_cntr].col;
+						bitmap.pix16(y, x) = STARS_COLOR_BASE + s_star_seed_tab[star_cntr].col;
 				}
 			}
 		}

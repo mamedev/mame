@@ -540,10 +540,11 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
 	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mycom_state, crtc_update_row)
+	MC6845(config, m_crtc, 1008000);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row), this);
 
 	SPEAKER(config, "mono").front_center();
 

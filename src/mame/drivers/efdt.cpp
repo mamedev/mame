@@ -582,19 +582,19 @@ MACHINE_CONFIG_START( efdt_state::efdt )
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, AY8910_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, efdt_state, soundlatch_0_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, efdt_state, soundlatch_1_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_1_w))
+	ay8910_device &ay1(AY8910(config, "ay1", AY8910_CLOCK));
+	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
+	ay1.port_a_read_callback().set(FUNC(efdt_state::soundlatch_0_r));
+	ay1.port_b_read_callback().set(FUNC(efdt_state::soundlatch_1_r));
+	ay1.port_a_write_callback().set(FUNC(efdt_state::soundlatch_0_w));
+	ay1.port_b_write_callback().set(FUNC(efdt_state::soundlatch_1_w));
 
-	MCFG_DEVICE_ADD("ay2", AY8910, AY8910_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, efdt_state, soundlatch_2_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, efdt_state, soundlatch_3_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_3_w))
+	ay8910_device &ay2(AY8910(config, "ay2", AY8910_CLOCK));
+	ay2.add_route(ALL_OUTPUTS, "mono", 1.0);
+	ay2.port_a_read_callback().set(FUNC(efdt_state::soundlatch_2_r));
+	ay2.port_b_read_callback().set(FUNC(efdt_state::soundlatch_3_r));
+	ay2.port_a_write_callback().set(FUNC(efdt_state::soundlatch_2_w));
+	ay2.port_b_write_callback().set(FUNC(efdt_state::soundlatch_3_w));
 
 MACHINE_CONFIG_END
 

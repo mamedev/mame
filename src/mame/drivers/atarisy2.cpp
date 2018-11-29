@@ -1189,9 +1189,9 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
+	M6502(config, m_audiocpu, SOUND_CLOCK/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &atarisy2_state::sound_map);
+	m_audiocpu->set_periodic_int("soundcomm", FUNC(atari_sound_comm_device::sound_irq_gen), attotime::from_hz(MASTER_CLOCK/2/16/16/16/10));
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
@@ -1233,12 +1233,12 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu").int_callback().set_nop();
+	ATARI_SOUND_COMM(config, m_soundcomm, m_audiocpu).int_callback().set_nop();
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, m_ym2151, SOUND_CLOCK/4);
+	m_ym2151->add_route(0, "lspeaker", 0.60);
+	m_ym2151->add_route(1, "rspeaker", 0.60);
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, SOUND_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))

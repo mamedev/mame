@@ -175,8 +175,8 @@ DISCRETE_SOUND_END
 
 READ8_MEMBER( abc800_state::pling_r )
 {
-	m_discrete->write(space, NODE_01, 0);
-	m_discrete->write(space, NODE_01, 1);
+	m_discrete->write(NODE_01, 0);
+	m_discrete->write(NODE_01, 1);
 
 	return 0xff;
 }

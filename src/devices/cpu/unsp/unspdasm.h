@@ -2,7 +2,7 @@
 // copyright-holders:Segher Boessenkool
 /*****************************************************************************
 
-    SunPlus micro'nSP disassembler
+    SunPlus µ'nSP disassembler
 
     Copyright 2008-2017  Segher Boessenkool  <segher@kernel.crashing.org>
     Licensed under the terms of the GNU GPL, version 2

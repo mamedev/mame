@@ -1018,19 +1018,19 @@ void state_entry::flip_data()
 		case 2:
 			data16 = (u16 *)m_data;
 			for (count = 0; count < m_typecount; count++)
-				data16[count] = flipendian_int16(data16[count]);
+				data16[count] = swapendian_int16(data16[count]);
 			break;
 
 		case 4:
 			data32 = (u32 *)m_data;
 			for (count = 0; count < m_typecount; count++)
-				data32[count] = flipendian_int32(data32[count]);
+				data32[count] = swapendian_int32(data32[count]);
 			break;
 
 		case 8:
 			data64 = (u64 *)m_data;
 			for (count = 0; count < m_typecount; count++)
-				data64[count] = flipendian_int64(data64[count]);
+				data64[count] = swapendian_int64(data64[count]);
 			break;
 	}
 }

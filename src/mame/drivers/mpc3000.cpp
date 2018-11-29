@@ -61,7 +61,7 @@ MPCs on other hardware:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/v53.h"
+#include "cpu/nec/v5x.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/hd61830.h"
 #include "bus/midi/midi.h"
@@ -90,7 +90,7 @@ public:
 	void init_mpc3000();
 
 private:
-	required_device<v53_base_device> m_maincpu;
+	required_device<v53a_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<midi_port_device> m_mdout;
@@ -103,7 +103,8 @@ private:
 
 	DECLARE_READ16_MEMBER(dsp_0008_hack_r);
 	DECLARE_WRITE16_MEMBER(dsp_0008_hack_w);
-	DECLARE_READ8_MEMBER(dma_memr_cb);
+	DECLARE_READ16_MEMBER(dma_memr_cb);
+	DECLARE_WRITE16_MEMBER(dma_memw_cb);
 	DECLARE_PALETTE_INIT(mpc3000);
 };
 
@@ -126,7 +127,7 @@ WRITE16_MEMBER(mpc3000_state::dsp_0008_hack_w)
 {
 	// this is related to the DSP's DMA capability.  The DSP
 	// connects to the V53's DMA3 channel on both the MPCs and HNG64.
-	m_maincpu->dreq3_w(data&0x1);
+	m_maincpu->dreq_w<3>(data&0x1);
 	m_dsp->l7a1045_sound_w(space,8/2,data,mem_mask);
 }
 
@@ -156,10 +157,15 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x00f8, 0x00ff).rw("adcexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
-READ8_MEMBER(mpc3000_state::dma_memr_cb)
+READ16_MEMBER(mpc3000_state::dma_memr_cb)
 {
 	//logerror("dma_memr_cb: offset %x\n", offset);
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_word(offset);
+}
+
+WRITE16_MEMBER(mpc3000_state::dma_memw_cb)
+{
+	m_maincpu->space(AS_PROGRAM).write_word(offset, data);
 }
 
 PALETTE_INIT_MEMBER(mpc3000_state, mpc3000)
@@ -170,18 +176,14 @@ PALETTE_INIT_MEMBER(mpc3000_state, mpc3000)
 
 void mpc3000_state::mpc3000(machine_config &config)
 {
-	// V53A isn't devcb3 compliant yet.
-	//V53A(config, m_maincpu, 16_MHz_XTAL);
-	//m_maincpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_map);
-	//m_maincpu->set_addrmap(AS_IO, &mpc3000_state::mpc3000_io_map);
-	device_t *device = nullptr;
-	MCFG_DEVICE_ADD("maincpu", V53A, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mpc3000_map)
-	MCFG_DEVICE_IO_MAP(mpc3000_io_map)
-	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE("maincpu", v53_base_device, hack_w))
-	MCFG_V53_DMAU_IN_MEMR_CB(READ8(*this, mpc3000_state, dma_memr_cb))
-	MCFG_V53_DMAU_IN_IOR_3_CB(WRITE8("dsp", l7a1045_sound_device, dma_r_cb))
-	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8("dsp", l7a1045_sound_device, dma_w_cb))
+	V53A(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_map);
+	m_maincpu->set_addrmap(AS_IO, &mpc3000_state::mpc3000_io_map);
+	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v53a_device::hack_w));
+	m_maincpu->in_mem16r_cb().set(FUNC(mpc3000_state::dma_memr_cb));
+	m_maincpu->out_mem16w_cb().set(FUNC(mpc3000_state::dma_memw_cb));
+	m_maincpu->in_io16r_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_r16_cb));
+	m_maincpu->out_io16w_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_w16_cb));
 
 	hc259_device &loledlatch(HC259(config, "loledlatch"));
 	loledlatch.q_out_cb<0>().set_output("led0").invert(); // Edit Loop
@@ -203,6 +205,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	hiledlatch.q_out_cb<6>().set_output("led14").invert(); // 16 Levels
 	hiledlatch.q_out_cb<7>().set_output("led15").invert(); // After
 
+	device_t *device = nullptr;
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(80)
 	MCFG_SCREEN_UPDATE_DEVICE("lcdc", hd61830_device, screen_update)

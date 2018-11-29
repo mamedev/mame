@@ -507,8 +507,7 @@ MACHINE_CONFIG_START(fireball_state::fireball)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8912(config, m_ay, AY_CLK).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* Video */
 	config.set_default_layout(layout_fireball);

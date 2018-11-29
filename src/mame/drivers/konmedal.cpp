@@ -562,9 +562,9 @@ MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(konmedal_state, shuriboy_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback), this);
 
 	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
 
@@ -664,6 +664,11 @@ ROM_START( shuriboy )
 
 	ROM_REGION( 0x200000, "upd", 0 )
 	ROM_LOAD( "341-a02.13c", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "am27s21apc.2d", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "am27s21apc.3d", 0x100, 0x100, NO_DUMP )
+	ROM_LOAD( "am27s21apc.4d", 0x200, 0x100, NO_DUMP )
 ROM_END
 
 GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)

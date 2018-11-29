@@ -159,7 +159,7 @@ iLinkSGUID=0x--------
 #include "emu.h"
 
 #include "cpu/mips/mips3.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/mips/ps2vu.h"
 #include "cpu/mips/ps2vif1.h"
 

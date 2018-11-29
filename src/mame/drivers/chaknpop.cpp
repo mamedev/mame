@@ -388,15 +388,15 @@ MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000) / 12)  // Verified on PCB
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(18'000'000) / 12));  // Verified on PCB
+	ay1.port_a_read_callback().set_ioport("DSWA");
+	ay1.port_b_read_callback().set_ioport("DSWB");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'000'000) / 12)  /* Verified on PCB */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, chaknpop_state, unknown_port_1_w))   // ??
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, chaknpop_state, unknown_port_2_w))    // ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(18'000'000) / 12));  // Verified on PCB
+	ay2.port_a_write_callback().set(FUNC(chaknpop_state::unknown_port_1_w));   // ??
+	ay2.port_b_write_callback().set(FUNC(chaknpop_state::unknown_port_2_w));   // ??
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.10);
 MACHINE_CONFIG_END
 
 

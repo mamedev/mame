@@ -69,7 +69,7 @@ f80b      ????
 
 WRITE8_MEMBER(tecmo_state::bankswitch_w)
 {
-	membank("bank1")->set_entry(data >> 3);
+	m_mainbank->set_entry(data >> 3);
 }
 
 WRITE8_MEMBER(tecmo_state::adpcm_start_w)
@@ -91,7 +91,7 @@ WRITE8_MEMBER(tecmo_state::adpcm_vol_w)
 WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 {
 	if (m_adpcm_pos >= m_adpcm_end ||
-				m_adpcm_pos >= memregion("adpcm")->bytes())
+				m_adpcm_pos >= m_adpcm_rom.bytes())
 		m_msm->reset_w(1);
 	else if (m_adpcm_data != -1)
 	{
@@ -100,9 +100,7 @@ WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 	}
 	else
 	{
-		uint8_t *ROM = memregion("adpcm")->base();
-
-		m_adpcm_data = ROM[m_adpcm_pos++];
+		m_adpcm_data = m_adpcm_rom[m_adpcm_pos++];
 		m_msm->write_data(m_adpcm_data >> 4);
 	}
 }
@@ -146,7 +144,7 @@ void tecmo_state::rygar_map(address_map &map)
 	map(0xdc00, 0xdfff).ram().w(FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
 	map(0xe000, 0xe7ff).ram().share("spriteram");
 	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xf000, 0xf7ff).bankr("bank1");
+	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xf800).portr("JOY1");
 	map(0xf801, 0xf801).portr("BUTTONS1");
 	map(0xf802, 0xf802).portr("JOY2");
@@ -158,8 +156,8 @@ void tecmo_state::rygar_map(address_map &map)
 	map(0xf808, 0xf808).r(FUNC(tecmo_state::dswb_l_r));
 	map(0xf809, 0xf809).r(FUNC(tecmo_state::dswb_h_r));
 	map(0xf80f, 0xf80f).portr("SYS_2");
-	map(0xf800, 0xf802).w(FUNC(tecmo_state::fgscroll_w));
-	map(0xf803, 0xf805).w(FUNC(tecmo_state::bgscroll_w));
+	map(0xf800, 0xf802).w(FUNC(tecmo_state::fgscroll_w)).share("fgscroll");
+	map(0xf803, 0xf805).w(FUNC(tecmo_state::bgscroll_w)).share("bgscroll");
 	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf807, 0xf807).w(FUNC(tecmo_state::flipscreen_w));
 	map(0xf808, 0xf808).w(FUNC(tecmo_state::bankswitch_w));
@@ -175,7 +173,7 @@ void tecmo_state::gemini_map(address_map &map)
 	map(0xdc00, 0xdfff).ram().w(FUNC(tecmo_state::bgvideoram_w)).share("bgvideoram");
 	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe800, 0xefff).ram().share("spriteram");
-	map(0xf000, 0xf7ff).bankr("bank1");
+	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xf800).portr("JOY1");
 	map(0xf801, 0xf801).portr("BUTTONS1");
 	map(0xf802, 0xf802).portr("JOY2");
@@ -187,8 +185,8 @@ void tecmo_state::gemini_map(address_map &map)
 	map(0xf808, 0xf808).r(FUNC(tecmo_state::dswb_l_r));
 	map(0xf809, 0xf809).r(FUNC(tecmo_state::dswb_h_r));
 	map(0xf80f, 0xf80f).portr("SYS_2");
-	map(0xf800, 0xf802).w(FUNC(tecmo_state::fgscroll_w));
-	map(0xf803, 0xf805).w(FUNC(tecmo_state::bgscroll_w));
+	map(0xf800, 0xf802).w(FUNC(tecmo_state::fgscroll_w)).share("fgscroll");
+	map(0xf803, 0xf805).w(FUNC(tecmo_state::bgscroll_w)).share("bgscroll");
 	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf807, 0xf807).w(FUNC(tecmo_state::flipscreen_w));
 	map(0xf808, 0xf808).w(FUNC(tecmo_state::bankswitch_w));
@@ -204,7 +202,7 @@ void tecmo_state::silkworm_map(address_map &map)
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xe7ff).ram().share("spriteram");
 	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xf000, 0xf7ff).bankr("bank1");
+	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xf800).portr("JOY1");
 	map(0xf801, 0xf801).portr("BUTTONS1");
 	map(0xf802, 0xf802).portr("JOY2");
@@ -217,8 +215,8 @@ void tecmo_state::silkworm_map(address_map &map)
 	map(0xf809, 0xf809).r(FUNC(tecmo_state::dswb_h_r));
 	map(0xf80e, 0xf80e).portr("SYS_3");
 	map(0xf80f, 0xf80f).portr("SYS_2");
-	map(0xf800, 0xf802).w(FUNC(tecmo_state::fgscroll_w));
-	map(0xf803, 0xf805).w(FUNC(tecmo_state::bgscroll_w));
+	map(0xf800, 0xf802).w(FUNC(tecmo_state::fgscroll_w)).share("fgscroll");
+	map(0xf803, 0xf805).w(FUNC(tecmo_state::bgscroll_w)).share("bgscroll");
 	map(0xf806, 0xf806).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf807, 0xf807).w(FUNC(tecmo_state::flipscreen_w));
 	map(0xf808, 0xf808).w(FUNC(tecmo_state::bankswitch_w));
@@ -237,19 +235,6 @@ void tecmo_state::rygar_sound_map(address_map &map)
 	map(0xf000, 0xf000).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 }
 
-void tecmo_state::tecmo_sound_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x2000, 0x207f).ram();             /* Silkworm set #2 has a custom CPU which */
-												/* writes code to this area */
-	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa001).w("ymsnd", FUNC(ym3812_device::write));
-	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(tecmo_state::adpcm_start_w));
-	map(0xc400, 0xc400).w(FUNC(tecmo_state::adpcm_end_w));
-	map(0xc800, 0xc800).w(FUNC(tecmo_state::adpcm_vol_w));
-	map(0xcc00, 0xcc00).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
-}
-
 void tecmo_state::silkwormp_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -257,6 +242,20 @@ void tecmo_state::silkwormp_sound_map(address_map &map)
 	map(0xa000, 0xa001).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xcc00, 0xcc00).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+}
+
+void tecmo_state::backfirt_sound_map(address_map &map)
+{
+	silkwormp_sound_map(map);
+	map(0x2000, 0x207f).ram(); // Silkworm set #2 has a custom CPU which writes code to this area
+}
+
+void tecmo_state::tecmo_sound_map(address_map &map)
+{
+	backfirt_sound_map(map);
+	map(0xc000, 0xc000).w(FUNC(tecmo_state::adpcm_start_w));
+	map(0xc400, 0xc400).w(FUNC(tecmo_state::adpcm_end_w));
+	map(0xc800, 0xc800).w(FUNC(tecmo_state::adpcm_vol_w));
 }
 
 static INPUT_PORTS_START( tecmo_default )
@@ -660,10 +659,10 @@ static const gfx_layout charlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	4*8*8
 };
 
 static const gfx_layout tilelayout =
@@ -671,28 +670,15 @@ static const gfx_layout tilelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			32*8+0*4, 32*8+1*4, 32*8+2*4, 32*8+3*4, 32*8+4*4, 32*8+5*4, 32*8+6*4, 32*8+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	128*8
-};
-
-static const gfx_layout spritelayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*8,4) },
+	{ STEP8(0,4*8), STEP8(4*8*8*2,4*8) },
+	4*8*8*2*2
 };
 
 static GFXDECODE_START( gfx_tecmo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 256, 16 )   /* colors 256 - 511 */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )   /* colors   0 - 255 */
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 16 )   /* colors   0 - 255 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 512, 16 )   /* colors 512 - 767 */
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 768, 16 )   /* colors 768 - 1023 */
 GFXDECODE_END
@@ -700,7 +686,7 @@ GFXDECODE_END
 
 void tecmo_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
+	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
 
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
@@ -737,14 +723,14 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
+	TECMO_SPRITE(config, m_sprgen, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+	soundlatch.set_separate_acknowledge(true);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(4'000'000)) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -795,6 +781,8 @@ MACHINE_CONFIG_START(tecmo_state::backfirt)
 
 	/* this pcb has no MSM5205 */
 	MCFG_DEVICE_REMOVE("msm")
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(backfirt_sound_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tecmo_state::silkwormp)
@@ -1281,7 +1269,7 @@ The non matching EPROM is a modified version of gw04-5s.rom with the following c
 
 ROM_START( geminib )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "g-2.6d",  0x00000, 0x10000,      CRC(cd79c5b3) SHA1(355aae2346d49d14a801fad05d49376581d329c6) )  /* c000-ffff is not used */
+	ROM_LOAD( "g-2.6d",       0x00000, 0x10000, CRC(cd79c5b3) SHA1(355aae2346d49d14a801fad05d49376581d329c6) )  /* c000-ffff is not used */
 	ROM_LOAD( "gw05-6s.rom",  0x10000, 0x10000, CRC(5a6947a9) SHA1(18b7aeb0f0e2c396bc759118dd7c45fd6070b804) )  /* banked at f000-f7ff */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -1331,19 +1319,6 @@ void tecmo_state::init_gemini()
 	m_video_type = 2;
 }
 
-void tecmo_state::init_backfirt()
-{
-	m_video_type = 2;
-
-	/* no MSM */
-	m_soundcpu->space(AS_PROGRAM).nop_write(0xc000, 0xc000);
-	m_soundcpu->space(AS_PROGRAM).nop_write(0xc400, 0xc400);
-	m_soundcpu->space(AS_PROGRAM).nop_write(0xc800, 0xc800);
-}
-
-
-
-
 
 GAME( 1986, rygar,     0,        rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 1)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rygar2,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 2)",             MACHINE_SUPPORTS_SAVE )
@@ -1355,4 +1330,4 @@ GAME( 1988, silkworm,  0,        silkworm,  silkworm,  tecmo_state, init_silkwor
 GAME( 1988, silkwormj, silkworm, silkworm,  silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",            MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
 GAME( 1988, silkwormp, silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (prototype)",        MACHINE_SUPPORTS_SAVE ) // prototype
 GAME( 1988, silkwormb, silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "bootleg", "Silk Worm (bootleg)",          MACHINE_SUPPORTS_SAVE ) // bootleg of (a different?) prototype
-GAME( 1988, backfirt,  0,        backfirt,  backfirt,  tecmo_state, init_backfirt, ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, backfirt,  0,        backfirt,  backfirt,  tecmo_state, init_gemini,   ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",   MACHINE_SUPPORTS_SAVE )

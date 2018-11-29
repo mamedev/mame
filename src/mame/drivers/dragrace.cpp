@@ -42,7 +42,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 WRITE8_MEMBER(dragrace_state::speed1_w)
 {
 	unsigned freq = ~data & 0x1f;
-	m_discrete->write(machine().dummy_space(), DRAGRACE_MOTOR1_DATA, freq);
+	m_discrete->write(DRAGRACE_MOTOR1_DATA, freq);
 
 	// the tachometers are driven from the same frequency generator that creates the engine sound
 	output().set_value("tachometer", freq);
@@ -51,7 +51,7 @@ WRITE8_MEMBER(dragrace_state::speed1_w)
 WRITE8_MEMBER(dragrace_state::speed2_w)
 {
 	unsigned freq = ~data & 0x1f;
-	m_discrete->write(machine().dummy_space(), DRAGRACE_MOTOR2_DATA, freq);
+	m_discrete->write(DRAGRACE_MOTOR2_DATA, freq);
 
 	// the tachometers are driven from the same frequency generator that creates the engine sound
 	output().set_value("tachometer2", freq);

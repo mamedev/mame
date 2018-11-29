@@ -9,16 +9,6 @@
 #include "video/tc0480scp.h"
 #include "emupal.h"
 
-struct schs_tempsprite
-{
-	int gfx;
-	int code,color;
-	int flipx,flipy;
-	int x,y;
-	int zoomx,zoomy;
-	int primask;
-};
-
 class superchs_state : public driver_device
 {
 public:
@@ -44,6 +34,16 @@ protected:
 	virtual void video_start() override;
 
 private:
+	struct schs_tempsprite
+	{
+		int gfx;
+		int code,color;
+		int flipx,flipy;
+		int x,y;
+		int zoomx,zoomy;
+		int primask;
+	};
+
 	required_shared_ptr<uint32_t> m_ram;
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_shared_ram;
@@ -59,7 +59,7 @@ private:
 	DECLARE_READ32_MEMBER(main_cycle_r);
 	DECLARE_READ16_MEMBER(sub_cycle_r);
 	uint32_t screen_update_superchs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int x_offs, int y_offs);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<tc0480scp_device> m_tc0480scp;

@@ -351,22 +351,23 @@ MACHINE_CONFIG_START(idsa_state::idsa)
 	SP0256(config, m_speech, 3120000); // unknown variant
 	m_speech->add_route(ALL_OUTPUTS, "lspeaker", 1.5);
 
-	MCFG_DEVICE_ADD("aysnd1", AY8910, 2000000) // 2Mhz according to pinmame, schematic omits the clock line
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 2000000));  // 2Mhz according to pinmame, schematic omits the clock line
+	aysnd1.port_a_write_callback().set(FUNC(idsa_state::ay1_a_w));
+	aysnd1.port_b_write_callback().set(FUNC(idsa_state::ay1_b_w));
+	aysnd1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
 
-	MCFG_DEVICE_ADD("aysnd2", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ay1_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ay1_b_w))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ay2_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ay2_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	ay8910_device &aysnd2(AY8910(config, "aysnd2", 2000000));
+	aysnd2.port_a_write_callback().set(FUNC(idsa_state::ay2_a_w));
+	aysnd2.port_b_write_callback().set(FUNC(idsa_state::ay2_b_w));
+	aysnd2.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(idsa_state::bsktbllp)
+void idsa_state::bsktbllp(machine_config &config)
+{
 	idsa(config);
-	MCFG_DEVICE_MODIFY("aysnd1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ppi_control_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ppi_data_w))
+	auto &aysnd1(*subdevice<ay8910_device>("aysnd1"));
+	aysnd1.port_a_write_callback().set(FUNC(idsa_state::ppi_control_w));
+	aysnd1.port_b_write_callback().set(FUNC(idsa_state::ppi_data_w));
 
 	I8255(config, m_ppi[0]);
 	m_ppi[0]->out_pa_callback().set(FUNC(idsa_state::ppi1_a_w));
@@ -377,7 +378,7 @@ MACHINE_CONFIG_START(idsa_state::bsktbllp)
 	m_ppi[1]->out_pa_callback().set(FUNC(idsa_state::ppi2_a_w));
 	m_ppi[1]->out_pb_callback().set(FUNC(idsa_state::ppi2_b_w));
 	m_ppi[1]->out_pc_callback().set(FUNC(idsa_state::ppi2_c_w));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(v1)

@@ -57,7 +57,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/mips/mips3.h"
 #include "machine/decioga.h"
 #include "machine/mc146818.h"
@@ -110,7 +110,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<r3041_device> m_maincpu;
+	required_device<r3000a_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<lk201_device> m_lk201;
 	required_device<dec_ioga_device> m_ioga;
@@ -305,7 +305,7 @@ WRITE32_MEMBER(decstation_state::cfb_w)
 WRITE_LINE_MEMBER(decstation_state::ioga_irq_w)
 {
 	// not sure this is correct
-	m_maincpu->set_input_line(R3000_IRQ3, state);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ3, state);
 }
 
 void decstation_state::machine_start()
@@ -364,10 +364,11 @@ static void dec_scsi_devices(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(decstation_state::kn02ba)
-	MCFG_DEVICE_ADD( "maincpu", R3041, 33000000 ) // FIXME: Should be R3000A
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_R3000_BRCOND0_INPUT(READLINE(*this, decstation_state, brcond0_r))
-	MCFG_DEVICE_PROGRAM_MAP( threemin_map )
+	R3000A(config, m_maincpu, 33.333_MHz_XTAL, 65536, 131072);
+	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
+	m_maincpu->set_fpurev(0x340); // should be R3010A v4.0
+	m_maincpu->in_brcond<0>().set(FUNC(decstation_state::brcond0_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &decstation_state::threemin_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(130000000, 1704, 32, (1280+32), 1064, 3, (1024+3));
@@ -376,7 +377,7 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 	BT459(config, m_bt459, 83'020'800);
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
-	m_lance->irq_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
+	m_lance->intr_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
 
 	DECSTATION_IOGA(config, m_ioga, XTAL(12'500'000));
 	m_ioga->irq_out().set(FUNC(decstation_state::ioga_irq_w));

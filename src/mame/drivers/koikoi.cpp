@@ -381,10 +381,10 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, koikoi_state, input_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, koikoi_state, unknown_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &aysnd(AY8910(config, "aysnd", KOIKOI_CRYSTAL/8));
+	aysnd.port_b_read_callback().set(FUNC(koikoi_state::input_r));
+	aysnd.port_a_write_callback().set(FUNC(koikoi_state::unknown_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.10);
 MACHINE_CONFIG_END
 
 

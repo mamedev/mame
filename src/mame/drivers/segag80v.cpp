@@ -951,31 +951,29 @@ MACHINE_CONFIG_START(segag80v_state::zektor)
 	MCFG_SAMPLES_NAMES(zektor_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, VIDEO_CLOCK/4/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
+	AY8912(config, m_aysnd, VIDEO_CLOCK/4/2).add_route(ALL_OUTPUTS, "speaker", 0.33);
 
 	/* speech board */
 	sega_speech_board(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(segag80v_state::tacscan)
+void segag80v_state::tacscan(machine_config &config)
+{
 	g80v_base(config);
 
 	/* universal sound board */
-	MCFG_SEGAUSB_ADD("usbsnd", "maincpu")
-MACHINE_CONFIG_END
+	SEGAUSB(config, m_usb, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(segag80v_state::startrek)
-	g80v_base(config);
+void segag80v_state::startrek(machine_config &config)
+{
+	tacscan(config);
 
 	/* speech board */
 	sega_speech_board(config);
-
-	/* universal sound board */
-	MCFG_SEGAUSB_ADD("usbsnd", "maincpu")
-MACHINE_CONFIG_END
+}
 
 
 

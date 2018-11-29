@@ -7,14 +7,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-
-#define VERBOSE 0
-#include "logmacro.h"
 #include "hp98265a.h"
+
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
 #include "machine/mb87030.h"
+
+#define VERBOSE 0
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98265A, bus::hp_dio, dio16_98265a_device, "hp98265a", "HP98265A SCSI S16 Interface")
 
@@ -165,8 +167,7 @@ void dio16_98265a_device::device_reset()
 	uint8_t code = m_sw1->read() >> REG_SW1_SELECT_CODE_SHIFT;
 	code &= REG_SW1_SELECT_CODE_MASK;
 
-	if (!m_installed_io)
-	{
+	if (!m_installed_io) {
 		program_space()->install_readwrite_handler(
 				0x600000 + (code * 0x10000),
 				0x6007ff + (code * 0x10000),
@@ -192,7 +193,7 @@ READ16_MEMBER(dio16_98265a_device::io_r)
 
 	uint16_t ret = 0xffff;
 
-	switch(offset) {
+	switch (offset) {
 	case 0: /* ID */
 		ret = 0x07;
 		break;
@@ -203,7 +204,7 @@ READ16_MEMBER(dio16_98265a_device::io_r)
 		ret = m_spc->data_read();
 		break;
 	case 3:
-		ret = 0xe8; /* Flush/Configuration register */
+		ret = 0x88; /* Flush/Configuration register */
 		break;
 	}
 	LOG("io_r: offset=%02X ret=%02X\n",offset, ret);
@@ -214,7 +215,7 @@ WRITE16_MEMBER(dio16_98265a_device::io_w)
 {
 	LOG("io_w: offset=%02X, data=%02X\n", offset, data);
 
-	switch(offset) {
+	switch (offset) {
 	case 0:
 		device_reset();
 		break;

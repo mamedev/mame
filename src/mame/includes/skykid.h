@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+#ifndef MAME_INCLUDES_SKYKID_H
+#define MAME_INCLUDES_SKYKID_H
+
+#pragma once
+
 #include "cpu/m6800/m6801.h"
 #include "sound/namco.h"
 #include "emupal.h"
@@ -70,3 +75,5 @@ private:
 	uint8_t m_main_irq_mask;
 	uint8_t m_mcu_irq_mask;
 };
+
+#endif // MAME_INCLUDES_SKYKID_H

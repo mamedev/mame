@@ -64,8 +64,8 @@ private:
 	bool m_irq_state;
 	bool m_dmar0;
 };
-}
-}
+
+} } // namespace bus::hp_dio
 
 DECLARE_DEVICE_TYPE_NS(HPDIO_98265A, bus::hp_dio, dio16_98265a_device)
 

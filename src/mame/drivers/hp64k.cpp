@@ -1449,29 +1449,31 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	m_rs232->dcd_handler().set(FUNC(hp64k_state::hp64k_rs232_dcd_w));
 	m_rs232->cts_handler().set(FUNC(hp64k_state::hp64k_rs232_cts_w));
 
-	MCFG_DEVICE_ADD("phi", PHI, 0)
-	MCFG_PHI_INT_WRITE_CB(WRITELINE(*this, hp64k_state, hp64k_phi_int_w))
-	MCFG_PHI_DMARQ_WRITE_CB(WRITELINE("cpu" , hp_5061_3011_cpu_device, halt_w))
-	MCFG_PHI_SYS_CNTRL_READ_CB(READLINE(*this, hp64k_state, hp64k_phi_sys_ctrl_r))
-	MCFG_PHI_DIO_READWRITE_CB(READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, host_dio_w))
-	MCFG_PHI_EOI_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_eoi_w))
-	MCFG_PHI_DAV_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_dav_w))
-	MCFG_PHI_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_nrfd_w))
-	MCFG_PHI_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ndac_w))
-	MCFG_PHI_IFC_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ifc_w))
-	MCFG_PHI_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_srq_w))
-	MCFG_PHI_ATN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_atn_w))
-	MCFG_PHI_REN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, host_ren_w))
+	PHI(config, m_phi, 0);
+	m_phi->int_write_cb().set(FUNC(hp64k_state::hp64k_phi_int_w));
+	m_phi->dmarq_write_cb().set(m_cpu, FUNC(hp_5061_3011_cpu_device::halt_w));
+	m_phi->sys_cntrl_read_cb().set(FUNC(hp64k_state::hp64k_phi_sys_ctrl_r));
+	m_phi->dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	m_phi->dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_EOI>().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_DAV>().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_NRFD>().set(IEEE488_TAG, FUNC(ieee488_device::host_nrfd_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_NDAC>().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_IFC>().set(IEEE488_TAG, FUNC(ieee488_device::host_ifc_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_SRQ>().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_ATN>().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
+	m_phi->signal_write_cb<phi_device::PHI_488_REN>().set(IEEE488_TAG, FUNC(ieee488_device::host_ren_w));
+
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("phi", phi_device, eoi_w))
-	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("phi", phi_device, dav_w))
-	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE("phi", phi_device, nrfd_w))
-	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE("phi", phi_device, ndac_w))
-	MCFG_IEEE488_IFC_CALLBACK(WRITELINE("phi", phi_device, ifc_w))
-	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE("phi", phi_device, srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(WRITELINE("phi", phi_device, atn_w))
-	MCFG_IEEE488_REN_CALLBACK(WRITELINE("phi", phi_device, ren_w))
-	MCFG_IEEE488_DIO_CALLBACK(WRITE8("phi", phi_device , bus_dio_w))
+	MCFG_IEEE488_EOI_CALLBACK(WRITELINE(m_phi, phi_device, eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(WRITELINE(m_phi, phi_device, dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE(m_phi, phi_device, nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE(m_phi, phi_device, ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(WRITELINE(m_phi, phi_device, ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_phi, phi_device, srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(m_phi, phi_device, atn_w))
+	MCFG_IEEE488_REN_CALLBACK(WRITELINE(m_phi, phi_device, ren_w))
+	MCFG_IEEE488_DIO_CALLBACK(WRITE8(m_phi, phi_device , bus_dio_w))
 	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
 MACHINE_CONFIG_END
 

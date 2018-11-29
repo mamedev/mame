@@ -36,8 +36,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
-		m_pit8253_0(*this, "pit8253_0"),
-		m_pit8253_1(*this, "pit8253_1"),
+		m_pit8253(*this, "pit8253%u", 0U),
 		m_ticket(*this, "ticket"),
 		m_samples(*this, "oki"),
 		m_alligator(*this, "alligator%u", 0U),
@@ -78,8 +77,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
-	required_device<pit8253_device> m_pit8253_0;
-	required_device<pit8253_device> m_pit8253_1;
+	required_device_array<pit8253_device, 2> m_pit8253;
 	required_device<ticket_dispenser_device> m_ticket;
 	required_memory_region m_samples;
 	output_finder<5> m_alligator;
@@ -126,11 +124,11 @@ WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
 
 WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
 {
-	m_pit8253_0->write_gate0(BIT(data, 0));
-	m_pit8253_0->write_gate1(BIT(data, 1));
-	m_pit8253_0->write_gate2(BIT(data, 2));
-	m_pit8253_1->write_gate1(BIT(data, 3));
-	m_pit8253_1->write_gate2(BIT(data, 4));
+	m_pit8253[0]->write_gate0(BIT(data, 0));
+	m_pit8253[0]->write_gate1(BIT(data, 1));
+	m_pit8253[0]->write_gate2(BIT(data, 2));
+	m_pit8253[1]->write_gate1(BIT(data, 3));
+	m_pit8253[1]->write_gate2(BIT(data, 4));
 
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40 ? 0 : 1);
 }
@@ -272,8 +270,8 @@ void wackygtr_state::program_map(address_map &map)
 
 	map(0x1000, 0x1001).w("ymsnd", FUNC(ym2413_device::write));
 
-	map(0x2000, 0x2003).rw(m_pit8253_0, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x3000, 0x3003).rw(m_pit8253_1, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x2000, 0x2003).rw(m_pit8253[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x3000, 0x3003).rw(m_pit8253[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
 	map(0x4000, 0x4003).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5000, 0x5003).rw("i8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -319,21 +317,21 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	ppi2.in_pb_callback().set_ioport("IN1");
 	ppi2.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("pit8253_0", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<0>))
-	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<1>))
-	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<2>))
+	PIT8253(config, m_pit8253[0], 0);
+	m_pit8253[0]->set_clk<0>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[0]->out_handler<0>().set(FUNC(wackygtr_state::alligator_ck<0>));
+	m_pit8253[0]->set_clk<1>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[0]->out_handler<1>().set(FUNC(wackygtr_state::alligator_ck<1>));
+	m_pit8253[0]->set_clk<2>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[0]->out_handler<2>().set(FUNC(wackygtr_state::alligator_ck<2>));
 
-	MCFG_DEVICE_ADD("pit8253_1", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT0_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<3>))
-	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<4>))
+	PIT8253(config, m_pit8253[1], 0);
+	m_pit8253[1]->set_clk<0>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[1]->out_handler<0>().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	m_pit8253[1]->set_clk<1>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[1]->out_handler<1>().set(FUNC(wackygtr_state::alligator_ck<3>));
+	m_pit8253[1]->set_clk<2>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[1]->out_handler<2>().set(FUNC(wackygtr_state::alligator_ck<4>));
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END

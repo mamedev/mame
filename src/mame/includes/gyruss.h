@@ -5,6 +5,10 @@
     Gyruss
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GYRUSS_H
+#define MAME_INCLUDES_GYRUSS_H
+
+#pragma once
 
 #include "sound/discrete.h"
 #include "emupal.h"
@@ -13,8 +17,8 @@
 class gyruss_state : public driver_device
 {
 public:
-	gyruss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gyruss_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
@@ -80,3 +84,5 @@ private:
 	void main_cpu1_map(address_map &map);
 	void main_cpu2_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GYRUSS_H

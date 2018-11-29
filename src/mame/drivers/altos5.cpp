@@ -415,11 +415,6 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	m_maincpu->set_addrmap(AS_IO, &altos5_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 8_MHz_XTAL / 4)); // 2MHz
-	ctc_clock.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg1));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
-
 	/* devices */
 	Z80DMA(config, m_dma, 8_MHz_XTAL / 2);
 	m_dma->out_busreq_callback().set(FUNC(altos5_state::busreq_w));
@@ -456,6 +451,9 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 8_MHz_XTAL / 2));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.set_clk<0>(8_MHz_XTAL / 4); // 2MHz
+	ctc.set_clk<1>(8_MHz_XTAL / 4); // 2MHz
+	ctc.set_clk<2>(8_MHz_XTAL / 4); // 2MHz
 	ctc.zc_callback<0>().set("sio", FUNC(z80sio_device::rxtxcb_w));    // SIO Ch B
 	ctc.zc_callback<1>().set("dart", FUNC(z80dart_device::txca_w));    // Z80DART Ch A, SIO Ch A
 	ctc.zc_callback<1>().append("dart", FUNC(z80dart_device::rxca_w));

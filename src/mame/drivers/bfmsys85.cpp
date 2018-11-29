@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
 	MCFG_DEVICE_PROGRAM_MAP(memmap)                        // setup read and write memorymap
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second
-	MCFG_MSC1937_ADD("vfd",0)
+	MSC1937(config, m_vfd);
 
 	ACIA6850(config, m_acia6850_0, 0);
 	m_acia6850_0->txd_handler().set(FUNC(bfmsys85_state::sys85_data_w));
@@ -413,8 +413,7 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfmsys85_state, write_acia_clock))
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd",AY8912, MASTER_CLOCK/4)          // add AY8912 soundchip
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);                       // load/save nv RAM
 

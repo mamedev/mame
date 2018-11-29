@@ -190,7 +190,8 @@ TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
 }
 
 
-MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
+void efo_zsu_device::device_add_mconfig(machine_config &config)
+{
 	z80_device& soundcpu(Z80(config, "soundcpu", 4000000));
 	soundcpu.set_addrmap(AS_PROGRAM, &efo_zsu_device::zsu_map);
 	soundcpu.set_addrmap(AS_IO, &efo_zsu_device::zsu_io);
@@ -215,11 +216,10 @@ MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
 	ck1mhz.signal_handler().append(m_ctc1, FUNC(z80ctc_device::trg2));
 #endif
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", input_merger_device, in_w<2>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<2>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq") // 74HC03 NAND gate
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline("soundcpu", INPUT_LINE_IRQ0); // 74HC03 NAND gate
 
 	SPEAKER(config, "mono").front_center();
 
@@ -231,23 +231,21 @@ MACHINE_CONFIG_START(efo_zsu_device::device_add_mconfig)
 	aysnd1.port_a_write_callback().set(FUNC(efo_zsu_device::ay1_porta_w));
 	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD(m_fifo, CD40105, 0)
-	MCFG_40105_DATA_OUT_READY_CB(WRITELINE(*this, efo_zsu_device, fifo_dor_w))
-	MCFG_40105_DATA_OUT_CB(WRITE8(m_adpcm, msm5205_device, data_w))
+	CD40105(config, m_fifo, 0);
+	m_fifo->out_ready_cb().set(FUNC(efo_zsu_device::fifo_dor_w));
+	m_fifo->out_cb().set(m_adpcm, FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD(m_adpcm, MSM5205, 4000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_adpcm, 4000000/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(cedar_magnet_sound_device::device_add_mconfig)
+void cedar_magnet_sound_device::device_add_mconfig(machine_config &config)
+{
 	efo_zsu_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_sound_map)
+	subdevice<z80_device>("soundcpu")->set_addrmap(AS_PROGRAM, &cedar_magnet_sound_device::cedar_magnet_sound_map);
 
-	MCFG_DEVICE_MODIFY("aysnd0")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, cedar_magnet_sound_device, ay0_porta_w))
-MACHINE_CONFIG_END
+	subdevice<ay8910_device>("aysnd0")->port_a_write_callback().set(FUNC(cedar_magnet_sound_device::ay0_porta_w));
+}
 
 void efo_zsu_device::device_start()
 {

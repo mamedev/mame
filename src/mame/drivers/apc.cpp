@@ -992,13 +992,13 @@ MACHINE_CONFIG_START(apc_state::apc)
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_apc)
 
-	MCFG_DEVICE_ADD(m_hgdc1, UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)
+	UPD7220(config, m_hgdc1, 3579545); // unk clock
+	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);
+	m_hgdc1->set_draw_text_callback(FUNC(apc_state::hgdc_draw_text), this);
 
-	MCFG_DEVICE_ADD(m_hgdc2, UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc2, 3579545); // unk clock
+	m_hgdc2->set_addrmap(0, &apc_state::upd7220_2_map);
+	m_hgdc2->set_display_pixels_callback(FUNC(apc_state::hgdc_display_pixels), this);
 
 	/* sound hardware */
 	SPEAKER(config, m_speaker).front_center();

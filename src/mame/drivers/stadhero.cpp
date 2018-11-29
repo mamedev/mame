@@ -18,6 +18,9 @@
   HSync = 15.6246kHz
   VSync = 57.4434Hz
 
+TODO : RNG issue? Some behavior isn't correct (ex: BGM randomizer).
+    reference: https://youtu.be/6azneK6uUnA
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -35,20 +38,9 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(stadhero_state::stadhero_control_w)
+WRITE16_MEMBER(stadhero_state::int_ack_w)
 {
-	switch (offset<<1)
-	{
-		case 4: /* Interrupt ack (VBL - IRQ 5) */
-			break;
-		case 6: /* 6502 sound cpu */
-			m_soundlatch->write(space, 0, data & 0xff);
-			m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-			break;
-		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",m_maincpu->pc(),data,0x30c010+offset);
-			break;
-	}
+	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 }
 
 
@@ -57,14 +49,14 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 void stadhero_state::main_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x200000, 0x2007ff).ram().w(FUNC(stadhero_state::stadhero_pf1_data_w)).share("pf1_data");
-	map(0x240000, 0x240007).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
-	map(0x240010, 0x240017).w(m_tilegen1, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x260000, 0x261fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x200000, 0x2007ff).ram().w(FUNC(stadhero_state::pf1_data_w)).share("pf1_data");
+	map(0x240000, 0x240007).w(m_tilegen, FUNC(deco_bac06_device::pf_control_0_w));                          /* text layer */
+	map(0x240010, 0x240017).w(m_tilegen, FUNC(deco_bac06_device::pf_control_1_w));
+	map(0x260000, 0x261fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x30c000, 0x30c001).portr("INPUTS");
 	map(0x30c002, 0x30c003).portr("COIN");
-	map(0x30c004, 0x30c005).portr("DSW");
-	map(0x30c000, 0x30c00b).w(FUNC(stadhero_state::stadhero_control_w));
+	map(0x30c004, 0x30c005).portr("DSW").w(FUNC(stadhero_state::int_ack_w));
+	map(0x30c007, 0x30c007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x310000, 0x3107ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff8000, 0xffbfff).ram(); /* Main ram */
 	map(0xffc000, 0xffc7ff).mirror(0x000800).ram().share("spriteram");
@@ -160,37 +152,33 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 chars */
-	4096,
+	RGN_FRAC(1,3),
 	3,      /* 4 bits per pixel  */
-	{ 0x00000*8,0x8000*8,0x10000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout tile_3bpp =
 {
 	16,16,
-	2048,
+	RGN_FRAC(1,3),
 	3,
-	{ 0x20000*8, 0x10000*8, 0x00000*8 },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
 static const gfx_layout spritelayout =
 {
 	16,16,
-	4096,
+	RGN_FRAC(1,4),
 	4,
-	{ 0x60000*8,0x40000*8,0x20000*8,0x00000*8 },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -207,37 +195,37 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stadhero_state,  irq5_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stadhero_state, irq5_line_assert)
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, 24_MHz_XTAL/16)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stadhero_state, screen_update_stadhero)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh(HZ_TO_ATTOSECONDS(58));
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(stadhero_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stadhero)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_stadhero);
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(1, 1, 2)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	PALETTE(config, "palette", 1024).set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(2)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen, 0);
+	m_tilegen->set_gfx_region_wide(1, 1, 2);
+	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
+	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(2);
+	m_spritegen->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch, 0);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 24_MHz_XTAL/16)
 	MCFG_SOUND_ROUTE(0, "mono", 0.95)

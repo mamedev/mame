@@ -288,7 +288,7 @@ WRITE8_MEMBER( sb2m600_state::keyboard_w )
 	m_keylatch = data;
 
 	if (m_io_sound->read())
-		m_discrete->write(space, NODE_01, (data >> 2) & 0x0f);
+		m_discrete->write(NODE_01, (data >> 2) & 0x0f);
 }
 
 WRITE8_MEMBER( uk101_state::keyboard_w )
@@ -316,7 +316,7 @@ WRITE8_MEMBER( sb2m600_state::ctrl_w )
 	m_32 = BIT(data, 0);
 	m_coloren = BIT(data, 1);
 
-	m_discrete->write(space, NODE_10, BIT(data, 4));
+	m_discrete->write(NODE_10, BIT(data, 4));
 }
 
 WRITE8_MEMBER( c1p_state::osi630_ctrl_w )

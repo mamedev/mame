@@ -964,7 +964,7 @@ MACHINE_CONFIG_START(lwings_state::lwings)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("2203a", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -1014,7 +1014,7 @@ MACHINE_CONFIG_START(lwings_state::fball)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1048,7 +1048,7 @@ MACHINE_CONFIG_START(lwings_state::trojan)
 
 	/* sound hardware */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MCFG_DEVICE_ADD("5205", MSM5205, XTAL(384'000))    /* verified on PCB */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* slave mode */

@@ -370,8 +370,8 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_DEVICE_PROGRAM_MAP(apricot_mem)
 	MCFG_DEVICE_IO_MAP(apricot_io)
 	MCFG_I8089_DATA_WIDTH(16)
-	MCFG_I8089_SINTR1(WRITELINE("ic31", pic8259_device, ir0_w))
-	MCFG_I8089_SINTR2(WRITELINE("ic31", pic8259_device, ir1_w))
+	MCFG_I8089_SINTR1(WRITELINE(m_pic, pic8259_device, ir0_w))
+	MCFG_I8089_SINTR2(WRITELINE(m_pic, pic8259_device, ir1_w))
 
 	// ram
 	RAM(config, RAM_TAG).set_default_size("256K");
@@ -385,11 +385,12 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD("ic30", HD6845, "screen", 15_MHz_XTAL / 10)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(10)
-	MCFG_MC6845_UPDATE_ROW_CB(apricot_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, apricot_state, apricot_hd6845_de))
+	HD6845(config, m_crtc, 15_MHz_XTAL / 10);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(10);
+	m_crtc->set_update_row_callback(FUNC(apricot_state::crtc_update_row), this);
+	m_crtc->out_de_callback().set(FUNC(apricot_state::apricot_hd6845_de));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -409,7 +410,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(4_MHz_XTAL / 16);
-	m_pit->out_handler<0>().set("ic31", FUNC(pic8259_device::ir6_w));
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir6_w));
 	m_pit->set_clk<1>(4_MHz_XTAL / 2);
 	m_pit->out_handler<1>().set("ic14", FUNC(ttl153_device::i0a_w));
 	m_pit->set_clk<2>(4_MHz_XTAL / 2);

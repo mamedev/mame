@@ -361,7 +361,7 @@ PFSB 64M Mask ROM board
 |----------------------------------------------------------|
 Notes:
       The other side of the cart PCB just has more locations for
-      SOP44 MASKROMs... IC12S to IC21S (ROM12 to ROM21)
+      SOP44 mask ROMs... IC12S to IC21S (ROM12 to ROM21)
 
   IC1-IC21S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated
       IC22  - EPROM (DIP42), either 27C160 or 27C322
@@ -374,7 +374,7 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
-                                                Sticker      EPROM   MASKROMs    X76F100     XC9536    315-5881
+                                                Sticker      EPROM   mask ROMs   X76F100     XC9536    315-5881
 Game                                            on cart      IC22#   # of SOP44  IC37#       IC41#     IC42#          Notes
 ------------------------------------------------------------------------------------------------------------------------------
 18 Wheeler (deluxe) (Rev A)                     840-0023C    22185A  20 (64Mb)   present     315-6213  317-0273-COM
@@ -538,7 +538,7 @@ from NAOMI side it read as X76F100-type, probably simulated by ACTEL FPGA.
 Actual data is shuffled, address bits 3 to 6 have reversed order, i.e. 8 7 3 4 5 6 2 1 0.
 
 Games known to use this PCB include....
-                                                             Sticker      EPROM   MASKROMs    25LC040  A54SX32
+                                                             Sticker      EPROM   mask ROMs   25LC040  A54SX32
 Game                                                         on cart      IC11#   # of SOP44  IC13S#   IC1#          Notes
 -----------------------------------------------------------------------------------------------------------------------------------------------
 Club Kart: European Session (2003, Rev A)                    840-0139C    24173A  18 (64Mb)   present  317-0382-COM
@@ -591,7 +591,7 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                                                Sticker    EPROM   MASKROMs    EPM7032    XC9536    315-5881      X76F100
+                                                Sticker    EPROM   mask ROMs   EPM7032    XC9536    315-5881      X76F100
 Game                                            on cart    IC22#   # of SOP44  IC27#      IC41#     IC42#         IC46#        Notes
 -----------------------------------------------------------------------------------------------------------------------------------------
 Alien Front (Rev A)                             840-0048C  23586A   5 (128Mb)  315-6319A  315-6213  317-0293-COM  present
@@ -723,7 +723,7 @@ Notes:
               Silkscreened VOYAGER64. Looks like the equivalent of IC11/22 on Sega carts
          2K - NAODEC1B (QFP100) Altera MAX EPM7064S. Silkscreened NAODEC1A
          3J - oscillator 28.000MHz
-4B-4N,6B-6P - MASKROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
+4B-4N,6B-6P - mask ROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
       4P,5P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
    CN1/2/3  - connectors joining to main board
 
@@ -779,7 +779,7 @@ Notes:
               On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
 2B,2C,2D,2F - DA28F640J5 FlashROM (SSOP56), either 32Mb or 64Mb. Not all positions are populated.
               Silkscreened VOYAGER64. Looks like the equivalent of IC11/22 on Sega carts
-4B-4M,6B-6N - MASKROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
+4B-4M,6B-6N - mask ROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
       4N,4P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
    CN1/2/3  - connectors joining to main board
 
@@ -1288,7 +1288,7 @@ Notes:
       XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
                game code. This code is different for each different game.
                The last 3 digits seems to be for the usage.
-               F01 = CPLD/protection device and M01 = MASKROM
+               F01 = CPLD/protection device and M01 = mask ROM
 
                Game (sorted by code)                 Code
                -----------------------------------------------
@@ -1370,7 +1370,7 @@ Notes:
    XCR3128XL - Xilinx XCR3128XL in-system programmable 128 Macro-cell CPLD (TQFP100)
                stamped with a game code. This code is different for each different game.
                The last 3 digits seems to be for the usage.
-               F01 = CPLD/protection device and M01 = MASKROM
+               F01 = CPLD/protection device and M01 = mask ROM
 
                Game (sorted by code)                 Code
                -----------------------------------------------
@@ -1442,6 +1442,7 @@ Notes:
                Animal Basket                         VM2001F01  -
                Block Pong-Pong                       VM2001F01  -
                WaiWai Drive                          VM2001F01  -
+               Faster Than Speed 837-14681           315-6248   -         (not dumped, known to exists)
 
           U* - Fujitsu MBM29PL12LM-10PCN 128M MirrorFlash TSOP56 flash ROM.
                (configured as 16Mbytes x8bit or 8Mwords x16bit)
@@ -2921,7 +2922,8 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SCREEN_RAW_PARAMS(13458568*2, 820, 0, 640, 532, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
+	POWERVR2(config, m_powervr2, 0);
+	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -3041,11 +3043,13 @@ MACHINE_CONFIG_END
  * Naomi 2 GD-Rom
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2_base)
-	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(*this, dc_state, pvr_irq))
+void naomi2_state::naomi2_base(machine_config &config)
+{
+	POWERVR2(config, m_powervr2_slave, 0);
+	m_powervr2_slave->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	// TODO: ELAN device
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(naomi2_state::naomi2gd)
 	naomigd(config);

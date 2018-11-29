@@ -296,12 +296,12 @@ MACHINE_CONFIG_START(hp49gp_state::hp49gp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 131 - 1, 0, 80 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
-	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
-	MCFG_S3C2410_PALETTE("palette")
-	MCFG_S3C2410_SCREEN("screen")
-	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(*this, hp49gp_state, s3c2410_gpio_port_r))
-	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(*this, hp49gp_state, s3c2410_gpio_port_w))
-	MCFG_S3C2410_LCD_FLAGS(S3C24XX_INTERFACE_LCD_REVERSE)
+	S3C2410(config, m_s3c2410, 12000000);
+	m_s3c2410->set_palette_tag("palette");
+	m_s3c2410->set_screen_tag("screen");
+	m_s3c2410->gpio_port_r_callback().set(FUNC(hp49gp_state::s3c2410_gpio_port_r));
+	m_s3c2410->gpio_port_w_callback().set(FUNC(hp49gp_state::s3c2410_gpio_port_w));
+	m_s3c2410->set_lcd_flags(S3C24XX_INTERFACE_LCD_REVERSE);
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hp49gp )

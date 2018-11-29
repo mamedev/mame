@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 
 class iop_intc_device : public device_t
 {

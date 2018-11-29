@@ -396,14 +396,14 @@ MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, taxidriv_state, p8910_0a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, taxidriv_state, p8910_0b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", 1250000));
+	ay1.port_a_read_callback().set(FUNC(taxidriv_state::p8910_0a_r));
+	ay1.port_b_write_callback().set(FUNC(taxidriv_state::p8910_0b_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, taxidriv_state, p8910_1a_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", 1250000));
+	ay2.port_a_read_callback().set(FUNC(taxidriv_state::p8910_1a_r));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 

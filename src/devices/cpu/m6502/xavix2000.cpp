@@ -41,11 +41,11 @@
 
     -- loop point 1
     01BC3E: A3          ldal0 a   // read byte 0 of 32-bit 'long' register into accumulator
-    01BC3F: 73          adcpa     // adc ($Address PA), y
+    01BC3F: 73          adcpa     // adc ($Address PA)
     01BC40: 83          stal0 a   // store accumulator back in byte 0 of 32-bit 'long' register (even byte checksum?)
     01BC41: FB          incpa     // increase 'address' register PA
     01BC42: A7          ldal1 a   // read byte 1 of 32-bit 'long' register into accumulator
-    01BC43: 73          adcpa     // adc ($Address PA), y
+    01BC43: 73          adcpa     // adc ($Address PA)
     01BC44: 87          stal1 a   // store accumulator back in byte 0 of 32-bit 'long' register (odd byte checksum?)
     01BC45: FB          incpa     // increase 'address' register PA
     01BC46: D0 F6       bne $1bc3e // (branch based on PA increase, so PA must set flags?, probably overflows after 0xffff if upper byte is 'bank'? or at 0xff if this really is a mirror of the function below
@@ -111,7 +111,10 @@ void xavix2000_device::device_start()
 {
 	xavix_device::device_start();
 
+	state_add(SXAVIX_J, "J", m_j).callimport().formatstr("%8s");;
+	state_add(SXAVIX_K, "K", m_k).callimport().formatstr("%8s");;
 	state_add(SXAVIX_L, "L", m_l).callimport().formatstr("%8s");;
+	state_add(SXAVIX_M, "M", m_m).callimport().formatstr("%8s");;
 	state_add(SXAVIX_PA, "PA", m_pa).callimport().formatstr("%8s");
 	state_add(SXAVIX_PB, "PB", m_pb).callimport().formatstr("%8s");
 }
@@ -128,7 +131,13 @@ void xavix2000_device::state_import(const device_state_entry &entry)
 
 	switch(entry.index())
 	{
+	case SXAVIX_J:
+		break;
+	case SXAVIX_K:
+		break;
 	case SXAVIX_L:
+		break;
+	case SXAVIX_M:
 		break;
 	case SXAVIX_PA:
 		break;
@@ -143,8 +152,17 @@ void xavix2000_device::state_string_export(const device_state_entry &entry, std:
 
 	switch(entry.index())
 	{
+	case SXAVIX_J:
+		str = string_format("%02x", m_j);
+		break;
+	case SXAVIX_K:
+		str = string_format("%02x", m_k);
+		break;
 	case SXAVIX_L:
-		str = string_format("%08x", m_l);
+		str = string_format("%02x", m_l);
+		break;
+	case SXAVIX_M:
+		str = string_format("%02x", m_m);
 		break;
 	case SXAVIX_PA:
 		str = string_format("%08x", m_pa);

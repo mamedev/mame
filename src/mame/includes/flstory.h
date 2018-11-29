@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_FLSTORY_H
+#define MAME_INCLUDES_FLSTORY_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
@@ -12,8 +16,8 @@
 class flstory_state : public driver_device
 {
 public:
-	flstory_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	flstory_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_scrlram(*this, "scrlram"),
@@ -28,7 +32,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_soundnmi(*this, "soundnmi") { }
+		m_soundnmi(*this, "soundnmi")
+	{ }
 
 	void flstory(machine_config &config);
 	void rumba(machine_config &config);
@@ -37,6 +42,9 @@ public:
 	void onna34ro_mcu(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	/* memory pointers */
@@ -96,7 +104,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rumba_tile_info);
-	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(flstory);
 	DECLARE_VIDEO_START(flstory);
 	DECLARE_VIDEO_START(victnine);
@@ -116,3 +123,5 @@ private:
 	void sound_map(address_map &map);
 	void victnine_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FLSTORY_H

@@ -17,7 +17,7 @@ sub sound functions
 WRITE8_MEMBER(subs_state::noise_reset_w)
 {
 	/* Pulse noise reset */
-	m_discrete->write(space, SUBS_NOISE_RESET, 0);
+	m_discrete->write(SUBS_NOISE_RESET, 0);
 }
 
 

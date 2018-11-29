@@ -273,17 +273,18 @@ MACHINE_START_MEMBER(_39in1_state,60in1)
 	}
 }
 
-MACHINE_CONFIG_START(_39in1_state::_39in1)
-	MCFG_DEVICE_ADD("maincpu", PXA255, 200000000)
-	MCFG_DEVICE_PROGRAM_MAP(_39in1_map)
+void _39in1_state::_39in1(machine_config &config)
+{
+	PXA255(config, m_maincpu, 200000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_39in1_state::_39in1_map);
 
 	EEPROM_93C66_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("pxa_periphs", PXA255_PERIPHERALS, 200000000, "maincpu")
-	MCFG_PXA255_GPIO0_SET_CALLBACK(WRITE32(*this, _39in1_state, eeprom_set_w))
-	MCFG_PXA255_GPIO0_CLEAR_CALLBACK(WRITE32(*this, _39in1_state, eeprom_clear_w))
-	MCFG_PXA255_GPIO0_IN_CALLBACK(READ32(*this, _39in1_state, eeprom_r))
-MACHINE_CONFIG_END
+	PXA255_PERIPHERALS(config, m_pxa_periphs, 200000000, m_maincpu);
+	m_pxa_periphs->gpio0_set_cb().set(FUNC(_39in1_state::eeprom_set_w));
+	m_pxa_periphs->gpio0_clear_cb().set(FUNC(_39in1_state::eeprom_clear_w));
+	m_pxa_periphs->gpio0_in_cb().set(FUNC(_39in1_state::eeprom_r));
+}
 
 MACHINE_CONFIG_START(_39in1_state::_60in1)
 	_39in1(config);

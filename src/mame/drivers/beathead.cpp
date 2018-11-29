@@ -364,9 +364,9 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", NOOP)
-	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

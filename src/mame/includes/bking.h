@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour, Zsolt Vasvari
+#ifndef MAME_INCLUDES_BKING_H
+#define MAME_INCLUDES_BKING_H
+
+#pragma once
 
 #include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
@@ -10,8 +14,8 @@
 class bking_state : public driver_device
 {
 public:
-	bking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bking_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bmcu(*this, "bmcu"),
@@ -101,3 +105,5 @@ public:
 	void bking_io_map(address_map &map);
 	void bking_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BKING_H

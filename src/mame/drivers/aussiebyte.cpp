@@ -524,13 +524,11 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	INPUT_BUFFER(config, "cent_data_in");
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 4.9152_MHz_XTAL / 4));
-	ctc_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
-	ctc_clock.signal_handler().append(m_ctc, FUNC(z80ctc_device::trg2));
-
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->set_clk<0>(4.9152_MHz_XTAL / 4);
+	m_ctc->set_clk<1>(4.9152_MHz_XTAL / 4);
+	m_ctc->set_clk<2>(4.9152_MHz_XTAL / 4);
 	m_ctc->zc_callback<0>().set("sio1", FUNC(z80sio_device::rxca_w));
 	m_ctc->zc_callback<0>().append("sio1", FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().set("sio1", FUNC(z80sio_device::rxtxcb_w));
@@ -583,13 +581,14 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 16_MHz_XTAL / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(aussiebyte_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(aussiebyte_state, crtc_update_addr)
+	SY6545_1(config, m_crtc, 16_MHz_XTAL / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(aussiebyte_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(aussiebyte_state::crtc_update_addr), this);
 
-	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
+	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", aussiebyte_state, aussiebyte, "com,cpm", 3)

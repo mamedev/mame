@@ -1,22 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_RALLYX_H
+#define MAME_INCLUDES_RALLYX_H
+
+#pragma once
+
 #include "audio/timeplt.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
 #include "emupal.h"
 
-struct jungler_star
-{
-	int x, y, color;
-};
-
-#define JUNGLER_MAX_STARS 1000
-
 class rallyx_state : public driver_device
 {
 public:
-	rallyx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	struct jungler_star
+	{
+		int x, y, color;
+	};
+
+	static constexpr unsigned JUNGLER_MAX_STARS = 1000;
+
+	rallyx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_radarattr(*this, "radarattr"),
 		m_maincpu(*this, "maincpu"),
@@ -24,7 +29,8 @@ public:
 		m_samples(*this, "samples"),
 		m_timeplt_audio(*this, "timeplt_audio"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -87,8 +93,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(jungler_vblank_irq);
 	inline void rallyx_get_tile_info( tile_data &tileinfo, int tile_index, int ram_offs);
 	inline void locomotn_get_tile_info(tile_data &tileinfo,int tile_index,int ram_offs);
-	void calculate_star_field(  );
-	void rallyx_video_start_common(  );
+	void calculate_star_field();
+	void rallyx_video_start_common();
 	void plot_star( bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, int color );
 	void draw_stars( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -105,3 +111,5 @@ public:
 	void jungler_map(address_map &map);
 	void rallyx_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_RALLYX_H

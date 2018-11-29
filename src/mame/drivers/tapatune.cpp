@@ -549,12 +549,13 @@ MACHINE_CONFIG_START(tapatune_state::tapatune)
 
 	MCFG_QUANTUM_PERFECT_CPU("videocpu")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(24'000'000) / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(5)
-	MCFG_MC6845_BEGIN_UPDATE_CB(tapatune_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(tapatune_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, tapatune_state, crtc_vsync))
+	h46505_device &crtc(H46505(config, "crtc", XTAL(24'000'000) / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(5);
+	crtc.set_begin_update_callback(FUNC(tapatune_state::crtc_begin_update), this);
+	crtc.set_update_row_callback(FUNC(tapatune_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set(FUNC(tapatune_state::crtc_vsync));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

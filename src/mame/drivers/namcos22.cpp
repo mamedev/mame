@@ -12,7 +12,7 @@
  *
  * TODO:
  * - finish slave DSP emulation
- * - emulate System22 I/O board C74
+ * - emulate System22 I/O board C74 instead of HLE (inputs, outputs, volume control - HLE only handles the inputs)
  * - alpinesa doesn't work, protection related?
  * - C139 for linked cabinets, as well as in RR fullscale
  * - confirm DSP and MCU clocks and their IRQ timing
@@ -35,7 +35,6 @@
  * - alpha blended sprite/poly with priority over alpha blended text doesn't work right (see dirtdash countdown when you start at jungle level)
  * - ss22 poly translucency is probably more limited than currently emulated, not supporting stacked layers
  * - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
- * - cybrcomm arrows(black part) should be below textlayer when a messagebox pops up
  * - cybrcycc speed dial needle is missing
  * - global offset is wrong in non-super22 servicemode video test, and above that, it flickers in acedrvrw, victlapw
  * - dirtdash polys are broken at the start section of the mountain level, maybe bad rom?
@@ -275,7 +274,7 @@
  *
  *Notes:
  *      J6           : Custom Namco connector for plug-in program ROM PCB
- *      J11          : Custom Namco connector for optional plug-in WAVE ROM PCB (holds some SOP44 MASKROMs)
+ *      J11          : Custom Namco connector for optional plug-in WAVE ROM PCB (holds some SOP44 mask ROMs)
  *      JC410        : Custom Namco connector for Optional plug-in Auxiliary PCB (e.g. Gun Control PCB used in Time Crisis
  *                     etc)
  *                     The connector is populated only on the 2nd revision CPU (B) PCB 8646962600 (8646972600)
@@ -340,20 +339,20 @@
  *                     Tokyo Wars         'TW1 DATA'
  *
  *     WAVEA.2L   \
- *     WAVEB.1L   /  : 16M/32M WAVE MASKROMs. If 32MBit DIP42, they're programmed in BYTE mode (DIP42/SOP44)
+ *     WAVEB.1L   /  : 16M/32M WAVE mask ROMs. If 32MBit DIP42, they're programmed in BYTE mode (DIP42/SOP44)
  *                     Game                Wave A        Wave B        Type
  *                     ----------------------------------------------------------------------------
- *                     Air Combat 22      'ACS1 WAVE0', 'ACS1 WAVE1' , both SOP44 32M MASKROMs
- *                     Alpine Racer 1     'AR1 WAVEA' ,              , DIP42 16M MASKROM
- *                     Alpine Racer 2     'ARS1 WAVEA', 'ARS2 WAVE B', both DIP42 32M MASKROMs
- *                     Alpine Surfer      'AF1 WAVEA' ,              , DIP42 32M MASKROM
- *                     Aqua Jet           'AJ1 WAVEA' , 'AJ1 WAVEB'  , both DIP42 32M MASKROMs
- *                     Armadillo Racing   'AM1 WAVEA' , 'AM1 WAVEB'  , both DIP42 32M MASKROMs. Prototype version uses TSOP56, mounted on a DIP48 adapter board
- *                     Cyber Cycles       'CB1 WAVEA' , 'CB1 WAVEB'  , WAVE A DIP42 32M MASKROM, WAVE B DIP42 16M MASKROM
- *                     Dirt Dash          'DT1 WAVEA' , 'DT1 WAVEB'  , both DIP42 32M MASKROMs
- *                     Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M MASKROM
- *                     Time Crisis        'TS1 WAVE A', 'TS1 WAVE B' , WAVE A DIP42 32M MASKROM, WAVE B DIP42 16M MASKROM
- *                     Tokyo Wars         'TW1 WAVE A',              , DIP42 32M MASKROM
+ *                     Air Combat 22      'ACS1 WAVE0', 'ACS1 WAVE1' , both SOP44 32M mask ROMs
+ *                     Alpine Racer 1     'AR1 WAVEA' ,              , DIP42 16M mask ROM
+ *                     Alpine Racer 2     'ARS1 WAVEA', 'ARS2 WAVE B', both DIP42 32M mask ROMs
+ *                     Alpine Surfer      'AF1 WAVEA' ,              , DIP42 32M mask ROM
+ *                     Aqua Jet           'AJ1 WAVEA' , 'AJ1 WAVEB'  , both DIP42 32M mask ROMs
+ *                     Armadillo Racing   'AM1 WAVEA' , 'AM1 WAVEB'  , both DIP42 32M mask ROMs. Prototype version uses TSOP56, mounted on a DIP48 adapter board
+ *                     Cyber Cycles       'CB1 WAVEA' , 'CB1 WAVEB'  , WAVE A DIP42 32M mask ROM, WAVE B DIP42 16M mask ROM
+ *                     Dirt Dash          'DT1 WAVEA' , 'DT1 WAVEB'  , both DIP42 32M mask ROMs
+ *                     Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M mask ROM
+ *                     Time Crisis        'TS1 WAVE A', 'TS1 WAVE B' , WAVE A DIP42 32M mask ROM, WAVE B DIP42 16M mask ROM
+ *                     Tokyo Wars         'TW1 WAVE A',              , DIP42 32M mask ROM
  *
  *
  *PROGRAM ROM Daughterboard PCB
@@ -1196,7 +1195,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "machine/namcomcu.h"
-#include "sound/c352.h"
 #include "speaker.h"
 
 // 51.2MHz XTAL on video board, pixel clock of 12.8MHz (doubled in MAME because of unemulated interlacing)
@@ -1683,6 +1681,9 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 			break;
 	}
 
+	if (machine().side_effects_disabled())
+		return 0;
+
 	// pick a random number, but don't pick the same twice in a row
 	u16 old_rng = m_keycus_rng;
 	do
@@ -1703,31 +1704,26 @@ WRITE16_MEMBER(namcos22_state::namcos22_keycus_w)
  * 0x50000008 and 0x5000000a
  *
  * Writes to 0x50000008 and 0x5000000a reset the state of the input buffer.
- *
- * Note that only the values read at 0x50000008 seem to be used in-game.
- *
- * Some of these values are redundant with respects to the work-RAM supplied input port
- * values supplied by the IO CPU.  For example, the position of the stick shift is digital,
- * and may be read through this mechanism or through shared IO RAM at 0x60004030.
- *
- * Other values seem to be digital versions of analog ports, for example "the gas pedal is
- * pressed" as a boolean flag.  IO RAM supplies it as an analog value.
+ * It appears to be meant for debugging, not all games use it.
  */
 READ16_MEMBER(namcos22_state::namcos22_portbit_r)
 {
 	u16 ret = m_portbits[offset] & 1;
-	m_portbits[offset] = m_portbits[offset] >> 1 | 0x8000;
+
+	if (!machine().side_effects_disabled())
+		m_portbits[offset] = m_portbits[offset] >> 1 | 0x8000;
+
 	return ret;
 }
 
 WRITE16_MEMBER(namcos22_state::namcos22_portbit_w)
 {
-	m_portbits[offset] = ((offset == 0) ? m_p1 : m_p2).read_safe(0xffff);
+	m_portbits[offset] = m_custom[offset].read_safe(0xffff);
 }
 
 READ16_MEMBER(namcos22_state::namcos22_dipswitch_r)
 {
-	return ioport("DSW0")->read();
+	return m_dsw->read();
 }
 
 WRITE16_MEMBER(namcos22_state::namcos22_cpuleds_w)
@@ -1846,7 +1842,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 *     0x50000000 - DIPSW3
 	 *     0x50000001 - DIPSW2
 	 */
-	map(0x50000000, 0x50000003).rw(FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
+	map(0x50000000, 0x50000003).rw(FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w)).umask32(0xffff0000);
 	map(0x50000008, 0x5000000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 
 	/**
@@ -1967,8 +1963,8 @@ void namcos22_state::namcos22s_am(address_map &map)
 	map(0x400000, 0x40001f).rw(FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
 	map(0x410000, 0x413fff).ram(); // C139 SCI buffer
 	map(0x420000, 0x42000f).rw(FUNC(namcos22_state::namcos22_sci_r), FUNC(namcos22_state::namcos22_sci_w)); // C139 SCI registers
-	map(0x430000, 0x430003).w(FUNC(namcos22_state::namcos22_cpuleds_w));
-	map(0x440000, 0x440003).r(FUNC(namcos22_state::namcos22_dipswitch_r));
+	map(0x430000, 0x430003).w(FUNC(namcos22_state::namcos22_cpuleds_w)).umask32(0xffff0000);
+	map(0x440000, 0x440003).r(FUNC(namcos22_state::namcos22_dipswitch_r)).umask32(0xffff0000);
 	map(0x450008, 0x45000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0x700000, 0x70001f).rw(FUNC(namcos22_state::syscon_r), FUNC(namcos22_state::ss22_syscon_w));
@@ -1992,21 +1988,29 @@ void namcos22_state::namcos22s_am(address_map &map)
 
 
 // Time Crisis gun
-READ32_MEMBER(namcos22_state::namcos22_gun_r)
+READ16_MEMBER(namcos22_state::namcos22_gun_r)
 {
-	int xpos = ioport("LIGHTX")->read();
-	int ypos = ioport("LIGHTY")->read();
+	u16 xpos = m_opt[0]->read();
+	u16 ypos = m_opt[1]->read();
 	// ypos is not completely understood yet, there should be a difference between case 1 and 2
 	// game determines real y = 430004 + 430008
 
+	// use screen edges for off-screen
+	const u16 xmin = m_opt[0]->field(0xffff)->minval();
+	const u16 xmax = m_opt[0]->field(0xffff)->maxval();
+	const u16 ymin = m_opt[1]->field(0xffff)->minval();
+	const u16 ymax = m_opt[1]->field(0xffff)->maxval();
+	if (xpos == xmin || xpos == xmax || ypos == ymin || ypos == ymax)
+		xpos = ypos = 0;
+
 	switch (offset)
 	{
-		case 0: /* 430000 */
-			return xpos << 16;
+		case 0: // 430000
+			return xpos;
 
-		case 1: /* 430004 */
-		case 2: /* 430008 */
-			return ypos << 16;
+		case 1: // 430004
+		case 2: // 430008
+			return ypos;
 
 		default:
 			return 0;
@@ -2016,7 +2020,7 @@ READ32_MEMBER(namcos22_state::namcos22_gun_r)
 void namcos22_state::timecris_am(address_map &map)
 {
 	namcos22s_am(map);
-	map(0x430000, 0x43000f).r(FUNC(namcos22_state::namcos22_gun_r));
+	map(0x430000, 0x43000f).r(FUNC(namcos22_state::namcos22_gun_r)).umask32(0xffff0000);
 }
 
 
@@ -2087,7 +2091,8 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 			break;
 
 		case 2:
-			m_dspram16_latch = value >> 16;
+			if (!machine().side_effects_disabled())
+				m_dspram16_latch = value >> 16;
 			value &= 0xffff;
 			break;
 
@@ -2736,6 +2741,24 @@ void namcos22_state::iomcu_s22_io(address_map &map)
 
 // System Super22 M37710
 
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
+{
+	int scanline = param;
+
+	/* TODO: real sources of these */
+	if (scanline == 480)
+		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+	else if (scanline == 0)
+		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+	else if (scanline == 240)
+		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
+}
+
+WRITE8_MEMBER(namcos22_state::mb87078_gain_changed)
+{
+	m_c352->set_output_gain(offset ^ 3, data / 100.0);
+}
+
 /*
   SS22 MCU outputs
   ----------------
@@ -2789,6 +2812,8 @@ void namcos22_state::iomcu_s22_io(address_map &map)
 
   Tokyo Wars:
   1 = start button lamp
+  4 = handle solenoid
+  6 = seat motor
   other: ?
 */
 
@@ -2826,10 +2851,8 @@ WRITE8_MEMBER(namcos22_state::mcu_port5_w)
 
 READ8_MEMBER(namcos22_state::mcu_port5_r)
 {
-	if (m_mcu_iocontrol & 8)
-		return m_mcup5a.read_safe(0xff);
-	else
-		return m_mcup5b.read_safe(0xff);
+	u16 inputs = m_inputs->read();
+	return (m_mcu_iocontrol & 8) ? inputs & 0xff : inputs >> 8;
 }
 
 WRITE8_MEMBER(namcos22_state::mcu_port6_w)
@@ -2845,7 +2868,7 @@ READ8_MEMBER(namcos22_state::mcu_port6_r)
 
 READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
 {
-	u16 adc = m_adc_ports[offset >> 1 & 7].read_safe(0) << 2;
+	u16 adc = m_adc_ports[offset >> 1 & 7].read_safe(0);
 	return (offset & 1) ? adc >> 8 : adc;
 }
 
@@ -2855,9 +2878,9 @@ void namcos22_state::mcu_program(address_map &map)
 	map(0x004000, 0x00bfff).ram().share("shareram");
 	map(0x00c000, 0x00ffff).rom().region("mcu", 0xc000);
 	map(0x200000, 0x27ffff).rom().region("mcu", 0);
-	map(0x300000, 0x300001).nopr(); // ? (cybrcycc, alpinesa)
+	map(0x300000, 0x300001).nopr(); // ? (cybrcycc, alpinesa - writes data to RAM, but then never reads from there)
 	map(0x301000, 0x301001).nopw(); // watchdog? LEDs?
-	map(0x308000, 0x308003).nopw(); // volume control IC?
+	map(0x308000, 0x308003).w("mb87078", FUNC(mb87078_device::data_w)).umask16(0x00ff);
 }
 
 void namcos22_state::mcu_io(address_map &map)
@@ -2868,18 +2891,6 @@ void namcos22_state::mcu_io(address_map &map)
 	map(M37710_ADC0_L, M37710_ADC7_H).r(FUNC(namcos22_state::namcos22s_mcu_adc_r));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
-{
-	int scanline = param;
-
-	/* TODO: real sources of these */
-	if (scanline == 480)
-		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
-	else if (scanline == 0)
-		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-	else if (scanline == 240)
-		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
-}
 
 /*********************************************************************************************/
 
@@ -2905,46 +2916,46 @@ void namcos22_state::handle_driving_io()
 {
 	if (m_syscontrol[0x18] != 0)
 	{
-		u16 flags = ioport("INPUTS")->read();
-		u16 gas   = ioport("GAS")->read();
-		u16 brake = ioport("BRAKE")->read();
-		u16 steer = ioport("STEER")->read();
+		u16 flags = m_inputs->read();
+		u16 steer = m_adc_ports[0]->read();
+		u16 gas   = m_adc_ports[1]->read();
+		u16 brake = m_adc_ports[2]->read();
 
 		switch (m_gametype)
 		{
 			case NAMCOS22_RIDGE_RACER:
 			case NAMCOS22_RIDGE_RACER2:
+				steer <<= 4;
+				steer += 0x160;
 				gas <<= 3;
 				gas += 884;
 				brake <<= 3;
 				brake += 809;
-				steer <<= 4;
-				steer += 0x160;
 				break;
 
 			case NAMCOS22_RAVE_RACER:
-				gas <<= 3;
-				gas += 992;
-				brake <<= 3;
-				brake += 3008;
 				steer <<= 4;
 				steer += 32;
-				break;
-
-			case NAMCOS22_VICTORY_LAP:
-			case NAMCOS22_ACE_DRIVER:
 				gas <<= 3;
 				gas += 992;
 				brake <<= 3;
 				brake += 3008;
+				break;
+
+			case NAMCOS22_ACE_DRIVER:
+			case NAMCOS22_VICTORY_LAP:
 				steer <<= 4;
 				steer += 2048;
+				gas <<= 3;
+				gas += 992;
+				brake <<= 3;
+				brake += 3008;
 				break;
 
 			default:
+				steer <<= 4;
 				gas <<= 3;
 				brake <<= 3;
-				steer <<= 4;
 				break;
 		}
 
@@ -2961,17 +2972,12 @@ void namcos22_state::handle_cybrcomm_io()
 {
 	if (m_syscontrol[0x18] != 0)
 	{
-		u16 flags = ioport("INPUTS")->read();
-		u16 volume0 = ioport("STICKY1")->read() * 0x10;
-		u16 volume1 = ioport("STICKY2")->read() * 0x10;
-		u16 volume2 = ioport("STICKX1")->read() * 0x10;
-		u16 volume3 = ioport("STICKX2")->read() * 0x10;
-
+		u16 flags = m_inputs->read();
 		m_shareram[0x030/2] = flags;
-		m_shareram[0x032/2] = volume0;
-		m_shareram[0x034/2] = volume1;
-		m_shareram[0x036/2] = volume2;
-		m_shareram[0x038/2] = volume3;
+		m_shareram[0x032/2] = m_adc_ports[0]->read() * 0x10;
+		m_shareram[0x034/2] = m_adc_ports[1]->read() * 0x10;
+		m_shareram[0x036/2] = m_adc_ports[2]->read() * 0x10;
+		m_shareram[0x038/2] = m_adc_ports[3]->read() * 0x10;
 		handle_coinage(flags);
 	}
 }
@@ -3023,15 +3029,16 @@ void namcos22_state::alpine_io_map(address_map &map)
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
 {
-	m_mcu->pulse_input_line(M37710_LINE_TIMERA3TICK, m_mcu->minimum_quantum_time());
+	m_mcu->set_input_line(M37710_LINE_TIMERA3OUT, param ? ASSERT_LINE : CLEAR_LINE);
+	m_mcu->pulse_input_line(M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 {
 	// arbitrary timer for reading optical pedal
-	u8 i = ioport("PEDAL")->read();
+	int pedal = m_opt[0]->read() - 0x80;
 
-	if (i != 0)
+	if (pedal != 0)
 	{
 		// the pedal has a simple 1-bit "light interrupted" sensor. the faster you pedal,
 		// the faster it pulses.  this is connected to the clock input for timer A3,
@@ -3043,8 +3050,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 		const int base = 750;
 		const int range = 100000;
 
-		attotime freq = attotime::from_usec(base + range * (1.0 / (double)i));
-		m_pc_pedal_interrupt->adjust(std::min(freq, m_pc_pedal_interrupt->time_left()), 0, freq);
+		attotime freq = attotime::from_usec(base + range * (1.0 / abs(pedal)));
+		m_pc_pedal_interrupt->adjust(std::min(freq, m_pc_pedal_interrupt->time_left()), pedal < 0, freq);
 	}
 	else
 	{
@@ -3058,63 +3065,43 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 
 TIMER_CALLBACK_MEMBER(namcos22_state::adillor_trackball_interrupt)
 {
-	m_mcu->pulse_input_line(param ? M37710_LINE_TIMERA2TICK : M37710_LINE_TIMERA3TICK, m_mcu->minimum_quantum_time());
+	m_mcu->set_input_line((param & 1) ? M37710_LINE_TIMERA2OUT : M37710_LINE_TIMERA3OUT, (param & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_mcu->pulse_input_line((param & 1) ? M37710_LINE_TIMERA2IN : M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 {
 	// arbitrary timer for reading optical trackball
-	u8 ix = ioport("TRACKX")->read();
-	u8 iy = ioport("TRACKY")->read();
+	// -1.0 .. 1.0
+	double x = (double)(int)(m_opt[0]->read() - 0x80) / 127.0;
+	double y = (double)(int)(m_opt[1]->read() - 0x80) / 127.0;
 
-	if (ix != 0x80 || iy < 0x80)
+	// note that it is rotated by 45 degrees, so instead of axes like (+), they are like (x)
+	double ox = x, oy = y;
+	double a = M_PI / 4.0;
+	x = ox*cos(a) - oy*sin(a);
+	y = ox*sin(a) + oy*cos(a);
+
+	// tied to mcu A2/A3 timer (speed determines frequency)
+	double t[2];
+	t[0] = fabs(y); // y -> A2
+	t[1] = fabs(x); // x -> A3
+	int params[2] = { (y >= 0.0) ? 2 : 0, (x <= 0.0) ? 3 : 1 };
+
+	// these values(in hz) may need tweaking:
+	const double base = 20;
+	const double range = 1250;
+
+	for (int axis = 0; axis < 2; axis++)
 	{
-		if (iy >= 0x80)
-			iy = 0x7f;
-		double x = (double)(ix - 0x80) / 127.0;
-		double y = (double)(0x80 - iy) / 127.0;
-
-		// normalize
-		double a = atan(x/y);
-		double p = sqrt(x*x + y*y);
-		double v = (fabs(a) < (M_PI / 4.0)) ? p*cos(a) : p*sin(a);
-		v = fabs(v);
-
-		// note that it is rotated by 45 degrees, so instead of axes like (+), they are like (x)
-		a += (M_PI / 4.0);
-		if (a < 0)
-			a = 0;
-		else if (a > (M_PI / 2.0))
-			a = M_PI / 2.0;
-
-		// tied to mcu A2/A3 timer (speed determines frequency)
-		// these values(in hz) may need tweaking:
-		const double base = 20;
-		const double range = 1250;
-
-		double t[2];
-		t[0] = v*sin(a); // y -> A2
-		t[1] = v*cos(a); // x -> A3
-
-		for (int axis = 0; axis < 2; axis++)
+		if (t[axis] > (1.0 / range))
 		{
-			if (t[axis] > (1.0 / range))
-			{
-				attotime freq = attotime::from_hz(base + range * t[axis]);
-				m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->remaining()), axis, freq);
-			}
-			else
-			{
-				// not moving
-				m_ar_tb_interrupt[axis]->adjust(attotime::never, axis, attotime::never);
-			}
+			attotime freq = attotime::from_hz(base + range * t[axis]);
+			m_ar_tb_interrupt[axis]->adjust(std::min(freq, m_ar_tb_interrupt[axis]->remaining()), params[axis], freq);
 		}
-	}
-	else
-	{
-		// both axes not moving
-		for (int axis = 0; axis < 2; axis++)
+		else
 		{
+			// not moving
 			m_ar_tb_interrupt[axis]->adjust(attotime::never, axis, attotime::never);
 		}
 	}
@@ -3129,27 +3116,38 @@ static INPUT_PORTS_START( ridgera )
 	/*  1 3 5   When the cabinet is set to Deluxe, the stick shift is basically
 	    |-|-|   an 8-way joystick that locks into place.
 	    2 4 6   Standard (default) setup uses a racing shifter like in Ace Driver. */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Down")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Shift Left")    // not used in Standard Cabinet
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Shift Right")   // not used in Standard Cabinet
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Clutch Pedal")        // not used in Standard Cabinet
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_NAME("Shift Down")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Shift Up")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_NAME("Shift Left")  // not used in Standard Cabinet
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Shift Right") // "
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Clutch Pedal")       // "
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_CONFNAME( 0x0100, 0x0000, DEF_STR( Cabinet ) ) // @ JAMMA pins
+	PORT_CONFNAME( 0x0100, 0x0000, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Standard ) )
 	PORT_CONFSETTING(      0x0100, "Deluxe" )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE3 ) // also service mode?
+	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW0")
-	PORT_SERVICE_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1")
+	PORT_START("ADC.0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+
+	PORT_START("ADC.1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xd0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("ADC.2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW2:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )
@@ -3165,15 +3163,6 @@ static INPUT_PORTS_START( ridgera )
 	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW3:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW3:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW3:8" )
-
-	PORT_START("GAS")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
-
-	PORT_START("BRAKE")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
-
-	PORT_START("STEER")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ridgeracf )
@@ -3184,14 +3173,15 @@ static INPUT_PORTS_START( ridgeracf )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("AT Switch")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("MT Switch")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
 
 	// DIP3-1 to DIP3-3 are for setting up the viewing angle (game used one board per screen?)
 	// Some of the other dipswitches are for debugging, like with Ridge Racer 2.
-	PORT_MODIFY("DSW0")
-	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0000, "SW2:1" ) // always on?
-	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0000, "SW2:2" ) // always on?
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode" ) PORT_DIPLOCATION("SW3:8")
+	PORT_MODIFY("DSW")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )
+	PORT_DIPNAME( 0x0002, 0x0000, "Unknown" ) PORT_DIPLOCATION("SW2:2") // always on?
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode 2" ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3200,7 +3190,7 @@ static INPUT_PORTS_START( ridgera2 )
 	PORT_INCLUDE( ridgera )
 
 	PORT_MODIFY("INPUTS")
-	PORT_CONFNAME( 0x2100, 0x2000, DEF_STR( Cabinet ) ) // @ JAMMA pins
+	PORT_CONFNAME( 0x2100, 0x2000, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(      0x0000, "50 Inch" )
 	PORT_CONFSETTING(      0x0100, "Twin" )
 	PORT_CONFSETTING(      0x2000, DEF_STR( Standard ) )
@@ -3213,8 +3203,8 @@ static INPUT_PORTS_START( ridgera2 )
 	    2-8 : no game over when time runs out (cheat)
 	    3-7 : debug polygons
 	*/
-	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode" ) PORT_DIPLOCATION("SW3:8")
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode 2" ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3224,8 +3214,7 @@ static INPUT_PORTS_START( raveracw )
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("View Change")
-
-	PORT_CONFNAME( 0x2100, 0x2000, DEF_STR( Cabinet ) ) // @ JAMMA pins
+	PORT_CONFNAME( 0x2100, 0x2000, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(      0x0000, "50 Inch" )
 	PORT_CONFSETTING(      0x0100, "Twin" )
 	PORT_CONFSETTING(      0x2000, DEF_STR( Standard ) )
@@ -3235,8 +3224,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cybrcomm )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")     // placed on both sticks
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile Button")  // placed on both sticks
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")    // placed on both sticks
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile Button") // placed on both sticks
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3252,22 +3241,22 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	/* Note(s)
-	    The ranges here are based on the test mode which displays +-224
-	    The eeprom is calibrated using these settings.  If the SUBCPU handling changes then these might
-	    end up needing to change again too
-	    Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
-	*/
-	PORT_START("STICKY1") /* VOLUME 1 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: vertical */
-	PORT_START("STICKX1") /* VOLUME 2 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: horizontal */
-	PORT_START("STICKY2") /* VOLUME 3 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_D) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: vertical */
-	PORT_START("STICKX2") /* VOLUME 4 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x47,0xb7) /* range based on test mode */ PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_F) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: horizontal */
+	// The ranges here are based on the test mode which displays +-224
+	// The eeprom is calibrated using these settings. If the SUBCPU handling changes then these might end up needing to change again too.
+	// Default key arrangement is based on dual-joystick 'Tank' arrangement found in Assault and CyberSled
+	PORT_START("ADC.0") // right joystick: vertical
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47, 0xb7) PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("DSW0")
+	PORT_START("ADC.1") // left joystick: vertical
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x47, 0xb7) PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_D) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("ADC.2") // right joystick: horizontal
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x47, 0xb7) PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("ADC.3") // left joystick: horizontal
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x47, 0xb7) PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_F) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW2:3" )
@@ -3288,7 +3277,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( acedrvr )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Shift Down")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3298,20 +3287,23 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion-Stop")
 
-	PORT_START("P1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Dev Service Enter")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
-	PORT_BIT( 0xff3e, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("ADC.0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 
-	PORT_START("DSW0")
+	PORT_START("ADC.1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("ADC.2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0x48) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+
+	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW2:3" )
@@ -3329,28 +3321,44 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_DIPNAME( 0x4000, 0x4000, "Test Mode?" ) PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode?" ) PORT_DIPLOCATION("SW3:8")
+	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode?" ) PORT_DIPLOCATION("SW3:8") // enter test mode if SW3:7 is on
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("GAS")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_START("DEV")
+	PORT_CONFNAME( 0x01, 0x00, "Enable Dev Inputs" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
 
-	PORT_START("BRAKE")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_START("CUSTOM.0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Enter") // also "REC" start
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Exit") // also "REC" stop
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Unknown 1") // enters free camera view while in attract mode
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Unknown 2") // resets game?
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Left")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Right")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
 
-	PORT_START("STEER")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_START("CUSTOM.1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) // pauses game?
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( victlap )
 	PORT_INCLUDE( acedrvr )
 
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Dev Service Enter")
-	PORT_BIT( 0xfe3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("CUSTOM.0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Exit")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Enter")
+	PORT_BIT( 0xfe0e, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 /*********************************************************************************************/
@@ -3361,7 +3369,25 @@ CUSTOM_INPUT_MEMBER(namcos22_state::alpine_motor_read)
 }
 
 static INPUT_PORTS_START( alpiner )
-	PORT_START("DSW0")
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) // Decision / View Change
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state, alpine_motor_read, (void *)0) // steps are free
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state, alpine_motor_read, (void *)1) // steps are locked
+	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC.0")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x080, 0x380) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_NAME("Steps Swing")
+
+	PORT_START("ADC.1")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x080, 0x380) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_PLAYER(2) PORT_NAME("Steps Edge")
+
+	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
@@ -3371,30 +3397,30 @@ static INPUT_PORTS_START( alpiner )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MCUP5A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // Decision / View Change
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)0) // steps are free
-
-	PORT_START("MCUP5B")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)1) // steps are locked
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Swing")
-
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2) PORT_NAME("Steps Edge")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( airco22 )
-	PORT_START("DSW0")
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile Button")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1 ) // also view-change function
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC.0")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x100, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(12)
+
+	PORT_START("ADC.1")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x100, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(12)
+
+	PORT_START("ADC.2") // throttle stick auto-centers
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Z ) PORT_MINMAX(0x100, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(12) PORT_NAME("Throttle Stick")
+
+	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
@@ -3404,33 +3430,31 @@ static INPUT_PORTS_START( airco22 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MCUP5A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile Button")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) // also view-change function
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MCUP5B")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(3)
-
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(3)
-
-	PORT_START("ADC.2") // throttle stick auto-centers
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(3) PORT_NAME("Throttle Stick")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cybrcycc )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode?" ) PORT_DIPLOCATION("SW4:1")
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) // also view-change function
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC.0")
+	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x004, 0x3fc) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Steering Wheel")
+
+	PORT_START("ADC.1")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Gas Pedal")
+
+	PORT_START("ADC.2")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Brake Pedal")
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
@@ -3441,32 +3465,34 @@ static INPUT_PORTS_START( cybrcycc )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MCUP5A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // also view-change function
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MCUP5B")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
-
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
-
-	PORT_START("ADC.2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dirtdash )
-	PORT_START("DSW0")
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("View Change")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion-Stop")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( Standard ) )
+	PORT_CONFSETTING(      0x0200, "Deluxe" ) // car suspension valves
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC.0")
+	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x001, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(12) PORT_NAME("Steering Wheel")
+
+	PORT_START("ADC.1")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x140) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Gas Pedal")
+
+	PORT_START("ADC.2")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Brake Pedal")
+
+	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
@@ -3476,33 +3502,33 @@ static INPUT_PORTS_START( dirtdash )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MCUP5A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("View Change")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Shift Down")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion-Stop")
-
-	PORT_START("MCUP5B")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(3) PORT_NAME("Steering Wheel")
-
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
-
-	PORT_START("ADC.2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tokyowar )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode?" ) PORT_DIPLOCATION("SW4:1")
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) // also view-change function
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Right Trigger")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Trigger")
+	PORT_CONFNAME( 0x0080, 0x0080, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(      0x0080, DEF_STR( Standard ) )
+	PORT_CONFSETTING(      0x0000, "Deluxe" ) // cannon recoil motors
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC.0")
+	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x100, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Steering Wheel")
+
+	PORT_START("ADC.2")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Gas Pedal")
+
+	PORT_START("ADC.3")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Brake Pedal")
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
@@ -3513,33 +3539,31 @@ static INPUT_PORTS_START( tokyowar )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MCUP5A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // also view-change function
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Right Trigger")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Trigger")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MCUP5B")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
-
-	PORT_START("ADC.2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
-
-	PORT_START("ADC.3")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aquajet )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode?" ) PORT_DIPLOCATION("SW4:1")
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC.0")
+	PORT_BIT( 0x3ff, 0x1fc, IPT_PADDLE ) PORT_MINMAX(0x000, 0x3f8) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
+
+	PORT_START("ADC.1")
+	PORT_BIT( 0x3ff, 0x0e0, IPT_PEDAL ) PORT_MINMAX(0x0e0, 0x1fc) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
+
+	PORT_START("ADC.2")
+	PORT_BIT( 0x3ff, 0x1fc, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x3f8) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
@@ -3550,33 +3574,29 @@ static INPUT_PORTS_START( aquajet )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MCUP5A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MCUP5B")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
-
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x80) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
-
-	PORT_START("ADC.2")
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( adillor )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode?" ) PORT_DIPLOCATION("SW4:1")
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("OPT.0")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Trackball X")
+
+	PORT_START("OPT.1")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Trackball Y") PORT_REVERSE
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
@@ -3588,38 +3608,45 @@ static INPUT_PORTS_START( adillor )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Dev Service Enter")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Dev Service Exit")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_NAME("Dev Service Left")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("Dev Service Right") // when in normal testmode, press this to enter the extra testmode
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("DEV")
+	PORT_CONFNAME( 0x01, 0x00, "Enable Dev Inputs" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
 
-	PORT_START("MCUP5A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MCUP5B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("TRACKX")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Trackball X")
-
-	PORT_START("TRACKY")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Trackball Y")
+	PORT_START("CUSTOM.0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Enter")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Exit")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Right") // when in normal testmode, press this to enter the extra testmode
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( propcycl )
-	PORT_START("DSW0")
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC.0")
+	PORT_BIT( 0x3ff, 0x1ff, IPT_AD_STICK_X ) PORT_MINMAX(0x0bf, 0x33f) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
+
+	PORT_START("ADC.1")
+	PORT_BIT( 0x3ff, 0x1ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x0bf, 0x33f) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
+
+	PORT_START("OPT.0")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Cycle Pedal")
+
+	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
@@ -3629,33 +3656,27 @@ static INPUT_PORTS_START( propcycl )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW4:8" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MCUP5A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MCUP5B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("ADC.0")
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
-
-	PORT_START("ADC.1")
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-
-	PORT_START("PEDAL")
-	PORT_BIT( 0x7f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( timecris )
-	PORT_START("DSW0")
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("OPT.0") // tuned for CRT
+	PORT_BIT( 0xffff, 68+626/2, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(68, 68+626) PORT_SENSITIVITY(48) PORT_KEYDELTA(10)
+
+	PORT_START("OPT.1") // tuned for CRT - can't shoot below the statusbar?
+	PORT_BIT( 0xffff, 43+241/2, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(43, 43+241) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
+
+	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW4:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW4:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW4:3" )
@@ -3663,27 +3684,10 @@ static INPUT_PORTS_START( timecris )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW4:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW4:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW4:7" )
-	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW4:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Test Mode" ) PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("MCUP5A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Pedal")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MCUP5B")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START( "LIGHTX" ) // tuned for CRT
-	PORT_BIT( 0xfff, 68+626/2, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(68, 68+626) PORT_SENSITIVITY(48) PORT_KEYDELTA(10)
-
-	PORT_START( "LIGHTY" ) // tuned for CRT - can't shoot below the statusbar?
-	PORT_BIT( 0xfff, 43+241/2, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(43, 43+241) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 
@@ -3764,8 +3768,10 @@ void namcos22_state::machine_reset()
 	master_enable(false);
 	slave_enable(false);
 	m_dsp_irq_enabled = false;
-	if (!m_is_ss22) m_iomcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	if (!m_is_ss22)
+		m_iomcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void namcos22_state::device_post_load()
@@ -3956,6 +3962,9 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000)) // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	MCFG_DEVICE_REMOVE("iomcu")
+
+	MB87078(config, m_mb87078);
+	m_mb87078->gain_changed().set(FUNC(namcos22_state::mb87078_gain_changed));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -4813,7 +4822,6 @@ ROM_START( victlapj )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 ROM_END
 
-/*********************************************************************************************/
 
 ROM_START( propcycl )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
@@ -5665,51 +5673,45 @@ void namcos22_state::install_141_speedup()
 
 /*********************************************************************************************/
 
-void namcos22_state::namcos22_init(int game_type)
-{
-	m_gametype = game_type;
-}
-
 void namcos22_state::init_ridgeraj()
 {
-	namcos22_init(NAMCOS22_RIDGE_RACER);
+	m_gametype = NAMCOS22_RIDGE_RACER;
 	install_c74_speedup();
 }
 
 void namcos22_state::init_ridger2j()
 {
-	namcos22_init(NAMCOS22_RIDGE_RACER2);
+	m_gametype = NAMCOS22_RIDGE_RACER2;
 	install_c74_speedup();
 }
 
 void namcos22_state::init_acedrvr()
 {
-	namcos22_init(NAMCOS22_ACE_DRIVER);
+	m_gametype = NAMCOS22_ACE_DRIVER;
 	install_c74_speedup();
 }
 
 void namcos22_state::init_victlap()
 {
-	namcos22_init(NAMCOS22_VICTORY_LAP);
+	m_gametype = NAMCOS22_VICTORY_LAP;
 	install_c74_speedup();
 }
 
 void namcos22_state::init_raveracw()
 {
-	namcos22_init(NAMCOS22_RAVE_RACER);
+	m_gametype = NAMCOS22_RAVE_RACER;
 	install_c74_speedup();
 }
 
 void namcos22_state::init_cybrcomm()
 {
-	namcos22_init(NAMCOS22_CYBER_COMMANDO);
+	m_gametype = NAMCOS22_CYBER_COMMANDO;
 	install_c74_speedup();
 }
 
-
 void namcos22_state::init_alpiner()
 {
-	namcos22_init(NAMCOS22_ALPINE_RACER);
+	m_gametype = NAMCOS22_ALPINE_RACER;
 	install_130_speedup();
 
 	m_motor_status = 2;
@@ -5717,7 +5719,7 @@ void namcos22_state::init_alpiner()
 
 void namcos22_state::init_alpiner2()
 {
-	namcos22_init(NAMCOS22_ALPINE_RACER_2);
+	m_gametype = NAMCOS22_ALPINE_RACER_2;
 	install_130_speedup();
 
 	m_motor_status = 2;
@@ -5725,7 +5727,7 @@ void namcos22_state::init_alpiner2()
 
 void namcos22_state::init_alpinesa()
 {
-	namcos22_init(NAMCOS22_ALPINE_SURFER);
+	m_gametype = NAMCOS22_ALPINE_SURFER;
 	install_141_speedup();
 
 	m_motor_status = 2;
@@ -5733,7 +5735,7 @@ void namcos22_state::init_alpinesa()
 
 void namcos22_state::init_airco22()
 {
-	namcos22_init(NAMCOS22_AIR_COMBAT22);
+	m_gametype = NAMCOS22_AIR_COMBAT22;
 	install_130_speedup(); // S22-BIOS ver1.20 namco all rights reserved 94/12/21
 }
 
@@ -5757,43 +5759,43 @@ void namcos22_state::init_propcycl()
 	//ROM[0x22296/4] &= 0xffff0000;
 	//ROM[0x22296/4] |= 0x00004e75;
 
-	namcos22_init(NAMCOS22_PROP_CYCLE);
+	m_gametype = NAMCOS22_PROP_CYCLE;
 	install_141_speedup();
 }
 
 void namcos22_state::init_cybrcyc()
 {
-	namcos22_init(NAMCOS22_CYBER_CYCLES);
+	m_gametype = NAMCOS22_CYBER_CYCLES;
 	install_130_speedup();
 }
 
 void namcos22_state::init_timecris()
 {
-	namcos22_init(NAMCOS22_TIME_CRISIS);
+	m_gametype = NAMCOS22_TIME_CRISIS;
 	install_130_speedup();
 }
 
 void namcos22_state::init_tokyowar()
 {
-	namcos22_init(NAMCOS22_TOKYO_WARS);
+	m_gametype = NAMCOS22_TOKYO_WARS;
 	install_141_speedup();
 }
 
 void namcos22_state::init_aquajet()
 {
-	namcos22_init(NAMCOS22_AQUA_JET);
+	m_gametype = NAMCOS22_AQUA_JET;
 	install_141_speedup();
 }
 
 void namcos22_state::init_adillor()
 {
-	namcos22_init(NAMCOS22_ARMADILLO_RACING);
+	m_gametype = NAMCOS22_ARMADILLO_RACING;
 	install_141_speedup();
 }
 
 void namcos22_state::init_dirtdash()
 {
-	namcos22_init(NAMCOS22_DIRT_DASH);
+	m_gametype = NAMCOS22_DIRT_DASH;
 	install_141_speedup();
 }
 
@@ -5803,7 +5805,7 @@ void namcos22_state::init_dirtdash()
 
 /*     YEAR, NAME,    PARENT,    MACHINE,   INPUT,     CLASS,          INIT,          MNTR, COMPANY, FULLNAME, FLAGS */
 // System22 games
-GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
+GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, RR3 means USA?
 GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
 GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
 GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,   namcos22_state, init_ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07

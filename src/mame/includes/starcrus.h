@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo
+#ifndef MAME_INCLUDES_STARCRUS_H
+#define MAME_INCLUDES_STARCRUS_H
+
+#pragma once
+
 #include "sound/samples.h"
 #include "emupal.h"
 
 class starcrus_state : public driver_device
 {
 public:
-	starcrus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	starcrus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -84,3 +89,5 @@ private:
 	void starcrus_io_map(address_map &map);
 	void starcrus_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_STARCRUS_H

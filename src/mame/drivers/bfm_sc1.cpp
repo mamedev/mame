@@ -1083,9 +1083,8 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 
 	MCFG_BFMBD1_ADD("vfd0",0)
 	SPEAKER(config, "mono").front_center();
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_DEVICE_ADD("aysnd",AY8912, MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	GENERIC_LATCH_8(config, "soundlatch");
+	AY8912(config, "aysnd", MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	config.set_default_layout(layout_sc1_vfd);

@@ -143,11 +143,11 @@ WRITE_LINE_MEMBER(ultratnk_state::lockout_w)
 
 WRITE8_MEMBER(ultratnk_state::attract_w)
 {
-	m_discrete->write(space, ULTRATNK_ATTRACT_EN, data & 1);
+	m_discrete->write(ULTRATNK_ATTRACT_EN, data & 1);
 }
 WRITE8_MEMBER(ultratnk_state::explosion_w)
 {
-	m_discrete->write(space, ULTRATNK_EXPLOSION_DATA, data & 15);
+	m_discrete->write(ULTRATNK_EXPLOSION_DATA, data & 15);
 }
 
 

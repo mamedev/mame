@@ -100,9 +100,6 @@ public:
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
 		, m_bankdev(*this, "bankdev")
 		, m_bbcconfig(*this, "BBCCONFIG")
 	{ }
@@ -118,18 +115,20 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_WRITE8_MEMBER(bbc_romsel_w);
-	DECLARE_WRITE8_MEMBER(bbc_bank4_w);
+	DECLARE_READ8_MEMBER(bbc_paged_r);
+	DECLARE_WRITE8_MEMBER(bbc_paged_w);
 	DECLARE_READ8_MEMBER(bbcbp_fetch_r);
 	DECLARE_WRITE8_MEMBER(bbcbp_romsel_w);
-	DECLARE_WRITE8_MEMBER(bbcbp_bank4_w);
-	DECLARE_WRITE8_MEMBER(bbcbp_bank5_w);
+	DECLARE_READ8_MEMBER(bbcbp_paged_r);
+	DECLARE_WRITE8_MEMBER(bbcbp_paged_w);
 	DECLARE_READ8_MEMBER(bbcm_fetch_r);
 	DECLARE_READ8_MEMBER(bbcm_acccon_r);
 	DECLARE_WRITE8_MEMBER(bbcm_acccon_w);
 	DECLARE_WRITE8_MEMBER(bbcm_romsel_w);
-	DECLARE_WRITE8_MEMBER(bbcm_bank4_w);
-	DECLARE_WRITE8_MEMBER(bbcm_bank5_w);
-	DECLARE_WRITE8_MEMBER(bbcm_bank6_w);
+	DECLARE_READ8_MEMBER(bbcm_paged_r);
+	DECLARE_WRITE8_MEMBER(bbcm_paged_w);
+	DECLARE_READ8_MEMBER(bbcm_hazel_r);
+	DECLARE_WRITE8_MEMBER(bbcm_hazel_w);
 	DECLARE_READ8_MEMBER(bbcm_tube_r);
 	DECLARE_WRITE8_MEMBER(bbcm_tube_w);
 	DECLARE_WRITE8_MEMBER(bbcbp_drive_control_w);
@@ -182,7 +181,9 @@ public:
 	int get_analogue_input(int channel_number);
 	void upd7002_eoc(int data);
 
-	void setup_banks(memory_bank *membank, uint32_t shift);
+	std::string get_rom_name(uint8_t* header);
+	void insert_device_rom(memory_region *rom);
+	void setup_device_roms();
 
 	image_init_result load_rom16(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom0) { return load_rom16(image, m_rom[0]); }
@@ -285,21 +286,14 @@ protected:
 	required_memory_bank m_bank1; // bbca bbcb bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank3; // bbca bbcb
-	required_memory_bank m_bank4; // bbca bbcb bbcbp bbcbp128 bbcm
-	optional_memory_bank m_bank5; //           bbcbp bbcbp128 bbcm
-	required_memory_bank m_bank6; // bbca bbcb bbcbp bbcbp128 bbcm
 	optional_device<address_map_bank_device> m_bankdev; //    bbcm
 	optional_ioport m_bbcconfig;
 
 	int m_monitortype;      // monitor type (colour, green, amber)
 	int m_swramtype;        // this stores the setting for the SWRAM type being used
-
 	int m_swrbank;          // This is the latch that holds the sideways ROM bank to read
-	bool m_swrbank_ram;     // Does ROM bank contain RAM
-
 	int m_paged_ram;        // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling
-
 	bool m_lk18_ic41_paged_rom;  // BBC Master Paged ROM/RAM select IC41
 	bool m_lk19_ic37_paged_rom;  // BBC Master Paged ROM/RAM select IC37
 

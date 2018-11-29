@@ -814,12 +814,13 @@ MACHINE_CONFIG_START(m20_state::m20)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8) /* hand tuned to get ~50 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_UPDATE_ROW_CB(m20_state, update_row)
+	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK/8)); /* hand tuned to get ~50 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(16);
+	crtc.set_update_row_callback(FUNC(m20_state::update_row), this);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	I8255A(config, m_i8255, 0);
 
 	I8251(config, m_kbdi8251, 0);
 	m_kbdi8251->txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
@@ -830,16 +831,16 @@ MACHINE_CONFIG_START(m20_state::m20)
 	m_ttyi8251->rxrdy_handler().set(m_i8259, FUNC(pic8259_device::ir3_w));
 	m_ttyi8251->txrdy_handler().set(m_i8259, FUNC(pic8259_device::ir5_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(1230782)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, m20_state, tty_clock_tick_w))
-	MCFG_PIT8253_CLK1(1230782)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, m20_state, kbd_clock_tick_w))
-	MCFG_PIT8253_CLK2(1230782)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, m20_state, timer_tick_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(1230782);
+	pit8253.out_handler<0>().set(FUNC(m20_state::tty_clock_tick_w));
+	pit8253.set_clk<1>(1230782);
+	pit8253.out_handler<1>().set(FUNC(m20_state::kbd_clock_tick_w));
+	pit8253.set_clk<2>(1230782);
+	pit8253.out_handler<2>().set(FUNC(m20_state::timer_tick_w));
 
-	MCFG_DEVICE_ADD(m_i8259, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, m20_state, int_w))
+	PIC8259(config, m_i8259, 0);
+	m_i8259->out_int_callback().set(FUNC(m20_state::int_w));
 
 	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard, "m20"));
 	kbd.rxd_handler().set(m_kbdi8251, FUNC(i8251_device::write_rxd));

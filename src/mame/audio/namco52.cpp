@@ -78,7 +78,7 @@ READ8_MEMBER( namco_52xx_device::R1_r )
 
 WRITE8_MEMBER( namco_52xx_device::P_w )
 {
-	m_discrete->write(space, NAMCO_52XX_P_DATA(m_basenode), data & 0x0f);
+	m_discrete->write(NAMCO_52XX_P_DATA(m_basenode), data & 0x0f);
 }
 
 WRITE8_MEMBER( namco_52xx_device::R2_w )

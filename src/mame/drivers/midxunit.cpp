@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(midxunit_state::midxunit)
 	adc.ch6_callback().set_ioport("AN5");
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K_UART, 0)
+	DCS_AUDIO_2K_UART(config, m_dcs, 0);
 MACHINE_CONFIG_END
 
 
