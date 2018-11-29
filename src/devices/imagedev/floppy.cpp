@@ -252,7 +252,11 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 {
 	extension_list[0] = '\0';
 	fif_list = nullptr;
-	for(int cnt=0; formats[cnt]; cnt++)
+	// FIXME: this code previously treated formats as an array, but none of the actual formats in src/lib/formats provide an array - they all just supply a single function pointer
+	// This happens to work by chance if the next poitner-sized piece of BSS data happens to be zero, which it is most of the time.
+	// However, for some reason on a Linux clang 6 build it sometimes isn't, causing a lovely crash here.
+	// If this is supposed to be a nullptr-terminated array of function pointers, the code needs to be changed to better enforce it.
+	for(int cnt=0; /*formats[cnt]*/ !cnt; cnt++)
 	{
 		// allocate a new format
 		floppy_image_format_t *fif = formats[cnt]();

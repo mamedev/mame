@@ -219,8 +219,8 @@ static const z80_daisy_config daisy_chain[] =
 
 void facit4440_state::facit4440(machine_config &config)
 {
-	constexpr u32 CHAR_WIDTH = 8;
-	constexpr u32 FAKE_DOT_CLOCK = 65 * 103 * 621 * CHAR_WIDTH;
+	constexpr u32 CH_WIDTH = 8;
+	constexpr u32 FAKE_DOT_CLOCK = 65 * 103 * 621 * CH_WIDTH;
 
 	Z80(config, m_maincpu, 32_MHz_XTAL / 8); // clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &facit4440_state::mem_map);
@@ -257,12 +257,12 @@ void facit4440_state::facit4440(machine_config &config)
 	// Channel B is not used
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(FAKE_DOT_CLOCK, 103 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 621, 0, 500);
-	//screen.set_raw(FAKE_DOT_CLOCK, 103 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 621, 0, 560);
+	screen.set_raw(FAKE_DOT_CLOCK, 103 * CH_WIDTH, 0, 80 * CH_WIDTH, 621, 0, 500);
+	//screen.set_raw(FAKE_DOT_CLOCK, 103 * CH_WIDTH, 0, 80 * CH_WIDTH, 621, 0, 560);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MC6845(config, m_crtc, FAKE_DOT_CLOCK / CHAR_WIDTH); // HD46505SP-2
-	m_crtc->set_char_width(CHAR_WIDTH);
+	MC6845(config, m_crtc, FAKE_DOT_CLOCK / CH_WIDTH); // HD46505SP-2
+	m_crtc->set_char_width(CH_WIDTH);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_update_row_callback(FUNC(facit4440_state::update_row), this);
 	m_crtc->out_hsync_callback().set("ctc", FUNC(z80ctc_device::trg3));
