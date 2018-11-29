@@ -918,8 +918,8 @@ u32 rx3230_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rec
 u16 rx3230_state::lance_r(offs_t offset, u16 mem_mask)
 {
 	u16 const data =
-		(m_ram->read(WORD_XOR_BE(offset + 1)) << 8) |
-		m_ram->read(WORD_XOR_BE(offset + 0));
+		(m_ram->read(BYTE4_XOR_BE(offset + 0)) << 8) |
+		m_ram->read(BYTE4_XOR_BE(offset + 1));
 
 	return data;
 }
@@ -927,10 +927,10 @@ u16 rx3230_state::lance_r(offs_t offset, u16 mem_mask)
 void rx3230_state::lance_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_ram->write(WORD_XOR_BE(offset + 0), data);
+		m_ram->write(BYTE4_XOR_BE(offset + 1), data);
 
 	if (ACCESSING_BITS_8_15)
-		m_ram->write(WORD_XOR_BE(offset + 1), data >> 8);
+		m_ram->write(BYTE4_XOR_BE(offset + 0), data >> 8);
 }
 
 ROM_START(rx2030)
