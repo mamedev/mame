@@ -15314,6 +15314,9 @@ hp2622a                         //
 @source:hp2640.cpp
 hp2645                          //
 
+@source:hp3478a.cpp
+hp3478a                         //
+
 @source:hp48.cpp
 hp38g                           //
 hp39g                           //
