@@ -3,7 +3,6 @@
 <!-- note, the led16seg renderer is hardcoded to have OFF segments darker than ON, which is good for LEDs but not LCDs. -->
 <!-- TODO : fix that -->
 <!-- TODO : add button subtext for shifted functions -->
-<!-- TODO : make buttons clickable ?  all the COL / input stuff is wrong-->
 <mamelayout version="2">
 	<element name="vfd0"><led16segsc><color red="0.8" green="0.8" blue="0.8" /></led16segsc></element>
 
