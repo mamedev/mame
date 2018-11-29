@@ -145,39 +145,32 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 	const uint8_t *const addr = gfxelement->get_data(code  % gfxelement->elements());
 	const uint32_t realcolor = gfxelement->granularity() * (color % gfxelement->colors());
 
-	const uint8_t* const source = flipy ? addr + (7 - line) * gfxelement->rowbytes() : addr + line * gfxelement->rowbytes();
+	const uint8_t *const source = flipy ? addr + (7 - line) * gfxelement->rowbytes() : addr + line * gfxelement->rowbytes();
 
 	if (realline >= cliprect.min_y && realline <= cliprect.max_y)
 	{
-		uint8_t m_gfxbppmask = 0x00;
-
 		// comments at top suggest that each bit of 'gfx' enables 2 bitplanes, but ultrax case disagrees, also that would require 4 bits to cover all cases, and we only have 3
-		switch (gfx & 0x07)
-		{
-		case 0x07: m_gfxbppmask = 0xff; break; // common 8bpp case
-		case 0x06: m_gfxbppmask = 0x3f; break; // common 6bpp case + keithlcy (logo), drifto94 (wheels) masking
+		static constexpr uint8_t BPP_MASK_TABLE[8] = {
+				0x3f,   // 0: ultrax, twineag2 text - is there a local / global mixup somewhere, or is this an 'invalid' setting that just enables all planes?
+				0xff,   // 1: unverified case, mimic old driver behavior of only using lowest bit
+				0x3f,   // 2: unverified case, mimic old driver behavior of only using lowest bit
+				0xff,   // 3: unverified case, mimic old driver behavior of only using lowest bit
+				0x0f,   // 4: eagle shot 4bpp birdie text (there is probably a case for the other 4bpp? but that's only used for Japanese text and the supported set isn't Japanese)
+				0xff,   // 5: unverified case, mimic old driver behavior of only using lowest bit
+				0x3f,   // 6: common 6bpp case + keithlcy (logo), drifto94 (wheels) masking
+				0xff }; // 7: common 8bpp case
+		const uint8_t gfxbppmask = BPP_MASK_TABLE[gfx & 0x07];
 
-		case 0x04: m_gfxbppmask = 0x0f; break; // eagle shot 4bpp birdie text (there is probably a case for the other 4bpp? but that's only used for Japanese text and the supported set isn't Japanese)
+		uint16_t *dest = &bitmap.pix16(realline);
 
-		case 0x00: m_gfxbppmask = 0x3f; break; // ultrax, twineag2 text - is there a local / global mixup somewhere, or is this an 'invalid' setting that just enables all planes?
-
-		// unverified cases, just mimic old driver behavior of only using lowest bit
-		case 0x05: m_gfxbppmask = 0xff; break; 
-		case 0x03: m_gfxbppmask = 0xff; break; 
-		case 0x01: m_gfxbppmask = 0xff; break; 
-		case 0x02: m_gfxbppmask = 0x3f; break; 
-		}
-
-		uint16_t* dest = &bitmap.pix16(realline);
-
-		const int x0 = flipx ? (base_sx + gfxelement->width() - 1) : (base_sx);
+		const int x0 = flipx ? (base_sx + gfxelement->width() - 1) : base_sx;
 		const int x1 = flipx ? (base_sx - 1) : (x0 + gfxelement->width());
-		const int dx = flipx ? (-1) : (1);
+		const int dx = flipx ? -1 : 1;
 
 		int column = 0;
 		for (int sx = x0; sx != x1; sx += dx)
 		{
-			uint8_t pen = source[column] & m_gfxbppmask;
+			const uint8_t pen = source[column] & gfxbppmask;
 
 			if (pen && sx >= cliprect.min_x && sx <= cliprect.max_x)
 			{
