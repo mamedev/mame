@@ -619,7 +619,7 @@ ROM_START( hp3478a )
 	ROM_LOAD("rom_dc118.bin", 0, 0x2000, CRC(10097ced) SHA1(bd665cf7e07e63f825b2353c8322ed8a4376b3bd))	//main CPU ROM, can match other datecodes too
 
 	ROM_REGION( 0x100, "nvram", 0 )	/* Calibration RAM, battery-backed */
-	ROM_LOAD_OPTIONAL( "calram.bin", 0, 0x100, CRC(0))
+	ROM_LOAD( "calram.bin", 0, 0x100, NO_DUMP)
 ROM_END
 
 /******************************************************************************
@@ -627,4 +627,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME             FLAGS
-COMP( 1983, hp3478a,  0,      0,  hp3478a, hp3478a,hp3478a_state, empty_init, "HP", "HP 3478A Multimeter", MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER)
+SYST( 1983, hp3478a,  0,      0,  hp3478a, hp3478a,hp3478a_state, empty_init, "HP", "HP 3478A Multimeter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

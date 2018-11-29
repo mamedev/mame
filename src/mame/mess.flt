@@ -291,6 +291,7 @@ hp16500.cpp
 hp2100.cpp
 hp2620.cpp
 hp2640.cpp
+hp3478a.cpp
 hp48.cpp
 hp49gp.cpp
 hp64k.cpp
