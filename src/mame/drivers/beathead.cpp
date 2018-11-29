@@ -142,9 +142,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 
 void beathead_state::machine_reset()
 {
-	/* reset the common subsystems */
-	atarigen_state::machine_reset();
-
 	/* the code is temporarily mapped at 0 at startup */
 	/* just copying the first 0x40 bytes is sufficient */
 	memcpy(m_ram_base, m_rom_base, 0x40);
