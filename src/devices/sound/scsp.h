@@ -15,16 +15,6 @@
 				// driver code indicates should be 4, but sounds distorted then
 
 
-#define MCFG_SCSP_IRQ_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_SCSP_EXTS_CB(_devcb) \
-	downcast<scsp_device &>(*device).set_exts_callback(DEVCB_##_devcb);
-
-
 class scsp_device : public device_t,
 	public device_sound_interface,
 	public device_rom_interface
@@ -32,12 +22,8 @@ class scsp_device : public device_t,
 public:
 	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 22'579'200);
 
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_exts_callback(Object &&cb) { return m_exts_cb.set_callback(std::forward<Object>(cb)); }
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto main_irq_cb() { return m_main_irq_cb.bind(); }
-	auto exts_cb() { return m_exts_cb.bind(); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );
@@ -106,7 +92,6 @@ private:
 
 	devcb_write8       m_irq_cb;  /* irq callback */
 	devcb_write_line   m_main_irq_cb;
-	devcb_read16       m_exts_cb;
 
 	union
 	{
@@ -162,6 +147,8 @@ private:
 
 	stream_sample_t *m_bufferl;
 	stream_sample_t *m_bufferr;
+	stream_sample_t *m_exts0;
+	stream_sample_t *m_exts1;
 
 	int m_length;
 
