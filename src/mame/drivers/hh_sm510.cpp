@@ -1139,6 +1139,92 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Nintendo Game & Watch: Oil Panic (model OP-51)
+  * PCB label OP-51A
+  * Sharp SM510 label OP-51 28ZB (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_opanic_state : public hh_sm510_state
+{
+public:
+	gnw_opanic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_opanic(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_opanic )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(gnw_opanic_state::gnw_opanic)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", SM510)
+	MCFG_SM510_R_MASK_OPTION(2) // confirmed
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920/2, 1292/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1292/2-1)
+
+	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1920/2, 1230/2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1230/2-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Nintendo Game & Watch: Donkey Kong (model DK-52)
   * PCB label DK-52C
   * Sharp SM510 label DK-52 52ZD (no decap)
@@ -6886,6 +6972,17 @@ ROM_START( exospace )
 	ROM_LOAD( "exospace.svg", 0, 66790, BAD_DUMP CRC(df31043a) SHA1(2d8caf42894df699e469652e5f448beaebbcc1ae) )
 ROM_END
 
+ROM_START( gnw_opanic )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "op-51", 0x0000, 0x1000, CRC(31c288c9) SHA1(4bfd0fba94a9927cefc925db8196b063c5dd9b19) )
+
+	ROM_REGION( 79616, "svg_top", 0)
+	ROM_LOAD( "gnw_opanic_top.svg", 0, 79616, CRC(208dccc5) SHA1(b3cd3dcc8a00ba3b1b8d93d902f756fe579e4dfc) )
+
+	ROM_REGION( 112809, "svg_bottom", 0)
+	ROM_LOAD( "gnw_opanic_bottom.svg", 0, 112809, CRC(919b9649) SHA1(f3d3c8ca3fed81782a1fcb5a7aff07faea86db07) )
+ROM_END
+
 ROM_START( gnw_dkong )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
@@ -7499,6 +7596,7 @@ CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_sta
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
 
 // multi screen
+CONS( 1982, gnw_opanic,  0,          0, gnw_opanic,  gnw_opanic,  gnw_opanic_state,  empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE)
 CONS( 1982, gnw_dkong,   0,          0, gnw_dkong,   gnw_dkong,   gnw_dkong_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_state, empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_ghouse,  0,          0, gnw_ghouse,  gnw_ghouse,  gnw_ghouse_state,  empty_init, "Nintendo", "Game & Watch: Green House", MACHINE_SUPPORTS_SAVE )
